@@ -13,6 +13,11 @@
               message="Code is required"
             ></dxi-validation-rule>
           </dx-validator>
+           <dxi-validation-rule
+            type="pattern"
+            [pattern]="'^[a-zA-Z0-9]+$'"
+            message="Code should be alphanumeric only"
+          ></dxi-validation-rule>
         </dx-text-box>
       </div>
     </dxi-item>
@@ -231,7 +236,12 @@
             <dxi-validation-rule
               type="required"
               message="This Field is required"
-            ></dxi-validation-rule> </dx-validator
+            ></dxi-validation-rule> 
+            <dxi-validation-rule
+              type="email"
+              message="Enter a valid email address">
+            </dxi-validation-rule>
+            </dx-validator
         ></dx-text-box>
       </div>
     </dxi-item>

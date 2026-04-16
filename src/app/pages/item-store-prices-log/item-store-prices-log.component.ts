@@ -59,7 +59,7 @@ type ButtonConfig = CustomButton | NamedButton;
 })
 export class ItemStorePricesLogComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   logList: any;
   showHeaderFilter = true;
   isVerified: boolean = false;
@@ -81,8 +81,8 @@ export class ItemStorePricesLogComponent {
       hint: 'Approve',
       icon: 'check',
       text: 'Approve',
-      onClick: (e) => this.onApproveClick(e),
-      visible: (e) => e.row.data.isVerified && !e.row.data.isApproved,
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) => e.row.data.isVerified && !e.row.data.isApproved,
     },
   ];
   allButtonsEditDelete = [
@@ -92,17 +92,17 @@ export class ItemStorePricesLogComponent {
     },
     {
       name: 'delete',
-      visible: (e) => !e.row.data.isVerified && !e.row.data.isApproved,
+      visible: (e: any) => !e.row.data.isVerified && !e.row.data.isApproved,
     },
   ];
   selectWorksheetData: any;
   selectedWorksheetData: any;
   logStatusMap: { [key: number]: string } = {};
   status: any;
-  AllowCommitWithSave: string;
-  dateFormat: string;
-  currencyFormt: string;
-  isFormVisible: boolean;
+  AllowCommitWithSave: any;
+  dateFormat: any;
+  currencyFormt: any;
+  isFormVisible: boolean = false;
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -167,8 +167,8 @@ export class ItemStorePricesLogComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/credit-note');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -217,7 +217,7 @@ export class ItemStorePricesLogComponent {
       .getWorksheetItemStorePrices()
       .subscribe((response: any) => {
         this.logList = response.dataworksheet
-          .map((item) => {
+          .map((item: any) => {
             this.logStatusMap[item.WS_NO] = item.Status;
             return {
               ...item,
@@ -225,8 +225,8 @@ export class ItemStorePricesLogComponent {
               isApproved: item.Status === 'Approved',
             };
           })
-          .sort((a, b) => b.WS_NO - a.WS_NO);
-        this.logList.forEach((item) => {
+          .sort((a: any, b: any) => b.WS_NO - a.WS_NO);
+        this.logList.forEach((item: any) => {
           if (item.isVerified) {
           } else if (item.isApproved) {
           } else {
@@ -244,7 +244,7 @@ export class ItemStorePricesLogComponent {
       .selectWorksheetForPrice(worksheetId)
       .subscribe((response: any) => {
         const ws = this.logList.find(
-          (worksheet) => worksheet.ID == response.ID,
+          (worksheet: any) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
         this.selectedWorksheetData = { ...response, status: this.status };
@@ -277,7 +277,7 @@ export class ItemStorePricesLogComponent {
       .selectWorksheetForPrice(worksheetId)
       .subscribe((response: any) => {
         const ws = this.logList.find(
-          (worksheet) => worksheet.ID == response.ID,
+          (worksheet: any) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
         this.selectedWorksheetData = { ...response, status: this.status };
@@ -335,7 +335,7 @@ export class ItemStorePricesLogComponent {
       .selectWorksheetForPrice(worksheetId)
       .subscribe((response: any) => {
         const ws = this.logList.find(
-          (worksheet) => worksheet.ID == response.ID,
+          (worksheet: any) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
 
@@ -378,7 +378,7 @@ export class ItemStorePricesLogComponent {
     const { worksheet_item_store, ...cleanedPayload } = selectedWorksheetData;
 
     const storId = selectedWorksheetData.worksheet_item_store.map(
-      (storeID) => storeID.STORE_ID,
+      (storeID: any) => storeID.STORE_ID,
     );
 
     const payload = {
@@ -395,7 +395,7 @@ export class ItemStorePricesLogComponent {
         if (response) {
           this.isApproved = true;
           const rowIndex = this.logList.findIndex(
-            (item) => item.ID === selectedWorksheetData.ID,
+            (item: any) => item.ID === selectedWorksheetData.ID,
           );
           if (rowIndex > -1) {
             this.logList[rowIndex].isApproved = true;
@@ -507,7 +507,7 @@ export class ItemStorePricesLogComponent {
     const { worksheet_item_store, ...cleanedPayload } = selectedWorksheetData;
 
     const storId = selectedWorksheetData.worksheet_item_store.map(
-      (storeID) => storeID.STORE_ID,
+      (storeID: any) => storeID.STORE_ID,
     );
 
     const payload = {
@@ -556,7 +556,7 @@ export class ItemStorePricesLogComponent {
               'error',
             );
           }
-          const index = this.logList.findIndex((item) => item.ID === id);
+          const index = this.logList.findIndex((item: any) => item.ID === id);
           if (index !== -1) {
             this.logList.splice(index, 1); // Remove item from the array
             event.component.refresh(); // Refresh the DataGrid

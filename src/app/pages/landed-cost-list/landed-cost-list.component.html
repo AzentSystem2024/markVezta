@@ -1,108 +1,103 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
     class="grid theme-dependent"
-    [dataSource]="landedcost"
+    [dataSource]="landedCostDataSource"
+    [height]="'82vh'"
     (onRowRemoving)="onRowRemoving($event)"
     [showBorders]="true"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
     (onExporting)="onExporting($event)"
     (onRowUpdating)="onRowUpdating($event)"
+    (onEditingStart)="onEditingStart($event)"
   >
-    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
-    <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
 
-    <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-
-    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
-      <dxo-popup
-        title="Edit Landed Cost"
-        [showTitle]="true"
-        [width]="500"
-        [height]="450"
-      ></dxo-popup>
-      <dxo-form [colCount]="1">
-        <dxi-item itemType="group" [colCount]="2">
-          <dxi-item dataField="CODE"></dxi-item>
-          <dxi-item
-            dataField="IS_INACTIVE"
-            [colCount]="1"
-            editorType="dxCheckBox"
-            cssClass="checkbox-right"
-            [editorOptions]="{ text: 'Inactive' }"
-          >
-            <dxo-label [visible]="false"></dxo-label>
-          </dxi-item>
-        </dxi-item>
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item dataField="DESCRIPTION"></dxi-item>
-        </dxi-item>
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item
-            dataField="IS_LOCAL_CURRENCY"
-            [colSpan]="1"
-            editorType="dxRadioGroup"
-            [editorOptions]="{
-              items: currencyOptions,
-              value: isLocalCurrency,
-              layout: 'horizontal',
-            }"
-          >
-            <dxo-label [visible]="false"></dxo-label>
-          </dxi-item>
-        </dxi-item>
-        <dxi-item itemType="group" [colCount]="2">
-          <dxi-item
-            dataField="IS_FIXED_AMOUNT"
-            [colSpan]="1"
-            editorType="dxRadioGroup"
-            [editorOptions]="{
-              items: amountOptions,
-              value: isFixedAmount,
-              layout: 'horizontal',
-            }"
-          ></dxi-item>
-          <dxi-item dataField="VALUE" [colSpan]="1"></dxi-item>
-        </dxi-item>
-      </dxo-form>
-    </dxo-editing>
-    <dxo-search-panel
+    <dxo-pager
       [visible]="true"
-      placeholder="Data Search"
-    ></dxo-search-panel>
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+  
+    <dxo-filter-row [visible]="isFilterOpened"></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+  <dxo-popup
+    title="Edit Landed Cost"
+    [showTitle]="true"
+    [width]="500"
+    [height]="450"
+  ></dxo-popup>
+
+  <!-- <dxo-form>
+    <dxi-item>
+      <div *dxTemplate>
+        <app-landed-cost-form
+          [formData]="editingRowData"
+        ></app-landed-cost-form>
+      </div>
+    </dxi-item>
+  </dxo-form> -->
+</dxo-editing>
+    
     <dxo-toolbar>
-      <dxi-item location="before">
-        <div class="grid-header">Landed Cost</div>
-      </dxi-item>
 
-      <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
+  <!-- Title -->
+  <dxi-item location="before">
+    <div
+      class="grid-header"
+      style="font-weight: 600; font-size: 20px; margin-left: 12px"
+    >
+      Landed Cost
+    </div>
+  </dxi-item>
 
-      <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          text: 'Refresh',
-          icon: 'refresh',
-          stylingMode: 'text',
-        }"
-      ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
-      <dxi-item name="exportButton"></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
-      <dxi-item
-        location="after"
-        widget="dxButton"
-        [options]="addButtonOptions"
-      ></dxi-item>
-    </dxo-toolbar>
+  <!-- Search Toggle -->
+  <dxi-item
+    location="after"
+    locateInMenu="auto"
+    widget="dxButton"
+    [options]="searchButtonOptions"
+  ></dxi-item>
+
+  <!-- Refresh -->
+  <dxi-item
+    location="after"
+    locateInMenu="auto"
+    widget="dxButton"
+    [options]="refreshButtonOptions"
+  ></dxi-item>
+
+  <!-- Divider -->
+  <dxi-item location="after">
+    <div class="toolbar-divider"></div>
+  </dxi-item>
+
+  <!-- Export -->
+  <dxi-item
+    name="exportButton"
+    location="after"
+    cssClass="export-btn"
+  ></dxi-item>
+
+  <!-- Add Button -->
+  <dxi-item
+    location="after"
+    locateInMenu="auto"
+    widget="dxButton"
+    [options]="addButtonOptions"
+  ></dxi-item>
+
+</dxo-toolbar>
 
     <dxi-column dataField="CODE" caption="Code" [visible]="false"> </dxi-column>
 
@@ -140,7 +135,21 @@
     [width]="500"
     (save)="onClickSaveLandedcost()"
     titleText="New Landed Cost"
+    [showApprove]="false"
   >
-    <app-landed-cost-form></app-landed-cost-form>
+    <app-landed-cost-form #addForm></app-landed-cost-form>
+  </form-popup>
+
+  <form-popup
+    [(visible)]="isEditLandedcostPopupOpened"
+    [width]="500"
+    (save)="onClickSaveLandedcost()"
+    titleText="Edit Landed Cost"
+    [showApprove]="false"
+  >
+    <app-landed-cost-form
+    #editForm
+    [formData]="editingRowData"
+    ></app-landed-cost-form>
   </form-popup>
 </div>

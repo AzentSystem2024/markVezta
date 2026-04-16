@@ -1361,32 +1361,50 @@ export class DataService {
 
   //-------------------------------------------------------------------------------------------------------------//
   getStoreItemPropertyList(): Observable<any> {
-    return this.http.post(this.apiUrlList, {});
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/itempropertylist`,
+      {},
+    );
   }
   verifyItemStoreProperties(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForVerify, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/Verify`,
+      payload,
+    );
   }
 
   approveworksheetItemProperty(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForApproval, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/Approval`,
+      payload,
+    );
   }
 
   //change item store properties
   saveWorksheetItemPropertyData(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForStoreProperties, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/insert`,
+      payload,
+    );
   }
 
   updateworksheetItemProperty(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForStorePropertyUpdate, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/update`,
+      payload,
+    );
   }
 
   selectWorksheet(id: number): Observable<any> {
-    return this.http.post(`${this.apiUrlForSelectWorksheet}/${id}`, {});
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/select/${id}`,
+      {},
+    );
   }
 
   //store item property log
   public getWorksheetItemPropertyLog(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/worksheetitemproperty/list`, {});
+    return this.http.post(`${this.apiUrl}worksheetitemproperty/list`, {});
   }
 
   deleteWorksheet(id: number): Observable<any> {
@@ -2832,7 +2850,7 @@ export class DataService {
 
   //tenders
   public getTendersData(): Observable<any> {
-    return this.http.post(`${this.apiUrl}tender/list`, {});
+    return this.http.post(`${this.apiUrl}tenders/list`, {});
   }
   public postTendersData(
     CODE: any,
@@ -2859,7 +2877,7 @@ export class DataService {
       ADDITIONAL_INFO_REQUIRED,
     };
 
-    return this.http.post(`${this.apiUrl}tender/save`, data);
+    return this.http.post(`${this.apiUrl}tenders/save`, data);
   }
 
   removeTenders(
@@ -2888,12 +2906,16 @@ export class DataService {
       ADDITIONAL_INFO_REQUIRED: additional_info,
     };
     return this.http.post<any>(
-      `${this.apiUrl}tender/delete/` + id,
+      `${this.apiUrl}tenders/delete/` + id,
       requestBody,
     );
   }
   updateTenders(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}tender/save`, data);
+    return this.http.post<any>(`${this.apiUrl}tenders/save`, data);
+  }
+
+  public selectTenders(id: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}tenders/select/${id}`, {});
   }
 
   //reasons
@@ -3495,28 +3517,28 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-  //Promotion Schema
+  //  ion Schema
   getPromotionSchemaLog(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}promotionschema/list`, {});
   }
 
   savePromotionSchema(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/insert`,
+      `${this.apiUrl}promotionschema/insert`,
       payload,
     );
   }
 
   selectPromotionSchema(id: number): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/select/${id}`,
+      `${this.apiUrl}promotionschema/select/${id}`,
       {},
     );
   }
 
   updatePromotionSchema(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}/promotionschema/update`,
+      `${this.apiUrl}promotionschema/update`,
       payload,
     );
   }

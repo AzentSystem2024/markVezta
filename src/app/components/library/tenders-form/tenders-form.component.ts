@@ -4,12 +4,16 @@ import {
   enableProdMode,
   OnInit,
   ViewChild,
+  Input,
+  SimpleChanges,
+  OnChanges,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
 import {
   DxCheckBoxModule,
+  DxNumberBoxModule,
   DxValidationGroupComponent,
   DxValidationGroupModule,
   DxValidatorModule,
@@ -29,7 +33,8 @@ import { DataService } from 'src/app/services';
   templateUrl: './tenders-form.component.html',
   styleUrls: ['./tenders-form.component.scss'],
 })
-export class TendersFormComponent implements OnInit {
+export class TendersFormComponent implements OnInit, OnChanges {
+  @Input() formData: any;
   @ViewChild(DxValidationGroupComponent)
   validationGroup: DxValidationGroupComponent;
   additionalInformationRequired: boolean = false;
@@ -39,7 +44,7 @@ export class TendersFormComponent implements OnInit {
   VATRuleDropdownData: any[] = [];
   TenderTypeDropdownData: any[] = [];
 
-  formTenderData = {
+  formTenderData :any = {
     CODE: '',
     IS_INACTIVE: this.isInactive,
     DESCRIPTION: '',
@@ -57,12 +62,17 @@ export class TendersFormComponent implements OnInit {
   getNewTenderData = () => ({ ...this.newTender });
 
   getVATRuleDropDown() {
-    this.service.getCurrencyData().subscribe((data: any) => {
+    const dropdowncurrency = {
+      name:'CURRENCY'
+    }
+    this.service.getDropdownData(dropdowncurrency).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
     });
   }
   getTenderTypeDropDown() {
-    const dropdowntender = 'TENDERTYPE';
+    const dropdowntender = {
+      name:'TENDERTYPE'
+    }
     this.service.getDropdownData(dropdowntender).subscribe((data: any) => {
       this.TenderTypeDropdownData = data;
     });
@@ -71,6 +81,18 @@ export class TendersFormComponent implements OnInit {
     this.getTenderTypeDropDown();
     this.getVATRuleDropDown();
   }
+  
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['formData'] && this.formData) {
+      this.newTender = this.formData;
+      this.allowOpening = this.formData.ALLOW_OPENING;
+      this.allowDeclaration = this.formData.ALLOW_DECLARATION;
+      this.additionalInformationRequired = this.formData.ADDITIONAL_INFO_REQUIRED;
+  
+      console.log(this.formData, 'formData received in child');
+    }
+  }
+
   onValueChangedOpening(value: boolean) {
     this.formTenderData.ALLOW_OPENING = value;
   }
@@ -94,6 +116,7 @@ export class TendersFormComponent implements OnInit {
     DxCheckBoxModule,
     DxValidationGroupModule,
     DxValidatorModule,
+    DxNumberBoxModule
   ],
   declarations: [TendersFormComponent],
   exports: [TendersFormComponent],

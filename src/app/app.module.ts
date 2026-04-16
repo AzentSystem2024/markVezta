@@ -391,6 +391,10 @@ import {
   AddInvoiceRetailComponent,
   AddInvoiceRetailModule,
 } from './pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
+import {
+  EditItemStorePropertyComponent,
+  EditItemStorePropertyModule,
+} from './pop-up/operations/edit-item-store-property/edit-item-store-property.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -766,6 +770,7 @@ import {
     PayrollViewReportModule,
     InvoiceRetailModule,
     AddInvoiceRetailModule,
+    EditItemStorePropertyModule,
   ],
 
   providers: [

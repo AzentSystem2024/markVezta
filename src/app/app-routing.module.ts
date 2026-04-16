@@ -174,6 +174,12 @@ import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.co
 import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
 import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
 import { InvoiceRetailComponent } from './pages/Operations/invoice-retail/invoice-retail.component';
+// import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
+// import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
+// import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
+import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
+import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
+import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -1062,8 +1068,13 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'promotion-vertify',
-        component: PromotionViewComponent,
+        path: 'promotion-verify',
+        component: PromotionApproveComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-store-properties-log',
+        component: ItemStorePropertiesLogComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1100,12 +1111,21 @@ const routes: Routes = [
       },
       {
         path: 'item-change-property',
+        component: ItemStorePropertiesLogComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-change-property-add',
         component: ItemStorePropertiesComponent,
         canActivate: [AuthGuardService],
       },
       {
         path: 'invoice-retail',
         component: InvoiceRetailComponent,
+      },
+      {
+        path: 'item-change-property-Edit',
+        component: ItemStorePropertiesEditComponent,
         canActivate: [AuthGuardService],
       },
       {

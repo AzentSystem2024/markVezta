@@ -37,9 +37,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-// import { ArticleAddModule } from '../article-add/article-add.component';
-// import { ArticleEditModule } from '../article-edit/article-edit.component';
-import { ArticleListComponent } from '../article-list/article-list.component';
 import { DataService } from 'src/app/services';
 import {
   PackingAddComponent,
@@ -240,7 +237,6 @@ export class PackingComponent {
     const id = event.data.ID;
     event.cancel = true;
     this.dataService.Delete_Package_Api(id).subscribe((res: any) => {
-      // this.dataGrid.instance.refresh();
       notify(
         {
           message: 'Data succesfully added',
