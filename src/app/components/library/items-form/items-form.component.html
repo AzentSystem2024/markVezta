@@ -16,6 +16,13 @@
                       type="required"
                       message="This field is required"
                     ></dxi-validation-rule>
+
+                    <dxi-validation-rule
+                    type="pattern"
+                    [pattern]="'^[a-zA-Z0-9]+$'"
+                    message="Only alphanumeric allowed"
+                  ></dxi-validation-rule>
+
                   </dx-validator>
                 </dx-text-box>
               </div>
@@ -24,7 +31,7 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-text-box
-                  label="Bar Code *"
+                  label="BarCode *"
                   labelMode="floating"
                   [(value)]="newItems.BARCODE"
                 >
@@ -45,7 +52,7 @@
               <div *dxTemplate>
                 <dx-select-box
                   class="field-spacing"
-                  label="Item Type"
+                  label="Item Type *"
                   displayExpr="DESCRIPTION"
                   [searchEnabled]="true"
                   [items]="itemtype"
@@ -61,6 +68,7 @@
                       message="This field is required"
                     ></dxi-validation-rule>
                   </dx-validator>
+
                 </dx-select-box>
               </div>
             </dxi-item>
@@ -136,21 +144,6 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-select-box
-                  label="Brand"
-                  labelMode="floating"
-                  [items]="brand"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
-                  placeholder="Select Brand"
-                  [searchEnabled]="true"
-                  [(value)]="newItems.BRAND_ID"
-                >
-                </dx-select-box>
-              </div>
-            </dxi-item>
-            <dxi-item>
-              <div *dxTemplate>
-                <dx-select-box
                   label="Category"
                   labelMode="floating"
                   [items]="catagory"
@@ -168,9 +161,7 @@
                 ></dx-select-box>
               </div>
             </dxi-item>
-          </dxi-item>
-          <dxi-item itemType="group" [colCount]="2"> </dxi-item>
-          <dxi-item itemType="group" [colCount]="2">
+
             <dxi-item>
               <div *dxTemplate>
                 <dx-select-box
@@ -191,10 +182,28 @@
                 ></dx-select-box>
               </div>
             </dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2"> </dxi-item>
+          <dxi-item itemType="group" [colCount]="2">
+            <dxi-item>
+              <div *dxTemplate>
+                <dx-select-box
+                  label="Brand"
+                  labelMode="floating"
+                  [items]="brand"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  placeholder="Select Brand"
+                  [searchEnabled]="true"
+                  [(value)]="newItems.BRAND_ID"
+                >
+                </dx-select-box>
+              </div>
+            </dxi-item>
             <dxi-item itemType="group" [colCount]="3">
               <div *dxTemplate>
                 <dx-select-box
-                  label="Item Tax"
+                  label="Item Tax *"
                   labelMode="floating"
                   [items]="VatClass"
                   valueExpr="ID"
@@ -256,16 +265,10 @@
             <dxi-item>
               <div *dxTemplate>
                 <dx-text-box
-                  label="HSN Code *"
+                  label="HSN Code"
                   labelMode="floating"
                   [(value)]="newItems.HSN_CODE"
                 >
-                  <dx-validator>
-                    <dxi-validation-rule
-                      type="required"
-                      message="This field is required"
-                    ></dxi-validation-rule>
-                  </dx-validator>
                 </dx-text-box>
               </div>
             </dxi-item>
@@ -648,6 +651,12 @@
                   [searchEnabled]="true"
                   [(value)]="newItems.COSTING_METHOD"
                 >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="This field is required"
+                  ></dxi-validation-rule>
+                </dx-validator>
                 </dx-select-box>
               </div>
               <div class="inventory-item">
@@ -896,7 +905,7 @@
           <div class="special-container">
             <dxi-item itemType="group" [colCount]="2">
               <dxi-item>
-                <dx-drop-down-box
+                <!-- <dx-drop-down-box
                   label="Select Parent Item"
                   labelMode="floating"
                   labelLocation="left"
@@ -927,7 +936,20 @@
                     >
                     </dx-data-grid>
                   </div>
-                </dx-drop-down-box>
+                </dx-drop-down-box> -->
+
+                <dx-select-box
+                  label="Select Parent Item"
+                  labelMode="floating"
+                  [(value)]="newItems.PARENT_ITEM_ID"
+                  [items]="parentitem"
+                  valueExpr="ID"
+                  displayExpr="DESCRIPTION"
+                  [searchEnabled]="true"
+                  [showClearButton]="true"
+                  placeholder="Select Parent Item"
+                >
+                </dx-select-box>
 
                 <!-- <dx-select-box
                   label="Parent Item"
@@ -948,13 +970,23 @@
               class="spacing-custom-items"
             >
               <dxi-item class="spacing-custom-items">
-                <dx-text-box
+                <dx-number-box
                   label="Child Quantity"
                   [width]="140"
                   labelMode="floating"
-                  [disabled]="!isParentItemSelected"
                   [(value)]="newItems.CHILD_QTY"
-                ></dx-text-box>
+                  [min]="0"
+                  [showSpinButtons]="true"
+                  [disabled]="!newItems.PARENT_ITEM_ID"
+                >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="custom"
+                    [validationCallback]="validateChildQty"
+                    message="Child Quantity must be greater than 0"
+                  ></dxi-validation-rule>
+                </dx-validator>
+              </dx-number-box>
               </dxi-item>
             </dxi-item>
             <dxi-item
@@ -1124,7 +1156,7 @@
           <!-- <dxo-editing mode="row" [allowAdding]="true" [allowDeleting]="true"> -->
           <!-- </dxo-editing> -->
 
-          <dxo-scrolling mode="standard"></dxo-scrolling>
+          <dxo-scrolling mode="virtual"></dxo-scrolling>
           <!-- <dxo-selection mode="multiple"> </dxo-selection> -->
           <dxi-column dataField="SUPP_ID" caption="Supplier Name">
             <dxo-lookup

@@ -496,6 +496,11 @@ export class CustomerFinFormComponent {
 
     return value.length === this.mobile_limit_Delivery_Address;
   };
+
+  allowOnlyNumbers(e: any) {
+    const value = e.event.target.value;
+    e.event.target.value = value.replace(/\D/g, '');
+  }
 }
 
 @NgModule({
