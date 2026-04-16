@@ -15,6 +15,7 @@ import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.c
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxNumberBoxModule,
   DxRadioGroupModule,
   DxTabPanelModule,
   DxValidationGroupModule,
@@ -65,7 +66,7 @@ export class CustomerFinEditFormComponent {
   phoneValue: any;
   editingIndex: number | null = null;
 
-  formCustomerData = {
+  formCustomerData:any = {
     WAREHOUSE_ID: '',
     DELIVERY_ADDRESS_ID: '',
     COMPANY_ID: this.selected_Company_id,
@@ -581,6 +582,11 @@ export class CustomerFinEditFormComponent {
 
     return value.length === this.mobile_limit_Delivery_Address;
   };
+
+  allowOnlyNumbers(e: any) {
+    const value = e.event.target.value;
+    e.event.target.value = value.replace(/\D/g, '');
+  }
 }
 
 @NgModule({
@@ -599,6 +605,7 @@ export class CustomerFinEditFormComponent {
     DxRadioGroupModule,
     DxTabPanelModule,
     DxButtonModule,
+    DxNumberBoxModule
   ],
   declarations: [CustomerFinEditFormComponent],
   exports: [CustomerFinEditFormComponent],

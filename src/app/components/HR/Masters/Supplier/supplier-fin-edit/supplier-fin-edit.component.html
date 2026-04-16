@@ -1,3 +1,4 @@
+<dx-validation-group #validationGroup>
 <dx-form class="plain-styled-form" [colCount]="3">
   <dxi-item itemType="group">
     <dxi-item itemType="group" [colCount]="1">
@@ -13,6 +14,16 @@
               <dx-validator>
                 <dxi-validation-rule type="required" message="Code is required">
                 </dxi-validation-rule>
+                <dxi-validation-rule
+                  type="pattern"
+                  [pattern]="'^[a-zA-Z0-9]+$'"
+                  message="Code should be alphanumeric only"
+              ></dxi-validation-rule>
+               <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateSupplierCode"
+                message="Code already exists"
+              ></dxi-validation-rule>
               </dx-validator>
             </dx-text-box>
           </div>
@@ -214,21 +225,19 @@
           <div *ngIf="supplierData">
             <div *dxTemplate>
               <dx-select-box
-                label="VAT Rule"
+                label="Tax Rule"
                 [items]="VATRuleDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
                 [(value)]="supplierData.VAT_RULE_ID"
-                placeholder="Select VAT Rule"
+                placeholder="Select Tax Rule"
                 labelMode="floating"
+                (onValueChanged)="onTaxRuleChange()"
               >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Select VAT rule"
-                  >
+                <dx-validator>
+                  <dxi-validation-rule type="required" message="Tax rule is required">
                   </dxi-validation-rule>
-                </dx-validator> -->
+                </dx-validator>
               </dx-select-box>
             </div>
           </div>
@@ -531,14 +540,15 @@
               label="VAT Registration Number"
               [(value)]="supplierData.VAT_REGNO"
               labelMode="floating"
+               [disabled]="supplierData.VAT_RULE_ID != 2"
             >
-              <!-- <dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="VAT registration number is required"
-                >
-                </dxi-validation-rule>
-              </dx-validator> -->
+              <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateVAT"
+                message="VAT Registration Number is required when Tax is applicable"
+              ></dxi-validation-rule>
+            </dx-validator>
             </dx-text-box>
           </div>
         </div>
@@ -629,6 +639,7 @@
         [keyExpr]="'ID'"
         [selectedRowKeys]="selectedLandedCostKeys"
         (onSelectionChanged)="onSelectedCostChanged($event)"
+        [disabled]="isCurrencyAccepted"
       >
         <dxo-paging [enabled]="false"></dxo-paging>
         <dxo-pager
@@ -660,4 +671,6 @@
     (onClick)="updateSupplier()"
   ></dx-button>
 </div>
+
+</dx-validation-group>
 

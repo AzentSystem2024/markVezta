@@ -31,7 +31,7 @@
               <dxi-item class="spacing-item">
                 <div *dxTemplate>
                   <dx-text-box
-                    label="Bar Code"
+                    label="BarCode"
                     [labelMode]="'floating'"
                     [(value)]="itemData.BARCODE"
                   >
@@ -117,7 +117,7 @@
             </dxi-item>
 
             <dxi-item itemType="group" [colCount]="2">
-              <dxi-item class="spacing-item">
+              <!-- <dxi-item class="spacing-item">
                 <div *dxTemplate>
                   <dx-select-box
                     label="Brand"
@@ -131,8 +131,8 @@
                   >
                   </dx-select-box>
                 </div>
-              </dxi-item>
-              <dxi-item class="spacing-item">
+              </dxi-item> -->
+              <!-- <dxi-item class="spacing-item">
                 <div *dxTemplate>
                   <dx-select-box
                     label="Category"
@@ -144,14 +144,9 @@
                     [labelMode]="'floating'"
                     [(value)]="itemData.CAT_ID"
                   >
-                    <dx-validator>
-                      <dxi-validation-rule
-                        type="required"
-                        message="This field is required"
-                      ></dxi-validation-rule> </dx-validator
-                  ></dx-select-box>
+                    </dx-select-box>
                 </div>
-              </dxi-item>
+              </dxi-item> -->
             </dxi-item>
             <dxi-item itemType="group" [colCount]="2" class="spacing-item">
             </dxi-item>
@@ -176,7 +171,69 @@
                   ></dx-select-box>
                 </div>
               </dxi-item>
-              <dxi-item itemType="group" [colCount]="3">
+
+              <dxi-item>
+                <div *dxTemplate>
+                  <dx-select-box
+                    label="Sub Category"
+                    [items]="subcatagory"
+                    displayExpr="SUBCAT_NAME"
+                    valueExpr="ID"
+                    placeholder="Select Sub Category"
+                    [searchEnabled]="true"
+                    [labelMode]="'floating'"
+                    [(value)]="itemData.SUBCAT_ID"
+                  >
+                    <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule> </dx-validator
+                  ></dx-select-box>
+                </div>
+              </dxi-item>
+
+            </dxi-item>
+            <dxi-item itemType="group" [colCount]="2" class="spacing-item">
+            </dxi-item>
+            <dxi-item itemType="group" [colCount]="2" class="spacing-item">
+              <!-- <dxi-item>
+                <div *dxTemplate>
+                  <dx-select-box
+                    label="Sub Category"
+                    [items]="subcatagory"
+                    displayExpr="SUBCAT_NAME"
+                    valueExpr="ID"
+                    placeholder="Select Sub Category"
+                    [searchEnabled]="true"
+                    [labelMode]="'floating'"
+                    [(value)]="itemData.SUBCAT_ID"
+                  >
+                    <dx-validator>
+                      <dxi-validation-rule
+                        type="required"
+                        message="This field is required"
+                      ></dxi-validation-rule> </dx-validator
+                  ></dx-select-box>
+                </div>
+              </dxi-item> -->
+
+              <dxi-item class="spacing-item">
+                <div *dxTemplate>
+                  <dx-select-box
+                    label="Brand"
+                    [items]="brand"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    placeholder="Select Brand"
+                    [searchEnabled]="true"
+                    [(value)]="itemData.BRAND_ID"
+                    [labelMode]="'floating'"
+                  >
+                  </dx-select-box>
+                </div>
+              </dxi-item> 
+              <dxi-item class="spacing-item">
                 <div *dxTemplate>
                   <dx-select-box
                     label="Item Tax"
@@ -198,29 +255,9 @@
                 </div>
               </dxi-item>
             </dxi-item>
+
             <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-            </dxi-item>
-            <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-              <dxi-item>
-                <div *dxTemplate>
-                  <dx-select-box
-                    label="Sub Category"
-                    [items]="subcatagory"
-                    displayExpr="SUBCAT_NAME"
-                    valueExpr="ID"
-                    placeholder="Select Sub Category"
-                    [searchEnabled]="true"
-                    [labelMode]="'floating'"
-                    [(value)]="itemData.SUBCAT_ID"
-                  >
-                    <dx-validator>
-                      <dxi-validation-rule
-                        type="required"
-                        message="This field is required"
-                      ></dxi-validation-rule> </dx-validator
-                  ></dx-select-box>
-                </div>
-              </dxi-item>
+
               <dxi-item class="spacing-item">
                 <div *dxTemplate>
                   <dx-select-box
@@ -243,9 +280,7 @@
                   </dx-select-box>
                 </div>
               </dxi-item>
-            </dxi-item>
-
-            <dxi-item itemType="group" [colCount]="2" class="spacing-item">
+              
               <dxi-item>
                 <div *dxTemplate>
                   <dx-text-box
@@ -267,28 +302,7 @@
                   </dx-text-box>
                 </div>
               </dxi-item> -->
-              <dxi-item class="spacing-item">
-                <div *dxTemplate>
-                  <dx-select-box
-                    label="Unit of Measure"
-                    labelMode="floating"
-                    [items]="uom"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    placeholder="Select Unit"
-                    [searchEnabled]="true"
-                    [(value)]="itemData.UNIT_ID"
-                    (onValueChanged)="onUOMChange($event)"
-                  >
-                    <dx-validator>
-                      <dxi-validation-rule
-                        type="required"
-                        message="This field is required"
-                      ></dxi-validation-rule>
-                    </dx-validator>
-                  </dx-select-box>
-                </div>
-              </dxi-item>
+              
             </dxi-item>
 
             <dxi-item itemType="group" [colCount]="3" class="spacing-item">
@@ -319,15 +333,19 @@
               </dxi-item>
 
               <dxi-item *ngIf="itemData.IS_DIFFERENT_UOM_PURCH">
-                <dx-text-box
-                  label="Conversion Quantity"
-                  [(value)]="itemData.UOM_MULTPLE"
-                  placeholder="Conversion Quantity"
-                  [width]="190"
-                  labelMode="floating"
-                  [disabled]="!itemData.IS_DIFFERENT_UOM_PURCH"
-                >
-                </dx-text-box>
+                <dx-number-box
+                label="Conversion Quantity"
+                [(value)]="itemData.UOM_MULTPLE"
+                placeholder="Conversion Quantity"
+                [width]="190"
+                labelMode="floating"
+                [disabled]="!itemData.IS_DIFFERENT_UOM_PURCH"
+                [min]="0"
+                [step]="0.01"
+                format="#0.00"
+                [showSpinButtons]="true"
+              >
+              </dx-number-box>
               </dxi-item>
             </dxi-item>
             <dxi-item itemType="group" [colCount]="2" class="spacing-item">

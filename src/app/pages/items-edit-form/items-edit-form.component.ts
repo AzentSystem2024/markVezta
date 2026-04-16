@@ -52,6 +52,7 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { BrowserModule } from '@angular/platform-browser';
 import notify from 'devextreme/ui/notify';
+import { isNullOrEmptyString } from '@devexpress/analytics-core/analytics-internal';
 
 @Component({
   selector: 'app-items-edit-form',
@@ -218,7 +219,7 @@ export class ItemsEditFormComponent implements OnInit {
     IMAGE_NAME: '',
     DESCRIPTION: '',
     ARABIC_DESCRIPTION: '',
-    TYPE_ID: '',
+    TYPE_ID: null,
     DEPT_ID: '',
     CAT_ID: '',
     SUBCAT_ID: '',
@@ -229,8 +230,8 @@ export class ItemsEditFormComponent implements OnInit {
     MATRIX_CODE: '',
     ITEM_PROPERTY4: '',
     ITEM_PROPERTY5: '',
-    VAT_CLASS_ID: '',
-    UNIT_ID: '',
+    VAT_CLASS_ID: null,
+    UNIT_ID: isNullOrEmptyString,
     PACKING_ID: '',
     LONG_DESCRIPTION: '',
     SALE_PRICE: '',

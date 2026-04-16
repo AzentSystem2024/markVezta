@@ -24,6 +24,7 @@ import {
   DxSelectBoxModule,
   DxTextAreaModule,
   DxTextBoxModule,
+  DxValidationGroupComponent,
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
@@ -50,6 +51,8 @@ export class SupplierFinEditComponent {
     @ViewChild('landedCostGrid', { static: false })
     landedCostGrid!: DxDataGridComponent;
     @ViewChild(SupplierFormComponent) itemsComponent: SupplierFormComponent;
+    @ViewChild(DxValidationGroupComponent)
+    validationGroup!: DxValidationGroupComponent;
     popupVisible: boolean = true;
     CountryDropdownData: any[] = [];
     VATRuleDropdownData: any[] = [];
@@ -62,7 +65,7 @@ export class SupplierFinEditComponent {
     selectedLandedCosts: { COST_ID: number }[] = [];
     selectedSupp: { SUPP_ID: number }[] = [];
     selecte_countyId: any;
-    formSupplierData = {
+    formSupplierData:any= {
       ID: '',
       HQID: 1,
       SUPP_CODE: '',
@@ -220,10 +223,16 @@ export class SupplierFinEditComponent {
         const [countryCode, number] = MobileNo.split('-');
         this.countryCode = countryCode;
         this.Supplier_mobile = number;
-        const phoneNo = this.supplierData.PHONE;
-        const [countryCodePhone, phonenumber] = phoneNo.split('-');
-        this.countryCodePhone = countryCodePhone;
-        this.PhoneNumber = phonenumber;
+        const phoneNo = this.supplierData.PHONE || '';
+        if (phoneNo.includes('-')) {
+          const [code, number] = phoneNo.split('-');
+          this.countryCodePhone = code;
+          this.PhoneNumber = number;
+        } else {
+          // fallback
+          this.countryCodePhone = this.DEFAULT_COUNTRY_CODE; // or ''
+          this.PhoneNumber = phoneNo;
+        }
         console.log(this.countryCodePhone, this.PhoneNumber);
         this.onCountrycodeChange({ value: this.countryCode });
         this.onCountrycodeChangePhone({ value: this.countryCodePhone });
@@ -415,12 +424,19 @@ export class SupplierFinEditComponent {
     }
   
     updateSupplier() {
+
+      const result = this.validationGroup.instance.validate();
+
+      if (!result.isValid) {
+        return; // stop API call
+      }
+
       const payload = {
         ...this.supplierData,
         SUPP_CAT_ID: this.Supplier_Category,
         PURCH_TYPE: this.purchType,
         MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
-        PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
+        PHONE: this.countryCode + '-' + this.PhoneNumber,
       };
       console.log(payload, 'PAYLOADINEDIT');
       this.dataservice
@@ -429,7 +445,7 @@ export class SupplierFinEditComponent {
           try {
             notify(
               {
-                message: 'Supplier updatedddd successfully',
+                message: 'Supplier updated successfully',
                 position: { at: 'top right', my: 'top right' },
               },
               'success',
@@ -504,6 +520,41 @@ export class SupplierFinEditComponent {
   
       return value.length === this.Phone_limit;
     };
+
+    validateVAT = (e: any): boolean => {
+    // If NOT applicable → always valid
+    if (this.supplierData.VAT_RULE_ID != 2) {
+      return true;
+    }
+
+    // If applicable → must have value
+    return !!(e.value && e.value.trim().length > 0);
+  };
+
+  onTaxRuleChange() {
+  if (this.supplierData.VAT_RULE_ID != 2) {
+    // Clear VAT value (optional but recommended)
+    this.supplierData.VAT_REGNO = '';
+  }
+}
+
+validateSupplierCode = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.supplier) return true;
+
+  const currentId = this.supplierData?.ID; //  FIX HERE
+
+  return !this.supplier.some((item: any) => {
+    const sameCode = item.SUPP_CODE?.toLowerCase() === value;
+
+    // skip current editing record
+    const isSameId = Number(item.ID) === Number(currentId);
+
+    return sameCode && !isSameId;
+  });
+};
+
 }
 @NgModule({
   imports: [
