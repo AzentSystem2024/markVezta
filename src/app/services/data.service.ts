@@ -1389,7 +1389,10 @@ export class DataService {
   }
 
   updateworksheetItemProperty(payload: any): Observable<any> {
-    return this.http.post(this.apiUrlForStorePropertyUpdate, payload);
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/update`,
+      payload,
+    );
   }
 
   selectWorksheet(id: number): Observable<any> {
@@ -3730,7 +3733,7 @@ The result can be exported to HTML or Markdown.`;
     };
     return this.http.post(`${this.apiUrl}grn/pendingpo`, reqBodyData);
   }
-public getPendingPoItems(payload:any): Observable<any> {
+  public getPendingPoItems(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}grn/pendingpolist`, payload);
   }
   saveGrnData(items: Object): Observable<any> {

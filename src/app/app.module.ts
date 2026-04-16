@@ -383,6 +383,10 @@ import {
   PayrollViewReportComponent,
   PayrollViewReportModule,
 } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
+import {
+  EditItemStorePropertyComponent,
+  EditItemStorePropertyModule,
+} from './pop-up/operations/edit-item-store-property/edit-item-store-property.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -756,6 +760,7 @@ import {
     SupplierFinFormModule,
     SupplierFinEditModule,
     PayrollViewReportModule,
+    EditItemStorePropertyModule,
   ],
 
   providers: [

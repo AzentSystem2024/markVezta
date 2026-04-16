@@ -50,6 +50,7 @@ export class ItemStorePropertiesEditComponent {
   // @Input() selectedWorksheetData: any;
   dataGrid!: DxDataGridComponent;
   @Input() selectedWorksheetData: any;
+  
   items: any;
   itemsList: any;
   isListVisible: boolean = false;
@@ -104,7 +105,7 @@ export class ItemStorePropertiesEditComponent {
   AllowCommitWithSave: any;
   isVerified: boolean = false;
   selected_Company_id: any;
-
+  selectedData: any;
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -130,6 +131,13 @@ export class ItemStorePropertiesEditComponent {
     this.updateColumnVisibility();
     this.extractStoreProperties(this.store);
     this.extractChangedProperties();
+
+    const data = history.state.worksheetData;
+
+    if (data) {
+      this.selectedData = data;
+      console.log('Received via router:', data);
+    }
   }
 
   subscribeToWorksheetData() {
@@ -201,32 +209,32 @@ export class ItemStorePropertiesEditComponent {
       },
     );
   }
-
-  onSelectionChanged(event: any) {
-    this.selectedRowCount = event.selectedRowKeys.length;
-    // this.selectedRowIds = event.selectedRowKeys;
-    this.selectedRowKeys = this.selectedRowIds;
-    const currentSelectedRowKeys = event.currentSelectedRowKeys;
-    if (currentSelectedRowKeys.length > 0) {
-      const selectedRow = currentSelectedRowKeys; // Get the first selected row
-      this.selectedRowId = selectedRow.ITEM_ID; // Capture the row ID
-      this.selectedItemId = selectedRow.ITEM_ID;
-      this.inactiveoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_INACTIVE_NEW'];
-      this.NotDiscounteoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_DISCOUNTABLE_NEW'];
-      this.NotSaleoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_ITEM_NEW'];
-      this.NotSaleReturnoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_RETURN_NEW'];
-      this.NotPriceoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_PRICE_REQUIRED_NEW'];
-      this.fetchSelectedItem(this.selectedRowId);
-    } else {
-      this.selectedRowId = null;
-      this.selectedItemId = null;
-    }
-  }
+  onSelectionChanged(event: any) {}
+  // onSelectionChanged(event: any) {
+  //   this.selectedRowCount = event.selectedRowKeys.length;
+  //   // this.selectedRowIds = event.selectedRowKeys;
+  //   this.selectedRowKeys = this.selectedRowIds;
+  //   const currentSelectedRowKeys = event.currentSelectedRowKeys;
+  //   if (currentSelectedRowKeys.length > 0) {
+  //     const selectedRow = currentSelectedRowKeys; // Get the first selected row
+  //     this.selectedRowId = selectedRow.ITEM_ID; // Capture the row ID
+  //     this.selectedItemId = selectedRow.ITEM_ID;
+  //     this.inactiveoldValue =
+  //       this.oldValues[this.selectedRowId]?.['IS_INACTIVE_NEW'];
+  //     this.NotDiscounteoldValue =
+  //       this.oldValues[this.selectedRowId]?.['IS_NOT_DISCOUNTABLE_NEW'];
+  //     this.NotSaleoldValue =
+  //       this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_ITEM_NEW'];
+  //     this.NotSaleReturnoldValue =
+  //       this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_RETURN_NEW'];
+  //     this.NotPriceoldValue =
+  //       this.oldValues[this.selectedRowId]?.['IS_PRICE_REQUIRED_NEW'];
+  //     this.fetchSelectedItem(this.selectedRowId);
+  //   } else {
+  //     this.selectedRowId = null;
+  //     this.selectedItemId = null;
+  //   }
+  // }
 
   fetchSelectedItem(id: number): void {
     this.dataservice.selectItems(id).subscribe(
