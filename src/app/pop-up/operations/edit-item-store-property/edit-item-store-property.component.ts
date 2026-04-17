@@ -49,6 +49,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-edit-item-store-property',
@@ -122,7 +123,14 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
   selectedGridData: any;
   updatedRows: any[] = [];
   selectedId: any;
-
+  selectedworksheetdata: any;
+  approveValue: boolean = false;
+  ApproveStatus: boolean = false;
+  readOnly: boolean = false;
+  selectedNarration: any;
+  statusValue: any = 0;
+  allowVerify: boolean = false;
+  VerifiedData: boolean = false;
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -141,7 +149,15 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
       const newDataKey = newData?.ID || JSON.stringify(newData);
       this.selectedStoreId = newData.STORE_ID || this.selectedStoreId;
       this.selectedId = newData.ID || this.selectedId;
+      this.selectedworksheetdata = newData.worksheet_item_property;
+      this.selectedNarration = newData.NARRATION || this.selectedNarration;
+      this.statusValue = newData.Status;
+      this.allowVerify = this.statusValue === '1';
+      this.VerifiedData = this.statusValue === '2';
 
+      this.readOnly = this.statusValue === '5';
+
+      this.cdr.detectChanges();
       if (
         newData &&
         newDataKey !== this.previousDataKey &&
@@ -209,12 +225,22 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
       this.cdr.detectChanges();
     }, 100);
   }
+  SaveBtnText() {
+    if (this.VerifiedData) {
+      return 'Approve';
+    } else if (this.approveValue) {
+      return 'Verify';
+    } else {
+      return 'Update';
+    }
+  }
 
   sesstion_Details() {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID;
+    this.userId = sessionData.USER_ID;
   }
 
   loadStore() {
@@ -223,6 +249,7 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
       this.store = response;
     });
   }
+  onApprovedChanged(e: any) {}
 
   onDropdownValueChanged(event: any) {
     this.storeId = event.value;
@@ -284,16 +311,17 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
   }
 
   updateColumnVisibility() {
-    this.showIsNotSaleItem = this.selectedProperties.includes('Not Sale Item');
+    this.showIsNotSaleItem = this.selectedProperties?.includes('Not Sale Item');
     this.showIsNotSaleReturn =
-      this.selectedProperties.includes('Not Sale Return');
+      this.selectedProperties?.includes('Not Sale Return');
     this.showIsNotDiscountable =
-      this.selectedProperties.includes('Not Discountable');
+      this.selectedProperties?.includes('Not Discountable');
     this.showIsPriceRequired =
-      this.selectedProperties.includes('Price Required');
-    this.showIsInactive = this.selectedProperties.includes('Inactive');
-  }
+      this.selectedProperties?.includes('Price Required');
+    this.showIsInactive = this.selectedProperties?.includes('Inactive');
 
+    this.cdr.detectChanges(); // 🔥 important
+  }
   onInactiveValueChanged(e: any) {
     console.log('Inactive value changed:', e);
   }
@@ -368,6 +396,11 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
       this.selectedRowKeys.includes(item.ITEM_ID),
     );
     console.log('Worksheet Item Property to Save:', worksheetItemProperty);
+    const worksheetItemPropertypayload =
+      worksheetItemProperty && worksheetItemProperty.length > 0
+        ? worksheetItemProperty
+        : this.selectedworksheetdata;
+
     const payload = {
       ID: this.selectedId,
       WS_NO: '',
@@ -375,25 +408,78 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
       STORE_ID: this.selectedStoreId.toString(),
       USER_ID: this.userId || 0,
       COMPANY_ID: this.selected_Company_id || 0,
-      NARRATION: '',
-      worksheet_item_property: worksheetItemProperty
-        ? worksheetItemProperty
-        : this.selectedData.worksheet_item_property,
+      NARRATION: this.selectedNarration,
+      Status: this.statusValue,
+      worksheet_item_property: worksheetItemPropertypayload,
     };
-    // Collect changed data
-    // console.log('FINAL DATA:', finalData);
-    this.dataservice.updateworksheetItemProperty(payload).subscribe(
-      (response: any) => {
-        if (response) {
-          this.isSaved = true;
-          notify('Data saved successfully', 'success', 2000);
+
+    if (this.approveValue) {
+      this.dataservice.verifyItemStoreProperties(payload).subscribe(
+        (res: any) => {
+          this.popupClosed.emit();
+
+          notify(
+            {
+              message:
+                'Worksheet item property verify and committed successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+          this.approveValue = false;
+        },
+        (error) => {
+          notify('Failed to approve worksheet item property.', 'error', 2000);
+          console.error(error);
+        },
+      );
+    } else if (this.statusValue === '2') {
+      confirm(
+        'It will approve and commit. Are you sure you want to commit?',
+        'Confirm Commit',
+      ).then((result: any) => {
+        if (result) {
+          this.dataservice.approveworksheetItemProperty(payload).subscribe(
+            (res: any) => {
+              this.popupClosed.emit();
+
+              notify(
+                {
+                  message:
+                    'Worksheet item property approved and committed successfully',
+                  position: { at: 'top right', my: 'top right' },
+                  displayTime: 500,
+                },
+                'success',
+              );
+            },
+            (error) => {
+              notify(
+                'Failed to approve worksheet item property.',
+                'error',
+                2000,
+              );
+              console.error(error);
+            },
+          );
         }
-      },
-      (error: any) => {
-        console.error('Save error:', error);
-        notify('Error saving data', 'error', 2000);
-      },
-    );
+      });
+    } else {
+      this.dataservice.updateworksheetItemProperty(payload).subscribe(
+        (response: any) => {
+          if (response) {
+            this.isSaved = true;
+            notify('Data saved successfully', 'success', 2000);
+            this.popupClosed.emit();
+          }
+        },
+        (error: any) => {
+          console.error('Save error:', error);
+          notify('Error saving data', 'error', 2000);
+        },
+      );
+    }
   }
 
   onVerify() {
