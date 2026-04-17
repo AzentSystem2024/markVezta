@@ -1408,7 +1408,10 @@ export class DataService {
   }
 
   deleteWorksheet(id: number): Observable<any> {
-    return this.http.post(`${this.apiUrlForDelete}/${id}`, {});
+    return this.http.post(
+      `${this.apiUrl}worksheetitemproperty/delete/${id}`,
+      {},
+    );
   }
 
   setWorksheetData(newData: any) {
@@ -3523,10 +3526,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   savePromotionSchema(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}promotionschema/insert`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}promotionschema/insert`, payload);
   }
 
   selectPromotionSchema(id: number): Observable<any> {
@@ -3537,10 +3537,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   updatePromotionSchema(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}promotionschema/update`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}promotionschema/update`, payload);
   }
 
   // deleteWorksheet(id: number): Observable<any> {
