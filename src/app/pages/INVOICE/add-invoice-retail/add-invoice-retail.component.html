@@ -180,6 +180,8 @@
           <dxi-column
             dataField="PRICE"
             caption="Cost"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
             [allowEditing]="false"
           ></dxi-column>
 
@@ -192,6 +194,8 @@
             dataField="AMOUNT"
             caption="Amount"
             [allowEditing]="false"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
             [calculateCellValue]="calculateAmount"
           ></dxi-column>
           <dxi-column
@@ -203,12 +207,16 @@
             dataField="TAX_AMOUNT"
             [caption]="vatTitle + ' Amount'"
             [allowEditing]="false"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
             [calculateCellValue]="calculateTax"
           ></dxi-column>
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total"
             [allowEditing]="false"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
             [calculateCellValue]="calculateTotal"
           ></dxi-column>
           <dxo-summary>
