@@ -23,6 +23,13 @@
                     message="Code is required"
                   >
                   </dxi-validation-rule>
+
+                  <dxi-validation-rule
+                    type="pattern"
+                    [pattern]="'^[a-zA-Z0-9]+$'"
+                    message="Code should be alphanumeric only"
+                  ></dxi-validation-rule>
+
                 </dx-validator>
               </dx-text-box>
             </div>
@@ -349,6 +356,18 @@
                 [(value)]="formCustomerData.EMAIL"
                 labelMode="floating"
               >
+              <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Email is required"
+                  >
+                  </dxi-validation-rule>
+
+                  <dxi-validation-rule
+                    type="email"
+                    message="Enter a valid email address"
+                  ></dxi-validation-rule>
+                </dx-validator>
               </dx-text-box>
             </div>
           </dxi-item>
@@ -419,37 +438,38 @@
         <dxi-item itemType="group" [colCount]="2">
           <dxi-item>
             <div *dxTemplate>
-              <dx-text-box
-                label="Credit Limit *"
-                labelMode="floating"
-                [(value)]="formCustomerData.CREDIT_LIMIT"
-              >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Credit limit is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator>
-              </dx-text-box>
+              <dx-number-box
+              label="Credit Limit *"
+              labelMode="floating"
+              [(value)]="formCustomerData.CREDIT_LIMIT"
+              [min]="0"
+              [showSpinButtons]="true"
+              format="#0.00"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Credit limit is required"
+                ></dxi-validation-rule>
+
+                <dxi-validation-rule
+                  type="numeric"
+                  message="Only numbers are allowed"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-number-box>
             </div>
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
-              <dx-text-box
-                label="Current Credit"
+              <dx-number-box
+                label="Current Credit *"
                 [(value)]="formCustomerData.CURRENT_CREDIT"
                 labelMode="floating"
                 [readOnly]="true"
+                format="#0.00"
               >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Current credit is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator> -->
-              </dx-text-box>
+              </dx-number-box>
             </div>
           </dxi-item>
         </dxi-item>
@@ -510,19 +530,36 @@
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
-              <dx-text-box
+              <dx-number-box
                 label="Discount % *"
                 labelMode="floating"
                 [(value)]="formCustomerData.DISCOUNT_PERCENT"
+                [min]="0"
+                [max]="100"
+                [step]="0.01"
+                format="#0.00"
+                [showSpinButtons]="true"
               >
                 <dx-validator>
                   <dxi-validation-rule
                     type="required"
                     message="Discount percent is required"
-                  >
-                  </dxi-validation-rule>
+                  ></dxi-validation-rule>
+
+                  <dxi-validation-rule
+                    type="numeric"
+                    message="Only numbers are allowed"
+                  ></dxi-validation-rule>
+
+                  <dxi-validation-rule
+                    type="range"
+                    [min]="0"
+                    [max]="100"
+                    message="Discount must be between 0 and 100"
+                  ></dxi-validation-rule>
                 </dx-validator>
-              </dx-text-box>
+              </dx-number-box>
+
             </div>
           </dxi-item>
         </dxi-item>
@@ -621,6 +658,8 @@
               [(value)]="MobileValue"
               stylingMode="outlined"
               style="margin-left: 10px; width: 250px"
+              mode="tel"
+              (onInput)="allowOnlyNumbers($event)"
             >
               <dx-validator>
                 <dxi-validation-rule
@@ -651,6 +690,8 @@
             labelMode="floating"
             [(value)]="phoneValue"
             stylingMode="outlined"
+            mode="tel"
+            (onInput)="allowOnlyNumbers($event)"
           >
             <dx-validator>
               <dxi-validation-rule

@@ -384,6 +384,14 @@ import {
   PayrollViewReportModule,
 } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import {
+  InvoiceRetailComponent,
+  InvoiceRetailModule,
+} from './pages/Operations/invoice-retail/invoice-retail.component';
+import {
+  AddInvoiceRetailComponent,
+  AddInvoiceRetailModule,
+} from './pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
+import {
   EditItemStorePropertyComponent,
   EditItemStorePropertyModule,
 } from './pop-up/operations/edit-item-store-property/edit-item-store-property.component';
@@ -760,6 +768,8 @@ import {
     SupplierFinFormModule,
     SupplierFinEditModule,
     PayrollViewReportModule,
+    InvoiceRetailModule,
+    AddInvoiceRetailModule,
     EditItemStorePropertyModule,
   ],
 

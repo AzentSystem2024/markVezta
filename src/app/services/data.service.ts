@@ -6374,4 +6374,29 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'MiscSalesInvoice/list';
     return this.http.post(getEndpoint, payload);
   }
+
+  //------------------------------SALES-INVOICE-RETAIL-----------------------------------------------------//
+  getItemsDetails(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/getitem`, data);
+  }
+
+  saveRetailInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/insert`, data);
+  }
+
+  selectInvoiceRetail(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SalesInvoice/select/` + id, {});
+  }
+
+  deleteInvoiceRetail(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SalesInvoice/delete/` + id, {});
+  }
+
+  updateRetailInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/update`, data);
+  }
+
+  approveRetailInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/commit`, data);
+  }
 }

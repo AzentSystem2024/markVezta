@@ -120,7 +120,8 @@
     (onHiding)="onPopupClose()"
     [showApprove]="false"
   >
-    <app-user-level-new-form *ngIf="isAddFormVisible"
+    <app-user-level-new-form
+      *ngIf="isAddFormVisible"
       #userLevelNewForm
       [sharedValue]="isAddFormVisible"
     ></app-user-level-new-form>

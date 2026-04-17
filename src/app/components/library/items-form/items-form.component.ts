@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   CUSTOM_ELEMENTS_SCHEMA,
   Component,
   ElementRef,
@@ -54,7 +55,7 @@ import notify from 'devextreme/ui/notify';
   templateUrl: './items-form.component.html',
   styleUrls: ['./items-form.component.scss'],
 })
-export class ItemsFormComponent implements OnInit {
+export class ItemsFormComponent implements OnInit,AfterViewInit {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   @ViewChild(DxFormComponent, { static: false }) form: DxFormComponent;
@@ -367,7 +368,7 @@ export class ItemsFormComponent implements OnInit {
     BARCODE: '',
     DESCRIPTION: '',
     ARABIC_DESCRIPTION: '',
-    TYPE_ID: 0,
+    TYPE_ID: null,
     DEPT_ID: 0,
     RESTOCK_LEVEL: 0,
     IS_CONSIGNMENT: false,
@@ -410,14 +411,14 @@ export class ItemsFormComponent implements OnInit {
     PURCH_PRICE: 0,
     BIN_LOCATION: '',
     PURCH_CURRENCY: 0,
-    VAT_CLASS_ID: 0,
+    VAT_CLASS_ID: null,
     VAT_NAME: '',
     ITEM_PROPERTY1: 0,
     ITEM_PROPERTY2: 0,
     ITEM_PROPERTY3: 0,
     ITEM_PROPERTY4: 0,
     ITEM_PROPERTY5: 0,
-    COSTING_METHOD: 0,
+    COSTING_METHOD: null,
     REORDER_POINT: 0,
     UNIT_ID: null,
     PACKING_ID: 0,
@@ -526,6 +527,44 @@ export class ItemsFormComponent implements OnInit {
     this.sesstion_Details();
 
     // this.loadImageFromLocalStorage();
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.addDefaultSupplierRow();
+    });
+  }
+
+  addDefaultSupplierRow() {
+    const grid = this.supplierGrid?.instance;
+
+    if (!grid) return;
+
+    // Add empty row if no data
+    if (!this.datasource || this.datasource.length === 0) {
+      this.datasource = [
+        {
+           ID: Date.now(), // ✅ FIX (unique key)
+          SUPP_ID: null,
+          CURRENCY: '',
+          REORDER_NO: null,
+          COST: null,
+          IS_PRIMARY: false,
+          IS_CONSIGNMENT: false
+        }
+      ];
+    }
+
+    // Refresh grid
+    grid.refresh();
+
+    // 🔥 wait for rendering
+    setTimeout(() => {
+      setTimeout(() => {
+        grid.focus(grid.getCellElement(0, 'SUPP_ID'));
+        grid.editCell(0, 'SUPP_ID');
+      }, 100);
+    }, 0);
   }
 
   sesstion_Details() {
@@ -831,6 +870,52 @@ export class ItemsFormComponent implements OnInit {
         }
       };
     }
+
+    if (event.parentType === 'dataRow' && event.dataField === 'COST') {
+  event.editorOptions.onValueChanged = (e: any) => {
+
+    const grid = event.component;
+
+    grid.cellValue(event.row.rowIndex, 'COST', e.value);
+
+    if (e.value && Number(e.value) > 0) {
+
+      const rows = grid.getVisibleRows();
+      const lastRow = rows[rows.length - 1]?.data;
+
+      // 🚫 prevent duplicate empty row
+      if (lastRow && !lastRow.SUPP_ID && !lastRow.COST) {
+        return;
+      }
+
+      grid.saveEditData();
+
+     setTimeout(() => {
+  grid.addRow();
+
+  setTimeout(() => {
+    const visibleRows = grid.getVisibleRows();
+
+    // 🔥 new row is ALWAYS first (index 0)
+    const newRow = visibleRows[0];
+
+    if (!newRow) return;
+
+          const rowIndex = newRow.rowIndex;
+          const rowKey = newRow.key;
+
+          // 🔥 force focus using key
+          grid.option('focusedRowKey', rowKey);
+
+          // 🔥 open editor
+          grid.editCell(rowIndex, 'SUPP_ID');
+
+        }, 100);
+
+      }, 0);
+    }
+  };
+}
   }
   onRowClick(e: any) {}
 
@@ -1015,6 +1100,16 @@ export class ItemsFormComponent implements OnInit {
     };
     this.selectedItemId = null;
   }
+
+  validateChildQty = (e: any): boolean => {
+    // If parent NOT selected → no validation needed
+    if (!this.newItems.PARENT_ITEM_ID) {
+      return true;
+    }
+
+    // If parent selected → qty must be > 0
+    return Number(e.value) > 0;
+  };
 }
 
 @NgModule({

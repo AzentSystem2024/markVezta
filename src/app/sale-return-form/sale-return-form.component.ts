@@ -61,7 +61,7 @@ export class SaleReturnFormComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;

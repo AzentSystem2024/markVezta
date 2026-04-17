@@ -173,6 +173,10 @@ import { ItemBrandListComponent } from './pages/item-brand-list/item-brand-list.
 import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.component';
 import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
 import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
+import { InvoiceRetailComponent } from './pages/Operations/invoice-retail/invoice-retail.component';
+// import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
+// import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
+// import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
 import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
 import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
 import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
@@ -1114,6 +1118,10 @@ const routes: Routes = [
         path: 'item-change-property-add',
         component: ItemStorePropertiesComponent,
         canActivate: [AuthGuardService],
+      },
+      {
+        path: 'invoice-retail',
+        component: InvoiceRetailComponent,
       },
       {
         path: 'item-change-property-Edit',

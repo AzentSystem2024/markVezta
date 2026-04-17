@@ -363,6 +363,12 @@
               >
                 <dx-validator>
                   <dxi-validation-rule
+                    type="required"
+                    message="Email is required"
+                  >
+                  </dxi-validation-rule>
+
+                  <dxi-validation-rule
                     type="email"
                     message="Enter a valid email address"
                   ></dxi-validation-rule>
@@ -652,6 +658,8 @@
               label="Mobile"
               labelMode="floating"
               [(value)]="MobileValue"
+              mode="tel"
+              (onInput)="allowOnlyNumbers($event)"
             >
               <dx-validator>
                 <dxi-validation-rule
@@ -683,6 +691,8 @@
             labelMode="floating"
             [(value)]="phoneValue"
             stylingMode="outlined"
+            mode="tel"
+            (onInput)="allowOnlyNumbers($event)"
           >
             <dxi-validation-rule
               type="custom"
