@@ -1,4 +1,4 @@
-<div class="edit-store-properties-container">
+<div class="view-wrapper list-page">
   <!-- Loading State -->
   <div
     *ngIf="!itemStoresList || itemStoresList.length === 0"
@@ -9,10 +9,14 @@
   </div>
 
   <!-- Main Grid -->
-  <div *ngIf="itemStoresList && itemStoresList.length > 0">
+  <div
+    class="grid-container"
+    *ngIf="itemStoresList && itemStoresList.length > 0"
+  >
     <dx-data-grid
       #dataGrid
       [width]="'100%'"
+      [height]="'70%'"
       class="grid theme-dependent"
       [dataSource]="itemStoresList"
       [showBorders]="true"
@@ -41,9 +45,9 @@
 
       <!-- Toolbar -->
       <dxo-toolbar>
-        <dxi-item location="before">
+        <!-- <dxi-item location="before">
           <div class="grid-header">Store Items Properties</div>
-        </dxi-item>
+        </dxi-item> -->
 
         <dxi-item location="before">
           <dx-tag-box
@@ -77,7 +81,17 @@
           >
           </dx-select-box>
         </dxi-item>
-
+        <dxi-item>
+          <dx-check-box
+            *ngIf="allowVerify"
+            [(value)]="approveValue"
+            text="verify"
+            [readOnly]="readOnly"
+            (onValueChanged)="onApprovedChanged($event)"
+            style="margin: 10px"
+          >
+          </dx-check-box
+        ></dxi-item>
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <dx-button
             text="Cancel"
@@ -90,29 +104,10 @@
 
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <dx-button
-            *ngIf="!isSaved && !isVerified"
-            text="Save"
+            [text]="SaveBtnText()"
             stylingMode="contained"
             type="default"
             (onClick)="onSaveButtonClick()"
-            style="width: 100px"
-          ></dx-button>
-
-          <dx-button
-            *ngIf="isSaved && !isVerified"
-            text="Verify"
-            stylingMode="contained"
-            type="default"
-            (onClick)="onVerify()"
-            style="width: 100px"
-          ></dx-button>
-
-          <dx-button
-            *ngIf="isVerified"
-            text="Approve"
-            stylingMode="contained"
-            type="default"
-            (onClick)="onApprove()"
             style="width: 100px"
           ></dx-button>
         </dxi-item>
@@ -151,7 +146,11 @@
       ></dxi-column>
 
       <!-- Not Sale Item -->
-      <dxi-column caption="Not Sale Item" [width]="240">
+      <dxi-column
+        caption="Not Sale Item"
+        [width]="240"
+        *ngIf="showIsNotSaleItem"
+      >
         <dxi-column
           dataField="IS_NOT_SALE_ITEM"
           caption="Current Value"
@@ -170,7 +169,11 @@
       </dxi-column>
 
       <!-- Not Sale Return -->
-      <dxi-column caption="Not Sale Return" [width]="240">
+      <dxi-column
+        caption="Not Sale Return"
+        [width]="240"
+        *ngIf="showIsNotSaleReturn"
+      >
         <dxi-column
           dataField="IS_NOT_SALE_RETURN"
           caption="Current Value"
@@ -189,7 +192,11 @@
       </dxi-column>
 
       <!-- Not Discountable -->
-      <dxi-column caption="Not Discountable" [width]="240">
+      <dxi-column
+        caption="Not Discountable"
+        [width]="240"
+        *ngIf="showIsNotDiscountable"
+      >
         <dxi-column
           dataField="IS_NOT_DISCOUNTABLE"
           caption="Current Value"
@@ -208,7 +215,11 @@
       </dxi-column>
 
       <!-- Price Required -->
-      <dxi-column caption="Price Required" [width]="240">
+      <dxi-column
+        caption="Price Required"
+        [width]="240"
+        *ngIf="showIsPriceRequired"
+      >
         <dxi-column
           dataField="IS_PRICE_REQUIRED"
           caption="Current Value"
@@ -227,7 +238,7 @@
       </dxi-column>
 
       <!-- Inactive -->
-      <dxi-column caption="Inactive" [width]="240">
+      <dxi-column caption="Inactive" [width]="240" *ngIf="showIsInactive">
         <dxi-column
           dataField="IS_INACTIVE"
           caption="Current Value"
@@ -246,4 +257,10 @@
       </dxi-column>
     </dx-data-grid>
   </div>
+  <dx-text-box
+    label="Narration"
+    [readOnly]="readOnly"
+    labelMode="floating"
+    [(value)]="selectedNarration"
+  ></dx-text-box>
 </div>

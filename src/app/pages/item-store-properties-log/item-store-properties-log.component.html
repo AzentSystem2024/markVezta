@@ -24,7 +24,7 @@
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowDeleting]="isDeleteVisible"
       ></dxo-editing>
       <dxo-search-panel
         [visible]="true"
@@ -36,6 +36,13 @@
         <dxi-item location="before">
           <div class="grid-header">Store Properties Log</div>
         </dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -82,8 +89,6 @@
         [width]="'auto'"
         [allowEditing]="false"
       ></dxi-column>
-      <dxi-column type="buttons" width="150" [buttons]="allButtons">
-      </dxi-column>
     </dx-data-grid>
   </div>
   <!-- <div class="selected-rows-container">
@@ -95,10 +100,13 @@
   [(visible)]="editPackPopupOpened"
   [width]="'80vw'"
   [height]="'90vh'"
-  title="Update Packing"
+  title="Update Store Items Properties"
   (onHiding)="handleClose()"
 >
   <div *dxTemplate="let data of 'content'">
-    <app-edit-item-store-property  [selectedData]="selectedData"></app-edit-item-store-property>
+    <app-edit-item-store-property
+      (popupClosed)="handleClose()"
+      [selectedData]="selectedData"
+    ></app-edit-item-store-property>
   </div>
 </dx-popup>

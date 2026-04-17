@@ -58,22 +58,9 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   selectedRowData: any;
   isEditPopupOpened: boolean = false;
   editPackPopupOpened: boolean = false;
-  selectedData:any
-  customButtons = [
-    {
-      hint: 'Verify',
-      icon: 'check',
-      text: 'Verify',
-      onClick: (e: any) => this.onVerifyClick(e),
-    },
-    {
-      hint: 'Approve',
-      icon: 'taskcomplete',
-      text: 'Approve',
-      onClick: (e: any) => this.onApproveClick(e),
-    },
-  ];
-  allButtons = ['edit', 'delete', ...this.customButtons];
+  selectedData: any;
+  isOpen: boolean = false;
+  allButtons = ['edit', 'delete'];
   totalRecords: any;
 
   addButtonOptions = {
@@ -119,10 +106,26 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     const selectedId = event.data.ID; // Get the selected row ID
     this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
       console.log(res, '============selected data for edit===========');
-      this.selectedData=res
+      this.selectedData = res;
 
       this.editPackPopupOpened = true;
     });
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.listWorkisheetItemProperty();
+    }
   }
   listWorkisheetItemProperty() {
     this.dataservice
@@ -132,6 +135,8 @@ export class ItemStorePropertiesLogComponent implements OnInit {
         this.dataGrid.instance.getDataSource = this.logList;
         this.totalRecords = this.logList.length;
       });
+    this.isOpen = this.logList.Status === 'Open';
+    console.log(this.isOpen, '====is open====');
   }
 
   updateWorksheet() {
@@ -177,7 +182,10 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     }
   }
 
-  handleClose() {}
+  handleClose() {
+    this.editPackPopupOpened = false;
+    this.listWorkisheetItemProperty();
+  }
 
   onSelectionChanged(event: any) {
     if (event.selectedRowsData.length > 0) {
@@ -342,26 +350,32 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     );
   }
 
+  isDeleteVisible = (e: any) => {
+    console.log(e, '=========es===================');
+    return e.row?.data.Status === 'Open';
+  };
   onRowRemoving(event: any) {
-    const selectedRow = event.data; // Get the data of the selected row
+    console.log(event, '====row removing event data====');
+    const selectedRow = event.data;
     const id = selectedRow.ID;
+
     if (id) {
       this.dataservice.deleteWorksheet(id).subscribe(
         (response) => {
           const index = this.logList.findIndex((item: any) => item.ID === id);
           if (index !== -1) {
-            this.logList.splice(index, 1); // Remove item from the array
-            event.component.refresh(); // Refresh the DataGrid
+            this.logList.splice(index, 1);
+            event.component.refresh();
           }
         },
         (error) => {
           console.error('Error deleting worksheet:', error);
-          event.cancel = true; // Prevent row removal if there's an error
+          event.cancel = true;
         },
       );
     } else {
       console.warn('No valid row data to delete');
-      event.cancel = true; // Prevent row removal if there's no valid data
+      event.cancel = true;
     }
   }
 
