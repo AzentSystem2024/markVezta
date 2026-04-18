@@ -105,6 +105,7 @@ export class ItemStorePropertiesComponent {
   updatedMap: any = {};
   selecte_grid_Data: any;
   User_Id: any;
+  updatedRows: any = [];
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
@@ -185,8 +186,8 @@ export class ItemStorePropertiesComponent {
         console.log('Updated Map:', this.updatedMap);
       };
     }
-    // const exists = e.row.data;
-    // console.log(exists);
+    const exists = e.row.data;
+    console.log(exists);
 
     if (
       e.parentType === 'dataRow' &&
@@ -228,7 +229,7 @@ export class ItemStorePropertiesComponent {
   onSelectionChanged(e: any) {
     console.log(e, '===================event -selectiopm=================');
 
-    this.Selected_Items_Data = e.selectedRowsData;
+    // this.Selected_Items_Data = e.selectedRowsData;
   }
 
   fetchSelectedItem(id: number): void {
@@ -369,6 +370,7 @@ export class ItemStorePropertiesComponent {
   saveChanges() {
     this.preparePayload();
     console.log(this.dataGrid);
+    console.log(this.selecte_grid_Data);
     if (this.selecte_grid_Data.length > 0) {
       const worksheetdata = this.selecte_grid_Data.map((item: any) => ({
         ID: 0,
@@ -415,6 +417,7 @@ export class ItemStorePropertiesComponent {
               'success',
             );
             this.dataGrid.instance.refresh();
+            this.selecte_grid_Data = [];
 
             this.router.navigate(['/item-store-properties-log']);
           } else {
