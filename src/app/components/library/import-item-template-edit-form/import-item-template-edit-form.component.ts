@@ -4,6 +4,7 @@ import {
   Input,
   NgModule,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -33,7 +34,7 @@ import * as XLSX from 'xlsx';
   templateUrl: './import-item-template-edit-form.component.html',
   styleUrls: ['./import-item-template-edit-form.component.scss'],
 })
-export class ImportItemTemplateEditFormComponent implements OnChanges {
+export class ImportItemTemplateEditFormComponent implements OnChanges,OnInit {
   @ViewChild('validationGroup', { static: true })
   validationGroup: DxValidationGroupComponent;
   @ViewChild(ImportItemTemplateEditFormComponent)
@@ -45,6 +46,8 @@ export class ImportItemTemplateEditFormComponent implements OnChanges {
 
   TemplateColumnsData: any;
   selectedRows: any[] = [];
+  currentEditId: number | null = null;
+  itemTemplate:any;
 
   constructor(private service: DataService) {}
   formModel: any = {
@@ -56,6 +59,16 @@ export class ImportItemTemplateEditFormComponent implements OnChanges {
   newItemTemplate = this.formModel;
 
   getNewItemTemplateData = () => ({ ...this.newItemTemplate });
+
+  ngOnInit(): void {
+    this.getItemsTemplateData();
+  }
+
+  getItemsTemplateData() { 
+    this.service.getImportTemplateData().subscribe((res) => { 
+      this.itemTemplate = res.data; 
+    }); 
+  }
 
   onTemplateColumnsValueChanged(e: any) {
     this.formModel.import_entry = e.value.map((columnTitle: string) => ({
@@ -116,6 +129,7 @@ export class ImportItemTemplateEditFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.formdata && changes.formdata.currentValue) {
       this.formModel = { ...this.formdata };
+      this.currentEditId = this.formdata.ID;
       this.TemplateColumnsData = this.formdata.import_entry;
       this.selectedRows = this.TemplateColumnsData.filter(
         (column) => column.SELECTED,
@@ -202,6 +216,22 @@ export class ImportItemTemplateEditFormComponent implements OnChanges {
 
     this.onExportClick();
   }
+
+
+  validateTemplateNameExists = (e: any) => {
+    if (!e.value) return true;
+
+    const inputName = e.value.toString().trim().toLowerCase();
+
+    const exists = this.itemTemplate?.some(
+      (item: any) =>
+        item.TEMPLATE_NAME?.toLowerCase().trim() === inputName &&
+        item.ID !== this.currentEditId // ✅ skip current record
+    );
+
+    return !exists;
+  };
+
 }
 @NgModule({
   imports: [

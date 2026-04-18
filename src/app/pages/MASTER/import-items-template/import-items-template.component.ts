@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   NgModule,
+  NgZone,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -28,6 +29,9 @@ import { Column } from 'jspdf-autotable';
 import { forkJoin } from 'rxjs';
 import * as XLSX from 'xlsx';
 import notify from 'devextreme/ui/notify';
+import DataSource from 'devextreme/data/data_source';
+import { lastValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-import-items-template',
@@ -35,12 +39,14 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./import-items-template.component.scss'],
 })
 export class ImportItemsTemplateComponent implements OnInit {
-  @ViewChild(ImportItemTemplateFormComponent)
-  itemComponent: ImportItemTemplateFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @ViewChild(ImportItemTemplateFormComponent)
+  itemComponent: ImportItemTemplateFormComponent;
+  
 
-  itemTemplate: any[] = [];
+  itemTemplate: any;
+  itemTemplateArray: any[] = [];
   isPopupOpened: boolean = false;
   isEditPopupOpened: boolean = false;
   TemplateColumnsData: any;
@@ -48,9 +54,58 @@ export class ImportItemsTemplateComponent implements OnInit {
   selectedTemplateColumnKeys: any[] = [];
   selectedRowData: any;
 
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+
+
+  addButtonOptions = {
+  type: 'default',
+  stylingMode: 'contained',
+  hint: 'Add new template',
+  onClick: () => {
+    this.openForm();
+  },
+  elementAttr: { class: 'add-button' },
+
+  template: () => {
+    return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+  },
+};
+
+
+searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+    this.toggleFilters();
+  },
+};
+
+refreshButtonOptions = {
+  icon: 'refresh',
+  hint: 'Refresh',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+};
+
+
+
   constructor(
     private service: DataService,
     private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
   onEditingRow(event): void {
@@ -84,10 +139,26 @@ export class ImportItemsTemplateComponent implements OnInit {
   // }
 
   getItemsTemplateData() {
-    this.service.getImportTemplateData().subscribe((res) => {
-      this.itemTemplate = res.data;
-    });
-  }
+  this.itemTemplate = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.service.getImportTemplateData().subscribe({
+          next: (res: any) => {
+            const data = res?.data || [];
+
+            this.itemTemplateArray = data; // ✅ store locally (for validation / reuse)
+
+            resolve(data);
+          },
+          error: () => {
+            this.itemTemplateArray = [];
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
   onReorder = (e: Parameters<DxDataGridTypes.RowDragging['onReorder']>[0]) => {
     const visibleRows = e.component.getVisibleRows();
     const toIndex = this.TemplateColumnsData.findIndex(
@@ -112,37 +183,70 @@ export class ImportItemsTemplateComponent implements OnInit {
   }
   onClickSave() {
     const data = this.itemComponent.getNewItemTemplateData();
-    this.service.postImportTemplate(data).subscribe((response) => {
-      if (response) {
-        this.getItemsTemplateData();
-      }
-    });
-  }
-  onRowRemoving(event: any) {
-    var SelectedRow = event.key;
-    this.service.removeImportTemplateData(SelectedRow.ID, {}).subscribe(() => {
-      try {
-        // Your delete logic here
+    this.service.postImportTemplate(data).subscribe({
+    next: (response: any) => {
+      if (response?.flag === '1') {
         notify(
           {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
+            message: 'Template saved successfully',
+            position: { at: 'top right', my: 'top right' }
           },
-          'success',
+          'success'
         );
-        this.dataGrid.instance.refresh();
-        this.getItemsTemplateData();
-      } catch (error) {
+
+        this.getItemsTemplateData(); // reload grid
+        this.isPopupOpened = false;  // close popup
+      } else {
         notify(
           {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
+            message: response?.message || 'Save failed',
+            position: { at: 'top right', my: 'top right' }
           },
-          'error',
+          'error'
         );
       }
-    });
+    },
+    error: () => {
+      notify(
+        {
+          message: 'Error occurred while saving',
+          position: { at: 'top right', my: 'top right' }
+        },
+        'error'
+      );
+    }
+  });
   }
+  onRowRemoving(e: any) {
+  const id = e.key.ID;
+
+  //  VERY IMPORTANT
+  e.cancel = true;
+
+  //  Tell grid to wait for this
+  e.promise = lastValueFrom(this.service.removeImportTemplateData(id))
+    .then(() => {
+      notify(
+        {
+          message: 'Delete operation successful',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'success'
+      );
+
+      this.getItemsTemplateData(); // reload
+    })
+    .catch(() => {
+      notify(
+        {
+          message: 'Delete operation failed',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
+    });
+}
+
   onRowUpdating(data: any) {}
   onExportClick() {
     const selectedColumns = this.TemplateColumnsData.filter((col) =>
@@ -195,6 +299,22 @@ export class ImportItemsTemplateComponent implements OnInit {
     this.dataGrid.instance.refresh();
     this.getItemsTemplateData();
   }
+
+  toggleFilters() {
+  const grid = this.dataGrid?.instance;
+  if (!grid) return;
+
+  const current = grid.option('filterRow.visible');
+  grid.option('filterRow.visible', !current);
+  grid.option('headerFilter.visible', !current);
+}
+
+refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+  }
+
 }
 
 @NgModule({
