@@ -61,17 +61,14 @@
 
             <dxi-item location="after" locateInMenu="auto">
               <div class="stacked-toolbar-group">
-                <dx-select-box
-                  [(value)]="adjustmentFormData.STORE_ID"
-                  [dataSource]="stores"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
-                  [width]="200"
-                  [searchEnabled]="true"
-                  [readOnly]="readOnlyTrue"
-                  label="Store"
-                  labelMode="floating"
-                ></dx-select-box>
+                <dx-text-box
+                    [(value)]="storename"
+                    [width]="200"
+                    label="Store"
+                    labelMode="floating"
+                    [readOnly]="true"
+                  >
+                  </dx-text-box>
                 <div style="margin-top: 2px; text-align: left">
                   <dx-button
                     text="Add Items"
@@ -107,6 +104,7 @@
             [visible]="canApprove"
             caption="Cost"
             [allowEditing]="false"
+            [visible]="!hidecost"
           ></dxi-column>
           <dxi-column
             dataField="STOCK_QTY"
@@ -273,7 +271,7 @@
 
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
 
-      <dxi-column dataField="COST" caption="Cost"></dxi-column>
+      <dxi-column dataField="COST" caption="Cost" [visible]="!hidecost"></dxi-column>
     </dx-data-grid>
   </div>
 </dx-popup>

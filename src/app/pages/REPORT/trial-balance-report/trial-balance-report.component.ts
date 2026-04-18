@@ -287,10 +287,7 @@ export class TrialBalanceReportComponent {
       companyId: this.selected_Company_id,
       finId: this.selected_fin_id,
       dateFrom: this.formatted_from_date,
-      dateTo: this.formatted_To_date,
-       STORE_ID: this.selectedStoreid?.length
-    ? this.selectedStoreid.join(',')  
-    : ''
+      dateTo: this.formatted_To_date
     };
 
     sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));

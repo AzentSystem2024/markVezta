@@ -40,8 +40,9 @@
           >
           </dx-date-box>
           <dx-text-box
-            label="Doc No. *"
+            label="Doc No."
             labelMode="floating"
+            [(value)]="invoiceFormData.DOC_NO"
             [readOnly]="true"
             [width]="200"
           >
@@ -61,6 +62,7 @@
           <dx-text-box
             label="Reference No."
             labelMode="floating"
+            [(value)]="invoiceFormData.REF_NO"
             [readOnly]="isReadOnlyMode"
             [width]="410"
           >
@@ -68,11 +70,12 @@
         </div>
         <div style="display: flex; align-items: flex-end; gap: 8px">
           <dx-select-box
-            [dataSource]="customerList"
+            [dataSource]="supplierList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
+            [(value)]="invoiceFormData.SUPP_ID"
             [width]="370"
-            label="Customer"
+            label="Supplier"
             labelMode="floating"
             [readOnly]="isEditing"
           >
@@ -156,7 +159,7 @@
           ></dxi-column>
 
           <dxi-column
-            dataField="particulars"
+            dataField="REMARKS"
             caption="Particulars"
             [editorOptions]="{ maxLength: 250 }"
           >
@@ -195,6 +198,7 @@
             [caption]="vatTitle + ' Amount'"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [calculateCellValue]="calculateTaxAmount"
           >
           </dxi-column>
           <dxi-column
@@ -204,6 +208,7 @@
             [visible]="true"
             [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [calculateCellValue]="calculateTotal"
           ></dxi-column>
           <dxi-column type="buttons">
             <dxi-button name="delete" width="80"></dxi-button>
@@ -250,7 +255,11 @@
     </div>
     <div class="form-footer-wrapper">
       <div class="right-section">
-        <dx-check-box text="Approve" [visible]="!isReadOnlyMode"></dx-check-box>
+        <dx-check-box
+          text="Approve"
+          [visible]="!isReadOnlyMode"
+          [(value)]="invoiceFormData.IS_APPROVED"
+        ></dx-check-box>
 
         <dx-button
           text="Cancel"
@@ -270,6 +279,7 @@
                 : 'Save'
           "
           [disabled]="isSaving"
+          (onClick)="saveInvoice()"
           stylingMode="contained"
           type="default"
         ></dx-button>

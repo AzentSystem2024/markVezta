@@ -119,19 +119,19 @@
         </dx-select-box>
       </div>
       <dxi-column
-        dataField="DOC_NO"
-        caption="Sale No"
+        dataField="PURCH_NO"
+        caption="Purchase No"
         alignment="left"
       ></dxi-column>
-      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+      <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
       <dxi-column
-        dataField="SALE_DATE"
+        dataField="PURCH_DATE"
         caption="Date"
         dataType="date"
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Gross Amount"
         dataType="number"
@@ -142,14 +142,19 @@
         [caption]="vatTitle + ' Amount'"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
+      ></dxi-column> -->
       <dxi-column
         dataField="NET_AMOUNT"
         caption="Net Amount"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
-
+      <dxi-column
+        dataField="NARRATION"
+        caption="Narration"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
       <dxi-column
         caption="Status"
         dataField="STATUS"

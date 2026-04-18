@@ -48,6 +48,7 @@
         >
         </dx-tabs>
         <dx-data-grid
+        #dataGrid
           *ngIf="!isLoading && selectedTabData?.length"
           class="grid theme-dependent mt-3"
           noDataText=""
@@ -59,7 +60,7 @@
           [hoverStateEnabled]="true"
           rowAlternationInterval="2"
           keyExpr="MenuId"
-          (onCellValueChanged)="onPermissionCheckboxChanged($event)"
+          (onEditorPreparing)="onEditorPreparing($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
           [selectedRowKeys]="selectedRows[selectedTab]"
         >
@@ -135,6 +136,18 @@
             [showEditorAlways]="true"
           >
           </dxi-column>
+
+          <dxi-column
+            dataField="HideCost"
+            caption="HideCost"
+            [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+          >
+          </dxi-column>
+          
 
           <dxi-column
             dataField="CanPrint"

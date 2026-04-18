@@ -130,9 +130,10 @@ export class PdcEditFormComponent {
     private sanitizer: DomSanitizer,
   ) {
     this.get_Supplier_dropdown();
+     this.sesstion_Details();
     this.get_Bank_dropdown();
     this.get_Customer_dropdown();
-    this.sesstion_Details();
+   
   }
 
   onSupplierChanged(event: any) {}

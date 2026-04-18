@@ -675,8 +675,14 @@ export class DataService {
 
   //--------------------------TRANSFER-IN-INVENTORY-------------------------------------//
   getItemDetailsForTrInInventory(payload: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}TransferIn/getitem`, payload);
+    return this.http.post(`${this.apiUrl}TransferIn/gettrout`, payload);
   }
+
+  public getItemsforTransferIn(id: any, companyId: any): Observable<any> {
+    const reqBodyData = { TRANSFER_ID: id, COMPANY_ID: companyId };
+    return this.http.post(`${this.apiUrl}TransferIn/getitem`, reqBodyData);
+  }
+
   getTransferInForInventoryMainList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}TransferIn/list`, data);
@@ -1585,7 +1591,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}country/save`, data);
   }
   removeCountry(id: any) {
-    return this.http.post(`${this.apiUrl}country/delete/` + id,{});
+    return this.http.post(`${this.apiUrl}country/delete/` + id, {});
   }
   updateCountry(ID: any, CODE: any, COUNTRY_NAME: any): Observable<any> {
     const data = { ID, CODE, COUNTRY_NAME };
@@ -6042,8 +6048,9 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}StockAdjustment/edit`, payload);
   }
-  List_Stock_Adjustment_Data() {
-    return this.http.post(`${this.apiUrl}StockAdjustment/list`, {});
+  List_Stock_Adjustment_Data(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}StockAdjustment/list`, payload);
   }
   select_Stock_Adjustment_Data(id: any) {
     return this.http.post(`${this.apiUrl}StockAdjustment/select/${id}`, {});
@@ -6409,6 +6416,25 @@ The result can be exported to HTML or Markdown.`;
   //------------------------------------MISC-PURCHASE-INVOICE-----------------------------------------------//
   getMiscPurchInvoiceMainList(items: any): Observable<any> {
     const data = items;
-    return this.http.post(`${this.apiUrl}miscPurchInvoice/list`, data);
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/list`, data);
+  }
+
+  saveMiscPurchInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/insert`, data);
+  }
+
+  selectMiscPurchInvoice(id: number) {
+    return this.http.post<any>(
+      `${this.apiUrl}MiscPurchInvoice/select/` + id,
+      {},
+    );
+  }
+
+  updateMiscPurchInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/update`, data);
+  }
+
+  approveMiscPurchInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/commit`, data);
   }
 }

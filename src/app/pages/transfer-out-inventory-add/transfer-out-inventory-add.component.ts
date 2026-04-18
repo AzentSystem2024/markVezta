@@ -90,6 +90,7 @@ export class TransferOutInventoryAddComponent {
   canPrint: any;
   canView: any;
   canApprove: any;
+  hideCost : any;
   matrix: any;
   storeFromSession: any;
   stores: any;
@@ -110,6 +111,8 @@ export class TransferOutInventoryAddComponent {
   userID: any;
   finID: any;
   companyID: any;
+  storename: any;
+  netamount: any;
 
   constructor(
     private dataService: DataService,
@@ -134,6 +137,7 @@ export class TransferOutInventoryAddComponent {
     console.log(this.companyID, 'COMPANYIDDDDDDDDDD');
     const menuGroups = menuResponse.MenuGroups || [];
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    this.storename = menuResponse.Configuration[0].STORE_NAME;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/transfer-out-inventory');
@@ -147,6 +151,7 @@ export class TransferOutInventoryAddComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
+      this.hideCost = packingRights?.HideCost ?? false;
       this.canApprove = packingRights.canApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
@@ -211,7 +216,11 @@ export class TransferOutInventoryAddComponent {
   }
 
   getStoreDropdown() {
-    this.dataService.getDropdownData('STORE').subscribe((response: any) => {
+    const payload = {
+      NAME : 'STORE',
+      COMPANY_ID : this.companyID
+    }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.stores = response.filter(
         (store: any) => store.ID !== this.storeFromSession,
       );
@@ -219,7 +228,11 @@ export class TransferOutInventoryAddComponent {
   }
 
   getReasonsDropdown() {
-    this.dataService.getDropdownData('REASON').subscribe((response: any) => {
+    const payload = {
+      NAME :'REASON',
+      COMPANY_ID : this.companyID
+    }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
     });
   }
@@ -343,19 +356,24 @@ export class TransferOutInventoryAddComponent {
     }
   }
 
-  updateNetAmount(editingRowIndex?: number, newValue?: number) {
-    this.transferOutFormData.NET_AMOUNT =
-      this.transferOutFormData.DETAILS.reduce(
-        (sum: number, item: any, idx: number) => {
-          let qty =
-            idx === editingRowIndex
-              ? Number(newValue) || 0
-              : Number(item.QUANTITY) || 0;
-          return sum + (Number(item.COST) || 0) * qty;
-        },
-        0,
-      );
-  }
+updateNetAmount(editingRowIndex?: number, newValue?: number) {
+  this.transferOutFormData.NET_AMOUNT = 0;
+
+  this.transferOutFormData.DETAILS.forEach((item: any, idx: number) => {
+    let qty =
+      idx === editingRowIndex
+        ? Number(newValue) || 0
+        : Number(item.QUANTITY) || 0;
+
+    // Calculate row total
+    item.netAmount = (Number(item.COST) || 0) * qty;
+
+    //  Add to grand total
+    this.transferOutFormData.NET_AMOUNT += item.netAmount;
+  });
+
+  this.netamount = this.transferOutFormData.NET_AMOUNT;
+}
 
   onSummaryCalculate(e: any) {
     if (e.name === 'netAmount') {
@@ -374,16 +392,9 @@ export class TransferOutInventoryAddComponent {
     }
   }
 
-  // updateNetAmount(e: any) {
-  //   // find the summary for UNIT_COST
-  //   const netCostSummary = e.totalValue?.find(
-  //     (s: any) => s.name === 'COST' || s.column === 'COST'
-  //   );
-
-  //   if (netCostSummary) {
-  //     this.transferOutFormData.NET_AMOUNT = netCostSummary.value;
-  //   }
-  // }
+calculateNetAmount(rowData: any) {
+  return (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY) || 0);
+}
 
   getTransferNo() {
     const payload = {

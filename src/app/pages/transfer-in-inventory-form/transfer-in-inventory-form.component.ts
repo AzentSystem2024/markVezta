@@ -100,7 +100,7 @@ export class TransferInInventoryFormComponent {
     STORE_ID: '',
     REC_DATE: new Date(),
     ORIGIN_STORE_ID: '',
-    ISSUE_ID: '',
+    ISSUE_ID: 0,
     NET_AMOUNT: '',
     FIN_ID: '',
     USER_ID: '',
@@ -113,6 +113,9 @@ export class TransferInInventoryFormComponent {
   finID: any;
   companyID: any;
   selectedStoreId: any;
+  netamount: any;
+  storename: any;
+  hideCost: any;
 
   constructor(
     private dataService: DataService,
@@ -136,9 +139,10 @@ export class TransferInInventoryFormComponent {
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    this.storename = menuResponse.Configuration[0].STORE_NAME;
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/transfer-out-inventory');
+      .find((menu) => menu.Path === '/transfer-in-inventory');
     this.getTransferNo();
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -146,6 +150,7 @@ export class TransferInInventoryFormComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
+      this.hideCost = packingRights?.HideCost;
       this.canApprove = packingRights.canApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
@@ -222,7 +227,11 @@ export class TransferInInventoryFormComponent {
       });
   }
   getStoreDropdown() {
-    this.dataService.getDropdownData('STORE').subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.companyID,
+      NAME : 'STORE'
+    }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.stores = response.filter(
         (store: any) => store.ID !== this.storeFromSession,
       );
@@ -236,50 +245,80 @@ export class TransferInInventoryFormComponent {
   }
 
   getReasonsDropdown() {
-    this.dataService.getDropdownData('REASON').subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID : this.companyID,
+      NAME : 'REASON'
+    }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
     });
   }
 
-  onSelectItems() {
-    const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+onSelectItems() {
+  const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 
-    if (selectedRows && selectedRows.length > 0) {
-      this.transferInFormData.DETAILS = this.transferInFormData.DETAILS.filter(
-        (item) => item.BARCODE !== '' && item.DESCRIPTION !== '',
-      );
+  if (selectedRows && selectedRows.length > 0) {
 
-      if (!this.transferInFormData.ISSUE_ID && selectedRows[0].ISSUE_ID) {
-        this.transferInFormData.ISSUE_ID = selectedRows[0].ISSUE_ID;
-      }
+    const transferId = selectedRows[0].TRANSFER_ID; //  get transfer id
 
-      selectedRows.forEach((row) => {
-        const exists = this.transferInFormData.DETAILS.some(
-          (item) => item.BARCODE === row.BARCODE,
-        );
+    // Call API instead of manually pushing rows
+    this.dataService
+      .getItemsforTransferIn(transferId, this.companyID)
+      .subscribe((res: any) => {
+        console.log(res, 'API response');
 
-        if (!exists) {
-          this.transferInFormData.DETAILS.push({
-            SL_NO: this.transferInFormData.DETAILS.length + 1,
-            ISSUE_DETAIL_ID: row.ISSUE_DETAIL_ID,
-            ISSUE_ID: row.ISSUE_ID, // stays in detail too if you need it
-            ITEM_ID: row.ITEM_ID,
-            BARCODE: row.BARCODE,
-            DESCRIPTION: row.DESCRIPTION,
-            UOM: row.UOM,
-            COST: row.COST,
-            QUANTITY_AVAILABLE: row.QUANTITY_AVAILABLE,
-            QUANTITY_ISSUED: row.QUANTITY_ISSUED || 0,
-            QUANTITY_RECEIVED: 0,
-            BATCH_NO: '0',
-            EXPIRY_DATE: new Date(),
+        if (res?.data && res.data.length > 0) {
+
+          //  Clear existing valid rows if needed
+          this.transferInFormData.DETAILS =
+            this.transferInFormData.DETAILS.filter(
+              (item) => item.BARCODE !== '' && item.DESCRIPTION !== '',
+            );
+
+          //  Set ISSUE_ID
+          if (!this.transferInFormData.ISSUE_ID && res.data[0].ISSUE_ID) {
+            this.transferInFormData.ISSUE_ID = res.data[0].ISSUE_ID;
+          }
+
+          //  Map API response → grid (like PO)
+          res.data.forEach((item: any) => {
+            const exists = this.transferInFormData.DETAILS.some(
+              (d) => d.BARCODE === item.BARCODE,
+            );
+
+            if (!exists) {
+              const qty = Number(item.QUANTITY_ISSUED) || 0;
+              const cost = Number(item.COST) || 0;
+
+              this.transferInFormData.DETAILS.push({
+                SL_NO: this.transferInFormData.DETAILS.length + 1,
+                ISSUE_DETAIL_ID: item.ISSUE_DETAIL_ID,
+                ISSUE_ID: item.ISSUE_ID,
+                ITEM_ID: item.ITEM_ID,
+                BARCODE: item.BARCODE,
+                DESCRIPTION: item.DESCRIPTION,
+                UOM: item.UOM,
+                COST: cost,
+                QUANTITY_AVAILABLE: item.QUANTITY_AVAILABLE,
+                QUANTITY_ISSUED: qty,
+                QUANTITY_RECEIVED: 0,
+                BATCH_NO: '0',
+                EXPIRY_DATE: new Date(),
+
+                // IMPORTANT
+                netAmount: cost * qty,
+              });
+            }
           });
+
+          
+          // this.recalculateNetAmount();
         }
       });
-    }
-
-    this.isPopupVisible = false; // close popup
   }
+
+  this.isPopupVisible = false; // close popup
+}
 
   onAddItems() {
     this.isPopupVisible = true;
@@ -370,6 +409,10 @@ export class TransferInInventoryFormComponent {
     }
   }
 
+  calculateNetAmount(rowData: any) {
+  return (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY_RECEIVED) || 0);
+}
+
   onEditorPrepared(e: any) {
     if (e.parentType === 'dataRow' && e.dataField === 'QUANTITY_RECEIVED') {
       setTimeout(() => {
@@ -378,18 +421,26 @@ export class TransferInInventoryFormComponent {
     }
   }
 
+
   updateNetAmount(editingRowIndex?: number, newValue?: number) {
-    this.transferInFormData.NET_AMOUNT = this.transferInFormData.DETAILS.reduce(
-      (sum: number, item: any, idx: number) => {
-        let qty =
-          idx === editingRowIndex
-            ? Number(newValue) || 0
-            : Number(item.QUANTITY_RECEIVED) || 0;
-        return sum + (Number(item.COST) || 0) * qty;
-      },
-      0,
-    );
-  }
+  this.transferInFormData.NET_AMOUNT = 0;
+
+  this.transferInFormData.DETAILS.forEach((item: any, idx: number) => {
+    let qty =
+      idx === editingRowIndex
+        ? Number(newValue) || 0
+        : Number(item.QUANTITY_RECEIVED) || 0;
+
+    // Calculate row total
+    item.netAmount = (Number(item.COST) || 0) * qty;
+
+    //  Add to grand total
+    this.transferInFormData.NET_AMOUNT += item.netAmount;
+  });
+
+  this.netamount = this.transferInFormData.NET_AMOUNT;
+}
+
 
   onSummaryCalculate(e: any) {
     if (e.name === 'netAmount') {

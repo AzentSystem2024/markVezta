@@ -75,6 +75,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
           menu.CanEdit = false;
           menu.CanApprove = false;
           menu.CanDelete = false;
+          menu.HideCost = false;
           menu.CanPrint = false;
 
           const match = userMenus.find(
@@ -88,6 +89,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             menu.CanEdit = match.CanEdit ?? false;
             menu.CanApprove = match.CanApprove ?? false;
             menu.CanDelete = match.CanDelete ?? false;
+            menu.HideCost = match.HideCost ?? false;
             menu.CanPrint = match.CanPrint ?? false;
 
             // Bind to grid checkboxes:
@@ -96,6 +98,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             menu.canEdit = match.CanEdit ?? false;
             menu.canApprove = match.CanApprove ?? false;
             menu.canDelete = match.CanDelete ?? false;
+            menu.HideCost = match.HideCost ?? false;
             menu.canPrint = match.CanPrint ?? false;
 
             this.selectedRows[tabIndex].push(menu.MenuId);
@@ -130,6 +133,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
               CanView: menu.canView ?? true,
               CanEdit: menu.canEdit ?? false,
               CanApprove: menu.canApprove ?? false,
+              HideCost : menu.HideCost ?? false,
               CanDelete: menu.canDelete ?? false,
               CanPrint: menu.canPrint ?? false,
             });
@@ -201,6 +205,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             CanEdit: menu.CanEdit ?? false,
             CanApprove: menu.CanApprove ?? false,
             CanDelete: menu.CanDelete ?? false,
+            HideCost : menu.HideCost ?? false,
             CanPrint: menu.CanPrint ?? false,
           });
         }
