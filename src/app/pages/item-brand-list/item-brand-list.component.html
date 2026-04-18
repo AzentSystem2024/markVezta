@@ -1,8 +1,10 @@
 <div class="view-wrapper list-page">
   
     <dx-data-grid
+      #dataGrid
       class="grid theme-dependent"
-      [dataSource]="brand"
+      [height]="'82vh'"
+      [dataSource]="brandDataSource"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       (onRowRemoving)="onRowRemoving($event)"
@@ -12,22 +14,56 @@
       [allowColumnResizing]="true"
       (onExporting)="onExporting($event)"
     >
-    <dxo-filter-panel [visible]="true"></dxo-filter-panel>
-    <dxo-filter-row
-    [visible]="showFilterRow"
-  ></dxo-filter-row>
 
-  <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+    <dxo-filter-row [visible]="isFilterOpened"></dxo-filter-row>
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
 
 <dxo-export
       [enabled]="true"
-      [formats]="['xlsx', 'pdf']"
+      [formats]="['xlsx']"
     >
     </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
-      <dxo-popup title="Edit Item Brand" [showTitle]="true" [width]="500" [height]="300"></dxo-popup>
-      <dxo-form [colCount]="1">
+      <dxo-popup title="Edit Item Brand" [showTitle]="true" [width]="500" [height]="'auto'"></dxo-popup>
+      <dxo-form
+        [colCount]="1"
+        labelMode="floating"
+      >
+
+        <dxi-item
+          dataField="CODE"
+          [editorOptions]="{ placeholder: 'Code' }"
+        >
+          <dxi-validation-rule
+            type="required"
+            message="Code is required"
+          ></dxi-validation-rule>
+        </dxi-item>
+
+        <dxi-item
+          dataField="BRAND_NAME"
+          [editorOptions]="{ placeholder: 'Brand Name' }"
+        >
+          <dxi-validation-rule
+            type="required"
+            message="Brand name is required"
+          ></dxi-validation-rule>
+        </dxi-item>
 
       </dxo-form>
     </dxo-editing>
@@ -37,42 +73,54 @@
     ></dxo-search-panel>
     
     <dxo-toolbar>
-        <dxi-item location="before">
-          <div class="grid-header">Brand</div>
-        </dxi-item>
-    
-    <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="addBrand()"
-          
-        ></dx-button>
-      </dxi-item>
-      <dxi-item
-            location="after"
-            locateInMenu="auto"
-            showText="inMenu"
-            widget="dxButton"
-            [options]="{
-              text: 'Refresh',
-              onClick: refresh,
-              icon: 'refresh',
-              stylingMode: 'text'
-            }"
-          ></dxi-item>
-          <dxi-item location="after" locateInMenu="auto">
-            <div class="separator"></div>
-          </dxi-item>
-          <dxi-item name="exportButton"></dxi-item>
-          <dxi-item location="after" locateInMenu="auto">
-            <div class="separator"></div>
-          </dxi-item>
-          <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
-    
-    </dxo-toolbar>
+
+    <!-- Title -->
+    <dxi-item location="before">
+      <div
+        class="grid-header"
+        style="font-weight: 600; font-size: 20px; margin-left: 12px"
+      >
+        Item Brand
+      </div>
+    </dxi-item>
+
+    <!-- Search Toggle Button -->
+    <dxi-item
+      location="after"
+      locateInMenu="auto"
+      widget="dxButton"
+      [options]="searchButtonOptions"
+    ></dxi-item>
+
+    <!-- Refresh Button -->
+    <dxi-item
+      location="after"
+      locateInMenu="auto"
+      widget="dxButton"
+      [options]="refreshButtonOptions"
+    ></dxi-item>
+
+    <!-- Divider -->
+    <dxi-item location="after">
+      <div class="toolbar-divider"></div>
+    </dxi-item>
+
+    <!-- Export -->
+    <dxi-item
+      name="exportButton"
+      location="after"
+      cssClass="export-btn"
+    ></dxi-item>
+
+    <!-- Add Button -->
+    <dxi-item
+      location="after"
+      locateInMenu="auto"
+      widget="dxButton"
+      [options]="addButtonOptions"
+    ></dxi-item>
+
+</dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
       <dxi-validation-rule type="required" message="Code is required">
         <dxi-validation-rule
@@ -98,6 +146,7 @@
     [(visible)]="isAddBrandPopupOpened"
     (save)="onClickSaveBrand()"
     titleText="New Brand"
+    [showApprove]="false"
       >
       <app-itm-brand-form></app-itm-brand-form>
 

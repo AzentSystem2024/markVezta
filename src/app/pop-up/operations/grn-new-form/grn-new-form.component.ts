@@ -206,12 +206,10 @@ export class GrnNewFormComponent implements OnInit {
     };
   };
   docNo: any;
+  isHQApp: boolean = false;
+  filteredStoreList: any[] = [];
 
   // add.component.ts
-  clearDemoArray() {
-    this.demoArray = [];
-    console.log(' demoArray cleared');
-  }
 
   constructor(
     private service: DataService,
@@ -229,6 +227,40 @@ export class GrnNewFormComponent implements OnInit {
     this.sesstion_Details();
   }
 
+  ngOnInit(): void {
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    console.log(this.isHQApp, 'USERDATASTRINGGGGGGGGGGGG');
+    const configStore = userData.Configuration?.[0];
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+    }
+    // this.getSupplierData();
+    this.get_Supplier_dropdown();
+    this.getStoreData();
+    this.sesstion_Details();
+    this.getDocNo();
+    if (this.isHQApp && configStore) {
+      this.filteredStoreList = [
+        {
+          ID: configStore.STORE_ID,
+          DESCRIPTION: configStore.STORE_NAME,
+        },
+      ];
+
+      // Auto select store
+      this.newGrnData.STORE_ID = configStore.STORE_ID;
+    } else {
+      this.filteredStoreList = this.storeList;
+    }
+    // this.getPurchaseOrderList();
+  }
+
   getDocNo() {
     const payload = {
       TRANS_TYPE: 18,
@@ -238,6 +270,11 @@ export class GrnNewFormComponent implements OnInit {
     this.service.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
     });
+  }
+
+  clearDemoArray() {
+    this.demoArray = [];
+    console.log(' demoArray cleared');
   }
 
   mergeItems(items: any[]) {
@@ -494,6 +531,9 @@ export class GrnNewFormComponent implements OnInit {
     };
     this.service.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
+      if (!this.isHQApp) {
+        this.filteredStoreList = this.storeList; //update here
+      }
     });
   }
 
@@ -1108,15 +1148,6 @@ export class GrnNewFormComponent implements OnInit {
 
     console.log(this.newGrnData.GRN_Cost, 'this.newGrnData.GRN_Cost');
     console.log(this.newGrnData.GRNDetails, 'this.newGrnData.GRNDetails');
-  }
-
-  ngOnInit(): void {
-    // this.getSupplierData();
-    this.get_Supplier_dropdown();
-    this.getStoreData();
-    this.sesstion_Details();
-    this.getDocNo();
-    // this.getPurchaseOrderList();
   }
 
   getLandedCostDropDownData() {

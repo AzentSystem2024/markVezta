@@ -1,72 +1,118 @@
-<dx-form class="plain-styled-form" >
+  <dx-form class="plain-styled-form">
     <dxi-item itemType="group">
+
       <dxo-col-count-by-screen
         [xs]="1"
         [sm]="1"
         [md]="1"
         [lg]="1"
       ></dxo-col-count-by-screen>
+
+      <!-- CODE -->
       <dxi-item>
-        <div *dxTemplate>
-          <form-textbox
-          
-            label="Code"
-            [(value)]="newCurrency.CODE"
-            [isEditing]="true"
-            
-          >
-          </form-textbox>
-          
-        </div>
+        <dx-text-box
+          label="Code *"
+          [(value)]="newCurrency.CODE"
+          labelMode="floating"
+        >
+          <dx-validator>
+
+            <dxi-validation-rule
+              type="required"
+              message="Code is required"
+            ></dxi-validation-rule>
+
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateCodeExists.bind(this)"
+              message="Code already exists"
+            ></dxi-validation-rule>
+
+            <!-- Optional: uppercase / no spaces -->
+            <dxi-validation-rule
+              type="pattern"
+              [pattern]="'^[A-Z0-9]+$'"
+              message="Only uppercase letters and numbers allowed"
+            ></dxi-validation-rule>
+
+          </dx-validator>
+        </dx-text-box>
       </dxi-item>
+
+      <!-- SYMBOL -->
       <dxi-item>
-        <div *dxTemplate>
-          <form-textbox
-            label="Symbol"
-            [(value)]="newCurrency.SYMBOL"
-            [isEditing]="true"
-            
-          >
-          </form-textbox>
-        </div>
+        <dx-text-box
+          label="Symbol *"
+          [(value)]="newCurrency.SYMBOL"
+          labelMode="floating"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Symbol is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
       </dxi-item>
-  
+
+      <!-- DESCRIPTION -->
       <dxi-item>
-        <div *dxTemplate>
-          <form-textbox
-            label="Description"
-            [(value)]="newCurrency.DESCRIPTION"
-            [isEditing]="true"
-          >
-          
-          </form-textbox>
-        </div>
+        <dx-text-box
+          label="Description *"
+          [(value)]="newCurrency.DESCRIPTION"
+          labelMode="floating"
+        >
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Description is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-text-box>
       </dxi-item>
+
+      <!-- FRACTION UNIT -->
       <dxi-item>
-        <div *dxTemplate>
-          <form-textbox
-            label="Fraction Unit"
-            [(value)]="newCurrency.FRACTION_UNIT"
-            [isEditing]="true"
-          >
-          </form-textbox>
-        </div>
+        <dx-text-box
+          label="Fraction Unit *"
+          [(value)]="newCurrency.FRACTION_UNIT"
+          labelMode="floating"
+        >
+        <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Fraction Unit is required"
+            ></dxi-validation-rule>
+        </dx-validator>
+        </dx-text-box>
       </dxi-item>
+
+      <!-- EXCHANGE -->
       <dxi-item>
-        <div *dxTemplate>
-          <form-textbox
-          #exchangeTextbox
-            label="Exchange"
-            [(value)]="newCurrency.EXCHANGE"
-            [isEditing]="true"
-            (valueChange)="validateExchange(exchangeTextbox.value)"
-          >
-          </form-textbox>
-          <div *ngIf="exchangeError" class="error-message">{{ exchangeError }}</div>
-        </div>
+        <dx-number-box
+          label="Exchange *"
+          [(value)]="newCurrency.EXCHANGE"
+          labelMode="floating"
+          [min]="0"
+          [step]="0.01"
+          format="#0.00"
+          [showSpinButtons]="true"
+        >
+          <dx-validator>
+
+            <dxi-validation-rule
+              type="required"
+              message="Exchange is required"
+            ></dxi-validation-rule>
+
+            <dxi-validation-rule
+              type="numeric"
+              message="Exchange must be a number"
+            ></dxi-validation-rule>
+
+          </dx-validator>
+        </dx-number-box>
       </dxi-item>
 
     </dxi-item>
   </dx-form>
-  
-

@@ -2,14 +2,13 @@
   <div
     [ngClass]="{
       'item-list-container': !showNewGrid,
-      'item-list-expanded': showNewGrid
+      'item-list-expanded': showNewGrid,
     }"
   >
     <dx-data-grid
       [width]="showNewGrid ? '100%' : '100%'"
-      [height]="'550px'"
       class="grid theme-dependent"
-      [dataSource]="itemStoresList"
+      [dataSource]="worksheetData"
       [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
@@ -21,11 +20,11 @@
       [(selectedRowKeys)]="selectedRowKeys"
       [keyExpr]="'ID'"
       [editing]="{
-        mode: 'batch', 
-        allowUpdating: true
+        mode: 'batch',
+        allowUpdating: true,
       }"
     >
-    <dxo-column-fixing [enabled]="true"></dxo-column-fixing>
+      <dxo-column-fixing [enabled]="true"></dxo-column-fixing>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-scrolling
         mode="standard"
@@ -67,7 +66,6 @@
               {{ data.name }}
             </div>
           </dx-tag-box>
-       
         </dxi-item>
         <dxi-item location="before"> </dxi-item>
         <dxi-item location="before">
@@ -80,77 +78,79 @@
             label="Select Store"
             labelMode="floating"
             labelLocation="left"
-
             [width]="300"
           >
           </dx-select-box>
         </dxi-item>
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
-          <dx-button text="Cancel" 
-                     stylingMode="outlined" 
-                     type="normal" 
-                     (onClick)="onCancel()" 
-                     style="width: 100px;"></dx-button>
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            type="normal"
+            (onClick)="onCancel()"
+            style="width: 100px"
+          ></dx-button>
         </dxi-item>
-      
+
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
-          <dx-button *ngIf="!isSaved && !isVerified" 
-                     text="Save" 
-                     stylingMode="contained" 
-                     type="default" 
-                     (onClick)="onSaveButtonClick()" 
-                     style="width: 100px;"></dx-button>
-          
-          <dx-button *ngIf="isSaved && !isVerified && AllowCommitWithSave" 
-                     text="Verify" 
-                     stylingMode="contained" 
-                     type="default" 
-                     (onClick)="onVerify()" 
-                     style="width: 100px;"></dx-button>
-      
-          <dx-button *ngIf="isVerified && AllowCommitWithSave" 
-                     text="Approve" 
-                     stylingMode="contained" 
-                     type="default" 
-                     (onClick)="onApprove()" 
-                     style="width: 100px;"></dx-button>
+          <dx-button
+            *ngIf="!isSaved && !isVerified"
+            text="Save"
+            stylingMode="contained"
+            type="default"
+            (onClick)="onSaveButtonClick()"
+            style="width: 100px"
+          ></dx-button>
+
+          <dx-button
+            *ngIf="isSaved && !isVerified && AllowCommitWithSave"
+            text="Verify"
+            stylingMode="contained"
+            type="default"
+            (onClick)="onVerify()"
+            style="width: 100px"
+          ></dx-button>
+
+          <dx-button
+            *ngIf="isVerified && AllowCommitWithSave"
+            text="Approve"
+            stylingMode="contained"
+            type="default"
+            (onClick)="onApprove()"
+            style="width: 100px"
+          ></dx-button>
         </dxi-item>
       </dxo-toolbar>
 
-        <dxi-column
+      <dxi-column
         dataField="BARCODE"
         caption="Barcode"
         [width]="150"
         [allowEditing]="false"
-       
       ></dxi-column>
       <dxi-column
         dataField="DESCRIPTION"
         caption="Description"
         [width]="220"
         [allowEditing]="false"
-   
       ></dxi-column>
       <dxi-column
         dataField="DEPT_NAME"
         caption="Department"
         [width]="150"
         [allowEditing]="false"
-     
       ></dxi-column>
       <dxi-column
         dataField="CAT_NAME"
         caption="Category"
         [width]="150"
         [allowEditing]="false"
-
       ></dxi-column>
       <dxi-column
         dataField="BRAND_NAME"
         caption="Brand"
         [width]="150"
         [allowEditing]="false"
-    
       ></dxi-column>
       <!-- <ng-container *ngIf="!worksheetData"> -->
       <dxi-column
@@ -169,13 +169,11 @@
           caption="New Value"
           [width]="100"
           dataType="boolean"
-          
           [editorOptions]="{
             iconSize: '15px',
             enableTwoStateBehavior: true,
-            onValueChanged: onSaleItemValueChanged
+            onValueChanged: onSaleItemValueChanged,
           }"
-          
         >
         </dxi-column>
       </dxi-column>
@@ -193,22 +191,19 @@
           [disable]="true"
           [allowEditing]="false"
         >
-      </dxi-column>
-      <dxi-column
-      dataField="IS_NOT_SALE_RETURN"
-      caption="New Value"
-      [width]="100"
-      dataType="boolean"
-      
-      [editorOptions]="{
-        iconSize: '15px',
-        enableTwoStateBehavior: true,
-        onValueChanged: onSaleReturnValueChanged
-      }"
-      
-    >
-
-    </dxi-column>
+        </dxi-column>
+        <dxi-column
+          dataField="IS_NOT_SALE_RETURN"
+          caption="New Value"
+          [width]="100"
+          dataType="boolean"
+          [editorOptions]="{
+            iconSize: '15px',
+            enableTwoStateBehavior: true,
+            onValueChanged: onSaleReturnValueChanged,
+          }"
+        >
+        </dxi-column>
       </dxi-column>
       <dxi-column
         caption="Not Discountable"
@@ -227,12 +222,11 @@
           caption="New Value"
           [width]="120"
           dataType="boolean"
-          
           [allowEditing]="true"
           [editorOptions]="{
             iconSize: '15px',
             showCheckBoxesMode: 'always',
-            onValueChanged: onNotDisountableValueChanged
+            onValueChanged: onNotDisountableValueChanged,
           }"
         >
         </dxi-column>
@@ -250,18 +244,18 @@
           [allowEditing]="false"
         ></dxi-column>
         <dxi-column
-        dataField="IS_PRICE_REQUIRED"
-        caption="New Value"
-        [width]="120"
-        dataType="boolean"
-        [allowEditing]="true"
-        [editorOptions]="{
-          iconSize: '15px',
-          enableTwoStateBehavior: true,
-          onValueChanged: onPriceRequiredValueChanged
-        }"
-      >
-      </dxi-column>
+          dataField="IS_PRICE_REQUIRED"
+          caption="New Value"
+          [width]="120"
+          dataType="boolean"
+          [allowEditing]="true"
+          [editorOptions]="{
+            iconSize: '15px',
+            enableTwoStateBehavior: true,
+            onValueChanged: onPriceRequiredValueChanged,
+          }"
+        >
+        </dxi-column>
       </dxi-column>
       <dxi-column caption="Inactive" [width]="150" [visible]="showIsInactive">
         <!-- Sub-column for Current Value -->
@@ -271,7 +265,7 @@
           [width]="120"
           [allowEditing]="false"
         ></dxi-column>
-        
+
         <!-- Sub-column for New Value -->
         <dxi-column
           dataField="IS_INACTIVE"
@@ -282,25 +276,13 @@
           [editorOptions]="{
             iconSize: '15px',
             enableTwoStateBehavior: true,
-            onValueChanged: onInactiveValueChanged
+            onValueChanged: onInactiveValueChanged,
           }"
         >
         </dxi-column>
       </dxi-column>
-      
+
       <!-- </ng-container> -->
-
-
-
-      
-
     </dx-data-grid>
-    
-
   </div>
-
 </div>
-
-
-
-

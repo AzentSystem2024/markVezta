@@ -24,6 +24,8 @@ export class ReasonsListComponent {
   @ViewChild(ReasonsFormComponent) reasonComponent: ReasonsFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @ViewChild('addForm') addFormComponent!: ReasonsFormComponent;
+  @ViewChild('editForm') editFormComponent!: ReasonsFormComponent;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -35,11 +37,16 @@ export class ReasonsListComponent {
   discounttype: any;
   isAddReasonsPopupOpened = false;
   selectedRows: any[] = [];
-  showFilterRow = true;
+  showFilterRow = false;
   showHeaderFilter = true;
   isEditReasonsPopupOpened: boolean = false;
   selected_Data: any;
   isFilterOpened = false;
+
+  isEditMode: boolean = false;
+
+  currentEditId: number | null = null;
+  
 
   constructor(
     private dataservice: DataService,
@@ -137,10 +144,9 @@ export class ReasonsListComponent {
     const id = e.data.ID;
     this.isEditReasonsPopupOpened = true;
     this.dataservice.select_reason(id).subscribe((res: any) => {
-      console.log(
-        res,
-        '=============selected data===============================',
-      );
+      
+      this.isEditMode = true;
+      this.currentEditId = id;
       this.selected_Data = res;
     });
   }
@@ -152,6 +158,42 @@ export class ReasonsListComponent {
     e.selectedRowKeys;
   }
   onClickSaveReasons() {
+    // const {
+    //   CODE,
+    //   DESCRIPTION,
+    //   ARABIC_DESCRIPTION,
+    //   START_DATE,
+    //   END_DATE,
+    //   REASON_TYPE,
+    //   DISCOUNT_TYPE,
+    //   AC_HEAD_ID,
+    //   COMPANY_ID,
+    //   DISCOUNT_PERCENT,
+    //   REASON_STORES,
+    // } = this.reasonComponent.getNewReasonsData();
+    // console.log(
+    //   'inserted data',
+    //   CODE,
+    //   DESCRIPTION,
+    //   ARABIC_DESCRIPTION,
+    //   START_DATE,
+    //   END_DATE,
+    //   REASON_TYPE,
+    //   DISCOUNT_TYPE,
+    //   DISCOUNT_PERCENT,
+    //   REASON_STORES,
+    //   COMPANY_ID,
+    // );
+
+
+    const component = this.isEditMode
+        ? this.editFormComponent
+        : this.addFormComponent;
+    
+    const data = component.getNewReasonsData();
+    
+    console.log('FINAL DATA', data);
+
     const {
       CODE,
       DESCRIPTION,
@@ -164,31 +206,19 @@ export class ReasonsListComponent {
       COMPANY_ID,
       DISCOUNT_PERCENT,
       REASON_STORES,
-    } = this.reasonComponent.getNewReasonsData();
-    console.log(
-      'inserted data',
-      CODE,
-      DESCRIPTION,
-      ARABIC_DESCRIPTION,
-      START_DATE,
-      END_DATE,
-      REASON_TYPE,
-      DISCOUNT_TYPE,
-      DISCOUNT_PERCENT,
-      REASON_STORES,
-      COMPANY_ID,
+    } = data;
+
+    const filteredReasons = this.isEditMode
+    ? this.reasons.filter((x: any) => x.ID !== this.currentEditId)
+    : this.reasons;
+
+    const isCodeDuplicate = filteredReasons.some(
+      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
     );
 
-    // Check for duplicates in CategoryList
-    const isCodeDuplicate = this.reasons.some(
-      // (item: any) => item.CODE === commonDetails.code
-      (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase(),
-    );
-
-    const isDescriptionDuplicate = this.reasons.some(
-      // (item: any) => item.DESCRIPTION === commonDetails.category
+    const isDescriptionDuplicate = filteredReasons.some(
       (item: any) =>
-        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase(),
+        item.DESCRIPTION.toLowerCase() === DESCRIPTION.toLowerCase()
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -223,7 +253,47 @@ export class ReasonsListComponent {
       return;
     }
 
-    if (REASON_STORES)
+    if (
+    !REASON_STORES ||
+    !Array.isArray(REASON_STORES) ||
+    REASON_STORES.length === 0 ||
+    REASON_STORES.every((x: any) => !x.STORE_ID || x.STORE_ID.toString().trim() === '')
+  ) {
+    notify(
+      {
+        message: 'At least one store should be selected',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 2000,
+      },
+      'error'
+    );
+    return;
+  }
+
+  if (this.isEditMode && this.currentEditId) {
+        this.dataservice
+      .Update_reason(
+        data
+      )
+          .subscribe((response: any) => {
+            if (response?.flag === '1') {
+              notify(
+                {
+                  message: 'Reason updated successfully',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'success'
+              );
+    
+              this.isEditReasonsPopupOpened = false;
+              this.showReasons();
+            }
+          });
+    
+        return;
+      }
+
+   
       this.dataservice
         .postReasonData(
           CODE,
@@ -239,13 +309,13 @@ export class ReasonsListComponent {
           COMPANY_ID,
         )
         .subscribe((response) => {
-          if (response) {
+          if (response.flag === '1') {
             this.showReasons();
             this.isAddReasonsPopupOpened = false;
 
             notify(
               {
-                message: 'The Reason Inserted Successfully',
+                message: 'Reason Saved Successfully',
                 position: { at: 'top right', my: 'top right' },
                 displayTime: 1000,
               },

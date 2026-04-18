@@ -25,10 +25,11 @@
         style="
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
+          align-items: center;
           gap: 10px;
         "
       >
+        <!-- Left side -->
         <div style="display: flex; gap: 4px">
           <dx-text-box
             label="Reference No."
@@ -38,6 +39,7 @@
             [readOnly]="true"
           >
           </dx-text-box>
+
           <dx-date-box
             label="Date"
             type="date"
@@ -45,52 +47,25 @@
             labelMode="floating"
             [width]="200"
             [displayFormat]="'dd-MM-yyyy'"
+            [readOnly]="true"
           >
           </dx-date-box>
         </div>
-        <dx-select-box
-          [dataSource]="distributorList"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="purchaseInvoiceFormData.SUPP_ID"
-          [width]="405"
-          label="Supplier"
-          labelMode="floating"
-          (onValueChanged)="onSupplierChanged($event)"
-        >
-        </dx-select-box>
-      </div>
 
-      <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 10px;
-        "
-      >
-        <div style="display: flex; gap: 4px">
-          <!-- <dx-date-box
-            label="Transaction Date"
-            type="date"
-            [(value)]="purchaseInvoiceFormData.PURCH_DATE"
+        <!-- Right side (Supplier + Button together) -->
+        <div style="display: flex; gap: 8px; align-items: center">
+          <dx-select-box
+            [dataSource]="distributorList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="purchaseInvoiceFormData.SUPP_ID"
+            [width]="300"
+            label="Supplier"
             labelMode="floating"
-            [width]="200"
-            [displayFormat]="'dd-MM-yyyy'"
-            [readOnly]="true"
+            (onValueChanged)="onSupplierChanged($event)"
           >
-          </dx-date-box> -->
-        </div>
+          </dx-select-box>
 
-        <div
-          style="
-            display: flex;
-            gap: 2px;
-            justify-content: flex-end;
-            margin-top: 8px;
-          "
-        >
           <dx-button
             [width]="200"
             class="blue-outline-btn"
@@ -107,10 +82,12 @@
                 ></span>
                 <span>Fill Pending GRN</span>
               </div>
-            </div></dx-button
-          >
+            </div>
+          </dx-button>
         </div>
       </div>
+
+      <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
     </div>
 
     <div class="salary-grid-wrapper" style="padding: 0 20px">
@@ -129,7 +106,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'50vh'"
+          [height]="'55vh'"
           [width]="'auto'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
@@ -413,6 +390,8 @@
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+      (onSelectionChanged)="onPopupSelectionChanged($event)"
+      (onRowPrepared)="onPopupRowPrepared($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager

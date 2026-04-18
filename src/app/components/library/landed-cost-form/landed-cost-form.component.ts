@@ -2,7 +2,7 @@ import { Component, NgModule, enableProdMode, OnInit } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
-import { DxCheckBoxModule } from 'devextreme-angular';
+import { DxCheckBoxModule, DxNumberBoxModule, DxValidatorModule } from 'devextreme-angular';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -12,13 +12,16 @@ import {
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxRadioGroupModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
+import { Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-landed-cost-form',
   templateUrl: './landed-cost-form.component.html',
   styleUrls: ['./landed-cost-form.component.scss'],
 })
-export class LandedCostFormComponent {
+export class LandedCostFormComponent implements  OnChanges {
+  @Input() formData: any;
+
   currencyOptions: any[] = [
     { text: 'Local', value: true },
     { text: 'Supplier', value: false },
@@ -43,6 +46,15 @@ export class LandedCostFormComponent {
 
   getNewLandedcost = () => ({ ...this.newLandedCost });
 
+
+  ngOnChanges(changes: SimpleChanges) {
+  if (changes['formData'] && this.formData) {
+    this.newLandedCost = this.formData;
+
+    console.log(this.formData, 'formData received in child');
+  }
+}
+
   onValueChangedInactive(event: any) {
     this.formLandedcostData.IS_INACTIVE = event;
   }
@@ -65,6 +77,8 @@ export class LandedCostFormComponent {
     FormTextboxModule,
     DxCheckBoxModule,
     DxRadioGroupModule,
+    DxValidatorModule,
+    DxNumberBoxModule
   ],
   declarations: [LandedCostFormComponent],
   exports: [LandedCostFormComponent],

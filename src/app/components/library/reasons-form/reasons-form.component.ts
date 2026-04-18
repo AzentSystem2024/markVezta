@@ -1,4 +1,4 @@
-import { Component, NgModule, enableProdMode, OnInit } from '@angular/core';
+import { Component, NgModule, enableProdMode, OnInit, OnChanges, Input, SimpleChanges } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
@@ -24,7 +24,8 @@ import { DxSelectBoxTypes } from 'devextreme-angular/ui/select-box';
   templateUrl: './reasons-form.component.html',
   styleUrls: ['./reasons-form.component.scss'],
 })
-export class ReasonsFormComponent {
+export class ReasonsFormComponent implements OnChanges{
+  @Input() formData: any;
   stores: any;
   customer: boolean = false;
   Inv_man_Adj: boolean = false;
@@ -63,6 +64,24 @@ export class ReasonsFormComponent {
     DISCOUNT_TYPE: this.newReasons.DISCOUNT_TYPE ?? 0,
     DISCOUNT_PERCENT: this.newReasons.DISCOUNT_PERCENT ?? 0,
   });
+
+  ngOnChanges(changes: SimpleChanges) {
+      if (changes['formData'] && this.formData) {
+        this.newReasons = this.formData;
+    
+        console.log(this.formData, 'formData received in child');
+
+        //  Convert reason_stores → selectedRows (for grid selection)
+        if (this.formData.reason_stores && Array.isArray(this.formData.reason_stores)) {
+          this.selectedRows = this.formData.reason_stores.map(
+            (x: any) => Number(x.STORE_ID)
+          );
+        } else {
+          this.selectedRows = [];
+        }
+      }
+    }
+  
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -127,17 +146,18 @@ export class ReasonsFormComponent {
       this.ac_ledger_Data = res;
     });
   }
+  
   onSelectionChanged(e: any) {
-    const selected_row = e.selectedRowKeys;
-    const selected_valued = e.selectedRowsData;
+  const selected_valued = e.selectedRowsData;
 
-    const restored_Data = selected_valued.map((item) => ({
-      ID: item.ID,
-      STORE_ID: item.STORE_NO ?? 0, // 👈 taking STORE_NO as STORE_ID
-    }));
+  const restored_Data = selected_valued.map((item) => ({
+    ID: item.ID,
+    STORE_ID: item.STORE_NO ?? 0,
+  }));
 
-    this.formReasonsData.REASON_STORES = restored_Data;
-  }
+  this.newReasons.REASON_STORES = restored_Data; // ✅ FIX
+}
+
   onValueChangedSDate(event: any) {
     this.formReasonsData.START_DATE = event.value;
   }

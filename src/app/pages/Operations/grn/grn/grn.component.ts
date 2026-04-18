@@ -52,6 +52,7 @@ import {
 } from 'src/app/pop-up/operations/grn-view-form/grn-view-form.component';
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-grn',
@@ -124,6 +125,7 @@ export class GrnComponent implements OnInit {
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup = false;
+  isSaving: boolean = false;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -268,50 +270,61 @@ export class GrnComponent implements OnInit {
   }
 
   onClickSaveNewData() {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.isSaving = true;
+
     const data = this.grnNewForm.getNewGrnData();
-    console.log(data, 'grn new data');
     data.IS_APPROVED = this.isApproved;
-    console.log(data, 'DATAAAAAAAAAAAAAAAAAAAAAA');
-    this.service.saveGrnData(data).subscribe((res) => {
-      console.log('data saved', res);
 
-      // Check proper save success
-      if (res.Message === 'Success' && res.Flag === 1) {
-        // Check approval from payload
-        if (data.IS_APPROVED === true) {
+    this.service
+      .saveGrnData(data)
+      .pipe(
+        finalize(() => {
+          this.isSaving = false; // 🔥 ALWAYS executes (success/error/cancel)
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.Message === 'Success' && res.Flag === 1) {
+            notify(
+              {
+                message: data.IS_APPROVED
+                  ? 'Data Saved & Approved Successfully'
+                  : 'Data Saved Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.ClearFormData();
+            this.GrnNewFormComponent?.clearDemoArray();
+            this.isGRNPopupVisible = false;
+            this.GrnNewFormComponent?.getDocNo();
+            this.getGrnLogData();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not Saved',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        },
+
+        error: () => {
           notify(
             {
-              message: 'Data Saved & Approved Successfully',
-              position: { at: 'top center', my: 'top center' },
+              message: 'Something went wrong',
+              position: { at: 'top right', my: 'top right' },
             },
-            'success',
+            'error',
           );
-        } else {
-          notify(
-            {
-              message: 'Data Saved Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-        }
-
-        // After success actions
-        this.ClearFormData();
-        this.GrnNewFormComponent?.clearDemoArray();
-        this.isGRNPopupVisible = false;
-        this.GrnNewFormComponent?.getDocNo();
-        this.getGrnLogData();
-      } else {
-        notify(
-          {
-            message: 'Your Data Not Saved',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      }
-    });
+        },
+      });
   }
 
   updateGrnData() {
@@ -360,7 +373,7 @@ export class GrnComponent implements OnInit {
             if (approveRes.Message === 'Success') {
               notify(
                 {
-                  message: 'Data Verified & Approved Successfully',
+                  message: 'Data Updated & Approved Successfully',
                   position: { at: 'top center', my: 'top center' },
                 },
                 'success',
@@ -384,7 +397,7 @@ export class GrnComponent implements OnInit {
         else {
           notify(
             {
-              message: 'Data Verified Successfully',
+              message: 'Data Updated Successfully',
               position: { at: 'top center', my: 'top center' },
             },
             'success',
@@ -707,6 +720,7 @@ export class GrnComponent implements OnInit {
   }
 
   ClearFormData() {
+    this.isSaving = false;
     if (this.grnNewForm) {
       this.grnNewForm.clearForm(); // call ONCE
     }

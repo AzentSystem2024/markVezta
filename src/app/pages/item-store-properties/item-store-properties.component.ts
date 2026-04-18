@@ -47,9 +47,8 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./item-store-properties.component.scss'],
 })
 export class ItemStorePropertiesComponent {
-  @ViewChild(DxDataGridComponent, { static: true })
-  // @Input() selectedWorksheetData: any;
-  dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
   @Input() selectedWorksheetData: any;
   items: any;
   itemsList: any;
@@ -77,7 +76,7 @@ export class ItemStorePropertiesComponent {
   editedItems: any[] = [];
   userId: any;
   AllowCommitWithSave: any;
-  selectedRowId: number | null = null; // Store the selected row ID
+  selectedRowId: any; // Store the selected row ID
   selectedItemId: number | null = null;
   storeId: any;
   selectedRowIds: number[] = [];
@@ -102,7 +101,10 @@ export class ItemStorePropertiesComponent {
   isSaved: boolean = false;
   isVerified: boolean = false;
   selected_Company_id: any;
-
+  Selected_Items_Data: any = [];
+  updatedMap: any = {};
+  selecte_grid_Data: any;
+  User_Id: any;
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
@@ -134,11 +136,15 @@ export class ItemStorePropertiesComponent {
   listStoreItemProperty() {
     this.dataservice.getStoreItemPropertyList().subscribe((response) => {
       this.itemStoresList = response.data;
+      console.log(
+        this.itemStoresList,
+        '================item store list===================',
+      );
 
       // Find items with matching ITEM_IDs from selectedItems
-      const matchingItems = this.itemStoresList.filter((itemStore) => {
+      const matchingItems = this.itemStoresList.filter((itemStore: any) => {
         return this.selectedItems.some(
-          (selectedItem) => selectedItem.ITEM_ID === itemStore.ITEM_ID,
+          (selectedItem: any) => selectedItem.ITEM_ID === itemStore.ITEM_ID,
         );
       });
 
@@ -147,8 +153,11 @@ export class ItemStorePropertiesComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.User_Id = sessionData.USER_ID;
   }
 
   loadStore() {
@@ -160,6 +169,25 @@ export class ItemStorePropertiesComponent {
     });
   }
   onEditorPreparing = (e: any) => {
+    console.log(e, '=========event data==========s');
+    if (e.row?.isSelected) {
+      e.editorOptions.onValueChanged = (args: any) => {
+        const row = e.row.data;
+        const id = row.ITEM_ID;
+
+        if (!this.updatedMap[id]) {
+          this.updatedMap[id] = { ...row };
+        }
+
+        // update changed field
+        this.updatedMap[id][e.dataField] = args.value;
+
+        console.log('Updated Map:', this.updatedMap);
+      };
+    }
+    // const exists = e.row.data;
+    // console.log(exists);
+
     if (
       e.parentType === 'dataRow' &&
       e.dataField &&
@@ -174,78 +202,42 @@ export class ItemStorePropertiesComponent {
     }
   };
 
-  listItems() {
-    const payload = {};
-    this.dataservice.getItemsData().subscribe(
-      (items: any) => {
-        this.items = items;
-        this.itemStoresList = items.data;
-        this.itemStoresList.forEach((item: any) => {
-          this.fetchSelectedItem(item.ID);
-        });
-        this.dataGrid.instance.refresh();
-      },
-      (error) => {
-        console.error('Error fetching items:', error);
-      },
-    );
+  preparePayload() {
+    const finalData = this.Selected_Items_Data.map((item: any) => {
+      const updated = this.updatedMap[item.ITEM_ID];
+
+      return {
+        ...item,
+        ...updated, // merge edited values
+
+        // ensure Selected = true
+        Selected: true,
+        ID: 0,
+      };
+    });
+
+    const payload = finalData;
+
+    this.selecte_grid_Data = payload;
+
+    console.log('FINAL PAYLOAD:', payload);
+
+    return payload;
   }
 
-  onSelectionChanged(event: any) {
-    this.selectedRowCount = event.selectedRowKeys.length;
-    this.selectedRowKeys = event.selectedRowKeys;
-    const selectedItems = event.selectedRowsData;
-    if (selectedItems.length > 0) {
-      const selectedRow = selectedItems[0];
-      this.selectedRowId = selectedRow.ID;
-      this.selectedItemId = selectedRow.ITEM_ID;
-      this.inactiveoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_INACTIVE_NEW'];
-      this.NotDiscounteoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_DISCOUNTABLE_NEW'];
-      this.NotSaleoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_ITEM_NEW'];
-      this.NotSaleReturnoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_NOT_SALE_RETURN_NEW'];
-      this.NotPriceoldValue =
-        this.oldValues[this.selectedRowId]?.['IS_PRICE_REQUIRED_NEW'];
-      this.fetchSelectedItem(this.selectedRowId);
-    } else {
-      this.selectedRowId = null;
-      this.selectedItemId = null;
-    }
+  onSelectionChanged(e: any) {
+    console.log(e, '===================event -selectiopm=================');
+
+    this.Selected_Items_Data = e.selectedRowsData;
   }
 
   fetchSelectedItem(id: number): void {
     this.dataservice.selectItems(id).subscribe(
       (response: any) => {
-        const item = this.itemStoresList.find((i) => i.ID === id);
+        const item = this.itemStoresList.find((i: any) => i.ID === id);
         if (item) {
           item.item_stores = response.item_stores || [];
-          if (item.item_stores.length > 0) {
-            item.IS_NOT_SALE_ITEM = this.aggregateProperty(
-              item.item_stores,
-              'IS_NOT_SALE_ITEM',
-            );
-            item.IS_NOT_SALE_RETURN = this.aggregateProperty(
-              item.item_stores,
-              'IS_NOT_SALE_RETURN',
-            );
-            item.IS_PRICE_REQUIRED = this.aggregateProperty(
-              item.item_stores,
-              'IS_PRICE_REQUIRED',
-            );
-            item.IS_NOT_DISCOUNTABLE = this.aggregateProperty(
-              item.item_stores,
-              'IS_NOT_DISCOUNTABLE',
-            );
-            item.IS_INACTIVE = this.aggregateProperty(
-              item.item_stores,
-              'IS_INACTIVE',
-            );
-          } else {
-            item.STORE_NAME = 'No Store';
-          }
+
           this.filteredRowCount = this.itemStoresList.length;
           // Check if worksheetData exists and match the item ID
           //
@@ -297,8 +289,9 @@ export class ItemStorePropertiesComponent {
       editedItem = {
         COMPANY_ID: 1,
         USER_ID: 1,
-        STORE_ID: this.selectedStoreId,
+        STORE_ID: this.selectedStoreId.toString(),
         NARRATION: '',
+        WS_DATE: new Date(),
         worksheet_item_property: [], // Initialize as an empty array
       };
       this.editedItems.push(editedItem);
@@ -308,19 +301,27 @@ export class ItemStorePropertiesComponent {
     this.selectedRowKeys.forEach((selectedItem: any) => {
       const selectedId = selectedItem.ID;
       let worksheetItem = editedItem.worksheet_item_property.find(
-        (prop) => prop.ID === selectedId,
+        (prop: any) => prop.ID === selectedId,
       );
 
       if (!worksheetItem) {
         // If no worksheetItem exists, initialize it with the current values (old values)
         worksheetItem = {
-          ITEM_ID: selectedId,
+          ID: 0,
+          ITEM_ID: rowData.ITEM_ID, // Use the ITEM_ID from rowData
           IS_PRICE_REQUIRED: rowData.IS_PRICE_REQUIRED ?? false, // Old value
           IS_NOT_DISCOUNTABLE: rowData.IS_NOT_DISCOUNTABLE ?? false, // Old value
           IS_NOT_SALE_ITEM: rowData.IS_NOT_SALE_ITEM ?? false, // Old value
           IS_NOT_SALE_RETURN: rowData.IS_NOT_SALE_RETURN ?? false, // Old value
           IS_INACTIVE: rowData.IS_INACTIVE ?? false, // Old value
-
+          BARCODE: rowData.BARCODE, // Include other necessary fields from rowData
+          DESCRIPTION: rowData.DESCRIPTION,
+          DEPT_NAME: rowData.DEPT_NAME,
+          CAT_NAME: rowData.CAT_NAME,
+          BRAND_NAME: rowData.BRAND_NAME,
+          Selected: true,
+          STORE_ID: rowData.STORE_ID,
+          STORE_NAME: rowData.STORE_NAME,
           // Initialize new values as null, to be set when the checkbox changes
           IS_PRICE_REQUIRED_NEW: null,
           IS_NOT_DISCOUNTABLE_NEW: null,
@@ -366,13 +367,45 @@ export class ItemStorePropertiesComponent {
   }
 
   saveChanges() {
-    if (this.editedItems.length > 0) {
-      const payload = this.editedItems;
-      this.dataservice.saveWorksheetItemPropertyData(payload[0]).subscribe(
+    this.preparePayload();
+    console.log(this.dataGrid);
+    if (this.selecte_grid_Data.length > 0) {
+      const worksheetdata = this.selecte_grid_Data.map((item: any) => ({
+        ID: 0,
+        ITEM_ID: item.ITEM_ID,
+        IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED ?? false,
+        IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW ?? false,
+        IS_NOT_DISCOUNTABLE: item.IS_NOT_DISCOUNTABLE ?? false,
+        IS_NOT_DISCOUNTABLE_NEW: item.IS_NOT_DISCOUNTABLE_NEW ?? false,
+        IS_NOT_SALE_ITEM: item.IS_NOT_SALE_ITEM ?? false,
+        IS_NOT_SALE_ITEM_NEW: item.IS_NOT_SALE_ITEM_NEW ?? false,
+        IS_NOT_SALE_RETURN: item.IS_NOT_SALE_RETURN ?? false,
+        IS_NOT_SALE_RETURN_NEW: item.IS_NOT_SALE_RETURN_NEW ?? false,
+        IS_INACTIVE: item.IS_INACTIVE ?? false,
+        IS_INACTIVE_NEW: item.IS_INACTIVE_NEW ?? false,
+        BARCODE: item.BARCODE,
+        DESCRIPTION: item.DESCRIPTION,
+        DEPT_NAME: item.DEPT_NAME,
+        CAT_NAME: item.CAT_NAME,
+        BRAND_NAME: item.BRAND_NAME,
+        Selected: item.Selected ?? true,
+        STORE_ID: item.STORE_ID,
+        STORE_NAME: item.STORE_NAME,
+      }));
+      const payload = {
+        WS_DATE: new Date().toISOString(), // dynamic date
+        STORE_ID: this.selectedStoreId.toString(),
+        USER_ID: this.User_Id,
+        COMPANY_ID: this.selected_Company_id,
+        NARRATION: 'string',
+        worksheet_item_property: worksheetdata,
+      };
+      console.log(payload);
+      this.dataservice.saveWorksheetItemPropertyData(payload).subscribe(
         (response: any) => {
           this.savedWorksheet = response;
           this.editedItems = []; // Clear edited items after successful save
-          // this.dataGrid.instance.refresh(); // Refresh grid if needed
+          this.selectedRowKeys = [];
           if (response) {
             notify(
               {
@@ -381,7 +414,9 @@ export class ItemStorePropertiesComponent {
               },
               'success',
             );
-            // this.dataGrid.instance.refresh();
+            this.dataGrid.instance.refresh();
+
+            this.router.navigate(['/item-store-properties-log']);
           } else {
             notify(
               {
@@ -393,7 +428,13 @@ export class ItemStorePropertiesComponent {
           }
         },
         (error) => {
-          // console.error('Error saving items:', error);
+          notify(
+            {
+              message: 'Your Data Not Saved',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
         },
       );
     }
@@ -416,6 +457,7 @@ export class ItemStorePropertiesComponent {
       USER_ID: this.savedWorksheet.USER_ID,
       STORE_ID: this.savedWorksheet.STORE_ID,
       worksheet_item_property: this.editedItems.map((item) => ({
+        ID: 0,
         ITEM_ID: item.ITEM_ID, // Ensure to use the right fields
         IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED,
         IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW,
@@ -470,6 +512,7 @@ export class ItemStorePropertiesComponent {
       USER_ID: this.savedWorksheet.USER_ID,
       STORE_ID: this.savedWorksheet.STORE_ID,
       worksheet_item_property: this.editedItems.map((item) => ({
+        ID: 0,
         ITEM_ID: item.ITEM_ID, // Ensure to use the right fields
         IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED,
         IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW,
@@ -537,36 +580,16 @@ export class ItemStorePropertiesComponent {
         (store: any) => store.ID === storeId,
       );
       if (this.filteredStores.length > 0) {
-        this.listItemsByStoreId(storeId);
+        // this.listItemsByStoreId(storeId);
       }
     });
   }
 
-  listItemsByStoreId(storeId: number) {
-    if (storeId == 1) {
-      const payload = {};
-      this.dataservice.getItemsData().subscribe((response: any) => {
-        this.items = response;
-        this.itemStoresList = response.data;
-        this.dataGrid.instance.refresh();
-        this.itemStoresList.forEach((item: any) => {
-          this.fetchSelectedItem(item.ID);
-        });
-      });
-    } else {
-      this.dataservice.getItemsByStoreId(storeId).subscribe((response: any) => {
-        this.items = response;
-        this.itemStoresList = response.data;
-        this.dataGrid.instance.refresh();
-        this.itemStoresList.forEach((item: any) => {
-          this.fetchSelectedItem(item.ID);
-        });
-      });
-    }
-  }
-
   onCancel() {
     this.router.navigate(['/item-store-properties-log']);
+    this.selectedRowKeys = [];
+
+    this.dataGrid.instance.refresh();
   }
 }
 @NgModule({

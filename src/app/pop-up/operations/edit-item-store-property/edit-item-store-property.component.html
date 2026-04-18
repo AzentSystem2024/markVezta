@@ -1,0 +1,266 @@
+<div class="view-wrapper list-page">
+  <!-- Loading State -->
+  <div
+    *ngIf="!itemStoresList || itemStoresList.length === 0"
+    class="loading-state"
+  >
+    <div class="loading-spinner"></div>
+    <p>Loading data...</p>
+  </div>
+
+  <!-- Main Grid -->
+  <div
+    class="grid-container"
+    *ngIf="itemStoresList && itemStoresList.length > 0"
+  >
+    <dx-data-grid
+      #dataGrid
+      [width]="'100%'"
+      [height]="'70%'"
+      class="grid theme-dependent"
+      [dataSource]="itemStoresList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      (onEditorPreparing)="onEditorPreparing($event)"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+      [keyExpr]="'ITEM_ID'"
+      [(selectedRowKeys)]="selectedRowKeys"
+      (onSelectionChanged)="onSelectionChanged($event)"
+      [editing]="{ mode: 'batch', allowUpdating: true }"
+    >
+      <dxo-column-fixing [enabled]="true"></dxo-column-fixing>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+
+      <!-- Toolbar -->
+      <dxo-toolbar>
+        <!-- <dxi-item location="before">
+          <div class="grid-header">Store Items Properties</div>
+        </dxi-item> -->
+
+        <dxi-item location="before">
+          <dx-tag-box
+            [dataSource]="storeProperties"
+            [width]="300"
+            displayExpr="name"
+            valueExpr="name"
+            [(value)]="selectedProperties"
+            label="Select Store Properties"
+            labelMode="floating"
+            [showSelectionControls]="true"
+            [maxDisplayedTags]="5"
+            (onValueChanged)="onPropertiesChange($event)"
+          >
+            <div *dxTemplate="let data of 'item'">
+              {{ data.name }}
+            </div>
+          </dx-tag-box>
+        </dxi-item>
+
+        <dxi-item location="before">
+          <dx-select-box
+            [items]="store"
+            valueExpr="ID"
+            [(value)]="selectedStoreId"
+            displayExpr="STORE_NAME"
+            (onValueChanged)="onDropdownValueChanged($event)"
+            label="Select Store"
+            labelMode="floating"
+            [width]="300"
+          >
+          </dx-select-box>
+        </dxi-item>
+        <dxi-item>
+          <dx-check-box
+            *ngIf="allowVerify"
+            [(value)]="approveValue"
+            text="verify"
+            [readOnly]="readOnly"
+            (onValueChanged)="onApprovedChanged($event)"
+            style="margin: 10px"
+          >
+          </dx-check-box
+        ></dxi-item>
+        <dxi-item location="after" cssClass="bottom-toolbar-buttons">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            type="normal"
+            (onClick)="onCancel()"
+            style="width: 100px"
+          ></dx-button>
+        </dxi-item>
+
+        <dxi-item location="after" cssClass="bottom-toolbar-buttons">
+          <dx-button
+            [text]="SaveBtnText()"
+            stylingMode="contained"
+            type="default"
+            (onClick)="onSaveButtonClick()"
+            style="width: 100px"
+          ></dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <!-- Columns -->
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Description"
+        [width]="220"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="DEPT_NAME"
+        caption="Department"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="CAT_NAME"
+        caption="Category"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="BRAND_NAME"
+        caption="Brand"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+
+      <!-- Not Sale Item -->
+      <dxi-column
+        caption="Not Sale Item"
+        [width]="240"
+        *ngIf="showIsNotSaleItem"
+      >
+        <dxi-column
+          dataField="IS_NOT_SALE_ITEM"
+          caption="Current Value"
+          [width]="120"
+          alignment="center"
+          [allowEditing]="false"
+          dataType="boolean"
+        ></dxi-column>
+        <dxi-column
+          dataField="IS_NOT_SALE_ITEM_NEW"
+          caption="New Value"
+          [width]="120"
+          alignment="center"
+          dataType="boolean"
+        ></dxi-column>
+      </dxi-column>
+
+      <!-- Not Sale Return -->
+      <dxi-column
+        caption="Not Sale Return"
+        [width]="240"
+        *ngIf="showIsNotSaleReturn"
+      >
+        <dxi-column
+          dataField="IS_NOT_SALE_RETURN"
+          caption="Current Value"
+          [width]="120"
+          alignment="center"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="IS_NOT_SALE_RETURN_NEW"
+          caption="New Value"
+          [width]="120"
+          alignment="center"
+          dataType="boolean"
+          [editorOptions]="{ onValueChanged: onSaleReturnValueChanged }"
+        ></dxi-column>
+      </dxi-column>
+
+      <!-- Not Discountable -->
+      <dxi-column
+        caption="Not Discountable"
+        [width]="240"
+        *ngIf="showIsNotDiscountable"
+      >
+        <dxi-column
+          dataField="IS_NOT_DISCOUNTABLE"
+          caption="Current Value"
+          [width]="120"
+          alignment="center"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="IS_NOT_DISCOUNTABLE_NEW"
+          caption="New Value"
+          [width]="120"
+          alignment="center"
+          dataType="boolean"
+          [editorOptions]="{ onValueChanged: onNotDisountableValueChanged }"
+        ></dxi-column>
+      </dxi-column>
+
+      <!-- Price Required -->
+      <dxi-column
+        caption="Price Required"
+        [width]="240"
+        *ngIf="showIsPriceRequired"
+      >
+        <dxi-column
+          dataField="IS_PRICE_REQUIRED"
+          caption="Current Value"
+          [width]="120"
+          alignment="center"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="IS_PRICE_REQUIRED_NEW"
+          caption="New Value"
+          [width]="120"
+          alignment="center"
+          dataType="boolean"
+          [editorOptions]="{ onValueChanged: onPriceRequiredValueChanged }"
+        ></dxi-column>
+      </dxi-column>
+
+      <!-- Inactive -->
+      <dxi-column caption="Inactive" [width]="240" *ngIf="showIsInactive">
+        <dxi-column
+          dataField="IS_INACTIVE"
+          caption="Current Value"
+          [width]="120"
+          alignment="center"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="IS_INACTIVE_NEW"
+          caption="New Value"
+          [width]="120"
+          alignment="center"
+          dataType="boolean"
+          [editorOptions]="{ onValueChanged: onInactiveValueChanged }"
+        ></dxi-column>
+      </dxi-column>
+    </dx-data-grid>
+  </div>
+  <dx-text-box
+    label="Narration"
+    [readOnly]="readOnly"
+    labelMode="floating"
+    [(value)]="selectedNarration"
+  ></dx-text-box>
+</div>

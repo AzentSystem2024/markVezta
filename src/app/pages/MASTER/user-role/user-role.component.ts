@@ -37,7 +37,7 @@ import { finalize, timeout } from 'rxjs/operators';
   templateUrl: './user-role.component.html',
   styleUrls: ['./user-role.component.scss'],
 })
-export class UserRoleComponent implements OnInit{
+export class UserRoleComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild(UserLevelNewFormComponent, { static: false })
@@ -94,7 +94,7 @@ export class UserRoleComponent implements OnInit{
     `;
     },
   };
-  
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',

@@ -568,7 +568,7 @@ export class ItemStorePricesEditComponent {
         .join(', ');
 
       notify(
-        `Price must be greater than Standard Price for Item(s): ${itemCodes}`,
+        `MRP must be greater than Standard Price for Item(s): ${itemCodes}`,
         'error',
         5000,
       );

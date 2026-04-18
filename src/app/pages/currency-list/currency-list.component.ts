@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
@@ -17,48 +17,105 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./currency-list.component.scss'],
 })
 export class CurrencyListComponent implements OnInit {
-  @ViewChild(CurrencyFormComponent) currencyComponent: CurrencyFormComponent;
+  @ViewChild(CurrencyFormComponent) currencyComponent!: CurrencyFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
-  showFilterRow = true;
+  dataGrid!: DxDataGridComponent;
+  showFilterRow = false;
   currency: any;
   showHeaderFilter = true;
   isAddCurrencyPopupOpened = false;
+  companyId:any;
+  currentEditId: number | null = null;
+
+  searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+    this.showFilterRow = !this.showFilterRow;
+    this.showHeaderFilter = !this.showHeaderFilter;
+  },
+};
+
+refreshButtonOptions = {
+  icon: 'refresh',
+  hint: 'Refresh',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+    this.ngZone.run(() => this.refresh());
+  },
+};
+
+
+addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+
+    onClick: () => {
+      // Run inside Angular's zone
+      this.ngZone.run(() => this.addCurrency());
+    },
+
+    elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
 
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private ngZone: NgZone,
   ) {}
+
+  onEditingStart(e: any) {
+    this.currentEditId = e.data.ID;
+  }
+
+  
 
   addCurrency() {
     this.isAddCurrencyPopupOpened = true;
   }
 
   onClickSaveCurrency() {
-    const exchangeValue = this.currencyComponent.newCurrency.EXCHANGE;
-    this.currencyComponent.validateExchange(exchangeValue);
+    // const exchangeValue = this.currencyComponent.newCurrency.EXCHANGE;
+    // this.currencyComponent.validateExchange(exchangeValue);
 
-    // Mark all controls as touched to show validation errors
-    this.currencyComponent.stateForm.markAllAsTouched();
+    // // Mark all controls as touched to show validation errors
+    // this.currencyComponent.stateForm.markAllAsTouched();
 
-    // If the form is invalid or there are errors, keep the popup open
-    if (
-      this.currencyComponent.stateForm.invalid ||
-      this.currencyComponent.exchangeError
-    ) {
-      return;
-    } else {
-      const { CODE, SYMBOL, DESCRIPTION, FRACTION_UNIT, EXCHANGE, COMPANY_ID } =
-        this.currencyComponent.getNewCurrencyData();
+    // // If the form is invalid or there are errors, keep the popup open
+    // if (
+    //   this.currencyComponent.stateForm.invalid ||
+    //   this.currencyComponent.exchangeError
+    // ) {
+    //   return;
+    // } else {
+      const data = this.currencyComponent.getNewCurrencyData();
+
+        const payload = {
+          ...data,
+          EXCHANGE: data.EXCHANGE != null ? data.EXCHANGE.toString() : null
+        };
 
       this.dataservice
         .postCurrencyData(
-          CODE,
-          SYMBOL,
-          DESCRIPTION,
-          FRACTION_UNIT,
-          EXCHANGE,
-          COMPANY_ID,
+          payload.CODE,
+          payload.SYMBOL,
+          payload.DESCRIPTION,
+          payload.FRACTION_UNIT,
+          payload.EXCHANGE,
+          this.companyId,
         )
         .subscribe(
           (response) => {
@@ -77,10 +134,10 @@ export class CurrencyListComponent implements OnInit {
             );
           },
         );
-    }
+    // }
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const {
       ID,
@@ -125,7 +182,8 @@ export class CurrencyListComponent implements OnInit {
       });
   }
 
-  onRowUpdating(event) {
+  onRowUpdating(event: any) {
+    const grid = this.dataGrid.instance;
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -156,6 +214,7 @@ export class CurrencyListComponent implements OnInit {
             },
             'success',
           );
+          grid.cancelEditData();
           this.dataGrid.instance.refresh();
           this.showCurrency();
         } else {
@@ -172,7 +231,7 @@ export class CurrencyListComponent implements OnInit {
     event.cancel = true; // Prevent the default update operation
   }
 
-  validateFractionUnit(params): boolean {
+  validateFractionUnit(params: any): boolean {
     const value = params.value;
 
     // Regular expression to check if value consists only of digits
@@ -198,11 +257,32 @@ export class CurrencyListComponent implements OnInit {
 
   ngOnInit(): void {
     this.showCurrency();
+
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      this.companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
+    }
   }
 
   refresh = () => {
     this.dataGrid.instance.refresh();
   };
+
+  validateCodeExistsGrid = (e: any) => {
+    if (!e.value) return true;
+
+    const inputCode = e.value.toString().trim().toUpperCase();
+
+    const exists = this.currency?.some(
+      (item: any) =>
+        item.CODE?.toUpperCase() === inputCode &&
+        item.ID !== this.currentEditId // ✅ skip current row
+    );
+
+    return !exists;
+  };
+
 }
 
 @NgModule({

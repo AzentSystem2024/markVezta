@@ -1185,7 +1185,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       SUPP_NET_AMOUNT: 0,
       NET_AMOUNT: 0,
       IS_APPROVED: false,
-      PoDetails: [], // ✅ correct place
+      PoDetails: [],
+      REF_NO: '',
     };
 
     // Sync UI model
@@ -1339,6 +1340,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
       case '+86': // China
         requiredLength = 11;
+        break;
+      case '+965': // Kuwait
+        requiredLength = 8;
         break;
 
       default:

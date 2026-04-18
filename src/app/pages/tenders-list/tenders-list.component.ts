@@ -20,17 +20,67 @@ import { DxCheckBoxModule } from 'devextreme-angular';
   styleUrls: ['./tenders-list.component.scss'],
 })
 export class TendersListComponent implements OnInit {
-  @ViewChild(TendersFormComponent) tendersComponent: TendersFormComponent;
+  @ViewChild(TendersFormComponent) tendersComponent!: TendersFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
+  @ViewChild('addForm') addFormComponent!: TendersFormComponent;
+  @ViewChild('editForm') editFormComponent!: TendersFormComponent;
   supplier: any;
   tenders: any;
   currencyList: any;
   VATRuleDropdownData: any;
   TenderTypeDropdownData: any;
-  showFilterRow = true;
+  showFilterRow = false;
   showHeaderFilter = true;
   isAddTendersPopupOpened = false;
+
+  isEditTendersPopupOpened: boolean = false;
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+
+  isEditMode: boolean = false;
+
+  currentEditId: number | null = null;
+
+  editingRowData: any;
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => this.addTenders(),
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -49,24 +99,51 @@ export class TendersListComponent implements OnInit {
   }
 
   onClickSaveTenders() {
-    const {
-      CODE,
-      IS_INACTIVE,
-      DESCRIPTION,
-      ARABIC_DESCRIPTION,
-      TENDER_TYPE,
-      DISPLAY_ORDER,
-      CURRENCY_ID,
-      ALLOW_OPENING,
-      ALLOW_DECLARATION,
-      ADDITIONAL_INFO_REQUIRED,
-    } = this.tendersComponent.getNewTenderData();
-    console.log(
-      'inserted data',
-      ALLOW_OPENING,
-      ALLOW_DECLARATION,
-      ADDITIONAL_INFO_REQUIRED,
-    );
+    
+    const component = this.isEditMode
+        ? this.editFormComponent
+        : this.addFormComponent;
+    
+        const data = component.getNewTenderData();
+    
+        console.log('FINAL DATA', data);
+    
+        const {
+        CODE,
+        IS_INACTIVE,
+        DESCRIPTION,
+        ARABIC_DESCRIPTION,
+        TENDER_TYPE,
+        DISPLAY_ORDER,
+        CURRENCY_ID,
+        ALLOW_OPENING,
+        ALLOW_DECLARATION,
+        ADDITIONAL_INFO_REQUIRED
+      } = data;
+    
+        if (this.isEditMode && this.currentEditId) {
+        this.dataservice
+      .updateTenders(
+        data
+      )
+          .subscribe((response: any) => {
+            if (response?.flag === '1') {
+              notify(
+                {
+                  message: 'Tender updated successfully',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'success'
+              );
+    
+              this.isEditTendersPopupOpened = false;
+              this.showTenders();
+            }
+          });
+    
+        return;
+      }
+
     this.dataservice
       .postTendersData(
         CODE,
@@ -78,7 +155,7 @@ export class TendersListComponent implements OnInit {
         CURRENCY_ID,
         ALLOW_OPENING,
         ALLOW_DECLARATION,
-        ADDITIONAL_INFO_REQUIRED,
+        ADDITIONAL_INFO_REQUIRED
       )
       .subscribe((response) => {
         if (response) {
@@ -175,6 +252,22 @@ export class TendersListComponent implements OnInit {
 
     event.cancel = true; // Prevent the default update operation
   }
+
+  onEditingRow(e: any) {
+    e.cancel = true;
+    const id = e.data.ID;
+
+    this.dataservice.selectTenders(id).subscribe((res: any) => {
+      this.editingRowData = res;
+
+      this.isEditMode = true;
+      this.currentEditId = id;
+
+      console.log(this.editingRowData, 'this.editingRowData');
+      this.isEditTendersPopupOpened = true;
+    });
+  }
+
   getCurrencyData() {
     this.dataservice.getCurrencyData().subscribe((data: any) => {
       this.currencyList = data;
@@ -190,6 +283,25 @@ export class TendersListComponent implements OnInit {
     this.showTenders();
     this.getCurrencyData();
     this.getTenderTypeDropDown();
+  }
+
+  toggleFilters() {
+    this.showFilterRow = !this.showFilterRow;
+    this.showHeaderFilter = this.showFilterRow;
+
+    const grid = this.dataGrid?.instance;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.showFilterRow);
+      grid.option('headerFilter.visible', this.showHeaderFilter);
+    }
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+    }
+    this.showTenders(); // reload API
   }
 }
 @NgModule({

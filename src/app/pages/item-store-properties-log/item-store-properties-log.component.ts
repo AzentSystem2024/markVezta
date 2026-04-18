@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -38,6 +39,8 @@ import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
 import { WorksheetService } from 'src/app/services/worksheet.service';
+import { ItemStorePropertiesEditModule } from '../item-store-properties-edit/item-store-properties-edit.component';
+import { EditItemStorePropertyModule } from 'src/app/pop-up/operations/edit-item-store-property/edit-item-store-property.component';
 
 @Component({
   selector: 'app-item-store-properties-log',
@@ -46,33 +49,51 @@ import { WorksheetService } from 'src/app/services/worksheet.service';
 })
 export class ItemStorePropertiesLogComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   showHeaderFilter = true;
   logList: any;
   userId: any;
   selectedWorksheetData: any;
   isPopupVisible: boolean = false;
   selectedRowData: any;
-  customButtons = [
-    {
-      hint: 'Verify',
-      icon: 'check',
-      text: 'Verify',
-      onClick: (e) => this.onVerifyClick(e),
-    },
-    {
-      hint: 'Approve',
-      icon: 'taskcomplete',
-      text: 'Approve',
-      onClick: (e) => this.onApproveClick(e),
-    },
-  ];
-  allButtons = ['edit', 'delete', ...this.customButtons];
+  isEditPopupOpened: boolean = false;
+  editPackPopupOpened: boolean = false;
+  selectedData: any;
+  isOpen: boolean = false;
+  allButtons = ['edit', 'delete'];
   totalRecords: any;
 
+  addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    // icon: 'add',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    // onClick: () => this.addCreditNote(),
+    onClick: () => {
+      this.zone.run(() => {
+        this.onAddClick();
+      });
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
   constructor(
     private dataservice: DataService,
     private router: Router,
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
@@ -80,6 +101,32 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     this.userId = sessionStorage.getItem('UserId');
   }
 
+  openEditingStart(event: any) {
+    event.cancel = true; // Prevent the default editing action
+    const selectedId = event.data.ID; // Get the selected row ID
+    this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
+      console.log(res, '============selected data for edit===========');
+      this.selectedData = res;
+
+      this.editPackPopupOpened = true;
+    });
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.listWorkisheetItemProperty();
+    }
+  }
   listWorkisheetItemProperty() {
     this.dataservice
       .getWorksheetItemPropertyLog()
@@ -88,6 +135,8 @@ export class ItemStorePropertiesLogComponent implements OnInit {
         this.dataGrid.instance.getDataSource = this.logList;
         this.totalRecords = this.logList.length;
       });
+    this.isOpen = this.logList.Status === 'Open';
+    console.log(this.isOpen, '====is open====');
   }
 
   updateWorksheet() {
@@ -125,26 +174,6 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     );
   }
 
-  selectWorksheetById(worksheetId: number) {
-    if (!worksheetId) {
-      console.warn('Invalid worksheet ID');
-      return;
-    }
-    this.dataservice.selectWorksheet(worksheetId).subscribe(
-      (response) => {
-        this.selectedWorksheetData = response;
-        this.dataservice.setWorksheetData(this.selectedWorksheetData);
-        this.router.navigate(['/item-store-properties-edit'], {
-          state: { worksheetData: this.selectedWorksheetData },
-        });
-        this.isPopupVisible = true;
-      },
-      (error) => {
-        console.error('Error selecting worksheet:', error);
-      },
-    );
-  }
-
   onRowSelected(event: any) {
     if (event.selectedRowsData.length > 0) {
       this.selectedWorksheetData = event.selectedRowsData[0];
@@ -153,15 +182,9 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     }
   }
 
-  openEditingStart(event: any) {
-    event.cancel = true; // Prevent the default editing action
-    const selectedId = event.data.ID; // Get the selected row ID
-    if (selectedId) {
-      this.selectWorksheetById(selectedId);
-      // this.router.navigate(['/item-store-properties']);
-    } else {
-      console.warn('No valid row ID selected');
-    }
+  handleClose() {
+    this.editPackPopupOpened = false;
+    this.listWorkisheetItemProperty();
   }
 
   onSelectionChanged(event: any) {
@@ -327,26 +350,32 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     );
   }
 
+  isDeleteVisible = (e: any) => {
+    console.log(e, '=========es===================');
+    return e.row?.data.Status === 'Open';
+  };
   onRowRemoving(event: any) {
-    const selectedRow = event.data; // Get the data of the selected row
+    console.log(event, '====row removing event data====');
+    const selectedRow = event.data;
     const id = selectedRow.ID;
+
     if (id) {
       this.dataservice.deleteWorksheet(id).subscribe(
         (response) => {
-          const index = this.logList.findIndex((item) => item.ID === id);
+          const index = this.logList.findIndex((item: any) => item.ID === id);
           if (index !== -1) {
-            this.logList.splice(index, 1); // Remove item from the array
-            event.component.refresh(); // Refresh the DataGrid
+            this.logList.splice(index, 1);
+            event.component.refresh();
           }
         },
         (error) => {
           console.error('Error deleting worksheet:', error);
-          event.cancel = true; // Prevent row removal if there's an error
+          event.cancel = true;
         },
       );
     } else {
       console.warn('No valid row data to delete');
-      event.cancel = true; // Prevent row removal if there's no valid data
+      event.cancel = true;
     }
   }
 
@@ -357,7 +386,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   }
 
   onAddClick() {
-    this.router.navigate(['/change-item-property']);
+    this.router.navigate(['/item-change-property-add']);
   }
 }
 @NgModule({
@@ -386,6 +415,8 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     DxRadioGroupModule,
     DxPopupModule,
     DxTagBoxModule,
+    ItemStorePropertiesEditModule,
+    EditItemStorePropertyModule,
   ],
   providers: [],
   exports: [ItemStorePropertiesLogComponent],

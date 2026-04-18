@@ -60,7 +60,7 @@ export class SupplierFinFormComponent {
     selectedLandedCosts: { COST_ID: number }[] = [];
     selectedSupp: { SUPP_ID: number }[] = [];
     selecte_countyId: any;
-    formSupplierData = {
+    formSupplierData:any = {
       COMPANY_ID: 0,
       HQID: 1,
       SUPP_CODE: '',
@@ -105,6 +105,8 @@ export class SupplierFinFormComponent {
       { text: 'Interstate Purchase', value: 2 },
     ];
     Phone_limit: any;
+
+    supplier: any;
   
     constructor(
       private service: DataService,
@@ -122,6 +124,7 @@ export class SupplierFinFormComponent {
       service.getCountryWithFlags().subscribe((data) => {
         this.countryCodes = data;
       });
+      this.listSupplier();
     }
     newSupplier = this.formSupplierData;
   
@@ -133,6 +136,24 @@ export class SupplierFinFormComponent {
   
     toggleCurrencyDropdown(checked: boolean) {
       this.isCurrencyAccepted = checked;
+
+      if (checked) {
+        // Clear selection when disabled
+        this.formSupplierData.Supplier_cost = [];
+
+        if (this.landedCostGrid) {
+          this.landedCostGrid.instance.clearSelection();
+        }
+      }
+    }
+
+    listSupplier() {
+      const payload = {
+        COMPANY_ID: this.selected_Company_id,
+      };
+      this.service.getSupplierData(payload).subscribe((response) => {
+        this.supplier = response;
+      });
     }
   
     private loadDropdownData(): void {
@@ -151,6 +172,7 @@ export class SupplierFinFormComponent {
       this.newSupplier.ADDRESS3 = '';
       this.newSupplier.NOTES = '';
       this.newSupplier.PHONE = '';
+      this.newSupplier.SUPP_CAT_ID = '';
       // Clear Supplier_cost
       this.formSupplierData.Supplier_cost = [];
   
@@ -360,6 +382,38 @@ export class SupplierFinFormComponent {
   
       return value.length === this.Phone_limit;
     };
+
+    validateVAT = (e: any): boolean => {
+    // If NOT applicable → always valid
+    if (this.newSupplier.VAT_RULE_ID != 2) {
+      return true;
+    }
+
+    // If applicable → must have value
+    return !!(e.value && e.value.trim().length > 0);
+  };
+
+  onTaxRuleChange() {
+  if (this.newSupplier.VAT_RULE_ID != 2) {
+    // Clear VAT value (optional but recommended)
+    this.newSupplier.VAT_REGNO = '';
+  }
+
+  // Revalidate whole form
+  this.validationGroup.instance.validate();
+}
+
+validateSupplierCode = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.supplier) return true;
+
+  return !this.supplier.some(
+    (item: any) =>
+      item.SUPP_CODE?.toLowerCase() === value
+  );
+};
+
 }
 @NgModule({
   imports: [

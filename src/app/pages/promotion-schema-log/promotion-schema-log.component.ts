@@ -4,6 +4,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -41,6 +42,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
 import { DxNumberBoxTypes } from 'devextreme-angular/ui/number-box';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-promotion-schema-log',
@@ -49,7 +51,10 @@ import { DxNumberBoxTypes } from 'devextreme-angular/ui/number-box';
 })
 export class PromotionSchemaLogComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid: DxDataGridComponent | undefined;
+  @ViewChild(DxValidationGroupComponent) validationGroup: DxValidationGroupComponent;
+  @ViewChild('editValidationGroup') editValidationGroup: DxValidationGroupComponent;
+
   showHeaderFilter = true;
   logList: any;
   isPopupVisible: boolean = false;
@@ -88,7 +93,7 @@ export class PromotionSchemaLogComponent {
   tableData$: Observable<any[]>;
   selectedSchemaCondition: string = 'multiple';
   currentSchemaValue: string;
-  // selectedValueInEdit: string = 'regular'; 
+  // selectedValueInEdit: string = 'regular';
   isSchemaOnQuantityMultiple: boolean;
   // selectedRadioValue: any = 'multiple';
   schemaCondition: string;
@@ -96,18 +101,71 @@ export class PromotionSchemaLogComponent {
   SCHEMA_ON_REGULAR_PRICE: any;
   selectedSchemaType: string = '';
   DISC_PERCENT: any;
+  isFilterOpened = false;
+  isFilterRowVisible: boolean = false;
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+
+  logDataSource: any;
+
+  isSaving: boolean = false;
+  isUpdating: boolean = false;
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.zone.run(() => this.onAddClick());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
 
   constructor(
     private dataservice: DataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {
-    this.dataservice.getDropdownData('PROMOTIONSCHEMA_TYPE').subscribe((data) => {
+    const payload = {
+      name: 'PROMOTIONSCHEMA_TYPE',
+    };
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
       this.promotionSchema = data;
       console.log(this.promotionSchema, 'dropdown');
     });
   }
-
-
 
   ngOnInit() {
     this.getLogList();
@@ -115,9 +173,10 @@ export class PromotionSchemaLogComponent {
   }
 
   setSchemaType() {
-    this.selectedSchemaType = this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE ? 'multiple' : 'regular';
+    this.selectedSchemaType = this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE
+      ? 'multiple'
+      : 'regular';
   }
-
 
   adjustPopupSize() {
     if (this.selectedPromotionSchema === 3) {
@@ -132,6 +191,13 @@ export class PromotionSchemaLogComponent {
   onPromotionSchemaChange(event: any) {
     this.selectedPromotionSchema = event.value;
     this.areRadioButtonsDisabled = this.selectedPromotionSchema !== 1;
+    // ✅ set value ONLY when enabled
+    if (!this.areRadioButtonsDisabled) {
+      this.selectedSchemaCondition = 'multiple';
+    } else {
+      this.selectedSchemaCondition = '';
+    }
+
     const selectedID = event.value;
     this.selectedPromotionSchema !== this.promotionSchema[0]?.DESCRIPTION;
     this.isQtyGetDisabled =
@@ -139,7 +205,7 @@ export class PromotionSchemaLogComponent {
     this.buyAndGetDisabled =
       this.selectedPromotionSchema === this.promotionSchema[2]?.ID;
     const selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID === this.selectedPromotionSchema
+      (schema) => schema.ID === this.selectedPromotionSchema,
     );
     if (this.selectedPromotionSchema === 3) {
       this.tableData = [];
@@ -150,17 +216,32 @@ export class PromotionSchemaLogComponent {
   }
 
   getLogList() {
-    this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
-      this.logList = response.promotion_data || [];
-      this.logList.sort((a: any, b: any) => {
-        const idA = a.ID || 0;
-        const idB = b.ID || 0;
-        return idB - idA; // Descending order by ID
+  this.logDataSource = new DataSource({
+    load: () => {
+      return new Promise((resolve) => {
+        this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
+          
+          let data = response.promotion_data || [];
+
+          // Sort descending by ID
+          data = data.sort((a: any, b: any) => {
+            return (b.ID || 0) - (a.ID || 0);
+          });
+
+          //  Store in logList ALSO
+          this.logList = data;
+
+          console.log(this.logList, 'Sorted LOGLIST');
+
+          resolve({
+            data: data,
+            totalCount: data.length
+          });
+        });
       });
-      console.log(this.logList, 'Sorted LOGLIST');
-    });
-  }
-  
+    }
+  });
+}
 
   openEditingStart(event: any) {
     const id = event.data.ID;
@@ -169,10 +250,9 @@ export class PromotionSchemaLogComponent {
       this.dataservice.selectPromotionSchema(id).subscribe(
         (response: any) => {
           if (response) {
-
             this.promotionData = response; // Store the fetched data
             this.tableData = response.promotionschema_entry;
-            console.log(this.promotionData,"PROMOTION")
+            console.log(this.promotionData, 'PROMOTION');
             this.setSchemaType();
             setTimeout(() => {
               this.cdr.detectChanges();
@@ -186,13 +266,13 @@ export class PromotionSchemaLogComponent {
         },
         (error) => {
           console.error('API Error:', error);
-        }
+        },
       );
     }
   }
 
   onSchemaTypeChange(event: any) {
-    console.log(event.value, "inevent");
+    console.log(event.value, 'inevent');
     if (event.value === 'multiple') {
       this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = true;
       this.promotionData.SCHEMA_ON_REGULAR_PRICE = false;
@@ -202,10 +282,8 @@ export class PromotionSchemaLogComponent {
     }
   }
 
-  
-
   handleSchemaConditionChange(event: any) {
-    const selectedValue = event.value.value; // Get the selected value
+    const selectedValue = event.value; // Get the selected value
     console.log(event.value, 'SCHEMA');
     if (!this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE) {
       this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = false; // Default to false
@@ -217,7 +295,7 @@ export class PromotionSchemaLogComponent {
       this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = true;
       console.log(
         this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE,
-        'PROMOTIONDATA'
+        'PROMOTIONDATA',
       );
       this.promotionData.SCHEMA_ON_REGULAR_PRICE = false; // Ensure the other is set to false
     } else if (selectedValue === 'more') {
@@ -226,8 +304,6 @@ export class PromotionSchemaLogComponent {
     }
     console.log('Schema condition changed:', this.promotionData);
   }
-
-
 
   onAddClick() {
     this.id = null;
@@ -243,24 +319,76 @@ export class PromotionSchemaLogComponent {
     this.tableData = [...this.tableData];
     this.dataGrid.instance.refresh(); // Refresh the grid to reflect changes
   }
-  
 
   savePromotionShema() {
-    console.log(this.promotionData,"PROMOTIONDATA")
-    console.log(this.DISC_PERCENT,"DISCOUNTTTT")
-    const isDuplicate = this.logList.some((row) => row.DESCRIPTION === this.promotionData.DESCRIPTION);
-  
+
+    const result = this.validationGroup.instance.validate();
+
+    if (!result.isValid) {
+      return;
+    }
+
+    this.isSaving = true;
+
+    console.log(this.promotionData, 'PROMOTIONDATA');
+    console.log(this.DISC_PERCENT, 'DISCOUNTTTT');
+    const isDuplicate = this.logList.some(
+      (row) => row.DESCRIPTION === this.promotionData.DESCRIPTION,
+    );
+
     if (isDuplicate) {
-      notify({
-        message: "This promotion name already exists. Please use a different name.",
-        position: { at: 'top right', my: 'top right' },
-      }, 'error');
+      this.isSaving = false;
+      notify(
+        {
+          message:
+            'This promotion name already exists. Please use a different name.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+      );
       return; // Exit the function if there's a duplicate
     }
+
+    // if (this.selectedSchemaType == 'multiple' || this.selectedSchemaType == 'regular' && this.selectedPromotionSchema==1) {
+    //   console.log(this.selectedSchemaType, this.selectedPromotionSchema )
+    //   notify({
+    //     message: 'Please select schema condition',
+    //     position: { at: 'top right', my: 'top right' }
+    //   }, 'error');
+    //   return;
+    // }
+
+    //  MIX & MATCH VALIDATION
+    if (this.selectedPromotionSchema === 3) {
+
+      if (!this.tableData || this.tableData.length === 0) {
+        this.isSaving = false;
+        notify({
+          message: 'Please add at least one row for Mix & Match schema',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+
+      const invalidRow = this.tableData.find(row =>
+        !row.qtyToBuy || row.qtyToBuy <= 0 ||
+        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      );
+
+      if (invalidRow) {
+        this.isSaving = false;
+        notify({
+          message: 'Qty must be > 0 and Discount must be a valid number',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+    }
+
     const payload = {
       DESCRIPTION: this.promotionData.DESCRIPTION, // Use promotionData
       QTY_BUY: this.promotionData.QTY_BUY ?? 1.0,
-      QTY_GET: this.promotionData.QTY_GET ,
+      QTY_GET: this.promotionData.QTY_GET,
       DISC_PERCENT: this.DISC_PERCENT,
       IS_INACTIVE: this.promotionData.IS_INACTIVE || false,
       SCHEMA_TYPE_ID: this.promotionData.SCHEMA_TYPE_ID || 1, // Use promotionData
@@ -277,36 +405,38 @@ export class PromotionSchemaLogComponent {
           : [{ QTY_BUY: 0, DISC_PERCENT: 0, DESCRIPTION: '' }],
     };
     this.dataservice.savePromotionSchema(payload).subscribe((response: any) => {
+      this.isSaving = false;
       if (response) {
-        try{
-          notify({
-            message:"Promtion Schema added successfully",
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        )
-        this.dataGrid.instance.refresh();
-        this.isPopupVisible = false;
-        this.getLogList();
-        }
-        catch(error){
-          notify({
-            message : "Add operation failed",
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        )
+        try {
+          notify(
+            {
+              message: 'Promtion Schema added successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+          this.dataGrid.instance.refresh();
+          this.isPopupVisible = false;
+          this.getLogList();
+        } catch (error) {
+          this.isSaving = false;
+          notify(
+            {
+              message: 'Add operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
         }
       }
     });
   }
 
-handleSchemaConditionChangeinEdit(event: any) {
-  this.schemaCondition = event.value;
-  // Map back to boolean
-  this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = event.value === 'multiple';
-}
-
+  handleSchemaConditionChangeinEdit(event: any) {
+    this.schemaCondition = event.value;
+    // Map back to boolean
+    this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = event.value === 'multiple';
+  }
 
   openDetailsPopup() {
     this.detailsPopup = true;
@@ -314,16 +444,62 @@ handleSchemaConditionChangeinEdit(event: any) {
   }
 
   updatePromotionSchema() {
-    const isDuplicate = this.logList.some((row) => row.DESCRIPTION === this.promotionData.DESCRIPTION &&
-    row.ID !== this.promotionData.ID); // Exclude the current promotion being edited
 
-  if (isDuplicate) {
-    notify({
-      message: "This promotion name already exists. Please use a different name.",
-      position: { at: 'top right', my: 'top right' },
-    }, 'error');
-    return; // Exit the function if there's a duplicate
-  }
+    const result = this.editValidationGroup.instance.validate();
+
+    if (!result.isValid) {
+      return;
+    }
+
+    this.isUpdating = true;
+ 
+    const isDuplicate = this.logList.some(
+      (row: any) =>
+        row.DESCRIPTION === this.promotionData.DESCRIPTION &&
+        row.ID !== this.promotionData.ID,
+    ); // Exclude the current promotion being edited
+
+    if (isDuplicate) {
+      this.isUpdating = false;
+ 
+      notify(
+        {
+          message:
+            'This promotion name already exists. Please use a different name.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+      );
+      return; // Exit the function if there's a duplicate
+    }
+
+    if (this.selectedPromotionSchema === 3) {
+
+      if (!this.tableData || this.tableData.length === 0) {
+        this.isUpdating = false;
+        notify({
+          message: 'Please add at least one row for Mix & Match schema',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+
+      const invalidRow = this.tableData.find(row =>
+        !row.qtyToBuy || row.qtyToBuy <= 0 ||
+        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      );
+
+      if (invalidRow) {
+        this.isUpdating = false;
+        notify({
+          message: 'Qty must be > 0 and Discount must be a valid number',
+          position: { at: 'top right', my: 'top right' }
+        }, 'error');
+        return;
+      }
+    }
+
+
     const payload = {
       ID: this.promotionData.ID,
       DESCRIPTION: this.promotionData.DESCRIPTION,
@@ -340,53 +516,60 @@ handleSchemaConditionChangeinEdit(event: any) {
 
     this.dataservice.updatePromotionSchema(payload).subscribe(
       (response: any) => {
+        this.isUpdating = false;
         if (response) {
-          try{
-            notify({
-              message:"Promtion Schema updated successfully",
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          )
-          this.dataGrid.instance.refresh();
-          this.isEditPopupVisible = false;
-          this.getLogList();
-          }
-          catch(error){
-            notify({
-              message : "Edit operation failed",
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error'
-          )
+          try {
+            notify(
+              {
+                message: 'Promtion Schema updated successfully',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+            this.dataGrid.instance.refresh();
+            this.isEditPopupVisible = false;
+            this.getLogList();
+          } catch (error) {
+            this.isUpdating = false;
+
+            notify(
+              {
+                message: 'Edit operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
           }
         } else {
+          this.isUpdating = false;
           console.error('Update Failed:', response.message);
         }
       },
       (error) => {
+        this.isUpdating = false;
         console.error('API Error:', error);
-      }
+      },
     );
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data; // Get the data of the selected row
     const id = selectedRow.ID;
-  
+
     // Cancel the row removal until the delete operation is confirmed
     event.cancel = true;
-  
+
     this.dataservice.deletePromotion(id).subscribe(
       (response: any) => {
-        if (response.flag === "0") {
+        if (response.flag === '0') {
           // Promotion is in use, show a notification and prevent deletion
           notify(
             {
-              message: response.message || 'Cannot delete.. Promotion is in use..',
+              message:
+                response.message || 'Cannot delete.. Promotion is in use..',
               position: { at: 'top center', my: 'top center' },
             },
-            'error'
+            'error',
           );
         } else {
           // Successful deletion
@@ -395,9 +578,9 @@ handleSchemaConditionChangeinEdit(event: any) {
               message: 'Promotion Deleted Successfully',
               position: { at: 'top center', my: 'top center' },
             },
-            'success'
+            'success',
           );
-  
+
           // If the deletion is successful, refresh the data grid
           this.dataGrid.instance.refresh();
         }
@@ -410,17 +593,15 @@ handleSchemaConditionChangeinEdit(event: any) {
             message: 'Delete Operation Failed',
             position: { at: 'top right', my: 'top right' },
           },
-          'error'
+          'error',
         );
-      }
+      },
     );
   }
-  
-  
 
   onSaved(event: any) {
     // Loop through the changes to find added rows
-    event.changes.forEach((change) => {
+    event.changes.forEach((change: any) => {
       if (change.type === 'insert') {
         // Append each new row to the end of `tableData`
         this.tableData = [...this.tableData, change.data];
@@ -446,7 +627,7 @@ handleSchemaConditionChangeinEdit(event: any) {
       event.preventDefault();
     }
   }
-  
+
   onPercentageChange(event: any) {
     let value = event.value;
 
@@ -468,11 +649,43 @@ handleSchemaConditionChangeinEdit(event: any) {
   getFormattedPercentage(): string {
     return `${this.promotionData.DISC_PERCENT}%`;
   }
-  
 
-  onSelectionChanged(event) {}
-  onCellPrepared(event) {}
-  SavePromotion() {}
+  // onSelectionChanged(event) {}
+  // onCellPrepared(event) {}
+  // SavePromotion() {}
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.getLogList();
+  }
+
+  onExporting(event: any) {
+    const fileName = 'promotion-schema-list';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
+
+  onEditCancel() {
+  this.isEditPopupVisible = false;
+  this.resetPopup(); // optional but recommended
+}
+  onNewCancel() {
+  this.isPopupVisible = false;
+  this.resetPopup(); // optional but recommended
+}
+
 }
 @NgModule({
   imports: [
@@ -502,7 +715,7 @@ handleSchemaConditionChangeinEdit(event: any) {
     DxTagBoxModule,
     DxNumberBoxModule,
     DxValidationGroupModule,
-    DxValidatorModule
+    DxValidatorModule,
   ],
   providers: [],
   exports: [PromotionSchemaLogComponent],

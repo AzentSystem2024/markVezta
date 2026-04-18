@@ -163,6 +163,28 @@ import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery
 import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
 import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-template/import-items-template.component';
 import { StoreItemsListComponent } from './pages/store-items-list/store-items-list.component';
+import { PromotionLogComponent } from './pages/promotion-log/promotion-log.component';
+import { PromotionComponent } from './pages/promotion/promotion.component';
+import { PromotionSchemaLogComponent } from './pages/promotion-schema-log/promotion-schema-log.component';
+// import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
+import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
+import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
+import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
+import { ItemBrandListComponent } from './pages/item-brand-list/item-brand-list.component';
+import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.component';
+import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
+import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
+import { InvoiceRetailComponent } from './pages/Operations/invoice-retail/invoice-retail.component';
+// import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
+// import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
+// import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
+import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
+import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
+import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
+import { MiscPurchaseInvoiceComponent } from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
+// import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
+// import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
+// import { PromotionComponent } from './pages/promotion/promotion.component';
 
 const routes: Routes = [
   {
@@ -180,8 +202,6 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
-  
-   
 
   {
     path: 'auth',
@@ -274,7 +294,7 @@ const routes: Routes = [
         component: CustomerListComponent,
         canActivate: [AuthGuardService],
       },
-       {
+      {
         path: 'customer--fin-list',
         component: CustomerFinListComponent,
         canActivate: [AuthGuardService],
@@ -585,6 +605,11 @@ const routes: Routes = [
       {
         path: 'item-category',
         component: ItemCategoryListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-brand',
+        component: ItemBrandListComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1002,7 +1027,7 @@ const routes: Routes = [
         path: 'profit-loss-branch',
         component: ProfitAndLossBranchComponent,
         canActivate: [AuthGuardService],
-      },  
+      },
 
       {
         path: 'misc-sales-invoice',
@@ -1011,28 +1036,111 @@ const routes: Routes = [
       },
       {
         path: 'payment-terms',
-        component:PaymentTermsListComponent,
+        component: PaymentTermsListComponent,
         canActivate: [AuthGuardService],
       },
       {
         path: 'delivery-terms',
-        component:DeliveryTermsListComponent,
+        component: DeliveryTermsListComponent,
         canActivate: [AuthGuardService],
       },
       {
         path: 'supplier-me',
-        component:SupplierFinListComponent,
+        component: SupplierFinListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotions',
+        component: PromotionLogComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotion-add',
+        component: PromotionComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotion-edit',
+        component: PromotionEditComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotion-view',
+        component: PromotionViewComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotion-verify',
+        component: PromotionApproveComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-store-properties-log',
+        component: ItemStorePropertiesLogComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotion-schema',
+        component: PromotionSchemaLogComponent,
+        canActivate: [AuthGuardService],
+      },
+      //   canActivate: [AuthGuardService],
+      // },
+      {
+        path: 'supplier-me',
+        component: SupplierFinListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'currency',
+        component: CurrencyListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'landed-costing',
+        component: LandedCostListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tenders',
+        component: TendersListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'promotions',
+        component: PromotionComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-change-property',
+        component: ItemStorePropertiesLogComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'item-change-property-add',
+        component: ItemStorePropertiesComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'invoice-retail',
+        component: InvoiceRetailComponent,
+      },
+      {
+        path: 'item-change-property-Edit',
+        component: ItemStorePropertiesEditComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'misc-purchase-invoice',
+        component: MiscPurchaseInvoiceComponent,
         canActivate: [AuthGuardService],
       },
       {
         path: 'storewise-stock',
-        component:StoreItemsListComponent,
         canActivate: [AuthGuardService],
       },
       
       {
-        path: '**',
-        redirectTo: 'login',
         pathMatch: 'full',
       },
     ],

@@ -454,7 +454,40 @@ export class EditPurchaseInvoiceComponent {
 
     return row;
   }
+isGRNAlreadySelected = (rowData: any) => {
+  return this.mainGridData?.some(
+    (item) => item.GRN_DET_ID === rowData.GRN_DET_ID
+  );
+};
 
+onPopupSelectionChanged(e: any) {
+  const selectedRows = e.selectedRowsData;
+
+  const validSelection = selectedRows.filter(
+    (row: any) => !this.isGRNAlreadySelected(row)
+  );
+
+  // If some already selected → remove them
+  if (validSelection.length !== selectedRows.length) {
+    this.popupGridRef.instance.deselectAll();
+
+    validSelection.forEach((row: any) => {
+      this.popupGridRef.instance.selectRows([row], true);
+    });
+
+    notify("Some GRNs are already added and cannot be selected again", "warning", 2000);
+  }
+}
+onPopupRowPrepared(e: any) {
+  if (e.rowType === 'data') {
+    const alreadyAdded = this.isGRNAlreadySelected(e.data);
+
+    if (alreadyAdded) {
+      e.rowElement.style.opacity = '0.5';
+      e.rowElement.style.pointerEvents = 'none'; // 🚫 disables click
+    }
+  }
+}
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 

@@ -34,7 +34,7 @@
 
 <dxo-export
       [enabled]="true"
-      [formats]="['xlsx', 'pdf']"
+      [formats]="['xlsx']"
     >
     </dxo-export>
     
@@ -58,11 +58,30 @@
         title="Edit Delivery Terms"
         [showTitle]="true"
         [width]="500"
-        [height]="300"
+        [height]="250"
       ></dxo-popup>
       <dxo-form [colCount]="1">
-      <dxi-item dataField="CODE"></dxi-item>
-      <dxi-item dataField="DESCRIPTION"></dxi-item>
+      <dxi-item
+        dataField="CODE"
+        editorType="dxTextBox"
+        [editorOptions]="{
+          label: 'Code',
+          labelMode: 'floating'
+        }"
+      >
+
+      <dxo-label [visible]="false"></dxo-label>
+      </dxi-item>
+      <dxi-item
+        dataField="DESCRIPTION"
+        editorType="dxTextBox"
+        [editorOptions]="{
+          label: 'Description',
+          labelMode: 'floating'
+        }"
+      >
+      <dxo-label [visible]="false"></dxo-label>
+      </dxi-item>
     </dxo-form>
     </dxo-editing>
 
@@ -99,8 +118,15 @@
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
       </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="toolbar-icon-btn export-btn"
+      ></dxi-item>
    
-         <dxi-item
+        <dxi-item
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
@@ -108,16 +134,29 @@
      
     </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
-      <dxi-validation-rule type="required" message="Code is required">
-        <dxi-validation-rule type="required" message="Code is required">
-        </dxi-validation-rule>
-      </dxi-validation-rule>
+      <dxi-validation-rule
+        type="required"
+        message="Code is required"
+      ></dxi-validation-rule>
+
+      <dxi-validation-rule
+        type="pattern"
+        [pattern]="'^[a-zA-Z0-9]+$'"
+        message="Only alphanumeric allowed"
+      ></dxi-validation-rule>
+
+      <!--  Duplicate validation -->
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validateGridDeliveryCode"
+        message="Code already exists"
+      ></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Description">
-      <dxi-validation-rule type="required" message="Description is required">
-        <dxi-validation-rule type="required" message="Description is required">
-        </dxi-validation-rule>
-      </dxi-validation-rule>
+      <dxi-validation-rule
+        type="required"
+        message="Description is required"
+    ></dxi-validation-rule>
     </dxi-column>
   </dx-data-grid>
   <form-popup

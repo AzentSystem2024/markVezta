@@ -113,35 +113,25 @@
       </dx-select-box>
     </div>
 
-    <dxi-column dataField="DOC_NO" width="130" caption="PO NO."></dxi-column>
+    <dxi-column dataField="DOC_NO" caption="PO NO."></dxi-column>
     <dxi-column
       dataField="PO_DATE"
-      width="auto"
       caption="Date"
       dataType="date"
       [allowEditing]="false"
       format="dd-MM-yyyy"
     ></dxi-column>
-    <dxi-column
-      dataField="SUPP_NAME"
-      width="auto"
-      caption="Supplier"
-    ></dxi-column>
+    <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+    <dxi-column dataField="STORE" caption="Receiving Store"></dxi-column>
     <dxi-column
       dataField="NET_AMOUNT"
-      width="auto"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       caption="Net Amount"
     ></dxi-column>
-    <dxi-column
-      dataField="STORE"
-      width="350"
-      caption="Receiving Store"
-    ></dxi-column>
+
     <dxi-column
       caption="Status"
       dataField="STATUS"
-      [width]="100"
       [cellTemplate]="statusCellRender"
       [allowHeaderFiltering]="true"
       [headerFilter]="{
@@ -152,8 +142,7 @@
       fixedPosition="right"
     >
     </dxi-column>
-    <dxi-column type="buttons" width="100" [buttons]="allButtonsEditDelete">
-    </dxi-column>
+    <dxi-column type="buttons" [buttons]="allButtonsEditDelete"> </dxi-column>
     <!-- <dxi-column type="buttons" width="100" [buttons]="customButtons">
     </dxi-column> -->
   </dx-data-grid>
@@ -193,6 +182,7 @@
     [showNetAmount]="true"
     [isEditMode]="true"
     [(isApproved)]="isApproved"
+    [isSaveDisabled]="isSaving"
     (save)="UpdatePurchaseOrder()"
   >
     <app-purchase-order-edit-form

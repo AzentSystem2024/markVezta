@@ -61,7 +61,7 @@ export class CustomerFinFormComponent {
   phoneValue: any;
   editingIndex: number | null = null;
 
-  formCustomerData = {
+  formCustomerData:any = {
     COMPANY_ID: this.selected_Company_id,
     CUST_CODE: '',
     FIRST_NAME: '',
@@ -496,6 +496,11 @@ export class CustomerFinFormComponent {
 
     return value.length === this.mobile_limit_Delivery_Address;
   };
+
+  allowOnlyNumbers(e: any) {
+    const value = e.event.target.value;
+    e.event.target.value = value.replace(/\D/g, '');
+  }
 }
 
 @NgModule({

@@ -140,6 +140,7 @@ export class DeliveryTermsListComponent {
       });
   }
   onRowUpdating(event) {
+    const grid = this.dataGrid.instance;
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -158,12 +159,13 @@ export class DeliveryTermsListComponent {
             },
             'success',
           );
+          grid.cancelEditData();
           this.dataGrid.instance.refresh();
           this.showDeliveryTerms();
         } else {
           notify(
             {
-              message: 'Your Data Not Saved',
+              message: 'Your Data Not Updated',
               position: { at: 'top right', my: 'top right' },
             },
             'error',
@@ -176,6 +178,22 @@ export class DeliveryTermsListComponent {
   ngOnInit(): void {
     this.showDeliveryTerms();
   }
+
+  validateGridDeliveryCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.delivery_terms) return true;
+
+    // get current row ID (works for edit & add)
+    const currentId = e.data?.ID;
+
+    return !this.delivery_terms.some((item: any) => {
+      const sameCode = item.CODE?.toLowerCase() === value;
+      const isSameId = Number(item.ID) === Number(currentId);
+
+      return sameCode && !isSameId;
+    });
+  };
 }
 @NgModule({
   imports: [

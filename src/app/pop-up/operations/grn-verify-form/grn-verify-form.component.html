@@ -70,8 +70,18 @@
       </dx-select-box>
     </div>
 
-    <div style="flex: 1">
+    <div
+      style="
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        min-width: 0;
+      "
+    >
       <dx-drop-down-box
+        width="100%"
+        style="min-width: 0"
         labelMode="floating"
         labelLocation="left"
         label="Select Purchase Order"
@@ -111,14 +121,17 @@
           </dx-data-grid>
         </div>
       </dx-drop-down-box>
-      <!-- <dx-text-box
-        label="Purchase Order"
-        [(value)]="newGrnData.PO_NO"
-        labelMode="floating"
-        [readOnly]="true"
-        [elementAttr]="{ class: 'grntextbox' }"
+
+      <dx-button
+        class="mt-2"
+        *ngIf="showPendingButton"
+        icon="search"
+        hint="View Pending PO Items"
+        stylingMode="contained"
+        type="default"
+        (onClick)="openPendingPopup()"
       >
-      </dx-text-box> -->
+      </dx-button>
     </div>
   </div>
 </div>
@@ -280,7 +293,7 @@
   </dx-data-grid>
 </div>
 <div style="display: flex">
-  <div style="flex: 1; margin-left: 20px">
+  <div style="flex: 1">
     <dx-text-area
       label="NARRATION"
       labelMode="floating"
@@ -405,3 +418,66 @@
 
   <dx-popup></dx-popup
 ></dx-popup>
+
+<dx-popup
+  [(visible)]="isPendingPopupVisible"
+  title="Pending PO Items"
+  [width]="800"
+  [height]="'65vh'"
+>
+  <dx-data-grid
+    [height]="'42vh'"
+    [dataSource]="pendingGrnItems"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [showBorders]="true"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [allowColumnResizing]="true"
+    [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+    [(selectedRowKeys)]="selectedPendingItems"
+    keyExpr="PO_DETAIL_ID"
+    (onSelectionChanged)="onPendingSelectionChanged($event)"
+    (onRowPrepared)="onPendingRowPrepared($event)"
+  >
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-load-panel [showPane]="false"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+
+    <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+    <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+    <dxi-column dataField="PRICE" caption="Price"></dxi-column>
+    <dxi-column dataField="PO_QUANTITY" caption="PO Qty"></dxi-column>
+    <dxi-column dataField="PENDING_QTY" caption="Pending Qty"></dxi-column>
+  </dx-data-grid>
+
+  <dxi-toolbar-item toolbar="bottom" location="after">
+    <dx-button
+      class="mx-2"
+      text="Close"
+      (onClick)="isPendingPopupVisible = false"
+    ></dx-button>
+
+    <dx-button
+      text="Save"
+      type="default"
+      stylingMode="contained"
+      (onClick)="onSavePendingItems()"
+    ></dx-button>
+  </dxi-toolbar-item>
+</dx-popup>

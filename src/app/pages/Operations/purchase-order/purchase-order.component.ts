@@ -50,6 +50,7 @@ import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-
 import { confirm } from 'devextreme/ui/dialog';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { finalize } from 'rxjs/operators';
+
 @Component({
   selector: 'app-purchase-order',
   templateUrl: './purchase-order.component.html',
@@ -851,7 +852,7 @@ export class PurchaseOrderComponent {
     }
     data.PoDetails = poDetails;
 
-    // ✅ API CALL (already correct with finalize)
+    // API CALL (already correct with finalize)
     this.service
       .savePoData(data)
       .pipe(
@@ -891,6 +892,8 @@ export class PurchaseOrderComponent {
   }
 
   UpdatePurchaseOrder() {
+    if (this.isSaving) return; // prevent double click
+    this.isSaving = true;
     const data = this.poEditForm.getNewPoData();
     // Combine country code + mobile (EDIT)
     // convert mobile before API
@@ -917,7 +920,7 @@ export class PurchaseOrderComponent {
     data.PoDetails = [...this.poEditForm.poData.PoDetails];
     data.PoDetails = data.PoDetails.map((item: any) => ({
       ...item,
-      PRICE: item.SUPP_PRICE, // ✅ IMPORTANT
+      PRICE: item.SUPP_PRICE, // IMPORTANT
     }));
     const invalidPriceItem = data.PoDetails.find(
       (item: any) =>
@@ -946,53 +949,67 @@ export class PurchaseOrderComponent {
       ).then((dialogResult) => {
         if (dialogResult) {
           // User confirmed → call approve API
-          this.service.ApprovePoData(data).subscribe((res) => {
-            if (res && res.flag === 1) {
-              notify(
-                {
-                  message: 'Purchase Order Approved',
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'success',
-              );
-              this.CloseEditForm();
-              this.getPurchaseOrderList();
-            } else {
-              notify(
-                {
-                  message: res?.Message || 'Approval Failed',
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'error',
-              );
-            }
-          });
+          this.service
+            .ApprovePoData(data)
+            .pipe(
+              finalize(() => {
+                this.isSaving = false; //reset loader
+              }),
+            )
+            .subscribe((res) => {
+              if (res && res.flag === 1) {
+                notify(
+                  {
+                    message: 'Purchase Order Approved',
+                    position: { at: 'top center', my: 'top center' },
+                  },
+                  'success',
+                );
+                this.CloseEditForm();
+                this.getPurchaseOrderList();
+              } else {
+                notify(
+                  {
+                    message: res?.Message || 'Approval Failed',
+                    position: { at: 'top center', my: 'top center' },
+                  },
+                  'error',
+                );
+              }
+            });
         } else {
         }
       });
     } else {
       // Call update API
-      this.service.updatePoData(data).subscribe((res) => {
-        if (res) {
-          notify(
-            {
-              message: 'Data Updated Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.CloseEditForm();
-          this.getPurchaseOrderList();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not Updated',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+      this.service
+        .updatePoData(data)
+        .pipe(
+          finalize(() => {
+            this.isSaving = false; //reset loader
+          }),
+        )
+        .subscribe((res) => {
+          if (res) {
+            notify(
+              {
+                message: 'Data Updated Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            this.CloseEditForm();
+            this.getPurchaseOrderList();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not Updated',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        });
     }
   }
 

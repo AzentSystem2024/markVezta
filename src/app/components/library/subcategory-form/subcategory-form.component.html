@@ -14,11 +14,18 @@
         style="margin-bottom: 10px"
         [(value)]="newSubCategory.CODE"
         placeholder="Enter Code"
+        label="Code"
         ><dx-validator>
           <dxi-validation-rule
             type="required"
             message="Code is required"
-          ></dxi-validation-rule> </dx-validator
+          ></dxi-validation-rule> 
+          <dxi-validation-rule
+            type="pattern"
+            [pattern]="'^[a-zA-Z0-9]+$'"
+            message="Code should be alphanumeric only"
+          ></dxi-validation-rule>
+          </dx-validator
       ></dx-text-box>
     </dxi-item>
 
@@ -29,6 +36,7 @@
         style="margin-bottom: 10px"
         [(value)]="newSubCategory.SUBCAT_NAME"
         placeholder="Enter Sub Category Name"
+        label="SubCategory Name"
         ><dx-validator>
           <dxi-validation-rule
             type="required"
@@ -48,6 +56,7 @@
         [searchEnabled]="true"
         placeholder="Select Category"
         [(value)]="newSubCategory.CAT_ID"
+        label="Category"
         ><dx-validator>
           <dxi-validation-rule
             type="required"

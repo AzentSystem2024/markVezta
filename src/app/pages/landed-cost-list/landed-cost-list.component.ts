@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule, ViewChild } from '@angular/core';
+import { Component, OnInit, NgModule, ViewChild, NgZone } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import {
   DxDataGridComponent,
@@ -15,6 +15,7 @@ import {
 import { ItemProperty1FormComponent } from 'src/app/components/library/item-property1-form/item-property1-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-landed-cost-list',
@@ -22,10 +23,12 @@ import { ExportService } from 'src/app/services/export.service';
   styleUrls: ['./landed-cost-list.component.scss'],
 })
 export class LandedCostListComponent implements OnInit {
-  @ViewChild(LandedCostFormComponent)
-  landedcostComponent: LandedCostFormComponent;
+  // @ViewChild(LandedCostFormComponent)
+  // landedcostComponent!: LandedCostFormComponent;
+  @ViewChild('addForm') addFormComponent!: LandedCostFormComponent;
+  @ViewChild('editForm') editFormComponent!: LandedCostFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   currencyOptions = [
     { text: 'Local', value: true },
     { text: 'Supplier', value: false },
@@ -41,15 +44,87 @@ export class LandedCostListComponent implements OnInit {
   showFilterRow = true;
   showHeaderFilter = true;
   IS_INACTIVE: boolean = false;
-  
+  isFilterOpened = false;
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+
+  landedCostDataSource: any;
+
+  editingRowData: any;
+
+  isEditLandedcostPopupOpened : boolean = false;
+
+  isEditMode: boolean = false;
+
+  currentEditId: number | null = null;
+
+
+  addButtonOptions = {
+  type: 'default',
+  stylingMode: 'contained',
+  hint: 'Add new Landed Cost',
+  onClick: () => this.addLandedcost(),
+  elementAttr: { class: 'add-button' },
+
+  template: () => {
+    return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+  },
+};
+
+searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => this.toggleFilters(),
+};
+
+refreshButtonOptions = {
+  icon: 'refresh',
+  hint: 'Refresh',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+};
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private zone: NgZone,
   ) {}
+
+  onEditingStart(e: any) {
+    e.cancel = true;
+    const id = e.data.ID;
+
+  this.dataservice.selectLandedCost(id).subscribe((res: any) => {
+    this.editingRowData = res;
+
+    this.isEditMode = true;         // ✅ set edit mode
+    this.currentEditId = id;
+
+    console.log(this.editingRowData,"this.editingRowData")
+    this.isEditLandedcostPopupOpened = true;
+  });
+  }
+  
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Landed_cost-list');
   }
   addLandedcost() {
+    this.isEditMode = false;
+    this.currentEditId = null;
+
     this.isAddLandedcostPopupOpened = true;
   }
 
@@ -65,45 +140,131 @@ export class LandedCostListComponent implements OnInit {
   }
 
   showLandedcost() {
-    this.dataservice.getLandedcostData().subscribe((response) => {
-      // this.landedcost = response;
-      // console.log(response,"LANDEDCOST");
+    this.landedCostDataSource = new DataSource({
+      load: () => {
+        return new Promise((resolve) => {
+          this.dataservice.getLandedcostData().subscribe((response: any) => {
+            const data = response || []; // adjust if response.data
+
+            resolve({
+              data: data,
+              totalCount: data.length
+            });
+          });
+        });
+      }
     });
   }
+
   onClickSaveLandedcost() {
+    // const {
+    //   DESCRIPTION,
+    //   IS_LOCAL_CURRENCY,
+    //   IS_FIXED_AMOUNT,
+    //   VALUE,
+    //   COMPANY_ID,
+    //   IS_INACTIVE,
+    // } = this.landedcostComponent.getNewLandedcost();
+    // console.log(
+    //   'inserted data',
+    //   DESCRIPTION,
+    //   IS_LOCAL_CURRENCY,
+    //   IS_FIXED_AMOUNT,
+    //   VALUE,
+    //   COMPANY_ID,
+    //   IS_INACTIVE,
+    // );
+
+    const component = this.isEditMode
+    ? this.editFormComponent
+    : this.addFormComponent;
+
+    const data = component.getNewLandedcost();
+
+    console.log('FINAL DATA', data);
+
     const {
-      DESCRIPTION,
-      IS_LOCAL_CURRENCY,
-      IS_FIXED_AMOUNT,
-      VALUE,
-      COMPANY_ID,
-      IS_INACTIVE,
-    } = this.landedcostComponent.getNewLandedcost();
-    console.log(
-      'inserted data',
-      DESCRIPTION,
-      IS_LOCAL_CURRENCY,
-      IS_FIXED_AMOUNT,
-      VALUE,
-      COMPANY_ID,
-      IS_INACTIVE,
-    );
+    DESCRIPTION,
+    IS_LOCAL_CURRENCY,
+    IS_FIXED_AMOUNT,
+    VALUE,
+    COMPANY_ID,
+    IS_INACTIVE,
+  } = data;
+
+    if (this.isEditMode && this.currentEditId) {
     this.dataservice
-      .postLandedcostData(
+      .updateLandedcostData(
+        this.currentEditId,
         DESCRIPTION,
         IS_LOCAL_CURRENCY,
         IS_FIXED_AMOUNT,
         VALUE,
         COMPANY_ID,
-        IS_INACTIVE,
+        IS_INACTIVE
       )
-      .subscribe((response) => {
-        if (response) {
+      .subscribe((response: any) => {
+        if (response?.flag === '1') {
+          notify(
+            {
+              message: 'Landed Cost updated successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success'
+          );
+
+          this.isEditLandedcostPopupOpened = false;
           this.showLandedcost();
         }
       });
+
+    return;
   }
-  onRowUpdating(event) {
+
+    this.dataservice
+    .postLandedcostData(
+      DESCRIPTION,
+      IS_LOCAL_CURRENCY,
+      IS_FIXED_AMOUNT,
+      VALUE,
+      COMPANY_ID,
+      IS_INACTIVE
+    )
+    .subscribe({
+      next: (response: any) => {
+        if (response?.flag === '1') {
+          notify(
+            {
+              message: 'Landed Cost saved successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success'
+          );
+
+          this.showLandedcost();
+          this.isAddLandedcostPopupOpened = false;
+        } else {
+          notify(
+            {
+              message: response?.message || 'Save failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error'
+          );
+        }
+      },
+      error: () => {
+        notify(
+          {
+            message: 'Server error while saving',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error'
+        );
+      },
+    });
+  }
+  onRowUpdating(event: any) {
     const updatedData = { ...event.oldData, ...event.newData };
 
     const {
@@ -140,7 +301,7 @@ export class LandedCostListComponent implements OnInit {
         }
       });
   }
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const {
       ID,
@@ -193,14 +354,38 @@ export class LandedCostListComponent implements OnInit {
     this.loadDropdownData();
     this.showLandedcost();
   }
-  calculateStatus(rowData) {
+  calculateStatus(rowData: any) {
     return rowData.IS_INACTIVE ? 'Inactive' : 'Active';
   }
-  calculateCurrency(rowData) {
+  calculateCurrency(rowData: any) {
     return rowData.IS_LOCAL_CURRENCY ? 'Local' : 'Supplier';
   }
-  calculateAmount(rowData) {
+  calculateAmount(rowData: any) {
     return rowData.IS_FIXED_AMOUNT ? 'Fixed Amount' : 'Percentage';
+  }
+
+  refresh() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showLandedcost();
+  }
+  toggleFilters() {
+  this.isFilterOpened = !this.isFilterOpened;
+
+  const grid = this.dataGrid?.instance;
+
+  if (grid) {
+    grid.option('filterRow.visible', this.isFilterOpened);
+    grid.option('headerFilter.visible', this.isFilterOpened);
+  }
+}
+
+refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showLandedcost();
   }
 }
 
