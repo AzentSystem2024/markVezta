@@ -6,7 +6,8 @@ import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.compone
 import { FormPhotoUploaderModule } from '../../utils/form-photo-uploader/form-photo-uploader.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators,ValidationErrors,ValidatorFn  } from '@angular/forms';
-import { DxSelectBoxModule, DxValidationGroupModule } from 'devextreme-angular';
+import { DxNumberBoxModule, DxSelectBoxModule, DxValidationGroupModule } from 'devextreme-angular';
+import { DataService } from 'src/app/services';
 
 @Component({
   selector: 'app-currency-form',
@@ -14,31 +15,35 @@ import { DxSelectBoxModule, DxValidationGroupModule } from 'devextreme-angular';
   styleUrls: ['./currency-form.component.scss']
 })
 export class CurrencyFormComponent {
+  currency:any;
   stateForm: FormGroup;
-  formCurrencyData = {
+  formCurrencyData:any = {
     CODE: '',
     SYMBOL:'',
     DESCRIPTION: '',
     FRACTION_UNIT:'',
-    EXCHANGE:'',
-    COMPANY_ID: '1'
+    EXCHANGE:''
   };
   numericPattern: string = '^-?\\d*\\.?\\d+$';
   exchangeError: string;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private service : DataService) {}
 
-  ngOnInit(): void {
-    this.stateForm = this.fb.group({
-      STATE_NAME: ['', Validators.required],
-      COUNTRY_ID: ['', Validators.required],
-      FRACTION_UNIT: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      EXCHANGE: ['', [Validators.pattern('^\\d+$')]]
-    });
-  }
+  
+
   newCurrency=this.formCurrencyData;
 
   getNewCurrencyData = () => ({ ...this.newCurrency });
+
+  ngOnInit(): void { 
+    this.showCurrency();
+  }
+
+  showCurrency() {
+    this.service.getCurrencyData().subscribe((response:any) => {
+      this.currency = response;
+    });
+  }
 
   get f() {
     return this.stateForm.controls;
@@ -52,6 +57,18 @@ export class CurrencyFormComponent {
       this.exchangeError = '';
     }
   }
+
+  validateCodeExists = (e: any) => {
+    if (!e.value) return true;
+
+    const inputCode = e.value.toString().trim().toUpperCase();
+
+    const exists = this.currency?.some(
+      (item: any) => item.CODE?.toUpperCase() === inputCode
+    );
+
+    return !exists; // return false → validation error
+  };
 
   get exchangeControl() {
     return this.stateForm.get('EXCHANGE');
@@ -69,7 +86,8 @@ export class CurrencyFormComponent {
     DxSelectBoxModule,
     DxValidatorModule,
     DxValidationGroupModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DxNumberBoxModule
   ],
   declarations: [CurrencyFormComponent],
   exports: [CurrencyFormComponent],

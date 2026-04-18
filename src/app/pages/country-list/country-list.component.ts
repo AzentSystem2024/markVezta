@@ -30,27 +30,39 @@ export class CountryListComponent implements OnInit {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   country: any;
-  showFilterRow = true;
+  showFilterRow :boolean = false;
   showHeaderFilter = true;
   isAddCountryPopupOpened = false;
-  constructor(
-    private dataservice: DataService,
-    private exportService: ExportService,
-    private ngZone: NgZone,
-  ) {}
-  addButtonOptions = {
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
+  isFilterOpened = false;
 
-    onClick: () => {
-      // Run inside Angular's zone
-      this.ngZone.run(() => this.addCountry());
-    },
+  countryDataSource: DataSource;
+  countryArray: any[] = [];
 
-    elementAttr: { class: 'add-button' },
-    template: () => {
-      return `
+  searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => this.toggleFilters(),
+};
+
+refreshButtonOptions = {
+  icon: 'refresh',
+  hint: 'Refresh',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => this.refreshGrid(),
+};
+
+addButtonOptions = {
+  type: 'default',
+  stylingMode: 'contained',
+  hint: 'Add new entry',
+  onClick: () => {
+    this.isAddCountryPopupOpened = true;
+  },
+  elementAttr: { class: 'add-button' },
+
+  template: () => {
+    return `
       <div class="add-btn-content">
         <span class="iconify"
               data-icon="formkit:add"
@@ -59,8 +71,15 @@ export class CountryListComponent implements OnInit {
         <span class="add-text">New</span>
       </div>
     `;
-    },
-  };
+  },
+};
+
+  constructor(
+    private dataservice: DataService,
+    private exportService: ExportService,
+    private ngZone: NgZone,
+  ) {}
+  
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Country-list');
   }
@@ -85,31 +104,36 @@ export class CountryListComponent implements OnInit {
         }
       });
   }
-  onRowRemoving(event: any) {
-    var SelectedRow = event.key;
-    this.dataservice.removeCountry(SelectedRow.ID).subscribe(() => {
-      try {
-        // Your delete logic here
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.dataGrid.instance.refresh();
-        this.showCountry();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      }
+  onRowRemoving(e: any) {
+  const id = e.key.ID;
+
+  //  Stop default delete
+  e.cancel = true;
+
+  //  Assign promise to grid
+  e.promise = this.dataservice.removeCountry(id).toPromise()
+    .then(() => {
+      notify(
+        {
+          message: 'Delete operation successful',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'success'
+      );
+
+      this.showCountry(); // reload data
+    })
+    .catch(() => {
+      notify(
+        {
+          message: 'Delete operation failed',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
     });
-  }
+}
+
   onRowUpdating(event: any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
@@ -146,10 +170,26 @@ export class CountryListComponent implements OnInit {
   }
 
   showCountry() {
-    this.dataservice.getCountryData().subscribe((response) => {
-      this.country = response;
-    });
-  }
+  this.countryDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.getCountryData().subscribe({
+          next: (response: any) => {
+            const data = response || [];
+
+            this.countryArray = data; // store locally (for validation etc.)
+
+            resolve(data);
+          },
+          error: () => {
+            this.countryArray = [];
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
+
   ngOnInit(): void {
     this.showCountry();
   }
@@ -179,6 +219,39 @@ export class CountryListComponent implements OnInit {
       return true;
     }
   }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showCountry();
+  }
+
+  validateGridCountryCode = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!value || !this.countryArray) return true;
+
+    const currentId = e.data?.ID; // 🔥 important for edit
+
+    return !this.countryArray.some((item: any) => {
+      const sameCode = (item.CODE || '').trim() === value;
+      const isSameId = Number(item.ID) === Number(currentId);
+
+      return sameCode && !isSameId;
+    });
+};
 }
 @NgModule({
   imports: [

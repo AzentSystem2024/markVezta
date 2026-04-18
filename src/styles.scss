@@ -1200,3 +1200,15 @@ body {
   cursor: pointer;
   height: 1rem;
 }
+
+.add-button.dx-button.dx-button-default {
+  border-radius: 8px !important;
+  background-color: #0073D8 !important;
+  color: #fff !important; /* text color */
+}
+.add-button.dx-button.dx-button-default:hover {
+  border-radius: 8px !important;
+  background-color: #0068C2 !important;
+  color: #fff !important; /* text color */
+}
+

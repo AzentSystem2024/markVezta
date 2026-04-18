@@ -82,6 +82,7 @@ export class UserLevelsFormComponent implements OnInit {
       canDelete: false,
       canVerify: false,
       canApprove: false,
+      HideCost:false,
       canPrint: false,
       canExport: false,
       ...item, // Include other properties such as permissions if needed
@@ -106,6 +107,7 @@ export class UserLevelsFormComponent implements OnInit {
       canDelete: item.canDelete || false,
       canVerify: item.canVerify || false,
       canApprove: item.canApprove || false,
+      HideCost:item.HideCost || false,
       canPrint: item.canPrint || false,
       canExport: item.canExport || false,
       ...item, // Include other properties
@@ -130,6 +132,7 @@ export class UserLevelsFormComponent implements OnInit {
             item.canDelete = selectedItem.canDelete;
             item.canVerify = selectedItem.canVerify;
             item.canApprove = selectedItem.canApprove;
+            item.HideCost = selectedItem.HideCost;
             item.canPrint = selectedItem.canPrint;
             item.canExport = selectedItem.canExport;
           }
@@ -154,6 +157,7 @@ export class UserLevelsFormComponent implements OnInit {
       canDelete: item.CanDelete || false,
       canVerify: item.canVerify || false,
       canApprove: item.canApprove || false,
+      HideCost:item.HideCost || false,
       canPrint: item.CanPrint || false,
       canExport: item.canExport || false,
       ...item, // Include other properties such as permissions if needed
@@ -178,6 +182,7 @@ export class UserLevelsFormComponent implements OnInit {
             item.canDelete = selectedItem.canDelete;
             item.canVerify = selectedItem.canVerify;
             item.canApprove = selectedItem.canApprove;
+            item.HideCost = selectedItem.HideCost;
             item.canPrint = selectedItem.canPrint;
             item.canExport = selectedItem.canExport;
           }
@@ -221,6 +226,7 @@ export class UserLevelsFormComponent implements OnInit {
           IS_DELETE: row.canDelete ? true : false,
           IS_VERIFY: row.canVerify ? true : false,
           IS_APPROVE: row.canApprove ? true : false,
+          HIDECOST:row.HideCost ? true : false,
           IS_PRINT: row.canPrint ? true : false,
           IS_EXPORT: row.canExport ? true : false,
         });

@@ -538,14 +538,42 @@ export class AddInvoiceRetailComponent {
     }
   }
 
+  isRowEmpty = (row: any) => {
+    return (
+      !row.ITEM_CODE &&
+      !row.DESCRIPTION &&
+      (!row.QUANTITY || row.QUANTITY === 0)
+    );
+  };
+
   onAddRow() {
     if (this.isReadOnlyMode) return;
 
     const grid = this.itemsGridRef?.instance;
-
     if (!grid) return;
 
-    //  Create empty row
+    const rows = this.invoiceFormData.Details || [];
+
+    // 🚫 Check if any empty row exists
+    const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
+
+    if (hasEmptyRow) {
+      notify(
+        'Please complete the current row before adding a new one',
+        'warning',
+        2000,
+      );
+
+      // 👉 focus that empty row
+      const emptyIndex = rows.findIndex((row: any) => this.isRowEmpty(row));
+      setTimeout(() => {
+        grid.editCell(emptyIndex, 'ITEM_CODE');
+      }, 50);
+
+      return;
+    }
+
+    // ✅ Add new row only if all rows are filled
     const newRow = {
       ITEM_ID: null,
       ITEM_CODE: null,
@@ -553,27 +581,21 @@ export class AddInvoiceRetailComponent {
       HSN_CODE: null,
       UOM: null,
       PRICE: 0,
-      QUANTITY: 1,
+      QUANTITY: 0,
       AMOUNT: 0,
       TAX_PERC: 0,
       TAX_AMOUNT: 0,
       TOTAL_AMOUNT: 0,
     };
 
-    //  Push into datasource
-    this.invoiceFormData.Details = [
-      ...(this.invoiceFormData.Details || []),
-      newRow,
-    ];
+    this.invoiceFormData.Details = [...rows, newRow];
 
-    // Refresh grid
     setTimeout(() => {
       grid.option('dataSource', this.invoiceFormData.Details);
       grid.refresh();
 
-      //  Focus last row
       const rowIndex = this.invoiceFormData.Details.length - 1;
-      grid.focus(grid.getCellElement(rowIndex, 1));
+      grid.editCell(rowIndex, 'ITEM_CODE');
     }, 50);
   }
   moveNextCell(field: string, rowIndex: number, grid: any) {
@@ -652,7 +674,7 @@ export class AddInvoiceRetailComponent {
       grid.saveEditData();
     }
 
-    // 🔥 VALIDATION
+    //  VALIDATION
     const invalidIndex = (this.invoiceFormData.Details || []).findIndex(
       (item: any) => item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0),
     );

@@ -72,7 +72,7 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Invoice</div>
+          <div class="grid-header">Miscellaneous Purchase Invoice</div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
@@ -119,13 +119,13 @@
         </dx-select-box>
       </div>
       <dxi-column
-        dataField="VOUCHER_NO"
+        dataField="DOC_NO"
         caption="Sale No"
         alignment="left"
       ></dxi-column>
       <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
       <dxi-column
-        dataField="TRANS_DATE"
+        dataField="SALE_DATE"
         caption="Date"
         dataType="date"
         [allowEditing]="false"
@@ -175,10 +175,10 @@
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice-retail
+  <app-misc-purch-invoice-form
     [isEditing]="false"
     (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
+  ></app-misc-purch-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>
 <dx-popup
@@ -190,12 +190,12 @@
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice-retail
+  <app-misc-purch-invoice-form
     [isEditing]="true"
     [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
+  ></app-misc-purch-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>
 

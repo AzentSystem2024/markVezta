@@ -7,6 +7,7 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import {
   DxTabPanelModule,
@@ -29,6 +30,7 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./user-level-new-form.component.scss'],
 })
 export class UserLevelNewFormComponent implements OnInit, OnChanges {
+  @ViewChild('dataGrid', { static: false }) dataGrid: any;
   @Input() sharedValue: any | false;
   width: any = '100%';
   rtlEnabled: boolean = false;
@@ -89,6 +91,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
             menu.CanEdit = false;
             menu.CanView = true;
             menu.CanDelete = false;
+            menu.HideCost = false;
             menu.CanApprove = false;
             // Reset any other permission fields as needed
           });
@@ -116,6 +119,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
           menu.CanEdit = false;
           menu.CanView = true;
           menu.CanDelete = false;
+          menu.HideCost = false;
           menu.CanApprove = false;
         });
       });
@@ -146,13 +150,32 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
     this.cdr.detectChanges();
   }
 
-  onSelectionChanged(event: any): void {
-    if (this.UserLevelValue == '') {
-      this.isErrorVisible = true;
-    }
-    this.selectedRows[this.selectedTab] = event.selectedRowKeys;
-    this.combineSelectedRows();
+onSelectionChanged(event: any): void {
+  if (this.UserLevelValue == '') {
+    this.isErrorVisible = true;
   }
+
+  const selectedKeys = new Set(event.selectedRowKeys);
+
+  this.selectedRows[this.selectedTab] = event.selectedRowKeys;
+
+  this.selectedTabData.forEach((menu: any) => {
+    if (selectedKeys.has(menu.MenuId)) {
+      menu.CanView = true; // default
+    } else {
+      // reset all permissions
+      menu.CanAdd = false;
+      menu.CanView = false;
+      menu.CanEdit = false;
+      menu.CanApprove = false;
+      menu.CanDelete = false;
+      menu.CanPrint = false;
+      menu.HideCost = false;
+    }
+  });
+
+  this.combineSelectedRows();
+}
 
   //   onSelectionChanged(event: any): void {
   //   if (this.UserLevelValue == '') {
@@ -210,6 +233,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
               menu.CanEdit = match.CanEdit ?? false;
               menu.CanApprove = match.CanApprove ?? false;
               menu.CanDelete = match.CanDelete ?? false;
+              menu.HideCost = match.HideCost ?? false;
               menu.CanPrint = match.CanPrint ?? false;
 
               // Also copy lowercase flags for checkbox binding
@@ -217,6 +241,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
               menu.CanView = match.CanView ?? true;
               menu.CanEdit = match.CanEdit ?? false;
               menu.CanApprove = match.CanApprove ?? false;
+              menu.HideCost = match.HideCost ?? false;
               menu.CanDelete = match.CanDelete ?? false;
               menu.CanPrint = match.CanPrint ?? false;
               menu.Selected = match.Selected ?? false;
@@ -229,12 +254,14 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
               menu.CanEdit = false;
               menu.CanApprove = false;
               menu.CanDelete = false;
+              menu.HideCost = false;
               menu.CanPrint = false;
 
               menu.CanAdd = false;
               menu.CanView = true;
               menu.CanEdit = false;
               menu.CanApprove = false;
+              menu.HideCost = false;
               menu.CanDelete = false;
               menu.CanPrint = false;
 
@@ -254,11 +281,36 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
     }
   }
 
-  onPermissionCheckboxChanged(e: any): void {
-    this.combineSelectedRows(); // Rebuild the latest data from updated grid values
+  onEditorPreparing(e: any): void {
+  if (e.parentType === 'dataRow' && e.dataField) {
+    const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+    e.editorOptions.onValueChanged = (args: any) => {
+      // 🔥 Update actual object immediately
+      e.row.data[e.dataField] = args.value;
+
+      // Call default behavior
+      if (originalOnValueChanged) {
+        originalOnValueChanged(args);
+      }
+
+      // Rebuild payload
+      this.combineSelectedRows();
+    };
+  }
+}
+
+onPermissionCheckboxChanged(e: any): void {
+  const { data, column, value } = e;
+
+  if (data && column?.dataField) {
+    data[column.dataField] = value; //  THIS IS THE KEY FIX
   }
 
-  combineSelectedRows(): void {
+  this.combineSelectedRows();
+}
+
+combineSelectedRows(): void {
     this.allSelectedRows = [];
 
     const selectedMenuIds = new Set<string>();
@@ -283,6 +335,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
             CanEdit: menu.CanEdit ?? false,
             CanApprove: menu.CanApprove ?? false,
             CanDelete: menu.CanDelete ?? false,
+            HideCost : menu.HideCost ?? false,
             CanPrint: menu.CanPrint ?? false,
           });
         }
@@ -294,6 +347,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
       Menus: enrichedMenus,
     });
   }
+
 
   getNewUSerLevelData = () => ({ ...this.allSelectedRows });
 }

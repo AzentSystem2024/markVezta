@@ -102,6 +102,8 @@ export class StockAdjustmentAddComponent {
   companyID: any;
   totalAmount: any;
   ENABLE_Matrix_Code: any;
+  storename: any;
+  hidecost: any;
 
   constructor(
     private dataService: DataService,
@@ -117,14 +119,16 @@ export class StockAdjustmentAddComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.getStockAdjustNo();
     console.log('Parsed ObjectData==================:', menuResponse);
     console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-    this.companyID = menuResponse.Companies[0].COMPANY_ID;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    this.storename = menuResponse.Configuration[0].STORE_NAME;
     console.log(this.storeFromSession);
     console.log(menuResponse.MenuGroups);
     const packingRights = menuResponse.MenuGroups.flatMap(
@@ -137,6 +141,7 @@ export class StockAdjustmentAddComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
+      this.hidecost = packingRights.HideCost;
       this.canApprove = packingRights.CanApprove;
     }
     console.log(this.canApprove, '==============');
@@ -146,7 +151,7 @@ export class StockAdjustmentAddComponent {
       // this.getItemsList();
     }
     this.getStoreDropdown();
-    this.getReasonsDropdown();
+    this.getReasonsDropdown() ;
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete, this.canApprove);
     // this.items = [];
@@ -212,7 +217,7 @@ export class StockAdjustmentAddComponent {
     };
     console.log(payload);
     this.dataService
-      .getrReasonDropdownData(payload)
+      .getDropdownData(payload)
       .subscribe((response: any) => {
         this.reasons = response;
       });
@@ -226,6 +231,25 @@ export class StockAdjustmentAddComponent {
       this.stores = response;
     });
   }
+
+  getStockAdjustNo() {
+    const payload = {
+      TRANS_TYPE: 49,
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.getDocNo(payload).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.adjustmentFormData.ADJ_NO = res.DOC_NO;
+          console.log('New Transfer No:', res.DOC_NO);
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching next transfer no:', err);
+      },
+    });
+  }
+
   get_item_list_Data() {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -243,15 +267,12 @@ export class StockAdjustmentAddComponent {
   cancel() {
     this.popupClosed.emit();
   }
-  d;
+  
   onAddItems() {
-    if (!this.adjustmentFormData.STORE_ID) {
-      notify('Please select a store to add items', 'error');
-      return;
-    }
+   
     this.isPopupVisible = true;
     const payload = {
-      STORE_ID: this.adjustmentFormData.STORE_ID,
+      STORE_ID: this.storeFromSession,
     };
 
     console.log(payload);
@@ -271,7 +292,7 @@ export class StockAdjustmentAddComponent {
 
     const transformed = ITEM_Details.map((item) => ({
       COMPANY_ID: this.companyID,
-      STORE_ID: this.adjustmentFormData.STORE_ID,
+      STORE_ID: this.storeFromSession,
       ADJ_ID: 0,
       NET_AMOUNT: 0,
 
@@ -295,11 +316,12 @@ export class StockAdjustmentAddComponent {
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
       NET_AMOUNT: this.totalAmount,
+      STORE_ID : this.storeFromSession,
       Details: transformed,
     };
     console.log(payload);
 
-    if (!this.adjustmentFormData.STORE_ID) {
+    if (!this.storeFromSession) {
       notify('Please select a store ', 'error');
       return;
     }

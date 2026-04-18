@@ -122,6 +122,7 @@ export class StockAdjustmentListComponent {
 
   filteredInvoiceList: any;
   filteredStockList: any;
+  selectedCompanyId: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -163,6 +164,7 @@ export class StockAdjustmentListComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
+    this.sessionData_tax();
     this.get_stock_adjustment_list();
   }
 
@@ -170,8 +172,15 @@ export class StockAdjustmentListComponent {
     const start = new Date(this.customStartDate); // keep as Date
     const end = new Date(this.customEndDate); // keep as Date
 
+    const datePayload = this.getDateRangePayload();
+
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
+    };
     // Use Date objects for filtering
-    this.dataService.List_Stock_Adjustment_Data().subscribe((res: any) => {
+    this.dataService.List_Stock_Adjustment_Data(payload).subscribe((res: any) => {
       const allData = res.Data;
       this.filteredStockList = allData.filter((item: any) => {
         const itemDate = new Date(item.ADJ_DATE);
@@ -191,8 +200,82 @@ export class StockAdjustmentListComponent {
     this.showCustomDatePopup = false;
   }
 
+   private getDateRangePayload(): {
+    DATE_FROM: string | null;
+    DATE_TO: string | null;
+  } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+    }
+
+    return {
+      DATE_FROM: fromDate ? this.formatDate(fromDate) : null,
+      DATE_TO: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
+    sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    // this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+  
   get_stock_adjustment_list() {
-    this.dataService.List_Stock_Adjustment_Data().subscribe((res: any) => {
+    
+    const datePayload = this.getDateRangePayload();
+
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
+    };
+
+    this.dataService.List_Stock_Adjustment_Data(payload).subscribe((res: any) => {
       console.log(res);
       const allData = res.Data;
       const dateField = 'ADJ_DATE';
