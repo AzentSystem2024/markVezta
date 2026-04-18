@@ -388,6 +388,9 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   onAddClick() {
     this.router.navigate(['/item-change-property-add']);
   }
+  getStatusFlagClass(Status: string): string {
+    return Status === '1' ? 'flag-red' : 'flag-green';
+  }
 }
 @NgModule({
   imports: [

@@ -213,29 +213,31 @@ export class MiscPurchaseInvoiceComponent {
         new Promise((resolve) => {
           this.dataService.getMiscPurchInvoiceMainList(payload).subscribe({
             next: (response: any) => {
-              const list = (response?.Data || [])
+              const list = (response?.List || [])
                 .map((item: any) => {
-                  let dateValue: Date;
+                  let dateValue = null;
 
-                  if (
-                    typeof item.SALE_DATE === 'string' &&
-                    item.SALE_DATE.includes('-')
-                  ) {
-                    const [day, month, year] =
-                      item.SALE_DATE.split('-').map(Number);
-                    dateValue = new Date(year, month - 1, day);
-                  } else {
-                    dateValue = new Date(item.SALE_DATE);
+                  if (item.PURCH_DATE) {
+                    // ISO format (your case)
+                    if (item.PURCH_DATE.includes('T')) {
+                      dateValue = new Date(item.PURCH_DATE);
+                    }
+                    // DD-MM-YYYY format
+                    else if (item.PURCH_DATE.includes('-')) {
+                      const [day, month, year] =
+                        item.PURCH_DATE.split('-').map(Number);
+                      dateValue = new Date(year, month - 1, day);
+                    }
                   }
 
                   return {
                     ...item,
-                    SALE_DATE: dateValue,
+                    PURCH_DATE: dateValue,
                   };
                 })
                 .sort((a: any, b: any) => {
-                  const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
-                  const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
+                  const numA = Number(a.PURCH_NO.match(/\d+$/)?.[0] || 0);
+                  const numB = Number(b.PURCH_NO.match(/\d+$/)?.[0] || 0);
                   return numB - numA; // descending
                 });
 
@@ -392,7 +394,7 @@ export class MiscPurchaseInvoiceComponent {
     }
 
     this.filteredInvoiceList = this.invoiceArray.filter((item: any) => {
-      const invoiceDate = item.SALE_DATE;
+      const invoiceDate = item.PURCH_DATE;
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
   }
@@ -518,7 +520,7 @@ export class MiscPurchaseInvoiceComponent {
     this.isReadOnlyInvoice = transStatus === 5;
 
     this.dataService
-      .selectInvoiceRetail(invoiceId)
+      .selectMiscPurchInvoice(invoiceId)
       .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
 
