@@ -551,24 +551,21 @@ export class AddCreditNoteComponent {
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
-
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
-          }, 50);
-        }
-      };
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
 
     if (e.dataField === 'ledgerCode') {
+      // ✅ Open dropdown on focus
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 0);
+      };
+
+      // ❌ REMOVE your existing onKeyDown completely
+
+      // ✅ Move on value selection
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_CODE === args.value,
@@ -577,22 +574,17 @@ export class AddCreditNoteComponent {
         e.setValue(args.value);
 
         if (selectedLedger) {
-          // 1️⃣ Set ledger name
+          // bind ledger name
           e.component.cellValue(
             rowIndex,
             'ledgerName',
             selectedLedger.HEAD_NAME,
           );
 
-          // 2️⃣ Set HSN FROM SELECTED INVOICE
-          e.component.cellValue(rowIndex, 'HSN_CODE', this.selectedInvoiceHsn);
-
-          // 3️⃣ Apply GST FROM SELECTED INVOICE
-          this.applyGstForRow(e.row.data);
-
-          // 4️⃣ Move focus
+          // 🔥 MOVE FOCUS HERE (THIS IS THE FIX)
           setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+            const grid = this.itemsGridRef?.instance;
+            grid.editCell(rowIndex, 'ledgerName');
           }, 50);
         }
       };
@@ -600,26 +592,45 @@ export class AddCreditNoteComponent {
 
     // ➤ ledgerName: move to particulars on Enter
     if (e.dataField === 'ledgerName') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
-          // setTimeout(() => {
-          //   this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          // }, 50);
-        }
+      // open dropdown on focus
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 0);
       };
 
+      // 🔥 MAIN FIX: move on selection
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_NAME === args.value,
         );
+
         e.setValue(args.value);
+
         if (selectedLedger) {
+          // sync code
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
             selectedLedger.HEAD_CODE,
           );
+        }
+
+        // 🔥 MOVE TO PARTICULARS HERE
+        setTimeout(() => {
+          const grid = this.itemsGridRef?.instance;
+          grid.editCell(rowIndex, 'particulars');
+        }, 50);
+      };
+
+      // optional: Enter also moves (keyboard users)
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'particulars');
+          }, 50);
         }
       };
     }
@@ -639,119 +650,87 @@ export class AddCreditNoteComponent {
     if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
-          const grid = e.component;
-          const rowIndex = e.row.rowIndex;
-          // Move focus to the "ledgerCode" column in the same row
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+          // ✅ simulate TAB key (DevExtreme handles this correctly)
+          const eKey = event.event;
+
+          const tabEvent = new KeyboardEvent('keydown', {
+            key: 'Tab',
+            code: 'Tab',
+            keyCode: 9,
+            which: 9,
+            bubbles: true,
           });
+
+          eKey.target.dispatchEvent(tabEvent);
         }
       };
     }
-    if (e.dataField === 'Amount') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
-
-          const grid = this.itemsGridRef?.instance;
-          const rowIndex = e.row.rowIndex;
-
-          // ✅ Commit value and update totals
-          const editorElement = event.event.target as HTMLElement;
-          editorElement.blur();
-
-          setTimeout(() => {
-            grid?.saveEditData();
-            const rows = grid.getVisibleRows().map((r) => r.data);
-            let netTotal = 0;
-            for (const row of rows) {
-              const amount = parseFloat(row.Amount) || 0;
-              const gst = parseFloat(row.gstAmount) || 0;
-              netTotal += amount + gst;
-            }
-            this.netAmountDisplay = netTotal;
-
-            // ✅ Add new empty row
-
-            if (!this.hasEmptyRow()) {
-              const grid = this.itemsGridRef?.instance;
-              const newRow = {
-                SL_NO: this.creditFormData.NOTE_DETAIL.length + 1,
-                ledgerCode: '',
-                ledgerName: '',
-                particulars: '',
-                Amount: '',
-                GST_PERC: '',
-                GST: 0,
-                CGST: 0,
-                SGST: 0,
-                gstAmount: '',
-                HEAD_ID: null,
-              };
-              this.applyGstForRow(newRow);
-              this.creditFormData.NOTE_DETAIL.push(newRow);
-
-              // ✅ Force rebind and refresh the grid
-              grid.option('dataSource', [...this.creditFormData.NOTE_DETAIL]);
-              grid.refresh();
-
-              // ✅ Wait a bit longer to ensure row is rendered before focusing
-              setTimeout(() => {
-                const visibleRows = grid.getVisibleRows();
-                const newRowIndex = visibleRows.findIndex(
-                  (r) => r.data === newRow,
-                );
-
-                if (newRowIndex >= 0) {
-                  // Small extra delay for rendering safety
-                  setTimeout(() => {
-                    grid.editCell(newRowIndex, 'ledgerCode');
-                  }, 50);
-                }
-              }, 100);
-            }
-          }, 50);
-        }
-
-        if (event.event.key === 'Tab') {
-          event.event.preventDefault();
-
-          const grid = this.itemsGridRef?.instance;
-          const editorElement = event.event.target as HTMLElement;
-          editorElement.blur();
-
-          setTimeout(() => {
-            grid?.saveEditData();
-            const rows = grid.getVisibleRows().map((r) => r.data);
-            let netTotal = 0;
-            for (const row of rows) {
-              const amount = parseFloat(row.Amount) || 0;
-              const gst = parseFloat(row.gstAmount) || 0;
-              netTotal += amount + gst;
-            }
-            this.netAmountDisplay = netTotal;
-            setTimeout(() => {
-              this.narrationRef?.instance?.focus();
-            }, 50);
-          }, 50);
-        }
-      };
-    }
-
     if (e.dataField === 'GST_PERC') {
-      const originalOnValueChanged = e.editorOptions.onValueChanged;
-
+      // existing logic (keep it)
+      const original = e.editorOptions.onValueChanged;
       e.editorOptions.onValueChanged = (args: any) => {
-        // keep existing behavior
-        if (originalOnValueChanged) {
-          originalOnValueChanged(args);
-        }
-
+        if (original) original(args);
         e.setValue(args.value);
 
-        // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
         e.row.data.CGST = 0;
         e.row.data.SGST = 0;
+      };
+
+      //  NEW: Enter → add row
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+
+          setTimeout(() => {
+            //  1. Commit current edit
+            grid.saveEditData();
+
+            //  2. Create new row
+            const newRow = {
+              SL_NO: this.creditFormData.NOTE_DETAIL.length + 1,
+              ledgerCode: '',
+              ledgerName: '',
+              particulars: '',
+              Amount: '',
+              GST_PERC: '',
+              GST: 0,
+              CGST: 0,
+              SGST: 0,
+              gstAmount: '',
+              HEAD_ID: null,
+            };
+
+            //Only ONE push
+            if (this.hasEmptyRow()) {
+              return; // stop if empty row exists
+            }
+
+            this.creditFormData.NOTE_DETAIL.push(newRow);
+            // this.updateSlNo();
+            // 3. Refresh grid
+            grid.option('dataSource', [...this.creditFormData.NOTE_DETAIL]);
+            grid.refresh();
+
+            // 4. Focus new row first column
+            setTimeout(() => {
+              const visibleRows = grid.getVisibleRows();
+              const newRowIndex = visibleRows.findIndex(
+                (r) => r.data === newRow,
+              );
+
+              if (newRowIndex >= 0) {
+                grid.editCell(newRowIndex, 'ledgerCode');
+              }
+            }, 100);
+          }, 50);
+        }
+      };
+
+      // keep dropdown auto-open
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 0);
       };
     }
 
@@ -770,6 +749,261 @@ export class AddCreditNoteComponent {
       };
     }
   }
+
+  // onEditorPreparing(e: any) {
+  //   if (
+  //     e.dataField === 'ledgerCode' ||
+  //     e.dataField === 'ledgerName' ||
+  //     e.dataField === 'particulars' ||
+  //     e.dataField === 'Amount' ||
+  //     e.dataField === 'GST_PERC' ||
+  //     e.dataField === 'gstAmount'
+  //   ) {
+  //     e.editorOptions = e.editorOptions || {};
+
+  //     // Let the editor inherit row height naturally (no fixed height)
+  //     e.editorOptions.elementAttr = {
+  //       style: `
+  //       height: 100%;
+  //       margin: 0;
+  //       padding: 0;
+  //       display: flex;
+  //       align-items: center;
+  //     `,
+  //     };
+
+  //     // Make sure the input fits snugly inside
+  //     e.editorOptions.inputAttr = {
+  //       style: `
+  //       height: 100%;
+  //       padding: 0 4px;
+  //       box-sizing: border-box;
+  //     `,
+  //     };
+
+  //     // Remove spin buttons to prevent layout changes
+  //     if (e.editorName === 'dxNumberBox') {
+  //       e.editorOptions.showSpinButtons = false;
+  //     }
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = this.itemsGridRef?.instance;
+  //         const visibleRows = grid.getVisibleRows();
+
+  //         const rowIndex = visibleRows.findIndex(
+  //           (r) => r?.data === e.row?.data,
+  //         );
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'GST'));
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+  //   if (e.parentType !== 'dataRow') return;
+  //   const rowIndex = e.row?.rowIndex;
+
+  //   if (e.dataField === 'ledgerCode') {
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       const selectedLedger = this.ledgerList.find(
+  //         (item: any) => item.HEAD_CODE === args.value,
+  //       );
+
+  //       e.setValue(args.value);
+
+  //       if (selectedLedger) {
+  //         // 1️⃣ Set ledger name
+  //         e.component.cellValue(
+  //           rowIndex,
+  //           'ledgerName',
+  //           selectedLedger.HEAD_NAME,
+  //         );
+
+  //         // 2️⃣ Set HSN FROM SELECTED INVOICE
+  //         e.component.cellValue(rowIndex, 'HSN_CODE', this.selectedInvoiceHsn);
+
+  //         // 3️⃣ Apply GST FROM SELECTED INVOICE
+  //         this.applyGstForRow(e.row.data);
+
+  //         // 4️⃣ Move focus
+  //         setTimeout(() => {
+  //           this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+
+  //   // ➤ ledgerName: move to particulars on Enter
+  //   if (e.dataField === 'ledgerName') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         event.event.preventDefault();
+  //         // setTimeout(() => {
+  //         //   this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+  //         // }, 50);
+  //       }
+  //     };
+
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       const selectedLedger = this.ledgerList.find(
+  //         (item: any) => item.HEAD_NAME === args.value,
+  //       );
+  //       e.setValue(args.value);
+  //       if (selectedLedger) {
+  //         e.component.cellValue(
+  //           rowIndex,
+  //           'ledgerCode',
+  //           selectedLedger.HEAD_CODE,
+  //         );
+  //       }
+  //     };
+  //   }
+
+  //   if (e.dataField === 'particulars') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = e.component;
+  //         const rowIndex = e.row.rowIndex;
+  //         // Move focus to the "ledgerCode" column in the same row
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'Amount'));
+  //         });
+  //       }
+  //     };
+  //   }
+  //   if (e.dataField === 'Amount') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = e.component;
+  //         const rowIndex = e.row.rowIndex;
+  //         // Move focus to the "ledgerCode" column in the same row
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+  //         });
+  //       }
+  //     };
+  //   }
+  //   if (e.dataField === 'Amount') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         event.event.preventDefault();
+
+  //         const grid = this.itemsGridRef?.instance;
+  //         const rowIndex = e.row.rowIndex;
+
+  //         // ✅ Commit value and update totals
+  //         const editorElement = event.event.target as HTMLElement;
+  //         editorElement.blur();
+
+  //         setTimeout(() => {
+  //           grid?.saveEditData();
+  //           const rows = grid.getVisibleRows().map((r) => r.data);
+  //           let netTotal = 0;
+  //           for (const row of rows) {
+  //             const amount = parseFloat(row.Amount) || 0;
+  //             const gst = parseFloat(row.gstAmount) || 0;
+  //             netTotal += amount + gst;
+  //           }
+  //           this.netAmountDisplay = netTotal;
+
+  //           // ✅ Add new empty row
+
+  //           if (!this.hasEmptyRow()) {
+  //             const grid = this.itemsGridRef?.instance;
+  //             const newRow = {
+  //               SL_NO: this.creditFormData.NOTE_DETAIL.length + 1,
+  //               ledgerCode: '',
+  //               ledgerName: '',
+  //               particulars: '',
+  //               Amount: '',
+  //               GST_PERC: '',
+  //               GST: 0,
+  //               CGST: 0,
+  //               SGST: 0,
+  //               gstAmount: '',
+  //               HEAD_ID: null,
+  //             };
+  //             this.applyGstForRow(newRow);
+  //             this.creditFormData.NOTE_DETAIL.push(newRow);
+
+  //             // ✅ Force rebind and refresh the grid
+  //             grid.option('dataSource', [...this.creditFormData.NOTE_DETAIL]);
+  //             grid.refresh();
+
+  //             // ✅ Wait a bit longer to ensure row is rendered before focusing
+  //             setTimeout(() => {
+  //               const visibleRows = grid.getVisibleRows();
+  //               const newRowIndex = visibleRows.findIndex(
+  //                 (r) => r.data === newRow,
+  //               );
+
+  //               if (newRowIndex >= 0) {
+  //                 // Small extra delay for rendering safety
+  //                 setTimeout(() => {
+  //                   grid.editCell(newRowIndex, 'ledgerCode');
+  //                 }, 50);
+  //               }
+  //             }, 100);
+  //           }
+  //         }, 50);
+  //       }
+
+  //       if (event.event.key === 'Tab') {
+  //         event.event.preventDefault();
+
+  //         const grid = this.itemsGridRef?.instance;
+  //         const editorElement = event.event.target as HTMLElement;
+  //         editorElement.blur();
+
+  //         setTimeout(() => {
+  //           grid?.saveEditData();
+  //           const rows = grid.getVisibleRows().map((r) => r.data);
+  //           let netTotal = 0;
+  //           for (const row of rows) {
+  //             const amount = parseFloat(row.Amount) || 0;
+  //             const gst = parseFloat(row.gstAmount) || 0;
+  //             netTotal += amount + gst;
+  //           }
+  //           this.netAmountDisplay = netTotal;
+  //           setTimeout(() => {
+  //             this.narrationRef?.instance?.focus();
+  //           }, 50);
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+
+  //   if (e.dataField === 'GST_PERC') {
+  //     const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       // keep existing behavior
+  //       if (originalOnValueChanged) {
+  //         originalOnValueChanged(args);
+  //       }
+
+  //       e.setValue(args.value);
+
+  //       // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
+  //       e.row.data.CGST = 0;
+  //       e.row.data.SGST = 0;
+  //     };
+  //   }
+
+  //   if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+  //     const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       if (originalOnValueChanged) {
+  //         originalOnValueChanged(args);
+  //       }
+
+  //       e.setValue(args.value);
+
+  //       // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
+  //       e.row.data.GST_PERC = 0;
+  //     };
+  //   }
+  // }
 
   onRowInserted(e: any): void {
     if (this.newRowAdded) {

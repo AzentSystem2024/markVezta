@@ -386,7 +386,39 @@ export class PurchaseReturnDebitFormComponent {
 
     console.log('Selected Supplier:', selectedSupplier);
   }
+  isAlreadySelected = (rowData: any) => {
+    return this.mainGridData?.some(
+      (item) => item.DETAIL_ID === rowData.DETAIL_ID,
+    );
+  };
 
+  onPopupSelectionChanged(e: any) {
+    const grid = this.popupGridRef.instance;
+
+    const invalidRows = e.selectedRowsData.filter((row: any) =>
+      this.isAlreadySelected(row),
+    );
+
+    if (invalidRows.length > 0) {
+      invalidRows.forEach((row: any) => {
+        grid.deselectRows([row.DETAIL_ID]);
+      });
+
+      notify('This invoice is already selected', 'warning', 2000);
+    }
+  }
+
+  onPopupRowPrepared(e: any) {
+    if (e.rowType === 'data') {
+      const alreadyAdded = this.isAlreadySelected(e.data);
+
+      if (alreadyAdded) {
+        e.rowElement.style.opacity = '0.5';
+        e.rowElement.style.pointerEvents = 'none';
+        e.rowElement.title = 'Already added';
+      }
+    }
+  }
   openPendingGrnPopup() {
     if (!this.selectedSupplierId) {
       notify('Please Select A Supplier', 'warning', 2000);

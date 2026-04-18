@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -37,21 +38,19 @@ import {
   DxiGroupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
+import notify from 'devextreme/ui/notify';
 import { FormTextboxModule } from 'src/app/components';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
-import { InvoiceListComponent } from '../invoice-list/invoice-list.component';
-import { Router } from '@angular/router';
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
-import notify from 'devextreme/ui/notify';
-import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import { MiscPurchInvoiceFormModule } from '../misc-purch-invoice-form/misc-purch-invoice-form.component';
 
 @Component({
-  selector: 'app-invoice-retail',
-  templateUrl: './invoice-retail.component.html',
-  styleUrls: ['./invoice-retail.component.scss'],
+  selector: 'app-misc-purchase-invoice',
+  templateUrl: './misc-purchase-invoice.component.html',
+  styleUrls: ['./misc-purchase-invoice.component.scss'],
 })
-export class InvoiceRetailComponent {
+export class MiscPurchaseInvoiceComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: any = DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -147,7 +146,6 @@ export class InvoiceRetailComponent {
     },
   ];
   isReadOnlyInvoice: boolean = false;
-
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -182,6 +180,7 @@ export class InvoiceRetailComponent {
 
     this.getInvoiceList();
   }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
@@ -192,7 +191,7 @@ export class InvoiceRetailComponent {
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+    const grid = this.dataGrid?.instance;
 
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
@@ -212,31 +211,31 @@ export class InvoiceRetailComponent {
     this.InvoiceDataSource = new DataSource({
       load: () =>
         new Promise((resolve) => {
-          this.dataService.getSalesInvoiceRetailData(payload).subscribe({
+          this.dataService.getMiscPurchInvoiceMainList(payload).subscribe({
             next: (response: any) => {
               const list = (response?.Data || [])
                 .map((item: any) => {
                   let dateValue: Date;
 
                   if (
-                    typeof item.TRANS_DATE === 'string' &&
-                    item.TRANS_DATE.includes('-')
+                    typeof item.SALE_DATE === 'string' &&
+                    item.SALE_DATE.includes('-')
                   ) {
                     const [day, month, year] =
-                      item.TRANS_DATE.split('-').map(Number);
+                      item.SALE_DATE.split('-').map(Number);
                     dateValue = new Date(year, month - 1, day);
                   } else {
-                    dateValue = new Date(item.TRANS_DATE);
+                    dateValue = new Date(item.SALE_DATE);
                   }
 
                   return {
                     ...item,
-                    TRANS_DATE: dateValue,
+                    SALE_DATE: dateValue,
                   };
                 })
                 .sort((a: any, b: any) => {
-                  const numA = Number(a.VOUCHER_NO.match(/\d+$/)?.[0] || 0);
-                  const numB = Number(b.VOUCHER_NO.match(/\d+$/)?.[0] || 0);
+                  const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
+                  const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
                   return numB - numA; // descending
                 });
 
@@ -254,7 +253,6 @@ export class InvoiceRetailComponent {
           });
         }),
     });
-    console.log(this.InvoiceDataSource, 'INVOICEDATASOURCE');
   }
 
   private getDateRangePayload(range: string) {
@@ -394,7 +392,7 @@ export class InvoiceRetailComponent {
     }
 
     this.filteredInvoiceList = this.invoiceArray.filter((item: any) => {
-      const invoiceDate = item.TRANS_DATE;
+      const invoiceDate = item.SALE_DATE;
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
   }
@@ -623,11 +621,11 @@ export class InvoiceRetailComponent {
     DxNumberBoxModule,
     DxoSummaryModule,
     CustomDatePopupModule,
-    AddInvoiceRetailModule,
+    MiscPurchInvoiceFormModule,
   ],
   providers: [],
-  declarations: [InvoiceRetailComponent],
-  exports: [InvoiceRetailComponent],
+  declarations: [MiscPurchaseInvoiceComponent],
+  exports: [MiscPurchaseInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceRetailModule {}
+export class MiscPurchaseInvoiceModule {}
