@@ -404,6 +404,7 @@ import {
   MiscPurchInvoiceFormModule,
 } from './pages/Operations/misc-purch-invoice-form/misc-purch-invoice-form.component';
 import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
+import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -783,6 +784,7 @@ import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } f
     MiscPurchaseInvoiceModule,
     MiscPurchInvoiceFormModule,
     MiscellaneousSalesInvoiceModule,
+    MiscellaneousSalesInvoiceFormModule,
   ],
 
   providers: [

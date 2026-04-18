@@ -6418,4 +6418,32 @@ The result can be exported to HTML or Markdown.`;
     const data = items;
     return this.http.post(`${this.apiUrl}miscPurchInvoice/list`, data);
   }
+
+  //-------------------------------------MISCELLANOUES-SALES-INVOICE--------------------------------------//
+  getMiscSalesInvoiceMainList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/list`, data);
+  }
+
+   insertMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/Insert`, data);
+  }
+
+   UpdateMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ACTransactions/Insert`, data);
+  }
+
+
+  selectMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SalesInvoice/select/` + id, {});
+  }
+
+  deleteMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SalesInvoice/delete/` + id, {});
+  }
+
+
+
 }
