@@ -80,15 +80,23 @@
       <dxi-column
         dataField="Narration"
         caption="Remarks"
-        [width]="'auto'"
+        [width]="'300'"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
         dataField="Status"
         caption="Status"
-        [width]="'auto'"
+        [width]="'100'"
         [allowEditing]="false"
       ></dxi-column>
+      <!-- <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value ? true : false"
+          style="margin-left: 10px; cursor: default"
+        ></i>
+      </div> -->
     </dx-data-grid>
   </div>
   <!-- <div class="selected-rows-container">
