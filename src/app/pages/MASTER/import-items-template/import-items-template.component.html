@@ -1,5 +1,6 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
+    #dataGrid
     class="grid theme-dependent"
     [dataSource]="itemTemplate"
     [allowColumnReordering]="true"
@@ -7,6 +8,9 @@
     (onEditingStart)="onEditingRow($event)"
     (onRowRemoving)="onRowRemoving($event)"
     (onRowUpdating)="onRowUpdating($event)"
+    [height]="'82vh'"
+    rowAlternationInterval="2"
+    [rowAlternationEnabled]="true"
     [width]="'100%'"
     [columnAutoWidth]="true"
   >
@@ -14,7 +18,7 @@
 
   <dxo-export
       [enabled]="true"
-      [formats]="['xlsx', 'pdf']"
+      [formats]="['xlsx']"
     >
     </dxo-export>
     <dxo-search-panel
@@ -22,28 +26,59 @@
       placeholder="Data Search"
     ></dxo-search-panel>
 
-<dxo-paging [pageSize]="10"></dxo-paging>
+  <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
 
   <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
   </dxo-editing>
   <dxo-toolbar>
-      <dxi-item location="before">
-        <div class="grid-header">Import Items Template</div>
-      </dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <dx-button
-          text="Add"
-          icon="plus"
-          type="default"
-          stylingMode="contained"
-          (onClick)="openForm()"
-          
-        ></dx-button>
-      </dxi-item>
-      
 
+  <!-- Title -->
+  <dxi-item location="before">
+    <div class="grid-header">Import Items Template</div>
+  </dxi-item>
 
-  </dxo-toolbar>
+  <!-- Filter Toggle -->
+  <dxi-item
+    location="after"
+    widget="dxButton"
+    [options]="searchButtonOptions"
+  ></dxi-item>
+
+  <!-- Refresh -->
+  <dxi-item
+    location="after"
+    widget="dxButton"
+    [options]="refreshButtonOptions"
+  ></dxi-item>
+
+  <!-- Divider -->
+  <dxi-item location="after">
+    <div class="toolbar-divider"></div>
+  </dxi-item>
+
+  <!-- Export -->
+  <dxi-item
+    name="exportButton"
+    location="after"
+    cssClass="export-btn"
+  ></dxi-item>
+
+  <!-- Add Button (Styled) -->
+  <dxi-item
+    location="after"
+    widget="dxButton"
+    [options]="addButtonOptions"
+  ></dxi-item>
+
+</dxo-toolbar>
 
   <dxi-column dataField="TEMPLATE_NAME" caption="Template Name"></dxi-column>
   <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
@@ -56,6 +91,7 @@
     [(visible)]="isPopupOpened"
     (save)="onClickSave()"
     titleText="New Item Template"
+    [showApprove]="false"
     [height]="700"
     [width]="700"
   >

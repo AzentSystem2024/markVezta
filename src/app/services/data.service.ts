@@ -3489,7 +3489,7 @@ The result can be exported to HTML or Markdown.`;
   }
   selectImportTemplateData(id: number) {
     return this.http.post<any>(
-      `${this.apiUrl}/importtemplate/select/` + id,
+      `${this.apiUrl}importtemplate/select/` + id,
       {},
     );
   }
@@ -3513,10 +3513,10 @@ The result can be exported to HTML or Markdown.`;
 
     return this.http.post(`${this.apiUrl}importtemplate/insert`, data);
   }
-  removeImportTemplateData(id: number, data: object) {
+  removeImportTemplateData(id: number) {
     return this.http.post<any>(
-      `${this.apiUrl}importtemplate/delete/ + id`,
-      data,
+      `${this.apiUrl}importtemplate/delete/` + id,
+      {}
     );
   }
 
