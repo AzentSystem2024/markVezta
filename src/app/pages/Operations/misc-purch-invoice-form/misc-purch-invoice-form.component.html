@@ -39,17 +39,14 @@
             [readOnly]="true"
           >
           </dx-date-box>
-
           <dx-text-box
             label="Doc No. *"
             labelMode="floating"
-            [(value)]="invoiceFormData.DOC_NO"
             [readOnly]="true"
             [width]="200"
           >
           </dx-text-box>
         </div>
-        <!--  -->
       </div>
       <div
         style="
@@ -60,23 +57,18 @@
           width: 100%;
         "
       >
-        <!-- LEFT SIDE -->
         <div style="display: flex; gap: 10px">
           <dx-text-box
             label="Reference No."
             labelMode="floating"
-            [(value)]="invoiceFormData.REF_NO"
             [readOnly]="isReadOnlyMode"
             [width]="410"
           >
           </dx-text-box>
         </div>
-
-        <!-- RIGHT SIDE -->
         <div style="display: flex; align-items: flex-end; gap: 8px">
           <dx-select-box
             [dataSource]="customerList"
-            [(value)]="invoiceFormData.CUSTOMER_ID"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
             [width]="370"
@@ -90,8 +82,8 @@
             stylingMode="contained"
             type="default"
             [visible]="!isReadOnlyMode"
-            (onClick)="onAddRow()"
-            hint="Add Customer"
+            hint="Add row"
+            (onClick)="addNewRow()"
           >
           </dx-button>
         </div>
@@ -134,114 +126,115 @@
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
           <dxi-column
-            dataField="ITEM_ID"
-            caption="Item ID"
-            [allowEditing]="!isReadOnlyMode"
-            [visible]="false"
+            dataField="SL_NO"
+            caption="Sl No"
+            width="80"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
+            dataField="ledgerCode"
+            caption="Ledger Code"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_CODE',
+              displayExpr: 'HEAD_CODE',
+              searchEnabled: true,
+            }"
           ></dxi-column>
 
           <dxi-column
-            dataField="ITEM_CODE"
-            caption="Item Code"
-            [allowEditing]="!isReadOnlyMode"
+            dataField="ledgerName"
+            caption="Ledger Name"
             [editorType]="'dxSelectBox'"
             [lookup]="{
-              dataSource: itemsList,
-              valueExpr: 'ID',
-              displayExpr: 'DESCRIPTION',
+              dataSource: ledgerList,
+              valueExpr: 'HEAD_NAME',
+              displayExpr: 'HEAD_NAME',
               searchEnabled: true,
             }"
           ></dxi-column>
+
           <dxi-column
-            dataField="DESCRIPTION"
-            caption="Descriptiom"
-            [allowEditing]="!isReadOnlyMode"
-            [editorType]="'dxSelectBox'"
-            [lookup]="{
-              dataSource: itemsDescriptionList,
-              valueExpr: 'ID',
-              displayExpr: 'DESCRIPTION',
-              searchEnabled: true,
-            }"
-          ></dxi-column>
+            dataField="particulars"
+            caption="Particulars"
+            [editorOptions]="{ maxLength: 250 }"
+          >
+            <dxi-validation-rule
+              type="stringLength"
+              [max]="250"
+              message="Max 250 characters allowed"
+            ></dxi-validation-rule>
+          </dxi-column>
           <dxi-column
             dataField="HSN_CODE"
             caption="HSN Code"
-            [allowEditing]="false"
+            dataType="string"
           ></dxi-column>
           <dxi-column
-            dataField="UOM"
-            caption="UOM"
-            [allowEditing]="false"
-          ></dxi-column>
-
-          <dxi-column
-            dataField="PRICE"
-            caption="Cost"
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-            [allowEditing]="false"
-          ></dxi-column>
-
-          <dxi-column
-            dataField="QUANTITY"
-            caption="Quantity"
-            [allowEditing]="!isReadOnlyMode"
-          ></dxi-column>
-          <dxi-column
-            dataField="AMOUNT"
+            dataField="Amount"
             caption="Amount"
-            [allowEditing]="false"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [calculateCellValue]="calculateAmount"
-          ></dxi-column>
+          >
+          </dxi-column>
           <dxi-column
-            dataField="TAX_PERC"
+            dataField="GST_PERC"
             [caption]="vatTitle + '%'"
-            [allowEditing]="false"
-          ></dxi-column>
+            alignment="right"
+            [format]="{ type: 'fixedPoint', precision: 0 }"
+            [lookup]="{
+              dataSource: VatClass,
+              valueExpr: 'VALUE',
+              displayExpr: 'DESCRIPTION',
+            }"
+          >
+          </dxi-column>
           <dxi-column
-            dataField="TAX_AMOUNT"
+            dataField="gstAmount"
             [caption]="vatTitle + ' Amount'"
-            [allowEditing]="false"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [calculateCellValue]="calculateTax"
-          ></dxi-column>
+          >
+          </dxi-column>
           <dxi-column
-            dataField="TOTAL_AMOUNT"
+            dataField="TOTAL"
             caption="Total"
-            [allowEditing]="false"
             dataType="number"
+            [visible]="true"
+            [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [calculateCellValue]="calculateTotal"
           ></dxi-column>
+          <dxi-column type="buttons">
+            <dxi-button name="delete" width="80"></dxi-button>
+          </dxi-column>
+
           <dxo-summary>
             <dxi-total-item
-              column="AMOUNT"
+              column="Amount"
               summaryType="sum"
               valueFormat="#,##0.00"
-              displayFormat="{0}"
+              displayFormat="Total: {0}"
               alignment="right"
-            ></dxi-total-item>
+            >
+            </dxi-total-item>
 
             <dxi-total-item
-              column="TAX_AMOUNT"
+              column="gstAmount"
               summaryType="sum"
               valueFormat="#,##0.00"
-              displayFormat="{0}"
+              displayFormat="Total: {0}"
               alignment="right"
-            ></dxi-total-item>
-
+            >
+            </dxi-total-item>
             <dxi-total-item
-              column="TOTAL_AMOUNT"
+              column="TOTAL"
               summaryType="sum"
               valueFormat="#,##0.00"
-              displayFormat="{0}"
+              displayFormat="Total: {0}"
               alignment="right"
-              [allowEditing]="true"
-            ></dxi-total-item>
+            >
+            </dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
       </div>
@@ -256,19 +249,13 @@
       ></dx-text-box>
     </div>
     <div class="form-footer-wrapper">
-      <!-- RIGHT SECTION -->
       <div class="right-section">
-        <dx-check-box
-          text="Approve"
-          [(value)]="invoiceFormData.IS_APPROVED"
-          [visible]="!isReadOnlyMode"
-        ></dx-check-box>
+        <dx-check-box text="Approve" [visible]="!isReadOnlyMode"></dx-check-box>
 
         <dx-button
           text="Cancel"
           stylingMode="outlined"
           type="normal"
-          (onClick)="cancel()"
         ></dx-button>
 
         <dx-button
@@ -283,7 +270,6 @@
                 : 'Save'
           "
           [disabled]="isSaving"
-          (onClick)="saveInvoice()"
           stylingMode="contained"
           type="default"
         ></dx-button>

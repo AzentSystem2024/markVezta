@@ -674,7 +674,7 @@ export class AddInvoiceRetailComponent {
       grid.saveEditData();
     }
 
-    // 🔥 VALIDATION
+    //  VALIDATION
     const invalidIndex = (this.invoiceFormData.Details || []).findIndex(
       (item: any) => item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0),
     );

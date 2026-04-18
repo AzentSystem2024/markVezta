@@ -395,6 +395,14 @@ import {
   EditItemStorePropertyComponent,
   EditItemStorePropertyModule,
 } from './pop-up/operations/edit-item-store-property/edit-item-store-property.component';
+import {
+  MiscPurchaseInvoiceComponent,
+  MiscPurchaseInvoiceModule,
+} from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
+import {
+  MiscPurchInvoiceFormComponent,
+  MiscPurchInvoiceFormModule,
+} from './pages/Operations/misc-purch-invoice-form/misc-purch-invoice-form.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -771,6 +779,8 @@ import {
     InvoiceRetailModule,
     AddInvoiceRetailModule,
     EditItemStorePropertyModule,
+    MiscPurchaseInvoiceModule,
+    MiscPurchInvoiceFormModule,
   ],
 
   providers: [

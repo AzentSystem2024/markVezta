@@ -6376,6 +6376,12 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //------------------------------SALES-INVOICE-RETAIL-----------------------------------------------------//
+
+  getSalesInvoiceRetailData(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalesInvoice/list`, data);
+  }
+
   getItemsDetails(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/getitem`, data);
   }
@@ -6398,5 +6404,11 @@ The result can be exported to HTML or Markdown.`;
 
   approveRetailInvoice(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/commit`, data);
+  }
+
+  //------------------------------------MISC-PURCHASE-INVOICE-----------------------------------------------//
+  getMiscPurchInvoiceMainList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}miscPurchInvoice/list`, data);
   }
 }
