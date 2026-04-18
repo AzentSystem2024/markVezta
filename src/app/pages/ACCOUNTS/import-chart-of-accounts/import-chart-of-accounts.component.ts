@@ -142,7 +142,8 @@ export class ImportChartOfAccountsComponent {
     icon: 'import',
     text: 'Import',
     hint: 'Import Excel',
-    stylingMode: 'default',
+    type: 'default',
+    stylingMode: 'contained',
     elementAttr: { class: 'add-button' },
 
     onClick: () => {
@@ -461,12 +462,20 @@ export class ImportChartOfAccountsComponent {
       this.batchNo = this.generateBatchNo();
     }
 
+    const formattedData = this.rawData.map((item: any) => ({
+      ...item,
+      LedgerCode:
+        item.LedgerCode !== undefined && item.LedgerCode !== null
+          ? String(item.LedgerCode)
+          : null, // keep null if empty
+    }));
+
     const payload = {
       CompanyID: this.selectedCompanyId,
       UserID: this.userID,
       BatchNo: this.batchNo,
       Action: 1,
-      Data: this.rawData,
+      Data: formattedData,
     };
 
     const startTime = Date.now();
