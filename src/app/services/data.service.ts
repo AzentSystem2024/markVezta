@@ -675,8 +675,14 @@ export class DataService {
 
   //--------------------------TRANSFER-IN-INVENTORY-------------------------------------//
   getItemDetailsForTrInInventory(payload: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}TransferIn/getitem`, payload);
+    return this.http.post(`${this.apiUrl}TransferIn/gettrout`, payload);
   }
+
+    public getItemsforTransferIn(id: any, companyId: any): Observable<any> {
+    const reqBodyData = { TRANSFER_ID: id, COMPANY_ID: companyId };
+    return this.http.post(`${this.apiUrl}TransferIn/getitem`, reqBodyData);
+  }
+
   getTransferInForInventoryMainList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}TransferIn/list`, data);
@@ -6021,8 +6027,9 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}StockAdjustment/edit`, payload);
   }
-  List_Stock_Adjustment_Data() {
-    return this.http.post(`${this.apiUrl}StockAdjustment/list`, {});
+  List_Stock_Adjustment_Data(item:any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}StockAdjustment/list`, payload);
   }
   select_Stock_Adjustment_Data(id: any) {
     return this.http.post(`${this.apiUrl}StockAdjustment/select/${id}`, {});

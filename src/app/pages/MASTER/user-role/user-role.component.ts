@@ -68,6 +68,7 @@ export class UserRoleComponent implements OnInit{
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  HideCost = false;
 
   isSaving = false;
   isUpdating = false;
@@ -129,6 +130,7 @@ export class UserRoleComponent implements OnInit{
         });
       }),
   });
+  
 
   constructor(
     private fb: FormBuilder,
@@ -157,6 +159,7 @@ export class UserRoleComponent implements OnInit{
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
+      this.HideCost = packingRights.HideCost;
       this.canApprove = packingRights.canApprove;
     }
   }
@@ -215,7 +218,7 @@ export class UserRoleComponent implements OnInit{
     const menuData = this.userlevelNewForm.getNewUSerLevelData();
     const userlevelvalues = this.userlevelNewForm.UserLevelValue;
     const userlistdata = this.userlevelNewForm.UserListdataSource;
-
+    console.log(menuData)
     const isDuplicate = userlistdata?.some((data: any) => {
       const existingName = data.UserRoles?.toString().trim().toLowerCase();
       return existingName === userlevelvalues;
@@ -239,7 +242,7 @@ export class UserRoleComponent implements OnInit{
       .pipe(
         timeout(15000), // ⏱️ prevents infinite wait
         finalize(() => {
-          this.isSaving = false; // ✅ ALWAYS reset loader
+          this.isSaving = false; //  ALWAYS reset loader
         }),
       )
       .subscribe({

@@ -49,18 +49,26 @@
                   ></dx-text-box>
                 </div>
 
-                <div style="margin-top: -4px; display: flex; gap: 20px">
+                <div style="margin-top: -4px; display: flex; gap: 5px">
                   <dx-select-box
                     [(value)]="transferOutFormData.REASON_ID"
                     [dataSource]="reasons"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
-                    [width]="405"
+                    [width]="200"
                     [searchEnabled]="true"
-                    label="Reason"
+                    label="Reasons"
                     labelMode="floating"
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
+
+                  <dx-text-box
+                    [(value)]="storename"
+                    [width]="200"
+                    label="Transfer from"
+                    labelMode="floating"
+                    [readOnly]="true"
+                  ></dx-text-box>
                 </div>
               </div>
             </dxi-item>
@@ -122,6 +130,7 @@
             dataField="COST"
             caption="Unit Cost"
             [allowEditing]="false"
+            [visible]="!hideCost"
           ></dxi-column>
           <dxi-column
             dataField="QUANTITY_AVAILABLE"
@@ -142,14 +151,15 @@
             ]"
           ></dxi-column>
 
+          <dxi-column
+            dataField="netAmount"
+            caption="Total Cost"
+            [allowEditing]="false"
+            [visible]="!hideCost"
+            [calculateCellValue]="calculateNetAmount"
+          ></dxi-column>
+
           <dxo-summary>
-            <dxi-total-item
-              column="COST"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="Net Cost: {0}"
-              alignment="right"
-            ></dxi-total-item>
             <dxi-total-item
               column="QUANTITY"
               summaryType="sum"
@@ -157,8 +167,8 @@
               alignment="right"
             ></dxi-total-item>
             <dxi-total-item
-              name="netAmount"
-              summaryType="custom"
+              column="netAmount"
+              summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="Net Amount: {0}"
               alignment="right"
@@ -181,14 +191,14 @@
 
           <!-- Buttons + Approve checkbox grouped together -->
           <div class="footer-right">
-            <dx-text-box
+            <!-- <dx-text-box
               class="right-align-textbox"
               [value]="transferOutFormData.NET_AMOUNT | number: '1.2-2'"
-              label="Net Amount"
+              label="Net Amount"  
               labelMode="floating"
               [readOnly]="true"
               [inputAttr]="{ style: 'text-align: right;' }"
-            ></dx-text-box>
+            ></dx-text-box> -->
             <div class="approve-container">
               <dx-check-box
                 [value]="
@@ -305,16 +315,16 @@
 
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
       <dxi-column dataField="UOM" caption="UOM"></dxi-column>
-      <dxi-column dataField="COST" caption="Unit Cost"></dxi-column>
+      <dxi-column dataField="COST" caption="Unit Cost" [visible]="!hideCost"></dxi-column>
       <dxi-column
         dataField="QUANTITY_AVAILABLE"
         caption="Qty Available"
       ></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         dataField="TOTAL_PAIR_QTY"
         caption="Qty"
         dataType="number"
-      ></dxi-column>
+      ></dxi-column> -->
     </dx-data-grid>
   </div>
 </dx-popup>

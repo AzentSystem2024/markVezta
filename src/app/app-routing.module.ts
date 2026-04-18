@@ -162,6 +162,7 @@ import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-te
 import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
 import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
 import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-template/import-items-template.component';
+import { StoreItemsListComponent } from './pages/store-items-list/store-items-list.component';
 
 const routes: Routes = [
   {
@@ -836,7 +837,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'Physical-Inventory',
+        path: 'physical-inventory',
         component: PhysicalInventoryComponent,
         canActivate: [AuthGuardService],
       },
@@ -1021,6 +1022,11 @@ const routes: Routes = [
       {
         path: 'supplier-me',
         component:SupplierFinListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'storewise-stock',
+        component:StoreItemsListComponent,
         canActivate: [AuthGuardService],
       },
       

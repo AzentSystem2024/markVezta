@@ -85,7 +85,7 @@ export class StockAdjustmentEditComponent {
   adjustmentFormData: any = {
     ID: 0,
     COMPANY_ID: 0,
-    STORE_ID: 0,
+    
     ADJ_NO: '',
     ADJ_DATE: '',
     REASON_ID: 0,
@@ -121,6 +121,8 @@ export class StockAdjustmentEditComponent {
       }
     },
   };
+  storename: any;
+  hidecost: any;
 
   constructor(
     private dataService: DataService,
@@ -144,6 +146,7 @@ export class StockAdjustmentEditComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    this.storename = menuResponse.Configuration[0].STORE_NAME;
     console.log(this.storeFromSession);
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -155,6 +158,7 @@ export class StockAdjustmentEditComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
+      this.hidecost = packingRights.HideCost;
       this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
@@ -249,7 +253,7 @@ export class StockAdjustmentEditComponent {
       NAME: 'REASON',
     };
     this.dataService
-      .getrReasonDropdownData(payload)
+      .getDropdownData(payload)
       .subscribe((response: any) => {
         this.reasons = response;
       });
@@ -306,7 +310,7 @@ export class StockAdjustmentEditComponent {
 
     const transformed = ITEM_Details.map((item) => ({
       COMPANY_ID: this.companyID,
-      STORE_ID: this.adjustmentFormData.STORE_ID,
+      STORE_ID: this.storeFromSession,
       ADJ_ID: 0,
       NET_AMOUNT: 0,
 
@@ -327,11 +331,12 @@ export class StockAdjustmentEditComponent {
       ...this.adjustmentFormData,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
+      STORE_ID : this.storeFromSession,
       Details: transformed,
     };
     console.log(payload);
 
-    if (!this.adjustmentFormData.STORE_ID) {
+    if (!this.storeFromSession) {
       notify('Please select a store ', 'error');
       return;
     }
