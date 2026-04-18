@@ -62,6 +62,7 @@
           <dx-text-box
             label="Reference No."
             labelMode="floating"
+            [(value)]="invoiceFormData.REF_NO"
             [readOnly]="isReadOnlyMode"
             [width]="410"
           >
@@ -75,7 +76,8 @@
             [width]="370"
             label="Customer"
             labelMode="floating"
-            [readOnly]="isEditing"
+            [(value)]="invoiceFormData.CUSTOMER_ID"
+            [readOnly]="isReadOnlyMode"
           >
           </dx-select-box>
           <dx-button
@@ -136,6 +138,7 @@
             dataField="ledgerCode"
             caption="Ledger Code"
             [editorType]="'dxSelectBox'"
+            [allowEditing]="!isReadOnlyMode"
             [lookup]="{
               dataSource: ledgerList,
               valueExpr: 'HEAD_CODE',
@@ -148,6 +151,7 @@
             dataField="ledgerName"
             caption="Ledger Name"
             [editorType]="'dxSelectBox'"
+            [allowEditing]="!isReadOnlyMode"
             [lookup]="{
               dataSource: ledgerList,
               valueExpr: 'HEAD_NAME',
@@ -159,6 +163,7 @@
           <dxi-column
             dataField="particulars"
             caption="Particulars"
+            [allowEditing]="!isReadOnlyMode"
             [editorOptions]="{ maxLength: 250 }"
           >
             <dxi-validation-rule
@@ -175,12 +180,14 @@
           <dxi-column
             dataField="Amount"
             caption="Amount"
+            [allowEditing]="!isReadOnlyMode"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           >
           </dxi-column>
           <dxi-column
             dataField="GST_PERC"
+            [allowEditing]="!isReadOnlyMode"
             [caption]="vatTitle + '%'"
             alignment="right"
             [format]="{ type: 'fixedPoint', precision: 0 }"
@@ -193,6 +200,7 @@
           </dxi-column>
           <dxi-column
             dataField="gstAmount"
+            [allowEditing]="!isReadOnlyMode"
             [caption]="vatTitle + ' Amount'"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -253,7 +261,7 @@
     </div>
     <div class="form-footer-wrapper">
       <div class="right-section">
-        <dx-check-box text="Approve" [visible]="!isReadOnlyMode"></dx-check-box>
+        <dx-check-box text="Approve" [visible]="!isReadOnlyMode" [(value)]="invoiceFormData.IS_APPROVED"></dx-check-box>
 
         <dx-button
           text="Cancel"
@@ -273,6 +281,7 @@
                 : 'Save'
           "
           [disabled]="isSaving"
+          (onClick)="saveInvoice()"
           stylingMode="contained"
           type="default"
         ></dx-button>

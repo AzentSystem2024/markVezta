@@ -216,7 +216,7 @@ export class MiscellaneousSalesInvoiceComponent {
           new Promise((resolve) => {
             this.dataService.getMiscSalesInvoiceMainList(payload).subscribe({
               next: (response: any) => {
-                const list = (response?.Data || [])
+                const list = (response?.List || [])
                   .map((item: any) => {
                     let dateValue: Date;
   
@@ -237,8 +237,8 @@ export class MiscellaneousSalesInvoiceComponent {
                     };
                   })
                   .sort((a: any, b: any) => {
-                    const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
-                    const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
+                    const numA = Number(a.SALE_NO.match(/\d+$/)?.[0] || 0);
+                    const numB = Number(b.SALE_NO.match(/\d+$/)?.[0] || 0);
                     return numB - numA; // descending
                   });
   
@@ -521,7 +521,7 @@ export class MiscellaneousSalesInvoiceComponent {
       this.isReadOnlyInvoice = transStatus === 5;
   
       this.dataService
-        .selectInvoiceRetail(invoiceId)
+        .selectMiscSalesInvoice(invoiceId)
         .subscribe((response: any) => {
           this.selectedInvoice = response.Data;
   
@@ -542,7 +542,7 @@ export class MiscellaneousSalesInvoiceComponent {
       const invoiceId = event.data.TRANS_ID;
       event.cancel = true;
       // Call your delete API
-      this.dataService.deleteInvoiceRetail(invoiceId).subscribe(
+      this.dataService.deleteMiscSalesInvoice(invoiceId).subscribe(
         (response: any) => {
           if (response) {
             notify(

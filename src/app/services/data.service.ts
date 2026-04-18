@@ -6446,21 +6446,26 @@ The result can be exported to HTML or Markdown.`;
 
    insertMiscSalesInvoice(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}MiscSales/Insert`, data);
+    return this.http.post(`${this.apiUrl}MiscSales/insert`, data);
   }
 
    UpdateMiscSalesInvoice(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}ACTransactions/Insert`, data);
+    return this.http.post(`${this.apiUrl}MiscSales/update`, data);
+  }
+
+    ApproveMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/commit`, data);
   }
 
 
   selectMiscSalesInvoice(id: number) {
-    return this.http.post<any>(`${this.apiUrl}SalesInvoice/select/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}MiscSales/select/` + id, {});
   }
 
   deleteMiscSalesInvoice(id: number) {
-    return this.http.post<any>(`${this.apiUrl}SalesInvoice/delete/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}MiscSales/delete/` + id, {});
   }
 
 
