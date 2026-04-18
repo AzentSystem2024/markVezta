@@ -20,18 +20,34 @@ export class CurrencyListComponent implements OnInit {
   @ViewChild(CurrencyFormComponent) currencyComponent!: CurrencyFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
-  showFilterRow = true;
+  showFilterRow = false;
   currency: any;
   showHeaderFilter = true;
   isAddCurrencyPopupOpened = false;
+  companyId:any;
+  currentEditId: number | null = null;
 
-  constructor(
-    private dataservice: DataService,
-    private exportService: ExportService,
-    private ngZone: NgZone,
-  ) {}
+  searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+    this.showFilterRow = !this.showFilterRow;
+    this.showHeaderFilter = !this.showHeaderFilter;
+  },
+};
 
-  addButtonOptions = {
+refreshButtonOptions = {
+  icon: 'refresh',
+  hint: 'Refresh',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+    this.ngZone.run(() => this.refresh());
+  },
+};
+
+
+addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -55,35 +71,51 @@ export class CurrencyListComponent implements OnInit {
     },
   };
 
+  constructor(
+    private dataservice: DataService,
+    private exportService: ExportService,
+    private ngZone: NgZone,
+  ) {}
+
+  onEditingStart(e: any) {
+    this.currentEditId = e.data.ID;
+  }
+
+  
+
   addCurrency() {
     this.isAddCurrencyPopupOpened = true;
   }
 
   onClickSaveCurrency() {
-    const exchangeValue = this.currencyComponent.newCurrency.EXCHANGE;
-    this.currencyComponent.validateExchange(exchangeValue);
+    // const exchangeValue = this.currencyComponent.newCurrency.EXCHANGE;
+    // this.currencyComponent.validateExchange(exchangeValue);
 
-    // Mark all controls as touched to show validation errors
-    this.currencyComponent.stateForm.markAllAsTouched();
+    // // Mark all controls as touched to show validation errors
+    // this.currencyComponent.stateForm.markAllAsTouched();
 
-    // If the form is invalid or there are errors, keep the popup open
-    if (
-      this.currencyComponent.stateForm.invalid ||
-      this.currencyComponent.exchangeError
-    ) {
-      return;
-    } else {
-      const { CODE, SYMBOL, DESCRIPTION, FRACTION_UNIT, EXCHANGE, COMPANY_ID } =
-        this.currencyComponent.getNewCurrencyData();
+    // // If the form is invalid or there are errors, keep the popup open
+    // if (
+    //   this.currencyComponent.stateForm.invalid ||
+    //   this.currencyComponent.exchangeError
+    // ) {
+    //   return;
+    // } else {
+      const data = this.currencyComponent.getNewCurrencyData();
+
+        const payload = {
+          ...data,
+          EXCHANGE: data.EXCHANGE != null ? data.EXCHANGE.toString() : null
+        };
 
       this.dataservice
         .postCurrencyData(
-          CODE,
-          SYMBOL,
-          DESCRIPTION,
-          FRACTION_UNIT,
-          EXCHANGE,
-          COMPANY_ID,
+          payload.CODE,
+          payload.SYMBOL,
+          payload.DESCRIPTION,
+          payload.FRACTION_UNIT,
+          payload.EXCHANGE,
+          this.companyId,
         )
         .subscribe(
           (response) => {
@@ -102,7 +134,7 @@ export class CurrencyListComponent implements OnInit {
             );
           },
         );
-    }
+    // }
   }
 
   onRowRemoving(event: any) {
@@ -151,6 +183,7 @@ export class CurrencyListComponent implements OnInit {
   }
 
   onRowUpdating(event: any) {
+    const grid = this.dataGrid.instance;
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -181,6 +214,7 @@ export class CurrencyListComponent implements OnInit {
             },
             'success',
           );
+          grid.cancelEditData();
           this.dataGrid.instance.refresh();
           this.showCurrency();
         } else {
@@ -223,11 +257,32 @@ export class CurrencyListComponent implements OnInit {
 
   ngOnInit(): void {
     this.showCurrency();
+
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      this.companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
+    }
   }
 
   refresh = () => {
     this.dataGrid.instance.refresh();
   };
+
+  validateCodeExistsGrid = (e: any) => {
+    if (!e.value) return true;
+
+    const inputCode = e.value.toString().trim().toUpperCase();
+
+    const exists = this.currency?.some(
+      (item: any) =>
+        item.CODE?.toUpperCase() === inputCode &&
+        item.ID !== this.currentEditId // ✅ skip current row
+    );
+
+    return !exists;
+  };
+
 }
 
 @NgModule({

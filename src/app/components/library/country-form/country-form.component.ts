@@ -99,6 +99,28 @@ export class CountryFormComponent {
       }
     });
   }
+
+  
+
+  validateCountryCode = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!value || !this.country?.length) return true;
+
+    return !this.country.some((item: any) => {
+      return (item.CODE || '').trim() === value;
+    });
+  };
+
+  onCodeChange(e: any) {
+    let value = e.value || '';
+
+    if (value && !value.startsWith('+')) {
+      value = '+' + value;
+    }
+
+    this.newCountry.CODE = value.replace(/[^0-9+]/g, '');
+  }
 }
 @NgModule({
   imports: [

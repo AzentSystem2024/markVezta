@@ -1585,7 +1585,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}country/save`, data);
   }
   removeCountry(id: any) {
-    return this.http.get(`${this.apiUrl}country/delete/` + id);
+    return this.http.post(`${this.apiUrl}country/delete/` + id,{});
   }
   updateCountry(ID: any, CODE: any, COUNTRY_NAME: any): Observable<any> {
     const data = { ID, CODE, COUNTRY_NAME };
@@ -1650,7 +1650,7 @@ export class DataService {
       COMPANY_ID,
     };
 
-    return this.http.post(`${this.apiUrl}/currency/save`, data);
+    return this.http.post(`${this.apiUrl}currency/save`, data);
   }
   removeCurrency(
     id: any,
@@ -1670,7 +1670,7 @@ export class DataService {
       COMPANY_ID: companyId,
     };
     return this.http.post<any>(
-      `${this.apiUrl}/currency/delete/` + id,
+      `${this.apiUrl}currency/delete/` + id,
       requestBody,
     );
   }
@@ -1693,7 +1693,7 @@ export class DataService {
       COMPANY_ID,
     };
 
-    return this.http.post(`${this.apiUrl}/currency/save`, data);
+    return this.http.post(`${this.apiUrl}currency/save`, data);
   }
 
   //category
