@@ -197,7 +197,6 @@
   <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-misc-purch-invoice-form
     [isEditing]="true"
-    [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
   ></app-misc-purch-invoice-form>
@@ -209,16 +208,16 @@
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="New Invoice"
+  title="Invoice"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice-retail
+  <app-misc-purch-invoice-form
     [isEditing]="true"
     [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
+  ></app-misc-purch-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>
 <app-custom-date-popup

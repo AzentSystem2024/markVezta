@@ -123,9 +123,9 @@ export class MiscPurchInvoiceFormComponent {
 
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
-    if (this.isEditing && this.EditingResponseData) {
-      this.isEditDataAvailable();
-    }
+    // if (this.isEditing && this.EditingResponseData) {
+    //   this.isEditDataAvailable();
+    // }
   }
 
   ngOnInit() {
@@ -176,7 +176,7 @@ export class MiscPurchInvoiceFormComponent {
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.retNo = response.DOC_NO;
-      this.invoiceFormData.DOC_NO = response.DOC_NO;
+      this.invoiceFormData.PURCH_NO = response.DOC_NO;
     });
   }
   isEditDataAvailable() {
@@ -184,19 +184,20 @@ export class MiscPurchInvoiceFormComponent {
 
     const data = this.EditingResponseData;
     const details = data.Details || [];
-
-    // ✅ PATCH HEADER (no breaking changes)
+    console.log(data.TRANS_ID, 'TRANSIDDDDDDDDDDDD');
+    // PATCH HEADER (no breaking changes)
     this.invoiceFormData = {
       ...this.invoiceFormData,
 
       COMPANY_ID: data.COMPANY_ID,
       STORE_ID: data.STORE_ID,
       TRANS_DATE: this.convertToDate(data.PURCH_DATE),
-
+      TRANS_ID: data.TRANS_ID,
       SUPP_ID: data.SUPP_ID,
       FIN_ID: data.FIN_ID,
       PURCH_TYPE: data.PURCH_TYPE,
-
+      REF_NO: data.REF_NO,
+      PURCH_NO: data.PURCH_NO,
       GROSS_AMOUNT: data.GROSS_AMOUNT,
       TAX_AMOUNT: data.TAX_AMOUNT,
       NET_AMOUNT: data.NET_AMOUNT,
@@ -219,7 +220,7 @@ export class MiscPurchInvoiceFormComponent {
         ledgerCode: ledger?.HEAD_CODE || '',
         ledgerName: ledger?.HEAD_NAME || '',
         HEAD_ID: item.HEAD_ID,
-
+        REMARKS: item.REMARKS,
         // ✅ amounts
         Amount: item.AMOUNT,
         GST_PERC: item.VAT_PERC,
@@ -265,7 +266,7 @@ export class MiscPurchInvoiceFormComponent {
     this.dataService.getDropdownData(payload).subscribe((data) => {
       this.VatClass = data.map((item: any) => ({
         ...item,
-        VALUE: Number(item.DESCRIPTION).toString(),
+        VALUE: item.ID,
       }));
     });
   }
@@ -285,24 +286,29 @@ export class MiscPurchInvoiceFormComponent {
   }
   calculateTaxAmount = (rowData: any) => {
     const amount = Number(rowData.Amount) || 0;
-    const gstPerc = Number(rowData.GST_PERC) || 0;
+
+    let gstPerc = Number(rowData.GST_VALUE) || 0;
+
+    // fallback if GST_VALUE not set
+    if (!gstPerc && rowData.GST_PERC) {
+      const vat = this.VatClass.find((v: any) => v.ID == rowData.GST_PERC);
+      gstPerc = Number(vat?.DESCRIPTION) || 0;
+    }
 
     return (amount * gstPerc) / 100;
   };
 
   calculateTotal = (rowData: any) => {
     const amount = Number(rowData.Amount) || 0;
-    const gstPerc = Number(rowData.GST_PERC) || 0;
+    const gstPerc = Number(rowData.GST_VALUE) || 0;
 
-    const gstAmount = (amount * gstPerc) / 100;
-
-    return amount + gstAmount;
+    return amount + (amount * gstPerc) / 100;
   };
   onEditorPreparing(e: any) {
     if (
       e.dataField === 'ledgerCode' ||
       e.dataField === 'ledgerName' ||
-      e.dataField === 'particulars' ||
+      e.dataField === 'REMARKS' ||
       e.dataField === 'Amount' ||
       e.dataField === 'GST_PERC' ||
       e.dataField === 'gstAmount'
@@ -372,7 +378,7 @@ export class MiscPurchInvoiceFormComponent {
       };
     }
 
-    // ➤ ledgerName: move to particulars on Enter
+    // ➤ ledgerName: move to REMARKS on Enter
     if (e.dataField === 'ledgerName') {
       // open dropdown on focus
       e.editorOptions.onFocusIn = (args: any) => {
@@ -402,7 +408,7 @@ export class MiscPurchInvoiceFormComponent {
         // 🔥 MOVE TO PARTICULARS HERE
         setTimeout(() => {
           const grid = this.itemsGridRef?.instance;
-          grid.editCell(rowIndex, 'particulars');
+          grid.editCell(rowIndex, 'REMARKS');
         }, 50);
       };
 
@@ -412,13 +418,13 @@ export class MiscPurchInvoiceFormComponent {
           const grid = this.itemsGridRef?.instance;
 
           setTimeout(() => {
-            grid.editCell(rowIndex, 'particulars');
+            grid.editCell(rowIndex, 'REMARKS');
           }, 50);
         }
       };
     }
 
-    if (e.dataField === 'particulars') {
+    if (e.dataField === 'REMARKS') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           const grid = e.component;
@@ -457,6 +463,9 @@ export class MiscPurchInvoiceFormComponent {
 
         e.row.data.CGST = 0;
         e.row.data.SGST = 0;
+        const selectedVat = this.VatClass.find((v: any) => v.ID == args.value);
+
+        e.row.data.GST_VALUE = Number(selectedVat?.DESCRIPTION) || 0;
       };
 
       //  NEW: Enter → add row
@@ -473,7 +482,7 @@ export class MiscPurchInvoiceFormComponent {
               SL_NO: this.invoiceFormData.Details.length + 1,
               ledgerCode: '',
               ledgerName: '',
-              particulars: '',
+              REMARKS: '',
               Amount: '',
               GST_PERC: '',
               GST: 0,
@@ -545,7 +554,7 @@ export class MiscPurchInvoiceFormComponent {
       SL_NO: (this.invoiceFormData.Details?.length || 0) + 1,
       ledgerCode: '',
       ledgerName: '',
-      particulars: '',
+      REMARKS: '',
       Amount: '',
       GST_PERC: '',
       GST: 0,
@@ -572,10 +581,21 @@ export class MiscPurchInvoiceFormComponent {
   hasEmptyRow(): boolean {
     return this.invoiceFormData.Details?.some(
       (row: any) =>
-        !row.ledgerCode && !row.ledgerName && !row.particulars && !row.Amount,
+        !row.ledgerCode && !row.ledgerName && !row.REMARKS && !row.Amount,
     );
   }
 
+  formatDateOnly(date: any): string {
+    if (!date) return '';
+
+    const d = new Date(date);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
   saveInvoice() {
     const grid = this.itemsGridRef?.instance;
 
@@ -636,9 +656,9 @@ export class MiscPurchInvoiceFormComponent {
     const payload = {
       TRANS_ID: this.invoiceFormData.TRANS_ID || 0,
 
-      COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+      COMPANY_ID: this.selectedCompanyId,
       STORE_ID: this.storeID,
-      PURCH_DATE: new Date(this.invoiceFormData.TRANS_DATE).toISOString(),
+      PURCH_DATE: this.formatDateOnly(this.invoiceFormData.TRANS_DATE),
       SUPP_ID: this.invoiceFormData.SUPP_ID,
       FIN_ID: this.invoiceFormData.FIN_ID,
       PURCH_TYPE: 1,
@@ -658,15 +678,15 @@ export class MiscPurchInvoiceFormComponent {
         0,
       ),
 
-      USER_ID: this.invoiceFormData.USER_ID,
+      USER_ID: this.userID,
       NARRATION: this.invoiceFormData.NARRATION,
       IS_APPROVED: this.invoiceFormData.IS_APPROVED,
-
+      REF_NO: this.invoiceFormData.REF_NO,
       Details: filteredDetails.map((row: any) => ({
-        COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+        COMPANY_ID: this.selectedCompanyId,
         STORE_ID: this.storeID,
         HEAD_ID: row.HEAD_ID,
-
+        REMARKS: row.REMARKS,
         VAT_PERC: Number(row.GST_PERC) || 0,
         VAT_AMOUNT: this.calculateTaxAmount(row),
 
@@ -716,6 +736,10 @@ export class MiscPurchInvoiceFormComponent {
         notify('Error while saving invoice', 'error', 2000);
       },
     });
+  }
+
+  cancel() {
+    this.popupClosed.emit();
   }
 
   getCustomerOrUnitLst() {}
