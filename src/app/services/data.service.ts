@@ -6437,4 +6437,11 @@ The result can be exported to HTML or Markdown.`;
   approveMiscPurchInvoice(data: any) {
     return this.http.post(`${this.apiUrl}MiscPurchInvoice/commit`, data);
   }
+
+  deleteMiscPurchInvoice(id: number) {
+    return this.http.post<any>(
+      `${this.apiUrl}MiscPurchInvoice/delete/` + id,
+      {},
+    );
+  }
 }
