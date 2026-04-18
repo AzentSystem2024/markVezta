@@ -162,7 +162,6 @@ import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-te
 import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
 import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
 import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-template/import-items-template.component';
-import { StoreItemsListComponent } from './pages/store-items-list/store-items-list.component';
 import { PromotionLogComponent } from './pages/promotion-log/promotion-log.component';
 import { PromotionComponent } from './pages/promotion/promotion.component';
 import { PromotionSchemaLogComponent } from './pages/promotion-schema-log/promotion-schema-log.component';
@@ -182,6 +181,7 @@ import { PromotionApproveComponent } from './pages/promotion-approve/promotion-a
 import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
 import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
 import { MiscPurchaseInvoiceComponent } from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
+import { MiscellaneousSalesInvoiceComponent } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -862,7 +862,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'physical-inventory',
+        path: 'Physical-Inventory',
         component: PhysicalInventoryComponent,
         canActivate: [AuthGuardService],
       },
@@ -1136,11 +1136,13 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'storewise-stock',
+        path: 'miscellaneous-sales-invoice',
+        component: MiscellaneousSalesInvoiceComponent,
         canActivate: [AuthGuardService],
       },
-      
       {
+        path: '**',
+        redirectTo: 'login',
         pathMatch: 'full',
       },
     ],

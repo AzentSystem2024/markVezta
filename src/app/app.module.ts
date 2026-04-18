@@ -403,9 +403,10 @@ import {
   MiscPurchInvoiceFormComponent,
   MiscPurchInvoiceFormModule,
 } from './pages/Operations/misc-purch-invoice-form/misc-purch-invoice-form.component';
+import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -781,6 +782,7 @@ import {
     EditItemStorePropertyModule,
     MiscPurchaseInvoiceModule,
     MiscPurchInvoiceFormModule,
+    MiscellaneousSalesInvoiceModule,
   ],
 
   providers: [
