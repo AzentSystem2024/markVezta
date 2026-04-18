@@ -3494,10 +3494,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}importitemlog/insert`, data);
   }
   selectImportTemplateData(id: number) {
-    return this.http.post<any>(
-      `${this.apiUrl}/importtemplate/select/` + id,
-      {},
-    );
+    return this.http.post<any>(`${this.apiUrl}importtemplate/select/` + id, {});
   }
   public getImportTemplateData(): Observable<any> {
     return this.http.post(`${this.apiUrl}importtemplate/list`, {});
@@ -3519,11 +3516,8 @@ The result can be exported to HTML or Markdown.`;
 
     return this.http.post(`${this.apiUrl}importtemplate/insert`, data);
   }
-  removeImportTemplateData(id: number, data: object) {
-    return this.http.post<any>(
-      `${this.apiUrl}importtemplate/delete/ + id`,
-      data,
-    );
+  removeImportTemplateData(id: number) {
+    return this.http.post<any>(`${this.apiUrl}importtemplate/delete/` + id, {});
   }
 
   //  ion Schema
@@ -6443,5 +6437,28 @@ The result can be exported to HTML or Markdown.`;
       `${this.apiUrl}MiscPurchInvoice/delete/` + id,
       {},
     );
+  }
+  //-------------------------------------MISCELLANOUES-SALES-INVOICE--------------------------------------//
+  getMiscSalesInvoiceMainList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/list`, data);
+  }
+
+  insertMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/Insert`, data);
+  }
+
+  UpdateMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ACTransactions/Insert`, data);
+  }
+
+  selectMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SalesInvoice/select/` + id, {});
+  }
+
+  deleteMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SalesInvoice/delete/` + id, {});
   }
 }

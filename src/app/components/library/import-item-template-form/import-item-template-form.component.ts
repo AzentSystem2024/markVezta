@@ -1,4 +1,4 @@
-import { Component, NgModule } from '@angular/core';
+import { Component, NgModule, OnInit } from '@angular/core';
 import {
   DxButtonModule,
   DxDataGridModule,
@@ -20,9 +20,10 @@ import { DxDataGridTypes } from 'devextreme-angular/ui/data-grid';
   templateUrl: './import-item-template-form.component.html',
   styleUrls: ['./import-item-template-form.component.scss'],
 })
-export class ImportItemTemplateFormComponent {
+export class ImportItemTemplateFormComponent implements OnInit {
   TemplateColumnsData: any;
   selectedRows: any[] = [];
+  itemTemplate:any;
 
   constructor(private service: DataService) {
     service.getTemplateColumnData().subscribe((res) => {
@@ -50,6 +51,16 @@ export class ImportItemTemplateFormComponent {
   newItemTemplate = this.formModel;
 
   getNewItemTemplateData = () => ({ ...this.newItemTemplate });
+
+  ngOnInit(): void {
+    this.getItemsTemplateData();
+  }
+
+  getItemsTemplateData() { 
+    this.service.getImportTemplateData().subscribe((res) => { 
+      this.itemTemplate = res.data; 
+    }); 
+  }
 
   onTemplateColumnsValueChanged(e: any) {
     this.formModel.import_entry = e.value.map((columnTitle: string) => ({
@@ -106,6 +117,20 @@ export class ImportItemTemplateFormComponent {
       COLUMN_ID: id,
     }));
   }
+
+
+  validateTemplateNameExists = (e: any) => {
+    if (!e.value) return true;
+
+    const inputName = e.value.toString().trim().toLowerCase();
+
+    const exists = this.itemTemplate?.some(
+      (item: any) =>
+        item.TEMPLATE_NAME?.toLowerCase().trim() === inputName
+    );
+
+    return !exists; // false → show error
+  };
 }
 
 @NgModule({
