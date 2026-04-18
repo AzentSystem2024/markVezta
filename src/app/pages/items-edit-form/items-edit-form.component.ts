@@ -32,6 +32,8 @@ import {
   DxTextAreaModule,
   DxTextBoxModule,
   DxToolbarModule,
+  DxValidationGroupComponent,
+  DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
 import { FormPopupModule, FormTextboxModule } from 'src/app/components';
@@ -68,6 +70,8 @@ export class ItemsEditFormComponent implements OnInit {
   dataGrid: DxDataGridComponent;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @Input() width = 480;
+  @ViewChild('validationGroup', { static: false })
+  validationGroup!: DxValidationGroupComponent;
   selectedParentItemId: any;
   selectedParentItemDescription: any;
   ENABLE_Matrix_Code: boolean = false;
@@ -491,6 +495,15 @@ export class ItemsEditFormComponent implements OnInit {
     });
   }
 
+
+  isValid() {
+  if (!this.validationGroup || !this.validationGroup.instance) {
+    return true; // or false based on your need
+  }
+
+  return this.validationGroup.instance.validate().isValid;
+}
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['itemData'] && this.itemData) {
       this.salePrice = this.itemData.SALE_PRICE;
@@ -504,6 +517,23 @@ export class ItemsEditFormComponent implements OnInit {
         this.textVisible = true; // Show "Upload Image" text
         this.imageUploaded = false; // Mark as no image uploaded
       }
+
+      if(this.itemData.ITEM_CODE === 0){
+        this.itemData.ITEM_CODE = null;
+      }
+
+      if (this.itemData.TYPE_ID === 0) {
+        this.itemData.TYPE_ID = null;
+      }
+
+      if (this.itemData.VAT_CLASS_ID === 0){
+        this.itemData.VAT_CLASS_ID = null;
+      }
+
+      if(this.itemData.UNIT_ID === 0){
+        this.itemData.UNIT_ID = null;
+      }
+
       this.showComponentTab = this.itemData.TYPE_ID === 8; // Show the Component tab if TYPE_ID is 8
       this.showSupplierTab = this.itemData.TYPE_ID !== 8;
       const data = this.uom;
@@ -780,6 +810,11 @@ export class ItemsEditFormComponent implements OnInit {
   }
 
   saveData() {
+
+    const result = this.validationGroup.instance.validate();
+    if (!result.isValid) {
+      return;
+    }
     console.log(this.selectedRowKeys, '==========selectedRowKeys============');
 
     const storeData = this.store
@@ -787,14 +822,14 @@ export class ItemsEditFormComponent implements OnInit {
       .map((s: any) => ({
         ID: 0,
         STORE_ID: s.ID,
-        SALE_PRICE: s.SALE_PRICE,
-        SALE_PRICE1: s.SALE_PRICE1,
-        SALE_PRICE2: s.SALE_PRICE2,
-        SALE_PRICE3: s.SALE_PRICE3,
-        SALE_PRICE4: s.SALE_PRICE4,
-        SALE_PRICE5: s.SALE_PRICE5,
+        SALE_PRICE: this.toNumber(s.SALE_PRICE),
+        SALE_PRICE1: this.toNumber(s.SALE_PRICE1),
+        SALE_PRICE2: this.toNumber(s.SALE_PRICE2),
+        SALE_PRICE3: this.toNumber(s.SALE_PRICE3),
+        SALE_PRICE4: this.toNumber(s.SALE_PRICE4),
+        SALE_PRICE5: this.toNumber(s.SALE_PRICE5),
         STORE_CODE: s.STORE_CODE,
-        STORE_NAME: s.STORE_NAME,
+        STORE_NAME: s.STORE_NAME, 
         COST: s.COST ?? 0,
         IS_INACTIVE: s.IS_INACTIVE ?? false,
         IS_NOT_SALE_ITEM: s.IS_NOT_SALE_ITEM ?? false,
@@ -881,6 +916,13 @@ export class ItemsEditFormComponent implements OnInit {
       },
     );
   }
+
+  toNumber(value: any): number {
+  if (value === '' || value === null || value === undefined) {
+    return 0;
+  }
+  return Number(value);
+}
 
   onFileInputChange(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -1202,6 +1244,7 @@ export class ItemsEditFormComponent implements OnInit {
     DxPopupModule,
     DxDropDownBoxModule,
     DxNumberBoxModule,
+    DxValidationGroupModule
   ],
   providers: [],
   exports: [ItemsEditFormComponent],

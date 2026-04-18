@@ -13,7 +13,7 @@ import { DxButtonModule } from 'devextreme-angular/ui/button';
 import { DxToolbarModule } from 'devextreme-angular/ui/toolbar';
 
 import { UserPanelModule } from '../user-panel/user-panel.component';
-import { AuthService, DataService, IUser } from 'src/app/services';
+import { AuthService, DataService, IUser, ThemeService } from 'src/app/services';
 import { ThemeSwitcherModule } from 'src/app/components/library/theme-switcher/theme-switcher.component';
 import { Router } from '@angular/router';
 
@@ -55,18 +55,26 @@ export class AppHeaderComponent implements OnInit {
   company: any;
   version: any;
   userInitials = '';
+  logoPath: string = '';
 
   constructor(
     private authService: AuthService,
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private dataservice: DataService,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit() {
     this.authService.getUser().then((e) => (this.user = e.data));
     this.sesstion_Details();
     this.version = this.dataservice.get_version();
+
+    this.themeService.isDark.subscribe((isDark) => {
+    this.logoPath = isDark
+      ? 'assets/images/Vezta-logo-dark.svg'
+      : 'assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png';
+  });
   }
 
   private getInitials(name: string): string {
