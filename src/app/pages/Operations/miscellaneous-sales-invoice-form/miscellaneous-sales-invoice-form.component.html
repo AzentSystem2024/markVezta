@@ -40,11 +40,11 @@
           >
           </dx-date-box>
           <dx-text-box
-            label="Doc No."
+            label="Doc No. *"
             labelMode="floating"
-            [(value)]="invoiceFormData.PURCH_NO"
             [readOnly]="true"
             [width]="200"
+            [(value)]="invoiceFormData.DOC_NO"
           >
           </dx-text-box>
         </div>
@@ -70,14 +70,14 @@
         </div>
         <div style="display: flex; align-items: flex-end; gap: 8px">
           <dx-select-box
-            [dataSource]="supplierList"
+            [dataSource]="customerList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
-            [(value)]="invoiceFormData.SUPP_ID"
             [width]="370"
-            label="Supplier"
+            label="Customer"
             labelMode="floating"
-            [readOnly]="isEditing"
+            [(value)]="invoiceFormData.CUSTOMER_ID"
+            [readOnly]="isReadOnlyMode"
           >
           </dx-select-box>
           <dx-button
@@ -137,8 +137,8 @@
           <dxi-column
             dataField="ledgerCode"
             caption="Ledger Code"
-            [allowEditing]="!isReadOnlyMode"
             [editorType]="'dxSelectBox'"
+            [allowEditing]="!isReadOnlyMode"
             [lookup]="{
               dataSource: ledgerList,
               valueExpr: 'HEAD_CODE',
@@ -161,10 +161,10 @@
           ></dxi-column>
 
           <dxi-column
-            dataField="REMARKS"
+            dataField="particulars"
             caption="Particulars"
-            [editorOptions]="{ maxLength: 250 }"
             [allowEditing]="!isReadOnlyMode"
+            [editorOptions]="{ maxLength: 250 }"
           >
             <dxi-validation-rule
               type="stringLength"
@@ -180,17 +180,17 @@
           <dxi-column
             dataField="Amount"
             caption="Amount"
+            [allowEditing]="!isReadOnlyMode"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [allowEditing]="!isReadOnlyMode"
           >
           </dxi-column>
           <dxi-column
             dataField="GST_PERC"
+            [allowEditing]="!isReadOnlyMode"
             [caption]="vatTitle + '%'"
             alignment="right"
             [format]="{ type: 'fixedPoint', precision: 0 }"
-            [allowEditing]="false"
             [lookup]="{
               dataSource: VatClass,
               valueExpr: 'VALUE',
@@ -200,11 +200,11 @@
           </dxi-column>
           <dxi-column
             dataField="gstAmount"
+            [allowEditing]="!isReadOnlyMode"
             [caption]="vatTitle + ' Amount'"
             dataType="number"
-            [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [calculateCellValue]="calculateTaxAmount"
+            [calculateCellValue]="calculateGSTAmount"
           >
           </dxi-column>
           <dxi-column
@@ -212,7 +212,6 @@
             caption="Total"
             dataType="number"
             [visible]="true"
-            [allowEditing]="false"
             [allowEditing]="false"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [calculateCellValue]="calculateTotal"
@@ -257,22 +256,17 @@
         labelMode="floating"
         [(value)]="invoiceFormData.NARRATION"
         [width]="300"
-        [readOnly]="!isReadOnlyMode"
+        [readOnly]="isReadOnlyMode"
       ></dx-text-box>
     </div>
     <div class="form-footer-wrapper">
       <div class="right-section">
-        <dx-check-box
-          text="Approve"
-          [visible]="!isReadOnlyMode"
-          [(value)]="invoiceFormData.IS_APPROVED"
-        ></dx-check-box>
+        <dx-check-box text="Approve" [visible]="!isReadOnlyMode" [(value)]="invoiceFormData.IS_APPROVED"></dx-check-box>
 
         <dx-button
           text="Cancel"
           stylingMode="outlined"
           type="normal"
-          (onClick)="cancel()"
         ></dx-button>
 
         <dx-button
@@ -288,7 +282,6 @@
           "
           [disabled]="isSaving"
           (onClick)="saveInvoice()"
-          [visible]="!isReadOnlyMode"
           stylingMode="contained"
           type="default"
         ></dx-button>
@@ -304,3 +297,4 @@
     </div>
   </div>
 </dx-validation-group>
+

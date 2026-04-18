@@ -3494,10 +3494,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}importitemlog/insert`, data);
   }
   selectImportTemplateData(id: number) {
-    return this.http.post<any>(
-      `${this.apiUrl}importtemplate/select/` + id,
-      {},
-    );
+    return this.http.post<any>(`${this.apiUrl}importtemplate/select/` + id, {});
   }
   public getImportTemplateData(): Observable<any> {
     return this.http.post(`${this.apiUrl}importtemplate/list`, {});
@@ -3520,10 +3517,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}importtemplate/insert`, data);
   }
   removeImportTemplateData(id: number) {
-    return this.http.post<any>(
-      `${this.apiUrl}importtemplate/delete/` + id,
-      {}
-    );
+    return this.http.post<any>(`${this.apiUrl}importtemplate/delete/` + id, {});
   }
 
   //  ion Schema
@@ -6436,5 +6430,40 @@ The result can be exported to HTML or Markdown.`;
 
   approveMiscPurchInvoice(data: any) {
     return this.http.post(`${this.apiUrl}MiscPurchInvoice/commit`, data);
+  }
+
+  deleteMiscPurchInvoice(id: number) {
+    return this.http.post<any>(
+      `${this.apiUrl}MiscPurchInvoice/delete/` + id,
+      {},
+    );
+  }
+  //-------------------------------------MISCELLANOUES-SALES-INVOICE--------------------------------------//
+  getMiscSalesInvoiceMainList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/list`, data);
+  }
+
+  insertMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/insert`, data);
+  }
+
+  UpdateMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/update`, data);
+  }
+
+    ApproveMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/commit`, data);
+  }
+
+  selectMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}MiscSales/select/` + id, {});
+  }
+
+  deleteMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}MiscSales/delete/` + id, {});
   }
 }
