@@ -162,7 +162,6 @@ import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-te
 import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
 import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
 import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-template/import-items-template.component';
-import { StoreItemsListComponent } from './pages/store-items-list/store-items-list.component';
 import { PromotionLogComponent } from './pages/promotion-log/promotion-log.component';
 import { PromotionComponent } from './pages/promotion/promotion.component';
 import { PromotionSchemaLogComponent } from './pages/promotion-schema-log/promotion-schema-log.component';
@@ -862,7 +861,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'physical-inventory',
+        path: 'Physical-Inventory',
         component: PhysicalInventoryComponent,
         canActivate: [AuthGuardService],
       },
@@ -1136,11 +1135,8 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'storewise-stock',
-        canActivate: [AuthGuardService],
-      },
-      
-      {
+        path: '**',
+        redirectTo: 'login',
         pathMatch: 'full',
       },
     ],
