@@ -405,6 +405,7 @@ import {
 } from './pages/Operations/misc-purch-invoice-form/misc-purch-invoice-form.component';
 import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
+import { StorewiseStockViewComponent, StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -785,6 +786,7 @@ import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormMo
     MiscPurchInvoiceFormModule,
     MiscellaneousSalesInvoiceModule,
     MiscellaneousSalesInvoiceFormModule,
+    StorewiseStockViewModule,
   ],
 
   providers: [

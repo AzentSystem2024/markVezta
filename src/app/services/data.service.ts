@@ -6466,4 +6466,10 @@ The result can be exported to HTML or Markdown.`;
   deleteMiscSalesInvoice(id: number) {
     return this.http.post<any>(`${this.apiUrl}MiscSales/delete/` + id, {});
   }
+
+  //=========================store wise stock view===============================
+    StockView_branch(payload: any) {
+    const getEndpoint = this.apiUrl + 'StockMovementRpt/storewisestock';
+    return this.http.post(getEndpoint, payload);
+  }
 }
