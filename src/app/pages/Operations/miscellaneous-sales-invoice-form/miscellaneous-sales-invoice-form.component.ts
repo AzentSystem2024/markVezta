@@ -201,6 +201,10 @@ export class MiscellaneousSalesInvoiceFormComponent {
     });
   }
 
+  onCancel(){
+     this.popupClosed.emit();
+  }
+
   onEditorPreparing(e: any) {
   if (
     e.dataField === 'ledgerCode' ||

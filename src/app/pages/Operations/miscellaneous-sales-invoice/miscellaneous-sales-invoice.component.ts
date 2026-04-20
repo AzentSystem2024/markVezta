@@ -54,6 +54,7 @@ import { MiscellaneousSalesInvoiceFormModule } from '../miscellaneous-sales-invo
 })
 export class MiscellaneousSalesInvoiceComponent {
 
+  
   @ViewChild(DxDataGridComponent, { static: true })
     dataGrid: any = DxDataGridComponent;
     readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -583,13 +584,13 @@ export class MiscellaneousSalesInvoiceComponent {
       this.cdr.detectChanges();
     }
     handleClose() {
-      this.ngZone.run(() => {
+      // this.ngZone.run(() => {
         this.isAddInvoice = false;
         this.isEditInvoice = false;
         this.isViewInvoice = false;
   
         this.getInvoiceList();
-      });
+      // });
     }
 }
 @NgModule({
