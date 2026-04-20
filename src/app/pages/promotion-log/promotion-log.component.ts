@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule, NgZone, ViewChild } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import {
@@ -22,6 +22,7 @@ import {
   DxToolbarModule,
   DxValidationGroupModule,
   DxValidatorModule,
+  DxDataGridComponent
 } from 'devextreme-angular';
 import {
   DxoFormItemModule,
@@ -33,6 +34,8 @@ import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
 import { workerData } from 'worker_threads';
+import { PromotionEditModule } from '../promotion-edit/promotion-edit.component';
+import { EditPromotionModule } from '../edit-promotion/edit-promotion.component';
 
 @Component({
   selector: 'app-promotion-log',
@@ -40,6 +43,8 @@ import { workerData } from 'worker_threads';
   styleUrls: ['./promotion-log.component.scss'],
 })
 export class PromotionLogComponent {
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid!: DxDataGridComponent;
   customButtons = [
     {
       hint: 'Verify',
@@ -72,7 +77,7 @@ export class PromotionLogComponent {
     // },
     {
       name: 'delete',
-      visible: (e) => !e.row.data.isVerified && !e.row.data.isApproved,
+      visible: (e: any) => !e.row.data.isVerified && !e.row.data.isApproved,
     },
   ];
   showHeaderFilter = true;
@@ -84,10 +89,46 @@ export class PromotionLogComponent {
   logStatusMap: { [key: number]: string } = {};
   status: any;
 
+  addButtonOptions = {
+    text: 'New',
+    icon: 'bi bi-file-earmark-plus',
+    // icon: 'add',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    // onClick: () => this.addCreditNote(),
+    onClick: () => {
+      this.zone.run(() => {
+        this.onAddClick();
+      });
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+  editPackPopupOpened: boolean = false
   constructor(
     private dataservice: DataService,
     private router: Router,
-  ) {}
+    private zone: NgZone
+  ) { }
 
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
@@ -155,7 +196,7 @@ export class PromotionLogComponent {
             console.log(this.status, 'SELECT RESPONSE');
             this.selectedPromotion = response;
             this.dataservice.setWorksheetData(response);
-            this.router.navigate(['/promotion-edit']);
+            // this.router.navigate(['/promotion-edit']);
           } else {
             this.goToView(worksheetId);
           }
@@ -187,16 +228,27 @@ export class PromotionLogComponent {
         });
       });
   }
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.getPromotionLogList();
+    }
+  }
 
   openEditingStart(event: any) {
     event.cancel = true;
     const selectedId = event.data.ID;
     console.log('Edit row triggered for ID:', selectedId);
-    if (selectedId) {
-      this.selectPromotionWorksheet(selectedId);
-    } else {
-      console.log('No valid row selected');
-    }
+    this.dataservice
+      .selectPromotionWorksheet(selectedId)
+      .subscribe((response: any) => {
+        this.selectedPromotion = response;
+        console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
+        this.editPackPopupOpened = true
+
+      })
+
   }
 
   onAddClick() {
@@ -297,6 +349,9 @@ export class PromotionLogComponent {
       }
     });
   }
+  handleClose() {
+
+  }
 }
 
 @NgModule({
@@ -328,10 +383,11 @@ export class PromotionLogComponent {
     DxNumberBoxModule,
     DxValidationGroupModule,
     DxValidatorModule,
+    EditPromotionModule
   ],
   providers: [],
   exports: [],
   declarations: [PromotionLogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PromotionLogModule {}
+export class PromotionLogModule { }

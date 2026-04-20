@@ -6,11 +6,11 @@
 
 //   width: 100%;
 //   display: contents;
-//   overflow: auto; 
+//   overflow: auto;
 // }
 
 // .view-wrapper {
-  
+
 //     .grid {
 //       .name-template {
 //         .position {
@@ -18,17 +18,17 @@
 //           color: var(--texteditor-label-color);
 //         }
 //       }
-  
+
 //       ::ng-deep & {
 //         .dx-datagrid-header-panel {
 //           padding: 0 var(--content-padding);
 //         }
-  
+
 //         .dx-toolbar {
 //           margin-bottom: 0;
 //           padding: var(--toolbar-margin-bottom) 0;
 //         }
-  
+
 //         .dx-datagrid-content .dx-row {
 //           cursor: pointer;
 //         }
@@ -37,42 +37,35 @@
 //       background-color: #00a0e028 !important; /* Replace with your desired color */
 //     }
 //       }
-  
+
 //       .grid-header {
 //         @include header();
 //       }
 //     }
-  
+
 //     user-panel {
 //       display: inherit;
 //     }
 
-
-  
 //   }
-
-
-  
 
 // /* Applies to the entire header row */
 // .dx-datagrid-headers .dx-header-row {
 //   background-color: #f0f0f0; /* Replace with your desired color */
 // }
 
-
-
 // .date-period {
 //     display: flex; /* Align items horizontally */
 //     gap: 10px; /* Add space between the date pickers */
 //     align-items: center; /* Vertically align the items */
 //   }
-  
+
 //   .date-picker-container {
 //     display: flex;
 //     flex-direction: column; /* Stack label and date box vertically */
 //     align-items: flex-start; /* Align the label and date box to the left */
 //   }
-  
+
 //   .date-picker-container label {
 //     margin-bottom: 5px; /* Add space between the label and date picker */
 //   }
@@ -95,35 +88,31 @@
 //     align-items: center;
 //     margin-bottom: 15px; /* Optional: spacing between sections */
 //   }
-  
+
 //   .half-width {
 //     flex: 1;
 //     margin-right: 10px; /* Optional: space between radio and text box */
 //   }
-  
+
 //   .half-width:last-child {
 //     margin-right: 0;
 //   }
-  
-  
 
-  
-  
 //   .operation-container {
 //     margin-bottom: 15px; /* Space between the label and select box */
 //   }
-  
+
 //   .operation-container label {
 //     margin-bottom: 5px; /* Space between label and select box */
 //     font-weight: bold;
 //   }
-  
+
 //   .action-buttons {
 //     margin-top: 20px;
 //     display: flex;
 //     gap: 10px; /* Space between the buttons */
 //   }
-  
+
 //   dx-button {
 //     width: 150px; /* Optional: Set consistent width for buttons */
 //   }
@@ -139,7 +128,7 @@
 
 // dx-button {
 //   width: 150px; /* Optional: Set consistent width for buttons */
-// }  
+// }
 // .three-field-row {
 //   display: flex;
 //   align-items: center;
@@ -298,9 +287,6 @@
 
 // }
 
-
-
-
 // .row, .flex-row, .inline-fields {
 //   display: flex;
 //   align-items: center;
@@ -313,8 +299,6 @@
 // .move-right[_ngcontent-ng-c1002616204] {
 //   margin-left: 0px !important;
 // }
-
-
 
 // .operation-dropdown {
 //   margin-right: 2px; /* Reduce space to the right of operation dropdown */
@@ -345,8 +329,6 @@
 //   margin-left: 0; /* Move the container to the left */
 // }
 
-
-
 @use "../../../variables.scss" as *;
 @use "sass:math";
 
@@ -355,134 +337,121 @@
 
   width: 100%;
   display: contents;
-  overflow: auto; 
+  overflow: auto;
 }
 
 .view-wrappers {
-  
-    .grid {
-      .name-template {
-        .position {
-          font-size: 12px;
-          color: var(--texteditor-label-color);
-        }
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
       }
-  
-      ::ng-deep & {
-        .dx-datagrid-header-panel {
-          padding: 0 var(--content-padding);
-        }
-  
-        .dx-toolbar {
-          height: 170px; /* Adjust the height as per your requirements */
-          overflow: visible;
-          margin-bottom: 0;
-          padding: var(--toolbar-margin-bottom) 0;
-        }
-  
-        .dx-datagrid-content .dx-row {
-          cursor: pointer;
-        }
-            /* Adding ::ng-deep for header row background */
-    ::ng-deep .dx-datagrid-headers .dx-header-row {
-      background-color: #00a0e028 !important; /* Replace with your desired color */
-    }
-      }
-  
-      .grid-header {
-        @include header();
-      }
-    }
-  
-    user-panel {
-      display: inherit;
     }
 
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
 
-  
+      .dx-toolbar {
+        height: 170px; /* Adjust the height as per your requirements */
+        overflow: visible;
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+      /* Adding ::ng-deep for header row background */
+      ::ng-deep .dx-datagrid-headers .dx-header-row {
+        background-color: #00a0e028 !important; /* Replace with your desired color */
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
   }
 
-
-  
+  user-panel {
+    display: inherit;
+  }
+}
 
 /* Applies to the entire header row */
 .dx-datagrid-headers .dx-header-row {
   background-color: #f0f0f0; /* Replace with your desired color */
 }
 
-
-
 .date-period {
-    display: flex; /* Align items horizontally */
-    gap: 10px; /* Add space between the date pickers */
-    align-items: center; /* Vertically align the items */
-  }
-  
-  .date-picker-container {
-    display: flex;
-    flex-direction: column; /* Stack label and date box vertically */
-    align-items: flex-start; /* Align the label and date box to the left */
-  }
-  
-  .date-picker-container label {
-    margin-bottom: 5px; /* Add space between the label and date picker */
-  }
-  .popup-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    // justify-content: center;
-    padding: 20px;
-  }
-  .left-align {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    margin-bottom: 15px; /* Optional: to add spacing between sections */
-  }
-  .on-sale-container-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px; /* Optional: spacing between sections */
-  }
-  
-  .half-width {
-    flex: 1;
-    margin-right: 10px; /* Optional: space between radio and text box */
-  }
-  
-  .half-width:last-child {
-    margin-right: 0;
-  }
-  
-  
+  display: flex; /* Align items horizontally */
+  gap: 10px; /* Add space between the date pickers */
+  align-items: center; /* Vertically align the items */
+}
 
-  
-  
-  .operation-container {
-    margin-bottom: 15px; /* Space between the label and select box */
-  }
-  
-  .operation-container label {
-    margin-bottom: 5px; /* Space between label and select box */
-    font-weight: bold;
-  }
-  
-  .action-buttons {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px; /* Space between the buttons */
-  }
-  
-  dx-button {
-    width: 150px; /* Optional: Set consistent width for buttons */
-  }
+.date-picker-container {
+  display: flex;
+  flex-direction: column; /* Stack label and date box vertically */
+  align-items: flex-start; /* Align the label and date box to the left */
+}
+
+.date-picker-container label {
+  margin-bottom: 5px; /* Add space between the label and date picker */
+}
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  // justify-content: center;
+  padding: 20px;
+}
+.left-align {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin-bottom: 15px; /* Optional: to add spacing between sections */
+}
+.on-sale-container-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px; /* Optional: spacing between sections */
+}
+
+.half-width {
+  flex: 1;
+  margin-right: 10px; /* Optional: space between radio and text box */
+}
+
+.half-width:last-child {
+  margin-right: 0;
+}
+
+.operation-container {
+  margin-bottom: 15px; /* Space between the label and select box */
+}
+
+.operation-container label {
+  margin-bottom: 5px; /* Space between label and select box */
+  font-weight: bold;
+}
+
+.action-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px; /* Space between the buttons */
+}
+
+dx-button {
+  width: 150px; /* Optional: Set consistent width for buttons */
+}
 /* Buttons Section at the Bottom Right */
 .action-buttons {
   display: flex;
   justify-content: space-between;
-  gap: 10px;  /* Space between the buttons */
+  gap: 10px; /* Space between the buttons */
   position: absolute;
   bottom: 20px; /* Distance from the bottom */
   right: 20px; /* Distance from the right */
@@ -490,7 +459,7 @@
 
 dx-button {
   width: 150px; /* Optional: Set consistent width for buttons */
-}  
+}
 .three-field-row {
   display: flex;
   align-items: center;
@@ -563,8 +532,8 @@ dx-button {
 //   margin-left: 18px; /* Push the element as far right as possible */
 // }
 .move-left {
-  margin-left: 5px;   /* Pushes it to the right within its flex container */
-  margin-right: 50px;     /* Optional: ensure there's no margin on the right */
+  margin-left: 5px; /* Pushes it to the right within its flex container */
+  margin-right: 50px; /* Optional: ensure there's no margin on the right */
   width: 80px; /* Adjust this value to move the second field closer */
 }
 .fixed-value-dropdown {
@@ -578,7 +547,8 @@ dx-button {
 //   margin-right: 5px; /* Reduce the gap here */
 // }
 
-.dx-select-box, .full-width {
+.dx-select-box,
+.full-width {
   // width: 100%; /* Ensures the dropdown takes the full available width */
   min-width: 80px; /* Optional: ensures the select box does not get too narrow */
 }
@@ -593,7 +563,8 @@ dx-button {
   margin-right: 10px;
 }
 
-.promotion-field, .operation-field {
+.promotion-field,
+.operation-field {
   display: flex;
   align-items: center;
 }
@@ -646,13 +617,11 @@ dx-button {
   flex: 1 1 auto; /* Ensures each field takes only the necessary space */
   // min-width: 200px; /* Ensures fields have a minimum width */
   // flex-direction: column;
-
 }
 
-
-
-
-.row, .flex-row, .inline-fields {
+.row,
+.flex-row,
+.inline-fields {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -668,7 +637,6 @@ dx-button {
   margin-left: 0px;
 }
 
-
 .operation-dropdown {
   margin-right: 2px; /* Reduce space to the right of operation dropdown */
 }
@@ -676,7 +644,8 @@ dx-button {
 .default-value-field {
   margin-left: 10px; /* Reduce space to the left of default text field */
 }
-.dropdown-field, .default-value-field {
+.dropdown-field,
+.default-value-field {
   flex: 0 0 auto; /* Prevent fields from growing or shrinking unexpectedly */
   width: auto; /* Let the fields adjust their widths based on content */
 }
@@ -689,7 +658,8 @@ dx-button {
   padding-left: 0;
 }
 
-.operation-dropdown, .default-value-field {
+.operation-dropdown,
+.default-value-field {
   margin-left: 0; /* Remove left margin */
 }
 
@@ -726,4 +696,45 @@ dx-button {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.promo-form {
+  padding: 20px;
+  border-radius: 4px;
+  background: #fff;
+  width: 100%;
+  max-width: 720px;
+}
+
+/* Row Layout */
+.form-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* Labels */
+.form-row label {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Inputs full width */
+.form-row dx-text-box,
+.form-row dx-select-box {
+  width: 100%;
+}
+
+/* Inline group (Adjustment Type) */
+.inline-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* Button alignment */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }

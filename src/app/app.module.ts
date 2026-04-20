@@ -403,9 +403,10 @@ import {
   MiscPurchInvoiceFormComponent,
   MiscPurchInvoiceFormModule,
 } from './pages/Operations/misc-purch-invoice-form/misc-purch-invoice-form.component';
+import { EditPromotionComponent, EditPromotionModule } from './pages/edit-promotion/edit-promotion.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -781,6 +782,7 @@ import {
     EditItemStorePropertyModule,
     MiscPurchaseInvoiceModule,
     MiscPurchInvoiceFormModule,
+    EditPromotionModule
   ],
 
   providers: [
@@ -795,4 +797,4 @@ import {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

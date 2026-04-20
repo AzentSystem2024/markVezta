@@ -30,6 +30,8 @@ import {
   DxToolbarModule,
   DxValidationGroupModule,
   DxValidatorModule,
+  DxSwitchModule,
+  DxTabPanelModule 
 } from 'devextreme-angular';
 import {
   DxoFormItemModule,
@@ -167,6 +169,7 @@ export class PromotionComponent {
   happyHoursPopup: boolean = false;
   narration: any;
   selected_Company_id: any;
+  selectedTabIndex :any= 0; 
   get displayTimeRange(): string {
     return this.fromTime && this.toTime
       ? `${this.fromTime} - ${this.toTime}`
@@ -175,6 +178,8 @@ export class PromotionComponent {
   isLoading: boolean = true;
   isPromotionApplied: boolean = false;
   isRowsSelected: boolean = false;
+   isHappyHoursEnabledvalue:any
+
 
   constructor(
     private dataservice: DataService,
@@ -229,7 +234,10 @@ export class PromotionComponent {
       this.brand = data;
     });
 
-    this.dataservice.getDropdownData('PROMOTION_LEVEL').subscribe((data) => {
+    const payloadpromotionlevel={
+      NAME:'PROMOTION_LEVEL'
+    }
+    this.dataservice.getDropdownData(payloadpromotionlevel).subscribe((data) => {
       if (data && data.length > 0) {
         this.promotionLevel = data;
 
@@ -254,15 +262,7 @@ export class PromotionComponent {
     }
   }
 
-  onHappyHoursChanged(isEnabled: boolean): void {
-    this.isHappyHoursEnabled = isEnabled;
 
-    if (!isEnabled) {
-      // Reset time values to '00:00' when disabled
-      this.fromTime = '00:00';
-      this.toTime = '00:00';
-    }
-  }
 
   dateCellTemplate(cellElement: any, cellInfo: any) {
     if (cellInfo.value) {
@@ -327,8 +327,11 @@ export class PromotionComponent {
   }
 
   schemaOptions() {
+    const payload={
+      NAME:"PROMOTIONSCHEMA_TYPE"
+    }
     this.dataservice
-      .getDropdownData('PROMOTIONSCHEMA_TYPE')
+      .getDropdownData(payload)
       .subscribe((data) => {
         this.promotionSchema = data;
         // console.log(data, 'schemadropdown');
@@ -570,58 +573,6 @@ export class PromotionComponent {
 
     this.closePopup(); // Close the popup after applying promotion
   }
-
-  // applyPromotion() {
-  //   this.isPromotionApplied = true;
-  //   if (this.selectedSchemaId) {
-  //     const selectedSchema = this.promotionSchema.find(
-  //       (schema) => schema.ID === this.selectedSchemaId
-  //     );
-  //     console.log(selectedSchema,"NEWWWWWWWWWWWWW")
-  //     if (selectedSchema) {
-  //       console.log(selectedSchema.REMARKS)
-  //       if(selectedSchema.REMARKS == '4'){
-  //         this.heading = 'Items To Buy';
-
-  //         this.filteredItemStoresList = this.itemStoresList.filter((item) => {
-  //           const isItemSelected = this.selectedRow.some((row) => row.ID === item.ID);
-
-  //           return !isItemSelected; // Keep only items that are NOT selected
-  //         });
-  //         this.originalGridHeight = '300px';
-  //       }
-  //       this.selectedSchemaName = selectedSchema.DESCRIPTION
-  //       this.selectedSchemaName = selectedSchema.DESCRIPTION; // Store the selected schema name
-  //       this.selectedRow.forEach((row, index) => {
-  //         const selectedRowIndex = this.itemStoresList.findIndex(
-  //           (item) => item.ID === row.ID
-  //         );
-  //         if (selectedRowIndex !== -1) {
-
-  //             this.itemStoresList[selectedRowIndex].PROMOTION_NAME =
-  //             this.selectedSchemaName;
-  //             this.itemStoresList[selectedRowIndex].PROMOTION_SCHEMA_ID =
-  //             this.selectedSchemaId;
-
-  //         } else {
-  //         }
-  //       });
-  //     }
-  //     this.closePopup(); // Exit the function early if schema is selected
-  //     return;
-  //   }
-
-  //   // If no schema is selected, proceed with the promotion logic
-  //   this.applySelectedValue();
-
-  //   if (this.valueToUse != null) {
-  //     this.calculateResult();
-  //     this.updatePromotionPrice();
-  //   }
-
-  //   this.closePopup(); // Close the popup after applying promotion
-  // }
-
   onAddClick() {
     this.popupForItemsToGet = true;
   }
@@ -649,15 +600,13 @@ export class PromotionComponent {
     this.popupForItemsToGet = false; // Close the popup after adding items
   }
 
-  // AddSelectedItems(){
-  //   this.selectedItems = this.selectedRowNew;
-  //   const selectedSchema = this.promotionSchema.find(
-  //     (schema) => schema.ID === this.selectedSchemaId
-  //   );
-  //   console.log(selectedSchema,"INADDSELECTIONNNNN")
-  //   console.log(this.selectedItems,"SELECTEDITEMSSSSSSSSSSSSSSSSSSSS")
-  //   this.popupForItemsToGet = false;
-  // }
+get isPriceLevel() {
+  return this.selectedTabIndex === 0;
+}
+
+get isSchemaLevel() {
+  return this.selectedTabIndex === 1;
+}
 
   clearFilter() {
     this.filteredItemStoresList = [];
@@ -690,6 +639,7 @@ export class PromotionComponent {
       this.selectedSalePrice.push(row.SALE_PRICE);
     });
   }
+  onSelectionChangedselectedDayas(e:any){}
 
   onSelectionChangedforNewItem(e) {
     this.selectedRowForNewList = e.selectedRowKeys;
@@ -987,59 +937,65 @@ export class PromotionComponent {
       if (selectedSchema) {
         if (selectedSchema.REMARKS !== '4') {
           worksheetPromotionSchema = this.selectedRow.map((row) => ({
+                ID:0,
             ITEM_ID: row.ID, // ITEM_ID from the selected row
             PRICE: row.SALE_PRICE || 0, // SALE_PRICE from the selected row
             COST: row.COST || 0, // COST from the selected row
             PROMOTION_PRICE: row.PROMOTION_PRICE || 0, // PROMOTION_PRICE from the selected row
             DATE_FROM: this.fromDate,
             DATE_TO: this.toDate,
-            TIME_FROM: this.fromTime,
-            TIME_TO: this.toTime,
+            TIME_FROM:this. formatTime(this.fromTime),
+            TIME_TO: this. formatTime(this.toTime),
             PROMOTION_SCHEMA_ID: this.selectedSchemaId || 0,
             PROMOTION_WEEKDAYS: this.selectedDays.join(','),
-            PROMOTION_LEVEL: this.selectedPromotionLevel,
-            IS_INACTIVE: 0,
+            PROMOTION_LEVEL: this.selectedPromotionLevel||0,
+            PROMOTION_GROUP_ID:0,
+            IS_INACTIVE: false,
             PROMOTION_NAME: this.selectedSchemaName || row.PROMOTION_NAME,
-            IS_BUY: this.isBuy,
-            IS_GET: this.isGet,
+            IS_BUY: this.isBuy||false,
+            IS_GET: this.isGet||false,
             IS_HAPPY_HOUR: this.isHappyHoursEnabled,
           }));
         } else {
           const additionalSchemaItems = this.selectedItems.map((item) => ({
+                ID:0,
             ITEM_ID: item.ID,
             PRICE: item.SALE_PRICE || 0,
             COST: item.COST || 0,
             PROMOTION_PRICE: item.PROMOTION_PRICE || 0,
             DATE_FROM: this.fromDate,
             DATE_TO: this.toDate,
-            TIME_FROM: this.fromTime,
-            TIME_TO: this.toTime,
+            TIME_FROM: this. formatTime( this.fromTime),
+            TIME_TO: this. formatTime( this.toTime),
             PROMOTION_SCHEMA_ID: this.selectedSchemaId,
             PROMOTION_WEEKDAYS: this.selectedDays.join(','),
-            PROMOTION_LEVEL: this.selectedPromotionLevel,
-            IS_INACTIVE: 0,
+            PROMOTION_LEVEL: this.selectedPromotionLevel||0,
+            PROMOTION_GROUP_ID:0,
+            IS_INACTIVE: false,
             PROMOTION_NAME: this.selectedSchemaName || item.PROMOTION_NAME,
-            IS_BUY: 0,
-            IS_GET: 1,
+            IS_BUY: false,
+            IS_GET: false,
             IS_HAPPY_HOUR: this.isHappyHoursEnabled,
           }));
           worksheetPromotionSchema = [
             ...this.selectedRow.map((row) => ({
+                  ID:0,
               ITEM_ID: row.ID,
               PRICE: row.SALE_PRICE || 0,
               COST: row.COST || 0,
               PROMOTION_PRICE: row.PROMOTION_PRICE || 0,
               DATE_FROM: this.fromDate,
               DATE_TO: this.toDate,
-              TIME_FROM: this.fromTime,
-              TIME_TO: this.toTime,
+              TIME_FROM:this. formatTime( this.fromTime),
+              TIME_TO: this. formatTime(this.toTime),
               PROMOTION_SCHEMA_ID: this.selectedSchemaId || 0,
               PROMOTION_WEEKDAYS: this.selectedDays.join(','),
-              PROMOTION_LEVEL: this.selectedPromotionLevel,
-              IS_INACTIVE: 0,
+              PROMOTION_LEVEL: this.selectedPromotionLevel||0,
+              PROMOTION_GROUP_ID:0,
+              IS_INACTIVE: false,
               PROMOTION_NAME: this.selectedSchemaName || row.PROMOTION_NAME,
-              IS_BUY: this.isBuy,
-              IS_GET: this.isGet,
+              IS_BUY: this.isBuy ||false,
+              IS_GET: this.isGet ||false,
               IS_HAPPY_HOUR: this.isHappyHoursEnabled,
             })),
             ...additionalSchemaItems, // Add the selectedItems to the schema
@@ -1049,26 +1005,30 @@ export class PromotionComponent {
     } else {
       // If selectedSchemaId is not set, default behavior (without schema logic)
       worksheetPromotionSchema = this.selectedRow.map((row) => ({
+            ID:0,
         ITEM_ID: row.ID, // ITEM_ID from the selected row
         PRICE: row.SALE_PRICE || 0, // SALE_PRICE from the selected row
         COST: row.COST || 0, // COST from the selected row
         PROMOTION_PRICE: row.PROMOTION_PRICE || 0, // PROMOTION_PRICE from the selected row
         DATE_FROM: this.fromDate,
         DATE_TO: this.toDate,
-        TIME_FROM: this.fromTime,
-        TIME_TO: this.toTime,
+        TIME_FROM:this. formatTime( this.fromTime),
+        TIME_TO: this. formatTime(this.toTime)
+        ,
         PROMOTION_SCHEMA_ID: this.selectedSchemaId || 0, // Using selected schema ID or defaulting to 0
         PROMOTION_WEEKDAYS: this.selectedDays.join(','),
-        PROMOTION_LEVEL: this.selectedPromotionLevel,
-        IS_INACTIVE: 0,
+        PROMOTION_LEVEL: this.selectedPromotionLevel||0,
+        PROMOTION_GROUP_ID:0,
+        IS_INACTIVE:false,
         PROMOTION_NAME: this.selectedSchemaName || row.PROMOTION_NAME,
-        IS_BUY: 1,
-        IS_GET: 0,
+        IS_BUY: false,
+        IS_GET: false,
         IS_HAPPY_HOUR: this.isHappyHoursEnabled,
       }));
     }
 
     const payload = {
+  
       COMPANY_ID: companyId, // Company ID
       USER_ID: userId, // User ID
       STORE_ID: storeID || '1', // Store ID
@@ -1104,8 +1064,11 @@ export class PromotionComponent {
   }
 
   Cancel() {
-    this.router.navigate(['/Promotion']);
+    this.router.navigate(['/promotions']);
   }
+  formatTime(date: any) {
+  return date ? new Date(date).toISOString() : null;
+}
 
   validateNumber(event: any): void {
     const inputValue = event.value || ''; // Get the current value
@@ -1117,6 +1080,20 @@ export class PromotionComponent {
     // Show or hide the error message based on input validity
     this.showError = sanitizedValue !== inputValue;
   }
+  onHappyHoursChanged(e: any) {
+  this.isHappyHoursEnabledvalue = e.value;
+
+  if (!this.isHappyHoursEnabled) {
+    // Reset time when disabled
+   
+  const resetTime = new Date();
+resetTime.setHours(0, 0, 0, 0);
+
+this.fromTime = resetTime;
+this.toTime = resetTime;
+    }
+  
+}
 }
 
 @NgModule({
@@ -1148,6 +1125,8 @@ export class PromotionComponent {
     DxNumberBoxModule,
     DxValidationGroupModule,
     DxValidatorModule,
+    DxSwitchModule,
+    DxTabPanelModule 
   ],
   providers: [],
   exports: [PromotionComponent],
