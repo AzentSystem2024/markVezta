@@ -181,17 +181,18 @@ import { PromotionApproveComponent } from './pages/promotion-approve/promotion-a
 import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
 import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
 import { MiscPurchaseInvoiceComponent } from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
-// import { MiscellaneousSalesInvoiceComponent } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
+import { MiscellaneousSalesInvoiceComponent } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
+import { StorewiseStockViewComponent } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
 
 const routes: Routes = [
   //  {
-      //   path: 'miscellaneous-sales-invoice',
-      //   component: MiscellaneousSalesInvoiceComponent,
-      //   canActivate: [AuthGuardService],
-      // },
+  //   path: 'miscellaneous-sales-invoice',
+  //   component: MiscellaneousSalesInvoiceComponent,
+  //   canActivate: [AuthGuardService],
+  // },
   {
     path: '',
     redirectTo: '/auth/login',
@@ -207,7 +208,7 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
- 
+
 
   {
     path: 'auth',
@@ -1141,7 +1142,16 @@ const routes: Routes = [
         component: MiscPurchaseInvoiceComponent,
         canActivate: [AuthGuardService],
       },
-      
+      {
+        path: 'miscellaneous-sales-invoice',
+        component: MiscellaneousSalesInvoiceComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'storewise-stock-view',
+        component: StorewiseStockViewComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'login',
@@ -1158,4 +1168,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

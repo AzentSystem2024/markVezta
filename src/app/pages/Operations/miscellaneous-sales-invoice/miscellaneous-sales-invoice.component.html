@@ -72,7 +72,7 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Miscellaneous Purchase Invoice</div>
+          <div class="grid-header">Miscellaneous Sales Invoice</div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
@@ -119,42 +119,38 @@
         </dx-select-box>
       </div>
       <dxi-column
-        dataField="PURCH_NO"
-        caption="Purchase No"
+        dataField="SALE_NO"
+        caption="Sale No"
         alignment="left"
+        
       ></dxi-column>
-      <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
       <dxi-column
-        dataField="PURCH_DATE"
+        dataField="TRANS_DATE"
         caption="Date"
         dataType="date"
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <!-- <dxi-column
+      <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Gross Amount"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
       <dxi-column
-        dataField="GST_AMOUNT"
+        dataField="TAX_AMOUNT"
         [caption]="vatTitle + ' Amount'"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column> -->
+      ></dxi-column>
       <dxi-column
         dataField="NET_AMOUNT"
         caption="Net Amount"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
-      <dxi-column
-        dataField="NARRATION"
-        caption="Narration"
-        dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
+
       <dxi-column
         caption="Status"
         dataField="STATUS"
@@ -180,10 +176,10 @@
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-misc-purch-invoice-form
+  <app-miscellaneous-sales-invoice-form
     [isEditing]="false"
     (popupClosed)="handleClose()"
-  ></app-misc-purch-invoice-form>
+  ></app-miscellaneous-sales-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>
 <dx-popup
@@ -195,11 +191,12 @@
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-misc-purch-invoice-form
+  <app-miscellaneous-sales-invoice-form
     [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-misc-purch-invoice-form>
+  ></app-miscellaneous-sales-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>
 
@@ -208,16 +205,16 @@
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="Invoice"
+  title="View Invoice"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-misc-purch-invoice-form
+  <app-miscellaneous-sales-invoice-form
     [isEditing]="true"
     [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-misc-purch-invoice-form>
+  ></app-miscellaneous-sales-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>
 <app-custom-date-popup
@@ -227,3 +224,4 @@
   (applyDates)="onCustomDateApplied($event)"
 >
 </app-custom-date-popup>
+

@@ -111,6 +111,8 @@ export class AddDebitComponent {
         HEAD_ID: '',
         AMOUNT: '',
         GST_AMOUNT: '',
+        GST_PERC: '',
+        GST_ID: 0,
         REMARKS: '',
         CGST: 0,
         SGST: 0,
@@ -220,7 +222,8 @@ export class AddDebitComponent {
         ledgerName: '',
         particulars: '',
         Amount: '',
-        GST_PERC: '',
+        GST_PERC: null,
+        GST_ID: null,
         gstAmount: '',
       },
     ];
@@ -339,7 +342,7 @@ export class AddDebitComponent {
 
     // 🔹 Re-apply GST ONLY if invoice already selected
     if (this.selectedInvoiceGST) {
-      this.applyInvoiceGSTToRows();
+      // this.applyInvoiceGSTToRows();
     }
 
     // 🔹 Reload pending invoices
@@ -358,7 +361,7 @@ export class AddDebitComponent {
     this.selectedInvoiceHSN = selected.HSN_CODE || '';
 
     // ✅ APPLY TAX MODE BASED ON STATE
-    this.applyInvoiceGSTToRows();
+    // this.applyInvoiceGSTToRows();
 
     this.invoicePopupVisible = false;
   }
@@ -373,6 +376,16 @@ export class AddDebitComponent {
       // ✅ Set HSN from invoice
       row.HSN_CODE = this.selectedInvoiceHSN;
       row.GST_PERC = this.selectedInvoiceGST;
+      row.GST_PERC = this.selectedInvoiceGST;
+
+      //  ADD THIS
+      const selectedVat = this.VatClass.find(
+        (v: any) => Number(v.DESCRIPTION) === this.selectedInvoiceGST,
+      );
+
+      if (selectedVat) {
+        row.GST_ID = selectedVat.ID;
+      }
       row.CGST = 0;
       row.SGST = 0;
       // if (isSameState) {
@@ -496,13 +509,11 @@ export class AddDebitComponent {
 
   onEditorPreparing(e: any) {
     if (
-      e.dataField === 'SL_NO' ||
       e.dataField === 'ledgerCode' ||
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
       e.dataField === 'Amount' ||
       e.dataField === 'GST_PERC' ||
-      e.dataField === 'HSN_CODE' ||
       e.dataField === 'gstAmount'
     ) {
       e.editorOptions = e.editorOptions || {};
@@ -531,65 +542,21 @@ export class AddDebitComponent {
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
-
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
-          }, 50);
-        }
-      };
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
 
-    // ➤ SL_NO: Move to ledgerCode on Enter
-    if (e.dataField === 'SL_NO') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
-
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
-
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
-          }, 50);
-        }
-      };
-    }
-
-    // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
     if (e.dataField === 'ledgerCode') {
-      let enterPressedOnce = false;
-
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
-
-          if (!enterPressedOnce) {
-            enterPressedOnce = true;
-            setTimeout(() => {
-              if (event.component?.open) {
-                event.component.open(); // open dropdown
-              }
-            }, 50);
-          } else {
-            enterPressedOnce = false;
-            setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-            }, 50);
-          }
-        }
+      // ✅ Open dropdown on focus
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 0);
       };
 
+      // ❌ REMOVE your existing onKeyDown completely
+
+      // ✅ Move on value selection
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_CODE === args.value,
@@ -598,28 +565,17 @@ export class AddDebitComponent {
         e.setValue(args.value);
 
         if (selectedLedger) {
-          //Set ledger name
+          // bind ledger name
           e.component.cellValue(
             rowIndex,
             'ledgerName',
             selectedLedger.HEAD_NAME,
           );
 
-          //Set HSN from SELECTED INVOICE (NOT SESSION)
-          if (this.selectedInvoiceHSN) {
-            e.component.cellValue(
-              rowIndex,
-              'HSN_CODE',
-              this.selectedInvoiceHSN,
-            );
-          }
-
-          // GST is already applied globally via applyInvoiceGSTToRows()
-          //  DO NOT SET GST HERE
-
-          // Move to next field
+          // 🔥 MOVE FOCUS HERE (THIS IS THE FIX)
           setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+            const grid = this.itemsGridRef?.instance;
+            grid.editCell(rowIndex, 'ledgerName');
           }, 50);
         }
       };
@@ -627,12 +583,15 @@ export class AddDebitComponent {
 
     // ➤ ledgerName: move to particulars on Enter
     if (e.dataField === 'ledgerName') {
+      // open dropdown on focus
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 0);
+      };
+
+      // 🔥 MAIN FIX: move on selection
       e.editorOptions.onValueChanged = (args: any) => {
-        const grid = this.itemsGridRef?.instance;
-        const visibleRows = grid.getVisibleRows();
-
-        const rowIndex = visibleRows.findIndex((r) => r?.data === e.row?.data);
-
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_NAME === args.value,
         );
@@ -640,14 +599,30 @@ export class AddDebitComponent {
         e.setValue(args.value);
 
         if (selectedLedger) {
-          // ✅ Set ledgerCode
-          grid.cellValue(rowIndex, 'ledgerCode', selectedLedger.HEAD_CODE);
+          // sync code
+          e.component.cellValue(
+            rowIndex,
+            'ledgerCode',
+            selectedLedger.HEAD_CODE,
+          );
         }
 
-        // 🔥 MOVE TO PARTICULARS (THIS IS THE KEY)
+        // 🔥 MOVE TO PARTICULARS HERE
         setTimeout(() => {
+          const grid = this.itemsGridRef?.instance;
           grid.editCell(rowIndex, 'particulars');
         }, 50);
+      };
+
+      // optional: Enter also moves (keyboard users)
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'particulars');
+          }, 50);
+        }
       };
     }
 
@@ -663,6 +638,7 @@ export class AddDebitComponent {
         }
       };
     }
+
     if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
@@ -675,77 +651,108 @@ export class AddDebitComponent {
         }
       };
     }
+    // if (e.dataField === 'Amount') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       // simulate TAB key (DevExtreme handles this correctly)
+    //       const eKey = event.event;
+
+    //       const tabEvent = new KeyboardEvent('keydown', {
+    //         key: 'Tab',
+    //         code: 'Tab',
+    //         keyCode: 9,
+    //         which: 9,
+    //         bubbles: true,
+    //       });
+
+    //       eKey.target.dispatchEvent(tabEvent);
+    //     }
+    //   };
+    // }
+
     if (e.dataField === 'GST_PERC') {
+      const original = e.editorOptions.onValueChanged;
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        if (original) original(args);
+
+        e.setValue(args.value);
+
+        const selectedVat = this.VatClass.find((v: any) => v.ID === args.value);
+
+        if (selectedVat) {
+          e.component.cellValue(rowIndex, 'GST_ID', selectedVat.ID);
+
+          e.component.cellValue(
+            rowIndex,
+            'GST_PERC',
+            Number(selectedVat.DESCRIPTION),
+          );
+        }
+
+        e.row.data.CGST = 0;
+        e.row.data.SGST = 0;
+      };
+
+      // ✅ auto open dropdown
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 50);
+      };
+
+      // ✅ ENTER → add row
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
           const grid = this.itemsGridRef?.instance;
-          const rowData = e.row?.data;
 
-          if (
-            rowData.ledgerCode &&
-            rowData.Amount != null &&
-            !this.hasEmptyRow()
-          ) {
-            const companyState = this.companyState?.trim().toLowerCase();
-            const supplierState =
-              this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+          setTimeout(() => {
+            grid.saveEditData();
 
-            const isSameState = companyState === supplierState;
+            if (this.hasEmptyRow()) return;
 
-            let newRow: any = {
+            // const baseRow = this.debitFormData.NOTE_DETAIL[0] || {};
+
+            const newRow = {
               SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
               ledgerCode: '',
               ledgerName: '',
               particulars: '',
-              Amount: null,
-              HSN_CODE: this.selectedInvoiceHSN || '',
-              GST_PERC: 0,
+              Amount: '',
+              GST_PERC: null, // ✅ EMPTY
+              GST_ID: null, // ✅ IMPORTANT for lookup
               CGST: 0,
               SGST: 0,
+              gstAmount: '',
+              HEAD_ID: null,
             };
 
-            //  APPLY GST
-            if (this.selectedInvoiceGST) {
-              //  ALWAYS SET GST_PERC FOR UI
-              newRow.GST_PERC = this.selectedInvoiceGST;
+            // ✅ CORRECT ARRAY
+            this.debitFormData.NOTE_DETAIL = [
+              ...this.debitFormData.NOTE_DETAIL,
+              newRow,
+            ];
 
-              // Keep split hidden in UI
-              newRow.CGST = 0;
-              newRow.SGST = 0;
-            }
-
-            this.debitFormData.NOTE_DETAIL.push(newRow);
-
+            // refresh
             grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
             grid.refresh();
 
+            // focus new row
             setTimeout(() => {
               const visibleRows = grid.getVisibleRows();
+
               const newRowIndex = visibleRows.findIndex(
-                (r) => r.data === newRow,
+                (r: any) => r.data === newRow,
               );
 
               if (newRowIndex >= 0) {
                 grid.editCell(newRowIndex, 'ledgerCode');
               }
-            }, 50);
-          }
+            }, 150);
+          }, 50);
         }
-      };
-    }
-    if (e.dataField === 'GST_PERC') {
-      const originalOnValueChanged = e.editorOptions.onValueChanged;
-
-      e.editorOptions.onValueChanged = (args: any) => {
-        if (originalOnValueChanged) {
-          originalOnValueChanged(args);
-        }
-
-        e.setValue(args.value);
-
-        // same behavior
-        e.row.data.CGST = 0;
-        e.row.data.SGST = 0;
       };
     }
 
@@ -759,13 +766,391 @@ export class AddDebitComponent {
 
         e.setValue(args.value);
 
-        //  CLEAR IGST WHEN CGST / SGST IS ENTERED
+        // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
         e.row.data.GST_PERC = 0;
       };
     }
-
-    // e.row.data.HSN_CODE = this.HSN_CODE;
   }
+
+  // onEditorPreparing(e: any) {
+  //   if (
+  //     e.dataField === 'SL_NO' ||
+  //     e.dataField === 'ledgerCode' ||
+  //     e.dataField === 'ledgerName' ||
+  //     e.dataField === 'particulars' ||
+  //     e.dataField === 'Amount' ||
+  //     e.dataField === 'GST_PERC' ||
+  //     e.dataField === 'HSN_CODE' ||
+  //     e.dataField === 'gstAmount'
+  //   ) {
+  //     e.editorOptions = e.editorOptions || {};
+
+  //     // Let the editor inherit row height naturally (no fixed height)
+  //     e.editorOptions.elementAttr = {
+  //       style: `
+  //       height: 100%;
+  //       margin: 0;
+  //       padding: 0;
+  //       display: flex;
+  //       align-items: center;
+  //     `,
+  //     };
+
+  //     // Make sure the input fits snugly inside
+  //     e.editorOptions.inputAttr = {
+  //       style: `
+  //       height: 100%;
+  //       padding: 0 4px;
+  //       box-sizing: border-box;
+  //     `,
+  //     };
+
+  //     // Remove spin buttons to prevent layout changes
+  //     if (e.editorName === 'dxNumberBox') {
+  //       e.editorOptions.showSpinButtons = false;
+  //     }
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = this.itemsGridRef?.instance;
+  //         const visibleRows = grid.getVisibleRows();
+
+  //         const rowIndex = visibleRows.findIndex(
+  //           (r) => r?.data === e.row?.data,
+  //         );
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'GST'));
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+  //   if (e.parentType !== 'dataRow') return;
+  //   const rowIndex = e.row?.rowIndex;
+
+  //   // ➤ SL_NO: Move to ledgerCode on Enter
+  //   if (e.dataField === 'SL_NO') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = this.itemsGridRef?.instance;
+  //         const visibleRows = grid.getVisibleRows();
+
+  //         const rowIndex = visibleRows.findIndex(
+  //           (r) => r?.data === e.row?.data,
+  //         );
+
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+
+  //   // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
+  //   if (e.dataField === 'ledgerCode') {
+  //     let enterPressedOnce = false;
+
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         event.event.preventDefault();
+
+  //         if (!enterPressedOnce) {
+  //           enterPressedOnce = true;
+  //           setTimeout(() => {
+  //             if (event.component?.open) {
+  //               event.component.open(); // open dropdown
+  //             }
+  //           }, 50);
+  //         } else {
+  //           enterPressedOnce = false;
+  //           setTimeout(() => {
+  //             this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+  //           }, 50);
+  //         }
+  //       }
+  //     };
+
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       const selectedLedger = this.ledgerList.find(
+  //         (item: any) => item.HEAD_CODE === args.value,
+  //       );
+
+  //       e.setValue(args.value);
+
+  //       if (selectedLedger) {
+  //         //Set ledger name
+  //         e.component.cellValue(
+  //           rowIndex,
+  //           'ledgerName',
+  //           selectedLedger.HEAD_NAME,
+  //         );
+
+  //         //Set HSN from SELECTED INVOICE (NOT SESSION)
+  //         if (this.selectedInvoiceHSN) {
+  //           e.component.cellValue(
+  //             rowIndex,
+  //             'HSN_CODE',
+  //             this.selectedInvoiceHSN,
+  //           );
+  //         }
+
+  //         // GST is already applied globally via applyInvoiceGSTToRows()
+  //         //  DO NOT SET GST HERE
+
+  //         // Move to next field
+  //         setTimeout(() => {
+  //           this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+
+  //   // ➤ ledgerName: move to particulars on Enter
+  //   if (e.dataField === 'ledgerName') {
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       const grid = this.itemsGridRef?.instance;
+  //       const visibleRows = grid.getVisibleRows();
+
+  //       const rowIndex = visibleRows.findIndex((r) => r?.data === e.row?.data);
+
+  //       const selectedLedger = this.ledgerList.find(
+  //         (item: any) => item.HEAD_NAME === args.value,
+  //       );
+
+  //       e.setValue(args.value);
+
+  //       if (selectedLedger) {
+  //         // ✅ Set ledgerCode
+  //         grid.cellValue(rowIndex, 'ledgerCode', selectedLedger.HEAD_CODE);
+  //       }
+
+  //       // 🔥 MOVE TO PARTICULARS (THIS IS THE KEY)
+  //       setTimeout(() => {
+  //         grid.editCell(rowIndex, 'particulars');
+  //       }, 50);
+  //     };
+  //   }
+
+  //   if (e.dataField === 'particulars') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = e.component;
+  //         const rowIndex = e.row.rowIndex;
+  //         // Move focus to the "ledgerCode" column in the same row
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'Amount'));
+  //         });
+  //       }
+  //     };
+  //   }
+  //   if (e.dataField === 'Amount') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = e.component;
+  //         const rowIndex = e.row.rowIndex;
+  //         // Move focus to the "ledgerCode" column in the same row
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+  //         });
+  //       }
+  //     };
+  //   }
+  //   // if (e.dataField === 'GST_PERC') {
+  //   //   e.editorOptions.onKeyDown = (event: any) => {
+  //   //     if (event.event.key === 'Enter') {
+  //   //       const grid = this.itemsGridRef?.instance;
+  //   //       const rowData = e.row?.data;
+
+  //   //       if (
+  //   //         rowData.ledgerCode &&
+  //   //         rowData.Amount != null &&
+  //   //         !this.hasEmptyRow()
+  //   //       ) {
+  //   //         const companyState = this.companyState?.trim().toLowerCase();
+  //   //         const supplierState =
+  //   //           this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+  //   //         const isSameState = companyState === supplierState;
+
+  //   //         let newRow: any = {
+  //   //           SL_NO: this.debitFormData.NOTE_DETAIL.length + 1,
+  //   //           ledgerCode: '',
+  //   //           ledgerName: '',
+  //   //           particulars: '',
+  //   //           Amount: null,
+  //   //           HSN_CODE: this.selectedInvoiceHSN || '',
+  //   //           GST_PERC: 0,
+  //   //           CGST: 0,
+  //   //           SGST: 0,
+  //   //         };
+
+  //   //         //  APPLY GST
+  //   //         if (this.selectedInvoiceGST) {
+  //   //           //  ALWAYS SET GST_PERC FOR UI
+  //   //           newRow.GST_PERC = this.selectedInvoiceGST;
+
+  //   //           // Keep split hidden in UI
+  //   //           newRow.CGST = 0;
+  //   //           newRow.SGST = 0;
+  //   //         }
+
+  //   //         this.debitFormData.NOTE_DETAIL.push(newRow);
+
+  //   //         grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
+  //   //         grid.refresh();
+
+  //   //         setTimeout(() => {
+  //   //           const visibleRows = grid.getVisibleRows();
+  //   //           const newRowIndex = visibleRows.findIndex(
+  //   //             (r) => r.data === newRow,
+  //   //           );
+
+  //   //           if (newRowIndex >= 0) {
+  //   //             grid.editCell(newRowIndex, 'ledgerCode');
+  //   //           }
+  //   //         }, 50);
+  //   //       }
+  //   //     }
+  //   //   };
+  //   // }
+  //   // if (e.dataField === 'GST_PERC') {
+  //   //   const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+  //   //   e.editorOptions.onValueChanged = (args: any) => {
+  //   //     if (originalOnValueChanged) {
+  //   //       originalOnValueChanged(args);
+  //   //     }
+
+  //   //     e.setValue(args.value);
+
+  //   //     // same behavior
+  //   //     e.row.data.CGST = 0;
+  //   //     e.row.data.SGST = 0;
+  //   //   };
+  //   // }
+
+  //   if (e.dataField === 'GST_PERC') {
+  //     const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+  //     // ✅ VALUE CHANGE (Dropdown select)
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       if (originalOnValueChanged) {
+  //         originalOnValueChanged(args);
+  //       }
+
+  //       e.setValue(args.value);
+
+  //       const rowIndex = e.row.rowIndex;
+
+  //       // ✅ FIND SELECTED VAT
+  //       const selectedVat = this.VatClass.find((v: any) => v.ID === args.value);
+
+  //       console.log(selectedVat, 'selectedVat--------');
+
+  //       if (selectedVat) {
+  //         const percent = Number(selectedVat.DESCRIPTION);
+
+  //         // ✅ STORE ID (hidden)
+  //         e.component.cellValue(rowIndex, 'GST_ID', selectedVat.ID);
+
+  //         // ✅ STORE % (visible)
+  //         e.component.cellValue(rowIndex, 'GST_PERC', percent);
+
+  //         // ✅ CALCULATE GST
+  //         const amount = Number(e.row.data.Amount) || 0;
+  //         const gst = (amount * percent) / 100;
+
+  //         e.component.cellValue(rowIndex, 'gstAmount', +gst.toFixed(2));
+  //       }
+
+  //       // ✅ reset split
+  //       e.row.data.CGST = 0;
+  //       e.row.data.SGST = 0;
+  //     };
+
+  //     // ✅ ENTER KEY LOGIC (ADD NEW ROW)
+  //     // e.editorOptions.onKeyDown = (event: any) => {
+  //     //   if (event.event.key === 'Enter') {
+  //     //     const grid = this.itemsGridRef?.instance;
+  //     //     const rowData = e.row?.data;
+
+  //     //     if (
+  //     //       rowData.ledgerCode &&
+  //     //       rowData.Amount != null &&
+  //     //       !this.hasEmptyRow()
+  //     //     ) {
+  //     //       const companyState = this.companyState?.trim().toLowerCase();
+  //     //       const supplierState =
+  //     //         this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
+
+  //     //       const isSameState = companyState === supplierState;
+
+  //     //       let newRow: any = {
+  //     //         SL_NO: this.noteDetails.length + 1,
+  //     //         ledgerCode: '',
+  //     //         ledgerName: '',
+  //     //         particulars: '',
+  //     //         Amount: null,
+  //     //         HSN_CODE: this.selectedInvoiceHSN || '',
+  //     //         // GST_PERC: 0,
+  //     //         GST_ID: null, // ✅ IMPORTANT
+  //     //         CGST: 0,
+  //     //         SGST: 0,
+  //     //       };
+
+  //     //       // ✅ APPLY GST FROM INVOICE
+  //     //       if (this.selectedInvoiceGST) {
+  //     //         newRow.GST_PERC = this.selectedInvoiceGST;
+
+  //     //         // 🔥 ALSO SET ID (IMPORTANT)
+  //     //         const selectedVat = this.VatClass.find(
+  //     //           (v: any) => Number(v.DESCRIPTION) === this.selectedInvoiceGST
+  //     //         );
+
+  //     //         if (selectedVat) {
+  //     //           newRow.GST_ID = selectedVat.ID;
+  //     //         }
+
+  //     //         newRow.CGST = 0;
+  //     //         newRow.SGST = 0;
+  //     //       }
+
+  //     //       // ✅ PUSH ROW
+  //     //       this.noteDetails.push(newRow);
+
+  //     //       grid.option('dataSource', [...this.noteDetails]);
+  //     //       grid.refresh();
+
+  //     //       setTimeout(() => {
+  //     //         const visibleRows = grid.getVisibleRows();
+  //     //         const newRowIndex = visibleRows.findIndex(
+  //     //           (r) => r.data === newRow
+  //     //         );
+
+  //     //         if (newRowIndex >= 0) {
+  //     //           grid.editCell(newRowIndex, 'ledgerCode');
+  //     //         }
+  //     //       }, 50);
+  //     //     }
+  //     //   }
+  //     // };
+  //   }
+
+  //   if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+  //     const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+  //     e.editorOptions.onValueChanged = (args: any) => {
+  //       if (originalOnValueChanged) {
+  //         originalOnValueChanged(args);
+  //       }
+
+  //       e.setValue(args.value);
+
+  //       //  CLEAR IGST WHEN CGST / SGST IS ENTERED
+  //       e.row.data.GST_PERC = 0;
+  //     };
+  //   }
+
+  //   // e.row.data.HSN_CODE = this.HSN_CODE;
+  // }
 
   onRowInserted(e: any) {
     // Recalculate SL_NO after insertion
@@ -1018,7 +1403,8 @@ export class AddDebitComponent {
           SL_NO: row.SL_NO || index + 1,
           HEAD_ID: ledger?.HEAD_ID || null,
           AMOUNT: Number(row.Amount) || 0,
-          GST_PERC: Number(row.GST_PERC) || 0,
+          // GST_PERC: Number(row.GST_PERC) || 0,
+          GST_PERC: row.GST_ID ?? row.GST_PERC,
           CGST: Number(row.CGST) || 0,
           SGST: Number(row.SGST) || 0,
           GST_AMOUNT: gstAmount,
@@ -1049,12 +1435,12 @@ export class AddDebitComponent {
         // SAME STATE → split into CGST + SGST
         row.CGST = gstPerc / 2;
         row.SGST = gstPerc / 2;
-        row.GST_PERC = 0;
+        row.GST_PERC = row.GST_PERC;
       } else {
         // DIFFERENT STATE → keep GST_PERC (IGST)
         row.CGST = 0;
         row.SGST = 0;
-        row.GST_PERC = gstPerc;
+        row.GST_PERC = row.GST_PERC;
       }
     });
 
@@ -1145,55 +1531,44 @@ export class AddDebitComponent {
   }
 
   onAddNewRow() {
-    const grid = this.itemsGridRef?.instance;
+    const grid = this.itemsGridRef.instance;
+    const rows = grid.getVisibleRows();
 
-    if (!grid) return;
-
-    if (this.hasEmptyRow()) {
-      notify('Please fill the existing empty row first.', 'warning', 2000);
+    const hasIncompleteRow = rows.some(
+      (r: any) => !r.data.ledgerName || !r.data.Amount,
+    );
+    if (hasIncompleteRow) {
       return;
     }
 
-    const nextSlNo = this.debitFormData.NOTE_DETAIL.length + 1;
+    const nextSlNo = this.noteDetails.length + 1;
 
-    const companyState = this.companyState?.trim().toLowerCase();
-    const supplierState =
-      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
-
-    const isSameState = companyState === supplierState;
-
-    let newRow: any = {
+    const newRow: any = {
       SL_NO: nextSlNo,
       ledgerCode: null,
       ledgerName: '',
       particulars: '',
       Amount: null,
-      HSN_CODE: this.selectedInvoiceHSN || '',
-      GST_PERC: 0,
+      gstAmount: null,
+      HSN_CODE: '',
       CGST: 0,
       SGST: 0,
+      GST_PERC: null, // ✅ keep empty
     };
 
-    if (this.selectedInvoiceGST) {
-      newRow.GST_PERC = this.selectedInvoiceGST;
-      newRow.CGST = 0;
-      newRow.SGST = 0;
+    const baseRow = this.noteDetails[0];
+
+    if (baseRow) {
+      // ❌ removed GST copy
+      newRow.HSN_CODE = baseRow.HSN_CODE || ''; // ✅ keep this if needed
     }
 
-    // push row
-    this.debitFormData.NOTE_DETAIL.push(newRow);
+    this.noteDetails.push(newRow);
 
-    // refresh datasource
-    grid.option('dataSource', [...this.debitFormData.NOTE_DETAIL]);
-
-    // focus ledgerCode
     setTimeout(() => {
-      const visibleRows = grid.getVisibleRows();
-      const newRowIndex = visibleRows.findIndex((r) => r.data === newRow);
-
-      if (newRowIndex >= 0) {
-        grid.editCell(newRowIndex, 'ledgerCode');
-      }
+      const gridInstance = this.itemsGridRef?.instance;
+      const newRowIndex = this.noteDetails.length - 1;
+      gridInstance?.editCell(newRowIndex, 'ledgerCode');
     }, 100);
   }
 
@@ -1212,6 +1587,11 @@ export class AddDebitComponent {
       this.netAmount = Number(this.netTotal).toFixed(2);
     }
   }
+
+  getGstDisplayValue = (row: any) => {
+    const percent = row.GST_PERC ?? 0;
+    return `${percent} %`;
+  };
 }
 
 @NgModule({

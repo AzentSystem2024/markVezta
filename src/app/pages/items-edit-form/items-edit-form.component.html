@@ -1,4 +1,6 @@
 <div class="edit-form-container">
+
+  <dx-validation-group #validationGroup>
   <dx-form class="plain-styled-form" [(visible)]="popupVisible">
     <dxi-item itemType="tabbed">
       <dxi-tab title="General">
@@ -1287,6 +1289,7 @@
       (onClick)="saveData()"
     ></dx-button>
   </div>
+  </dx-validation-group>
 </div>
 
 <dx-popup

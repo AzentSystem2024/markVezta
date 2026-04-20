@@ -43,6 +43,7 @@
                   [readOnly]="true"
                 ></dx-text-box>
                 <dx-text-box
+                  *ngIf="showSubType"
                   label="Doc No"
                   [value]="debitFormData[0].SUB_TYPE_NAME"
                   labelMode="floating"
@@ -163,10 +164,13 @@
         <dxi-column
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
-          dataType="number"
-          [allowEditing]="false"
+          alignment="right"
+          [format]="{ type: 'fixedPoint', precision: 0 }"
+          [calculateDisplayValue]="getGstDisplayValue"
         >
         </dxi-column>
+
+        <dxi-column dataField="GST_ID" [visible]="false"></dxi-column>
 
         <!-- <dxi-column
           dataField="CGST"

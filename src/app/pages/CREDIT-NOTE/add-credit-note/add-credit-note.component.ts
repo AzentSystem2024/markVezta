@@ -117,6 +117,7 @@ export class AddCreditNoteComponent {
         HEAD_ID: '',
         AMOUNT: '',
         GST_PERC: '',
+        GST_ID: 0,
         GST_AMOUNT: '',
         REMARKS: '',
       },
@@ -218,6 +219,7 @@ export class AddCreditNoteComponent {
         ledgerName: '',
         particulars: '',
         Amount: '',
+        GST_ID: 0,
         gstAmount: '',
       },
     ];
@@ -650,104 +652,134 @@ export class AddCreditNoteComponent {
     if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
-          // ✅ simulate TAB key (DevExtreme handles this correctly)
-          const eKey = event.event;
-
-          const tabEvent = new KeyboardEvent('keydown', {
-            key: 'Tab',
-            code: 'Tab',
-            keyCode: 9,
-            which: 9,
-            bubbles: true,
+          const grid = e.component;
+          const rowIndex = e.row.rowIndex;
+          // Move focus to the "ledgerCode" column in the same row
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
           });
-
-          eKey.target.dispatchEvent(tabEvent);
         }
       };
     }
+    // if (e.dataField === 'Amount') {
+    //   e.editorOptions.onKeyDown = (event: any) => {
+    //     if (event.event.key === 'Enter') {
+    //       // simulate TAB key (DevExtreme handles this correctly)
+    //       const eKey = event.event;
+
+    //       const tabEvent = new KeyboardEvent('keydown', {
+    //         key: 'Tab',
+    //         code: 'Tab',
+    //         keyCode: 9,
+    //         which: 9,
+    //         bubbles: true,
+    //       });
+
+    //       eKey.target.dispatchEvent(tabEvent);
+    //     }
+    //   };
+    // }
+
     if (e.dataField === 'GST_PERC') {
-      // existing logic (keep it)
       const original = e.editorOptions.onValueChanged;
+
       e.editorOptions.onValueChanged = (args: any) => {
         if (original) original(args);
+
         e.setValue(args.value);
+
+        const selectedVat = this.VatClass.find((v: any) => v.ID === args.value);
+
+        if (selectedVat) {
+          e.component.cellValue(rowIndex, 'GST_ID', selectedVat.ID);
+
+          e.component.cellValue(
+            rowIndex,
+            'GST_PERC',
+            Number(selectedVat.DESCRIPTION),
+          );
+        }
 
         e.row.data.CGST = 0;
         e.row.data.SGST = 0;
       };
 
-      //  NEW: Enter → add row
+      // ✅ auto open dropdown
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 50);
+      };
+
+      // ✅ ENTER → add row
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
           const grid = this.itemsGridRef?.instance;
 
           setTimeout(() => {
-            //  1. Commit current edit
             grid.saveEditData();
 
-            //  2. Create new row
+            if (this.hasEmptyRow()) return;
+
+            const baseRow = this.creditFormData.NOTE_DETAIL[0] || {};
+
             const newRow = {
               SL_NO: this.creditFormData.NOTE_DETAIL.length + 1,
               ledgerCode: '',
               ledgerName: '',
               particulars: '',
               Amount: '',
-              GST_PERC: '',
-              GST: 0,
-              CGST: 0,
-              SGST: 0,
+              GST_PERC: null,
+              GST_ID: null,
+              CGST: baseRow.CGST || 0,
+              SGST: baseRow.SGST || 0,
               gstAmount: '',
               HEAD_ID: null,
             };
 
-            //Only ONE push
-            if (this.hasEmptyRow()) {
-              return; // stop if empty row exists
-            }
+            // ✅ CORRECT ARRAY
+            this.creditFormData.NOTE_DETAIL = [
+              ...this.creditFormData.NOTE_DETAIL,
+              newRow,
+            ];
 
-            this.creditFormData.NOTE_DETAIL.push(newRow);
-            // this.updateSlNo();
-            // 3. Refresh grid
+            // refresh
             grid.option('dataSource', [...this.creditFormData.NOTE_DETAIL]);
             grid.refresh();
 
-            // 4. Focus new row first column
+            // focus new row
             setTimeout(() => {
               const visibleRows = grid.getVisibleRows();
+
               const newRowIndex = visibleRows.findIndex(
-                (r) => r.data === newRow,
+                (r: any) => r.data === newRow,
               );
 
               if (newRowIndex >= 0) {
                 grid.editCell(newRowIndex, 'ledgerCode');
               }
-            }, 100);
+            }, 150);
           }, 50);
         }
       };
-
-      // keep dropdown auto-open
-      e.editorOptions.onFocusIn = (args: any) => {
-        setTimeout(() => {
-          args.component.open();
-        }, 0);
-      };
     }
 
-    if (e.dataField === 'CGST' || e.dataField === 'SGST') {
-      const originalOnValueChanged = e.editorOptions.onValueChanged;
+    // if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+    //   const originalOnValueChanged = e.editorOptions.onValueChanged;
 
-      e.editorOptions.onValueChanged = (args: any) => {
-        if (originalOnValueChanged) {
-          originalOnValueChanged(args);
-        }
+    //   e.editorOptions.onValueChanged = (args: any) => {
+    //     if (originalOnValueChanged) {
+    //       originalOnValueChanged(args);
+    //     }
 
-        e.setValue(args.value);
+    //     e.setValue(args.value);
 
-        // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
-        e.row.data.GST_PERC = 0;
-      };
-    }
+    //     // ✅ CLEAR IGST WHEN CGST / SGST IS ENTERED
+    //     e.row.data.GST_PERC = 0;
+    //   };
+    // }
   }
 
   // onEditorPreparing(e: any) {
@@ -1255,7 +1287,7 @@ export class AddCreditNoteComponent {
           AMOUNT: amount,
 
           // ✅ Always pass only GST_PERC
-          GST_PERC: gstPerc,
+          GST_PERC: row.GST_ID,
 
           // ❌ No split
           CGST: 0,
@@ -1422,6 +1454,11 @@ export class AddCreditNoteComponent {
   cancel() {
     this.popupClosed.emit();
   }
+
+  getGstDisplayValue = (row: any) => {
+    const percent = row.GST_PERC ?? 0;
+    return `${percent} %`;
+  };
 }
 
 @NgModule({

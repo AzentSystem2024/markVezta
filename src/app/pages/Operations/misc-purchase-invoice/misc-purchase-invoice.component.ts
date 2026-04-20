@@ -213,29 +213,31 @@ export class MiscPurchaseInvoiceComponent {
         new Promise((resolve) => {
           this.dataService.getMiscPurchInvoiceMainList(payload).subscribe({
             next: (response: any) => {
-              const list = (response?.Data || [])
+              const list = (response?.List || [])
                 .map((item: any) => {
-                  let dateValue: Date;
+                  let dateValue = null;
 
-                  if (
-                    typeof item.SALE_DATE === 'string' &&
-                    item.SALE_DATE.includes('-')
-                  ) {
-                    const [day, month, year] =
-                      item.SALE_DATE.split('-').map(Number);
-                    dateValue = new Date(year, month - 1, day);
-                  } else {
-                    dateValue = new Date(item.SALE_DATE);
+                  if (item.PURCH_DATE) {
+                    // ISO format (your case)
+                    if (item.PURCH_DATE.includes('T')) {
+                      dateValue = new Date(item.PURCH_DATE);
+                    }
+                    // DD-MM-YYYY format
+                    else if (item.PURCH_DATE.includes('-')) {
+                      const [day, month, year] =
+                        item.PURCH_DATE.split('-').map(Number);
+                      dateValue = new Date(year, month - 1, day);
+                    }
                   }
 
                   return {
                     ...item,
-                    SALE_DATE: dateValue,
+                    PURCH_DATE: dateValue,
                   };
                 })
                 .sort((a: any, b: any) => {
-                  const numA = Number(a.DOC_NO.match(/\d+$/)?.[0] || 0);
-                  const numB = Number(b.DOC_NO.match(/\d+$/)?.[0] || 0);
+                  const numA = Number(a.PURCH_NO.match(/\d+$/)?.[0] || 0);
+                  const numB = Number(b.PURCH_NO.match(/\d+$/)?.[0] || 0);
                   return numB - numA; // descending
                 });
 
@@ -392,7 +394,7 @@ export class MiscPurchaseInvoiceComponent {
     }
 
     this.filteredInvoiceList = this.invoiceArray.filter((item: any) => {
-      const invoiceDate = item.SALE_DATE;
+      const invoiceDate = item.PURCH_DATE;
       return invoiceDate >= startDate && invoiceDate <= endDate;
     });
   }
@@ -482,13 +484,13 @@ export class MiscPurchaseInvoiceComponent {
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
+    const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color = status === 'Approved' ? '#5cac6fff' : '#d87f7fff';
+    icon.title = status === 'Approved' ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -499,7 +501,7 @@ export class MiscPurchaseInvoiceComponent {
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
-      if (e.data.TRANS_STATUS === 5) {
+      if (e.data.STATUS === 5) {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
         if (deleteButton) {
           deleteButton.style.display = 'none';
@@ -512,17 +514,17 @@ export class MiscPurchaseInvoiceComponent {
     event.cancel = true;
 
     const invoiceId = event.data.TRANS_ID;
-    const transStatus = event.data.TRANS_STATUS;
+    const transStatus = event.data.STATUS;
 
     //  SET FLAG HERE
-    this.isReadOnlyInvoice = transStatus === 5;
+    this.isReadOnlyInvoice = transStatus === 'Approved';
 
     this.dataService
-      .selectInvoiceRetail(invoiceId)
+      .selectMiscPurchInvoice(invoiceId)
       .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
-
-        if (transStatus === 5) {
+        this.selectedInvoice = { ...this.selectedInvoice };
+        if (transStatus === 'Approved') {
           this.isViewInvoice = true;
         } else {
           this.isEditInvoice = true;
@@ -531,7 +533,7 @@ export class MiscPurchaseInvoiceComponent {
   }
 
   onDeleteInvoice(event: any) {
-    if (event.data.TRANS_STATUS === 5) {
+    if (event.data.STATUS === 'Approved') {
       event.cancel = true;
       notify('Invoice cannot be deleted.', 'error', 2000);
       return;
@@ -539,7 +541,7 @@ export class MiscPurchaseInvoiceComponent {
     const invoiceId = event.data.TRANS_ID;
     event.cancel = true;
     // Call your delete API
-    this.dataService.deleteInvoiceRetail(invoiceId).subscribe(
+    this.dataService.deleteMiscPurchInvoice(invoiceId).subscribe(
       (response: any) => {
         if (response) {
           notify(

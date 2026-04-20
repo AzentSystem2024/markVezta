@@ -218,13 +218,16 @@
           [caption]="vatTitle + '%'"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 0 }"
+          [calculateDisplayValue]="getGstDisplayValue"
           [lookup]="{
             dataSource: VatClass,
-            valueExpr: 'VALUE',
+            valueExpr: 'ID',
             displayExpr: 'DESCRIPTION',
           }"
         >
         </dxi-column>
+
+        <dxi-column dataField="GST_ID" [visible]="false"></dxi-column>
 
         <!-- <dxi-column
           dataField="CGST"

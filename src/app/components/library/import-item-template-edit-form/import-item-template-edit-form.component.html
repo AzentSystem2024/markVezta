@@ -9,16 +9,36 @@
             <dx-text-box
               label="Template Name"
               [(value)]="formModel.TEMPLATE_NAME"
-              stylingMode="filled"
-            ></dx-text-box>
+              labelMode="floating"
+            >
+
+            <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Template Name is required"
+            ></dxi-validation-rule>
+            <dxi-validation-rule
+              type="pattern"
+              [pattern]="'^[a-zA-Z0-9]+$'"
+              message="Only alphanumeric characters are allowed"
+            ></dxi-validation-rule>
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateTemplateNameExists.bind(this)"
+              message="Template Name already exists"
+            ></dxi-validation-rule>
+          </dx-validator>
+
+          </dx-text-box>
           </div>
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
+                class="mt-2 mb-2"
                 label="Remarks"
                 [(value)]="formModel.REMARKS"
-                stylingMode="filled"
+                labelMode="floating"
               ></dx-text-box>
             </div>
             </dxi-item>
@@ -50,8 +70,9 @@
     </dxi-item>
     
 </dx-form>
+
 <div
-      class="form-popup-buttons-container"
+      class="form-popup-buttons-container mt-5"
       
     >
       <dx-button

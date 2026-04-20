@@ -678,7 +678,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}TransferIn/gettrout`, payload);
   }
 
-    public getItemsforTransferIn(id: any, companyId: any): Observable<any> {
+  public getItemsforTransferIn(id: any, companyId: any): Observable<any> {
     const reqBodyData = { TRANSFER_ID: id, COMPANY_ID: companyId };
     return this.http.post(`${this.apiUrl}TransferIn/getitem`, reqBodyData);
   }
@@ -1591,7 +1591,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}country/save`, data);
   }
   removeCountry(id: any) {
-    return this.http.post(`${this.apiUrl}country/delete/` + id,{});
+    return this.http.post(`${this.apiUrl}country/delete/` + id, {});
   }
   updateCountry(ID: any, CODE: any, COUNTRY_NAME: any): Observable<any> {
     const data = { ID, CODE, COUNTRY_NAME };
@@ -3494,10 +3494,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}importitemlog/insert`, data);
   }
   selectImportTemplateData(id: number) {
-    return this.http.post<any>(
-      `${this.apiUrl}/importtemplate/select/` + id,
-      {},
-    );
+    return this.http.post<any>(`${this.apiUrl}importtemplate/select/` + id, {});
   }
   public getImportTemplateData(): Observable<any> {
     return this.http.post(`${this.apiUrl}importtemplate/list`, {});
@@ -3519,11 +3516,8 @@ The result can be exported to HTML or Markdown.`;
 
     return this.http.post(`${this.apiUrl}importtemplate/insert`, data);
   }
-  removeImportTemplateData(id: number, data: object) {
-    return this.http.post<any>(
-      `${this.apiUrl}importtemplate/delete/ + id`,
-      data,
-    );
+  removeImportTemplateData(id: number) {
+    return this.http.post<any>(`${this.apiUrl}importtemplate/delete/` + id, {});
   }
 
   //  ion Schema
@@ -6048,7 +6042,7 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}StockAdjustment/edit`, payload);
   }
-  List_Stock_Adjustment_Data(item:any) {
+  List_Stock_Adjustment_Data(item: any) {
     const payload = item;
     return this.http.post(`${this.apiUrl}StockAdjustment/list`, payload);
   }
@@ -6416,6 +6410,66 @@ The result can be exported to HTML or Markdown.`;
   //------------------------------------MISC-PURCHASE-INVOICE-----------------------------------------------//
   getMiscPurchInvoiceMainList(items: any): Observable<any> {
     const data = items;
-    return this.http.post(`${this.apiUrl}miscPurchInvoice/list`, data);
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/list`, data);
+  }
+
+  saveMiscPurchInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/insert`, data);
+  }
+
+  selectMiscPurchInvoice(id: number) {
+    return this.http.post<any>(
+      `${this.apiUrl}MiscPurchInvoice/select/` + id,
+      {},
+    );
+  }
+
+  updateMiscPurchInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/update`, data);
+  }
+
+  approveMiscPurchInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}MiscPurchInvoice/commit`, data);
+  }
+
+  deleteMiscPurchInvoice(id: number) {
+    return this.http.post<any>(
+      `${this.apiUrl}MiscPurchInvoice/delete/` + id,
+      {},
+    );
+  }
+  //-------------------------------------MISCELLANOUES-SALES-INVOICE--------------------------------------//
+  getMiscSalesInvoiceMainList(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/list`, data);
+  }
+
+  insertMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/insert`, data);
+  }
+
+  UpdateMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/update`, data);
+  }
+
+    ApproveMiscSalesInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscSales/commit`, data);
+  }
+
+  selectMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}MiscSales/select/` + id, {});
+  }
+
+  deleteMiscSalesInvoice(id: number) {
+    return this.http.post<any>(`${this.apiUrl}MiscSales/delete/` + id, {});
+  }
+
+  //=========================store wise stock view===============================
+    StockView_branch(payload: any) {
+    const getEndpoint = this.apiUrl + 'StockMovementRpt/storewisestock';
+    return this.http.post(getEndpoint, payload);
   }
 }
