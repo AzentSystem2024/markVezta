@@ -169,11 +169,11 @@
             message="Max 250 characters allowed"
           ></dxi-validation-rule>
         </dxi-column>
-        <dxi-column
+        <!-- <dxi-column
           dataField="HSN_CODE"
           caption="HSN Code"
           dataType="string"
-        ></dxi-column>
+        ></dxi-column> -->
         <dxi-column
           dataField="Amount"
           caption="Amount"
@@ -190,14 +190,17 @@
           dataField="GST_PERC"
           [caption]="vatTitle + '%'"
           alignment="right"
+          [calculateDisplayValue]="getGstDisplayValue"
           [format]="{ type: 'fixedPoint', precision: 0 }"
           [lookup]="{
             dataSource: VatClass,
-            valueExpr: 'VALUE',
+            valueExpr: 'ID',
             displayExpr: 'DESCRIPTION',
           }"
         >
         </dxi-column>
+
+        <dxi-column dataField="GST_ID" [visible]="false"></dxi-column>
 
         <dxi-column
           dataField="gstAmount"

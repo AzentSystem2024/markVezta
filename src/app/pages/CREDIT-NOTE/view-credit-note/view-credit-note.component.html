@@ -140,14 +140,8 @@
       ></dxi-column>
       <dxi-column
         dataField="GST_PERC"
-        [caption]="
-          selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-            ? ' VAT %'
-            : ' GST %'
-        "
+        [caption]="vatTitle + '%'"
         dataType="number"
-        [visible]="showGST"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
       <dxi-column
@@ -177,11 +171,11 @@
         [allowEditing]="false"
       ></dxi-column>
 
-      <dxi-column
+      <!-- <dxi-column
         dataField="HSN_CODE"
         caption="HSN Code"
         dataType="string"
-      ></dxi-column>
+      ></dxi-column> -->
 
       <dxi-column
         dataField="Total"
