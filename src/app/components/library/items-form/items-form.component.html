@@ -1135,9 +1135,12 @@
 
     <dxi-tab title="Supplier" *ngIf="newItems.TYPE_ID !== 8">
       <dxi-item>
+        <div class="grid-container">
         <dx-data-grid
           #supplierGridRef
           class="grid theme-dependent"
+          rowAlternationInterval="2"
+          [rowAlternationEnabled]="true"
           [columnAutoWidth]="true"
           height="300"
           keyExpr="ID"
@@ -1146,12 +1149,12 @@
           (onEditorPreparing)="onEditorPreparing($event)"
           (onRowInserted)="onRowInserted($event)"
           [editing]="{
-            mode: 'cell',
-            allowUpdating: true,
-            allowDeleting: true,
-            allowAdding: true,
-            useIcons: true,
-          }"
+          mode: 'cell',
+          allowUpdating: true,
+          allowDeleting: true,
+          allowAdding: false,
+          useIcons: true,
+        }"
         >
           <!-- <dxo-editing mode="row" [allowAdding]="true" [allowDeleting]="true"> -->
           <!-- </dxo-editing> -->
@@ -1197,6 +1200,7 @@
           <dxi-column dataField="IS_CONSIGNMENT" [visible]="false">
           </dxi-column>
         </dx-data-grid>
+        </div>
       </dxi-item>
     </dxi-tab>
 

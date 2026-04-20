@@ -519,3 +519,8 @@ button:hover {
 //   align-items: center;
 //   justify-content: center;
 // }
+
+::ng-deep .dx-data-grid .dx-row > td:empty::after {
+  content: '\00a0'; /* non-breaking space */
+  display: block;
+}
