@@ -173,7 +173,7 @@ export class EditDebitComponent {
       this.userId = userData.USER_ID;
       this.finId = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
     }
-    this.getVatPercentList();
+    // this.getVatPercentList();
     // this.getDocNo();
     this.getLedgerCodeDropdown();
     // this.getSupplierDropdown();
@@ -184,6 +184,8 @@ export class EditDebitComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['debitFormData'] && this.debitFormData?.length) {
       const data = this.debitFormData[0];
+
+      this.selectedCompanyId = data.COMPANY_ID;
 
       setTimeout(() => {
         this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
@@ -227,20 +229,49 @@ export class EditDebitComponent {
       // -----------------------------
       // STEP 3: BUILD GRID ROWS
       // -----------------------------
-      this.getLedgerCodeDropdown()
+      Promise.all([
+        this.getLedgerCodeDropdown(),
+        this.getVatPercentListPromise(), // 👈 create this
+      ])
         .then(() => {
           this.noteDetails = (data.NOTE_DETAIL || []).map(
             (item: any, index: number) => {
               const match = this.ledgerList.find(
                 (l: any) => l.HEAD_ID === item.HEAD_ID,
               );
+              // let gstPerc = 0;
+
+              // if (item.GST_PERC && item.GST_PERC > 0) {
+              //   gstPerc = item.GST_PERC;
+              // } else {
+              //   gstPerc = (Number(item.CGST) || 0) + (Number(item.SGST) || 0);
+              // }
+
+              const vatId = Number(item.GST_PERC);
+              console.log(vatId, 'vatId');
+
+              console.log(item, 'item');
+
+              const selectedVat = this.VatClass?.find(
+                (v: any) => v.ID === vatId,
+              );
+
+              console.log(this.VatClass, 'VatClass');
+
+              console.log(selectedVat, 'selectedVat');
+
               let gstPerc = 0;
 
-              if (item.GST_PERC && item.GST_PERC > 0) {
-                gstPerc = item.GST_PERC;
-              } else {
-                gstPerc = (Number(item.CGST) || 0) + (Number(item.SGST) || 0);
+              //  if IGST
+              if (selectedVat) {
+                gstPerc = Number(selectedVat.DESCRIPTION);
               }
+
+              // //  if CGST + SGST (same state)
+              // if (!gstPerc) {
+              //   gstPerc = (Number(item.CGST) || 0) + (Number(item.SGST) || 0);
+              // }
+
               return {
                 SL_NO: index + 1,
                 ...item,
@@ -250,7 +281,9 @@ export class EditDebitComponent {
                 Amount: item.AMOUNT || '',
                 gstAmount: item.GST_AMOUNT || '',
                 HSN_CODE: item.HSN_CODE || this.HSNCODE,
+                // GST_PERC: gstPerc,
                 GST_PERC: gstPerc,
+                GST_ID: item.GST_PERC,
                 CGST: 0,
                 SGST: 0,
               };
@@ -281,7 +314,6 @@ export class EditDebitComponent {
     const grid = this.itemsGridRef.instance;
     const rows = grid.getVisibleRows();
 
-    // Prevent adding if any existing row is incomplete
     const hasIncompleteRow = rows.some(
       (r: any) => !r.data.ledgerName || !r.data.Amount,
     );
@@ -291,7 +323,6 @@ export class EditDebitComponent {
 
     const nextSlNo = this.noteDetails.length + 1;
 
-    // ---------- NEW ROW BASE ----------
     const newRow: any = {
       SL_NO: nextSlNo,
       ledgerCode: null,
@@ -302,24 +333,16 @@ export class EditDebitComponent {
       HSN_CODE: '',
       CGST: 0,
       SGST: 0,
-      GST_PERC: 0,
+      GST_PERC: null, // ✅ keep empty
     };
 
-    // ---------- GST / CGST+SGST FROM SAVED DATA ----------
-    const baseRow = this.noteDetails[0]; // source of truth
+    const baseRow = this.noteDetails[0];
 
     if (baseRow) {
-      //ALWAYS USE GST_PERC FOR UI
-      newRow.GST_PERC = baseRow.GST_PERC || 0;
-
-      //keep split hidden
-      newRow.CGST = 0;
-      newRow.SGST = 0;
-
-      newRow.HSN_CODE = baseRow.HSN_CODE || '';
+      // ❌ removed GST copy
+      newRow.HSN_CODE = baseRow.HSN_CODE || ''; // ✅ keep this if needed
     }
 
-    // ---------- PUSH ROW & FOCUS ----------
     this.noteDetails.push(newRow);
 
     setTimeout(() => {
@@ -328,7 +351,6 @@ export class EditDebitComponent {
       gridInstance?.editCell(newRowIndex, 'ledgerCode');
     }, 100);
   }
-
   ngAfterViewInit(): void {
     // Wait for the grid and everything else to stabilize
     setTimeout(() => {
@@ -354,18 +376,36 @@ export class EditDebitComponent {
     e.component.option('value', this.debitFormData.TRANS_DATE);
   }
 
-  getVatPercentList() {
-    console.log('VATPERCENTAGEEEEEEEEEEEEEEEE');
-    const payload = {
-      COMPANY_ID: this.selectedCompanyId,
-      NAME: 'VAT_PERC',
-    };
+  // getVatPercentList() {
+  //   console.log('VATPERCENTAGEEEEEEEEEEEEEEEE');
+  //   const payload = {
+  //     COMPANY_ID: this.selectedCompanyId,
+  //     NAME: 'VAT_PERC',
+  //   };
 
-    this.dataService.getDropdownData(payload).subscribe((data) => {
-      this.VatClass = data.map((item: any) => ({
-        ...item,
-        VALUE: Number(item.DESCRIPTION).toString(),
-      }));
+  //   this.dataService.getDropdownData(payload).subscribe((data) => {
+  //     this.VatClass = data.map((item: any) => ({
+  //       ...item,
+  //       VALUE: Number(item.DESCRIPTION).toString(),
+  //     }));
+  //   });
+  // }
+
+  getVatPercentListPromise(): Promise<void> {
+    return new Promise((resolve) => {
+      const payload = {
+        COMPANY_ID: this.selectedCompanyId,
+        NAME: 'VAT_PERC',
+      };
+
+      this.dataService.getDropdownData(payload).subscribe((data) => {
+        this.VatClass = data.map((item: any) => ({
+          ...item,
+          VALUE: Number(item.DESCRIPTION),
+          DESCRIPTION: Number(item.DESCRIPTION).toString(),
+        }));
+        resolve();
+      });
     });
   }
 
@@ -569,9 +609,18 @@ export class EditDebitComponent {
     });
   }
 
+  hasEmptyRow(): boolean {
+    return (this.debitFormData.NOTE_DETAIL || []).some((row: any) => {
+      const hasLedger = !!row.ledgerCode || !!row.ledgerName;
+      const hasAmount = Number(row.Amount) > 0;
+
+      // ❌ EMPTY ROW = no ledger AND no amount
+      return !hasLedger && !hasAmount;
+    });
+  }
+
   onEditorPreparing(e: any) {
     if (
-      e.dataField === 'SL_NO' ||
       e.dataField === 'ledgerCode' ||
       e.dataField === 'ledgerName' ||
       e.dataField === 'particulars' ||
@@ -605,65 +654,21 @@ export class EditDebitComponent {
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
-
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
-          }, 50);
-        }
-      };
     }
     if (e.parentType !== 'dataRow') return;
     const rowIndex = e.row?.rowIndex;
 
-    // ➤ SL_NO: Move to ledgerCode on Enter
-    if (e.dataField === 'SL_NO') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
-
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
-
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'ledgerCode'));
-          }, 50);
-        }
-      };
-    }
-
-    // ➤ ledgerCode: open dropdown on Enter, move to ledgerName on second Enter
     if (e.dataField === 'ledgerCode') {
-      let enterPressedOnce = false;
-
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
-
-          if (!enterPressedOnce) {
-            enterPressedOnce = true;
-            setTimeout(() => {
-              if (event.component?.open) {
-                event.component.open(); // open dropdown
-              }
-            }, 50);
-          } else {
-            enterPressedOnce = false;
-            setTimeout(() => {
-              this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-            }, 50);
-          }
-        }
+      // ✅ Open dropdown on focus
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 0);
       };
 
+      // REMOVE your existing onKeyDown completely
+
+      //  Move on value selection
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_CODE === args.value,
@@ -672,31 +677,17 @@ export class EditDebitComponent {
         e.setValue(args.value);
 
         if (selectedLedger) {
-          // 1️⃣ Set ledger name
+          // bind ledger name
           e.component.cellValue(
             rowIndex,
             'ledgerName',
             selectedLedger.HEAD_NAME,
           );
 
-          // 2️⃣ Get HSN & GST from session
-          const sessionData = JSON.parse(
-            sessionStorage.getItem('savedUserData'),
-          );
-          // DO NOT TOUCH GST HERE
-          // GST already exists from saved data
-
-          if (!e.row.data.HSN_CODE) {
-            e.component.cellValue(
-              rowIndex,
-              'HSN_CODE',
-              this.noteDetails[0]?.HSN_CODE || this.HSNCODE,
-            );
-          }
-
-          // 5️⃣ Move to next field
+          //  MOVE FOCUS HERE (THIS IS THE FIX)
           setTimeout(() => {
-            this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
+            const grid = this.itemsGridRef?.instance;
+            grid.editCell(rowIndex, 'ledgerName');
           }, 50);
         }
       };
@@ -704,26 +695,45 @@ export class EditDebitComponent {
 
     // ➤ ledgerName: move to particulars on Enter
     if (e.dataField === 'ledgerName') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          event.event.preventDefault();
-          // setTimeout(() => {
-          //   this.itemsGridRef?.instance?.editCell(rowIndex, 'particulars');
-          // }, 50);
-        }
+      // open dropdown on focus
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 0);
       };
 
+      // 🔥 MAIN FIX: move on selection
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_NAME === args.value,
         );
+
         e.setValue(args.value);
+
         if (selectedLedger) {
+          // sync code
           e.component.cellValue(
             rowIndex,
             'ledgerCode',
             selectedLedger.HEAD_CODE,
           );
+        }
+
+        // 🔥 MOVE TO PARTICULARS HERE
+        setTimeout(() => {
+          const grid = this.itemsGridRef?.instance;
+          grid.editCell(rowIndex, 'particulars');
+        }, 50);
+      };
+
+      // optional: Enter also moves (keyboard users)
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'particulars');
+          }, 50);
         }
       };
     }
@@ -744,218 +754,99 @@ export class EditDebitComponent {
     if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const rowData = e.row?.data;
-
-          // validate
-          if (!rowData.ledgerCode || rowData.Amount == null) {
-            return;
-          }
-
-          // prevent multiple empty rows
-          const lastRow = this.noteDetails[this.noteDetails.length - 1];
-          if (!lastRow.ledgerCode && !lastRow.Amount) {
-            return;
-          }
-
-          const nextSlNo = this.noteDetails.length + 1;
-
-          const newRow: any = {
-            SL_NO: nextSlNo,
-            ledgerCode: '',
-            ledgerName: '',
-            particulars: '',
-            Amount: null,
-            gstAmount: null,
-            HSN_CODE: '',
-            CGST: 0,
-            SGST: 0,
-            GST_PERC: 0,
-          };
-
-          // ⭐ COPY TAX STRUCTURE FROM FIRST ROW
-          const baseRow = this.noteDetails[0];
-
-          if (baseRow) {
-            // ALWAYS USE GST_PERC FOR UI
-
-            let gstPerc = 0;
-
-            if (baseRow.GST_PERC && baseRow.GST_PERC > 0) {
-              gstPerc = baseRow.GST_PERC;
-            } else {
-              // if old data had CGST + SGST → combine
-              gstPerc =
-                (Number(baseRow.CGST) || 0) + (Number(baseRow.SGST) || 0);
-            }
-
-            newRow.GST_PERC = gstPerc;
-
-            //  DO NOT USE SPLIT IN UI
-            newRow.CGST = 0;
-            newRow.SGST = 0;
-
-            //Keep HSN
-            newRow.HSN_CODE = baseRow.HSN_CODE || '';
-          }
-
-          this.noteDetails.push(newRow);
-
-          grid.option('dataSource', [...this.noteDetails]);
-
-          //  focus new row ledgerCode
+          const grid = e.component;
+          const rowIndex = e.row.rowIndex;
+          // Move focus to the "ledgerCode" column in the same row
           setTimeout(() => {
-            const visibleRows = grid.getVisibleRows();
-            const newRowIndex = visibleRows.findIndex((r) => r.data === newRow);
-
-            if (newRowIndex >= 0) {
-              grid.editCell(newRowIndex, 'ledgerCode');
-            }
-          }, 80);
+            grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+          });
         }
       };
     }
     // if (e.dataField === 'Amount') {
     //   e.editorOptions.onKeyDown = (event: any) => {
     //     if (event.event.key === 'Enter') {
-    //       const grid = e.component;
-    //       const rowIndex = e.row.rowIndex;
-    //       // Move focus to the "ledgerCode" column in the same row
-    //       setTimeout(() => {
-    //         grid.focus(grid.getCellElement(rowIndex, 'GST_PERC'));
+    //       // simulate TAB key (DevExtreme handles this correctly)
+    //       const eKey = event.event;
+
+    //       const tabEvent = new KeyboardEvent('keydown', {
+    //         key: 'Tab',
+    //         code: 'Tab',
+    //         keyCode: 9,
+    //         which: 9,
+    //         bubbles: true,
     //       });
+
+    //       eKey.target.dispatchEvent(tabEvent);
     //     }
     //   };
     // }
-    // if (e.dataField === 'GST_PERC') {
-    //   e.editorOptions.onKeyDown = (event: any) => {
-    //     if (event.event.key === 'Enter') {
-    //       event.event.preventDefault();
 
-    //       const grid = this.itemsGridRef?.instance;
-    //       const rowData = e.row?.data;
-
-    //       // ✅ Validate ledgerCode and Amount before proceeding
-    //       if (!rowData.ledgerCode) {
-    //         notify(
-    //           'Please select a Ledger Code before proceeding.',
-    //           'warning',
-    //           2000
-    //         );
-    //         return;
-    //       }
-    //       if (rowData.Amount == null || rowData.Amount <= 0) {
-    //         notify(
-    //           'Please enter a valid Amount before proceeding.',
-    //           'warning',
-    //           2000
-    //         );
-    //         return;
-    //       }
-
-    //       // ✅ Ensure gstAmount is not greater than Amount
-    //       if (rowData.Amount != null && event.value > rowData.Amount) {
-    //         notify('GST Amount cannot be greater than Amount.', 'error', 2000);
-    //         event.value = rowData.Amount;
-    //         e.setCellValue(rowData, event.value);
-    //         return;
-    //       }
-
-    //       // ✅ Force the editor to lose focus and commit its value
-    //       const editorElement = event.event.target as HTMLElement;
-    //       editorElement.blur();
-
-    //       // ✅ Delay to let grid register the committed value
-    //       setTimeout(() => {
-    //         grid?.saveEditData();
-
-    //         // ✅ Recalculate net total
-    //         const rows = grid.getVisibleRows().map((r) => r.data);
-    //         let netTotal = 0;
-    //         for (const row of rows) {
-    //           const amount = parseFloat(row.Amount) || 0;
-    //           const gst = parseFloat(row.gstAmount) || 0;
-    //           netTotal += amount + gst;
-    //         }
-    //         this.netAmountDisplay = netTotal;
-
-    //         // ✅ Add new row only if current row is fully filled
-    //         if (
-    //           rowData.ledgerCode &&
-    //           rowData.Amount != null &&
-    //           rowData.gstAmount != null
-    //         ) {
-    //           // ✅ Check if last row is empty, prevent multiple empty rows
-    //           const lastRow = this.noteDetails[this.noteDetails.length - 1];
-    //           if (!lastRow || (lastRow.ledgerCode && lastRow.Amount != null)) {
-    //             const newRow = {
-    //               SL_NO: this.noteDetails.length + 1,
-    //               HEAD_ID: '',
-    //               AMOUNT: '',
-    //               GST_AMOUNT: '',
-    //               REMARKS: '',
-    //             };
-    //             this.noteDetails.push(newRow);
-
-    //             setTimeout(() => {
-    //               grid.option('dataSource', [...this.noteDetails]);
-
-    //               setTimeout(() => {
-    //                 const visibleRows = grid.getVisibleRows();
-    //                 const newRowIndex = visibleRows.findIndex(
-    //                   (r) => r.data === newRow
-    //                 );
-    //                 if (newRowIndex >= 0) {
-    //                   grid.editCell(newRowIndex, 'ledgerCode');
-    //                 }
-    //               }, 50);
-    //             }, 50);
-    //           }
-    //         }
-    //       }, 50);
-    //     }
-
-    //     if (event.event.key === 'Tab') {
-    //       event.event.preventDefault();
-    //       const grid = this.itemsGridRef?.instance;
-    //       const editorElement = event.event.target as HTMLElement;
-
-    //       editorElement.blur();
-
-    //       setTimeout(() => {
-    //         grid?.saveEditData();
-
-    //         // ✅ Recalculate net total
-    //         const rows = grid.getVisibleRows().map((r) => r.data);
-    //         let netTotal = 0;
-    //         for (const row of rows) {
-    //           const amount = parseFloat(row.Amount) || 0;
-    //           const gst = parseFloat(row.gstAmount) || 0;
-    //           netTotal += amount + gst;
-    //         }
-    //         this.netAmountDisplay = netTotal;
-
-    //         setTimeout(() => {
-    //           this.narrationRef?.instance?.focus();
-    //         }, 50);
-    //       }, 50);
-    //     }
-    //   };
-    // }
     if (e.dataField === 'GST_PERC') {
-      const originalOnValueChanged = e.editorOptions.onValueChanged;
+      const original = e.editorOptions.onValueChanged;
 
       e.editorOptions.onValueChanged = (args: any) => {
-        // keep existing behavior
-        if (originalOnValueChanged) {
-          originalOnValueChanged(args);
+        if (original) original(args);
+
+        const selectedVat = this.VatClass.find((v: any) => v.ID === args.value);
+
+        if (selectedVat) {
+          e.component.cellValue(rowIndex, 'GST_ID', selectedVat.ID);
+
+          e.component.cellValue(
+            rowIndex,
+            'GST_PERC',
+            Number(selectedVat.DESCRIPTION),
+          );
         }
 
-        e.setValue(args.value);
-
-        // ✅ CLEAR CGST & SGST WHEN IGST IS ENTERED
         e.row.data.CGST = 0;
         e.row.data.SGST = 0;
+      };
+
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => {
+          args.component.open();
+        }, 50);
+      };
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const editor = event.component;
+
+          // 🔥 FIX: close dropdown instead of blocking
+          if (editor.option('opened')) {
+            editor.close();
+          }
+
+          event.event.preventDefault();
+
+          const grid = this.itemsGridRef?.instance;
+
+          setTimeout(() => {
+            grid.saveEditData();
+
+            const currentRow = e.row?.data;
+
+            if (
+              !currentRow?.ledgerCode &&
+              !currentRow?.ledgerName &&
+              !currentRow?.Amount
+            )
+              return;
+
+            grid.addRow();
+
+            setTimeout(() => {
+              const rows = grid.getVisibleRows();
+              const newRowIndex = rows.findIndex((r) => r.isNewRow);
+
+              if (newRowIndex >= 0) {
+                grid.editCell(newRowIndex, 'ledgerCode');
+              }
+            }, 100);
+          }, 100);
+        }
       };
     }
 
@@ -984,14 +875,6 @@ export class EditDebitComponent {
       }, 0);
     }
   }
-
-  // getDocNo() {
-  //   this.dataService.getDocNo().subscribe((response: any) => {
-  //     this.docNo = response.DOC_NO;
-
-  //     console. (response.DOC_NO, 'DOCNOOOOOOOOO');
-  //   });
-  // }
 
   onSummaryCalculated(e: any): void {
     if (e.name === 'netTotal') {
@@ -1106,7 +989,7 @@ export class EditDebitComponent {
             ROUND_OFF: this.debitFormData[0].ROUND_OFF,
             NOTE_DETAIL: this.noteDetails
               .filter(
-                (item) =>
+                (item: any) =>
                   item.ledgerCode ||
                   item.ledgerName ||
                   item.Amount ||
@@ -1118,7 +1001,7 @@ export class EditDebitComponent {
               )
               .map((item: any, index: number) => {
                 const match = this.ledgerList.find(
-                  (l) =>
+                  (l: any) =>
                     l.HEAD_CODE === item.ledgerCode ||
                     l.HEAD_NAME === item.ledgerName,
                 );
@@ -1127,7 +1010,8 @@ export class EditDebitComponent {
                   SL_NO: item.SL_NO || index + 1,
                   HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
                   AMOUNT: Number(item.Amount) || 0,
-                  GST_PERC: Number(item.GST_PERC) || 0,
+                  // GST_PERC: Number(item.GST_PERC) || 0,
+                  GST_PERC: Number(item.GST_ID) || 0,
                   GST_AMOUNT: gstAmount,
                   CGST: Number(item.CGST) || 0,
                   SGST: Number(item.SGST) || 0,
@@ -1191,7 +1075,7 @@ export class EditDebitComponent {
         ROUND_OFF: this.debitFormData[0].ROUND_OFF,
         NOTE_DETAIL: this.noteDetails
           .filter(
-            (item) =>
+            (item: any) =>
               item.ledgerCode ||
               item.ledgerName ||
               item.Amount ||
@@ -1202,7 +1086,7 @@ export class EditDebitComponent {
           )
           .map((item: any, index: number) => {
             const match = this.ledgerList.find(
-              (l) =>
+              (l: any) =>
                 l.HEAD_CODE === item.ledgerCode ||
                 l.HEAD_NAME === item.ledgerName,
             );
@@ -1211,7 +1095,7 @@ export class EditDebitComponent {
               SL_NO: item.SL_NO || index + 1,
               HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
               AMOUNT: Number(item.Amount) || 0,
-              GST_PERC: Number(item.GST_PERC) || 0,
+              GST_PERC: Number(item.GST_ID) || 0,
               GST_AMOUNT: gstAmount,
               REMARKS: item.particulars || '',
               CGST: item.CGST || 0,
@@ -1278,6 +1162,11 @@ export class EditDebitComponent {
   };
 
   onRoundOffChange() {}
+
+  getGstDisplayValue = (row: any) => {
+    const percent = row.GST_PERC ?? 0;
+    return `${percent} %`;
+  };
 }
 
 @NgModule({

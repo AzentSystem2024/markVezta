@@ -21,6 +21,8 @@ import {
   DxProgressBarModule,
   DxRadioGroupModule,
   DxSelectBoxModule,
+  DxSwitchModule,
+  DxTabPanelModule,
   DxTabsModule,
   DxTagBoxModule,
   DxTemplateModule,
@@ -47,16 +49,17 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./promotion-edit.component.scss'],
 })
 export class PromotionEditComponent {
+
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   worksheetData: any;
-  AllowCommitWithSave: string;
-  userId: string;
+  AllowCommitWithSave: any;
+  userId: any;
   store: any;
   itemsList: any;
   selectedStoreId: any;
-  itemStoresList: any;
-  itemIds: any[];
+  itemStoresList: any = [];
+  itemIds: any = [];
   filteredItems: any;
   selectedRowKeys: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -105,11 +108,11 @@ export class PromotionEditComponent {
     { value: 2, text: 'Price Level 2' },
     { value: 3, text: 'Price Level 3' },
   ];
-  selectedPriceLevel: string;
+  selectedPriceLevel: any;
   operationValue: string = '';
   selectedSchema: any;
   schemaLevelPromotion: any;
-  roundingValue: string;
+  roundingValue: any;
   onSaleStatus: boolean = false;
   selectedOperation: string = '';
   promotionName: any;
@@ -120,7 +123,7 @@ export class PromotionEditComponent {
     { label: 'Set Promotion Price To', value: 'defaultPrice' },
   ];
   promotionSchema: any;
-  tagTemplate = (data) => {
+  tagTemplate = (data: any) => {
     return `
       <div style="margin-right: 2px; display: inline-block; white-space: nowrap;">
         ${data.text}
@@ -128,8 +131,8 @@ export class PromotionEditComponent {
     `;
   };
   documentNo: string = '12345';
-  salePrice: number; // Store the final result after operation and rounding
-  selectedRowIndex: number;
+  salePrice: any; // Store the final result after operation and rounding
+  selectedRowIndex: any;
   selectedItem: any;
   selectedPrice: number = 0;
   selectedCost: any[] = [];
@@ -137,16 +140,16 @@ export class PromotionEditComponent {
   valueToUse: number[] = [];
   selectedRow: any;
   areDatesSelected = false;
-  worksheetPromotionSchema: any[] = [];
+  worksheetPromotionSchema: any = [];
   selectedId: any;
   selectedPromotionSchemaId: any;
   updatedItems: { [key: number]: any } = {};
-  selectedSchemaId: number; // To store the selected ID
-  selectedSchemaName: string;
+  selectedSchemaId: any; // To store the selected ID
+  selectedSchemaName: any;
   disableRightColumn = false;
   combinedData: any[] = [];
   promotionLevel: any;
-  showDropdown: boolean;
+  showDropdown: any;
   selectedPromotionLevel: any;
   selectedOption: string = 'onSaleStatus';
   defaultTextValue: any;
@@ -156,20 +159,20 @@ export class PromotionEditComponent {
   heading: string = 'Items on Promotion';
   filteredItemStoresList: any;
   originalGridHeight = '540px';
-  popupForItemsToGet: boolean;
+  popupForItemsToGet: any;
   selectedItems: any;
   selectedRowNew: any;
   selectedRowForNewList: any;
   combinedItem: any;
   selectedSchemaType: any;
-  isGet: number;
-  isBuy: number;
-  showError: boolean;
+  isGet: any;
+  isBuy: any;
+  showError: any;
   TimeFromArray: string[] = [];
   TimeToArray: string[] = [];
   isTimeRangeEnabled: boolean = false;
   timeRange: any;
-  isHappyHoursEnabled: boolean = false;
+  isHappyHoursEnabled: any;
   happyHoursPopup: boolean = false;
   IdInList: any;
   worksheetpromotionSchema: any;
@@ -178,9 +181,9 @@ export class PromotionEditComponent {
   filteredItemsWithIsGetTrue: any;
   remainingItemStoresList: any;
   filteredItemStoresListRemaining: any;
-  isLoading: boolean;
-  isGridVisible: boolean;
-  showGrid: boolean;
+  isLoading: boolean = false;
+  isGridVisible: boolean = false;
+  showGrid: boolean = false;
   selectedRowsData: any;
   selectedRowKeysNew: any;
   selectedRowsOfPopup: any;
@@ -189,7 +192,7 @@ export class PromotionEditComponent {
   wsNo: any;
   wsDate: any;
   selected_Company_id: any;
-
+  selectedTabIndex: any = 0
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -227,14 +230,15 @@ export class PromotionEditComponent {
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.userId = sessionStorage.getItem('UserId');
+    this.listItemsByMultipleStoreIds();
+
     this.sesstion_Details();
     this.schemaOptions();
     this.getPromotionData();
     // this.listStoreItemProperty();
     this.loadStores();
     const defaultStoreId = this.selectedStoreId.join(',');
-    this.listItemsByMultipleStoreIds(defaultStoreId);
-    // this.setHeightOfTheGrid()
+
   }
 
   onCheckboxChange(event: any): void {
@@ -244,23 +248,36 @@ export class PromotionEditComponent {
     }
   }
 
-  onHappyHoursChanged(isEnabled: boolean): void {
-    this.isHappyHoursEnabled = isEnabled;
+  // onHappyHoursChanged(isEnabled: boolean): void {
+  //   this.isHappyHoursEnabled = isEnabled;
 
-    if (!isEnabled) {
-      // Reset time values to '00:00' when disabled
-      this.fromTime = '00:00';
-      this.toTime = '00:00';
-    }
-  }
+  //   if (!isEnabled) {
+  //     // Reset time values to '00:00' when disabled
+  //     this.fromTime = '00:00';
+  //     this.toTime = '00:00';
+  //   }
+  // }
 
   getPromotionData() {
+    console.log(this.itemStoresList, '=======grid coloum and data')
+
     this.dataservice.getWorksheetData().subscribe((data) => {
       this.worksheetData = data;
+
+
       this.worksheetpromotionSchema =
-        this.worksheetData.worksheet_promotion_schema.filter(
-          (item: any) => item.IS_BUY === true,
-        );
+        this.worksheetData?.worksheet_promotion_schema || [];
+
+      this.itemIds = this.worksheetpromotionSchema.map((item: any) => +item.ITEM_ID);
+      const selectedIds = this.worksheetpromotionSchema.map((item: any) => item.ITEM_ID);
+
+      // AFTER itemStoresList is assigned
+      this.itemStoresList = (this.itemStoresList || []).map((item: any) => ({
+        ...item,
+        Selected: selectedIds.includes(item.ID)
+      }));
+
+      this.selectedRowKeys = selectedIds;
       this.wsNo = this.worksheetData.WS_NO;
 
       this.wsDate = this.worksheetData.WS_DATE
@@ -271,14 +288,14 @@ export class PromotionEditComponent {
         this.worksheetData.worksheet_promotion_schema[0].NARRATION;
       console.log(this.narration, 'NARRATION');
       this.itemIds = this.worksheetData.worksheet_promotion_schema.map(
-        (item) => +item.ITEM_ID,
+        (item: any) => +item.ITEM_ID,
       );
       // console.log(this.worksheetpromotionSchema, "WORKSHEET DATA IN EDITTTT");
       this.isBuy = this.worksheetpromotionSchema.some(
-        (item) => item.IS_BUY === true,
+        (item: any) => item.IS_BUY === true,
       );
       this.isGet = this.worksheetpromotionSchema.some(
-        (item) => item.IS_GET === true,
+        (item: any) => item.IS_GET === true,
       );
 
       this.timeFrom = this.worksheetpromotionSchema[0]?.TIME_FROM.split(
@@ -290,12 +307,12 @@ export class PromotionEditComponent {
 
       // console.log(this.timeFrom,this.timeTo,"???????????????????????????time")
       this.isHappyHoursEnabled = this.worksheetpromotionSchema.some(
-        (item) => item.IS_HAPPY_HOUR,
+        (item: any) => item.IS_HAPPY_HOUR,
       );
       // console.log(this.isHappyHoursEnabled, "ISHAPPYHOUR");
 
       this.filteredItemStoresList = this.worksheetpromotionSchema.filter(
-        (worksheetItem) => worksheetItem.IS_GET === true,
+        (worksheetItem: any) => worksheetItem.IS_GET === true,
       );
       if (this.worksheetpromotionSchema?.length) {
         this.fromDate = new Date(this.worksheetpromotionSchema[0].DATE_FROM);
@@ -317,24 +334,24 @@ export class PromotionEditComponent {
         this.worksheetpromotionSchema.length > 0
       ) {
         const hasSchemaId = this.worksheetpromotionSchema.some(
-          (promotion) => promotion.PROMOTION_SCHEMA_ID > 0,
+          (promotion: any) => promotion.PROMOTION_SCHEMA_ID > 0,
         );
         this.selectedOption = hasSchemaId
           ? 'schemaLevelPromotion'
           : 'onSaleStatus';
       }
       this.selectedRowKeys = this.worksheetpromotionSchema.map(
-        (item) => item.ITEM_ID,
+        (item: any) => item.ITEM_ID,
       );
-      this.selectedIds = this.combinedData
-        .filter((item) => !item.Selected) // Invert the condition to filter items where Selected is false
-        .map((item) => item.ITEM_ID);
+      this.selectedIds = this.itemStoresList
+        .filter((item: any) => item.Selected)
+        .map((item: any) => item.ITEM_ID);
       this.promotionName =
         this.worksheetData.worksheet_promotion_schema[0]?.PROMOTION_NAME || '';
       this.selectedSchemaId =
         this.worksheetpromotionSchema[0].PROMOTION_SCHEMA_ID || null;
       const storeIds = this.worksheetData.worksheet_item_store.map(
-        (store) => store.STORE_ID,
+        (store: any) => store.STORE_ID,
       );
       this.selectedStoreId = storeIds;
       if (
@@ -345,21 +362,14 @@ export class PromotionEditComponent {
         if (weekdays) {
           // Convert the comma-separated string to an array of numbers
           this.selectedDays = weekdays.split(',').map(Number);
-          // console.log('Selected Days for Edit:', this.selectedDays);
         }
       }
-      // this.itemIds = []
 
-      // console.log(this.itemIds,"ITEMIDS")
+
     });
   }
   setHeightOfTheGrid() {
-    // console.log(this.selectedItems,"FILTEREDITEMS<<<<<<<<<setHeightOfTheGrid>>>>>>>>>>")
-    // if (this.filteredItemStoresList.length === 0) {
-    //   this.originalGridHeight = '540px';
-    // } else {
-    //   this.originalGridHeight = '300px';  // Reset to the original height if not empty
-    // }
+
   }
 
   schemaOptions() {
@@ -372,23 +382,23 @@ export class PromotionEditComponent {
       console.log(this.worksheetpromotionSchema, '==========???');
 
       // Create a mapping for REMARKS and DESCRIPTION from promotionSchema
-      const remarksMapping = this.promotionSchema.reduce((acc, curr) => {
+      const remarksMapping = this.promotionSchema.reduce((acc: any, curr: any) => {
         acc[curr.DESCRIPTION] = curr.REMARKS;
         return acc;
       }, {});
 
       // Now, for each worksheetpromotionSchema, find the REMARKS by matching the PROMOTION_NAME
-      worksheetpromotionSchema.forEach((item) => {
+      worksheetpromotionSchema.forEach((item: any) => {
         const promotionName = item.PROMOTION_NAME;
         const remarksCode = remarksMapping[promotionName];
 
         if (remarksCode === '4') {
           // If REMARKS is 4, filter the items with isGet = true
           this.filteredItems = worksheetpromotionSchema.filter(
-            (worksheetItem) => worksheetItem.IS_GET === true,
+            (worksheetItem: any) => worksheetItem.IS_GET === true,
           );
           this.selectedRowForNewList = this.filteredItems.map(
-            (item) => item.ID,
+            (item: any) => item.ID,
           );
           console.log(
             'Filtered items with isGet = true and REMARKS = 4:',
@@ -418,7 +428,7 @@ export class PromotionEditComponent {
     return date;
   }
 
-  listItemsByMultipleStoreIds(storeIds: string): void {
+  listItemsByMultipleStoreIds(): void {
     const allStoreIds = '2,3,4'; // Define all store IDs here
 
     // Determine the payload based on the storeId
@@ -444,7 +454,7 @@ export class PromotionEditComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -487,11 +497,11 @@ export class PromotionEditComponent {
 
     // Automatically select all rows if there are items in the grid
     if (totalItemsCount > 0) {
-      grid.selectAll(); // Select all rows
+      // grid.selectAll(); // Select all rows
     }
   }
 
-  onSelectionChanged(e) {
+  onSelectionChanged(e: any) {
     this.selectedRowKeys = e.selectedRowKeys;
     // console.log(this.selectedRowKeys, 'SELECTED');
     this.selectedRow = e.selectedRowsData; // Gets the first selected row
@@ -499,14 +509,20 @@ export class PromotionEditComponent {
     this.selectedId = [];
     this.selectedCost = [];
     this.selectedSalePrice = [];
-    this.selectedRow.forEach((row) => {
+    this.selectedRow.forEach((row: any) => {
       this.selectedId.push(row.ID);
       this.selectedCost.push(row.COST);
       this.selectedSalePrice.push(row.PRICE);
     });
+    this.selectedRowKeys = e.selectedRowKeys;
+
+    this.itemStoresList = this.itemStoresList.map((item: any) => ({
+      ...item,
+      Selected: this.selectedRowKeys.includes(item.ITEM_ID)
+    }));
   }
 
-  onRowClick(event) {
+  onRowClick(event: any) {
     this.selectedRowIndex = event.rowIndex;
     console.log('Selected Row:', event.data);
   }
@@ -519,15 +535,15 @@ export class PromotionEditComponent {
     // If a schema is selected
     if (this.selectedSchemaId) {
       const selectedSchema = this.promotionSchema.find(
-        (schema) => schema.ID === this.selectedSchemaId,
+        (schema: any) => schema.ID === this.selectedSchemaId,
       );
       if (selectedSchema) {
         console.log(selectedSchema.REMARKS);
         if (selectedSchema.REMARKS == '4') {
           this.heading = 'Items To Buy';
-          this.filteredItemStoresList = this.itemStoresList.filter((item) => {
+          this.filteredItemStoresList = this.itemStoresList.filter((item: any) => {
             const isItemSelected = this.selectedRow.some(
-              (row) => row.ID === item.ID,
+              (row: any) => row.ID === item.ID,
             );
             return !isItemSelected; // Keep only items that are NOT selected
           });
@@ -542,10 +558,10 @@ export class PromotionEditComponent {
         );
         this.selectedSchemaName = selectedSchema.DESCRIPTION; // Store the selected schema name
         console.log(this.selectedSchemaName, 'NAME');
-        this.selectedRow.forEach((row, index) => {
+        this.selectedRow.forEach((row: any, index: any) => {
           // Find the corresponding row in `itemStoresList` by ID
           const selectedRowIndex = this.worksheetpromotionSchema.findIndex(
-            (item) => item.ID === row.ID,
+            (item: any) => item.ID === row.ID,
           );
 
           if (selectedRowIndex !== -1) {
@@ -589,23 +605,23 @@ export class PromotionEditComponent {
       console.log('NO SELECTEDITEMSS');
       const excludedIDs = new Set([
         ...this.worksheetData.worksheet_promotion_schema.map(
-          (item) => item.BARCODE,
+          (item: any) => item.BARCODE,
         ),
       ]);
       console.log(excludedIDs, 'EXCLUDEDIDSSSSSSSSSSS');
       this.filteredItemStoresListRemaining = this.itemStoresList.filter(
-        (item) => !excludedIDs.has(item.ID),
+        (item: any) => !excludedIDs.has(item.ID),
       );
     } else {
       const excludedIDs = new Set([
         ...this.worksheetData.worksheet_promotion_schema.map(
-          (item) => item.BARCODE,
+          (item: any) => item.BARCODE,
         ),
-        ...this.filteredItems.map((item) => item.BARCODE),
+        ...this.filteredItems.map((item: any) => item.BARCODE),
       ]);
       console.log(excludedIDs, 'EXCLUDEDIDSSSSSSSSSSS');
       this.filteredItemStoresListRemaining = this.itemStoresList.filter(
-        (item) => !excludedIDs.has(item.BARCODE),
+        (item: any) => !excludedIDs.has(item.BARCODE),
       );
 
       // this.filteredItemStoresListRemaining = this.itemStoresList.filter(
@@ -629,7 +645,7 @@ export class PromotionEditComponent {
       // Push the selectedRowsOfPopup to filteredItems, ensuring no duplicates
       this.filteredItems = [
         ...this.filteredItems,
-        ...this.selectedRowsOfPopup.map((row) => ({
+        ...this.selectedRowsOfPopup.map((row: any) => ({
           ...row,
           ITEM_ID: row.ID,
           ITEM_DESCRIPTION: row.DESCRIPTION, // Map DESCRIPTION to ITEM_DESCRIPTION
@@ -657,7 +673,7 @@ export class PromotionEditComponent {
     }
 
     // Ensure filteredItems are shown as selected in the grid
-    this.selectedRowKeysNew = this.filteredItems.map((item) => item.ID); // Update selectedRowKeys with filtered items' IDs
+    this.selectedRowKeysNew = this.filteredItems.map((item: any) => item.ID); // Update selectedRowKeys with filtered items' IDs
 
     console.log(
       this.selectedRowKeysNew,
@@ -685,7 +701,7 @@ export class PromotionEditComponent {
     );
 
     this.selectedRowForNewList = [
-      ...this.filteredItems.map((item) => item.ITEM_ID), // Include IDs from filteredItems
+      ...this.filteredItems.map((item: any) => item.ITEM_ID), // Include IDs from filteredItems
       ...this.selectedRowKeys, // Include IDs from selected rows
     ];
     console.log(
@@ -699,7 +715,7 @@ export class PromotionEditComponent {
 
     // If you want the selected row data as well, you can merge both
     this.selectedRowNew = [
-      ...this.filteredItems.filter((item) =>
+      ...this.filteredItems.filter((item: any) =>
         this.selectedRowForNewList.includes(item.ID),
       ),
       ...this.selectedRowsData,
@@ -718,10 +734,10 @@ export class PromotionEditComponent {
       }
 
       // Iterate over each selected row and update its PROMOTION_PRICE with the calculated result
-      this.selectedRow.forEach((row, index) => {
+      this.selectedRow.forEach((row: any, index: number) => {
         // Find the corresponding row in `itemStoresList` by ID
         const selectedRowIndex = this.worksheetpromotionSchema.findIndex(
-          (item) => item.ID === row.ID,
+          (item: any) => item.ID === row.ID,
         );
 
         if (selectedRowIndex !== -1) {
@@ -855,7 +871,7 @@ export class PromotionEditComponent {
     const selectedValue = event.value; // This is the ID of the selected schema
     console.log('onchemachanged triggered');
     this.selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID === selectedValue,
+      (schema: any) => schema.ID === selectedValue,
     );
     console.log(this.selectedSchema.REMARKS, '--------------===');
     if (!this.selectedSchema) {
@@ -871,11 +887,11 @@ export class PromotionEditComponent {
     }
     // this.showGrid = this.selectedSchema.REMARKS === '4';
     const selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID === event.value, // Use event.value to get the selected ID
+      (schema: any) => schema.ID === event.value, // Use event.value to get the selected ID
     );
     console.log(selectedSchema, 'SELECTEDSCHEMA');
     this.selectedSchemaType = this.promotionSchema.find(
-      (schema) => schema.REMARKS,
+      (schema: any) => schema.REMARKS,
     );
     if (selectedSchema) {
       this.selectedSchemaId = selectedSchema.ID;
@@ -907,14 +923,14 @@ export class PromotionEditComponent {
     if (this.firstDropdownValue === 'cost') {
       this.valueToUse = this.selectedCost; // Assign array of costs
       // Log each row's cost with its ID
-      this.selectedRow.forEach((row, index) => {
+      this.selectedRow.forEach((row: any, index: any) => {
         console.log(`Row ID: ${row.ID}, Cost: ${this.selectedCost[index]}`);
       });
       // console.log(this.valueToUse, 'COSTS OF SELECTED ROWS');
     } else if (this.firstDropdownValue === 'salePrice') {
       this.valueToUse = this.selectedSalePrice; // Assign array of sale prices
       // Log each row's sale price with its ID
-      this.selectedRow.forEach((row, index) => {
+      this.selectedRow.forEach((row: any, index: any) => {
         console.log(
           `Row ID: ${row.ID}, Sale Price: ${this.selectedSalePrice[index]}`,
         );
@@ -927,9 +943,9 @@ export class PromotionEditComponent {
       }
       // console.log('Default value entered:', this.defaultTextValue);
       const fieldName = 'PROMOTION_PRICE'; // This could be dynamic too if needed
-      this.selectedRow.forEach((row) => {
+      this.selectedRow.forEach((row: any) => {
         const matchingRow = this.worksheetpromotionSchema.find(
-          (gridRow) => gridRow.ID === row.ID,
+          (gridRow: any) => gridRow.ID === row.ID,
         );
         if (matchingRow) {
           matchingRow.PROMOTION_PRICE = this.defaultTextValue; // Directly updating the field
@@ -955,7 +971,7 @@ export class PromotionEditComponent {
       this.schemaLevelPromotion = null;
     } else {
       // Select right side, deselect left side
-      this.onSaleStatus = null;
+      this.onSaleStatus = false;
       this.schemaLevelPromotion = true;
     }
   }
@@ -974,38 +990,34 @@ export class PromotionEditComponent {
 
     if (this.selectedSchemaId) {
       console.log(this.selectedSchemaId, ']]]');
-
-      const selectedSchema = this.promotionSchema.find(
-        (schema) => schema.ID === this.selectedSchemaId,
-      );
-
-      if (selectedSchema) {
-        if (selectedSchema.REMARKS !== '4') {
-          worksheetPromotionSchema = this.selectedRow.map((row) => ({
+      if (this.selectedSchemaId) {
+        if (this.selectedSchemaId) {
+          worksheetPromotionSchema = this.selectedRow.map((row: any) => ({
+            ID: 0,
             ITEM_ID: row.ITEM_ID, // ITEM_ID from the selected row
             PRICE: row.SALE_PRICE ?? row.PRICE, // SALE_PRICE from the selected row
             COST: row.COST || 0, // COST from the selected row
             PROMOTION_PRICE: row.PROMOTION_PRICE || 0, // PROMOTION_PRICE from the selected row
             DATE_FROM: this.fromDate, // Assuming you have fromDate defined somewhere
             DATE_TO: this.toDate, // Assuming you have toDate defined somewhere
-            TIME_FROM: this.timeFrom,
-            TIME_TO: this.timeTo,
+            TIME_FROM: this.combineDateAndTime(this.timeFrom),
+            TIME_TO: this.combineDateAndTime(this.timeTo),
             PROMOTION_SCHEMA_ID: this.selectedSchemaId || 0, // Using selected schema ID or defaulting to 0
             PROMOTION_WEEKDAYS: this.selectedDays.join(','), // Assuming selectDays is a method returning the weekdays
-            PROMOTION_LEVEL: this.selectedPromotionLevel,
-            IS_INACTIVE: 0, // Assuming inactive is set to 0
+            PROMOTION_LEVEL: this.selectedPromotionLevel || 0,
+            IS_INACTIVE: false, // Assuming inactive is set to 0
             PROMOTION_NAME:
               this.selectedSchemaName ||
               (Array.isArray(row.PROMOTION_NAME)
                 ? row.PROMOTION_NAME.join(',')
                 : row.PROMOTION_NAME || ''), // Assuming promotionName is a defined value
-            IS_BUY: this.isBuy, // Assuming IS_BUY is set to 0
-            IS_GET: this.isGet,
-            IS_HAPPY_HOUR: this.isHappyHoursEnabled,
+            IS_BUY: this.isBuy || false, // Assuming IS_BUY is set to 0
+            IS_GET: this.isGet || false,
+            IS_HAPPY_HOUR: this.isHappyHoursEnabled || false,
           }));
         } else {
           // console.log(this.filteredItems,"-----------------------")
-          const additionalSchemaItems = this.filteredItems.map((item) => ({
+          const additionalSchemaItems = this.filteredItems.map((item: any) => ({
             ITEM_ID: item.ITEM_ID,
             PRICE: item.SALE_PRICE ?? item.PRICE,
             COST: item.COST || 0,
@@ -1028,7 +1040,7 @@ export class PromotionEditComponent {
             IS_HAPPY_HOUR: this.isHappyHoursEnabled,
           }));
           worksheetPromotionSchema = [
-            ...this.selectedRow.map((row) => ({
+            ...this.selectedRow.map((row: any) => ({
               ITEM_ID: row.ITEM_ID,
               PRICE: row.SALE_PRICE ?? row.PRICE,
               COST: row.COST || 0,
@@ -1059,7 +1071,7 @@ export class PromotionEditComponent {
       }
     } else {
       // If selectedSchemaId is not set, default behavior (without schema logic)
-      worksheetPromotionSchema = this.selectedRow.map((row) => ({
+      worksheetPromotionSchema = this.selectedRow.map((row: any) => ({
         ITEM_ID: row.ITEM_ID, // ITEM_ID from the selected row
         PRICE: row.SALE_PRICE ?? row.PRICE,
         COST: row.COST || 0, // COST from the selected row
@@ -1140,7 +1152,7 @@ export class PromotionEditComponent {
 
   selectDays() {
     const selectedDaysArray = Object.keys(this.selectedDays).filter(
-      (day) => this.selectedDays[day],
+      (day: any) => this.selectedDays[day],
     );
     if (selectedDaysArray.length === 0) {
       alert('Please select at least one day to apply promotion.');
@@ -1167,7 +1179,7 @@ export class PromotionEditComponent {
     this.storeIds =
       selectedStoreIds.length > 0 ? selectedStoreIds.join(',') : '1';
     console.log(this.storeIds, 'storeids');
-    this.listItemsByMultipleStoreIds(this.storeIds);
+    // this.listItemsByMultipleStoreIds();
   }
   handleDaySelection(event: any) {
     this.selectedDays = event.value;
@@ -1214,7 +1226,7 @@ export class PromotionEditComponent {
   }
 
   Cancel() {
-    this.router.navigate(['/Promotion']);
+    this.router.navigate(['/promotions']);
   }
 
   clearFilter() {
@@ -1233,6 +1245,22 @@ export class PromotionEditComponent {
     // Show or hide the error message based on input validity
     this.showError = sanitizedValue !== inputValue;
   }
+  combineDateAndTime(time: Date) {
+    if (!time) return null;
+
+    const result = new Date();
+
+    result.setHours(time.getHours());
+    result.setMinutes(time.getMinutes());
+    result.setSeconds(0);
+
+    return result.toISOString();
+  }
+  onHappyHoursChanged(event: any) {
+
+  }
+  onEditorPreparing(event: any) { }
+
 }
 
 @NgModule({
@@ -1264,10 +1292,15 @@ export class PromotionEditComponent {
     DxNumberBoxModule,
     DxValidationGroupModule,
     DxValidatorModule,
+    DxTabsModule,
+    DxSwitchModule,
+    DxTabPanelModule
+
   ],
   providers: [],
-  exports: [PromotionEditComponent],
   declarations: [PromotionEditComponent],
+  exports: [PromotionEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+
 })
-export class PromotionEditModule {}
+export class PromotionEditModule { }

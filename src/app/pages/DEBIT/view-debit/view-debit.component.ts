@@ -121,6 +121,8 @@ export class ViewDebitComponent {
   subTypeList: any;
   vatTilte: any;
   vatTitle: any;
+  VatClass: any;
+  showSubType: boolean;
 
   constructor(
     private dataService: DataService,
@@ -153,6 +155,7 @@ export class ViewDebitComponent {
     );
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.subType = userData.Configuration[0].SUB_TYPE_ID;
+    this.showSubType = !!this.subType;
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       // ✅ Assign Companies array to companyList
@@ -183,6 +186,8 @@ export class ViewDebitComponent {
     if (!changes['debitFormData'] || !this.debitFormData?.length) return;
 
     const data = this.debitFormData[0];
+    console.log(this.debitFormData[0], 'DEBITFORMDATA=========');
+    this.selectedCompanyId = data.COMPANY_ID;
 
     setTimeout(() => {
       this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
@@ -207,24 +212,10 @@ export class ViewDebitComponent {
 
     const firstRow = data.NOTE_DETAIL?.[0];
 
-    // if (firstRow) {
-    //   if ((firstRow.CGST || 0) > 0 || (firstRow.SGST || 0) > 0) {
-    //     // SAME STATE (Saved)
-    //     this.showCGST = true;
-    //     this.showSGST = true;
-    //     this.showGST = false;
-    //   } else if ((firstRow.GST_PERC || 0) > 0) {
-    //     // DIFFERENT STATE (Saved)
-    //     this.showGST = true;
-    //     this.showCGST = false;
-    //     this.showSGST = false;
-    //   }
-    // }
-
-    // -----------------------------
-    // BUILD GRID ROWS (READ ONLY)
-    // -----------------------------
-    this.getLedgerCodeDropdown()
+    Promise.all([
+      this.getLedgerCodeDropdown(),
+      this.getVatPercentListPromise(), // 👈 create this
+    ])
       .then(() => {
         this.noteDetails = (data.NOTE_DETAIL || []).map(
           (item: any, index: number) => {
@@ -232,29 +223,37 @@ export class ViewDebitComponent {
               (l: any) => l.HEAD_ID === item.HEAD_ID,
             );
 
+            let gstPerc = 0;
+
             return {
               SL_NO: index + 1,
-
-              // 🔥 TRUST BACKEND VALUES
-              HEAD_ID: item.HEAD_ID,
-              Amount: Number(item.AMOUNT) || 0,
-              gstAmount: Number(item.GST_AMOUNT) || 0,
-              GST_PERC: Number(item.GST_PERC) || 0,
-              CGST: Number(item.CGST) || 0,
-              SGST: Number(item.SGST) || 0,
-              HSN_CODE: item.HSN_CODE || '',
-
-              // DISPLAY HELPERS
+              ...item,
               ledgerCode: match?.HEAD_CODE || '',
               ledgerName: match?.HEAD_NAME || '',
               particulars: item.REMARKS || '',
+              Amount: item.AMOUNT || '',
+              gstAmount: item.GST_AMOUNT || '',
+              HSN_CODE: item.HSN_CODE || this.HSNCODE,
+              // GST_PERC: gstPerc,
+              GST_PERC: item.GST_PERC,
+              GST_ID: item.GST_PERC,
+              CGST: 0,
+              SGST: 0,
             };
           },
         );
 
-        // SAFETY: empty view
         if (this.noteDetails.length === 0) {
-          this.noteDetails = [];
+          this.noteDetails.push({
+            SL_NO: 1,
+            ledgerCode: '',
+            ledgerName: '',
+            particulars: '',
+            Amount: '',
+            gstAmount: '',
+            HSN_CODE: '',
+            HEAD_ID: null,
+          });
         }
       })
       .finally(() => {
@@ -262,6 +261,14 @@ export class ViewDebitComponent {
         this.itemsGridRef?.instance?.endCustomLoading();
       });
   }
+
+  getGstDisplayValue = (row: any) => {
+    const gstId = row.GST_PERC; // this is ID (16,17...)
+
+    const match = this.VatClass?.find((v: any) => v.ID === gstId);
+
+    return match ? match.DESCRIPTION : gstId;
+  };
 
   private hasEmptyRow(): boolean {
     return (this.noteDetails || []).some(
@@ -374,6 +381,24 @@ export class ViewDebitComponent {
     return new Promise((resolve) => {
       this.dataService.getActiveLedger().subscribe((response: any) => {
         this.ledgerList = response.Data;
+        resolve();
+      });
+    });
+  }
+
+  getVatPercentListPromise(): Promise<void> {
+    return new Promise((resolve) => {
+      const payload = {
+        COMPANY_ID: this.selectedCompanyId,
+        NAME: 'VAT_PERC',
+      };
+
+      this.dataService.getDropdownData(payload).subscribe((data) => {
+        this.VatClass = data.map((item: any) => ({
+          ...item,
+          VALUE: Number(item.DESCRIPTION),
+          DESCRIPTION: Number(item.DESCRIPTION).toString(),
+        }));
         resolve();
       });
     });
@@ -538,6 +563,47 @@ export class ViewDebitComponent {
         }
       };
     }
+
+    if (e.dataField === 'GST_PERC') {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
+
+      //  VALUE CHANGE (Dropdown select)
+      e.editorOptions.onValueChanged = (args: any) => {
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
+
+        e.setValue(args.value);
+
+        const rowIndex = e.row.rowIndex;
+
+        //  FIND SELECTED VAT
+        const selectedVat = this.VatClass.find((v: any) => v.ID === args.value);
+
+        console.log(selectedVat, 'selectedVat--------');
+
+        if (selectedVat) {
+          const percent = Number(selectedVat.DESCRIPTION);
+
+          //  STORE ID (hidden)
+          e.component.cellValue(rowIndex, 'GST_ID', selectedVat.ID);
+
+          // STORE % (visible)
+          e.component.cellValue(rowIndex, 'GST_PERC', percent);
+
+          //  CALCULATE GST
+          const amount = Number(e.row.data.Amount) || 0;
+          const gst = (amount * percent) / 100;
+
+          e.component.cellValue(rowIndex, 'gstAmount', +gst.toFixed(2));
+        }
+
+        //  reset split
+        e.row.data.CGST = 0;
+        e.row.data.SGST = 0;
+      };
+    }
+
     if (e.dataField === 'gstAmount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
@@ -740,7 +806,8 @@ export class ViewDebitComponent {
 
   calculateTotal = (row: any) => {
     const amount = Number(row.Amount) || 0;
-    const gst = this.calculateTaxAmount(row) || 0;
+    // const gst = this.calculateTaxAmount(row) || 0;
+    const gst = Number(row.gstAmount) || 0;
     return amount + gst;
   };
 

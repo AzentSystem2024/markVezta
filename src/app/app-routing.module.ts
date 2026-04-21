@@ -188,6 +188,11 @@ import { StorewiseStockViewComponent } from './pages/REPORT/storewise-stock-view
 // import { PromotionComponent } from './pages/promotion/promotion.component';
 
 const routes: Routes = [
+  //  {
+  //   path: 'miscellaneous-sales-invoice',
+  //   component: MiscellaneousSalesInvoiceComponent,
+  //   canActivate: [AuthGuardService],
+  // },
   {
     path: '',
     redirectTo: '/auth/login',
@@ -203,6 +208,7 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
+
 
   {
     path: 'auth',
@@ -1162,4 +1168,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

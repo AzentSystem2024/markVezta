@@ -300,9 +300,9 @@ export class MiscPurchInvoiceFormComponent {
 
   calculateTotal = (rowData: any) => {
     const amount = Number(rowData.Amount) || 0;
-    const gstPerc = Number(rowData.GST_VALUE) || 0;
+    const gstAmount = this.calculateTaxAmount(rowData) || 0;
 
-    return amount + (amount * gstPerc) / 100;
+    return amount + gstAmount;
   };
   onEditorPreparing(e: any) {
     if (
@@ -439,7 +439,7 @@ export class MiscPurchInvoiceFormComponent {
     if (e.dataField === 'Amount') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
-          // ✅ simulate TAB key (DevExtreme handles this correctly)
+          //simulate TAB key (DevExtreme handles this correctly)
           const eKey = event.event;
 
           const tabEvent = new KeyboardEvent('keydown', {

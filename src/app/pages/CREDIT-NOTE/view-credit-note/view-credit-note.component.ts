@@ -142,6 +142,8 @@ export class ViewCreditNoteComponent {
   vatTitle: any;
   showSubType: boolean;
 
+  VatClass: any;
+
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -195,6 +197,8 @@ export class ViewCreditNoteComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['creditFormData'] && this.creditFormData?.length) {
       const data = this.creditFormData[0];
+
+      this.selectedCompanyId = data.COMPANY_ID;
 
       setTimeout(() => {
         this.itemsGridRef?.instance?.beginCustomLoading('Loading...');
@@ -268,32 +272,50 @@ export class ViewCreditNoteComponent {
       // -----------------------------
       // STEP 3: BUILD GRID ROWS
       // -----------------------------
-      this.getLedgerCodeDropdown()
-        .then(() => {
+      Promise.all([
+          this.getLedgerCodeDropdown(),
+          this.getVatPercentListPromise() // 👈 create this
+        ]).then(() => {
+
           this.noteDetails = (data.NOTE_DETAIL || []).map((item: any) => {
-            const match = this.ledgerList.find(
-              (l: any) => l.HEAD_ID === item.HEAD_ID,
+
+            const ledger = this.ledgerList.find(
+              (l: any) => l.HEAD_ID === item.HEAD_ID
             );
 
+            console.log(this.VatClass,"vatclass------------")
+
+            const vatId = item.GST_ID ?? item.GST_PERC;
+
+            const selectedVat = this.VatClass.find(
+              (v: any) => v.ID === vatId
+            );
+
+            const percent = Number(selectedVat?.DESCRIPTION) || 0;
+
+            console.log(percent,"percent--------------------")
+
             return {
-              ...item, // ✅ KEEP CGST, SGST, GST_PERC AS-IS
-              ledgerCode: match?.HEAD_CODE || '',
-              ledgerName: match?.HEAD_NAME || '',
+              SL_NO: item.SL_NO,
+              ledgerCode: ledger?.HEAD_CODE || '',
+              ledgerName: ledger?.HEAD_NAME || '',
               particulars: item.REMARKS || '',
-              Amount: item.AMOUNT || 0,
-              gstAmount: item.GST_AMOUNT || 0, // ✅ IMPORTANT
-              HSN_CODE: item.HSN_CODE || this.HSNCODE,
-              CGST: Number(item.CGST) || 0,
-              SGST: Number(item.SGST) || 0,
-              GST_PERC: Number(item.GST_PERC) || 0,
+              Amount: item.AMOUNT || '',
+              GST_PERC: percent,
+              GST_ID: item.GST_PERC,
+              CGST: item.CGST ?? 0,
+              SGST: item.SGST ?? 0,
+              gstAmount: item.GST_AMOUNT ?? 0,
+              HSN_CODE: item.HSN_CODE,
+              HEAD_ID: item.HEAD_ID,
+              _isExisting: true,
             };
           });
 
-          // ✅ 🔥 CALL VISIBILITY LOGIC AFTER MAPPING
-          this.setTaxVisibilityFromNoteDetails(this.noteDetails);
+          this.cdr.detectChanges();
         })
         .finally(() => {
-          // 🟢 STOP GRID LOADING
+          // STOP GRID LOADING
           this.itemsGridRef?.instance?.endCustomLoading();
         });
 
@@ -531,6 +553,24 @@ export class ViewCreditNoteComponent {
       });
     });
   }
+
+  getVatPercentListPromise(): Promise<void> {
+  return new Promise((resolve) => {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      NAME: 'VAT_PERC',
+    };
+
+    this.dataService.getDropdownData(payload).subscribe((data) => {
+      this.VatClass = data.map((item: any) => ({
+        ...item,
+        VALUE: Number(item.DESCRIPTION),
+        DESCRIPTION: Number(item.DESCRIPTION).toString(),
+      }));
+      resolve();
+    });
+  });
+}
 
   onEditorPreparing(e: any) {
     if (
