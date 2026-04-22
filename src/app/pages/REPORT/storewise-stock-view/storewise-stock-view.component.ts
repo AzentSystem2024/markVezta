@@ -89,6 +89,7 @@ export class StorewiseStockViewComponent {
   storeHint: string = '';
   itemHint : string = '';
   grandTotal: number = 0;
+  storeColumnTotals: any = {};
 
   
   constructor(
@@ -123,7 +124,7 @@ export class StorewiseStockViewComponent {
 
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
-    this.get_DataSource();
+    // this.get_DataSource();
   }
 
   refreshGrid() {
@@ -277,100 +278,96 @@ updateItemHint() {
     })
   }
 
-  get_DataSource() {
-    const grid = this.dataGrid?.instance;
-    grid?.beginCustomLoading('Loading...');
+ get_DataSource() {
+  const grid = this.dataGrid?.instance;
+  grid?.beginCustomLoading('Loading...');
 
-  this.dynamicColumns = [];
+  let payload = {
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.finID,
+    ITEM_ID: this.selectedItem ? String(this.selectedItem) : "",
+    STORE_ID: this.selectedStoreid ? String(this.selectedStoreid) : ""
+  };
 
-const firstRow = this.StockViewReport[0];
+  const payloadData = {
+    companyId: payload.COMPANY_ID,
+    finId: payload.FIN_ID,
+    itemid: payload.ITEM_ID,
+    storeid: payload.STORE_ID
+  };
 
-if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-  // NO STORE SELECTED → SHOW ALL STORES FROM RESPONSE
-  if (firstRow && firstRow.StoreStock) {
-    this.dynamicColumns = Object.keys(firstRow.StoreStock)
-      .filter(key => key !== 'TOTAL') // remove TOTAL column
-      .map(key => ({
-        dataField: `StoreStock.${key}`,
-        caption: key,
-        dataType: 'number',
-        alignment: 'right'
-      }));
-  }
-} else {
-  //  STORES SELECTED → SHOW ONLY SELECTED
-  this.selectedStoreid.forEach((storeId) => {
-    const storeObj = this.Store.find(s => s.ID === storeId);
+  sessionStorage.removeItem('viewclickvalue');
+  sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-    if (storeObj) {
-      const key = storeObj.DESCRIPTION?.trim();
+  this.dataservice.StockView_branch(payload).subscribe({
+    next: (res: any) => {
 
-      this.dynamicColumns.push({
-        dataField: `StoreStock.${key}`,
-        caption: key,
-        dataType: 'number',
-        alignment: 'right'
+      this.isEmptyDatagrid = false;
+      this.StockViewReport = res.data || [];
+
+      // 🔥 IMPORTANT: BUILD DYNAMIC COLUMNS AFTER DATA ARRIVES
+      this.dynamicColumns = [];
+
+      const firstRow = this.StockViewReport[0];
+
+      if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+
+        // ✅ NO STORE SELECTED → SHOW ALL STORES
+        if (firstRow && firstRow.StoreStock) {
+          this.dynamicColumns = Object.keys(firstRow.StoreStock)
+            .filter(key => key !== 'TOTAL')
+            .map(key => ({
+              dataField: `StoreStock.${key}`,
+              caption: key,
+              dataType: 'number',
+              alignment: 'right'
+            }));
+        }
+
+      } else {
+
+        // ✅ STORES SELECTED → SHOW ONLY SELECTED
+        this.selectedStoreid.forEach((storeId) => {
+          const storeObj = this.Store.find(s => s.ID === storeId);
+
+          if (storeObj) {
+            const key = storeObj.DESCRIPTION?.trim();
+
+            this.dynamicColumns.push({
+              dataField: `StoreStock.${key}`,
+              caption: key,
+              dataType: 'number',
+              alignment: 'right'
+            });
+          }
+        });
+      }
+
+      // 🔥 FORCE UI UPDATE (fix first-load issue)
+      this.cdr.detectChanges();
+
+      // 🔥 YOUR CALCULATIONS
+      this.calculateStoreColumnTotals();
+      this.calculateGrandTotal();
+
+      // 🔥 FINAL GRID REFRESH
+      setTimeout(() => {
+        this.dataGrid.instance.refresh();
       });
+
+    },
+
+    error: () => {
+      grid?.endCustomLoading();
+    },
+
+    complete: () => {
+      grid?.endCustomLoading();
     }
   });
 }
 
-    let payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.finID,
-      // DATE_FROM: this.formatted_from_date,
-      ITEM_ID : this.selectedItem ? String(this.selectedItem) : "",
-      STORE_ID: this.selectedStoreid ? String(this.selectedStoreid) : ""
-    };
 
-    const payloadData = {
-      companyId: payload.COMPANY_ID,
-      finId: payload.FIN_ID,
-      // dateFrom: payload.DATE_FROM,
-      itemid : payload.ITEM_ID,
-      storeid : payload.STORE_ID
-    };
-
-    sessionStorage.removeItem('viewclickvalue');
-    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
-
-    // console.log(JSON.parse(sessionStorage.getItem('viewclickvalue')));
-    // console.log(payload, '==========payload================');
-
-    this.dataservice.StockView_branch(payload).subscribe({
-      next: (res: any) => {
-        this.isEmptyDatagrid = false;
-        // console.log(res, '----------list --------------------------');
-
-        this.StockViewReport = res.data;
-
-        this.StockViewReport = res.data;
-
-
-
-if (this.selectedStoreid.length) {
-  const selectedNames = this.Store
-    .filter(s => this.selectedStoreid.includes(s.ID))
-    .map(s => s.DESCRIPTION);
-
-  this.dynamicColumns = this.dynamicColumns.filter(col =>
-    selectedNames.includes(col.caption)
-  );
-}
-
-        // this.calculateNetProfit();
-        this.calculateGrandTotal();
-
-        this.dataGrid.instance.refresh(); // force grid to recalc summaries
-      },
-      error: () => {},
-      complete: () => {
-        grid?.endCustomLoading();
-      },
-      
-    });
-    
-  }
   typeSorting = (a: string, b: string) => {
     const order = {
       REVENUE: 1,
@@ -394,6 +391,23 @@ if (this.selectedStoreid.length) {
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
   }
+
+  calculateStoreColumnTotals() {
+  this.storeColumnTotals = {};
+
+  this.StockViewReport.forEach(row => {
+    const storeStock = row.StoreStock || {};
+
+    Object.keys(storeStock).forEach(key => {
+      if (key === 'TOTAL') return; // skip total column
+
+      const value = Number(storeStock[key] || 0);
+
+      this.storeColumnTotals[key] =
+        (this.storeColumnTotals[key] || 0) + value;
+    });
+  });
+}
 
   onRowPrepared(e) {
     if (e.rowType === 'data' && e.data.isSummary) {
@@ -423,6 +437,27 @@ onCellPrepared(e: any) {
         Grand Total: ${formatted}
       </div>
     `;
+  }
+
+   // 🔹 DYNAMIC STORE COLUMNS
+  if (e.rowType === 'totalFooter' && e.column?.dataField?.startsWith('StoreStock.')) {
+
+    const key = e.column.dataField.split('.')[1];
+
+    if (key !== 'TOTAL') {
+      const total = this.storeColumnTotals[key] || 0;
+
+      const formatted = total.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      e.cellElement.innerHTML = `
+        <div style="text-align: right; font-weight: bold;">
+          ${formatted}
+        </div>
+      `;
+    }
   }
 }
 }
