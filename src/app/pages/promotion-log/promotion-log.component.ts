@@ -88,6 +88,7 @@ export class PromotionLogComponent {
   AllowCommitWithSave: any;
   logStatusMap: { [key: number]: string } = {};
   status: any;
+  approveValue: boolean = false
 
   addButtonOptions = {
     text: 'New',
@@ -134,6 +135,7 @@ export class PromotionLogComponent {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     console.log(this.AllowCommitWithSave, 'ALLOW');
     this.getPromotionLogList();
+    this.handleClose()
   }
 
   getPromotionLogList() {
@@ -256,18 +258,8 @@ export class PromotionLogComponent {
   }
 
   onVerifyClick(e: any) {
-    if (this.AllowCommitWithSave) {
-      console.log('Verify Button clicked');
-      const rowData = e.row.data; // Access the row data
-      e.row.data.isVerified = true;
-      const worksheetId = rowData?.ID;
-      console.log('Row ID:', worksheetId);
-      if (worksheetId) {
-        this.verifyWorksheetById(worksheetId, e);
-      } else {
-        console.warn('Worksheet ID is invalid.');
-      }
-    }
+    console.log('====================call this function============', e)
+    const id = e.data.ID
   }
 
   verifyWorksheetById(worksheetId: number, e: any) {
@@ -291,6 +283,7 @@ export class PromotionLogComponent {
   }
 
   onApproveClick(e: any) {
+    console.log('--------------------function call===========-----------------')
     if (this.AllowCommitWithSave) {
       console.log('approve Button clicked');
       const rowData = e.row.data; // Access the row data
@@ -350,6 +343,9 @@ export class PromotionLogComponent {
     });
   }
   handleClose() {
+
+    this.editPackPopupOpened = false
+    this.getPromotionLogList()
 
   }
 }
