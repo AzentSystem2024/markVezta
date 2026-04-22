@@ -54,7 +54,7 @@
               margin-right: 3px;
             "
           >
-            Branch wise Stock View
+            Store wise Stock View
           </div>
         </dxi-item>
 
@@ -243,11 +243,13 @@
         >
         </dxi-group-item>
 
-        <dxi-total-item column="StoreStock.TOTAL" summaryType="sum" displayFormat="">
+        <dxi-total-item column="" summaryType="sum" displayFormat="">        
+        </dxi-total-item>
+        <dxi-total-item column="StoreStock.TOTAL" summaryType="sum" displayFormat="">        
         </dxi-total-item>
       </dxo-summary>
 
-      <dxi-column
+      <!-- <dxi-column
         *ngIf="StockViewReport.length > 0"
         type="buttons"
         [width]="100"
@@ -258,7 +260,7 @@
           text="View"
           [onClick]="onViewClick.bind(this)"
         ></dxi-button>
-      </dxi-column>
+      </dxi-column> -->
     </dx-data-grid>
   </div>
 </div>

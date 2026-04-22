@@ -869,7 +869,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'Physical-Inventory',
+        path: 'physical-inventory',
         component: PhysicalInventoryComponent,
         canActivate: [AuthGuardService],
       },
