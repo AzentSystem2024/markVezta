@@ -41,6 +41,7 @@ export class StoresFormComponent implements OnInit {
   selectedUnitsTooltip: any;
   countryCode: string = '971';
   formStoresData = {
+    ID: 0,
     CODE: '',
     STORE_NAME: '',
     IS_PRODUCTION: false,
@@ -76,6 +77,8 @@ export class StoresFormComponent implements OnInit {
   selectedStateId: any;
   StateId: any;
   stateLabel: any;
+
+  storesArray: any[] = [];
 
   constructor(
     private service: DataService,
@@ -129,6 +132,7 @@ export class StoresFormComponent implements OnInit {
 
   resetForm() {
     this.newStores = {
+      ID: 0,
       CODE: '',
       STORE_NAME: '',
       IS_PRODUCTION: false,
@@ -165,6 +169,7 @@ export class StoresFormComponent implements OnInit {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; // Show only selected company
         this.getGroupDropDown();
+        this.showStores();
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
@@ -172,6 +177,8 @@ export class StoresFormComponent implements OnInit {
         this.creditFormData.FIN_ID = firstFinYear.FIN_ID;
       }
     }
+
+    
 
     this.get_Country_Dropdown_List();
     this.getCountryListWithFlag();
@@ -331,6 +338,36 @@ export class StoresFormComponent implements OnInit {
     this.dxForm?.instance?.resetValues(); // optional
     this.dxForm?.instance?.resetValidation();
   }
+
+  showStores() {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
+
+    this.service.getStoresData(payload).subscribe({
+      next: (response: any[]) => {
+        this.storesArray = response || [];
+        console.log(this.storesArray,"this.storesArray")
+      },
+      error: () => {
+        this.storesArray = [];
+      },
+    });
+  }
+
+  validateStoreCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.storesArray?.length) return true;
+
+    const currentId = this.newStores?.ID || 0;
+
+    return !this.storesArray.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId;
+    });
+  };  
 }
 @NgModule({
   imports: [
