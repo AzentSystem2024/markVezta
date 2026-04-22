@@ -438,14 +438,14 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
       ledgerName: '',
       particulars: '',
       Amount: '',
-      GST_PERC: null, // ✅ COPY IGST
-      CGST: baseRow.CGST || 0, // ✅ COPY CGST
-      SGST: baseRow.SGST || 0, // ✅ COPY SGST
+      GST_PERC: null, //  COPY IGST
+      CGST: baseRow.CGST || 0, //  COPY CGST
+      SGST: baseRow.SGST || 0, //  COPY SGST
       gstAmount: '',
       HEAD_ID: null,
     };
 
-    // ✅ This now works because GST values exist
+    //  This now works because GST values exist
     // this.applyGstForRow(newRow);
 
     this.noteDetails = [...this.noteDetails, newRow];

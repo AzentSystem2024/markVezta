@@ -413,7 +413,9 @@ export class StoresListComponent implements OnInit {
 
   onEditStore(event: any) {
     event.cancel = true; // prevent default DevExtreme editing
-    this.selectedStore = event.data; // send row data to the form
+    // this.selectedStore = event.data; // send row data to the form
+    this.selectedStore = { ...event.data }; // 🔥 force new reference
+    console.log(this.selectedStore, 'SELECTEDSTOREEEEEEEEEEEEE');
     this.isAddStoresPopupOpened = true; // open the same popup
   }
 
@@ -427,8 +429,8 @@ export class StoresListComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;

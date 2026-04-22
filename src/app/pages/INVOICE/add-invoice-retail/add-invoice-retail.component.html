@@ -91,7 +91,7 @@
             type="default"
             [visible]="!isReadOnlyMode"
             (onClick)="onAddRow()"
-            hint="Add Customer"
+            hint="Add Row"
           >
           </dx-button>
         </div>
@@ -127,9 +127,10 @@
 
             texts: { addRow: '' },
           }"
-          (onRowRemoved)="onRowRemoved()"
+          (onRowRemoved)="onRowRemoved($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
           (onCellValueChanged)="onCellValueChanged($event)"
+          (onRowPrepared)="onRowPrepared($event)"
         >
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
@@ -150,6 +151,11 @@
               valueExpr: 'ID',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
+              searchMode: 'contains',
+              minSearchLength: 2,
+              showDataBeforeSearch: false,
+              paginate: true,
+              pageSize: 50,
             }"
           ></dxi-column>
           <dxi-column
@@ -162,6 +168,11 @@
               valueExpr: 'ID',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
+              searchMode: 'contains',
+              minSearchLength: 2,
+              showDataBeforeSearch: false,
+              paginate: true,
+              pageSize: 50,
             }"
           ></dxi-column>
           <dxi-column

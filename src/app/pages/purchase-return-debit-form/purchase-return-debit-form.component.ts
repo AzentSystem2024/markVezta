@@ -449,7 +449,7 @@ export class PurchaseReturnDebitFormComponent {
       this.popupGridRef?.instance.getSelectedRowsData() || [];
 
     if (selectedRows.length > 0) {
-      selectedRows.forEach((row) => {
+      selectedRows.forEach((row: any) => {
         const exists = this.mainGridData.some(
           (item) => item.DETAIL_ID === row.DETAIL_ID,
         );
@@ -580,7 +580,7 @@ export class PurchaseReturnDebitFormComponent {
     }
   }
 
-  validateQuantity = (e) => {
+  validateQuantity = (e: any) => {
     const row = e.data;
     const qty = e.value;
     const pendingQty = row?.PENDING_QTY ?? 0;
@@ -622,7 +622,7 @@ export class PurchaseReturnDebitFormComponent {
     // }
   };
 
-  calculateTotalAmount = (rowData) => {
+  calculateTotalAmount = (rowData: any) => {
     return this.calculateAmount(rowData) + this.calculateVATAmount(rowData);
   };
   private toDateOnlyString(value: any): string {
@@ -638,6 +638,12 @@ export class PurchaseReturnDebitFormComponent {
     return `${y}-${m}-${d}`;
   }
 
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data?.isInvalid) {
+      e.rowElement.classList.add('invalid-row');
+    }
+  }
+
   savePurchaseReturn() {
     // Validate Supplier
     if (!this.purchaseReturnFormData.SUPP_ID) {
@@ -650,21 +656,48 @@ export class PurchaseReturnDebitFormComponent {
       notify('Please add at least one item.', 'warning', 2000);
       return;
     }
-    // ✅ Get Store & Department from grid
+    //  Get Store & Department from grid
     this.itemsGridRef.instance.saveEditData();
 
     const selectedStoreId = this.mainGridData[0]?.STORE_ID || null;
     const selectedDeptId = this.mainGridData[0]?.DEPT_ID || null;
 
-    // ✅ Assign to header
+    //  Assign to header
     this.purchaseReturnFormData.STORE_ID = selectedStoreId;
     this.purchaseReturnFormData.DEPT_ID = selectedDeptId;
     // Validate quantity
     const invalidQtyRow = this.mainGridData.find(
       (row) => !row.QUANTITY || row.QUANTITY <= 0,
     );
-    if (invalidQtyRow) {
-      notify('Please enter a valid Quantity for all items.', 'warning', 2000);
+    // if (invalidQtyRow) {
+    //   notify('Please enter a valid Quantity for all items.', 'warning', 2000);
+    //   return;
+    // }
+    let isValid = true;
+
+    this.mainGridData.forEach((row: any, index: number) => {
+      row.isInvalid = false; //  reset
+
+      if (!row.QUANTITY || row.QUANTITY <= 0) {
+        row.isInvalid = true;
+        isValid = false;
+      }
+
+      if (row.QUANTITY > row.PENDING_QTY) {
+        row.isInvalid = true;
+        isValid = false;
+      }
+    });
+
+    //  force UI update
+    this.itemsGridRef.instance.repaint();
+
+    if (!isValid) {
+      notify(
+        'Please enter valid quantity for highlighted rows.',
+        'warning',
+        2000,
+      );
       return;
     }
     let totalAmount = 0;

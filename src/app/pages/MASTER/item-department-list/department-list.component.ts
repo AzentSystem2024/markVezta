@@ -127,7 +127,7 @@ export class DepartmentListComponent implements OnInit {
     this.isAddDepartmentPopupOpened = true;
     this.departmentComponent.resetButton();
   }
-  
+
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Department-list');
   }
@@ -153,7 +153,8 @@ export class DepartmentListComponent implements OnInit {
 
   showDepartment() {
     const payload = {
-      COMPANY_ID: this.COMPANY_ID,
+      // COMPANY_ID: this.COMPANY_ID,
+      COMPANY_ID: 0,
     };
     this.dataservice.getDepartmentData(payload).subscribe((response) => {
       this.department = response;

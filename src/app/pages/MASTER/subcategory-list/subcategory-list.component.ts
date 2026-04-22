@@ -154,7 +154,8 @@ export class SubcategoryListComponent {
 
   getSubCategory() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
     };
 
     this.SubCategoryDataSource = new DataSource({

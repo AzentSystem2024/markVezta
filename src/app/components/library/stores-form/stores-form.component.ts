@@ -93,21 +93,34 @@ export class StoresFormComponent implements OnInit {
   });
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['storeData'] &&
-      this.storeData &&
-      Object.keys(this.storeData).length
-    ) {
-      const phoneNo = this.storeData.PHONE;
-      const [countryCodePhone, phonenumber] = phoneNo.split('-');
-      this.countryCodePhone = countryCodePhone;
-      this.newStores = {
-        ...this.formStoresData,
-        ...this.storeData,
-      };
-      this.newStores.PHONE = phonenumber;
-    }
+    if (changes['storeData'] && this.storeData) {
+      // 👉 EDIT MODE
+      if (Object.keys(this.storeData).length > 0) {
+        const phoneNo = this.storeData.PHONE || '';
 
+        let countryCodePhone = '';
+        let phonenumber = '';
+
+        if (phoneNo.includes('-')) {
+          [countryCodePhone, phonenumber] = phoneNo.split('-');
+        } else {
+          phonenumber = phoneNo;
+        }
+
+        this.countryCodePhone = countryCodePhone;
+
+        this.newStores = {
+          ...this.formStoresData,
+          ...this.storeData,
+          PHONE: phonenumber,
+        };
+      }
+      // 👉 ADD MODE (important fix)
+      else {
+        this.resetForm();
+      }
+    }
+    console.log(this.newStores, 'NEWSTOREASSSSSSS');
     // ADD MODE → ALWAYS set companyId when received
     if (changes['companyId'] && this.companyId) {
       this.newStores.COMPANY_ID = this.companyId;

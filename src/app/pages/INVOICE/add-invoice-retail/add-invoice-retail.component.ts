@@ -182,7 +182,16 @@ export class AddInvoiceRetailComponent {
       name: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.itemsList = response;
+      // this.itemsList = response;
+      this.itemsList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
     });
   }
   getItemsDescription() {
@@ -190,7 +199,15 @@ export class AddInvoiceRetailComponent {
       name: 'ITEMSDESC',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.itemsDescriptionList = response;
+      this.itemsDescriptionList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
     });
   }
   getItemsData(itemId: any, rowData: any) {
@@ -280,10 +297,12 @@ export class AddInvoiceRetailComponent {
       }
     }
   }
-  onRowRemoved() {
-    if (!this.mainGridData || this.mainGridData.length === 0) {
-      this.mainGridData = [{}];
-    }
+  onRowRemoved(e: any) {
+    const removedData = e.data;
+
+    this.invoiceFormData.Details = (this.invoiceFormData.Details || []).filter(
+      (item: any) => item !== removedData,
+    );
   }
 
   calculateAmount = (rowData: any) => {
@@ -554,7 +573,7 @@ export class AddInvoiceRetailComponent {
 
     const rows = this.invoiceFormData.Details || [];
 
-    // 🚫 Check if any empty row exists
+    //  Check if any empty row exists
     const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
 
     if (hasEmptyRow) {
@@ -636,6 +655,12 @@ export class AddInvoiceRetailComponent {
     }
   }
 
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data?.isInvalid) {
+      e.rowElement.classList.add('invalid-row');
+    }
+  }
+
   saveInvoice() {
     if (this.isSaving) return;
 
@@ -673,12 +698,18 @@ export class AddInvoiceRetailComponent {
     if (grid) {
       grid.saveEditData();
     }
+    (this.invoiceFormData.Details || []).forEach((item: any) => {
+      item.isInvalid = false; // reset
 
+      if (item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0)) {
+        item.isInvalid = true; // ✅ mark row
+      }
+    });
     //  VALIDATION
     const invalidIndex = (this.invoiceFormData.Details || []).findIndex(
       (item: any) => item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0),
     );
-
+    this.itemsGridRef.instance.repaint();
     if (invalidIndex !== -1) {
       notify({
         message: 'Quantity must be greater than 0',

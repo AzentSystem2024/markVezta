@@ -25,7 +25,7 @@ export class CategoryListComponent implements OnInit {
   isAddCategoryPopupOpened = false;
   showFilterRow = true;
   showHeaderFilter = true;
-  c;
+  // c;
   selected_Company_id: any;
   constructor(
     private dataservice: DataService,
@@ -58,7 +58,7 @@ export class CategoryListComponent implements OnInit {
       });
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const {
       ID,
@@ -103,7 +103,7 @@ export class CategoryListComponent implements OnInit {
         }
       });
   }
-  onRowUpdating(event) {
+  onRowUpdating(event: any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
     const combinedData = { ...oldData, ...updataDate };
@@ -149,7 +149,8 @@ export class CategoryListComponent implements OnInit {
 
   showCategory() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: 0,
     };
     this.dataservice.getCategoryData(payload).subscribe((response) => {
       this.category = response;

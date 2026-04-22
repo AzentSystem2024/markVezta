@@ -30,11 +30,11 @@ export class CategoryFormComponent implements OnInit {
     LOYALTY_POINT: 0,
     COST_HEAD_ID: 0,
     DEPT_ID: '',
-    COMPANY_ID: '',
+    COMPANY_ID: 0,
   };
   COMPANY_ID: string;
   newCategory = this.formCategoryData;
-  
+
   constructor(private service: DataService) {}
 
   ngOnInit(): void {

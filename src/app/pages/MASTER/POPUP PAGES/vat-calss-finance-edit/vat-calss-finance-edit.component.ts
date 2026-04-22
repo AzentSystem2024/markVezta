@@ -76,17 +76,17 @@ export class VatCalssFinanceEditComponent {
   }
 
   tryBindData() {
-  if (this.isLedgerLoaded && this.selectedData) {
-    this.formVatclassData = {
-      ...this.selectedData,
-      IGST_INPUT_HEAD_ID: Number(this.selectedData.IGST_INPUT_HEAD_ID),
-      IGST_OUTPUT_HEAD_ID: Number(this.selectedData.IGST_OUTPUT_HEAD_ID),
-    };
+    if (this.isLedgerLoaded && this.selectedData) {
+      this.formVatclassData = {
+        ...this.selectedData,
+        IGST_INPUT_HEAD_ID: Number(this.selectedData.IGST_INPUT_HEAD_ID),
+        IGST_OUTPUT_HEAD_ID: Number(this.selectedData.IGST_OUTPUT_HEAD_ID),
+      };
 
-    //IMPORTANT FIX
-    this.newVatclass = this.formVatclassData;
+      //IMPORTANT FIX
+      this.newVatclass = this.formVatclassData;
+    }
   }
-}
 
   keyPressCode(event: any) {
     const charCode = event.which ? event.which : event.keyCode;
@@ -133,7 +133,8 @@ export class VatCalssFinanceEditComponent {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    // this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id = 0;
   }
 
   UpdateData() {

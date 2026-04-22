@@ -454,40 +454,44 @@ export class EditPurchaseInvoiceComponent {
 
     return row;
   }
-isGRNAlreadySelected = (rowData: any) => {
-  return this.mainGridData?.some(
-    (item) => item.GRN_DET_ID === rowData.GRN_DET_ID
-  );
-};
+  isGRNAlreadySelected = (rowData: any) => {
+    return this.mainGridData?.some(
+      (item) => item.GRN_DET_ID === rowData.GRN_DET_ID,
+    );
+  };
 
-onPopupSelectionChanged(e: any) {
-  const selectedRows = e.selectedRowsData;
+  onPopupSelectionChanged(e: any) {
+    const selectedRows = e.selectedRowsData;
 
-  const validSelection = selectedRows.filter(
-    (row: any) => !this.isGRNAlreadySelected(row)
-  );
+    const validSelection = selectedRows.filter(
+      (row: any) => !this.isGRNAlreadySelected(row),
+    );
 
-  // If some already selected → remove them
-  if (validSelection.length !== selectedRows.length) {
-    this.popupGridRef.instance.deselectAll();
+    // If some already selected → remove them
+    if (validSelection.length !== selectedRows.length) {
+      this.popupGridRef.instance.deselectAll();
 
-    validSelection.forEach((row: any) => {
-      this.popupGridRef.instance.selectRows([row], true);
-    });
+      validSelection.forEach((row: any) => {
+        this.popupGridRef.instance.selectRows([row], true);
+      });
 
-    notify("Some GRNs are already added and cannot be selected again", "warning", 2000);
-  }
-}
-onPopupRowPrepared(e: any) {
-  if (e.rowType === 'data') {
-    const alreadyAdded = this.isGRNAlreadySelected(e.data);
-
-    if (alreadyAdded) {
-      e.rowElement.style.opacity = '0.5';
-      e.rowElement.style.pointerEvents = 'none'; // 🚫 disables click
+      notify(
+        'Some GRNs are already added and cannot be selected again',
+        'warning',
+        2000,
+      );
     }
   }
-}
+  onPopupRowPrepared(e: any) {
+    if (e.rowType === 'data') {
+      const alreadyAdded = this.isGRNAlreadySelected(e.data);
+
+      if (alreadyAdded) {
+        e.rowElement.style.opacity = '0.5';
+        e.rowElement.style.pointerEvents = 'none'; // 🚫 disables click
+      }
+    }
+  }
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
 
@@ -554,6 +558,12 @@ onPopupRowPrepared(e: any) {
     });
   }
 
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data?.isInvalid) {
+      e.rowElement.classList.add('invalid-row');
+    }
+  }
+
   savePurchaseInvoice() {
     if (!this.purchaseInvoiceFormData.SUPP_ID) {
       notify(
@@ -598,6 +608,40 @@ onPopupRowPrepared(e: any) {
         3000,
       );
       return; // stop execution here
+    }
+    let isValid = true;
+
+    this.mainGridData = this.mainGridData.map((row: any, index: number) => {
+      let isInvalid = false;
+
+      if (!row.QUANTITY || row.QUANTITY <= 0) {
+        notify(
+          // `Row ${index + 1}: Quantity must be greater than 0`,
+          'Please enter valid quantity for highlighted rows.',
+          'warning',
+          3000,
+        );
+        isInvalid = true;
+        isValid = false;
+      }
+
+      if (row.QUANTITY > row.PENDING_QTY) {
+        isInvalid = true;
+        isValid = false;
+      }
+
+      return {
+        ...row,
+        isInvalid: isInvalid, // 🔥 new object reference
+      };
+    });
+
+    this.itemsGridRef.instance.refresh(); // 🔥 important
+
+    if (!isValid) return;
+
+    if (!isValid) {
+      return; // 🚫 STOP saving
     }
     let grossAmount = 0;
     let vatAmount = 0;

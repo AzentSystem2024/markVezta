@@ -1,4 +1,4 @@
-import { Component,NgModule } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
@@ -11,18 +11,18 @@ import { DxSelectBoxModule } from 'devextreme-angular';
 @Component({
   selector: 'app-itm-brand-form',
   templateUrl: './itm-brand-form.component.html',
-  styleUrls: ['./itm-brand-form.component.scss']
+  styleUrls: ['./itm-brand-form.component.scss'],
 })
 export class ItmBrandFormComponent {
   formBrandData = {
     CODE: '',
     BRAND_NAME: '',
-    COMPANY_ID: '1'
+    COMPANY_ID: '1',
+    COMPANY_NAME: '',
   };
-  newBrand=this.formBrandData;
+  newBrand = this.formBrandData;
 
   getNewBrandData = () => ({ ...this.newBrand });
-
 }
 @NgModule({
   imports: [
