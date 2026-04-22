@@ -225,6 +225,22 @@ export class ItemBrandListComponent implements OnInit {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
+  validateGridBrandCode = (e: any): boolean => {
+  const value = (e.value || '').trim();
+  const currentId = e?.data?.ID; // editing row id
+
+  if (!value || !this.brandDataSource) return true;
+
+  const items = this.brandDataSource?.items?.() || [];
+
+  return !items.some((item: any) => {
+    return (
+      (item.CODE || '').trim() === value &&
+      item.ID !== currentId   // ignore current row while editing
+    );
+  });
+};
 }
 @NgModule({
   imports: [
