@@ -4,7 +4,7 @@ import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { DxSelectBoxModule } from 'devextreme-angular';
+import { DxNumberBoxModule, DxSelectBoxModule } from 'devextreme-angular';
 import { FormPhotoUploaderModule, FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 
@@ -14,7 +14,9 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./vat-calss-finance-form.component.scss'],
 })
 export class VatCalssFinanceFormComponent {
-  formVatclassData = {
+  vatClass:any;
+  companyID:any;
+  formVatclassData:any = {
     CODE: '',
     VAT_NAME: '',
     VAT_PERC: '',
@@ -27,12 +29,29 @@ export class VatCalssFinanceFormComponent {
 
   constructor(private dataservice: DataService) {
     this.getLedgerCodeDropdown();
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.showVatclass();
   }
 
   getLedgerCodeDropdown() {
     this.dataservice.getActiveLedger().subscribe((response: any) => {
       this.ledgerList = response.Data;
     });
+  }
+
+   showVatclass() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
+
+    this.dataservice.getVatclassData(payload).subscribe(res=>{
+      this.vatClass = res;
+      console.log(this.vatClass,"this.vatClass")
+    })
+
   }
 
   getNewVatclassData = () => ({ ...this.newVatclass });
@@ -78,6 +97,19 @@ export class VatCalssFinanceFormComponent {
       return true;
     }
   }
+
+  validateVatClassCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.vatClass?.length) return true;
+
+
+    return !this.vatClass.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value;
+    });
+  };  
 }
 @NgModule({
   imports: [
@@ -89,6 +121,7 @@ export class VatCalssFinanceFormComponent {
     CommonModule,
     ReactiveFormsModule,
     DxSelectBoxModule,
+    DxNumberBoxModule
   ],
   declarations: [VatCalssFinanceFormComponent],
   exports: [VatCalssFinanceFormComponent],

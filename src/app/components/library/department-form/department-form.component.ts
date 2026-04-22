@@ -7,6 +7,7 @@ import { FormPhotoUploaderModule } from '../../utils/form-photo-uploader/form-ph
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DxSelectBoxModule } from 'devextreme-angular';
+import { DataService } from 'src/app/services';
 
 @Component({
   selector: 'app-department-form',
@@ -17,9 +18,11 @@ export class DepartmentFormComponent {
   COMPANY_ID: any;
   sessionData: any;
   COMPANY_NAME: any;
+  department:any;
 
-  constructor() {
+  constructor(private service:DataService) {
     this.sesstion_Details();
+    this.showItemDepartment();
   }
 
   formDepartmentData = {
@@ -95,6 +98,29 @@ export class DepartmentFormComponent {
     };
     this.newDepartment = this.formDepartmentData;
   }
+
+  showItemDepartment() {
+    const payload = {
+      COMPANY_ID: this.COMPANY_ID,
+    };
+
+    this.service.getDepartmentData(payload).subscribe((response) => {
+      this.department = response;
+    });
+  }
+
+  validateDepartmentCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.department?.length) return true;
+
+
+    return !this.department.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value;
+    });
+  };  
 }
 @NgModule({
   imports: [

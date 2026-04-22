@@ -105,6 +105,7 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.sesstion_Details();
     this.getDepartmentDropDown();
+    this.showItemCategory();
   }
 
   closePopup() {
@@ -201,6 +202,31 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
       });
     });
   }
+
+  showItemCategory() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: 0,
+    };
+
+    this.service.getCategoryData(payload).subscribe((response) => {
+      this.category = response;
+    });
+  }
+
+  validateCategoryCode = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.category?.length) return true;
+
+  const currentId = this.formCategoryData?.ID; // current editing row
+
+  return !this.category.some((item: any) => {
+    const code = (item.CODE || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId; // ignore same record
+  });
+};
 }
 
 @NgModule({

@@ -126,7 +126,6 @@ export class VatClassFinanceComponent implements OnInit {
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     // this.selected_Company_id = this.companyID;
-    this.selected_Company_id = 0;
     this.poData = {
       COMPANY_ID: this.companyID,
       USER_ID: sessionData.USER_ID,
@@ -135,7 +134,7 @@ export class VatClassFinanceComponent implements OnInit {
 
   showVatclass() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: this.companyID,
     };
 
     this.VatClassDataSource = new DataSource({
