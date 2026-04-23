@@ -632,90 +632,32 @@ export class AddInvoiceRetailComponent {
     );
   };
 
-  // onAddRow() {
-  //   if (this.isReadOnlyMode) return;
-
-  //   const grid = this.itemsGridRef?.instance;
-  //   if (!grid) return;
-
-  //   const rows = this.invoiceFormData.Details || [];
-
-  //   //  Check if any empty row exists
-  //   const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
-
-  //   if (hasEmptyRow) {
-  //     notify(
-  //       'Please complete the current row before adding a new one',
-  //       'warning',
-  //       2000,
-  //     );
-
-  //     // 👉 focus that empty row
-  //     const emptyIndex = rows.findIndex((row: any) => this.isRowEmpty(row));
-  //     setTimeout(() => {
-  //       grid.editCell(emptyIndex, 'ITEM_CODE');
-  //     }, 50);
-
-  //     return;
-  //   }
-
-  //   // ✅ Add new row only if all rows are filled
-  //   const newRow = {
-  //     ITEM_ID: null,
-  //     ITEM_CODE: null,
-  //     DESCRIPTION: null,
-  //     HSN_CODE: null,
-  //     UOM: null,
-  //     PRICE: 0,
-  //     QUANTITY: 0,
-  //     AMOUNT: 0,
-  //     TAX_PERC: 0,
-  //     TAX_AMOUNT: 0,
-  //     TOTAL_AMOUNT: 0,
-  //     DISC_PERC: 0,
-  //     DISC_AMT: 0,
-  //   };
-
-  //   this.invoiceFormData.Details = [...rows, newRow];
-
-  //   setTimeout(() => {
-  //     grid.option('dataSource', this.invoiceFormData.Details);
-  //     grid.refresh();
-
-  //     const rowIndex = this.invoiceFormData.Details.length - 1;
-  //     grid.editCell(rowIndex, 'ITEM_CODE');
-  //   }, 50);
-  // }
-
-
   onAddRow() {
-  if (this.isReadOnlyMode) return;
+    if (this.isReadOnlyMode) return;
 
-  const grid = this.itemsGridRef?.instance;
-  if (!grid) return;
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
 
-  const rows = this.invoiceFormData.Details || [];
+    const rows = this.invoiceFormData.Details || [];
 
-    //  Check if any empty row exists
     const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
 
-  if (hasEmptyRow) {
-    notify(
-      'Please complete the current row before adding a new one',
-      'warning',
-      2000,
-    );
+    if (hasEmptyRow) {
+      notify(
+        'Please complete the current row before adding a new one',
+        'warning',
+        2000,
+      );
 
-      // 👉 focus that empty row
       const emptyIndex = rows.findIndex((row: any) => this.isRowEmpty(row));
+
       setTimeout(() => {
         grid.editCell(emptyIndex, 'ITEM_CODE');
-      }, 50);
+      }, 100);
 
-    return;
-  }
+      return;
+    }
 
-    // ✅ Add new row only if all rows are filled
     const newRow = {
       ITEM_ID: null,
       ITEM_CODE: null,
@@ -732,15 +674,34 @@ export class AddInvoiceRetailComponent {
       DISC_AMT: 0,
     };
 
-  this.invoiceFormData.Details = [...rows, newRow];
+    this.invoiceFormData.Details = [...rows, newRow];
 
+    // 🔥 IMPORTANT FIX
     setTimeout(() => {
       grid.option('dataSource', this.invoiceFormData.Details);
-      grid.refresh();
 
-      const rowIndex = this.invoiceFormData.Details.length - 1;
-      grid.editCell(rowIndex, 'ITEM_CODE');
-    }, 50);
+      // 🔥 Wait for rendering properly
+      setTimeout(() => {
+        const rowIndex = this.invoiceFormData.Details.length - 1;
+
+        grid.option('focusedRowIndex', rowIndex); // ✅ ensure row focus
+        grid.editCell(rowIndex, 'ITEM_CODE');
+
+        // 🔥 OPEN DROPDOWN (optional but better UX)
+        setTimeout(() => {
+          const cellElement = grid.getCellElement(rowIndex, 'ITEM_CODE');
+          const selectBoxElement = cellElement?.querySelector('.dx-selectbox');
+
+          if (selectBoxElement) {
+            const selectBox = dxSelectBox.getInstance(
+              selectBoxElement,
+            ) as dxSelectBox;
+            selectBox?.focus();
+            selectBox?.open();
+          }
+        }, 100);
+      }, 150); // ⬅️ THIS is the real fix
+    }, 0);
   }
   moveNextCell(field: string, rowIndex: number, grid: any) {
     if (field === 'ITEM_CODE') {
