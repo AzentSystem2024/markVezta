@@ -407,6 +407,7 @@ import { EditPromotionComponent, EditPromotionModule } from './pages/edit-promot
 import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 import { StorewiseStockViewComponent, StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
+import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -789,6 +790,8 @@ import { StorewiseStockViewComponent, StorewiseStockViewModule } from './pages/R
     MiscellaneousSalesInvoiceModule,
     MiscellaneousSalesInvoiceFormModule,
     StorewiseStockViewModule,
+    ViewPromotionWizardModule
+
   ],
 
   providers: [

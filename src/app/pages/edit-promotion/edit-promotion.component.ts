@@ -126,9 +126,9 @@ export class EditPromotionComponent {
   selectedOperation: string = '';
   promotionName: any;
   firstDropdownValue: any;
-  selectedMode: any;
+  selectedMode: 'price' | 'schema' = 'price';
   readOnly: boolean = false
-  approveValue: any
+  approveValue: boolean = false
   price_level: any
   isSaving: boolean = false
   firstDropdownOptions = [
@@ -209,6 +209,7 @@ export class EditPromotionComponent {
   selectedTabIndex: any = 0
   wsId: any;
   selected_Data_id: any;
+  is_promotion_level: boolean = false
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -226,6 +227,8 @@ export class EditPromotionComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+
+    this.is_promotion_level = sessionData.GeneralSettings.ENABLE_PROMOTION_LEVEL
 
     this.loadStores()
 
@@ -268,6 +271,9 @@ export class EditPromotionComponent {
           this.selectedDays = first.PROMOTION_WEEKDAYS
             ? first.PROMOTION_WEEKDAYS.split(',').map(Number)
             : [];
+
+          this.price_level = first.PROMOTION_LEVEL
+
         }
         const promotionMap = (data?.worksheet_promotion_schema || [])
           .reduce((acc: any, item: any) => {
@@ -434,8 +440,8 @@ export class EditPromotionComponent {
 
           PROMOTION_WEEKDAYS: this.selectedDays?.join(',') || '',
 
-          PROMOTION_LEVEL: 0,
-          PROMOTION_LEVEL_NAME: '0',
+          PROMOTION_LEVEL: this.price_level || 1,
+          PROMOTION_LEVEL_NAME: '',
 
           IS_INACTIVE: false,
 
@@ -480,7 +486,7 @@ export class EditPromotionComponent {
     if (this.approveValue === true) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit',
+        'Confirm Commit'
       ).then((result) => {
         if (result) {
           this.dataservice.approvePromotion(payload).subscribe(
@@ -488,54 +494,113 @@ export class EditPromotionComponent {
               this.isSaving = false;
               this.popupClosed.emit();
 
-              notify(
-                {
-                  message: '  Approve approved and committed successfully',
-                  position: { at: 'top right', my: 'top right' },
-                  displayTime: 500,
-                },
-                'success',
-              );
-              // this.resetFormAfterUpdate();
+              if (res.flag === 1) {
+                notify(
+                  {
+                    message: 'Approved and committed successfully',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 500,
+                  },
+                  'success'
+                );
+              } else if (res.flag === 0) {
+                // 🔹 Extract IDs
+                const match = res.message.match(/Item IDs:\s*([\d,]+)/);
+                let itemNames: string[] = [];
+
+                if (match && match[1]) {
+                  const ids = match[1].split(',').map((id: string) => Number(id.trim()));
+
+                  itemNames = this.itemStoresList
+                    .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
+                    .map((item: any) => item.DESCRIPTION); // adjust key if needed
+                }
+
+                const finalMessage =
+                  itemNames.length > 0
+                    ? `Already exists for: ${itemNames.join(', ')}`
+                    : res.message;
+
+                notify(
+                  {
+                    message: finalMessage,
+                    position: { at: 'top right', my: 'top right' },
+                  },
+                  'error'
+                );
+              }
             },
             (error) => {
-              this.isSaving = false; // ✅ STOP loading
-              notify('Failed to approve   Approve.', 'error', 2000);
+              this.isSaving = false;
+              notify('Failed to approve.', 'error', 2000);
               console.error(error);
-            },
+            }
           );
         } else {
           this.isSaving = false;
           notify('Approval cancelled.', 'info', 2000);
         }
       });
+
     } else {
       this.dataservice.updatePromotion(payload).subscribe(
         (response: any) => {
           console.log(response, 'SAVE RESPONSE');
+
           try {
-            notify(
-              {
-                message: 'Promotion updated successfully',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'success',
-            );
-            this.popupClosed.emit();
-            this.dataGrid.instance.refresh();
+            if (response.flag === 1) {
+              notify(
+                {
+                  message: 'Promotion updated successfully',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'success'
+              );
+
+              this.popupClosed.emit();
+              this.dataGrid.instance.refresh();
+
+            } else if (response.flag === 0) {
+              // 🔹 Extract IDs
+              const match = response.message.match(/Item IDs:\s*([\d,]+)/);
+              let itemNames: string[] = [];
+
+              if (match && match[1]) {
+                const ids = match[1].split(',').map((id: string) => Number(id.trim()));
+
+                itemNames = this.itemStoresList
+                  .filter((item: any) => ids.includes(item.itemId)) // adjust key if needed
+                  .map((item: any) => item.itemName); // adjust key if needed
+              }
+
+              const finalMessage =
+                itemNames.length > 0
+                  ? `Promotion already exists for: ${itemNames.join(', ')}`
+                  : response.message;
+
+              notify(
+                {
+                  message: finalMessage,
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error'
+              );
+            }
+
           } catch (error) {
             notify(
               {
-                message: 'Add operation failed',
+                message: 'Update operation failed',
                 position: { at: 'top right', my: 'top right' },
               },
-              'error',
+              'error'
             );
           }
         },
         (error) => {
           console.error('Error saving promotion:', error);
-        },
+          notify('Update failed.', 'error', 2000);
+        }
       );
     }
   }

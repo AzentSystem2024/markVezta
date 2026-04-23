@@ -94,7 +94,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     private dataservice: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.listWorkisheetItemProperty();
@@ -167,7 +167,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
         })),
     };
     this.dataservice.updateworksheetItemProperty(payload).subscribe(
-      (response: any) => {},
+      (response: any) => { },
       (error) => {
         console.error('Error updating worksheet:', error);
       },
@@ -250,7 +250,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
           );
         }
       },
-      (error) => {},
+      (error) => { },
     );
   }
 
@@ -346,12 +346,11 @@ export class ItemStorePropertiesLogComponent implements OnInit {
           );
         }
       },
-      (error) => {},
+      (error) => { },
     );
   }
 
   isDeleteVisible = (e: any) => {
-    console.log(e, '=========es===================');
     return e.row?.data.Status === 'Open';
   };
   onRowRemoving(event: any) {
@@ -426,4 +425,4 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   declarations: [ItemStorePropertiesLogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemStorePropertiesLogModule {}
+export class ItemStorePropertiesLogModule { }
