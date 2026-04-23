@@ -158,3 +158,11 @@
   color: #ffffff !important;
   background-color: #ffa500 !important; /* blue text */
 }
+::ng-deep .invalid-row > td {
+  background-color: #ffe6e6 !important;
+  border-left: 3px solid red;
+}
+
+::ng-deep .invalid-row > td {
+  background-color: #ffe6e6 !important;
+}

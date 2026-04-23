@@ -182,7 +182,16 @@ export class AddInvoiceRetailComponent {
       name: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.itemsList = response;
+      // this.itemsList = response;
+      this.itemsList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
     });
   }
   getItemsDescription() {
@@ -190,7 +199,15 @@ export class AddInvoiceRetailComponent {
       name: 'ITEMSDESC',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.itemsDescriptionList = response;
+      this.itemsDescriptionList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
     });
   }
   getItemsData(itemId: any, rowData: any) {
@@ -280,10 +297,12 @@ export class AddInvoiceRetailComponent {
       }
     }
   }
-  onRowRemoved() {
-    if (!this.mainGridData || this.mainGridData.length === 0) {
-      this.mainGridData = [{}];
-    }
+  onRowRemoved(e: any) {
+    const removedData = e.data;
+
+    this.invoiceFormData.Details = (this.invoiceFormData.Details || []).filter(
+      (item: any) => item !== removedData,
+    );
   }
 
   calculateAmount = (rowData: any) => {
@@ -293,6 +312,12 @@ export class AddInvoiceRetailComponent {
     return qty * cost;
   };
 
+  calculateDiscAmt = (rowData: any) => {
+    const amt = Number(rowData?.AMOUNT) || 0;
+    const discPerc = Number(rowData?.DISC_PERC) || 0;
+
+    return (amt * discPerc) / 100;
+  };
   calculateTax = (rowData: any) => {
     const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
     const vat = rowData?.TAX_PERC || 0;
@@ -371,7 +396,9 @@ export class AddInvoiceRetailComponent {
     if (
       e.dataField === 'ITEM_CODE' ||
       e.dataField === 'DESCRIPTION' ||
-      e.dataField === 'QUANTITY'
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'PRICE' ||
+      e.dataField === 'DISC_PERC'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -408,7 +435,7 @@ export class AddInvoiceRetailComponent {
             (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+            // grid.focus(grid.getCellElement(rowIndex, 'GST'));
           }, 50);
         }
       };
@@ -476,22 +503,33 @@ export class AddInvoiceRetailComponent {
             setTimeout(() => {
               editor.close();
 
-              // 👉 move to next column
+              //  move to next column
               if (e.dataField === 'ITEM_CODE') {
                 grid.editCell(rowIndex, 'DESCRIPTION');
               } else if (e.dataField === 'DESCRIPTION') {
                 grid.editCell(rowIndex, 'QUANTITY');
+              } else if (e.dataField === 'QUANTITY') {
+                grid.editCell(rowIndex, 'DISC_PERC'); // ADD THIS
               }
             }, 100);
           }
 
           return;
         }
+        // 👉 HANDLE QUANTITY (NumberBox)
+        if (e.dataField === 'QUANTITY') {
+          event.event.preventDefault();
 
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'DISC_PERC'); // ✅ move to Disc %
+          }, 50);
+
+          return;
+        }
         // =====================================================
         // 🔥 QUANTITY → CREATE NEW ROW
         // =====================================================
-        if (e.dataField === 'QUANTITY') {
+        if (e.dataField === 'DISC_PERC') {
           event.event.preventDefault();
 
           const editorElement = event.event.target as HTMLElement;
@@ -554,7 +592,7 @@ export class AddInvoiceRetailComponent {
 
     const rows = this.invoiceFormData.Details || [];
 
-    // 🚫 Check if any empty row exists
+    //  Check if any empty row exists
     const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
 
     if (hasEmptyRow) {
@@ -636,6 +674,12 @@ export class AddInvoiceRetailComponent {
     }
   }
 
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data?.isInvalid) {
+      e.rowElement.classList.add('invalid-row');
+    }
+  }
+
   saveInvoice() {
     if (this.isSaving) return;
 
@@ -673,12 +717,18 @@ export class AddInvoiceRetailComponent {
     if (grid) {
       grid.saveEditData();
     }
+    (this.invoiceFormData.Details || []).forEach((item: any) => {
+      item.isInvalid = false; // reset
 
+      if (item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0)) {
+        item.isInvalid = true; // ✅ mark row
+      }
+    });
     //  VALIDATION
     const invalidIndex = (this.invoiceFormData.Details || []).findIndex(
       (item: any) => item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0),
     );
-
+    this.itemsGridRef.instance.repaint();
     if (invalidIndex !== -1) {
       notify({
         message: 'Quantity must be greater than 0',

@@ -17,6 +17,7 @@ export class DepartmentMeAddFormComponent {
   sessionData: any;
   COMPANY_NAME: any;
   Cost_Bucket_DropDownData: any;
+  department:any;
 
   formDepartmentData = {
     CODE: '',
@@ -29,6 +30,7 @@ export class DepartmentMeAddFormComponent {
   constructor(private service: DataService) {
     this.sesstion_Details();
     this.getCostBucket_DropDown();
+    this.showDepartment();
   }
 
   getNewDepartmentData = () => ({ ...this.newDepartment });
@@ -39,6 +41,15 @@ export class DepartmentMeAddFormComponent {
     );
     this.COMPANY_ID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
+  }
+
+  showDepartment() {
+    const payload = {
+      COMPANY_ID: this.COMPANY_ID,
+    };
+    this.service.get_Department_List(payload).subscribe((response: any) => {
+      this.department = response.datas;
+    });
   }
 
   keyPressCode(event: any) {
@@ -97,6 +108,19 @@ export class DepartmentMeAddFormComponent {
     };
     this.newDepartment = this.formDepartmentData;
   }
+
+  validateDepartmentCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.department?.length) return true;
+
+
+    return !this.department.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value;
+    });
+  };  
 }
 @NgModule({
   imports: [

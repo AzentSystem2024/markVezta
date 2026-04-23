@@ -120,7 +120,7 @@ export class PurchaseReturnDebitComponent {
   isEditDebitNote: boolean = false;
   isViewCreditNote: boolean = false;
   selectedDebitNote: any;
-  isViewDebitNote: boolean;
+  isViewDebitNote: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -139,11 +139,11 @@ export class PurchaseReturnDebitComponent {
   sessionData: any;
   selected_vat_id: any;
 
-  isAddPurchaseReturn: boolean;
-  isEditPurchaseReturn: boolean;
-  isViewPurchaseReturn: boolean;
+  isAddPurchaseReturn: boolean = false;
+  isEditPurchaseReturn: boolean = false;
+  isViewPurchaseReturn: boolean = false;
   selectedPurchaseReturn: any;
-  isReadOnlyPurchaseReturn: boolean;
+  isReadOnlyPurchaseReturn: boolean = false;
   companyID: any;
   PurchaseReturnDataSource: any;
   purchaseReturnArray: any[] = [];
@@ -177,8 +177,8 @@ export class PurchaseReturnDebitComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

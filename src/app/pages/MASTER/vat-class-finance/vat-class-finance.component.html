@@ -19,7 +19,7 @@
     >
       <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
 
       <dxo-pager
@@ -105,7 +105,7 @@
 <dx-popup
   [(visible)]="isEditVatclassPopupOpened"
   title="Edit VAT Class"
-  height="40vh"
+  height="auto"
   width="35vw"
 >
   <div>

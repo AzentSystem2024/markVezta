@@ -99,50 +99,45 @@ export class TendersListComponent implements OnInit {
   }
 
   onClickSaveTenders() {
-    
     const component = this.isEditMode
-        ? this.editFormComponent
-        : this.addFormComponent;
-    
-        const data = component.getNewTenderData();
-    
-        console.log('FINAL DATA', data);
-    
-        const {
-        CODE,
-        IS_INACTIVE,
-        DESCRIPTION,
-        ARABIC_DESCRIPTION,
-        TENDER_TYPE,
-        DISPLAY_ORDER,
-        CURRENCY_ID,
-        ALLOW_OPENING,
-        ALLOW_DECLARATION,
-        ADDITIONAL_INFO_REQUIRED
-      } = data;
-    
-        if (this.isEditMode && this.currentEditId) {
-        this.dataservice
-      .updateTenders(
-        data
-      )
-          .subscribe((response: any) => {
-            if (response?.flag === '1') {
-              notify(
-                {
-                  message: 'Tender updated successfully',
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'success'
-              );
-    
-              this.isEditTendersPopupOpened = false;
-              this.showTenders();
-            }
-          });
-    
-        return;
-      }
+      ? this.editFormComponent
+      : this.addFormComponent;
+
+    const data = component.getNewTenderData();
+
+    console.log('FINAL DATA', data);
+
+    const {
+      CODE,
+      IS_INACTIVE,
+      DESCRIPTION,
+      ARABIC_DESCRIPTION,
+      TENDER_TYPE,
+      DISPLAY_ORDER,
+      CURRENCY_ID,
+      ALLOW_OPENING,
+      ALLOW_DECLARATION,
+      ADDITIONAL_INFO_REQUIRED,
+    } = data;
+
+    if (this.isEditMode && this.currentEditId) {
+      this.dataservice.updateTenders(data).subscribe((response: any) => {
+        if (response?.flag === '1') {
+          notify(
+            {
+              message: 'Tender updated successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.isEditTendersPopupOpened = false;
+          this.showTenders();
+        }
+      });
+
+      return;
+    }
 
     this.dataservice
       .postTendersData(
@@ -155,15 +150,24 @@ export class TendersListComponent implements OnInit {
         CURRENCY_ID,
         ALLOW_OPENING,
         ALLOW_DECLARATION,
-        ADDITIONAL_INFO_REQUIRED
+        ADDITIONAL_INFO_REQUIRED,
       )
       .subscribe((response) => {
-        if (response) {
+        if (response?.flag === '1') {
+          notify(
+            {
+              message: 'Tender added successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.isAddTendersPopupOpened = false;
           this.showTenders();
         }
       });
   }
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const {
       ID,

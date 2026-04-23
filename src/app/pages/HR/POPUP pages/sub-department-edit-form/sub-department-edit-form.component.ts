@@ -41,6 +41,8 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
     DEPARTMENT_ID: '',
   };
 
+  subDepartment:any;
+
   DepartmentDropdownData: any;
   newSubDepartment: any;
   SubDepartment: any = [];
@@ -50,6 +52,7 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.getDepartmentDropDown();
+    this.show_subdepartment();
   }
 
   getNewSubDepartmentData = () => ({ ...this.newSubDepartment });
@@ -153,6 +156,29 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
       });
     });
   }
+
+  show_subdepartment() {
+    this.service.get_SubDepartment_Data().subscribe((res: any) => {
+        this.subDepartment = res.datas;
+        console.log(this.subDepartment,"subdepartment")
+    });
+  }
+
+  validateSubDepartmentCode = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.subDepartment?.length) return true;
+
+  return !this.subDepartment.some((item: any) => {
+    const code = (item.CODE || '').trim().toLowerCase();
+
+    return (
+      item.ID !== this.formSubDepartmentData.ID && //  exclude current record
+      code === value
+    );
+  });
+};
+
 }
 
 @NgModule({

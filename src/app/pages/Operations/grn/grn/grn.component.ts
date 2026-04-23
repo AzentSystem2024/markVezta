@@ -333,7 +333,7 @@ export class GrnComponent implements OnInit {
 
     this.service.updateGrnData(data).subscribe((res) => {
       console.log('data updated', res);
-      if (res.Message === 'Success') {
+      if (res.Message === 'Success' && res.Flag === 1) {
         notify(
           {
             message: 'Data Updated Successfully',

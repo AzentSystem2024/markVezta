@@ -30,16 +30,18 @@ export class CategoryFormComponent implements OnInit {
     LOYALTY_POINT: 0,
     COST_HEAD_ID: 0,
     DEPT_ID: '',
-    COMPANY_ID: '',
+    COMPANY_ID: 0,
   };
   COMPANY_ID: string;
   newCategory = this.formCategoryData;
-  
+  category:any;
+
   constructor(private service: DataService) {}
 
   ngOnInit(): void {
     this.session_Details();
     this.getDepartmentDropDown();
+    this.showItemCategory();
   }
 
   getNewCategoryData = () => ({ ...this.newCategory });
@@ -61,6 +63,30 @@ export class CategoryFormComponent implements OnInit {
       this.popupClosed.emit();
     });
   }
+
+  showItemCategory() {
+    const payload = {
+      COMPANY_ID: this.COMPANY_ID,
+      // COMPANY_ID: 0,
+    };
+
+    this.service.getCategoryData(payload).subscribe((response) => {
+      this.category = response;
+    });
+  }
+
+  validateCategoryCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.category?.length) return true;
+
+
+    return !this.category.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value;
+    });
+  };  
 }
 @NgModule({
   imports: [

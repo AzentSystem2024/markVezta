@@ -41,6 +41,7 @@ export class StoresFormComponent implements OnInit {
   selectedUnitsTooltip: any;
   countryCode: string = '971';
   formStoresData = {
+    ID: 0,
     CODE: '',
     STORE_NAME: '',
     IS_PRODUCTION: false,
@@ -77,6 +78,8 @@ export class StoresFormComponent implements OnInit {
   StateId: any;
   stateLabel: any;
 
+  storesArray: any[] = [];
+
   constructor(
     private service: DataService,
     private countryService: CountryServiceService,
@@ -93,21 +96,34 @@ export class StoresFormComponent implements OnInit {
   });
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['storeData'] &&
-      this.storeData &&
-      Object.keys(this.storeData).length
-    ) {
-      const phoneNo = this.storeData.PHONE;
-      const [countryCodePhone, phonenumber] = phoneNo.split('-');
-      this.countryCodePhone = countryCodePhone;
-      this.newStores = {
-        ...this.formStoresData,
-        ...this.storeData,
-      };
-      this.newStores.PHONE = phonenumber;
-    }
+    if (changes['storeData'] && this.storeData) {
+      // 👉 EDIT MODE
+      if (Object.keys(this.storeData).length > 0) {
+        const phoneNo = this.storeData.PHONE || '';
 
+        let countryCodePhone = '';
+        let phonenumber = '';
+
+        if (phoneNo.includes('-')) {
+          [countryCodePhone, phonenumber] = phoneNo.split('-');
+        } else {
+          phonenumber = phoneNo;
+        }
+
+        this.countryCodePhone = countryCodePhone;
+
+        this.newStores = {
+          ...this.formStoresData,
+          ...this.storeData,
+          PHONE: phonenumber,
+        };
+      }
+      // 👉 ADD MODE (important fix)
+      else {
+        this.resetForm();
+      }
+    }
+    console.log(this.newStores, 'NEWSTOREASSSSSSS');
     // ADD MODE → ALWAYS set companyId when received
     if (changes['companyId'] && this.companyId) {
       this.newStores.COMPANY_ID = this.companyId;
@@ -116,6 +132,7 @@ export class StoresFormComponent implements OnInit {
 
   resetForm() {
     this.newStores = {
+      ID: 0,
       CODE: '',
       STORE_NAME: '',
       IS_PRODUCTION: false,
@@ -152,6 +169,7 @@ export class StoresFormComponent implements OnInit {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         this.companyList = [selectedCompany]; // Show only selected company
         this.getGroupDropDown();
+        this.showStores();
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
@@ -159,6 +177,8 @@ export class StoresFormComponent implements OnInit {
         this.creditFormData.FIN_ID = firstFinYear.FIN_ID;
       }
     }
+
+    
 
     this.get_Country_Dropdown_List();
     this.getCountryListWithFlag();
@@ -318,6 +338,36 @@ export class StoresFormComponent implements OnInit {
     this.dxForm?.instance?.resetValues(); // optional
     this.dxForm?.instance?.resetValidation();
   }
+
+  showStores() {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
+
+    this.service.getStoresData(payload).subscribe({
+      next: (response: any[]) => {
+        this.storesArray = response || [];
+        console.log(this.storesArray,"this.storesArray")
+      },
+      error: () => {
+        this.storesArray = [];
+      },
+    });
+  }
+
+  validateStoreCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.storesArray?.length) return true;
+
+    const currentId = this.newStores?.ID || 0;
+
+    return !this.storesArray.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId;
+    });
+  };  
 }
 @NgModule({
   imports: [

@@ -31,7 +31,7 @@ import {
   DxValidationGroupModule,
   DxValidatorModule,
   DxSwitchModule,
-  DxTabPanelModule
+  DxTabPanelModule,
 } from 'devextreme-angular';
 import {
   DxoFormItemModule,
@@ -171,7 +171,7 @@ export class PromotionComponent {
   selected_Company_id: any;
   selectedTabIndex: any = 0;
   wsId: any;
-  price_level: any
+  price_level: any;
   get displayTimeRange(): string {
     return this.fromTime && this.toTime
       ? `${this.fromTime} - ${this.toTime}`
@@ -180,7 +180,7 @@ export class PromotionComponent {
   isLoading: boolean = true;
   isPromotionApplied: boolean = false;
   isRowsSelected: boolean = false;
-  isHappyHoursEnabledvalue: any
+  isHappyHoursEnabledvalue: any;
   selectedMode: 'price' | 'schema' = 'price';
   is_promotion_level: boolean = false
   constructor(
@@ -213,7 +213,7 @@ export class PromotionComponent {
   };
 
   ngOnInit() {
-    console.log('==========test data=============')
+    console.log('==========test data=============');
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.userId = sessionStorage.getItem('UserId');
     this.sesstion_Details();
@@ -238,24 +238,26 @@ export class PromotionComponent {
     });
 
     const payloadpromotionlevel = {
-      NAME: 'PROMOTION_LEVEL'
-    }
-    this.dataservice.getDropdownData(payloadpromotionlevel).subscribe((data) => {
-      if (data && data.length > 0) {
-        this.promotionLevel = data;
+      NAME: 'PROMOTION_LEVEL',
+    };
+    this.dataservice
+      .getDropdownData(payloadpromotionlevel)
+      .subscribe((data) => {
+        if (data && data.length > 0) {
+          this.promotionLevel = data;
 
-        if (this.promotionLevel.length > 1) {
-          this.showDropdown = true; // More than one level, show dropdown
+          if (this.promotionLevel.length > 1) {
+            this.showDropdown = true; // More than one level, show dropdown
+          } else {
+            this.selectedPromotionLevel = this.promotionLevel[0].value; // Only one level, set as default
+            this.showDropdown = false;
+          }
         } else {
-          this.selectedPromotionLevel = this.promotionLevel[0].value; // Only one level, set as default
+          this.promotionLevel = [{ text: 'Level 0', value: 0 }];
+          this.selectedPromotionLevel = 0;
           this.showDropdown = false;
         }
-      } else {
-        this.promotionLevel = [{ text: 'Level 0', value: 0 }];
-        this.selectedPromotionLevel = 0;
-        this.showDropdown = false;
-      }
-    });
+      });
   }
 
   onCheckboxChange(event: any): void {
@@ -265,11 +267,9 @@ export class PromotionComponent {
     }
   }
 
-
-
   onModeChange(e: any) {
     const mode = e.value;
-    console.log(e, '==================')
+    console.log(e, '==================');
 
     if (mode === 'price') {
       // reset schema
@@ -347,18 +347,15 @@ export class PromotionComponent {
 
   schemaOptions() {
     const payload = {
-      NAME: "PROMOTIONSCHEMA_TYPE"
-    }
-    this.dataservice
-      .getDropdownData(payload)
-      .subscribe((data) => {
-        this.promotionSchema = data;
-        // console.log(data, 'schemadropdown');
-      });
+      NAME: 'PROMOTIONSCHEMA_TYPE',
+    };
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
+      this.promotionSchema = data;
+      // console.log(data, 'schemadropdown');
+    });
   }
 
   onSchemaChanged(event: any) {
-
     this.selectedOption = '';
     this.roundingValue = null;
     this.operationInputValue = '';
@@ -432,7 +429,9 @@ export class PromotionComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.is_promotion_level = sessionData.GeneralSettings.ENABLE_PROMOTION_LEVEL
@@ -460,10 +459,8 @@ export class PromotionComponent {
   }
 
   setPromotion(selectedRowKeys: any[]) {
-
     console.log(this.selectedStoreId, 'INSETPROMOTION');
     this.isVisible = true; // Open the popup when rows are selected
-
   }
 
   selectDays() {
@@ -495,14 +492,13 @@ export class PromotionComponent {
     // ✅ SCHEMA MODE ONLY
     // =========================
     if (this.selectedMode === 'schema') {
-
       if (!this.selectedSchemaId) {
         notify({ message: 'Please select schema.' }, 'error');
         return;
       }
 
       const schema = this.promotionSchema.find(
-        (s: any) => s.ID == this.selectedSchemaId
+        (s: any) => s.ID == this.selectedSchemaId,
       );
 
       if (!schema) {
@@ -512,7 +508,7 @@ export class PromotionComponent {
 
       this.selectedRow.forEach((row: any) => {
         const index = this.itemStoresList.findIndex(
-          (item: any) => item.ID === row.ID
+          (item: any) => item.ID === row.ID,
         );
 
         if (index !== -1) {
@@ -535,7 +531,6 @@ export class PromotionComponent {
     // ✅ PRICE MODE ONLY
     // =========================
     if (this.selectedMode === 'price') {
-
       if (!this.promotionName) {
         notify({ message: 'Enter promotion name.' }, 'error');
         return;
@@ -552,16 +547,14 @@ export class PromotionComponent {
 
       this.selectedRow.forEach((row: any, index: any) => {
         const i = this.itemStoresList.findIndex(
-          (item: any) => item.ID === row.ID
+          (item: any) => item.ID === row.ID,
         );
 
         if (i !== -1) {
           // ✅ ONLY price fields updated
-          this.itemStoresList[i].PROMOTION_PRICE =
-            this.operationResult[index];
+          this.itemStoresList[i].PROMOTION_PRICE = this.operationResult[index];
 
-          this.itemStoresList[i].PROMOTION_NAME =
-            this.promotionName;
+          this.itemStoresList[i].PROMOTION_NAME = this.promotionName;
 
           // ❌ CLEAR schema fields (important)
           this.itemStoresList[i].PROMOTION_SCHEMA_ID = null;
@@ -936,10 +929,13 @@ export class PromotionComponent {
     const companyId = 1; // example company ID
     const userId = this.userId; // example user ID
     const narration = '';
-    const data = this.dataGrid.instance.getDataSource().items()
-    console.log(data, '=================grid data==============================')
+    const data = this.dataGrid.instance.getDataSource().items();
+    console.log(
+      data,
+      '=================grid data==============================',
+    );
 
-    console.log()
+    console.log();
     let worksheetPromotionSchema = [];
     //  Check selected rows properly
     if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
@@ -976,7 +972,9 @@ export class PromotionComponent {
     }
 
 
-    const grid_Data = this.dataGrid.instance.getDataSource().items()
+    const grid_Data = this.dataGrid.instance
+      .getDataSource()
+      .items()
       .filter((item: any) => this.selectedRowKeys.includes(item.ID))
       .map((item: any) => {
         return {
@@ -1020,7 +1018,7 @@ export class PromotionComponent {
           BARCODE: item.BARCODE || '',
           ITEM_DESCRIPTION: item.DESCRIPTION || '',
 
-          NARRATION: this.narration || ''
+          NARRATION: this.narration || '',
         };
       });
 
@@ -1035,11 +1033,8 @@ export class PromotionComponent {
 
       NARRATION: this.narration || '',
 
-
-      worksheet_promotion_schema: grid_Data
-
-    }
-
+      worksheet_promotion_schema: grid_Data,
+    };
 
     console.log(payload, 'PAYLOAD IN SAVE');
 
@@ -1100,14 +1095,11 @@ export class PromotionComponent {
         );
       }
     });
-
-
   }
-
 
   Cancel() {
     this.router.navigate(['/promotions']);
-    this.resetForm()
+    this.resetForm();
   }
   formatTime(date: any) {
     return date ? new Date(date).toISOString() : null;
@@ -1135,7 +1127,6 @@ export class PromotionComponent {
       this.fromTime = resetTime;
       this.toTime = resetTime;
     }
-
   }
   resetForm() {
     this.fromDate = new Date();
@@ -1146,12 +1137,11 @@ export class PromotionComponent {
 
     this.selectedDays = [];
 
-
     this.promotionName = null;
     this.operationInputValue = '';
     this.roundingValue = null;
-    this.selectedStoreId = []
-    this.narration = ''
+    this.selectedStoreId = [];
+    this.narration = '';
     this.isHappyHoursEnabled = false;
   }
   onPriceLevel(e: any) {
@@ -1161,7 +1151,6 @@ export class PromotionComponent {
 
   }
 }
-
 
 @NgModule({
   imports: [
@@ -1193,7 +1182,7 @@ export class PromotionComponent {
     DxValidationGroupModule,
     DxValidatorModule,
     DxSwitchModule,
-    DxTabPanelModule
+    DxTabPanelModule,
   ],
   providers: [],
   exports: [PromotionComponent],
