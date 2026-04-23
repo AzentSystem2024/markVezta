@@ -51,6 +51,7 @@
           class="tabItems"
           height="100%"
           *dxTemplate="let tab of 'title'"
+          [class.active]="selectedIndex === tabs.indexOf(tab)"
           (click)="TabItemClick(tab)"
         >
           <span class="tabSubItems ms-2">{{ tab.title }}</span>

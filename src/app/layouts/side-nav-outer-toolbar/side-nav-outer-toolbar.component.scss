@@ -39,11 +39,35 @@
   // margin-left: auto;
   font-size: 14px;
   margin-right: 5px;
+  border-radius: 50%;
   color: var(--close-icon-color);
+  opacity: 0; /* hidden by default */
+  transition: all 0.2s ease;
 }
-// .close-icon:hover {
-//   color: aliceblue;
-// }
+
+/* ===== SHOW ICON ON HOVER (inactive tab) ===== */
+.tabItems:hover .close-icon {
+  opacity: 1;
+}
+
+/* ===== ACTIVE TAB ICON (always visible) ===== */
+.tabItems.active .close-icon {
+  opacity: 1;
+  color: #374151; /* darker gray */
+}
+
+.tabItems .close-icon:hover {
+  color: var(--selected-tab-text-color);
+  background-color: rgb(96 165 250 / 20%);
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+/* ===== CLICK EFFECT ===== */
+.tabItems .close-icon:active {
+  background-color: #ef4444;
+  color: #fff;
+}
 
 .dx-treelist-borders .dx-treelist-headers .dx-treelist-table {
   border-bottom-width: 1px;
@@ -259,3 +283,5 @@
     background-color: var(--base-bg);
   }
 }
+
+
