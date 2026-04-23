@@ -129,7 +129,6 @@
           }"
           (onRowRemoved)="onRowRemoved($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
-          (onCellValueChanged)="onCellValueChanged($event)"
           (onRowPrepared)="onRowPrepared($event)"
         >
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -250,6 +249,13 @@
 
             <dxi-total-item
               column="TAX_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="DISC_AMT"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="{0}"
