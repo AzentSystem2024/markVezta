@@ -182,12 +182,12 @@ export class PromotionComponent {
   isRowsSelected: boolean = false;
   isHappyHoursEnabledvalue: any;
   selectedMode: 'price' | 'schema' = 'price';
-
+  is_promotion_level: boolean = false
   constructor(
     private dataservice: DataService,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -434,6 +434,8 @@ export class PromotionComponent {
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.is_promotion_level = sessionData.GeneralSettings.ENABLE_PROMOTION_LEVEL
+
   }
 
   loadStores() {
@@ -617,6 +619,8 @@ export class PromotionComponent {
   }
 
   onSelectionChanged(e: any) {
+
+    console.log(e, '-----------select grid ----------------')
     this.selectedRowKeys = e.selectedRowKeys || [];
     this.selectedRow = e.selectedRowsData || [];
 
@@ -624,6 +628,12 @@ export class PromotionComponent {
     this.selectedId = [];
     this.selectedCost = [];
     this.selectedSalePrice = [];
+    // ✅ Correct condition for unselect (EMPTY)
+    if (!this.selectedRowKeys.length) {
+      console.log('No selection → All values reset to zero');
+      return;
+    }
+
 
     if (!this.selectedRow || this.selectedRow.length === 0) {
       return;
@@ -639,7 +649,7 @@ export class PromotionComponent {
 
     console.log('Selected IDs:', this.selectedId);
   }
-  onSelectionChangedselectedDayas(e: any) {}
+  onSelectionChangedselectedDayas(e: any) { }
 
   onSelectionChangedforNewItem(e: any) {
     this.selectedRowForNewList = e.selectedRowKeys;
@@ -927,11 +937,40 @@ export class PromotionComponent {
 
     console.log();
     let worksheetPromotionSchema = [];
-    if (!this.selectedRow) {
-      console.error('Selected row or promotion price is missing');
+    //  Check selected rows properly
+    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
+      notify(
+        {
+          message: 'Select at least one row',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
       return;
     }
-    const storeID = this.selectedStoreId.join(',') || '1';
+
+    //  Check selected days properly
+    if (!this.selectedDays || this.selectedDays.length === 0) {
+      notify(
+        {
+          message: 'Select at least one day',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
+      return;
+    }
+    if (!this.selectedStoreId || this.selectedStoreId.length === 0) {
+      notify(
+        {
+          message: 'Select at least one store',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
+      return;
+    }
+
 
     const grid_Data = this.dataGrid.instance
       .getDataSource()
@@ -958,7 +997,7 @@ export class PromotionComponent {
 
           PROMOTION_WEEKDAYS: this.selectedDays?.join(',') || '',
 
-          PROMOTION_LEVEL: 0,
+          PROMOTION_LEVEL: this.price_level || 1,
           PROMOTION_LEVEL_NAME: '0',
 
           IS_INACTIVE: false,
@@ -1003,26 +1042,56 @@ export class PromotionComponent {
     this.dataservice.savePromotion(payload).subscribe((response: any) => {
       console.log(response, 'SAVE RESPONSE');
       try {
-        notify(
-          {
-            message: 'Promotion added successfully',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.resetForm();
+        if (response.flag === 1) {
+          notify(
+            {
+              message: 'Promotion added successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success'
+          );
 
-        this.router.navigate(['/promotions'], {
-          state: { refresh: true },
-        });
-        this.dataGrid.instance.refresh();
+          this.resetForm();
+          this.router.navigate(['/promotions']);
+          this.dataGrid.instance.refresh();
+
+        } else if (response.flag === 0) {
+
+          // 🔹 Extract IDs from message
+          const match = response.message.match(/Item IDs:\s*([\d,]+)/);
+          let itemNames: string[] = [];
+
+          if (match && match[1]) {
+            const ids = match[1].split(',').map((id: string) => Number(id.trim()));
+            console.log(this.itemStoresList)
+            // 🔹 Map IDs to names from itemStoresList
+            itemNames = this.itemStoresList
+              .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
+              .map((item: any) => item.DESCRIPTION); // adjust key if needed
+          }
+
+          // 🔹 Final message
+          const finalMessage =
+            itemNames.length > 0
+              ? `Promotion already exists for: ${itemNames.join(', ')}`
+              : response.message;
+
+          notify(
+            {
+              message: finalMessage,
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error'
+          );
+        }
+
       } catch (error) {
         notify(
           {
             message: 'Add operation failed',
             position: { at: 'top right', my: 'top right' },
           },
-          'error',
+          'error'
         );
       }
     });
@@ -1075,7 +1144,12 @@ export class PromotionComponent {
     this.narration = '';
     this.isHappyHoursEnabled = false;
   }
-  onPriceLevel(e: any) {}
+  onPriceLevel(e: any) {
+
+  }
+  onSelectionChangedDAYS(e: any) {
+
+  }
 }
 
 @NgModule({
@@ -1115,4 +1189,4 @@ export class PromotionComponent {
   declarations: [PromotionComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PromotionModule {}
+export class PromotionModule { }

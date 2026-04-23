@@ -42,6 +42,7 @@ import { DataService } from 'src/app/services';
 import { workerData } from 'worker_threads';
 import { PromotionEditModule } from '../promotion-edit/promotion-edit.component';
 import { EditPromotionModule } from '../edit-promotion/edit-promotion.component';
+import { ViewPromotionWizardModule } from '../view-promotion-wizard/view-promotion-wizard.component';
 import { NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -96,8 +97,8 @@ export class PromotionLogComponent {
   AllowCommitWithSave: any;
   logStatusMap: { [key: number]: string } = {};
   status: any;
-  approveValue: boolean = false;
-
+  approveValue: boolean = false
+  ViewPopupOpened: boolean = false
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -137,7 +138,7 @@ export class PromotionLogComponent {
     private dataservice: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
@@ -228,7 +229,7 @@ export class PromotionLogComponent {
       .selectPromotionWorksheet(worksheetId)
       .subscribe((response: any) => {
         const ws = this.promotionLogList.find(
-          (worksheet) => worksheet.ID == response.ID,
+          (worksheet: any) => worksheet.ID == response.ID,
         );
         this.status = ws.Status;
         this.selectedPromotion = { ...response, status: this.status };
@@ -254,14 +255,24 @@ export class PromotionLogComponent {
   openEditingStart(event: any) {
     event.cancel = true;
     const selectedId = event.data.ID;
-    console.log('Edit row triggered for ID:', selectedId);
+    console.log('Edit row triggered for ID:', selectedId, event);
+    const status = event.data.Status
+    console.log(status, '=============ststus----------------')
     this.dataservice
       .selectPromotionWorksheet(selectedId)
       .subscribe((response: any) => {
         this.selectedPromotion = response;
         console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
-        this.editPackPopupOpened = true;
-      });
+
+      })
+    if (status === "Approved") {
+      this.ViewPopupOpened = true
+    } else {
+      this.editPackPopupOpened = true
+
+    }
+
+
   }
 
   onAddClick() {
@@ -359,6 +370,10 @@ export class PromotionLogComponent {
     this.editPackPopupOpened = false;
     this.getPromotionLogList();
   }
+  isDeleteVisible = (e: any) => {
+    console.log(e, '=========es===================');
+    return e.row?.data.Status === 'Open';
+  };
 }
 
 @NgModule({
@@ -391,10 +406,11 @@ export class PromotionLogComponent {
     DxValidationGroupModule,
     DxValidatorModule,
     EditPromotionModule,
+    ViewPromotionWizardModule
   ],
   providers: [],
   exports: [],
   declarations: [PromotionLogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PromotionLogModule {}
+export class PromotionLogModule { }

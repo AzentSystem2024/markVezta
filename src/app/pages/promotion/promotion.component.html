@@ -167,7 +167,7 @@
                     [multiline]="false"
                     [width]="300"
                     [searchEnabled]="true"
-                    (onValueChanged)="onSelectionChanged($event)"
+                    (onValueChanged)="onSelectionChangedDAYS($event)"
                   ></dx-tag-box>
 
                   <dx-tag-box
@@ -183,6 +183,7 @@
                     (onValueChanged)="onDropdownValueChanged($event)"
                   ></dx-tag-box>
                   <dx-select-box
+                    *ngIf="is_promotion_level"
                     [(value)]="price_level"
                     [items]="priceLevels"
                     displayExpr="text"

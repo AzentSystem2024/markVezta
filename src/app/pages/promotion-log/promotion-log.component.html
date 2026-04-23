@@ -22,7 +22,7 @@
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowDeleting]="isDeleteVisible"
       ></dxo-editing>
       <dxo-search-panel
         [visible]="true"
@@ -89,5 +89,19 @@
       (popupClosed)="handleClose()"
       [selectedData]="selectedPromotion"
     ></app-edit-promotion>
+  </div>
+</dx-popup>
+<dx-popup
+  [(visible)]="ViewPopupOpened"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="View Promotion"
+  (onHiding)="handleClose()"
+>
+  <div *dxTemplate="let data of 'content'">
+    <app-view-promotion-wizard
+      (popupClosed)="handleClose()"
+      [selectedData]="selectedPromotion"
+    ></app-view-promotion-wizard>
   </div>
 </dx-popup>

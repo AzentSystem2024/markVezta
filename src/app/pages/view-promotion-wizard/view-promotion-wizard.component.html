@@ -1,0 +1,297 @@
+<div class="view-wrappers list-page">
+  <div>
+    <dx-data-grid
+      #dataGrid
+      [width]="'100%'"
+      [height]="originalGridHeight"
+      class="grid theme-dependent"
+      [dataSource]="itemStoresList"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [editing]="{
+        mode: 'cell',
+        allowUpdating: true,
+      }"
+      [keyExpr]="'ID'"
+      [(selectedRowKeys)]="selectedRowKeys"
+      (onSelectionChanged)="onSelectionChanged($event)"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <dxo-scrolling
+        mode="standard"
+        columnRenderingMode="virtual"
+      ></dxo-scrolling>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+      ></dxo-header-filter>
+      <dxo-search-panel
+        [visible]="true"
+        [highlightCaseSensitive]="false"
+      ></dxo-search-panel>
+      <dxo-editing mode="popup" [allowAdding]="true" [allowUpdating]="true">
+      </dxo-editing>
+
+      <dxo-toolbar style="height: 120px">
+        <dxi-item location="before">
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              width: 100%;
+              gap: 10px;
+              height: 120px;
+            "
+          >
+            <!-- 🔹 Heading -->
+            <!-- <div class="grid-header">{{ heading }}</div> -->
+
+            <!-- 🔹 Main Row -->
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                gap: 20px;
+                width: 100%;
+              "
+            >
+              <!-- ================= LEFT SIDE ================= -->
+              <div
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 20px;
+                  flex-wrap: wrap;
+                "
+              >
+                <!-- From & To Date -->
+                <div style="display: flex; flex-direction: column; gap: 10px">
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <label style="width: 90px">From Date:</label>
+                    <dx-date-box
+                      [(value)]="fromDate"
+                      type="date"
+                      displayFormat="yyyy-MM-dd"
+                      width="150"
+                      [readOnly]="true"
+                    >
+                    </dx-date-box>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <label style="width: 90px">To Date:</label>
+                    <dx-date-box
+                      [(value)]="toDate"
+                      type="date"
+                      displayFormat="yyyy-MM-dd"
+                      width="150"
+                      [readOnly]="true"
+                    >
+                    </dx-date-box>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <label style="width: 90px">Remark:</label>
+                    <dx-text-box
+                      [(value)]="narration"
+                      placeholder="Enter Remarks"
+                      width="150"
+                      [readOnly]="true"
+                      style="margin-bottom: 10px"
+                    >
+                    </dx-text-box>
+                  </div>
+                </div>
+
+                <!-- Time -->
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <dx-switch [(value)]="isHappyHoursEnabled" [readOnly]="true">
+                  </dx-switch>
+                  <dx-date-box
+                    [(value)]="timeFrom"
+                    type="time"
+                    displayFormat="HH:mm"
+                    pickerType="rollers"
+                    [readOnly]="true"
+                    placeholder="From Time"
+                    width="90"
+                    [disabled]="!isHappyHoursEnabled"
+                  >
+                  </dx-date-box>
+
+                  <dx-date-box
+                    [(value)]="timeTo"
+                    type="time"
+                    displayFormat="HH:mm"
+                    pickerType="rollers"
+                    placeholder="To Time"
+                    width="90"
+                    [readOnly]="true"
+                    [disabled]="!isHappyHoursEnabled"
+                  >
+                  </dx-date-box>
+                </div>
+
+                <!-- Days + Store -->
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <dx-tag-box
+                    [items]="daysOfWeek"
+                    [(value)]="selectedDays"
+                    displayExpr="text"
+                    valueExpr="value"
+                    [multiline]="false"
+                    [showSelectionControls]="true"
+                    placeholder="Select Days"
+                    [searchEnabled]="true"
+                    [readOnly]="true"
+                    [width]="300"
+                  >
+                  </dx-tag-box>
+
+                  <dx-tag-box
+                    [items]="store"
+                    [(value)]="selectedStoreId"
+                    displayExpr="STORE_NAME"
+                    valueExpr="ID"
+                    [multiline]="false"
+                    [width]="300"
+                    [multiline]="false"
+                    [showSelectionControls]="true"
+                    placeholder="Select Days"
+                    [searchEnabled]="true"
+                    [readOnly]="true"
+                  >
+                  </dx-tag-box>
+
+                  <dx-select-box
+                    *ngIf="is_promotion_level"
+                    [(value)]="price_level"
+                    [items]="priceLevels"
+                    displayExpr="text"
+                    valueExpr="value"
+                    placeholder="Price level"
+                    width="300"
+                    [multiline]="false"
+                    [searchEnabled]="true"
+                    [readOnly]="true"
+                  ></dx-select-box>
+                </div>
+              </div>
+
+              <!-- ================= RIGHT SIDE ================= -->
+              <div style="display: flex; align-items: center; gap: 10px">
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <div class="d-flex">
+                    <dx-check-box
+                      [(value)]="approveValue"
+                      [readOnly]="true"
+                      text="Approve"
+                      style="margin: 10px"
+                    ></dx-check-box>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <!-- <dx-check-box
+                    [(value)]="approveValue"
+                    text="Approve"
+                    [readOnly]="readOnly"
+                    style="margin: 10px"
+                  >
+                  </dx-check-box> -->
+                </div>
+              </div>
+
+              <div></div>
+            </div>
+          </div>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_DESCRIPTION"
+        caption="Description"
+        [width]="200"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        alignment="left"
+        dataField="CAT_NAME"
+        caption="Category"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        alignment="right"
+        dataField="DEPT_NAME"
+        caption="Department"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+
+      <dxi-column
+        alignment="right"
+        dataField="COST"
+        caption="Cost"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        alignment="right"
+        dataField="PRICE"
+        caption="Price"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        alignment="right"
+        dataField="PROMOTION_PRICE"
+        caption="Promotion Price"
+        [width]="100"
+        [allowEditing]="false"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+        [visible]="selectedOption !== 'schemaLevelPromotion'"
+      ></dxi-column>
+      <dxi-column
+        alignment="left"
+        dataField="PROMOTION_NAME"
+        caption="Schema"
+        [width]="150"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        alignment="left"
+        dataField="PROMOTION_SCHEMA_ID"
+        caption="Schema ID"
+        [width]="150"
+        [visible]="false"
+        [allowEditing]="false"
+      ></dxi-column>
+    </dx-data-grid>
+  </div>
+</div>

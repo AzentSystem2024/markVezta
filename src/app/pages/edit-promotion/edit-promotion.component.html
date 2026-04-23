@@ -82,10 +82,59 @@
                 flex-wrap: wrap;
               "
             >
-              <!-- From & To Date -->
-              <div style="display: flex; flex-direction: column; gap: 10px">
-                <div style="display: flex; align-items: center; gap: 10px">
-                  <label style="width: 90px">From Date:</label>
+              <!-- ================= LEFT SIDE ================= -->
+              <div
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 20px;
+                  flex-wrap: wrap;
+                "
+              >
+                <!-- From & To Date -->
+                <div style="display: flex; flex-direction: column; gap: 10px">
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <label style="width: 90px">From Date:</label>
+                    <dx-date-box
+                      [(value)]="fromDate"
+                      type="date"
+                      displayFormat="yyyy-MM-dd"
+                      width="150"
+                      (onValueChanged)="checkDateSelection($event)"
+                    >
+                    </dx-date-box>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <label style="width: 90px">To Date:</label>
+                    <dx-date-box
+                      [(value)]="toDate"
+                      type="date"
+                      displayFormat="yyyy-MM-dd"
+                      width="150"
+                      (onValueChanged)="checkDateSelection($event)"
+                    >
+                    </dx-date-box>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <label style="width: 90px">Remark:</label>
+                    <dx-text-box
+                      [(value)]="narration"
+                      placeholder="Enter Remarks"
+                      width="150"
+                    >
+                    </dx-text-box>
+                  </div>
+                </div>
+
+                <!-- Time -->
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <dx-switch
+                    [(value)]="isHappyHoursEnabled"
+                    (onValueChanged)="onHappyHoursChanged($event)"
+                  >
+                  </dx-switch>
                   <dx-date-box
                     [(value)]="fromDate"
                     type="date"
@@ -96,97 +145,100 @@
                   </dx-date-box>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 10px">
-                  <label style="width: 90px">To Date:</label>
-                  <dx-date-box
-                    [(value)]="toDate"
-                    type="date"
-                    displayFormat="yyyy-MM-dd"
-                    width="150"
-                    (onValueChanged)="checkDateSelection($event)"
+                <!-- Days + Store -->
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <dx-tag-box
+                    [items]="daysOfWeek"
+                    [(value)]="selectedDays"
+                    displayExpr="text"
+                    valueExpr="value"
+                    [multiline]="false"
+                    [showSelectionControls]="true"
+                    placeholder="Select Days"
+                    [searchEnabled]="true"
+                    [width]="300"
                   >
                   </dx-date-box>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 10px">
-                  <label style="width: 90px">Remark:</label>
-                  <dx-text-box
-                    [(value)]="narration"
-                    placeholder="Enter Remarks"
-                    width="150"
+                  <dx-tag-box
+                    [items]="store"
+                    [(value)]="selectedStoreId"
+                    displayExpr="STORE_NAME"
+                    valueExpr="ID"
+                    [multiline]="false"
+                    [width]="300"
+                    [multiline]="false"
+                    [showSelectionControls]="true"
+                    placeholder="Select Days"
+                    [searchEnabled]="true"
                   >
-                  </dx-text-box>
+                  </dx-tag-box>
+
+                  <dx-select-box
+                    *ngIf="is_promotion_level"
+                    [(value)]="price_level"
+                    [items]="priceLevels"
+                    displayExpr="text"
+                    valueExpr="value"
+                    placeholder="Price level"
+                    width="300"
+                    [multiline]="false"
+                    [searchEnabled]="true"
+                    (onValueChanged)="onPriceLevel($event)"
+                  ></dx-select-box>
                 </div>
               </div>
 
-              <!-- Switch + Narration -->
-              <div style="display: flex; flex-direction: column; gap: 10px">
-                <dx-switch
-                  [(value)]="isHappyHoursEnabled"
-                  (onValueChanged)="onHappyHoursChanged($event)"
-                >
-                </dx-switch>
+              <!-- ================= RIGHT SIDE ================= -->
+              <div style="display: flex; align-items: center; gap: 10px">
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <dx-button
+                    text="Promotion"
+                    icon="formula"
+                    stylingMode="contained"
+                    type="default"
+                    (onClick)="setPromotion(dataGrid.selectedRowKeys)"
+                    width="250"
+                  >
+                  </dx-button>
+                  <div class="d-flex">
+                    <dx-check-box
+                      [(value)]="approveValue"
+                      text="Approve"
+                      [readOnly]="readOnly"
+                      (onValueChanged)="onApprovedChanged($event)"
+                      style="margin: 10px"
+                    ></dx-check-box>
+                    <dx-button
+                      [text]="
+                        approveValue
+                          ? 'Approve'
+                          : approveValue
+                            ? 'Approve'
+                            : 'Update'
+                      "
+                      stylingMode="contained"
+                      type="default"
+                      class="mt-2"
+                      (onClick)="savePromotion()"
+                    >
+                    </dx-button>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px">
+                  <!-- <dx-check-box
+                    [(value)]="approveValue"
+                    text="Approve"
+                    [readOnly]="readOnly"
+                    (onValueChanged)="onApprovedChanged($event)"
+                    style="margin: 10px"
+                  >
+                  </dx-check-box> -->
+                </div>
               </div>
 
-              <!-- Time -->
-              <div style="display: flex; flex-direction: column; gap: 5px">
-                <dx-date-box
-                  [(value)]="timeFrom"
-                  type="time"
-                  displayFormat="HH:mm"
-                  pickerType="rollers"
-                  placeholder="From Time"
-                  width="90"
-                  [disabled]="!isHappyHoursEnabled"
-                >
-                </dx-date-box>
-
-                <dx-date-box
-                  [(value)]="timeTo"
-                  type="time"
-                  displayFormat="HH:mm"
-                  pickerType="rollers"
-                  placeholder="To Time"
-                  width="90"
-                  [disabled]="!isHappyHoursEnabled"
-                >
-                </dx-date-box>
-              </div>
-
-              <!-- Days + Store -->
-              <div style="display: flex; flex-direction: column; gap: 5px">
-                <dx-tag-box
-                  [items]="daysOfWeek"
-                  [(value)]="selectedDays"
-                  displayExpr="text"
-                  valueExpr="value"
-                  [showSelectionControls]="true"
-                  placeholder="Select Days"
-                  [searchEnabled]="true"
-                  [width]="300"
-                >
-                </dx-tag-box>
-
-                <dx-tag-box
-                  [items]="store"
-                  [(value)]="selectedStoreId"
-                  displayExpr="STORE_NAME"
-                  valueExpr="ID"
-                  [width]="300"
-                >
-                </dx-tag-box>
-
-                <dx-select-box
-                  [(value)]="price_level"
-                  [items]="priceLevels"
-                  displayExpr="text"
-                  valueExpr="value"
-                  placeholder="Price level"
-                  width="300"
-                  [searchEnabled]="true"
-                  (onValueChanged)="onPriceLevel($event)"
-                ></dx-select-box>
-              </div>
+              <div></div>
             </div>
 
             <!-- ================= RIGHT SIDE ================= -->
@@ -318,7 +370,7 @@
   [showCloseButton]="true"
 >
   <div *dxTemplate="let data of 'content'" class="popup-content">
-    <!-- 🔥 RADIO BUTTON -->
+    <!-- RADIO BUTTON -->
     <dx-radio-group
       [(value)]="selectedMode"
       [items]="[
