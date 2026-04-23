@@ -32,7 +32,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
         <dxo-popup
           title="Edit Vat Class"
           [showTitle]="true"
@@ -82,6 +82,7 @@
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
+          [visible]="canAdd"
         ></dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="CODE" caption="Code">

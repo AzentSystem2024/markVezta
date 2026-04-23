@@ -25,6 +25,7 @@ import {
   ItemProperty2FormComponent,
   ItemProperty2FormModule,
 } from 'src/app/components/library/item-property2-form/item-property2-form.component';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-item-property2-list',
   templateUrl: './item-property2-list.component.html',
@@ -63,12 +64,21 @@ export class ItemProperty2ListComponent {
   selected_Company_id: any;
   poData: any;
   isFilterOpened = false;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   constructor(
     private dataservice: DataService,
     authservice: AuthService,
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private router:Router
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY2;
 
@@ -295,6 +305,30 @@ export class ItemProperty2ListComponent {
     });
   }
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
+
     this.sessionDetails();
     this.showItemProperty2();
   }

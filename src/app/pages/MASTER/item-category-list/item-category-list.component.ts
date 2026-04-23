@@ -318,11 +318,16 @@ export class ItemCategoryListComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
+    console.log(menuResponse,"menuResponse")
+
     const menuGroups = menuResponse.MenuGroups || [];
 
+
     const packingRights = menuGroups
-      .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/user');
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

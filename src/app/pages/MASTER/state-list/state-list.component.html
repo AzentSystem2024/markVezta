@@ -44,7 +44,7 @@
 
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-form [colCount]="1"> </dxo-form>
     </dxo-editing>
 

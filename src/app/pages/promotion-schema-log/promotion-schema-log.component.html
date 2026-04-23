@@ -29,8 +29,8 @@
 
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-filter-row
         [visible]="isFilterRowVisible"
@@ -89,6 +89,7 @@
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
+          [visible]="canAdd"
         ></dxi-item>
       </dxo-toolbar>
       <dxi-column

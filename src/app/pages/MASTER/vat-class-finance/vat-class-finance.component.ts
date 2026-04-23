@@ -24,6 +24,7 @@ import {
   VatCalssFinanceFormModule,
 } from '../POPUP PAGES/vat-calss-finance-form/vat-calss-finance-form.component';
 import { VatCalssFinanceEditModule } from '../POPUP PAGES/vat-calss-finance-edit/vat-calss-finance-edit.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vat-class-finance',
@@ -59,6 +60,13 @@ export class VatClassFinanceComponent implements OnInit {
   companyStateID: any;
   GST_PERC: any;
   poData: any;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   addButtonOptions = {
     type: 'default',
@@ -103,6 +111,7 @@ export class VatClassFinanceComponent implements OnInit {
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private router :Router
   ) {}
 
   onExporting(event: any) {
@@ -113,6 +122,29 @@ export class VatClassFinanceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.sessionDetails();
     this.showVatclass();
   }

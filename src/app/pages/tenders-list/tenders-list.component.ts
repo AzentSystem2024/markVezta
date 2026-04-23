@@ -13,6 +13,7 @@ import {
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { DxCheckBoxModule } from 'devextreme-angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tenders-list',
@@ -45,6 +46,13 @@ export class TendersListComponent implements OnInit {
   currentEditId: number | null = null;
 
   editingRowData: any;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   addButtonOptions = {
     type: 'default',
@@ -84,6 +92,7 @@ export class TendersListComponent implements OnInit {
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private router:Router
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Tenders-list');
@@ -284,6 +293,28 @@ export class TendersListComponent implements OnInit {
     });
   }
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.showTenders();
     this.getCurrencyData();
     this.getTenderTypeDropDown();

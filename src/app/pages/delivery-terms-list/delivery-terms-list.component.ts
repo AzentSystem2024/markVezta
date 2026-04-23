@@ -12,6 +12,7 @@ import {
 } from 'src/app/components/library/delivery-terms-form/delivery-terms-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-delivery-terms-list',
@@ -32,11 +33,19 @@ export class DeliveryTermsListComponent {
   displayMode: any = 'full';
   showPageSizeSelector = true;
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private router:Router
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Delivery_terms-list');
@@ -176,6 +185,28 @@ export class DeliveryTermsListComponent {
     event.cancel = true; // Prevent the default update operation
   }
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.showDeliveryTerms();
   }
 
