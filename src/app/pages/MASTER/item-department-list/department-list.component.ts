@@ -153,8 +153,7 @@ export class DepartmentListComponent implements OnInit {
 
   showDepartment() {
     const payload = {
-      // COMPANY_ID: this.COMPANY_ID,
-      COMPANY_ID: 0,
+      COMPANY_ID: this.COMPANY_ID,
     };
     this.dataservice.getDepartmentData(payload).subscribe((response) => {
       this.department = response;

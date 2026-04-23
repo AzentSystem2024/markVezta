@@ -25,6 +25,7 @@ export class SubDepartmentAddFormComponent implements OnInit {
   @Output() popupClosed = new EventEmitter<void>();
 
   DepartmentDropdownData: any;
+  subDepartment:any;
   formSubDepartmentData = {
     CODE: '',
     DESCRIPTION: '',
@@ -37,6 +38,7 @@ export class SubDepartmentAddFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.getDepartmentDropDown();
+    this.show_subdepartment();
   }
 
   getNewSubDepartmentData = () => ({ ...this.newSubDepartment });
@@ -54,6 +56,26 @@ export class SubDepartmentAddFormComponent implements OnInit {
       this.popupClosed.emit();
     });
   }
+
+  show_subdepartment() {
+    this.service.get_SubDepartment_Data().subscribe((res: any) => {
+        this.subDepartment = res.datas;
+        console.log(this.subDepartment,"subdepartment")
+    });
+  }
+
+  validateSubDepartmentCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.subDepartment?.length) return true;
+
+
+    return !this.subDepartment.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value;
+    });
+  };  
 }
 @NgModule({
   imports: [

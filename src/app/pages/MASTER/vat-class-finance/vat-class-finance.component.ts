@@ -135,7 +135,7 @@ export class VatClassFinanceComponent implements OnInit {
 
   showVatclass() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: this.companyID,
     };
 
     this.VatClassDataSource = new DataSource({

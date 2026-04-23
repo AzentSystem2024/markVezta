@@ -12,6 +12,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import {
   DxButtonModule,
   DxFormModule,
+  DxNumberBoxModule,
   DxSelectBoxModule,
   DxTextBoxModule,
   DxValidationGroupComponent,
@@ -32,7 +33,7 @@ export class VatCalssFinanceEditComponent {
   @Input() selectedData: any = {};
   @Output() formClosed = new EventEmitter<void>();
 
-  formVatclassData = {
+  formVatclassData:any = {
     ID: 0,
     CODE: '',
     VAT_NAME: '',
@@ -43,6 +44,9 @@ export class VatCalssFinanceEditComponent {
 
   selected_Company_id: any;
   ledgerList: any[] = [];
+
+  vatClass:any;
+  companyID:any;
 
   newVatclass = this.formVatclassData;
 
@@ -57,6 +61,14 @@ export class VatCalssFinanceEditComponent {
   ngOnInit(): void {
     this.sessionDetails();
     this.getLedgerCodeDropdown();
+
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+
+    this.showVatclass();
+    
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -64,6 +76,18 @@ export class VatCalssFinanceEditComponent {
       this.selectedData = changes['selectedData'].currentValue;
       this.tryBindData();
     }
+  }
+
+  showVatclass() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
+
+    this.dataservice.getVatclassData(payload).subscribe(res=>{
+      this.vatClass = res;
+      console.log(this.vatClass,"this.vatClass")
+    })
+
   }
 
   // Load dropdown
@@ -165,6 +189,20 @@ export class VatCalssFinanceEditComponent {
   closePopup() {
     this.formClosed.emit();
   }
+
+  validateVatClassCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.vatClass?.length) return true;
+
+    const currentId = this.formVatclassData?.ID; //  current editing ID
+
+    return !this.vatClass.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId; //  ignore same record
+    });
+};
 }
 @NgModule({
   imports: [
@@ -177,6 +215,7 @@ export class VatCalssFinanceEditComponent {
     ReactiveFormsModule,
     DxSelectBoxModule,
     DxButtonModule,
+    DxNumberBoxModule
   ],
   declarations: [VatCalssFinanceEditComponent],
   exports: [VatCalssFinanceEditComponent],

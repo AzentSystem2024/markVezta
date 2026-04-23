@@ -14,6 +14,25 @@
           labelMode="floating"
           (keypress)="keyPressCode($event)"
         >
+        <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="Code is required"
+            ></dxi-validation-rule>
+
+            <dxi-validation-rule
+              type="pattern"
+              [pattern]="'^[a-zA-Z0-9]+$'"
+              message="Code should be alphanumeric only"
+            ></dxi-validation-rule>
+
+            <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateVatClassCode"
+                message="Code already exists"
+            ></dxi-validation-rule>
+
+          </dx-validator>
         </dx-text-box>
       </div>
     </dxi-item>
@@ -25,18 +44,33 @@
           [(value)]="formVatclassData.VAT_NAME"
           labelMode="floating"
         >
+        <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="VAT Name is required"
+            ></dxi-validation-rule>
+        </dx-validator>
         </dx-text-box>
       </div>
     </dxi-item>
 
     <dxi-item>
       <div *dxTemplate>
-        <dx-text-box
+        <dx-number-box
           label="VAT Percentage"
           [(value)]="formVatclassData.VAT_PERC"
           labelMode="floating"
+          [min]="0"
+          [max]="100"
+          [showSpinButtons]="true"
         >
-        </dx-text-box>
+          <dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="VAT Percentage is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-number-box>
       </div>
     </dxi-item>
 
