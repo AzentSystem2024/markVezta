@@ -43,6 +43,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { SaleReturnFormComponent } from 'src/app/sale-return-form/sale-return-form.component';
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
+import dxSelectBox from 'devextreme/ui/select_box';
 
 @Component({
   selector: 'app-add-invoice-retail',
@@ -88,7 +89,7 @@ export class AddInvoiceRetailComponent {
     RET_NO: '',
     VEHICLE_NO: '',
     ROUND_OFF: false,
-    DISC_AMOUNT: 0,
+    DISCOUNT_AMOUNT: 0,
     Details: [
       {
         ITEM_ID: 0,
@@ -115,6 +116,7 @@ export class AddInvoiceRetailComponent {
   isSaving: boolean = false;
   storeID: any;
   invalidQtyRowIndex: number | null = null;
+  totalDiscAmount: number = 0;
   constructor(private dataService: DataService) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
@@ -638,7 +640,6 @@ export class AddInvoiceRetailComponent {
 
     const rows = this.invoiceFormData.Details || [];
 
-    //  Check if any empty row exists
     const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
 
     if (hasEmptyRow) {
@@ -648,16 +649,15 @@ export class AddInvoiceRetailComponent {
         2000,
       );
 
-      // 👉 focus that empty row
       const emptyIndex = rows.findIndex((row: any) => this.isRowEmpty(row));
+
       setTimeout(() => {
         grid.editCell(emptyIndex, 'ITEM_CODE');
-      }, 50);
+      }, 100);
 
       return;
     }
 
-    // ✅ Add new row only if all rows are filled
     const newRow = {
       ITEM_ID: null,
       ITEM_CODE: null,
@@ -676,13 +676,32 @@ export class AddInvoiceRetailComponent {
 
     this.invoiceFormData.Details = [...rows, newRow];
 
+    // 🔥 IMPORTANT FIX
     setTimeout(() => {
       grid.option('dataSource', this.invoiceFormData.Details);
-      grid.refresh();
 
-      const rowIndex = this.invoiceFormData.Details.length - 1;
-      grid.editCell(rowIndex, 'ITEM_CODE');
-    }, 50);
+      // 🔥 Wait for rendering properly
+      setTimeout(() => {
+        const rowIndex = this.invoiceFormData.Details.length - 1;
+
+        grid.option('focusedRowIndex', rowIndex); // ✅ ensure row focus
+        grid.editCell(rowIndex, 'ITEM_CODE');
+
+        // 🔥 OPEN DROPDOWN (optional but better UX)
+        setTimeout(() => {
+          const cellElement = grid.getCellElement(rowIndex, 'ITEM_CODE');
+          const selectBoxElement = cellElement?.querySelector('.dx-selectbox');
+
+          if (selectBoxElement) {
+            const selectBox = dxSelectBox.getInstance(
+              selectBoxElement,
+            ) as dxSelectBox;
+            selectBox?.focus();
+            selectBox?.open();
+          }
+        }, 100);
+      }, 150); // ⬅️ THIS is the real fix
+    }, 0);
   }
   moveNextCell(field: string, rowIndex: number, grid: any) {
     if (field === 'ITEM_CODE') {
@@ -806,7 +825,11 @@ export class AddInvoiceRetailComponent {
 
     this.isSaving = true;
 
-    const validDetails = (this.invoiceFormData.Details || []).filter(
+    // const grid = this.itemsGridRef.instance;
+
+    const allRows = grid.getVisibleRows().map((r: any) => r.data);
+
+    const validDetails = allRows.filter(
       (item: any) => item.ITEM_CODE && item.QUANTITY > 0,
     );
 
@@ -848,7 +871,7 @@ export class AddInvoiceRetailComponent {
     this.invoiceFormData.GROSS_AMOUNT = gross;
     this.invoiceFormData.TAX_AMOUNT = tax;
     this.invoiceFormData.NET_AMOUNT = net;
-    this.invoiceFormData.DISC_AMOUNT = discamt;
+    this.invoiceFormData.DISCOUNT_AMOUNT = discamt;
     this.invoiceFormData.Details = validDetails;
     this.invoiceFormData.PARTY_NAME = String(this.invoiceFormData.CUSTOMER_ID);
     this.invoiceFormData.TRANS_DATE = this.formatDateOnly(
