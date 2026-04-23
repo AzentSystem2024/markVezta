@@ -312,6 +312,12 @@ export class AddInvoiceRetailComponent {
     return qty * cost;
   };
 
+  calculateDiscAmt = (rowData: any) => {
+    const amt = Number(rowData?.AMOUNT) || 0;
+    const discPerc = Number(rowData?.DISC_PERC) || 0;
+
+    return (amt * discPerc) / 100;
+  };
   calculateTax = (rowData: any) => {
     const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
     const vat = rowData?.TAX_PERC || 0;
@@ -390,7 +396,9 @@ export class AddInvoiceRetailComponent {
     if (
       e.dataField === 'ITEM_CODE' ||
       e.dataField === 'DESCRIPTION' ||
-      e.dataField === 'QUANTITY'
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'PRICE' ||
+      e.dataField === 'DISC_PERC'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -427,7 +435,7 @@ export class AddInvoiceRetailComponent {
             (r) => r?.data === e.row?.data,
           );
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+            // grid.focus(grid.getCellElement(rowIndex, 'GST'));
           }, 50);
         }
       };
@@ -495,22 +503,33 @@ export class AddInvoiceRetailComponent {
             setTimeout(() => {
               editor.close();
 
-              // 👉 move to next column
+              //  move to next column
               if (e.dataField === 'ITEM_CODE') {
                 grid.editCell(rowIndex, 'DESCRIPTION');
               } else if (e.dataField === 'DESCRIPTION') {
                 grid.editCell(rowIndex, 'QUANTITY');
+              } else if (e.dataField === 'QUANTITY') {
+                grid.editCell(rowIndex, 'DISC_PERC'); // ADD THIS
               }
             }, 100);
           }
 
           return;
         }
+        // 👉 HANDLE QUANTITY (NumberBox)
+        if (e.dataField === 'QUANTITY') {
+          event.event.preventDefault();
 
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'DISC_PERC'); // ✅ move to Disc %
+          }, 50);
+
+          return;
+        }
         // =====================================================
         // 🔥 QUANTITY → CREATE NEW ROW
         // =====================================================
-        if (e.dataField === 'QUANTITY') {
+        if (e.dataField === 'DISC_PERC') {
           event.event.preventDefault();
 
           const editorElement = event.event.target as HTMLElement;

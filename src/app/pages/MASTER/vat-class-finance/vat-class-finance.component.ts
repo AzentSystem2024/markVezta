@@ -125,8 +125,8 @@ export class VatClassFinanceComponent implements OnInit {
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
-    // this.selected_Company_id = this.companyID;
-    this.selected_Company_id = 0;
+    this.selected_Company_id = this.companyID;
+    // this.selected_Company_id = 0;
     this.poData = {
       COMPANY_ID: this.companyID,
       USER_ID: sessionData.USER_ID,
@@ -195,30 +195,35 @@ export class VatClassFinanceComponent implements OnInit {
   }
 
   onRowRemoving(event: any) {
-    const selectedRow = event.data;
-    const { ID } = selectedRow;
+    const { ID } = event.data;
 
-    this.dataservice.removeVatclass(ID).subscribe(() => {
-      try {
-        // Your delete logic here
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.dataGrid?.instance.refresh();
-        this.showVatclass();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      }
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice.removeVatclass(ID).subscribe({
+        next: () => {
+          notify(
+            {
+              message: 'Delete operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.showVatclass(); // reload data
+
+          resolve(true); // ✅ closes popup + keeps grid in sync
+        },
+        error: () => {
+          notify(
+            {
+              message: 'Delete operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+
+          reject(); // ❌ prevents deletion
+        },
+      });
     });
   }
 

@@ -133,8 +133,8 @@ export class VatCalssFinanceEditComponent {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    // this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.selected_Company_id = 0;
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    // this.selected_Company_id = 0;
   }
 
   UpdateData() {

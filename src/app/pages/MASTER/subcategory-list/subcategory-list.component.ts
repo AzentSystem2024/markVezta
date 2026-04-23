@@ -154,8 +154,8 @@ export class SubcategoryListComponent {
 
   getSubCategory() {
     const payload = {
-      // COMPANY_ID: this.selected_Company_id,
-      COMPANY_ID: 0,
+      COMPANY_ID: this.selected_Company_id,
+      // COMPANY_ID: 0,
     };
 
     this.SubCategoryDataSource = new DataSource({
@@ -288,31 +288,39 @@ export class SubcategoryListComponent {
       this.selected_data = res;
     });
   }
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const { ID, SUBCAT_NAME, CAT_ID, DEPT_ID } = event.data;
-    this.dataService
-      .removeSubCategory(ID, SUBCAT_NAME, CAT_ID, DEPT_ID)
-      .subscribe(() => {
-        try {
-          notify(
-            {
-              message: ' Delete operation successfull',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.getSubCategory();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataService
+        .removeSubCategory(ID, SUBCAT_NAME, CAT_ID, DEPT_ID)
+        .subscribe({
+          next: () => {
+            notify(
+              {
+                message: 'Delete operation successful',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+
+            this.getSubCategory(); // reload data
+
+            resolve(true); // ✅ closes popup + syncs grid
+          },
+          error: () => {
+            notify(
+              {
+                message: 'Delete operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+
+            reject(); //  keeps popup open
+          },
+        });
+    });
   }
   handleClose() {
     this.isAddSubcategoryPopupOpened = false;

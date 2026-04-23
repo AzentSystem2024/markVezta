@@ -191,7 +191,7 @@
             caption="Cost"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [allowEditing]="false"
+            [allowEditing]="true"
           ></dxi-column>
 
           <dxi-column
@@ -206,6 +206,17 @@
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [calculateCellValue]="calculateAmount"
+          ></dxi-column>
+          <dxi-column
+            dataField="DISC_PERC"
+            caption="Disc %"
+            [allowEditing]="true"
+          ></dxi-column>
+          <dxi-column
+            dataField="DISC_AMT"
+            caption="Disc Amount"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateDiscAmt"
           ></dxi-column>
           <dxi-column
             dataField="TAX_PERC"

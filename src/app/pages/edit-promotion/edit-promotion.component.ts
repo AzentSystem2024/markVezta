@@ -51,15 +51,13 @@ import { confirm } from 'devextreme/ui/dialog';
 @Component({
   selector: 'app-edit-promotion',
   templateUrl: './edit-promotion.component.html',
-  styleUrls: ['./edit-promotion.component.scss']
+  styleUrls: ['./edit-promotion.component.scss'],
 })
 export class EditPromotionComponent {
-
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
   @Input() selectedData: any = {};
   @Output() popupClosed = new EventEmitter<void>();
-
 
   worksheetData: any;
   AllowCommitWithSave: any;
@@ -127,10 +125,10 @@ export class EditPromotionComponent {
   promotionName: any;
   firstDropdownValue: any;
   selectedMode: any;
-  readOnly: boolean = false
-  approveValue: any
-  price_level: any
-  isSaving: boolean = false
+  readOnly: boolean = false;
+  approveValue: any;
+  price_level: any;
+  isSaving: boolean = false;
   firstDropdownOptions = [
     { label: 'Cost', value: 'cost' },
     { label: 'Price', value: 'salePrice' },
@@ -206,103 +204,82 @@ export class EditPromotionComponent {
   wsNo: any;
   wsDate: any;
   selected_Company_id: any;
-  selectedTabIndex: any = 0
+  selectedTabIndex: any = 0;
   wsId: any;
   selected_Data_id: any;
+  initialSelectionApplied: boolean;
   constructor(
     private dataservice: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-  ) {
-
-  }
+  ) {}
   ngOnInit() {
-    this.sesstion_Details()
-    this.listItemsByMultipleStoreIds()
-    this.schemaOptions()
-
+    console.log(this.selectedData, 'SELECTEDDATAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+    this.sesstion_Details();
+    // if (this.selectedData && Object.keys(this.selectedData).length) {
+    //   this.listItemsByMultipleStoreIds();
+    // }
+    this.schemaOptions();
   }
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
-    this.loadStores()
-
+    this.loadStores();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // this.listItemsByMultipleStoreIds()
-    if (this.itemStoresList) {
-      if (changes['selectedData'] && changes['selectedData'].currentValue) {
-        const data = changes['selectedData'].currentValue;
+    if (changes['selectedData'] && changes['selectedData'].currentValue) {
+      const data = changes['selectedData'].currentValue;
 
-        console.log('Changes in EditPromotionComponent:', data);
-        this.selected_Data_id = data.ID;
+      console.log('Changes in EditPromotionComponent:', data);
 
+      this.selected_Data_id = data.ID;
 
-        //    1. GRID SELECTION
-        this.selectedRowKeys = (data?.worksheet_promotion_schema || [])
-          .map((item: any) => item.ITEM_ID); //  must match keyExpr
+      // ✅ selection
+      this.selectedRowKeys = (data?.worksheet_promotion_schema || []).map(
+        (item: any) => Number(item.ITEM_ID),
+      );
 
-        //    2. TOOLBAR DATA
-        const first = data?.worksheet_promotion_schema?.[0];
+      // ✅ toolbar fields
+      const first = data?.worksheet_promotion_schema?.[0];
 
-        if (first) {
-          this.narration = first.NARRATION || '';
+      if (first) {
+        this.narration = first.NARRATION || '';
 
+        this.fromDate = first.DATE_FROM ? new Date(first.DATE_FROM) : null;
+        this.toDate = first.DATE_TO ? new Date(first.DATE_TO) : null;
 
-          this.fromDate = first.DATE_FROM ? new Date(first.DATE_FROM) : null;
-          this.toDate = first.DATE_TO ? new Date(first.DATE_TO) : null;
+        this.timeFrom = first.TIME_FROM
+          ? this.formatTime(first.TIME_FROM)
+          : null;
 
-          this.timeFrom = first.TIME_FROM
-            ? this.formatTime(first.TIME_FROM)
-            : null;
+        this.timeTo = first.TIME_TO ? this.formatTime(first.TIME_TO) : null;
 
-          this.timeTo = first.TIME_TO
-            ? this.formatTime(first.TIME_TO)
-            : null;
+        this.isHappyHoursEnabled = first.IS_HAPPY_HOUR || false;
 
-          this.isHappyHoursEnabled = first.IS_HAPPY_HOUR || false;
-
-          this.selectedDays = first.PROMOTION_WEEKDAYS
-            ? first.PROMOTION_WEEKDAYS.split(',').map(Number)
-            : [];
-        }
-        const promotionMap = (data?.worksheet_promotion_schema || [])
-          .reduce((acc: any, item: any) => {
-            acc[item.ITEM_ID] = item;
-            return acc;
-          }, {});
-
-        //    merge into grid
-        this.itemStoresList = (this.itemStoresList || []).map((item: any) => {
-
-          const promo = promotionMap[item.ID]; // match ID ↔ ITEM_ID
-
-          return {
-            ...item,
-            PROMOTION_PRICE: promo?.PROMOTION_PRICE || 0,
-            PROMOTION_NAME: promo?.PROMOTION_NAME || '',
-            PROMOTION_SCHEMA_ID: promo?.PROMOTION_SCHEMA_ID || null
-          };
-        });
-        //    3. STORE SELECTION
-        this.selectedStoreId = (data?.worksheet_item_store || [])
-          .map((s: any) => s.STORE_ID);
-
-        //    4. OTHER HEADER DATA
-        this.wsNo = data.WS_NO;
-        this.wsDate = data.WS_DATE
-          ? new Date(data.WS_DATE).toISOString().split('T')[0]
-          : '';
-
-
-
+        this.selectedDays = first.PROMOTION_WEEKDAYS
+          ? first.PROMOTION_WEEKDAYS.split(',').map(Number)
+          : [];
       }
-    }
 
-    console.log('Selected Data in EditPromotionComponent:', this.selectedData);
+      // ✅ store selection
+      this.selectedStoreId = (data?.worksheet_item_store || []).map(
+        (s: any) => s.STORE_ID,
+      );
+
+      // ✅ header
+      this.wsNo = data.WS_NO;
+      this.wsDate = data.WS_DATE
+        ? new Date(data.WS_DATE).toISOString().split('T')[0]
+        : '';
+
+      // ✅ CALL API ONLY HERE
+      this.listItemsByMultipleStoreIds();
+    }
   }
 
   formatTime(date: any): string {
@@ -331,38 +308,49 @@ export class EditPromotionComponent {
   }
   listItemsByMultipleStoreIds(): void {
     this.isLoading = true;
+    this.showGrid = false;
 
     this.dataservice.getItemListByStoreId().subscribe(
       (response: any) => {
+        const apiData = response.PriceWizardData || [];
 
-        this.itemStoresList = response.PriceWizardData || [];
+        // ✅ create promotion map
+        const promotionMap: any = {};
+        (this.selectedData?.worksheet_promotion_schema || []).forEach(
+          (item: any) => {
+            promotionMap[Number(item.ITEM_ID)] = item;
+          },
+        );
 
-        console.log('Fetched Item Stores List:', this.itemStoresList);
+        // ✅ merge data correctly
+        this.itemStoresList = apiData.map((item: any) => {
+          const promo = promotionMap[Number(item.ID)];
 
-        //    MATCH & SELECT
-        if (this.selectedRowKeys && this.selectedRowKeys.length > 0) {
+          return {
+            ...item,
+            PROMOTION_PRICE: promo ? Number(promo.PROMOTION_PRICE) : 0,
+            PROMOTION_NAME: promo?.PROMOTION_NAME || '',
+            PROMOTION_SCHEMA_ID: promo?.PROMOTION_SCHEMA_ID || null,
+          };
+        });
 
-          // ensure type match (number)
-          this.selectedRowKeys = this.selectedRowKeys.map((id: any) => Number(id));
+        // ✅ ensure selection is valid
+        this.selectedRowKeys = (
+          this.selectedData?.worksheet_promotion_schema || []
+        ).map((item: any) => Number(item.ITEM_ID));
 
-          // filter only matching IDs (optional but clean)
-          const validIds = this.itemStoresList
-            .map((item: any) => Number(item.ID));
-
-          this.selectedRowKeys = this.selectedRowKeys.filter((id: any) =>
-            validIds.includes(id)
-          );
-        }
-
+        // ✅ render grid
+        this.showGrid = true;
         this.isLoading = false;
 
-        console.log('Grid Data:', this.itemStoresList);
-        console.log('Selected Keys:', this.selectedRowKeys);
+        this.cdr.detectChanges();
+
+        console.log('FINAL GRID:', this.itemStoresList);
       },
       (error) => {
         this.isLoading = false;
-        console.error('Error fetching item list:', error);
-      }
+        console.error(error);
+      },
     );
   }
 
@@ -409,9 +397,11 @@ export class EditPromotionComponent {
     if (!this.itemStoresList || !this.itemStoresList.length) {
       return [];
     }
-    const data = this.dataGrid.instance.getDataSource().items()
+    const data = this.dataGrid.instance.getDataSource().items();
     console.log(data, 'DATAAAAAA');
-    const grid_Data = this.dataGrid.instance.getDataSource().items()
+    const grid_Data = this.dataGrid.instance
+      .getDataSource()
+      .items()
       .filter((item: any) => this.selectedRowKeys.includes(item.ID))
       .map((item: any) => {
         return {
@@ -455,7 +445,7 @@ export class EditPromotionComponent {
           BARCODE: item.BARCODE || '',
           ITEM_DESCRIPTION: item.DESCRIPTION || '',
 
-          NARRATION: this.narration || ''
+          NARRATION: this.narration || '',
         };
       });
 
@@ -472,10 +462,8 @@ export class EditPromotionComponent {
 
       NARRATION: this.narration || '',
 
-
-      worksheet_promotion_schema: grid_Data
-
-    }
+      worksheet_promotion_schema: grid_Data,
+    };
 
     if (this.approveValue === true) {
       confirm(
@@ -551,48 +539,34 @@ export class EditPromotionComponent {
     return result.toISOString();
   }
 
-
   Cancel() {
     this.popupClosed.emit();
   }
-  onHappyHoursChanged(event: any) {
-
-  }
+  onHappyHoursChanged(event: any) {}
   schemaOptions() {
     const payload = {
-      NAME: "PROMOTIONSCHEMA_TYPE"
-    }
-    this.dataservice
-      .getDropdownData(payload)
-      .subscribe((data) => {
-        this.promotionSchema = data;
-        // console.log(data, 'schemadropdown');
-      });
+      NAME: 'PROMOTIONSCHEMA_TYPE',
+    };
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
+      this.promotionSchema = data;
+      // console.log(data, 'schemadropdown');
+    });
   }
-  onEditorPreparing(event: any) {
-
-  }
-  checkDateSelection(event: any) {
-  }
+  onEditorPreparing(event: any) {}
+  checkDateSelection(event: any) {}
   onSelectionChanged(e: any) {
     this.selectedRowKeys = e.selectedRowKeys;
-    // console.log(this.selectedRowKeys, 'SELECTED');
-    this.selectedRow = e.selectedRowsData; // Gets the first selected row
-    // console.log(this.selectedRow, 'SELECTEDROW');
+    this.selectedRow = e.selectedRowsData;
+
     this.selectedId = [];
     this.selectedCost = [];
     this.selectedSalePrice = [];
+
     this.selectedRow.forEach((row: any) => {
       this.selectedId.push(row.ID);
       this.selectedCost.push(row.COST);
       this.selectedSalePrice.push(row.SALE_PRICE);
     });
-    this.selectedRowKeys = e.selectedRowKeys;
-
-    this.itemStoresList = this.itemStoresList.map((item: any) => ({
-      ...item,
-      Selected: this.selectedRowKeys.includes(item.ITEM_ID)
-    }));
   }
   loadStores() {
     const payload = {
@@ -608,7 +582,6 @@ export class EditPromotionComponent {
   }
 
   applyPromotion() {
-
     //    Validate selection
     if (!this.selectedRow || this.selectedRow.length === 0) {
       notify({ message: 'Please select at least one item.' }, 'error');
@@ -619,14 +592,13 @@ export class EditPromotionComponent {
     //    SCHEMA MODE ONLY
     // =========================
     if (this.selectedMode === 'schema') {
-
       if (!this.selectedSchemaId) {
         notify({ message: 'Please select schema.' }, 'error');
         return;
       }
 
       const selectedSchema = this.promotionSchema.find(
-        (schema: any) => schema.ID === this.selectedSchemaId
+        (schema: any) => schema.ID === this.selectedSchemaId,
       );
 
       if (!selectedSchema) return;
@@ -635,14 +607,12 @@ export class EditPromotionComponent {
 
       //   Update ONLY schema fields
       this.selectedRow.forEach((row: any) => {
-
         const index = this.itemStoresList.findIndex(
-          (item: any) => item.ID === row.ID
+          (item: any) => item.ID === row.ID,
         );
 
         if (index !== -1) {
-          this.itemStoresList[index].PROMOTION_NAME =
-            this.selectedSchemaName;
+          this.itemStoresList[index].PROMOTION_NAME = this.selectedSchemaName;
 
           this.itemStoresList[index].PROMOTION_SCHEMA_ID =
             this.selectedSchemaId;
@@ -663,7 +633,6 @@ export class EditPromotionComponent {
     //    PRICE MODE ONLY
     // =========================
     if (this.selectedMode === 'price') {
-
       if (!this.promotionName) {
         notify({ message: 'Please enter promotion name.' }, 'error');
         return;
@@ -680,17 +649,14 @@ export class EditPromotionComponent {
 
       //   Update ONLY price fields
       this.selectedRow.forEach((row: any, index: number) => {
-
         const i = this.itemStoresList.findIndex(
-          (item: any) => item.ID === row.ID
+          (item: any) => item.ID === row.ID,
         );
 
         if (i !== -1) {
-          this.itemStoresList[i].PROMOTION_PRICE =
-            this.operationResult[index];
+          this.itemStoresList[i].PROMOTION_PRICE = this.operationResult[index];
 
-          this.itemStoresList[i].PROMOTION_NAME =
-            this.promotionName;
+          this.itemStoresList[i].PROMOTION_NAME = this.promotionName;
 
           //    clear schema
           this.itemStoresList[i].PROMOTION_SCHEMA_ID = null;
@@ -707,9 +673,7 @@ export class EditPromotionComponent {
     this.isVisible = false;
   }
 
-
   updatePromotionPrice() {
-
     //    SAFETY INIT
     this.itemStoresList = this.itemStoresList || [];
     this.worksheetpromotionSchema = this.worksheetpromotionSchema || [];
@@ -731,12 +695,11 @@ export class EditPromotionComponent {
     }
 
     this.selectedRow.forEach((row: any, index: number) => {
-
       const newPrice = Number(this.operationResult[index]) || 0;
 
       //    SAFE FIND (GRID)
       const gridItem = (this.itemStoresList || []).find(
-        (item: any) => Number(item?.ID) === Number(row?.ID)
+        (item: any) => Number(item?.ID) === Number(row?.ID),
       );
 
       if (gridItem) {
@@ -746,7 +709,7 @@ export class EditPromotionComponent {
 
       //    SAFE FIND (SCHEMA)
       const schemaItem = (this.worksheetpromotionSchema || []).find(
-        (item: any) => Number(item?.ITEM_ID) === Number(row?.ID)
+        (item: any) => Number(item?.ITEM_ID) === Number(row?.ID),
       );
 
       if (schemaItem) {
@@ -757,10 +720,9 @@ export class EditPromotionComponent {
         this.worksheetpromotionSchema.push({
           ITEM_ID: row.ID,
           PROMOTION_PRICE: Number(newPrice.toFixed(2)),
-          PROMOTION_NAME: this.promotionName
+          PROMOTION_NAME: this.promotionName,
         });
       }
-
     });
 
     console.log('Updated Grid:', this.itemStoresList);
@@ -807,10 +769,7 @@ export class EditPromotionComponent {
       );
     }
   }
-  onApprovedChanged(e: any) {
-
-  }
-
+  onApprovedChanged(e: any) {}
 
   calculateResult() {
     // Convert operationInputValue to number (ensure it's a valid number)
@@ -958,9 +917,7 @@ export class EditPromotionComponent {
     console.log('Using values for processing:', this.valueToUse);
   }
 
-  onPriceLevel(e: any) {
-
-  }
+  onPriceLevel(e: any) {}
 }
 
 @NgModule({
@@ -995,12 +952,10 @@ export class EditPromotionComponent {
     DxTabsModule,
     DxSwitchModule,
     DxTabPanelModule,
-
   ],
   providers: [],
   declarations: [EditPromotionComponent],
   exports: [EditPromotionComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-
 })
-export class EditPromotionModule { }
+export class EditPromotionModule {}
