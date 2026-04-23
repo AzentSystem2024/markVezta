@@ -1,11 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  NgModule,
-  NgZone,
-  ViewChild,
-} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule, NgZone, ViewChild } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import {
@@ -28,7 +22,7 @@ import {
   DxToolbarModule,
   DxValidationGroupModule,
   DxValidatorModule,
-  DxDataGridComponent,
+  DxDataGridComponent
 } from 'devextreme-angular';
 import {
   DxoFormItemModule,
@@ -43,8 +37,6 @@ import { workerData } from 'worker_threads';
 import { PromotionEditModule } from '../promotion-edit/promotion-edit.component';
 import { EditPromotionModule } from '../edit-promotion/edit-promotion.component';
 import { ViewPromotionWizardModule } from '../view-promotion-wizard/view-promotion-wizard.component';
-import { NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-promotion-log',
@@ -133,23 +125,18 @@ export class PromotionLogComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
-  editPackPopupOpened: boolean = false;
+  editPackPopupOpened: boolean = false
   constructor(
     private dataservice: DataService,
     private router: Router,
-    private zone: NgZone,
+    private zone: NgZone
   ) { }
 
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     console.log(this.AllowCommitWithSave, 'ALLOW');
     this.getPromotionLogList();
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.getPromotionLogList(); //  reload every time you land here
-      });
-    this.handleClose();
+    this.handleClose()
   }
 
   getPromotionLogList() {
@@ -280,8 +267,8 @@ export class PromotionLogComponent {
   }
 
   onVerifyClick(e: any) {
-    console.log('====================call this function============', e);
-    const id = e.data.ID;
+    console.log('====================call this function============', e)
+    const id = e.data.ID
   }
 
   verifyWorksheetById(worksheetId: number, e: any) {
@@ -305,9 +292,7 @@ export class PromotionLogComponent {
   }
 
   onApproveClick(e: any) {
-    console.log(
-      '--------------------function call===========-----------------',
-    );
+    console.log('--------------------function call===========-----------------')
     if (this.AllowCommitWithSave) {
       console.log('approve Button clicked');
       const rowData = e.row.data; // Access the row data
@@ -367,8 +352,10 @@ export class PromotionLogComponent {
     });
   }
   handleClose() {
-    this.editPackPopupOpened = false;
-    this.getPromotionLogList();
+
+    this.editPackPopupOpened = false
+    this.getPromotionLogList()
+
   }
   isDeleteVisible = (e: any) => {
     console.log(e, '=========es===================');
