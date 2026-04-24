@@ -417,7 +417,35 @@ export class CompanyMasterComponent {
 
     if (ID !== undefined) {
       this.dataservice.Select_CompanyList_Api(ID).subscribe((response: any) => {
+        const data = response.Data;
         this.selectedData = response;
+
+        // 🔹 PHONE split
+        if (data.PHONE) {
+          const phoneParts = data.PHONE.split('-');
+          this.countryCodephone = phoneParts[0];   // +971
+          this.editingRowData.PHONE = phoneParts[1]; // 578674589
+        }
+
+        // 🔹 MOBILE split
+        if (data.MOBILE) {
+          const mobileParts = data.MOBILE.split('-');
+          this.countryCodemobile = mobileParts[0];
+          this.editingRowData.MOBILE = mobileParts[1];
+        }
+
+        // 🔹 WHATSAPP split
+        if (data.WHATSAPP) {
+          const whatsappParts = data.WHATSAPP.split('-');
+          this.countryCodewhatsapp = whatsappParts[0];
+          this.editingRowData.WHATSAPP = whatsappParts[1];
+        }
+
+  this.formsource.patchValue({
+    CompanyTypeName: data.COMPANY_TYPE || 0,
+    STATE_ID: data.STATE_ID,
+  });
+
         this.formsource.patchValue({
           CompanyTypeName: response.Data.COMPANY_TYPE || 0,
           STATE_ID: response.Data.STATE_ID,
@@ -458,10 +486,17 @@ export class CompanyMasterComponent {
       ADDRESS2: Second_address,
       ADDRESS3: Third_address,
       CONTACT_NAME: Contact_name,
-      PHONE: Phone_no,
-      MOBILE: Mobile_no,
+      PHONE: this.countryCodephone
+              ? `${this.countryCodephone}-${Phone_no || ''}`
+              : Phone_no,
+
+      MOBILE: this.countryCodemobile
+              ? `${this.countryCodemobile}-${Mobile_no || ''}`
+              : Mobile_no,
       EMAIL: Email,
-      WHATSAPP: WhatsApp_no,
+      WHATSAPP: this.countryCodewhatsapp
+                ? `${this.countryCodewhatsapp}-${WhatsApp_no || ''}`
+                : WhatsApp_no,
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: Is_Inactive,
       STATE_ID: STATE_ID,
@@ -596,7 +631,7 @@ export class CompanyMasterComponent {
   };
   countryDisplay(item: any) {
     if (!item) return '';
-    return `${item.CODE}${item.COUNTRY_NAME}`;
+    return `${item.CODE}`;
   }
 }
 
