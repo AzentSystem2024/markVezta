@@ -108,6 +108,7 @@ export class EditPurchaseInvoiceComponent {
   vatTilte: any;
   storeList: any;
   departmentList: any;
+  totalDiscAmount: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -316,30 +317,56 @@ export class EditPurchaseInvoiceComponent {
 
     console.log('Selected Supplier:', selectedSupplier);
   }
+  calculateDiscAmt = (rowData: any) => {
+    const qty = Number(rowData?.QUANTITY) || 0;
 
-  calculateGstAmount = (row: any) => {
-    const amt = this.calculateAmount(row);
+    // ✅ FIX: use RATE (same as your amount function)
+    const price = Number(rowData?.RATE) || 0;
 
-    const igst = parseFloat(row.VAT_PERC) || 0; // GST column = GST
-    const cgst = parseFloat(row.CGST) || 0;
-    const sgst = parseFloat(row.SGST) || 0;
+    const amount = qty * price;
+    const discPerc = Number(rowData?.DISC_PERCENT) || 0;
 
-    let totalGstPercent = 0;
-
-    // GST case
-    if (igst > 0) {
-      totalGstPercent = igst;
-    }
-    // CGST + SGST case
-    else {
-      totalGstPercent = cgst + sgst;
-    }
-
-    return amt * (totalGstPercent / 100);
+    return (amount * discPerc) / 100;
   };
+  calculateDiscountAmount = (rowData: any) => {
+    const qty = Number(rowData?.QUANTITY) || 0;
+    const price = Number(rowData?.RATE) || 0;
+
+    const amount = qty * price;
+
+    const discPerc = Number(rowData?.DISC_PERCENT) || 0;
+    const discAmt = (amount * discPerc) / 100;
+
+    return amount - discAmt;
+  };
+  calculateGstAmount = (row: any) => {
+    const amt = this.calculateDiscountAmount(row);
+    const vatPerc = parseFloat(row.VAT_PERC) || 0;
+    return amt * (vatPerc / 100);
+  };
+  // calculateGstAmount = (row: any) => {
+  //   const amt = this.calculateAmount(row);
+
+  //   const igst = parseFloat(row.VAT_PERC) || 0; // GST column = GST
+  //   const cgst = parseFloat(row.CGST) || 0;
+  //   const sgst = parseFloat(row.SGST) || 0;
+
+  //   let totalGstPercent = 0;
+
+  //   // GST case
+  //   if (igst > 0) {
+  //     totalGstPercent = igst;
+  //   }
+  //   // CGST + SGST case
+  //   else {
+  //     totalGstPercent = cgst + sgst;
+  //   }
+
+  //   return amt * (totalGstPercent / 100);
+  // };
 
   calculateTotal = (row: any) => {
-    const amt = this.calculateAmount(row);
+    const amt = this.calculateDiscountAmount(row);
     const gst = this.calculateGstAmount(row);
     return amt + gst;
   };
@@ -581,6 +608,8 @@ export class EditPurchaseInvoiceComponent {
     if (this.itemsGridRef?.instance) {
       this.totalAmount =
         this.itemsGridRef.instance.getTotalSummaryValue('AMOUNT') || 0;
+      this.totalDiscAmount =
+        this.itemsGridRef.instance.getTotalSummaryValue('DISC_AMT') || 0;
       this.taxAmount =
         this.itemsGridRef.instance.getTotalSummaryValue('VAT_AMOUNT') || 0;
       this.grandTotal =
@@ -646,6 +675,7 @@ export class EditPurchaseInvoiceComponent {
     let grossAmount = 0;
     let vatAmount = 0;
     let netAmount = 0;
+    let totalDiscountAmount = 0;
     // get selected values from grid
     this.itemsGridRef.instance.saveEditData();
 
@@ -657,10 +687,13 @@ export class EditPurchaseInvoiceComponent {
       (item: any) => {
         const amount = this.calculateAmount(item);
         const vat = this.calculateGstAmount(item);
-
+        const discamt = this.calculateDiscountAmount(item);
+        const net = this.calculateTotal(item);
         grossAmount += amount;
         vatAmount += vat;
-        netAmount += amount + vat;
+        // netAmount += amount + vat;
+        totalDiscountAmount += discamt;
+        netAmount += net;
 
         return {
           ID: this.purchaseInvoiceFormData.ID,
@@ -680,7 +713,7 @@ export class EditPurchaseInvoiceComponent {
           ITEM_DESC: item.ITEM_DESC || '',
           PO_DET_ID: item.PO_DET_ID,
           UOM: item.UOM,
-          DISC_PERCENT: 0,
+          // DISC_PERCENT: 0,
           COST: item.COST,
           SUPP_PRICE: item.RATE || 0,
           SUPP_AMOUNT: item.AMOUNT,
@@ -694,6 +727,8 @@ export class EditPurchaseInvoiceComponent {
           PENDING_QTY: 0,
           GRN_QUANTITY: 0,
           NARRATION: this.purchaseInvoiceFormData.NARRATION,
+          DISC_PERCENT: item.DISC_PERCENT,
+          DISC_AMT: this.calculateDiscAmt(item),
           // SGST: item.SGST,
           // CGST: item.CGST,
           // GST: item.GST ?? 0,
@@ -705,6 +740,9 @@ export class EditPurchaseInvoiceComponent {
       grossAmount.toFixed(2),
     );
     this.purchaseInvoiceFormData.VAT_AMOUNT = parseFloat(vatAmount.toFixed(2));
+    this.purchaseInvoiceFormData.DISCOUNT_AMOUNT = parseFloat(
+      totalDiscountAmount.toFixed(2),
+    );
     this.purchaseInvoiceFormData.NET_AMOUNT = parseFloat(netAmount.toFixed(2));
     this.purchaseInvoiceFormData.SUPP_GROSS_AMOUNT = parseFloat(
       grossAmount.toFixed(2),
@@ -783,6 +821,8 @@ export class EditPurchaseInvoiceComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('AMOUNT') || 0;
       this.taxAmount =
         this.itemsGridRef?.instance?.getTotalSummaryValue('VAT_AMOUNT') || 0;
+      this.totalDiscAmount =
+        this.itemsGridRef?.instance?.getTotalSummaryValue('DISC_AMT') || 0;
       this.grandTotal =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);

@@ -147,11 +147,6 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.sessionData_tax();
-    this.getSalesmanDropdown();
-    this.getCustomerDropdown();
-    this.getDeliveryNo();
-    this.isEditDataAvailable();
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -183,6 +178,11 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       // this.getItemsList();
     }
     // this.getDocNo();
+    this.sessionData_tax();
+    this.getSalesmanDropdown();
+    this.getCustomerDropdown();
+    this.getDeliveryNo();
+    this.isEditDataAvailable();
     this.sessionData_tax();
     this.getSalesmanDropdown();
     this.getCustomerDropdown();

@@ -6,7 +6,7 @@
   --side-panel-toolbar-height: 76px;
 
   width: 100%;
-  display: contents;
+  display: block;
   overflow: auto;
 }
 
@@ -58,7 +58,9 @@
 
 .flag-open {
   color: white; /* or rgb(245, 240, 240) */
-  text-shadow: 0 0 1px black, 0 0 2px black;
+  text-shadow:
+    0 0 1px black,
+    0 0 2px black;
 }
 
 .flag-pending {

@@ -66,7 +66,7 @@ export class CustomerFinEditFormComponent {
   phoneValue: any;
   editingIndex: number | null = null;
 
-  formCustomerData:any = {
+  formCustomerData: any = {
     WAREHOUSE_ID: '',
     DELIVERY_ADDRESS_ID: '',
     COMPANY_ID: this.selected_Company_id,
@@ -605,7 +605,7 @@ export class CustomerFinEditFormComponent {
     DxRadioGroupModule,
     DxTabPanelModule,
     DxButtonModule,
-    DxNumberBoxModule
+    DxNumberBoxModule,
   ],
   declarations: [CustomerFinEditFormComponent],
   exports: [CustomerFinEditFormComponent],
