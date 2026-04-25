@@ -199,6 +199,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   };
   isFilterOpened: boolean;
   vatTitle: any;
+  storeItems: any;
 
   constructor(
     private service: DataService,
@@ -610,6 +611,76 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         this.SupplierCurrencyCode !== this.localCurrencyCode;
       console.log('showSupplierAmount:', shouldShowSupplierAmount);
       this.showSupplierAmount.emit(shouldShowSupplierAmount); // Emit after initialization
+    });
+  }
+
+  getStoreOrCompanyByid() {
+    const payload = {
+      // SUPP_ID: this.newPoData.SUPP_ID,
+      // COMPANY_ID: this.companyID,
+      STORE_ID: this.newPoData.STORE_ID,
+    };
+
+    this.service.getStoreData(payload).subscribe((res) => {
+      this.storeItems = res;
+      const supplier = res[0];
+
+      this.supplierStateID = supplier.STATE_ID;
+      console.log(this.supplierStateID, 'STATEIDDDDDDDDDDDDDDD');
+
+      // ✅ Decide GST type
+      this.isInterState = this.companyStateID !== this.supplierStateID;
+      // this.applyGstModeToItems();
+
+      // 🔁 Refresh grid so columns + values update
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.refresh();
+      }, 0);
+
+      console.log('GST MODE:', this.isInterState ? 'IGST' : 'CGST + SGST');
+
+      // ⬇️ 🔒 KEEPING ALL YOUR EXISTING CODE AS-IS
+      // this.newPoData.CURRENCY_ID = this.supplierItems[0].CURRENCY_ID;
+      // this.newPoData.SUPP_CONTACT = this.supplierItems[0].SUPP_NAME;
+
+      // this.newPoData.SUPP_ADDRESS = this.supplierItems[0].SUPP_ADDRESS;
+      // this.SupplierCurrency = this.supplierItems[0].CURRENCY_NAME;
+      // this.SupplierCurrencyCode = this.supplierItems[0].CURRENCY_CODE;
+      // this.SupplierCurrencySymbol = this.supplierItems[0].CURRENCY_SYMBOL;
+      // this.supplierMail = this.supplierItems[0].SUPPLIER_MAIL;
+
+      // this.newPoData.EXCHANGE_PRICE = this.supplierItems[0].EXCHANGE;
+      // this.vatRule = this.supplierItems[0].VAT_RULE_NAME;
+
+      this.showLocalCurrencyColumn =
+        this.localCurrencyId !== this.newPoData.CURRENCY_ID;
+      this.newPoData.SHIP_TO = this.storeItems[0].ADDRESS1;
+      this.newPoData.CONTACT_NAME = this.storeItems[0].STORE_NAME;
+      this.newPoData.CONTACT_MOBILE = this.storeItems[0].PHONE;
+      const storeMobile = this.storeItems[0].PHONE;
+
+      if (!storeMobile) return;
+
+      // Extract country code and number
+      const match = storeMobile.match(/^(\+?\d+)[-\s]?(\d+)$/);
+
+      if (match) {
+        let code = match[1];
+        let number = match[2];
+
+        // ensure + exists
+        if (!code.startsWith('+')) {
+          code = '+' + code;
+        }
+
+        this.supplierCountryCode = code;
+        this.newPoData.CONTACT_MOBILE = number;
+      }
+
+      // this.extractSupplierCountryCode();
+      this.extractShippingCountryCode();
+
+      console.log(this.supplierItems, 'supplier items');
     });
   }
 

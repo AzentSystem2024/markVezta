@@ -61,7 +61,7 @@ export class CustomerFinFormComponent {
   phoneValue: any;
   editingIndex: number | null = null;
 
-  formCustomerData:any = {
+  formCustomerData: any = {
     COMPANY_ID: this.selected_Company_id,
     CUST_CODE: '',
     FIRST_NAME: '',

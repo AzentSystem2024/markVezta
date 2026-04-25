@@ -3639,6 +3639,11 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}purchaseorder/supplierlist`, data);
   }
 
+  public getStoreData(data: any): Observable<any> {
+    // const reqBodyData = { SUPP_ID: value };
+    return this.http.post(`${this.apiUrl}purchaseorder/Getstore`, data);
+  }
+
   public getPurchaseOrderList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}purchaseorder/list`, data);
