@@ -38,7 +38,7 @@
     >
     </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-popup title="Edit Item Brand" [showTitle]="true" [width]="500" [height]="'auto'"></dxo-popup>
       <dxo-form
         [colCount]="1"
@@ -117,6 +117,7 @@
       location="after"
       locateInMenu="auto"
       widget="dxButton"
+      [visible]="canAdd"
       [options]="addButtonOptions"
     ></dxi-item>
 

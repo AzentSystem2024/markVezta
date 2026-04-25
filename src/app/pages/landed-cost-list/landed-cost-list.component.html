@@ -30,7 +30,7 @@
     </dxo-header-filter>
 
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
   <dxo-popup
     title="Edit Landed Cost"
     [showTitle]="true"
@@ -95,6 +95,7 @@
     locateInMenu="auto"
     widget="dxButton"
     [options]="addButtonOptions"
+    [visible]="canAdd"
   ></dxi-item>
 
 </dxo-toolbar>

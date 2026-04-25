@@ -6478,4 +6478,46 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'StockMovementRpt/storewisestock';
     return this.http.post(getEndpoint, payload);
   }
+
+  //-----------------------sales summary report-------------------------
+  SalesSummaryReport(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/SalesSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+   //-----------------------sales Detail report-------------------------
+  SalesDetailReport(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/SalesDetail';
+    return this.http.post(getEndpoint, payload)
+  }
+
+  //-----------------------ConsignmentSummary_Report-------------------------
+  ConsignmentSummary_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ConsignmentSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+  //-----------------------ConsignmentReturn_Details_Report-------------------------
+  ConsignmentReturn_Details_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ConsignmentReturnDetail';
+    return this.http.post(getEndpoint, payload)
+  }
+
+    //-----------------------ItemwiseSales_Report-------------------------
+  ItemwiseSales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSales';
+    return this.http.post(getEndpoint, payload)
+  }
+
+    //-----------------------ItemwiseSales Summary Report-------------------------
+  ItemwiseSales_Summary_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSalesSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+    //-----------------------Discountwise_Sales Report-------------------------
+  Discountwise_Sales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/DiscountWiseSales';
+    return this.http.post(getEndpoint, payload)
+  }
 }

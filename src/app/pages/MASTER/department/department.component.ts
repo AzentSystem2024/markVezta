@@ -20,6 +20,7 @@ import {
 } from '@angular/forms';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-department',
@@ -46,6 +47,13 @@ export class DepartmentComponent {
   formData = { IS_ACTIVE: false };
   editingIndex: number | undefined;
   isLoading: boolean=false;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   addButtonOptions = {
     text: 'New',
@@ -88,6 +96,7 @@ export class DepartmentComponent {
     private fb: FormBuilder,
     private dataservice: DataService,
     private ngZone: NgZone,
+    private router:Router
   ) {
     this.formsource = this.fb.group({
       CODE: ['', Validators.required],
@@ -95,6 +104,25 @@ export class DepartmentComponent {
       IS_ACTIVE: [false],
       COMPANY_ID: ['',Validators.required]
     });
+
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.sesstion_Details();
     this.get_Department_List();
   }

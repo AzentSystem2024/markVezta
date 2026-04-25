@@ -36,7 +36,7 @@
       [showNavigationButtons]="true"
     ></dxo-pager>
 
-  <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+  <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
   </dxo-editing>
   <dxo-toolbar>
 
@@ -76,6 +76,7 @@
     location="after"
     widget="dxButton"
     [options]="addButtonOptions"
+    [visible]="canAdd"
   ></dxi-item>
 
 </dxo-toolbar>

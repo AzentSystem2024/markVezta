@@ -407,6 +407,13 @@ import { EditPromotionComponent, EditPromotionModule } from './pages/edit-promot
 import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 import { StorewiseStockViewComponent, StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
+import { SalesSummaryComponent, SalesSummaryModule } from './pages/REPORT/sales-summary/sales-summary.component';
+import { SalesDetailComponent, SalesDetailModule } from './pages/REPORT/sales-detail/sales-detail.component';
+import { ConsignmentSummaryComponent, ConsignmentSummaryModule } from './pages/REPORT/consignment-summary/consignment-summary.component';
+import { ConsignmentReturnDetailComponent, ConsignmentReturnDetailModule } from './pages/REPORT/consignment-return-detail/consignment-return-detail.component';
+import { ItemwisesalesComponent, ItemwisesalesModule } from './pages/REPORT/itemwisesales/itemwisesales.component';
+import { ItemWiseSalesSummaryComponent, ItemWiseSalesSummaryModule } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
+import { DiscountWiseSalesComponent, DiscountWiseSalesModule } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
 import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
 
 @NgModule({
@@ -790,6 +797,13 @@ import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages
     MiscellaneousSalesInvoiceModule,
     MiscellaneousSalesInvoiceFormModule,
     StorewiseStockViewModule,
+    SalesSummaryModule,
+    SalesDetailModule,
+    ConsignmentSummaryModule,
+    ConsignmentReturnDetailModule,
+    ItemwisesalesModule,
+    ItemWiseSalesSummaryModule,
+    DiscountWiseSalesModule,
     ViewPromotionWizardModule
 
   ],

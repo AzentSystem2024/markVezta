@@ -433,7 +433,7 @@ export class SupplierFinListComponent {
   
       const packingRights = menuGroups
         .flatMap((group: any) => group.Menus)
-        .find((menu: any) => menu.Path === '/supplier-me');
+        .find((menu: any) => menu.Path === currentUrl);
   
       if (packingRights) {
         this.canAdd = packingRights.CanAdd;

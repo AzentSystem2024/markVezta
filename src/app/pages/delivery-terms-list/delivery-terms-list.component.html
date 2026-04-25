@@ -50,9 +50,9 @@
   
     <dxo-editing
       mode="popup"
-      [allowUpdating]="true"
-      [allowDeleting]="true"
-      [allowAdding]="true"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+      [allowAdding]="canAdd"
     >
       <dxo-popup
         title="Edit Delivery Terms"
@@ -130,6 +130,7 @@
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
+        [visible]="canAdd"
       ></dxi-item>
      
     </dxo-toolbar>

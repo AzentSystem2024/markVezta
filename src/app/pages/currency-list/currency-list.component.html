@@ -27,7 +27,7 @@
     >
     </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-popup title="Edit Currency" [showTitle]="true" [width]="450" [height]="400"  >
         
       </dxo-popup>
@@ -132,6 +132,7 @@
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
+        [visible]="canAdd"
       ></dxi-item>
 
     </dxo-toolbar>

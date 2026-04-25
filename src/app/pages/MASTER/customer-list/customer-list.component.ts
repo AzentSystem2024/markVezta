@@ -495,7 +495,7 @@ export class CustomerListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

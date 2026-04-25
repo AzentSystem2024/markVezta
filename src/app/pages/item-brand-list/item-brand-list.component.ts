@@ -11,6 +11,7 @@ import notify from 'devextreme/ui/notify';
 import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { ExportService } from 'src/app/services/export.service';
 import DataSource from 'devextreme/data/data_source';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-item-brand-list',
@@ -72,10 +73,18 @@ export class ItemBrandListComponent implements OnInit {
 
   brandDataSource: any;
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private zone: NgZone,
+    private router:Router
   ) {}
 
   onExporting(event: any) {
@@ -206,6 +215,28 @@ export class ItemBrandListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.showBrand();
   }
 

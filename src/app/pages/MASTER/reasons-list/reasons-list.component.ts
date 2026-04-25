@@ -15,6 +15,8 @@ import { LandedCostFormComponent } from 'src/app/components/library/landed-cost-
 import { Console } from 'console';
 import { ExportService } from 'src/app/services/export.service';
 import { ReasonEditModule } from 'src/app/components/library/reason-edit/reason-edit/reason-edit.component';
+import { RoutedConnectorViewModel } from '@devexpress/analytics-core/analytics-diagram';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-reasons-list',
   templateUrl: './reasons-list.component.html',
@@ -46,12 +48,20 @@ export class ReasonsListComponent {
   isEditMode: boolean = false;
 
   currentEditId: number | null = null;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
   
 
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
+    private router:Router
   ) {
     const payload = {
       NAME: 'REASONTYPES',
@@ -376,6 +386,26 @@ export class ReasonsListComponent {
       });
   }
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.showReasons();
   }
   onValueChangedReason(event: any) {

@@ -71,8 +71,9 @@ export class SubcategoryListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user');
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
