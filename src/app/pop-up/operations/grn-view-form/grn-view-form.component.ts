@@ -672,7 +672,11 @@ export class GrnViewFormComponent {
         // QTY_BASE_UNIT: item.UOM_MULTIPLE
         //   ? `${item.RECEIVED_QTY / item.UOM_MULTIPLE} ${item.UOM}`
         //   : `${item.RECEIVED_QTY} ${item.UOM}`,
-        QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
+        // QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
+        QTY_BASE_UNIT:
+          item.UOM_MULTIPLE > 0
+            ? `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`
+            : `0`, // or 'N/A',
         DESCRIPTION: item.ITEM_NAME,
       }));
 

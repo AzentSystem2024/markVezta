@@ -67,9 +67,20 @@
             labelMode="floating"
             [(value)]="invoiceFormData.REF_NO"
             [readOnly]="isReadOnlyMode"
-            [width]="410"
+            [width]="200"
           >
           </dx-text-box>
+          <dx-select-box
+            [dataSource]="filteredStoreList"
+            [(value)]="invoiceFormData.STORE_ID"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [width]="200"
+            label="Customer"
+            labelMode="floating"
+            [readOnly]="isEditing"
+          >
+          </dx-select-box>
         </div>
 
         <!-- RIGHT SIDE -->
@@ -296,6 +307,7 @@
           text="Cancel"
           stylingMode="outlined"
           type="normal"
+          [visible]="!isReadOnlyMode"
           (onClick)="cancel()"
         ></dx-button>
 
@@ -311,6 +323,7 @@
                 : 'Save'
           "
           [disabled]="isSaving"
+          [visible]="!isReadOnlyMode"
           (onClick)="saveInvoice()"
           stylingMode="contained"
           type="default"
