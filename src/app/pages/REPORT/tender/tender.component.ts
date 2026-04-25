@@ -55,14 +55,13 @@ import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-inv
 
 
 @Component({
-  selector: 'app-discount-wise-sales',
-  templateUrl: './discount-wise-sales.component.html',
-  styleUrls: ['./discount-wise-sales.component.scss']
+  selector: 'app-tender',
+  templateUrl: './tender.component.html',
+  styleUrls: ['./tender.component.scss']
 })
-export class DiscountWiseSalesComponent {
+export class TenderComponent {
 
-
-    @ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
           dataGrid: DxDataGridComponent;
           JournalBookDataSource: DataSource; // ONLY for dx-data-grid
           journalBookArray: any[] = []; // ONLY for logic / checks
@@ -150,7 +149,11 @@ export class DiscountWiseSalesComponent {
           Store: any;
           selectedStoreid: any;
           selectedCustomer: any;
-          selectedReason:any;
+           selectedBrand: any;
+        selectedDepartment: any;
+        selectedCategory: any;
+        selectedSubcategory: any;
+        selectedSalesman: any;
         items: any;
          selectedItem:any[] = [];
          itemHint : string = '';
@@ -158,35 +161,29 @@ export class DiscountWiseSalesComponent {
          // Add this variable
       isFilterVisible: boolean = true;
         distributorList: any;
+        Salesman: any;
+    Brand: any;
+    Subcategory: any;
+    Category: any;
+    Department: any;
+    itemProperty2: any;
+    itemProperty1: any;
+    selectedItemProperty1:any;
+    selectedItemProperty2:any;
+  
+     Saletype = [
+    { ID: 0, DESCRIPTION: 'All' },
+    { ID: 1, DESCRIPTION: 'Sales & Return' },
+    { ID: 2, DESCRIPTION: 'Sales' },
+    { ID: 3, DESCRIPTION: 'Return' },
+    { ID: 4, DESCRIPTION: 'Void Invoice' },
+    { ID: 5, DESCRIPTION: 'Cash In & Cash Out' },
+    { ID: 6, DESCRIPTION: 'Receipts' }
+  ];
+  
+  // Optional default selection
+  selectedSaletype = [0]; // or [] if nothing selected
       
-          Saletype = [
-  { ID: 0, DESCRIPTION: 'All' },
-  { ID: 1, DESCRIPTION: 'Sales & Return' },
-  { ID: 2, DESCRIPTION: 'Sales' },
-  { ID: 3, DESCRIPTION: 'Return' },
-  { ID: 4, DESCRIPTION: 'Void Invoice' },
-  { ID: 5, DESCRIPTION: 'Cash In & Cash Out' },
-  { ID: 6, DESCRIPTION: 'Receipts' }
-];
-
-// Optional default selection
-selectedSaletype = [0]; // or [] if nothing selected
-  Salesman: any;
-  itemProperty2: any;
-  itemProperty1: any;
-  Brand: any;
-  Subcategory: any;
-  Category: any;
-  Department: any;
-   selectedBrand: any;
-      selectedDepartment: any;
-      selectedCategory: any;
-      selectedSubcategory: any;
-      selectedSalesman: any;
-      selectedItemProperty1 : any;
-selectedItemProperty2:any;
-  Reason: any;
-
       //  Toggle function
       toggleFiltersPanel() {
         this.isFilterVisible = !this.isFilterVisible;
@@ -252,17 +249,7 @@ selectedItemProperty2:any;
         
             this.load_JournalBook_data();
             this.store_dropdown();
-            this.item_dropdown();
             this.getCustomerOrUnitLst();
-            this.department_dropdown()
-            this.Catgeory_dropdown();
-            this.SubCatgeory_dropdown();
-            this.Brand_dropdown();
-            this.Salesman_dropdown();
-            this.ItemProperty1_dropdown();
-            this.ItemProperty2_dropdown();
-            this.reason_dropdown();
-            
           }
         
           ngAfterViewInit() {
@@ -417,38 +404,26 @@ selectedItemProperty2:any;
         
           load_JournalBook_data() {
             
-                 const payload = {
-          COMPANY_ID: this.selected_Company_id,
-          FIN_ID :  this.selected_fin_id,
-          DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-          DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-           STORE_ID: this.selectedStoreid?.length
-        ? this.selectedStoreid.join(',') // FINAL FIX
-        : '',
-         CUST_ID: this.selectedCustomer != null
-    ? String(this.selectedCustomer)
-    : '',
-      SALE_TYPE: this.selectedSaletype != null? Number(this.selectedSaletype)
-    : 0,
-        BRAND_ID: this.selectedBrand != null
-    ? String(this.selectedBrand)
-    : '',
-    STATUS_ID:"",
-    ITEM_ID : "",
-    SALESMAN_ID: this.selectedSalesman !=null? String(this.selectedSalesman):'',
-    DEPT_ID : this.selectedDepartment !=null ? String(this.selectedDepartment):'',
-    CAT_ID : this.selectedCategory !=null ? String(this.selectedCategory): '',
-    SUBCAT_ID: this.selectedSubcategory !=null ? String(this.selectedSubcategory):'',
-    REASON_ID :this.selectedReason !=null ? String(this.selectedReason):'',
-    CUSTOM1 : this.selectedItemProperty1 !=null ? String(this.selectedItemProperty1):'',
-    CUSTOM2 : this.selectedItemProperty2 !=null ? String(this.selectedItemProperty2):'',
-    INCLUDE_SUMMARY: 0
-        };
+              const payload = {
+            COMPANY_ID: this.selected_Company_id,
+            FIN_ID :  this.selected_fin_id,
+            DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
+            DATE_TO: this.formatted_To_date ?? this.selected_To_date,
+             STORE_ID: this.selectedStoreid?.length
+          ? this.selectedStoreid.join(',') // FINAL FIX
+          : '',
+           CUSTOMER_ID: this.selectedCustomer != null
+      ? String(this.selectedCustomer)
+      : '',
+        SALE_TYPE: this.selectedSaletype != null? Number(this.selectedSaletype)
+      : 0,
+          };
+          
         
             this.JournalBookDataSource = new DataSource({
               load: () =>
                 new Promise((resolve) => {
-                  this.dataService.Discountwise_Sales_Report(payload).subscribe({
+                  this.dataService.Tender_Sales_Report(payload).subscribe({
                     next: (res: any) => {
                       const list = res || [];
         
@@ -490,70 +465,55 @@ selectedItemProperty2:any;
               // 1. Total Debitṅ
               {
                 name: 'totalDr',
-                column: 'PRICE',
+                column: 'CASH',
                 summaryType: 'sum',
                 displayFormat: 'Total {0}',
                 valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-                showInColumn: 'PRICE',
+                showInColumn: 'CASH',
                 alignment: 'right',
               },
               {
                 name: 'totalDr',
-                column: 'GROSS_AMOUNT',
+                column: 'FAB POS CARD',
                 summaryType: 'sum',
                 displayFormat: 'Total {0}',
                 valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-                showInColumn: 'GROSS_AMOUNT',
+                showInColumn: 'FAB POS CARD',
                 alignment: 'right',
               },
               {
                 name: 'totalDr',
-                column: 'VAT_AMOUNT',
+                column: 'TOTAL',
                 summaryType: 'sum',
                 displayFormat: 'Total {0}',
                 valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-                showInColumn: 'VAT_AMOUNT',
-                alignment: 'right',
-              },
-              {
-                name: 'totalDr',
-                column: 'NET_AMOUNT',
-                summaryType: 'sum',
-                displayFormat: 'Total {0}',
-                valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-                showInColumn: 'NET_AMOUNT',
+                showInColumn: 'TOTAL',
                 alignment: 'right',
               },
             ],
             groupItems: [
               {
-                column: 'PRICE',
+                column: 'CASH',
                 summaryType: 'sum',
                 displayFormat: '{0}',
                 valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
                 alignByColumn: true,
               },
               {
-                column: 'GROSS_AMOUNT',
+                column: 'FAB POS CARD',
                 summaryType: 'sum',
                 displayFormat: '{0}',
                 valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
                 alignByColumn: true,
               },
               {
-                column: 'VAT_AMOUNT',
+                column: 'TOTAL',
                 summaryType: 'sum',
                 displayFormat: '{0}',
                 valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
                 alignByColumn: true,
               },
-              {
-                column: 'NET_AMOUNT',
-                summaryType: 'sum',
-                displayFormat: '{0}',
-                valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-                alignByColumn: true,
-              },
+        
             ],
             calculateCustomSummary: (options) => {
               if (options.name === 'summaryRow') {
@@ -599,96 +559,8 @@ selectedItemProperty2:any;
               this.Store = res;
             });
           }
-
-           department_dropdown(){
-        const payload = {
-          NAME :'DEPARTMENT',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Department = res;
-        });
-      }
-
-      Catgeory_dropdown(){
-        const payload = {
-          NAME :'ITEMCATEGORY',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Category = res;
-        });
-      }
   
-      SubCatgeory_dropdown(){
-        const payload = {
-          NAME :'SUBCATEGORY',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Subcategory = res;
-        });
-      }
-
-      Brand_dropdown(){
-        const payload = {
-          NAME :'BRAND',
-          // COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Brand = res;
-        });
-      }
-
-
-           ItemProperty1_dropdown(){
-        const payload = {
-          NAME :'ITEMPROPERTY1',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.itemProperty1 = res;
-        });
-      }
-
-      ItemProperty2_dropdown(){
-        const payload = {
-          NAME :'ITEMPROPERTY2',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.itemProperty2 = res;
-        });
-      }
-
-      Salesman_dropdown(){
-        const payload = {
-          NAME :'SALESMAN',
-          // COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Salesman = res;
-        });
-      }
-
-      reason_dropdown(){
-        const payload = {
-          NAME :'REASON',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Reason = res;
-        });
-      }
-      
-            item_dropdown(){
-          const payload = {
-            NAME : 'ITEMS'
-          }
-          this.dataService.Common_Dropdown(payload).subscribe((res:any)=>{
-            this.items = res
-          })
-        }
+         
       
         updateItemHint() {
         if (!this.selectedItem || this.selectedItem.length === 0) {
@@ -773,6 +645,6 @@ selectedItemProperty2:any;
   ],
   providers: [],
   exports: [],
-  declarations: [DiscountWiseSalesComponent],
+  declarations: [TenderComponent],
 })
-export class DiscountWiseSalesModule {}
+export class TenderModule {}

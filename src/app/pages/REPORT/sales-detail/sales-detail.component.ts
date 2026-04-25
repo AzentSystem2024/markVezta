@@ -686,7 +686,17 @@ selectedSaletype = [0]; // or [] if nothing selected
         NAME : 'ITEMS'
       }
       this.dataService.Common_Dropdown(payload).subscribe((res:any)=>{
-        this.items = res
+        // this.items = res
+
+        this.items = {
+        store: {
+          type: 'array',
+          data: res,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
       })
     }
   

@@ -415,6 +415,8 @@ import { ItemwisesalesComponent, ItemwisesalesModule } from './pages/REPORT/item
 import { ItemWiseSalesSummaryComponent, ItemWiseSalesSummaryModule } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
 import { DiscountWiseSalesComponent, DiscountWiseSalesModule } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
 import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
+import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
+import { TenderSummaryComponent, TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -804,8 +806,9 @@ import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages
     ItemwisesalesModule,
     ItemWiseSalesSummaryModule,
     DiscountWiseSalesModule,
-    ViewPromotionWizardModule
-
+    ViewPromotionWizardModule,
+    TenderModule,
+    TenderSummaryModule,
   ],
 
   providers: [
