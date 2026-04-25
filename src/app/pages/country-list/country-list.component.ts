@@ -15,6 +15,7 @@ import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { FormTextboxModule } from 'src/app/components';
 import { DxFormModule } from 'devextreme-angular';
 import { ExportService } from 'src/app/services/export.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-country-list',
@@ -35,8 +36,17 @@ export class CountryListComponent implements OnInit {
   isAddCountryPopupOpened = false;
   isFilterOpened = false;
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   countryDataSource: DataSource;
   countryArray: any[] = [];
+
+  
 
   searchButtonOptions = {
   icon: 'search',
@@ -78,6 +88,7 @@ addButtonOptions = {
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
+    private router:Router
   ) {}
   
   onExporting(event: any) {
@@ -191,6 +202,26 @@ addButtonOptions = {
 }
 
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    
     this.showCountry();
   }
   refresh = () => {

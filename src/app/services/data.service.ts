@@ -1608,8 +1608,9 @@ export class DataService {
     CODE: any,
     BRAND_NAME: any,
     COMPANY_ID: any,
+    COMPANY_NAME: any,
   ): Observable<any> {
-    const data = { CODE, BRAND_NAME, COMPANY_ID };
+    const data = { CODE, BRAND_NAME, COMPANY_ID, COMPANY_NAME };
 
     return this.http.post(`${this.apiUrl}itembrand/save`, data);
   }
@@ -6454,7 +6455,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}MiscSales/update`, data);
   }
 
-    ApproveMiscSalesInvoice(items: any) {
+  ApproveMiscSalesInvoice(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscSales/commit`, data);
   }
@@ -6468,7 +6469,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=========================store wise stock view===============================
-    StockView_branch(payload: any) {
+  StockView_branch(payload: any) {
     const getEndpoint = this.apiUrl + 'StockMovementRpt/storewisestock';
     return this.http.post(getEndpoint, payload);
   }

@@ -43,8 +43,10 @@ export class TendersFormComponent implements OnInit, OnChanges {
   isInactive: boolean = false;
   VATRuleDropdownData: any[] = [];
   TenderTypeDropdownData: any[] = [];
+  tenders:any;
 
   formTenderData :any = {
+    ID:0,
     CODE: '',
     IS_INACTIVE: this.isInactive,
     DESCRIPTION: '',
@@ -78,6 +80,7 @@ export class TendersFormComponent implements OnInit, OnChanges {
     });
   }
   ngOnInit(): void {
+    this.showTenders();
     this.getTenderTypeDropDown();
     this.getVATRuleDropDown();
   }
@@ -102,6 +105,26 @@ export class TendersFormComponent implements OnInit, OnChanges {
   onValueChangedInformation(value: boolean) {
     this.formTenderData.ADDITIONAL_INFO_REQUIRED = value;
   }
+
+  showTenders() {
+    this.service.getTendersData().subscribe((response) => {
+      this.tenders = response;
+    });
+  }
+
+  validateTenderCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.tenders?.length) return true;
+
+    const currentId = this.newTender?.ID || 0;
+
+    return !this.tenders.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId;
+    });
+  };  
 }
 
 @NgModule({

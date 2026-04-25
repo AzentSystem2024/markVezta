@@ -131,8 +131,9 @@ export class UomListComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/packing');
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -205,29 +206,36 @@ export class UomListComponent implements OnInit {
     });
   }
 
-  onRowRemoving(event) {
-    const selectedRow = event.data;
-    const { ID, UOM } = selectedRow;
-    this.dataservice.removeUom(ID, UOM).subscribe(() => {
-      try {
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.dataGrid.instance.refresh();
-        this.listUom();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operationfailed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      }
+  onRowRemoving(event: any) {
+    const { ID, UOM } = event.data;
+
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice.removeUom(ID, UOM).subscribe({
+        next: () => {
+          notify(
+            {
+              message: 'Delete operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.listUom(); // reload data
+
+          resolve(true); // ✅ closes popup + syncs grid
+        },
+        error: () => {
+          notify(
+            {
+              message: 'Delete operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+
+          reject(); // prevents deletion
+        },
+      });
     });
   }
 

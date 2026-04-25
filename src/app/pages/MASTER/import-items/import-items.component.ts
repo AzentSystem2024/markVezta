@@ -44,6 +44,7 @@ import {
 import { ImportItemTemplateFormComponent } from 'src/app/components/library/import-item-template-form/import-item-template-form.component';
 import DataSource from 'devextreme/data/data_source';
 import { DxLoadPanelModule } from 'devextreme-angular';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-import-items',
   templateUrl: './import-items.component.html',
@@ -92,6 +93,13 @@ export class ImportItemsComponent implements OnInit {
   finID: any;
   popupReady = false;
   isSaving = false;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   searchButtonOptions = {
     icon: 'search',
@@ -164,6 +172,7 @@ export class ImportItemsComponent implements OnInit {
     private service: DataService,
     private cd: ChangeDetectorRef,
     private ngZone: NgZone,
+    private router: Router
   ) {}
 
   toggleFilters() {
@@ -621,7 +630,31 @@ export class ImportItemsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     const userDataString = localStorage.getItem('userData');
+    
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;

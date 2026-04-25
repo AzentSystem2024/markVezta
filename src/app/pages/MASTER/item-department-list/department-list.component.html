@@ -49,7 +49,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
         <dxo-popup
           title="Edit Department"
           [showTitle]="true"

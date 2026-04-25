@@ -15,14 +15,9 @@
         mode: 'cell',
         allowUpdating: true,
       }"
-      [selection]="{
-        mode: 'multiple',
-        showCheckBoxesMode: 'always',
-      }"
       [keyExpr]="'ID'"
       [(selectedRowKeys)]="selectedRowKeys"
       (onSelectionChanged)="onSelectionChanged($event)"
-      (onEditorPreparing)="onEditorPreparing($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -53,7 +48,7 @@
       <dxo-editing mode="popup" [allowAdding]="true" [allowUpdating]="true">
       </dxo-editing>
 
-      <dxo-toolbar>
+      <dxo-toolbar style="height: 120px">
         <dxi-item location="before">
           <div
             style="
@@ -61,6 +56,7 @@
               flex-direction: column;
               width: 100%;
               gap: 10px;
+              height: 120px;
             "
           >
             <!-- 🔹 Heading -->
@@ -95,7 +91,7 @@
                       type="date"
                       displayFormat="yyyy-MM-dd"
                       width="150"
-                      (onValueChanged)="checkDateSelection($event)"
+                      [readOnly]="true"
                     >
                     </dx-date-box>
                   </div>
@@ -107,7 +103,7 @@
                       type="date"
                       displayFormat="yyyy-MM-dd"
                       width="150"
-                      (onValueChanged)="checkDateSelection($event)"
+                      [readOnly]="true"
                     >
                     </dx-date-box>
                   </div>
@@ -118,6 +114,8 @@
                       [(value)]="narration"
                       placeholder="Enter Remarks"
                       width="150"
+                      [readOnly]="true"
+                      style="margin-bottom: 10px"
                     >
                     </dx-text-box>
                   </div>
@@ -125,16 +123,14 @@
 
                 <!-- Time -->
                 <div style="display: flex; flex-direction: column; gap: 5px">
-                  <dx-switch
-                    [(value)]="isHappyHoursEnabled"
-                    (onValueChanged)="onHappyHoursChanged($event)"
-                  >
+                  <dx-switch [(value)]="isHappyHoursEnabled" [readOnly]="true">
                   </dx-switch>
                   <dx-date-box
                     [(value)]="timeFrom"
                     type="time"
                     displayFormat="HH:mm"
                     pickerType="rollers"
+                    [readOnly]="true"
                     placeholder="From Time"
                     width="90"
                     [disabled]="!isHappyHoursEnabled"
@@ -148,6 +144,7 @@
                     pickerType="rollers"
                     placeholder="To Time"
                     width="90"
+                    [readOnly]="true"
                     [disabled]="!isHappyHoursEnabled"
                   >
                   </dx-date-box>
@@ -164,6 +161,7 @@
                     [showSelectionControls]="true"
                     placeholder="Select Days"
                     [searchEnabled]="true"
+                    [readOnly]="true"
                     [width]="300"
                   >
                   </dx-tag-box>
@@ -179,6 +177,7 @@
                     [showSelectionControls]="true"
                     placeholder="Select Days"
                     [searchEnabled]="true"
+                    [readOnly]="true"
                   >
                   </dx-tag-box>
 
@@ -192,7 +191,7 @@
                     width="300"
                     [multiline]="false"
                     [searchEnabled]="true"
-                    (onValueChanged)="onPriceLevel($event)"
+                    [readOnly]="true"
                   ></dx-select-box>
                 </div>
               </div>
@@ -200,37 +199,13 @@
               <!-- ================= RIGHT SIDE ================= -->
               <div style="display: flex; align-items: center; gap: 10px">
                 <div style="display: flex; flex-direction: column; gap: 5px">
-                  <dx-button
-                    text="Promotion"
-                    icon="formula"
-                    stylingMode="contained"
-                    type="default"
-                    (onClick)="setPromotion(dataGrid.selectedRowKeys)"
-                    width="250"
-                  >
-                  </dx-button>
                   <div class="d-flex">
                     <dx-check-box
                       [(value)]="approveValue"
+                      [readOnly]="true"
                       text="Approve"
-                      [readOnly]="readOnly"
-                      (onValueChanged)="onApprovedChanged($event)"
                       style="margin: 10px"
                     ></dx-check-box>
-                    <dx-button
-                      [text]="
-                        approveValue
-                          ? 'Approve'
-                          : approveValue
-                            ? 'Approve'
-                            : 'Update'
-                      "
-                      stylingMode="contained"
-                      type="default"
-                      class="mt-2"
-                      (onClick)="savePromotion()"
-                    >
-                    </dx-button>
                   </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 5px">
@@ -238,7 +213,6 @@
                     [(value)]="approveValue"
                     text="Approve"
                     [readOnly]="readOnly"
-                    (onValueChanged)="onApprovedChanged($event)"
                     style="margin: 10px"
                   >
                   </dx-check-box> -->
@@ -258,7 +232,7 @@
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
-        dataField="DESCRIPTION"
+        dataField="ITEM_DESCRIPTION"
         caption="Description"
         [width]="200"
         [allowEditing]="false"
@@ -288,7 +262,7 @@
       ></dxi-column>
       <dxi-column
         alignment="right"
-        dataField="SALE_PRICE"
+        dataField="PRICE"
         caption="Price"
         [width]="100"
         [allowEditing]="false"
@@ -321,124 +295,3 @@
     </dx-data-grid>
   </div>
 </div>
-
-<dx-popup
-  [(visible)]="isVisible"
-  [width]="'850'"
-  [height]="'500px'"
-  title="Set Promotion"
-  [showCloseButton]="true"
->
-  <div *dxTemplate="let data of 'content'" class="popup-content">
-    <!-- RADIO BUTTON -->
-    <dx-radio-group
-      [(value)]="selectedMode"
-      [items]="[
-        { text: 'Price Level Promotion', value: 'price' },
-        { text: 'Schema Level Promotion', value: 'schema' },
-      ]"
-      displayExpr="text"
-      valueExpr="value"
-      layout="horizontal"
-      (onValueChanged)="onModeChange($event)"
-    >
-    </dx-radio-group>
-
-    <!-- ========================= -->
-    <!--   PRICE SECTION -->
-    <!-- ========================= -->
-    <div
-      class="promo-container mt-3"
-      [class.disabled-section]="selectedMode === 'schema'"
-    >
-      <div class="form-row single">
-        <div class="form-inline">
-          <label>Promotion</label>
-          <dx-text-box
-            [(value)]="promotionName"
-            [disabled]="selectedMode === 'schema'"
-          ></dx-text-box>
-        </div>
-      </div>
-
-      <div class="form-row two-col">
-        <div class="form-inline">
-          <label>Set Sale Price To</label>
-          <dx-select-box
-            [(value)]="firstDropdownValue"
-            [items]="firstDropdownOptions"
-            displayExpr="label"
-            valueExpr="value"
-            [searchEnabled]="true"
-            [disabled]="selectedMode === 'schema'"
-          ></dx-select-box>
-        </div>
-
-        <div class="form-inline">
-          <label>Adjustment</label>
-          <div class="adjust-group">
-            <dx-select-box
-              [(value)]="operationValue"
-              [items]="operationOptions"
-              displayExpr="value"
-              valueExpr="value"
-              [searchEnabled]="true"
-              [disabled]="selectedMode === 'schema'"
-            ></dx-select-box>
-
-            <dx-text-box
-              [(value)]="operationInputValue"
-              [disabled]="selectedMode === 'schema'"
-            ></dx-text-box>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row two-col">
-        <div class="form-inline">
-          <label>Result Rounding</label>
-          <dx-select-box
-            [(value)]="roundingValue"
-            [items]="roundingOptions"
-            displayExpr="text"
-            valueExpr="value"
-            [searchEnabled]="true"
-            [disabled]="selectedMode === 'schema'"
-          ></dx-select-box>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========================= -->
-    <!--   SCHEMA SECTION -->
-    <!-- ========================= -->
-    <div
-      class="form-container mt-3"
-      [class.disabled-section]="selectedMode === 'price'"
-    >
-      <div class="form-group">
-        <label>Select Schema</label>
-        <dx-select-box
-          [(value)]="selectedSchemaId"
-          [items]="promotionSchema"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [searchEnabled]="true"
-          (onValueChanged)="onSchemaChanged($event)"
-          [disabled]="selectedMode === 'price'"
-        >
-        </dx-select-box>
-      </div>
-    </div>
-
-    <!-- BUTTON -->
-    <div class="action-buttons mt-3">
-      <dx-button
-        text="Apply"
-        stylingMode="contained"
-        type="default"
-        (onClick)="applyPromotion()"
-      ></dx-button>
-    </div>
-  </div>
-</dx-popup>

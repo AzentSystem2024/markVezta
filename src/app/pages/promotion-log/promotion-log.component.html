@@ -22,7 +22,7 @@
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowDeleting]="isDeleteVisible"
       ></dxo-editing>
       <dxo-search-panel
         [visible]="true"
@@ -74,12 +74,6 @@
         [width]="'150'"
         [allowEditing]="false"
       ></dxi-column>
-
-      <dxi-column type="buttons" width="150" [buttons]="allButtonsEditDelete">
-      </dxi-column>
-
-      <dxi-column type="buttons" width="150" [buttons]="customButtons">
-      </dxi-column>
     </dx-data-grid>
   </div>
 </div>
@@ -87,7 +81,7 @@
   [(visible)]="editPackPopupOpened"
   [width]="'80vw'"
   [height]="'90vh'"
-  title="Update Store Items Properties"
+  title="Update Promotion"
   (onHiding)="handleClose()"
 >
   <div *dxTemplate="let data of 'content'">
@@ -95,5 +89,19 @@
       (popupClosed)="handleClose()"
       [selectedData]="selectedPromotion"
     ></app-edit-promotion>
+  </div>
+</dx-popup>
+<dx-popup
+  [(visible)]="ViewPopupOpened"
+  [width]="'80vw'"
+  [height]="'90vh'"
+  title="View Promotion"
+  (onHiding)="handleClose()"
+>
+  <div *dxTemplate="let data of 'content'">
+    <app-view-promotion-wizard
+      (popupClosed)="handleClose()"
+      [selectedData]="selectedPromotion"
+    ></app-view-promotion-wizard>
   </div>
 </dx-popup>

@@ -29,7 +29,7 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
 
-      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
         <dxo-popup
           title="Edit SubDepartment"
           [showTitle]="true"
@@ -127,7 +127,7 @@
   [(visible)]="editItemSubDepartment"
   [width]="'35vw'"
   [height]="'40vh'"
-  title="Update Sub Department"
+  title="Edit Sub Department"
   (onHiding)="handleClose()"
 >
   <app-sub-department-edit-form

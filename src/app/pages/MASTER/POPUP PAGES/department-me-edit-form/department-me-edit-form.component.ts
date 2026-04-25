@@ -5,6 +5,7 @@ import {
   Input,
   NgModule,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -56,6 +57,7 @@ export class DepartmentMeEditFormComponent implements OnChanges {
   constructor(private dataservice: DataService) {
     this.sesstion_Details();
     this.getCostBucket_DropDown();
+    this.showDepartment();
   }
 
   getNewDepartmentData = () => ({ ...this.editDepartment });
@@ -65,8 +67,9 @@ export class DepartmentMeEditFormComponent implements OnChanges {
       COMPANY_ID: this.COMPANY_ID,
     };
 
-    this.dataservice.getDepartmentData(payload).subscribe((response) => {
-      this.department = response;
+    this.dataservice.get_Department_List(payload).subscribe((response:any) => {
+      this.department = response.datas;
+      console.log(this.department,"this.department")
     });
   }
 
@@ -256,6 +259,21 @@ export class DepartmentMeEditFormComponent implements OnChanges {
       return true;
     }
   }
+
+
+  validateDepartmentCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.department?.length) return true;
+
+    const currentId = this.formDepartmentData?.ID; //  current editing ID
+
+    return !this.department.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId; //  ignore same record
+    });
+};
 }
 
 @NgModule({

@@ -32,7 +32,7 @@
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-popup
         title="Edit Tenders"
         [showTitle]="true"
@@ -137,6 +137,7 @@
         locateInMenu="auto"
         widget="dxButton"
         [options]="addButtonOptions"
+        [visible]="canAdd"
       ></dxi-item>
     </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code"></dxi-column>

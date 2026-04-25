@@ -225,50 +225,48 @@ export class ItemCategoryListComponent implements OnInit {
       });
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
-    const {
-      ID,
-      CODE,
-      CAT_NAME,
-      LOYALTY_POINT,
-      COST_HEAD_ID,
-      DEPT_ID,
-      COMPANY_ID,
-    } = selectedRow;
 
-    this.dataservice
-      .removeCategory(
-        ID,
-        CODE,
-        CAT_NAME,
-        LOYALTY_POINT,
-        COST_HEAD_ID,
-        DEPT_ID,
-        COMPANY_ID,
-      )
-      .subscribe(() => {
-        try {
-          // Your delete logic here
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.showCategory();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice
+        .removeCategory(
+          selectedRow.ID,
+          selectedRow.CODE,
+          selectedRow.CAT_NAME,
+          selectedRow.LOYALTY_POINT,
+          selectedRow.COST_HEAD_ID,
+          selectedRow.DEPT_ID,
+          selectedRow.COMPANY_ID,
+        )
+        .subscribe({
+          next: () => {
+            notify(
+              {
+                message: 'Delete operation successful',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+
+            this.dataGrid.instance.refresh();
+            this.showCategory();
+
+            resolve(true); // ✅ tells grid: deletion successful → close popup
+          },
+          error: () => {
+            notify(
+              {
+                message: 'Delete operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+
+            reject(); //  tells grid: don't close popup
+          },
+        });
+    });
   }
 
   sesstion_Details() {
@@ -280,6 +278,7 @@ export class ItemCategoryListComponent implements OnInit {
   showCategory() {
     const payload = {
       COMPANY_ID: this.COMPANY_ID,
+      // COMPANY_ID: 0,
     };
 
     this.CategoryDataSource = new DataSource({
@@ -319,11 +318,16 @@ export class ItemCategoryListComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
+    console.log(menuResponse,"menuResponse")
+
     const menuGroups = menuResponse.MenuGroups || [];
 
+
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user');
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

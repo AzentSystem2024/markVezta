@@ -13,6 +13,7 @@ import {
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { DxCheckBoxModule } from 'devextreme-angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tenders-list',
@@ -45,6 +46,13 @@ export class TendersListComponent implements OnInit {
   currentEditId: number | null = null;
 
   editingRowData: any;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   addButtonOptions = {
     type: 'default',
@@ -84,6 +92,7 @@ export class TendersListComponent implements OnInit {
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
+    private router:Router
   ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Tenders-list');
@@ -99,50 +108,45 @@ export class TendersListComponent implements OnInit {
   }
 
   onClickSaveTenders() {
-    
     const component = this.isEditMode
-        ? this.editFormComponent
-        : this.addFormComponent;
-    
-        const data = component.getNewTenderData();
-    
-        console.log('FINAL DATA', data);
-    
-        const {
-        CODE,
-        IS_INACTIVE,
-        DESCRIPTION,
-        ARABIC_DESCRIPTION,
-        TENDER_TYPE,
-        DISPLAY_ORDER,
-        CURRENCY_ID,
-        ALLOW_OPENING,
-        ALLOW_DECLARATION,
-        ADDITIONAL_INFO_REQUIRED
-      } = data;
-    
-        if (this.isEditMode && this.currentEditId) {
-        this.dataservice
-      .updateTenders(
-        data
-      )
-          .subscribe((response: any) => {
-            if (response?.flag === '1') {
-              notify(
-                {
-                  message: 'Tender updated successfully',
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'success'
-              );
-    
-              this.isEditTendersPopupOpened = false;
-              this.showTenders();
-            }
-          });
-    
-        return;
-      }
+      ? this.editFormComponent
+      : this.addFormComponent;
+
+    const data = component.getNewTenderData();
+
+    console.log('FINAL DATA', data);
+
+    const {
+      CODE,
+      IS_INACTIVE,
+      DESCRIPTION,
+      ARABIC_DESCRIPTION,
+      TENDER_TYPE,
+      DISPLAY_ORDER,
+      CURRENCY_ID,
+      ALLOW_OPENING,
+      ALLOW_DECLARATION,
+      ADDITIONAL_INFO_REQUIRED,
+    } = data;
+
+    if (this.isEditMode && this.currentEditId) {
+      this.dataservice.updateTenders(data).subscribe((response: any) => {
+        if (response?.flag === '1') {
+          notify(
+            {
+              message: 'Tender updated successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.isEditTendersPopupOpened = false;
+          this.showTenders();
+        }
+      });
+
+      return;
+    }
 
     this.dataservice
       .postTendersData(
@@ -155,15 +159,24 @@ export class TendersListComponent implements OnInit {
         CURRENCY_ID,
         ALLOW_OPENING,
         ALLOW_DECLARATION,
-        ADDITIONAL_INFO_REQUIRED
+        ADDITIONAL_INFO_REQUIRED,
       )
       .subscribe((response) => {
-        if (response) {
+        if (response?.flag === '1') {
+          notify(
+            {
+              message: 'Tender added successfully',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.isAddTendersPopupOpened = false;
           this.showTenders();
         }
       });
   }
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
     const selectedRow = event.data;
     const {
       ID,
@@ -280,6 +293,28 @@ export class TendersListComponent implements OnInit {
     });
   }
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.showTenders();
     this.getCurrencyData();
     this.getTenderTypeDropDown();

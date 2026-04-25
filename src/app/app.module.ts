@@ -414,6 +414,7 @@ import { ConsignmentReturnDetailComponent, ConsignmentReturnDetailModule } from 
 import { ItemwisesalesComponent, ItemwisesalesModule } from './pages/REPORT/itemwisesales/itemwisesales.component';
 import { ItemWiseSalesSummaryComponent, ItemWiseSalesSummaryModule } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
 import { DiscountWiseSalesComponent, DiscountWiseSalesModule } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
+import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -803,6 +804,8 @@ import { DiscountWiseSalesComponent, DiscountWiseSalesModule } from './pages/REP
     ItemwisesalesModule,
     ItemWiseSalesSummaryModule,
     DiscountWiseSalesModule,
+    ViewPromotionWizardModule
+
   ],
 
   providers: [

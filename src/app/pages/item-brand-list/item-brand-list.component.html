@@ -38,7 +38,7 @@
     >
     </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-popup title="Edit Item Brand" [showTitle]="true" [width]="500" [height]="'auto'"></dxo-popup>
       <dxo-form
         [colCount]="1"
@@ -117,19 +117,27 @@
       location="after"
       locateInMenu="auto"
       widget="dxButton"
+      [visible]="canAdd"
       [options]="addButtonOptions"
     ></dxi-item>
 
 </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
       <dxi-validation-rule type="required" message="Code is required">
-        <dxi-validation-rule
-        type="pattern"
-        
-        message="Code is required"
-      >
       </dxi-validation-rule>
-      </dxi-validation-rule>
+
+      <dxi-validation-rule
+      type="pattern"
+      [pattern]="'^[a-zA-Z0-9]+$'"
+      message="Code should be alphanumeric only"
+    ></dxi-validation-rule>
+
+      <dxi-validation-rule
+      type="custom"
+      [validationCallback]="validateGridBrandCode"
+      message="Code already exists"
+    ></dxi-validation-rule>
+ 
     </dxi-column>
     <dxi-column dataField="BRAND_NAME" caption="Brand Name">
       <dxi-validation-rule type="required" message="Code is required">

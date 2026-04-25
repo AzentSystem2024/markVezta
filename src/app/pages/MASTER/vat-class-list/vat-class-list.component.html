@@ -32,7 +32,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
         <dxo-popup
           title="Edit Vat Class"
           [showTitle]="true"
@@ -82,8 +82,8 @@
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
+          [visible]="canAdd"
         ></dxi-item>
-
       </dxo-toolbar>
       <dxi-column dataField="CODE" caption="Code">
         <dxi-validation-rule type="required" message="Code is required">
@@ -122,7 +122,7 @@
   [(visible)]="isEditVatclassPopupOpened"
   title="Edit GST Class"
   [width]="800"
-  [height]="'auto'"
+  [height]="'80vh'"
 >
   <app-vat-class-edit
     [selectedData]="selected_data"

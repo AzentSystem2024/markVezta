@@ -22,6 +22,7 @@ import {
 } from 'src/app/components/library/item-property3-form/item-property3-form.component';
 import { AuthService, DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-item-property3',
@@ -57,11 +58,20 @@ export class ItemProperty3Component {
   GST_PERC: any;
   selected_Company_id: any;
   poData: any;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   constructor(
     private dataservice: DataService,
     authservice: AuthService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private router:Router
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY3;
 
@@ -102,6 +112,29 @@ export class ItemProperty3Component {
     this.listItemProperty3();
   }
   ngOnInit() {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.sessionDetails();
     this.listItemProperty3();
   }

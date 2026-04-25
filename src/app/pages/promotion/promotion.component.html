@@ -116,22 +116,24 @@
                       (onValueChanged)="checkDateSelection($event)"
                     ></dx-date-box>
                   </div>
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <label style="width: 90px">Narration:</label>
+
+                    <dx-text-box
+                      [(value)]="narration"
+                      placeholder="Enter Remarks"
+                      width="150"
+                      class="mt-2"
+                    ></dx-text-box>
+                  </div>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 10px">
+
+                <!-- Time -->
+                <div style="display: flex; flex-direction: column; gap: 5px">
                   <dx-switch
                     [(value)]="isHappyHoursEnabledvalue"
                     (onValueChanged)="onHappyHoursChanged($event)"
                   ></dx-switch>
-
-                  <dx-text-box
-                    [(value)]="narration"
-                    placeholder="Enter Remarks"
-                    width="200"
-                    class="mt-2"
-                  ></dx-text-box>
-                </div>
-                <!-- Time -->
-                <div style="display: flex; flex-direction: column; gap: 5px">
                   <dx-date-box
                     [(value)]="fromTime"
                     type="time"
@@ -165,7 +167,7 @@
                     [multiline]="false"
                     [width]="300"
                     [searchEnabled]="true"
-                    (onValueChanged)="onSelectionChanged($event)"
+                    (onValueChanged)="onSelectionChangedDAYS($event)"
                   ></dx-tag-box>
 
                   <dx-tag-box
@@ -180,6 +182,17 @@
                     [searchEnabled]="true"
                     (onValueChanged)="onDropdownValueChanged($event)"
                   ></dx-tag-box>
+                  <dx-select-box
+                    *ngIf="is_promotion_level"
+                    [(value)]="price_level"
+                    [items]="priceLevels"
+                    displayExpr="text"
+                    valueExpr="value"
+                    placeholder="Price level"
+                    width="300"
+                    [searchEnabled]="true"
+                    (onValueChanged)="onPriceLevel($event)"
+                  ></dx-select-box>
                 </div>
               </div>
 
@@ -207,7 +220,6 @@
                   hint="Set Promotion"
                   stylingMode="contained"
                   type="default"
-                  width="130"
                   (onClick)="setPromotion(dataGrid.selectedRowKeys)"
                 ></dx-button>
 
@@ -412,89 +424,94 @@
   [showCloseButton]="true"
 >
   <div *dxTemplate="let data of 'content'" class="popup-content">
-    <dx-tab-panel
-      [(selectedIndex)]="selectedTabIndex"
-      [animationEnabled]="true"
-      [swipeEnabled]="false"
+    <div class="form-row">
+      <dx-radio-group
+        [(value)]="selectedMode"
+        [items]="[
+          { text: 'Price Level Promotion', value: 'price' },
+          { text: 'Schema Level Promotion', value: 'schema' },
+        ]"
+        displayExpr="text"
+        valueExpr="value"
+        layout="horizontal"
+        (onValueChanged)="onModeChange($event)"
+      >
+      </dx-radio-group>
+    </div>
+    <div class="promo-form" [class.disabled]="selectedMode !== 'price'">
+      <div class="form-row">
+        <label>Promotion</label>
+        <dx-text-box
+          [(value)]="promotionName"
+          [disabled]="selectedMode !== 'price'"
+        ></dx-text-box>
+      </div>
+
+      <div class="form-row">
+        <label>Set Sale Price To</label>
+        <dx-select-box
+          [(value)]="firstDropdownValue"
+          [items]="firstDropdownOptions"
+          displayExpr="label"
+          valueExpr="value"
+          [disabled]="selectedMode !== 'price'"
+          [searchEnabled]="true"
+        ></dx-select-box>
+      </div>
+
+      <div class="form-row">
+        <label>Adjustment Type</label>
+
+        <div class="inline-group">
+          <dx-select-box
+            [(value)]="operationValue"
+            [items]="operationOptions"
+            width="80"
+            displayExpr="label"
+            valueExpr="value"
+            [disabled]="selectedMode !== 'price'"
+            [searchEnabled]="true"
+          ></dx-select-box>
+
+          <dx-text-box
+            [(value)]="operationInputValue"
+            placeholder="Enter value"
+            [disabled]="selectedMode !== 'price'"
+          ></dx-text-box>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Result Rounding</label>
+        <dx-select-box
+          [(value)]="roundingValue"
+          [items]="roundingOptions"
+          displayExpr="text"
+          valueExpr="value"
+          [disabled]="selectedMode !== 'price'"
+          [searchEnabled]="true"
+        ></dx-select-box>
+      </div>
+    </div>
+    <div
+      class="tab-content mt-3 ms-3"
+      [class.disabled]="selectedMode !== 'schema'"
     >
-      <!-- 🔹 TAB 1: Price Level -->
-      <dxi-item title="Price Level Promotion">
-        <div class="promo-form">
-          <!-- Promotion -->
-          <div class="form-row">
-            <label>Promotion</label>
-            <dx-text-box
-              [(value)]="promotionName"
-              placeholder="Promotion Name"
-            ></dx-text-box>
-          </div>
-
-          <!-- Set Sale Price -->
-          <div class="form-row">
-            <label>Set Sale Price To</label>
-            <dx-select-box
-              [(value)]="firstDropdownValue"
-              [items]="firstDropdownOptions"
-              displayExpr="label"
-              valueExpr="value"
-              placeholder="Choose an Option"
-              (onValueChanged)="applySelectedValue()"
-            ></dx-select-box>
-          </div>
-
-          <!-- Adjustment Type -->
-          <div class="form-row">
-            <label>Adjustment Type</label>
-
-            <div class="inline-group">
-              <dx-select-box
-                [(value)]="operationValue"
-                [items]="operationOptions"
-                width="80"
-                displayExpr="label"
-                valueExpr="value"
-              ></dx-select-box>
-
-              <dx-text-box
-                [(value)]="operationInputValue"
-                placeholder="Enter value to apply"
-              ></dx-text-box>
-            </div>
-          </div>
-
-          <!-- Rounding -->
-          <div class="form-row">
-            <label>Result Rounding</label>
-            <dx-select-box
-              [(value)]="roundingValue"
-              [items]="roundingOptions"
-              displayExpr="text"
-              valueExpr="value"
-            ></dx-select-box>
-          </div>
-
-          <!-- Apply Button -->
-        </div>
-      </dxi-item>
-
-      <!-- 🔹 TAB 2: Schema Level -->
-      <dxi-item title="Schema Level Promotion">
-        <div class="tab-content">
-          <div class="dropdown-field">
-            <label>Select Schema</label>
-            <dx-select-box
-              [(value)]="selectedSchemaId"
-              [items]="promotionSchema"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              placeholder="Choose Schema"
-              width="300"
-              (onValueChanged)="onSchemaChanged($event)"
-            ></dx-select-box>
-          </div>
-        </div>
-      </dxi-item>
-    </dx-tab-panel>
+      <div class="dropdown-field">
+        <label>Select Schema</label>
+        <dx-select-box
+          [(value)]="selectedSchemaId"
+          [items]="promotionSchema"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          placeholder="Choose Schema"
+          width="300"
+          [searchEnabled]="true"
+          [disabled]="selectedMode !== 'schema'"
+          (onValueChanged)="onSchemaChanged($event)"
+        ></dx-select-box>
+      </div>
+    </div>
 
     <div class="action-buttons">
       <dx-button

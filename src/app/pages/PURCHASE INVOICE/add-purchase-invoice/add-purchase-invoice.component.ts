@@ -568,6 +568,12 @@ export class AddPurchaseInvoiceComponent {
     }, 100);
   }
 
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data?.isInvalid) {
+      e.rowElement.classList.add('invalid-row');
+    }
+  }
+
   savePurchaseInvoice() {
     if (!this.purchaseInvoiceFormData.SUPP_ID) {
       notify(
@@ -622,9 +628,13 @@ export class AddPurchaseInvoiceComponent {
     let isValid = true;
 
     this.mainGridData.forEach((row: any, index: number) => {
+      row.isInvalid = false; // reset first
+
       if (!row.QUANTITY || row.QUANTITY <= 0) {
+        row.isInvalid = true; // ADD THIS
         notify(
-          `Row ${index + 1}: Quantity must be greater than 0`,
+          // `Row ${index + 1}: Quantity must be greater than 0`,
+          'Please enter valid quantity for highlighted rows.',
           'warning',
           3000,
         );
@@ -632,6 +642,7 @@ export class AddPurchaseInvoiceComponent {
       }
 
       if (row.QUANTITY > row.PENDING_QTY) {
+        row.isInvalid = true; // ✅ ADD THIS
         notify(
           `Row ${index + 1}: Quantity exceeds pending qty`,
           'warning',
@@ -640,7 +651,7 @@ export class AddPurchaseInvoiceComponent {
         isValid = false;
       }
     });
-
+    this.itemsGridRef.instance.repaint();
     if (!isValid) {
       return;
     }

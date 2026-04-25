@@ -24,6 +24,7 @@ import {
   VatCalssFinanceFormModule,
 } from '../POPUP PAGES/vat-calss-finance-form/vat-calss-finance-form.component';
 import { VatCalssFinanceEditModule } from '../POPUP PAGES/vat-calss-finance-edit/vat-calss-finance-edit.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vat-class-finance',
@@ -59,6 +60,13 @@ export class VatClassFinanceComponent implements OnInit {
   companyStateID: any;
   GST_PERC: any;
   poData: any;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   addButtonOptions = {
     type: 'default',
@@ -103,6 +111,7 @@ export class VatClassFinanceComponent implements OnInit {
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private router :Router
   ) {}
 
   onExporting(event: any) {
@@ -113,6 +122,29 @@ export class VatClassFinanceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.sessionDetails();
     this.showVatclass();
   }
@@ -126,6 +158,7 @@ export class VatClassFinanceComponent implements OnInit {
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     this.selected_Company_id = this.companyID;
+    // this.selected_Company_id = 0;
     this.poData = {
       COMPANY_ID: this.companyID,
       USER_ID: sessionData.USER_ID,
@@ -134,7 +167,7 @@ export class VatClassFinanceComponent implements OnInit {
 
   showVatclass() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: this.companyID,
     };
 
     this.VatClassDataSource = new DataSource({
@@ -194,30 +227,35 @@ export class VatClassFinanceComponent implements OnInit {
   }
 
   onRowRemoving(event: any) {
-    const selectedRow = event.data;
-    const { ID } = selectedRow;
+    const { ID } = event.data;
 
-    this.dataservice.removeVatclass(ID).subscribe(() => {
-      try {
-        // Your delete logic here
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.dataGrid?.instance.refresh();
-        this.showVatclass();
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      }
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice.removeVatclass(ID).subscribe({
+        next: () => {
+          notify(
+            {
+              message: 'Delete operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success',
+          );
+
+          this.showVatclass(); // reload data
+
+          resolve(true); // ✅ closes popup + keeps grid in sync
+        },
+        error: () => {
+          notify(
+            {
+              message: 'Delete operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+
+          reject(); // ❌ prevents deletion
+        },
+      });
     });
   }
 

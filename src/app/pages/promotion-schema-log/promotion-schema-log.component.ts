@@ -43,6 +43,7 @@ import { ItemsFormModule } from 'src/app/components/library/items-form/items-for
 import { DataService } from 'src/app/services';
 import { DxNumberBoxTypes } from 'devextreme-angular/ui/number-box';
 import DataSource from 'devextreme/data/data_source';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-promotion-schema-log',
@@ -113,6 +114,13 @@ export class PromotionSchemaLogComponent {
   isSaving: boolean = false;
   isUpdating: boolean = false;
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -156,7 +164,8 @@ export class PromotionSchemaLogComponent {
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private router:Router
   ) {
     const payload = {
       name: 'PROMOTIONSCHEMA_TYPE',
@@ -168,6 +177,28 @@ export class PromotionSchemaLogComponent {
   }
 
   ngOnInit() {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.getLogList();
     this.setSchemaType();
   }

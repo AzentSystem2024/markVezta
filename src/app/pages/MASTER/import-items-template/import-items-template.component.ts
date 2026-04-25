@@ -31,6 +31,7 @@ import * as XLSX from 'xlsx';
 import notify from 'devextreme/ui/notify';
 import DataSource from 'devextreme/data/data_source';
 import { lastValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -57,6 +58,13 @@ export class ImportItemsTemplateComponent implements OnInit {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
 
   addButtonOptions = {
@@ -105,7 +113,8 @@ refreshButtonOptions = {
   constructor(
     private service: DataService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private router: Router
   ) {}
 
   onEditingRow(event): void {
@@ -175,6 +184,29 @@ refreshButtonOptions = {
   };
 
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .flatMap((menu: any) => menu.Children || [])
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+
     this.getItemsTemplateData();
   }
 

@@ -22,9 +22,9 @@
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
-        [allowAdding]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+        [allowAdding]="canAdd"
       >
       </dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -84,6 +84,7 @@
           location="after"
           widget="dxButton"
           [options]="addButtonOptions"
+          [visible]="canAdd"
         ></dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="CODE" caption="Code" width="150"> </dxi-column>

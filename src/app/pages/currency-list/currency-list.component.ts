@@ -10,6 +10,7 @@ import {
   CurrencyFormModule,
 } from 'src/app/components/library/currency-form/currency-form.component';
 import { ExportService } from 'src/app/services/export.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-currency-list',
@@ -26,6 +27,13 @@ export class CurrencyListComponent implements OnInit {
   isAddCurrencyPopupOpened = false;
   companyId:any;
   currentEditId: number | null = null;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   searchButtonOptions = {
   icon: 'search',
@@ -75,6 +83,7 @@ addButtonOptions = {
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
+    private router:Router
   ) {}
 
   onEditingStart(e: any) {
@@ -256,6 +265,27 @@ addButtonOptions = {
   }
 
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    
+
     this.showCurrency();
 
     const userDataString = localStorage.getItem('userData');

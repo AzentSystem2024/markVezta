@@ -35,12 +35,12 @@
 
     <dxo-editing
       mode="popup"
-      [allowUpdating]="true"
-      [allowDeleting]="true"
-      [allowAdding]="true"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+      [allowAdding]="canAdd"
     >
       <dxo-popup
-        title="Update Department"
+        title="Edit Department"
         [showTitle]="true"
         [width]="600"
         [height]="300"
@@ -81,6 +81,7 @@
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
+        [visible]="canAdd"
       ></dxi-item>
     </dxo-toolbar>
 

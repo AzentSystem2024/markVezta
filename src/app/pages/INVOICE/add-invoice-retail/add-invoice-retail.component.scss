@@ -180,3 +180,11 @@
 
   margin-left: auto; /* 🔥 pushes to right */
 }
+::ng-deep .invalid-row > td {
+  background-color: #ffe6e6 !important;
+  border-left: 3px solid red;
+}
+
+::ng-deep .invalid-row > td {
+  background-color: #ffe6e6 !important;
+}

@@ -20,7 +20,7 @@
     <dxo-paging [pageSize]="10"> </dxo-paging>
 
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <!-- <dxo-popup
         title="Edit UOM"
         [showTitle]="true"

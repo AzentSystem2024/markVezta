@@ -19,7 +19,7 @@
 
     <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
 
-    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -30,7 +30,7 @@
       [showInfo]="true"
       [showNavigationButtons]="true"
     ></dxo-pager>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-popup
         title="Edit {{ itemlabel }}"
         [showTitle]="true"
@@ -73,6 +73,7 @@
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
+        [visible]="canAdd"
       ></dxi-item>
 
       <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>

@@ -51,6 +51,7 @@ export class DepartmentEditComponent {
 
   constructor(private dataservice: DataService) {
     this.sesstion_Details();
+    this.showDepartment();
   }
   showDepartment() {
     const payload = {
@@ -265,6 +266,21 @@ export class DepartmentEditComponent {
       return true;
     }
   }
+
+  validateDepartmentCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.department?.length) return true;
+
+    const currentId = this.formDepartmentData?.ID; //  current editing ID
+
+    return !this.department.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId; //  ignore same record
+    });
+};
+
 }
 
 @NgModule({

@@ -43,6 +43,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { SaleReturnFormComponent } from 'src/app/sale-return-form/sale-return-form.component';
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
+import dxSelectBox from 'devextreme/ui/select_box';
 
 @Component({
   selector: 'app-add-invoice-retail',
@@ -88,6 +89,7 @@ export class AddInvoiceRetailComponent {
     RET_NO: '',
     VEHICLE_NO: '',
     ROUND_OFF: false,
+    DISCOUNT_AMOUNT: 0,
     Details: [
       {
         ITEM_ID: 0,
@@ -97,6 +99,8 @@ export class AddInvoiceRetailComponent {
         TAX_PERC: 0,
         TAX_AMOUNT: 0,
         TOTAL_AMOUNT: 0,
+        DISC_PERC: 0,
+        DISC_AMT: 0,
       },
     ],
   };
@@ -112,6 +116,7 @@ export class AddInvoiceRetailComponent {
   isSaving: boolean = false;
   storeID: any;
   invalidQtyRowIndex: number | null = null;
+  totalDiscAmount: number = 0;
   constructor(private dataService: DataService) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
@@ -182,7 +187,16 @@ export class AddInvoiceRetailComponent {
       name: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.itemsList = response;
+      // this.itemsList = response;
+      this.itemsList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
     });
   }
   getItemsDescription() {
@@ -190,7 +204,15 @@ export class AddInvoiceRetailComponent {
       name: 'ITEMSDESC',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.itemsDescriptionList = response;
+      this.itemsDescriptionList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
     });
   }
   getItemsData(itemId: any, rowData: any) {
@@ -239,51 +261,48 @@ export class AddInvoiceRetailComponent {
       }, 50);
     });
   }
-  onCellValueChanged(e: any) {
-    // 🔹 existing calculation logic can stay
+  // onCellValueChanged(e: any) {
+  //   // // 🔹 existing calculation logic can stay
+  //   // //  Trigger when quantity is entered (or TOTAL if you prefer)
+  //   if (e.dataField === 'DISC_PERC') {
+  //     const grid = this.itemsGridRef.instance;
+  //     const visibleRows = grid.getVisibleRows();
+  //     const rowIndex = grid.getRowIndexByKey(e.key);
+  //     const isLastRow = rowIndex === visibleRows.length - 1;
+  //     if (isLastRow) {
+  //       // 🔥 Add new empty row
+  //       const newRow = {
+  //         ITEM_ID: null,
+  //         ITEM_CODE: null,
+  //         DESCRIPTION: null,
+  //         HSN_CODE: '',
+  //         UOM: '',
+  //         PRICE: 0,
+  //         QUANTITY: 0,
+  //         AMOUNT: 0,
+  //         TAX_PERC: 0,
+  //         DISC_PERC: 0,
+  //         DISC_AMT: 0,
+  //         TAX_AMOUNT: 0,
+  //         TOTAL_AMOUNT: 0,
+  //       };
+  //       this.invoiceFormData.Details.push(newRow);
+  //       // Refresh grid
+  //       setTimeout(() => {
+  //         grid.refresh();
+  //         //  Move focus to new row first column
+  //         const newRowIndex = this.invoiceFormData.Details.length - 1;
+  //         grid.editCell(newRowIndex, 'ITEM_CODE');
+  //       }, 50);
+  //     }
+  //   }
+  // }
+  onRowRemoved(e: any) {
+    const removedData = e.data;
 
-    //  Trigger when quantity is entered (or TOTAL if you prefer)
-    if (e.dataField === 'QUANTITY') {
-      const grid = this.itemsGridRef.instance;
-
-      const visibleRows = grid.getVisibleRows();
-      const rowIndex = grid.getRowIndexByKey(e.key);
-
-      const isLastRow = rowIndex === visibleRows.length - 1;
-
-      if (isLastRow) {
-        // 🔥 Add new empty row
-        const newRow = {
-          ITEM_ID: null,
-          ITEM_CODE: null,
-          DESCRIPTION: null,
-          HSN_CODE: '',
-          UOM: '',
-          PRICE: 0,
-          QUANTITY: 0,
-          AMOUNT: 0,
-          TAX_PERC: 0,
-          TAX_AMOUNT: 0,
-          TOTAL_AMOUNT: 0,
-        };
-
-        this.invoiceFormData.Details.push(newRow);
-
-        // Refresh grid
-        setTimeout(() => {
-          grid.refresh();
-
-          //  Move focus to new row first column
-          const newRowIndex = this.invoiceFormData.Details.length - 1;
-          grid.editCell(newRowIndex, 'ITEM_CODE');
-        }, 50);
-      }
-    }
-  }
-  onRowRemoved() {
-    if (!this.mainGridData || this.mainGridData.length === 0) {
-      this.mainGridData = [{}];
-    }
+    this.invoiceFormData.Details = (this.invoiceFormData.Details || []).filter(
+      (item: any) => item !== removedData,
+    );
   }
 
   calculateAmount = (rowData: any) => {
@@ -293,16 +312,38 @@ export class AddInvoiceRetailComponent {
     return qty * cost;
   };
 
+  calculateDiscAmt = (rowData: any) => {
+    const qty = Number(rowData?.QUANTITY) || 0;
+    const price = Number(rowData?.PRICE) || 0;
+
+    const amount = qty * price; //  recompute instead of using rowData.AMOUNT
+    const discPerc = Number(rowData?.DISC_PERC) || 0;
+
+    return (amount * discPerc) / 100;
+  };
   calculateTax = (rowData: any) => {
     const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
-    const vat = rowData?.TAX_PERC || 0;
-    return (amount * vat) / 100;
+    const discPerc = Number(rowData?.DISC_PERC) || 0;
+
+    const discount = (amount * discPerc) / 100;
+    const taxableAmount = amount - discount;
+
+    const vat = Number(rowData?.TAX_PERC) || 0;
+
+    return (taxableAmount * vat) / 100;
   };
 
   calculateTotal = (rowData: any) => {
     const amount = this.calculateAmount(rowData);
-    const tax = this.calculateTax(rowData);
-    return amount + tax;
+
+    const discPerc = Number(rowData?.DISC_PERC) || 0;
+    const discount = (amount * discPerc) / 100;
+
+    const taxableAmount = amount - discount;
+
+    const tax = (taxableAmount * (rowData?.TAX_PERC || 0)) / 100;
+
+    return taxableAmount + tax;
   };
 
   getCustomerOrUnitLst() {
@@ -348,6 +389,8 @@ export class AddInvoiceRetailComponent {
       QUANTITY: item.QUANTITY,
       AMOUNT: item.AMOUNT,
       TAX_PERC: item.TAX_PERC,
+      DISC_PERC: item.DISC_PERC,
+      DISC_AMT: item.DISC_AMT,
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
     }));
@@ -371,11 +414,12 @@ export class AddInvoiceRetailComponent {
     if (
       e.dataField === 'ITEM_CODE' ||
       e.dataField === 'DESCRIPTION' ||
-      e.dataField === 'QUANTITY'
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'PRICE' ||
+      e.dataField === 'DISC_PERC'
     ) {
       e.editorOptions = e.editorOptions || {};
 
-      // Let the editor inherit row height naturally (no fixed height)
       e.editorOptions.elementAttr = {
         style: `
         height: 100%;
@@ -386,7 +430,6 @@ export class AddInvoiceRetailComponent {
       `,
       };
 
-      // Make sure the input fits snugly inside
       e.editorOptions.inputAttr = {
         style: `
         height: 100%;
@@ -395,10 +438,10 @@ export class AddInvoiceRetailComponent {
       `,
       };
 
-      // Remove spin buttons to prevent layout changes
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
+
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           const grid = this.itemsGridRef?.instance;
@@ -407,24 +450,27 @@ export class AddInvoiceRetailComponent {
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
           );
+
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+            // existing logic untouched
           }, 50);
         }
       };
     }
+
     if (
       e.dataField === 'ITEM_CODE' ||
       e.dataField === 'DESCRIPTION' ||
-      e.dataField === 'QUANTITY'
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'DISC_PERC'
     ) {
       e.editorOptions = e.editorOptions || {};
 
       const grid = this.itemsGridRef?.instance;
 
-      // =====================================================
-      // 🔹 DROPDOWN (ITEM CODE / DESCRIPTION)
-      // =====================================================
+      // ============================
+      // DROPDOWN
+      // ============================
       if (e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION') {
         e.editorName = 'dxSelectBox';
 
@@ -447,9 +493,9 @@ export class AddInvoiceRetailComponent {
         };
       }
 
-      // =====================================================
-      // 🔹 KEY HANDLING (MAIN LOGIC)
-      // =====================================================
+      // ============================
+      // MAIN KEY HANDLING
+      // ============================
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key !== 'Enter') return;
 
@@ -460,7 +506,7 @@ export class AddInvoiceRetailComponent {
 
         const editor = event.component;
 
-        // 🔹 DROPDOWN BEHAVIOR
+        // DROPDOWN
         if (e.editorName === 'dxSelectBox') {
           event.event.preventDefault();
 
@@ -476,7 +522,6 @@ export class AddInvoiceRetailComponent {
             setTimeout(() => {
               editor.close();
 
-              // 👉 move to next column
               if (e.dataField === 'ITEM_CODE') {
                 grid.editCell(rowIndex, 'DESCRIPTION');
               } else if (e.dataField === 'DESCRIPTION') {
@@ -488,45 +533,65 @@ export class AddInvoiceRetailComponent {
           return;
         }
 
-        // =====================================================
-        // 🔥 QUANTITY → CREATE NEW ROW
-        // =====================================================
+        // ============================
+        // QUANTITY (UNCHANGED - YOUR WORKING CODE)
+        // ============================
         if (e.dataField === 'QUANTITY') {
+          const input = event.event.target as HTMLInputElement;
+          const value = Number(input.value);
+
+          e.setValue(value);
+
           event.event.preventDefault();
 
-          const editorElement = event.event.target as HTMLElement;
-          editorElement.blur();
+          const grid = this.itemsGridRef.instance;
+          const rowIndex = e.row.rowIndex;
 
           setTimeout(() => {
-            grid.saveEditData();
+            grid.editCell(rowIndex, 'DISC_PERC');
+          }, 0);
 
+          return;
+        }
+
+        // ============================
+        // ✅ DISC_PERC (ONLY NEW ADDITION)
+        // ============================
+        if (e.dataField === 'DISC_PERC') {
+          event.event.preventDefault();
+
+          const grid = this.itemsGridRef.instance;
+          const rowIndex = e.row.rowIndex;
+
+          const input = event.event.target as HTMLInputElement;
+          const value = Number(input.value);
+
+          e.setValue(value);
+
+          grid.saveEditData();
+
+          setTimeout(() => {
+            const visibleRows = grid.getVisibleRows();
             const isLastRow = rowIndex === visibleRows.length - 1;
 
             if (isLastRow) {
-              const newRow = {
-                ITEM_ID: null,
-                ITEM_DESC_ID: null,
-                ITEM_CODE: null,
-                DESCRIPTION: null,
-                HSN_CODE: '',
-                UOM: '',
-                PRICE: 0,
-                QUANTITY: 0,
-                AMOUNT: 0,
-                TAX_PERC: 0,
-                TAX_AMOUNT: 0,
-                TOTAL_AMOUNT: 0,
-              };
+              // ✅ call your function
+              this.onAddRow();
 
-              this.invoiceFormData.Details.push(newRow);
-
-              //  CRITICAL
-              grid.option('dataSource', [...this.invoiceFormData.Details]);
-
+              // 🔥 FORCE FOCUS (IMPORTANT)
               setTimeout(() => {
                 const newRowIndex = this.invoiceFormData.Details.length - 1;
+
                 grid.editCell(newRowIndex, 'ITEM_CODE');
-              }, 100);
+
+                // optional: focus input
+                setTimeout(() => {
+                  const cell = grid.getCellElement(newRowIndex, 'ITEM_CODE');
+                  const input = cell?.querySelector('input');
+                  input?.focus();
+                  input?.select();
+                }, 50);
+              }, 100); // ⬅️ must be slightly higher
             } else {
               grid.editCell(rowIndex + 1, 'ITEM_CODE');
             }
@@ -535,6 +600,27 @@ export class AddInvoiceRetailComponent {
           return;
         }
       };
+    }
+  }
+
+  onCellValueChanged(e: any) {
+    if (e.dataField === 'DISC_PERC') {
+      const grid = this.itemsGridRef.instance;
+
+      const visibleRows = grid.getVisibleRows();
+      const rowIndex = e.row.rowIndex;
+      const isLastRow = rowIndex === visibleRows.length - 1;
+
+      if (isLastRow) {
+        setTimeout(() => {
+          grid.addRow(); // ✅ ONLY HERE
+
+          setTimeout(() => {
+            const newRowIndex = grid.getVisibleRows().length - 1;
+            grid.editCell(newRowIndex, 'ITEM_CODE');
+          }, 50);
+        }, 0);
+      }
     }
   }
 
@@ -554,7 +640,6 @@ export class AddInvoiceRetailComponent {
 
     const rows = this.invoiceFormData.Details || [];
 
-    // 🚫 Check if any empty row exists
     const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
 
     if (hasEmptyRow) {
@@ -564,16 +649,15 @@ export class AddInvoiceRetailComponent {
         2000,
       );
 
-      // 👉 focus that empty row
       const emptyIndex = rows.findIndex((row: any) => this.isRowEmpty(row));
+
       setTimeout(() => {
         grid.editCell(emptyIndex, 'ITEM_CODE');
-      }, 50);
+      }, 100);
 
       return;
     }
 
-    // ✅ Add new row only if all rows are filled
     const newRow = {
       ITEM_ID: null,
       ITEM_CODE: null,
@@ -586,17 +670,38 @@ export class AddInvoiceRetailComponent {
       TAX_PERC: 0,
       TAX_AMOUNT: 0,
       TOTAL_AMOUNT: 0,
+      DISC_PERC: 0,
+      DISC_AMT: 0,
     };
 
     this.invoiceFormData.Details = [...rows, newRow];
 
+    // 🔥 IMPORTANT FIX
     setTimeout(() => {
       grid.option('dataSource', this.invoiceFormData.Details);
-      grid.refresh();
 
-      const rowIndex = this.invoiceFormData.Details.length - 1;
-      grid.editCell(rowIndex, 'ITEM_CODE');
-    }, 50);
+      // 🔥 Wait for rendering properly
+      setTimeout(() => {
+        const rowIndex = this.invoiceFormData.Details.length - 1;
+
+        grid.option('focusedRowIndex', rowIndex); // ✅ ensure row focus
+        grid.editCell(rowIndex, 'ITEM_CODE');
+
+        // 🔥 OPEN DROPDOWN (optional but better UX)
+        setTimeout(() => {
+          const cellElement = grid.getCellElement(rowIndex, 'ITEM_CODE');
+          const selectBoxElement = cellElement?.querySelector('.dx-selectbox');
+
+          if (selectBoxElement) {
+            const selectBox = dxSelectBox.getInstance(
+              selectBoxElement,
+            ) as dxSelectBox;
+            selectBox?.focus();
+            selectBox?.open();
+          }
+        }, 100);
+      }, 150); // ⬅️ THIS is the real fix
+    }, 0);
   }
   moveNextCell(field: string, rowIndex: number, grid: any) {
     if (field === 'ITEM_CODE') {
@@ -604,6 +709,8 @@ export class AddInvoiceRetailComponent {
     } else if (field === 'DESCRIPTION') {
       grid.editCell(rowIndex, 'QUANTITY');
     } else if (field === 'QUANTITY') {
+      grid.editCell(rowIndex, 'DISC_PERC');
+    } else if (field === 'DISC_PERC') {
       const visibleRows = grid.getVisibleRows();
       const isLastRow = rowIndex === visibleRows.length - 1;
 
@@ -633,6 +740,12 @@ export class AddInvoiceRetailComponent {
       } else {
         grid.editCell(rowIndex + 1, 'ITEM_CODE');
       }
+    }
+  }
+
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data?.isInvalid) {
+      e.rowElement.classList.add('invalid-row');
     }
   }
 
@@ -671,14 +784,21 @@ export class AddInvoiceRetailComponent {
     const grid = this.itemsGridRef?.instance;
 
     if (grid) {
+      grid.closeEditCell();
       grid.saveEditData();
     }
+    (this.invoiceFormData.Details || []).forEach((item: any) => {
+      item.isInvalid = false; // reset
 
+      if (item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0)) {
+        item.isInvalid = true; // ✅ mark row
+      }
+    });
     //  VALIDATION
     const invalidIndex = (this.invoiceFormData.Details || []).findIndex(
       (item: any) => item.ITEM_CODE && (!item.QUANTITY || item.QUANTITY <= 0),
     );
-
+    this.itemsGridRef.instance.repaint();
     if (invalidIndex !== -1) {
       notify({
         message: 'Quantity must be greater than 0',
@@ -705,7 +825,11 @@ export class AddInvoiceRetailComponent {
 
     this.isSaving = true;
 
-    const validDetails = (this.invoiceFormData.Details || []).filter(
+    // const grid = this.itemsGridRef.instance;
+
+    const allRows = grid.getVisibleRows().map((r: any) => r.data);
+
+    const validDetails = allRows.filter(
       (item: any) => item.ITEM_CODE && item.QUANTITY > 0,
     );
 
@@ -723,19 +847,23 @@ export class AddInvoiceRetailComponent {
     let gross = 0;
     let tax = 0;
     let net = 0;
+    let discamt = 0;
 
     validDetails.forEach((item: any) => {
       const amount = this.calculateAmount(item);
       const taxAmt = this.calculateTax(item);
       const total = this.calculateTotal(item);
+      const discAmount = this.calculateDiscAmt(item);
 
       item.AMOUNT = amount;
       item.TAX_AMOUNT = taxAmt;
       item.TOTAL_AMOUNT = total;
+      item.DISC_AMT = discAmount;
 
       gross += amount;
       tax += taxAmt;
       net += total;
+      discamt += discAmount;
     });
 
     // Assign back
@@ -743,6 +871,7 @@ export class AddInvoiceRetailComponent {
     this.invoiceFormData.GROSS_AMOUNT = gross;
     this.invoiceFormData.TAX_AMOUNT = tax;
     this.invoiceFormData.NET_AMOUNT = net;
+    this.invoiceFormData.DISCOUNT_AMOUNT = discamt;
     this.invoiceFormData.Details = validDetails;
     this.invoiceFormData.PARTY_NAME = String(this.invoiceFormData.CUSTOMER_ID);
     this.invoiceFormData.TRANS_DATE = this.formatDateOnly(
