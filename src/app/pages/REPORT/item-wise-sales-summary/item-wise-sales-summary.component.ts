@@ -429,12 +429,12 @@ selectedSaletype = [0]; // or [] if nothing selected
     STATUS_ID:"",
     ITEM_ID : this.selectedItem !=null? String(this.selectedItem):'',
     SALESMAN_ID: this.selectedSalesman !=null? String(this.selectedSalesman):'',
-    DEPT_ID : this.selectedDepartment !=null ? Number(this.selectedDepartment):'',
-    CAT_ID : this.selectedCategory !=null ? Number(this.selectedCategory): '',
-    SUBCAT_ID: this.selectedSubcategory !=null ? Number(this.selectedSubcategory):'',
+    DEPT_ID : this.selectedDepartment !=null ? String(this.selectedDepartment):'',
+    CAT_ID : this.selectedCategory !=null ? String(this.selectedCategory): '',
+    SUBCAT_ID: this.selectedSubcategory !=null ? String(this.selectedSubcategory):'',
     DISCOUNTED_ITEMS_ONLY :0,
-    CUSTOM1 : this.selectedItemProperty1 !=null ? Number(this.selectedItemProperty1):'',
-    CUSTOM2 : this.selectedItemProperty2 !=null ? Number(this.selectedItemProperty2):'',
+    CUSTOM1 : this.selectedItemProperty1 !=null ? String(this.selectedItemProperty1):'',
+    CUSTOM2 : this.selectedItemProperty2 !=null ? String(this.selectedItemProperty2):'',
     INCLUDE_SUMMARY: 0,
     GROUP_BY_STORE:0
         };
@@ -671,7 +671,15 @@ selectedSaletype = [0]; // or [] if nothing selected
           NAME : 'ITEMS'
         }
         this.dataService.Common_Dropdown(payload).subscribe((res:any)=>{
-          this.items = res
+          this.items = {
+        store: {
+          type: 'array',
+          data: res,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
         })
       }
     

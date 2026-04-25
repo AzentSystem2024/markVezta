@@ -64,14 +64,14 @@
             [items]="Store"
             [(value)]="selectedStoreid"
             [searchEnabled]="true"
+            [showSelectionControls]="true"
             [maxDisplayedTags]="100"
             [showMultiTagOnly]="true"
             [multiline]="false"
-            [showSelectionControls]="true"
             (onValueChanged)="updateStoreHint()">
           </dx-tag-box>
         </dxi-item>
-   <dxi-item>
+    <dxi-item>
           <dx-select-box
             label="Sale type"
             labelMode="floating"
@@ -86,7 +86,7 @@
         </dxi-item>
 
 
-      <!-- Customer (smaller width) -->
+     <!-- Customer (smaller width) -->
 <dxi-item [colSpan]="1">
   <dx-select-box
     label="Customer"
@@ -100,104 +100,8 @@
 </dxi-item>
 
 <!-- Empty space -->
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Department"
-    labelMode="floating"
-    [(value)]="selectedDepartment"
-    [dataSource]="Department"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
 
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Catgeory"
-    labelMode="floating"
-    [(value)]="selectedCategory"
-    [dataSource]="Category"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="SubCategory"
-    labelMode="floating"
-    [(value)]="selectedSubcategory"
-    [dataSource]="Subcategory"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<!-- Empty space -->
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Brand"
-    labelMode="floating"
-    [(value)]="selectedBrand"
-    [dataSource]="Brand"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="ItemProperty1"
-    labelMode="floating"
-    [(value)]="selectedItemProperty1"
-    [dataSource]="itemProperty1"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="ItemProperty2"
-    labelMode="floating"
-    [(value)]="selectedItemProperty2"
-    [dataSource]="itemProperty2"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Salesman"
-    labelMode="floating"
-    [(value)]="selectedSalesman"
-    [dataSource]="Salesman"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Item"
-    labelMode="floating"
-    [(value)]="selectedItem"
-    [dataSource]="items"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<dxi-item [colSpan]="2"></dxi-item>
+<dxi-item [colSpan]="4"></dxi-item>
 
 <!-- Apply button -->
 <dxi-item [colSpan]="1" cssClass="apply-btn-right">
@@ -234,7 +138,7 @@
       class="grid theme-dependent"
       [dataSource]="JournalBookDataSource"
       height="79vh"
-    [showBorders]="true"
+      [showBorders]="true"
       [showRowLines]="true"
       [allowColumnResizing]="false"
       [showColumnLines]="true"
@@ -264,12 +168,12 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      
+
       <!-- ================= TOOLBAR ================= -->
       <dxo-toolbar>
 
         <dxi-item location="before">
-          <div class="grid-header">Sales Detail</div>
+          <div class="grid-header">Tender Summary Report</div>
         </dxi-item>
 
         <dxi-item
@@ -287,53 +191,30 @@
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
+
+      <dxi-column dataField="STORE" caption="Store"></dxi-column>
+
       <dxi-column
-        dataField="SALE_DATE"
-        caption="Sale Date"
-        dataType="date"
-        [format]="{ type: 'custom', formatter: formatDates }">
-      </dxi-column>
-      <dxi-column dataField="SALE_NO" caption="Sale no."></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
-      <dxi-column dataField="SALE_TYPE_NAME" caption="Sale type"></dxi-column>
-      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
-      <dxi-column dataField="ITEM_CODE" caption="ItemCode"></dxi-column>
-      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-      <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
-      <dxi-column dataField="PRICE" caption="Price"></dxi-column>
-      <dxi-column dataField="DISCOUNT" caption="Discount"></dxi-column>
-      <dxi-column dataField="DISC_REASON" caption="Reason"></dxi-column>
-      <dxi-column
-        dataField="GROSS_AMOUNT"
-        caption="Gross Amount"
+        dataField="CASH"
+        caption="Cash"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
       <dxi-column
-        dataField="VAT_PERCENT"
-        caption="VAT%"
+        dataField="FAB POS CARD"
+        caption="Fab Pos Card"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
       <dxi-column
-        dataField="VAT_AMOUNT"
-        caption="VAT Amount"
+        dataField="ROOM CHARGE"
+        caption="Room Charge"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
-       <dxi-column
-        dataField="NET_AMOUNT"
-        caption="Net Amount"
-        alignment="right"
-        [format]="{ type: 'fixedPoint', precision: 2 }">
-      </dxi-column>
-       <dxi-column
-        dataField="SALESMAN"
-        caption="Salesman">
-      </dxi-column>
-       <dxi-column
-        dataField="COMMISSION"
-        caption="Commission"
+      <dxi-column
+        dataField="TOTAL"
+        caption="Total"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
@@ -368,3 +249,4 @@
   ></app-add-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>
+

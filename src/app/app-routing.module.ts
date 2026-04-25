@@ -190,6 +190,8 @@ import { ConsignmentReturnDetailComponent } from './pages/REPORT/consignment-ret
 import { ItemwisesalesComponent } from './pages/REPORT/itemwisesales/itemwisesales.component';
 import { ItemWiseSalesSummaryComponent } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
 import { DiscountWiseSalesComponent } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
+import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
+import { TenderSummaryComponent } from './pages/REPORT/tender-summary/tender-summary.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -1192,6 +1194,16 @@ const routes: Routes = [
       {
         path: 'discountwise-sales',
         component: DiscountWiseSalesComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tender',
+        component: TenderComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tender-summary',
+        component: TenderSummaryComponent,
         canActivate: [AuthGuardService],
       },
       {

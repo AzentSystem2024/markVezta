@@ -6515,4 +6515,15 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'SalesReport/DiscountWiseSales';
     return this.http.post(getEndpoint, payload)
   }
+
+    //-----------------------Tender Sales Report-------------------------
+  Tender_Sales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/TenderReport';
+    return this.http.post(getEndpoint, payload)
+  }
+
+   TenderSummary_Sales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/TenderSummary';
+    return this.http.post(getEndpoint, payload)
+  }
 }
