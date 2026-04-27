@@ -79,9 +79,20 @@
             labelMode="floating"
             [(value)]="salesReturnFormData.RET_NO"
             [readOnly]="true"
-            [width]="410"
+            [width]="200"
           >
           </dx-text-box>
+          <dx-select-box
+            [dataSource]="filteredStoreList"
+            [(value)]="salesReturnFormData.STORE_ID"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [width]="200"
+            label="Store"
+            labelMode="floating"
+            [readOnly]="isEditing"
+          >
+          </dx-select-box>
         </div>
 
         <div style="display: flex; gap: 2px; justify-content: flex-end">

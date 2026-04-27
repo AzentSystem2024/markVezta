@@ -117,6 +117,9 @@ export class AddInvoiceRetailComponent {
   storeID: any;
   invalidQtyRowIndex: number | null = null;
   totalDiscAmount: number = 0;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
+  storeList: { ID: any; DESCRIPTION: any }[];
   constructor(private dataService: DataService) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
@@ -129,6 +132,8 @@ export class AddInvoiceRetailComponent {
     if (!userDataString) return;
 
     const userData = JSON.parse(userDataString);
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     this.storeID = userData.Configuration[0].STORE_ID;
     console.log(userData.Configuration[0].STORE_ID, 'USERDATA');
     const selectedCompany = userData.SELECTED_COMPANY;
@@ -148,6 +153,20 @@ export class AddInvoiceRetailComponent {
     const firstFinYear = userData.FINANCIAL_YEARS?.[0];
     if (firstFinYear?.FIN_ID) {
       this.invoiceFormData.FIN_ID = firstFinYear.FIN_ID;
+    }
+
+    if (this.isHQApp && configStore) {
+      this.filteredStoreList = [
+        {
+          ID: configStore.STORE_ID,
+          DESCRIPTION: configStore.STORE_NAME,
+        },
+      ];
+
+      // Auto select store
+      this.invoiceFormData.STORE_ID = configStore.STORE_ID;
+    } else {
+      this.filteredStoreList = this.storeList;
     }
     this.getItems();
     this.getItemsDescription();
@@ -179,6 +198,19 @@ export class AddInvoiceRetailComponent {
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.retNo = response.DOC_NO;
       this.invoiceFormData.DOC_NO = response.DOC_NO;
+    });
+  }
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+      if (!this.isHQApp) {
+        this.filteredStoreList = this.storeList; //update here
+      }
     });
   }
 
@@ -867,7 +899,7 @@ export class AddInvoiceRetailComponent {
     });
 
     // Assign back
-    this.invoiceFormData.STORE_ID = this.storeID;
+    this.invoiceFormData.STORE_ID = this.invoiceFormData.STORE_ID;
     this.invoiceFormData.GROSS_AMOUNT = gross;
     this.invoiceFormData.TAX_AMOUNT = tax;
     this.invoiceFormData.NET_AMOUNT = net;

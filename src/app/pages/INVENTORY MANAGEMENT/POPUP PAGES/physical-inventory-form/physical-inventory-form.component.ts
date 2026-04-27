@@ -176,8 +176,8 @@ export class PhysicalInventoryFormComponent {
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     console.log(this.storeFromSession, 'STOREFROMSESSION');
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/quotation');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/quotation');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -489,7 +489,6 @@ export class PhysicalInventoryFormComponent {
   onImportExcel() {
     this.fileInput.nativeElement.click();
   }
- 
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
