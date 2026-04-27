@@ -51,17 +51,16 @@ import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/pa
 import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
-import notify from 'devextreme/ui/notify';
 
 
 @Component({
-  selector: 'app-sales-detail',
-  templateUrl: './sales-detail.component.html',
-  styleUrls: ['./sales-detail.component.scss']
+  selector: 'app-zreport',
+  templateUrl: './zreport.component.html',
+  styleUrls: ['./zreport.component.scss']
 })
-export class SalesDetailComponent {
+export class ZReportComponent {
 
-   @ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
       dataGrid: DxDataGridComponent;
       JournalBookDataSource: DataSource; // ONLY for dx-data-grid
       journalBookArray: any[] = []; // ONLY for logic / checks
@@ -149,41 +148,27 @@ export class SalesDetailComponent {
       Store: any;
       selectedStoreid: any;
       selectedCustomer: any;
-      selectedBrand: any;
-      selectedDepartment: any;
-      selectedCategory: any;
-      selectedSubcategory: any;
-      selectedSalesman: any;
-      selectedItemProperty2:any;
-      selectedItemProperty1:any;
-
+    
     items: any;
-     selectedItem:any;
+     selectedItem:any[] = [];
      itemHint : string = '';
   
      // Add this variable
   isFilterVisible: boolean = true;
     distributorList: any;
-  Department: any;
-  Category: any;
-  Subcategory: any;
-  Brand: any;
-  Salesman: any;
-today: Date = new Date();
-  Saletype = [
-  { ID: 0, DESCRIPTION: 'All' },
-  { ID: 1, DESCRIPTION: 'Sales & Return' },
-  { ID: 2, DESCRIPTION: 'Sales' },
-  { ID: 3, DESCRIPTION: 'Return' },
-  { ID: 4, DESCRIPTION: 'Void Invoice' },
-  { ID: 5, DESCRIPTION: 'Cash In & Cash Out' },
-  { ID: 6, DESCRIPTION: 'Receipts' }
-];
-
-// Optional default selection
-selectedSaletype = [0]; // or [] if nothing selected
-  itemProperty1: any;
-  itemProperty2: any;
+  
+    Saletype = [
+    { ID: 0, DESCRIPTION: 'All' },
+    { ID: 1, DESCRIPTION: 'Sales & Return' },
+    { ID: 2, DESCRIPTION: 'Sales' },
+    { ID: 3, DESCRIPTION: 'Return' },
+    { ID: 4, DESCRIPTION: 'Void Invoice' },
+    { ID: 5, DESCRIPTION: 'Cash In & Cash Out' },
+    { ID: 6, DESCRIPTION: 'Receipts' }
+  ];
+  
+  // Optional default selection
+  selectedSaletype = [0]; // or [] if nothing selected
   
   //  Toggle function
   toggleFiltersPanel() {
@@ -252,13 +237,7 @@ selectedSaletype = [0]; // or [] if nothing selected
         this.store_dropdown();
         this.item_dropdown();
         this.getCustomerOrUnitLst();
-        this.Catgeory_dropdown();
-        this.SubCatgeory_dropdown();
-        this.department_dropdown();
-        this.Brand_dropdown();
-        this.Salesman_dropdown();
-        this.ItemProperty1_dropdown();
-        this.ItemProperty2_dropdown();
+        
       }
     
       ngAfterViewInit() {
@@ -390,26 +369,12 @@ selectedSaletype = [0]; // or [] if nothing selected
     
       onFromDateChange(event: any) {
         const rawDate: Date = new Date(event.value);
-          const today = new Date();
-        
-          if (rawDate > today) {
-            notify('From Date cannot be greater than today', 'error', 2000);
-            this.selected_from_date = today;
-            return;
-          }
         this.formatted_from_date = this.formatDate(rawDate);
         // this.reloadJournalBook();
       }
     
       onToDateChange(event: any) {
         const rawDate: Date = new Date(event.value);
-         const today = new Date();
-        
-          if (rawDate > today) {
-            notify('To Date cannot be greater than today', 'error', 2000);
-            this.selected_To_date = today;
-            return;
-          }
         this.formatted_To_date = this.formatDate(rawDate);
         // this.reloadJournalBook();
       }
@@ -434,31 +399,13 @@ selectedSaletype = [0]; // or [] if nothing selected
           DATE_TO: this.formatted_To_date ?? this.selected_To_date,
            STORE_ID: this.selectedStoreid?.length
         ? this.selectedStoreid.join(',') // FINAL FIX
-        : '',
-         CUSTOMER_ID: this.selectedCustomer != null
-    ? String(this.selectedCustomer)
-    : '',
-      SALE_TYPE: this.selectedSaletype != null? Number(this.selectedSaletype)
-    : 0,
-        BRAND_ID: this.selectedBrand != null
-    ? String(this.selectedBrand)
-    : '',
-    STATUS_ID:"",
-    ITEM_ID : this.selectedItem !=null? String(this.selectedItem):'',
-    SALESMAN_ID: this.selectedSalesman !=null? String(this.selectedSalesman):'',
-    DEPT_ID : this.selectedDepartment !=null ? String(this.selectedDepartment):'',
-    CAT_ID : this.selectedCategory !=null ? String(this.selectedCategory): '',
-    SUBCAT_ID: this.selectedSubcategory !=null ? String(this.selectedSubcategory):'',
-    DISCOUNTED_ITEMS_ONLY :0,
-    CUSTOM1 : this.selectedItemProperty1 !=null ? String(this.selectedItemProperty1):'',
-    CUSTOM2 : this.selectedItemProperty2 !=null ? String(this.selectedItemProperty2):'',
-    INCLUDE_SUMMARY: 0
+        : 0,
         };
     
         this.JournalBookDataSource = new DataSource({
           load: () =>
             new Promise((resolve) => {
-              this.dataService.SalesDetailReport(payload).subscribe({
+              this.dataService.Z_Report(payload).subscribe({
                 next: (res: any) => {
                   const list = res || [];
     
@@ -467,18 +414,6 @@ selectedSaletype = [0]; // or [] if nothing selected
                   this.journalBookCount = list.length;
     
                   this.ledgerSummaryData = list;
-
-                    if (list.length === 0) {
-    notify({
-      message: 'No data available',
-      type: 'warning',
-      displayTime: 2000,
-      position: {
-        at: 'top center',
-        my: 'top center'
-      }
-    });
-  }
                   this.isFilterVisible = false
                   resolve(list); // 🔑 grid gets data
                 },
@@ -497,96 +432,83 @@ selectedSaletype = [0]; // or [] if nothing selected
         console.log(e)
         const trans_id = e.row.data.TRANS_ID;
     
-         this.dataService
-      .selectInvoiceRetail(trans_id)
-      .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
-
-        
-          this.isViewInvoice = true;
-      });
+       this.dataService
+        .selectInvoiceRetail(trans_id)
+        .subscribe((response: any) => {
+          this.selectedInvoice = response.Data;
+  
+          
+            this.isViewInvoice = true;
+        });
       }
+  
+      getNetAmount = (rowData: any) => {
+    return rowData['Inc.VAT Total'];
+  };
+  
+  getExVATtotal = (rowData: any) => {
+    return rowData['Ex. VAT Total'];
+  };
     
       summaryColumnsData = {
         totalItems: [
-          // 1. Total Debitṅ
           {
-            name: 'totalDr',
-            column: 'QUANTITY',
+            column: 'ExVATtotal',
             summaryType: 'sum',
             displayFormat: 'Total {0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-            showInColumn: 'QUANTITY',
+            showInColumn: 'ExVATtotal',
             alignment: 'right',
           },
           {
-            name: 'totalDr',
-            column: 'PRICE',
+            column: 'VAT Amount',
             summaryType: 'sum',
             displayFormat: 'Total {0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-            showInColumn: 'PRICE',
+            showInColumn: 'VAT Amount',
             alignment: 'right',
           },
           {
-            name: 'totalDr',
-            column: 'GROSS_AMOUNT',
+            column: 'netAmount',
             summaryType: 'sum',
             displayFormat: 'Total {0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-            showInColumn: 'GROSS_AMOUNT',
+            showInColumn: 'netAmount',
             alignment: 'right',
           },
           {
-            name: 'totalDr',
-            column: 'VAT_AMOUNT',
+            column: 'CASH',
             summaryType: 'sum',
             displayFormat: 'Total {0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-            showInColumn: 'VAT_AMOUNT',
-            alignment: 'right',
-          },
-          {
-            name: 'totalDr',
-            column: 'NET_AMOUNT',
-            summaryType: 'sum',
-            displayFormat: 'Total {0}',
-            valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-            showInColumn: 'NET_AMOUNT',
+            showInColumn: 'CASH',
             alignment: 'right',
           },
         ],
         groupItems: [
           {
-            column: 'QUANTITY',
+            column: 'ExVATtotal',
             summaryType: 'sum',
             displayFormat: '{0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
             alignByColumn: true,
           },
           {
-            column: 'PRICE',
+            column: 'VAT Amount',
             summaryType: 'sum',
             displayFormat: '{0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
             alignByColumn: true,
           },
           {
-            column: 'GROSS_AMOUNT',
+            column: 'netAmount',
             summaryType: 'sum',
             displayFormat: '{0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
             alignByColumn: true,
           },
           {
-            column: 'VAT_AMOUNT',
-            summaryType: 'sum',
-            displayFormat: '{0}',
-            valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-            alignByColumn: true,
-          },
-          {
-            column: 'NET_AMOUNT',
+            column: 'CASH',
             summaryType: 'sum',
             displayFormat: '{0}',
             valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
@@ -637,93 +559,13 @@ selectedSaletype = [0]; // or [] if nothing selected
           this.Store = res;
         });
       }
-
-       department_dropdown(){
-        const payload = {
-          NAME :'DEPARTMENT',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Department = res;
-        });
-      }
-
-      Catgeory_dropdown(){
-        const payload = {
-          NAME :'ITEMCATEGORY',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Category = res;
-        });
-      }
-  
-      SubCatgeory_dropdown(){
-        const payload = {
-          NAME :'SUBCATEGORY',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Subcategory = res;
-        });
-      }
-
-      Brand_dropdown(){
-        const payload = {
-          NAME :'BRAND',
-          // COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Brand = res;
-        });
-      }
-
-      Salesman_dropdown(){
-        const payload = {
-          NAME :'SALESMAN',
-          // COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.Salesman = res;
-        });
-      }
-
-      ItemProperty1_dropdown(){
-        const payload = {
-          NAME :'ITEMPROPERTY1',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.itemProperty1 = res;
-        });
-      }
-
-      ItemProperty2_dropdown(){
-        const payload = {
-          NAME :'ITEMPROPERTY2',
-          COMPANY_ID : this.selected_Company_id
-        }
-        this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-          this.itemProperty2 = res;
-        });
-      }
   
         item_dropdown(){
       const payload = {
         NAME : 'ITEMS'
       }
       this.dataService.Common_Dropdown(payload).subscribe((res:any)=>{
-        // this.items = res
-
-        this.items = {
-        store: {
-          type: 'array',
-          data: res,
-          key: 'ID',
-        },
-        paginate: true,
-        pageSize: 50,
-      };
+        this.items = res
       })
     }
   
@@ -742,11 +584,10 @@ selectedSaletype = [0]; // or [] if nothing selected
   
     getCustomerOrUnitLst() {
       const payload = {
-        COMPANY_ID: this.selected_Company_id,
-        NAME:'CUSTOMER'
+        COMPANY_ID: this.selected_Company_id
       };
       this.dataService
-        .Common_Dropdown(payload)
+        .getOutsideCustomerWithState(payload)
         .subscribe((response: any) => {
           this.distributorList = response;
         });
@@ -811,6 +652,6 @@ selectedSaletype = [0]; // or [] if nothing selected
   ],
   providers: [],
   exports: [],
-  declarations: [SalesDetailComponent],
+  declarations: [ZReportComponent],
 })
-export class SalesDetailModule {}
+export class ZReportModule {}

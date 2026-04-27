@@ -6527,8 +6527,15 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload)
   }
 
+  //-----------------------TenderSummary Sales Report-------------------------
    TenderSummary_Sales_Report(payload : any){
     const getEndpoint = this.apiUrl + 'SalesReport/TenderSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+  //-----------------------Z Report-------------------------
+  Z_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ZReport';
     return this.http.post(getEndpoint, payload)
   }
 }

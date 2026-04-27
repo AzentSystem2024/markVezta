@@ -39,6 +39,7 @@
             labelMode="floating"
             [(value)]="selected_from_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onFromDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -50,6 +51,7 @@
             labelMode="floating"
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onToDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -302,9 +304,16 @@
       <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
       <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-      <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
-      
-
+       <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+      <dxi-column dataField="CAT_NAME" caption="Category"></dxi-column>
+      <dxi-column dataField="SUBCAT_NAME" caption="Subcategory"></dxi-column>
+      <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
+      <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
+      <dxi-column dataField="CUSTOM1_NAME" caption="ItemProperty1"></dxi-column>
+      <dxi-column dataField="CUSTOM2_NAME" caption="ItemProperty2"></dxi-column>
+      <dxi-column dataField="DISC_REASON" caption="Reason"></dxi-column>
+  
       <dxi-column
         dataField="PRICE"
         caption="Price"
