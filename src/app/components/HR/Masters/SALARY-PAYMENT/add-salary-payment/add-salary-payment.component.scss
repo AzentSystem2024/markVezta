@@ -49,7 +49,7 @@
   overflow-y: auto;
 }
 
-::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
+::ng-deep .add-salary-wrapper .salary-grid-wrapper .dx-datagrid .dx-toolbar {
   min-height: 40px;
   align-items: center;
   z-index: 2; /* Ensure toolbar stays on top */
