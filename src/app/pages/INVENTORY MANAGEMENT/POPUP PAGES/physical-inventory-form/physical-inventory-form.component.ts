@@ -74,7 +74,7 @@ export class PhysicalInventoryFormComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @ViewChild('itemsGridRef', { static: false })
@@ -143,7 +143,7 @@ export class PhysicalInventoryFormComponent {
   department: any;
   brand: any;
   category: any;
-  store: any;
+
   history: any;
 
   constructor(
@@ -151,7 +151,7 @@ export class PhysicalInventoryFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.isEditDataAvailable();
@@ -176,8 +176,8 @@ export class PhysicalInventoryFormComponent {
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     console.log(this.storeFromSession, 'STOREFROMSESSION');
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/quotation');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/quotation');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -386,20 +386,22 @@ export class PhysicalInventoryFormComponent {
     ]);
   }
 
-  calculateSerialNumber() {}
+  calculateSerialNumber() { }
   isEditDataAvailable() {
     // 🔹 Check if edit mode is active and data is passed in
     if (this.isEditing && this.EditingResponseData) {
       console.log('Edit Mode Active:', this.EditingResponseData);
 
       const editData = this.EditingResponseData;
+      console.log('Raw edit data:', editData.STORE_ID);
+      this.StoreIDData = editData.STORE_ID || this.StoreIDData;
 
       // 🧩 Assign header-level data
       this.inventoryFormData = {
         ID: editData.ID || 0,
         COMPANY_ID: editData.COMPANY_ID || this.companyID,
         FIN_ID: editData.FIN_ID || this.finID,
-        STORE_ID: editData.STORE_ID || this.storeFromSession,
+        STORE_ID: editData.STORE_ID || this.StoreIDData,
         PHYSICAL_NO: editData.PHYSICAL_NO || '',
         PHYSICAL_DATE: editData.PHYSICAL_DATE || new Date(),
         SUPP_ID: editData.SUPP_ID || 0,
@@ -422,7 +424,7 @@ export class PhysicalInventoryFormComponent {
         this.inventoryFormData.Details = editData.Details.map((d: any) => ({
           ID: d.ID || 0,
           COMPANY_ID: d.COMPANY_ID || this.companyID,
-          STORE_ID: d.STORE_ID || this.storeFromSession,
+          STORE_ID: d.STORE_ID || this.StoreIDData,
           PHYSICAL_ID: d.PHYSICAL_ID || editData.ID || 0,
           ITEM_ID: d.ITEM_ID || 0,
           ITEM_CODE: d.ITEM_CODE || '',
@@ -454,7 +456,7 @@ export class PhysicalInventoryFormComponent {
         ...this.inventoryFormData,
         COMPANY_ID: this.companyID,
         FIN_ID: this.finID,
-        STORE_ID: this.storeFromSession,
+        STORE_ID: this.StoreIDData,
         USER_ID: this.userID,
         PHYSICAL_DATE: new Date(),
         STATUS: 1,
@@ -489,7 +491,7 @@ export class PhysicalInventoryFormComponent {
   onImportExcel() {
     this.fileInput.nativeElement.click();
   }
- 
+
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -653,7 +655,7 @@ export class PhysicalInventoryFormComponent {
       });
   }
   saveInventory() {
-    // 🧩 Basic validation
+    //  Basic validation
     if (!this.inventoryFormData.PHYSICAL_DATE) {
       notify(
         {
@@ -694,15 +696,15 @@ export class PhysicalInventoryFormComponent {
     }
     const dateOnly = this.inventoryFormData.PHYSICAL_DATE
       ? new Date(this.inventoryFormData.PHYSICAL_DATE)
-          .toISOString()
-          .split('T')[0]
+        .toISOString()
+        .split('T')[0]
       : null;
     // 🧾 Prepare payload
     const payload = {
       ID: this.inventoryFormData.ID || 0,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.StoreIDData,
       PHYSICAL_NO: this.inventoryFormData.PHYSICAL_NO || '',
       PHYSICAL_DATE: dateOnly,
       SUPP_ID: this.inventoryFormData.SUPP_ID || 0,
@@ -828,6 +830,7 @@ export class PhysicalInventoryFormComponent {
       },
     });
   }
+
 }
 @NgModule({
   imports: [
@@ -869,4 +872,4 @@ export class PhysicalInventoryFormComponent {
   exports: [PhysicalInventoryFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PhysicalInventoryFormModule {}
+export class PhysicalInventoryFormModule { }

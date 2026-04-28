@@ -6,47 +6,50 @@
 
   width: 100%;
   display: contents;
-  overflow: auto; 
+  overflow: auto;
 }
 
 .view-wrapper {
-  
-    .grid {
-      .name-template {
-        .position {
-          font-size: 12px;
-          color: var(--texteditor-label-color);
-        }
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
       }
-  
-      ::ng-deep & {
-        .dx-datagrid-header-panel {
-          padding: 0 var(--content-padding);
-        }
-  
-        .dx-toolbar {
-          margin-bottom: 0;
-          padding: var(--toolbar-margin-bottom) 0;
-        }
-  
-        .dx-datagrid-content .dx-row {
-          cursor: pointer;
-        }
-            /* Adding ::ng-deep for header row background */
-    ::ng-deep .dx-datagrid-headers .dx-header-row {
-      background-color: #00a0e028 !important; /* Replace with your desired color */
-    }
-      }
-  
-      .grid-header {
-        @include header();
-      }
-    }
-  
-    user-panel {
-      display: inherit;
     }
 
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
 
-  
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+      /* Adding ::ng-deep for header row background */
+      ::ng-deep .dx-datagrid-headers .dx-header-row {
+        background-color: #00a0e028 !important; /* Replace with your desired color */
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
   }
+
+  user-panel {
+    display: inherit;
+  }
+}
+.flag-red {
+  color: rgb(236, 140, 13);
+}
+
+.flag-green {
+  color: green;
+}

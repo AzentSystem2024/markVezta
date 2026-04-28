@@ -1,13 +1,4 @@
 <div class="view-wrapper list-page">
-  <!-- Loading State -->
-  <div
-    *ngIf="!itemStoresList || itemStoresList.length === 0"
-    class="loading-state"
-  >
-    <div class="loading-spinner"></div>
-    <p>Loading data...</p>
-  </div>
-
   <!-- Main Grid -->
   <div
     class="grid-container"
@@ -16,7 +7,7 @@
     <dx-data-grid
       #dataGrid
       [width]="'100%'"
-      [height]="'70%'"
+      [height]="'100%'"
       class="grid theme-dependent"
       [dataSource]="itemStoresList"
       [showBorders]="true"
@@ -33,6 +24,7 @@
     >
       <dxo-column-fixing [enabled]="true"></dxo-column-fixing>
       <dxo-paging [pageSize]="10"></dxo-paging>
+
       <dxo-scrolling
         mode="standard"
         columnRenderingMode="virtual"
@@ -59,7 +51,7 @@
             label="Select Store Properties"
             labelMode="floating"
             [showSelectionControls]="true"
-            [maxDisplayedTags]="5"
+            [multiline]="false"
             (onValueChanged)="onPropertiesChange($event)"
           >
             <div *dxTemplate="let data of 'item'">
@@ -69,25 +61,29 @@
         </dxi-item>
 
         <dxi-item location="before">
-          <dx-select-box
+          <dx-tag-box
             [items]="store"
             valueExpr="ID"
-            [(value)]="selectedStoreId"
             displayExpr="STORE_NAME"
+            [(value)]="selectedStoreIds"
             (onValueChanged)="onDropdownValueChanged($event)"
-            label="Select Store"
+            label="Select Stores"
             labelMode="floating"
             [width]="300"
+            [showSelectionControls]="true"
+            [searchEnabled]="true"
+            [multiline]="false"
+            [readOnly]="isView"
+            [hint]="selectedStoreHint"
           >
-          </dx-select-box>
+          </dx-tag-box>
         </dxi-item>
         <dxi-item>
           <dx-check-box
             *ngIf="allowVerify"
             [(value)]="approveValue"
-            text="verify"
+            text="Approve"
             [readOnly]="readOnly"
-            (onValueChanged)="onApprovedChanged($event)"
             style="margin: 10px"
           >
           </dx-check-box
@@ -104,7 +100,8 @@
 
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <dx-button
-            [text]="SaveBtnText()"
+            *ngIf="!isView"
+            [text]="approveValue ? 'Approve' : 'Update'"
             stylingMode="contained"
             type="default"
             (onClick)="onSaveButtonClick()"
@@ -187,7 +184,6 @@
           [width]="120"
           alignment="center"
           dataType="boolean"
-          [editorOptions]="{ onValueChanged: onSaleReturnValueChanged }"
         ></dxi-column>
       </dxi-column>
 
@@ -210,7 +206,6 @@
           [width]="120"
           alignment="center"
           dataType="boolean"
-          [editorOptions]="{ onValueChanged: onNotDisountableValueChanged }"
         ></dxi-column>
       </dxi-column>
 
@@ -233,7 +228,6 @@
           [width]="120"
           alignment="center"
           dataType="boolean"
-          [editorOptions]="{ onValueChanged: onPriceRequiredValueChanged }"
         ></dxi-column>
       </dxi-column>
 
@@ -252,7 +246,6 @@
           [width]="120"
           alignment="center"
           dataType="boolean"
-          [editorOptions]="{ onValueChanged: onInactiveValueChanged }"
         ></dxi-column>
       </dxi-column>
     </dx-data-grid>

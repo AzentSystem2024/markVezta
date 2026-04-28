@@ -116,13 +116,15 @@ export class TransferInInventoryFormComponent {
   netamount: any;
   storename: any;
   hideCost: any;
-
+  IS_HQ_App: boolean = false;
+  StoreIDData: any
+  transferstores: any[] = []
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.isEditDataAvailable();
@@ -134,6 +136,7 @@ export class TransferInInventoryFormComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.IS_HQ_App = menuResponse.GeneralSettings.IS_HQ_APP;
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
@@ -228,13 +231,21 @@ export class TransferInInventoryFormComponent {
   }
   getStoreDropdown() {
     const payload = {
-      COMPANY_ID : this.companyID,
-      NAME : 'STORE'
+      COMPANY_ID: this.companyID,
+      NAME: 'STORE'
     }
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.stores = response.filter(
-        (store: any) => store.ID !== this.storeFromSession,
-      );
+      this.transferstores = response;
+      if (this.IS_HQ_App) {
+        // 🔹 HQ App → show only store with ID = 1
+        this.stores = response.filter((item: any) => item.ID === 1);
+        this.StoreIDData = 1;
+
+
+      } else {
+        // 🔹 Not HQ → show all stores
+        this.stores = response;
+      }
     });
   }
 
@@ -246,79 +257,81 @@ export class TransferInInventoryFormComponent {
 
   getReasonsDropdown() {
     const payload = {
-      COMPANY_ID : this.companyID,
-      NAME : 'REASON'
+      COMPANY_ID: this.companyID,
+      NAME: 'REASON'
     }
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
     });
   }
 
-onSelectItems() {
-  const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+  onSelectItems() {
+    const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+    console.log(selectedRows, 'SELECTED ROWS');
 
-  if (selectedRows && selectedRows.length > 0) {
+    if (selectedRows && selectedRows.length > 0) {
 
-    const transferId = selectedRows[0].TRANSFER_ID; //  get transfer id
+      const transferId = selectedRows.map((row: any) => row.TRANSFER_ID).join(',') //  get transfer id
+      console.log(transferId, 'Selected Transfer IDs');
 
-    // Call API instead of manually pushing rows
-    this.dataService
-      .getItemsforTransferIn(transferId, this.companyID)
-      .subscribe((res: any) => {
-        console.log(res, 'API response');
+      // Call API instead of manually pushing rows
+      this.dataService
+        .getItemsforTransferIn(transferId, this.companyID)
+        .subscribe((res: any) => {
+          console.log(res, 'API response');
 
-        if (res?.data && res.data.length > 0) {
+          if (res?.data && res.data.length > 0) {
 
-          //  Clear existing valid rows if needed
-          this.transferInFormData.DETAILS =
-            this.transferInFormData.DETAILS.filter(
-              (item) => item.BARCODE !== '' && item.DESCRIPTION !== '',
-            );
+            //  Clear existing valid rows if needed
+            this.transferInFormData.DETAILS =
+              this.transferInFormData.DETAILS.filter(
+                (item) => item.BARCODE !== '' && item.DESCRIPTION !== '',
+              );
 
-          //  Set ISSUE_ID
-          if (!this.transferInFormData.ISSUE_ID && res.data[0].ISSUE_ID) {
-            this.transferInFormData.ISSUE_ID = res.data[0].ISSUE_ID;
-          }
-
-          //  Map API response → grid (like PO)
-          res.data.forEach((item: any) => {
-            const exists = this.transferInFormData.DETAILS.some(
-              (d) => d.BARCODE === item.BARCODE,
-            );
-
-            if (!exists) {
-              const qty = Number(item.QUANTITY_ISSUED) || 0;
-              const cost = Number(item.COST) || 0;
-
-              this.transferInFormData.DETAILS.push({
-                SL_NO: this.transferInFormData.DETAILS.length + 1,
-                ISSUE_DETAIL_ID: item.ISSUE_DETAIL_ID,
-                ISSUE_ID: item.ISSUE_ID,
-                ITEM_ID: item.ITEM_ID,
-                BARCODE: item.BARCODE,
-                DESCRIPTION: item.DESCRIPTION,
-                UOM: item.UOM,
-                COST: cost,
-                QUANTITY_AVAILABLE: item.QUANTITY_AVAILABLE,
-                QUANTITY_ISSUED: qty,
-                QUANTITY_RECEIVED: 0,
-                BATCH_NO: '0',
-                EXPIRY_DATE: new Date(),
-
-                // IMPORTANT
-                netAmount: cost * qty,
-              });
+            //  Set ISSUE_ID
+            if (!this.transferInFormData.ISSUE_ID && res.data[0].ISSUE_ID) {
+              this.transferInFormData.ISSUE_ID = res.data[0].ISSUE_ID;
             }
-          });
 
-          
-          // this.recalculateNetAmount();
-        }
-      });
+            //  Map API response → grid (like PO)
+            res.data.forEach((item: any) => {
+              const exists = this.transferInFormData.DETAILS.some(
+                (d) => d.BARCODE === item.BARCODE,
+              );
+
+              if (!exists) {
+                const qty = Number(item.QUANTITY_ISSUED) || 0;
+                const cost = Number(item.COST) || 0;
+
+                this.transferInFormData.DETAILS.push({
+                  SL_NO: this.transferInFormData.DETAILS.length + 1,
+                  ISSUE_DETAIL_ID: item.ISSUE_DETAIL_ID,
+                  ISSUE_ID: item.ISSUE_ID,
+                  ITEM_ID: item.ITEM_ID,
+                  BARCODE: item.BARCODE,
+                  DESCRIPTION: item.DESCRIPTION,
+                  UOM: item.UOM,
+                  COST: cost,
+                  QUANTITY_AVAILABLE: item.QUANTITY_AVAILABLE,
+                  QUANTITY_ISSUED: qty,
+                  QUANTITY_RECEIVED: 0,
+                  BATCH_NO: '0',
+                  EXPIRY_DATE: new Date(),
+
+                  // IMPORTANT
+                  netAmount: cost * qty,
+                });
+              }
+            });
+
+
+            // this.recalculateNetAmount();
+          }
+        });
+    }
+
+    this.isPopupVisible = false; // close popup
   }
-
-  this.isPopupVisible = false; // close popup
-}
 
   onAddItems() {
     this.isPopupVisible = true;
@@ -327,7 +340,7 @@ onSelectItems() {
     this.popupClosed.emit();
   }
 
-  onPopupHiding() {}
+  onPopupHiding() { }
 
   private formatDateLocal(date: any): string | null {
     if (!date) return null;
@@ -410,8 +423,8 @@ onSelectItems() {
   }
 
   calculateNetAmount(rowData: any) {
-  return (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY_RECEIVED) || 0);
-}
+    return (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY_RECEIVED) || 0);
+  }
 
   onEditorPrepared(e: any) {
     if (e.parentType === 'dataRow' && e.dataField === 'QUANTITY_RECEIVED') {
@@ -423,23 +436,23 @@ onSelectItems() {
 
 
   updateNetAmount(editingRowIndex?: number, newValue?: number) {
-  this.transferInFormData.NET_AMOUNT = 0;
+    this.transferInFormData.NET_AMOUNT = 0;
 
-  this.transferInFormData.DETAILS.forEach((item: any, idx: number) => {
-    let qty =
-      idx === editingRowIndex
-        ? Number(newValue) || 0
-        : Number(item.QUANTITY_RECEIVED) || 0;
+    this.transferInFormData.DETAILS.forEach((item: any, idx: number) => {
+      let qty =
+        idx === editingRowIndex
+          ? Number(newValue) || 0
+          : Number(item.QUANTITY_RECEIVED) || 0;
 
-    // Calculate row total
-    item.netAmount = (Number(item.COST) || 0) * qty;
+      // Calculate row total
+      item.netAmount = (Number(item.COST) || 0) * qty;
 
-    //  Add to grand total
-    this.transferInFormData.NET_AMOUNT += item.netAmount;
-  });
+      //  Add to grand total
+      this.transferInFormData.NET_AMOUNT += item.netAmount;
+    });
 
-  this.netamount = this.transferInFormData.NET_AMOUNT;
-}
+    this.netamount = this.transferInFormData.NET_AMOUNT;
+  }
 
 
   onSummaryCalculate(e: any) {
@@ -491,7 +504,7 @@ onSelectItems() {
       USER_ID: this.userID,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.StoreIDData,
       ISSUE_DETAIL_ID:
         this.transferInFormData.DETAILS.length > 0
           ? this.transferInFormData.DETAILS[0].ISSUE_DETAIL_ID
@@ -1126,10 +1139,12 @@ onSelectItems() {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${
-      months[date.getMonth()]
-    }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
+      }-${date.getFullYear().toString().slice(-2)}`;
   }
+
+
+
 }
 
 @NgModule({
@@ -1172,4 +1187,4 @@ onSelectItems() {
   exports: [TransferInInventoryFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferInInventoryFormModule {}
+export class TransferInInventoryFormModule { }

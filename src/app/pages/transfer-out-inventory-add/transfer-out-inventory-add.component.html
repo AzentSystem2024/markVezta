@@ -62,13 +62,17 @@
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
 
-                  <dx-text-box
-                    [(value)]="storename"
-                    [width]="200"
-                    label="Transfer from"
+                  <dx-select-box
+                    [(value)]="StoreIDData"
+                    [dataSource]="stores"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="'100%'"
+                    [searchEnabled]="true"
+                    label="Store"
                     labelMode="floating"
-                    [readOnly]="true"
-                  ></dx-text-box>
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-select-box>
                 </div>
               </div>
             </dxi-item>
@@ -77,7 +81,7 @@
               <div class="stacked-toolbar-group">
                 <dx-select-box
                   [(value)]="transferOutFormData.DEST_STORE_ID"
-                  [dataSource]="stores"
+                  [dataSource]="transferstores"
                   displayExpr="DESCRIPTION"
                   valueExpr="ID"
                   [width]="200"
@@ -85,6 +89,7 @@
                   label="Transfer To"
                   labelMode="floating"
                   [readOnly]="isReadOnlyMode"
+                  (onValueChanged)="onStoreChange($event)"
                 ></dx-select-box>
                 <div style="margin-top: 2px; text-align: left">
                   <dx-button
@@ -315,7 +320,11 @@
 
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
       <dxi-column dataField="UOM" caption="UOM"></dxi-column>
-      <dxi-column dataField="COST" caption="Unit Cost" [visible]="!hideCost"></dxi-column>
+      <dxi-column
+        dataField="COST"
+        caption="Unit Cost"
+        [visible]="!hideCost"
+      ></dxi-column>
       <dxi-column
         dataField="QUANTITY_AVAILABLE"
         caption="Qty Available"

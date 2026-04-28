@@ -408,6 +408,7 @@ import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } f
 import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 import { StorewiseStockViewComponent, StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
 import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
+// import { ItemStorePropertiesViewComponent, ItemStorePropertiesViewModule } from './pages/item-store-properties-view/item-store-properties-view.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -790,7 +791,8 @@ import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages
     MiscellaneousSalesInvoiceModule,
     MiscellaneousSalesInvoiceFormModule,
     StorewiseStockViewModule,
-    ViewPromotionWizardModule
+    ViewPromotionWizardModule,
+
 
   ],
 

@@ -109,13 +109,13 @@
         </dxi-item> -->
 
         <dxi-item>
-            <dx-tag-box
+          <dx-tag-box
             label="item"
             labelMode="floating"
             valueExpr="ID"
             displayExpr="DESCRIPTION"
             [searchEnabled]="true"
-            [items]="items"
+            [dataSource]="items"
             [showSelectionControls]="true"
             [maxDisplayedTags]="100"
             [showMultiTagOnly]="true"
@@ -123,27 +123,27 @@
             [(value)]="selectedItem"
             [hint]="itemHint"
             (onValueChanged)="updateItemHint()"
-            ></dx-tag-box>
+          ></dx-tag-box>
         </dxi-item>
 
         <dxi-item>
-      <dx-tag-box
-  label="Store"
-  labelMode="floating"
-  displayExpr="DESCRIPTION"
-  valueExpr="ID"
-  [items]="Store"
-  [searchEnabled]="true"
-  [(value)]="selectedStoreid"
-  [showSelectionControls]="true"
-  [maxDisplayedTags]="100"
-  [showMultiTagOnly]="true"
-  [multiline]="false"
-  [hint]="storeHint"
-  [width]="200"
-  (onValueChanged)="updateStoreHint()"
-></dx-tag-box>
-    </dxi-item>
+          <dx-tag-box
+            label="Store"
+            labelMode="floating"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [items]="Store"
+            [searchEnabled]="true"
+            [(value)]="selectedStoreid"
+            [showSelectionControls]="true"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [hint]="storeHint"
+            [width]="200"
+            (onValueChanged)="updateStoreHint()"
+          ></dx-tag-box>
+        </dxi-item>
 
         <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
         <dxi-item location="after" locateInMenu="auto">
@@ -208,28 +208,26 @@
         sortOrder="asc"
         [sortingMethod]="typeSorting"
       ></dxi-column>
-     
+
       <!-- <dxi-column
         dataField="StoreAmounts.CENTRAL STORE"
         caption="Central Store"
         alignment="left"
         dataType="number"
       ></dxi-column> -->
-     <dxi-column
-  *ngFor="let col of dynamicColumns"
-  [dataField]="col.dataField"
-  [caption]="col.caption"
-  alignment="right"
-  dataType="number"
-  format="#,##0.00"
-  [width]="100"
->
-</dxi-column>
+      <dxi-column
+        *ngFor="let col of dynamicColumns"
+        [dataField]="col.dataField"
+        [caption]="col.caption"
+        alignment="right"
+        dataType="number"
+        [width]="100"
+      >
+      </dxi-column>
       <dxi-column
         dataField="StoreStock.TOTAL"
         caption="Total"
         dataType="number"
-        format="#,##0.00"
       ></dxi-column>
 
       <!-- Group summary for MAIN_GROUP_NAME -->
@@ -243,9 +241,13 @@
         >
         </dxi-group-item>
 
-        <dxi-total-item column="" summaryType="sum" displayFormat="">        
+        <dxi-total-item column="" summaryType="sum" displayFormat="">
         </dxi-total-item>
-        <dxi-total-item column="StoreStock.TOTAL" summaryType="sum" displayFormat="">        
+        <dxi-total-item
+          column="StoreStock.TOTAL"
+          summaryType="sum"
+          displayFormat=""
+        >
         </dxi-total-item>
       </dxo-summary>
 
@@ -264,4 +266,3 @@
     </dx-data-grid>
   </div>
 </div>
-

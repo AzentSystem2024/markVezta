@@ -27,6 +27,7 @@ import {
   DxTabsModule,
   DxNumberBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -80,6 +81,7 @@ export class StockAdjustmentListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+  selectedStoreid: any[] = []
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -123,11 +125,13 @@ export class StockAdjustmentListComponent {
   filteredInvoiceList: any;
   filteredStockList: any;
   selectedCompanyId: any;
+  Store: any[] = [];
   constructor(
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
   ) {
+
     if (this.selectedDateRange === 'today') {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -146,7 +150,7 @@ export class StockAdjustmentListComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
-    // this.sessionData_tax()
+    this.sessionData_tax()
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuGroups);
 
@@ -200,7 +204,7 @@ export class StockAdjustmentListComponent {
     this.showCustomDatePopup = false;
   }
 
-   private getDateRangePayload(): {
+  private getDateRangePayload(): {
     DATE_FROM: string | null;
     DATE_TO: string | null;
   } {
@@ -259,14 +263,47 @@ export class StockAdjustmentListComponent {
     };
   }
 
-    sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+
+    this.store_dropdown()
   }
-  
+
+  // get_stock_adjustment_list() {
+
+  //   const datePayload = this.getDateRangePayload();
+
+  //   const payload = {
+  //     COMPANY_ID: this.selectedCompanyId,
+  //     DATE_FROM: datePayload.DATE_FROM,
+  //     DATE_TO: datePayload.DATE_TO,
+  //   };
+
+  //   this.dataService.List_Stock_Adjustment_Data(payload).subscribe((res: any) => {
+  //     console.log(res);
+  //     const allData = res.Data;
+  //     const dateField = 'ADJ_DATE';
+
+  //     // If 'all' is selected, skip filtering
+  //     if (this.selectedDateRange === 'all') {
+  //       this.filteredStockList = allData;
+  //     } else {
+  //       const start = new Date(this.startDate);
+  //       const end = new Date(this.EndDate);
+  //       end.setHours(23, 59, 59, 999);
+
+  //       this.filteredStockList = allData.filter((item: any) => {
+  //         const itemDate = new Date(item[dateField]);
+  //         return itemDate >= start && itemDate <= end;
+  //       });
+  //     }
+
+  //     // this.filteredStockList=res.Data
+  //   });
+  // }
   get_stock_adjustment_list() {
-    
     const datePayload = this.getDateRangePayload();
 
     const payload = {
@@ -276,28 +313,35 @@ export class StockAdjustmentListComponent {
     };
 
     this.dataService.List_Stock_Adjustment_Data(payload).subscribe((res: any) => {
-      console.log(res);
       const allData = res.Data;
       const dateField = 'ADJ_DATE';
 
-      // If 'all' is selected, skip filtering
+      let dateFilteredData: any[];
+
+      // ✅ Step 1: Date filter
       if (this.selectedDateRange === 'all') {
-        this.filteredStockList = allData;
+        dateFilteredData = allData;
       } else {
         const start = new Date(this.startDate);
         const end = new Date(this.EndDate);
         end.setHours(23, 59, 59, 999);
 
-        this.filteredStockList = allData.filter((item: any) => {
+        dateFilteredData = allData.filter((item: any) => {
           const itemDate = new Date(item[dateField]);
           return itemDate >= start && itemDate <= end;
         });
       }
 
-      // this.filteredStockList=res.Data
+      // ✅ Step 2: Store filter
+      if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+        this.filteredStockList = dateFilteredData;
+      } else {
+        this.filteredStockList = dateFilteredData.filter((item: any) =>
+          this.selectedStoreid.includes(Number(item.STORE_ID)) // ✅ IMPORTANT
+        );
+      }
     });
   }
-
   formatDate(date: Date): string {
     const month = date.getMonth() + 1; // Months are 0-based
     const day = date.getDate();
@@ -450,6 +494,22 @@ export class StockAdjustmentListComponent {
     this.is_Edit_popup = false;
     this.get_stock_adjustment_list();
   }
+  
+  onStoreChanged(e: any) {
+
+    console.log('Selected store IDs:', this.selectedStoreid);
+
+    this.get_stock_adjustment_list(); // ✅ re-fetch + apply both filters
+  }
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompanyId
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
 }
 
 @NgModule({
@@ -485,10 +545,11 @@ export class StockAdjustmentListComponent {
     DxoSummaryModule,
     StockAdjustmentEditModule,
     StockAdjustmentAddModule,
+    DxTagBoxModule
   ],
   providers: [],
   declarations: [StockAdjustmentListComponent],
   exports: [StockAdjustmentListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentListModule {}
+export class StockAdjustmentListModule { }

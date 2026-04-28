@@ -27,6 +27,7 @@ import {
   DxTabsModule,
   DxNumberBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -73,6 +74,7 @@ export class TransferInInventoryComponent {
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
+  Store: any = []
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -102,11 +104,12 @@ export class TransferInInventoryComponent {
     `;
     },
   };
-  isAddTransferOut: boolean;
+  isAddTransferOut: boolean = false;
   transferInList: any;
   selecteTrOut: any;
-  isEditTransferOut: boolean;
+  isEditTransferOut: boolean = false;
   selectedTrOut: any;
+  selectedStoreid: any
 
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -122,18 +125,20 @@ export class TransferInInventoryComponent {
   showCustomDatePopup = false;
   filteredInvoiceList: any;
   filteredTrInList: any;
-  isReadOnlyTrOut: boolean;
-  isAddTransferIn: boolean;
-  isEditTransferIn: boolean;
+  isReadOnlyTrOut: boolean = false;
+  isAddTransferIn: boolean = false;
+  isEditTransferIn: boolean = false;
   selectedTrIn: any;
-  isReadOnlyTrIn: boolean;
+  isReadOnlyTrIn: boolean = false;
   selected_Company_id: any;
+  storeHint: string = '';
+  dateFilteredList: any;
 
   constructor(
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -142,6 +147,7 @@ export class TransferInInventoryComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.sessionData_tax();
+    this.store_dropdown();
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
@@ -244,55 +250,123 @@ export class TransferInInventoryComponent {
     }
   }
 
+  // applyDateFilter() {
+  //   if (!this.selectedDateRange || !this.transferInList) {
+  //     this.filteredTrInList = this.transferInList;
+  //     return;
+  //   }
+  //   if (this.selectedDateRange === 'all') {
+  //     this.filteredTrInList = this.transferInList; // show full list
+  //     return;
+  //   }
+  //   const today = new Date();
+  //   let startDate: Date;
+  //   const endDate = new Date(); // today
+
+  //   switch (this.selectedDateRange) {
+  //     case 'today':
+  //       startDate = new Date();
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last7':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 6);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last15':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 14);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last30':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 29);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     default:
+  //       this.filteredTrInList = this.transferInList;
+  //       return;
+  //   }
+
+  //   this.filteredTrInList = this.transferInList.filter((item: any) => {
+  //     if (!item.TRANSFER_DATE) {
+  //       console.warn('Missing TRANSFER_DATE in item:', item);
+  //       return false;
+  //     }
+
+  //     const invoiceDate = item.TRANSFER_DATE;
+  //     return invoiceDate >= startDate && invoiceDate <= endDate;
+  //   });
+  //     this.applyStoreFilter();
+
+  // }
   applyDateFilter() {
     if (!this.selectedDateRange || !this.transferInList) {
-      this.filteredTrInList = this.transferInList;
+      this.dateFilteredList = [...this.transferInList];
+      this.filteredTrInList = [...this.transferInList];
       return;
     }
+
     if (this.selectedDateRange === 'all') {
-      this.filteredTrInList = this.transferInList; // show full list
+      this.dateFilteredList = [...this.transferInList];
+      this.filteredTrInList = [...this.transferInList];
       return;
     }
+
     const today = new Date();
     let startDate: Date;
-    const endDate = new Date(); // today
+    const endDate = new Date();
 
     switch (this.selectedDateRange) {
       case 'today':
         startDate = new Date();
         startDate.setHours(0, 0, 0, 0);
         break;
+
       case 'last7':
         startDate = new Date();
         startDate.setDate(today.getDate() - 6);
-        startDate.setHours(0, 0, 0, 0);
         break;
+
       case 'last15':
         startDate = new Date();
         startDate.setDate(today.getDate() - 14);
-        startDate.setHours(0, 0, 0, 0);
         break;
+
       case 'last30':
         startDate = new Date();
         startDate.setDate(today.getDate() - 29);
-        startDate.setHours(0, 0, 0, 0);
         break;
+
       default:
-        this.filteredTrInList = this.transferInList;
+        this.dateFilteredList = [...this.transferInList];
+        this.filteredTrInList = [...this.transferInList];
         return;
     }
 
-    this.filteredTrInList = this.transferInList.filter((item: any) => {
-      if (!item.TRANSFER_DATE) {
-        console.warn('Missing TRANSFER_DATE in item:', item);
-        return false;
-      }
-
-      const invoiceDate = item.TRANSFER_DATE;
-      return invoiceDate >= startDate && invoiceDate <= endDate;
+    this.dateFilteredList = this.transferInList.filter((item: any) => {
+      if (!item.TRANSFER_DATE) return false;
+      const d = new Date(item.TRANSFER_DATE);
+      return d >= startDate && d <= endDate;
     });
-  }
 
+    // ✅ ALWAYS apply store after date
+    this.applyStoreFilter();
+  }
+  applyStoreFilter() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.filteredTrInList = [...this.dateFilteredList];
+      return;
+    }
+
+    const selectedNames = (this.Store || [])
+      .filter((s: any) => this.selectedStoreid.includes(Number(s.ID)))
+      .map((s: any) => s.DESCRIPTION);
+
+    this.filteredTrInList = this.dateFilteredList.filter((item: any) =>
+      selectedNames.includes(item.STORE_NAME)
+    );
+  }
   applyCustomDateFilter() {
     if (!(this.customStartDate && this.customEndDate)) return;
 
@@ -491,7 +565,7 @@ export class TransferInInventoryComponent {
     );
   }
 
-  onCellPrepared(event: any) {}
+  onCellPrepared(event: any) { }
 
   handleClose() {
     this.isAddTransferIn = false;
@@ -505,7 +579,22 @@ export class TransferInInventoryComponent {
 
     this.applyCustomDateFilter(); // your existing function
   }
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
+  //===========filter data based on store id in transfer in list=================
+  onStoreChanged(e: any) {
+    console.log('Selected store IDs:', this.selectedStoreid);
+    this.applyStoreFilter(); // ✅ ONLY store filter
+  }
 }
+
 
 @NgModule({
   imports: [
@@ -544,10 +633,11 @@ export class TransferInInventoryComponent {
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
     CustomDatePopupModule,
+    DxTagBoxModule
   ],
   providers: [],
   declarations: [TransferInInventoryComponent],
   exports: [TransferInInventoryComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferInInventoryModule {}
+export class TransferInInventoryModule { }

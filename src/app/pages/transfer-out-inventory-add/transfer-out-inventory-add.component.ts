@@ -90,7 +90,7 @@ export class TransferOutInventoryAddComponent {
   canPrint: any;
   canView: any;
   canApprove: any;
-  hideCost : any;
+  hideCost: any;
   matrix: any;
   storeFromSession: any;
   stores: any;
@@ -113,12 +113,15 @@ export class TransferOutInventoryAddComponent {
   companyID: any;
   storename: any;
   netamount: any;
-
+  StoreIDData: any
+  IS_HQ_App: boolean = false;
+  transferstores: any[] = [];
+  selectedStoreId: any;
   constructor(
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log(this.isReadOnlyMode, 'READONLYMODE');
@@ -131,6 +134,8 @@ export class TransferOutInventoryAddComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.IS_HQ_App = menuResponse.GeneralSettings.IS_HQ_APP;
+
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
@@ -180,6 +185,7 @@ export class TransferOutInventoryAddComponent {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
+    this.StoreIDData = data.STORE_ID; // pre-select store in dropdown
 
     this.transferOutFormData = {
       TRANS_ID: data.TRANS_ID,
@@ -217,29 +223,43 @@ export class TransferOutInventoryAddComponent {
 
   getStoreDropdown() {
     const payload = {
-      NAME : 'STORE',
-      COMPANY_ID : this.companyID
+      NAME: 'STORE',
+      COMPANY_ID: this.companyID
     }
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.stores = response.filter(
-        (store: any) => store.ID !== this.storeFromSession,
-      );
+      this.transferstores = response;
+
+      if (this.IS_HQ_App) {
+        // 🔹 HQ App → show only store with ID = 1
+        this.stores = response.filter((item: any) => item.ID === 1);
+        this.StoreIDData = 1;
+
+
+      } else {
+        // 🔹 Not HQ → show all stores
+        this.stores = response;
+      }
     });
   }
 
   getReasonsDropdown() {
     const payload = {
-      NAME :'REASON',
-      COMPANY_ID : this.companyID
+      NAME: 'REASON',
+      COMPANY_ID: this.companyID
     }
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
     });
   }
+  onStoreChange(e: any) {
+    this.selectedStoreId = e.value;
+    console.log('Selected Store ID:', this.selectedStoreId);
+    this.getItemsList();
+  }
 
   getItemsList() {
     const payload = {
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.selectedStoreId,
     };
     this.dataService
       .getItemDetailsForInventory(payload)
@@ -253,7 +273,7 @@ export class TransferOutInventoryAddComponent {
     this.isPopupVisible = true; // open popup
   }
 
-  onPopupHiding() {}
+  onPopupHiding() { }
 
   onSelectItems() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
@@ -356,24 +376,24 @@ export class TransferOutInventoryAddComponent {
     }
   }
 
-updateNetAmount(editingRowIndex?: number, newValue?: number) {
-  this.transferOutFormData.NET_AMOUNT = 0;
+  updateNetAmount(editingRowIndex?: number, newValue?: number) {
+    this.transferOutFormData.NET_AMOUNT = 0;
 
-  this.transferOutFormData.DETAILS.forEach((item: any, idx: number) => {
-    let qty =
-      idx === editingRowIndex
-        ? Number(newValue) || 0
-        : Number(item.QUANTITY) || 0;
+    this.transferOutFormData.DETAILS.forEach((item: any, idx: number) => {
+      let qty =
+        idx === editingRowIndex
+          ? Number(newValue) || 0
+          : Number(item.QUANTITY) || 0;
 
-    // Calculate row total
-    item.netAmount = (Number(item.COST) || 0) * qty;
+      // Calculate row total
+      item.netAmount = (Number(item.COST) || 0) * qty;
 
-    //  Add to grand total
-    this.transferOutFormData.NET_AMOUNT += item.netAmount;
-  });
+      //  Add to grand total
+      this.transferOutFormData.NET_AMOUNT += item.netAmount;
+    });
 
-  this.netamount = this.transferOutFormData.NET_AMOUNT;
-}
+    this.netamount = this.transferOutFormData.NET_AMOUNT;
+  }
 
   onSummaryCalculate(e: any) {
     if (e.name === 'netAmount') {
@@ -392,9 +412,9 @@ updateNetAmount(editingRowIndex?: number, newValue?: number) {
     }
   }
 
-calculateNetAmount(rowData: any) {
-  return (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY) || 0);
-}
+  calculateNetAmount(rowData: any) {
+    return (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY) || 0);
+  }
 
   getTransferNo() {
     const payload = {
@@ -563,7 +583,7 @@ calculateNetAmount(rowData: any) {
       USER_ID: this.userID,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.StoreIDData,
     };
 
     console.log('Final payload:', payload);
@@ -697,9 +717,8 @@ calculateNetAmount(rowData: any) {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${
-      months[date.getMonth()]
-    }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
+      }-${date.getFullYear().toString().slice(-2)}`;
   }
 
   openPDF() {
@@ -1131,4 +1150,4 @@ calculateNetAmount(rowData: any) {
   exports: [TransferOutInventoryAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferOutInventoryAddModule {}
+export class TransferOutInventoryAddModule { }

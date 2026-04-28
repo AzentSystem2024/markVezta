@@ -101,7 +101,8 @@
                       [min]="minDate"
                       width="150"
                       (onValueChanged)="checkDateSelection($event)"
-                    ></dx-date-box>
+                    >
+                    </dx-date-box>
                   </div>
 
                   <div style="display: flex; align-items: center; gap: 10px">
@@ -111,9 +112,16 @@
                       [type]="'date'"
                       displayFormat="yyyy-MM-dd"
                       placeholder="Select to date"
-                      [min]="minDate"
                       width="150"
+                      [min]="fromDate"
                       (onValueChanged)="checkDateSelection($event)"
+                      ><dx-validator>
+                        <dxi-validation-rule
+                          type="custom"
+                          [validationCallback]="validateToDate"
+                          message="To Date must be greater than From Date"
+                        >
+                        </dxi-validation-rule> </dx-validator
                     ></dx-date-box>
                   </div>
                   <div style="display: flex; align-items: center; gap: 10px">
@@ -142,6 +150,7 @@
                     placeholder="From Time"
                     width="90"
                     [disabled]="!isHappyHoursEnabledvalue"
+                    (onValueChanged)="onFromTimeChanged($event)"
                   ></dx-date-box>
 
                   <dx-date-box
@@ -152,6 +161,7 @@
                     placeholder="To Time"
                     width="90"
                     [disabled]="!isHappyHoursEnabledvalue"
+                    (onValueChanged)="onToTimeChanged($event)"
                   ></dx-date-box>
                 </div>
 
@@ -444,6 +454,11 @@
         <dx-text-box
           [(value)]="promotionName"
           [disabled]="selectedMode !== 'price'"
+          ><dx-validator>
+            <dxi-validation-rule
+              type="required"
+              message="This field is required"
+            ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
       </div>
 
@@ -497,7 +512,7 @@
       class="tab-content mt-3 ms-3"
       [class.disabled]="selectedMode !== 'schema'"
     >
-      <div class="dropdown-field">
+      <div class="form-row">
         <label>Select Schema</label>
         <dx-select-box
           [(value)]="selectedSchemaId"
