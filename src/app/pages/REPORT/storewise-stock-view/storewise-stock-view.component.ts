@@ -36,7 +36,7 @@ import {
 })
 export class StorewiseStockViewComponent {
 
-    @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
+  @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
   @ViewChild(DxDataGridComponent) grid!: DxDataGridComponent;
   refreshButtonOptions = {
     icon: 'refresh',
@@ -73,7 +73,7 @@ export class StorewiseStockViewComponent {
   formatted_To_date: any;
   HeadId: any;
   selectedStoreid: any[] = [];
-  selectedItem:any[] = [];
+  selectedItem: any[] = [];
 
   netProfit: number = 0;
   totalRevenue: number = 0;
@@ -87,11 +87,11 @@ export class StorewiseStockViewComponent {
   dynamicColumns: any[] = [];
   items: any;
   storeHint: string = '';
-  itemHint : string = '';
+  itemHint: string = '';
   grandTotal: number = 0;
   storeColumnTotals: any = {};
 
-  
+
   constructor(
     private dataservice: DataService,
     private fb: FormBuilder,
@@ -135,7 +135,7 @@ export class StorewiseStockViewComponent {
   }
 
 
-  
+
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -234,138 +234,146 @@ export class StorewiseStockViewComponent {
 
 
 
-updateStoreHint() {
-  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-    this.storeHint = 'No store selected';
-    return;
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store
+      .filter(x => this.selectedStoreid.includes(x.ID))
+      .map(x => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
   }
 
-  const selectedNames = this.Store
-    .filter(x => this.selectedStoreid.includes(x.ID))
-    .map(x => x.DESCRIPTION);
+  updateItemHint() {
+    if (!this.selectedItem || this.selectedItem.length === 0) {
+      this.itemHint = 'No item selected';
+      return;
+    }
 
-  this.storeHint = selectedNames.join(', ');
-}
+    const selectedNames = this.items
+      .filter(x => this.selectedItem.includes(x.ID))
+      .map(x => x.DESCRIPTION);
 
-updateItemHint() {
-  if (!this.selectedItem || this.selectedItem.length === 0) {
-    this.itemHint = 'No item selected';
-    return;
+    this.itemHint = selectedNames.join(', ');
   }
-
-  const selectedNames = this.items
-    .filter(x => this.selectedItem.includes(x.ID))
-    .map(x => x.DESCRIPTION);
-
-  this.itemHint = selectedNames.join(', ');
-}
-    store_dropdown(){
+  store_dropdown() {
     const payload = {
-      NAME :'STORE',
-      COMPANY_ID : this.selected_Company_id
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
   }
 
-  item_dropdown(){
+  item_dropdown() {
     const payload = {
-      NAME : 'ITEMS'
+      NAME: 'ITEMS'
     }
-    this.dataservice.Common_Dropdown(payload).subscribe((res:any)=>{
-      this.items = res
+    this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
+      this.items = {
+        store: {
+          type: 'array',
+          data: res,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
     })
   }
 
- get_DataSource() {
-  const grid = this.dataGrid?.instance;
-  grid?.beginCustomLoading('Loading...');
+  get_DataSource() {
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...');
 
-  let payload = {
-    COMPANY_ID: this.selected_Company_id,
-    FIN_ID: this.finID,
-    ITEM_ID: this.selectedItem ? String(this.selectedItem) : "",
-    STORE_ID: this.selectedStoreid ? String(this.selectedStoreid) : ""
-  };
+    let payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.finID,
+      ITEM_ID: this.selectedItem ? String(this.selectedItem) : "",
+      STORE_ID: this.selectedStoreid ? String(this.selectedStoreid) : ""
+    };
 
-  const payloadData = {
-    companyId: payload.COMPANY_ID,
-    finId: payload.FIN_ID,
-    itemid: payload.ITEM_ID,
-    storeid: payload.STORE_ID
-  };
+    const payloadData = {
+      companyId: payload.COMPANY_ID,
+      finId: payload.FIN_ID,
+      itemid: payload.ITEM_ID,
+      storeid: payload.STORE_ID
+    };
 
-  sessionStorage.removeItem('viewclickvalue');
-  sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
+    sessionStorage.removeItem('viewclickvalue');
+    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-  this.dataservice.StockView_branch(payload).subscribe({
-    next: (res: any) => {
+    this.dataservice.StockView_branch(payload).subscribe({
+      next: (res: any) => {
 
-      this.isEmptyDatagrid = false;
-      this.StockViewReport = res.data || [];
+        this.isEmptyDatagrid = false;
+        this.StockViewReport = res.data || [];
 
-      // 🔥 IMPORTANT: BUILD DYNAMIC COLUMNS AFTER DATA ARRIVES
-      this.dynamicColumns = [];
+        // 🔥 IMPORTANT: BUILD DYNAMIC COLUMNS AFTER DATA ARRIVES
+        this.dynamicColumns = [];
 
-      const firstRow = this.StockViewReport[0];
+        const firstRow = this.StockViewReport[0];
 
-      if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+        if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
 
-        // ✅ NO STORE SELECTED → SHOW ALL STORES
-        if (firstRow && firstRow.StoreStock) {
-          this.dynamicColumns = Object.keys(firstRow.StoreStock)
-            .filter(key => key !== 'TOTAL')
-            .map(key => ({
-              dataField: `StoreStock.${key}`,
-              caption: key,
-              dataType: 'number',
-              alignment: 'right'
-            }));
+          // ✅ NO STORE SELECTED → SHOW ALL STORES
+          if (firstRow && firstRow.StoreStock) {
+            this.dynamicColumns = Object.keys(firstRow.StoreStock)
+              .filter(key => key !== 'TOTAL')
+              .map(key => ({
+                dataField: `StoreStock.${key}`,
+                caption: key,
+                dataType: 'number',
+                alignment: 'right'
+              }));
+          }
+
+        } else {
+
+          // ✅ STORES SELECTED → SHOW ONLY SELECTED
+          this.selectedStoreid.forEach((storeId) => {
+            const storeObj = this.Store.find(s => s.ID === storeId);
+
+            if (storeObj) {
+              const key = storeObj.DESCRIPTION?.trim();
+
+              this.dynamicColumns.push({
+                dataField: `StoreStock.${key}`,
+                caption: key,
+                dataType: 'number',
+                alignment: 'right'
+              });
+            }
+          });
         }
 
-      } else {
+        // 🔥 FORCE UI UPDATE (fix first-load issue)
+        this.cdr.detectChanges();
 
-        // ✅ STORES SELECTED → SHOW ONLY SELECTED
-        this.selectedStoreid.forEach((storeId) => {
-          const storeObj = this.Store.find(s => s.ID === storeId);
+        // 🔥 YOUR CALCULATIONS
+        this.calculateStoreColumnTotals();
+        this.calculateGrandTotal();
 
-          if (storeObj) {
-            const key = storeObj.DESCRIPTION?.trim();
-
-            this.dynamicColumns.push({
-              dataField: `StoreStock.${key}`,
-              caption: key,
-              dataType: 'number',
-              alignment: 'right'
-            });
-          }
+        // 🔥 FINAL GRID REFRESH
+        setTimeout(() => {
+          this.dataGrid.instance.refresh();
         });
+
+      },
+
+      error: () => {
+        grid?.endCustomLoading();
+      },
+
+      complete: () => {
+        grid?.endCustomLoading();
       }
-
-      // 🔥 FORCE UI UPDATE (fix first-load issue)
-      this.cdr.detectChanges();
-
-      // 🔥 YOUR CALCULATIONS
-      this.calculateStoreColumnTotals();
-      this.calculateGrandTotal();
-
-      // 🔥 FINAL GRID REFRESH
-      setTimeout(() => {
-        this.dataGrid.instance.refresh();
-      });
-
-    },
-
-    error: () => {
-      grid?.endCustomLoading();
-    },
-
-    complete: () => {
-      grid?.endCustomLoading();
-    }
-  });
-}
+    });
+  }
 
 
   typeSorting = (a: string, b: string) => {
@@ -376,7 +384,7 @@ updateItemHint() {
 
     return (order[a] || 99) - (order[b] || 99);
 
-    
+
   };
 
   onViewClick(e: any) {
@@ -393,21 +401,21 @@ updateItemHint() {
   }
 
   calculateStoreColumnTotals() {
-  this.storeColumnTotals = {};
+    this.storeColumnTotals = {};
 
-  this.StockViewReport.forEach(row => {
-    const storeStock = row.StoreStock || {};
+    this.StockViewReport.forEach(row => {
+      const storeStock = row.StoreStock || {};
 
-    Object.keys(storeStock).forEach(key => {
-      if (key === 'TOTAL') return; // skip total column
+      Object.keys(storeStock).forEach(key => {
+        if (key === 'TOTAL') return; // skip total column
 
-      const value = Number(storeStock[key] || 0);
+        const value = Number(storeStock[key] || 0);
 
-      this.storeColumnTotals[key] =
-        (this.storeColumnTotals[key] || 0) + value;
+        this.storeColumnTotals[key] =
+          (this.storeColumnTotals[key] || 0) + value;
+      });
     });
-  });
-}
+  }
 
   onRowPrepared(e) {
     if (e.rowType === 'data' && e.data.isSummary) {
@@ -416,50 +424,50 @@ updateItemHint() {
     }
   }
 
-calculateGrandTotal() {
-  this.grandTotal = this.StockViewReport.reduce((sum, row) => {
-    return sum + Number(row.StoreStock?.TOTAL || 0);
-  }, 0);
-}
-
-onCellPrepared(e: any) {
-  if (
-    e.rowType === 'totalFooter' &&
-    e.column?.dataField === 'StoreStock.TOTAL'
-  ) {
-    const formatted = (this.grandTotal || 0).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-
-    e.cellElement.innerHTML = `
-      <div style="text-align: right; font-weight: bold; padding-right: 20px;">
-        Grand Total: ${formatted}
-      </div>
-    `;
+  calculateGrandTotal() {
+    this.grandTotal = this.StockViewReport.reduce((sum, row) => {
+      return sum + Number(row.StoreStock?.TOTAL || 0);
+    }, 0);
   }
 
-   // 🔹 DYNAMIC STORE COLUMNS
-  if (e.rowType === 'totalFooter' && e.column?.dataField?.startsWith('StoreStock.')) {
-
-    const key = e.column.dataField.split('.')[1];
-
-    if (key !== 'TOTAL') {
-      const total = this.storeColumnTotals[key] || 0;
-
-      const formatted = total.toLocaleString(undefined, {
+  onCellPrepared(e: any) {
+    if (
+      e.rowType === 'totalFooter' &&
+      e.column?.dataField === 'StoreStock.TOTAL'
+    ) {
+      const formatted = (this.grandTotal || 0).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
 
       e.cellElement.innerHTML = `
+      <div style="text-align: right; font-weight: bold; padding-right: 20px;">
+        Grand Total: ${formatted}
+      </div>
+    `;
+    }
+
+    // 🔹 DYNAMIC STORE COLUMNS
+    if (e.rowType === 'totalFooter' && e.column?.dataField?.startsWith('StoreStock.')) {
+
+      const key = e.column.dataField.split('.')[1];
+
+      if (key !== 'TOTAL') {
+        const total = this.storeColumnTotals[key] || 0;
+
+        const formatted = total.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
+        e.cellElement.innerHTML = `
         <div style="text-align: right; font-weight: bold;">
           ${formatted}
         </div>
       `;
+      }
     }
   }
-}
 }
 
 @NgModule({
@@ -485,4 +493,4 @@ onCellPrepared(e: any) {
   exports: [],
   declarations: [StorewiseStockViewComponent],
 })
-export class StorewiseStockViewModule {}
+export class StorewiseStockViewModule { }

@@ -54,7 +54,7 @@ export class DataService {
   ];
 
   private worksheetDataSubject = new BehaviorSubject<any>(null); // Initialize with null
-  worksheetData$ = this.worksheetDataSubject.asObservable();
+    worksheetData$ = this.worksheetDataSubject.asObservable();
 
   private apiUrl = environment.apiUrl;
   private apiUrlList =
@@ -6537,5 +6537,9 @@ The result can be exported to HTML or Markdown.`;
   Z_Report(payload : any){
     const getEndpoint = this.apiUrl + 'SalesReport/ZReport';
     return this.http.post(getEndpoint, payload)
+  }
+
+  Select_SalesInvoice_Retail(id:number){
+    return this.http.post<any>(`${this.apiUrl}MiscSales/delete/` + id, {});
   }
 }

@@ -106,6 +106,8 @@ export class ItemStorePropertiesComponent {
   selecte_grid_Data: any;
   User_Id: any;
   updatedRows: any = [];
+  selectedStoreIds: any = [];
+  selectedNarration: any;
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
@@ -170,38 +172,25 @@ export class ItemStorePropertiesComponent {
     });
   }
   onEditorPreparing = (e: any) => {
-    console.log(e, '=========event data==========s');
-    if (e.row?.isSelected) {
+    if (e.parentType === 'dataRow') {
+      const original = e.editorOptions.onValueChanged;
+
       e.editorOptions.onValueChanged = (args: any) => {
+        // keep default DevExtreme behavior (important)
+        if (original) original(args);
+        e.setValue(args.value); // make sure grid data actually updates
+
         const row = e.row.data;
         const id = row.ITEM_ID;
 
         if (!this.updatedMap[id]) {
           this.updatedMap[id] = { ...row };
         }
-
-        // update changed field
         this.updatedMap[id][e.dataField] = args.value;
-
-        console.log('Updated Map:', this.updatedMap);
       };
     }
-    const exists = e.row.data;
-    console.log(exists);
-
-    if (
-      e.parentType === 'dataRow' &&
-      e.dataField &&
-      e.dataField.endsWith('_NEW')
-    ) {
-      const rowKey = e.row.data['ID']; // Adjust this to match your row identifier
-      const oldValue = e.row.data[e.dataField.replace('_NEW', '')];
-      if (!this.oldValues[rowKey]) {
-        this.oldValues[rowKey] = {};
-      }
-      this.oldValues[rowKey][e.dataField] = oldValue;
-    }
   };
+
 
   preparePayload() {
     const finalData = this.Selected_Items_Data.map((item: any) => {
@@ -227,10 +216,9 @@ export class ItemStorePropertiesComponent {
   }
 
   onSelectionChanged(e: any) {
-    console.log(e, '===================event -selectiopm=================');
-
-    // this.Selected_Items_Data = e.selectedRowsData;
+    this.Selected_Items_Data = e.selectedRowsData;
   }
+
 
   fetchSelectedItem(id: number): void {
     this.dataservice.selectItems(id).subscribe(
@@ -399,8 +387,13 @@ export class ItemStorePropertiesComponent {
         STORE_ID: this.selectedStoreId.toString(),
         USER_ID: this.User_Id,
         COMPANY_ID: this.selected_Company_id,
-        NARRATION: 'string',
+        NARRATION: this.selectedNarration,
         worksheet_item_property: worksheetdata,
+        worksheet_item_store: this.selectedStoreIds.map((storeId: number) => ({
+          ID: 0,
+          WS_ID: 0,
+          STORE_ID: storeId,
+        })),
       };
       console.log(payload);
       this.dataservice.saveWorksheetItemPropertyData(payload).subscribe(
@@ -563,16 +556,6 @@ export class ItemStorePropertiesComponent {
     this.updateColumnVisibility();
   }
 
-  onDropdownValueChanged(event: any) {
-    this.storeId = event.value; // Get the selected store ID
-    if (!this.storeId || this.storeId === null) {
-      this.selectedStoreId = null;
-      this.itemStoresList = [];
-    } else {
-      this.selectedStoreId = this.storeId;
-      this.getStoresById(this.storeId);
-    }
-  }
 
   getStoresById(storeId: any) {
     const payload = {
@@ -593,6 +576,9 @@ export class ItemStorePropertiesComponent {
     this.selectedRowKeys = [];
 
     this.dataGrid.instance.refresh();
+  }
+  onDropdownValueChanged(e: any) {
+    this.selectedStoreIds = Array.isArray(e?.value) ? e.value : [];
   }
 }
 @NgModule({
@@ -627,4 +613,4 @@ export class ItemStorePropertiesComponent {
   declarations: [ItemStorePropertiesComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemStorePropertiesModule {}
+export class ItemStorePropertiesModule { }

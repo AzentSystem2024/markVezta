@@ -52,6 +52,7 @@ import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sa
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import notify from 'devextreme/ui/notify';
+import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 
 @Component({
@@ -63,6 +64,7 @@ export class SalesDetailComponent {
 
    @ViewChild(DxDataGridComponent, { static: true })
       dataGrid: DxDataGridComponent;
+     
       JournalBookDataSource: DataSource; // ONLY for dx-data-grid
       journalBookArray: any[] = []; // ONLY for logic / checks
       journalBookCount = 0;
@@ -248,7 +250,7 @@ selectedSaletype = [0]; // or [] if nothing selected
         this.selected_from_date = SystemDate;
         this.selected_To_date = SystemDate;
     
-        this.load_JournalBook_data();
+        // this.load_JournalBook_data();
         this.store_dropdown();
         this.item_dropdown();
         this.getCustomerOrUnitLst();
@@ -498,7 +500,7 @@ selectedSaletype = [0]; // or [] if nothing selected
         const trans_id = e.row.data.TRANS_ID;
     
          this.dataService
-      .selectInvoiceRetail(trans_id)
+      .Select_SalesInvoice_Retail(trans_id)
       .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
 
@@ -808,6 +810,7 @@ selectedSaletype = [0]; // or [] if nothing selected
        DxTagBoxModule,
        DxFormModule,
        AddInvoiceRetailModule,
+       AddSalesInvoiceRetailModule,
   ],
   providers: [],
   exports: [],

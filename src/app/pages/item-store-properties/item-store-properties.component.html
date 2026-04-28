@@ -68,19 +68,22 @@
         </dxi-item>
         <dxi-item location="before"> </dxi-item>
         <dxi-item location="before">
-          <dx-select-box
+          <dx-tag-box
             [items]="store"
             valueExpr="ID"
-            [(value)]="selectedStoreId"
             displayExpr="STORE_NAME"
+            [(value)]="selectedStoreIds"
             (onValueChanged)="onDropdownValueChanged($event)"
-            label="Select Store"
+            label="Select Stores"
             labelMode="floating"
-            labelLocation="left"
-            [width]="200"
+            [width]="300"
+            [showSelectionControls]="true"
+            [searchEnabled]="true"
+            [multiline]="false"
           >
-          </dx-select-box>
+          </dx-tag-box>
         </dxi-item>
+
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <dx-button
             text="Cancel"
@@ -254,4 +257,9 @@
       <!-- </ng-container> -->
     </dx-data-grid>
   </div>
+  <dx-text-box
+    label="Narration"
+    labelMode="floating"
+    [(value)]="selectedNarration"
+  ></dx-text-box>
 </div>

@@ -51,6 +51,7 @@ import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/pa
 import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-tender-summary',
@@ -168,6 +169,7 @@ export class TenderSummaryComponent {
       itemProperty1: any;
       selectedItemProperty1:any;
       selectedItemProperty2:any;
+      today: Date = new Date();
     
        Saletype = [
       { ID: 0, DESCRIPTION: 'All' },
@@ -245,7 +247,7 @@ export class TenderSummaryComponent {
               this.selected_from_date = SystemDate;
               this.selected_To_date = SystemDate;
           
-              this.load_JournalBook_data();
+              // this.load_JournalBook_data();
               this.store_dropdown();
               this.getCustomerOrUnitLst();
             }
@@ -379,12 +381,26 @@ export class TenderSummaryComponent {
           
             onFromDateChange(event: any) {
               const rawDate: Date = new Date(event.value);
+              const today = new Date();
+
+  if (rawDate > today) {
+    notify('From Date cannot be greater than today', 'error', 2000);
+    this.selected_from_date = today;
+    return;
+  }
               this.formatted_from_date = this.formatDate(rawDate);
               // this.reloadJournalBook();
             }
           
             onToDateChange(event: any) {
               const rawDate: Date = new Date(event.value);
+              const today = new Date();
+
+  if (rawDate > today) {
+    notify('To Date cannot be greater than today', 'error', 2000);
+    this.selected_To_date = today;
+    return;
+  }
               this.formatted_To_date = this.formatDate(rawDate);
               // this.reloadJournalBook();
             }
@@ -430,6 +446,17 @@ export class TenderSummaryComponent {
                         this.journalBookCount = list.length;
           
                         this.ledgerSummaryData = list;
+                         if (list.length === 0) {
+    notify({
+      message: 'No data available',
+      type: 'warning',
+      displayTime: 2000,
+      position: {
+        at: 'top center',
+        my: 'top center'
+      }
+    });
+  }
                         this.isFilterVisible = false
                         resolve(list); // 🔑 grid gets data
                       },
@@ -590,10 +617,11 @@ export class TenderSummaryComponent {
         
           getCustomerOrUnitLst() {
             const payload = {
-              COMPANY_ID: this.selected_Company_id
+              COMPANY_ID: this.selected_Company_id,
+              NAME:'CUSTOMER'
             };
             this.dataService
-              .getOutsideCustomerWithState(payload)
+              .Common_Dropdown(payload)
               .subscribe((response: any) => {
                 this.distributorList = response;
               });

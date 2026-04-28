@@ -252,7 +252,7 @@ selectedItemProperty2:any;
             this.selected_from_date = SystemDate;
             this.selected_To_date = SystemDate;
         
-            this.load_JournalBook_data();
+            // this.load_JournalBook_data();
             this.store_dropdown();
             this.item_dropdown();
             this.getCustomerOrUnitLst();

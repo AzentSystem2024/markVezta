@@ -39,6 +39,7 @@
             labelMode="floating"
             [(value)]="selected_from_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onFromDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -50,6 +51,7 @@
             labelMode="floating"
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onToDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -193,6 +195,8 @@
       <!-- ================= COLUMNS ================= -->
 
       <dxi-column dataField="STORE" caption="Store"></dxi-column>
+      <dxi-column dataField="CUSTOMER" caption="Customer"></dxi-column>
+      <dxi-column dataField="SALE_TYPE_NAME" caption="Sale Type"></dxi-column>
 
       <dxi-column
         dataField="CASH"

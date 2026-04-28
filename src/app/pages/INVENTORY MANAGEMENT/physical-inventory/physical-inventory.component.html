@@ -64,6 +64,7 @@
           <div class="grid-header">Physical Inventory</div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -93,6 +94,25 @@
           </div>
         </dx-select-box>
       </div>
+      <div
+        *dxTemplate="let data of 'StoreFilterTemplate'"
+        style="margin-bottom: 5px"
+      >
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Store"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [width]="200"
+          (onValueChanged)="onStoreChanged($event)"
+        ></dx-tag-box>
+      </div>
       <dxi-column
         dataField="PHYSICAL_NO"
         caption="Inventory No."
@@ -108,7 +128,7 @@
       ></dxi-column>
       <dxi-column
         dataField="STORE_NAME"
-        caption="Store."
+        caption="Store"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
@@ -276,4 +296,49 @@
       (popupClosed)="handleClose()"
     ></app-physical-inventory-form>
   </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="showCustomDatePopup"
+  [showTitle]="true"
+  title="Select Dates"
+  [width]="350"
+  [height]="250"
+  [dragEnabled]="false"
+>
+  <div>
+    <div
+      style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px"
+    >
+      <dx-date-box
+        [(value)]="customStartDate"
+        type="date"
+        width="250"
+        displayFormat="dd/MM/yyyy"
+        placeholder="From Date"
+        label="From Date"
+        labelMode="floating"
+      >
+      </dx-date-box>
+
+      <dx-date-box
+        [(value)]="customEndDate"
+        type="date"
+        width="250"
+        displayFormat="dd/MM/yyyy"
+        placeholder="To Date"
+        label="To Date"
+        labelMode="floating"
+      >
+      </dx-date-box>
+    </div>
+
+    <div class="button-container">
+      <dx-button
+        text="Apply"
+        type="default"
+        (onClick)="applyCustomDateFilter()"
+      ></dx-button>
+    </div>
+  </div>
 </dx-popup>

@@ -1,0 +1,170 @@
+<dx-validation-group #journalVoucherGroup>
+  <div class="invoice-wrapper">
+
+    <!-- 🔹 HEADER -->
+   <div class="header-container">
+
+  <!-- 🔹 ROW 1 -->
+  <div class="header-row">
+
+    <!-- LEFT SIDE -->
+    <div class="left-section">
+      <dx-text-box
+        label="Invoice No"
+        [(value)]="invoiceFormData.DOC_NO"
+        [readOnly]="true"
+        labelMode="floating"
+        width="180">
+      </dx-text-box>
+
+      <dx-date-box
+        label="Date"
+        [(value)]="invoiceFormData.TRANS_DATE"
+        type="date"
+        [readOnly]="true"
+        displayFormat="dd-MM-yyyy"
+        labelMode="floating"
+        width="180">
+      </dx-date-box>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-section">
+      <dx-select-box
+        label="Store"
+        [dataSource]="filteredStoreList"
+        [(value)]="invoiceFormData.STORE_ID"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [readOnly]="true"
+        labelMode="floating"
+         width="250">
+      </dx-select-box>
+    </div>
+
+  </div>
+
+  <!-- 🔹 ROW 2 -->
+  <div class="header-row">
+
+    <!-- LEFT -->
+    <div class="left-section">
+      <dx-select-box
+        label="Customer"
+        [dataSource]="customerList"
+        [(value)]="invoiceFormData.CUSTOMER_ID"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [readOnly]="true"
+        labelMode="floating"
+        width="380">
+      </dx-select-box>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-section">
+      <dx-text-box
+        label="Salesman"
+        [readOnly]="true"
+        [(value)]="invoiceFormData.SALESMAN"
+        labelMode="floating"
+        width="250">
+      </dx-text-box>
+    </div>
+
+  </div>
+
+</div>
+    <!-- 🔹 GRID + TENDER -->
+    <div class="main-layout">
+
+      <!-- LEFT GRID -->
+      <div class="grid-section">
+
+        <dx-data-grid
+          #itemsGridRef
+          [dataSource]="invoiceFormData.Details"
+          [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: true }"
+          height="100%"
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: true,
+            allowDeleting: true
+          }">
+
+          <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
+          <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+          <dxi-column dataField="QUANTITY" caption="Qty"></dxi-column>
+          <dxi-column dataField="PRICE" caption="Price"></dxi-column>
+          <dxi-column dataField="DISC_PERC" caption="Disc %"></dxi-column>
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Amount(Incl.VAT)"
+            [calculateCellValue]="calculateAmount">
+          </dxi-column>
+<dxi-column dataField="TAX_PERC" caption="VAT %"></dxi-column>
+       <dxi-column
+            dataField="TAX_AMOUNT"
+            caption="VAT Amt"
+            [calculateCellValue]="calculateTax">
+          </dxi-column>       
+
+          <dxi-column
+            dataField="TOTAL_AMOUNT"
+            caption="Total"
+            [calculateCellValue]="calculateTotal">
+          </dxi-column>
+
+        </dx-data-grid>
+
+      </div>
+
+      <!-- RIGHT TENDER -->
+      <div class="tender-section">
+
+        <dx-data-grid
+          [dataSource]="tenderList"
+          [showBorders]="true"
+          height="100%">
+
+          <dxi-column dataField="TYPE" caption="Tender"></dxi-column>
+          <dxi-column dataField="AMOUNT" caption="Amount"></dxi-column>
+
+        </dx-data-grid>
+
+      </div>
+
+    </div>
+
+    <!-- 🔹 TOTALS -->
+    <div class="totals-section">
+
+      <dx-number-box [(value)]="totalQty" label="TotalQty" labelMode="floating"></dx-number-box>
+      <dx-number-box [(value)]="totalExclVAT" label="Total Excl VAT" labelMode="floating"></dx-number-box>
+      <dx-number-box [(value)]="vatAmount" label="VAT Amount" labelMode="floating"></dx-number-box>
+      <dx-number-box [(value)]="totalInclVAT" label="Total Incl.VAT" labelMode="floating"></dx-number-box>
+      <dx-number-box [(value)]="totalInclVAT" label="Total Tender" labelMode="floating"></dx-number-box>
+
+    </div>
+
+    <!-- 🔹 FOOTER -->
+    <div class="footer">
+
+      <dx-button text="Cancel" (onClick)="cancel()"></dx-button>
+
+    </div>
+
+  </div>
+</dx-validation-group>

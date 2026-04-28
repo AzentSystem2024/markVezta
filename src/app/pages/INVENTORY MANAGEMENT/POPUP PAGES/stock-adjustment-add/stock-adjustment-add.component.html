@@ -67,18 +67,21 @@
 
           <dxi-item location="after" locateInMenu="auto">
             <div class="stacked-toolbar-group">
-             <dx-text-box
-                    [(value)]="storename"
-                    [width]="200"
-                    label="Store"
-                    labelMode="floating"
-                    [readOnly]="true"
-                  ><dx-validator>
+              <dx-select-box
+                [(value)]="StoreIDData"
+                [dataSource]="stores"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                [width]="'100%'"
+                [searchEnabled]="true"
+                label="Store"
+                labelMode="floating"
+                ><dx-validator>
                   <dxi-validation-rule
                     type="required"
                     message="Store is required"
                   ></dxi-validation-rule> </dx-validator
-              ></dx-text-box>
+              ></dx-select-box>
               <div style="margin-top: 2px; text-align: left">
                 <dx-button
                   text="Add Items"
@@ -279,7 +282,11 @@
       <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
 
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-      <dxi-column dataField="COST" caption="cost" [visible]="!hidecost"></dxi-column>
+      <dxi-column
+        dataField="COST"
+        caption="cost"
+        [visible]="!hidecost"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </dx-popup>

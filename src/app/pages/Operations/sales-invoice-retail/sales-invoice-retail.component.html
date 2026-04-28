@@ -12,10 +12,10 @@
         showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="filteredTrOutList"
+      [dataSource]="InvoiceDataSource"
       [showBorders]="true"
+      [showRowLines]="true"
       [showColumnLines]="true"
-      [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
@@ -30,16 +30,22 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onToolbarPreparing)="onToolbarPreparing($event)"
-      (onEditingStart)="onEditTransferOut($event)"
+      [scrolling]="{ mode: 'virtual' }"
+      (onEditingStart)="onEditInvoice($event)"
+      (onRowRemoving)="onDeleteInvoice($event)"
       (onCellPrepared)="onCellPrepared($event)"
-      (onRowRemoving)="onDeleteTrOuT($event)"
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
       ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -50,11 +56,14 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
       <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
@@ -63,24 +72,33 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Transfer Out</div>
+          <div class="grid-header">Invoice</div>
         </dxi-item>
-
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
-        <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
-
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
-          [visible]="canAdd"
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
@@ -92,65 +110,52 @@
           [(value)]="selectedDateRange"
           (onValueChanged)="onDateRangeChanged($event)"
           (onOpened)="attachItemClickHandler($event)"
-          width="180"
+          width="220"
         >
+          <!-- This controls the dropdown list rendering -->
           <div *dxTemplate="let item of 'item'">
             {{ item.value === "custom" ? "Custom" : item.label }}
           </div>
         </dx-select-box>
       </div>
-      <div
-        *dxTemplate="let data of 'StoreFilterTemplate'"
-        style="margin-bottom: 5px"
-      >
-        <dx-tag-box
-          label="Store"
-          labelMode="floating"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [items]="Store"
-          [searchEnabled]="true"
-          [(value)]="selectedStoreid"
-          [showSelectionControls]="true"
-          [showMultiTagOnly]="true"
-          [multiline]="false"
-          [width]="200"
-          (onValueChanged)="onStoreChanged($event)"
-        ></dx-tag-box>
-      </div>
       <dxi-column
-        dataField="DOC_NO"
-        caption="Transfer No."
+        dataField="VOUCHER_NO"
+        caption="Sale No"
+        alignment="left"
+      ></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+      <dxi-column
+        dataField="TRANS_DATE"
+        caption="Date"
+        dataType="date"
         [allowEditing]="false"
-        width="120"
+        format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column
-        dataField="TRANSFER_DATE"
-        caption="Transfer Date"
-        [allowEditing]="false"
-        dataType="date"
-        width="120"
-        [format]="{ type: 'custom', formatter: formatDate }"
-      >
-      </dxi-column>
-
+        dataField="GROSS_AMOUNT"
+        caption="Gross Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
       <dxi-column
-        dataField="STORE_NAME"
-        caption="Destination Store"
-        [allowEditing]="false"
+        dataField="DISCOUNT_AMOUNT"
+        caption="Discount Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="GST_AMOUNT"
+        [caption]="vatTitle + ' Amount'"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
       <dxi-column
         dataField="NET_AMOUNT"
-        caption="Net amount"
-        [allowEditing]="false"
-        format="#,##0.00"
-        width="120"
+        caption="Net Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
-      <dxi-column
-        dataField="NARRATION"
-        caption="Narration"
-        [allowEditing]="false"
-      ></dxi-column>
+
       <dxi-column
         caption="Status"
         dataField="STATUS"
@@ -163,12 +168,60 @@
         }"
       >
       </dxi-column>
-
-      <dxi-column type="buttons"></dxi-column>
     </dx-data-grid>
   </div>
 </div>
 
+<dx-popup
+  *ngIf="isAddInvoice"
+  [(visible)]="isAddInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="New Invoice"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-add-sales-invoice-retail
+    [isEditing]="false"
+    (popupClosed)="handleClose()"
+  ></app-add-sales-invoice-retail>
+  <!-- </ng-container> -->
+</dx-popup>
+<dx-popup
+  *ngIf="isEditInvoice"
+  [(visible)]="isEditInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Edit Invoice"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlyInvoice"
+    [EditingResponseData]="selectedInvoice"
+    (popupClosed)="handleClose()"
+  ></app-add-invoice-retail>
+  <!-- </ng-container> -->
+</dx-popup>
+
+<dx-popup
+  *ngIf="isViewInvoice"
+  [(visible)]="isViewInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Invoice"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-add-sales-invoice-retail
+    [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlyInvoice"
+    [EditingResponseData]="selectedInvoice"
+    (popupClosed)="handleClose()"
+  ></app-add-sales-invoice-retail>
+  <!-- </ng-container> -->
+</dx-popup>
 <app-custom-date-popup
   [(visible)]="showCustomDatePopup"
   [startDate]="customStartDate"
@@ -177,70 +230,3 @@
 >
 </app-custom-date-popup>
 
-<!-- <dx-popup
-  [(visible)]="showCustomDatePopup"
-  [showTitle]="true"
-  title="Select Dates"
-  [width]="350"
-  [height]="170"
-  [dragEnabled]="false"
->
-  <div>
-    <div class="date-range-container">
-      <dx-date-box
-        [(value)]="customStartDate"
-        type="date"
-        width="300"
-        placeholder="From Date"
-      >
-      </dx-date-box>
-
-      <dx-date-box
-        [(value)]="customEndDate"
-        type="date"
-        placeholder="To Date"
-        width="300"
-      >
-      </dx-date-box>
-    </div>
-
-    <div class="button-container">
-      <dx-button
-        text="Apply"
-        type="default"
-        (onClick)="applyCustomDateFilter()"
-      ></dx-button>
-    </div> -->
-<!-- </div>
-</dx-popup> -->
-
-<dx-popup
-  [(visible)]="isAddTransferOut"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Transfer Out"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isAddTransferOut">
-    <app-transfer-out-inventory-add
-      (popupClosed)="handleClose()"
-    ></app-transfer-out-inventory-add>
-  </ng-container>
-</dx-popup>
-
-<dx-popup
-  [(visible)]="isEditTransferOut"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Transfer Out"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditTransferOut">
-    <app-transfer-out-inventory-add
-      [isEditing]="true"
-      [EditingResponseData]="selectedTrOut"
-      [isReadOnlyMode]="isReadOnlyTrOut"
-      (popupClosed)="handleClose()"
-    ></app-transfer-out-inventory-add>
-  </ng-container>
-</dx-popup>
