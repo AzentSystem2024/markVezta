@@ -10,6 +10,7 @@ import { PaymentTermsFormModule } from 'src/app/components/library/payment-terms
 import notify from 'devextreme/ui/notify';
 import { PaymentTermsFormComponent } from 'src/app/components/library/payment-terms-form/payment-terms-form.component';
 import { ExportService } from 'src/app/services/export.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-payment-terms-list',
@@ -33,11 +34,20 @@ export class PaymentTermsListComponent {
   selectedPaymentTerms: any;
   selectedId: any;
   selectedpaymenttermId: any;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private router:Router
     
   ) {}
   onExporting(event: any) {
@@ -202,6 +212,27 @@ export class PaymentTermsListComponent {
   event.cancel = true; // keep this
 }
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    
+
     this.showPaymentTerms();
   }
 

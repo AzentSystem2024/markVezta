@@ -29,7 +29,6 @@
                     [pattern]="'^[a-zA-Z0-9]+$'"
                     message="Code should be alphanumeric only"
                   ></dxi-validation-rule>
-
                 </dx-validator>
               </dx-text-box>
             </div>
@@ -311,6 +310,7 @@
                 [(value)]="formCustomerData.PHONE"
                 labelMode="floating"
                 (keypress)="keyPressNumbers($event)"
+                (onValueChanged)="onCountrycodeChangeDeliveryAddress($event)"
               >
                 <dx-validator>
                   <dxi-validation-rule
@@ -356,7 +356,7 @@
                 [(value)]="formCustomerData.EMAIL"
                 labelMode="floating"
               >
-              <dx-validator>
+                <dx-validator>
                   <dxi-validation-rule
                     type="required"
                     message="Email is required"
@@ -439,25 +439,25 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-number-box
-              label="Credit Limit *"
-              labelMode="floating"
-              [(value)]="formCustomerData.CREDIT_LIMIT"
-              [min]="0"
-              [showSpinButtons]="true"
-              format="#0.00"
-            >
-              <dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="Credit limit is required"
-                ></dxi-validation-rule>
+                label="Credit Limit *"
+                labelMode="floating"
+                [(value)]="formCustomerData.CREDIT_LIMIT"
+                [min]="0"
+                [showSpinButtons]="true"
+                format="#0.00"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Credit limit is required"
+                  ></dxi-validation-rule>
 
-                <dxi-validation-rule
-                  type="numeric"
-                  message="Only numbers are allowed"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-number-box>
+                  <dxi-validation-rule
+                    type="numeric"
+                    message="Only numbers are allowed"
+                  ></dxi-validation-rule>
+                </dx-validator>
+              </dx-number-box>
             </div>
           </dxi-item>
           <dxi-item>
@@ -559,7 +559,6 @@
                   ></dxi-validation-rule>
                 </dx-validator>
               </dx-number-box>
-
             </div>
           </dxi-item>
         </dxi-item>

@@ -199,6 +199,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   };
   isFilterOpened: boolean;
   vatTitle: any;
+  storeItems: any;
 
   constructor(
     private service: DataService,
@@ -613,6 +614,76 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     });
   }
 
+  getStoreOrCompanyByid() {
+    const payload = {
+      // SUPP_ID: this.newPoData.SUPP_ID,
+      // COMPANY_ID: this.companyID,
+      STORE_ID: this.newPoData.STORE_ID,
+    };
+
+    this.service.getStoreData(payload).subscribe((res) => {
+      this.storeItems = res;
+      const supplier = res[0];
+
+      this.supplierStateID = supplier.STATE_ID;
+      console.log(this.supplierStateID, 'STATEIDDDDDDDDDDDDDDD');
+
+      // ✅ Decide GST type
+      this.isInterState = this.companyStateID !== this.supplierStateID;
+      // this.applyGstModeToItems();
+
+      // 🔁 Refresh grid so columns + values update
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.refresh();
+      }, 0);
+
+      console.log('GST MODE:', this.isInterState ? 'IGST' : 'CGST + SGST');
+
+      //  KEEPING ALL YOUR EXISTING CODE AS-IS
+      // this.newPoData.CURRENCY_ID = this.supplierItems[0].CURRENCY_ID;
+      // this.newPoData.SUPP_CONTACT = this.supplierItems[0].SUPP_NAME;
+
+      // this.newPoData.SUPP_ADDRESS = this.supplierItems[0].SUPP_ADDRESS;
+      // this.SupplierCurrency = this.supplierItems[0].CURRENCY_NAME;
+      // this.SupplierCurrencyCode = this.supplierItems[0].CURRENCY_CODE;
+      // this.SupplierCurrencySymbol = this.supplierItems[0].CURRENCY_SYMBOL;
+      // this.supplierMail = this.supplierItems[0].SUPPLIER_MAIL;
+
+      // this.newPoData.EXCHANGE_PRICE = this.supplierItems[0].EXCHANGE;
+      // this.vatRule = this.supplierItems[0].VAT_RULE_NAME;
+
+      this.showLocalCurrencyColumn =
+        this.localCurrencyId !== this.newPoData.CURRENCY_ID;
+      this.newPoData.SHIP_TO = this.storeItems[0].ADDRESS1;
+      this.newPoData.CONTACT_NAME = this.storeItems[0].STORE_NAME;
+      this.newPoData.CONTACT_MOBILE = this.storeItems[0].PHONE;
+      const storeMobile = this.storeItems[0].PHONE;
+
+      if (!storeMobile) return;
+
+      // Extract country code and number
+      const match = storeMobile.match(/^(\+?\d+)[-\s]?(\d+)$/);
+
+      if (match) {
+        let code = match[1];
+        let number = match[2];
+
+        // ensure + exists
+        if (!code.startsWith('+')) {
+          code = '+' + code;
+        }
+
+        this.supplierCountryCode = code;
+        this.newPoData.CONTACT_MOBILE = number;
+      }
+
+      // this.extractSupplierCountryCode();
+      this.extractShippingCountryCode();
+
+      console.log(this.supplierItems, 'supplier items');
+    });
+  }
+
   onTabClick(e: any) {
     this.selectedTabIndex = e.itemIndex;
     if (this.selectedTabIndex === 2) {
@@ -635,8 +706,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   //   this.sessionDetails();
   // }
 
-  onSelectionChanged(e) {
-    this.selectedItems = e.selectedRowsData.map((item) => ({
+  onSelectionChanged(e: any) {
+    this.selectedItems = e.selectedRowsData.map((item: any) => ({
       ...item,
       HSN_CODE: item.HSN_CODE, // from item
       GST_PERC: item.GST_PERC || item.VAT_PERC || 0, // from item
@@ -1376,28 +1447,107 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   extractSupplierCountryCode() {
-    if (!this.newPoData.SUPP_MOBILE) return;
+    let mobile = this.newPoData.SUPP_MOBILE;
 
-    const parts = this.newPoData.SUPP_MOBILE.split('-');
+    if (!mobile) {
+      // ✅ Default when empty
+      this.supplierCountryCode = '+971';
+      this.newPoData.SUPP_MOBILE = '';
+      return;
+    }
 
-    if (parts.length === 2) {
-      this.supplierCountryCode = '+' + parts[0];
-      this.newPoData.SUPP_MOBILE = parts[1];
-      // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+    // Remove spaces
+    mobile = mobile.toString().trim();
+
+    // Match with optional country code
+    const match = mobile.match(/^(\+?\d{1,4})?[-\s]?(\d+)$/);
+
+    if (match) {
+      let code = match[1];
+      const number = match[2];
+
+      // ✅ If NO country code → default +971
+      if (!code) {
+        code = '+971';
+      }
+
+      // ✅ Ensure '+' exists
+      if (!code.startsWith('+')) {
+        code = '+' + code;
+      }
+
+      this.supplierCountryCode = code;
+      this.newPoData.SUPP_MOBILE = number;
+    } else {
+      // ✅ fallback safety (unexpected format)
+      this.supplierCountryCode = '+971';
+      this.newPoData.SUPP_MOBILE = mobile.replace(/\D/g, '');
     }
   }
+
+  // extractSupplierCountryCode() {
+  //   if (!this.newPoData.SUPP_MOBILE) return;
+
+  //   const parts = this.newPoData.SUPP_MOBILE.split('-');
+
+  //   if (parts.length === 2) {
+  //     this.supplierCountryCode = '+' + parts[0];
+  //     this.newPoData.SUPP_MOBILE = parts[1];
+  //     // this.newPoData.SUPP_MOBILE = parts[0] + '-' + parts[1];
+  //   }
+  // }
 
   extractShippingCountryCode() {
-    if (!this.newPoData.CONTACT_MOBILE) return;
+    let mobile = this.newPoData.CONTACT_MOBILE;
 
-    const parts = this.newPoData.CONTACT_MOBILE.split('-');
+    if (!mobile) {
+      // ✅ Default when empty
+      this.shippingCountryCode = '+971';
+      this.newPoData.CONTACT_MOBILE = '';
+      return;
+    }
 
-    if (parts.length === 2) {
-      this.shippingCountryCode = '+' + parts[0];
-      this.newPoData.CONTACT_MOBILE = parts[1];
-      // this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+    // Remove spaces
+    mobile = mobile.toString().trim();
+
+    // Match all formats:
+    // +971-xxxx, 971-xxxx, +971xxxx, 971xxxx, xxxx
+    const match = mobile.match(/^(\+?\d{1,4})?[-\s]?(\d+)$/);
+
+    if (match) {
+      let code = match[1];
+      const number = match[2];
+
+      // ✅ If NO country code → default +971
+      if (!code) {
+        code = '+971';
+      }
+
+      // Ensure '+' exists
+      if (!code.startsWith('+')) {
+        code = '+' + code;
+      }
+
+      this.shippingCountryCode = code;
+      this.newPoData.CONTACT_MOBILE = number;
+    } else {
+      // fallback safety
+      this.shippingCountryCode = '+971';
+      this.newPoData.CONTACT_MOBILE = mobile.replace(/\D/g, '');
     }
   }
+
+  // extractShippingCountryCode() {
+  //   if (!this.newPoData.CONTACT_MOBILE) return;
+
+  //   const parts = this.newPoData.CONTACT_MOBILE.split('-');
+
+  //   if (parts.length === 2) {
+  //     this.shippingCountryCode = '+' + parts[0];
+  //     this.newPoData.CONTACT_MOBILE = parts[1];
+  //     // this.newPoData.CONTACT_MOBILE = parts[0] + '-' + parts[1];
+  //   }
+  // }
 
   updateSupplierMobileNumber() {
     // const cleanDialCode = this.supplierCountryCode?.replace('+', '');

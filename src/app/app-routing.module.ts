@@ -183,6 +183,16 @@ import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-
 import { MiscPurchaseInvoiceComponent } from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
 import { MiscellaneousSalesInvoiceComponent } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { StorewiseStockViewComponent } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
+import { SalesSummaryComponent } from './pages/REPORT/sales-summary/sales-summary.component';
+import { SalesDetailComponent } from './pages/REPORT/sales-detail/sales-detail.component';
+import { ConsignmentSummaryComponent } from './pages/REPORT/consignment-summary/consignment-summary.component';
+import { ConsignmentReturnDetailComponent } from './pages/REPORT/consignment-return-detail/consignment-return-detail.component';
+import { ItemwisesalesComponent } from './pages/REPORT/itemwisesales/itemwisesales.component';
+import { ItemWiseSalesSummaryComponent } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
+import { DiscountWiseSalesComponent } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
+import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
+import { TenderSummaryComponent } from './pages/REPORT/tender-summary/tender-summary.component';
+import { ZReportComponent } from './pages/REPORT/zreport/zreport.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -1150,6 +1160,56 @@ const routes: Routes = [
       {
         path: 'storewise-stock-view',
         component: StorewiseStockViewComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'sales-summary',
+        component: SalesSummaryComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'sales-detail',
+        component: SalesDetailComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'consignment-summary',
+        component: ConsignmentSummaryComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'consignment-return-detail',
+        component: ConsignmentReturnDetailComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'itemwise-sales',
+        component: ItemwisesalesComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'itemWise-sales-summary',
+        component: ItemWiseSalesSummaryComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'discountwise-sales',
+        component: DiscountWiseSalesComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tender',
+        component: TenderComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tender-summary',
+        component: TenderSummaryComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'z-report',
+        component: ZReportComponent,
         canActivate: [AuthGuardService],
       },
       {

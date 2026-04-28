@@ -245,6 +245,7 @@ export class GrnNewFormComponent implements OnInit {
     this.getStoreData();
     this.sesstion_Details();
     this.getDocNo();
+    this.getStoreData();
     if (this.isHQApp && configStore) {
       this.filteredStoreList = [
         {

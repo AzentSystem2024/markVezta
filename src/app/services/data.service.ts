@@ -3639,6 +3639,11 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}purchaseorder/supplierlist`, data);
   }
 
+  public getStoreData(data: any): Observable<any> {
+    // const reqBodyData = { SUPP_ID: value };
+    return this.http.post(`${this.apiUrl}purchaseorder/Getstore`, data);
+  }
+
   public getPurchaseOrderList(items: any): Observable<any> {
     const data = items;
     return this.http.post(`${this.apiUrl}purchaseorder/list`, data);
@@ -6472,5 +6477,65 @@ The result can be exported to HTML or Markdown.`;
   StockView_branch(payload: any) {
     const getEndpoint = this.apiUrl + 'StockMovementRpt/storewisestock';
     return this.http.post(getEndpoint, payload);
+  }
+
+  //-----------------------sales summary report-------------------------
+  SalesSummaryReport(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/SalesSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+   //-----------------------sales Detail report-------------------------
+  SalesDetailReport(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/SalesDetail';
+    return this.http.post(getEndpoint, payload)
+  }
+
+  //-----------------------ConsignmentSummary_Report-------------------------
+  ConsignmentSummary_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ConsignmentSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+  //-----------------------ConsignmentReturn_Details_Report-------------------------
+  ConsignmentReturn_Details_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ConsignmentReturnDetail';
+    return this.http.post(getEndpoint, payload)
+  }
+
+    //-----------------------ItemwiseSales_Report-------------------------
+  ItemwiseSales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSales';
+    return this.http.post(getEndpoint, payload)
+  }
+
+    //-----------------------ItemwiseSales Summary Report-------------------------
+  ItemwiseSales_Summary_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSalesSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+    //-----------------------Discountwise_Sales Report-------------------------
+  Discountwise_Sales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/DiscountWiseSales';
+    return this.http.post(getEndpoint, payload)
+  }
+
+    //-----------------------Tender Sales Report-------------------------
+  Tender_Sales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/TenderReport';
+    return this.http.post(getEndpoint, payload)
+  }
+
+  //-----------------------TenderSummary Sales Report-------------------------
+   TenderSummary_Sales_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/TenderSummary';
+    return this.http.post(getEndpoint, payload)
+  }
+
+  //-----------------------Z Report-------------------------
+  Z_Report(payload : any){
+    const getEndpoint = this.apiUrl + 'SalesReport/ZReport';
+    return this.http.post(getEndpoint, payload)
   }
 }

@@ -407,8 +407,18 @@ import { EditPromotionComponent, EditPromotionModule } from './pages/edit-promot
 import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 import { StorewiseStockViewComponent, StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
+import { SalesSummaryComponent, SalesSummaryModule } from './pages/REPORT/sales-summary/sales-summary.component';
+import { SalesDetailComponent, SalesDetailModule } from './pages/REPORT/sales-detail/sales-detail.component';
+import { ConsignmentSummaryComponent, ConsignmentSummaryModule } from './pages/REPORT/consignment-summary/consignment-summary.component';
+import { ConsignmentReturnDetailComponent, ConsignmentReturnDetailModule } from './pages/REPORT/consignment-return-detail/consignment-return-detail.component';
+import { ItemwisesalesComponent, ItemwisesalesModule } from './pages/REPORT/itemwisesales/itemwisesales.component';
+import { ItemWiseSalesSummaryComponent, ItemWiseSalesSummaryModule } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
+import { DiscountWiseSalesComponent, DiscountWiseSalesModule } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
 import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
 // import { ItemStorePropertiesViewComponent, ItemStorePropertiesViewModule } from './pages/item-store-properties-view/item-store-properties-view.component';
+import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
+import { TenderSummaryComponent, TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
+import { ZReportComponent, ZReportModule } from './pages/REPORT/zreport/zreport.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -792,8 +802,17 @@ import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages
     MiscellaneousSalesInvoiceFormModule,
     StorewiseStockViewModule,
     ViewPromotionWizardModule,
-
-
+    SalesSummaryModule,
+    SalesDetailModule,
+    ConsignmentSummaryModule,
+    ConsignmentReturnDetailModule,
+    ItemwisesalesModule,
+    ItemWiseSalesSummaryModule,
+    DiscountWiseSalesModule,
+    ViewPromotionWizardModule,
+    TenderModule,
+    TenderSummaryModule,
+    ZReportModule,
   ],
 
   providers: [

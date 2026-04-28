@@ -55,6 +55,20 @@
         <!-- Right side (Supplier + Button together) -->
         <div style="display: flex; gap: 8px; align-items: center">
           <dx-select-box
+            label="Store"
+            labelMode="floating"
+            width="200"
+            [dataSource]="filteredStoreList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="purchaseInvoiceFormData.STORE_ID"
+            placeholder="Select Store *"
+            [searchEnabled]="true"
+            [elementAttr]="{ class: 'grndropdown' }"
+            (onValueChanged)="onStoreValueChanged($event)"
+          >
+          </dx-select-box>
+          <dx-select-box
             [dataSource]="distributorList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
@@ -189,6 +203,22 @@
             [calculateCellValue]="calculateAmount"
           ></dxi-column>
           <dxi-column
+            dataField="DISC_PERCENT"
+            caption="Discount %"
+            dataType="number"
+            [width]="140"
+            [allowEditing]="true"
+          ></dxi-column>
+          <dxi-column
+            dataField="DISC_AMT"
+            caption="Discount Amount"
+            dataType="number"
+            format="#,##0.00"
+            [width]="140"
+            [allowEditing]="false"
+            [calculateCellValue]="calculateDiscAmt"
+          ></dxi-column>
+          <dxi-column
             dataField="VAT_PERC"
             [caption]="vatTilte + ' %'"
             dataType="number"
@@ -196,21 +226,6 @@
             [allowEditing]="true"
           ></dxi-column>
 
-          <!-- <dxi-column
-            dataField="CGST"
-            caption="CGST"
-            dataType="number"
-            [visible]="showCGST"
-            [allowEditing]="false"
-          ></dxi-column>
-
-          <dxi-column
-            dataField="SGST"
-            caption="SGST"
-            dataType="number"
-            [visible]="showSGST"
-            [allowEditing]="false"
-          ></dxi-column> -->
           <dxi-column
             dataField="TAX_AMOUNT"
             [caption]="vatTilte + ' Amount'"
@@ -243,7 +258,13 @@
               displayFormat="{0}"
               alignment="right"
             ></dxi-total-item>
-
+            <dxi-total-item
+              column="DISC_AMT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
             <dxi-total-item
               column="TAX_AMOUNT"
               summaryType="sum"

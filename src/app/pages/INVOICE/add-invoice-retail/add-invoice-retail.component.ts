@@ -43,6 +43,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { SaleReturnFormComponent } from 'src/app/sale-return-form/sale-return-form.component';
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
+import dxSelectBox from 'devextreme/ui/select_box';
 
 @Component({
   selector: 'app-add-invoice-retail',
@@ -88,7 +89,7 @@ export class AddInvoiceRetailComponent {
     RET_NO: '',
     VEHICLE_NO: '',
     ROUND_OFF: false,
-    DISC_AMOUNT: 0,
+    DISCOUNT_AMOUNT: 0,
     Details: [
       {
         ITEM_ID: 0,
@@ -115,6 +116,10 @@ export class AddInvoiceRetailComponent {
   isSaving: boolean = false;
   storeID: any;
   invalidQtyRowIndex: number | null = null;
+  totalDiscAmount: number = 0;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
+  storeList: { ID: any; DESCRIPTION: any }[];
   constructor(private dataService: DataService) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
@@ -127,6 +132,8 @@ export class AddInvoiceRetailComponent {
     if (!userDataString) return;
 
     const userData = JSON.parse(userDataString);
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     this.storeID = userData.Configuration[0].STORE_ID;
     console.log(userData.Configuration[0].STORE_ID, 'USERDATA');
     const selectedCompany = userData.SELECTED_COMPANY;
@@ -146,6 +153,20 @@ export class AddInvoiceRetailComponent {
     const firstFinYear = userData.FINANCIAL_YEARS?.[0];
     if (firstFinYear?.FIN_ID) {
       this.invoiceFormData.FIN_ID = firstFinYear.FIN_ID;
+    }
+    this.getStoreData();
+    if (this.isHQApp && configStore) {
+      this.filteredStoreList = [
+        {
+          ID: configStore.STORE_ID,
+          DESCRIPTION: configStore.STORE_NAME,
+        },
+      ];
+
+      // Auto select store
+      this.invoiceFormData.STORE_ID = configStore.STORE_ID;
+    } else {
+      this.filteredStoreList = this.storeList;
     }
     this.getItems();
     this.getItemsDescription();
@@ -177,6 +198,20 @@ export class AddInvoiceRetailComponent {
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.retNo = response.DOC_NO;
       this.invoiceFormData.DOC_NO = response.DOC_NO;
+    });
+  }
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+      console.log(this.storeID, 'STORELISTTTTTTTTTTT');
+      if (!this.isHQApp) {
+        this.filteredStoreList = this.storeList; //update here
+      }
     });
   }
 
@@ -259,40 +294,42 @@ export class AddInvoiceRetailComponent {
       }, 50);
     });
   }
-  onCellValueChanged(e: any) {
-    // // 🔹 existing calculation logic can stay
-    // //  Trigger when quantity is entered (or TOTAL if you prefer)
-    if (e.dataField === 'DISC_PERC') {
-      const grid = this.itemsGridRef.instance;
-      const visibleRows = grid.getVisibleRows();
-      const rowIndex = grid.getRowIndexByKey(e.key);
-      const isLastRow = rowIndex === visibleRows.length - 1;
-      if (isLastRow) {
-        // 🔥 Add new empty row
-        const newRow = {
-          ITEM_ID: null,
-          ITEM_CODE: null,
-          DESCRIPTION: null,
-          HSN_CODE: '',
-          UOM: '',
-          PRICE: 0,
-          QUANTITY: 0,
-          AMOUNT: 0,
-          TAX_PERC: 0,
-          TAX_AMOUNT: 0,
-          TOTAL_AMOUNT: 0,
-        };
-        this.invoiceFormData.Details.push(newRow);
-        // Refresh grid
-        setTimeout(() => {
-          grid.refresh();
-          //  Move focus to new row first column
-          const newRowIndex = this.invoiceFormData.Details.length - 1;
-          grid.editCell(newRowIndex, 'ITEM_CODE');
-        }, 50);
-      }
-    }
-  }
+  // onCellValueChanged(e: any) {
+  //   // // 🔹 existing calculation logic can stay
+  //   // //  Trigger when quantity is entered (or TOTAL if you prefer)
+  //   if (e.dataField === 'DISC_PERC') {
+  //     const grid = this.itemsGridRef.instance;
+  //     const visibleRows = grid.getVisibleRows();
+  //     const rowIndex = grid.getRowIndexByKey(e.key);
+  //     const isLastRow = rowIndex === visibleRows.length - 1;
+  //     if (isLastRow) {
+  //       // 🔥 Add new empty row
+  //       const newRow = {
+  //         ITEM_ID: null,
+  //         ITEM_CODE: null,
+  //         DESCRIPTION: null,
+  //         HSN_CODE: '',
+  //         UOM: '',
+  //         PRICE: 0,
+  //         QUANTITY: 0,
+  //         AMOUNT: 0,
+  //         TAX_PERC: 0,
+  //         DISC_PERC: 0,
+  //         DISC_AMT: 0,
+  //         TAX_AMOUNT: 0,
+  //         TOTAL_AMOUNT: 0,
+  //       };
+  //       this.invoiceFormData.Details.push(newRow);
+  //       // Refresh grid
+  //       setTimeout(() => {
+  //         grid.refresh();
+  //         //  Move focus to new row first column
+  //         const newRowIndex = this.invoiceFormData.Details.length - 1;
+  //         grid.editCell(newRowIndex, 'ITEM_CODE');
+  //       }, 50);
+  //     }
+  //   }
+  // }
   onRowRemoved(e: any) {
     const removedData = e.data;
 
@@ -312,21 +349,34 @@ export class AddInvoiceRetailComponent {
     const qty = Number(rowData?.QUANTITY) || 0;
     const price = Number(rowData?.PRICE) || 0;
 
-    const amount = qty * price; // 🔥 recompute instead of using rowData.AMOUNT
+    const amount = qty * price; //  recompute instead of using rowData.AMOUNT
     const discPerc = Number(rowData?.DISC_PERC) || 0;
 
     return (amount * discPerc) / 100;
   };
   calculateTax = (rowData: any) => {
     const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
-    const vat = rowData?.TAX_PERC || 0;
-    return (amount * vat) / 100;
+    const discPerc = Number(rowData?.DISC_PERC) || 0;
+
+    const discount = (amount * discPerc) / 100;
+    const taxableAmount = amount - discount;
+
+    const vat = Number(rowData?.TAX_PERC) || 0;
+
+    return (taxableAmount * vat) / 100;
   };
 
   calculateTotal = (rowData: any) => {
     const amount = this.calculateAmount(rowData);
-    const tax = this.calculateTax(rowData);
-    return amount + tax;
+
+    const discPerc = Number(rowData?.DISC_PERC) || 0;
+    const discount = (amount * discPerc) / 100;
+
+    const taxableAmount = amount - discount;
+
+    const tax = (taxableAmount * (rowData?.TAX_PERC || 0)) / 100;
+
+    return taxableAmount + tax;
   };
 
   getCustomerOrUnitLst() {
@@ -372,6 +422,8 @@ export class AddInvoiceRetailComponent {
       QUANTITY: item.QUANTITY,
       AMOUNT: item.AMOUNT,
       TAX_PERC: item.TAX_PERC,
+      DISC_PERC: item.DISC_PERC,
+      DISC_AMT: item.DISC_AMT,
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
     }));
@@ -442,7 +494,8 @@ export class AddInvoiceRetailComponent {
     if (
       e.dataField === 'ITEM_CODE' ||
       e.dataField === 'DESCRIPTION' ||
-      e.dataField === 'QUANTITY'
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'DISC_PERC'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -543,33 +596,64 @@ export class AddInvoiceRetailComponent {
           const grid = this.itemsGridRef.instance;
           const rowIndex = e.row.rowIndex;
 
-          // ✅ COMMIT VALUE FIRST (THIS WAS MISSING)
           const input = event.event.target as HTMLInputElement;
           const value = Number(input.value);
+
           e.setValue(value);
 
-          const visibleRows = grid.getVisibleRows();
-          const isLastRow = rowIndex === visibleRows.length - 1;
+          grid.saveEditData();
 
           setTimeout(() => {
-            grid.saveEditData(); // 🔥 IMPORTANT
-            grid.closeEditCell();
+            const visibleRows = grid.getVisibleRows();
+            const isLastRow = rowIndex === visibleRows.length - 1;
 
             if (isLastRow) {
-              grid.addRow();
+              // ✅ call your function
+              this.onAddRow();
 
+              // 🔥 FORCE FOCUS (IMPORTANT)
               setTimeout(() => {
-                const newRowIndex = grid.getVisibleRows().length - 1;
+                const newRowIndex = this.invoiceFormData.Details.length - 1;
+
                 grid.editCell(newRowIndex, 'ITEM_CODE');
-              }, 50);
+
+                // optional: focus input
+                setTimeout(() => {
+                  const cell = grid.getCellElement(newRowIndex, 'ITEM_CODE');
+                  const input = cell?.querySelector('input');
+                  input?.focus();
+                  input?.select();
+                }, 50);
+              }, 100); // ⬅️ must be slightly higher
             } else {
               grid.editCell(rowIndex + 1, 'ITEM_CODE');
             }
-          }, 0);
+          }, 50);
 
           return;
         }
       };
+    }
+  }
+
+  onCellValueChanged(e: any) {
+    if (e.dataField === 'DISC_PERC') {
+      const grid = this.itemsGridRef.instance;
+
+      const visibleRows = grid.getVisibleRows();
+      const rowIndex = e.row.rowIndex;
+      const isLastRow = rowIndex === visibleRows.length - 1;
+
+      if (isLastRow) {
+        setTimeout(() => {
+          grid.addRow(); // ✅ ONLY HERE
+
+          setTimeout(() => {
+            const newRowIndex = grid.getVisibleRows().length - 1;
+            grid.editCell(newRowIndex, 'ITEM_CODE');
+          }, 50);
+        }, 0);
+      }
     }
   }
 
@@ -589,7 +673,6 @@ export class AddInvoiceRetailComponent {
 
     const rows = this.invoiceFormData.Details || [];
 
-    //  Check if any empty row exists
     const hasEmptyRow = rows.some((row: any) => this.isRowEmpty(row));
 
     if (hasEmptyRow) {
@@ -599,16 +682,15 @@ export class AddInvoiceRetailComponent {
         2000,
       );
 
-      // 👉 focus that empty row
       const emptyIndex = rows.findIndex((row: any) => this.isRowEmpty(row));
+
       setTimeout(() => {
         grid.editCell(emptyIndex, 'ITEM_CODE');
-      }, 50);
+      }, 100);
 
       return;
     }
 
-    // ✅ Add new row only if all rows are filled
     const newRow = {
       ITEM_ID: null,
       ITEM_CODE: null,
@@ -627,13 +709,32 @@ export class AddInvoiceRetailComponent {
 
     this.invoiceFormData.Details = [...rows, newRow];
 
+    // 🔥 IMPORTANT FIX
     setTimeout(() => {
       grid.option('dataSource', this.invoiceFormData.Details);
-      grid.refresh();
 
-      const rowIndex = this.invoiceFormData.Details.length - 1;
-      grid.editCell(rowIndex, 'ITEM_CODE');
-    }, 50);
+      // 🔥 Wait for rendering properly
+      setTimeout(() => {
+        const rowIndex = this.invoiceFormData.Details.length - 1;
+
+        grid.option('focusedRowIndex', rowIndex); // ✅ ensure row focus
+        grid.editCell(rowIndex, 'ITEM_CODE');
+
+        // 🔥 OPEN DROPDOWN (optional but better UX)
+        setTimeout(() => {
+          const cellElement = grid.getCellElement(rowIndex, 'ITEM_CODE');
+          const selectBoxElement = cellElement?.querySelector('.dx-selectbox');
+
+          if (selectBoxElement) {
+            const selectBox = dxSelectBox.getInstance(
+              selectBoxElement,
+            ) as dxSelectBox;
+            selectBox?.focus();
+            selectBox?.open();
+          }
+        }, 100);
+      }, 150); // ⬅️ THIS is the real fix
+    }, 0);
   }
   moveNextCell(field: string, rowIndex: number, grid: any) {
     if (field === 'ITEM_CODE') {
@@ -716,6 +817,7 @@ export class AddInvoiceRetailComponent {
     const grid = this.itemsGridRef?.instance;
 
     if (grid) {
+      grid.closeEditCell();
       grid.saveEditData();
     }
     (this.invoiceFormData.Details || []).forEach((item: any) => {
@@ -756,7 +858,11 @@ export class AddInvoiceRetailComponent {
 
     this.isSaving = true;
 
-    const validDetails = (this.invoiceFormData.Details || []).filter(
+    // const grid = this.itemsGridRef.instance;
+
+    const allRows = grid.getVisibleRows().map((r: any) => r.data);
+
+    const validDetails = allRows.filter(
       (item: any) => item.ITEM_CODE && item.QUANTITY > 0,
     );
 
@@ -794,13 +900,14 @@ export class AddInvoiceRetailComponent {
     });
 
     // Assign back
-    this.invoiceFormData.STORE_ID = this.storeID;
+    this.invoiceFormData.STORE_ID = this.invoiceFormData.STORE_ID;
     this.invoiceFormData.GROSS_AMOUNT = gross;
     this.invoiceFormData.TAX_AMOUNT = tax;
     this.invoiceFormData.NET_AMOUNT = net;
-    this.invoiceFormData.DISC_AMOUNT = discamt;
+    this.invoiceFormData.DISCOUNT_AMOUNT = discamt;
     this.invoiceFormData.Details = validDetails;
     this.invoiceFormData.PARTY_NAME = String(this.invoiceFormData.CUSTOMER_ID);
+
     this.invoiceFormData.TRANS_DATE = this.formatDateOnly(
       this.invoiceFormData.TRANS_DATE,
     );
@@ -816,21 +923,21 @@ export class AddInvoiceRetailComponent {
 
     console.log('SAVE/UPDATE/APPROVE PAYLOAD', payload);
 
-    // 🔥 API DECISION LOGIC
+    //API DECISION LOGIC
     let apiCall;
 
     if (this.isEditing && this.invoiceFormData.IS_APPROVED) {
-      // ✅ EDIT + APPROVE
+      //  EDIT + APPROVE
       apiCall = this.dataService.approveRetailInvoice(payload);
     } else if (this.isEditing) {
-      // ✅ EDIT ONLY
+      //  EDIT ONLY
       apiCall = this.dataService.updateRetailInvoice(payload);
     } else {
-      // ✅ ADD
+      //  ADD
       apiCall = this.dataService.saveRetailInvoice(payload);
     }
 
-    // 🔥 API CALL
+    //  API CALL
     apiCall.subscribe({
       next: () => {
         this.isSaving = false;

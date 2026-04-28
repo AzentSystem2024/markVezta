@@ -16,6 +16,7 @@ import { ItemProperty1FormComponent } from 'src/app/components/library/item-prop
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import DataSource from 'devextreme/data/data_source';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-landed-cost-list',
@@ -60,6 +61,13 @@ export class LandedCostListComponent implements OnInit {
 
   currentEditId: number | null = null;
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
 
   addButtonOptions = {
   type: 'default',
@@ -101,6 +109,7 @@ refreshButtonOptions = {
     private dataservice: DataService,
     private exportService: ExportService,
     private zone: NgZone,
+    private router: Router
   ) {}
 
   onEditingStart(e: any) {
@@ -351,6 +360,28 @@ refreshButtonOptions = {
     this.dataservice.selectLandedCost(id).subscribe((response: any) => {});
   }
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+    .flatMap((group: any) => group.Menus)
+    .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.canApprove;
+    }
+    
     this.loadDropdownData();
     this.showLandedcost();
   }

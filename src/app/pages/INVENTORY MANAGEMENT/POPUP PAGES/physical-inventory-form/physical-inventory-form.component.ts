@@ -492,7 +492,6 @@ export class PhysicalInventoryFormComponent {
     this.fileInput.nativeElement.click();
   }
 
-
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;

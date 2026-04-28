@@ -67,9 +67,20 @@
             labelMode="floating"
             [(value)]="invoiceFormData.REF_NO"
             [readOnly]="isReadOnlyMode"
-            [width]="410"
+            [width]="200"
           >
           </dx-text-box>
+          <dx-select-box
+            [dataSource]="filteredStoreList"
+            [(value)]="invoiceFormData.STORE_ID"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [width]="200"
+            label="Store"
+            labelMode="floating"
+            [readOnly]="isEditing"
+          >
+          </dx-select-box>
         </div>
 
         <!-- RIGHT SIDE -->
@@ -129,7 +140,6 @@
           }"
           (onRowRemoved)="onRowRemoved($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
-          (onCellValueChanged)="onCellValueChanged($event)"
           (onRowPrepared)="onRowPrepared($event)"
         >
           <dxo-filter-builder [allowHierarchicalFields]="true">
@@ -175,11 +185,11 @@
               pageSize: 50,
             }"
           ></dxi-column>
-          <dxi-column
+          <!-- <dxi-column
             dataField="HSN_CODE"
             caption="HSN Code"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="UOM"
             caption="UOM"
@@ -255,6 +265,13 @@
               displayFormat="{0}"
               alignment="right"
             ></dxi-total-item>
+            <dxi-total-item
+              column="DISC_AMT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+              alignment="right"
+            ></dxi-total-item>
 
             <dxi-total-item
               column="TOTAL_AMOUNT"
@@ -290,6 +307,7 @@
           text="Cancel"
           stylingMode="outlined"
           type="normal"
+          [visible]="!isReadOnlyMode"
           (onClick)="cancel()"
         ></dx-button>
 
@@ -305,6 +323,7 @@
                 : 'Save'
           "
           [disabled]="isSaving"
+          [visible]="!isReadOnlyMode"
           (onClick)="saveInvoice()"
           stylingMode="contained"
           type="default"

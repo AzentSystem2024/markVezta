@@ -108,6 +108,9 @@ export class EditPurchaseInvoiceComponent {
   vatTilte: any;
   storeList: any;
   departmentList: any;
+  totalDiscAmount: any;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -128,7 +131,8 @@ export class EditPurchaseInvoiceComponent {
     const selectedCompany = userData.SELECTED_COMPANY;
     this.vatTilte = userData.GeneralSettings.VAT_TITLE;
     console.log(this.vatTilte, 'VATTITLE');
-
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     // this.getSupplierDropdown();
     this.getSupplierOrUnitLst();
     // this.getPendingGRNList();
@@ -141,6 +145,19 @@ export class EditPurchaseInvoiceComponent {
 
     this.sessionData_tax();
     this.getStoreData();
+    if (this.isHQApp && configStore) {
+      this.filteredStoreList = [
+        {
+          ID: configStore.STORE_ID,
+          DESCRIPTION: configStore.STORE_NAME,
+        },
+      ];
+
+      // Auto select store
+      this.purchaseInvoiceFormData.STORE_ID = configStore.STORE_ID;
+    } else {
+      this.filteredStoreList = this.storeList;
+    }
     this.getDepartments();
     setTimeout(() => {
       this.itemsGridRef?.instance?.refresh();
@@ -213,10 +230,38 @@ export class EditPurchaseInvoiceComponent {
       NAME: 'STORE',
       COMPANY_ID: this.selectedCompany,
     };
+
     this.dataService.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
+
+      if (this.isHQApp && this.sessionData?.Configuration?.[0]) {
+        const configStore = this.sessionData.Configuration[0];
+
+        this.filteredStoreList = [
+          {
+            ID: configStore.STORE_ID,
+            DESCRIPTION: configStore.STORE_NAME,
+          },
+        ];
+
+        if (!this.purchaseInvoiceFormData?.STORE_ID) {
+          this.purchaseInvoiceFormData.STORE_ID = configStore.STORE_ID;
+        }
+      } else {
+        this.filteredStoreList = this.storeList;
+      }
     });
   }
+
+  // getStoreData() {
+  //   const payload = {
+  //     NAME: 'STORE',
+  //     COMPANY_ID: this.selectedCompany,
+  //   };
+  //   this.dataService.getDropdownData(payload).subscribe((res) => {
+  //     this.storeList = res;
+  //   });
+  // }
 
   getDepartments() {
     const payload = {
@@ -316,30 +361,56 @@ export class EditPurchaseInvoiceComponent {
 
     console.log('Selected Supplier:', selectedSupplier);
   }
+  calculateDiscAmt = (rowData: any) => {
+    const qty = Number(rowData?.QUANTITY) || 0;
 
-  calculateGstAmount = (row: any) => {
-    const amt = this.calculateAmount(row);
+    // ✅ FIX: use RATE (same as your amount function)
+    const price = Number(rowData?.RATE) || 0;
 
-    const igst = parseFloat(row.VAT_PERC) || 0; // GST column = GST
-    const cgst = parseFloat(row.CGST) || 0;
-    const sgst = parseFloat(row.SGST) || 0;
+    const amount = qty * price;
+    const discPerc = Number(rowData?.DISC_PERCENT) || 0;
 
-    let totalGstPercent = 0;
-
-    // GST case
-    if (igst > 0) {
-      totalGstPercent = igst;
-    }
-    // CGST + SGST case
-    else {
-      totalGstPercent = cgst + sgst;
-    }
-
-    return amt * (totalGstPercent / 100);
+    return (amount * discPerc) / 100;
   };
+  calculateDiscountAmount = (rowData: any) => {
+    const qty = Number(rowData?.QUANTITY) || 0;
+    const price = Number(rowData?.RATE) || 0;
+
+    const amount = qty * price;
+
+    const discPerc = Number(rowData?.DISC_PERCENT) || 0;
+    const discAmt = (amount * discPerc) / 100;
+
+    return amount - discAmt;
+  };
+  calculateGstAmount = (row: any) => {
+    const amt = this.calculateDiscountAmount(row);
+    const vatPerc = parseFloat(row.VAT_PERC) || 0;
+    return amt * (vatPerc / 100);
+  };
+  // calculateGstAmount = (row: any) => {
+  //   const amt = this.calculateAmount(row);
+
+  //   const igst = parseFloat(row.VAT_PERC) || 0; // GST column = GST
+  //   const cgst = parseFloat(row.CGST) || 0;
+  //   const sgst = parseFloat(row.SGST) || 0;
+
+  //   let totalGstPercent = 0;
+
+  //   // GST case
+  //   if (igst > 0) {
+  //     totalGstPercent = igst;
+  //   }
+  //   // CGST + SGST case
+  //   else {
+  //     totalGstPercent = cgst + sgst;
+  //   }
+
+  //   return amt * (totalGstPercent / 100);
+  // };
 
   calculateTotal = (row: any) => {
-    const amt = this.calculateAmount(row);
+    const amt = this.calculateDiscountAmount(row);
     const gst = this.calculateGstAmount(row);
     return amt + gst;
   };
@@ -581,6 +652,8 @@ export class EditPurchaseInvoiceComponent {
     if (this.itemsGridRef?.instance) {
       this.totalAmount =
         this.itemsGridRef.instance.getTotalSummaryValue('AMOUNT') || 0;
+      this.totalDiscAmount =
+        this.itemsGridRef.instance.getTotalSummaryValue('DISC_AMT') || 0;
       this.taxAmount =
         this.itemsGridRef.instance.getTotalSummaryValue('VAT_AMOUNT') || 0;
       this.grandTotal =
@@ -646,28 +719,35 @@ export class EditPurchaseInvoiceComponent {
     let grossAmount = 0;
     let vatAmount = 0;
     let netAmount = 0;
+    let totalDiscountAmount = 0;
     // get selected values from grid
     this.itemsGridRef.instance.saveEditData();
 
-    const selectedStoreId = this.mainGridData[0]?.STORE_ID || null;
+    // const selectedStoreId = this.mainGridData[0]?.STORE_ID || null;
     const selectedDeptId = this.mainGridData[0]?.DEPT_ID || null;
-    this.purchaseInvoiceFormData.STORE_ID = selectedStoreId;
+    // this.purchaseInvoiceFormData.STORE_ID = selectedStoreId;
+    this.purchaseInvoiceFormData.STORE_ID =
+      this.purchaseInvoiceFormData.STORE_ID || this.store_id;
     this.purchaseInvoiceFormData.DEPT_ID = selectedDeptId;
     this.purchaseInvoiceFormData.PurchDetails = this.mainGridData.map(
       (item: any) => {
         const amount = this.calculateAmount(item);
         const vat = this.calculateGstAmount(item);
-
+        const discamt = this.calculateDiscountAmount(item);
+        const net = this.calculateTotal(item);
         grossAmount += amount;
         vatAmount += vat;
-        netAmount += amount + vat;
+        // netAmount += amount + vat;
+        totalDiscountAmount += discamt;
+        netAmount += net;
 
         return {
           ID: this.purchaseInvoiceFormData.ID,
           COMPANY_ID: this.selectedCompany,
           USER_ID: this.user_id,
           FIN_ID: this.fin_id,
-          STORE_ID: selectedStoreId || 0,
+          // STORE_ID: selectedStoreId || 0,
+          STORE_ID: this.purchaseInvoiceFormData.STORE_ID,
           DEPT_ID: selectedDeptId || 0,
           PURCH_ID: 0,
           GRN_DET_ID: item.GRN_DET_ID || '',
@@ -680,7 +760,7 @@ export class EditPurchaseInvoiceComponent {
           ITEM_DESC: item.ITEM_DESC || '',
           PO_DET_ID: item.PO_DET_ID,
           UOM: item.UOM,
-          DISC_PERCENT: 0,
+          // DISC_PERCENT: 0,
           COST: item.COST,
           SUPP_PRICE: item.RATE || 0,
           SUPP_AMOUNT: item.AMOUNT,
@@ -694,6 +774,8 @@ export class EditPurchaseInvoiceComponent {
           PENDING_QTY: 0,
           GRN_QUANTITY: 0,
           NARRATION: this.purchaseInvoiceFormData.NARRATION,
+          DISC_PERCENT: item.DISC_PERCENT,
+          DISC_AMT: this.calculateDiscAmt(item),
           // SGST: item.SGST,
           // CGST: item.CGST,
           // GST: item.GST ?? 0,
@@ -705,6 +787,9 @@ export class EditPurchaseInvoiceComponent {
       grossAmount.toFixed(2),
     );
     this.purchaseInvoiceFormData.VAT_AMOUNT = parseFloat(vatAmount.toFixed(2));
+    this.purchaseInvoiceFormData.DISCOUNT_AMOUNT = parseFloat(
+      totalDiscountAmount.toFixed(2),
+    );
     this.purchaseInvoiceFormData.NET_AMOUNT = parseFloat(netAmount.toFixed(2));
     this.purchaseInvoiceFormData.SUPP_GROSS_AMOUNT = parseFloat(
       grossAmount.toFixed(2),
@@ -783,6 +868,8 @@ export class EditPurchaseInvoiceComponent {
         this.itemsGridRef?.instance?.getTotalSummaryValue('AMOUNT') || 0;
       this.taxAmount =
         this.itemsGridRef?.instance?.getTotalSummaryValue('VAT_AMOUNT') || 0;
+      this.totalDiscAmount =
+        this.itemsGridRef?.instance?.getTotalSummaryValue('DISC_AMT') || 0;
       this.grandTotal =
         this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
       this.netAmount = Number(this.grandTotal).toFixed(2);

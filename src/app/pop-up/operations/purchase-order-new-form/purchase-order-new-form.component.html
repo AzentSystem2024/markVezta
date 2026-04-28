@@ -68,10 +68,11 @@
             ? 'Store'
             : 'Location'
         "
-        [items]="StoreList"
+        [items]="filteredStoreList"
         displayExpr="DESCRIPTION"
         valueExpr="ID"
         [(value)]="newPoData.STORE_ID"
+        (onValueChanged)="getStoreOrCompanyByid()"
         [searchEnabled]="true"
       >
       </dx-select-box>

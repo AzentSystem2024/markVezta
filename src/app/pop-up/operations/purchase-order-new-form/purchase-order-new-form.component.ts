@@ -188,6 +188,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     onClick: () => this.toggleFilters(),
   };
   vatTitle: any;
+  storeID: any;
+  storeItems: any;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
 
   constructor(
     private service: DataService,
@@ -208,14 +212,18 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
+    this.storeID = this.menuResponse.Configuration[0].STORE_ID;
     const menuGroups = this.menuResponse.MenuGroups || [];
-
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -228,6 +236,19 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.currentDate = new Date();
     this.GetSupplierList();
     this.GetStoresList();
+    // if (this.isHQApp && configStore) {
+    //   this.filteredStoreList = [
+    //     {
+    //       ID: configStore.STORE_ID,
+    //       DESCRIPTION: configStore.STORE_NAME,
+    //     },
+    //   ];
+
+    //   // Auto select store
+    //   this.newPoData.STORE_ID = configStore.STORE_ID;
+    // } else {
+    //   this.filteredStoreList = this.StoreList;
+    // }
     this.GetDeliveryTermsList();
     this.GetPaymentTermsList();
     this.GetEmployeeList();
@@ -289,11 +310,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   resetSupplierDependentData() {
-    // 🔥 CLEAR GRID
+    //  CLEAR GRID
     this.savedItems = [];
     this.poData.PoDetails = [];
 
-    // 🔥 RESET TOTALS
+    //  RESET TOTALS
     this.totalQuantity = 0;
     this.newPoData.GROSS_AMOUNT = 0;
     this.newPoData.TAX_AMOUNT = 0;
@@ -301,7 +322,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.newPoData.SUPP_GROSS_AMOUNT = 0;
     this.newPoData.SUPP_NET_AMOUNT = 0;
 
-    // 🔥 RESET SUPPLIER-SPECIFIC FIELDS
+    //  RESET SUPPLIER-SPECIFIC FIELDS
     this.newPoData.SUPP_CONTACT = '';
     this.newPoData.SUPP_MOBILE = '';
     this.newPoData.SUPP_ADDRESS = '';
@@ -313,10 +334,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.currencyExchangeRate = null;
     this.vatRule = null;
 
-    // 🔥 RESET GST MODE
+    //  RESET GST MODE
     this.isInterState = false;
 
-    // 🔁 Refresh grid UI
+    // Refresh grid UI
     setTimeout(() => {
       this.itemsGridRef?.instance?.refresh();
     }, 0);
@@ -364,10 +385,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   onAddItemClick() {
     if (!this.newPoData?.SUPP_ID) {
       notify('Please select a supplier before adding items.', 'warning', 2500);
-      return; // ❌ stop here
+      return; //  stop here
     }
 
-    // ✅ Supplier selected → proceed
+    // Supplier selected → proceed
     this.showAddItemPopup = true;
 
     console.log(this.newPoData.SUPP_ID, 'selected supplier id');
@@ -379,6 +400,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const payload = {
       SUPP_ID: this.newPoData.SUPP_ID,
       COMPANY_ID: this.companyID,
+      STORE_ID: this.newPoData.STORE_ID,
     };
 
     this.service.getSupplierItemsData(payload).subscribe((res) => {
@@ -388,18 +410,18 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.supplierStateID = supplier.STATE_ID;
       console.log(this.supplierStateID, 'STATEIDDDDDDDDDDDDDDD');
 
-      // ✅ Decide GST type
+      //  Decide GST type
       this.isInterState = this.companyStateID !== this.supplierStateID;
       this.applyGstModeToItems();
 
-      // 🔁 Refresh grid so columns + values update
+      //  Refresh grid so columns + values update
       setTimeout(() => {
         this.itemsGridRef?.instance?.refresh();
       }, 0);
 
       console.log('GST MODE:', this.isInterState ? 'IGST' : 'CGST + SGST');
 
-      // ⬇️ 🔒 KEEPING ALL YOUR EXISTING CODE AS-IS
+      // KEEPING ALL YOUR EXISTING CODE AS-IS
       this.newPoData.CURRENCY_ID = this.supplierItems[0].CURRENCY_ID;
       this.newPoData.SUPP_CONTACT = this.supplierItems[0].SUPP_NAME;
 
@@ -411,12 +433,12 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
       this.newPoData.EXCHANGE_PRICE = this.supplierItems[0].EXCHANGE;
       this.vatRule = this.supplierItems[0].VAT_RULE_NAME;
-
+      this.newPoData.SUPP_MOBILE = this.supplierItems[0].PHONE;
       this.showLocalCurrencyColumn =
         this.localCurrencyId !== this.newPoData.CURRENCY_ID;
-      this.newPoData.SHIP_TO = this.supplierItems[0].COMPANY_ADDRESS;
-      this.newPoData.CONTACT_NAME = this.supplierItems[0].COMPANY_CONTACT;
-      this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
+      // this.newPoData.SHIP_TO = this.supplierItems[0].COMPANY_ADDRESS;
+      // this.newPoData.CONTACT_NAME = this.supplierItems[0].COMPANY_CONTACT;
+      // this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
       const suppMobile = this.supplierItems[0].PHONE;
 
       if (!suppMobile) return;
@@ -435,6 +457,76 @@ export class PurchaseOrderNewFormComponent implements OnInit {
 
         this.supplierCountryCode = code;
         this.newPoData.SUPP_MOBILE = number;
+      }
+
+      // this.extractSupplierCountryCode();
+      this.extractShippingCountryCode();
+
+      console.log(this.supplierItems, 'supplier items');
+    });
+  }
+
+  getStoreOrCompanyByid() {
+    const payload = {
+      // SUPP_ID: this.newPoData.SUPP_ID,
+      // COMPANY_ID: this.companyID,
+      STORE_ID: this.newPoData.STORE_ID,
+    };
+
+    this.service.getStoreData(payload).subscribe((res) => {
+      this.storeItems = res;
+      const supplier = res[0];
+
+      this.supplierStateID = supplier.STATE_ID;
+      console.log(this.supplierStateID, 'STATEIDDDDDDDDDDDDDDD');
+
+      // ✅ Decide GST type
+      this.isInterState = this.companyStateID !== this.supplierStateID;
+      this.applyGstModeToItems();
+
+      // 🔁 Refresh grid so columns + values update
+      setTimeout(() => {
+        this.itemsGridRef?.instance?.refresh();
+      }, 0);
+
+      console.log('GST MODE:', this.isInterState ? 'IGST' : 'CGST + SGST');
+
+      // ⬇️ 🔒 KEEPING ALL YOUR EXISTING CODE AS-IS
+      // this.newPoData.CURRENCY_ID = this.supplierItems[0].CURRENCY_ID;
+      // this.newPoData.SUPP_CONTACT = this.supplierItems[0].SUPP_NAME;
+
+      // this.newPoData.SUPP_ADDRESS = this.supplierItems[0].SUPP_ADDRESS;
+      // this.SupplierCurrency = this.supplierItems[0].CURRENCY_NAME;
+      // this.SupplierCurrencyCode = this.supplierItems[0].CURRENCY_CODE;
+      // this.SupplierCurrencySymbol = this.supplierItems[0].CURRENCY_SYMBOL;
+      // this.supplierMail = this.supplierItems[0].SUPPLIER_MAIL;
+
+      // this.newPoData.EXCHANGE_PRICE = this.supplierItems[0].EXCHANGE;
+      // this.vatRule = this.supplierItems[0].VAT_RULE_NAME;
+
+      this.showLocalCurrencyColumn =
+        this.localCurrencyId !== this.newPoData.CURRENCY_ID;
+      this.newPoData.SHIP_TO = this.storeItems[0].ADDRESS1;
+      this.newPoData.CONTACT_NAME = this.storeItems[0].STORE_NAME;
+      this.newPoData.CONTACT_MOBILE = this.storeItems[0].PHONE;
+      const storeMobile = this.storeItems[0].PHONE;
+
+      if (!storeMobile) return;
+
+      // Extract country code and number
+      const match = storeMobile.match(/^(\+?\d+)[-\s]?(\d+)$/);
+
+      if (match) {
+        let code = match[1];
+        let number = match[2];
+
+        // ensure + exists
+        if (!code.startsWith('+')) {
+          code = '+' + code;
+        }
+
+        this.supplierCountryCode = code;
+        this.newPoData.CONTACT_MOBILE = number;
       }
 
       // this.extractSupplierCountryCode();
@@ -480,17 +572,17 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     if (parts.length === 2) {
       let code = parts[0];
 
-      // ✅ ensure + exists (but don't duplicate)
+      // ensure + exists (but don't duplicate)
       if (!code.startsWith('+')) {
         code = '+' + code;
       }
 
       this.shippingCountryCode = code;
 
-      // ✅ only number
+      //  only number
       this.newPoData.CONTACT_MOBILE = parts[1];
     } else {
-      // ✅ No country code → default +91
+      //  No country code → default +91
       this.shippingCountryCode = '+971';
       this.newPoData.CONTACT_MOBILE = value;
     }
@@ -531,7 +623,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
         // store GST
         GST_PERC: itemGst,
 
-        // ✅ DO NOT SPLIT GST
+        //  DO NOT SPLIT GST
         VAT_PERC: itemGst,
         CGST: 0,
         SGST: 0,
@@ -854,17 +946,34 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.SupplierList = res;
     });
   }
-
   GetStoresList() {
     const payload = {
       NAME: 'STORE',
       COMPANY_ID: this.companyID,
     };
+
     this.service.getDropdownData(payload).subscribe((res) => {
       this.StoreList = res;
+
+      const userData = JSON.parse(
+        sessionStorage.getItem('savedUserData') || '{}',
+      );
+      const configStore = userData.Configuration?.[0];
+
+      if (this.isHQApp && configStore) {
+        this.filteredStoreList = [
+          {
+            ID: configStore.STORE_ID,
+            DESCRIPTION: configStore.STORE_NAME,
+          },
+        ];
+
+        this.newPoData.STORE_ID = configStore.STORE_ID;
+      } else {
+        this.filteredStoreList = this.StoreList; // ✅ NOW WORKS
+      }
     });
   }
-
   GetDeliveryTermsList() {
     const payload = {
       NAME: 'DELIVERYTERMS',

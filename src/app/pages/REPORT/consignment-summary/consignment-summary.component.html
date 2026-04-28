@@ -1,0 +1,220 @@
+<div class="view-wrapper list-page">
+
+  <!-- ================= FILTER PANEL ================= -->
+  <div
+    class="paramsDiv SearchParams-container"
+    [ngClass]="{ 'hide-content': !isFilterVisible }"
+  >
+    <dx-form>
+      <dxi-item itemType="group" [colCount]="6">
+
+        <!-- Year -->
+        <dxi-item>
+          <dx-select-box
+            label="Year"
+            labelMode="floating"
+            [(value)]="selectedYear"
+            [dataSource]="years"
+            (onValueChanged)="onYearChanged($event)">
+          </dx-select-box>
+        </dxi-item>
+
+        <!-- Month -->
+        <dxi-item>
+          <dx-select-box
+            label="Month"
+            labelMode="floating"
+            [dataSource]="monthDataSource"
+            displayExpr="name"
+            valueExpr="value"
+            [(value)]="selectedmonth"
+            (onValueChanged)="onMonthValueChanged($event)">
+          </dx-select-box>
+        </dxi-item>
+
+        <!-- From Date -->
+        <dxi-item>
+          <dx-date-box
+            label="From Date"
+            labelMode="floating"
+            [(value)]="selected_from_date"
+            displayFormat="dd-MM-yyyy"
+            (onValueChanged)="onFromDateChange($event)">
+          </dx-date-box>
+        </dxi-item>
+
+        <!-- To Date -->
+        <dxi-item>
+          <dx-date-box
+            label="To Date"
+            labelMode="floating"
+            [(value)]="selected_To_date"
+            displayFormat="dd-MM-yyyy"
+            (onValueChanged)="onToDateChange($event)">
+          </dx-date-box>
+        </dxi-item>
+
+        <!-- Store -->
+        <dxi-item>
+          <dx-tag-box
+            label="Store"
+            labelMode="floating"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [items]="Store"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [(value)]="selectedStoreid"
+            [searchEnabled]="true"
+            [showSelectionControls]="true"
+            (onValueChanged)="updateStoreHint()">
+          </dx-tag-box>
+        </dxi-item>
+   <dxi-item>
+          <dx-tag-box
+            label="Sale type"
+            labelMode="floating"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [items]="Store"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [(value)]="selectedStoreid"
+            [searchEnabled]="true"
+            [showSelectionControls]="true"
+            (onValueChanged)="updateStoreHint()">
+          </dx-tag-box>
+        </dxi-item>
+
+
+      <!-- Customer (smaller width) -->
+<dxi-item [colSpan]="2">
+  <dx-select-box
+    label="Customer"
+    labelMode="floating"
+    [(value)]="selectedCustomer"
+    [dataSource]="distributorList"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    [searchEnabled]="true">
+  </dx-select-box>
+</dxi-item>
+
+<!-- Empty space -->
+<dxi-item [colSpan]="3"></dxi-item>
+
+<!-- Apply button -->
+<dxi-item [colSpan]="1" cssClass="apply-btn-right">
+  <dx-button
+    text="Apply"
+    type="default"
+    stylingMode="contained"
+    (onClick)="load_JournalBook_data()">
+  </dx-button>
+</dxi-item>
+
+      </dxi-item>
+    </dx-form>
+  </div>
+
+  <!-- ================= TOGGLE BUTTON ================= -->
+  <div class="button-container mt-1 mb-2">
+    <dx-button
+      class="toggleButton"
+      [width]="200"
+      [height]="13"
+      stylingMode="outlined"
+      type="normal"
+      [icon]="isFilterVisible ? 'chevronup' : 'chevrondown'"
+      (onClick)="toggleFiltersPanel()"
+      [hint]="isFilterVisible ? 'Hide Filters' : 'Show Filters'">
+    </dx-button>
+  </div>
+
+  <!-- ================= GRID ================= -->
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      class="grid theme-dependent"
+      [dataSource]="JournalBookDataSource"
+      height="79vh"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+      [scrolling]="{ mode: 'virtual' }"
+      [columnFixing]="{ enabled: true }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+    >
+
+      <!-- ================= TOOLBAR ================= -->
+      <dxo-toolbar>
+
+        <dxi-item location="before">
+          <div class="grid-header">Consignment Summary</div>
+        </dxi-item>
+
+        <dxi-item
+          widget="dxButton"
+          [options]="searchButtonOptions">
+        </dxi-item>
+
+        <dxi-item
+          widget="dxButton"
+          [options]="refreshButtonOptions">
+        </dxi-item>
+
+        <dxi-item name="exportButton"></dxi-item>
+
+      </dxo-toolbar>
+
+      <!-- ================= COLUMNS ================= -->
+      <dxi-column
+        dataField="SALE_DATE"
+        caption="Date"
+        dataType="date"
+        [format]="{ type: 'custom', formatter: formatDates }">
+      </dxi-column>
+
+      <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column>
+      <dxi-column dataField="CUSTOMER_NAME" caption="Customer"></dxi-column>
+
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="Net Amount"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }">
+      </dxi-column>
+
+      <dxi-column *ngIf="journalBookCount > 0" type="buttons" [width]="100">
+        <dxi-button
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)">
+        </dxi-button>
+      </dxi-column>
+
+    </dx-data-grid>
+  </div>
+
+</div>
+
+<!-- ================= POPUP ================= -->
+<dx-popup
+  *ngIf="isViewInvoice"
+  [(visible)]="isViewInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="New Invoice"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [EditingResponseData]="selectedInvoice"
+    (popupClosed)="handleClose()"
+  ></app-add-invoice-retail>
+  <!-- </ng-container> -->
+</dx-popup>

@@ -458,6 +458,9 @@ export class GrnComponent implements OnInit {
   }
 
   getGrnLogData() {
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...'); // ✅ START LOADING
+
     const datePayload = this.getDateRangePayload();
 
     const payload = {
@@ -466,10 +469,31 @@ export class GrnComponent implements OnInit {
       DATE_TO: datePayload.DATE_TO,
     };
 
-    this.service.getGrnLogData(payload).subscribe((res: any) => {
-      this.grnDataSource = res.grnheader;
-    });
+    this.service
+      .getGrnLogData(payload)
+      .pipe(
+        finalize(() => {
+          grid?.endCustomLoading(); // ✅ ALWAYS STOP LOADING
+        }),
+      )
+      .subscribe((res: any) => {
+        this.grnDataSource = res.grnheader;
+      });
   }
+
+  // getGrnLogData() {
+  //   const datePayload = this.getDateRangePayload();
+
+  //   const payload = {
+  //     COMPANY_ID: this.selectedCompanyId,
+  //     DATE_FROM: datePayload.DATE_FROM,
+  //     DATE_TO: datePayload.DATE_TO,
+  //   };
+
+  //   this.service.getGrnLogData(payload).subscribe((res: any) => {
+  //     this.grnDataSource = res.grnheader;
+  //   });
+  // }
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;

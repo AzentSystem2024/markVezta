@@ -659,18 +659,18 @@ body {
 .dx-tabpanel-tabs-position-top .dx-tabs {
   border-bottom: none !important;
 }
-.dx-tabs.dx-state-focused .dx-tab.dx-state-focused {
-  background: none !important;
-  color: var(--selected-text-color);
-}
+// .dx-tabs.dx-state-focused .dx-tab.dx-state-focused {
+//   background: none !important;
+//   color: var(--selected-text-color);
+// }
 
-.dx-tab .dx-tab-text .dx-tab-text-span {
-  position: relative;
-  display: block;
-  font-weight: 500;
-  visibility: hidden;
-  font-size: 15px !important;
-}
+// .dx-tab .dx-tab-text .dx-tab-text-span {
+//   position: relative;
+//   display: block;
+//   font-weight: 500;
+//   visibility: hidden;
+//   font-size: 15px !important;
+// }
 .custom-tab .dx-tabs-styling-mode-secondary .dx-tab {
   border-radius: 8px;
   background-color: var(--tab-unselected-bg-color);
@@ -1211,4 +1211,85 @@ body {
   background-color: #0068C2 !important;
   color: #fff !important; /* text color */
 }
+
+
+
+/* ========================= */
+/* 🔥 TAB CONTAINER */
+/* ========================= */
+
+.custom-tab .dx-tabpanel-tab {
+  margin: 0 !important;
+}
+
+.custom-tab .dx-tabs-wrapper {
+  display: flex;
+  gap: 10px !important;
+  padding: 10px 16px;
+  // background: #ffffff; /* grey bg */
+  border-radius: 8px;
+  // height:52px;
+}
+
+/* ========================= */
+/* 🔵 TAB */
+/* ========================= */
+
+
+/* ========================= */
+/* 🟦 ACTIVE */
+/* ========================= */
+.custom-tab .dx-tab.dx-tab-selected {
+  background-color: var(--tab-selected-bg-color) !important;
+  color: var(--selected-text-color);
+}
+
+
+
+/* ========================= */
+/* 🖱 HOVER */
+/* ========================= */
+.custom-tab .dx-tab:not(.dx-tab-selected).dx-state-hover {
+  background-color: var(--tab-selected-bg-color);
+  color: var(--selected-text-color);
+}
+
+/* ========================= */
+/* ❌ REMOVE DEFAULT EFFECTS */
+/* ========================= */
+.custom-tab .dx-tabs::before,
+.custom-tab .dx-tabs::after,
+.custom-tab .dx-tab::after {
+  display: none !important;
+}
+
+.custom-tab 
+.dx-tabs-styling-mode-secondary 
+.dx-tab.dx-tab-selected 
+.dx-tab-content::after {
+  display: none !important;
+  content: none !important;
+}
+
+.custom-tab .dx-tab.dx-state-hover .dx-tab-content::after,
+.custom-tab .dx-tab.dx-tab-selected .dx-tab-content::after {
+  display: none !important;
+  content: none !important;
+}
+
+.custom-tab .dx-tab-content::after,
+.custom-tab .dx-tab.dx-state-hover .dx-tab-content::after,
+.custom-tab .dx-tab.dx-tab-selected .dx-tab-content::after,
+.custom-tab .dx-tab.dx-state-active .dx-tab-content::after {
+  display: none !important;
+  content: none !important;
+}
+
+.custom-tab .dx-tab.dx-state-focused {
+  background-color: var(--tab-selected-bg-color);
+  color: var(--selected-text-color);
+}
+
+
+
 

@@ -138,6 +138,9 @@ export class SaleReturnFormComponent {
   retNo: any;
   summaryValues: (summaryItemName: string) => any;
   vatTitle: any;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
+  storeList: { ID: any; DESCRIPTION: any }[];
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
@@ -147,7 +150,8 @@ export class SaleReturnFormComponent {
     const userData = JSON.parse(userDataString);
     const selectedCompany = userData.SELECTED_COMPANY;
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
-    // SINGLE SOURCE OF TRUTH
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     this.selectedCompanyId = selectedCompany.COMPANY_ID;
     this.companyStateId = selectedCompany.STATE_ID;
     this.userID = userData.USER_ID;
@@ -165,6 +169,20 @@ export class SaleReturnFormComponent {
     const firstFinYear = userData.FINANCIAL_YEARS?.[0];
     if (firstFinYear?.FIN_ID) {
       this.salesReturnFormData.FIN_ID = firstFinYear.FIN_ID;
+    }
+
+    if (this.isHQApp && configStore) {
+      this.filteredStoreList = [
+        {
+          ID: configStore.STORE_ID,
+          DESCRIPTION: configStore.STORE_NAME,
+        },
+      ];
+
+      // Auto select store
+      this.salesReturnFormData.STORE_ID = configStore.STORE_ID;
+    } else {
+      this.filteredStoreList = this.storeList;
     }
     if (!this.isEditing) {
       this.getDocNo();
@@ -189,6 +207,19 @@ export class SaleReturnFormComponent {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
       reader.readAsDataURL(blob);
+    });
+  }
+
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+      if (!this.isHQApp) {
+        this.filteredStoreList = this.storeList; //update here
+      }
     });
   }
 
@@ -661,7 +692,7 @@ export class SaleReturnFormComponent {
       COMPANY_ID: this.selectedCompanyId,
       USER_ID: this.userID,
       FIN_ID: this.finID,
-
+      STORE_ID: this.salesReturnFormData.STORE_ID,
       // HEADER LEVEL SALE INFO
       SALE_ID: firstRow?.SLAE_ID || 0,
       SALE_NO: firstRow?.SALE_NO || '',
