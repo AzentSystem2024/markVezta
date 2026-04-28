@@ -104,11 +104,12 @@ export class StockAdjustmentAddComponent {
   ENABLE_Matrix_Code: any;
   storename: any;
   hidecost: any;
-
+  IS_HQ_App: boolean = false;
+  StoreIDData: any;
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) {}
+  ) { }
   ngOnInit() {
     this.isEditDataAvailable();
     this.get_item_list_Data();
@@ -119,6 +120,8 @@ export class StockAdjustmentAddComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.IS_HQ_App = menuResponse.GeneralSettings.IS_HQ_APP;
+
     this.getStockAdjustNo();
     console.log('Parsed ObjectData==================:', menuResponse);
     console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
@@ -151,7 +154,7 @@ export class StockAdjustmentAddComponent {
       // this.getItemsList();
     }
     this.getStoreDropdown();
-    this.getReasonsDropdown() ;
+    this.getReasonsDropdown();
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete, this.canApprove);
     // this.items = [];
@@ -228,7 +231,13 @@ export class StockAdjustmentAddComponent {
       NAME: 'STORE',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.stores = response;
+      if (this.IS_HQ_App) {
+        // 🔹 HQ App → show only store with ID = 1
+        this.stores = response.filter((item: any) => item.ID === 1);
+      } else {
+        // 🔹 Not HQ → show all stores
+        this.stores = response;
+      }
     });
   }
 
@@ -267,12 +276,12 @@ export class StockAdjustmentAddComponent {
   cancel() {
     this.popupClosed.emit();
   }
-  
+
   onAddItems() {
-   
+
     this.isPopupVisible = true;
     const payload = {
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.StoreIDData,
     };
 
     console.log(payload);
@@ -281,9 +290,9 @@ export class StockAdjustmentAddComponent {
       this.items = res.Data;
     });
   }
-  onPopupHiding() {}
+  onPopupHiding() { }
 
-  updateNetAmount(event: any) {}
+  updateNetAmount(event: any) { }
 
   SaveStockAdjustment() {
     console.log(this.adjustmentFormData);
@@ -292,7 +301,7 @@ export class StockAdjustmentAddComponent {
 
     const transformed = ITEM_Details.map((item) => ({
       COMPANY_ID: this.companyID,
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.StoreIDData,
       ADJ_ID: 0,
       NET_AMOUNT: 0,
 
@@ -316,7 +325,7 @@ export class StockAdjustmentAddComponent {
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
       NET_AMOUNT: this.totalAmount,
-      STORE_ID : this.storeFromSession,
+      STORE_ID: this.storeFromSession,
       Details: transformed,
     };
     console.log(payload);
@@ -404,9 +413,9 @@ export class StockAdjustmentAddComponent {
     this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
   }
 
-  onSelectPackAdd(e: any) {}
+  onSelectPackAdd(e: any) { }
 
-  onEditPackUpdate(e: any) {}
+  onEditPackUpdate(e: any) { }
 
   onCellValueChanged(e: any) {
     console.log(e, '===============pppppppppp==============  ');
@@ -460,4 +469,4 @@ export class StockAdjustmentAddComponent {
   exports: [StockAdjustmentAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentAddModule {}
+export class StockAdjustmentAddModule { }

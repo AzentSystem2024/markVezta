@@ -61,11 +61,12 @@
         caption="Document Date"
         [width]="'180'"
         [allowEditing]="false"
+        dataType="date"
+        format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column
         dataField="NARRATION"
         caption="Remarks"
-        [width]="'150'"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
@@ -73,7 +74,16 @@
         caption="Status"
         [width]="'150'"
         [allowEditing]="false"
+        cellTemplate="statusCellTemplate"
       ></dxi-column>
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
+        <i
+          class="fas fa-flag"
+          [ngClass]="getStatusFlagClass(cellData.value)"
+          [attr.title]="cellData.value == 'Open' ? 'Open ' : 'Approve '"
+          style="cursor: default; align-items: center"
+        ></i>
+      </div>
     </dx-data-grid>
   </div>
 </div>

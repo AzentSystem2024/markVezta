@@ -132,7 +132,7 @@
           [loading]="isSaving"
         ></dx-button>
 
-        <dx-button
+        <!-- <dx-button
           *ngIf="isSaved && !isVerified && AllowCommitWithSave"
           text="Verify"
           stylingMode="contained"
@@ -140,9 +140,9 @@
           (onClick)="onVerify()"
           style="width: 100px"
           [disabled]="isApproved"
-        ></dx-button>
+        ></dx-button> -->
 
-        <dx-button
+        <!-- <dx-button
           *ngIf="isVerified && AllowCommitWithSave"
           text="Approve"
           stylingMode="contained"
@@ -150,7 +150,7 @@
           (onClick)="onApprove()"
           style="width: 100px"
           [disabled]="isApproved"
-        ></dx-button>
+        ></dx-button> -->
       </div>
 
       <div *dxTemplate="let data of 'narration'">

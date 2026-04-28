@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule, NgZone, ViewChild } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -37,6 +37,7 @@ import { workerData } from 'worker_threads';
 import { PromotionEditModule } from '../promotion-edit/promotion-edit.component';
 import { EditPromotionModule } from '../edit-promotion/edit-promotion.component';
 import { ViewPromotionWizardModule } from '../view-promotion-wizard/view-promotion-wizard.component';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-promotion-log',
@@ -136,6 +137,11 @@ export class PromotionLogComponent {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     console.log(this.AllowCommitWithSave, 'ALLOW');
     this.getPromotionLogList();
+       this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.getPromotionLogList(); //  reload every time you land here
+      });
     this.handleClose()
   }
 
@@ -361,6 +367,10 @@ export class PromotionLogComponent {
     console.log(e, '=========es===================');
     return e.row?.data.Status === 'Open';
   };
+
+    getStatusFlagClass(Status: string): string {
+    return Status === 'Open' ? 'flag-red' : 'flag-green';
+  }
 }
 
 @NgModule({

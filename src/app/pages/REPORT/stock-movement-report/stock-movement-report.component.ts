@@ -136,24 +136,26 @@ export class StockMovementReportComponent {
   saleReturnDetails: any[] = [];
   salesInvoiceDetails: any[] = [];
   adjustedDetails: any[] = [];
-  isEditProductionPopupVisible: boolean;
+  isEditProductionPopupVisible: boolean = false;
   selectedProduction: any;
-  isReadOnlyInvoice: boolean;
-  selectedProductionType: string;
+  isReadOnlyInvoice: boolean = false;;
+  selectedProductionType: any;
   selectedGrnId: any;
-  isViewGrnPopupOpened: boolean;
+  isViewGrnPopupOpened: boolean = false;;
   selectedPurchaseReturnId: any;
-  isEditPurchaseReturn: boolean;
+  isEditPurchaseReturn: boolean = false;;
   selectedPurchaseReturn: any;
   selectedDelivery: any;
-  isReadOnlyPurchaseReturn: boolean;
-  isEditSaleReturn: boolean;
-  isEditDelivery: boolean;
+  isReadOnlyPurchaseReturn: boolean = false;
+  isEditSaleReturn: boolean = false;
+  isEditDelivery: boolean = false;
   selectedSaleReturn: any;
   isReadOnlySaleReturn = true;
   isReadOnlyDelivery = true;
   selectedInvoice: any;
-  isViewInvoice: boolean;
+  isViewInvoice: boolean = false;;
+  fin_id: any;
+  finID: any;
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -245,6 +247,10 @@ export class StockMovementReportComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.fin_id = sessionData.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
+    }
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -337,6 +343,8 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
+      FIN_ID: this.finID,
+
     };
     this.dataService.StockMovement_Api(payload).subscribe({
       next: (res: any) => {
@@ -1002,4 +1010,4 @@ export class StockMovementReportComponent {
   exports: [StockMovementReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockMovementReportModule {}
+export class StockMovementReportModule { }

@@ -202,6 +202,10 @@ export class PurchaseOrderComponent {
   showCustomDatePopup = false;
   filteredPOList: any;
   isSaving = false;
+  selectedStoreId: any;
+  storeList: any;
+  isHQApp: any;
+  filteredStoreList: any;
 
   constructor(
     private service: DataService,
@@ -237,7 +241,11 @@ export class PurchaseOrderComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
     }
-
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    this.getStoreData();
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     this.getPurchaseOrderList();
     this.initializePrintTemplateData();
     this.getDocNo();
@@ -261,7 +269,12 @@ export class PurchaseOrderComponent {
       this.getPurchaseOrderList();
     }
   }
+  onStoreChanged(e: any) {
+    this.selectedStoreId = e.value;
 
+    // 🔥 Reload list with selected store
+    this.getPurchaseOrderList();
+  }
   private getDateRange(): { fromDate: string | null; toDate: string | null } {
     const today = new Date();
     let fromDate: Date | null = null;
@@ -471,6 +484,41 @@ export class PurchaseOrderComponent {
     });
   }
 
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    this.service.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      const configStore = userData.Configuration?.[0];
+
+      if (this.isHQApp && configStore) {
+        this.filteredStoreList = [
+          {
+            ID: configStore.STORE_ID,
+            DESCRIPTION: configStore.STORE_NAME,
+          },
+        ];
+
+        this.selectedStoreId = configStore.STORE_ID;
+      } else {
+        this.filteredStoreList = this.storeList;
+
+        // ✅ default select first store
+        if (!this.selectedStoreId && this.storeList?.length) {
+          this.selectedStoreId = this.storeList[0].ID;
+        }
+      }
+
+      // 🔥 Load data AFTER store is ready
+      this.getPurchaseOrderList();
+    });
+  }
+
   getPurchaseOrderList() {
     const grid = this.dataGrid?.instance;
     grid?.beginCustomLoading('Loading...');
@@ -481,6 +529,7 @@ export class PurchaseOrderComponent {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: fromDate,
       DATE_TO: toDate,
+      STORE_ID: this.selectedStoreId,
     };
 
     this.service.getPurchaseOrderList(payload).subscribe({

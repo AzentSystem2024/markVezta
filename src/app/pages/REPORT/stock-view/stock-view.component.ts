@@ -69,6 +69,8 @@ export class StockViewComponent {
   sessionData: any;
   selected_vat_id: any;
   companyID: any;
+  fin_id: any;
+  finID: any;
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -91,7 +93,7 @@ export class StockViewComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -99,6 +101,10 @@ export class StockViewComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.fin_id = menuResponse.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
+    }
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
@@ -141,8 +147,11 @@ export class StockViewComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
+
   getStockViewList() {
     const payload = {
+      FIN_ID: this.finID,
       COMPANY_ID: this.companyID,
     };
     this.dataService.getStockViewList(payload).subscribe((response: any) => {
@@ -187,4 +196,4 @@ export class StockViewComponent {
   exports: [StockViewComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockViewModule {}
+export class StockViewModule { }

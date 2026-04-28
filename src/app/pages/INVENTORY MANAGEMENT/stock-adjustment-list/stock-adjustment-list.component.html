@@ -70,6 +70,7 @@
           </div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -97,6 +98,25 @@
             {{ item.value === "custom" ? "Custom" : item.label }}
           </div>
         </dx-select-box>
+      </div>
+      <div
+        *dxTemplate="let data of 'StoreFilterTemplate'"
+        style="margin-bottom: 5px"
+      >
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Store"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [width]="200"
+          (onValueChanged)="onStoreChanged($event)"
+        ></dx-tag-box>
       </div>
       <dxi-column
         dataField="ADJ_NO"

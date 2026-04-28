@@ -73,3 +73,9 @@
 .flag-approved {
   color: green;
 }
+::ng-deep .grndropdown {
+  margin-top: -8px; /* adjust -4px / -8px as needed */
+}
+::ng-deep .dx-toolbar .dx-toolbar-items-container {
+  align-items: flex-start !important;
+}
