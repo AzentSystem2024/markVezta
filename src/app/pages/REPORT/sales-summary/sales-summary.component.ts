@@ -590,10 +590,11 @@ getExVATtotal = (rowData: any) => {
 
   getCustomerOrUnitLst() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
+      NAME : 'CUSTOMER'
     };
     this.dataService
-      .getOutsideCustomerWithState(payload)
+      .Common_Dropdown(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
       });
