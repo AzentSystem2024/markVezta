@@ -166,8 +166,8 @@ export class CreditNoteListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/credit-note');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

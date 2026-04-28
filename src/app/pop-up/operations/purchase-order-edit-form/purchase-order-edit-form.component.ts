@@ -1523,7 +1523,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         code = '+971';
       }
 
-      // ✅ Ensure '+' exists
+      // Ensure '+' exists
       if (!code.startsWith('+')) {
         code = '+' + code;
       }
@@ -1531,7 +1531,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       this.shippingCountryCode = code;
       this.newPoData.CONTACT_MOBILE = number;
     } else {
-      // ✅ fallback safety
+      // fallback safety
       this.shippingCountryCode = '+971';
       this.newPoData.CONTACT_MOBILE = mobile.replace(/\D/g, '');
     }

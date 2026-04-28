@@ -154,7 +154,7 @@ export class AddInvoiceRetailComponent {
     if (firstFinYear?.FIN_ID) {
       this.invoiceFormData.FIN_ID = firstFinYear.FIN_ID;
     }
-
+    this.getStoreData();
     if (this.isHQApp && configStore) {
       this.filteredStoreList = [
         {
@@ -208,6 +208,7 @@ export class AddInvoiceRetailComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
+      console.log(this.storeID, 'STORELISTTTTTTTTTTT');
       if (!this.isHQApp) {
         this.filteredStoreList = this.storeList; //update here
       }
@@ -906,6 +907,7 @@ export class AddInvoiceRetailComponent {
     this.invoiceFormData.DISCOUNT_AMOUNT = discamt;
     this.invoiceFormData.Details = validDetails;
     this.invoiceFormData.PARTY_NAME = String(this.invoiceFormData.CUSTOMER_ID);
+
     this.invoiceFormData.TRANS_DATE = this.formatDateOnly(
       this.invoiceFormData.TRANS_DATE,
     );
@@ -921,21 +923,21 @@ export class AddInvoiceRetailComponent {
 
     console.log('SAVE/UPDATE/APPROVE PAYLOAD', payload);
 
-    // 🔥 API DECISION LOGIC
+    //API DECISION LOGIC
     let apiCall;
 
     if (this.isEditing && this.invoiceFormData.IS_APPROVED) {
-      // ✅ EDIT + APPROVE
+      //  EDIT + APPROVE
       apiCall = this.dataService.approveRetailInvoice(payload);
     } else if (this.isEditing) {
-      // ✅ EDIT ONLY
+      //  EDIT ONLY
       apiCall = this.dataService.updateRetailInvoice(payload);
     } else {
-      // ✅ ADD
+      //  ADD
       apiCall = this.dataService.saveRetailInvoice(payload);
     }
 
-    // 🔥 API CALL
+    //  API CALL
     apiCall.subscribe({
       next: () => {
         this.isSaving = false;
