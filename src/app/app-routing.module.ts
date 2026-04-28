@@ -193,6 +193,7 @@ import { DiscountWiseSalesComponent } from './pages/REPORT/discount-wise-sales/d
 import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
 import { TenderSummaryComponent } from './pages/REPORT/tender-summary/tender-summary.component';
 import { ZReportComponent } from './pages/REPORT/zreport/zreport.component';
+import { SalesInvoiceRetailComponent } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -1210,6 +1211,11 @@ const routes: Routes = [
       {
         path: 'z-report',
         component: ZReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'sales-invoice-retail',
+        component: SalesInvoiceRetailComponent,
         canActivate: [AuthGuardService],
       },
       {

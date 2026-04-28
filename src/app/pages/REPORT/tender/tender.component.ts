@@ -248,7 +248,7 @@ export class TenderComponent {
             this.selected_from_date = SystemDate;
             this.selected_To_date = SystemDate;
         
-            this.load_JournalBook_data();
+            // this.load_JournalBook_data();
             this.store_dropdown();
             this.getCustomerOrUnitLst();
           }
@@ -604,10 +604,11 @@ export class TenderComponent {
       
         getCustomerOrUnitLst() {
           const payload = {
-            COMPANY_ID: this.selected_Company_id
+            COMPANY_ID: this.selected_Company_id,
+            NAME:'CUSTOMER'
           };
           this.dataService
-            .getOutsideCustomerWithState(payload)
+            .Common_Dropdown(payload)
             .subscribe((response: any) => {
               this.distributorList = response;
             });

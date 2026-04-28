@@ -6538,4 +6538,8 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'SalesReport/ZReport';
     return this.http.post(getEndpoint, payload)
   }
+
+  Select_SalesInvoice_Retail(id:number){
+    return this.http.post<any>(`${this.apiUrl}MiscSales/delete/` + id, {});
+  }
 }
