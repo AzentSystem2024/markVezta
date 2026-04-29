@@ -52,6 +52,7 @@ import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sa
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import notify from 'devextreme/ui/notify';
+import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 
 
@@ -248,7 +249,7 @@ export class TenderComponent {
             this.selected_from_date = SystemDate;
             this.selected_To_date = SystemDate;
         
-            this.load_JournalBook_data();
+            // this.load_JournalBook_data();
             this.store_dropdown();
             this.getCustomerOrUnitLst();
           }
@@ -473,19 +474,19 @@ export class TenderComponent {
             });
           }
         
-          onViewClick(e: any) {
-            console.log(e)
-            const trans_id = e.row.data.TRANS_ID;
+           onViewClick(e: any) {
+        console.log(e)
+        const trans_id = e.row.data.TRANS_ID;
+    
+         this.dataService
+      .Select_SalesInvoice_Retail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.data;
+
         
-           this.dataService
-            .selectInvoiceRetail(trans_id)
-            .subscribe((response: any) => {
-              this.selectedInvoice = response.Data;
-      
-              
-                this.isViewInvoice = true;
-            });
-          }
+          this.isViewInvoice = true;
+      });
+      }
         
           summaryColumnsData = {
             totalItems: [
@@ -604,10 +605,11 @@ export class TenderComponent {
       
         getCustomerOrUnitLst() {
           const payload = {
-            COMPANY_ID: this.selected_Company_id
+            COMPANY_ID: this.selected_Company_id,
+            NAME:'CUSTOMER'
           };
           this.dataService
-            .getOutsideCustomerWithState(payload)
+            .Common_Dropdown(payload)
             .subscribe((response: any) => {
               this.distributorList = response;
             });
@@ -669,6 +671,7 @@ export class TenderComponent {
        DxTagBoxModule,
        DxFormModule,
        AddInvoiceRetailModule,
+       AddSalesInvoiceRetailModule,
   ],
   providers: [],
   exports: [],

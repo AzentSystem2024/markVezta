@@ -195,8 +195,8 @@ export class SalesOrderFormComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     this.salesOrderFormData.STORE_ID = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/quotation');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/sales-order');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

@@ -65,6 +65,7 @@
             placeholder="Select Store *"
             [searchEnabled]="true"
             [elementAttr]="{ class: 'grndropdown' }"
+            [readOnly]="readOnly"
           >
           </dx-select-box>
           <dx-select-box
@@ -330,7 +331,7 @@
               [width]="200"
             ></dx-text-box>
             <dx-text-box
-              label="Narration"
+              label="Remarks"
               labelMode="floating"
               [(value)]="purchaseInvoiceFormData.NARRATION"
               [width]="400"

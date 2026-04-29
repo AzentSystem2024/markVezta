@@ -51,6 +51,8 @@ import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/pa
 import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import notify from 'devextreme/ui/notify';
+import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 
 @Component({
@@ -156,6 +158,7 @@ export class SalesSummaryComponent {
    // Add this variable
 isFilterVisible: boolean = true;
   distributorList: any;
+   today: Date = new Date();
 
   Saletype = [
   { ID: 0, DESCRIPTION: 'All' },
@@ -233,7 +236,7 @@ toggleFiltersPanel() {
       this.selected_from_date = SystemDate;
       this.selected_To_date = SystemDate;
   
-      this.load_JournalBook_data();
+      // this.load_JournalBook_data();
       this.store_dropdown();
       this.item_dropdown();
       this.getCustomerOrUnitLst();
@@ -369,12 +372,26 @@ toggleFiltersPanel() {
   
     onFromDateChange(event: any) {
       const rawDate: Date = new Date(event.value);
+       const today = new Date();
+            
+              if (rawDate > today) {
+                notify('From Date cannot be greater than today', 'error', 2000);
+                this.selected_from_date = today;
+                return;
+              }
       this.formatted_from_date = this.formatDate(rawDate);
       // this.reloadJournalBook();
     }
   
     onToDateChange(event: any) {
       const rawDate: Date = new Date(event.value);
+       const today = new Date();
+
+  if (rawDate > today) {
+    notify('To Date cannot be greater than today', 'error', 2000);
+    this.selected_To_date = today;
+    return;
+  }
       this.formatted_To_date = this.formatDate(rawDate);
       // this.reloadJournalBook();
     }
@@ -420,6 +437,17 @@ toggleFiltersPanel() {
                 this.journalBookCount = list.length;
   
                 this.ledgerSummaryData = list;
+                 if (list.length === 0) {
+    notify({
+      message: 'No data available',
+      type: 'warning',
+      displayTime: 2000,
+      position: {
+        at: 'top center',
+        my: 'top center'
+      }
+    });
+  }
                 this.isFilterVisible = false
                 resolve(list); // 🔑 grid gets data
               },
@@ -434,19 +462,19 @@ toggleFiltersPanel() {
       });
     }
   
-    onViewClick(e: any) {
-      console.log(e)
-      const trans_id = e.row.data.TRANS_ID;
-  
-     this.dataService
-      .selectInvoiceRetail(trans_id)
+   onViewClick(e: any) {
+        console.log(e)
+        const trans_id = e.row.data.TRANS_ID;
+    
+         this.dataService
+      .Select_SalesInvoice_Retail(trans_id)
       .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
+        this.selectedInvoice = response.data;
 
         
           this.isViewInvoice = true;
       });
-    }
+      }
 
     getNetAmount = (rowData: any) => {
   return rowData['Inc.VAT Total'];
@@ -656,6 +684,7 @@ getExVATtotal = (rowData: any) => {
        DxTagBoxModule,
        DxFormModule,
        AddInvoiceRetailModule,
+       AddSalesInvoiceRetailModule,
   ],
   providers: [],
   exports: [],

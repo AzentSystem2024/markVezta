@@ -419,6 +419,8 @@ import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages
 import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
 import { TenderSummaryComponent, TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
 import { ZReportComponent, ZReportModule } from './pages/REPORT/zreport/zreport.component';
+import { SalesInvoiceRetailComponent, SalesInvoiceRetailModule } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
+import { AddSalesInvoiceRetailComponent, AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -813,6 +815,8 @@ import { ZReportComponent, ZReportModule } from './pages/REPORT/zreport/zreport.
     TenderModule,
     TenderSummaryModule,
     ZReportModule,
+    SalesInvoiceRetailModule,
+    AddSalesInvoiceRetailModule,
   ],
 
   providers: [
