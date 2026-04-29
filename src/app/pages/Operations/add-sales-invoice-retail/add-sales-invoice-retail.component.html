@@ -97,16 +97,20 @@
           <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
           <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
           <dxi-column dataField="QUANTITY" caption="Qty"></dxi-column>
-          <dxi-column dataField="PRICE" caption="Price"></dxi-column>
-          <dxi-column dataField="DISC_PERC" caption="Disc %"></dxi-column>
+          <dxi-column dataField="PRICE" caption="Price" dataType="number" format="#,##0.00"></dxi-column>
+          <dxi-column dataField="DISC_PERC" caption="Discount" dataType="number"
+  format="#,##0.00"></dxi-column>
           <dxi-column
             dataField="AMOUNT_INCL_VAT"
-            caption="Amount(Incl.VAT)">
+            caption="Amount(Incl.VAT)" dataType="number"
+  format="#,##0.00">
           </dxi-column>
 <dxi-column dataField="TAX_PERC" caption="VAT %"></dxi-column>
        <dxi-column
             dataField="TAX_AMOUNT"
-            caption="VAT Amt">
+            caption="VAT Amt"
+            dataType="number"
+  format="#,##0.00">
           </dxi-column>       
 
         </dx-data-grid>
@@ -134,7 +138,8 @@
           height="85%">
 
           <dxi-column dataField="TYPE" caption="Tender"></dxi-column>
-          <dxi-column dataField="AMOUNT" caption="Amount"></dxi-column>
+          <dxi-column dataField="AMOUNT" caption="Amount" dataType="number"
+  format="#,##0.00"></dxi-column>
 
         </dx-data-grid>
 
@@ -146,17 +151,14 @@
     <div class="totals-section">
 
       <dx-number-box [(value)]="totalQty" label="TotalQty" labelMode="floating"></dx-number-box>
-      <dx-number-box [(value)]="totalExclVAT" label="Total Excl VAT" labelMode="floating"></dx-number-box>
-      <dx-number-box [(value)]="vatAmount" label="VAT Amount" labelMode="floating"></dx-number-box>
-      <dx-number-box [(value)]="totalInclVAT" label="Total Incl.VAT" labelMode="floating"></dx-number-box>
-      <dx-number-box [(value)]="totalTender" label="Total Tender" labelMode="floating"></dx-number-box>
-
-    </div>
-
-    <!-- 🔹 FOOTER -->
-    <div class="footer">
-
-      <dx-button text="Cancel" (onClick)="cancel()"></dx-button>
+      <dx-number-box [(value)]="totalExclVAT" label="Total Excl VAT" labelMode="floating" dataType="number"
+  format="#,##0.00"></dx-number-box>
+      <dx-number-box [(value)]="vatAmount" label="VAT Amount" labelMode="floating" dataType="number"
+  format="#,##0.00"></dx-number-box>
+      <dx-number-box [(value)]="totalInclVAT" label="Total Incl.VAT" labelMode="floating" dataType="number"
+  format="#,##0.00"></dx-number-box>
+      <dx-number-box [(value)]="totalTender" label="Total Tender" labelMode="floating" dataType="number"
+  format="#,##0.00"></dx-number-box>
 
     </div>
 
