@@ -161,10 +161,17 @@
                   <dxi-column
                     dataField="ITEM_CODE"
                     caption="Item Code"
+                    [editorType]="'dxSelectBox'"
                     [lookup]="{
                       dataSource: items,
                       valueExpr: 'ITEM_ID',
                       displayExpr: 'ITEM_CODE',
+                      searchEnabled: true,
+                      searchMode: 'startswith',
+                      minSearchLength: 2,
+                      showDataBeforeSearch: false,
+                      paginate: true,
+                      pageSize: 50,
                     }"
                     [width]="250"
                   >
@@ -172,10 +179,17 @@
                   <dxi-column
                     dataField="DESCRIPTION"
                     caption="Description"
+                    [editorType]="'dxSelectBox'"
                     [lookup]="{
                       dataSource: items,
                       valueExpr: 'ITEM_ID',
                       displayExpr: 'DESCRIPTION',
+                      searchEnabled: true,
+                      searchMode: 'startswith',
+                      minSearchLength: 2,
+                      showDataBeforeSearch: false,
+                      paginate: true,
+                      pageSize: 50,
                     }"
                     [width]="300"
                   ></dxi-column>

@@ -239,12 +239,13 @@
             <dxi-total-item
               column="STOCK_QTY"
               summaryType="sum"
-              displayFormat="Total: {0}"
+              displayFormat="{0}"
             ></dxi-total-item>
             <dxi-total-item
               column="TOTAL_AMOUNT"
               summaryType="sum"
               valueFormat="#,##0.00"
+              displayFormat="{0}"
               [format]="{ type: 'fixedPoint', precision: 2 }"
             ></dxi-total-item>
           </dxo-summary>

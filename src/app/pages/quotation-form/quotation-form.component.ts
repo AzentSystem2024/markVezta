@@ -176,60 +176,6 @@ export class QuotationFormComponent {
     private ngZone: NgZone,
   ) {}
 
-  // ngOnInit() {
-  //   const currentUrl = this.router.url;
-  //   console.log('Current URL:', currentUrl);
-  //   const menuResponse = JSON.parse(
-  //     sessionStorage.getItem('savedUserData') || '{}',
-  //   );
-  //   this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
-
-  //   this.userID = menuResponse.USER_ID;
-  //   this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-  //   this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-  //   console.log(
-  //     this.companyID,
-  //     menuResponse,
-  //     'COMPANYIDDDDDDDDDDDDDDDDDDDDDDDDDDD',
-  //   );
-  //   const menuGroups = menuResponse.MenuGroups || [];
-  //   this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
-  //   const packingRights = menuGroups
-  //     .flatMap((group) => group.Menus)
-  //     .find((menu) => menu.Path === '/quotation');
-
-  //   if (packingRights) {
-  //     this.canAdd = packingRights.CanAdd;
-  //     this.canEdit = packingRights.CanEdit;
-  //     this.canDelete = packingRights.CanDelete;
-  //     this.canPrint = packingRights.CanEdit;
-  //     this.canView = packingRights.canView;
-  //     this.canApprove = packingRights.canApprove;
-  //   }
-  //   if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
-  //     // this.getItemsList();
-  //   } else {
-  //     // this.getItemsList();
-  //   }
-  //   // this.getStoreDropdown();
-  //   console.log('packingRights', packingRights);
-  //   console.log(this.canAdd, this.canEdit, this.canDelete);
-  //   this.sessionData_tax();
-  //   this.getSalesmanDropdown();
-  //   this.getCustomerDropdown();
-  //   this.getPymentTermsDropdown();
-  //   this.getDeliveryTermsDropdown();
-  //   this.getQuotationNo(); // always fetch fresh number when popup opens
-  //   this.getTermsAndConditionsList();
-  //   this.getStoreDropdown();
-  //   // this.items = [];
-  //   // this.addEmptyRow();
-  //   this.getItems().subscribe(() => {
-  //     this.isEditDataAvailable();
-  //   });
-  //   this.setTaxSummaryLabel();
-  // }
-
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
@@ -254,8 +200,8 @@ export class QuotationFormComponent {
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/quotation');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/quotation');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -601,7 +547,7 @@ export class QuotationFormComponent {
 
     return this.dataService.getItemsForQuotation(payload).pipe(
       tap((response: any) => {
-        this.items = response.Data || [];
+        this.items = (response.Data || []).slice(0, 200);
         this.itemDataCache.set(cacheKey, [...this.items]);
       }),
     );
