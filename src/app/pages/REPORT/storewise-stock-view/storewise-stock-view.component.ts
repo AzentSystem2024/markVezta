@@ -429,16 +429,13 @@ export class StorewiseStockViewComponent {
       return sum + Number(row.StoreStock?.TOTAL || 0);
     }, 0);
   }
-
   onCellPrepared(e: any) {
+    // 🔹 GRAND TOTAL
     if (
       e.rowType === 'totalFooter' &&
       e.column?.dataField === 'StoreStock.TOTAL'
     ) {
-      const formatted = (this.grandTotal || 0).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
+      const formatted = (this.grandTotal || 0).toLocaleString(); // ✅ no decimals
 
       e.cellElement.innerHTML = `
       <div style="text-align: right; font-weight: bold; padding-right: 20px;">
@@ -448,17 +445,16 @@ export class StorewiseStockViewComponent {
     }
 
     // 🔹 DYNAMIC STORE COLUMNS
-    if (e.rowType === 'totalFooter' && e.column?.dataField?.startsWith('StoreStock.')) {
-
+    if (
+      e.rowType === 'totalFooter' &&
+      e.column?.dataField?.startsWith('StoreStock.')
+    ) {
       const key = e.column.dataField.split('.')[1];
 
       if (key !== 'TOTAL') {
         const total = this.storeColumnTotals[key] || 0;
 
-        const formatted = total.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
+        const formatted = total.toLocaleString(); // ✅ no decimals
 
         e.cellElement.innerHTML = `
         <div style="text-align: right; font-weight: bold;">
