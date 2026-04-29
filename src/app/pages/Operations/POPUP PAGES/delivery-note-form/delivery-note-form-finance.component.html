@@ -199,7 +199,7 @@
             <dx-text-box
               #narrationRef
               [(value)]="deliveryFormData.NARRATION"
-              label="Narration"
+              label="Remarks"
               labelMode="floating"
               class="narration-box"
               [readOnly]="isReadOnlyMode"
@@ -211,7 +211,7 @@
               label="Contact Name"
               labelMode="floating"
               [width]="410"
-              [readOnly]="true"
+              [readOnly]="false"
               style="margin-top: 10px"
             ></dx-text-box>
             <div style="flex: 1">
@@ -220,7 +220,7 @@
                 label="Fax"
                 labelMode="floating"
                 [width]="410"
-                [readOnly]="true"
+                [readOnly]="false"
               ></dx-text-box>
             </div>
           </div>
@@ -241,14 +241,14 @@
                 [(value)]="deliveryFormData.CONTACT_PHONE"
                 label="Phone"
                 labelMode="floating"
-                [readOnly]="true"
+                [readOnly]="false"
               ></dx-text-box>
 
               <dx-text-box
                 [(value)]="deliveryFormData.CONTACT_MOBILE"
                 label="Mobile"
                 labelMode="floating"
-                [readOnly]="true"
+                [readOnly]="false"
               >
               </dx-text-box>
             </div>

@@ -241,7 +241,7 @@ export class InvoiceRetailComponent {
       //  else {
       this.filteredStoreList = this.storeList;
 
-      // ✅ default select first store
+      // default select first store
       if (!this.selectedStoreId && this.storeList?.length) {
         this.selectedStoreId = this.storeList[0].ID;
         // }
