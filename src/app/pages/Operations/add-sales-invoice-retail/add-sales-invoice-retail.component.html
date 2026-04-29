@@ -17,29 +17,26 @@
         width="180">
       </dx-text-box>
 
-      <dx-date-box
-        label="Date"
-        [(value)]="invoiceFormData.TRANS_DATE"
-        type="date"
-        [readOnly]="true"
-        displayFormat="dd-MM-yyyy"
-        labelMode="floating"
-        width="180">
-      </dx-date-box>
+     <dx-date-box
+  label="Date"
+  [(value)]="invoiceFormData.TRANS_DATE"
+  type="date"
+  [readOnly]="true"
+  displayFormat="dd-MM-yyyy"
+  labelMode="floating"
+  width="180">
+</dx-date-box>
     </div>
 
     <!-- RIGHT SIDE -->
     <div class="right-section">
-      <dx-select-box
+      <dx-text-box
         label="Store"
-        [dataSource]="filteredStoreList"
-        [(value)]="invoiceFormData.STORE_ID"
-        displayExpr="DESCRIPTION"
-        valueExpr="ID"
+        [(value)]="invoiceFormData.STORE_NAME"
         [readOnly]="true"
         labelMode="floating"
          width="250">
-      </dx-select-box>
+      </dx-text-box>
     </div>
 
   </div>
@@ -49,16 +46,13 @@
 
     <!-- LEFT -->
     <div class="left-section">
-      <dx-select-box
+      <dx-text-box
         label="Customer"
-        [dataSource]="customerList"
-        [(value)]="invoiceFormData.CUSTOMER_ID"
-        displayExpr="DESCRIPTION"
-        valueExpr="ID"
+        [(value)]="invoiceFormData.CUST_NAME"
         [readOnly]="true"
         labelMode="floating"
         width="380">
-      </dx-select-box>
+      </dx-text-box>
     </div>
 
     <!-- RIGHT -->
@@ -97,12 +91,8 @@
       [columnResizingMode]="'nextColumn'"
       [filterRow]="{ visible: false }"
       [headerFilter]="{ visible: true }"
-          height="100%"
-          [editing]="{
-            mode: 'cell',
-            allowUpdating: true,
-            allowDeleting: true
-          }">
+      height="85%"
+         >
 
           <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
           <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
@@ -110,22 +100,14 @@
           <dxi-column dataField="PRICE" caption="Price"></dxi-column>
           <dxi-column dataField="DISC_PERC" caption="Disc %"></dxi-column>
           <dxi-column
-            dataField="AMOUNT"
-            caption="Amount(Incl.VAT)"
-            [calculateCellValue]="calculateAmount">
+            dataField="AMOUNT_INCL_VAT"
+            caption="Amount(Incl.VAT)">
           </dxi-column>
 <dxi-column dataField="TAX_PERC" caption="VAT %"></dxi-column>
        <dxi-column
             dataField="TAX_AMOUNT"
-            caption="VAT Amt"
-            [calculateCellValue]="calculateTax">
+            caption="VAT Amt">
           </dxi-column>       
-
-          <dxi-column
-            dataField="TOTAL_AMOUNT"
-            caption="Total"
-            [calculateCellValue]="calculateTotal">
-          </dxi-column>
 
         </dx-data-grid>
 
@@ -137,7 +119,19 @@
         <dx-data-grid
           [dataSource]="tenderList"
           [showBorders]="true"
-          height="100%">
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: true }"
+          height="85%">
 
           <dxi-column dataField="TYPE" caption="Tender"></dxi-column>
           <dxi-column dataField="AMOUNT" caption="Amount"></dxi-column>
@@ -155,7 +149,7 @@
       <dx-number-box [(value)]="totalExclVAT" label="Total Excl VAT" labelMode="floating"></dx-number-box>
       <dx-number-box [(value)]="vatAmount" label="VAT Amount" labelMode="floating"></dx-number-box>
       <dx-number-box [(value)]="totalInclVAT" label="Total Incl.VAT" labelMode="floating"></dx-number-box>
-      <dx-number-box [(value)]="totalInclVAT" label="Total Tender" labelMode="floating"></dx-number-box>
+      <dx-number-box [(value)]="totalTender" label="Total Tender" labelMode="floating"></dx-number-box>
 
     </div>
 

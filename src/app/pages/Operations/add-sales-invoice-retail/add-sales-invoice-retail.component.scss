@@ -25,11 +25,16 @@
   display: flex;
   gap: 10px;
   padding: 0 20px;
-  flex: 1;
+  flex: 1;              /* 👈 restore this */
+  min-height: 0;        /* 👈 IMPORTANT for flex scrolling */
 }
 
-.grid-section {
-  flex: 3;
+.grid-section,
+.tender-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .tender-section {
@@ -40,8 +45,9 @@
 .totals-section {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 10px 20px;
+  gap: 8px;
+  padding: 5px 15px;
+  margin-top: -5px;
 }
 
 .footer {

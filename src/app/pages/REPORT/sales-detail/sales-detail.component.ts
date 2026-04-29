@@ -502,7 +502,7 @@ selectedSaletype = [0]; // or [] if nothing selected
          this.dataService
       .Select_SalesInvoice_Retail(trans_id)
       .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
+        this.selectedInvoice = response.data;
 
         
           this.isViewInvoice = true;

@@ -5,6 +5,7 @@ import {
   Input,
   NgModule,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -52,54 +53,89 @@ import dxSelectBox from 'devextreme/ui/select_box';
 })
 export class AddSalesInvoiceRetailComponent {
  @Input() EditingResponseData: any;
-   invoiceFormData: any = {
+  
+    // ✅ MAIN FORM MODEL
+  invoiceFormData: any = {
     DOC_NO: '',
-    TRANS_DATE: new Date(),
-    STORE_ID: null,
-    CUSTOMER_ID: null,
-    Details: [
-      {
-        ITEM_CODE: '',
-        DESCRIPTION: '',
-        QUANTITY: 0,
-        PRICE: 0,
-        DISC_PERC: 0,
-        TAX_PERC: 0
-      }
-    ]
+    TRANS_DATE: null,
+    STORE_NAME: '',
+    CUST_NAME: '',
+    SALESMAN: '',
+    Details: []
   };
 
-  filteredStoreList = [];
-  customerList = [];
+  // ✅ TENDER LIST
+  tenderList: any[] = [];
 
-  tenderList = [
-    { TYPE: 'FAB POS CARD', AMOUNT: 138 }
-  ];
+  // ✅ TOTALS
+  totalQty = 0;
+  totalExclVAT = 0;
+  vatAmount = 0;
+  totalInclVAT = 0;
+  totalTender =0;
 
-  totalQty = 2;
-  totalExclVAT = 131.43;
-  vatAmount = 6.57;
-  totalInclVAT = 138;
+ngOnChanges(changes: SimpleChanges) {
+    if (changes['EditingResponseData'] && this.EditingResponseData) {
+      this.bindData(this.EditingResponseData);
+    }
+  }
 
-  calculateAmount = (row: any) => {
-    return row.PRICE * row.QUANTITY;
-  };
+  // ✅ MAIN BIND FUNCTION
+  bindData(data: any) {
+    console.log('Incoming Data:', data);
 
-  calculateDiscAmt = (row: any) => {
-    return (row.PRICE * row.QUANTITY) * (row.DISC_PERC || 0) / 100;
-  };
+    const header = data?.Header;
+    if (!header) return;
 
-  calculateTax = (row: any) => {
-    const amount = this.calculateAmount(row);
-    return amount * (row.TAX_PERC || 0) / 100;
-  };
+    // 🔹 Assign values (DO NOT replace whole object)
+    this.invoiceFormData.DOC_NO = header.INVOICE_NO;
+    this.invoiceFormData.TRANS_DATE = header.SALE_DATE ? new Date(header.SALE_DATE) : null;
+    this.invoiceFormData.STORE_NAME = header.STORE_NAME || '';
+    this.invoiceFormData.CUST_NAME = header.CUST_NAME || '';
+    this.invoiceFormData.SALESMAN = header.EMP_NAME || '';
 
-  calculateTotal = (row: any) => {
-    const amount = this.calculateAmount(row);
-    const tax = this.calculateTax(row);
-    const disc = this.calculateDiscAmt(row);
-    return amount + tax - disc;
-  };
+    // 🔹 DETAILS GRID
+    this.invoiceFormData.Details = (data.Details || []).map((d: any) => ({
+      ITEM_CODE: d.ITEM_CODE,
+      DESCRIPTION: d.DESCRIPTION,
+      QUANTITY: d.QUANTITY,
+      PRICE: d.PRICE,
+      DISC_PERC: d.DISCOUNT || 0,
+      AMOUNT_INCL_VAT: d.AMOUNT_INCL_VAT || 0,
+      TAX_PERC: d.VAT_PERCENT || 0,
+      TAX_AMOUNT: d.VAT_AMOUNT || 0,
+      TOTAL_AMOUNT: d.AMOUNT_INCL_VAT || 0
+    }));
+
+    // 🔹 TENDER GRID
+    this.tenderList = (data.Tenders || []).map((t: any) => ({
+      TYPE: t.DESCRIPTION,
+      AMOUNT: t.AMOUNT
+    }));
+
+    // 🔹 TOTALS
+    this.totalQty = this.invoiceFormData.Details.reduce(
+      (sum: number, x: any) => sum + (x.QUANTITY || 0), 0
+    );
+
+    this.totalExclVAT = this.invoiceFormData.Details.reduce(
+      (sum: number, x: any) => sum + ((x.GROSS_AMOUNT || 0)), 0
+    );
+
+    this.vatAmount = this.invoiceFormData.Details.reduce(
+  (sum: number, x: any) => sum + (x.TAX_AMOUNT || 0),
+  0
+);
+    this.totalInclVAT = this.invoiceFormData.Details.reduce(
+  (sum: number, x: any) => sum + (x.AMOUNT_INCL_VAT || 0),
+  0
+);
+
+this.totalTender = this.tenderList.reduce(
+  (sum: number, t: any) => sum + (t.AMOUNT || 0),
+  0
+);
+  }
 
   cancel() {
     console.log('Cancelled');
