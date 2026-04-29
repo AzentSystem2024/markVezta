@@ -6540,6 +6540,6 @@ The result can be exported to HTML or Markdown.`;
   }
 
   Select_SalesInvoice_Retail(id:number){
-    return this.http.post<any>(`${this.apiUrl}MiscSales/delete/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}SalesPOS/select/` + id, {});
   }
 }

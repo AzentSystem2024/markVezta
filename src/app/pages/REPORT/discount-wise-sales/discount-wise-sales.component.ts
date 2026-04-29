@@ -52,6 +52,7 @@ import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sa
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import notify from 'devextreme/ui/notify';
+import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 
 
@@ -499,18 +500,18 @@ selectedItemProperty2:any;
           }
         
           onViewClick(e: any) {
-            console.log(e)
-            const trans_id = e.row.data.TRANS_ID;
+        console.log(e)
+        const trans_id = e.row.data.TRANS_ID;
+    
+         this.dataService
+      .Select_SalesInvoice_Retail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.data;
+
         
-           this.dataService
-            .selectInvoiceRetail(trans_id)
-            .subscribe((response: any) => {
-              this.selectedInvoice = response.Data;
-      
-              
-                this.isViewInvoice = true;
-            });
-          }
+          this.isViewInvoice = true;
+      });
+      }
         
           summaryColumnsData = {
             totalItems: [
@@ -798,7 +799,7 @@ selectedItemProperty2:any;
        PayrollViewReportModule,
        DxTagBoxModule,
        DxFormModule,
-       AddInvoiceRetailModule,
+       AddSalesInvoiceRetailModule,
   ],
   providers: [],
   exports: [],

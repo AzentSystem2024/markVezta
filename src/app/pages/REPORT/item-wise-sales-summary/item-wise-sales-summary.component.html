@@ -347,15 +347,14 @@
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="New Invoice"
+  title="Invoice"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice-retail
-    [isEditing]="true"
+  <app-add-sales-invoice-retail
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
+  ></app-add-sales-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>
 
