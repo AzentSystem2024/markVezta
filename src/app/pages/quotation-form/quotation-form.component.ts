@@ -232,16 +232,21 @@ export class QuotationFormComponent {
     // Fetch quotation number
     this.getQuotationNo();
 
-    // SAFE CALL: getItems() may return undefined
-    const items$ = this.getItems();
-    if (items$) {
-      items$.subscribe(() => {
-        this.isEditDataAvailable();
-      });
-    } else {
-      // fallback when items are already cached or storeId missing
-      this.isEditDataAvailable();
-    }
+    // // SAFE CALL: getItems() may return undefined
+    // const items$ = this.getItems();
+    // if (items$) {
+    //   items$.subscribe(() => {
+    //     this.isEditDataAvailable();
+    //   });
+    // } else {
+    //   // fallback when items are already cached or storeId missing
+    //   this.isEditDataAvailable();
+    // }
+
+    this.getItems()?.subscribe();
+
+    // Immediately load edit data
+    this.isEditDataAvailable();
 
     this.setTaxSummaryLabel();
   }
@@ -533,7 +538,10 @@ export class QuotationFormComponent {
 
   getItems() {
     const STORE_ID = this.storeId;
-    if (!STORE_ID) return;
+    if (!STORE_ID) {
+      // notify('Please select a Store first', 'warning', 3000);
+      return;
+    }
 
     const cacheKey = `${STORE_ID}`;
 
@@ -603,7 +611,25 @@ export class QuotationFormComponent {
         };
       }
     }
+    if (isLookup) {
+      e.editorOptions.onOpened = () => {
+        if (!this.storeId) {
+          notify('Please select a Store first', 'warning', 3000);
 
+          // Close dropdown immediately
+          setTimeout(() => {
+            e.component.closeEditCell();
+          }, 0);
+        }
+      };
+
+      e.editorOptions.onFocusIn = () => {
+        if (!this.storeId) {
+          notify('Please select a Store first', 'warning', 3000);
+          e.component.closeEditCell();
+        }
+      };
+    }
     if (
       e.dataField === 'ITEM_CODE' ||
       e.dataField === 'DESCRIPTION' ||
@@ -624,11 +650,11 @@ export class QuotationFormComponent {
             grid.cellValue(rowIndex, 'ITEM_ID', selectedItem.ITEM_ID);
             grid.cellValue(rowIndex, 'ITEM_CODE', selectedItem.ITEM_ID);
             grid.cellValue(rowIndex, 'DESCRIPTION', selectedItem.ITEM_ID);
-            grid.cellValue(
-              rowIndex,
-              'STOCK_QTY',
-              Number(selectedItem.STOCK_QTY || 0),
-            );
+            // grid.cellValue(
+            //   rowIndex,
+            //   'STOCK_QTY',
+            //   Number(selectedItem.STOCK_QTY || 0),
+            // );
             grid.cellValue(rowIndex, 'UOM', selectedItem.UOM);
             grid.cellValue(
               rowIndex,
