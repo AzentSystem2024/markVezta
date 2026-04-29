@@ -536,7 +536,8 @@ export class PurchaseReturnDebitFormComponent {
       e.dataField === 'VAT_PERC' ||
       e.dataField === 'RATE' ||
       e.dataField === 'STORE_ID' ||
-      e.dataField === 'DEPT_ID'
+      e.dataField === 'DEPT_ID' ||
+      e.dataField === 'AMOUNT'
     ) {
       e.editorOptions = e.editorOptions || {};
 

@@ -228,22 +228,23 @@ export class InvoiceRetailComponent {
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
       const configStore = userData.Configuration?.[0];
 
-      if (this.isHQApp && configStore) {
-        this.filteredStoreList = [
-          {
-            ID: configStore.STORE_ID,
-            DESCRIPTION: configStore.STORE_NAME,
-          },
-        ];
+      // if (this.isHQApp && configStore) {
+      //   this.filteredStoreList = [
+      //     {
+      //       ID: configStore.STORE_ID,
+      //       DESCRIPTION: configStore.STORE_NAME,
+      //     },
+      //   ];
 
-        this.selectedStoreId = configStore.STORE_ID;
-      } else {
-        this.filteredStoreList = this.storeList;
+      //   this.selectedStoreId = configStore.STORE_ID;
+      // }
+      //  else {
+      this.filteredStoreList = this.storeList;
 
-        // ✅ default select first store
-        if (!this.selectedStoreId && this.storeList?.length) {
-          this.selectedStoreId = this.storeList[0].ID;
-        }
+      // ✅ default select first store
+      if (!this.selectedStoreId && this.storeList?.length) {
+        this.selectedStoreId = this.storeList[0].ID;
+        // }
       }
 
       // 🔥 Load data AFTER store is ready
