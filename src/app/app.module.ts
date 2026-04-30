@@ -415,8 +415,12 @@ import { ItemwisesalesComponent, ItemwisesalesModule } from './pages/REPORT/item
 import { ItemWiseSalesSummaryComponent, ItemWiseSalesSummaryModule } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
 import { DiscountWiseSalesComponent, DiscountWiseSalesModule } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
 import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
+// import { ItemStorePropertiesViewComponent, ItemStorePropertiesViewModule } from './pages/item-store-properties-view/item-store-properties-view.component';
 import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
 import { TenderSummaryComponent, TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
+import { ZReportComponent, ZReportModule } from './pages/REPORT/zreport/zreport.component';
+import { SalesInvoiceRetailComponent, SalesInvoiceRetailModule } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
+import { AddSalesInvoiceRetailComponent, AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -799,6 +803,7 @@ import { TenderSummaryComponent, TenderSummaryModule } from './pages/REPORT/tend
     MiscellaneousSalesInvoiceModule,
     MiscellaneousSalesInvoiceFormModule,
     StorewiseStockViewModule,
+    ViewPromotionWizardModule,
     SalesSummaryModule,
     SalesDetailModule,
     ConsignmentSummaryModule,
@@ -809,6 +814,9 @@ import { TenderSummaryComponent, TenderSummaryModule } from './pages/REPORT/tend
     ViewPromotionWizardModule,
     TenderModule,
     TenderSummaryModule,
+    ZReportModule,
+    SalesInvoiceRetailModule,
+    AddSalesInvoiceRetailModule,
   ],
 
   providers: [

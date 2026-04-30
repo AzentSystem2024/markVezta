@@ -42,6 +42,7 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
 import { PhysicalInventoryFormModule } from '../POPUP PAGES/physical-inventory-form/physical-inventory-form.component';
+import { ThisReceiver } from '@angular/compiler';
 
 @Component({
   selector: 'app-physical-inventory',
@@ -80,13 +81,14 @@ export class PhysicalInventoryComponent {
     DEPT_ID: any[];
     ALL_ITEMS: boolean;
   } = {
-    CAT_ID: [],
-    SUPP_ID: [],
-    BRAND_ID: [],
-    DEPT_ID: [],
-    ALL_ITEMS: false,
-  };
+      CAT_ID: [],
+      SUPP_ID: [],
+      BRAND_ID: [],
+      DEPT_ID: [],
+      ALL_ITEMS: false,
+    };
   stores: any[] = [];
+  dateFilteredList: any[] = [];
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -123,21 +125,23 @@ export class PhysicalInventoryComponent {
   showCustomDatePopup = false;
   filteredInventoryList: any;
   inventoryList: any;
-  isAddInventory: boolean;
-  selectedInventory: any;
-  isEditSalesOrder: boolean;
-  isReadOnlySalesOrder: boolean;
-  isEditInventory: boolean;
-  isReadOnlyInventory: boolean;
+  isAddInventory: boolean = false;
+  selectedInventory: any = false;
+  isEditSalesOrder: boolean = false;;
+  isReadOnlySalesOrder: boolean = false;;
+  isEditInventory: boolean = false;;
+  isReadOnlyInventory: boolean = false;;
   store: any;
   companyID: any;
   StoreIDData: any;
-
+  Store: any[] = [];
+  selectedStoreid: any[] = [];
+  IS_HQ_App: boolean = false;
   constructor(
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
   ngOnInit() {
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
@@ -163,17 +167,21 @@ export class PhysicalInventoryComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
-    this.getStoreDropdown();
     this.getInventoryList();
-    this.getDropdownList();
-    this.getStoreDropdown();
+    this.getDropdownList()
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.companyID = this.sessionData.Companies[0].COMPANY_ID;
+    this.IS_HQ_App = this.sessionData.GeneralSettings.IS_HQ_APP;
+
+    this.getStoreDropdown();
+
+
+    // this.IS_HQ_App=fa
   }
   getDropdownList() {
     const payloadsupplier = {
@@ -202,15 +210,7 @@ export class PhysicalInventoryComponent {
       .subscribe((response: any) => {
         this.brand = response;
       });
-    const payloadstore = {
-      COMPANY_ID: this.companyID,
-      NAME: 'STORE',
-    };
-    this.dataService
-      .getDropdownData(payloadstore)
-      .subscribe((response: any) => {
-        this.store = response;
-      });
+
     const payloaditemcategory = {
       COMPANY_ID: this.companyID,
       NAME: 'ITEMCATEGORY',
@@ -293,14 +293,71 @@ export class PhysicalInventoryComponent {
     }
   }
 
-  applyDateFilter() {
-    if (!this.selectedDateRange || !this.inventoryList) {
-      this.filteredInventoryList = this.inventoryList;
-      return;
-    }
+  // applyDateFilter() {
+  //   if (!this.selectedDateRange || !this.inventoryList) {
+  //     this.filteredInventoryList = this.inventoryList;
+  //     return;
+  //   }
 
-    if (this.selectedDateRange === 'all') {
-      this.filteredInventoryList = this.inventoryList;
+  //   if (this.selectedDateRange === 'all') {
+  //     this.filteredInventoryList = this.inventoryList;
+  //     return;
+  //   }
+
+  //   const today = new Date();
+  //   let startDate: Date;
+  //   let endDate: Date;
+
+  //   switch (this.selectedDateRange) {
+  //     case 'today':
+  //       startDate = new Date(today);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       endDate = new Date(today);
+  //       endDate.setHours(23, 59, 59, 999);
+  //       break;
+  //     case 'last7':
+  //       startDate = new Date(today);
+  //       startDate.setDate(today.getDate() - 6);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       endDate = new Date(today);
+  //       endDate.setHours(23, 59, 59, 999);
+  //       break;
+  //     case 'last15':
+  //       startDate = new Date(today);
+  //       startDate.setDate(today.getDate() - 14);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       endDate = new Date(today);
+  //       endDate.setHours(23, 59, 59, 999);
+  //       break;
+  //     case 'last30':
+  //       startDate = new Date(today);
+  //       startDate.setDate(today.getDate() - 29);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       endDate = new Date(today);
+  //       endDate.setHours(23, 59, 59, 999);
+  //       break;
+  //     default:
+  //       this.filteredInventoryList = this.inventoryList;
+  //       return;
+  //   }
+
+  //   // Filter from the original list, not the previously filtered one
+  //   this.filteredInventoryList = this.inventoryList.filter((item: any) => {
+  //     if (!item.PHYSICAL_DATE) return false;
+
+  //     const invoiceDate = new Date(item.PHYSICAL_DATE); // ensure it's a Date object
+  //     return invoiceDate >= startDate && invoiceDate <= endDate;
+  //   });
+  // }
+  applyDateFilter() {
+    if (!this.inventoryList) return;
+
+    let baseList = [...this.inventoryList];
+
+    // 🔹 ALL case
+    if (!this.selectedDateRange || this.selectedDateRange === 'all') {
+      this.dateFilteredList = baseList;
+      this.applyStoreFilter(); // ✅ always call
       return;
     }
 
@@ -315,6 +372,7 @@ export class PhysicalInventoryComponent {
         endDate = new Date(today);
         endDate.setHours(23, 59, 59, 999);
         break;
+
       case 'last7':
         startDate = new Date(today);
         startDate.setDate(today.getDate() - 6);
@@ -322,6 +380,7 @@ export class PhysicalInventoryComponent {
         endDate = new Date(today);
         endDate.setHours(23, 59, 59, 999);
         break;
+
       case 'last15':
         startDate = new Date(today);
         startDate.setDate(today.getDate() - 14);
@@ -329,6 +388,7 @@ export class PhysicalInventoryComponent {
         endDate = new Date(today);
         endDate.setHours(23, 59, 59, 999);
         break;
+
       case 'last30':
         startDate = new Date(today);
         startDate.setDate(today.getDate() - 29);
@@ -336,18 +396,42 @@ export class PhysicalInventoryComponent {
         endDate = new Date(today);
         endDate.setHours(23, 59, 59, 999);
         break;
+
       default:
-        this.filteredInventoryList = this.inventoryList;
+        this.dateFilteredList = baseList;
+        this.applyStoreFilter();
         return;
     }
 
-    // Filter from the original list, not the previously filtered one
-    this.filteredInventoryList = this.inventoryList.filter((item: any) => {
+    // 🔹 Step 1: Date filter
+    this.dateFilteredList = baseList.filter((item: any) => {
       if (!item.PHYSICAL_DATE) return false;
-
-      const invoiceDate = new Date(item.PHYSICAL_DATE); // ensure it's a Date object
-      return invoiceDate >= startDate && invoiceDate <= endDate;
+      const date = new Date(item.PHYSICAL_DATE);
+      return date >= startDate && date <= endDate;
     });
+
+    // 🔹 Step 2: Store filter
+    this.applyStoreFilter();
+  }
+  applyStoreFilter() {
+    // ❗ VERY IMPORTANT: start from dateFilteredList
+    let baseList = [...this.dateFilteredList];
+
+    // 🔹 No store selected → show ALL (date filtered)
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.filteredInventoryList = baseList;
+      return;
+    }
+
+    // 🔹 Convert selected IDs → store names
+    const selectedNames = (this.Store || [])
+      .filter((s: any) => this.selectedStoreid.includes(Number(s.ID)))
+      .map((s: any) => s.DESCRIPTION); // ⚠️ ensure matches STORE_NAME
+
+    // 🔹 Apply filter
+    this.filteredInventoryList = baseList.filter((item: any) =>
+      selectedNames.includes(item.STORE_NAME)
+    );
   }
 
   applyCustomDateFilter() {
@@ -359,20 +443,27 @@ export class PhysicalInventoryComponent {
     const end = new Date(this.customEndDate);
     end.setHours(23, 59, 59, 999);
 
-    this.filteredInventoryList = this.filteredInventoryList.filter(
-      (item: any) => {
-        const invoiceDate = item.PHYSICAL_DATE;
-        return invoiceDate >= start && invoiceDate <= end;
-      },
-    );
+    // 🔹 Always start from ORIGINAL list
+    this.dateFilteredList = [...this.inventoryList];
 
+    // 🔹 Apply date filter
+    this.dateFilteredList = this.dateFilteredList.filter((item: any) => {
+      if (!item.PHYSICAL_DATE) return false;
+      const invoiceDate = new Date(item.PHYSICAL_DATE);
+      return invoiceDate >= start && invoiceDate <= end;
+    });
+
+    // 🔹 Apply store filter after date
+    this.applyStoreFilter();
+
+    // 🔹 Update label
     const fromLabel = this.formatAsDDMMYYYY(start);
     const toLabel = this.formatAsDDMMYYYY(end);
 
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} to ${toLabel}` }
-        : option,
+        : option
     );
 
     this.showCustomDatePopup = false;
@@ -494,7 +585,7 @@ export class PhysicalInventoryComponent {
   onEditInventory(event: any) {
     console.log(event, 'eventttttttttttttt');
     event.cancel = true;
-    const orderId = event.data.ID;
+    const orderId = event.data.TRANS_ID;
     const status = event.data.TRANS_STATUS;
     this.dataService
       .selectPhysicalInventory(orderId)
@@ -590,6 +681,7 @@ export class PhysicalInventoryComponent {
       DEPT_ID: [],
       ALL_ITEMS: false,
     };
+    this.StoreIDData = null;
     this.isPrePopupVisible = true;
   }
 
@@ -633,9 +725,29 @@ export class PhysicalInventoryComponent {
       NAME: 'STORE',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.stores = response;
+      if (this.IS_HQ_App) {
+        // 🔹 HQ App → show only store with ID = 1
+        this.stores = response.filter((item: any) => item.ID === 1);
+        this.StoreIDData = 1;
+      } else {
+        // 🔹 Not HQ → show all stores
+        this.stores = response;
+      }
+      this.Store = response
     });
   }
+
+
+  onStoreChanged(e: any) {
+
+    console.log('Selected store IDs:', this.selectedStoreid);
+    this.applyStoreFilter(); //  ONLY store filter
+
+  }
+
+
+
+
 }
 @NgModule({
   imports: [
@@ -670,10 +782,11 @@ export class PhysicalInventoryComponent {
     DxTagBoxModule,
     DxoSummaryModule,
     PhysicalInventoryFormModule,
+    DxTagBoxModule
   ],
   providers: [],
   declarations: [PhysicalInventoryComponent],
   exports: [PhysicalInventoryComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PhysicalInventoryModule {}
+export class PhysicalInventoryModule { }

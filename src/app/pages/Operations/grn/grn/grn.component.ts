@@ -223,16 +223,36 @@ export class GrnComponent implements OnInit {
       this.getGrnLogData();
     }
   }
-
+  // allButtonsEditDelete = [
+  //   {
+  //     name: 'edit',
+  //     visible: (e: any) =>
+  //       e.row.data.STATUS === 'Approved'
+  //         ? true // show icon for approved → opens view popup
+  //         : this.canEdit && e.row.data.STATUS == 'Open',
+  //   },
+  //   {
+  //     name: 'delete',
+  //     visible: (e: any) =>
+  //       this.canDelete &&
+  //       e.row.data.STATUS !== 'Approved' &&
+  //       e.row.data.STATUS !== 'Verified',
+  //   },
+  // ];
   allButtonsEditDelete = [
     {
       name: 'edit',
-      visible: (e) =>
-        e.row.data.STATUS !== 'Approved' || e.row.data.STATUS === 'Approved',
+      visible: (e: any) =>
+        e.row.data.STATUS === 'Approved'
+          ? true // show icon for approved → opens view popup
+          : this.canEdit && e.row.data.STATUS == 'Open',
     },
     {
       name: 'delete',
-      visible: (e) => e.row.data.STATUS !== 'Approved',
+      visible: (e: any) =>
+        this.canDelete &&
+        e.row.data.STATUS !== 'Approved' &&
+        e.row.data.STATUS !== 'Verified',
     },
   ];
 
@@ -458,6 +478,9 @@ export class GrnComponent implements OnInit {
   }
 
   getGrnLogData() {
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...'); // ✅ START LOADING
+
     const datePayload = this.getDateRangePayload();
 
     const payload = {
@@ -466,10 +489,31 @@ export class GrnComponent implements OnInit {
       DATE_TO: datePayload.DATE_TO,
     };
 
-    this.service.getGrnLogData(payload).subscribe((res: any) => {
-      this.grnDataSource = res.grnheader;
-    });
+    this.service
+      .getGrnLogData(payload)
+      .pipe(
+        finalize(() => {
+          grid?.endCustomLoading(); // ✅ ALWAYS STOP LOADING
+        }),
+      )
+      .subscribe((res: any) => {
+        this.grnDataSource = res.grnheader;
+      });
   }
+
+  // getGrnLogData() {
+  //   const datePayload = this.getDateRangePayload();
+
+  //   const payload = {
+  //     COMPANY_ID: this.selectedCompanyId,
+  //     DATE_FROM: datePayload.DATE_FROM,
+  //     DATE_TO: datePayload.DATE_TO,
+  //   };
+
+  //   this.service.getGrnLogData(payload).subscribe((res: any) => {
+  //     this.grnDataSource = res.grnheader;
+  //   });
+  // }
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
@@ -635,16 +679,16 @@ export class GrnComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/accounts');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sessionData_tax();

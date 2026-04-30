@@ -63,6 +63,7 @@ export class EditPurchaseInvoiceComponent {
   popupGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() invoiceFormData: any;
+  @Input() canApprove: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -109,6 +110,8 @@ export class EditPurchaseInvoiceComponent {
   storeList: any;
   departmentList: any;
   totalDiscAmount: any;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -129,7 +132,8 @@ export class EditPurchaseInvoiceComponent {
     const selectedCompany = userData.SELECTED_COMPANY;
     this.vatTilte = userData.GeneralSettings.VAT_TITLE;
     console.log(this.vatTilte, 'VATTITLE');
-
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     // this.getSupplierDropdown();
     this.getSupplierOrUnitLst();
     // this.getPendingGRNList();
@@ -142,6 +146,19 @@ export class EditPurchaseInvoiceComponent {
 
     this.sessionData_tax();
     this.getStoreData();
+    if (this.isHQApp && configStore) {
+      this.filteredStoreList = [
+        {
+          ID: configStore.STORE_ID,
+          DESCRIPTION: configStore.STORE_NAME,
+        },
+      ];
+
+      // Auto select store
+      this.purchaseInvoiceFormData.STORE_ID = configStore.STORE_ID;
+    } else {
+      this.filteredStoreList = this.storeList;
+    }
     this.getDepartments();
     setTimeout(() => {
       this.itemsGridRef?.instance?.refresh();
@@ -214,10 +231,38 @@ export class EditPurchaseInvoiceComponent {
       NAME: 'STORE',
       COMPANY_ID: this.selectedCompany,
     };
+
     this.dataService.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
+
+      if (this.isHQApp && this.sessionData?.Configuration?.[0]) {
+        const configStore = this.sessionData.Configuration[0];
+
+        this.filteredStoreList = [
+          {
+            ID: configStore.STORE_ID,
+            DESCRIPTION: configStore.STORE_NAME,
+          },
+        ];
+
+        if (!this.purchaseInvoiceFormData?.STORE_ID) {
+          this.purchaseInvoiceFormData.STORE_ID = configStore.STORE_ID;
+        }
+      } else {
+        this.filteredStoreList = this.storeList;
+      }
     });
   }
+
+  // getStoreData() {
+  //   const payload = {
+  //     NAME: 'STORE',
+  //     COMPANY_ID: this.selectedCompany,
+  //   };
+  //   this.dataService.getDropdownData(payload).subscribe((res) => {
+  //     this.storeList = res;
+  //   });
+  // }
 
   getDepartments() {
     const payload = {
@@ -679,9 +724,11 @@ export class EditPurchaseInvoiceComponent {
     // get selected values from grid
     this.itemsGridRef.instance.saveEditData();
 
-    const selectedStoreId = this.mainGridData[0]?.STORE_ID || null;
+    // const selectedStoreId = this.mainGridData[0]?.STORE_ID || null;
     const selectedDeptId = this.mainGridData[0]?.DEPT_ID || null;
-    this.purchaseInvoiceFormData.STORE_ID = selectedStoreId;
+    // this.purchaseInvoiceFormData.STORE_ID = selectedStoreId;
+    this.purchaseInvoiceFormData.STORE_ID =
+      this.purchaseInvoiceFormData.STORE_ID || this.store_id;
     this.purchaseInvoiceFormData.DEPT_ID = selectedDeptId;
     this.purchaseInvoiceFormData.PurchDetails = this.mainGridData.map(
       (item: any) => {
@@ -700,7 +747,8 @@ export class EditPurchaseInvoiceComponent {
           COMPANY_ID: this.selectedCompany,
           USER_ID: this.user_id,
           FIN_ID: this.fin_id,
-          STORE_ID: selectedStoreId || 0,
+          // STORE_ID: selectedStoreId || 0,
+          STORE_ID: this.purchaseInvoiceFormData.STORE_ID,
           DEPT_ID: selectedDeptId || 0,
           PURCH_ID: 0,
           GRN_DET_ID: item.GRN_DET_ID || '',

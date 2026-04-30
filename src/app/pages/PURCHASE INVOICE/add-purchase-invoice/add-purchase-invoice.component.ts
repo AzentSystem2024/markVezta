@@ -59,6 +59,7 @@ export class AddPurchaseInvoiceComponent {
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -176,6 +177,8 @@ export class AddPurchaseInvoiceComponent {
   isSaving = false;
   vatTilte: any;
   totalDiscAmount: any;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -195,7 +198,8 @@ export class AddPurchaseInvoiceComponent {
     // Bind company to form
     this.purchaseInvoiceFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
     this.companyList = [selectedCompany];
-
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     // Other settings
     this.HSNCODE = userData.GeneralSettings.HSN_CODE;
     this.GST = userData.GeneralSettings.GST_PERC;
@@ -207,18 +211,45 @@ export class AddPurchaseInvoiceComponent {
     // CALL DOC NO ONLY AFTER COMPANY_ID IS READY
     this.getSuppInvNo();
     this.getStoreData();
+    if (this.isHQApp && configStore) {
+      this.filteredStoreList = [
+        {
+          ID: configStore.STORE_ID,
+          DESCRIPTION: configStore.STORE_NAME,
+        },
+      ];
+
+      // Auto select store
+      this.purchaseInvoiceFormData.STORE_ID = configStore.STORE_ID;
+    } else {
+      this.filteredStoreList = this.storeList;
+    }
     this.getDepartments();
   }
 
   getStoreData() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selectedCompany,
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
+      if (!this.isHQApp) {
+        this.filteredStoreList = this.storeList; //update here
+      }
     });
   }
+
+  onStoreValueChanged(event: any) {}
+  // getStoreData() {
+  //   const payload = {
+  //     NAME: 'STORE',
+  //     COMPANY_ID: this.selectedCompany,
+  //   };
+  //   this.dataService.getDropdownData(payload).subscribe((res) => {
+  //     this.storeList = res;
+  //   });
+  // }
 
   getDepartments() {
     const payload = {
@@ -700,7 +731,8 @@ export class AddPurchaseInvoiceComponent {
           COMPANY_ID: this.selectedCompany,
           USER_ID: this.user_id,
           // STORE_ID: this.store_id,
-          STORE_ID: selectedStoreId || this.store_id,
+          // STORE_ID: selectedStoreId || this.store_id,
+          STORE_ID: this.purchaseInvoiceFormData.STORE_ID,
           DEPT_ID: selectedDeptId || 0,
           FIN_ID: this.fin_id,
           PURCH_ID: 0, // or a real ID if updating
@@ -764,7 +796,9 @@ export class AddPurchaseInvoiceComponent {
 
     this.purchaseInvoiceFormData.COMPANY_ID = this.selectedCompany;
     this.purchaseInvoiceFormData.USER_ID = this.user_id;
-    this.purchaseInvoiceFormData.STORE_ID = selectedStoreId || 0;
+    // this.purchaseInvoiceFormData.STORE_ID = selectedStoreId || 0;
+    this.purchaseInvoiceFormData.STORE_ID =
+      this.purchaseInvoiceFormData.STORE_ID || this.store_id;
     this.purchaseInvoiceFormData.DEPT_ID = selectedDeptId || 0;
     this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
     this.purchaseInvoiceFormData.PURCH_DATE = invoiceDate;

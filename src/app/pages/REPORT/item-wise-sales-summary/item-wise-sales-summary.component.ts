@@ -51,6 +51,8 @@ import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/pa
 import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import notify from 'devextreme/ui/notify';
+import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 @Component({
   selector: 'app-item-wise-sales-summary',
@@ -168,6 +170,7 @@ export class ItemWiseSalesSummaryComponent {
   itemProperty1: any;
   selectedItemProperty1:any;
   selectedItemProperty2:any;
+  today: Date = new Date();
 
    Saletype = [
   { ID: 0, DESCRIPTION: 'All' },
@@ -245,7 +248,7 @@ selectedSaletype = [0]; // or [] if nothing selected
           this.selected_from_date = SystemDate;
           this.selected_To_date = SystemDate;
       
-          this.load_JournalBook_data();
+          // this.load_JournalBook_data();
           this.store_dropdown();
           this.item_dropdown();
           this.getCustomerOrUnitLst();
@@ -387,12 +390,26 @@ selectedSaletype = [0]; // or [] if nothing selected
       
         onFromDateChange(event: any) {
           const rawDate: Date = new Date(event.value);
+          const today = new Date();
+
+  if (rawDate > today) {
+    notify('To Date cannot be greater than today', 'error', 2000);
+    this.selected_To_date = today;
+    return;
+  }
           this.formatted_from_date = this.formatDate(rawDate);
           // this.reloadJournalBook();
         }
       
         onToDateChange(event: any) {
           const rawDate: Date = new Date(event.value);
+          const today = new Date();
+
+  if (rawDate > today) {
+    notify('To Date cannot be greater than today', 'error', 2000);
+    this.selected_To_date = today;
+    return;
+  }
           this.formatted_To_date = this.formatDate(rawDate);
           // this.reloadJournalBook();
         }
@@ -452,6 +469,17 @@ selectedSaletype = [0]; // or [] if nothing selected
                     this.journalBookCount = list.length;
       
                     this.ledgerSummaryData = list;
+                     if (list.length === 0) {
+                        notify({
+                          message: 'No data available',
+                          type: 'warning',
+                          displayTime: 2000,
+                          position: {
+                            at: 'top center',
+                            my: 'top center'
+                          }
+                        });
+                      }
                     this.isFilterVisible = false
                     resolve(list); // 🔑 grid gets data
                   },
@@ -467,18 +495,19 @@ selectedSaletype = [0]; // or [] if nothing selected
         }
       
         onViewClick(e: any) {
-          console.log(e)
-          const trans_id = e.row.data.TRANS_ID;
-      
-         this.dataService
-          .selectInvoiceRetail(trans_id)
-          .subscribe((response: any) => {
-            this.selectedInvoice = response.Data;
+        console.log(e)
+        const trans_id = e.row.data.TRANS_ID;
     
-            
-              this.isViewInvoice = true;
-          });
-        }
+         this.dataService
+      .Select_SalesInvoice_Retail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.data;
+
+        
+          this.isViewInvoice = true;
+      });
+      }
+    
       
         summaryColumnsData = {
           totalItems: [
@@ -698,10 +727,11 @@ selectedSaletype = [0]; // or [] if nothing selected
     
       getCustomerOrUnitLst() {
         const payload = {
-          COMPANY_ID: this.selected_Company_id
+          COMPANY_ID: this.selected_Company_id,
+          NAME:'CUSTOMER'
         };
         this.dataService
-          .getOutsideCustomerWithState(payload)
+          .Common_Dropdown(payload)
           .subscribe((response: any) => {
             this.distributorList = response;
           });
@@ -762,7 +792,7 @@ selectedSaletype = [0]; // or [] if nothing selected
        PayrollViewReportModule,
        DxTagBoxModule,
        DxFormModule,
-       AddInvoiceRetailModule,
+       AddSalesInvoiceRetailModule,
   ],
   providers: [],
   exports: [],

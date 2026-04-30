@@ -167,14 +167,14 @@
           <dxi-column
             dataField="TRANSFER_NO"
             caption="Transfer No"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="TRANSFER_DATE"
             caption="Date"
             dataType="date"
             format="dd-MM-yyyy"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <!-- <dxi-column
             dataField="STORE_ID"
@@ -351,7 +351,7 @@
         </div>
         <div class="form-popup-buttons-container">
           <!-- Approve -->
-          <div class="approve-container">
+          <div class="approve-container" *ngIf="canApprove">
             <dx-check-box
               [value]="
                 isReadOnlyMode ? true : purchaseReturnFormData.IS_APPROVED

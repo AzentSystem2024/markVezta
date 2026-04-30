@@ -147,6 +147,10 @@ export class InvoiceRetailComponent {
     },
   ];
   isReadOnlyInvoice: boolean = false;
+  isHQApp: any;
+  filteredStoreList: { ID: any; DESCRIPTION: any }[];
+  storeList: { ID: any; DESCRIPTION: any }[];
+  selectedStoreId: any;
 
   constructor(
     private dataService: DataService,
@@ -165,11 +169,13 @@ export class InvoiceRetailComponent {
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
+    const configStore = userData.Configuration?.[0];
     const menuGroups = menuResponse.MenuGroups || [];
     console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/invoice');
+      .find((menu: any) => menu.Path === currentUrl);
     console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -177,9 +183,20 @@ export class InvoiceRetailComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
-
+    this.getStoreData();
+    // if (this.isHQApp && configStore) {
+    //   this.filteredStoreList = [
+    //     {
+    //       ID: configStore.STORE_ID,
+    //       DESCRIPTION: configStore.STORE_NAME,
+    //     },
+    //   ];
+    // } else {
+    //   this.filteredStoreList = this.storeList;
+    // }
+    // this.selectedStoreId = configStore.STORE_ID;
     this.getInvoiceList();
   }
   refreshGrid() {
@@ -199,7 +216,47 @@ export class InvoiceRetailComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+  getStoreData() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.companyID,
+    };
 
+    this.dataService.getDropdownData(payload).subscribe((res) => {
+      this.storeList = res;
+
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      const configStore = userData.Configuration?.[0];
+
+      // if (this.isHQApp && configStore) {
+      //   this.filteredStoreList = [
+      //     {
+      //       ID: configStore.STORE_ID,
+      //       DESCRIPTION: configStore.STORE_NAME,
+      //     },
+      //   ];
+
+      //   this.selectedStoreId = configStore.STORE_ID;
+      // }
+      //  else {
+      this.filteredStoreList = this.storeList;
+
+      // default select first store
+      if (!this.selectedStoreId && this.storeList?.length) {
+        this.selectedStoreId = this.storeList[0].ID;
+        // }
+      }
+
+      // 🔥 Load data AFTER store is ready
+      this.getInvoiceList();
+    });
+  }
+  onStoreChanged(e: any) {
+    this.selectedStoreId = e.value;
+
+    // 🔥 Reload list with selected store
+    this.getInvoiceList();
+  }
   getInvoiceList(dateRange: string = this.selectedDateRange) {
     const datePayload = this.getDateRangePayload(dateRange);
 
@@ -207,6 +264,7 @@ export class InvoiceRetailComponent {
       COMPANY_ID: this.companyID,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      STORE_ID: this.selectedStoreId || this.storeList?.[0]?.ID || 0,
     };
 
     this.InvoiceDataSource = new DataSource({

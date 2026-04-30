@@ -75,6 +75,24 @@
           <div class="grid-header">Invoice</div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <!-- <dxi-item location="after">
+          <div *dxTemplate="let data of 'storeTemplate'">
+            <dx-select-box
+              label="Store"
+              labelMode="floating"
+              width="200"
+              [dataSource]="storeList"
+              [(value)]="selectedStoreId"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              placeholder="Select Store *"
+              [searchEnabled]="true"
+              [elementAttr]="{ class: 'grndropdown' }"
+              (onValueChanged)="onStoreChanged($event)"
+            >
+            </dx-select-box>
+          </div>
+        </dxi-item> -->
         <dxi-item
           location="after"
           locateInMenu="auto"

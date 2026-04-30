@@ -39,6 +39,7 @@
             labelMode="floating"
             [(value)]="selected_from_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onFromDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -50,6 +51,7 @@
             labelMode="floating"
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onToDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -155,6 +157,7 @@
       [allowColumnReordering]="true"
       [filterRow]="{ visible: false }"
       [headerFilter]="{ visible: true }"
+      [noDataText]="'No data available'"
       (onExporting)="onExporting($event)"
     >
 
@@ -200,6 +203,7 @@
       <dxi-column dataField="INVOICE NO" caption="Invoice No."></dxi-column>
       <dxi-column dataField="STORE" caption="Store"></dxi-column>
       <dxi-column dataField="INVOICE TYPE" caption="Invoice Type"></dxi-column>
+      <dxi-column dataField="CUSTOMER_NAME" caption="Customer"></dxi-column>
 
       <dxi-column
         dataField="CASH"
@@ -239,15 +243,14 @@
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="New Invoice"
+  title="Invoice"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice-retail
-    [isEditing]="true"
+  <app-add-sales-invoice-retail
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
+  ></app-add-sales-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>
 

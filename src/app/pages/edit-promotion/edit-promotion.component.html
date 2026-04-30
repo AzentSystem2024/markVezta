@@ -107,8 +107,16 @@
                       type="date"
                       displayFormat="yyyy-MM-dd"
                       width="150"
+                      [min]="fromDate"
                       (onValueChanged)="checkDateSelection($event)"
-                    >
+                      >><dx-validator>
+                        <dxi-validation-rule
+                          type="custom"
+                          [validationCallback]="validateToDate"
+                          message="To Date must be greater than From Date"
+                        >
+                        </dxi-validation-rule>
+                      </dx-validator>
                     </dx-date-box>
                   </div>
 
@@ -138,6 +146,7 @@
                     placeholder="From Time"
                     width="90"
                     [disabled]="!isHappyHoursEnabled"
+                    (onValueChanged)="onFromTimeChanged($event)"
                   >
                   </dx-date-box>
 
@@ -149,6 +158,7 @@
                     placeholder="To Time"
                     width="90"
                     [disabled]="!isHappyHoursEnabled"
+                    (onValueChanged)="onToTimeChanged($event)"
                   >
                   </dx-date-box>
                 </div>
@@ -298,7 +308,7 @@
         alignment="right"
         dataField="PROMOTION_PRICE"
         caption="Promotion Price"
-        [width]="100"
+        [width]="200"
         [allowEditing]="false"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         [visible]="selectedOption !== 'schemaLevelPromotion'"

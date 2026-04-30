@@ -134,7 +134,7 @@ export class EditPromotionComponent {
   firstDropdownOptions = [
     { label: 'Cost', value: 'cost' },
     { label: 'Price', value: 'salePrice' },
-    { label: 'Set Promotion Price To', value: 'defaultPrice' },
+    // { label: 'Set Promotion Price To', value: 'defaultPrice' },
   ];
   promotionSchema: any;
   tagTemplate = (data: any) => {
@@ -235,8 +235,10 @@ export class EditPromotionComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // this.listItemsByMultipleStoreIds()
+    this.listItemsByMultipleStoreIds()
     if (this.itemStoresList) {
+      setTimeout(() => {
+      }, 5000);
       if (changes['selectedData'] && changes['selectedData'].currentValue) {
         const data = changes['selectedData'].currentValue;
 
@@ -282,17 +284,17 @@ export class EditPromotionComponent {
           }, {});
 
         //    merge into grid
-        this.itemStoresList = (this.itemStoresList || []).map((item: any) => {
+        // this.itemStoresList = (this.itemStoresList || []).map((item: any) => {
 
-          const promo = promotionMap[item.ID]; // match ID ↔ ITEM_ID
+        //   const promo = promotionMap[item.ID]; // match ID ↔ ITEM_ID
 
-          return {
-            ...item,
-            PROMOTION_PRICE: promo?.PROMOTION_PRICE || 0,
-            PROMOTION_NAME: promo?.PROMOTION_NAME || '',
-            PROMOTION_SCHEMA_ID: promo?.PROMOTION_SCHEMA_ID || null
-          };
-        });
+        //   return {
+        //     ...item,
+        //     PROMOTION_PRICE: promo?.PROMOTION_PRICE || 0,
+        //     PROMOTION_NAME: promo?.PROMOTION_NAME || '',
+        //     PROMOTION_SCHEMA_ID: promo?.PROMOTION_SCHEMA_ID || null
+        //   };
+        // });
         //    3. STORE SELECTION
         this.selectedStoreId = (data?.worksheet_item_store || [])
           .map((s: any) => s.STORE_ID);
@@ -309,6 +311,26 @@ export class EditPromotionComponent {
     }
 
     console.log('Selected Data in EditPromotionComponent:', this.selectedData);
+  }
+  mergePromotionData() {
+    if (!this.selectedData || !this.itemStoresList) return;
+
+    const promotionMap = (this.selectedData?.worksheet_promotion_schema || [])
+      .reduce((acc: any, item: any) => {
+        acc[item.ITEM_ID] = item;
+        return acc;
+      }, {});
+
+    this.itemStoresList = this.itemStoresList.map((item: any) => {
+      const promo = promotionMap[item.ID];
+
+      return {
+        ...item,
+        PROMOTION_PRICE: promo?.PROMOTION_PRICE || 0,
+        PROMOTION_NAME: promo?.PROMOTION_NAME || '',
+        PROMOTION_SCHEMA_ID: promo?.PROMOTION_SCHEMA_ID || null
+      };
+    });
   }
 
   formatTime(date: any): string {
@@ -342,6 +364,8 @@ export class EditPromotionComponent {
       (response: any) => {
 
         this.itemStoresList = response.PriceWizardData || [];
+        this.mergePromotionData();
+
 
         console.log('Fetched Item Stores List:', this.itemStoresList);
 
@@ -1067,6 +1091,32 @@ export class EditPromotionComponent {
 
   onPriceLevel(e: any) {
 
+  }
+  validateToDate = (e: any) => {
+    if (!this.fromDate || !e.value) return true;
+
+    return new Date(e.value) >= new Date(this.fromDate);
+  };
+  onFromTimeChanged(e: any) {
+    const iso = e.value; // example: "2026-04-22T19:30:00.000Z"
+    const timeHHmm = new Date(iso).toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Kolkata'
+    });
+    this.fromTime
+  }
+
+  onToTimeChanged(e: any) {
+    const iso = e.value; // example: "2026-04-22T19:30:00.000Z"
+    const timeHHmm = new Date(iso).toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Kolkata'
+    });
+    this.toTime
   }
 }
 

@@ -85,7 +85,7 @@ export class StockAdjustmentEditComponent {
   adjustmentFormData: any = {
     ID: 0,
     COMPANY_ID: 0,
-    
+
     ADJ_NO: '',
     ADJ_DATE: '',
     REASON_ID: 0,
@@ -123,12 +123,12 @@ export class StockAdjustmentEditComponent {
   };
   storename: any;
   hidecost: any;
-
+  IS_HQ_App: boolean = false;
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) {}
-  
+  ) { }
+
   ngOnInit() {
     // this.isEditDataAvailable();
     this.get_item_list_Data();
@@ -138,6 +138,8 @@ export class StockAdjustmentEditComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.IS_HQ_App = menuResponse.GeneralSettings.IS_HQ_APP;
+
     console.log('Parsed ObjectData==================:', menuResponse);
     console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
@@ -264,7 +266,13 @@ export class StockAdjustmentEditComponent {
       NAME: 'STORE',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.stores = response;
+      if (this.IS_HQ_App) {
+        // 🔹 HQ App → show only store with ID = 1
+        this.stores = response.filter((item: any) => item.ID === 1);
+      } else {
+        // 🔹 Not HQ → show all stores
+        this.stores = response;
+      }
     });
   }
   get_item_list_Data() {
@@ -301,8 +309,8 @@ export class StockAdjustmentEditComponent {
       this.items = res.Data;
     });
   }
-  onPopupHiding() {}
-  updateNetAmount(event: any) {}
+  onPopupHiding() { }
+  updateNetAmount(event: any) { }
   UpdateStockAdjustment() {
     console.log(this.adjustmentFormData);
     const ITEM_Details = this.adjustmentFormData.Details;
@@ -331,7 +339,7 @@ export class StockAdjustmentEditComponent {
       ...this.adjustmentFormData,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
-      STORE_ID : this.storeFromSession,
+      STORE_ID: this.storeFromSession,
       Details: transformed,
     };
     console.log(payload);
@@ -478,4 +486,4 @@ export class StockAdjustmentEditComponent {
   exports: [StockAdjustmentEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentEditModule {}
+export class StockAdjustmentEditModule { }

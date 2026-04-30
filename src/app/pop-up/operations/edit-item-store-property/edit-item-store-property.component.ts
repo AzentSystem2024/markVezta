@@ -73,7 +73,6 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
   brand: any;
   filteredStores: any;
   showHeaderFilter = true;
-  storeProperties: any[] = [];
   selectedProperties: any[] = [];
   gridWidth: string = '100%';
   showNewGrid: boolean = false;
@@ -131,6 +130,15 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
   statusValue: any = 0;
   allowVerify: boolean = false;
   VerifiedData: boolean = false;
+  isView: boolean = false;
+  selectedStoreIds: any[] = [];
+  storeProperties = [
+    { name: 'Inactive', value: "IS_INACTIVE" },
+    { name: 'Not Discountable', value: "IS_NOT_DISCOUNTABLE" },
+    { name: 'Not Sale Item', value: "IS_NOT_SALE_ITEM" },
+    { name: 'Not Sale Return', value: "IS_NOT_SALE_RETURN" },
+    { name: 'Price Required', value: "IS_PRICE_REQUIRED" },
+  ];
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -141,99 +149,101 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.loadStore();
+    this.listStoreItemProperty()
   }
+  // ngOnChanges(changes: SimpleChanges) {
+  //   this.loadStore();
 
+  //   if (changes['selectedData']?.currentValue) {
+  //     const newData = changes['selectedData'].currentValue;
+
+  //     this.selectedStoreId = newData.STORE_ID;
+  //     this.selectedId = newData.ID;
+  //     this.selectedNarration = newData.NARRATION;
+
+  //     // ✅ Store selection
+  //     this.selectedStoreIds = (newData.worksheet_item_store || []).map(
+  //       (x: any) => x.STORE_ID
+  //     );
+
+  //     this.statusValue = newData.Status;
+  //     this.allowVerify = this.statusValue === '1';
+  //     this.VerifiedData = this.statusValue === '2';
+  //     this.readOnly = this.statusValue === '5';
+
+  //     // ✅ MAIN FIX: bind grid data from selectedData
+  //     if (newData.worksheet_item_property?.length) {
+  //       this.itemStoresList = newData.worksheet_item_property.map((item: any) => ({
+  //         ...item,
+
+  //         // ensure NEW fields exist
+  //         IS_NOT_SALE_ITEM_NEW: item.IS_NOT_SALE_ITEM_NEW ?? item.IS_NOT_SALE_ITEM ?? false,
+  //         IS_NOT_SALE_RETURN_NEW: item.IS_NOT_SALE_RETURN_NEW ?? item.IS_NOT_SALE_RETURN ?? false,
+  //         IS_NOT_DISCOUNTABLE_NEW: item.IS_NOT_DISCOUNTABLE_NEW ?? item.IS_NOT_DISCOUNTABLE ?? false,
+  //         IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW ?? item.IS_PRICE_REQUIRED ?? false,
+  //         IS_INACTIVE_NEW: item.IS_INACTIVE_NEW ?? item.IS_INACTIVE ?? false,
+
+  //         Selected: item.Selected ?? false
+  //       }));
+
+  //       // ✅ Bind selection to grid
+  //       this.selectedRowKeys = this.itemStoresList
+  //         .filter((x: any) => x.Selected)
+  //         .map((x: any) => x.ITEM_ID);
+  //     } else {
+  //       // fallback if no worksheet data
+  //       this.listStoreItemProperty();
+  //     }
+
+  //     // ✅ force grid update
+  //     setTimeout(() => {
+  //       if (this.dataGrid?.instance) {
+  //         this.dataGrid.instance.option('dataSource', this.itemStoresList);
+  //         this.dataGrid.instance.option('selectedRowKeys', this.selectedRowKeys);
+  //       }
+  //       this.cdr.detectChanges();
+  //     }, 0);
+  //   }
+  // }
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedData'] && changes['selectedData'].currentValue) {
+    if (changes['selectedData']?.currentValue) {
       const newData = changes['selectedData'].currentValue;
-      const newDataKey = newData?.ID || JSON.stringify(newData);
-      this.selectedStoreId = newData.STORE_ID || this.selectedStoreId;
-      this.selectedId = newData.ID || this.selectedId;
-      this.selectedworksheetdata = newData.worksheet_item_property;
-      this.selectedNarration = newData.NARRATION || this.selectedNarration;
+
+      this.selectedData = newData;
+
+      this.selectedId = newData.ID;
+      this.selectedNarration = newData.NARRATION;
+      const staus = newData.Status
+      if (staus === '5') {
+        this.isView = true
+      } else {
+        this.isView = false
+      }
+
+
+      this.selectedStoreIds = (newData.worksheet_item_store || []).map(
+        (x: any) => x.STORE_ID
+      );
+
       this.statusValue = newData.Status;
       this.allowVerify = this.statusValue === '1';
       this.VerifiedData = this.statusValue === '2';
-
       this.readOnly = this.statusValue === '5';
 
-      this.cdr.detectChanges();
-      if (
-        newData &&
-        newDataKey !== this.previousDataKey &&
-        newData.worksheet_item_property
-      ) {
-        console.log('Processing new worksheet data:', newData);
-        this.processWorksheetData(newData);
-        this.previousDataKey = newDataKey;
-      }
+      // ✅ reload and merge
+      this.listStoreItemProperty();
     }
   }
+get selectedStoreHint(): string {
+  if (!this.selectedStoreIds?.length) return 'No store selected';
 
-  private processWorksheetData(data: any) {
-    if (!data?.worksheet_item_property) return;
+  return this.store
+    .filter((s: any) => this.selectedStoreIds.includes(s.ID))
+    .map((s: any) => s.STORE_NAME)
+    .join(', ');
+}
 
-    // Clear existing data
-    this.itemStoresList = [];
-    this.selectedRowKeys = [];
 
-    // Remove duplicates using ITEM_ID
-    const uniqueItems = new Map();
-    data.worksheet_item_property.forEach((item: any) => {
-      if (!uniqueItems.has(item.ITEM_ID)) {
-        uniqueItems.set(item.ITEM_ID, {
-          ...item,
-          IS_NOT_SALE_ITEM: item.IS_NOT_SALE_ITEM ?? false,
-          IS_NOT_SALE_RETURN: item.IS_NOT_SALE_RETURN ?? false,
-          IS_NOT_DISCOUNTABLE: item.IS_NOT_DISCOUNTABLE ?? false,
-          IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED ?? false,
-          IS_INACTIVE: item.IS_INACTIVE ?? false,
-          IS_NOT_SALE_ITEM_NEW:
-            item.IS_NOT_SALE_ITEM_NEW ?? item.IS_NOT_SALE_ITEM ?? false,
-          IS_NOT_SALE_RETURN_NEW:
-            item.IS_NOT_SALE_RETURN_NEW ?? item.IS_NOT_SALE_RETURN ?? false,
-          IS_NOT_DISCOUNTABLE_NEW:
-            item.IS_NOT_DISCOUNTABLE_NEW ?? item.IS_NOT_DISCOUNTABLE ?? false,
-          IS_PRICE_REQUIRED_NEW:
-            item.IS_PRICE_REQUIRED_NEW ?? item.IS_PRICE_REQUIRED ?? false,
-          IS_INACTIVE_NEW: item.IS_INACTIVE_NEW ?? item.IS_INACTIVE ?? false,
-        });
-      }
-    });
-
-    this.itemStoresList = Array.from(uniqueItems.values());
-
-    // Set selected rows
-    this.selectedRowKeys = this.itemStoresList
-      .filter((x: any) => x.Selected === true)
-      .map((x: any) => x.ITEM_ID);
-
-    // Extract store properties
-    if (this.itemStoresList.length > 0 && this.itemStoresList[0].STORE_ID) {
-      this.selectedStoreId = this.itemStoresList[0].STORE_ID;
-      this.extractStoreProperties(this.itemStoresList[0]);
-    }
-
-    // Refresh grid
-    setTimeout(() => {
-      if (this.dataGrid?.instance) {
-        this.dataGrid.instance.refresh();
-        if (this.selectedRowKeys.length > 0) {
-          this.dataGrid.instance.selectRows(this.selectedRowKeys, true);
-        }
-      }
-      this.cdr.detectChanges();
-    }, 100);
-  }
-  SaveBtnText() {
-    if (this.VerifiedData) {
-      return 'Approve';
-    } else if (this.approveValue) {
-      return 'Verify';
-    } else {
-      return 'Update';
-    }
-  }
 
   sesstion_Details() {
     const sessionData = JSON.parse(
@@ -249,60 +259,27 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
       this.store = response;
     });
   }
-  onApprovedChanged(e: any) {}
+  onDropdownValueChanged(e: any) {
+    const ids = Array.isArray(e?.value) ? e.value : [];
+    this.selectedStoreIds = ids;
 
-  onDropdownValueChanged(event: any) {
-    this.storeId = event.value;
-    if (!this.storeId || this.storeId === null) {
-      this.selectedStoreId = null;
-      this.itemStoresList = [];
+    if (ids.length > 0) {
+      const firstStore = this.store.find((s: any) => s.ID === ids[0]);
+
     } else {
-      this.selectedStoreId = this.storeId;
-      this.getStoresById(this.storeId);
-      this.extractStoreProperties(this.storeId);
     }
   }
 
-  getStoresById(storeId: any) {
-    const payload = { COMPANY_ID: this.selected_Company_id };
-    this.dataservice.getStoresData(payload).subscribe((response: any) => {
-      this.filteredStores = response.filter(
-        (store: any) => store.ID === storeId,
-      );
-    });
-  }
 
-  extractStorePropertiesFromStoreId(storeId: any) {
-    const selectedStore = this.store.find((s: any) => s.ID === storeId);
-    if (selectedStore) {
-      this.extractStoreProperties(selectedStore);
-    }
-  }
 
-  extractStoreProperties(storeData: any) {
-    if (!storeData) return;
+  extractStoreProperties() {
 
-    this.storeProperties = [];
-    this.selectedProperties = [];
 
-    const properties = [
-      { name: 'Inactive', value: storeData.IS_INACTIVE },
-      { name: 'Not Discountable', value: storeData.IS_NOT_DISCOUNTABLE },
-      { name: 'Not Sale Item', value: storeData.IS_NOT_SALE_ITEM },
-      { name: 'Not Sale Return', value: storeData.IS_NOT_SALE_RETURN },
-      { name: 'Price Required', value: storeData.IS_PRICE_REQUIRED },
-    ];
 
-    properties.forEach((property) => {
-      if (property.value !== null && property.value !== undefined) {
-        this.storeProperties.push(property);
-        if (property.value === true) {
-          this.selectedProperties.push(property.name);
-        }
-      }
-    });
 
-    this.updateColumnVisibility();
+
+
+
   }
 
   onPropertiesChange(event: any) {
@@ -322,157 +299,120 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
 
     this.cdr.detectChanges(); // 🔥 important
   }
-  onInactiveValueChanged(e: any) {
-    console.log('Inactive value changed:', e);
-  }
-
-  onPriceRequiredValueChanged(e: any) {
-    console.log('Price Required value changed:', e);
-  }
-
-  onNotDisountableValueChanged(e: any) {
-    console.log('Not Discountable value changed:', e);
-  }
-
-  onSaleReturnValueChanged(e: any) {
-    console.log('Sale Return value changed:', e);
-  }
-
-  onSaleItemValueChanged(e: any) {
-    console.log('Sale Item value changed:', e);
-  }
-
   onEditorPreparing(e: any) {
-    if (e.parentType === 'dataRow') {
-      e.editorOptions.onValueChanged = (args: any) => {
-        e.setValue(args.value); // ✅ update grid
+    if (e.parentType !== 'dataRow') return;
 
-        const row = e.row.data;
+    const original = e.editorOptions.onValueChanged;
+    e.editorOptions.onValueChanged = (args: any) => {
+      if (original) original(args);
+      e.setValue(args.value); // important for batch mode
 
-        // 🔥 update main array
-        const index = this.itemStoresList.findIndex(
-          (x) => x.ITEM_ID === row.ITEM_ID,
-        );
-
-        if (index > -1) {
-          this.itemStoresList[index][e.dataField] = args.value;
-        }
-
-        // 🔥 store updated row separately
-        let existing = this.updatedRows.find((x) => x.ITEM_ID === row.ITEM_ID);
-
-        if (!existing) {
-          existing = { ...row }; // full row copy
-          this.updatedRows.push(existing);
-        }
-
-        // update changed field
-        existing[e.dataField] = args.value;
-
-        console.log('Updated Row:', existing);
-        console.log('All Updated Rows:', this.updatedRows);
-      };
-    }
+      const row = e.row.data;
+      const i = this.itemStoresList.findIndex((x: any) => x.ITEM_ID === row.ITEM_ID);
+      if (i > -1) this.itemStoresList[i][e.dataField] = args.value;
+    };
   }
 
-  onSelectionChanged(event: any) {
-    this.selectedRowKeys = event.selectedRowKeys;
-    console.log('Selection changed:', this.selectedRowKeys);
+  onSelectionChanged(e: any) {
+    const currentKeys = e.selectedRowKeys;
 
-    console.log('Selected Row event:', event);
+    // Add new selections
+    currentKeys.forEach((key: number) => {
+      if (!this.selectedRowKeys.includes(key)) {
+        this.selectedRowKeys.push(key);
+      }
+    });
 
-    this.selectedGridData = event.selectedRowsData;
+    // Remove unselected (only from current page)
+    const currentPageItems = e.component.getVisibleRows().map((r: any) => r.data.ITEM_ID);
 
-    // Update Selected property in data source
-    if (this.itemStoresList) {
-      this.itemStoresList.forEach((item: any) => {
-        item.Selected = this.selectedRowKeys.includes(item.ITEM_ID);
-      });
-    }
+    this.selectedRowKeys = this.selectedRowKeys.filter((key: number) => {
+      if (currentPageItems.includes(key)) {
+        return currentKeys.includes(key);
+      }
+      return true; // keep other page selections
+    });
+
+    console.log('Global selected keys:', this.selectedRowKeys);
   }
 
-  onSaveButtonClick() {
-    const worksheetItemProperty = this.updatedRows.filter((item) =>
-      this.selectedRowKeys.includes(item.ITEM_ID),
+  async onSaveButtonClick() {
+    await this.dataGrid.instance.saveEditData();
+
+    const allRows = this.itemStoresList;
+    console.log(allRows)
+
+    const selectedRows = allRows.filter((x: any) =>
+      this.selectedRowKeys.includes(x.ITEM_ID) || x.Selected
     );
-    console.log('Worksheet Item Property to Save:', worksheetItemProperty);
-    const worksheetItemPropertypayload =
-      worksheetItemProperty && worksheetItemProperty.length > 0
-        ? worksheetItemProperty
-        : this.selectedworksheetdata;
+    console.log('Selected rows for save:', selectedRows);
+
+    if (!selectedRows.length) {
+      notify('Please select at least one row', 'error', 2000);
+      return;
+    }
+
+    const worksheet_item_property = selectedRows.map((x: any) => ({
+      ID: Number(x.ID ?? 0),
+      ITEM_ID: Number(x.ITEM_ID ?? 0),
+      IS_PRICE_REQUIRED: !!x.IS_PRICE_REQUIRED,
+      IS_PRICE_REQUIRED_NEW: !!x.IS_PRICE_REQUIRED_NEW,
+      IS_NOT_DISCOUNTABLE: !!x.IS_NOT_DISCOUNTABLE,
+      IS_NOT_DISCOUNTABLE_NEW: !!x.IS_NOT_DISCOUNTABLE_NEW,
+      IS_NOT_SALE_ITEM: !!x.IS_NOT_SALE_ITEM,
+      IS_NOT_SALE_ITEM_NEW: !!x.IS_NOT_SALE_ITEM_NEW,
+      IS_NOT_SALE_RETURN: !!x.IS_NOT_SALE_RETURN,
+      IS_NOT_SALE_RETURN_NEW: !!x.IS_NOT_SALE_RETURN_NEW || false,
+      IS_INACTIVE: !!x.IS_INACTIVE,
+      IS_INACTIVE_NEW: !!x.IS_INACTIVE_NEW,
+      BARCODE: x.BARCODE ?? '',
+      DESCRIPTION: x.DESCRIPTION ?? '',
+      DEPT_NAME: x.DEPT_NAME ?? '',
+      CAT_NAME: x.CAT_NAME ?? '',
+      BRAND_NAME: x.BRAND_NAME ?? '',
+      Selected: true,
+      STORE_ID: Number(x.STORE_ID ?? 0),
+      STORE_NAME: x.STORE_NAME ?? '',
+    }));
 
     const payload = {
-      ID: this.selectedId,
+      ID: Number(this.selectedId ?? 0),
       WS_NO: '',
       WS_DATE: new Date().toISOString(),
-      STORE_ID: this.selectedStoreId.toString(),
-      USER_ID: this.userId || 0,
-      COMPANY_ID: this.selected_Company_id || 0,
-      NARRATION: this.selectedNarration,
-      Status: this.statusValue,
-      worksheet_item_property: worksheetItemPropertypayload,
+      STORE_ID: String(this.selectedStoreId ?? 0),
+      USER_ID: Number(this.userId ?? 0),
+      COMPANY_ID: Number(this.selected_Company_id ?? 0),
+      NARRATION: this.selectedNarration ?? '',
+      Status: String(this.statusValue ?? '0'),
+      worksheet_item_property,
+      worksheet_item_store: (this.selectedStoreIds || []).map((storeId: number) => ({
+        ID: 0,
+        WS_ID: 0,
+        STORE_ID: Number(storeId),
+      })),
     };
 
     if (this.approveValue) {
-      this.dataservice.verifyItemStoreProperties(payload).subscribe(
-        (res: any) => {
-          this.popupClosed.emit();
-
-          notify(
-            {
-              message:
-                'Worksheet item property verify and committed successfully',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
-          this.approveValue = false;
-        },
-        (error) => {
-          notify('Failed to approve worksheet item property.', 'error', 2000);
-          console.error(error);
-        },
-      );
-    } else if (this.statusValue === '2') {
-      confirm(
-        'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit',
-      ).then((result: any) => {
-        if (result) {
+      confirm('It will approve and commit. Are you sure you want to commit?', 'Confirm Commit')
+        .then((result: any) => {
+          if (!result) return;
           this.dataservice.approveworksheetItemProperty(payload).subscribe(
-            (res: any) => {
+            () => {
               this.popupClosed.emit();
-
-              notify(
-                {
-                  message:
-                    'Worksheet item property approved and committed successfully',
-                  position: { at: 'top right', my: 'top right' },
-                  displayTime: 500,
-                },
-                'success',
-              );
+              notify('Worksheet item property approved and committed successfully', 'success', 2000);
             },
             (error) => {
-              notify(
-                'Failed to approve worksheet item property.',
-                'error',
-                2000,
-              );
+              notify('Failed to approve worksheet item property.', 'error', 2000);
               console.error(error);
             },
           );
-        }
-      });
+        });
     } else {
       this.dataservice.updateworksheetItemProperty(payload).subscribe(
-        (response: any) => {
-          if (response) {
-            this.isSaved = true;
-            notify('Data saved successfully', 'success', 2000);
-            this.popupClosed.emit();
-          }
+        () => {
+          this.isSaved = true;
+          notify('Data saved successfully', 'success', 2000);
+          this.popupClosed.emit();
         },
         (error: any) => {
           console.error('Save error:', error);
@@ -482,39 +422,8 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
     }
   }
 
-  onVerify() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      USER_ID: sessionStorage.getItem('UserId'),
-      STORE_ID: this.selectedStoreId,
-      worksheet_item_property: this.itemStoresList.map((item: any) => ({
-        ITEM_ID: item.ITEM_ID,
-        IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED,
-        IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW,
-        IS_NOT_DISCOUNTABLE: item.IS_NOT_DISCOUNTABLE,
-        IS_NOT_DISCOUNTABLE_NEW: item.IS_NOT_DISCOUNTABLE_NEW,
-        IS_NOT_SALE_ITEM: item.IS_NOT_SALE_ITEM,
-        IS_NOT_SALE_ITEM_NEW: item.IS_NOT_SALE_ITEM_NEW,
-        IS_NOT_SALE_RETURN: item.IS_NOT_SALE_RETURN,
-        IS_NOT_SALE_RETURN_NEW: item.IS_NOT_SALE_RETURN_NEW,
-        IS_INACTIVE: item.IS_INACTIVE,
-        IS_INACTIVE_NEW: item.IS_INACTIVE_NEW,
-      })),
-    };
 
-    this.dataservice.verifyItemStoreProperties(payload).subscribe(
-      (response: any) => {
-        if (response) {
-          this.isVerified = true;
-          notify('Data verified successfully', 'success', 2000);
-        }
-      },
-      (error: any) => {
-        console.error('Verify error:', error);
-        notify('Error verifying data', 'error', 2000);
-      },
-    );
-  }
+
 
   onApprove() {
     const payload = {
@@ -558,9 +467,78 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
     this.popupClosed.emit();
   }
 
+  // listStoreItemProperty() {
+  //   this.dataservice.getStoreItemPropertyList().subscribe((response: any) => {
+
+  //     this.itemStoresList = (response.data || []).map((item: any) => ({
+  //       ...item,
+
+  //       // ✅ ADD NEW FIELDS (IMPORTANT)
+  //       IS_NOT_SALE_ITEM_NEW: item.IS_NOT_SALE_ITEM ?? false,
+  //       IS_NOT_SALE_RETURN_NEW: item.IS_NOT_SALE_RETURN ?? false,
+  //       IS_NOT_DISCOUNTABLE_NEW: item.IS_NOT_DISCOUNTABLE ?? false,
+  //       IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED ?? false,
+  //       IS_INACTIVE_NEW: item.IS_INACTIVE ?? false,
+
+  //       // ✅ Ensure Selected exists
+  //       Selected: item.Selected ?? false
+  //     }));
+
+  //     // ✅ Sync selection
+  //     this.selectedRowKeys = this.itemStoresList
+  //       .filter((x: any) => x.Selected)
+  //       .map((x: any) => x.ITEM_ID);
+  //   });
+  // }
+
   listStoreItemProperty() {
     this.dataservice.getStoreItemPropertyList().subscribe((response: any) => {
-      this.itemStoresList = response.data;
+
+      const apiData = response.data || [];
+
+      // 👉 selected worksheet data
+      const selectedItems = this.selectedData?.worksheet_item_property || [];
+
+      this.itemStoresList = apiData.map((item: any) => {
+
+        // find matching selected item
+        const matched = selectedItems.find(
+          (x: any) => x.ITEM_ID === item.ITEM_ID
+        );
+
+        return {
+          ...item,
+
+          // ✅ CURRENT values from API
+          IS_NOT_SALE_ITEM: item.IS_NOT_SALE_ITEM ?? false,
+          IS_NOT_SALE_RETURN: item.IS_NOT_SALE_RETURN ?? false,
+          IS_NOT_DISCOUNTABLE: item.IS_NOT_DISCOUNTABLE ?? false,
+          IS_PRICE_REQUIRED: item.IS_PRICE_REQUIRED ?? false,
+          IS_INACTIVE: item.IS_INACTIVE ?? false,
+
+          // ✅ NEW values from selectedData (if exists)
+          IS_NOT_SALE_ITEM_NEW: matched?.IS_NOT_SALE_ITEM_NEW ?? item.IS_NOT_SALE_ITEM ?? false,
+          IS_NOT_SALE_RETURN_NEW: matched?.IS_NOT_SALE_RETURN_NEW ?? item.IS_NOT_SALE_RETURN ?? false,
+          IS_NOT_DISCOUNTABLE_NEW: matched?.IS_NOT_DISCOUNTABLE_NEW ?? item.IS_NOT_DISCOUNTABLE ?? false,
+          IS_PRICE_REQUIRED_NEW: matched?.IS_PRICE_REQUIRED_NEW ?? item.IS_PRICE_REQUIRED ?? false,
+          IS_INACTIVE_NEW: matched?.IS_INACTIVE_NEW ?? item.IS_INACTIVE ?? false,
+
+          // ✅ selection
+          Selected: matched?.Selected ?? false
+        };
+      });
+
+      // ✅ bind selection to grid
+      this.selectedRowKeys = this.itemStoresList
+        .filter((x: any) => x.Selected)
+        .map((x: any) => x.ITEM_ID);
+
+      // ✅ refresh grid
+      setTimeout(() => {
+        this.dataGrid?.instance?.option('dataSource', this.itemStoresList);
+        this.dataGrid?.instance?.option('selectedRowKeys', this.selectedRowKeys);
+        this.cdr.detectChanges();
+      }, 0);
     });
   }
 }
@@ -602,4 +580,4 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
   exports: [EditItemStorePropertyComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditItemStorePropertyModule {}
+export class EditItemStorePropertyModule { }

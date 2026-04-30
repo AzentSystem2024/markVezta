@@ -55,6 +55,20 @@
         <!-- Right side (Supplier + Button) -->
         <div style="display: flex; gap: 8px; align-items: center">
           <dx-select-box
+            label="Store"
+            labelMode="floating"
+            width="200"
+            [dataSource]="filteredStoreList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="purchaseInvoiceFormData.STORE_ID"
+            placeholder="Select Store *"
+            [searchEnabled]="true"
+            [elementAttr]="{ class: 'grndropdown' }"
+            [readOnly]="readOnly"
+          >
+          </dx-select-box>
+          <dx-select-box
             [dataSource]="distributorList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
@@ -317,7 +331,7 @@
               [width]="200"
             ></dx-text-box>
             <dx-text-box
-              label="Narration"
+              label="Remarks"
               labelMode="floating"
               [(value)]="purchaseInvoiceFormData.NARRATION"
               [width]="400"
@@ -343,12 +357,14 @@
                 gap: 6px;
               "
             >
-              <dx-check-box
-                *ngIf="!readOnly"
-                text="Approve"
-                [(value)]="isApproved"
-                [readOnly]="readOnly"
-              ></dx-check-box>
+              <div class="approve-container" *ngIf="canApprove">
+                <dx-check-box
+                  *ngIf="!readOnly"
+                  text="Approve"
+                  [(value)]="isApproved"
+                  [readOnly]="readOnly"
+                ></dx-check-box>
+              </div>
               <div style="display: flex; gap: 8px">
                 <dx-button
                   text="Cancel"

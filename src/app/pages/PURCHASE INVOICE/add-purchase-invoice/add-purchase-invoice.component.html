@@ -55,6 +55,20 @@
         <!-- Right side (Supplier + Button together) -->
         <div style="display: flex; gap: 8px; align-items: center">
           <dx-select-box
+            label="Store"
+            labelMode="floating"
+            width="200"
+            [dataSource]="filteredStoreList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="purchaseInvoiceFormData.STORE_ID"
+            placeholder="Select Store *"
+            [searchEnabled]="true"
+            [elementAttr]="{ class: 'grndropdown' }"
+            (onValueChanged)="onStoreValueChanged($event)"
+          >
+          </dx-select-box>
+          <dx-select-box
             [dataSource]="distributorList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
@@ -330,11 +344,12 @@
               "
             >
               <!-- Approve checkbox (TOP) -->
-              <dx-check-box
-                text="Approve"
-                [(value)]="purchaseInvoiceFormData.IS_APPROVED"
-              ></dx-check-box>
-
+              <div class="approve-container" *ngIf="canApprove">
+                <dx-check-box
+                  text="Approve"
+                  [(value)]="purchaseInvoiceFormData.IS_APPROVED"
+                ></dx-check-box>
+              </div>
               <!-- Buttons row -->
               <div style="display: flex; gap: 8px">
                 <dx-button

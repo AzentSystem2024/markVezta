@@ -136,24 +136,26 @@ export class StockMovementReportComponent {
   saleReturnDetails: any[] = [];
   salesInvoiceDetails: any[] = [];
   adjustedDetails: any[] = [];
-  isEditProductionPopupVisible: boolean;
+  isEditProductionPopupVisible: boolean = false;
   selectedProduction: any;
-  isReadOnlyInvoice: boolean;
-  selectedProductionType: string;
+  isReadOnlyInvoice: boolean = false;;
+  selectedProductionType: any;
   selectedGrnId: any;
-  isViewGrnPopupOpened: boolean;
+  isViewGrnPopupOpened: boolean = false;;
   selectedPurchaseReturnId: any;
-  isEditPurchaseReturn: boolean;
+  isEditPurchaseReturn: boolean = false;;
   selectedPurchaseReturn: any;
   selectedDelivery: any;
-  isReadOnlyPurchaseReturn: boolean;
-  isEditSaleReturn: boolean;
-  isEditDelivery: boolean;
+  isReadOnlyPurchaseReturn: boolean = false;
+  isEditSaleReturn: boolean = false;
+  isEditDelivery: boolean = false;
   selectedSaleReturn: any;
   isReadOnlySaleReturn = true;
   isReadOnlyDelivery = true;
   selectedInvoice: any;
-  isViewInvoice: boolean;
+  isViewInvoice: boolean = false;;
+  fin_id: any;
+  finID: any;
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -245,6 +247,10 @@ export class StockMovementReportComponent {
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.fin_id = sessionData.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
+    }
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -337,6 +343,8 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
+      FIN_ID: this.finID,
+
     };
     this.dataService.StockMovement_Api(payload).subscribe({
       next: (res: any) => {
@@ -375,7 +383,6 @@ export class StockMovementReportComponent {
         column: 'OPENING_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'OPENING_QTY',
         alignment: 'Right',
       },
@@ -383,7 +390,6 @@ export class StockMovementReportComponent {
         column: 'GRN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'GRN_QTY',
         alignment: 'Right',
       },
@@ -391,7 +397,6 @@ export class StockMovementReportComponent {
         column: 'BALANCE_STOCK',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'BALANCE_STOCK',
         alignment: 'Right',
       },
@@ -399,7 +404,6 @@ export class StockMovementReportComponent {
         column: 'PURCHASE_RETURN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'PURCHASE_RETURN_QTY',
         alignment: 'Right',
       },
@@ -407,7 +411,6 @@ export class StockMovementReportComponent {
         column: 'TRANSFEROUT_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'TRANSFEROUT_QTY',
         alignment: 'Right',
       },
@@ -415,7 +418,6 @@ export class StockMovementReportComponent {
         column: 'TRANSFERIN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'TRANSFERIN_QTY',
         alignment: 'Right',
       },
@@ -423,7 +425,6 @@ export class StockMovementReportComponent {
         column: 'DELIVERY_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'DELIVERY_QTY',
         alignment: 'Right',
       },
@@ -431,7 +432,6 @@ export class StockMovementReportComponent {
         column: 'DELIVERY_RETURN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'DELIVERY_RETURN_QTY',
         alignment: 'Right',
       },
@@ -439,7 +439,6 @@ export class StockMovementReportComponent {
         column: 'SALE_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'SALE_QTY',
         alignment: 'Right',
       },
@@ -447,7 +446,6 @@ export class StockMovementReportComponent {
         column: 'SALE_RETURN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'SALE_RETURN_QTY',
         alignment: 'Right',
       },
@@ -455,15 +453,27 @@ export class StockMovementReportComponent {
         column: 'ADJUSTED',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'ADJUSTED',
+        alignment: 'Right',
+      },
+      {
+        column: 'TRANSFER_OUT_QTY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        showInColumn: 'TRANSFER_OUT_QTY',
+        alignment: 'Right',
+      },
+      {
+        column: 'TRANSFER_IN_QTY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        showInColumn: 'TRANSFER_IN_QTY',
         alignment: 'Right',
       },
       {
         column: 'PRODUCTION_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'PRODUCTION_QTY',
         alignment: 'Right',
       },
@@ -471,7 +481,6 @@ export class StockMovementReportComponent {
         column: 'CONSUMPTION_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'CONSUMPTION_QTY',
         alignment: 'Right',
       },
@@ -481,91 +490,90 @@ export class StockMovementReportComponent {
         column: 'OPENING_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'GRN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'BALANCE_STOCK',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'PURCHASE_RETURN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'TRANSFEROUT_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'TRANSFERIN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'DELIVERY_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'DELIVERY_RETURN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'SALE_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'SALE_RETURN_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'ADJUSTED',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'TRANSFER_OUT_QTY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        alignByColumn: true,
+      },
+      {
+        column: 'TRANSFER_IN_QTY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
         alignByColumn: true,
       },
       {
         column: 'PRODUCTION_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
         column: 'CONSUMPTION_QTY',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
     ],
@@ -1002,4 +1010,4 @@ export class StockMovementReportComponent {
   exports: [StockMovementReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockMovementReportModule {}
+export class StockMovementReportModule { }

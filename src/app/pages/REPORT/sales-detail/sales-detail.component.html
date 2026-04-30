@@ -39,6 +39,7 @@
             labelMode="floating"
             [(value)]="selected_from_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onFromDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -50,6 +51,7 @@
             labelMode="floating"
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onToDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -301,7 +303,14 @@
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
       <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
       <dxi-column dataField="PRICE" caption="Price"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+      <dxi-column dataField="CAT_NAME" caption="Category"></dxi-column>
+      <dxi-column dataField="SUBCAT_NAME" caption="SubCategory"></dxi-column>
+      <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
+      <dxi-column dataField="ITEMCATEGORY1_NAME" caption="ItemProperty1"></dxi-column>
+      <dxi-column dataField="ITEMCATEGORY2_NAME" caption="ItemProperty2"></dxi-column>
       <dxi-column dataField="DISCOUNT" caption="Discount"></dxi-column>
+      <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
       <dxi-column dataField="DISC_REASON" caption="Reason"></dxi-column>
       <dxi-column
         dataField="GROSS_AMOUNT"
@@ -352,19 +361,19 @@
 </div>
 
 <!-- ================= POPUP ================= -->
+
 <dx-popup
   *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="New Invoice"
+  title="Invoice"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice-retail
-    [isEditing]="true"
+  <app-add-sales-invoice-retail
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
+  ></app-add-sales-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>

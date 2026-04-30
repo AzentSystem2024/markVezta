@@ -61,14 +61,17 @@
 
             <dxi-item location="after" locateInMenu="auto">
               <div class="stacked-toolbar-group">
-                <dx-text-box
-                    [(value)]="storename"
-                    [width]="200"
-                    label="Store"
-                    labelMode="floating"
-                    [readOnly]="true"
-                  >
-                  </dx-text-box>
+                <dx-select-box
+                  [dataSource]="stores"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [width]="'100%'"
+                  [searchEnabled]="true"
+                  label="Store"
+                  labelMode="floating"
+                  [readOnly]="readOnlyTrue"
+                >
+                </dx-select-box>
                 <div style="margin-top: 2px; text-align: left">
                   <dx-button
                     text="Add Items"
@@ -127,6 +130,7 @@
             [visible]="canApprove"
             caption="Amount"
             [allowEditing]="false"
+            format="#,##0.00"
           ></dxi-column>
           <!-- <dxi-column
         dataField="REASON_ID"
@@ -271,7 +275,11 @@
 
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
 
-      <dxi-column dataField="COST" caption="Cost" [visible]="!hidecost"></dxi-column>
+      <dxi-column
+        dataField="COST"
+        caption="Cost"
+        [visible]="!hidecost"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </dx-popup>

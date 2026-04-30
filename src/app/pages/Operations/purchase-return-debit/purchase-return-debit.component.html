@@ -181,6 +181,7 @@
 >
   <app-purchase-return-debit-form
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
   ></app-purchase-return-debit-form>
 </dx-popup>
 
@@ -197,6 +198,7 @@
       [EditingResponseData]="selectedPurchaseReturn"
       [isReadOnlyMode]="isReadOnlyPurchaseReturn"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-purchase-return-debit-form>
   </ng-container>
 </dx-popup>

@@ -39,6 +39,7 @@
             labelMode="floating"
             [(value)]="selected_from_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onFromDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -50,6 +51,7 @@
             labelMode="floating"
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
+            [max]="today"
             (onValueChanged)="onToDateChange($event)">
           </dx-date-box>
         </dxi-item>
@@ -267,14 +269,13 @@
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="New Invoice"
+  title="Invoice"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
-  <app-add-invoice-retail
-    [isEditing]="true"
+  <app-add-sales-invoice-retail
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
+  ></app-add-sales-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>

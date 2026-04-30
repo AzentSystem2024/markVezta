@@ -10,7 +10,6 @@
     [rowAlternationEnabled]="true"
     [allowColumnReordering]="true"
     [showColumnHeaders]="true"
-    [columnAutoWidth]="true"
     [allowColumnResizing]="true"
     [columnResizingMode]="'nextColumn'"
     [filterRow]="{ visible: false }"
@@ -27,8 +26,8 @@
   >
     <dxo-editing
       mode="popup"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
     ></dxo-editing>
     <dxo-export
       [enabled]="true"
@@ -60,6 +59,24 @@
       <dxi-item location="before">
         <div class="grid-header">Purchase Order</div>
       </dxi-item>
+      <!-- <dxi-item location="after">
+        <div *dxTemplate="let data of 'storeTemplate'">
+          <dx-select-box
+            label="Store"
+            labelMode="floating"
+            width="200"
+            [dataSource]="filteredStoreList"
+            [(value)]="selectedStoreId"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            placeholder="Select Store *"
+            [searchEnabled]="true"
+            [elementAttr]="{ class: 'grndropdown' }"
+            (onValueChanged)="onStoreChanged($event)"
+          >
+          </dx-select-box>
+        </div>
+      </dxi-item> -->
       <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
       <dxi-item
         location="after"
@@ -159,6 +176,7 @@
     [netQuantity]="netQuantity"
     [isEditMode]="false"
     [(isApproved)]="isApproved"
+    [showApprove]="canApprove"
     [isSaveDisabled]="isSaving"
     (save)="onClickSaveNewData()"
     (cancel)="onCancelNewData()"
@@ -182,6 +200,7 @@
     [showNetAmount]="true"
     [isEditMode]="true"
     [(isApproved)]="isApproved"
+    [showApprove]="canApprove"
     [isSaveDisabled]="isSaving"
     (save)="UpdatePurchaseOrder()"
   >

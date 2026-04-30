@@ -62,13 +62,16 @@
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
 
-                   <dx-text-box
-                    [(value)]="storename"
-                    [width]="200"
+                  <dx-select-box
+                    [(value)]="StoreIDData"
+                    [dataSource]="stores"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="'100%'"
+                    [searchEnabled]="true"
                     label="Store"
                     labelMode="floating"
-                    [readOnly]="true"
-                  ></dx-text-box>
+                  ></dx-select-box>
                 </div>
               </div>
             </dxi-item>
@@ -76,7 +79,7 @@
               <div class="stacked-toolbar-group">
                 <dx-select-box
                   [(value)]="transferInFormData.ORIGIN_STORE_ID"
-                  [dataSource]="stores"
+                  [dataSource]="transferstores"
                   displayExpr="DESCRIPTION"
                   valueExpr="ID"
                   [width]="200"
@@ -152,7 +155,7 @@
             ]"
           ></dxi-column>
 
-           <dxi-column
+          <dxi-column
             dataField="netAmount"
             caption="Total Cost"
             [allowEditing]="false"
@@ -199,8 +202,6 @@
 
           <!-- Buttons + Approve checkbox grouped together -->
           <div class="footer-right">
-           
-
             <!-- <dx-check-box
               *ngIf="isEditing && !isReadOnlyMode"
               [(value)]="isApproved"
@@ -329,9 +330,15 @@
       </dxo-toolbar>
       <dxi-column dataField="TRANSFER_NO" caption="TransferNo."></dxi-column>
 
-      <dxi-column dataField="TRANSFER_DATE" caption="Transfer Date"></dxi-column>
+      <dxi-column
+        dataField="TRANSFER_DATE"
+        caption="Transfer Date"
+      ></dxi-column>
       <dxi-column dataField="SOURCE_STORE" caption="Source store"></dxi-column>
-      <dxi-column dataField="DESTINATION_STORE" caption="Destination store"></dxi-column>
+      <dxi-column
+        dataField="DESTINATION_STORE"
+        caption="Destination store"
+      ></dxi-column>
       <!-- <dxi-column
         dataField="QUANTITY_AVAILABLE"
         caption="Qty Available"
