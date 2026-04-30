@@ -681,7 +681,7 @@ export class GrnComponent implements OnInit {
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
       .find((menu: any) => menu.Path === currentUrl);
-
+    console.log(packingRights, 'PACKINGRIGHTSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
