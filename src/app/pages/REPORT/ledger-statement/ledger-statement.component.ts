@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  ViewChild,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -32,6 +33,7 @@ import {
   DxValidationGroupModule,
   DxAutocompleteModule,
   DxTagBoxModule,
+  DxValidationGroupComponent,
 } from 'devextreme-angular';
 
 import {
@@ -76,6 +78,9 @@ import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/pa
   styleUrls: ['./ledger-statement.component.scss'],
 })
 export class LedgerStatementComponent {
+  @ViewChild('formValidationGroup', { static: false })
+  formValidationGroup!: DxValidationGroupComponent;
+
   Ledger_statement_datasource: DataSource;
   isEditJournalVoucher: boolean = false;
   isViewJournalVoucher: boolean = false;
@@ -92,8 +97,8 @@ export class LedgerStatementComponent {
   selected_Head_Id: any;
   selected_fin_id: any;
   selectedJournalVoucher: any;
-  formatted_from_date: string;
-  formatted_To_date: string;
+  formatted_from_date: any;
+  formatted_To_date: any;
   editLedgerPopup: boolean = false;
   selectedDebitNote: any;
   isViewCreditNote: boolean = false;
@@ -111,7 +116,7 @@ export class LedgerStatementComponent {
   Selected_Depreciation_data: any;
   EditDepreciationPopupVisible: boolean = false;
   editPrePaymentPopupOpened: boolean = false;
-  viewPayrollPopupOpened : boolean = false;
+  viewPayrollPopupOpened: boolean = false;
   selectedSalaryData: any;
   editSalaryPopup: boolean = false;
   selectedPrePayment: any;
@@ -145,7 +150,7 @@ export class LedgerStatementComponent {
   isViewBoxProduction: boolean;
   selectedProduction: any;
   isViewProduction: boolean;
-  isMiscViewInvoice : boolean = false;
+  isMiscViewInvoice: boolean = false;
   selectedPayroll: any;
   Store: any;
   selectedStoreid: any;
@@ -178,6 +183,17 @@ export class LedgerStatementComponent {
   }
 
   ngOnInit() {
+    console.log('ledgerstatementttttttttttttttttttttt');
+    const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    this.selected_from_date = SystemDate;
+    this.selected_To_date = SystemDate;
     this.get_sessionstorage_data();
     this.get_fin_id();
     this.sesstion_Details();
@@ -203,16 +219,7 @@ export class LedgerStatementComponent {
 
     this.loadLedgerData();
 
-    const today = new Date();
-    const SystemDate =
-      today.getFullYear() +
-      '-' +
-      String(today.getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(today.getDate()).padStart(2, '0');
 
-    this.selected_from_date = SystemDate;
-    this.selected_To_date = SystemDate;
   }
 
   loadHeadList() {
@@ -368,8 +375,8 @@ export class LedgerStatementComponent {
       DATE_FROM: sessiondata.dateFrom,
       DATE_TO: sessiondata.dateTo,
       STORE_ID: this.selectedStoreid?.length
-    ? this.selectedStoreid.join(',') // FINAL FIX
-    : ''
+        ? this.selectedStoreid.join(',') // FINAL FIX
+        : ''
     };
 
     console.log(payload, '=========payload=========');
@@ -378,7 +385,7 @@ export class LedgerStatementComponent {
     this.selected_Head_Id = payload.HEAD_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
-    this.selectedStoreid = payload.STORE_ID;  
+    this.selectedStoreid = payload.STORE_ID;
 
     // use your existing datasource creator
     this.createLedgerDataSource(payload);
@@ -441,15 +448,20 @@ export class LedgerStatementComponent {
   }
 
   load_Ledgre_data() {
+    //  Validate main form
+    const validationResult = this.formValidationGroup?.instance?.validate();
+    if (!validationResult?.isValid) {
+      return;
+    }
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
       HEAD_ID: this.selected_Head_Id,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-       STORE_ID: this.selectedStoreid?.length
-    ? this.selectedStoreid.join(',') // ✅ FINAL FIX
-    : ''
+      STORE_ID: this.selectedStoreid?.length
+        ? this.selectedStoreid.join(',') // ✅ FINAL FIX
+        : ''
     };
 
     this.createLedgerDataSource(payload);
@@ -685,18 +697,18 @@ export class LedgerStatementComponent {
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
-    } 
+    }
     else if (TRANS_TYPE_ID === 105) {
       this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
-      this.selectedInvoice = response;
+        this.selectedInvoice = response;
         this.isMiscViewInvoice = true;
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
-    } 
+    }
     else if (TRANS_TYPE_ID === 29) {
       this.dataService.viewSelectedPayroll(trans_id).subscribe((response: any) => {
-      this.selectedPayroll = response;
+        this.selectedPayroll = response;
         this.viewPayrollPopupOpened = true;
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
@@ -711,25 +723,25 @@ export class LedgerStatementComponent {
     return this.transtypeId !== 0 && this.transtypeId !== 1;
   }
 
-   storeHint: string = '';
+  storeHint: string = '';
 
-updateStoreHint() {
-  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-    this.storeHint = 'No store selected';
-    return;
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store
+      .filter(x => this.selectedStoreid.includes(x.ID))
+      .map(x => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
   }
 
-  const selectedNames = this.Store
-    .filter(x => this.selectedStoreid.includes(x.ID))
-    .map(x => x.DESCRIPTION);
-
-  this.storeHint = selectedNames.join(', ');
-}
-
-    store_dropdown(){
+  store_dropdown() {
     const payload = {
-      NAME :'STORE',
-      COMPANY_ID : this.selected_Company_id
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
@@ -931,11 +943,11 @@ updateStoreHint() {
     SaleReturnFormModule,
     ProductionJvViewModule,
     MiscSalesInvoiceFormModule,
-    
+
   ],
   providers: [],
   declarations: [LedgerStatementComponent],
   exports: [LedgerStatementComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LedgerStatementModule {}
+export class LedgerStatementModule { }
