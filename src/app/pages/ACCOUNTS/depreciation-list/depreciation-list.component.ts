@@ -177,7 +177,7 @@ export class DepreciationListComponent {
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/depreciation');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

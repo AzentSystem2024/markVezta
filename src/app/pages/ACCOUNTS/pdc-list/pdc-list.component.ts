@@ -181,7 +181,7 @@ export class PdcListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/pdc');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

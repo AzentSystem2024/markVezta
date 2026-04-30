@@ -65,6 +65,7 @@ export class AddMiscReceiptComponent {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() canApprove: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild('miscFormGroup') miscFormGroup: DxValidationGroupComponent;
   @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;

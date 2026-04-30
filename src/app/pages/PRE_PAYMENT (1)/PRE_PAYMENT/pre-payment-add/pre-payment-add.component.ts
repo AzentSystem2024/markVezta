@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   NgZone,
   Output,
@@ -40,7 +41,7 @@ export class PrePaymentAddComponent {
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup: DxValidationGroupComponent;
   @ViewChild('prepayDetailGrid') prepayDetailGrid: DxDataGridComponent;
-
+  @Input() canApprove: boolean = false;
   @Output() formClosed = new EventEmitter<void>();
 
   selectedRows: any[] = [];
