@@ -351,7 +351,7 @@
         </div>
         <div class="form-popup-buttons-container">
           <!-- Approve -->
-          <div class="approve-container">
+          <div class="approve-container" *ngIf="canApprove">
             <dx-check-box
               [value]="
                 isReadOnlyMode ? true : purchaseReturnFormData.IS_APPROVED
