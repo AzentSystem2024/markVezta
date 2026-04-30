@@ -152,7 +152,6 @@ export class StockViewComponent {
   getStockViewList() {
     const payload = {
       FIN_ID: this.finID,
-      COMPANY_ID: this.companyID,
     };
     this.dataService.getStockViewList(payload).subscribe((response: any) => {
       this.stockViewList = response.Data;

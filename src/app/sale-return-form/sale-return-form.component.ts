@@ -430,9 +430,9 @@ export class SaleReturnFormComponent {
       return;
     }
     if (selectedRows.length > 0) {
-      selectedRows.forEach((row) => {
+      selectedRows.forEach((row: any) => {
         const exists = this.mainGridData.some(
-          (item) => item.DETAIL_ID === row.DETAIL_ID,
+          (item) => item.SALE_DET_ID === row.SALE_DET_ID,
         );
 
         if (!exists) {
