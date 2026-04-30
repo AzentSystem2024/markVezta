@@ -344,11 +344,12 @@
               "
             >
               <!-- Approve checkbox (TOP) -->
-              <dx-check-box
-                text="Approve"
-                [(value)]="purchaseInvoiceFormData.IS_APPROVED"
-              ></dx-check-box>
-
+              <div class="approve-container" *ngIf="canApprove">
+                <dx-check-box
+                  text="Approve"
+                  [(value)]="purchaseInvoiceFormData.IS_APPROVED"
+                ></dx-check-box>
+              </div>
               <!-- Buttons row -->
               <div style="display: flex; gap: 8px">
                 <dx-button

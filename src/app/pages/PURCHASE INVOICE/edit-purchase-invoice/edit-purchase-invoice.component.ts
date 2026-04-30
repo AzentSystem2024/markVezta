@@ -63,6 +63,7 @@ export class EditPurchaseInvoiceComponent {
   popupGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() invoiceFormData: any;
+  @Input() canApprove: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';

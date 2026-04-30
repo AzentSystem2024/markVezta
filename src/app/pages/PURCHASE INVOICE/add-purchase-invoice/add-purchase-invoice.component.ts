@@ -59,6 +59,7 @@ export class AddPurchaseInvoiceComponent {
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
