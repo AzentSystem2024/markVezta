@@ -261,12 +261,13 @@
     </div>
     <div class="form-footer-wrapper">
       <div class="right-section">
-        <dx-check-box
-          text="Approve"
-          [visible]="!isReadOnlyMode"
-          [(value)]="invoiceFormData.IS_APPROVED"
-        ></dx-check-box>
-
+        <div class="approve-container" *ngIf="canApprove">
+          <dx-check-box
+            text="Approve"
+            [visible]="!isReadOnlyMode"
+            [(value)]="invoiceFormData.IS_APPROVED"
+          ></dx-check-box>
+        </div>
         <dx-button
           text="Cancel"
           stylingMode="outlined"

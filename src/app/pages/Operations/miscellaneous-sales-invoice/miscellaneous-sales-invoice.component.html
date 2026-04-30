@@ -37,8 +37,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
         [enabled]="true"
@@ -122,7 +122,6 @@
         dataField="SALE_NO"
         caption="Sale No"
         alignment="left"
-        
       ></dxi-column>
       <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
       <dxi-column
@@ -179,6 +178,7 @@
   <app-miscellaneous-sales-invoice-form
     [isEditing]="false"
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
   ></app-miscellaneous-sales-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>
@@ -189,6 +189,7 @@
   [height]="'100vh'"
   title="Edit Invoice"
   (onHiding)="handleClose()"
+  [canApprove]="canApprove"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-miscellaneous-sales-invoice-form
@@ -224,4 +225,3 @@
   (applyDates)="onCustomDateApplied($event)"
 >
 </app-custom-date-popup>
-

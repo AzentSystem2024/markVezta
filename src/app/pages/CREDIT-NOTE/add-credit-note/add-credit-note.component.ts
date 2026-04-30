@@ -3,6 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   EventEmitter,
+  Input,
   NgModule,
   NgZone,
   Output,
@@ -78,6 +79,7 @@ export class AddCreditNoteComponent {
   narrationRef!: DxTextBoxComponent;
   @ViewChild('saveButtonRef', { static: false })
   saveButtonRef!: DxButtonComponent;
+  @Input() canApprove: boolean = false;
 
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();

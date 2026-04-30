@@ -52,7 +52,7 @@ import { ChartOfAccountsFinanceEditFormModule } from '../chart-of-accounts-finan
 })
 export class ChartOfAccountsFinanceComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent| undefined;
+  dataGrid: DxDataGridComponent | undefined;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -136,15 +136,15 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log(currentUrl)
+    console.log(currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group:any) => group.Menus)
-      .find((menu:any) => menu.Path === '/chart-of-accounts-finance');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -152,7 +152,7 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getAccountsGroupList();

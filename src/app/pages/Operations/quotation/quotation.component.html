@@ -166,7 +166,10 @@
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddQuotation">
-    <app-quotation-form (popupClosed)="handleClose()"></app-quotation-form>
+    <app-quotation-form
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+    ></app-quotation-form>
   </ng-container>
 </dx-popup>
 
@@ -183,6 +186,7 @@
       [EditingResponseData]="selectedQuotation"
       [isReadOnlyMode]="isReadOnlyQuotation"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-quotation-form>
   </ng-container>
 </dx-popup>

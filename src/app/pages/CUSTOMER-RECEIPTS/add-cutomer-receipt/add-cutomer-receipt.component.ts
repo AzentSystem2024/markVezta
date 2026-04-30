@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   NgZone,
   Output,
@@ -57,7 +58,7 @@ import { confirm } from 'devextreme/ui/dialog';
 export class AddCutomerReceiptComponent {
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
-
+  @Input() canApprove: boolean = false;
   receiptNo = '';
   customerName = '';
   receiptDate = new Date();

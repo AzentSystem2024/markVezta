@@ -292,11 +292,12 @@
       "
     >
       <!-- TOP RIGHT -->
-      <dx-check-box
-        text="Approve"
-        [(value)]="journalVoucherFormData.IS_APPROVED"
-      ></dx-check-box>
-
+      <div class="approve-container" *ngIf="canApprove">
+        <dx-check-box
+          text="Approve"
+          [(value)]="journalVoucherFormData.IS_APPROVED"
+        ></dx-check-box>
+      </div>
       <!-- BOTTOM RIGHT -->
       <div style="display: flex; gap: 10px">
         <dx-button

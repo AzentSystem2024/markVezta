@@ -51,7 +51,7 @@ export class FixedAsstesAddComponent {
   newformValidationGroup: DxValidationGroupComponent;
   AddFixedAssetsPopupVisible: boolean = false;
   asseted_Data: any;
-
+  // @Input() canApprove: boolean = false;
   isFilterRowVisible: boolean = false;
   selected_Company_id: number;
   selected_fin_id: any;
@@ -72,8 +72,8 @@ export class FixedAsstesAddComponent {
     PURCH_DATE: '',
     IS_INACTIVE: false,
     IS_DELETED: false,
-    DEPT_ID:0,
-    SUB_DEPT_ID :0
+    DEPT_ID: 0,
+    SUB_DEPT_ID: 0,
   };
   asset_ledgerData: any;
   FixedAssets: any;
@@ -95,9 +95,8 @@ export class FixedAsstesAddComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
   ) {
-     this.sesstion_Details();
+    this.sesstion_Details();
     this.Get_dropdowns();
-   
   }
 
   sesstion_Details() {
@@ -131,9 +130,9 @@ export class FixedAsstesAddComponent {
     });
 
     const payload = {
-      NAME : 'DEPT',
-      COMPANY_ID : this.selected_Company_id
-    }
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
     });
@@ -148,19 +147,19 @@ export class FixedAsstesAddComponent {
   }
 
   onDepartmentChange(e: any) {
-  const selectedDeptId = e.value;
+    const selectedDeptId = e.value;
 
-  const subdepartment = {
-    NAME: 'SUB_DEPT',
-    DEPT_ID: selectedDeptId
-  };
+    const subdepartment = {
+      NAME: 'SUB_DEPT',
+      DEPT_ID: selectedDeptId,
+    };
 
-  this.dataService.Get_SubDepartment_Dropdown(subdepartment)
-    .subscribe((res: any) => {
-      this.SubDepartment = res;
-    });
-}
-
+    this.dataService
+      .Get_SubDepartment_Dropdown(subdepartment)
+      .subscribe((res: any) => {
+        this.SubDepartment = res;
+      });
+  }
 
   list_fixed_assets() {
     const payload = {

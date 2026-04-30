@@ -172,8 +172,8 @@ export class JournalVoucherListComponent {
     );
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -181,7 +181,7 @@ export class JournalVoucherListComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sessionData_tax();
@@ -682,5 +682,4 @@ export class JournalVoucherListComponent {
   exports: [JournalVoucherListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-
 export class JournalVoucherModule {}

@@ -63,7 +63,7 @@ export class SalesOrderFinancePopupFormComponent {
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
-
+  @Input() canApprove: boolean = false;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild('popupGridRef', { static: false })
@@ -124,7 +124,7 @@ export class SalesOrderFinancePopupFormComponent {
   canDelete: any;
   canPrint: any;
   canView: any;
-  canApprove: any;
+  // canApprove: any;
   items: any;
   popupVisible: boolean = false;
   selectedTab = 0;
@@ -212,7 +212,7 @@ export class SalesOrderFinancePopupFormComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();

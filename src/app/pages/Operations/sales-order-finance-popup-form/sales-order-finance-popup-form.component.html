@@ -272,18 +272,22 @@
             </div>
 
             <div class="footer-right">
-              <dx-check-box
-                [value]="isReadOnlyMode ? true : salesOrderFormData.IS_APPROVED"
-                (valueChange)="
-                  !isReadOnlyMode
-                    ? (salesOrderFormData.IS_APPROVED = $event)
-                    : null
-                "
-                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
-                [readOnly]="isReadOnlyMode"
-                stylingMode="outlined"
-              >
-              </dx-check-box>
+              <div class="approve-container" *ngIf="canApprove">
+                <dx-check-box
+                  [value]="
+                    isReadOnlyMode ? true : salesOrderFormData.IS_APPROVED
+                  "
+                  (valueChange)="
+                    !isReadOnlyMode
+                      ? (salesOrderFormData.IS_APPROVED = $event)
+                      : null
+                  "
+                  [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                  [readOnly]="isReadOnlyMode"
+                  stylingMode="outlined"
+                >
+                </dx-check-box>
+              </div>
               <!-- <dx-check-box
                 *ngIf="isEditing && !isReadOnlyMode"
                 [(value)]="isApproved"

@@ -313,13 +313,14 @@
         ></dx-text-box>
 
         <!-- Middle: Round Off Checkbox -->
-        <dx-check-box
-          text="Round Off"
-          [(value)]="debitFormData[0].ROUND_OFF"
-          (onValueChanged)="onRoundOffChange()"
-          style="margin-top: 18px"
-        ></dx-check-box>
-
+        <div class="approve-container" *ngIf="canApprove">
+          <dx-check-box
+            text="Round Off"
+            [(value)]="debitFormData[0].ROUND_OFF"
+            (onValueChanged)="onRoundOffChange()"
+            style="margin-top: 18px"
+          ></dx-check-box>
+        </div>
         <!-- Right: Net Amount + Approve checkbox -->
         <div
           style="

@@ -59,6 +59,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -84,7 +85,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   canDelete: any;
   canPrint: any;
   canView: any;
-  canApprove: any;
+  // canApprove: any;
   matrix: any;
   storeFromSession: any;
   stores: any;

@@ -254,18 +254,21 @@
             </div>
 
             <!-- Approve Checkbox -->
-            <dx-check-box
-              [value]="isReadOnlyMode ? true : deliveryFormData.IS_APPROVED"
-              (valueChange)="
-                !isReadOnlyMode ? (deliveryFormData.IS_APPROVED = $event) : null
-              "
-              [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
-              [readOnly]="isReadOnlyMode"
-              class="approve-checkbox"
-              stylingMode="text"
-              style="margin-top: 5px"
-            ></dx-check-box>
-
+            <div class="approve-container" *ngIf="canApprove">
+              <dx-check-box
+                [value]="isReadOnlyMode ? true : deliveryFormData.IS_APPROVED"
+                (valueChange)="
+                  !isReadOnlyMode
+                    ? (deliveryFormData.IS_APPROVED = $event)
+                    : null
+                "
+                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                [readOnly]="isReadOnlyMode"
+                class="approve-checkbox"
+                stylingMode="text"
+                style="margin-top: 5px"
+              ></dx-check-box>
+            </div>
             <!-- Buttons -->
             <div class="footer-actions" style="margin-top: 15px">
               <dx-button

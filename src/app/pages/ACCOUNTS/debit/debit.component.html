@@ -188,7 +188,10 @@
   title="New Debit Note"
   (onHiding)="handleClose()"
 >
-  <app-add-debit (popupClosed)="handleClose()"></app-add-debit>
+  <app-add-debit
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  ></app-add-debit>
 </dx-popup>
 
 <dx-popup
@@ -202,6 +205,7 @@
     <app-edit-debit
       [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-edit-debit>
   </ng-container>
 </dx-popup>

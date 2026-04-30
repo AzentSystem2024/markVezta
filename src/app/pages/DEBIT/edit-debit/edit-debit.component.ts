@@ -61,6 +61,7 @@ import { confirm } from 'devextreme/ui/dialog';
 export class EditDebitComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() debitFormData: any;
+  @Input() canApprove: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';

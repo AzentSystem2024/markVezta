@@ -178,7 +178,10 @@
   title="Sale Return"
   (onHiding)="handleClose()"
 >
-  <app-sale-return-form (popupClosed)="handleClose()"></app-sale-return-form>
+  <app-sale-return-form
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  ></app-sale-return-form>
 </dx-popup>
 
 <dx-popup
@@ -194,6 +197,7 @@
       [EditingResponseData]="selectedSaleReturn"
       [isReadOnlyMode]="isReadOnlySaleReturn"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-sale-return-form>
   </ng-container>
 </dx-popup>

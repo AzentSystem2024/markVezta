@@ -68,11 +68,12 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   @Output() popupClosed = new EventEmitter<void>();
   // @Input() creditFormData: any;
   private _creditFormData: any;
+  @Input() canApprove: boolean = false;
   creditHeader!: any;
   vatTitle: any;
   showSubType: boolean;
   VatClass: any;
-
+  @Input() boolean = false;
   @Input()
   set creditFormData(value: any) {
     if (!value || !value.length) return;

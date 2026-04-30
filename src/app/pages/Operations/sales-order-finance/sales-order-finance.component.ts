@@ -144,8 +144,8 @@ export class SalesOrderFinanceComponent {
     console.log('MenuGroups:', menuGroups);
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
     console.log(packingRights, 'PACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

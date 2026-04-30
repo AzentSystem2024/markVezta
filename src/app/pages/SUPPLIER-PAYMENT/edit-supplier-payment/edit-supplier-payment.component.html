@@ -349,14 +349,14 @@
   "
 >
   <!-- Checkbox right above buttons -->
-
-  <dx-check-box
-    *ngIf="isReadOnlyMode"
-    [(value)]="isApprovedForView"
-    text="Approved"
-    [readOnly]="true"
-  ></dx-check-box>
-
+  <div class="approve-container" *ngIf="canApprove">
+    <dx-check-box
+      *ngIf="isReadOnlyMode"
+      [(value)]="isApprovedForView"
+      text="Approved"
+      [readOnly]="true"
+    ></dx-check-box>
+  </div>
   <!-- Buttons row -->
   <div style="display: flex; gap: 10px">
     <!-- <dx-button

@@ -34,7 +34,7 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
+        [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -203,7 +203,10 @@
   ></app-fixed-asstes-add> -->
 
   <ng-container *ngIf="AddFixedAssetsPopupVisible">
-    <app-fixed-asstes-add (popupClosed)="handleClose()"></app-fixed-asstes-add>
+    <app-fixed-asstes-add
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+    ></app-fixed-asstes-add>
   </ng-container>
 </dx-popup>
 
@@ -218,6 +221,7 @@
     [SelectFixedAssetData]="Selected_fixedAssets_data"
     (popupClosed)="handleClose()"
     [fixedAssetId]="selectedFA"
+    [canApprove]="canApprove"
   ></app-fixed-asstes-edit>
 </dx-popup>
 

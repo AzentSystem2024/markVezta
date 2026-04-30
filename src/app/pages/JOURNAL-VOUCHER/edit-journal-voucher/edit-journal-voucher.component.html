@@ -303,12 +303,14 @@
       "
     >
       <div *ngIf="journalVoucherFormData">
-        <dx-check-box
-          [(value)]="journalVoucherFormData.IS_APPROVED"
-          text="Approve"
-          (onValueChanged)="onApprovedChanged($event)"
-        >
-        </dx-check-box>
+        <div class="approve-container" *ngIf="canApprove">
+          <dx-check-box
+            [(value)]="journalVoucherFormData.IS_APPROVED"
+            text="Approve"
+            (onValueChanged)="onApprovedChanged($event)"
+          >
+          </dx-check-box>
+        </div>
       </div>
       <div style="display: flex; gap: 10px">
         <dx-button

@@ -58,6 +58,7 @@ export class AddInvoiceRetailComponent {
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;

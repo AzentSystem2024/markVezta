@@ -63,6 +63,7 @@ export class EditCustomerReceiptComponent {
   @Input() receiprtFormData: any;
   @Input() readOnlyMode: boolean = false;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() canApprove: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';

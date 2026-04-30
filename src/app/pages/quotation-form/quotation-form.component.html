@@ -387,12 +387,14 @@
                         [width]="405"
                       ></dx-text-box>
                     </div>
-                    <dx-check-box
-                      *ngIf="isEditing && !isReadOnlyMode"
-                      [(value)]="isApproved"
-                      text="Approve"
-                      class="approve-checkbox"
-                    ></dx-check-box>
+                    <div class="approve-container" *ngIf="canApprove">
+                      <dx-check-box
+                        *ngIf="isEditing && !isReadOnlyMode"
+                        [(value)]="isApproved"
+                        text="Approve"
+                        class="approve-checkbox"
+                      ></dx-check-box>
+                    </div>
                   </div>
                 </div>
               </div>

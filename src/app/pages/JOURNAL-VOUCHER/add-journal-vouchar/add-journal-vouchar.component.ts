@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   NgZone,
   Output,
@@ -63,6 +64,7 @@ export class AddJournalVoucharComponent {
   @ViewChild('refBoxRef') refBoxRef: DxTextBoxComponent;
   @ViewChild('partyNameRef') partyNameRef: DxTextBoxComponent;
   @ViewChild('narrationRefBox') narrationRefBox: DxTextBoxComponent;
+  @Input() canApprove: boolean = false;
   // @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
