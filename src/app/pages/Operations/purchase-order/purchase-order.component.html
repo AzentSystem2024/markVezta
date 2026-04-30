@@ -26,8 +26,8 @@
   >
     <dxo-editing
       mode="popup"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
     ></dxo-editing>
     <dxo-export
       [enabled]="true"
@@ -176,6 +176,7 @@
     [netQuantity]="netQuantity"
     [isEditMode]="false"
     [(isApproved)]="isApproved"
+    [showApprove]="canApprove"
     [isSaveDisabled]="isSaving"
     (save)="onClickSaveNewData()"
     (cancel)="onCancelNewData()"
@@ -199,6 +200,7 @@
     [showNetAmount]="true"
     [isEditMode]="true"
     [(isApproved)]="isApproved"
+    [showApprove]="canApprove"
     [isSaveDisabled]="isSaving"
     (save)="UpdatePurchaseOrder()"
   >
