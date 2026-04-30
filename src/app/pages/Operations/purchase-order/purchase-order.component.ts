@@ -469,7 +469,7 @@ export class PurchaseOrderComponent {
     }
   }
 
-  onEditingRow(event): void {
+  onEditingRow(event: any): void {
     event.cancel = true;
     this.poId = event.data.ID;
     const Id = event.data.ID;
@@ -513,7 +513,7 @@ export class PurchaseOrderComponent {
       } else {
         this.filteredStoreList = this.storeList;
 
-        // ✅ default select first store
+        // default select first store
         if (!this.selectedStoreId && this.storeList?.length) {
           this.selectedStoreId = this.storeList[0].ID;
         }
