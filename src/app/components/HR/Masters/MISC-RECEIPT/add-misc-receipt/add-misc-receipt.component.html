@@ -299,13 +299,13 @@
           </div>
         </div>
         <dx-check-box
-          *ngIf="!isEditing && !isReadOnlyMode"
+          *ngIf="!isEditing && !isReadOnlyMode && canApprove"
           [(value)]="miscFormData.IS_APPROVED"
           text="Approve"
           style="margin-top: 10px"
         ></dx-check-box>
         <dx-check-box
-          *ngIf="isEditing && !isReadOnlyMode"
+          *ngIf="isEditing && !isReadOnlyMode  && canApprove"
           [(value)]="isApproved"
           text="Approve"
           style="margin-top: 10px"

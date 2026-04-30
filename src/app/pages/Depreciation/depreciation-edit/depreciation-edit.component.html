@@ -233,6 +233,7 @@
   ></dx-text-box>
   <dxi-item>
     <dx-check-box
+      *ngIf="canApprove"
       [(value)]="approveValue"
       text="Approve"
       [readOnly]="readOnly"

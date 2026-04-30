@@ -50,6 +50,7 @@ import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv
 import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
+import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -75,6 +76,7 @@ export class JournalBookComponent {
   selected_Head_Id: any;
   selected_fin_id: any;
   isEditReadOnly: boolean = true;
+  isReadOnlyInvoice:boolean = true;
   isViewJournalVoucher: boolean = false;
   formatted_from_date: string;
   formatted_To_date: string;
@@ -433,15 +435,12 @@ export class JournalBookComponent {
         );
       });
     } else if (TransType === 25) {
-      this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+       this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
-        this.loadingInvoice = false;
-
-        this.isViewInvoice = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
+          this.isViewInvoice = true;
       });
-    } else if (TransType == 19) {
+    } else if (TransType === 19) {
+      console.log("PURCHINVVVVVVVVVVVVVVVVVVVVVVVVVVV")
       this.dataService
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
@@ -746,6 +745,7 @@ updateStoreHint() {
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
+    AddInvoiceRetailModule,
   ],
   providers: [],
   exports: [],

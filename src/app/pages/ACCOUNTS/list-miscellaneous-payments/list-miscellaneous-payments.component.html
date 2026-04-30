@@ -175,6 +175,7 @@
   <app-add-miscellaneous-payment
     *ngIf="addMiscPaymentPopup"
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
   ></app-add-miscellaneous-payment>
 </dx-popup>
 
@@ -188,6 +189,7 @@
   <app-add-miscellaneous-payment
     *ngIf="editMiscPopupOpened"
     [isEditing]="true"
+    [canApprove]="canApprove"
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
     (popupClosed)="handleClose()"

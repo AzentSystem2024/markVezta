@@ -5,6 +5,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   Output,
   ViewChild,
@@ -49,6 +50,7 @@ export class FixedAsstesAddComponent {
   formValidationGroup: DxValidationGroupComponent;
   @ViewChild('newformValidationGroup', { static: false })
   newformValidationGroup: DxValidationGroupComponent;
+  @Input() canApprove:boolean = false;
   AddFixedAssetsPopupVisible: boolean = false;
   asseted_Data: any;
   // @Input() canApprove: boolean = false;

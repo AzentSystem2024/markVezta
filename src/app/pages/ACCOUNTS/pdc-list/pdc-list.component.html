@@ -199,6 +199,7 @@
       (onHiding)="handleClose()"
     >
       <app-pdc-add-form
+        [canApprove]="canApprove"
         [isOpen]="addPDCPopupOpened"
         (formClosed)="handleClose()"
       ></app-pdc-add-form>
@@ -219,6 +220,7 @@
     [isReadOnly]="isEditReadOnly"
     (formClosed)="handleClose()"
     [PDCid]="selectPDC"
+    [canApprove]="canApprove"
   ></app-pdc-edit-form>
 </dx-popup>
 

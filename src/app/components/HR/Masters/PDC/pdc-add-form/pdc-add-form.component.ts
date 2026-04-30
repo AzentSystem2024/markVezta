@@ -36,6 +36,7 @@ export class PdcAddFormComponent {
   @Output() formClosed = new EventEmitter<void>();
   @Input() selectedPDC: any;
   @Output() pdcInserted = new EventEmitter<any>();
+  @Input() canApprove :boolean = false;
 
   Supplier: any;
   priorities_value: any;

@@ -338,23 +338,7 @@ export class ItemStorePricesComponent {
     }
   }
   onToolbarPreparing(e: any) {
-    // const toolbarItems = e.toolbarOptions.items;
-    // // Avoid adding the button more than once
-    // const alreadyAdded = toolbarItems.some(
-    //   (item: any) => item.name === 'toggleFilterButton',
-    // );
-    //   if (!alreadyAdded) {
-    //     toolbarItems.splice(toolbarItems.length - 1, 0, {
-    //       widget: 'dxButton',
-    //       name: 'toggleFilterButton', // custom name to avoid duplicates
-    //       location: 'after',
-    //       options: {
-    //         icon: 'filter',
-    //         hint: 'Search Column',
-    //         onClick: () => this.toggleFilters(),
-    //       },
-    //     });
-    //   }
+
   }
   getWorksheetData(): void {
     this.dataservice.worksheetData$.subscribe((data) => {
@@ -456,6 +440,7 @@ export class ItemStorePricesComponent {
   }
 
   onRowUpdated(event: any) {
+    console.log('Row updated:', event);
     const updatedData = event.data;
     const rowId = updatedData.ID;
     this.updatedItems[rowId] = {
@@ -466,13 +451,15 @@ export class ItemStorePricesComponent {
       SALE_PRICE3: updatedData.SALE_PRICE3 || 0.0,
       SALE_PRICE4: updatedData.SALE_PRICE4 || 0.0,
       SALE_PRICE5: updatedData.SALE_PRICE5 || 0.0,
-      PRICE_NEW: updatedData.PRICE_NEW || null,
+      PRICE_NEW: updatedData.PRICE_NEW ?? null,
       PRICE_LEVEL1_NEW: updatedData.PRICE_LEVEL1_NEW || null,
       PRICE_LEVEL2_NEW: updatedData.PRICE_LEVEL2_NEW || null,
       PRICE_LEVEL3_NEW: updatedData.PRICE_LEVEL3_NEW || null,
       PRICE_LEVEL4_NEW: updatedData.PRICE_LEVEL4_NEW || null,
       PRICE_LEVEL5_NEW: updatedData.PRICE_LEVEL5_NEW || null,
     };
+
+    console.log('Updated items dictionary:', this.updatedItems);
   }
 
   onCellValueChanged(event: any) {
@@ -505,18 +492,18 @@ export class ItemStorePricesComponent {
     const defaultStoreId = 1;
     const worksheetItemPrice = Object.values(this.updatedItems).map((item) => ({
       ITEM_ID: item.ITEM_ID,
-      SALE_PRICE: item.SALE_PRICE ?? 0.0,
-      SALE_PRICE1: item.SALE_PRICE1 ?? 0.0,
-      SALE_PRICE2: item.SALE_PRICE2 ?? 0.0,
-      SALE_PRICE3: item.SALE_PRICE3 ?? 0.0,
-      SALE_PRICE4: item.SALE_PRICE4 ?? 0.0,
-      SALE_PRICE5: item.SALE_PRICE5 ?? 0.0,
-      PRICE_NEW: item.PRICE_NEW ?? 0.0,
-      PRICE_LEVEL1_NEW: item.PRICE_LEVEL1_NEW ?? 0.0,
-      PRICE_LEVEL2_NEW: item.PRICE_LEVEL2_NEW ?? 0.0,
-      PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? 0.0,
-      PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? 0.0,
-      PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
+      SALE_PRICE: item.SALE_PRICE ?? null,
+      SALE_PRICE1: item.SALE_PRICE1 ?? null,
+      SALE_PRICE2: item.SALE_PRICE2 ?? null,
+      SALE_PRICE3: item.SALE_PRICE3 ?? null,
+      SALE_PRICE4: item.SALE_PRICE4 ?? null,
+      SALE_PRICE5: item.SALE_PRICE5 ?? null,
+      PRICE_NEW: item.PRICE_NEW ?? null,
+      PRICE_LEVEL1_NEW: item.PRICE_LEVEL1_NEW ?? null,
+      PRICE_LEVEL2_NEW: item.PRICE_LEVEL2_NEW ?? null,
+      PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? null,
+      PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? null,
+      PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? null,
     }));
     const hasEnteredPrice = worksheetItemPrice.some(
       (item) =>
@@ -539,6 +526,19 @@ export class ItemStorePricesComponent {
       );
       return;
     }
+
+    console.log('Payload for saving:', worksheetItemPrice)
+    // const updatedList = worksheetItemPrice.map((item: any) => {
+    //   return {
+    //     ...item,
+    //     PRICE_NEW: item.PRICE_NEW ?? item.SALE_PRICE,
+    //     PRICE_LEVEL1_NEW: item.PRICE_LEVEL1_NEW ?? item.SALE_PRICE1,
+    //     PRICE_LEVEL2_NEW: item.PRICE_LEVEL2_NEW ?? item.SALE_PRICE2,
+    //     PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? item.SALE_PRICE3,
+    //     PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? item.SALE_PRICE4,
+    //     PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? item.SALE_PRICE5,
+    //   };
+    // });
     const payload = {
       ID: 0,
       COMPANY_ID: companyId,

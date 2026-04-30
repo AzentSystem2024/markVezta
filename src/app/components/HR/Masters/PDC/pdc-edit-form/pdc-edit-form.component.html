@@ -143,7 +143,7 @@
     </dx-text-box>
   </div>
 
-  <div style="margin-bottom: 1.5rem">
+  <div style="margin-bottom: 1.5rem" *ngIf="canApprove">
     <dx-check-box
       text="Approve"
       [readOnly]="isReadOnly"

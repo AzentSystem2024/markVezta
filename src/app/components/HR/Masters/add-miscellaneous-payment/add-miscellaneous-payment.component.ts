@@ -64,6 +64,7 @@ export class AddMiscellaneousPaymentComponent {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() canApprove: boolean = false;
   @ViewChild('miscFormGroup') miscFormGroup: DxValidationGroupComponent;
   @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;
   @ViewChild('invoiceBoxRef', { static: false })

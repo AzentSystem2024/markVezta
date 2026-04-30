@@ -366,7 +366,7 @@
   ></app-view-credit-note>
 </dx-popup>
 
-<dx-popup
+<!-- <dx-popup
   *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'100vw'"
@@ -381,7 +381,23 @@
       (popupClosed)="handleClose()"
     ></app-view-invoice>
   </ng-container>
-</dx-popup>
+</dx-popup> -->
+
+<dx-popup
+  *ngIf="isViewInvoice"
+  [(visible)]="isViewInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Invoice"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlyInvoice"
+    [EditingResponseData]="selectedInvoice"
+    (popupClosed)="handleClose()"
+  ></app-add-invoice-retail>
 
 <dx-popup
   *ngIf="isEditCustomerReceipt"

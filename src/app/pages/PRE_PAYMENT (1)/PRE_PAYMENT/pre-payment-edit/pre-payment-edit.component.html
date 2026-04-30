@@ -259,8 +259,9 @@
       </dx-data-grid>
     </div>
 
-    <div class="total-expense">
+    <div class="total-expense" *ngIf="canApprove">
       <dx-check-box
+      
         [readOnly]="isReadOnly"
         text="Approve"
         [(value)]="PrePaymentFormData.TRANS_STATUS"
