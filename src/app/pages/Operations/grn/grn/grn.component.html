@@ -33,7 +33,7 @@
     <dxo-export
       [enabled]="true"
       [allowExportSelectedData]="true"
-      [formats]="['xlsx', 'pdf']"
+      [formats]="['xlsx']"
     >
     </dxo-export>
     <!-- <dxo-pager
@@ -135,8 +135,8 @@
       [cellTemplate]="statusCellRender"
     ></dxi-column>
 
-    <dxi-column type="buttons" width="100" [buttons]="allButtonsEditDelete">
-    </dxi-column>
+    <dxi-column type="buttons" [buttons]="allButtonsEditDelete"> </dxi-column>
+    <!-- </dxi-column> -->
     <!-- <dxi-column type="buttons" width="100" [buttons]="customButtons">
     </dxi-column> -->
   </dx-data-grid>
@@ -151,6 +151,7 @@
   (closePopup)="ClearFormData()"
   [isEditMode]="false"
   [(isApproved)]="isApproved"
+  [showApprove]="canApprove"
   [isSaveDisabled]="isSaving"
 >
   <app-grn-new-form></app-grn-new-form>
@@ -202,6 +203,7 @@
   [height]="'100vh'"
   [width]="width"
   [(isApproved)]="isApproved"
+  [showApprove]="canApprove"
   (save)="verifyGrnData()"
 >
   <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>

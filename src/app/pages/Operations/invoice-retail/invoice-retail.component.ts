@@ -175,7 +175,7 @@ export class InvoiceRetailComponent {
     console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/invoice');
+      .find((menu: any) => menu.Path === currentUrl);
     console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -183,7 +183,7 @@ export class InvoiceRetailComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.getStoreData();
     // if (this.isHQApp && configStore) {
