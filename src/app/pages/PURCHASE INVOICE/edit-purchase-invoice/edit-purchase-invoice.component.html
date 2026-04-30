@@ -357,12 +357,14 @@
                 gap: 6px;
               "
             >
-              <dx-check-box
-                *ngIf="!readOnly"
-                text="Approve"
-                [(value)]="isApproved"
-                [readOnly]="readOnly"
-              ></dx-check-box>
+              <div class="approve-container" *ngIf="canApprove">
+                <dx-check-box
+                  *ngIf="!readOnly"
+                  text="Approve"
+                  [(value)]="isApproved"
+                  [readOnly]="readOnly"
+                ></dx-check-box>
+              </div>
               <div style="display: flex; gap: 8px">
                 <dx-button
                   text="Cancel"

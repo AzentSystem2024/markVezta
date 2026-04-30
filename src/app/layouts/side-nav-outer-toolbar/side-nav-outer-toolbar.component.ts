@@ -59,13 +59,13 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
 
   menuRevealMode: DxDrawerTypes.RevealMode = 'expand';
 
-  minMenuSize = 0;
+  minMenuSize = 48;
 
   shaderEnabled = false;
 
   routerSubscription: Subscription;
 
-  screenSubscription: Subscription;
+  screenSubscription: Subscription | undefined;
 
   tabs: any[] = [];
   selectedIndex = 0;
@@ -109,16 +109,15 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routerSubscription.unsubscribe();
-    this.screenSubscription.unsubscribe();
+    this.screenSubscription?.unsubscribe();
   }
 
   updateDrawer() {
     const isXSmall = this.screen.sizes['screen-x-small'];
     const isLarge = this.screen.sizes['screen-large'];
-
     this.menuMode = isLarge ? 'shrink' : 'overlap';
     this.menuRevealMode = isXSmall ? 'slide' : 'expand';
-    this.minMenuSize = isXSmall ? 0 : 48;
+    // this.minMenuSize = isXSmall ? 0 : 48;
     this.shaderEnabled = !isLarge;
   }
 
@@ -185,7 +184,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     e.itemData = e.fromData[e.fromIndex];
   }
 
-  onTabDrop(event) {}
+  onTabDrop(event:any) {}
 
   showCloseButton() {
     return true;
@@ -225,19 +224,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  private finishClose(tab: any, index: number) {
-    (this.reuseStrategy as CustomReuseStrategy).removeStoredComponent(tab.path);
-
-    this.tabs.splice(index, 1);
-
-    if (this.selectedIndex >= this.tabs.length) {
-      this.selectedIndex = this.tabs.length - 1;
-    }
-
-    if (this.selectedIndex >= 0) {
-      this.router.navigate([this.tabs[this.selectedIndex].path]);
-    }
-  }
+ 
 }
 
 @NgModule({
