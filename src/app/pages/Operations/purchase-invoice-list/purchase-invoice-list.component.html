@@ -35,7 +35,7 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
+        [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
@@ -168,6 +168,7 @@
   <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-add-purchase-invoice
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
   ></app-add-purchase-invoice>
   <!-- </ng-container> -->
 </dx-popup>
@@ -184,6 +185,7 @@
       [invoiceFormData]="selectedInvoice"
       [readOnly]="isEditInvoiceReadOnly"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-edit-purchase-invoice>
   </ng-container>
 </dx-popup>

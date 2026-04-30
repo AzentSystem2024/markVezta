@@ -185,8 +185,8 @@ export class PurchaseReturnDebitComponent {
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getpurchaseReturnList();

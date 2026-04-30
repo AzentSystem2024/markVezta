@@ -233,13 +233,15 @@ export class PurchaseOrderComponent {
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === currentUrl);
 
+      console.log(packingRights,"packingRights")
+
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     const userDataString = localStorage.getItem('userData');
     const userData = JSON.parse(userDataString);
@@ -426,11 +428,14 @@ export class PurchaseOrderComponent {
     {
       name: 'edit',
       visible: (e) =>
-        e.row.data.STATUS !== 'Approved' || e.row.data.STATUS !== 'Open',
-    },
+      e.row.data.STATUS === 'Approved'
+        ? true // show icon for approved → opens view popup
+        : this.canEdit && e.row.data.STATUS == 'Open',
+  },
     {
       name: 'delete',
       visible: (e) =>
+        this.canDelete &&
         e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Verified',
     },
   ];
@@ -464,7 +469,7 @@ export class PurchaseOrderComponent {
     }
   }
 
-  onEditingRow(event): void {
+  onEditingRow(event: any): void {
     event.cancel = true;
     this.poId = event.data.ID;
     const Id = event.data.ID;
@@ -508,7 +513,7 @@ export class PurchaseOrderComponent {
       } else {
         this.filteredStoreList = this.storeList;
 
-        // ✅ default select first store
+        // default select first store
         if (!this.selectedStoreId && this.storeList?.length) {
           this.selectedStoreId = this.storeList[0].ID;
         }
