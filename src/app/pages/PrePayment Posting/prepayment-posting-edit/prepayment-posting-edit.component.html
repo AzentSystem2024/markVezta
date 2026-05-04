@@ -113,6 +113,7 @@
 </dx-data-grid>
 
 <dx-check-box
+*ngIf="canApprove"
   [(value)]="approveValue"
   text="Approve"
   [readOnly]="isEditReadOnly"

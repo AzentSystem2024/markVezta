@@ -76,6 +76,11 @@ export class BankReconciliationAddComponent {
   formatted_To_date: string;
   editLedgerPopup: boolean = false;
 
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter = true;
+  showFilterRow = true;
   selectedInvoice: any;
 
   selectedReceipt: any;
@@ -113,6 +118,13 @@ export class BankReconciliationAddComponent {
   selectedBankName: any;
   selectedBankId: any;
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -127,6 +139,30 @@ export class BankReconciliationAddComponent {
   }
 
   ngOnInit() {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData.SELECTED_COMPANY;
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+    }
+
     // If you want to format or adjust it, you can do that here
     this.selected_To_date = new Date();
   }

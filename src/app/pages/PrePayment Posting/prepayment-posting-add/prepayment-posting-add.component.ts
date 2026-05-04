@@ -4,6 +4,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   NgZone,
   OnDestroy,
@@ -32,7 +33,7 @@ import { DataService } from 'src/app/services';
 })
 export class PrepaymentPostingAddComponent {
   @Output() popupClosed = new EventEmitter<void>();
-
+@Input() canApprove: boolean = false;
   selectedMonthYear: string | number | Date;
   PrepaymentList: any;
   PREPAY_DETAIL: any;
