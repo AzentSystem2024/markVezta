@@ -88,6 +88,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
           tab.Menus.forEach((menu: any) => {
             menu.CanAdd = false;
             menu.CanPrint = false;
+            menu.CanVerify = false;
             menu.CanEdit = false;
             menu.CanView = true;
             menu.CanDelete = false;
@@ -117,6 +118,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
           menu.CanAdd = false;
           menu.CanPrint = false;
           menu.CanEdit = false;
+          menu.CanVerify = false;
           menu.CanView = true;
           menu.CanDelete = false;
           menu.HideCost = false;
@@ -167,6 +169,7 @@ onSelectionChanged(event: any): void {
       menu.CanAdd = false;
       menu.CanView = false;
       menu.CanEdit = false;
+      menu.CanVerify = false;
       menu.CanApprove = false;
       menu.CanDelete = false;
       menu.CanPrint = false;
@@ -231,6 +234,7 @@ onSelectionChanged(event: any): void {
               menu.CanAdd = match.CanAdd ?? false;
               menu.CanView = match.CanView ?? true;
               menu.CanEdit = match.CanEdit ?? false;
+              menu.CanVerify = match.CanVerify ?? false;
               menu.CanApprove = match.CanApprove ?? false;
               menu.CanDelete = match.CanDelete ?? false;
               menu.HideCost = match.HideCost ?? false;
@@ -240,6 +244,7 @@ onSelectionChanged(event: any): void {
               menu.CanAdd = match.CanAdd ?? false;
               menu.CanView = match.CanView ?? true;
               menu.CanEdit = match.CanEdit ?? false;
+              menu.CanVerify = match.CanVerify ?? false;
               menu.CanApprove = match.CanApprove ?? false;
               menu.HideCost = match.HideCost ?? false;
               menu.CanDelete = match.CanDelete ?? false;
@@ -252,6 +257,7 @@ onSelectionChanged(event: any): void {
               menu.CanAdd = false;
               menu.CanView = true;
               menu.CanEdit = false;
+              menu.CanVerify = false;
               menu.CanApprove = false;
               menu.CanDelete = false;
               menu.HideCost = false;
@@ -260,6 +266,7 @@ onSelectionChanged(event: any): void {
               menu.CanAdd = false;
               menu.CanView = true;
               menu.CanEdit = false;
+              menu.CanVerify = false;
               menu.CanApprove = false;
               menu.HideCost = false;
               menu.CanDelete = false;
@@ -333,6 +340,7 @@ combineSelectedRows(): void {
             CanAdd: menu.CanAdd ?? false,
             CanView: menu.CanView ?? true,
             CanEdit: menu.CanEdit ?? false,
+            CanVerify:menu.CanVerify ?? false,
             CanApprove: menu.CanApprove ?? false,
             CanDelete: menu.CanDelete ?? false,
             HideCost : menu.HideCost ?? false,
