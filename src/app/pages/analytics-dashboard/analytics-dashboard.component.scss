@@ -3,62 +3,96 @@
 :host {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  height: 100%;
+  // flex-grow: 1;
+  height: calc(100vh - 120px);
 }
 
 .view-wrapper {
-  padding-top: var(--content-padding);
-  padding-bottom: var(--content-padding);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 16px; /* keep only this */
 }
+/* =========================
+DASHBOARD CHART LAYOUT
+========================= */
 
-.cards {
-  display: grid;
-  width: 100%;
+.dashboard-container {
+  display: flex;
   gap: 20px;
-  grid-template-columns: repeat(2, calc(50% - 10px));
+  flex: 1;
+  overflow: hidden;
 
-  &.grey {
-    margin: 20px 0;
-    grid-template-columns: repeat(4, calc(25% - 15px));
-
-    ::ng-deep .card {
-      background-color: yellow;
-      border: none;
-      height: 120px;
-
-      ::ng-deep {
-        .dx-button {
-          background-color: var(--side-panel-background);
-        }
-
-        .content {
-          height: auto;
-        }
-      }
-    }
-
-    ::ng-deep .dx-loadpanel-indicator {
-      width: 24px;
-      height: 24px;
-    }
-  }
+  padding: 0 16px; /* ✅ FIX: match wrapper padding */
+  box-sizing: border-box;
 }
 
-@media only screen and (max-width: 1400px) {
-  .cards.grey {
-    grid-template-columns: repeat(2, calc(50% - 10px));
-  }
+/* COMMON CARD STYLE */
+.left-panel,
+.chart-box {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px; /* ✅ uniform padding */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
 }
 
-@media only screen and (max-width: 900px) {
-  .cards {
-    grid-template-columns: repeat(1, 100%);
-  }
+/* LEFT (FUNNEL) */
+.left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-@media only screen and (max-width: 700px) {
-  .cards.grey {
-    grid-template-columns: repeat(1, 100%);
+/* RIGHT SIDE */
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+}
+
+/* CHART BOX */
+.chart-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* TITLE */
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* FORCE CHART HEIGHT */
+dx-chart,
+dx-funnel {
+  flex: 1 !important;
+  height: auto !important;
+  width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1000px) {
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
   }
+}
+.chart-box dx-chart {
+  // height: 260px; /* ✅ fixed height */
+}
+
+.left-panel dx-funnel {
+  flex: 1;
+  margin: 0 !important; /* ✅ FIX: remove internal shift */
+  padding: 0 !important;
 }

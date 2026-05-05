@@ -45,15 +45,43 @@ type DataLoader = (startDate: string, endDate: string) => Observable<Object>;
   providers: [DataService],
 })
 export class AnalyticsDashboardComponent implements OnInit {
+  // Funnel (business flow)
+  opportunities = [
+    { stage: 'Transactions', value: 1200 },
+    { stage: 'Sales', value: 950 },
+    { stage: 'Net Sales', value: 900 },
+    { stage: 'Completed', value: 850 },
+  ];
+
+  // Sales vs Returns
+  salesComparison = [
+    { type: 'Sales', value: 150000 },
+    { type: 'Sales Return', value: 20000 },
+    { type: 'Net Sales', value: 130000 },
+  ];
+
+  // Transactions trend
+  transactionsData = [
+    { period: 'Jan', value: 120 },
+    { period: 'Feb', value: 150 },
+    { period: 'Mar', value: 180 },
+    { period: 'Apr', value: 140 },
+    { period: 'May', value: 200 },
+  ];
   analyticsPanelItems = analyticsPanelItems;
 
-  opportunities: SalesOrOpportunitiesByCategory = null;
+  // opportunities: SalesOrOpportunitiesByCategory = null;
   sales: Sales = null;
   salesByState: SalesByState = null;
   salesByCategory: SalesByStateAndCity = null;
 
   isLoading: boolean = true;
-
+  customPalette = [
+    '#BAE6FD', // Transactions
+    '#7DD3FC', // Sales
+    '#0EA5E9', // Net Sales
+    '#0284C7', // Completed
+  ];
   constructor(private service: DataService) {}
 
   selectionChange(dates: Dates) {
@@ -94,8 +122,8 @@ export class AnalyticsDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     const [startDate, endDate] = analyticsPanelItems[4].value.split('/');
-
-    this.loadData(startDate, endDate);
+    this.isLoading = false;
+    // this.loadData(startDate, endDate);
   }
 }
 

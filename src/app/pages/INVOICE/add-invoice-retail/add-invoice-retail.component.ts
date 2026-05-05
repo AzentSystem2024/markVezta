@@ -102,6 +102,7 @@ export class AddInvoiceRetailComponent {
         TOTAL_AMOUNT: 0,
         DISC_PERC: 0,
         DISC_AMT: 0,
+        CUSTOMER_ID: 0,
       },
     ],
   };
@@ -427,6 +428,7 @@ export class AddInvoiceRetailComponent {
       DISC_AMT: item.DISC_AMT,
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+      CUSTOMER_ID: data.CUSTOMER_ID,
     }));
 
     // refresh grid
@@ -706,6 +708,7 @@ export class AddInvoiceRetailComponent {
       TOTAL_AMOUNT: 0,
       DISC_PERC: 0,
       DISC_AMT: 0,
+      CUSTOMER_ID: this.invoiceFormData.CUSTOMER_ID,
     };
 
     this.invoiceFormData.Details = [...rows, newRow];
@@ -882,7 +885,7 @@ export class AddInvoiceRetailComponent {
     let tax = 0;
     let net = 0;
     let discamt = 0;
-
+    const customerId = this.invoiceFormData.CUSTOMER_ID;
     validDetails.forEach((item: any) => {
       const amount = this.calculateAmount(item);
       const taxAmt = this.calculateTax(item);
@@ -893,7 +896,7 @@ export class AddInvoiceRetailComponent {
       item.TAX_AMOUNT = taxAmt;
       item.TOTAL_AMOUNT = total;
       item.DISC_AMT = discAmount;
-
+      item.CUSTOMER_ID = customerId;
       gross += amount;
       tax += taxAmt;
       net += total;
@@ -979,7 +982,7 @@ export class AddInvoiceRetailComponent {
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
 
-    return `${year}-${month}-${day}`; // ✅ format you are using
+    return `${year}-${month}-${day}`; // format you are using
   }
   resetForm() {
     this.invoiceFormData = {

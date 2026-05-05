@@ -1,31 +1,45 @@
-<!-- <dx-scroll-view class="view-wrapper-scroll">
-  <div class="view-wrapper">
-    <toolbar-analytics
-      titleText="Dashboard"
-      [panelItems]="analyticsPanelItems"
-      [selectedItems]="[5]"
-      (selectionChanged)="selectionChange($event)"
-    >
-    </toolbar-analytics>
+<div class="dashboard-container">
+  <!-- LEFT -->
 
-    <div class="cards grey">
-      <opportunities-ticker [data]="opportunities"></opportunities-ticker>
-      <revenue-total-ticker [data]="sales"></revenue-total-ticker>
-      <conversion-ticker></conversion-ticker>
-      <leads-ticker></leads-ticker>
+  <div class="left-panel">
+    <div class="card-title">Sales Funnel</div>
+
+    <dx-funnel
+      [dataSource]="opportunities"
+      argumentField="stage"
+      valueField="value"
+      [palette]="customPalette"
+    >
+      <dxo-tooltip [enabled]="true"></dxo-tooltip>
+      <dxo-label [visible]="true" position="inside"></dxo-label>
+    </dx-funnel>
+  </div>
+
+  <!-- RIGHT -->
+
+  <div class="right-panel">
+    <div class="chart-box">
+      <div class="card-title">Sales vs Returns</div>
+
+      <dx-chart [dataSource]="salesComparison">
+        <dxi-series
+          argumentField="type"
+          valueField="value"
+          type="bar"
+        ></dxi-series>
+      </dx-chart>
     </div>
 
-    <div class="cards">
-      <revenue-card [data]="sales"></revenue-card>
-      <conversion-card [data]="opportunities"></conversion-card>
-      <revenue-analysis-card [data]="salesByState"></revenue-analysis-card>
-      <revenue-snapshot-card [data]="salesByCategory"></revenue-snapshot-card>
+    <div class="chart-box">
+      <div class="card-title">Transactions</div>
+
+      <dx-chart [dataSource]="transactionsData">
+        <dxi-series
+          argumentField="period"
+          valueField="value"
+          type="line"
+        ></dxi-series>
+      </dx-chart>
     </div>
   </div>
-</dx-scroll-view>
-<dx-load-panel
-  container=".view-wrapper"
-  [position]="{ of: '.content' }"
-  [visible]="isLoading"
-  [showPane]="true"
-></dx-load-panel> -->
+</div>
