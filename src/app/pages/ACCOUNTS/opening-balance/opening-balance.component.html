@@ -21,8 +21,8 @@
       [selection]="{ mode: 'single' }"
       [editing]="{
         mode: 'cell',
-        allowUpdating: !isReadOnly,
-        allowDeleting: !isReadOnly,
+        allowUpdating: !isReadOnly || canEdit,
+        allowDeleting: !isReadOnly || canDelete,
         allowAdding: !isReadOnly,
         newRowPosition: 'first',
         useIcons: true,
@@ -33,6 +33,12 @@
       (onRowValidating)="onRowValidating($event)"
       (onExporting)="onExporting($event)"
     >
+
+    <dxo-editing
+       [allowUpdating]="canEdit"
+       [allowDeleting]="canDelete"
+      ></dxo-editing>
+
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -78,6 +84,7 @@
         ></dxi-item>
 
         <dxi-item
+        *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
@@ -97,13 +104,14 @@
         caption="Ledger Code"
         [width]="130"
         [editorType]="'dxSelectBox'"
-        [allowEditing]="!isReadOnly"
+        [allowEditing]="!isReadOnly || canEdit"
         [lookup]="{
           dataSource: ledgerList,
           valueExpr: 'HEAD_CODE',
           displayExpr: 'HEAD_CODE',
           searchEnabled: true,
         }"
+
       ></dxi-column>
 
       <dxi-column
@@ -219,6 +227,7 @@
       type="normal"
     ></dx-button>
     <dx-button
+    *ngIf="canAdd"
       #saveBtnRef
       id="saveBtn"
       [text]="isApproved ? 'Commit' : 'Save'"

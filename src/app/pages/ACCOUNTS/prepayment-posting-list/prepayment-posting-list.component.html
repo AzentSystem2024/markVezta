@@ -32,8 +32,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
         [enabled]="true"
@@ -251,8 +251,7 @@
   title="New Prepayment Posting"
   (onHiding)="handleClose()"
 >
-  <app-prepayment-posting-add (popupClosed)="handleClose()">
-  </app-prepayment-posting-add>
+  <app-prepayment-posting-add (popupClosed)="handleClose()" [canApprove]="canApprove"></app-prepayment-posting-add>
 </dx-popup>
 
 <dx-popup
@@ -267,6 +266,7 @@
     [selecteprepaymentData]="selecte_prepayment_Data"
     (popupClosed)="handleClose()"
     [prepaymentpostingId]="selectedprepaymentposting"
+    [canApprove]="canApprove"
   >
   </app-prepayment-posting-edit>
 </dx-popup>

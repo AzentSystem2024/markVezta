@@ -34,7 +34,8 @@
     >
       <dxo-editing
         mode="cell"
-        [allowUpdating]="canEdit"
+       [allowUpdating]="canEdit"
+       [allowDeleting]="canDelete"
       ></dxo-editing>
 
       
@@ -83,7 +84,7 @@
       </dxo-toolbar>
       <dxi-column dataField="NAME" caption="Name"></dxi-column>
 
-      <dxi-column dataField="HEAD_ID" caption="Ledger" [allowEditing]="true">
+      <dxi-column dataField="HEAD_ID" caption="Ledger" [allowEditing]="canEdit">
         <dxo-lookup
           [dataSource]="ledgerDropdown"
           valueExpr="ID"
@@ -95,6 +96,7 @@
   <dxi-button name="edit"></dxi-button>
 
   <dxi-button
+            *ngIf="canDelete"
     icon="trash"
     hint="Clear Ledger"
     [onClick]="clearLedger"
