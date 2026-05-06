@@ -174,9 +174,9 @@ export class PrePaymentListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -466,4 +466,4 @@ export class PrePaymentListComponent {
   exports: [PrePaymentListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PrePaymentListModule {}
+export class PrePaymentListModule { }

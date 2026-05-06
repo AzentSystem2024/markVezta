@@ -30,6 +30,7 @@ import {
 import { FormPopupModule, FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-staff-eos',
   templateUrl: './staff-eos.component.html',
@@ -116,6 +117,12 @@ export class StaffEOSComponent {
 
   fromDate: string | number | Date = new Date();
   toDate: string | number | Date = new Date();
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
 
   isCustomDatePopupVisible = false;
   //daatebox end
@@ -123,58 +130,44 @@ export class StaffEOSComponent {
   allActionButtons = [
     {
       name: 'edit',
-
       hint: 'Edit',
-
       icon: 'edit',
-
       text: 'Edit',
-      visible: (e) => e.row.data.STATUS !== 'Verified',
+      visible: (e: any) => this.canEdit && e.row.data.STATUS !== 'Verified',
     },
 
     {
       name: 'delete',
-
       hint: 'Delete',
-
       icon: 'trash',
-
       text: 'Delete',
-
-      // onClick: (e) => this.onDeleteClick(e),
-
-      visible: (e) => e.row.data.STATUS !== 'Left Service',
+      visible: (e: any) =>
+        this.canDelete && e.row.data.STATUS !== 'Left Service',
     },
 
     {
       hint: 'Verify',
-
       icon: 'check',
-
       text: 'Verify',
-
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onVerifyClick(e));
       },
-
-      visible: (e) =>
+      visible: (e: any) =>
+        this.canApprove &&
         e.row.data.STATUS !== 'Left Service' &&
         e.row.data.STATUS !== 'Verified',
     },
 
     {
       hint: 'Approve',
-
       icon: 'check',
-
       text: 'Approve',
-
       onClick: (e) => {
         setTimeout(() => this.onApproveClick(e));
       },
-
-      visible: (e) => e.row.data.STATUS === 'Verified',
-    },
+      visible: (e) =>
+        this.canApprove && e.row.data.STATUS === 'Verified',
+    }
   ];
   //====================Header filter=========================
 
@@ -196,6 +189,7 @@ export class StaffEOSComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private cdRef: ChangeDetectorRef,
+    private router: Router,
   ) {
     this.formSource = this.fb.group({
       id: [null],
@@ -213,9 +207,29 @@ export class StaffEOSComponent {
     this.dropdown_employee();
   }
 
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+    }
+  }
+
   //--------------Session storage----------------
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(
@@ -811,6 +825,7 @@ export class StaffEOSComponent {
     });
   }
   Approve_EOS() {
+    console.log('Approve_EOS called');
     const id = this.selected_data.ID;
     const user_id = sessionStorage.getItem('UserId');
     const store_id = sessionStorage.getItem('StoreId');
@@ -820,8 +835,9 @@ export class StaffEOSComponent {
     const date = this.selected_data.EOS_DATE;
     console.log(id, user_id, store_id, emp_id, reason_id, remarks, date);
     const relieving_date = this.selected_data.RELIEVING_DATE;
-    const days = this.all_workingdays.toString();
-
+    const days = this.all_workingdays
+      ? this.all_workingdays.toString()
+      : '0';
     this.dataService
       .Approve_Staff_EOS_api(
         id,
@@ -919,4 +935,4 @@ export class StaffEOSComponent {
   declarations: [StaffEOSComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StaffEOSModule {}
+export class StaffEOSModule { }

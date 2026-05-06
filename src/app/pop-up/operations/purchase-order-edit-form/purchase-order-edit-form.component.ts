@@ -260,9 +260,9 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -1823,4 +1823,4 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   declarations: [PurchaseOrderEditFormComponent],
   exports: [PurchaseOrderEditFormComponent],
 })
-export class PurchaseOrderEditFormModule {}
+export class PurchaseOrderEditFormModule { }

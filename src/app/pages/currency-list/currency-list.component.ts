@@ -25,7 +25,7 @@ export class CurrencyListComponent implements OnInit {
   currency: any;
   showHeaderFilter = true;
   isAddCurrencyPopupOpened = false;
-  companyId:any;
+  companyId: any;
   currentEditId: number | null = null;
 
   canAdd = false;
@@ -36,26 +36,26 @@ export class CurrencyListComponent implements OnInit {
   canPrint = false;
 
   searchButtonOptions = {
-  icon: 'search',
-  hint: 'Show / Hide Filters',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => {
-    this.showFilterRow = !this.showFilterRow;
-    this.showHeaderFilter = !this.showHeaderFilter;
-  },
-};
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.showFilterRow = !this.showFilterRow;
+      this.showHeaderFilter = !this.showHeaderFilter;
+    },
+  };
 
-refreshButtonOptions = {
-  icon: 'refresh',
-  hint: 'Refresh',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => {
-    this.ngZone.run(() => this.refresh());
-  },
-};
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refresh());
+    },
+  };
 
 
-addButtonOptions = {
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -83,14 +83,14 @@ addButtonOptions = {
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
-    private router:Router
-  ) {}
+    private router: Router
+  ) { }
 
   onEditingStart(e: any) {
     this.currentEditId = e.data.ID;
   }
 
-  
+
 
   addCurrency() {
     this.isAddCurrencyPopupOpened = true;
@@ -110,39 +110,39 @@ addButtonOptions = {
     // ) {
     //   return;
     // } else {
-      const data = this.currencyComponent.getNewCurrencyData();
+    const data = this.currencyComponent.getNewCurrencyData();
 
-        const payload = {
-          ...data,
-          EXCHANGE: data.EXCHANGE != null ? data.EXCHANGE.toString() : null
-        };
+    const payload = {
+      ...data,
+      EXCHANGE: data.EXCHANGE != null ? data.EXCHANGE.toString() : null
+    };
 
-      this.dataservice
-        .postCurrencyData(
-          payload.CODE,
-          payload.SYMBOL,
-          payload.DESCRIPTION,
-          payload.FRACTION_UNIT,
-          payload.EXCHANGE,
-          this.companyId,
-        )
-        .subscribe(
-          (response) => {
-            if (response) {
-              this.showCurrency();
-              this.isAddCurrencyPopupOpened = false; // Close the popup on successful submission
-            } else {
-              notify('Failed to save currency data', 'error', 3000);
-            }
-          },
-          (error) => {
-            notify(
-              'An error occurred while saving currency data',
-              'error',
-              3000,
-            );
-          },
-        );
+    this.dataservice
+      .postCurrencyData(
+        payload.CODE,
+        payload.SYMBOL,
+        payload.DESCRIPTION,
+        payload.FRACTION_UNIT,
+        payload.EXCHANGE,
+        this.companyId,
+      )
+      .subscribe(
+        (response) => {
+          if (response) {
+            this.showCurrency();
+            this.isAddCurrencyPopupOpened = false; // Close the popup on successful submission
+          } else {
+            notify('Failed to save currency data', 'error', 3000);
+          }
+        },
+        (error) => {
+          notify(
+            'An error occurred while saving currency data',
+            'error',
+            3000,
+          );
+        },
+      );
     // }
   }
 
@@ -280,11 +280,11 @@ addButtonOptions = {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
-    
+
 
     this.showCurrency();
 
@@ -326,4 +326,4 @@ addButtonOptions = {
   exports: [],
   declarations: [CurrencyListComponent],
 })
-export class CurrencyListModule {}
+export class CurrencyListModule { }

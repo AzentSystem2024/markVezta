@@ -850,7 +850,7 @@ export class ItemStorePriceViewComponent {
       // grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
-  onPriceColumnChange() {}
+  onPriceColumnChange() { }
   isVisible(code: string): boolean {
     return this.selectedPriceColumns.includes(code);
   }
@@ -887,4 +887,4 @@ export class ItemStorePriceViewComponent {
   declarations: [ItemStorePriceViewComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemStorePriceViewModule {}
+export class ItemStorePriceViewModule { }

@@ -100,7 +100,7 @@ export class LedgerSettingsListComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -118,9 +118,9 @@ export class LedgerSettingsListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.getLedgerSettingsList();
     this.getLedgerDropdown();
@@ -238,52 +238,52 @@ export class LedgerSettingsListComponent {
   }
 
 
-    sessionDetails() {
+  sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   clearLedger = (e: any) => {
-  const rowIndex = e.row.rowIndex;
-  const headId = e.row.data.HEAD_ID;
+    const rowIndex = e.row.rowIndex;
+    const headId = e.row.data.HEAD_ID;
 
-  if (!headId) {
-    // Nothing to delete, just clear UI
-    e.component.cellValue(rowIndex, 'HEAD_ID', null);
-    return;
-  }
-
-  const payload = {
-    COMPANY_ID: this.companyID,
-    HEAD_ID: headId,
-  };
-
-  this.dataService.DeletetLedgerSettings(payload).subscribe({
-    next: (res: any) => {
-      notify(
-        {
-          message: 'Ledger removed successfully',
-          position: { at: 'top center', my: 'top center' },
-        },
-        'success'
-      );
-
-      //  Clear UI after success
+    if (!headId) {
+      // Nothing to delete, just clear UI
       e.component.cellValue(rowIndex, 'HEAD_ID', null);
-      e.component.refresh();
-    },
-    error: (err: any) => {
-      console.error(err);
-      notify(
-        {
-          message: 'Failed to delete ledger',
-          position: { at: 'top center', my: 'top center' },
-        },
-        'error'
-      );
-    },
-  });
-};
+      return;
+    }
+
+    const payload = {
+      COMPANY_ID: this.companyID,
+      HEAD_ID: headId,
+    };
+
+    this.dataService.DeletetLedgerSettings(payload).subscribe({
+      next: (res: any) => {
+        notify(
+          {
+            message: 'Ledger removed successfully',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success'
+        );
+
+        //  Clear UI after success
+        e.component.cellValue(rowIndex, 'HEAD_ID', null);
+        e.component.refresh();
+      },
+      error: (err: any) => {
+        console.error(err);
+        notify(
+          {
+            message: 'Failed to delete ledger',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'error'
+        );
+      },
+    });
+  };
 }
 @NgModule({
   imports: [
@@ -321,4 +321,4 @@ export class LedgerSettingsListComponent {
   exports: [LedgerSettingsListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LedgerSettingsListModule {}
+export class LedgerSettingsListModule { }

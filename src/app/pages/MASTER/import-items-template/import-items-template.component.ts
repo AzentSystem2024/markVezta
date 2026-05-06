@@ -44,7 +44,7 @@ export class ImportItemsTemplateComponent implements OnInit {
   dataGrid: DxDataGridComponent;
   @ViewChild(ImportItemTemplateFormComponent)
   itemComponent: ImportItemTemplateFormComponent;
-  
+
 
   itemTemplate: any;
   itemTemplateArray: any[] = [];
@@ -68,16 +68,16 @@ export class ImportItemsTemplateComponent implements OnInit {
 
 
   addButtonOptions = {
-  type: 'default',
-  stylingMode: 'contained',
-  hint: 'Add new template',
-  onClick: () => {
-    this.openForm();
-  },
-  elementAttr: { class: 'add-button' },
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new template',
+    onClick: () => {
+      this.openForm();
+    },
+    elementAttr: { class: 'add-button' },
 
-  template: () => {
-    return `
+    template: () => {
+      return `
       <div class="add-btn-content">
         <span class="iconify"
               data-icon="formkit:add"
@@ -86,27 +86,27 @@ export class ImportItemsTemplateComponent implements OnInit {
         <span class="add-text">New</span>
       </div>
     `;
-  },
-};
+    },
+  };
 
 
-searchButtonOptions = {
-  icon: 'search',
-  hint: 'Show / Hide Filters',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => {
-    this.toggleFilters();
-  },
-};
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.toggleFilters();
+    },
+  };
 
-refreshButtonOptions = {
-  icon: 'refresh',
-  hint: 'Refresh',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => {
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
       this.ngZone.run(() => this.refreshGrid());
     },
-};
+  };
 
 
 
@@ -115,7 +115,7 @@ refreshButtonOptions = {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router
-  ) {}
+  ) { }
 
   onEditingRow(event): void {
     event.cancel = true;
@@ -148,25 +148,25 @@ refreshButtonOptions = {
   // }
 
   getItemsTemplateData() {
-  this.itemTemplate = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.service.getImportTemplateData().subscribe({
-          next: (res: any) => {
-            const data = res?.data || [];
+    this.itemTemplate = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.service.getImportTemplateData().subscribe({
+            next: (res: any) => {
+              const data = res?.data || [];
 
-            this.itemTemplateArray = data; // ✅ store locally (for validation / reuse)
+              this.itemTemplateArray = data; // ✅ store locally (for validation / reuse)
 
-            resolve(data);
-          },
-          error: () => {
-            this.itemTemplateArray = [];
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(data);
+            },
+            error: () => {
+              this.itemTemplateArray = [];
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onReorder = (e: Parameters<DxDataGridTypes.RowDragging['onReorder']>[0]) => {
     const visibleRows = e.component.getVisibleRows();
@@ -194,17 +194,17 @@ refreshButtonOptions = {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getItemsTemplateData();
@@ -216,70 +216,70 @@ refreshButtonOptions = {
   onClickSave() {
     const data = this.itemComponent.getNewItemTemplateData();
     this.service.postImportTemplate(data).subscribe({
-    next: (response: any) => {
-      if (response?.flag === '1') {
-        notify(
-          {
-            message: 'Template saved successfully',
-            position: { at: 'top right', my: 'top right' }
-          },
-          'success'
-        );
+      next: (response: any) => {
+        if (response?.flag === '1') {
+          notify(
+            {
+              message: 'Template saved successfully',
+              position: { at: 'top right', my: 'top right' }
+            },
+            'success'
+          );
 
-        this.getItemsTemplateData(); // reload grid
-        this.isPopupOpened = false;  // close popup
-      } else {
+          this.getItemsTemplateData(); // reload grid
+          this.isPopupOpened = false;  // close popup
+        } else {
+          notify(
+            {
+              message: response?.message || 'Save failed',
+              position: { at: 'top right', my: 'top right' }
+            },
+            'error'
+          );
+        }
+      },
+      error: () => {
         notify(
           {
-            message: response?.message || 'Save failed',
+            message: 'Error occurred while saving',
             position: { at: 'top right', my: 'top right' }
           },
           'error'
         );
       }
-    },
-    error: () => {
-      notify(
-        {
-          message: 'Error occurred while saving',
-          position: { at: 'top right', my: 'top right' }
-        },
-        'error'
-      );
-    }
-  });
+    });
   }
   onRowRemoving(e: any) {
-  const id = e.key.ID;
+    const id = e.key.ID;
 
-  //  VERY IMPORTANT
-  e.cancel = true;
+    //  VERY IMPORTANT
+    e.cancel = true;
 
-  //  Tell grid to wait for this
-  e.promise = lastValueFrom(this.service.removeImportTemplateData(id))
-    .then(() => {
-      notify(
-        {
-          message: 'Delete operation successful',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'success'
-      );
+    //  Tell grid to wait for this
+    e.promise = lastValueFrom(this.service.removeImportTemplateData(id))
+      .then(() => {
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
 
-      this.getItemsTemplateData(); // reload
-    })
-    .catch(() => {
-      notify(
-        {
-          message: 'Delete operation failed',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error'
-      );
-    });
-}
+        this.getItemsTemplateData(); // reload
+      })
+      .catch(() => {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error'
+        );
+      });
+  }
 
-  onRowUpdating(data: any) {}
+  onRowUpdating(data: any) { }
   onExportClick() {
     const selectedColumns = this.TemplateColumnsData.filter((col) =>
       this.selectedTemplateColumnKeys.includes(col.COLUMN_TITLE),
@@ -333,15 +333,15 @@ refreshButtonOptions = {
   }
 
   toggleFilters() {
-  const grid = this.dataGrid?.instance;
-  if (!grid) return;
+    const grid = this.dataGrid?.instance;
+    if (!grid) return;
 
-  const current = grid.option('filterRow.visible');
-  grid.option('filterRow.visible', !current);
-  grid.option('headerFilter.visible', !current);
-}
+    const current = grid.option('filterRow.visible');
+    grid.option('filterRow.visible', !current);
+    grid.option('headerFilter.visible', !current);
+  }
 
-refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
@@ -364,4 +364,4 @@ refreshGrid() {
   exports: [],
   declarations: [ImportItemsTemplateComponent],
 })
-export class ImportItemsTemplateModule {}
+export class ImportItemsTemplateModule { }

@@ -150,7 +150,7 @@ export class CreditNoteListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -173,9 +173,9 @@ export class CreditNoteListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getCreditNotes();
@@ -223,7 +223,7 @@ export class CreditNoteListComponent {
         // ✅ single bind
         this.filteredInvoiceList = this.creditNotes;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -662,4 +662,4 @@ export class CreditNoteListComponent {
   exports: [CreditNoteListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CreditNoteListModule {}
+export class CreditNoteListModule { }

@@ -55,7 +55,7 @@ export class LandedCostListComponent implements OnInit {
 
   editingRowData: any;
 
-  isEditLandedcostPopupOpened : boolean = false;
+  isEditLandedcostPopupOpened: boolean = false;
 
   isEditMode: boolean = false;
 
@@ -70,14 +70,14 @@ export class LandedCostListComponent implements OnInit {
 
 
   addButtonOptions = {
-  type: 'default',
-  stylingMode: 'contained',
-  hint: 'Add new Landed Cost',
-  onClick: () => this.addLandedcost(),
-  elementAttr: { class: 'add-button' },
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new Landed Cost',
+    onClick: () => this.addLandedcost(),
+    elementAttr: { class: 'add-button' },
 
-  template: () => {
-    return `
+    template: () => {
+      return `
       <div class="add-btn-content">
         <span class="iconify"
               data-icon="formkit:add"
@@ -86,47 +86,47 @@ export class LandedCostListComponent implements OnInit {
         <span class="add-text">New</span>
       </div>
     `;
-  },
-};
+    },
+  };
 
-searchButtonOptions = {
-  icon: 'search',
-  hint: 'Show / Hide Filters',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => this.toggleFilters(),
-};
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
-refreshButtonOptions = {
-  icon: 'refresh',
-  hint: 'Refresh',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => {
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
       this.zone.run(() => this.refreshGrid());
     },
-};
+  };
 
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private zone: NgZone,
     private router: Router
-  ) {}
+  ) { }
 
   onEditingStart(e: any) {
     e.cancel = true;
     const id = e.data.ID;
 
-  this.dataservice.selectLandedCost(id).subscribe((res: any) => {
-    this.editingRowData = res;
+    this.dataservice.selectLandedCost(id).subscribe((res: any) => {
+      this.editingRowData = res;
 
-    this.isEditMode = true;         // ✅ set edit mode
-    this.currentEditId = id;
+      this.isEditMode = true;         // ✅ set edit mode
+      this.currentEditId = id;
 
-    console.log(this.editingRowData,"this.editingRowData")
-    this.isEditLandedcostPopupOpened = true;
-  });
+      console.log(this.editingRowData, "this.editingRowData")
+      this.isEditLandedcostPopupOpened = true;
+    });
   }
-  
+
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Landed_cost-list');
   }
@@ -185,26 +185,53 @@ refreshButtonOptions = {
     // );
 
     const component = this.isEditMode
-    ? this.editFormComponent
-    : this.addFormComponent;
+      ? this.editFormComponent
+      : this.addFormComponent;
 
     const data = component.getNewLandedcost();
 
     console.log('FINAL DATA', data);
 
     const {
-    DESCRIPTION,
-    IS_LOCAL_CURRENCY,
-    IS_FIXED_AMOUNT,
-    VALUE,
-    COMPANY_ID,
-    IS_INACTIVE,
-  } = data;
+      DESCRIPTION,
+      IS_LOCAL_CURRENCY,
+      IS_FIXED_AMOUNT,
+      VALUE,
+      COMPANY_ID,
+      IS_INACTIVE,
+    } = data;
 
     if (this.isEditMode && this.currentEditId) {
+      this.dataservice
+        .updateLandedcostData(
+          this.currentEditId,
+          DESCRIPTION,
+          IS_LOCAL_CURRENCY,
+          IS_FIXED_AMOUNT,
+          VALUE,
+          COMPANY_ID,
+          IS_INACTIVE
+        )
+        .subscribe((response: any) => {
+          if (response?.flag === '1') {
+            notify(
+              {
+                message: 'Landed Cost updated successfully',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success'
+            );
+
+            this.isEditLandedcostPopupOpened = false;
+            this.showLandedcost();
+          }
+        });
+
+      return;
+    }
+
     this.dataservice
-      .updateLandedcostData(
-        this.currentEditId,
+      .postLandedcostData(
         DESCRIPTION,
         IS_LOCAL_CURRENCY,
         IS_FIXED_AMOUNT,
@@ -212,66 +239,39 @@ refreshButtonOptions = {
         COMPANY_ID,
         IS_INACTIVE
       )
-      .subscribe((response: any) => {
-        if (response?.flag === '1') {
+      .subscribe({
+        next: (response: any) => {
+          if (response?.flag === '1') {
+            notify(
+              {
+                message: 'Landed Cost saved successfully',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success'
+            );
+
+            this.showLandedcost();
+            this.isAddLandedcostPopupOpened = false;
+          } else {
+            notify(
+              {
+                message: response?.message || 'Save failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error'
+            );
+          }
+        },
+        error: () => {
           notify(
             {
-              message: 'Landed Cost updated successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          );
-
-          this.isEditLandedcostPopupOpened = false;
-          this.showLandedcost();
-        }
-      });
-
-    return;
-  }
-
-    this.dataservice
-    .postLandedcostData(
-      DESCRIPTION,
-      IS_LOCAL_CURRENCY,
-      IS_FIXED_AMOUNT,
-      VALUE,
-      COMPANY_ID,
-      IS_INACTIVE
-    )
-    .subscribe({
-      next: (response: any) => {
-        if (response?.flag === '1') {
-          notify(
-            {
-              message: 'Landed Cost saved successfully',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success'
-          );
-
-          this.showLandedcost();
-          this.isAddLandedcostPopupOpened = false;
-        } else {
-          notify(
-            {
-              message: response?.message || 'Save failed',
+              message: 'Server error while saving',
               position: { at: 'top right', my: 'top right' },
             },
             'error'
           );
-        }
-      },
-      error: () => {
-        notify(
-          {
-            message: 'Server error while saving',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        );
-      },
-    });
+        },
+      });
   }
   onRowUpdating(event: any) {
     const updatedData = { ...event.oldData, ...event.newData };
@@ -357,7 +357,7 @@ refreshButtonOptions = {
   }
 
   selectLandedCostData(id: any) {
-    this.dataservice.selectLandedCost(id).subscribe((response: any) => {});
+    this.dataservice.selectLandedCost(id).subscribe((response: any) => { });
   }
   ngOnInit(): void {
 
@@ -370,18 +370,18 @@ refreshButtonOptions = {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
-    
+
     this.loadDropdownData();
     this.showLandedcost();
   }
@@ -402,17 +402,17 @@ refreshButtonOptions = {
     this.showLandedcost();
   }
   toggleFilters() {
-  this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterOpened = !this.isFilterOpened;
 
-  const grid = this.dataGrid?.instance;
+    const grid = this.dataGrid?.instance;
 
-  if (grid) {
-    grid.option('filterRow.visible', this.isFilterOpened);
-    grid.option('headerFilter.visible', this.isFilterOpened);
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
-}
 
-refreshGrid() {
+  refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
@@ -433,4 +433,4 @@ refreshGrid() {
   exports: [],
   declarations: [LandedCostListComponent],
 })
-export class LandedCostListModule {}
+export class LandedCostListModule { }

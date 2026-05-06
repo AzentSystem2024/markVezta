@@ -236,9 +236,9 @@ export class DealerComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -336,7 +336,7 @@ export class DealerComponent {
     // });
   }
 
-  onAddPopupClose() {}
+  onAddPopupClose() { }
 
   onEditingStart(event: any) {
     event.cancel = true;
@@ -778,7 +778,7 @@ export class DealerComponent {
     const isDuplicate = this.Datasource?.some((data: any) => {
       return (
         data.DISTRIBUTOR_NAME?.trim().toLowerCase() ===
-          distributorName.toLowerCase() && data.ID !== this.ID
+        distributorName.toLowerCase() && data.ID !== this.ID
       );
     });
 
@@ -834,7 +834,7 @@ export class DealerComponent {
 
   delete_Data(event: any) {
     const Id = event.data.ID;
-    this.dataservice.Delete_Dealer_Api(Id).subscribe((response: any) => {});
+    this.dataservice.Delete_Dealer_Api(Id).subscribe((response: any) => { });
   }
 }
 
@@ -863,4 +863,4 @@ export class DealerComponent {
   exports: [],
   declarations: [DealerComponent],
 })
-export class DealerModule {}
+export class DealerModule { }

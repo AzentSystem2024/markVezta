@@ -162,9 +162,9 @@ export class ArticleTypeComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -176,7 +176,7 @@ export class ArticleTypeComponent {
     this.Select_ArticleType(event);
   }
 
-  closePop() {}
+  closePop() { }
 
   addArticleType() {
     this.AddArticleTypePopup = true;
@@ -363,4 +363,4 @@ export class ArticleTypeComponent {
   exports: [],
   declarations: [ArticleTypeComponent],
 })
-export class ArticleTypeModule {}
+export class ArticleTypeModule { }

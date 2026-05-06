@@ -29,7 +29,7 @@ export class DeliveryTermsListComponent {
   showHeaderFilter = true;
   isAddDeliveryTermsPopupOpened = false;
   isFilterRowVisible: boolean = false;
-   readonly allowedPageSizes: any = [5, 10, 'all'];
+  readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
 
@@ -45,8 +45,8 @@ export class DeliveryTermsListComponent {
     private exportService: ExportService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private router:Router
-  ) {}
+    private router: Router
+  ) { }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Delivery_terms-list');
   }
@@ -54,14 +54,14 @@ export class DeliveryTermsListComponent {
     this.isAddDeliveryTermsPopupOpened = true;
   }
 
-     searchButtonOptions = {
+  searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilterRow(),
   };
 
-   //=================================refresh=============================
+  //=================================refresh=============================
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -70,7 +70,7 @@ export class DeliveryTermsListComponent {
     text: '',
   };
 
-   refreshGrid() {
+  refreshGrid() {
     this.showDeliveryTerms();
   }
 
@@ -195,16 +195,16 @@ export class DeliveryTermsListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.showDeliveryTerms();
@@ -237,4 +237,4 @@ export class DeliveryTermsListComponent {
   exports: [],
   declarations: [DeliveryTermsListComponent],
 })
-export class DeliveryTermsListModule {}
+export class DeliveryTermsListModule { }

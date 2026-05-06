@@ -174,7 +174,7 @@ export class QuotationFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -207,9 +207,9 @@ export class QuotationFormComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     console.log('packingRights', packingRights);
@@ -265,12 +265,12 @@ export class QuotationFormComponent {
     // Map ITEM_NAME → DESCRIPTION for DevExtreme grid binding
     const mappedDetails = data.Details
       ? data.Details.map((item: any) => ({
-          ...item,
-          DESCRIPTION: item.ITEM_ID,
-          ITEM_CODE: item.ITEM_ID,
-          ITEM_ID: item.ITEM_ID,
-          STOCK_QTY: item.QUANTITY,
-        }))
+        ...item,
+        DESCRIPTION: item.ITEM_ID,
+        ITEM_CODE: item.ITEM_ID,
+        ITEM_ID: item.ITEM_ID,
+        STOCK_QTY: item.QUANTITY,
+      }))
       : [];
 
     this.quotationFormData = {
@@ -785,7 +785,7 @@ export class QuotationFormComponent {
   setTaxSummaryLabel() {
     this.taxSummaryLabel =
       (this.selected_vat_id === this.sessionData.VAT_ID &&
-      this.sessionData.VAT_ID === 2
+        this.sessionData.VAT_ID === 2
         ? 'VAT Amount'
         : 'VAT Amount') + ': {0}';
   }
@@ -1023,9 +1023,8 @@ export class QuotationFormComponent {
 
       <!-- FOOTER NOTE -->
       <div style="margin-top: 50px; text-align: center; font-style: italic;">
-        This quotation is valid for ${
-          data.VALID_DAYS
-        } days from the date of issue.
+        This quotation is valid for ${data.VALID_DAYS
+      } days from the date of issue.
       </div>
     </div>
   `;
@@ -1054,7 +1053,7 @@ export class QuotationFormComponent {
       </thead>
       <tbody>
         ${data.Details.map(
-          (item: any, index: number) => `
+      (item: any, index: number) => `
           <tr>
             <td style="text-align: center">${index + 1}</td>
             <td>${item.ITEM_CODE || ''}</td>
@@ -1065,22 +1064,18 @@ export class QuotationFormComponent {
             <td style="text-align: right">${item.TAX_PERCENT || ''}</td>
             <td style="text-align: right">${item.STOCK_QTY || ''}</td>
             <td style="text-align: right">${item.PRICE?.toFixed(2) || ''}</td>
-            <td style="text-align: right">${
-              item.GROSS_AMOUNT?.toFixed(2) || ''
-            }</td>
-            <td style="text-align: right">${
-              item.DISC_PERCENT?.toFixed(2) || ''
-            }</td>
+            <td style="text-align: right">${item.GROSS_AMOUNT?.toFixed(2) || ''
+        }</td>
+            <td style="text-align: right">${item.DISC_PERCENT?.toFixed(2) || ''
+        }</td>
             <td style="text-align: right">${item.AMOUNT?.toFixed(2) || ''}</td>
-            <td style="text-align: right">${
-              item.TAX_AMOUNT?.toFixed(2) || ''
-            }</td>
-            <td style="text-align: right">${
-              item.TOTAL_AMOUNT?.toFixed(2) || ''
-            }</td>
+            <td style="text-align: right">${item.TAX_AMOUNT?.toFixed(2) || ''
+        }</td>
+            <td style="text-align: right">${item.TOTAL_AMOUNT?.toFixed(2) || ''
+        }</td>
           </tr>
         `,
-        ).join('')}
+    ).join('')}
       </tbody>
     </table>
   `;
@@ -1095,10 +1090,10 @@ export class QuotationFormComponent {
         <h3 style="border-top: 1px solid #000; padding-top: 5px;">Terms & Conditions</h3>
         <ol style="margin-left: 20px; font-size: 12px;">
           ${data.TERMS.map(
-            (term: any, index: number) => `
+        (term: any, index: number) => `
             <li>${term.TERMS}</li>
           `,
-          ).join('')}
+      ).join('')}
         </ol>
       </div>
     `;
@@ -1192,4 +1187,4 @@ export class QuotationFormComponent {
   exports: [QuotationFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class QuotationFormModule {}
+export class QuotationFormModule { }

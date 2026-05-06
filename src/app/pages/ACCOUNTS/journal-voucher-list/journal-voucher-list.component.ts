@@ -163,7 +163,7 @@ export class JournalVoucherListComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -179,9 +179,9 @@ export class JournalVoucherListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sessionData_tax();
@@ -683,4 +683,4 @@ export class JournalVoucherListComponent {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 
-export class JournalVoucherModule {}
+export class JournalVoucherModule { }

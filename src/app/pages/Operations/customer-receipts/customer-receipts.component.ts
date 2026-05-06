@@ -152,7 +152,7 @@ export class CustomerReceiptsComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -177,9 +177,9 @@ export class CustomerReceiptsComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.sessionData_tax();
 
@@ -650,4 +650,4 @@ export class CustomerReceiptsComponent {
   exports: [CustomerReceiptsComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomerReceiptsModule {}
+export class CustomerReceiptsModule { }

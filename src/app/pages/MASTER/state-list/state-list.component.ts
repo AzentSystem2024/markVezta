@@ -107,7 +107,7 @@ export class StateListComponent {
     private exportService: ExportService,
     private zone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
@@ -126,9 +126,9 @@ export class StateListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.showState();
@@ -370,4 +370,4 @@ export class StateListComponent {
   exports: [],
   declarations: [StateListComponent],
 })
-export class StateListModule {}
+export class StateListModule { }

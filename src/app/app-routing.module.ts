@@ -194,6 +194,7 @@ import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.comp
 import { TenderSummaryComponent } from './pages/REPORT/tender-summary/tender-summary.component';
 import { ZReportComponent } from './pages/REPORT/zreport/zreport.component';
 import { SalesInvoiceRetailComponent } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
+import { ItemStorePriceApproveComponent } from './pages/item-store-price-approve/item-store-price-approve.component';
 // import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 // import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 // import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -870,7 +871,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'item-store-prices-verify-approve',
+        path: 'item-store-prices-verify',
         component: ItemStorePriceVerifyApproveComponent,
         canActivate: [AuthGuardService],
       },
@@ -1218,6 +1219,14 @@ const routes: Routes = [
         component: SalesInvoiceRetailComponent,
         canActivate: [AuthGuardService],
       },
+
+         {
+        path: 'item-store-price-approve',
+        component: ItemStorePriceApproveComponent,
+        canActivate: [AuthGuardService],
+      },
+
+
       {
         path: '**',
         redirectTo: 'login',

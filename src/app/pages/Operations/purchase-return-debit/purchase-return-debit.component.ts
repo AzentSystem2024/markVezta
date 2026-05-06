@@ -160,7 +160,7 @@ export class PurchaseReturnDebitComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -184,7 +184,7 @@ export class PurchaseReturnDebitComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
@@ -653,4 +653,4 @@ export class PurchaseReturnDebitComponent {
   exports: [PurchaseReturnDebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseReturnDebitModule {}
+export class PurchaseReturnDebitModule { }

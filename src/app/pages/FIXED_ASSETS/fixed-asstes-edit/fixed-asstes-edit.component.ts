@@ -70,8 +70,8 @@ export class FixedAsstesEditComponent {
     DEPR_PERCENT: null,
     PURCH_DATE: '',
     IS_INACTIVE: false,
-    DEPT_ID :0,
-    SUB_DEPT_ID:0,
+    DEPT_ID: 0,
+    SUB_DEPT_ID: 0,
   };
   asset_ledgerData: any;
   FixedAssets: any;
@@ -118,9 +118,9 @@ export class FixedAsstesEditComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.Get_dropdowns();
@@ -172,9 +172,9 @@ export class FixedAsstesEditComponent {
       this.asset_ledgerData = res;
     });
 
-     const payload = {
-      NAME : 'DEPT',
-      COMPANY_ID : this.selected_Company_id
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
@@ -182,19 +182,19 @@ export class FixedAsstesEditComponent {
 
   }
 
-   onDepartmentChange(e: any) {
-  const selectedDeptId = e.value;
+  onDepartmentChange(e: any) {
+    const selectedDeptId = e.value;
 
-  const subdepartment = {
-    NAME: 'SUB_DEPT',
-    DEPT_ID: selectedDeptId
-  };
+    const subdepartment = {
+      NAME: 'SUB_DEPT',
+      DEPT_ID: selectedDeptId
+    };
 
-  this.dataService.Get_SubDepartment_Dropdown(subdepartment)
-    .subscribe((res: any) => {
-      this.SubDepartment = res;
-    });
-}
+    this.dataService.Get_SubDepartment_Dropdown(subdepartment)
+      .subscribe((res: any) => {
+        this.SubDepartment = res;
+      });
+  }
 
 
   async UpdateData() {
@@ -380,4 +380,4 @@ export class FixedAsstesEditComponent {
   declarations: [FixedAsstesEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class FixedAsstesEditModule {}
+export class FixedAsstesEditModule { }

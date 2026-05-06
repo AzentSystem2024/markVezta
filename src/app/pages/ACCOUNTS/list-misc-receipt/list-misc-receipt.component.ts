@@ -145,7 +145,7 @@ export class ListMiscReceiptComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -161,9 +161,9 @@ export class ListMiscReceiptComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getMiscReceipts();
@@ -212,7 +212,7 @@ export class ListMiscReceiptComponent {
         // ✅ reuse existing variable
         this.filteredMiscReceipts = this.miscReceipts;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -632,4 +632,4 @@ export class ListMiscReceiptComponent {
   exports: [ListMiscReceiptComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ListMiscReceiptModule {}
+export class ListMiscReceiptModule { }

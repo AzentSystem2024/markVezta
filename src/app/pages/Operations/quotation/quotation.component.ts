@@ -156,7 +156,7 @@ export class QuotationComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -180,9 +180,9 @@ export class QuotationComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();
@@ -655,4 +655,4 @@ export class QuotationComponent {
   exports: [QuotationComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class QuotationModule {}
+export class QuotationModule { }

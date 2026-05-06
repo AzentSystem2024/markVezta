@@ -150,7 +150,7 @@ export class SaleReturnComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -178,9 +178,9 @@ export class SaleReturnComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getSaleReturnList();
@@ -631,4 +631,4 @@ export class SaleReturnComponent {
   exports: [SaleReturnComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SaleReturnModule {}
+export class SaleReturnModule { }

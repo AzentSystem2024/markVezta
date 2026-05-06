@@ -364,9 +364,9 @@ export class CustomerFinListComponent {
     const nameExists = this.customerList?.some(
       (cust: any) =>
         cust.FIRST_NAME?.trim().toLowerCase() ===
-          newCustomerData.FIRST_NAME?.trim().toLowerCase() &&
+        newCustomerData.FIRST_NAME?.trim().toLowerCase() &&
         cust.LAST_NAME?.trim().toLowerCase() ===
-          newCustomerData.LAST_NAME?.trim().toLowerCase(),
+        newCustomerData.LAST_NAME?.trim().toLowerCase(),
     );
 
     // 🔴 Show exact message
@@ -521,9 +521,9 @@ export class CustomerFinListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.showCustomer();
@@ -576,7 +576,7 @@ export class CustomerFinListComponent {
     //   this.StateDropdownData = data;
     // });
   }
-  onStateSelectionChanged(event: any) {}
+  onStateSelectionChanged(event: any) { }
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
@@ -685,4 +685,4 @@ export class CustomerFinListComponent {
   declarations: [CustomerFinListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomerFinListModule {}
+export class CustomerFinListModule { }

@@ -115,7 +115,7 @@ export class OpeningBalanceComponent {
     private dataService: DataService,
     private router: Router,
     private sanitizer: DomSanitizer,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.openingBalance = [];
@@ -170,9 +170,9 @@ export class OpeningBalanceComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getLedgerCodeDropdown();
@@ -629,7 +629,7 @@ export class OpeningBalanceComponent {
     }, 100);
   }
 
-  cancel() {}
+  cancel() { }
 
   saveOpeningBalance() {
     console.log('SAVE CALLED');
@@ -871,4 +871,4 @@ export class OpeningBalanceComponent {
   exports: [OpeningBalanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class OpeningBalanceModule {}
+export class OpeningBalanceModule { }

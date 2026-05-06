@@ -128,7 +128,7 @@ export class MiscellaneousInvoiceComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -149,9 +149,9 @@ export class MiscellaneousInvoiceComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.geMiscInvoiceList();
@@ -452,4 +452,4 @@ export class MiscellaneousInvoiceComponent {
   exports: [MiscellaneousInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class MiscellaneousInvoiceModule {}
+export class MiscellaneousInvoiceModule { }

@@ -169,9 +169,9 @@ export class DeliveryAddressComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
   onEditingStart(event: any) {
@@ -318,4 +318,4 @@ export class DeliveryAddressComponent {
   exports: [],
   declarations: [DeliveryAddressComponent],
 })
-export class DeliveryAddressModule {}
+export class DeliveryAddressModule { }

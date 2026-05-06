@@ -64,7 +64,7 @@ export class UomListComponent implements OnInit {
     private dataservice: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   addButtonOptions = {
     type: 'default',
@@ -131,17 +131,17 @@ export class UomListComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -334,4 +334,4 @@ export class UomListComponent implements OnInit {
   exports: [],
   declarations: [UomListComponent],
 })
-export class UomListModule {}
+export class UomListModule { }

@@ -156,7 +156,7 @@ export class DebitComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -179,9 +179,9 @@ export class DebitComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getDebitNoteList();
@@ -231,7 +231,7 @@ export class DebitComponent {
         this.filteredJournalVoucherList = this.debitList;
         this.isEmptyDatagrid = this.debitList.length === 0;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -653,4 +653,4 @@ export class DebitComponent {
   exports: [DebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DebitModule {}
+export class DebitModule { }

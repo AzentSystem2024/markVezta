@@ -150,7 +150,7 @@ export class ArticleListComponent {
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -179,9 +179,9 @@ export class ArticleListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -466,4 +466,4 @@ export class ArticleListComponent {
   exports: [ArticleListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ArticleListModule {}
+export class ArticleListModule { }

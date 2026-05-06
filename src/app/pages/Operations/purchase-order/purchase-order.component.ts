@@ -211,7 +211,7 @@ export class PurchaseOrderComponent {
     private service: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
@@ -233,13 +233,13 @@ export class PurchaseOrderComponent {
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === currentUrl);
 
-      console.log(packingRights,"packingRights")
+    console.log(packingRights, "packingRights")
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
@@ -428,10 +428,10 @@ export class PurchaseOrderComponent {
     {
       name: 'edit',
       visible: (e) =>
-      e.row.data.STATUS === 'Approved'
-        ? true // show icon for approved → opens view popup
-        : this.canEdit && e.row.data.STATUS == 'Open',
-  },
+        e.row.data.STATUS === 'Approved'
+          ? true // show icon for approved → opens view popup
+          : this.canEdit && e.row.data.STATUS == 'Open',
+    },
     {
       name: 'delete',
       visible: (e) =>
@@ -575,7 +575,7 @@ export class PurchaseOrderComponent {
         // ✅ SAME AS PRODUCTION JV
         this.filteredPOList = this.dataSource;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -1121,7 +1121,7 @@ export class PurchaseOrderComponent {
 
   deletePOData(event: any) {
     const ID = event.data.ID;
-    this.service.DeletePoData(ID).subscribe((response: any) => {});
+    this.service.DeletePoData(ID).subscribe((response: any) => { });
   }
 
   CloseEditForm() {
@@ -1179,7 +1179,7 @@ export class PurchaseOrderComponent {
     intParam.value = invisibleIntParamValue;
   }
 
-  viewPdf(log: any) {}
+  viewPdf(log: any) { }
 }
 
 @NgModule({
@@ -1214,4 +1214,4 @@ export class PurchaseOrderComponent {
   declarations: [PurchaseOrderComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseOrderModule {}
+export class PurchaseOrderModule { }

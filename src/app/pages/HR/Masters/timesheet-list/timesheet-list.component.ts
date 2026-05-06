@@ -142,12 +142,12 @@ export class TimesheetListComponent {
   yearSelectorVisible = false;
   years: number[] = [];
   // CompanyID: any;
-  canAdd: any;
-  canEdit: any;
-  canDelete: any;
-  canPrint: any;
-  canView: any;
-  canApprove: any;
+  canAdd: boolean = false;
+  canEdit: boolean = false;
+  canDelete: boolean = false;
+  canPrint: boolean = false;
+  canView: boolean = false;
+  canApprove: boolean = false;
 
   addButtonOptions = {
     type: 'default',
@@ -183,7 +183,7 @@ export class TimesheetListComponent {
     private dataService: DataService,
     private zone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -200,9 +200,9 @@ export class TimesheetListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     const today = new Date();
     this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
@@ -371,7 +371,7 @@ export class TimesheetListComponent {
   getPayTimeEntries() {
     this.dataService
       .getDropdownData('PAYTIME_ENTRY')
-      .subscribe((res: any) => {});
+      .subscribe((res: any) => { });
   }
 
   goToPreviousMonth() {
@@ -382,7 +382,7 @@ export class TimesheetListComponent {
 
     this.fetchTimesheetList();
   }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+
   goToNextMonth() {
     const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
     currentDate.setMonth(currentDate.getMonth() + 1);
@@ -682,4 +682,4 @@ export class TimesheetListComponent {
   exports: [TimesheetListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetListModule {}
+export class TimesheetListModule { }

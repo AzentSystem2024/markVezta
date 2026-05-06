@@ -8,7 +8,9 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { confirm } from 'devextreme/ui/dialog';
+import { filter } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -49,65 +51,44 @@ import { DataService } from 'src/app/services';
   encapsulation: ViewEncapsulation.None,
 })
 export class ItemStorePriceVerifyApproveComponent {
+
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-
-  allItems: any;
-  allItemsList: any;
-  totalRowCount: any;
-  selectedStoreId: number[] = [1];
-  store: any[] = [];
+  AllowCommitWithSave: any;
   department: any;
   catagory: any;
   brand: any;
-  items: any;
-  selectedData: any;
+  userId: string;
+  worksheetData: any;
+  worksheetItems: any[] = [];
+  showHeaderFilter = true;
+  selectedItems: any;
+  selectedStoreId: number[] = [1];
+  store: any;
   filteredStoreList: any[] = [];
+  itemStoresList: any[] = [];
   storeIds: any;
-  itemStoresList: any;
-  payload: any[] = [];
+  updatedItems: { [key: number]: any } = {};
   selectedRowCount: any;
-  selectedRowKeys: any;
   selectedRowId: any;
-  selectedItemId: any;
+  oldValues: { [key: string]: { [field: string]: any } } = {};
   salepriceoldValue: any;
-  saleprice1odValue: any;
+  saleprice1oldValue: any;
   saleprice2oldValue: any;
-  NotSaleReturnoldValue: any;
   saleprice3oldValue: any;
   saleprice4oldValue: any;
   saleprice5oldValue: any;
-  saleprice1oldValue: any;
-  oldValues: { [key: string]: { [field: string]: any } } = {};
-  storeProperties: any;
-  storePrices: any;
-  currentSalePrice: number = 0.0;
-  newSalePrice: number = 0.0;
-  currentSalePrice1: number = 0.0;
-  newSalePrice1: number = 0.0;
-  currentSalePrice2: number = 0.0;
-  newSalePrice2: number = 0.0;
-  currentSalePrice3: number = 0.0;
-  newSalePrice3: number = 0.0;
-  currentSalePrice4: number = 0.0;
-  newSalePrice4: number = 0.0;
-  currentSalePrice5: number = 0.0;
-  newSalePrice5: number = 0.0;
-  itemPrices: number = 0.0;
-  updatedItems: { [key: number]: any } = {}; // Use a dictionary for keyed access
-  showHeaderFilter: true;
-  isSaved: boolean = false;
+  selectedItemId: null;
+  selectedRowKeys: any[] = [];
+  selectedRowIds: any;
   isVerified: boolean = false;
-  AllowCommitWithSave: any;
-  savedWorksheet: any;
-  isPopupVisible: boolean = false;
-  isButtonDisabled: boolean = true;
-  savedWorksheet1: {
-    ID: any; // assuming response might not have ID
-    COMPANY_ID: number; // from your payload
-    USER_ID: number; // from your payload
-    WS_DATE: Date; // you can set this to the current date or however appropriate
-    WS_NO: string; // generate as needed
+  isSaved: boolean = false;
+  savedWorksheet: {
+    ID: any;
+    COMPANY_ID: number;
+    USER_ID: number;
+    WS_DATE: Date;
+    WS_NO: string;
     flag: number; // Assuming success
     message: string;
     worksheet_item_price: {
@@ -126,17 +107,10 @@ export class ItemStorePriceVerifyApproveComponent {
       PRICE_LEVEL5_NEW: any;
     }[];
   };
-  newValues: {
-    PRICE_NEW: any;
-    PRICE_LEVEL1_NEW: any;
-    PRICE_LEVEL2_NEW: any;
-    PRICE_LEVEL3_NEW: any;
-    PRICE_LEVEL4_NEW: any;
-    PRICE_LEVEL5_NEW: any;
-  };
+  isPopupVisible: boolean;
+  isButtonDisabled: boolean = true;
   percentage: number = 0;
-  priceAdjustment: string = 'increase'; // 'increase' or 'decrease'
-  // roundingOption: string = 'none'; // 'none', 'nearest', 'down', 'up'
+  priceAdjustment: string = 'increase';
   currentPrice: number = 100; // Example current price
   adjustedPrice: number = 0;
   adjustmentOptions = [
@@ -156,24 +130,59 @@ export class ItemStorePriceVerifyApproveComponent {
   isIncrease: boolean = true;
   selectedSalePrice: any;
   salePriceOptions = [
-    { value: 'SALE_PRICE', text: 'Sale Price ' },
-    { value: 'SALE_PRICE1', text: 'Sale Price 1' },
-    { value: 'SALE_PRICE2', text: 'Sale Price 2' },
-    { value: 'SALE_PRICE3', text: 'Sale Price 3' },
-    { value: 'SALE_PRICE4', text: 'Sale Price 4' },
-    { value: 'SALE_PRICE5', text: 'Sale Price 5' },
+    { value: 'SALE_PRICE', text: 'MRP ' },
+    { value: 'SALE_PRICE1', text: 'Standard Price' },
+    { value: 'SALE_PRICE2', text: ' Price 2' },
+    { value: 'SALE_PRICE3', text: ' Price 3' },
+    { value: 'SALE_PRICE4', text: ' Price 4' },
+    { value: 'SALE_PRICE5', text: ' Price 5' },
   ];
   newPrice: any;
+  isEditable: boolean = true;
+  status: string | undefined;
   payloadForVerify: any;
-  worksheetData: any;
-  selectedItems: any;
-  worksheetItems: any;
-  selectedRowIds: any;
-  userId: string;
-  VerifiedFromLog: boolean = true;
-  selectedIds: any;
+  statusOfWorksheet: any;
+  isApplyButtonDisabled: boolean = true;
+  disableIfVerified: boolean = true;
+  isApproved: boolean = false;
+  dateFormat: string;
+  currencyFormt: string;
+  worksheetItemPrices: any;
+  itemIds: number[];
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showInfo = true;
+  showNavButtons = true;
+  selectedIds: any[];
+  isFilterOpened = false;
+  private filterApplied = false;
   selected_Company_id: any;
+  selected_ItemType: any;
+  itemtype: any;
+  narrationText: any;
 
+  //----------------select columns--------
+  priceColumnOptions = [
+    { text: 'MRP', value: 'MRP' },
+    { text: 'Standard Price', value: 'PRICE1' },
+    { text: 'Price 2', value: 'PRICE2' },
+    { text: 'Price 3', value: 'PRICE3' },
+    { text: 'Price 4', value: 'PRICE4' },
+    { text: 'Price 5', value: 'PRICE5' },
+  ];
+
+  selectedPriceColumns: string[] = ['MRP']; // default visible
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+  selected_data: any;
+  isSaving = false;
+  isApproving = false;
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -188,66 +197,128 @@ export class ItemStorePriceVerifyApproveComponent {
     dataservice.getDropdownData('BRAND').subscribe((data) => {
       this.brand = data;
     });
+    const payload = {
+      NAME: 'ITEMTYPE',
+    };
+    dataservice.getDropdownData(payload).subscribe((data) => {
+      this.itemtype = data;
+    });
   }
 
   ngOnInit() {
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.userId = sessionStorage.getItem('UserId');
+    this.dateFormat = sessionStorage.getItem('dateFormat');
+    this.currencyFormt = sessionStorage.getItem('currencyFormat');
+    this.sesstion_Details();
     this.getWorksheetData();
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => { });
     if (this.selectedStoreId.length > 1) {
       const defaultStoreId = this.selectedStoreId.join(',');
-      this.listItemsByMultipleStoreIds(defaultStoreId);
+      // this.listItemsByMultipleStoreIds(defaultStoreId);
     }
-    this.sesstion_Details();
     this.loadStores();
+    this.isApproved = false;
   }
 
   getWorksheetData(): void {
     this.dataservice.worksheetData$.subscribe((data) => {
-      this.isSaved = true;
       this.worksheetData = data;
-      this.VerifiedFromLog = this.worksheetData?.status === 'Verified';
-      this.worksheetItems = this.worksheetData.worksheet_item_price;
-      this.selectedIds = this.worksheetItems
-        .filter((item) => !item.Selected) // Invert the condition to filter items where Selected is false
-        .map((item) => item.ITEM_ID); // Collect ITEM_IDs
-      if (
-        this.worksheetData.worksheet_item_price &&
-        this.worksheetData.worksheet_item_price.length > 0
-      ) {
-        this.selectedItems = this.worksheetItems.filter(
-          (item) => item.Selected === true,
-        );
-        const storId = this.worksheetData.worksheet_item_store.map(
-          (storeID) => storeID.STORE_ID,
-        );
 
+      this.worksheetItems = this.worksheetData.worksheet_item_price || [];
+      this.narrationText = this.worksheetData.NARRATION;
+
+      this.itemIds = this.worksheetItems.map((item) => +item.ITEM_ID);
+
+      // Select rows that have Selected === true
+      this.selectedItems = this.worksheetItems.filter(
+        (item) => item.Selected === true,
+      );
+
+      // Now set selectedRowKeys after selecting items
+      this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
+
+      this.statusOfWorksheet = data.status;
+      this.isApplyButtonDisabled = this.statusOfWorksheet === 'Approved';
+      this.disableIfVerified = this.statusOfWorksheet === 'Verified';
+
+      if (this.worksheetData?.worksheet_item_price?.length > 0) {
+        const storId = this.worksheetData.worksheet_item_store.map(
+          (store) => store.STORE_ID,
+        );
         this.payloadForVerify = {
           ID: this.worksheetData.ID,
           COMPANY_ID: 1,
           USER_ID: 1,
           STORE_ID: storId[0],
           NARRATION: '',
-          worksheet_item_price: this.worksheetItems, // Update worksheet_item_price with updated data
+          worksheet_item_price: this.worksheetItems,
         };
-        if (this.selectedItems.length > 0) {
-          this.selectedRowKeys = this.selectedItems.map((item) => item.ID);
-          this.isButtonDisabled = false;
-        } else {
-          console.warn('No selected items found.');
-          this.isButtonDisabled = true;
-        }
+        this.isButtonDisabled = this.selectedItems.length === 0;
       } else {
         console.warn('worksheet_item_price is empty or not present.');
       }
+
       if (this.worksheetData?.worksheet_item_store?.length > 0) {
-        this.selectedStoreId = [
-          this.worksheetData.worksheet_item_store[0].STORE_ID,
-        ];
+        this.selectedStoreId = this.worksheetData.worksheet_item_store.map(
+          (store) => store.STORE_ID,
+        );
       } else {
-        console.warn('worksheet_item_store is empty or not present.');
+        this.selectedStoreId = [];
       }
+
+      this.cdr.detectChanges(); // Ensure UI refresh
     });
+  }
+
+  isVisible(code: string): boolean {
+    return this.selectedPriceColumns.includes(code);
+  }
+
+  onPriceColumnChange() { }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+  onToolbarPreparing(e: any) {
+    const toolbarItems = e.toolbarOptions.items;
+
+    // Avoid adding the button more than once
+    const alreadyAdded = toolbarItems.some(
+      (item: any) => item.name === 'toggleFilterButton',
+    );
+    if (!alreadyAdded) {
+      toolbarItems.splice(toolbarItems.length - 1, 0, {
+        widget: 'dxButton',
+        name: 'toggleFilterButton', // custom name to avoid duplicates
+        location: 'after',
+        options: {
+          icon: 'filter',
+          hint: 'Search Column',
+          onClick: () => this.toggleFilters(),
+        },
+      });
+    }
+  }
+
+  currencyCellTemplate(cellElement: any, cellInfo: any) {
+    if (cellInfo.value) {
+      const formattedCurrency = new Intl.NumberFormat(navigator.language, {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+      }).format(cellInfo.value);
+      cellElement.innerText = formattedCurrency;
+    }
   }
 
   sesstion_Details() {
@@ -275,12 +346,15 @@ export class ItemStorePriceVerifyApproveComponent {
         (store: any) => store.ID === storeId,
       );
       if (this.filteredStoreList.length > 0) {
-        this.listItemsByMultipleStoreIds(storeId);
+        // this.listItemsByMultipleStoreIds(storeId);
       }
     });
   }
 
   listItemsByMultipleStoreIds(storeIds: string) {
+    storeIds = storeIds.toString();
+    storeIds = storeIds.toString();
+
     this.dataservice.getItemListByStoreId().subscribe(
       (response) => {
         this.worksheetItems = response.PriceWizardData;
@@ -292,53 +366,103 @@ export class ItemStorePriceVerifyApproveComponent {
         } else {
           this.selectedRowKeys = [];
         }
+        this.cdr.detectChanges();
       },
       (error) => {
-        console.error('Error fetching item list:', error);
+        // console.error('Error fetching item list:', error);
       },
     );
   }
 
+  // onRowUpdated(event: any) {
+  //   const updatedData = event.data;
+  //   const rowId = updatedData.ID;
+  //   const eventRowdata = event.data;
+  //   this.updatedItems[rowId] = {
+  //     ITEM_ID: rowId,
+  //     SALE_PRICE: updatedData.SALE_PRICE || 0.0,
+  //     SALE_PRICE1: updatedData.SALE_PRICE1 || 0.0,
+  //     SALE_PRICE2: updatedData.SALE_PRICE2 || 0.0,
+  //     SALE_PRICE3: updatedData.SALE_PRICE3 || 0.0,
+  //     SALE_PRICE4: updatedData.SALE_PRICE4 || 0.0,
+  //     SALE_PRICE5: updatedData.SALE_PRICE5 || 0.0,
+
+  //     PRICE_NEW: updatedData.PRICE_NEW || '',
+  //     PRICE_LEVEL1_NEW: updatedData.PRICE_LEVEL1_NEW || '',
+  //     PRICE_LEVEL2_NEW: updatedData.PRICE_LEVEL2_NEW || '',
+  //     PRICE_LEVEL3_NEW: updatedData.PRICE_LEVEL3_NEW || '',
+  //     PRICE_LEVEL4_NEW: updatedData.PRICE_LEVEL4_NEW || '',
+  //     PRICE_LEVEL5_NEW: updatedData.PRICE_LEVEL5_NEW || '',
+  //   };
+  // }
+
   onRowUpdated(event: any) {
-    const updatedData = event.data;
-    const rowId = updatedData.ID;
+    const updatedRow = event.data;
+    const rowId = updatedRow.ID;
+
+    // 🔍 selected_data il already undo enn check
+    const index = this.selected_data.findIndex(
+      (item: any) => item.ID === rowId,
+    );
+
+    if (index !== -1) {
+      //  Already selected → update values
+      this.selected_data[index] = {
+        ...this.selected_data[index],
+        ...updatedRow,
+      };
+    } else {
+      // ➕ Not selected → add newly
+      this.selected_data.push(updatedRow);
+    }
+
+    // (Optional) backend save / payload use cheyyan
     this.updatedItems[rowId] = {
       ITEM_ID: rowId,
-      SALE_PRICE: updatedData.SALE_PRICE || 0.0,
-      SALE_PRICE1: updatedData.SALE_PRICE1 || 0.0,
-      SALE_PRICE2: updatedData.SALE_PRICE2 || 0.0,
-      SALE_PRICE3: updatedData.SALE_PRICE3 || 0.0,
-      SALE_PRICE4: updatedData.SALE_PRICE4 || 0.0,
-      SALE_PRICE5: updatedData.SALE_PRICE5 || 0.0,
-      PRICE_NEW: updatedData.PRICE_NEW || '',
-      PRICE_LEVEL1_NEW: updatedData.PRICE_LEVEL1_NEW || '',
-      PRICE_LEVEL2_NEW: updatedData.PRICE_LEVEL2_NEW || '',
-      PRICE_LEVEL3_NEW: updatedData.PRICE_LEVEL3_NEW || '',
-      PRICE_LEVEL4_NEW: updatedData.PRICE_LEVEL4_NEW || '',
-      PRICE_LEVEL5_NEW: updatedData.PRICE_LEVEL5_NEW || '',
+      SALE_PRICE: updatedRow.SALE_PRICE || 0,
+      SALE_PRICE1: updatedRow.SALE_PRICE1 || 0,
+      SALE_PRICE2: updatedRow.SALE_PRICE2 || 0,
+      SALE_PRICE3: updatedRow.SALE_PRICE3 || 0,
+      SALE_PRICE4: updatedRow.SALE_PRICE4 || 0,
+      SALE_PRICE5: updatedRow.SALE_PRICE5 || 0,
+
+      PRICE_NEW: updatedRow.PRICE_NEW || '',
+      PRICE_LEVEL1_NEW: updatedRow.PRICE_LEVEL1_NEW || '',
+      PRICE_LEVEL2_NEW: updatedRow.PRICE_LEVEL2_NEW || '',
+      PRICE_LEVEL3_NEW: updatedRow.PRICE_LEVEL3_NEW || '',
+      PRICE_LEVEL4_NEW: updatedRow.PRICE_LEVEL4_NEW || '',
+      PRICE_LEVEL5_NEW: updatedRow.PRICE_LEVEL5_NEW || '',
     };
   }
 
   onSelectionChanged(event: any) {
     const totalItemsCount = event.component.getDataSource().items().length;
+
+    this.selected_data = [...event.selectedRowsData];
+
     // Automatically select all rows if there are items available
     if (totalItemsCount > 0 && this.selectedRowCount === 0) {
       // Select all rows
       event.component.selectAll();
+
       // After selecting all, use setTimeout to allow for the grid's update
       setTimeout(() => {
         // Get the updated selected keys from the component directly
         this.selectedRowIds = event.component.getSelectedRowKeys();
         this.selectedRowCount = this.selectedRowIds.length;
         this.selectedRowKeys = this.selectedRowIds;
+
         // Determine if the button should be disabled
         this.isButtonDisabled = this.selectedRowCount === 0;
+
         // Store selected items
         this.selectedItems = event.selectedRowsData;
+
         if (this.selectedItems.length > 0) {
           const selectedRow = this.selectedItems[0];
           this.selectedRowId = selectedRow.ID;
           this.selectedItems = selectedRow.ITEM_ID;
+
           // Store old values if not already stored
           if (!this.oldValues[this.selectedRowId]) {
             this.oldValues[this.selectedRowId] = {
@@ -361,14 +485,18 @@ export class ItemStorePriceVerifyApproveComponent {
       this.selectedRowIds = event.selectedRowKeys;
       this.selectedRowCount = this.selectedRowIds.length;
       this.selectedRowKeys = this.selectedRowIds;
+
       // Determine if the button should be disabled
       this.isButtonDisabled = this.selectedRowCount === 0;
+
       // Store selected items
       this.selectedItems = event.selectedRowsData;
+
       if (this.selectedItems.length > 0) {
         const selectedRow = this.selectedItems[0];
         this.selectedRowId = selectedRow.ID;
         this.selectedItems = selectedRow.ITEM_ID;
+
         // Store old values if not already stored
         if (!this.oldValues[this.selectedRowId]) {
           this.oldValues[this.selectedRowId] = {
@@ -389,7 +517,8 @@ export class ItemStorePriceVerifyApproveComponent {
   }
 
   Cancel() {
-    this.router.navigate(['/item-store-prices-log']);
+    this.router.navigate(['/change-price']);
+    this.isApproved = false;
   }
 
   onDropdownValueChanged(event: any) {
@@ -399,11 +528,12 @@ export class ItemStorePriceVerifyApproveComponent {
       this.itemStoresList = [];
     } else {
       this.selectedStoreId = this.storeIds;
-      this.listItemsByMultipleStoreIds(this.storeIds);
+      // this.listItemsByMultipleStoreIds(this.storeIds);
     }
   }
 
   onSaveButtonClick() {
+    if (this.isSaving) return;
     this.Save();
     this.isSaved = true;
   }
@@ -419,68 +549,129 @@ export class ItemStorePriceVerifyApproveComponent {
       );
       return;
     }
-    const companyId = 1;
-    const userId = 1;
-    const narration = 'Narration';
-    const defaultStoreId = 1;
-    const worksheetItemPrice = Object.values(this.updatedItems).map((item) => ({
-      ITEM_ID: item.ITEM_ID,
-      SALE_PRICE: item.SALE_PRICE ?? 0.0,
-      SALE_PRICE1: item.SALE_PRICE1 ?? 0.0,
-      SALE_PRICE2: item.SALE_PRICE2 ?? 0.0,
-      SALE_PRICE3: item.SALE_PRICE3 ?? 0.0,
-      SALE_PRICE4: item.SALE_PRICE4 ?? 0.0,
-      SALE_PRICE5: item.SALE_PRICE5 ?? 0.0,
-      PRICE_NEW: item.PRICE_NEW ?? 0.0,
-      PRICE_LEVEL1_NEW: item.PRICE_LEVEL1_NEW ?? 0.0,
-      PRICE_LEVEL2_NEW: item.PRICE_LEVEL2_NEW ?? 0.0,
-      PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? 0.0,
-      PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? 0.0,
-      PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
-    }));
+
+    this.isSaving = true;
+
     const payload = {
-      COMPANY_ID: companyId,
-      USER_ID: userId,
-      STORE_ID: this.storeIds || defaultStoreId,
-      NARRATION: narration,
-      worksheet_item_price: worksheetItemPrice,
+      ...this.worksheetData,
+      NARRATION: this.narrationText,
+      worksheet_item_price: this.selected_data || this.worksheetItems,
     };
-    this.dataservice.updateworksheetItemPrice(payload).subscribe(
-      (response) => {
-        if (response) {
-          notify(
-            {
-              message: 'Worksheet Updated Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-        } else {
-          notify(
-            {
-              message: 'Your Data Not Saved',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
+
+    const invalidItems = payload.worksheet_item_price.filter((item: any) => {
+      const priceToCheck =
+        Number(item.PRICE_NEW) === 0
+          ? Number(item.SALE_PRICE)
+          : Number(item.PRICE_NEW);
+
+      return priceToCheck <= Number(item.PRICE_LEVEL1_NEW);
+    });
+
+    if (invalidItems.length > 0) {
+      const itemCodes = invalidItems
+        .map((item: any) => item.ITEM_CODE)
+        .join(', ');
+
+      notify(
+        `MRP must be greater than Standard Price for Item(s): ${itemCodes}`,
+        'error',
+        5000,
+      );
+
+      this.isSaving = false; // ✅ stop loading
+      return;
+    }
+
+    if (this.isApproved) {
+      const result = confirm(
+        'Are you sure you want to approve this worksheet?',
+        'Confirm Approval',
+      );
+
+      result.then((dialogResult) => {
+        if (!dialogResult) {
+          this.isSaving = false; // ✅ stop loading if cancelled
+          return;
         }
-      },
-      (error) => {
-        console.error('Error saving data:', error);
-      },
-    );
+
+        this.dataservice.approveworksheetItemPrices(payload).subscribe(
+          (response) => {
+            this.isSaving = false; // ✅ stop loading
+
+            if (response.flag == 1) {
+              notify(
+                {
+                  message: 'Worksheet Approved Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+              this.router.navigate(['/change-price']);
+              this.isApproved = false;
+            } else {
+              notify(
+                {
+                  message: response.message || 'Worksheet Approved failed',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            this.isSaving = false; // ✅ stop loading
+
+            console.error('Error approving worksheet:', error);
+            notify(
+              {
+                message: 'Error approving worksheet',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          },
+        );
+      });
+    } else {
+      this.dataservice.updateworksheetItemPrice(payload).subscribe(
+        (response) => {
+          this.isSaving = false; // ✅ stop loading
+
+          if (response.flag === 1) {
+            notify(
+              {
+                message: 'Worksheet Updated Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            if (!this.AllowCommitWithSave) {
+              this.router.navigate(['/change-price']);
+            }
+          } else {
+            notify(
+              {
+                message: response.message || 'Your Data Not Saved',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        },
+        (error) => {
+          this.isSaving = false; // ✅ stop loading
+
+          console.error('Error saving data:', error);
+        },
+      );
+    }
   }
 
   onVerify() {
     if (this.AllowCommitWithSave) {
-      if (this.payloadForVerify) {
-        this.dataservice
-          .verifyItemStorePrices(this.payloadForVerify)
-          .subscribe((response) => {});
-      }
       const companyId = 1; // Example: this.companyId = 1
       const userId = 1; // Example: this.userId = 1
-      const narration = 'Narration'; // Replace with the actual narration if needed
+      const narration = ''; // Replace with the actual narration if needed
       const defaultStoreId = 1;
       const worksheetItemPrice = Object.values(this.updatedItems).map(
         (item) => ({
@@ -499,10 +690,19 @@ export class ItemStorePriceVerifyApproveComponent {
           PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
         }),
       );
+      const ID = this.worksheetData.ID;
+      let storeId = this.worksheetData.worksheet_item_store
+        .map((storeID) => storeID.STORE_ID)
+        .join(',');
+
+      if (storeId.includes(',')) {
+        storeId = '1';
+      }
       const verificationPayload = {
+        ID: ID,
         COMPANY_ID: companyId,
         USER_ID: userId,
-        STORE_ID: this.storeIds || defaultStoreId,
+        STORE_ID: storeId || defaultStoreId,
         NARRATION: narration,
         worksheet_item_price: worksheetItemPrice,
       };
@@ -511,88 +711,126 @@ export class ItemStorePriceVerifyApproveComponent {
   }
 
   verifyItemStorePrices(payload) {
-    this.dataservice
-      .verifyItemStorePrices(payload)
-      .subscribe((verifyResponse) => {
-        if (verifyResponse) {
-          notify(
-            {
-              message: 'Worksheet Verified Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-        } else {
-          notify(
-            {
-              message: 'Your Data Not Saved',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        this.isVerified = true;
-      });
+    if (this.AllowCommitWithSave) {
+      this.dataservice
+        .verifyItemStorePrices(this.payloadForVerify)
+        .subscribe((verifyResponse) => {
+          if (verifyResponse) {
+            notify(
+              {
+                message: 'Worksheet Verified Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            this.isVerified = true;
+          } else {
+            notify(
+              {
+                message: 'Your Data Not Saved',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+          // this.isVerified = true;
+        });
+    }
   }
 
   onApprove() {
-    if (this.payloadForVerify) {
-      this.dataservice
-        .approveworksheetItemPrices(this.payloadForVerify)
-        .subscribe((response) => {});
+    if (this.isApproving) return; // ✅ prevent double click
+
+    this.isApproving = true;
+    if (this.AllowCommitWithSave) {
+      if (this.payloadForVerify) {
+        this.dataservice
+          .approveworksheetItemPrices(this.payloadForVerify)
+          .subscribe(
+            (response) => {
+              this.selectedRowKeys = [];
+            },
+            (error) => {
+              this.isApproving = false; // ✅ stop loading on error
+            },
+          );
+      }
+      const companyId = 1; // Example: this.companyId = 1
+      const userId = 1; // Example: this.userId = 1
+      const narration = 'Narration'; // Replace with the actual narration if needed
+      const defaultStoreId = 1;
+      const worksheetItemPrice = Object.values(this.updatedItems).map(
+        (item) => ({
+          ITEM_ID: item.ITEM_ID,
+          SALE_PRICE: item.SALE_PRICE ?? 0.0,
+          SALE_PRICE1: item.SALE_PRICE1 ?? 0.0,
+          SALE_PRICE2: item.SALE_PRICE2 ?? 0.0,
+          SALE_PRICE3: item.SALE_PRICE3 ?? 0.0,
+          SALE_PRICE4: item.SALE_PRICE4 ?? 0.0,
+          SALE_PRICE5: item.SALE_PRICE5 ?? 0.0,
+          PRICE_NEW: item.PRICE_NEW ?? 0.0, // Ensure this reflects the updated value
+          PRICE_LEVEL1_NEW: item.PRICE_LEVEL1_NEW ?? 0.0,
+          PRICE_LEVEL2_NEW: item.PRICE_LEVEL2_NEW ?? 0.0,
+          PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? 0.0,
+          PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? 0.0,
+          PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
+        }),
+      );
+      const ID = this.worksheetData.ID;
+      let storeId = this.worksheetData.worksheet_item_store
+        .map((storeID) => storeID.STORE_ID)
+        .join(',');
+
+      // If multiple stores are selected, set storeId to "1"
+      if (storeId.includes(',')) {
+        storeId = '1';
+      }
+      const approvePayload = {
+        ID: ID,
+        COMPANY_ID: companyId,
+        USER_ID: userId,
+        STORE_ID: storeId || defaultStoreId,
+        NARRATION: narration,
+        worksheet_item_price: worksheetItemPrice,
+      };
+
+      this.approveItemStoreProperties(approvePayload);
+    } else {
+      this.isApproving = false; // ✅ stop loading if not allowed
     }
-    const companyId = 1; // Example: this.companyId = 1
-    const userId = 1; // Example: this.userId = 1
-    const narration = 'Narration'; // Replace with the actual narration if needed
-    const defaultStoreId = 1;
-    const worksheetItemPrice = Object.values(this.updatedItems).map((item) => ({
-      ITEM_ID: item.ITEM_ID,
-      SALE_PRICE: item.SALE_PRICE ?? 0.0,
-      SALE_PRICE1: item.SALE_PRICE1 ?? 0.0,
-      SALE_PRICE2: item.SALE_PRICE2 ?? 0.0,
-      SALE_PRICE3: item.SALE_PRICE3 ?? 0.0,
-      SALE_PRICE4: item.SALE_PRICE4 ?? 0.0,
-      SALE_PRICE5: item.SALE_PRICE5 ?? 0.0,
-      PRICE_NEW: item.PRICE_NEW ?? 0.0, // Ensure this reflects the updated value
-      PRICE_LEVEL1_NEW: item.PRICE_LEVEL1_NEW ?? 0.0,
-      PRICE_LEVEL2_NEW: item.PRICE_LEVEL2_NEW ?? 0.0,
-      PRICE_LEVEL3_NEW: item.PRICE_LEVEL3_NEW ?? 0.0,
-      PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? 0.0,
-      PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? 0.0,
-    }));
-    const approvePayload = {
-      COMPANY_ID: companyId,
-      USER_ID: userId,
-      STORE_ID: this.storeIds || defaultStoreId,
-      NARRATION: narration,
-      worksheet_item_price: worksheetItemPrice,
-    };
-    this.approveItemStoreProperties(approvePayload);
   }
 
   approveItemStoreProperties(payload) {
-    this.dataservice
-      .approveworksheetItemPrices(payload)
-      .subscribe((approveResponse) => {
-        if (approveResponse) {
-          notify(
-            {
-              message: 'Worksheet Approved Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-        } else {
-          notify(
-            {
-              message: 'Your Data Not Saved',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
-    this.router.navigate(['/item-store-prices-log']);
+    if (this.AllowCommitWithSave) {
+      this.dataservice
+        .approveworksheetItemPrices(this.payloadForVerify)
+        .subscribe(
+          (approveResponse) => {
+            if (approveResponse) {
+              this.isApproving = false;
+              notify(
+                {
+                  message: 'Worksheet Approved Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+            } else {
+              notify(
+                {
+                  message: 'Your Data Not Saved',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            this.isApproving = false; // ✅ stop loading on error
+          },
+        );
+      this.router.navigate(['/change-price']);
+    }
   }
 
   handlePercentageChange(event) {
@@ -601,7 +839,6 @@ export class ItemStorePriceVerifyApproveComponent {
       console.warn('Invalid percentage value.');
       return;
     }
-    // This stores the percentage but does not apply the price change until the button is clicked
     this.percentage = percentageValue;
   }
 
@@ -662,7 +899,8 @@ export class ItemStorePriceVerifyApproveComponent {
         if (selectedRow) {
           // Iterate over each selected option
           this.selectedSalePrice.forEach((selectedOption) => {
-            let originalPrice = this.oldValues[rowId][selectedOption];
+            let originalPrice = this.oldValues[rowId][selectedOption]; // Use original value
+
             // Calculate the new price without modifying the original sale price
             let processedPrice = this.isIncrease
               ? originalPrice * (1 + this.percentageString / 100)
@@ -711,12 +949,15 @@ export class ItemStorePriceVerifyApproveComponent {
         if (selectedRow) {
           // Iterate over each selected option
           this.selectedSalePrice.forEach((selectedOption) => {
-            let originalPrice = this.oldValues[selectedRowId][selectedOption];
+            let originalPrice = this.oldValues[selectedRowId][selectedOption]; // Use original value
+
+            // Calculate the new price
             let processedPrice = this.isIncrease
               ? originalPrice * (1 + this.percentageString / 100)
               : originalPrice * (1 - this.percentageString / 100);
+
             this.newPrice = this.roundValue(processedPrice); // Apply rounding
-            selectedRow[selectedOption] = this.newPrice;
+            selectedRow[selectedOption] = this.newPrice; // This updates the displayed value
           });
         } else {
           console.error(`Selected row with ID ${selectedRowId} not found.`);
@@ -730,12 +971,11 @@ export class ItemStorePriceVerifyApproveComponent {
   onPriceAdjustmentChanged(event: any) {
     this.isIncrease = event.value; // True for increase, false for decrease
 
-    // This does not apply the change yet, it only sets the mode (increase or decrease)
   }
 
   adjustPercentage(amount: number) {
     this.percentage += amount;
-    if (this.percentage < 0) this.percentage = 0;
+    if (this.percentage < 0) this.percentage = 0; // Ensure percentage doesn't go below 0
   }
 
   toggleAdjustment() {
@@ -743,7 +983,6 @@ export class ItemStorePriceVerifyApproveComponent {
   }
 
   areRowsSelected(): boolean {
-    // Replace this with your actual logic for checking selected rows
     return this.selectedRowKeys.length > 0;
   }
 }
@@ -781,4 +1020,4 @@ export class ItemStorePriceVerifyApproveComponent {
   declarations: [ItemStorePriceVerifyApproveComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemStorePriceVerifyApproveModule {}
+export class ItemStorePriceVerifyApproveModule { }

@@ -177,7 +177,7 @@ export class SalesOrderFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -202,9 +202,9 @@ export class SalesOrderFormComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();
@@ -241,16 +241,16 @@ export class SalesOrderFormComponent {
       // Map backend fields → grid fields
       const mappedDetails = Array.isArray(response.Details)
         ? response.Details.map((item: any) => ({
-            ITEM: item.BRAND_ID || 0,
-            TYPE: item.ARTICLE_TYPE || 0,
-            CATEGORY: item.CATEGORY_ID || 0,
-            ARTNO: item.ART_NO || 0,
-            COLOR: item.COLOR_ID || 0,
-            PACKING: item.PACKING_ID || 0,
-            CONTENT: item.CONTENT || '',
-            QTY: item.QUANTITY || 0,
-            ...item,
-          }))
+          ITEM: item.BRAND_ID || 0,
+          TYPE: item.ARTICLE_TYPE || 0,
+          CATEGORY: item.CATEGORY_ID || 0,
+          ARTNO: item.ART_NO || 0,
+          COLOR: item.COLOR_ID || 0,
+          PACKING: item.PACKING_ID || 0,
+          CONTENT: item.CONTENT || '',
+          QTY: item.QUANTITY || 0,
+          ...item,
+        }))
         : [];
 
       this.salesOrderFormData = {
@@ -1465,4 +1465,4 @@ export class SalesOrderFormComponent {
   exports: [SalesOrderFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalesOrderFormModule {}
+export class SalesOrderFormModule { }

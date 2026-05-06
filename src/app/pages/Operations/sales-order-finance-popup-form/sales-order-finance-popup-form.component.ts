@@ -185,7 +185,7 @@ export class SalesOrderFinancePopupFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -210,9 +210,9 @@ export class SalesOrderFinancePopupFormComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();
@@ -265,17 +265,17 @@ export class SalesOrderFinancePopupFormComponent {
       // Map backend fields → grid fields
       const mappedDetails = Array.isArray(response.Details)
         ? response.Details.map((item: any) => ({
-            ITEM_CODE: item.ITEM_CODE || 0,
-            DESCRIPTION: item.ITEM_DESCRIPTION || 0,
-            UOM: item.UOM || 0,
-            TAX_PERCENT: item.TAX_PERCENT || 0,
-            STOCK_QTY: item.QUANTITY || 0,
-            PRICE: item.PRICE || 0,
-            AMOUNT: item.AMOUNT || '',
-            TAX_AMOUNT: item.TAX_AMOUNT || 0,
-            TOTAL_AMOUNT: item.TOTAL_AMOUNT || 0,
-            ...item,
-          }))
+          ITEM_CODE: item.ITEM_CODE || 0,
+          DESCRIPTION: item.ITEM_DESCRIPTION || 0,
+          UOM: item.UOM || 0,
+          TAX_PERCENT: item.TAX_PERCENT || 0,
+          STOCK_QTY: item.QUANTITY || 0,
+          PRICE: item.PRICE || 0,
+          AMOUNT: item.AMOUNT || '',
+          TAX_AMOUNT: item.TAX_AMOUNT || 0,
+          TOTAL_AMOUNT: item.TOTAL_AMOUNT || 0,
+          ...item,
+        }))
         : [];
 
       this.salesOrderFormData = {
@@ -1269,7 +1269,7 @@ export class SalesOrderFinancePopupFormComponent {
     }
   }
 
-  applyGstModeToItems() {}
+  applyGstModeToItems() { }
 
   onAddItemClick() {
     if (!this.salesOrderFormData?.CUST_ID) {
@@ -1641,4 +1641,4 @@ export class SalesOrderFinancePopupFormComponent {
   exports: [SalesOrderFinancePopupFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalesOrderFinancePopupFormModule {}
+export class SalesOrderFinancePopupFormModule { }

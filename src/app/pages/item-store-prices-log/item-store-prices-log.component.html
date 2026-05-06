@@ -126,14 +126,15 @@
         ></i>
               
       </div>
-      <dxi-column type="buttons" [width]="150" [buttons]="allButtonsEditDelete">
-      </dxi-column>
-      <!-- <dxi-column type="buttons" width="150" [buttons]="allButtons">
-        </dxi-column> -->
+      <dxi-column
+        type="buttons"
+        [width]="200"
+        [buttons]="allButtons"
+      ></dxi-column>
     </dx-data-grid>
   </div>
-  <app-item-store-prices
+  <app-item-store-pricess
     *ngIf="isFormVisible"
     (afterSave)="getLoglist()"
-  ></app-item-store-prices>
+  ></app-item-store-pricess>
 </div>

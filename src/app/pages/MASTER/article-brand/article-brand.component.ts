@@ -143,9 +143,9 @@ export class ArticleBrandComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -427,4 +427,4 @@ export class ArticleBrandComponent {
   exports: [],
   declarations: [ArticleBrandComponent],
 })
-export class ArticleBrandModule {}
+export class ArticleBrandModule { }

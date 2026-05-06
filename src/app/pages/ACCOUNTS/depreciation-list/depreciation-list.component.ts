@@ -183,9 +183,9 @@ export class DepreciationListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.get_Depreciation_list();
@@ -245,7 +245,7 @@ export class DepreciationListComponent {
     this.EditDepreciationPopupVisible = false;
     this.get_Depreciation_list();
   }
-  Selected_Depreciation_data() {}
+  Selected_Depreciation_data() { }
   onDateRangeChanged(e: any) {
     const today = new Date();
     this.selectedDateRange = e.value;
@@ -440,6 +440,6 @@ export class DepreciationListComponent {
   declarations: [DepreciationListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DepreciationListModule {}
+export class DepreciationListModule { }
 
 // DepreciationListComponent

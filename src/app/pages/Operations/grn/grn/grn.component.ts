@@ -267,7 +267,7 @@ export class GrnComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   openGRNForm() {
     this.isGRNPopupVisible = true;
@@ -686,7 +686,7 @@ export class GrnComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
     }
@@ -748,7 +748,7 @@ export class GrnComponent implements OnInit {
 
   deleteGrnData(event: any) {
     const ID = event.data.ID;
-    this.service.deleteGrnData(ID).subscribe((response: any) => {});
+    this.service.deleteGrnData(ID).subscribe((response: any) => { });
   }
 
   formatGrnDate(rowData: any): string {
@@ -861,4 +861,4 @@ export class GrnComponent implements OnInit {
   exports: [],
   declarations: [GrnComponent],
 })
-export class GrnModule {}
+export class GrnModule { }

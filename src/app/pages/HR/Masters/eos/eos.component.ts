@@ -19,6 +19,7 @@ import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import { ExportService } from 'src/app/services/export.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-eos',
@@ -41,12 +42,19 @@ export class EOSComponent {
   isFilterRowVisible: boolean = false;
   sessionData: any;
   COMPANY_ID: any;
-
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
     private ngZone: NgZone,
     private exportService: ExportService,
+    private router: Router,
+
   ) {
     this.formsource = this.fb.group({
       CODE: ['', Validators.required],
@@ -65,6 +73,26 @@ export class EOSComponent {
   Status: boolean = false;
   Eos: any;
   isFilterOpened = false;
+
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+    }
+  }
 
   addEOS() {
     this.AddEOSPopup = true;
@@ -206,7 +234,7 @@ export class EOSComponent {
     const isDuplicate = this.EOS.some((data: any) => {
       return (
         data.DESCRIPTION?.toLowerCase().trim() ===
-          DESCRIPTION?.toLowerCase().trim() ||
+        DESCRIPTION?.toLowerCase().trim() ||
         data.CODE?.toLowerCase().trim() === CODE?.toLowerCase().trim()
       );
     });
@@ -272,9 +300,9 @@ export class EOSComponent {
 
       return (
         (item.CODE?.trim().toLowerCase() || '') ===
-          (CODE?.trim().toLowerCase() || '') ||
+        (CODE?.trim().toLowerCase() || '') ||
         (item.DESCRIPTION?.trim().toLowerCase() || '') ===
-          (DESCRIPTION?.trim().toLowerCase() || '')
+        (DESCRIPTION?.trim().toLowerCase() || '')
       );
     });
     this.formsource.reset();
@@ -338,7 +366,7 @@ export class EOSComponent {
 
   delete_EOS(event: any) {
     const ID = event.data.ID;
-    this.dataservice.Delete_EOS_Api(ID).subscribe((response: any) => {});
+    this.dataservice.Delete_EOS_Api(ID).subscribe((response: any) => { });
   }
 }
 @NgModule({
@@ -357,4 +385,4 @@ export class EOSComponent {
   exports: [],
   declarations: [EOSComponent],
 })
-export class EOSModule {}
+export class EOSModule { }

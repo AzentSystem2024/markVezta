@@ -187,9 +187,9 @@ export class PdcListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -721,7 +721,7 @@ export class PdcListComponent {
 
   handleClose() {
     this.addPDCPopupOpened = false;
-    this.editPDCPopupOpened = false; 
+    this.editPDCPopupOpened = false;
     this.get_PDC_list();
   }
 }
@@ -755,4 +755,4 @@ export class PdcListComponent {
   exports: [PdcListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PdcListModule {}
+export class PdcListModule { }

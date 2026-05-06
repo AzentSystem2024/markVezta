@@ -84,8 +84,8 @@ export class ItemBrandListComponent implements OnInit {
     private dataservice: DataService,
     private exportService: ExportService,
     private zone: NgZone,
-    private router:Router
-  ) {}
+    private router: Router
+  ) { }
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Brand-list');
@@ -224,17 +224,17 @@ export class ItemBrandListComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.showBrand();
@@ -258,20 +258,20 @@ export class ItemBrandListComponent implements OnInit {
   }
 
   validateGridBrandCode = (e: any): boolean => {
-  const value = (e.value || '').trim();
-  const currentId = e?.data?.ID; // editing row id
+    const value = (e.value || '').trim();
+    const currentId = e?.data?.ID; // editing row id
 
-  if (!value || !this.brandDataSource) return true;
+    if (!value || !this.brandDataSource) return true;
 
-  const items = this.brandDataSource?.items?.() || [];
+    const items = this.brandDataSource?.items?.() || [];
 
-  return !items.some((item: any) => {
-    return (
-      (item.CODE || '').trim() === value &&
-      item.ID !== currentId   // ignore current row while editing
-    );
-  });
-};
+    return !items.some((item: any) => {
+      return (
+        (item.CODE || '').trim() === value &&
+        item.ID !== currentId   // ignore current row while editing
+      );
+    });
+  };
 }
 @NgModule({
   imports: [
@@ -284,4 +284,4 @@ export class ItemBrandListComponent implements OnInit {
   exports: [],
   declarations: [ItemBrandListComponent],
 })
-export class ItemBrandListModule {}
+export class ItemBrandListModule { }

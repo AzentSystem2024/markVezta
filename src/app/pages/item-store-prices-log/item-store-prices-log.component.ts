@@ -69,30 +69,59 @@ export class ItemStorePricesLogComponent {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showInfo = true;
-  customButtons = [
-    // {
-    //   hint: 'Verify',
-    //   icon: 'check',
-    //   text: 'Verify',
-    //   onClick: (e) => this.onVerifyClick(e),
-    //   visible: (e) => !e.row.data.isVerified && !e.row.data.isApproved,
-    // },
+  allButtons = [
+    {
+      name: 'edit',
+      visible: (e: any) => {
+        const { isApproved, isEditable } = this.getRowState(e.row.data);
+        return this.canEdit && isEditable;
+      },
+    },
+    {
+      name: 'delete',
+      visible: (e: any) => {
+        const { isVerified, isApproved } = this.getRowState(e.row.data);
+        return this.canDelete && !isVerified && !isApproved;
+      },
+    },
+    {
+      hint: 'Verify',
+      icon: 'check',
+      text: 'Verify',
+      onClick: (e: any) => this.onVerifyClick(e),
+      visible: (e: any) => {
+        this.canVerify &&
+          (
+            e.row.data.Status === 'Open'
+          )
+
+      },
+    },
     {
       hint: 'Approve',
       icon: 'check',
       text: 'Approve',
       onClick: (e: any) => this.onApproveClick(e),
-      visible: (e: any) => e.row.data.isVerified && !e.row.data.isApproved,
+       visible: (e: any) => {
+        this.canVerify &&
+          (
+            e.row.data.Status === 'Verify'
+          )
+
+      },
     },
-  ];
-  allButtonsEditDelete = [
     {
-      name: 'edit',
-      visible: true,
-    },
-    {
-      name: 'delete',
-      visible: (e: any) => !e.row.data.isVerified && !e.row.data.isApproved,
+      hint: 'View',
+      icon: 'check',
+      text: 'View',
+      onClick: (e: any) => this.onViewClick(e),
+      visible: (e: any) =>
+        this.canView &&
+        (
+          e.row.data.Status === 'Approved' ||
+          (e.row.data.Status === 'Verified' && !this.canApprove)
+        )
+
     },
   ];
   selectWorksheetData: any;
@@ -137,6 +166,13 @@ export class ItemStorePricesLogComponent {
     `;
     },
   };
+  private getRowState(row: any) {
+    const status = (row?.Status || '')
+    const isEditable = status == 'Open';
+    const isApproved = status === 'approved';
+    const isVerified = status === 'verified' || status === 'approved';
+    return { isVerified, isApproved, isEditable };
+  }
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -151,11 +187,12 @@ export class ItemStorePricesLogComponent {
   canApprove = false;
   canPrint = false;
   isFilterOpened = false;
+  canVerify = false;
   constructor(
     private dataservice: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -174,9 +211,10 @@ export class ItemStorePricesLogComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.router.events
@@ -186,7 +224,6 @@ export class ItemStorePricesLogComponent {
           this.getLoglist();
         }
       });
-    this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.dateFormat = sessionStorage.getItem('dateFormat');
     this.currencyFormt = sessionStorage.getItem('currencyFormat');
     this.getLoglist();
@@ -315,14 +352,24 @@ export class ItemStorePricesLogComponent {
     this.listItemsByMultipleStoreIds();
   }
   onApproveClick(e: any) {
-    if (this.AllowCommitWithSave) {
-      const rowData = e.row.data; // Access the row data
-      const worksheetId = rowData?.ID;
-      if (worksheetId) {
-        this.approveWorksheetById(worksheetId);
-      } else {
-        console.warn('Worksheet ID is invalid.');
-      }
+    console.log('Approve button clicked for row:', e.row.data);
+    const rowData = e.row.data; // Access the row data
+    const worksheetId = rowData?.ID;
+    if (worksheetId) {
+      this.approveWorksheetById(worksheetId);
+    } else {
+      console.warn('Worksheet ID is invalid.');
+    }
+
+  }
+  onViewClick(e: any) {
+    console.log('View button clicked for row:', e.row.data);
+    const rowData = e.row.data; // Access the row data
+    const worksheetId = rowData?.ID;
+    if (worksheetId) {
+      this.goToView(worksheetId);
+    } else {
+      console.warn('Worksheet ID is invalid.');
     }
   }
 
@@ -345,7 +392,7 @@ export class ItemStorePricesLogComponent {
         if (this.status == 'Approved') {
           this.goToView(worksheetId);
         }
-        this.router.navigate(['/item-store-prices-approve'], {
+        this.router.navigate(['/item-store-price-approve'], {
           state: {
             worksheetData: this.selectedWorksheetData,
           },
@@ -419,21 +466,21 @@ export class ItemStorePricesLogComponent {
           );
         }
       },
-      (error) => {},
+      (error) => { },
     );
   }
 
   onVerifyClick(e: any) {
-    if (this.AllowCommitWithSave) {
-      const rowData = e.row.data; // Access the row data
-      e.row.data.isVerified = true;
-      const worksheetId = rowData?.ID;
-      if (worksheetId) {
-        this.verifyWorksheetById(worksheetId, e);
-      } else {
-        console.warn('Worksheet ID is invalid.');
-      }
+    console.log('verify button clicked for row:', e.row.data);
+    const rowData = e.row.data; // Access the row data
+    e.row.data.isVerified = true;
+    const worksheetId = rowData?.ID;
+    if (worksheetId) {
+      this.verifyWorksheetById(worksheetId, e);
+    } else {
+      console.warn('Worksheet ID is invalid.');
     }
+
   }
 
   verifyWorksheetById(worksheetId: number, e: any) {
@@ -445,25 +492,11 @@ export class ItemStorePricesLogComponent {
     this.dataservice.selectWorksheetForPrice(worksheetId).subscribe(
       (response) => {
         const selectedWorksheetData = response;
-
-        // if (
-        //   response.worksheet_item_price &&
-        //   response.worksheet_item_price.length > 0
-        // ) {
-        //   response.worksheet_item_price.forEach((item: any) => {
-        //     item.SALE_PRICE = item.PRICE_NEW;
-        //     item.SALE_PRICE1 = item.PRICE_LEVEL1_NEW; // Optional, if needed
-        //     item.SALE_PRICE2 = item.PRICE_LEVEL2_NEW; // Optional, if needed
-        //     item.SALE_PRICE3 = item.PRICE_LEVEL3_NEW; // Optional, if needed
-        //     item.SALE_PRICE4 = item.PRICE_LEVEL4_NEW; // Optional, if needed
-        //     item.SALE_PRICE5 = item.PRICE_LEVEL5_NEW; // Optional, if needed
-        //   });
-        // }
         this.selectedWorksheetData = response;
 
         this.dataservice.setWorksheetData(this.selectedWorksheetData);
 
-        this.router.navigate(['/item-store-prices-verify-approve'], {
+        this.router.navigate(['/item-store-prices-verify'], {
           state: {
             worksheetData: this.selectedWorksheetData,
             status: status,
@@ -478,6 +511,32 @@ export class ItemStorePricesLogComponent {
     );
   }
 
+  onEditClick(worksheetId: number, e: any) {
+    if (!worksheetId) {
+      console.warn('Invalid worksheet ID');
+      return;
+    }
+
+    this.dataservice.selectWorksheetForPrice(worksheetId).subscribe(
+      (response) => {
+        const selectedWorksheetData = response;
+        this.selectedWorksheetData = response;
+        const status = response.Status;
+
+        this.dataservice.setWorksheetData(this.selectedWorksheetData);
+        this.router.navigate(['/change-price-edit'], {
+          state: {
+            worksheetData: this.selectedWorksheetData,
+            status: status,
+          },
+        });
+        this.verifyItemStore(selectedWorksheetData, e);
+      },
+      (error) => {
+        console.error('Error fetching worksheet for verification:', error);
+      },
+    );
+  }
   verifyItemStore(selectedWorksheetData: any, e: any) {
     if (!selectedWorksheetData || !selectedWorksheetData.worksheet_item_price) {
       console.error('Selected worksheet data is missing required properties.');
@@ -521,7 +580,7 @@ export class ItemStorePricesLogComponent {
     };
   }
 
-  onSelectionChanged(event: any) {}
+  onSelectionChanged(event: any) { }
   openEditingStart(event: any) {
     event.cancel = true; // Prevent the default editing action
     const selectedId = event.data.ID; // Get the selected row ID
@@ -589,7 +648,7 @@ export class ItemStorePricesLogComponent {
   refreshItems() {
     this.getLoglist();
   }
-  onCellPrepared(event: any) {}
+  onCellPrepared(event: any) { }
 }
 @NgModule({
   imports: [
@@ -622,4 +681,4 @@ export class ItemStorePricesLogComponent {
   declarations: [ItemStorePricesLogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemStorePricesLogModule {}
+export class ItemStorePricesLogModule { }

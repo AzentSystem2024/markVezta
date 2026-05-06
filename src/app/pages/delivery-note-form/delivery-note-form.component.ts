@@ -152,7 +152,7 @@ export class DeliveryNoteFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.sessionData_tax();
@@ -178,9 +178,9 @@ export class DeliveryNoteFormComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();
@@ -253,7 +253,7 @@ export class DeliveryNoteFormComponent {
     this.updateTotalQty();
   }
 
-  reindexDetails() {}
+  reindexDetails() { }
 
   onInitNewRow(e: any) {
     // Prevent auto-adding empty row
@@ -464,7 +464,7 @@ export class DeliveryNoteFormComponent {
     }
   }
 
-  onAddItems() {}
+  onAddItems() { }
 
   validateQtyReceived = (e: any) => {
     const issued = e.data?.QUANTITY_ISSUED || 0;
@@ -503,7 +503,7 @@ export class DeliveryNoteFormComponent {
     );
   }
 
-  handleClose() {}
+  handleClose() { }
 
   cancel() {
     this.popupClosed.emit();
@@ -536,10 +536,8 @@ export class DeliveryNoteFormComponent {
       }
       if (item.DELIVERED_QUANTITY > item.QUANTITY) {
         notify(
-          `Row ${
-            index + 1
-          }: Delivered Quantity cannot exceed Ordered Quantity (${
-            item.QUANTITY
+          `Row ${index + 1
+          }: Delivered Quantity cannot exceed Ordered Quantity (${item.QUANTITY
           }).`,
         );
         isValid = false;
@@ -1069,4 +1067,4 @@ function numberToWordsIndianNumber(num: number) {
   exports: [DeliveryNoteFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFormModule {}
+export class DeliveryNoteFormModule { }

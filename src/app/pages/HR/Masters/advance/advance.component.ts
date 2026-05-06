@@ -506,15 +506,15 @@ export class AdvanceComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/salary-advance');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.get_Employee_dropdown();
@@ -1078,4 +1078,4 @@ export class AdvanceComponent {
   declarations: [AdvanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AdvanceModule {}
+export class AdvanceModule { }

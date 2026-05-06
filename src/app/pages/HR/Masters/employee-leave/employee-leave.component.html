@@ -99,6 +99,7 @@
 
         <!-- Add -->
         <dxi-item
+          *ngIf="canAdd"
           location="after"
           widget="dxButton"
           [options]="addButtonOptions"
@@ -588,7 +589,7 @@
   [width]="550"
   height="530px"
   [showApprove]="false"
-    [saveButtonText]="'Approve'"
+  [saveButtonText]="'Approve'"
   (save)="Approve_Data()"
 >
   <dx-form id="form">

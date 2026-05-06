@@ -117,7 +117,7 @@ export class VatClassListComponent {
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'VAT_class-list');
   }
@@ -148,17 +148,17 @@ export class VatClassListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
-    
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
+
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.subType = userData?.Configuration?.[0]?.SUB_TYPE_ID || 0;
@@ -345,4 +345,4 @@ export class VatClassListComponent {
   exports: [],
   declarations: [VatClassListComponent],
 })
-export class VatClassListModule {}
+export class VatClassListModule { }
