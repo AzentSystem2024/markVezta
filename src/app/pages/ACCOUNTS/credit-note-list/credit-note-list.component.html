@@ -170,7 +170,10 @@
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddCreditNote">
-    <app-add-credit-note (popupClosed)="handleClose()"></app-add-credit-note>
+    <app-add-credit-note
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+    ></app-add-credit-note>
   </ng-container>
 </dx-popup>
 
@@ -199,6 +202,7 @@
     <app-edit-credit-note
       [creditFormData]="selectedCreditNoteForEdit"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-edit-credit-note>
   </ng-container>
 </dx-popup>

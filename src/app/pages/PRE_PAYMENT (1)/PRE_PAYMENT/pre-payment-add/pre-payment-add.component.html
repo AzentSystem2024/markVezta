@@ -253,6 +253,7 @@
       ></dx-number-box>
     </div>
     <div
+    *ngIf="canApprove"
       style="
         margin: 4px 0 8px 0;
         display: flex;
@@ -260,6 +261,7 @@
         justify-content: flex-end;
         gap: 10px;
       "
+      
     >
       <dx-check-box
         text="Approve"

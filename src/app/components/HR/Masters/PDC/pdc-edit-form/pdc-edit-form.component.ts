@@ -43,7 +43,7 @@ export class PdcEditFormComponent {
   @Input() selectedPDC: any;
   @Input() isReadOnly: boolean = false;
   @Input() PDCid: any;
-
+   @Input() canApprove :boolean = false;
   isPdfPopupVisible: boolean = false;
   pdfSrc: SafeResourceUrl | null = null;
 

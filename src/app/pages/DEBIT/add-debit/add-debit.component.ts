@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   Output,
   ViewChild,
@@ -69,6 +70,7 @@ export class AddDebitComponent {
   @ViewChild('saveButtonRef', { static: false }) saveButtonRef!: any;
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;

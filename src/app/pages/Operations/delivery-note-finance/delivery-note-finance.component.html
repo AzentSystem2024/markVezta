@@ -243,6 +243,7 @@
   <ng-container *ngIf="isAddDelivery">
     <app-delivery-note-form-finance
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-delivery-note-form-finance>
   </ng-container>
 </dx-popup>
@@ -260,6 +261,7 @@
       [EditingResponseData]="selectedDelivery"
       [isReadOnlyMode]="isReadOnlyDelivery"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-delivery-note-form-finance>
   </ng-container>
 </dx-popup>

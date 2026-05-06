@@ -39,6 +39,7 @@ export class PrepaymentPostingEditComponent {
   @Input() selecteprepaymentData: any = {};
   @Output() popupClosed = new EventEmitter<void>();
   @Input() prepaymentpostingId: any;
+  @Input() canApprove: boolean = false;
   selectedMonthYear: string | number | Date;
   PrepaymentList: any;
   PREPAY_DETAIL: any;

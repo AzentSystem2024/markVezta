@@ -173,8 +173,8 @@ export class QuotationComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/quotation');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -655,4 +655,4 @@ export class QuotationComponent {
   exports: [QuotationComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class QuotationModule { }
+export class QuotationModule {}

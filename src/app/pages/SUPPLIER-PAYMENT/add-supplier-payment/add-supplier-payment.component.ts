@@ -2,6 +2,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   NgZone,
   Output,
@@ -59,6 +60,7 @@ export class AddSupplierPaymentComponent {
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];

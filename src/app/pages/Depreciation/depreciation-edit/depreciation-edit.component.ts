@@ -49,6 +49,7 @@ export class DepreciationEditComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() SelectDepreciationData: any = {};
   @Input() DepreciationId: any;
+  @Input() canApprove : boolean = false;
   depreciationDate: any;
   approveValue: boolean = false;
   DepreciationPayload: any = {

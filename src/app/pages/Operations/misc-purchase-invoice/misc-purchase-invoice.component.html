@@ -37,8 +37,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
         [enabled]="true"
@@ -183,6 +183,7 @@
   <app-misc-purch-invoice-form
     [isEditing]="false"
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
   ></app-misc-purch-invoice-form>
   <!-- </ng-container> -->
 </dx-popup>

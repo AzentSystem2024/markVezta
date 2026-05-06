@@ -44,6 +44,7 @@ import {
 import { ImportItemTemplateFormComponent } from 'src/app/components/library/import-item-template-form/import-item-template-form.component';
 import DataSource from 'devextreme/data/data_source';
 import { DxLoadPanelModule } from 'devextreme-angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-import-chart-of-accounts',
@@ -155,10 +156,18 @@ export class ImportChartOfAccountsComponent {
   importedAccounts: any[] = [];
   isDetailsLoading = false;
 
+   canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+
   constructor(
     private service: DataService,
     private cd: ChangeDetectorRef,
     private ngZone: NgZone,
+    private router: Router,
   ) {}
 
   toggleFilters() {
@@ -386,7 +395,28 @@ export class ImportChartOfAccountsComponent {
   }
 
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData.SELECTED_COMPANY;
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanEdit;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+    }
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;

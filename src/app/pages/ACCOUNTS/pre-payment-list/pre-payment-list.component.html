@@ -157,6 +157,7 @@
       <app-pre-payment-add
         [isOpen]="addPrepaymentPopupOpened"
         (formClosed)="handleClose()"
+        [canApprove]="canApprove"
       ></app-pre-payment-add>
     </dx-popup>
   </div>
@@ -174,6 +175,7 @@
     [isOpen]="editPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"
     (formClosed)="handleClose()"
+    [canApprove]="canApprove"
     [PrepaymentId]="selectprepayment"
   ></app-pre-payment-edit>
 </dx-popup>

@@ -312,18 +312,22 @@
 
         <div class="form-popup-buttons-container">
           <div class="approve-container">
-            <dx-check-box
-              [value]="isReadOnlyMode ? true : salesReturnFormData.IS_APPROVED"
-              (valueChange)="
-                !isReadOnlyMode
-                  ? (salesReturnFormData.IS_APPROVED = $event)
-                  : null
-              "
-              [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
-              [readOnly]="isReadOnlyMode"
-              stylingMode="outlined"
-            >
-            </dx-check-box>
+            <div class="approve-container" *ngIf="canApprove">
+              <dx-check-box
+                [value]="
+                  isReadOnlyMode ? true : salesReturnFormData.IS_APPROVED
+                "
+                (valueChange)="
+                  !isReadOnlyMode
+                    ? (salesReturnFormData.IS_APPROVED = $event)
+                    : null
+                "
+                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                [readOnly]="isReadOnlyMode"
+                stylingMode="outlined"
+              >
+              </dx-check-box>
+            </div>
           </div>
           <div class="popup-footer">
             <dx-button

@@ -188,6 +188,7 @@
   <ng-container *ngIf="isAddSalesOrder">
     <app-sales-order-finance-popup-form
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-sales-order-finance-popup-form>
   </ng-container>
 </dx-popup>
@@ -206,6 +207,7 @@
       [EditingResponseData]="selectedSalesOrder"
       [isReadOnlyMode]="isReadOnlySalesOrder"
       (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
     ></app-sales-order-finance-popup-form>
   </ng-container>
 </dx-popup>

@@ -50,6 +50,7 @@ export class PrePaymentEditComponent {
   @Input() selectedPrePayment: any;
   @Input() isReadOnly: boolean = false;
   @Input() PrepaymentId: any;
+  @Input() canApprove: boolean = false;
 
   selectedRows: any[] = [];
   ExpenseAmountDetails: any[] = [];

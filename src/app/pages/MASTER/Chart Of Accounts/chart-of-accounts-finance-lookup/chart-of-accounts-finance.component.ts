@@ -136,7 +136,7 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
 
   ngOnInit() {
     const currentUrl = this.router.url;
-    console.log(currentUrl)
+    console.log(currentUrl);
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -144,7 +144,7 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/chart-of-accounts-finance');
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

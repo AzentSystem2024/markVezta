@@ -710,7 +710,7 @@ export class TransferOutInventoryAddComponent {
       'Apr',
       'May',
       'Jun',
-      'Jul',
+      'Jul',  
       'Aug',
       'Sep',
       'Oct',
@@ -732,320 +732,141 @@ export class TransferOutInventoryAddComponent {
       });
   }
 
-  generatePDF(data: any) {
-    console.log(data, 'DATA');
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
+  getBase64ImageFromURL(url: string): Promise<string> {
+  return fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    });
+}
 
-    // ============================================================
-    // 1) TOP HEADER (LOGO + RIGHT DETAILS)
-    // ============================================================
-    const headerY = 12;
+ async  generatePDF(data: any) {
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-    const logoX = 18;
-    const logoY = headerY;
-    const logoW = 55;
-    const logoH = 22;
+  // ============================================================
+  // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
+  // ============================================================
 
-    doc.setFillColor(225, 225, 225);
-    doc.rect(logoX, logoY, logoW, logoH, 'F');
+  const headerY = 10;
 
-    doc.setFontSize(11);
-    doc.text('logo', logoX + logoW / 2, logoY + logoH / 2 + 3, {
-      align: 'center',
+  // --- Logo placeholder (replace with addImage if needed)
+  const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
+
+  doc.addImage(logoBase64, 'PNG', 15, headerY, 35, 50);
+
+  // --- Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('TRANSFER OUT', pageWidth / 2, headerY + 25, {
+    align: 'center',
+  });
+
+ // ============================================================
+  // 2) RIGHT SIDE DETAILS (FIXED - WRAPPING ADDED)
+  // ============================================================
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-GB');
+  };
+
+  const rightDetails = [
+    `ISSUE DATE: ${formatDate(data.TRANSFER_DATE)}`,
+    `TRANSFER NO: ${data.DOC_NO}`,
+    `TRANSFER FROM: ${data.COMPANY_NAME}`,
+    `TRANSFER TO: ${data.STORE_CODE}`,
+    `REASON: ${data.REASON_ID || ''}`,
+    `NARRATION: ${data.NARRATION || ''}`,
+  ];
+
+  const rightMargin = 20;   // distance from right edge
+  const maxWidth = 70;      // width of text block
+
+  let y = headerY + 5;
+
+  rightDetails.forEach((line) => {
+    //  wrap long text داخل عرض محدد
+    const wrappedText = doc.splitTextToSize(line, maxWidth);
+
+    //  draw aligned to right
+    doc.text(wrappedText, pageWidth - rightMargin, y, {
+      align: 'right',
     });
 
-    const purchDate = (data.TRANSFER_DATE || '').split('T')[0];
-    const headerBlockX = pageWidth - 65;
-    let ty = headerY + 4;
+    //  dynamic spacing
+    y += wrappedText.length * 6;
+  });
 
-    const headerLines = [
-      `Debit Note No : ${data.TRANSFER_NO}`,
-      `e-Way Bill No :`,
-      `Original Invoice No. & Date:`,
-      `Dated : ${this.formatDateDDMMMyyyy(purchDate)}`,
-    ];
+  // ============================================================
+  // 2) TABLE
+  // ============================================================
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+  const tableStartY = y + 10;
 
-    headerLines.forEach((txt) => {
-      doc.text(txt, headerBlockX, ty);
-      ty += 6;
-    });
+  const rows = data.DETAILS.map((item: any, index: number) => [
+    index + 1,
+    item.BARCODE,
+    item.DESCRIPTION,
+    item.UOM,
+    Number(item.QUANTITY_AVAILABLE || 0).toFixed(2),
+    Number(item.QUANTITY || 0).toFixed(2),
+  ]);
 
-    const lineY = logoY + logoH + 3;
-    doc.setDrawColor(180);
-    doc.line(15, lineY, pageWidth - 15, lineY);
+  autoTable(doc, {
+    startY: tableStartY,
+    theme: 'grid',
+    margin: { left: 15, right: 15 },
+    styles: {
+      fontSize: 9,
+      cellPadding: 2,
+    },
 
-    // ============================================================
-    // 2) COMPANY BLOCK (LEFT BLUE BOX)
-    // ============================================================
-    const compBoxX = 15;
-    const compBoxY = lineY + 3;
-    const compBoxW = 95;
+    headStyles: {
+      fillColor: [200, 210, 220],
+      textColor: 0,
+      halign: 'center',
+      fontStyle: 'bold',
+    },
 
-    const companyLines = [
-      data.COMPANY_NAME,
-      data.ADDRESS1,
-      data.ADDRESS2,
-      data.ADDRESS3,
-      `GSTIN/UIN : ${data.COMPANY_CODE}`,
-      `State Name : ${data.STORE_STATE_NAME}, Code : 32`,
-      `Email : ${data.EMAIL}`,
-    ];
+    columnStyles: {
+      0: { cellWidth: 12, halign: 'center' },
+      1: { cellWidth: 35 },
+      2: { cellWidth: 60 },
+      3: { cellWidth: 20, halign: 'center' },
+      4: { cellWidth: 30, halign: 'right' },
+      5: { cellWidth: 30, halign: 'right' },
+    },
 
-    const lineHeight = 5;
-    const topPadding = 8;
-    const compBoxH = topPadding + companyLines.length * lineHeight + 4;
-
-    doc.setFillColor(210, 230, 255);
-    doc.rect(compBoxX, compBoxY, compBoxW, compBoxH, 'F');
-
-    let cy = compBoxY + 8;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text(data.COMPANY_NAME || '', compBoxX + 5, cy);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-
-    companyLines.slice(1).forEach((line) => {
-      cy += lineHeight;
-      if (line.startsWith('Email')) doc.setTextColor(0, 0, 255);
-      doc.text(line || '', compBoxX + 5, cy);
-      doc.setTextColor(0, 0, 0);
-    });
-
-    // ============================================================
-    // 2.1 EXTRA INFO BLOCK (LEFT-SIDE COLUMN ONLY)
-    // ============================================================
-    const infoX = compBoxX;
-    const infoBlockY = compBoxY + compBoxH + 5;
-
-    const infoW = compBoxW; // keeps it left-side only
-    const rowH = 8;
-    const totalRows = 9;
-    const infoH = totalRows * rowH;
-
-    doc.setDrawColor(0);
-    doc.rect(infoX, infoBlockY, infoW, infoH);
-
-    const splitX = infoX + infoW / 2;
-    doc.line(splitX, infoBlockY, splitX, infoBlockY + infoH);
-
-    for (let i = 1; i < totalRows; i++) {
-      doc.line(
-        infoX,
-        infoBlockY + rowH * i,
-        infoX + infoW,
-        infoBlockY + rowH * i,
-      );
-    }
-
-    const leftLabels = [
-      'Invoice No.',
-      'Delivery Note',
-      'Reference No. & Date.',
-      "Buyer's Order No.",
-      'Dispatch Doc No.',
-      'Dispatched through',
-      '',
-      'Terms of Delivery',
-    ];
-
-    const rightLabels = [
-      'Dated',
-      'Mode/Terms of Payment',
-      'Other References',
-      'Dated',
-      'Delivery Note Date',
-      'Destination',
-      '',
-      '',
-    ];
-
-    let textY = infoBlockY + 6;
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-
-    leftLabels.forEach((line, i) => {
-      doc.text(line, infoX + 3, textY + i * rowH);
-    });
-
-    rightLabels.forEach((line, i) => {
-      doc.text(line, splitX + 3, textY + i * rowH);
-    });
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(data.TRANSFER_NO?.toString() || '', infoX + 35, textY);
-    doc.text(this.formatDateDDMMMyyyy(purchDate), splitX + 20, textY);
-
-    // ============================================================
-    // 3) CONSIGNEE (SHIP TO) — RIGHT COLUMN
-    // ============================================================
-    let shipX = compBoxX + compBoxW + 15;
-    let shipY = compBoxY + 8; // <-- move upwards next to company block
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('Consignee (Ship to)', shipX, shipY);
-
-    shipY += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-
-    const shipLines = [
-      data.STORE_NAME,
-      data.STORE_ADDRESS1,
-      data.STORE_ADDRESS2,
-      `${data.STORE_CITY} - ${data.STORE_ZIP}`,
-      `GSTIN/UIN : ${data.STORE_CODE}`,
-      `State Name : ${data.STORE_STATE_NAME}, Code : 32`,
-    ];
-
-    shipLines.forEach((l) => {
-      doc.text(l || '', shipX, shipY);
-      shipY += 5;
-    });
-
-    // ============================================================
-    // 4) BUYER (BILL TO) — RIGHT COLUMN BELOW SHIP TO
-    // ============================================================
-    let buyerX = shipX;
-    let buyerY = shipY + shipLines.length * 5 + 12;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('Buyer (Bill to)', buyerX, buyerY);
-
-    buyerY += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-
-    const buyerLines = [...shipLines];
-
-    buyerLines.forEach((l) => {
-      doc.text(l || '', buyerX, buyerY);
-      buyerY += 5;
-    });
-
-    // ============================================================
-    // 5) TABLE
-    // ============================================================
-    const tableLineY = buyerY + 2;
-    doc.setDrawColor(180);
-    doc.line(15, tableLineY, pageWidth - 15, tableLineY);
-
-    const tableStartY = tableLineY + 4;
-
-    const rows = data.DETAILS.map((item: any, index: number) => [
-      index + 1,
-      item.BARCODE,
-      item.DESCRIPTION,
-      item.COST.toFixed(2),
-      item.QUANTITY,
-      item.QUANTITY_AVAILABLE,
-    ]);
-
-    autoTable(doc, {
-      startY: tableStartY,
-      theme: 'grid',
-      margin: { left: 15, right: 15 },
-      tableWidth: pageWidth - 30,
-      headStyles: {
-        fillColor: [240, 240, 240],
-        textColor: 0,
-        fontSize: 9,
-        halign: 'center',
-      },
-      bodyStyles: { fontSize: 9 },
-      columnStyles: {
-        0: { cellWidth: 12, halign: 'center' },
-        1: { cellWidth: 38, halign: 'center' },
-        2: { cellWidth: 70 },
-        3: { cellWidth: 20, halign: 'right' },
-        4: { cellWidth: 20, halign: 'center' },
-        5: { cellWidth: 20, halign: 'center' },
-      },
-      head: [
-        [
-          'Sl No',
-          'Barcode',
-          'Description of goods',
-          'Cost',
-          'Quantity',
-          'Quantity Available',
-        ],
+    head: [
+      [
+        'Sl No',
+        'Barcode',
+        'Description',
+        'UOM',
+        'QTY Available',
+        'QTY Issued',
       ],
-      body: rows,
-      foot: [
-        [
-          {
-            content: 'Total',
-            colSpan: 5,
-            styles: { halign: 'right', fontStyle: 'bold' },
-          },
-          {
-            content: data.NET_AMOUNT.toFixed(2),
-            styles: { halign: 'right', fontStyle: 'bold' },
-          },
-        ],
-      ],
-    });
+    ],
 
-    // ============================================================
-    // 6) FOOTER + SIGNATURE
-    // ============================================================
-    const footerY = (doc as any).lastAutoTable.finalY + 10;
-    const leftColX = 15;
-    const rightColX = pageWidth / 2 + 10;
+    body: rows,
+  });
 
-    doc.setFontSize(9);
-    doc.text('E. & O.E', leftColX, footerY);
-    doc.text(`User: ${data.USER_NAME || ''}`, leftColX, footerY + 5);
+  // ============================================================
+  // 3) OPEN PDF
+  // ============================================================
 
-    doc.text("Company's PAN", leftColX, footerY + 10);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`: ${data.PAN_NO || ''}`, leftColX + 40, footerY + 10);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.text('Amount Chargeable (in words)', rightColX, footerY);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(
-      `INR ${this.convertNumberToWords(data.NET_AMOUNT)} Only`,
-      rightColX,
-      footerY + 6,
-    );
-
-    const boxY = footerY + 15;
-    const boxWidth = pageWidth - rightColX - 15;
-    const boxHeight = 25;
-
-    doc.setDrawColor(0);
-    doc.rect(rightColX, boxY, boxWidth, boxHeight);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    const companyText = `for ${data.COMPANY_NAME}`;
-    const wrappedCompanyName = doc.splitTextToSize(companyText, boxWidth - 10);
-
-    doc.text(wrappedCompanyName, rightColX + 5, boxY + 10);
-
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(10);
-    doc.text(
-      'Authorised Signatory',
-      rightColX + boxWidth - 45,
-      boxY + boxHeight - 6,
-    );
-
-    doc.output('dataurlnewwindow');
-  }
+  doc.output('dataurlnewwindow');
+}
 
   convertNumberToWords(num: number): string {
     if (num === 0) return 'Zero';

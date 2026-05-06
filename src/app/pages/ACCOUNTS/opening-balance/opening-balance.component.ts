@@ -164,7 +164,7 @@ export class OpeningBalanceComponent {
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/opening-balance');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;

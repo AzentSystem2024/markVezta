@@ -350,10 +350,12 @@
 </dx-validation-group>
 
 <div class="form-popup-buttons-container">
-  <dx-check-box
-    text="Approve"
-    [(value)]="paymentFormData.IS_APPROVED"
-  ></dx-check-box>
+  <div class="approve-container" *ngIf="canApprove">
+    <dx-check-box
+      text="Approve"
+      [(value)]="paymentFormData.IS_APPROVED"
+    ></dx-check-box>
+  </div>
   <div class="popup-footer">
     <dx-button
       text="Cancel"

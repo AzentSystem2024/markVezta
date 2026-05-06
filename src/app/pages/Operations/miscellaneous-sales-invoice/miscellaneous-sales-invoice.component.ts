@@ -46,15 +46,12 @@ import DataSource from 'devextreme/data/data_source';
 import { MiscPurchInvoiceFormModule } from '../misc-purch-invoice-form/misc-purch-invoice-form.component';
 import { MiscellaneousSalesInvoiceFormModule } from '../miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 
-
 @Component({
   selector: 'app-miscellaneous-sales-invoice',
   templateUrl: './miscellaneous-sales-invoice.component.html',
-  styleUrls: ['./miscellaneous-sales-invoice.component.scss']
+  styleUrls: ['./miscellaneous-sales-invoice.component.scss'],
 })
 export class MiscellaneousSalesInvoiceComponent {
-
-
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: any = DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -155,7 +152,7 @@ export class MiscellaneousSalesInvoiceComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -171,13 +168,13 @@ export class MiscellaneousSalesInvoiceComponent {
     console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/invoice');
+      .find((menu: any) => menu.Path === currentUrl);
     console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanPrint;
+      this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
@@ -632,4 +629,4 @@ export class MiscellaneousSalesInvoiceComponent {
   exports: [MiscellaneousSalesInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class MiscellaneousSalesInvoiceModule { }
+export class MiscellaneousSalesInvoiceModule {}

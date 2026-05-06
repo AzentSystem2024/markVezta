@@ -62,7 +62,7 @@ export class PurchaseReturnDebitComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;

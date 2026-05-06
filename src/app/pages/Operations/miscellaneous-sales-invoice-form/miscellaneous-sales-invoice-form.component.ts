@@ -44,14 +44,12 @@ import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
 import notify from 'devextreme/ui/notify';
 
-
 @Component({
   selector: 'app-miscellaneous-sales-invoice-form',
   templateUrl: './miscellaneous-sales-invoice-form.component.html',
-  styleUrls: ['./miscellaneous-sales-invoice-form.component.scss']
+  styleUrls: ['./miscellaneous-sales-invoice-form.component.scss'],
 })
 export class MiscellaneousSalesInvoiceFormComponent {
-
   @ViewChild('popupGridRef', { static: false }) popupGridRef: any;
   @ViewChild('itemsGridRef', { static: false })
   itemsGridRef!: DxDataGridComponent;
@@ -59,6 +57,7 @@ export class MiscellaneousSalesInvoiceFormComponent {
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -90,16 +89,15 @@ export class MiscellaneousSalesInvoiceFormComponent {
     Details: [
       {
         SL_NO: 1,
-        
+
         REMARKS: '',
         ledgerCode: null,
         ledgerName: '',
         HEAD_ID: null,
-         GST_PERC: 0,
-        Amount : 0,
+        GST_PERC: 0,
+        Amount: 0,
         gstAmount: 0,
         TOTAL: 0,
-        
       },
     ],
   };
@@ -121,19 +119,19 @@ export class MiscellaneousSalesInvoiceFormComponent {
 
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
-  if (this.isEditing && this.EditingResponseData) {
-    this.waitAndBind();
-}
+    if (this.isEditing && this.EditingResponseData) {
+      this.waitAndBind();
+    }
   }
 
   waitAndBind() {
-  if (!this.ledgerList || this.ledgerList.length === 0) {
-    setTimeout(() => this.waitAndBind(), 100);
-    return;
-  }
+    if (!this.ledgerList || this.ledgerList.length === 0) {
+      setTimeout(() => this.waitAndBind(), 100);
+      return;
+    }
 
-  this.isEditDataAvailable();
-}
+    this.isEditDataAvailable();
+  }
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -201,239 +199,237 @@ export class MiscellaneousSalesInvoiceFormComponent {
     });
   }
 
-  onCancel(){
-     this.popupClosed.emit();
+  onCancel() {
+    this.popupClosed.emit();
   }
 
   onEditorPreparing(e: any) {
-  if (
-    e.dataField === 'ledgerCode' ||
-    e.dataField === 'ledgerName' ||
-    e.dataField === 'particulars' ||
-    e.dataField === 'Amount' ||
-    e.dataField === 'GST_PERC' ||
-    e.dataField === 'gstAmount'
-  ) {
-    e.editorOptions = e.editorOptions || {};
+    if (
+      e.dataField === 'ledgerCode' ||
+      e.dataField === 'ledgerName' ||
+      e.dataField === 'particulars' ||
+      e.dataField === 'Amount' ||
+      e.dataField === 'GST_PERC' ||
+      e.dataField === 'gstAmount'
+    ) {
+      e.editorOptions = e.editorOptions || {};
 
-    e.editorOptions.elementAttr = {
-      style: `
+      e.editorOptions.elementAttr = {
+        style: `
         height: 100%;
         margin: 0;
         padding: 0;
         display: flex;
         align-items: center;
       `,
-    };
+      };
 
-    e.editorOptions.inputAttr = {
-      style: `
+      e.editorOptions.inputAttr = {
+        style: `
         height: 100%;
         padding: 0 4px;
         box-sizing: border-box;
       `,
-    };
+      };
 
-    if (e.editorName === 'dxNumberBox') {
-      e.editorOptions.showSpinButtons = false;
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+    }
+
+    if (e.parentType !== 'dataRow') return;
+
+    const rowIndex = e.row?.rowIndex;
+    const grid = this.itemsGridRef?.instance;
+
+    // =========================
+    // ✅ LEDGER CODE
+    // =========================
+    if (e.dataField === 'ledgerCode') {
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => args.component.open(), 0);
+      };
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedLedger = this.ledgerList.find(
+          (item: any) => item.HEAD_CODE === args.value,
+        );
+
+        e.setValue(args.value);
+
+        if (selectedLedger) {
+          // ✅ UI update
+          grid.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
+          grid.cellValue(rowIndex, 'HEAD_ID', selectedLedger.HEAD_ID);
+
+          // ✅ DATA SOURCE update (CRITICAL FIX)
+          const rowData = this.invoiceFormData.Details[rowIndex];
+          rowData.ledgerCode = selectedLedger.HEAD_CODE;
+          rowData.ledgerName = selectedLedger.HEAD_NAME;
+          rowData.HEAD_ID = selectedLedger.HEAD_ID;
+
+          // Move focus
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'ledgerName');
+          }, 50);
+        }
+      };
+    }
+
+    // =========================
+    // ✅ LEDGER NAME
+    // =========================
+    if (e.dataField === 'ledgerName') {
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => args.component.open(), 0);
+      };
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        const selectedLedger = this.ledgerList.find(
+          (item: any) => item.HEAD_NAME === args.value,
+        );
+
+        e.setValue(args.value);
+
+        if (selectedLedger) {
+          // ✅ UI update
+          grid.cellValue(rowIndex, 'ledgerCode', selectedLedger.HEAD_CODE);
+          grid.cellValue(rowIndex, 'HEAD_ID', selectedLedger.HEAD_ID);
+
+          // ✅ DATA SOURCE update
+          const rowData = this.invoiceFormData.Details[rowIndex];
+          rowData.ledgerCode = selectedLedger.HEAD_CODE;
+          rowData.ledgerName = selectedLedger.HEAD_NAME;
+          rowData.HEAD_ID = selectedLedger.HEAD_ID;
+
+          // Move focus
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'particulars');
+          }, 50);
+        }
+      };
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'particulars');
+          }, 50);
+        }
+      };
+    }
+
+    // =========================
+    // ✅ PARTICULARS
+    // =========================
+    if (e.dataField === 'particulars') {
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'Amount');
+          }, 50);
+        }
+      };
+    }
+
+    // =========================
+    // ✅ AMOUNT
+    // =========================
+    if (e.dataField === 'Amount') {
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const tabEvent = new KeyboardEvent('keydown', {
+            key: 'Tab',
+            code: 'Tab',
+            keyCode: 9,
+            which: 9,
+            bubbles: true,
+          });
+
+          event.event.target.dispatchEvent(tabEvent);
+        }
+      };
+    }
+
+    // =========================
+    // ✅ GST %
+    // =========================
+    if (e.dataField === 'GST_PERC') {
+      const original = e.editorOptions.onValueChanged;
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        if (original) original(args);
+
+        e.setValue(args.value);
+
+        const rowData = this.invoiceFormData.Details[rowIndex];
+
+        rowData.GST_PERC = args.value;
+        rowData.CGST = 0;
+        rowData.SGST = 0;
+      };
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          setTimeout(() => {
+            grid.saveEditData();
+
+            if (this.hasEmptyRow()) return;
+
+            const newRow = {
+              SL_NO: this.invoiceFormData.Details.length + 1,
+              ledgerCode: '',
+              ledgerName: '',
+              particulars: '',
+              Amount: '',
+              GST_PERC: '',
+              GST: 0,
+              CGST: 0,
+              SGST: 0,
+              gstAmount: '',
+              HEAD_ID: null,
+            };
+
+            this.invoiceFormData.Details.push(newRow);
+            this.updateSlNo();
+
+            grid.option('dataSource', [...this.invoiceFormData.Details]);
+            grid.refresh();
+
+            setTimeout(() => {
+              const visibleRows = grid.getVisibleRows();
+              const newRowIndex = visibleRows.findIndex(
+                (r) => r.data === newRow,
+              );
+
+              if (newRowIndex >= 0) {
+                grid.editCell(newRowIndex, 'ledgerCode');
+              }
+            }, 100);
+          }, 50);
+        }
+      };
+
+      e.editorOptions.onFocusIn = (args: any) => {
+        setTimeout(() => args.component.open(), 0);
+      };
+    }
+
+    // =========================
+    // ✅ CGST / SGST
+    // =========================
+    if (e.dataField === 'CGST' || e.dataField === 'SGST') {
+      const original = e.editorOptions.onValueChanged;
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        if (original) original(args);
+
+        e.setValue(args.value);
+
+        const rowData = this.invoiceFormData.Details[rowIndex];
+        rowData.GST_PERC = 0;
+      };
     }
   }
-
-  if (e.parentType !== 'dataRow') return;
-
-  const rowIndex = e.row?.rowIndex;
-  const grid = this.itemsGridRef?.instance;
-
-  // =========================
-  // ✅ LEDGER CODE
-  // =========================
-  if (e.dataField === 'ledgerCode') {
-    e.editorOptions.onFocusIn = (args: any) => {
-      setTimeout(() => args.component.open(), 0);
-    };
-
-    e.editorOptions.onValueChanged = (args: any) => {
-      const selectedLedger = this.ledgerList.find(
-        (item: any) => item.HEAD_CODE === args.value
-      );
-
-      e.setValue(args.value);
-
-      if (selectedLedger) {
-        // ✅ UI update
-        grid.cellValue(rowIndex, 'ledgerName', selectedLedger.HEAD_NAME);
-        grid.cellValue(rowIndex, 'HEAD_ID', selectedLedger.HEAD_ID);
-
-        // ✅ DATA SOURCE update (CRITICAL FIX)
-        const rowData = this.invoiceFormData.Details[rowIndex];
-        rowData.ledgerCode = selectedLedger.HEAD_CODE;
-        rowData.ledgerName = selectedLedger.HEAD_NAME;
-        rowData.HEAD_ID = selectedLedger.HEAD_ID;
-
-        // Move focus
-        setTimeout(() => {
-          grid.editCell(rowIndex, 'ledgerName');
-        }, 50);
-      }
-    };
-  }
-
-  // =========================
-  // ✅ LEDGER NAME
-  // =========================
-  if (e.dataField === 'ledgerName') {
-    e.editorOptions.onFocusIn = (args: any) => {
-      setTimeout(() => args.component.open(), 0);
-    };
-
-    e.editorOptions.onValueChanged = (args: any) => {
-      const selectedLedger = this.ledgerList.find(
-        (item: any) => item.HEAD_NAME === args.value
-      );
-
-      e.setValue(args.value);
-
-      if (selectedLedger) {
-        // ✅ UI update
-        grid.cellValue(rowIndex, 'ledgerCode', selectedLedger.HEAD_CODE);
-        grid.cellValue(rowIndex, 'HEAD_ID', selectedLedger.HEAD_ID);
-
-        // ✅ DATA SOURCE update
-        const rowData = this.invoiceFormData.Details[rowIndex];
-        rowData.ledgerCode = selectedLedger.HEAD_CODE;
-        rowData.ledgerName = selectedLedger.HEAD_NAME;
-        rowData.HEAD_ID = selectedLedger.HEAD_ID;
-
-        // Move focus
-        setTimeout(() => {
-          grid.editCell(rowIndex, 'particulars');
-        }, 50);
-      }
-    };
-
-    e.editorOptions.onKeyDown = (event: any) => {
-      if (event.event.key === 'Enter') {
-        setTimeout(() => {
-          grid.editCell(rowIndex, 'particulars');
-        }, 50);
-      }
-    };
-  }
-
-  // =========================
-  // ✅ PARTICULARS
-  // =========================
-  if (e.dataField === 'particulars') {
-    e.editorOptions.onKeyDown = (event: any) => {
-      if (event.event.key === 'Enter') {
-        setTimeout(() => {
-          grid.editCell(rowIndex, 'Amount');
-        }, 50);
-      }
-    };
-  }
-
-  // =========================
-  // ✅ AMOUNT
-  // =========================
-  if (e.dataField === 'Amount') {
-    e.editorOptions.onKeyDown = (event: any) => {
-      if (event.event.key === 'Enter') {
-        const tabEvent = new KeyboardEvent('keydown', {
-          key: 'Tab',
-          code: 'Tab',
-          keyCode: 9,
-          which: 9,
-          bubbles: true,
-        });
-
-        event.event.target.dispatchEvent(tabEvent);
-      }
-    };
-  }
-
-  // =========================
-  // ✅ GST %
-  // =========================
-  if (e.dataField === 'GST_PERC') {
-    const original = e.editorOptions.onValueChanged;
-
-    e.editorOptions.onValueChanged = (args: any) => {
-      if (original) original(args);
-
-      e.setValue(args.value);
-
-      const rowData = this.invoiceFormData.Details[rowIndex];
-
-      rowData.GST_PERC = args.value;
-      rowData.CGST = 0;
-      rowData.SGST = 0;
-    };
-
-    e.editorOptions.onKeyDown = (event: any) => {
-      if (event.event.key === 'Enter') {
-        setTimeout(() => {
-          grid.saveEditData();
-
-          if (this.hasEmptyRow()) return;
-
-          const newRow = {
-            SL_NO: this.invoiceFormData.Details.length + 1,
-            ledgerCode: '',
-            ledgerName: '',
-            particulars: '',
-            Amount: '',
-            GST_PERC: '',
-            GST: 0,
-            CGST: 0,
-            SGST: 0,
-            gstAmount: '',
-            HEAD_ID: null,
-          };
-
-          this.invoiceFormData.Details.push(newRow);
-          this.updateSlNo();
-
-          grid.option('dataSource', [...this.invoiceFormData.Details]);
-          grid.refresh();
-
-          setTimeout(() => {
-            const visibleRows = grid.getVisibleRows();
-            const newRowIndex = visibleRows.findIndex(
-              (r) => r.data === newRow
-            );
-
-            if (newRowIndex >= 0) {
-              grid.editCell(newRowIndex, 'ledgerCode');
-            }
-          }, 100);
-        }, 50);
-      }
-    };
-
-    e.editorOptions.onFocusIn = (args: any) => {
-      setTimeout(() => args.component.open(), 0);
-    };
-  }
-
-  // =========================
-  // ✅ CGST / SGST
-  // =========================
-  if (e.dataField === 'CGST' || e.dataField === 'SGST') {
-    const original = e.editorOptions.onValueChanged;
-
-    e.editorOptions.onValueChanged = (args: any) => {
-      if (original) original(args);
-
-      e.setValue(args.value);
-
-      const rowData = this.invoiceFormData.Details[rowIndex];
-      rowData.GST_PERC = 0;
-    };
-  }
-}
-
-  
 
   addNewRow() {
     const grid = this.itemsGridRef?.instance;
@@ -478,73 +474,72 @@ export class MiscellaneousSalesInvoiceFormComponent {
     );
   }
 
-convertToDate(dateValue: any): Date | null {
-  if (!dateValue) return null;
+  convertToDate(dateValue: any): Date | null {
+    if (!dateValue) return null;
 
-  const [dd, mm, yyyy] = dateValue.split('-');
-  return new Date(+yyyy, +mm - 1, +dd);
-}
- 
-  
+    const [dd, mm, yyyy] = dateValue.split('-');
+    return new Date(+yyyy, +mm - 1, +dd);
+  }
+
   isEditDataAvailable() {
-  const data = this.EditingResponseData;
-  const details = data.Details || [];
+    const data = this.EditingResponseData;
+    const details = data.Details || [];
 
-  this.invoiceFormData = {
-    ...this.invoiceFormData,
+    this.invoiceFormData = {
+      ...this.invoiceFormData,
 
-  //  COMPANY_ID: this.invoiceFormData.COMPANY_ID,,
-    STORE_ID: data.STORE_ID,
-    DOC_NO : data.SALE_NO,
-    TRANS_DATE: this.convertToDate(data.TRANS_DATE),
-    TRANS_ID: data.TRANS_ID, 
-    CUSTOMER_ID: data.CUSTOMER_ID,
-    REF_NO: data.REF_NO,
+      //  COMPANY_ID: this.invoiceFormData.COMPANY_ID,,
+      STORE_ID: data.STORE_ID,
+      DOC_NO: data.SALE_NO,
+      TRANS_DATE: this.convertToDate(data.TRANS_DATE),
+      TRANS_ID: data.TRANS_ID,
+      CUSTOMER_ID: data.CUSTOMER_ID,
+      REF_NO: data.REF_NO,
 
-    GROSS_AMOUNT: data.GROSS_AMOUNT,
-    TAX_AMOUNT: data.TAX_AMOUNT,
-    NET_AMOUNT: data.NET_AMOUNT,
+      GROSS_AMOUNT: data.GROSS_AMOUNT,
+      TAX_AMOUNT: data.TAX_AMOUNT,
+      NET_AMOUNT: data.NET_AMOUNT,
 
-    USER_ID: this.userID,
-    NARRATION: data.NARRATION,
-  };
-
-  this.invoiceFormData.Details = details.map((item: any, index: number) => {
-    const ledger = this.ledgerList?.find(
-      (l: any) => l.HEAD_ID == item.HEAD_ID
-    );
-
-    return {
-      SL_NO: index + 1,
-
-      ledgerCode: ledger?.HEAD_CODE || '',
-      ledgerName: ledger?.HEAD_NAME || '',
-      HEAD_ID: item.HEAD_ID,
-
-      Amount: item.AMOUNT,
-      GST_PERC: item.TAX_PERC,
-      gstAmount: item.TAX_AMOUNT,
-      TOTAL: item.TOTAL_AMOUNT,
-
-      particulars: item.REMARKS || '',
+      USER_ID: this.userID,
+      NARRATION: data.NARRATION,
     };
-  });
 
-  setTimeout(() => {
-    this.itemsGridRef?.instance?.option(
-      'dataSource',
-      this.invoiceFormData.Details
-    );
-    this.itemsGridRef?.instance?.refresh();
-  });
-}
+    this.invoiceFormData.Details = details.map((item: any, index: number) => {
+      const ledger = this.ledgerList?.find(
+        (l: any) => l.HEAD_ID == item.HEAD_ID,
+      );
+
+      return {
+        SL_NO: index + 1,
+
+        ledgerCode: ledger?.HEAD_CODE || '',
+        ledgerName: ledger?.HEAD_NAME || '',
+        HEAD_ID: item.HEAD_ID,
+
+        Amount: item.AMOUNT,
+        GST_PERC: item.TAX_PERC,
+        gstAmount: item.TAX_AMOUNT,
+        TOTAL: item.TOTAL_AMOUNT,
+
+        particulars: item.REMARKS || '',
+      };
+    });
+
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.option(
+        'dataSource',
+        this.invoiceFormData.Details,
+      );
+      this.itemsGridRef?.instance?.refresh();
+    });
+  }
 
   getItems() {}
   getItemsDescription() {}
-    getDocNo() {
+  getDocNo() {
     const payload = {
       TRANS_TYPE: 105,
-      COMPANY_ID: this.selectedCompanyId
+      COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
       this.invoiceFormData.DOC_NO = response.DOC_NO;
@@ -552,22 +547,22 @@ convertToDate(dateValue: any): Date | null {
   }
 
   calculateGSTAmount(rowData: any) {
-  const amount = rowData.Amount || 0;
-  const perc = rowData.GST_PERC || 0;
+    const amount = rowData.Amount || 0;
+    const perc = rowData.GST_PERC || 0;
 
-  return (amount * perc) / 100;
-}
+    return (amount * perc) / 100;
+  }
 
-calculateTotal(rowData: any) {
-  const amount = rowData.Amount || 0;
-  const perc = rowData.GST_PERC || 0;
+  calculateTotal(rowData: any) {
+    const amount = rowData.Amount || 0;
+    const perc = rowData.GST_PERC || 0;
 
-  const gstAmount = (amount * perc) / 100;
+    const gstAmount = (amount * perc) / 100;
 
-  return amount + gstAmount;
-}
+    return amount + gstAmount;
+  }
 
-    getCustomerOrUnitLst() {
+  getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     };
@@ -578,15 +573,15 @@ calculateTotal(rowData: any) {
       });
   }
 
-formatDateYYYYMMDD(date: Date): string {
-  const yyyy = date.getFullYear();
-  const mm = (date.getMonth() + 1).toString().padStart(2, '0');
-  const dd = date.getDate().toString().padStart(2, '0');
+  formatDateYYYYMMDD(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const dd = date.getDate().toString().padStart(2, '0');
 
-  return `${yyyy}-${mm}-${dd}`;
-}
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
-    saveInvoice() {
+  saveInvoice() {
     const grid = this.itemsGridRef?.instance;
 
     // 1. Save pending edits
@@ -686,49 +681,49 @@ formatDateYYYYMMDD(date: Date): string {
     // };
 
     const payload = {
-       TRANS_ID: this.invoiceFormData.TRANS_ID || 0,
-  COMPANY_ID: this.invoiceFormData.COMPANY_ID,
-  STORE_ID: this.storeID,
-  FIN_ID: this.invoiceFormData.FIN_ID,
+      TRANS_ID: this.invoiceFormData.TRANS_ID || 0,
+      COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+      STORE_ID: this.storeID,
+      FIN_ID: this.invoiceFormData.FIN_ID,
 
-  TRANS_DATE: this.formatDateYYYYMMDD(this.invoiceFormData.TRANS_DATE),
-  REF_NO: this.invoiceFormData.REF_NO || '',
-  CUSTOMER_ID: this.invoiceFormData.CUSTOMER_ID, // mapped
-  PARTY_NAME: this.invoiceFormData.PARTY_NAME || '',
+      TRANS_DATE: this.formatDateYYYYMMDD(this.invoiceFormData.TRANS_DATE),
+      REF_NO: this.invoiceFormData.REF_NO || '',
+      CUSTOMER_ID: this.invoiceFormData.CUSTOMER_ID, // mapped
+      PARTY_NAME: this.invoiceFormData.PARTY_NAME || '',
 
-  NARRATION: this.invoiceFormData.NARRATION,
-  CREATE_USER_ID: this.invoiceFormData.USER_ID,
-  GROSS_AMOUNT: filteredDetails.reduce(
-    (sum: number, r: any) => sum + (Number(r.Amount) || 0),
-    0
-  ),
+      NARRATION: this.invoiceFormData.NARRATION,
+      CREATE_USER_ID: this.invoiceFormData.USER_ID,
+      GROSS_AMOUNT: filteredDetails.reduce(
+        (sum: number, r: any) => sum + (Number(r.Amount) || 0),
+        0,
+      ),
 
-  TAX_AMOUNT: filteredDetails.reduce(
-    (sum: number, r: any) => sum + this.calculateGSTAmount(r),
-    0
-  ),
+      TAX_AMOUNT: filteredDetails.reduce(
+        (sum: number, r: any) => sum + this.calculateGSTAmount(r),
+        0,
+      ),
 
-  NET_AMOUNT: filteredDetails.reduce(
-    (sum: number, r: any) => sum + this.calculateTotal(r),
-    0
-  ),
+      NET_AMOUNT: filteredDetails.reduce(
+        (sum: number, r: any) => sum + this.calculateTotal(r),
+        0,
+      ),
 
-  IS_APPROVED: this.invoiceFormData.IS_APPROVED,
+      IS_APPROVED: this.invoiceFormData.IS_APPROVED,
 
-  DETAILS: filteredDetails.map((row: any) => ({
-    COMPANY_ID: this.invoiceFormData.COMPANY_ID,
-    STORE_ID: this.storeID,
+      DETAILS: filteredDetails.map((row: any) => ({
+        COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+        STORE_ID: this.storeID,
 
-    HEAD_ID: row.HEAD_ID,
+        HEAD_ID: row.HEAD_ID,
 
-    AMOUNT: Number(row.Amount) || 0,
+        AMOUNT: Number(row.Amount) || 0,
 
-    TAX_PERC: Number(row.GST_PERC) || 0,
-    TAX_AMOUNT: this.calculateGSTAmount(row),
-    REMARKS : row.particulars ,
-    TOTAL_AMOUNT: this.calculateTotal(row),
-  })),
-};
+        TAX_PERC: Number(row.GST_PERC) || 0,
+        TAX_AMOUNT: this.calculateGSTAmount(row),
+        REMARKS: row.particulars,
+        TOTAL_AMOUNT: this.calculateTotal(row),
+      })),
+    };
 
     // API Decision Logic (IMPORTANT)
     let request$;

@@ -36,8 +36,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
         [enabled]="true"
@@ -220,6 +220,7 @@
   <app-add-supplier-payment
     *ngIf="addSupllierPayment"
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
   ></app-add-supplier-payment>
   <!-- </ng-container> -->
 </dx-popup>
@@ -237,6 +238,7 @@
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
     [supplierPaymentId]="selectedSupplierPayment"
   ></app-edit-supplier-payment>
   <!-- </ng-container> -->

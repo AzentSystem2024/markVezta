@@ -195,7 +195,7 @@
     (popupClosed)="handleClose()"
   ></app-fixed-asstes-add> -->
 
-  <app-depreciation-add (popupClosed)="handleClose()"></app-depreciation-add>
+  <app-depreciation-add (popupClosed)="handleClose()" [canApprove]="canApprove"></app-depreciation-add>
 </dx-popup>
 
 <dx-popup
@@ -209,6 +209,7 @@
     [DepreciationId]="selectedDepreciation"
     [SelectDepreciationData]="Selected_Depreciation_data"
     (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
   ></app-depreciation-edit>
 </dx-popup>
 

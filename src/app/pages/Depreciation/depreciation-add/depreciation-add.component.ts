@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
+  Input,
   NgModule,
   Output,
   ViewChild,
@@ -45,6 +46,8 @@ export class DepreciationAddComponent {
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup: DxValidationGroupComponent;
   depreciationDate: any;
+
+  @Input() canApprove:boolean = false;
 
   DepreciationPayload: any = {
     DEPR_DATE: new Date(), // format: YYYY-MM-DD

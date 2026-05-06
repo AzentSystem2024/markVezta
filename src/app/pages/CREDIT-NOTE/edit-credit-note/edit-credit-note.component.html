@@ -293,11 +293,13 @@
           "
         >
           <div style="display: flex; align-items: center; gap: 15px">
-            <dx-check-box
-              text="Round Off"
-              [(value)]="creditFormData[0].ROUND_OFF"
-              (onValueChanged)="onRoundOffChange()"
-            ></dx-check-box>
+            <div class="approve-container" *ngIf="canApprove">
+              <dx-check-box
+                text="Round Off"
+                [(value)]="creditFormData[0].ROUND_OFF"
+                (onValueChanged)="onRoundOffChange()"
+              ></dx-check-box>
+            </div>
             <dx-text-box
               [value]="calculatedNetAmount"
               label="Net Amount"

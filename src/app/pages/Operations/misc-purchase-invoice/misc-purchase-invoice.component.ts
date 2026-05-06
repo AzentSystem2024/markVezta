@@ -167,7 +167,7 @@ export class MiscPurchaseInvoiceComponent {
     console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/invoice');
+      .find((menu: any) => menu.Path === currentUrl);
     console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
