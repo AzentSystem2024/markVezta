@@ -177,9 +177,9 @@ export class InvoiceTrOutComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getInvoiceList();
@@ -665,4 +665,4 @@ export class InvoiceTrOutComponent {
   exports: [InvoiceTrOutComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceTrOutModule {}
+export class InvoiceTrOutModule { }

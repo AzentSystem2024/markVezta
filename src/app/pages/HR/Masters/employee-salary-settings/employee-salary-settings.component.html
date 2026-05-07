@@ -35,7 +35,7 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
+        [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
 
@@ -86,6 +86,7 @@
         ></dxi-item>
         <!-- ADD BUTTON -->
         <dxi-item
+          *ngIf="canAdd"
           location="after"
           widget="dxButton"
           [options]="addButtonOptions"

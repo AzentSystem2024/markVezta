@@ -144,7 +144,7 @@ export class PurchaseInvoiceListComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -163,7 +163,7 @@ export class PurchaseInvoiceListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
@@ -648,4 +648,4 @@ export class PurchaseInvoiceListComponent {
   exports: [PurchaseInvoiceListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseInvoiceListModule {}
+export class PurchaseInvoiceListModule { }

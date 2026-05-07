@@ -145,7 +145,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -169,9 +169,9 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();
@@ -270,7 +270,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     console.log('Edit Mode: deliveryFormData loaded:', this.deliveryFormData);
   }
 
-  reindexDetails() {}
+  reindexDetails() { }
 
   getDocNo() {
     const payload = {
@@ -503,7 +503,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     }
   }
 
-  onAddItems() {}
+  onAddItems() { }
 
   validateQtyReceived = (e: any) => {
     const issued = e.data?.QUANTITY_ISSUED || 0;
@@ -544,7 +544,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     console.log('Updated TOTAL_QTY:', this.deliveryFormData.TOTAL_QTY);
   }
 
-  handleClose() {}
+  handleClose() { }
 
   cancel() {
     this.popupClosed.emit();
@@ -581,10 +581,8 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       }
       if (item.DELIVERED_QUANTITY > item.QUANTITY) {
         notify(
-          `Row ${
-            index + 1
-          }: Delivered Quantity cannot exceed Ordered Quantity (${
-            item.QUANTITY
+          `Row ${index + 1
+          }: Delivered Quantity cannot exceed Ordered Quantity (${item.QUANTITY
           }).`,
         );
         isValid = false;
@@ -1144,4 +1142,4 @@ function numberToWordsIndianNumber(num: number) {
   exports: [DeliveryNoteFormFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFormFinanceModule {}
+export class DeliveryNoteFormFinanceModule { }

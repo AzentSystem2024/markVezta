@@ -31,7 +31,7 @@ export class CountryListComponent implements OnInit {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   country: any;
-  showFilterRow :boolean = false;
+  showFilterRow: boolean = false;
   showHeaderFilter = true;
   isAddCountryPopupOpened = false;
   isFilterOpened = false;
@@ -46,33 +46,33 @@ export class CountryListComponent implements OnInit {
   countryDataSource: DataSource;
   countryArray: any[] = [];
 
-  
+
 
   searchButtonOptions = {
-  icon: 'search',
-  hint: 'Show / Hide Filters',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => this.toggleFilters(),
-};
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
-refreshButtonOptions = {
-  icon: 'refresh',
-  hint: 'Refresh',
-  elementAttr: { class: 'toolbar-icon-btn' },
-  onClick: () => this.refreshGrid(),
-};
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+  };
 
-addButtonOptions = {
-  type: 'default',
-  stylingMode: 'contained',
-  hint: 'Add new entry',
-  onClick: () => {
-    this.isAddCountryPopupOpened = true;
-  },
-  elementAttr: { class: 'add-button' },
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.isAddCountryPopupOpened = true;
+    },
+    elementAttr: { class: 'add-button' },
 
-  template: () => {
-    return `
+    template: () => {
+      return `
       <div class="add-btn-content">
         <span class="iconify"
               data-icon="formkit:add"
@@ -81,16 +81,16 @@ addButtonOptions = {
         <span class="add-text">New</span>
       </div>
     `;
-  },
-};
+    },
+  };
 
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
-    private router:Router
-  ) {}
-  
+    private router: Router
+  ) { }
+
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Country-list');
   }
@@ -116,34 +116,34 @@ addButtonOptions = {
       });
   }
   onRowRemoving(e: any) {
-  const id = e.key.ID;
+    const id = e.key.ID;
 
-  //  Stop default delete
-  e.cancel = true;
+    //  Stop default delete
+    e.cancel = true;
 
-  //  Assign promise to grid
-  e.promise = this.dataservice.removeCountry(id).toPromise()
-    .then(() => {
-      notify(
-        {
-          message: 'Delete operation successful',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'success'
-      );
+    //  Assign promise to grid
+    e.promise = this.dataservice.removeCountry(id).toPromise()
+      .then(() => {
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success'
+        );
 
-      this.showCountry(); // reload data
-    })
-    .catch(() => {
-      notify(
-        {
-          message: 'Delete operation failed',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error'
-      );
-    });
-}
+        this.showCountry(); // reload data
+      })
+      .catch(() => {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error'
+        );
+      });
+  }
 
   onRowUpdating(event: any) {
     const updataDate = event.newData;
@@ -181,25 +181,25 @@ addButtonOptions = {
   }
 
   showCountry() {
-  this.countryDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.getCountryData().subscribe({
-          next: (response: any) => {
-            const data = response || [];
+    this.countryDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.getCountryData().subscribe({
+            next: (response: any) => {
+              const data = response || [];
 
-            this.countryArray = data; // store locally (for validation etc.)
+              this.countryArray = data; // store locally (for validation etc.)
 
-            resolve(data);
-          },
-          error: () => {
-            this.countryArray = [];
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(data);
+            },
+            error: () => {
+              this.countryArray = [];
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   ngOnInit(): void {
 
@@ -217,11 +217,11 @@ addButtonOptions = {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
-    
+
     this.showCountry();
   }
   refresh = () => {
@@ -282,7 +282,7 @@ addButtonOptions = {
 
       return sameCode && !isSameId;
     });
-};
+  };
 }
 @NgModule({
   imports: [
@@ -299,4 +299,4 @@ addButtonOptions = {
   exports: [],
   declarations: [CountryListComponent],
 })
-export class CountryListModule {}
+export class CountryListModule { }

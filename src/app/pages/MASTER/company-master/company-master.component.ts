@@ -202,9 +202,9 @@ export class CompanyMasterComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.sesstion_Details();
     this.getCompanyList();
@@ -441,10 +441,10 @@ export class CompanyMasterComponent {
           this.editingRowData.WHATSAPP = whatsappParts[1];
         }
 
-  this.formsource.patchValue({
-    CompanyTypeName: data.COMPANY_TYPE || 0,
-    STATE_ID: data.STATE_ID,
-  });
+        this.formsource.patchValue({
+          CompanyTypeName: data.COMPANY_TYPE || 0,
+          STATE_ID: data.STATE_ID,
+        });
 
         this.formsource.patchValue({
           CompanyTypeName: response.Data.COMPANY_TYPE || 0,
@@ -487,16 +487,16 @@ export class CompanyMasterComponent {
       ADDRESS3: Third_address,
       CONTACT_NAME: Contact_name,
       PHONE: this.countryCodephone
-              ? `${this.countryCodephone}-${Phone_no || ''}`
-              : Phone_no,
+        ? `${this.countryCodephone}-${Phone_no || ''}`
+        : Phone_no,
 
       MOBILE: this.countryCodemobile
-              ? `${this.countryCodemobile}-${Mobile_no || ''}`
-              : Mobile_no,
+        ? `${this.countryCodemobile}-${Mobile_no || ''}`
+        : Mobile_no,
       EMAIL: Email,
       WHATSAPP: this.countryCodewhatsapp
-                ? `${this.countryCodewhatsapp}-${WhatsApp_no || ''}`
-                : WhatsApp_no,
+        ? `${this.countryCodewhatsapp}-${WhatsApp_no || ''}`
+        : WhatsApp_no,
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: Is_Inactive,
       STATE_ID: STATE_ID,
@@ -659,4 +659,4 @@ export class CompanyMasterComponent {
   exports: [],
   declarations: [CompanyMasterComponent],
 })
-export class CompanyMasterModule {}
+export class CompanyMasterModule { }

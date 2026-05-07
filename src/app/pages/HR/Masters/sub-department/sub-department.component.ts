@@ -130,9 +130,9 @@ export class SubDepartmentComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -335,4 +335,4 @@ export class SubDepartmentComponent implements OnInit {
   declarations: [SubDepartmentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SubDepartmentModule {}
+export class SubDepartmentModule { }

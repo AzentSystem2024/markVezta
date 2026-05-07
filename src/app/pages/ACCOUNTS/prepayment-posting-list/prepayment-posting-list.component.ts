@@ -156,9 +156,9 @@ export class PrepaymentPostingListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     // this.getAccountsGroupList();
@@ -302,7 +302,7 @@ export class PrepaymentPostingListComponent {
     return `${dd}-${mm}-${yyyy}`;
   }
 
-  toggleCalendar() {}
+  toggleCalendar() { }
   selectMonthByIndex(monthIndex: number) {
     this.selectedMonth = new Date(this.selectedYear, monthIndex, 1, 12); // Set the date to the 1st of the selected month
     this.onMonthChange({ value: this.selectedMonth }); // Pass the selected month to onMonthChange
@@ -409,4 +409,4 @@ export class PrepaymentPostingListComponent {
   exports: [PrepaymentPostingListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PrepaymentPostingListModule {}
+export class PrepaymentPostingListModule { }

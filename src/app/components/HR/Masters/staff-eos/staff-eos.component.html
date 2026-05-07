@@ -48,6 +48,7 @@
         ></dx-select-box>
       </dxi-item>
       <dxi-item
+        *ngIf="canAdd"
         location="after"
         locateInMenu="auto"
         widget="dxButton"
@@ -69,7 +70,11 @@
 
     <!-- <dxo-filter-row [visible]="isFilterVisible"></dxo-filter-row> -->
     <dxo-filter-row [visible]="true" *ngIf="isFilterVisible"></dxo-filter-row>
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
       <dxo-form [colCount]="1"> </dxo-form>
     </dxo-editing>
     <dxi-column

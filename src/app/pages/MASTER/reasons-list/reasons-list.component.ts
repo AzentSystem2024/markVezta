@@ -55,13 +55,13 @@ export class ReasonsListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  
+
 
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private ngZone: NgZone,
-    private router:Router
+    private router: Router
   ) {
     const payload = {
       NAME: 'REASONTYPES',
@@ -154,7 +154,7 @@ export class ReasonsListComponent {
     const id = e.data.ID;
     this.isEditReasonsPopupOpened = true;
     this.dataservice.select_reason(id).subscribe((res: any) => {
-      
+
       this.isEditMode = true;
       this.currentEditId = id;
       this.selected_Data = res;
@@ -197,11 +197,11 @@ export class ReasonsListComponent {
 
 
     const component = this.isEditMode
-        ? this.editFormComponent
-        : this.addFormComponent;
-    
+      ? this.editFormComponent
+      : this.addFormComponent;
+
     const data = component.getNewReasonsData();
-    
+
     console.log('FINAL DATA', data);
 
     const {
@@ -219,8 +219,8 @@ export class ReasonsListComponent {
     } = data;
 
     const filteredReasons = this.isEditMode
-    ? this.reasons.filter((x: any) => x.ID !== this.currentEditId)
-    : this.reasons;
+      ? this.reasons.filter((x: any) => x.ID !== this.currentEditId)
+      : this.reasons;
 
     const isCodeDuplicate = filteredReasons.some(
       (item: any) => item.CODE.toLowerCase() === CODE.toLowerCase()
@@ -264,75 +264,75 @@ export class ReasonsListComponent {
     }
 
     if (
-    !REASON_STORES ||
-    !Array.isArray(REASON_STORES) ||
-    REASON_STORES.length === 0 ||
-    REASON_STORES.every((x: any) => !x.STORE_ID || x.STORE_ID.toString().trim() === '')
-  ) {
-    notify(
-      {
-        message: 'At least one store should be selected',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 2000,
-      },
-      'error'
-    );
-    return;
-  }
+      !REASON_STORES ||
+      !Array.isArray(REASON_STORES) ||
+      REASON_STORES.length === 0 ||
+      REASON_STORES.every((x: any) => !x.STORE_ID || x.STORE_ID.toString().trim() === '')
+    ) {
+      notify(
+        {
+          message: 'At least one store should be selected',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'error'
+      );
+      return;
+    }
 
-  if (this.isEditMode && this.currentEditId) {
-        this.dataservice
-      .Update_reason(
-        data
-      )
-          .subscribe((response: any) => {
-            if (response?.flag === '1') {
-              notify(
-                {
-                  message: 'Reason updated successfully',
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'success'
-              );
-    
-              this.isEditReasonsPopupOpened = false;
-              this.showReasons();
-            }
-          });
-    
-        return;
-      }
-
-   
+    if (this.isEditMode && this.currentEditId) {
       this.dataservice
-        .postReasonData(
-          CODE,
-          DESCRIPTION,
-          ARABIC_DESCRIPTION,
-          START_DATE,
-          END_DATE,
-          REASON_TYPE,
-          DISCOUNT_TYPE,
-          AC_HEAD_ID,
-          DISCOUNT_PERCENT,
-          REASON_STORES,
-          COMPANY_ID,
+        .Update_reason(
+          data
         )
-        .subscribe((response) => {
-          if (response.flag === '1') {
-            this.showReasons();
-            this.isAddReasonsPopupOpened = false;
-
+        .subscribe((response: any) => {
+          if (response?.flag === '1') {
             notify(
               {
-                message: 'Reason Saved Successfully',
+                message: 'Reason updated successfully',
                 position: { at: 'top right', my: 'top right' },
-                displayTime: 1000,
               },
-              'success',
+              'success'
             );
+
+            this.isEditReasonsPopupOpened = false;
+            this.showReasons();
           }
         });
+
+      return;
+    }
+
+
+    this.dataservice
+      .postReasonData(
+        CODE,
+        DESCRIPTION,
+        ARABIC_DESCRIPTION,
+        START_DATE,
+        END_DATE,
+        REASON_TYPE,
+        DISCOUNT_TYPE,
+        AC_HEAD_ID,
+        DISCOUNT_PERCENT,
+        REASON_STORES,
+        COMPANY_ID,
+      )
+      .subscribe((response) => {
+        if (response.flag === '1') {
+          this.showReasons();
+          this.isAddReasonsPopupOpened = false;
+
+          notify(
+            {
+              message: 'Reason Saved Successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 1000,
+            },
+            'success',
+          );
+        }
+      });
   }
   onRowRemoving(event) {
     const selectedRow = event.data;
@@ -401,9 +401,9 @@ export class ReasonsListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.showReasons();
@@ -430,4 +430,4 @@ export class ReasonsListComponent {
   exports: [],
   declarations: [ReasonsListComponent],
 })
-export class ReasonsListModule {}
+export class ReasonsListModule { }

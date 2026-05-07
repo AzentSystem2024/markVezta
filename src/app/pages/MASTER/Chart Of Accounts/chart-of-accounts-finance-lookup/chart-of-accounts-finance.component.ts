@@ -132,7 +132,7 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -150,7 +150,7 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
@@ -371,4 +371,4 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
   exports: [ChartOfAccountsFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ChartOfAccountsFinanceModule {}
+export class ChartOfAccountsFinanceModule { }

@@ -149,9 +149,9 @@ export class PackingComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -172,7 +172,7 @@ export class PackingComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
-  onToolbarPreparing(e: any) {}
+  onToolbarPreparing(e: any) { }
 
   getStatusFlagClass(Status: string): string {
     return Status === 'Active' ? 'flag-green' : 'flag-red';
@@ -304,4 +304,4 @@ export class PackingComponent {
   exports: [PackingComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PackingModule {}
+export class PackingModule { }

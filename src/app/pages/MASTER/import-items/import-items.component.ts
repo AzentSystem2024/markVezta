@@ -173,7 +173,7 @@ export class ImportItemsComponent implements OnInit {
     private cd: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router
-  ) {}
+  ) { }
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
@@ -383,8 +383,8 @@ export class ImportItemsComponent implements OnInit {
       },
     );
   }
-  
-  close() {}
+
+  close() { }
 
   // Helper method to create and show tooltips
   private createTooltip(cellElement: HTMLElement, message: string) {
@@ -640,21 +640,21 @@ export class ImportItemsComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     const userDataString = localStorage.getItem('userData');
-    
+
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -706,4 +706,4 @@ export class ImportItemsComponent implements OnInit {
   exports: [],
   declarations: [ImportItemsComponent],
 })
-export class ImportItemsModule {}
+export class ImportItemsModule { }

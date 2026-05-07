@@ -41,15 +41,15 @@ export class PaymentTermsListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private router:Router
-    
-  ) {}
+    private router: Router
+
+  ) { }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Payment_terms-list');
   }
@@ -57,7 +57,7 @@ export class PaymentTermsListComponent {
     this.isAddPaymentTermsPopupOpened = true;
   }
 
-   addButtonOptions = {
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -80,14 +80,14 @@ export class PaymentTermsListComponent {
   };
 
 
-    searchButtonOptions = {
+  searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilterRow(),
   };
 
-    //=================================refresh=============================
+  //=================================refresh=============================
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -96,16 +96,16 @@ export class PaymentTermsListComponent {
     text: '',
   };
 
-   refreshGrid() {
+  refreshGrid() {
     this.showPaymentTerms();
   }
 
-    toggleFilterRow = () => {
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
 
-  
+
 
   showPaymentTerms() {
     this.dataservice.getPaymentTermsData().subscribe((response) => {
@@ -132,7 +132,7 @@ export class PaymentTermsListComponent {
   //   const paymenttermId = e.data.ID;
   //   this.selectedpaymenttermId = e.data.ID;
   //   this.selectedId = paymenttermId;
-    
+
   //   this.dataservice.selectPaymentTerms(paymenttermId).subscribe({
   //     next: (response: any) => {
   //       console.log(response)
@@ -147,7 +147,7 @@ export class PaymentTermsListComponent {
   //     },
   //   });
   // }
-  onRowRemoving(event:any) {
+  onRowRemoving(event: any) {
     const id = event.data.ID;
     this.dataservice.removePaymentTerms(id).subscribe(() => {
       try {
@@ -174,43 +174,43 @@ export class PaymentTermsListComponent {
   }
   onRowUpdating(event: any) {
 
-  console.log("🔥 UPDATE TRIGGERED");
+    console.log("🔥 UPDATE TRIGGERED");
 
-  const oldData = event.oldData;
-  const newData = event.newData;
+    const oldData = event.oldData;
+    const newData = event.newData;
 
-  const combinedData = { ...oldData, ...newData };
+    const combinedData = { ...oldData, ...newData };
 
-  const id = combinedData.ID;
-  const code = combinedData.CODE;
-  const description = combinedData.DESCRIPTION;
+    const id = combinedData.ID;
+    const code = combinedData.CODE;
+    const description = combinedData.DESCRIPTION;
 
-  this.dataservice
-    .updatePaymentTerms(id, code, description)
-    .subscribe((data: any) => {
+    this.dataservice
+      .updatePaymentTerms(id, code, description)
+      .subscribe((data: any) => {
 
-      if (data) {
-        notify(
-          {
-            message: 'Payments Terms Updated Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success',
-          2000
-        );
-        this.showPaymentTerms();
-      } else {
-        notify('Your Data Not Saved', 'error', 2000);
-      }
+        if (data) {
+          notify(
+            {
+              message: 'Payments Terms Updated Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+            2000
+          );
+          this.showPaymentTerms();
+        } else {
+          notify('Your Data Not Saved', 'error', 2000);
+        }
 
-      // 🔥 CRITICAL PART (from your reference)
-      event.component.cancelEditData(); // ✅ CLOSE POPUP
+        // 🔥 CRITICAL PART (from your reference)
+        event.component.cancelEditData(); // ✅ CLOSE POPUP
 
-      this.dataGrid.instance.refresh();
-    });
+        this.dataGrid.instance.refresh();
+      });
 
-  event.cancel = true; // keep this
-}
+    event.cancel = true; // keep this
+  }
   ngOnInit(): void {
 
     const currentUrl = this.router.url;
@@ -227,16 +227,16 @@ export class PaymentTermsListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
-    
+
 
     this.showPaymentTerms();
   }
 
-    handleClose() {
+  handleClose() {
     this.isAddPaymentTermsPopupOpened = false;
     this.isEditPaymentTermsPopupOpened = false;
     this.showPaymentTerms();
@@ -268,4 +268,4 @@ export class PaymentTermsListComponent {
   exports: [],
   declarations: [PaymentTermsListComponent],
 })
-export class PaymentTermsListModule {}
+export class PaymentTermsListModule { }

@@ -42,11 +42,11 @@ export class DepartmentComponent {
   editingRowData: any = {};
   selectedData: any;
   list_of_duplication: any;
-  Department: any[]= [];
+  Department: any[] = [];
   departmentComponent: any;
   formData = { IS_ACTIVE: false };
   editingIndex: number | undefined;
-  isLoading: boolean=false;
+  isLoading: boolean = false;
 
   canAdd = false;
   canEdit = false;
@@ -96,13 +96,13 @@ export class DepartmentComponent {
     private fb: FormBuilder,
     private dataservice: DataService,
     private ngZone: NgZone,
-    private router:Router
+    private router: Router
   ) {
     this.formsource = this.fb.group({
       CODE: ['', Validators.required],
       DEPT_NAME: ['', Validators.required],
       IS_ACTIVE: [false],
-      COMPANY_ID: ['',Validators.required]
+      COMPANY_ID: ['', Validators.required]
     });
 
     const currentUrl = this.router.url;
@@ -118,9 +118,9 @@ export class DepartmentComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -174,8 +174,8 @@ export class DepartmentComponent {
   };
 
   statusCellTemplate = (cellElement: any, cellInfo: any) => {
-    const status = cellInfo.value; 
-    const text = status; 
+    const status = cellInfo.value;
+    const text = status;
 
     // Apply the dynamic styles and content
     cellElement.innerHTML = `
@@ -198,17 +198,17 @@ export class DepartmentComponent {
     });
   }
 
-   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
+  sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
-    }
+  }
 
-    
+
   //===================get data list========================
   get_Department_List() {
     const payload = {
-      COMPANY_ID : this.COMPANY_ID
+      COMPANY_ID: this.COMPANY_ID
     }
     this.isLoading = true;
     this.dataservice.get_Department_List(payload).subscribe((res: any) => {
@@ -218,7 +218,7 @@ export class DepartmentComponent {
           SlNo: index + 1, // Assign serial number
         }));
       }
-      });
+    });
   }
 
   //============Add data============
@@ -233,7 +233,7 @@ export class DepartmentComponent {
     const isDuplicate = this.Department.some((data: any) => {
       return (
         data.DEPT_NAME?.toLowerCase().trim() ===
-          DEPT_NAME?.toLowerCase().trim() ||
+        DEPT_NAME?.toLowerCase().trim() ||
         data.CODE?.toLowerCase().trim() === CODE?.toLowerCase().trim()
       );
     });
@@ -254,7 +254,7 @@ export class DepartmentComponent {
 
     if (CODE && DEPT_NAME) {
       this.dataservice
-        .Insert_Department_Api(CODE, DEPT_NAME, IS_ACTIVE,COMPANY_ID)
+        .Insert_Department_Api(CODE, DEPT_NAME, IS_ACTIVE, COMPANY_ID)
         .subscribe((response) => {
           notify(
             {
@@ -297,9 +297,9 @@ export class DepartmentComponent {
 
       return (
         (item.CODE?.trim().toLowerCase() || '') ===
-          (CODE?.trim().toLowerCase() || '') ||
+        (CODE?.trim().toLowerCase() || '') ||
         (item.DEPT_NAME?.trim().toLowerCase() || '') ===
-          (DEPT_NAME?.trim().toLowerCase() || '')
+        (DEPT_NAME?.trim().toLowerCase() || '')
       );
     });
 
@@ -317,7 +317,7 @@ export class DepartmentComponent {
     this.formsource.reset();
     if (CODE && DEPT_NAME) {
       this.dataservice
-        .Update_Department_Api(ID, CODE, DEPT_NAME, IS_ACTIVE,COMPANY_ID)
+        .Update_Department_Api(ID, CODE, DEPT_NAME, IS_ACTIVE, COMPANY_ID)
         .subscribe((response: any) => {
           notify(
             {
@@ -328,7 +328,7 @@ export class DepartmentComponent {
             'success',
           );
           this.get_Department_List();
-          });
+        });
       this.UpdateDepartmentPopup = false;
       this.get_Department_List();
       this.formsource.reset();
@@ -360,7 +360,7 @@ export class DepartmentComponent {
   delete_Department(event: any) {
     const ID = event.data.ID;
     this.dataservice.Delete_Department_Api(ID).subscribe((response: any) => {
-      });
+    });
   }
 }
 @NgModule({
@@ -381,4 +381,4 @@ export class DepartmentComponent {
   exports: [],
   declarations: [DepartmentComponent],
 })
-export class DepartmentModule {}
+export class DepartmentModule { }

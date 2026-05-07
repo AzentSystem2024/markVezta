@@ -229,9 +229,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.currentDate = new Date();
     this.GetSupplierList();
@@ -1625,4 +1625,4 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   declarations: [PurchaseOrderNewFormComponent],
   exports: [PurchaseOrderNewFormComponent],
 })
-export class PurchaseOrderNewFormModule {}
+export class PurchaseOrderNewFormModule { }

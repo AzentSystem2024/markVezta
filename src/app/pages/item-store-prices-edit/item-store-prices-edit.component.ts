@@ -47,6 +47,7 @@ import { filter } from 'rxjs';
   styleUrls: ['./item-store-prices-edit.component.scss'],
 })
 export class ItemStorePricesEditComponent {
+  
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   AllowCommitWithSave: any;
@@ -666,7 +667,7 @@ export class ItemStorePricesEditComponent {
     if (this.AllowCommitWithSave) {
       const companyId = 1; // Example: this.companyId = 1
       const userId = 1; // Example: this.userId = 1
-      const narration = 'Narration'; // Replace with the actual narration if needed
+      const narration = ''; // Replace with the actual narration if needed
       const defaultStoreId = 1;
       const worksheetItemPrice = Object.values(this.updatedItems).map(
         (item) => ({

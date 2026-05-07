@@ -124,7 +124,7 @@ export class InvoiceDeliveryComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
   ngOnInit() {
     const currentUrl = this.router.url;
 
@@ -142,9 +142,9 @@ export class InvoiceDeliveryComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getInvoiceList();
@@ -514,4 +514,4 @@ export class InvoiceDeliveryComponent {
   exports: [InvoiceDeliveryComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceDeliveryModule {}
+export class InvoiceDeliveryModule { }

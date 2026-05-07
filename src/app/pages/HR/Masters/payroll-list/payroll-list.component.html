@@ -38,7 +38,7 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
+        [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-export
@@ -167,6 +167,7 @@
           [options]="approveButtonOptions"
         ></dxi-item> -->
         <dxi-item
+          *ngIf="canApprove"
           location="after"
           widget="dxButton"
           [options]="approveButtonOptions"

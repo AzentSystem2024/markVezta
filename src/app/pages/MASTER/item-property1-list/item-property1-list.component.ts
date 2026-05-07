@@ -311,17 +311,17 @@ export class ItemProperty1ListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sessionDetails();
@@ -351,4 +351,4 @@ export class ItemProperty1ListComponent {
   exports: [],
   declarations: [ItemProperty1ListComponent],
 })
-export class ItemProperty1ListModule {}
+export class ItemProperty1ListModule { }

@@ -165,7 +165,7 @@ export class PromotionSchemaLogComponent {
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private router:Router
+    private router: Router
   ) {
     const payload = {
       name: 'PROMOTIONSCHEMA_TYPE',
@@ -187,16 +187,16 @@ export class PromotionSchemaLogComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getLogList();
@@ -247,32 +247,32 @@ export class PromotionSchemaLogComponent {
   }
 
   getLogList() {
-  this.logDataSource = new DataSource({
-    load: () => {
-      return new Promise((resolve) => {
-        this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
-          
-          let data = response.promotion_data || [];
+    this.logDataSource = new DataSource({
+      load: () => {
+        return new Promise((resolve) => {
+          this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
 
-          // Sort descending by ID
-          data = data.sort((a: any, b: any) => {
-            return (b.ID || 0) - (a.ID || 0);
-          });
+            let data = response.promotion_data || [];
 
-          //  Store in logList ALSO
-          this.logList = data;
+            // Sort descending by ID
+            data = data.sort((a: any, b: any) => {
+              return (b.ID || 0) - (a.ID || 0);
+            });
 
-          console.log(this.logList, 'Sorted LOGLIST');
+            //  Store in logList ALSO
+            this.logList = data;
 
-          resolve({
-            data: data,
-            totalCount: data.length
+            console.log(this.logList, 'Sorted LOGLIST');
+
+            resolve({
+              data: data,
+              totalCount: data.length
+            });
           });
         });
-      });
-    }
-  });
-}
+      }
+    });
+  }
 
   openEditingStart(event: any) {
     const id = event.data.ID;
@@ -429,10 +429,10 @@ export class PromotionSchemaLogComponent {
       promotionschema_entry:
         this.tableData.length > 0
           ? this.tableData.map((row) => ({
-              QTY_BUY: row.qtyToBuy ?? 0,
-              DISC_PERCENT: row.discount ?? 0,
-              DESCRIPTION: row.description || '',
-            }))
+            QTY_BUY: row.qtyToBuy ?? 0,
+            DISC_PERCENT: row.discount ?? 0,
+            DESCRIPTION: row.description || '',
+          }))
           : [{ QTY_BUY: 0, DISC_PERCENT: 0, DESCRIPTION: '' }],
     };
     this.dataservice.savePromotionSchema(payload).subscribe((response: any) => {
@@ -483,7 +483,7 @@ export class PromotionSchemaLogComponent {
     }
 
     this.isUpdating = true;
- 
+
     const isDuplicate = this.logList.some(
       (row: any) =>
         row.DESCRIPTION === this.promotionData.DESCRIPTION &&
@@ -492,7 +492,7 @@ export class PromotionSchemaLogComponent {
 
     if (isDuplicate) {
       this.isUpdating = false;
- 
+
       notify(
         {
           message:
@@ -709,13 +709,13 @@ export class PromotionSchemaLogComponent {
   }
 
   onEditCancel() {
-  this.isEditPopupVisible = false;
-  this.resetPopup(); // optional but recommended
-}
+    this.isEditPopupVisible = false;
+    this.resetPopup(); // optional but recommended
+  }
   onNewCancel() {
-  this.isPopupVisible = false;
-  this.resetPopup(); // optional but recommended
-}
+    this.isPopupVisible = false;
+    this.resetPopup(); // optional but recommended
+  }
 
 }
 @NgModule({
@@ -753,4 +753,4 @@ export class PromotionSchemaLogComponent {
   declarations: [PromotionSchemaLogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PromotionSchemaLogModule {}
+export class PromotionSchemaLogModule { }

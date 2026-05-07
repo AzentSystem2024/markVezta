@@ -170,7 +170,7 @@ export class ArticleproductionJvListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -188,9 +188,9 @@ export class ArticleproductionJvListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -652,4 +652,4 @@ export class ArticleproductionJvListComponent {
   exports: [ArticleproductionJvListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ArticleproductionJvListModule {}
+export class ArticleproductionJvListModule { }

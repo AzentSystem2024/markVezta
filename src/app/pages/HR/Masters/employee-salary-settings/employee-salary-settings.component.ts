@@ -149,9 +149,9 @@ export class EmployeeSalarySettingsComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -162,7 +162,7 @@ export class EmployeeSalarySettingsComponent {
     private dataservice: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   formatMonthYear = (date: Date) => {
     if (!date) return '';
@@ -347,4 +347,4 @@ export class EmployeeSalarySettingsComponent {
   exports: [EmployeeSalarySettingsComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeSalarySettingsModule {}
+export class EmployeeSalarySettingsModule { }

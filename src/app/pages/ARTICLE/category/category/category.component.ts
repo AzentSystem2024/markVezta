@@ -256,9 +256,9 @@ export class CategoryComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -700,7 +700,7 @@ export class CategoryComponent {
     const isDescriptionDuplicate = this.CategoryList.some(
       (item: any) =>
         item.DESCRIPTION?.toLowerCase() ===
-          updatedPayload.DESCRIPTION?.toLowerCase() &&
+        updatedPayload.DESCRIPTION?.toLowerCase() &&
         item.ID !== updatedPayload.ID,
     );
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -916,8 +916,8 @@ export class CategoryComponent {
     // this.calculateTotalPairQty(); // optional re-calculate if needed
   }
 
-  onEditPackUpdateedit(e: any) {}
-  calculateTotalUpdateedit() {}
+  onEditPackUpdateedit(e: any) { }
+  calculateTotalUpdateedit() { }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -973,4 +973,4 @@ export class CategoryComponent {
   exports: [CategoryComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CategoryModule {}
+export class CategoryModule { }

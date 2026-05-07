@@ -73,6 +73,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
           menu.CanAdd = false;
           menu.CanView = true;
           menu.CanEdit = false;
+          menu.CanVerify = false;
           menu.CanApprove = false;
           menu.CanDelete = false;
           menu.HideCost = false;
@@ -87,6 +88,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             menu.CanAdd = match.CanAdd ?? false;
             menu.CanView = match.CanView ?? true;
             menu.CanEdit = match.CanEdit ?? false;
+            menu.CanVerify = match.CanVerify ?? false;
             menu.CanApprove = match.CanApprove ?? false;
             menu.CanDelete = match.CanDelete ?? false;
             menu.HideCost = match.HideCost ?? false;
@@ -96,6 +98,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             menu.canAdd = match.CanAdd ?? false;
             menu.canView = match.CanView ?? true;
             menu.canEdit = match.CanEdit ?? false;
+            menu.CanVerify = match.CanVerify ?? false;
             menu.canApprove = match.CanApprove ?? false;
             menu.canDelete = match.CanDelete ?? false;
             menu.HideCost = match.HideCost ?? false;
@@ -132,6 +135,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
               CanAdd: menu.canAdd ?? false,
               CanView: menu.canView ?? true,
               CanEdit: menu.canEdit ?? false,
+              CanVerify: menu.canVerify ?? false,
               CanApprove: menu.canApprove ?? false,
               HideCost : menu.HideCost ?? false,
               CanDelete: menu.canDelete ?? false,
@@ -203,6 +207,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             CanAdd: menu.CanAdd ?? false,
             CanView: menu.CanView ?? true,
             CanEdit: menu.CanEdit ?? false,
+            CanVerify:menu.CanVerify ?? false,
             CanApprove: menu.CanApprove ?? false,
             CanDelete: menu.CanDelete ?? false,
             HideCost : menu.HideCost ?? false,
