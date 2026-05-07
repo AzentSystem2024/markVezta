@@ -206,6 +206,10 @@ export class PurchaseOrderComponent {
   storeList: any;
   isHQApp: any;
   filteredStoreList: any;
+  canVerify: any;
+  isVerifyMode: boolean = false;
+  isApproveMode: boolean = false;
+  popupTitle: string = 'Edit Purchase Order';
 
   constructor(
     private service: DataService,
@@ -242,6 +246,7 @@ export class PurchaseOrderComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
     const userDataString = localStorage.getItem('userData');
     const userData = JSON.parse(userDataString);
@@ -432,15 +437,15 @@ export class PurchaseOrderComponent {
       icon: 'check',
       text: 'Verify',
       // onClick: (e) => this.onVerifyClick(e),
-      visible: (e) =>
+      visible: (e: any) =>
         e.row.data.STATUS !== 'Verified' && e.row.data.STATUS !== 'Approved',
     },
     {
       hint: 'Approve',
       icon: 'check',
       text: 'Approve',
-      onClick: (e) => this.onApproveClick(e),
-      visible: (e) =>
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) =>
         e.row.data.STATUS == 'Verified' && e.row.data.STATUS !== 'Approved',
     },
     {
@@ -448,11 +453,20 @@ export class PurchaseOrderComponent {
       icon: 'detailslayout', // You can change this to an appropriate icon
       text: 'View',
       // onClick: (e) => this.onViewClick(e),
-      visible: (e) => e.row.data.STATUS === 'Approved',
+      visible: (e: any) => e.row.data.STATUS === 'Approved',
     },
   ];
 
   allButtonsEditDelete = [
+    {
+      hint: 'Verify',
+      icon: 'check',
+      text: 'Verify',
+      template: 'verifyTemplate',
+      // onClick: (e) => this.onVerifyClick(e),
+      visible: (e: any) =>
+        e.row.data.STATUS !== 'Verified' && e.row.data.STATUS !== 'Approved',
+    },
     {
       name: 'edit',
       visible: (e: any) => {
@@ -532,6 +546,36 @@ export class PurchaseOrderComponent {
     });
   }
 
+  onVerifyClick(e: any) {
+    const rowData = e.row.data;
+
+    const id = rowData.ID;
+    const status = rowData.STATUS;
+
+    this.service.selectPoData(id).subscribe((res) => {
+      this.selectedRowData = res;
+
+      // APPROVED -> VIEW
+      if (status === 'Approved') {
+        this.isViewPopupOpened = true;
+        return;
+      }
+
+      // VERIFIED -> APPROVE
+      if (status === 'Verified') {
+        this.isApproved = true;
+        this.isVerifyMode = false;
+
+        this.isApprovePopupOpened = true;
+        return;
+      }
+
+      // OPEN -> VERIFY
+      this.isVerifyMode = true;
+
+      this.isVerifyPopupOpened = true;
+    });
+  }
   getStoreData() {
     const payload = {
       NAME: 'STORE',
@@ -1078,29 +1122,36 @@ export class PurchaseOrderComponent {
         }
       });
     } else {
-      // Call update API
-      this.service
-        .updatePoData(data)
+      const apiCall = this.isVerifyMode
+        ? this.service.verifyPoData(data)
+        : this.service.updatePoData(data);
+
+      apiCall
         .pipe(
           finalize(() => {
-            this.isSaving = false; //reset loader
+            this.isSaving = false;
           }),
         )
         .subscribe((res) => {
           if (res) {
             notify(
               {
-                message: 'Data Updated Successfully',
+                message: this.isVerifyMode
+                  ? 'Purchase Order Verified Successfully'
+                  : 'Data Updated Successfully',
                 position: { at: 'top center', my: 'top center' },
               },
               'success',
             );
+
             this.CloseEditForm();
             this.getPurchaseOrderList();
           } else {
             notify(
               {
-                message: 'Your Data Not Updated',
+                message: this.isVerifyMode
+                  ? 'Verification Failed'
+                  : 'Your Data Not Updated',
                 position: { at: 'top right', my: 'top right' },
               },
               'error',

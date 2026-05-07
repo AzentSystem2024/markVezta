@@ -54,6 +54,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @ViewChild('supplierItemsGrid') supplierItemsGrid: DxDataGridComponent;
   @Input() formdata: any;
+  @Input() isVerifyMode: boolean = false;
   poHistoryList: any;
   selectedCompanyId: any;
   companyList: any[];
@@ -1823,4 +1824,4 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   declarations: [PurchaseOrderEditFormComponent],
   exports: [PurchaseOrderEditFormComponent],
 })
-export class PurchaseOrderEditFormModule { }
+export class PurchaseOrderEditFormModule {}
