@@ -186,6 +186,43 @@
         }"
       >
       </dxi-column>
+
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditInvoice({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="onDeleteInvoice({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <i
+          *ngIf="canVerify"
+          class="fas fa-check"
+          style="color: green; cursor: pointer"
+          title="Verify"
+          (click)="onVerifyInvoice({ row: { data: cellData.data } })"
+        ></i>
+      </div>
     </dx-data-grid>
   </div>
 </div>

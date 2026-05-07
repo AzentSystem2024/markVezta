@@ -190,7 +190,10 @@ import { ConsignmentReturnDetailComponent } from './pages/REPORT/consignment-ret
 import { ItemwisesalesComponent } from './pages/REPORT/itemwisesales/itemwisesales.component';
 import { ItemWiseSalesSummaryComponent } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
 import { DiscountWiseSalesComponent } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
-import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
+import {
+  TenderComponent,
+  TenderModule,
+} from './pages/REPORT/tender/tender.component';
 import { TenderSummaryComponent } from './pages/REPORT/tender-summary/tender-summary.component';
 import { ZReportComponent } from './pages/REPORT/zreport/zreport.component';
 import { SalesInvoiceRetailComponent } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
@@ -219,7 +222,6 @@ const routes: Routes = [
     component: PrepaymentGstListComponent,
     canActivate: [AuthGuardService],
   },
-
 
   {
     path: 'auth',
@@ -1234,4 +1236,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

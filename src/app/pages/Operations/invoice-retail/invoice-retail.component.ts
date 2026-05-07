@@ -95,6 +95,7 @@ export class InvoiceRetailComponent {
   canView = false;
   canDelete = false;
   canApprove = false;
+  canVerify: boolean = false;
   canPrint = false;
   companyID: any;
   vatTitle: any;
@@ -627,7 +628,9 @@ export class InvoiceRetailComponent {
       },
     );
   }
-
+  onVerifyInvoice(e: any) {
+    console.log('Verify clicked', e.row.data);
+  }
   onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;

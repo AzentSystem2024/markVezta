@@ -271,6 +271,7 @@ export class QuotationFormComponent {
           ITEM_CODE: item.ITEM_ID,
           ITEM_ID: item.ITEM_ID,
           STOCK_QTY: item.QUANTITY,
+          CUST_ID: data.CUST_ID || 0,
         }))
       : [];
 
@@ -893,6 +894,7 @@ export class QuotationFormComponent {
           TAX_AMOUNT: taxAmount,
           TOTAL_AMOUNT: totalAmount,
           REMARKS: row.REMARKS || '',
+          CUST_ID: this.quotationFormData.CUST_ID || 0,
         };
       }),
     };
