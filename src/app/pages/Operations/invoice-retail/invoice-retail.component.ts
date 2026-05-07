@@ -45,6 +45,7 @@ import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 import notify from 'devextreme/ui/notify';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-invoice-retail',
@@ -152,13 +153,15 @@ export class InvoiceRetailComponent {
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
   storeList: { ID: any; DESCRIPTION: any }[];
   selectedStoreId: any;
+  isVerifyInvoice: boolean = false;
+  isApproveInvoice: boolean = false;
 
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -185,6 +188,7 @@ export class InvoiceRetailComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
     this.getStoreData();
     // if (this.isHQApp && configStore) {
@@ -548,8 +552,13 @@ export class InvoiceRetailComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -591,46 +600,84 @@ export class InvoiceRetailComponent {
       });
   }
 
+  onVerifyInvoice(e: any) {
+    const rowData = e.row.data;
+
+    const invoiceId = rowData.TRANS_ID;
+    const transStatus = rowData.TRANS_STATUS;
+
+    this.isReadOnlyInvoice = transStatus === 5;
+
+    this.dataService
+      .selectInvoiceRetail(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+
+        // APPROVED -> OPEN VIEW PAGE
+        if (transStatus === 5) {
+          this.isViewInvoice = true;
+        }
+
+        // VERIFIED -> OPEN APPROVE PAGE
+        else if (transStatus === 2) {
+          this.isApproveInvoice = true;
+        }
+
+        // OPEN VERIFY PAGE
+        else {
+          this.isVerifyInvoice = true;
+        }
+      });
+  }
+
   onDeleteInvoice(event: any) {
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
+
       notify('Invoice cannot be deleted.', 'error', 2000);
+
       return;
     }
-    const invoiceId = event.data.TRANS_ID;
+
     event.cancel = true;
-    // Call your delete API
-    this.dataService.deleteInvoiceRetail(invoiceId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Invoice Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.getInvoiceList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
-    );
+
+    confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    ).then((dialogResult: boolean) => {
+      if (dialogResult) {
+        const invoiceId = event.data.TRANS_ID;
+
+        this.dataService.deleteInvoiceRetail(invoiceId).subscribe(
+          (response: any) => {
+            if (response) {
+              notify(
+                {
+                  message: 'Invoice Deleted Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+
+              this.getInvoiceList();
+            } else {
+              notify(
+                {
+                  message: 'Your Data Not deleted',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            console.error('Error deleting invoice:', error);
+          },
+        );
+      }
+    });
   }
-  onVerifyInvoice(e: any) {
-    console.log('Verify clicked', e.row.data);
-  }
+
   onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
@@ -647,7 +694,8 @@ export class InvoiceRetailComponent {
       this.isAddInvoice = false;
       this.isEditInvoice = false;
       this.isViewInvoice = false;
-
+      this.isVerifyInvoice = false;
+      this.isApproveInvoice = false;
       this.getInvoiceList();
     });
   }
@@ -691,4 +739,4 @@ export class InvoiceRetailComponent {
   exports: [InvoiceRetailComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceRetailModule { }
+export class InvoiceRetailModule {}
