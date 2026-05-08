@@ -1126,6 +1126,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}PurchaseInvoice/update`, data);
   }
 
+  verifyPurchaseInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseInvoice/verify`, data);
+  }
+
   approvePurchaseInvoice(data: Object): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseInvoice/approve`, data);
   }
@@ -1155,6 +1160,11 @@ export class DataService {
   updateMiscPayment(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscPayment/update`, data);
+  }
+
+  verifyMiscPayment(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscPayment/verify`, data);
   }
 
   selectMiscPayment(id: number) {
@@ -1188,6 +1198,11 @@ export class DataService {
   updateMiscReceipt(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscReceipt/update`, data);
+  }
+
+  verifyMiscReceipt(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscReceipt/verify`, data);
   }
 
   approveMiscReceipt(data: Object): Observable<any> {

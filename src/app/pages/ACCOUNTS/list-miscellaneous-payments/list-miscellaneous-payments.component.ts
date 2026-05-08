@@ -55,6 +55,7 @@ export class ListMiscellaneousPaymentsComponent {
   showHeaderFilter: true;
   showFilterRow = true;
   isFilterOpened = false;
+  statusFinder:any;
   miscPaymentsList: any;
   addMiscPopupOpened: boolean = false;
   editMiscPopupOpened: boolean = false;
@@ -67,6 +68,7 @@ export class ListMiscellaneousPaymentsComponent {
   isFilterRowVisible: boolean = false;
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -149,6 +151,77 @@ export class ListMiscellaneousPaymentsComponent {
   sessionData: any;
   selected_vat_id: any;
 
+   allActionButtons = [
+    {
+      name: 'edit',
+
+      hint: 'Edit',
+
+      icon: 'edit',
+
+      text: 'Edit',
+      visible: (e) => this.canEdit && e.row.data.TRANS_STATUS === 'Open' 
+    },
+
+    {
+      name: 'delete',
+
+      hint: 'Delete',
+
+      icon: 'trash',
+
+      text: 'Delete',
+
+      // onClick: (e) => this.onDeleteClick(e),
+
+      visible: (e) => e.row.data.TRANS_STATUS !== 'Approve' || e.row.data.TRANS_STATUS === 'Open' || e.row.data.TRANS_STATUS !== 'Verify' && this.canApprove,
+    },
+
+    {
+      hint: 'Verify',
+
+      icon: 'check',
+
+      text: 'Verify',
+
+      onClick: (e) => {
+        setTimeout(() => this.onVerifyClick(e));
+      },
+
+      visible: (e) =>
+        e.row.data.TRANS_STATUS !== 'Verify',
+    },
+
+    {
+      hint: 'Approve',
+
+      icon: 'check',
+
+      text: 'Approve',
+
+      onClick: (e) => {
+        setTimeout(() => this.onApproveClick(e));
+      },
+
+      visible: (e) => e.row.data.TRANS_STATUS === 'Verify',
+    },
+  ];
+
+
+      //===================Status flag=========================
+  getStatusFlagClass(status: string): string {
+    switch (status) {
+      case 'Open':
+        return 'flag-open'; // White or gray
+      case 'Verify':
+        return 'flag-verified'; // Orange
+      case 'Approve':
+        return 'flag-approved'; // Green
+      default:
+        return '';
+    }
+  }
+
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -174,6 +247,7 @@ export class ListMiscellaneousPaymentsComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
+      this.canVerify = packingRights.CanVerify;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.canApprove;
@@ -541,7 +615,45 @@ export class ListMiscellaneousPaymentsComponent {
     }
   }
 
+
+   // ============================Verify Popup function=========================================
+  onVerifyClick(e: any): void {
+    console.log(e,'event--------------')
+    this.editMiscPopupOpened = false
+    this.verifyMiscPopupOpened = true;
+    e.cancel = true;
+  const transStatus = e.row.data.TRANS_STATUS;
+  this.statusFinder = e.row.data.TRANS_STATUS;
+    const id = e.row.data.TRANS_ID;
+    console.log(id, '===================id');
+    this.dataService.selectMiscPayment(id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedmiscellaneousData = res;
+      console.log(this.selectedmiscellaneousData, '==============select data====verify');
+      // this.get_employes_details_value_select();
+      this.isReadOnlyPayment = transStatus === 'Approve';
+    });
+  }
+
+   // ============================Approve Popup function=========================================
+  onApproveClick(e: any): void {
+    this.verifyMiscPopupOpened = true;
+    e.cancel = true;
+    const transStatus = e.row.data.TRANS_STATUS;
+    this.statusFinder = e.row.data.TRANS_STATUS;
+    const id = e.row.data.TRANS_ID;
+    console.log(id, '===================id');
+    this.dataService.selectMiscPayment(id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedmiscellaneousData = res;
+      console.log(this.selectedmiscellaneousData, '==============select data====verify');
+      // this.get_employes_details_value_select();
+      this.isReadOnlyPayment = transStatus === 'Approve';
+    });
+  }
+
   onEditOrViewMiscPayment(e: any) {
+    this.editMiscPopupOpened = true;
     e.cancel = true;
     const miscId = e.data.TRANS_ID;
 
@@ -552,7 +664,7 @@ export class ListMiscellaneousPaymentsComponent {
       next: (response: any) => {
         this.selectedmiscellaneousData = response;
 
-        this.editMiscPopupOpened = true;
+        
         this.isReadOnlyPayment = status === 5;
       },
       error: (err) => {
@@ -612,6 +724,7 @@ export class ListMiscellaneousPaymentsComponent {
   handleClose() {
     this.addMiscPaymentPopup = false;
     this.editMiscPopupOpened = false;
+    this.verifyMiscPopupOpened = false;
     this.getMiscPaymentList();
   }
 

@@ -64,6 +64,7 @@ export class AddMiscellaneousPaymentComponent {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() status: any;
   @Input() canApprove: boolean = false;
   @ViewChild('miscFormGroup') miscFormGroup: DxValidationGroupComponent;
   @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;
@@ -163,6 +164,7 @@ export class AddMiscellaneousPaymentComponent {
   isSaving: boolean;
   selected_Company_id: any;
   Store: any;
+ @Input() verifyMiscPopupOpened: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -944,90 +946,236 @@ export class AddMiscellaneousPaymentComponent {
 
     // 5. Submit via API - Conditional: Approve or Update
     // 5. Submit via API - Conditional: Approve or Update
-    if (this.isApproved) {
-      confirm(
-        'Are you sure you want to approve this Miscellaneous Payment?',
-        'Confirm Approval',
-      ).then((dialogResult) => {
-        if (dialogResult) {
-          this.isSaving = true;
-          // YES -> Call approve API
-          this.dataService.approveMiscPayment(payload).subscribe({
-            next: (response: any) => {
-              this.isSaving = false;
-              if (response?.flag == 1) {
-                notify(
-                  {
-                    message: 'Miscellaneous Payment Approved Successfully',
-                    position: { at: 'top center', my: 'top center' },
-                  },
-                  'success',
-                );
-                this.popupClosed.emit();
-              } else {
-                notify(
-                  {
-                    message: response?.Message || 'Failed to approve.',
-                    position: { at: 'top center', my: 'top center' },
-                  },
-                  'error',
-                );
-              }
-            },
-            error: (err) => {
-              this.isSaving = false;
-              console.error('Approve Error:', err);
-              notify(
-                {
-                  message: 'Something went wrong while approving.',
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'error',
-              );
-            },
-          });
-        }
-        // If NO -> do nothing
-      });
 
-      return; // Stop here
-    }
-    this.isSaving = true;
-    // NOT APPROVED → normal update API
-    this.dataService.updateMiscPayment(payload).subscribe({
-      next: (response: any) => {
-        this.isSaving = false;
-        if (response?.flag == 1) {
-          notify(
-            {
-              message: 'Miscellaneous Payment Updated Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.popupClosed.emit();
-        } else {
-          notify(
-            {
-              message: response?.Message || 'Failed to update.',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'error',
-          );
-        }
-      },
-      error: (err) => {
-        this.isSaving = false;
-        console.error('Update Error:', err);
+    let apiCall;
+
+if (
+  this.status === 'Open' &&
+  this.verifyMiscPopupOpened === true
+) {
+
+  apiCall = this.dataService.verifyMiscPayment(payload);
+
+} else if (
+  this.status === 'Verify'
+) {
+
+  apiCall = this.dataService.approveMiscPayment(payload);
+
+} else {
+
+  apiCall = this.dataService.updateMiscPayment(payload);
+
+}
+
+let confirmMessage = '';
+let successMessage = '';
+
+if (
+  this.status === 'Open' &&
+  this.verifyMiscPopupOpened === true
+) {
+
+  confirmMessage =
+    'Are you sure you want to verify this Miscellaneous Payment?';
+
+  successMessage =
+    'Miscellaneous Payment Verified Successfully';
+
+} else if (
+  this.status === 'Verify'
+) {
+
+  confirmMessage =
+    'Are you sure you want to approve this Miscellaneous Payment?';
+
+  successMessage =
+    'Miscellaneous Payment Approved Successfully';
+
+} else {
+
+  successMessage =
+    'Miscellaneous Payment Updated Successfully';
+
+}
+
+const executeApi = () => {
+
+  this.isSaving = true;
+
+  apiCall.subscribe({
+    next: (response: any) => {
+
+      this.isSaving = false;
+
+      if (response?.flag == 1) {
+
         notify(
           {
-            message: 'Something went wrong while updating.',
-            position: { at: 'top center', my: 'top center' },
+            message: successMessage,
+            position: {
+              at: 'top center',
+              my: 'top center',
+            },
+          },
+          'success',
+        );
+
+        this.popupClosed.emit();
+
+      } else {
+
+        notify(
+          {
+            message:
+              response?.Message || 'Operation failed.',
+            position: {
+              at: 'top center',
+              my: 'top center',
+            },
           },
           'error',
         );
-      },
+      }
+    },
+
+    error: (err) => {
+
+      this.isSaving = false;
+
+      console.error('API Error:', err);
+
+      notify(
+        {
+          message:
+            'Something went wrong.',
+          position: {
+            at: 'top center',
+            my: 'top center',
+          },
+        },
+        'error',
+      );
+    },
+  });
+};
+
+if (
+  this.status === 'Open' &&
+  this.verifyMiscPopupOpened === true
+) {
+
+  confirm(confirmMessage, 'Confirm Verify')
+    .then((dialogResult) => {
+
+      if (dialogResult) {
+        executeApi();
+      }
+
     });
+
+} else if (
+  this.status === 'Verify'
+) {
+
+  confirm(confirmMessage, 'Confirm Approval')
+    .then((dialogResult) => {
+
+      if (dialogResult) {
+        executeApi();
+      }
+
+    });
+
+} else {
+
+  executeApi();
+
+}
+    // if (this.isApproved) {
+    //   confirm(
+    //     'Are you sure you want to approve this Miscellaneous Payment?',
+    //     'Confirm Approval',
+    //   ).then((dialogResult) => {
+    //     if (dialogResult) {
+    //       this.isSaving = true;
+    //       // YES -> Call approve API
+    //       this.dataService.approveMiscPayment(payload).subscribe({
+    //         next: (response: any) => {
+    //           this.isSaving = false;
+    //           if (response?.flag == 1) {
+    //             notify(
+    //               {
+    //                 message: 'Miscellaneous Payment Approved Successfully',
+    //                 position: { at: 'top center', my: 'top center' },
+    //               },
+    //               'success',
+    //             );
+    //             this.popupClosed.emit();
+    //           } else {
+    //             notify(
+    //               {
+    //                 message: response?.Message || 'Failed to approve.',
+    //                 position: { at: 'top center', my: 'top center' },
+    //               },
+    //               'error',
+    //             );
+    //           }
+    //         },
+    //         error: (err) => {
+    //           this.isSaving = false;
+    //           console.error('Approve Error:', err);
+    //           notify(
+    //             {
+    //               message: 'Something went wrong while approving.',
+    //               position: { at: 'top center', my: 'top center' },
+    //             },
+    //             'error',
+    //           );
+    //         },
+    //       });
+    //     }
+    //     // If NO -> do nothing
+    //   });
+
+    //   return; // Stop here
+    // }
+    // this.isSaving = true;
+    // // NOT APPROVED → normal update API
+    // this.dataService.updateMiscPayment(payload).subscribe({
+    //   next: (response: any) => {
+    //     this.isSaving = false;
+    //     if (response?.flag == 1) {
+    //       notify(
+    //         {
+    //           message: 'Miscellaneous Payment Updated Successfully',
+    //           position: { at: 'top center', my: 'top center' },
+    //         },
+    //         'success',
+    //       );
+    //       this.popupClosed.emit();
+    //     } else {
+    //       notify(
+    //         {
+    //           message: response?.Message || 'Failed to update.',
+    //           position: { at: 'top center', my: 'top center' },
+    //         },
+    //         'error',
+    //       );
+    //     }
+    //   },
+    //   error: (err) => {
+    //     this.isSaving = false;
+    //     console.error('Update Error:', err);
+    //     notify(
+    //       {
+    //         message: 'Something went wrong while updating.',
+    //         position: { at: 'top center', my: 'top center' },
+    //       },
+    //       'error',
+    //     );
+    //   },
+    // });
   }
 
   Department_dropdown() {
