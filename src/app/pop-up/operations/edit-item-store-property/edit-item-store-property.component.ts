@@ -58,6 +58,9 @@ import { confirm } from 'devextreme/ui/dialog';
 })
 export class EditItemStorePropertyComponent implements OnInit, OnChanges {
   @Input() selectedData: any = {};
+  @Input() status: any = {};
+
+
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild('dataGrid') dataGrid!: any;
 
@@ -151,63 +154,16 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
     this.loadStore();
     this.listStoreItemProperty()
   }
-  // ngOnChanges(changes: SimpleChanges) {
-  //   this.loadStore();
 
-  //   if (changes['selectedData']?.currentValue) {
-  //     const newData = changes['selectedData'].currentValue;
-
-  //     this.selectedStoreId = newData.STORE_ID;
-  //     this.selectedId = newData.ID;
-  //     this.selectedNarration = newData.NARRATION;
-
-  //     // ✅ Store selection
-  //     this.selectedStoreIds = (newData.worksheet_item_store || []).map(
-  //       (x: any) => x.STORE_ID
-  //     );
-
-  //     this.statusValue = newData.Status;
-  //     this.allowVerify = this.statusValue === '1';
-  //     this.VerifiedData = this.statusValue === '2';
-  //     this.readOnly = this.statusValue === '5';
-
-  //     // ✅ MAIN FIX: bind grid data from selectedData
-  //     if (newData.worksheet_item_property?.length) {
-  //       this.itemStoresList = newData.worksheet_item_property.map((item: any) => ({
-  //         ...item,
-
-  //         // ensure NEW fields exist
-  //         IS_NOT_SALE_ITEM_NEW: item.IS_NOT_SALE_ITEM_NEW ?? item.IS_NOT_SALE_ITEM ?? false,
-  //         IS_NOT_SALE_RETURN_NEW: item.IS_NOT_SALE_RETURN_NEW ?? item.IS_NOT_SALE_RETURN ?? false,
-  //         IS_NOT_DISCOUNTABLE_NEW: item.IS_NOT_DISCOUNTABLE_NEW ?? item.IS_NOT_DISCOUNTABLE ?? false,
-  //         IS_PRICE_REQUIRED_NEW: item.IS_PRICE_REQUIRED_NEW ?? item.IS_PRICE_REQUIRED ?? false,
-  //         IS_INACTIVE_NEW: item.IS_INACTIVE_NEW ?? item.IS_INACTIVE ?? false,
-
-  //         Selected: item.Selected ?? false
-  //       }));
-
-  //       // ✅ Bind selection to grid
-  //       this.selectedRowKeys = this.itemStoresList
-  //         .filter((x: any) => x.Selected)
-  //         .map((x: any) => x.ITEM_ID);
-  //     } else {
-  //       // fallback if no worksheet data
-  //       this.listStoreItemProperty();
-  //     }
-
-  //     // ✅ force grid update
-  //     setTimeout(() => {
-  //       if (this.dataGrid?.instance) {
-  //         this.dataGrid.instance.option('dataSource', this.itemStoresList);
-  //         this.dataGrid.instance.option('selectedRowKeys', this.selectedRowKeys);
-  //       }
-  //       this.cdr.detectChanges();
-  //     }, 0);
-  //   }
-  // }
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedData']?.currentValue) {
       const newData = changes['selectedData'].currentValue;
+      console.log(this.status, '=================status from log===============');
+      if (this.status == 'viewScreen') {
+        this.isView = true
+      } else {
+        this.isView = false
+      }
 
       this.selectedData = newData;
 
@@ -234,14 +190,14 @@ export class EditItemStorePropertyComponent implements OnInit, OnChanges {
       this.listStoreItemProperty();
     }
   }
-get selectedStoreHint(): string {
-  if (!this.selectedStoreIds?.length) return 'No store selected';
+  get selectedStoreHint(): string {
+    if (!this.selectedStoreIds?.length) return 'No store selected';
 
-  return this.store
-    .filter((s: any) => this.selectedStoreIds.includes(s.ID))
-    .map((s: any) => s.STORE_NAME)
-    .join(', ');
-}
+    return this.store
+      .filter((s: any) => this.selectedStoreIds.includes(s.ID))
+      .map((s: any) => s.STORE_NAME)
+      .join(', ');
+  }
 
 
 
@@ -392,7 +348,7 @@ get selectedStoreHint(): string {
       })),
     };
 
-    if (this.approveValue) {
+    if (this.status == 'ApprovalScreen') {
       confirm('It will approve and commit. Are you sure you want to commit?', 'Confirm Commit')
         .then((result: any) => {
           if (!result) return;
@@ -407,7 +363,22 @@ get selectedStoreHint(): string {
             },
           );
         });
-    } else {
+    }
+    else if (this.status == 'VerificationScreen') {
+      this.dataservice.verifyItemStoreProperties(payload).subscribe(
+        () => {
+          this.isSaved = true;
+          notify('Data verified successfully', 'success', 2000);
+          this.popupClosed.emit();
+        },
+        (error: any) => {
+          console.error('Save error:', error);
+          notify('Error saving data', 'error', 2000);
+        },
+      );
+    }
+
+    else {
       this.dataservice.updateworksheetItemProperty(payload).subscribe(
         () => {
           this.isSaved = true;
@@ -540,6 +511,19 @@ get selectedStoreHint(): string {
         this.cdr.detectChanges();
       }, 0);
     });
+  }
+
+  getButtonText(): string {
+    if (this.status == 'ApprovalScreen') {
+      return 'Approve';
+    } else if (this.status == 'VerificationScreen') {
+      return 'Verify';
+    }
+    else {
+      return 'Update';
+    }
+
+    return '';
   }
 }
 

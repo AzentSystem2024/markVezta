@@ -61,12 +61,12 @@
         ></dxi-item>
 
         <!-- <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item> -->
-        <dxi-item
+        <!-- <dxi-item
           location="after"
           template="ApproveButtons"
           cssClass="bottom-toolbar-buttons"
         >
-        </dxi-item>
+        </dxi-item> -->
         <dxi-item
           location="after"
           template="cancelButton"
@@ -113,12 +113,12 @@
         ></dx-text-box>
       </div>
       <div *dxTemplate="let data of 'ApproveButtons'">
-        <dx-check-box
+        <!-- <dx-check-box
           text="Approve"
           [(value)]="isApproved"
           stylingMode="outlined"
         >
-        </dx-check-box>
+        </dx-check-box> -->
       </div>
       <div *dxTemplate="let data of 'cancelButton'">
         <dx-button
@@ -141,11 +141,11 @@
       </div>
       <div *dxTemplate="let data of 'saveButton'">
         <dx-button
-          [text]="isApproved ? 'Approve' : 'Save'"
+          text="Approve"
           stylingMode="contained"
           type="default"
           (onClick)="onSaveButtonClick()"
-          [disabled]="isApplyButtonDisabled || !areRowsSelected() || isSaving"
+          [disabled]="isSaving"
           [loading]="isSaving"
           style="width: 100px"
         ></dx-button>
@@ -208,7 +208,6 @@
           [allowEditing]="statusOfWorksheet !== 'Approved'"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2 }"
-          [allowEditing]="statusOfWorksheet !== 'Verified'"
         >
         </dxi-column>
       </dxi-column>
@@ -231,7 +230,6 @@
           caption="New"
           [width]="100"
           alignment="right"
-          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
@@ -255,7 +253,6 @@
           caption="New"
           [width]="100"
           alignment="right"
-          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
@@ -279,7 +276,6 @@
           caption="New"
           [width]="100"
           alignment="right"
-          [allowEditing]="statusOfWorksheet !== 'Verified'"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
@@ -303,7 +299,6 @@
           caption="New"
           [width]="100"
           alignment="right"
-          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
@@ -327,7 +322,6 @@
           caption="New"
           [width]="100"
           alignment="right"
-          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>

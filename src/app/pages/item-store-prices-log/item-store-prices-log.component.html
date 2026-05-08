@@ -34,8 +34,8 @@
       ></dxo-scrolling>
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-search-panel
         [visible]="true"
@@ -121,10 +121,8 @@
         <i
           class="fas fa-flag"
           [ngClass]="getStatusFlagClass(cellData.value)"
-          [attr.title]="cellData.value == 'Open' ? 'Open ' : 'Approve '"
-          style="cursor: default; align-items: center"
+          [attr.title]="cellData.value"
         ></i>
-              
       </div>
       <dxi-column
         type="buttons"

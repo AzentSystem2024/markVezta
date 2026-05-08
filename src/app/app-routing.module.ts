@@ -1093,11 +1093,11 @@ const routes: Routes = [
         component: PromotionApproveComponent,
         canActivate: [AuthGuardService],
       },
-      {
-        path: 'item-store-properties-log',
-        component: ItemStorePropertiesLogComponent,
-        canActivate: [AuthGuardService],
-      },
+      // {
+      //   path: 'item-store-properties-log',
+      //   component: ItemStorePropertiesLogComponent,
+      //   canActivate: [AuthGuardService],
+      // },
       {
         path: 'promotion-schema',
         component: PromotionSchemaLogComponent,
@@ -1220,7 +1220,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
 
-         {
+      {
         path: 'item-store-price-approve',
         component: ItemStorePriceApproveComponent,
         canActivate: [AuthGuardService],
