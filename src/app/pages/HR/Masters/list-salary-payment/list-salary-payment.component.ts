@@ -129,7 +129,7 @@ export class ListSalaryPaymentComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -146,9 +146,9 @@ export class ListSalaryPaymentComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.sessionData_tax();
     this.selectedDateRange = 'today';
@@ -568,4 +568,4 @@ export class ListSalaryPaymentComponent {
   exports: [ListSalaryPaymentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ListSalaryPaymentModule {}
+export class ListSalaryPaymentModule { }

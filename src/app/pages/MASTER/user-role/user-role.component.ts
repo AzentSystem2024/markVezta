@@ -130,7 +130,7 @@ export class UserRoleComponent implements OnInit {
         });
       }),
   });
-  
+
 
   constructor(
     private fb: FormBuilder,
@@ -138,7 +138,7 @@ export class UserRoleComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -157,10 +157,10 @@ export class UserRoleComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.HideCost = packingRights.HideCost;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -429,4 +429,4 @@ export class UserRoleComponent implements OnInit {
   exports: [],
   declarations: [UserRoleComponent],
 })
-export class UserRoleModule {}
+export class UserRoleModule { }

@@ -53,7 +53,7 @@ import DataSource from 'devextreme/data/data_source';
   templateUrl: './accounts-list.component.html',
   styleUrls: ['./accounts-list.component.scss'],
 })
-export class AccountsListComponent implements OnInit{
+export class AccountsListComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -83,7 +83,7 @@ export class AccountsListComponent implements OnInit{
   };
 
   auto: string = 'auto';
-  
+
   selectedAccountHead: any;
 
   searchButtonOptions = {
@@ -123,7 +123,7 @@ export class AccountsListComponent implements OnInit{
     text: '',
   };
 
-   getStatusFilterData = [
+  getStatusFilterData = [
     {
       text: 'Approved',
       value: 'Approved',
@@ -140,7 +140,7 @@ export class AccountsListComponent implements OnInit{
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -159,9 +159,9 @@ export class AccountsListComponent implements OnInit{
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getAccountsGroupList();
@@ -382,4 +382,4 @@ export class AccountsListComponent implements OnInit{
   exports: [AccountsListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AccountsListModule {}
+export class AccountsListModule { }

@@ -501,9 +501,9 @@ export class CustomerListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.showCustomer();
@@ -556,7 +556,7 @@ export class CustomerListComponent {
     //   this.StateDropdownData = data;
     // });
   }
-  onStateSelectionChanged(event: any) {}
+  onStateSelectionChanged(event: any) { }
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
@@ -664,4 +664,4 @@ export class CustomerListComponent {
   exports: [],
   declarations: [CustomerListComponent],
 })
-export class CustomerListModule {}
+export class CustomerListModule { }

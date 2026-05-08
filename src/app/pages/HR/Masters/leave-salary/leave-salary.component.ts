@@ -6,6 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -38,11 +39,17 @@ export class LeaveSalaryComponent {
   showPageSizeSelector = true;
   showHeaderFilter = true;
   isFilterRowVisible: boolean = false;
-
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
     private ngZone: NgZone,
+    private router: Router,
   ) {
     this.formsource = this.fb.group({
       CODE: ['', Validators.required],
@@ -86,6 +93,25 @@ export class LeaveSalaryComponent {
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+    }
+  }
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
@@ -205,7 +231,7 @@ export class LeaveSalaryComponent {
     const isDuplicate = this.LeaveType.some((data: any) => {
       return (
         data.DESCRIPTION?.toLowerCase().trim() ===
-          DESCRIPTION?.toLowerCase().trim() ||
+        DESCRIPTION?.toLowerCase().trim() ||
         data.CODE?.toLowerCase().trim() === CODE?.toLowerCase().trim()
       );
     });
@@ -272,7 +298,7 @@ export class LeaveSalaryComponent {
       if (data.ID === ID) return false;
       return (
         (data.DESCRIPTION?.toLowerCase() || '') ===
-          (DESCRIPTION?.trim().toLowerCase() || '') ||
+        (DESCRIPTION?.trim().toLowerCase() || '') ||
         (data.CODE?.toLowerCase() || '') === (CODE?.trim().toLowerCase() || '')
       );
     });
@@ -369,4 +395,4 @@ export class LeaveSalaryComponent {
   exports: [],
   declarations: [LeaveSalaryComponent],
 })
-export class LeaveSalaryModule {}
+export class LeaveSalaryModule { }

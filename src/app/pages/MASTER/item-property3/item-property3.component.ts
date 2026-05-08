@@ -71,7 +71,7 @@ export class ItemProperty3Component {
     authservice: AuthService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private router:Router
+    private router: Router
   ) {
     this.itemlabel = authservice.getsettingsData().ITEM_PROPERTY3;
 
@@ -122,17 +122,17 @@ export class ItemProperty3Component {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sessionDetails();
@@ -345,4 +345,4 @@ export class ItemProperty3Component {
   declarations: [ItemProperty3Component],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemProperty3Module {}
+export class ItemProperty3Module { }

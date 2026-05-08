@@ -105,9 +105,9 @@ export class SettingsListComponent {
     //   this.canAdd = packingRights.CanAdd;
     //   this.canEdit = packingRights.CanEdit;
     //   this.canDelete = packingRights.CanDelete;
-    //   this.canPrint = packingRights.CanEdit;
+    //   this.canPrint = packingRights.CanPrint;
     //   this.canView = packingRights.canView;
-    //   this.canApprove = packingRights.canApprove;
+    //   this.canApprove=packingRights.CanApprove;
     // }
 
     // this.getCreditNotes();
@@ -120,7 +120,7 @@ export class SettingsListComponent {
       COMPANY_ID: this.selectedCompany,
       TRANS_TYPE: this.trans_id,
     };
-    this.service.Doc_Last_SNo(payload).subscribe((res: any) => {});
+    this.service.Doc_Last_SNo(payload).subscribe((res: any) => { });
   }
 
   //========================list for doc settings========================
@@ -250,4 +250,4 @@ export class SettingsListComponent {
   exports: [SettingsListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SettingsListModule {}
+export class SettingsListModule { }

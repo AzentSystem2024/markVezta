@@ -210,7 +210,7 @@ export class SalesOrderFinancePopupFormComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
@@ -274,6 +274,7 @@ export class SalesOrderFinancePopupFormComponent {
             AMOUNT: item.AMOUNT || '',
             TAX_AMOUNT: item.TAX_AMOUNT || 0,
             TOTAL_AMOUNT: item.TOTAL_AMOUNT || 0,
+            CUST_ID: response.CUST_ID,
             ...item,
           }))
         : [];
@@ -1439,6 +1440,7 @@ export class SalesOrderFinancePopupFormComponent {
           TAX_PERCENT: row.TAX_PERCENT || 0,
           TAX_AMOUNT: taxAmount,
           TOTAL_AMOUNT: totalAmount,
+          CUST_ID: this.salesOrderFormData.CUST_ID,
         };
       }),
     };

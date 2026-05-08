@@ -66,7 +66,7 @@ import { MiscSalesInvoiceFormComponent, MiscSalesInvoiceFormModule } from '../PO
 export class MiscSalesInvoiceListComponent {
   @ViewChild(MiscSalesInvoiceFormComponent) addInvoiceComp!: MiscSalesInvoiceFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent|undefined;
+  dataGrid: DxDataGridComponent | undefined;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -132,7 +132,7 @@ export class MiscSalesInvoiceListComponent {
   invoiceCount = 0;
   isEditInvoice: boolean = false;
   selectedInvoice: any;
-  isViewInvoice: boolean=false;
+  isViewInvoice: boolean = false;
 
   sessionData: any;
   selected_Company_id: any;
@@ -168,16 +168,16 @@ export class MiscSalesInvoiceListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     //
     const packingRights = menuGroups
-      .flatMap((group:any) => group.Menus)
-      .find((menu:any) => menu.Path === '/invoice');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/invoice');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     //
@@ -364,7 +364,7 @@ export class MiscSalesInvoiceListComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -554,7 +554,7 @@ export class MiscSalesInvoiceListComponent {
 
     this.dataService.getMiscSalesInvoiceByID(invoiceId).subscribe((response: any) => {
       this.selectedInvoice = response;
-      console.log(this.selectedInvoice,"selectedInvoice")
+      console.log(this.selectedInvoice, "selectedInvoice")
       if (transStatus === 5) {
         // Open view popup
         this.isViewInvoice = true;
@@ -625,9 +625,9 @@ export class MiscSalesInvoiceListComponent {
   }
 
   handleAfterSave() {
-    this.isAddInvoice = false;   
+    this.isAddInvoice = false;
     this.isEditInvoice = false;
-    this.getInvoiceList();       
+    this.getInvoiceList();
   }
 
 }
@@ -680,4 +680,4 @@ export class MiscSalesInvoiceListComponent {
   exports: [MiscSalesInvoiceListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class MiscSalesInvoiceListModule {}
+export class MiscSalesInvoiceListModule { }

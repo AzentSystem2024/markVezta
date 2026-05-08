@@ -102,7 +102,7 @@ export class ImportItemsDialogComponent implements AfterViewInit {
     private service: DataService,
     private cd: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
@@ -131,9 +131,9 @@ export class ImportItemsDialogComponent implements AfterViewInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();
@@ -627,4 +627,4 @@ export class ImportItemsDialogComponent implements AfterViewInit {
   exports: [ImportItemsDialogComponent],
   declarations: [ImportItemsDialogComponent],
 })
-export class ImportItemsDialogModule {}
+export class ImportItemsDialogModule { }

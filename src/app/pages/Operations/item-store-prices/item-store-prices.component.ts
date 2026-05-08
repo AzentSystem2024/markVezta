@@ -272,9 +272,9 @@ export class ItemStorePricesComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.sesstion_Details();

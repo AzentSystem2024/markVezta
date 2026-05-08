@@ -54,6 +54,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @ViewChild('supplierItemsGrid') supplierItemsGrid: DxDataGridComponent;
   @Input() formdata: any;
+  @Input() isVerifyMode: boolean = false;
   poHistoryList: any;
   selectedCompanyId: any;
   companyList: any[];
@@ -260,9 +261,9 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {

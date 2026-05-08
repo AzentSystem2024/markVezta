@@ -107,7 +107,7 @@ export class TimesheetAddComponent {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -124,9 +124,9 @@ export class TimesheetAddComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -445,7 +445,7 @@ export class TimesheetAddComponent {
 
     return `${day}-${month}-${year}`;
   }
-  
+
   saveTimesheet() {
     if (
       this.timesheetFormData.EMP_ID === '' ||
@@ -653,4 +653,4 @@ export class TimesheetAddComponent {
   exports: [TimesheetAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetAddModule {}
+export class TimesheetAddModule { }

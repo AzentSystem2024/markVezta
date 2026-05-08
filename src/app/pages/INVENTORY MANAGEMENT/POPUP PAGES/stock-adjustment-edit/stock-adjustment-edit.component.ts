@@ -158,7 +158,7 @@ export class StockAdjustmentEditComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.hidecost = packingRights.HideCost;
       this.canApprove = packingRights.CanApprove;

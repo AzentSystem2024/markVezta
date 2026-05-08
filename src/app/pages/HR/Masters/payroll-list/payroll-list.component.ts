@@ -198,7 +198,7 @@ export class PayrollListComponent {
     private zone: NgZone,
     private router: Router,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -235,9 +235,9 @@ export class PayrollListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getPayrollList();
@@ -268,7 +268,7 @@ export class PayrollListComponent {
       this.cdr.detectChanges();
     });
   }
-  onToolbarPreparing(e: any) {}
+  onToolbarPreparing(e: any) { }
   approveSelectedPayroll() {
     console.log('PAYROLLAPPROVE');
     const selectedRows = this.dataGrid.instance.getSelectedRowsData();
@@ -701,4 +701,4 @@ export class PayrollListComponent {
   exports: [PayrollListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PayrollListModule {}
+export class PayrollListModule { }

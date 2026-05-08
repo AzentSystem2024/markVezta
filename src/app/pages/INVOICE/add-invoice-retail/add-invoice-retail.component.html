@@ -200,7 +200,7 @@
             caption="Cost"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
 
           <dxi-column
@@ -300,14 +300,13 @@
           <dx-check-box
             text="Approve"
             [(value)]="invoiceFormData.IS_APPROVED"
-            [visible]="!isReadOnlyMode"
+            [visible]="!isReadOnlyMode && !isApproveMode"
           ></dx-check-box>
         </div>
         <dx-button
           text="Cancel"
           stylingMode="outlined"
           type="normal"
-          [visible]="!isReadOnlyMode"
           (onClick)="cancel()"
         ></dx-button>
 

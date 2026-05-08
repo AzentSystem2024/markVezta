@@ -153,9 +153,9 @@ export class FixedAsstesListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.list_fixed_assets();
@@ -413,4 +413,4 @@ export class FixedAsstesListComponent {
   declarations: [FixedAsstesListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class FixedAsstesListModule {}
+export class FixedAsstesListModule { }

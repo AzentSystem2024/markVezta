@@ -52,14 +52,14 @@ export class SalaryHeadListComponent {
   @ViewChild(SalaryHeadAddComponent)
   SalaryHeadAddComponent!: SalaryHeadAddComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent|undefined;
+  dataGrid: DxDataGridComponent | undefined;
   @ViewChild('SalaryHeadValidation', { static: false })
-  SalaryHeadValidation: DxValidationGroupComponent|undefined;
+  SalaryHeadValidation: DxValidationGroupComponent | undefined;
   salaryHeadList: any = [];
   readonly allowedPageSizes: any = [10, 15, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter:boolean= true;
+  showHeaderFilter: boolean = true;
   addSalaryHeadPopupOpened: boolean = false;
   EditSalaryHeadPopupOpened: boolean = false;
   Selected_salaryHead_Data: any;
@@ -100,7 +100,7 @@ export class SalaryHeadListComponent {
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
-  isFilterOpened:boolean= false;
+  isFilterOpened: boolean = false;
 
   onExporting(event: any) {
     const fileName = 'Credit_Note';
@@ -115,7 +115,7 @@ export class SalaryHeadListComponent {
     text: '',
   };
   selected_Company_id: any;
-  
+
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
@@ -129,16 +129,16 @@ export class SalaryHeadListComponent {
 
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group:any) => group.Menus)
-      .find((menu:any) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sesstion_Details();
@@ -288,4 +288,4 @@ export class SalaryHeadListComponent {
   exports: [SalaryHeadListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalaryHeadListModule {}
+export class SalaryHeadListModule { }

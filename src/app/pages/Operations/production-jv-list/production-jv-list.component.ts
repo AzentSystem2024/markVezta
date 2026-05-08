@@ -181,7 +181,7 @@ export class ProductionJvListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -201,9 +201,9 @@ export class ProductionJvListComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
   }
 
@@ -928,4 +928,4 @@ export class ProductionJvListComponent {
   exports: [ProductionJvListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ProductionJvListModule {}
+export class ProductionJvListModule { }

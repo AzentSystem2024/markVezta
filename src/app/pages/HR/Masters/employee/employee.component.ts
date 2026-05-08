@@ -117,7 +117,7 @@ export class EmployeeComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   onExporting(event: any) {
     const fileName = 'Credit_Note';
@@ -156,9 +156,9 @@ export class EmployeeComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     // this.isLoading = true;
     this.sesstion_Details();
@@ -214,8 +214,8 @@ export class EmployeeComponent implements OnInit {
   applyFilter() {
     this.GridSource.filter();
   }
-  
-  onAddClick() {}
+
+  onAddClick() { }
 
   addEmployee() {
     this.addEmployeePopupOpened = true;
@@ -333,4 +333,4 @@ export class EmployeeComponent implements OnInit {
   exports: [EmployeeComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeModule {}
+export class EmployeeModule { }

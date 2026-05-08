@@ -111,8 +111,8 @@ export class VatClassFinanceComponent implements OnInit {
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private router :Router
-  ) {}
+    private router: Router
+  ) { }
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'VAT_class-list');
@@ -132,17 +132,17 @@ export class VatClassFinanceComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .flatMap((menu: any) => menu.Children || [])
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.sessionDetails();
@@ -302,4 +302,4 @@ export class VatClassFinanceComponent implements OnInit {
   exports: [],
   declarations: [VatClassFinanceComponent],
 })
-export class VatClassFinanceModule {}
+export class VatClassFinanceModule { }

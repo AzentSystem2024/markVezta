@@ -4,8 +4,10 @@
     <dx-data-grid
       #dataGrid
       [width]="'100%'"
-      [height]="'530px'"
+      [height]="'75vh'"
+      [keyExpr]="'ID'"
       class="grid theme-dependent"
+      noDataText=" "
       [dataSource]="worksheetItems"
       [showBorders]="true"
       [columnAutoWidth]="true"
@@ -13,18 +15,25 @@
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
       [allowColumnResizing]="true"
+      [showColumnLines]="true"
       [editing]="{
         mode: 'cell',
-        allowUpdating: true
+        allowUpdating: true,
       }"
-
-      [selectedRowKeys]="selectedIds"
-      (onSelectionChanged)="onSelectionChanged($event)"
-      [keyExpr]="'ID'"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+      [selectedRowKeys]="selectedRowKeys"
       (onSelectionChanged)="onSelectionChanged($event)"
       (onRowUpdated)="onRowUpdated($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
       <dxo-scrolling
         mode="standard"
         columnRenderingMode="virtual"
@@ -43,127 +52,119 @@
         <dxi-item location="before">
           <div class="grid-header">Change Price</div>
         </dxi-item>
-        <dxi-item location="before"> </dxi-item>
-        <dxi-item location="before"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto">
-          <dx-tag-box
-            [items]="store"
-            valueExpr="ID"
-            [(value)]="selectedStoreId"
-            displayExpr="STORE_NAME"
-            label="Select Store"
-            labelMode="floating"
-            labelLocation="left"
-            [showSelectionControls]="true"
-            [multiline]="false"
-            [searchEnabled]="true"
-            (onValueChanged)="onDropdownValueChanged($event)"
-            [width]="300"
-          >
-          </dx-tag-box>
+        <dxi-item location="after" template="priceColumnSelector"> </dxi-item>
+        <dxi-item location="after" template="narration"> </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item> -->
+        <dxi-item
+          location="after"
+          template="ApproveButtons"
+          cssClass="bottom-toolbar-buttons"
+        >
+        </dxi-item>
+        <dxi-item
+          location="after"
+          template="cancelButton"
+          cssClass="bottom-toolbar-buttons"
+        >
         </dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto">
-          <dx-button icon="refresh" stylingMode="text"></dx-button>
+        <dxi-item
+          location="after"
+          template="formulaButton"
+          cssClass="bottom-toolbar-buttons"
+        >
         </dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <div class="separator"></div>
+        <dxi-item
+          location="after"
+          template="saveButton"
+          cssClass="bottom-toolbar-buttons"
+        >
         </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <div class="separator"></div>
-        </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="before" locateInMenu="auto"> </dxi-item>
-        <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
-
-        <dxi-item location="after" cssClass="bottom-toolbar-buttons">
-          <dx-button
-            text="Cancel"
-            stylingMode="outlined"
-            type="normal"
-            (onClick)="Cancel()"
-            style="width: 100px"
-          ></dx-button>
-        </dxi-item>
-
-        <dxi-item location="after" cssClass="bottom-toolbar-buttons">
-          <dx-button
-            icon="formula"
-            hint="Apply Formula"
-            stylingMode="contained"
-            type="default"
-            (onClick)="applyFormula($event)"
-            [disabled]="isButtonDisabled"
-          ></dx-button>
-        </dxi-item>
-
-        <dxi-item location="after" cssClass="bottom-toolbar-buttons">
-          <dx-button
-            *ngIf="!isSaved && !isVerified"
-            text="Save"
-            stylingMode="contained"
-            type="default"
-            (onClick)="onSaveButtonClick()"
-            [disabled]="isButtonDisabled || !areRowsSelected()"
-            style="width: 100px"
-          ></dx-button>
-
-          <dx-button
-            *ngIf="isSaved && !isVerified && AllowCommitWithSave"
-            text="Verify"
-            stylingMode="contained"
-            type="default"
-            (onClick)="onVerify()"
-            style="width: 100px"
-          ></dx-button>
-
-          <dx-button
-            *ngIf="isVerified && AllowCommitWithSave"
-            text="Approve"
-            stylingMode="contained"
-            type="default"
-            (onClick)="onApprove()"
-            style="width: 100px"
-          ></dx-button>
-          <!-- <dx-button 
-                       text="Change Price" 
-                       stylingMode="contained" 
-                       type="default" 
-                       (onClick)="applyFormula()" 
-                       style="width: 100px;"></dx-button> -->
-        </dxi-item>
-        <!-- <dxi-item location="after" locateInMenu="auto">
-            <dx-button
-              text="Cancel"
-              type="normal"
-              (onClick)="Cancel()"
-              stylingMode="contained"
-            ></dx-button>
-          </dxi-item>
-  
-          <dxi-item location="after" locateInMenu="auto">
-            <dx-button
-              text="Save"
-              type="default"
-              (onClick)="Save()"
-              stylingMode="contained"
-            ></dx-button>
-          </dxi-item> -->
       </dxo-toolbar>
+      <div *dxTemplate="let data of 'priceColumnSelector'">
+        <dx-tag-box
+          [items]="priceColumnOptions"
+          valueExpr="value"
+          displayExpr="text"
+          width="250"
+          label="Select Prices"
+          [(value)]="selectedPriceColumns"
+          placeholder="Select Prices"
+          labelMode="floating"
+          [showSelectionControls]="true"
+          (onValueChanged)="onPriceColumnChange()"
+          [multiline]="false"
+        >
+        </dx-tag-box>
+      </div>
+
+      <div *dxTemplate="let data of 'narration'">
+        <dx-text-box
+          [(value)]="narrationText"
+          placeholder="Enter Remarks"
+          style="width: 250px"
+        ></dx-text-box>
+      </div>
+      <div *dxTemplate="let data of 'ApproveButtons'">
+        <dx-check-box
+          text="Approve"
+          [(value)]="isApproved"
+          stylingMode="outlined"
+        >
+        </dx-check-box>
+      </div>
+      <div *dxTemplate="let data of 'cancelButton'">
+        <dx-button
+          text="Cancel"
+          stylingMode="outlined"
+          type="normal"
+          (onClick)="Cancel()"
+          style="width: 100px"
+        ></dx-button>
+      </div>
+      <div *dxTemplate="let data of 'formulaButton'">
+        <dx-button
+          icon="formula"
+          hint="Apply Formula"
+          stylingMode="contained"
+          type="default"
+          (onClick)="applyFormula($event)"
+          [disabled]="isButtonDisabled"
+        ></dx-button>
+      </div>
+      <div *dxTemplate="let data of 'saveButton'">
+        <dx-button
+          [text]="isApproved ? 'Approve' : 'Save'"
+          stylingMode="contained"
+          type="default"
+          (onClick)="onSaveButtonClick()"
+          [disabled]="isApplyButtonDisabled || !areRowsSelected() || isSaving"
+          [loading]="isSaving"
+          style="width: 100px"
+        ></dx-button>
+      </div>
       <dxi-column
-        dataField="BARCODE"
-        caption="Barcode"
+        dataField="ITEM_CODE"
+        caption="Item Code"
         [width]="150"
         [allowEditing]="false"
       ></dxi-column>
       <dxi-column
         dataField="DESCRIPTION"
         caption="Description"
+        [width]="220"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="ITEM_TYPE"
+        caption="Item Type"
         [width]="220"
         [allowEditing]="false"
       ></dxi-column>
@@ -186,7 +187,12 @@
         [allowEditing]="false"
       ></dxi-column>
 
-      <dxi-column caption="Price" [width]="120" alignment="center">
+      <dxi-column
+        caption="MRP"
+        [visible]="isVisible('MRP')"
+        [width]="120"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE"
           caption="Present"
@@ -199,13 +205,20 @@
           caption="New"
           [width]="100"
           [allowEditing]="true"
+          [allowEditing]="statusOfWorksheet !== 'Approved'"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2 }"
+          [allowEditing]="statusOfWorksheet !== 'Verified'"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 1" [width]="120" alignment="center">
+      <dxi-column
+        caption="Standard Price"
+        [width]="120"
+        [visible]="isVisible('PRICE1')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE1"
           caption="Present"
@@ -218,12 +231,18 @@
           caption="New"
           [width]="100"
           alignment="right"
+          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 2" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 2"
+        [width]="120"
+        [visible]="isVisible('PRICE2')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE2"
           caption="Present"
@@ -236,12 +255,18 @@
           caption="New"
           [width]="100"
           alignment="right"
+          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 3" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 3"
+        [width]="120"
+        [visible]="isVisible('PRICE3')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE3"
           caption="Present"
@@ -254,12 +279,18 @@
           caption="New"
           [width]="100"
           alignment="right"
+          [allowEditing]="statusOfWorksheet !== 'Verified'"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 4" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 4"
+        [width]="120"
+        [visible]="isVisible('PRICE4')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE4"
           caption="Present"
@@ -272,12 +303,18 @@
           caption="New"
           [width]="100"
           alignment="right"
+          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Price 5" [width]="120" alignment="center">
+      <dxi-column
+        caption="Price 5"
+        [width]="120"
+        [visible]="isVisible('PRICE5')"
+        alignment="center"
+      >
         <dxi-column
           dataField="SALE_PRICE5"
           caption="Present"
@@ -290,6 +327,7 @@
           caption="New"
           [width]="100"
           alignment="right"
+          [allowEditing]="!isVerified"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
         </dxi-column>
@@ -309,13 +347,14 @@
   <div class="popup-content">
     <div class="form-row">
       <div class="input-container">
-        <dx-text-box
+        <dx-number-box
           [(value)]="percentageString"
           placeholder="Enter percentage"
           [showSpinButtons]="true"
-          (onValueChanged)="handlePercentageChange($event)"
+          label="enter percentage(%)"
+          labelMode="floating"
           style="width: 350px"
-        ></dx-text-box>
+        ></dx-number-box>
         <div class="toggle-container" (click)="toggleAdjustment()">
           <div
             class="toggle-slider"
@@ -344,12 +383,11 @@
         displayExpr="text"
         valueExpr="value"
         placeholder="Choose rounding option"
-        (onValueChanged)="handleRoundingChange($event)"
       ></dx-select-box>
     </div>
 
     <div>
-      <dxi-item>
+      <dxi-item location="before" locateInMenu="auto">
         <dx-tag-box
           [items]="salePriceOptions"
           valueExpr="value"
@@ -363,9 +401,18 @@
           [searchEnabled]="true"
           (onValueChanged)="handleSalePriceChange($event)"
           [width]="300"
+          [disabled]="statusOfWorksheet === 'Approved'"
         >
         </dx-tag-box>
       </dxi-item>
+      <!-- <dx-select-box
+        [(value)]="selectedSalePrice"
+        [items]="salePriceOptions"
+        valueExpr="value"       
+        displayExpr="text"       
+        placeholder="Select Price Option"
+        (onValueChanged)="handleSalePriceChange($event)"
+      ></dx-select-box> -->
     </div>
 
     <div>
@@ -375,6 +422,7 @@
         type="default"
         (onClick)="applyPriceChange()"
         style="width: 150px"
+        [disabled]="isApplyButtonDisabled && isApproved"
       ></dx-button>
     </div>
   </div>

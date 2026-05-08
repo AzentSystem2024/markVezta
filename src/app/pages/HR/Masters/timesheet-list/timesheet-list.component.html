@@ -53,8 +53,8 @@
       </dxo-export>
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="isDeleteVisible"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="isDeleteVisible || canDelete"
       ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -148,6 +148,7 @@
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
         <dxi-item
+          *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           [options]="addButtonOptions"
@@ -156,6 +157,7 @@
         </dxi-item>
 
         <dxi-item
+          *ngIf="canApprove"
           location="after"
           widget="dxButton"
           [options]="approveButtonOptions"

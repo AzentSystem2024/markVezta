@@ -26,8 +26,8 @@
   >
     <dxo-editing
       mode="popup"
-      [allowUpdating]="true"
-      [allowDeleting]="true"
+      [allowUpdating]="false"
+      [allowDeleting]="false"
     ></dxo-editing>
     <dxo-export
       [enabled]="true"
@@ -155,13 +155,89 @@
         dataSource: getStatusFilterData,
         encodeHtml: false,
       }"
-      [fixed]="true"
-      fixedPosition="right"
     >
     </dxi-column>
-    <dxi-column type="buttons" [buttons]="allButtonsEditDelete"> </dxi-column>
-    <!-- <dxi-column type="buttons" width="100" [buttons]="customButtons">
-    </dxi-column> -->
+    <dxi-column caption="Actions" [width]="140" cellTemplate="actionTemplate">
+    </dxi-column>
+
+    <div *dxTemplate="let cellData of 'actionTemplate'">
+      <!-- Verify / Approve / View -->
+      <span
+        *ngIf="
+          canVerify ||
+          (canApprove && cellData.data.STATUS === 'Verified') ||
+          (canView && cellData.data.STATUS === 'Approved')
+        "
+        style="
+          position: relative;
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          margin-right: 12px;
+          margin-top: -4px;
+          cursor: pointer;
+          vertical-align: middle;
+        "
+        [title]="
+          cellData.data.STATUS === 'Approved'
+            ? 'View'
+            : cellData.data.STATUS === 'Verified'
+              ? 'Approve'
+              : 'Verify'
+        "
+        (click)="onVerifyClick({ row: { data: cellData.data } })"
+      >
+        <!-- Badge -->
+        <i
+          class="fas fa-certificate"
+          [style.color]="
+            cellData.data.STATUS === 'Approved'
+              ? '#10B981'
+              : cellData.data.STATUS === 'Verified'
+                ? '#0073D8'
+                : '#FFA500'
+          "
+          style="font-size: 18px; position: absolute; top: 0; left: 0"
+        ></i>
+
+        <!-- Tick -->
+        <i
+          class="fas fa-check"
+          style="
+            color: white;
+            font-size: 7px;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            pointer-events: none;
+          "
+        ></i>
+      </span>
+
+      <!-- Edit -->
+      <i
+        *ngIf="
+          canEdit &&
+          !['Approved', 'Verified', 'Closed'].includes(cellData.data.STATUS)
+        "
+        class="dx-icon dx-icon-edit"
+        style="cursor: pointer; margin-right: 10px"
+        title="Edit"
+        (click)="onEditingRow({ data: cellData.data, cancel: false })"
+      ></i>
+
+      <!-- Delete -->
+      <i
+        *ngIf="
+          canDelete &&
+          !['Approved', 'Verified', 'Closed'].includes(cellData.data.STATUS)
+        "
+        class="dx-icon dx-icon-trash"
+        style="cursor: pointer"
+        title="Delete"
+        (click)="deletePOData({ data: cellData.data })"
+      ></i>
+    </div>
   </dx-data-grid>
 
   <form-popup
@@ -212,6 +288,29 @@
       (netEditQuantityChange)="netEditQuantity = $event"
       (showSupplierAmount)="showSupplierAmount = $event"
     ></app-purchase-order-edit-form>
+  </form-popup>
+
+  <form-popup
+    *ngIf="isVerifyPopupOpened"
+    [(visible)]="isVerifyPopupOpened"
+    [width]="width"
+    [height]="height"
+    titleText="Verify Purchase Order"
+    [showNetAmount]="true"
+    [isEditMode]="true"
+    [showApprove]="false"
+    [isSaveDisabled]="isSaving"
+    (save)="VerifyPurchaseOrder()"
+  >
+    <app-purchase-order-edit-form
+      [formdata]="selectedRowData"
+      (closeForm)="CloseEditForm()"
+      (netEditSupplierAmountChange)="netVerifySupplierAmount = $event"
+      (netEditAmountChange)="netVerifyAmount = $event"
+      (netEditQuantityChange)="netVerifyQuantity = $event"
+      (showSupplierAmount)="showSupplierAmount = $event"
+    >
+    </app-purchase-order-edit-form>
   </form-popup>
 
   <dx-popup

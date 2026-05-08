@@ -109,7 +109,7 @@ export class EditJournalVoucherComponent {
     private dataService: DataService,
     private router: Router,
     private sanitizer: DomSanitizer,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -128,9 +128,9 @@ export class EditJournalVoucherComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     this.getDepartments();
     this.getStoreData();
@@ -715,8 +715,8 @@ export class EditJournalVoucherComponent {
     const nextSlNo =
       this.journalVoucherFormData.DETAILS.length > 0
         ? Math.max(
-            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
-          ) + 1
+          ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
+        ) + 1
         : 1;
 
     const newRow = {
@@ -1011,4 +1011,4 @@ export class EditJournalVoucherComponent {
   exports: [EditJournalVoucherComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditJournalVoucherModule {}
+export class EditJournalVoucherModule { }

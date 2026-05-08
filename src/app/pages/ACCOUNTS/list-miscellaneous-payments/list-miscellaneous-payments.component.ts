@@ -250,7 +250,7 @@ export class ListMiscellaneousPaymentsComponent {
       this.canVerify = packingRights.CanVerify;
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getMiscPaymentList();
@@ -382,7 +382,7 @@ export class ListMiscellaneousPaymentsComponent {
         // ✅ single binding source
         this.filteredInvoiceList = this.miscPaymentsList;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -773,4 +773,4 @@ export class ListMiscellaneousPaymentsComponent {
   exports: [ListMiscellaneousPaymentsComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class MiscellaneousPaymentsModule {}
+export class MiscellaneousPaymentsModule { }

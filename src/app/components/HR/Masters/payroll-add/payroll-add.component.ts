@@ -70,10 +70,10 @@ export class PayrollAddComponent implements OnInit, OnChanges {
     TS_ID: string;
     USER_ID: Number;
   } = {
-    COMPANY_ID: '',
-    TS_ID: '',
-    USER_ID: 0,
-  };
+      COMPANY_ID: '',
+      TS_ID: '',
+      USER_ID: 0,
+    };
   companyID: any;
   canAdd: any;
   canEdit: any;
@@ -86,7 +86,7 @@ export class PayrollAddComponent implements OnInit, OnChanges {
   constructor(
     private dataSerivice: DataService,
     private router: Router,
-  ) {}
+  ) { }
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedMonth'] && this.selectedMonth) {
       this.setSessionData();
@@ -110,9 +110,9 @@ export class PayrollAddComponent implements OnInit, OnChanges {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
     // this.payRollData.SAL_MONTH = this.selectedMonth;
     // this.getTimesheetList();
@@ -270,4 +270,4 @@ export class PayrollAddComponent implements OnInit, OnChanges {
   exports: [PayrollAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PayrollAddModule {}
+export class PayrollAddModule { }

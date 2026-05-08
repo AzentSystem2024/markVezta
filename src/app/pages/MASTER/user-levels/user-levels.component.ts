@@ -106,7 +106,7 @@ export class UserLevelsComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     console.log('=======================================================');
@@ -126,9 +126,9 @@ export class UserLevelsComponent implements OnInit {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.getUserLevelData();
@@ -310,4 +310,4 @@ export class UserLevelsComponent implements OnInit {
   exports: [],
   declarations: [UserLevelsComponent],
 })
-export class UserLevelsModule {}
+export class UserLevelsModule { }

@@ -27,6 +27,7 @@ import {
 import { DataService } from 'src/app/services';
 import { name } from '@devexpress/analytics-core/analytics-diagram';
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-employee-leave',
@@ -82,7 +83,12 @@ export class EmployeeLeaveComponent {
 
   minDate: Date | undefined;
   today = new Date();
-
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -166,6 +172,7 @@ export class EmployeeLeaveComponent {
       },
 
       visible: (e: any) =>
+        this.canApprove &&
         e.row.data.STATUS !== 'Approved' &&
         e.row.data.STATUS !== 'Verified' &&
         e.row.data.STATUS !== 'Travelled' &&
@@ -212,6 +219,7 @@ export class EmployeeLeaveComponent {
     private fb: FormBuilder,
     private dataservice: DataService,
     private ngZone: NgZone,
+    private router: Router
   ) {
     this.formsource = this.fb.group({
       Doc_no: ['', Validators.required],
@@ -247,6 +255,42 @@ export class EmployeeLeaveComponent {
     this.get_Employee_Dropdown_List();
     this.get_EOS_Dropdown_List();
   }
+  // Inside your component
+  ngOnInit(): void {
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+    }
+    // Watch manually if using template-driven form
+    Object.defineProperty(this.selectedData, 'REJOIN_DATE', {
+      set: (newValue) => {
+        this._REJOIN_DATE = newValue;
+        this.calculateLeaveDaysTaken();
+      },
+      get: () => {
+        return this._REJOIN_DATE;
+      },
+      configurable: true,
+    });
+
+    const today = new Date();
+    // Set minDate to the 1st day of the next month
+  }
+
+
   //========================STATUS====================
   onVerifyClick(e: any): void {
     e.cancel = true;
@@ -369,23 +413,6 @@ export class EmployeeLeaveComponent {
 
   //================AUTO FILL REJOIN DATEE==============
 
-  // Inside your component
-  ngOnInit(): void {
-    // Watch manually if using template-driven form
-    Object.defineProperty(this.selectedData, 'REJOIN_DATE', {
-      set: (newValue) => {
-        this._REJOIN_DATE = newValue;
-        this.calculateLeaveDaysTaken();
-      },
-      get: () => {
-        return this._REJOIN_DATE;
-      },
-      configurable: true,
-    });
-
-    const today = new Date();
-    // Set minDate to the 1st day of the next month
-  }
 
   // Backup for setter/getter
   private _REJOIN_DATE: Date | null = null;
@@ -1234,4 +1261,4 @@ export class EmployeeLeaveComponent {
   exports: [],
   declarations: [EmployeeLeaveComponent],
 })
-export class EmployeeLeaveModule {}
+export class EmployeeLeaveModule { }

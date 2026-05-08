@@ -92,8 +92,8 @@ export class TendersListComponent implements OnInit {
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
-    private router:Router
-  ) {}
+    private router: Router
+  ) { }
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Tenders-list');
   }
@@ -303,16 +303,16 @@ export class TendersListComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-    .flatMap((group: any) => group.Menus)
-    .find((child: any) => child.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((child: any) => child.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanEdit;
+      this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.canApprove;
+      this.canApprove = packingRights.CanApprove;
     }
 
     this.showTenders();
@@ -351,4 +351,4 @@ export class TendersListComponent implements OnInit {
   exports: [],
   declarations: [TendersListComponent],
 })
-export class TendersListModule {}
+export class TendersListModule { }
