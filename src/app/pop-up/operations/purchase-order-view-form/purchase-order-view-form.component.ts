@@ -171,6 +171,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   menuResponse: any;
   vatTitle: any;
   storeOrLocation: any;
+  logoImg: string;
 
   constructor(
     private service: DataService,
@@ -377,7 +378,9 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
     });
-
+    this.loadLogo().then((img) => {
+      this.logoImg = img;
+    });
     this.getCountryCodeList();
   }
 
@@ -1178,6 +1181,413 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     // ===========================
     //  RETURN PDF
     // ===========================
+    doc.output('dataurlnewwindow');
+  }
+  async loadLogo() {
+    const response = await fetch('assets/images/dmgt_logo.jpeg');
+    const blob = await response.blob();
+
+    return new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  }
+  viewPdfDMGT(): void {
+    this.service.selectPoData(this.poId).subscribe((res) => {
+      this.generatePoPdf(res);
+    });
+  }
+
+  generatePoPdf(data: any) {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+
+    // =========================
+    // TITLE
+    // =========================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('PURCHASE ORDER', pageWidth / 2, 20, { align: 'center' });
+
+    // underline
+    doc.line(pageWidth / 2 - 24, 22, pageWidth / 2 + 24, 22);
+
+    // =========================
+    // LOGO (RIGHT)
+    // =========================
+    if (this.logoImg && this.logoImg.startsWith('data:image')) {
+      // doc.addImage(this.logoImg, 'JPEG', pageWidth - 45, 10, 30, 22);
+      doc.addImage(this.logoImg, 'JPEG', 10, 8, 35, 40);
+    }
+
+    // =========================
+    // TEXT SETTINGS
+    // =========================
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+
+    let y = 35;
+
+    const labelX = 145;
+    const colonX = 170;
+    const valueX = 175;
+
+    const yPos: any = {};
+
+    // =========================
+    // LEFT SIDE
+    // =========================
+
+    // PO NO
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('PO NO.', labelX, y);
+    doc.text(':', colonX, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.DOC_NO || '', valueX, y);
+    yPos.po = y;
+
+    // DATE
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Date', labelX, y);
+    doc.text(':', colonX, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(this.formatDateToDDMMYYYY(data.PO_DATE), valueX, y);
+    yPos.date = y;
+
+    // SUPP VAT
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Supp VAT', labelX, y);
+    doc.text(':', colonX, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('', valueX, y);
+    yPos.suppVat = y;
+
+    // STORE VAT
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Store VAT', labelX, y);
+    doc.text(':', colonX, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.GST_NO || '', valueX, y);
+    yPos.storeVat = y;
+
+    // SUPPLIER
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Supplier', labelX, y);
+    doc.text(':', colonX, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.SUPP_NAME || '', valueX, y);
+    yPos.supplier = y;
+
+    // ADDRESS
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Address', labelX, y);
+    doc.text(':', colonX, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.SUPP_ADDRESS1 || '', valueX, y);
+    yPos.address = y;
+
+    // =========================
+    // RIGHT SIDE (FIXED)
+    // =========================
+
+    const rLabelX = 10;
+    const rColonX = 42;
+    const rValueX = 48;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    // ship to → align with Store VAT row
+    doc.text('ship to', rLabelX, yPos.storeVat);
+    doc.text(':', rColonX, yPos.storeVat);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.COMPANY_NAME || '', rValueX, yPos.storeVat, {
+      maxWidth: 50,
+    });
+
+    // Contact Person → align with Supplier
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Contact Person', rLabelX, yPos.supplier);
+    doc.text(':', rColonX, yPos.supplier);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.CONTACT_NAME || '', rValueX, yPos.supplier);
+
+    // Contact No → align with Address
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Contact No', rLabelX, yPos.address);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.CONTACT_MOBILE || '', rValueX, yPos.address);
+
+    // =========================
+    // TERMS TABLE (BORDERED)
+    // =========================
+
+    let tableStartY = yPos.address + 10;
+
+    const termsColumns = [
+      'Ship Method',
+      'Payment Terms',
+      'Currency',
+      'Delivery Date',
+      'Remarks (If any)',
+    ];
+
+    const termsData = [
+      [
+        data.DELIVERY_TERM || '',
+        data.PAY_TERM || '',
+        data.CURRENCY_NAME || '',
+        this.formatDateToDDMMYYYY(data.DELIVERY_DATE) || '',
+        data.NARRATION || '',
+      ],
+    ];
+
+    autoTable(doc, {
+      startY: tableStartY,
+      head: [termsColumns],
+      body: termsData,
+      theme: 'plain',
+
+      // ADD THIS (IMPORTANT)
+      margin: { left: 10, right: 10 }, // reduce margins → table becomes wider
+
+      tableWidth: 190, // or 'wrap' (see below)
+
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        valign: 'middle',
+        lineWidth: 0,
+      },
+
+      headStyles: {
+        fontStyle: 'bold',
+        fillColor: [217, 234, 249],
+        textColor: 0,
+        lineWidth: 0,
+      },
+
+      bodyStyles: {
+        lineWidth: 0,
+      },
+    });
+
+    const itemTableStartY = (doc as any).lastAutoTable.finalY + 8;
+
+    const itemColumns = [
+      'Item Code',
+      'Description',
+
+      'Qty',
+      'Unit Price',
+      'Taxable(Amt)',
+      'VAT(%)',
+      'VAT(Amt)',
+      'Total Price',
+    ];
+
+    const itemData = data.PoDetails.map((item: any) => [
+      item.ITEM_CODE || '',
+      item.ITEM_DESC || '',
+
+      item.QUANTITY || '',
+      item.PRICE || '',
+      item.SUPP_AMOUNT || '',
+      item.VAT_PERC || '',
+      item.TAX_AMOUNT || '',
+      item.TOTAL_AMOUNT || '',
+    ]);
+
+    // underline
+
+    const totalQty = data.PoDetails.reduce(
+      (sum: number, item: any) => sum + Number(item.QUANTITY || 0),
+      0,
+    );
+
+    const totalTaxable = data.PoDetails.reduce(
+      (sum: number, item: any) => sum + Number(item.SUPP_AMOUNT || 0),
+      0,
+    );
+
+    const totalVat = data.PoDetails.reduce(
+      (sum: number, item: any) => sum + Number(item.TAX_AMOUNT || 0),
+      0,
+    );
+
+    const totalPrice = data.PoDetails.reduce(
+      (sum: number, item: any) => sum + Number(item.TOTAL_AMOUNT || 0),
+      0,
+    );
+
+    autoTable(doc, {
+      startY: itemTableStartY,
+      head: [itemColumns],
+      body: itemData,
+
+      theme: 'plain',
+
+      margin: { left: 10, right: 10 },
+
+      tableWidth: 190,
+
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        valign: 'middle',
+        lineWidth: 0,
+      },
+
+      columnStyles: {
+        0: { cellWidth: 28 },
+        1: { cellWidth: 42 },
+
+        2: {
+          halign: 'center',
+          cellWidth: 18,
+        },
+
+        3: {
+          halign: 'center',
+          cellWidth: 22,
+        },
+
+        4: {
+          halign: 'center',
+          cellWidth: 24,
+        },
+
+        5: {
+          halign: 'center',
+          cellWidth: 16,
+        },
+
+        6: {
+          halign: 'center',
+          cellWidth: 24,
+        },
+
+        7: {
+          halign: 'center',
+          cellWidth: 24,
+        },
+      },
+
+      headStyles: {
+        fontStyle: 'bold',
+        fillColor: [217, 234, 249],
+        textColor: 0,
+        lineWidth: 0,
+      },
+
+      bodyStyles: {
+        lineWidth: 0,
+      },
+    });
+
+    // =========================
+    // TOTAL SECTION
+    // =========================
+
+    const finalY = (doc as any).lastAutoTable.finalY;
+
+    // top line
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.3);
+
+    doc.line(10, finalY + 3, 200, finalY + 3);
+
+    // totals
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+
+    doc.text('Total', 55, finalY + 10);
+
+    doc.text(String(totalQty), 95, finalY + 10, {
+      align: 'right',
+    });
+
+    doc.text(totalTaxable.toFixed(2), 138, finalY + 10, {
+      align: 'right',
+    });
+
+    doc.text(totalVat.toFixed(2), 170, finalY + 10, {
+      align: 'right',
+    });
+
+    doc.text(totalPrice.toFixed(2), 198, finalY + 10, {
+      align: 'right',
+    });
+
+    // =========================
+    // FOOTER COMPANY DETAILS
+    // =========================
+
+    const footerY = doc.internal.pageSize.height - 18;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    // Address line
+    const addressText = [data.ADDRESS1, data.ADDRESS2, data.ADDRESS3]
+      .filter(Boolean)
+      .join(', ');
+
+    doc.text(addressText, pageWidth / 2, footerY, {
+      align: 'center',
+    });
+
+    // Contact line
+    const contactText = [data.CONTACT_MOBILE ? `T. ${data.CONTACT_MOBILE}` : '']
+      .filter(Boolean)
+      .join(' | ');
+
+    doc.text(contactText, pageWidth / 2, footerY + 6, {
+      align: 'center',
+    });
+
+    // Email / website line
+    // Email / Website line
+    // Email / Website line
+    const emailWebsiteText = [
+      data.EMAIL ? `E. ${data.EMAIL}` : '',
+      'W. www.desert-memories.com',
+    ]
+      .filter(Boolean)
+      .join(' | ');
+
+    doc.text(emailWebsiteText, pageWidth / 2, footerY + 12, {
+      align: 'center',
+    });
+
+    // Page number
+    doc.text('Page 1 of 1', pageWidth - 20, footerY + 12);
+    // =========================
+    // OPEN PDF
+    // =========================
     doc.output('dataurlnewwindow');
   }
 

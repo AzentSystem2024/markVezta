@@ -54,7 +54,7 @@ export class DataService {
   ];
 
   private worksheetDataSubject = new BehaviorSubject<any>(null); // Initialize with null
-    worksheetData$ = this.worksheetDataSubject.asObservable();
+  worksheetData$ = this.worksheetDataSubject.asObservable();
 
   private apiUrl = environment.apiUrl;
   private apiUrlList =
@@ -1126,6 +1126,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}PurchaseInvoice/update`, data);
   }
 
+  verifyPurchaseInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseInvoice/verify`, data);
+  }
+
   approvePurchaseInvoice(data: Object): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseInvoice/approve`, data);
   }
@@ -1155,6 +1160,11 @@ export class DataService {
   updateMiscPayment(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscPayment/update`, data);
+  }
+
+  verifyMiscPayment(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscPayment/verify`, data);
   }
 
   selectMiscPayment(id: number) {
@@ -1188,6 +1198,11 @@ export class DataService {
   updateMiscReceipt(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscReceipt/update`, data);
+  }
+
+  verifyMiscReceipt(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscReceipt/verify`, data);
   }
 
   approveMiscReceipt(data: Object): Observable<any> {
@@ -6413,6 +6428,10 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}SalesInvoice/commit`, data);
   }
 
+  verifyRetailInvoice(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/Verify`, data);
+  }
+
   //------------------------------------MISC-PURCHASE-INVOICE-----------------------------------------------//
   getMiscPurchInvoiceMainList(items: any): Observable<any> {
     const data = items;
@@ -6480,66 +6499,66 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //-----------------------sales summary report-------------------------
-  SalesSummaryReport(payload : any){
+  SalesSummaryReport(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/SalesSummary';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
-   //-----------------------sales Detail report-------------------------
-  SalesDetailReport(payload : any){
+  //-----------------------sales Detail report-------------------------
+  SalesDetailReport(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/SalesDetail';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
   //-----------------------ConsignmentSummary_Report-------------------------
-  ConsignmentSummary_Report(payload : any){
+  ConsignmentSummary_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/ConsignmentSummary';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
   //-----------------------ConsignmentReturn_Details_Report-------------------------
-  ConsignmentReturn_Details_Report(payload : any){
+  ConsignmentReturn_Details_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/ConsignmentReturnDetail';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
-    //-----------------------ItemwiseSales_Report-------------------------
-  ItemwiseSales_Report(payload : any){
+  //-----------------------ItemwiseSales_Report-------------------------
+  ItemwiseSales_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSales';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
-    //-----------------------ItemwiseSales Summary Report-------------------------
-  ItemwiseSales_Summary_Report(payload : any){
+  //-----------------------ItemwiseSales Summary Report-------------------------
+  ItemwiseSales_Summary_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSalesSummary';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
-    //-----------------------Discountwise_Sales Report-------------------------
-  Discountwise_Sales_Report(payload : any){
+  //-----------------------Discountwise_Sales Report-------------------------
+  Discountwise_Sales_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/DiscountWiseSales';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
-    //-----------------------Tender Sales Report-------------------------
-  Tender_Sales_Report(payload : any){
+  //-----------------------Tender Sales Report-------------------------
+  Tender_Sales_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/TenderReport';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
   //-----------------------TenderSummary Sales Report-------------------------
-   TenderSummary_Sales_Report(payload : any){
+  TenderSummary_Sales_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/TenderSummary';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
   //-----------------------Z Report-------------------------
-  Z_Report(payload : any){
+  Z_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/ZReport';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
-  Select_SalesInvoice_Retail(id:number){
+  Select_SalesInvoice_Retail(id: number) {
     return this.http.post<any>(`${this.apiUrl}SalesPOS/select/` + id, {});
   }
 }

@@ -186,6 +186,102 @@
         }"
       >
       </dxi-column>
+
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditInvoice({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="onDeleteInvoice({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="canVerify"
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.TRANS_STATUS === 5
+              ? 'Approved'
+              : cellData.data.TRANS_STATUS === 2
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifyInvoice({ row: { data: cellData.data } })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.TRANS_STATUS === 5
+                ? '#10B981'
+                : cellData.data.TRANS_STATUS === 2
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
     </dx-data-grid>
   </div>
 </div>
@@ -223,6 +319,45 @@
     [canApprove]="canApprove"
   ></app-add-invoice-retail>
   <!-- </ng-container> -->
+</dx-popup>
+
+<dx-popup
+  *ngIf="isVerifyInvoice"
+  [(visible)]="isVerifyInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  [title]="
+    selectedInvoice?.TRANS_STATUS === 2 ? 'Approve Invoice' : 'Verify Invoice'
+  "
+  (popupClosed)="handleClose()"
+>
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [EditingResponseData]="selectedInvoice"
+    [isVerifyMode]="selectedInvoice?.TRANS_STATUS !== 2"
+    [isApproveMode]="selectedInvoice?.TRANS_STATUS === 2"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-add-invoice-retail>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isApproveInvoice"
+  [(visible)]="isApproveInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Invoice"
+  (onHiding)="handleClose()"
+>
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [EditingResponseData]="selectedInvoice"
+    [isApproveMode]="true"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-add-invoice-retail>
 </dx-popup>
 
 <dx-popup

@@ -59,6 +59,8 @@ export class AddInvoiceRetailComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -251,7 +253,10 @@ export class AddInvoiceRetailComponent {
     });
   }
   getItemsData(itemId: any, rowData: any) {
-    const payload = { ITEM_ID: itemId };
+    const payload = {
+      ITEM_ID: itemId,
+      CUSTOMER_ID: this.invoiceFormData.CUSTOMER_ID,
+    };
 
     this.dataService.getItemsDetails(payload).subscribe((response: any) => {
       const data = response?.Data?.[0];
@@ -800,7 +805,7 @@ export class AddInvoiceRetailComponent {
     }
 
     //  HANDLE APPROVE CASE
-    if (this.invoiceFormData.IS_APPROVED === true) {
+    if (this.invoiceFormData.IS_APPROVED === true || this.isApproveMode) {
       confirm(
         'Are you sure you want to approve and commit this invoice?',
         'Confirmation',
@@ -812,7 +817,18 @@ export class AddInvoiceRetailComponent {
 
       return;
     }
+    if (this.isVerifyMode) {
+      confirm(
+        'Are you sure you want to verify this invoice?',
+        'Confirm Verification',
+      ).then((result: boolean) => {
+        if (result) {
+          this.proceedSave();
+        }
+      });
 
+      return;
+    }
     //  NORMAL SAVE
     this.proceedSave();
   }
@@ -929,17 +945,25 @@ export class AddInvoiceRetailComponent {
 
     //API DECISION LOGIC
     let apiCall;
-
-    if (this.isEditing && this.invoiceFormData.IS_APPROVED) {
-      //  EDIT + APPROVE
+    if (this.isApproveMode) {
       apiCall = this.dataService.approveRetailInvoice(payload);
+    } else if (this.isVerifyMode) {
+      apiCall = this.dataService.verifyRetailInvoice(payload);
     } else if (this.isEditing) {
-      //  EDIT ONLY
       apiCall = this.dataService.updateRetailInvoice(payload);
     } else {
-      //  ADD
       apiCall = this.dataService.saveRetailInvoice(payload);
     }
+    // if (this.isEditing && this.invoiceFormData.IS_APPROVED) {
+    //   //  EDIT + APPROVE
+    //   apiCall = this.dataService.approveRetailInvoice(payload);
+    // } else if (this.isEditing) {
+    //   //  EDIT ONLY
+    //   apiCall = this.dataService.updateRetailInvoice(payload);
+    // } else {
+    //   //  ADD
+    //   apiCall = this.dataService.saveRetailInvoice(payload);
+    // }
 
     //  API CALL
     apiCall.subscribe({
@@ -948,9 +972,10 @@ export class AddInvoiceRetailComponent {
         this.popupClosed.emit();
 
         notify({
-          message:
-            this.isEditing && this.invoiceFormData.IS_APPROVED
-              ? 'Invoice Approved Successfully'
+          message: this.isApproveMode
+            ? 'Invoice Approved Successfully'
+            : this.isVerifyMode
+              ? 'Invoice Verified Successfully'
               : this.isEditing
                 ? 'Invoice Updated Successfully'
                 : 'Invoice Saved Successfully',
