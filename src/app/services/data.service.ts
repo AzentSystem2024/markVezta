@@ -545,6 +545,11 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}PurchaseReturn/approve`, data);
   }
+
+  verifyPurchaseReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseReturn/verify`, data);
+  }
   deletePurchaseReturn(id: number) {
     return this.http.post<any>(`${this.apiUrl}PurchaseReturn/delete/` + id, {});
   }
