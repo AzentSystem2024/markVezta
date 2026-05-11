@@ -505,27 +505,6 @@ export class ItemStorePricesComponent {
       PRICE_LEVEL4_NEW: item.PRICE_LEVEL4_NEW ?? null,
       PRICE_LEVEL5_NEW: item.PRICE_LEVEL5_NEW ?? null,
     }));
-    const hasEnteredPrice = worksheetItemPrice.some(
-      (item) =>
-        item.PRICE_NEW != null ||
-        item.PRICE_LEVEL1_NEW != null ||
-        item.PRICE_LEVEL2_NEW != null ||
-        item.PRICE_LEVEL3_NEW != null ||
-        item.PRICE_LEVEL4_NEW != null ||
-        item.PRICE_LEVEL5_NEW != null
-    );
-
-    if (!hasEnteredPrice) {
-      notify(
-        {
-          message:
-            'Please enter at least one price value (New Price Value) before saving.',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error'
-      );
-      return;
-    }
 
     console.log('Payload for saving:', worksheetItemPrice)
     // const updatedList = worksheetItemPrice.map((item: any) => {
@@ -548,6 +527,37 @@ export class ItemStorePricesComponent {
       NARRATION: narration,
       worksheet_item_price: worksheetItemPrice,
     };
+
+    console.log('Final payload before validation:', payload);
+    const invalidItems = payload.worksheet_item_price.filter((item: any) => {
+      const mrp =
+        Number(item.PRICE_NEW) >= 0
+          ? Number(item.PRICE_NEW)
+          : Number(item.SALE_PRICE);
+
+      const standardPrice = Number(item.PRICE_LEVEL1_NEW);
+
+      if (isNaN(mrp) || isNaN(standardPrice)) {
+        return false;
+      }
+console.log(mrp, standardPrice,"MRP, Standard Price")
+      return mrp <= standardPrice;
+    });
+
+    if (invalidItems.length > 0) {
+      const itemCodes = invalidItems
+        .map((item: any) => item.ITEM_CODE)
+        .join(', ');
+
+      notify(
+        `MRP must be greater than Standard Price for Item(s): ${itemCodes}`,
+        'error',
+        5000,
+      );
+
+      this.isSaving = false; //  stop loading
+      return;
+    }
     this.dataservice.saveWorksheetPrice(payload).subscribe(
       (response) => {
         this.worksheetID = response.data.ID;

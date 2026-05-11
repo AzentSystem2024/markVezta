@@ -212,3 +212,20 @@
   outline: 2px solid #999;
   outline-offset: 2px;
 }
+
+.month-selector dx-button {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+.month-selector .dx-button {
+  cursor: pointer;
+}
+
+.calendar-popup {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  z-index: 9999;
+  background: white;
+}

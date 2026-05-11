@@ -24,7 +24,7 @@
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
-        [allowDeleting]="isDeleteVisible"
+        [allowDeleting]="true"
       ></dxo-editing>
       <dxo-search-panel
         [visible]="true"
@@ -79,17 +79,24 @@
       <dxi-column
         dataField="Status"
         caption="Status"
-        [width]="'100'"
+        [width]="150"
         [allowEditing]="false"
+        cellTemplate="statusCellTemplate"
+        alignment="center"
       ></dxi-column>
-      <!-- <div *dxTemplate="let cellData of 'statusCellTemplate'">
+
+      <div *dxTemplate="let cellData of 'statusCellTemplate'">
         <i
           class="fas fa-flag"
           [ngClass]="getStatusFlagClass(cellData.value)"
-          [attr.title]="cellData.value ? true : false"
-          style="margin-left: 10px; cursor: default"
+          [attr.title]="cellData.value"
         ></i>
-      </div> -->
+      </div>
+      <dxi-column
+        type="buttons"
+        [width]="200"
+        [buttons]="allButtons"
+      ></dxi-column>
     </dx-data-grid>
   </div>
   <!-- <div class="selected-rows-container">
@@ -108,6 +115,7 @@
     <app-edit-item-store-property
       (popupClosed)="handleClose()"
       [selectedData]="selectedData"
+      [status]="StatusType"
     ></app-edit-item-store-property>
   </div>
 </dx-popup>

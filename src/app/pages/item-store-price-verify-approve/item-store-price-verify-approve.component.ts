@@ -582,89 +582,39 @@ export class ItemStorePriceVerifyApproveComponent {
       return;
     }
 
-    if (this.isApproved) {
-      const result = confirm(
-        'Are you sure you want to approve this worksheet?',
-        'Confirm Approval',
-      );
 
-      result.then((dialogResult) => {
-        if (!dialogResult) {
-          this.isSaving = false; // ✅ stop loading if cancelled
-          return;
-        }
+    this.dataservice.verifyItemStorePrices(payload).subscribe(
+      (response) => {
+        this.isSaving = false; // ✅ stop loading
 
-        this.dataservice.approveworksheetItemPrices(payload).subscribe(
-          (response) => {
-            this.isSaving = false; // ✅ stop loading
-
-            if (response.flag == 1) {
-              notify(
-                {
-                  message: 'Worksheet Approved Successfully',
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'success',
-              );
-              this.router.navigate(['/change-price']);
-              this.isApproved = false;
-            } else {
-              notify(
-                {
-                  message: response.message || 'Worksheet Approved failed',
-                  position: { at: 'top center', my: 'top center' },
-                },
-                'error',
-              );
-            }
-          },
-          (error) => {
-            this.isSaving = false; // ✅ stop loading
-
-            console.error('Error approving worksheet:', error);
-            notify(
-              {
-                message: 'Error approving worksheet',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'error',
-            );
-          },
-        );
-      });
-    } else {
-      this.dataservice.updateworksheetItemPrice(payload).subscribe(
-        (response) => {
-          this.isSaving = false; // ✅ stop loading
-
-          if (response.flag === 1) {
-            notify(
-              {
-                message: 'Worksheet Updated Successfully',
-                position: { at: 'top center', my: 'top center' },
-              },
-              'success',
-            );
-            if (!this.AllowCommitWithSave) {
-              this.router.navigate(['/change-price']);
-            }
-          } else {
-            notify(
-              {
-                message: response.message || 'Your Data Not Saved',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'error',
-            );
+        if (response.flag === 1) {
+          notify(
+            {
+              message: 'Worksheet Updated Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
+          if (!this.AllowCommitWithSave) {
+            this.router.navigate(['/change-price']);
           }
-        },
-        (error) => {
-          this.isSaving = false; // ✅ stop loading
+        } else {
+          notify(
+            {
+              message: response.message || 'Your Data Not Saved',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+      },
+      (error) => {
+        this.isSaving = false; // ✅ stop loading
 
-          console.error('Error saving data:', error);
-        },
-      );
-    }
+        console.error('Error saving data:', error);
+      },
+    );
+
   }
 
   onVerify() {

@@ -148,18 +148,48 @@
         format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         caption="Status"
         dataField="TRANS_STATUS"
         [width]="80"
-        [cellTemplate]="statusCellRender"
+        cellTemplate="statusCellTemplate"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
           encodeHtml: false,
         }"
       >
-      </dxi-column>
+      </dxi-column> -->
+
+      <dxi-column
+      dataField="TRANS_STATUS"
+      caption="Status"
+      alignment="right"
+      fixedPosition="right"
+      cellTemplate="statusCellTemplate"
+      width="100"
+      fixedPosition="right"
+    >
+    </dxi-column>
+
+       <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+            
+    </div>
+
+      <dxi-column
+      type="buttons"
+      [buttons]="allActionButtons"
+      fixed="true"
+      fixedPosition="right"
+      width="150"
+    ></dxi-column>
+
     </dx-data-grid>
   </div>
 </div>
@@ -179,6 +209,26 @@
 </dx-popup>
 
 <dx-popup
+  [(visible)]="verifypopup"
+  [width]="'75vw'"
+  [height]="'100vh'"
+  title="Miscellaneous Receipt"
+  (onHiding)="handleClose()"
+> 
+  <app-add-misc-receipt
+    *ngIf="verifypopup"
+    [status]="statusFinder"
+    [isEditing]="true"
+    [verifypopup] = "true"
+    [canApprove]="canApprove"
+    [EditingResponseData]="selectedmiscellaneousData"
+    [isReadOnlyMode]="isReadOnlyPayment"
+    (popupClosed)="handleClose()"
+    [MiscReceiptId]="selectedMiscReceipt"
+  ></app-add-misc-receipt>
+</dx-popup>
+
+<dx-popup
   [(visible)]="editMiscPopup"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -188,6 +238,7 @@
   <app-add-misc-receipt
     *ngIf="editMiscPopup"
     [isEditing]="true"
+    [verifypopup] = "false"
     [canApprove]="canApprove"
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
@@ -201,7 +252,7 @@
   [startDate]="customStartDate"
   [endDate]="customEndDate"
   (applyDates)="onCustomDateApplied($event)"
->
+> 
 </app-custom-date-popup>
 
 <!-- <dx-popup
@@ -242,3 +293,4 @@
     </div>
   </div>
 </dx-popup> -->
+  

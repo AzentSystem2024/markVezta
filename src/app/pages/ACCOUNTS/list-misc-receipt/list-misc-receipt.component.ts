@@ -69,10 +69,13 @@ export class ListMiscReceiptComponent {
   canEdit = false;
   canView = false;
   canDelete = false;
+  canVerify = false;
   canApprove = false;
   canPrint = false;
   selectedMiscReceipt: any;
   MiscReceiptId: any;
+    statusFinder: any;
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -133,13 +136,86 @@ export class ListMiscReceiptComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredInvoiceList: any;
-  isReadOnlyReceipt: boolean;
-  isEditReceipt: boolean;
-  isReadOnlyPayment: boolean;
+  isReadOnlyReceipt: boolean = false;
+  isEditReceipt: boolean = false;
+  isReadOnlyPayment: boolean = false;
   filteredMiscReceipts: any;
-  addMiscReceiptPopup: boolean;
-  addMiscPopup: boolean;
+  addMiscReceiptPopup: boolean = false;
+  addMiscPopup: boolean = false;
   editMiscPopup: boolean = false;
+  verifypopup : boolean = false;
+  Approvepopup:boolean=false;
+
+   allActionButtons = [
+    {
+      name: 'edit',
+
+      hint: 'Edit',
+
+      icon: 'edit',
+
+      text: 'Edit',
+      visible: (e) => this.canEdit && e.row.data.TRANS_STATUS === 'Open' 
+    },
+
+    {
+      name: 'delete',
+
+      hint: 'Delete',
+
+      icon: 'trash',
+
+      text: 'Delete',
+
+      // onClick: (e) => this.onDeleteClick(e),
+
+      visible: (e) => e.row.data.TRANS_STATUS !== 'Approve' || e.row.data.TRANS_STATUS === 'Open' || e.row.data.TRANS_STATUS !== 'Verify' && this.canApprove,
+    },
+
+    {
+      hint: 'Verify',
+
+      icon: 'check',
+
+      text: 'Verify',
+
+      onClick: (e) => {
+        setTimeout(() => this.onVerifyClick(e));
+      },
+
+      visible: (e) =>
+        e.row.data.TRANS_STATUS !== 'Verify',
+    },
+
+    {
+      hint: 'Approve',
+
+      icon: 'check',
+
+      text: 'Approve',
+
+      onClick: (e) => {
+        setTimeout(() => this.onApproveClick(e));
+      },
+
+      visible: (e) => e.row.data.TRANS_STATUS === 'Verify',
+    },
+  ];
+
+
+    //===================Status flag=========================
+  getStatusFlagClass(status: string): string {
+    switch (status) {
+      case 'Open':
+        return 'flag-open'; // White or gray
+      case 'Verify':
+        return 'flag-verified'; // Orange
+      case 'Approve':
+        return 'flag-approved'; // Green
+      default:
+        return '';
+    }
+  }
 
   constructor(
     private dataService: DataService,
@@ -161,6 +237,7 @@ export class ListMiscReceiptComponent {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
+      this.canVerify = packingRights.CanVerify;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
@@ -285,6 +362,43 @@ export class ListMiscReceiptComponent {
   addMiscReceipt() {
     this.addMiscPopup = true;
   }
+
+    // ============================Verify Popup function=========================================
+  onVerifyClick(e: any): void {
+    console.log(e,'event--------------')
+    this.editMiscPopup = false
+    this.verifypopup = true;
+    e.cancel = true;
+  const transStatus = e.row.data.TRANS_STATUS;
+  this.statusFinder = e.row.data.TRANS_STATUS;
+    const id = e.row.data.TRANS_ID;
+    console.log(id, '===================id');
+    this.dataService.selectMiscReceipt(id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedmiscellaneousData = res.Data;
+      console.log(this.selectedmiscellaneousData, '==============select data====verify');
+      // this.get_employes_details_value_select();
+      this.isReadOnlyPayment = transStatus === 'Approve';
+    });
+  }
+
+   // ============================Approve Popup function=========================================
+  onApproveClick(e: any): void {
+    this.verifypopup = true;
+    e.cancel = true;
+    const transStatus = e.row.data.TRANS_STATUS;
+    this.statusFinder = e.row.data.TRANS_STATUS;
+    const id = e.row.data.TRANS_ID;
+    console.log(id, '===================id');
+    this.dataService.selectMiscReceipt(id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedmiscellaneousData = res.Data;
+      console.log(this.selectedmiscellaneousData, '==============select data====verify');
+      // this.get_employes_details_value_select();
+      this.isReadOnlyPayment = transStatus === 'Approve';
+    });
+  }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
@@ -529,7 +643,7 @@ export class ListMiscReceiptComponent {
         this.selectedmiscellaneousData = response.Data;
 
         this.editMiscPopup = true;
-        this.isReadOnlyPayment = status === 5;
+        this.isReadOnlyPayment = status === 'Approve';
       },
       error: (err) => {
         console.error('Failed to fetch salary revision:', err);
@@ -587,6 +701,7 @@ export class ListMiscReceiptComponent {
   handleClose() {
     this.addMiscPopup = false;
     this.editMiscPopup = false;
+    this.verifypopup = false;
     this.getMiscReceipts();
   }
 

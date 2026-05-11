@@ -142,7 +142,7 @@
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         caption="Status"
         dataField="STATUS"
         [width]="80"
@@ -153,7 +153,35 @@
           encodeHtml: false,
         }"
       >
-      </dxi-column>
+      </dxi-column> -->
+
+      <dxi-column
+      dataField="STATUS"
+      caption="Status"
+      alignment="right"
+      fixedPosition="right"
+      cellTemplate="statusCellTemplate"
+      width="100"
+      fixedPosition="right"
+    >
+    </dxi-column>
+ <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+            
+    </div>
+       <dxi-column
+      type="buttons"
+      [buttons]="allActionButtons"
+      fixed="true"
+      fixedPosition="right"
+      width="150"
+    ></dxi-column>
+
     </dx-data-grid>
   </div>
 </div>
@@ -186,9 +214,31 @@
       [readOnly]="isEditInvoiceReadOnly"
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
+      [isVerifyInvoice]="false"
+      [status]="statusFinder"
     ></app-edit-purchase-invoice>
   </ng-container>
 </dx-popup>
+
+<dx-popup
+  [(visible)]="isVerifyInvoice"
+  [width]="'100vw'"
+  [height]="'100vh'"
+  title="Purchase Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isVerifyInvoice">
+    <app-edit-purchase-invoice
+    [isVerifyInvoice]="true"
+    [status]="statusFinder"
+      [invoiceFormData]="selectedInvoice"
+      [readOnly]="isEditInvoiceReadOnly"
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+    ></app-edit-purchase-invoice>
+  </ng-container>
+</dx-popup>
+
 
 <app-custom-date-popup
   [(visible)]="showCustomDatePopup"

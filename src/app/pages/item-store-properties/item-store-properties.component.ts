@@ -412,7 +412,7 @@ export class ItemStorePropertiesComponent {
             this.dataGrid.instance.refresh();
             this.selecte_grid_Data = [];
 
-            this.router.navigate(['/item-store-properties-log']);
+            this.router.navigate(['/item-change-property']);
           } else {
             notify(
               {
@@ -537,7 +537,7 @@ export class ItemStorePropertiesComponent {
             },
             'success',
           );
-          this.router.navigate(['/item-store-properties-log']);
+          this.router.navigate(['/item-change-property']);
           this.dataGrid.instance.refresh();
         } else {
           notify(
@@ -572,7 +572,7 @@ export class ItemStorePropertiesComponent {
   }
 
   onCancel() {
-    this.router.navigate(['/item-store-properties-log']);
+    this.router.navigate(['/item-change-property']);
     this.selectedRowKeys = [];
 
     this.dataGrid.instance.refresh();

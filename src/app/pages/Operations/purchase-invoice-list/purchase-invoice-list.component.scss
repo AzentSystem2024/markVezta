@@ -63,8 +63,11 @@
     0 0 2px black;
 }
 
-.flag-pending {
-  color: black;
+.flag-open {
+  color: white; /* or rgb(245, 240, 240) */
+  text-shadow:
+    0 0 1px black,
+    0 0 2px black;
 }
 
 .flag-verified {

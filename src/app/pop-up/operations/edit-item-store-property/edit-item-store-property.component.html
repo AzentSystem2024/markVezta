@@ -78,7 +78,7 @@
           >
           </dx-tag-box>
         </dxi-item>
-        <dxi-item>
+        <!-- <dxi-item>
           <dx-check-box
             *ngIf="allowVerify"
             [(value)]="approveValue"
@@ -87,7 +87,7 @@
             style="margin: 10px"
           >
           </dx-check-box
-        ></dxi-item>
+        ></dxi-item> -->
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <dx-button
             text="Cancel"
@@ -101,7 +101,7 @@
         <dxi-item location="after" cssClass="bottom-toolbar-buttons">
           <dx-button
             *ngIf="!isView"
-            [text]="approveValue ? 'Approve' : 'Update'"
+            [text]="getButtonText()"
             stylingMode="contained"
             type="default"
             (onClick)="onSaveButtonClick()"

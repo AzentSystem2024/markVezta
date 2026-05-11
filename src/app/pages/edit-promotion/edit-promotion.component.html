@@ -220,21 +220,8 @@
                   >
                   </dx-button>
                   <div class="d-flex">
-                    <dx-check-box
-                      [(value)]="approveValue"
-                      text="Approve"
-                      [readOnly]="readOnly"
-                      (onValueChanged)="onApprovedChanged($event)"
-                      style="margin: 10px"
-                    ></dx-check-box>
                     <dx-button
-                      [text]="
-                        approveValue
-                          ? 'Approve'
-                          : approveValue
-                            ? 'Approve'
-                            : 'Update'
-                      "
+                      [text]="getButtonText()"
                       stylingMode="contained"
                       type="default"
                       class="mt-2"
@@ -426,7 +413,7 @@
       class="form-container mt-3"
       [class.disabled-section]="selectedMode === 'price'"
     >
-      <div class="form-group">
+      <div class="form-inline">
         <label>Select Schema</label>
         <dx-select-box
           [(value)]="selectedSchemaId"

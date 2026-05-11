@@ -38,6 +38,7 @@ import { PromotionEditModule } from '../promotion-edit/promotion-edit.component'
 import { EditPromotionModule } from '../edit-promotion/edit-promotion.component';
 import { ViewPromotionWizardModule } from '../view-promotion-wizard/view-promotion-wizard.component';
 import { filter } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-promotion-log',
@@ -92,6 +93,15 @@ export class PromotionLogComponent {
   status: any;
   approveValue: boolean = false
   ViewPopupOpened: boolean = false
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  isFilterOpened = false;
+  canVerify = false;
+  StatusType: any;
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -119,6 +129,70 @@ export class PromotionLogComponent {
     `;
     },
   };
+  allButtons = [
+    {
+      name: 'edit',
+      onClick: (e: any) => this.openEditingStart(e),
+      visible: (e: any) => {
+
+        return this.canEdit &&
+          (
+            e.row.data.Status === 'Open'
+          )
+      }
+
+    },
+    {
+      name: 'delete',
+      visible: (e: any) => {
+        const status = e.row.data.Status;
+
+        return this.canDelete &&
+          (
+            (e.row.data.Status == 'Open') || (status === 'Verified' && this.canApprove)
+
+          )
+
+      },
+    },
+    {
+      hint: 'Verify',
+      icon: 'check',
+      text: 'Verify',
+      onClick: (e: any) => this.onVerifyClick(e),
+      visible: (e: any) => {
+        return this.canVerify && e.row.data.Status === 'Open';
+
+
+      },
+    },
+    {
+      hint: 'Approve',
+      icon: 'check',
+      text: 'Approve',
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) => {
+        return this.canApprove &&
+          (
+            e.row.data.Status === 'Verified' || (this.canVerify ? false : e.row.data.Status === 'Open')
+          )
+
+      },
+    },
+    {
+      hint: 'View',
+      icon: 'check',
+      text: 'View',
+      onClick: (e: any) => this.onViewClick(e),
+      visible: (e: any) =>
+        this.canView &&
+        (
+          e.row.data.Status === 'Approved' ||
+          (e.row.data.Status === 'Verified' && !this.canApprove)
+        )
+
+    },
+  ];
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -130,14 +204,43 @@ export class PromotionLogComponent {
   constructor(
     private dataservice: DataService,
     private router: Router,
-    private zone: NgZone
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef
+
   ) { }
 
   ngOnInit() {
+
+
+    const currentUrl = this.router.url;
+
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    // this.sessionData_tax();
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      console.log(packingRights, '====packing rights====');
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
+      console.log(this.canVerify, 'VERIFY RIGHTS');
+    }
+
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     console.log(this.AllowCommitWithSave, 'ALLOW');
     this.getPromotionLogList();
-       this.router.events
+    this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.getPromotionLogList(); //  reload every time you land here
@@ -246,25 +349,23 @@ export class PromotionLogComponent {
   }
 
   openEditingStart(event: any) {
+
     event.cancel = true;
-    const selectedId = event.data.ID;
+    const selectedId = event.row.data.ID;
     console.log('Edit row triggered for ID:', selectedId, event);
-    const status = event.data.Status
+    const status = event.row.data.Status
+    this.StatusType = 'EditScreen'
+
     console.log(status, '=============ststus----------------')
     this.dataservice
       .selectPromotionWorksheet(selectedId)
       .subscribe((response: any) => {
         this.selectedPromotion = response;
         console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
+        this.editPackPopupOpened = true
+        this.cdr.detectChanges();
 
       })
-    if (status === "Approved") {
-      this.ViewPopupOpened = true
-    } else {
-      this.editPackPopupOpened = true
-
-    }
-
 
   }
 
@@ -273,8 +374,23 @@ export class PromotionLogComponent {
   }
 
   onVerifyClick(e: any) {
-    console.log('====================call this function============', e)
-    const id = e.data.ID
+
+    e.cancel = true;
+    const selectedId = e.row.data.ID;
+    console.log('Edit row triggered for ID:', selectedId, e);
+    const status = e.row.data.Status
+    this.StatusType = 'VerifyScreen'
+
+    console.log(this.StatusType, '=============StatusType----------------')
+    this.dataservice
+      .selectPromotionWorksheet(selectedId)
+      .subscribe((response: any) => {
+        this.selectedPromotion = response;
+        console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
+        this.editPackPopupOpened = true;
+        this.cdr.detectChanges();
+
+      })
   }
 
   verifyWorksheetById(worksheetId: number, e: any) {
@@ -298,19 +414,23 @@ export class PromotionLogComponent {
   }
 
   onApproveClick(e: any) {
-    console.log('--------------------function call===========-----------------')
-    if (this.AllowCommitWithSave) {
-      console.log('approve Button clicked');
-      const rowData = e.row.data; // Access the row data
-      e.row.data.isVerified = true;
-      const worksheetId = rowData?.ID;
-      console.log('Row ID:', worksheetId);
-      if (worksheetId) {
-        this.approveWorksheetById(worksheetId, e);
-      } else {
-        console.warn('Worksheet ID is invalid.');
-      }
-    }
+    e.cancel = true;
+    const selectedId = e.row.data.ID;
+    console.log('Edit row triggered for ID:', selectedId, e);
+    const status = e.row.data.Status
+    this.StatusType = 'ApprovalScreen'
+
+    console.log(status, '=============ststus----------------')
+    this.dataservice
+      .selectPromotionWorksheet(selectedId)
+      .subscribe((response: any) => {
+        this.selectedPromotion = response;
+        console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
+        this.editPackPopupOpened = true;
+        this.cdr.detectChanges();
+
+      })
+
   }
 
   approveWorksheetById(worksheetId: number, e: any) {
@@ -368,8 +488,33 @@ export class PromotionLogComponent {
     return e.row?.data.Status === 'Open';
   };
 
-    getStatusFlagClass(Status: string): string {
-    return Status === 'Open' ? 'flag-red' : 'flag-green';
+  getStatusFlagClass(status: string): string {
+    return status === 'Open'
+      ? 'flag-white'
+      : status === 'Verified'
+        ? 'flag-orange'
+        : status === 'Approved'
+          ? 'flag-green'
+          : '';
+  }
+  onViewClick(e: any) {
+    e.cancel = true;
+    const selectedId = e.row.data.ID;
+    console.log('Edit row triggered for ID:', selectedId, e);
+    const status = e.row.data.Status
+    this.StatusType = 'viewScreen'
+
+    console.log(status, '=============ststus----------------')
+    this.dataservice
+      .selectPromotionWorksheet(selectedId)
+      .subscribe((response: any) => {
+        this.selectedPromotion = response;
+        console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
+        this.ViewPopupOpened = true;
+        this.cdr.detectChanges();
+
+
+      })
   }
 }
 

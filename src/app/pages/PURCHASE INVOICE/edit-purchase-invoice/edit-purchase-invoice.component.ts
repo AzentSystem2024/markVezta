@@ -65,6 +65,8 @@ export class EditPurchaseInvoiceComponent {
   @Input() invoiceFormData: any;
   @Input() canApprove: boolean = false;
   popupVisible = false;
+  @Input() isVerifyInvoice: boolean = false;
+  @Input() status: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -163,6 +165,12 @@ export class EditPurchaseInvoiceComponent {
     setTimeout(() => {
       this.itemsGridRef?.instance?.refresh();
     }, 100);
+
+    console.log(this.status)
+
+    if(this.status === 'Approved') {
+      this.readOnly === true
+    }
   }
 
   sessionData_tax() {
@@ -813,7 +821,7 @@ export class EditPurchaseInvoiceComponent {
     // this.purchaseInvoiceFormData.STORE_ID = this.store_id;
     this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
-    if (this.isApproved) {
+    if (this.status === 'Verified') {
       // Ask confirmation only if approving
       const result = confirm(
         'Are you sure you want to approve and commit this invoice?',
@@ -833,17 +841,50 @@ export class EditPurchaseInvoiceComponent {
 
   // Separated logic to keep code clean
   submitInvoice() {
-    const apiCall = this.isApproved
-      ? this.dataService.approvePurchaseInvoice(this.purchaseInvoiceFormData)
-      : this.dataService.updatePurchaseInvoice(this.purchaseInvoiceFormData);
+    // const apiCall = this.isApproved
+    //   ? this.dataService.approvePurchaseInvoice(this.purchaseInvoiceFormData)
+    //   : this.dataService.updatePurchaseInvoice(this.purchaseInvoiceFormData);
+ console.log(this.status)
+    let apiCall;
+
+if (this.status === 'Open' && this.isVerifyInvoice === true) {
+
+  apiCall = this.dataService.verifyPurchaseInvoice(
+    this.purchaseInvoiceFormData
+  );
+
+} else if (this.status === 'Verified') {
+
+  apiCall = this.dataService.approvePurchaseInvoice(
+    this.purchaseInvoiceFormData
+  );
+
+} else {
+
+  apiCall = this.dataService.updatePurchaseInvoice(
+    this.purchaseInvoiceFormData
+  );
+
+}
 
     apiCall.subscribe({
       next: (res) => {
         this.isSaving = false;
-        const message = this.isApproved
-          ? 'Invoice approved successfully'
-          : 'Invoice updated successfully';
+        let message = '';
 
+if (this.status === 'Open') {
+
+  message = 'Invoice verified successfully';
+
+} else if (this.status === 'Verified') {
+
+  message = 'Invoice approved successfully';
+
+} else {
+
+  message = 'Invoice updated successfully';
+
+}
         notify(
           {
             message,

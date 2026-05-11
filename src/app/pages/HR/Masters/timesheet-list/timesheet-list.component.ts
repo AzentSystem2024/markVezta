@@ -115,6 +115,14 @@ export class TimesheetListComponent {
     disabled: false,
     onClick: () => this.ApproveBulkRows(),
   };
+  VerifyButtonOptions: any = {
+    text: 'Verify',
+    type: 'default',
+    stylingMode: 'contained',
+    width: 100,
+    disabled: false,
+    onClick: () => this.VerifyBulkRows(),
+  };
 
   // selectedMonth: string | number | Date = new Date();
   selectedMonth: Date = new Date();
@@ -177,8 +185,12 @@ export class TimesheetListComponent {
     elementAttr: { class: 'toolbar-icon-btn' }, // global style
     onClick: () => this.toggleFilters(),
   };
-  popupTitle: string;
-  isViewMode: boolean;
+  popupTitle: any;
+  isViewMode: boolean = false;
+  selectedStatus: any;
+  canVerify: boolean = false;
+  SessioncanApprove: boolean = false;
+  SessioncanVerify: boolean = false;
   constructor(
     private dataService: DataService,
     private zone: NgZone,
@@ -202,7 +214,10 @@ export class TimesheetListComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
-      this.canApprove = packingRights.CanApprove;
+      this.SessioncanApprove = packingRights.CanApprove;
+
+      this.SessioncanVerify = packingRights.CanVerify;
+
     }
     const today = new Date();
     this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
@@ -534,14 +549,120 @@ export class TimesheetListComponent {
     this.fetchTimesheetList();
   }
 
-  onSelectionChanged(e: any) {
-    const filteredRows = e.selectedRowsData.filter((row: any) => {
-      return row.STATUS !== 'Approved';
-    });
 
-    // If you need keys
-    this.selectedRowKeys = filteredRows.map((row: any) => row.ID);
+  // onSelectionChanged(e: any) {
+
+  //   const selectedRows = e.selectedRowsData;
+
+  //   if (!selectedRows || selectedRows.length === 0) {
+  //     this.canApprove = false;
+  //     this.canVerify = false;
+  //     this.selectedRowKeys = [];
+  //     return;
+  //   }
+
+  //   // Take first selected row status
+  //   const firstStatus = selectedRows[0].STATUS;
+
+  //   // Allow only same status rows
+  //   const validRows = selectedRows.filter(
+  //     (row: any) => row.STATUS === firstStatus
+  //   );
+
+  //   // If mixed status selected, remove invalid selections
+  //   if (validRows.length !== selectedRows.length) {
+
+  //     this.selectedRowKeys = validRows.map(
+  //       (row: any) => row.ID
+  //     );
+
+  //     this.dataGrid.instance.selectRows(
+  //       this.selectedRowKeys,
+  //       false
+  //     );
+  //   }
+
+  //   // Button visibility
+  //   if (firstStatus === 'Verified') {
+
+  //     this.canApprove = true;
+  //     this.canVerify = false;
+
+  //   } else if (firstStatus === 'Open') {
+
+  //     this.canApprove = false;
+  //     this.canVerify = true;
+
+  //   } else {
+
+  //     this.canApprove = false;
+  //     this.canVerify = false;
+  //   }
+
+  //   this.selectedRowKeys = validRows.map(
+  //     (row: any) => row.ID
+  //   );
+  // }
+
+  onSelectionChanged(e: any) {
+
+    const selectedRows = e.selectedRowsData;
+
+    if (!selectedRows || selectedRows.length === 0) {
+      this.canApprove = false;
+      this.canVerify = false;
+      this.selectedRowKeys = [];
+      return;
+    }
+
+    // First selected row status
+    const firstStatus = selectedRows[0].STATUS;
+
+    // Allow only same status rows
+    const validRows = selectedRows.filter(
+      (row: any) => row.STATUS === firstStatus
+    );
+
+    // Remove mixed status selection
+    if (validRows.length !== selectedRows.length) {
+
+      this.selectedRowKeys = validRows.map(
+        (row: any) => row.ID
+      );
+
+      this.dataGrid.instance.selectRows(
+        this.selectedRowKeys,
+        false
+      );
+    }
+
+    // Reset buttons
+    this.canApprove = false;
+    this.canVerify = false;
+
+    // Open -> Verify button only if session verify permission exists
+    if (
+      firstStatus === 'Open' &&
+      this.SessioncanVerify
+    ) {
+
+      this.canVerify = true;
+    }
+
+    // Verified -> Approve button only if session approve permission exists
+    if (
+      firstStatus === 'Verified' &&
+      this.SessioncanApprove
+    ) {
+
+      this.canApprove = true;
+    }
+
+    this.selectedRowKeys = validRows.map(
+      (row: any) => row.ID
+    );
   }
+
   onCellPrepared(e: any) {
     if (
       e.rowType === 'data' &&
@@ -623,6 +744,38 @@ export class TimesheetListComponent {
         notify(
           {
             message: `Approved Successfully`,
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+        );
+        this.fetchTimesheetList();
+      });
+  }
+  VerifyBulkRows() {
+    //  Check if nothing selected
+    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one row',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return; // stop execution
+    }
+    const payload = {
+      IDs: this.selectedRowKeys,
+    };
+
+    this.dataService
+      .verifyTimesheet(payload)
+      .subscribe((response: any) => {
+        // this.timesheetList = response;
+        this.selectedRowKeys = []; // Clear selection after success
+        notify(
+          {
+            message: `Verified Successfully`,
             position: { at: 'top right', my: 'top right' },
           },
           'success',

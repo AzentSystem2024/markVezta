@@ -9,25 +9,38 @@
 }
 
 .edit-cell {
-    position: relative;
-  
-    contact-status {
-      position: absolute;
-      margin-top: 10px;
-      margin-left: 11px;
-    }
-  }
+  position: relative;
 
-.grid-header{
-    font-size: 22px;
-    font-weight: 400;
-    padding-right: 25px
+  contact-status {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 11px;
+  }
+}
+
+.grid-header {
+  font-size: 22px;
+  font-weight: 400;
+  padding-right: 25px;
 }
 
 .selected-rows-container {
   position: relative;
   left: 24x;
-  bottom: 5px;;
+  bottom: 5px;
   margin-top: 10px;
-  margin-left: 10px; 
+  margin-left: 10px;
+}
+
+.flag-white {
+  color: white; /* or rgb(245, 240, 240) */
+  text-shadow:
+    0 0 1px black,
+    0 0 2px black;
+}
+.flag-orange {
+  color: orange !important;
+}
+.flag-green {
+  color: green !important;
 }
