@@ -185,11 +185,74 @@ export class AdvanceComponent {
   canApprove = false;
   canPrint = false;
 
-  gridButtons = [
-    'edit',
+  // gridButtons = [
+  //   'edit',
+  //   {
+  //     name: 'delete',
+  //     visible: (e: any) => e.row?.data?.STATUS?.trim() === 'Open',
+  //   },
+  // ];
+
+  allButtons = [
+    {
+      name: 'edit',
+      onClick: (e: any) => this.onEditStart(e),
+      visible: (e: any) => {
+
+        return this.canEdit &&
+          (
+            e.row.data.STATUS === 'Open'
+          )
+      }
+
+    },
     {
       name: 'delete',
-      visible: (e: any) => e.row?.data?.STATUS?.trim() === 'Open',
+      visible: (e: any) => {
+        const status = e.row.data.STATUS;
+
+        return this.canDelete &&
+          (
+            (e.row.data.STATUS == 'Open') || (status === 'Verified' && this.canApprove)
+
+          )
+
+      },
+    },
+    {
+      hint: 'Verify',
+      icon: 'check',
+      text: 'Verify',
+      onClick: (e: any) => this.onVerifyClick(e),
+      visible: (e: any) => {
+        return this.canVerify && e.row.data.STATUS === 'Open';
+      },
+    },
+    {
+      hint: 'Approve',
+      icon: 'check',
+      text: 'Approve',
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) => {
+        return this.canApprove &&
+          (
+            e.row.data.STATUS === 'Verified' || (this.canVerify ? false : e.row.data.STATUS === 'Open')
+          )
+
+      },
+    },
+    {
+      hint: 'View',
+      icon: 'check',
+      text: 'View',
+      onClick: (e: any) => this.onViewClick(e),
+      visible: (e: any) =>
+        this.canView &&
+        (
+          e.row.data.STATUS === 'Approved' ||
+          (e.row.data.STATUS === 'Verified' && !this.canApprove)
+        )
+
     },
   ];
   selected_Company_id: any;
@@ -197,6 +260,9 @@ export class AdvanceComponent {
   selected_fin_id: any;
   companyId: any;
   Recovery_Date: any;
+  minDate: Date;
+  canVerify: boolean = false;
+  buttonText: any;
   constructor(
     private fb: FormBuilder,
     private dataService: DataService,
@@ -413,7 +479,6 @@ export class AdvanceComponent {
     });
   }
 
-  // Reset filter to show all data
   resetFilter() {
     this.initialLoad = true;
     this.selectedRange = 'all'; // Add this option to your dateRanges array
@@ -463,35 +528,17 @@ export class AdvanceComponent {
 
   onEditStart(e: any) {
     e.cancel = true;
-    const statusValue = e.data.STATUS;
-    const id = e.data.TRANS_ID;
-    // this.dataService.select_Advance(id).subscribe((res: any) => {
-    // });
+    this.buttonText = 'Update';
+
+    const statusValue = e.row.data.STATUS;
+    const id = e.row.data.TRANS_ID;
     this.isEditPopUp = true;
-
-    const status = e.data?.STATUS?.trim();
-    // this.isEditReadOnly = (status === 'Approved');
-    if (status === 'Approved') {
-      this.isEditReadOnly = true;
-    } else {
-      this.isEditReadOnly = false;
-    }
-
+    const status = e.row.data?.STATUS?.trim();
     this.select_api_Advance(e);
+    this.isEditReadOnly = false;
+
     this.ledgerlist();
-
-    // Set a flag to determine if the form should be read-only
-    // this.isEditReceipt = true;
-    // this.isReadOnlyReceipt = (STATUS === 5); // true if status is approved
-
-    //        if( this.selected_Cheque_No){
-    //     this.selectedPaymentMode=='14'
-    //  }
-    //  else{
-    //    this.selectedPaymentMode=='13'
-    //  }
   }
-  minDate: Date;
 
   ngOnInit() {
     const today = new Date();
@@ -515,6 +562,7 @@ export class AdvanceComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.get_Employee_dropdown();
@@ -672,8 +720,7 @@ export class AdvanceComponent {
   }
 
   select_api_Advance(event: any) {
-    const id = event.data.TRANS_ID;
-
+    const id = event.row.data.TRANS_ID;
     this.dataService.select_Advance(id).subscribe((res: any) => {
       this.selected_Data = res;
 
@@ -696,35 +743,7 @@ export class AdvanceComponent {
         this.selectedPaymentMode = '14'; // Bank
       }
 
-      //       if (this.selected_Data?.DATE) {
-      //   const parts = this.selected_Data.DATE.split('/');
-      //   if (parts.length === 3) {
-      //     const day = +parts[0];
-      //     const month = +parts[1] - 1; // JS months are 0-based
-      //     let year = +parts[2];
-      //     year += year < 100 ? 2000 : 0; // Handle 2-digit years
-      //     this.date_value = new Date(year, month, day); // Set time to 18:30:00 if needed
-      //   } else {
-      //     this.date_value = null;
-      //   }
-      // } else {
-      //   this.date_value = null;
-      // }
 
-      // if (this.selected_Data.DATE) {
-      //   const parts = this.selected_Data.DATE.split('/');
-      //   if (parts.length === 3) {
-      //     const day = +parts[0];
-      //     const month = +parts[1] - 1; // JavaScript months are 0-based
-      //     let year = +parts[2];
-      //     // Fix 2-digit year like 24 → 2024
-      //     year += year < 100 ? 2000 : 0;
-      //     this.date_value = new Date(year, month, day);
-      //   } else {
-      //     this.date_value = null;
-      //   }
-      // } else {
-      //   this.date_value = null;
       this.emp_id = this.selected_Data.EMP_ID;
       this.emp_name_value = this.selected_Data.EMP_NAME;
       this.reco_Amount_value = this.selected_Data.REC_AMOUNT;
@@ -737,8 +756,90 @@ export class AdvanceComponent {
       this.approveValue = this.selected_Data.STATUS === 'Approved';
 
       this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
+      this.cdr.detectChanges();
 
-      // this.payment_functionality()
+    });
+  }
+  select_api_Advance_Approve(event: any) {
+    const id = event.row.data.TRANS_ID;
+    this.dataService.select_Advance(id).subscribe((res: any) => {
+      this.selected_Data = res;
+
+      this.id = this.selected_Data.ID;
+
+      this.Advance_Amount_value = this.selected_Data.ADVANCE_AMOUNT;
+      this.adv_no_value = this.selected_Data.ADV_NO;
+      this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
+      this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
+      this.date_value = this.selected_Data.DATE;
+      this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
+      this.selectTransId = this.selected_Data.TRANS_ID;
+      this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
+      this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE;
+      this.selected_pay_type_id = this.selected_Data.PAY_TYPE_ID;
+
+      if (this.selected_pay_type_id === 0 || this.selected_pay_type_id === 1) {
+        this.selectedPaymentMode = '13'; // Cash
+      } else {
+        this.selectedPaymentMode = '14'; // Bank
+      }
+
+
+      this.emp_id = this.selected_Data.EMP_ID;
+      this.emp_name_value = this.selected_Data.EMP_NAME;
+      this.reco_Amount_value = this.selected_Data.REC_AMOUNT;
+      this.reco_install_Amount_value = this.selected_Data.REC_INSTALL_AMOUNT;
+      this.reco_inst_count_value = this.selected_Data.REC_INSTALL_COUNT;
+      this.reco_stat_month = this.selected_Data.REC_START_MONTH;
+      this.remark_value = this.selected_Data.REMARKS;
+      this.trans_id = this.selected_Data.TRANS_ID;
+      this.selectedpayid = this.selected_Data.PAY_TYPE_ID;
+      this.approveValue = this.selected_Data.STATUS === 'Approved';
+
+      this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
+      this.cdr.detectChanges();
+
+    });
+  }
+  select_api_Advance_Verify(event: any) {
+    const id = event.row.data.TRANS_ID;
+    this.dataService.select_Advance(id).subscribe((res: any) => {
+      this.selected_Data = res;
+
+      this.id = this.selected_Data.ID;
+
+      this.Advance_Amount_value = this.selected_Data.ADVANCE_AMOUNT;
+      this.adv_no_value = this.selected_Data.ADV_NO;
+      this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
+      this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
+      this.date_value = this.selected_Data.DATE;
+      this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
+      this.selectTransId = this.selected_Data.TRANS_ID;
+      this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
+      this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE;
+      this.selected_pay_type_id = this.selected_Data.PAY_TYPE_ID;
+
+      if (this.selected_pay_type_id === 0 || this.selected_pay_type_id === 1) {
+        this.selectedPaymentMode = '13'; // Cash
+      } else {
+        this.selectedPaymentMode = '14'; // Bank
+      }
+
+
+      this.emp_id = this.selected_Data.EMP_ID;
+      this.emp_name_value = this.selected_Data.EMP_NAME;
+      this.reco_Amount_value = this.selected_Data.REC_AMOUNT;
+      this.reco_install_Amount_value = this.selected_Data.REC_INSTALL_AMOUNT;
+      this.reco_inst_count_value = this.selected_Data.REC_INSTALL_COUNT;
+      this.reco_stat_month = this.selected_Data.REC_START_MONTH;
+      this.remark_value = this.selected_Data.REMARKS;
+      this.trans_id = this.selected_Data.TRANS_ID;
+      this.selectedpayid = this.selected_Data.PAY_TYPE_ID;
+      this.approveValue = this.selected_Data.STATUS === 'Approved';
+
+      this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
+      this.cdr.detectChanges();
+
     });
   }
   paymentModesValue(event: any) {
@@ -1018,18 +1119,6 @@ export class AdvanceComponent {
       });
   }
 
-  //=====================payemt functionality=========================
-  // payment_functionality() {
-  //   const id=this.trans_id
-
-  //   this.dataService.get_paymentDetails(id).subscribe((res: any) => {
-  //
-
-  //     this.payment_Detilas=res
-  //   });
-
-  // }
-
   //====================min date for update validation=========================
   onDateValueChanged(e: any): void {
     this.date_value = e.value;
@@ -1051,6 +1140,37 @@ export class AdvanceComponent {
       default:
         return '';
     }
+  }
+
+  onViewClick = (e: any) => {
+    e.cancel = true;
+    this.isEditReadOnly = true;
+    this.buttonText = 'View';
+    this.isEditPopUp = true;
+
+    this.select_api_Advance(e);
+
+  }
+  onApproveClick = (e: any) => {
+    e.cancel = true;
+    this.approveValue = true;
+    this.buttonText = 'Approve';
+    this.isEditPopUp = true;
+    this.isEditReadOnly = false;
+    this.select_api_Advance_Approve(e);
+
+
+
+  }
+  onVerifyClick = (e: any) => {
+    e.cancel = true;
+    this.isEditPopUp = true;
+    this.isEditReadOnly = false;
+    this.buttonText = 'Verify';
+
+    this.select_api_Advance_Verify(e);
+
+
   }
 }
 
