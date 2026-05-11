@@ -26,11 +26,7 @@
     </dxo-header-filter>
     <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
-    <dxo-editing
-      mode="popup"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
-    >
+    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
     </dxo-editing>
     <!-- <dxo-filter-row [visible]="true" [height]="10"></dxo-filter-row> -->
     <dxo-scrolling mode="standard"></dxo-scrolling>
@@ -135,8 +131,12 @@
         style="margin-left: 10px; cursor: default"
       ></i>
     </div>
-
-    <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column>
+    <dxi-column
+      type="buttons"
+      [width]="200"
+      [buttons]="allButtons"
+    ></dxi-column>
+    <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
     <!-- <dxi-column type="buttons" [buttons]="allActionButtons" fixed="true" fixedPosition="right"width="150"></dxi-column> -->
   </dx-data-grid>
 </div>
