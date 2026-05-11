@@ -172,6 +172,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   vatTitle: any;
   storeOrLocation: any;
   logoImg: string;
+  PoID: any;
 
   constructor(
     private service: DataService,
@@ -702,7 +703,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     if (changes.formdata && changes.formdata.currentValue) {
       this.transID = this.formdata.TRANS_ID;
       this.fileDetails.DOC_ID = this.formdata.ID;
-
+      this.PoID = this.formdata.ID;
       this.newPoData = { ...this.formdata };
       this.newPoData.PoDetails = this.formdata.PoDetails || [];
 
@@ -1194,7 +1195,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     });
   }
   viewPdfDMGT(): void {
-    this.service.selectPoData(this.poId).subscribe((res) => {
+    console.log('PDFFFFFFFFFF');
+    this.service.selectPoData(this.PoID).subscribe((res) => {
       this.generatePoPdf(res);
     });
   }

@@ -75,6 +75,7 @@ export class PurchaseReturnDebitComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  canVerify: boolean = false;
   id: any;
 
   searchButtonOptions = {
@@ -149,6 +150,9 @@ export class PurchaseReturnDebitComponent {
   purchaseReturnArray: any[] = [];
   purchaseReturnCount = 0;
   vatTitle: any;
+  isViewInvoice: boolean;
+  isApproveInvoice: boolean;
+  isVerifyInvoice: boolean;
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -160,7 +164,7 @@ export class PurchaseReturnDebitComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -187,6 +191,7 @@ export class PurchaseReturnDebitComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.getpurchaseReturnList();
@@ -331,8 +336,13 @@ export class PurchaseReturnDebitComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -541,6 +551,27 @@ export class PurchaseReturnDebitComponent {
       });
   }
 
+  onVerifyPurchaseReturn(event: any) {
+    const rowData = event.row.data;
+
+    const invoiceId = rowData.TRANS_ID;
+    const transStatus = rowData.TRANS_STATUS;
+
+    this.isReadOnlyPurchaseReturn = transStatus === 5;
+    this.dataService
+      .selectPurchaseReturn(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedPurchaseReturn = response;
+        if (transStatus === 5) {
+          this.isViewInvoice = true;
+        } else if (transStatus === 2) {
+          this.isApproveInvoice = true;
+        } else {
+          this.isVerifyInvoice = true;
+        }
+      });
+  }
+
   onDeletePurchaseReturn(event: any) {
     const returnId = event.data.TRANS_ID;
     console.log(returnId);
@@ -601,6 +632,10 @@ export class PurchaseReturnDebitComponent {
     this.isAddPurchaseReturn = false;
     this.isEditPurchaseReturn = false;
     this.isViewPurchaseReturn = false;
+    this.isVerifyInvoice = false;
+    this.isApproveInvoice = false;
+    this.isViewInvoice = false;
+
     if (this.PurchaseReturnDebitFormComponent) {
       this.PurchaseReturnDebitFormComponent.resetPurchaseReturnForm();
     }
@@ -653,4 +688,4 @@ export class PurchaseReturnDebitComponent {
   exports: [PurchaseReturnDebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseReturnDebitModule { }
+export class PurchaseReturnDebitModule {}

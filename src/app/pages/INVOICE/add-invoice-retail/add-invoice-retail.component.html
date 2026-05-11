@@ -300,7 +300,7 @@
           <dx-check-box
             text="Approve"
             [(value)]="invoiceFormData.IS_APPROVED"
-            [visible]="!isReadOnlyMode && !isApproveMode"
+            [visible]="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
           ></dx-check-box>
         </div>
         <dx-button

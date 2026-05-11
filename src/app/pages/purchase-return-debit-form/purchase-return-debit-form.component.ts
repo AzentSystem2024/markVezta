@@ -68,6 +68,8 @@ export class PurchaseReturnDebitFormComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Input() canApprove: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -783,6 +785,7 @@ export class PurchaseReturnDebitFormComponent {
     this.purchaseReturnFormData.RET_DATE = retDate;
 
     // --- ADD MODE vs EDIT MODE ---
+    // --- ADD MODE vs EDIT MODE ---
     if (this.isEditing) {
       // Only for edit: ensure Return ID is passed (if backend needs it)
       if (this.EditingResponseData?.RETURN_ID) {
@@ -790,10 +793,65 @@ export class PurchaseReturnDebitFormComponent {
           this.EditingResponseData.RETURN_ID;
       }
 
-      // UPDATE API
-      // If approved → call APPROVE API
-      // If Approved → Ask confirmation before calling APPROVE API
-      if (this.purchaseReturnFormData.IS_APPROVED === true) {
+      // =========================================
+      // VERIFY MODE
+      // =========================================
+      if (this.isVerifyMode) {
+        const result = confirm(
+          `Are you sure you want to verify this Purchase Return?`,
+          'Confirm Verification',
+        );
+
+        result.then((dialogResult) => {
+          if (dialogResult) {
+            this.isSaving = true;
+
+            this.dataService
+              .verifyPurchaseReturn(this.purchaseReturnFormData)
+              .subscribe(
+                (response: any) => {
+                  this.isSaving = false;
+
+                  notify(
+                    {
+                      message: 'Purchase Return Verified Successfully',
+                      position: { at: 'top right', my: 'top right' },
+                    },
+                    'success',
+                  );
+
+                  this.popupClosed.emit();
+                },
+
+                (error: any) => {
+                  this.isSaving = false;
+                  console.error('VERIFY ERROR:', error);
+
+                  if (error?.status === 0) {
+                    notify(
+                      'Network error. Please check your internet connection and try again.',
+                      'error',
+                      3000,
+                    );
+                  } else {
+                    notify(
+                      'Error verifying purchase return. Please try again.',
+                      'error',
+                      3000,
+                    );
+                  }
+                },
+              );
+          }
+        });
+
+        return;
+      }
+
+      // =========================================
+      // APPROVE MODE
+      // =========================================
+      if (this.isApproveMode) {
         const result = confirm(
           `Are you sure you want to approve this Purchase Return?`,
           'Confirm Approval',
@@ -802,12 +860,13 @@ export class PurchaseReturnDebitFormComponent {
         result.then((dialogResult) => {
           if (dialogResult) {
             this.isSaving = true;
-            // user clicked OK → call APPROVE API
+
             this.dataService
               .approvePurchaseReturn(this.purchaseReturnFormData)
               .subscribe(
                 (response: any) => {
                   this.isSaving = false;
+
                   notify(
                     {
                       message: 'Purchase Return Approved Successfully',
@@ -818,6 +877,65 @@ export class PurchaseReturnDebitFormComponent {
 
                   this.popupClosed.emit();
                 },
+
+                (error) => {
+                  this.isSaving = false;
+                  console.error('APPROVE ERROR:', error);
+
+                  if (error?.status === 0) {
+                    notify(
+                      'Network error. Please check your internet connection and try again.',
+                      'error',
+                      3000,
+                    );
+                  } else {
+                    notify(
+                      'Error approving purchase return. Please try again.',
+                      'error',
+                      3000,
+                    );
+                  }
+                },
+              );
+          }
+        });
+
+        return;
+      }
+
+      // =========================================
+      // NORMAL EDIT MODE
+      // =========================================
+
+      // If approved → call APPROVE API
+      if (this.purchaseReturnFormData.IS_APPROVED === true) {
+        const result = confirm(
+          `Are you sure you want to approve this Purchase Return?`,
+          'Confirm Approval',
+        );
+
+        result.then((dialogResult) => {
+          if (dialogResult) {
+            this.isSaving = true;
+
+            // user clicked OK → call APPROVE API
+            this.dataService
+              .approvePurchaseReturn(this.purchaseReturnFormData)
+              .subscribe(
+                (response: any) => {
+                  this.isSaving = false;
+
+                  notify(
+                    {
+                      message: 'Purchase Return Approved Successfully',
+                      position: { at: 'top right', my: 'top right' },
+                    },
+                    'success',
+                  );
+
+                  this.popupClosed.emit();
+                },
+
                 (error) => {
                   this.isSaving = false;
                   console.error('SAVE ERROR:', error);
@@ -843,15 +961,17 @@ export class PurchaseReturnDebitFormComponent {
           }
         });
 
-        return; // prevent continuing to update API block
+        return;
       } else {
         // Otherwise → UPDATE API
         this.isSaving = true;
+
         this.dataService
           .updatePurchaseReturn(this.purchaseReturnFormData)
           .subscribe(
             (response: any) => {
               this.isSaving = false;
+
               notify(
                 {
                   message: 'Purchase Return Updated Successfully',
@@ -862,6 +982,7 @@ export class PurchaseReturnDebitFormComponent {
 
               this.popupClosed.emit();
             },
+
             (error) => {
               this.isSaving = false;
               console.error('SAVE ERROR:', error);
