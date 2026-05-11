@@ -245,6 +245,25 @@
 
         <!-- Delete -->
         <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="
+            onDeletePurchaseReturn({ data: cellData.data, cancel: false })
+          "
+        ></i>
+        <!-- <i
           *ngIf="
             canDelete &&
             !['Approved', 'Verified', 'Closed'].includes(
@@ -255,7 +274,7 @@
           style="cursor: pointer"
           title="Delete"
           (click)="onDeletePurchaseReturn({ data: cellData.data })"
-        ></i>
+        ></i> -->
       </div>
     </dx-data-grid>
   </div>
