@@ -747,6 +747,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Quotation/approve`, data);
   }
 
+  verifySalesQuotation(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Quotation/verify`, data);
+  }
+
   getTermsAndConditions(): Observable<any> {
     return this.http.post(`${this.apiUrl}Quotation/list-terms`, {});
   }

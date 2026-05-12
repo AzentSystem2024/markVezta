@@ -922,7 +922,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     return {
       ...prepared,
       GRNDetails: mergedDetails, //  full list with edits merged
-      GRN_DATE: new Date(), //  override with current date
+      // GRN_DATE: new Date(), //  override with current date
+      GRN_DATE: this.newGrnData.GRN_DATE,
     };
   };
   onEditorPreparing(e: any) {

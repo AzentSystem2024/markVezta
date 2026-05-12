@@ -66,6 +66,8 @@ export class QuotationFormComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -230,8 +232,10 @@ export class QuotationFormComponent {
       this.storeId = this.EditingResponseData.STORE_ID;
     }
 
-    // Fetch quotation number
-    this.getQuotationNo();
+    // Fetch quotation number only in add mode
+    if (!this.isEditing) {
+      this.getQuotationNo();
+    }
 
     // // SAFE CALL: getItems() may return undefined
     // const items$ = this.getItems();
@@ -553,7 +557,7 @@ export class QuotationFormComponent {
       return;
     }
 
-    const payload = { STORE_ID };
+    const payload = { STORE_ID, CUSTOMER_ID: this.quotationFormData.CUST_ID };
 
     return this.dataService.getItemsForQuotation(payload).pipe(
       tap((response: any) => {
@@ -729,19 +733,6 @@ export class QuotationFormComponent {
       this.quotationFormData.QTN_NO = response.DOC_NO;
       console.log(response.DOC_NO, 'DOCNOOOOOOOOO');
     });
-    // this.dataService.getVoucherNoForQuotation().subscribe(
-    //   (response: any) => {
-    //     if (response?.Flag === 1 && response?.Data?.length) {
-    //       this.quotationFormData.QTN_NO = response.Data[0].VOCHERNO;
-    //       console.log(this.quotationFormData.SO_NO, 'SONO');
-    //     } else {
-    //       console.error('No data returned for voucher number');
-    //     }
-    //   },
-    //   (err) => {
-    //     console.error('API error:', err);
-    //   },
-    // );
   }
 
   calculateGrossAmount = (rowData: any) => {
@@ -906,9 +897,11 @@ export class QuotationFormComponent {
     const proceedWithSave = () => {
       this.isSaving = true;
       const apiCall = this.isEditing
-        ? this.isApproved
+        ? this.isApproveMode || this.isApproved
           ? this.dataService.approveSalesQuotation(payload) // Approve API
-          : this.dataService.updateSalesQuotation(payload) // Update API
+          : this.isVerifyMode
+            ? this.dataService.verifySalesQuotation(payload) // Verify API
+            : this.dataService.updateSalesQuotation(payload) // Update API
         : this.dataService.insertSalesQuotation(payload); // Save API
 
       apiCall.subscribe(
@@ -921,7 +914,7 @@ export class QuotationFormComponent {
               2000,
             );
             this.popupClosed.emit();
-            this.getQuotationNo();
+            // this.getQuotationNo();
           } else {
             notify(
               response.Message || 'Failed to save quotation',
@@ -938,10 +931,20 @@ export class QuotationFormComponent {
     };
 
     // Confirmation before approving
-    if (this.isEditing && this.isApproved) {
+    // Confirmation before approving/verifying
+    if (this.isEditing && (this.isApproveMode || this.isApproved)) {
       confirm(
         'Are you sure you want to approve this quotation?',
         'Confirm Approval',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          proceedWithSave();
+        }
+      });
+    } else if (this.isEditing && this.isVerifyMode) {
+      confirm(
+        'Are you sure you want to verify this quotation?',
+        'Confirm Verify',
       ).then((dialogResult) => {
         if (dialogResult) {
           proceedWithSave();

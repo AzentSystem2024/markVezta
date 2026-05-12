@@ -53,6 +53,7 @@ import {
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { finalize } from 'rxjs/operators';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-grn',
@@ -126,6 +127,11 @@ export class GrnComponent implements OnInit {
   customEndDate: any = null;
   showCustomDatePopup = false;
   isSaving: boolean = false;
+  canVerify: any;
+  isVerifyMode: boolean;
+  isViewOpened: boolean;
+  isApproveOpened: boolean;
+  isVerifyOpened: boolean;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -156,29 +162,29 @@ export class GrnComponent implements OnInit {
     this.applyCustomDateFilter(); // your existing function
   }
 
-  customButtons = [
-    // {
-    //   hint: 'Verify',
-    //   icon: 'check',
-    //   text: 'Verify',
-    //   onClick: (e) => this.onVerifyClick(e),
-    //   visible: (e) => e.row.data.STATUS!=='Verified' && e.row.data.STATUS!=='Approved',
-    // },
-    {
-      hint: 'Approve',
-      icon: 'check',
-      text: 'Approve',
-      onClick: (e) => this.onApproveClick(e),
-      visible: (e) => e.row.data.STATUS !== 'Approved',
-    },
-    {
-      hint: 'View',
-      icon: 'detailslayout', // You can change this to an appropriate icon
-      text: 'View',
-      onClick: (e) => this.onViewClick(e),
-      visible: (e) => e.row.data.STATUS === 'Approved',
-    },
-  ];
+  // customButtons = [
+  //   // {
+  //   //   hint: 'Verify',
+  //   //   icon: 'check',
+  //   //   text: 'Verify',
+  //   //   onClick: (e) => this.onVerifyClick(e),
+  //   //   visible: (e) => e.row.data.STATUS!=='Verified' && e.row.data.STATUS!=='Approved',
+  //   // },
+  //   {
+  //     hint: 'Approve',
+  //     icon: 'check',
+  //     text: 'Approve',
+  //     onClick: (e) => this.onApproveClick(e),
+  //     visible: (e) => e.row.data.STATUS !== 'Approved',
+  //   },
+  //   {
+  //     hint: 'View',
+  //     icon: 'detailslayout', // You can change this to an appropriate icon
+  //     text: 'View',
+  //     onClick: (e) => this.onViewClick(e),
+  //     visible: (e) => e.row.data.STATUS === 'Approved',
+  //   },
+  // ];
 
   searchButtonOptions = {
     icon: 'search',
@@ -267,7 +273,7 @@ export class GrnComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) { }
+  ) {}
 
   openGRNForm() {
     this.isGRNPopupVisible = true;
@@ -376,7 +382,7 @@ export class GrnComponent implements OnInit {
     });
   }
 
-  verifyGrnData() {
+  editGrnData() {
     const data = this.grnVerifyForm.getNewGrnData();
     console.log(data, 'grn verified data');
 
@@ -437,6 +443,56 @@ export class GrnComponent implements OnInit {
           'error',
         );
       }
+    });
+  }
+
+  verifyGrnData() {
+    confirm(
+      this.isApproved
+        ? 'Are you sure you want to approve this GRN?'
+        : 'Are you sure you want to verify this GRN?',
+      this.isApproved ? 'Confirm Approval' : 'Confirm Verify',
+    ).then((dialogResult) => {
+      if (!dialogResult) return;
+
+      const data = this.grnVerifyForm.getNewGrnData();
+      console.log(data, 'grn verified data');
+
+      this.service.verifyGrnData(data).subscribe((res) => {
+        console.log('data verified', res);
+
+        // Step 1: Update success
+        if (res.Message === 'Success') {
+          // Step 2: If approved → call approve API
+          if (this.isApproved === true) {
+          }
+
+          // Step 3: Only verification
+          else {
+            notify(
+              {
+                message: 'Data Updated Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.getGrnLogData();
+            this.isVerifyPopupOpened = false;
+          }
+        }
+
+        // Update failed
+        else {
+          notify(
+            {
+              message: 'Your Data Not Verified',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+      });
     });
   }
 
@@ -689,6 +745,7 @@ export class GrnComponent implements OnInit {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.sessionData_tax();
@@ -697,7 +754,7 @@ export class GrnComponent implements OnInit {
     this.getDocNo();
   }
 
-  onEditingRow(event): void {
+  onEditingRow(event: any): void {
     event.cancel = true; // stop default grid edit
 
     const rowData = event.data;
@@ -723,7 +780,39 @@ export class GrnComponent implements OnInit {
     });
   }
 
-  onApproveClick = (e) => {
+  onVerifyClick(event: any) {
+    event.cancel = true;
+    console.log(event.row.data, 'VERIFYCLICKEDDDDDDDDDD');
+    const rowData = event.row.data;
+
+    const grnId = rowData.ID;
+    const status = rowData.STATUS;
+    this.service.selectGrnData(grnId).subscribe((res) => {
+      this.selectedRowData = res;
+
+      // APPROVED -> VIEW
+      if (status === 'Approved') {
+        this.isViewOpened = true;
+        return;
+      }
+
+      // VERIFIED -> APPROVE
+      if (status === 'Verified') {
+        this.isApproved = true;
+        this.isVerifyMode = false;
+
+        this.isApproveOpened = true;
+        return;
+      }
+
+      // OPEN -> VERIFY
+      this.isVerifyMode = true;
+
+      this.isVerifyOpened = true;
+    });
+  }
+
+  onApproveClick = (e: any) => {
     e.cancel = true;
     const id = e.row.data.ID;
     this.isApprovePopupOpened = true;
@@ -734,7 +823,7 @@ export class GrnComponent implements OnInit {
     });
   };
 
-  onViewClick = (e) => {
+  onViewClick = (e: any) => {
     e.cancel = true;
     const id = e.row.data.ID;
     this.selectedGrnId = id;
@@ -748,7 +837,7 @@ export class GrnComponent implements OnInit {
 
   deleteGrnData(event: any) {
     const ID = event.data.ID;
-    this.service.deleteGrnData(ID).subscribe((response: any) => { });
+    this.service.deleteGrnData(ID).subscribe((response: any) => {});
   }
 
   formatGrnDate(rowData: any): string {
@@ -861,4 +950,4 @@ export class GrnComponent implements OnInit {
   exports: [],
   declarations: [GrnComponent],
 })
-export class GrnModule { }
+export class GrnModule {}
