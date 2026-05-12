@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
@@ -56,11 +57,11 @@ import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-pop
 })
 export class TransferInInventoryComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -110,7 +111,7 @@ export class TransferInInventoryComponent {
   isEditTransferOut: boolean = false;
   selectedTrOut: any;
   selectedStoreid: any
-
+  canVerify: boolean = false
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -133,16 +134,78 @@ export class TransferInInventoryComponent {
   selected_Company_id: any;
   storeHint: string = '';
   dateFilteredList: any;
+  StatusType: any;
+  allButtons = [
+    {
+      name: 'edit',
+      onClick: (e: any) => this.onEditTransferIn(e),
+      visible: (e: any) => {
 
+        return this.canEdit &&
+          (
+            e.row.data.STATUS === 'OPEN'
+          )
+      }
+
+    },
+    {
+      name: 'delete',
+      visible: (e: any) => {
+        const status = e.row.data.STATUS;
+
+        return this.canDelete &&
+          (
+            (e.row.data.STATUS == 'OPEN') || (status === 'VERIFIED' && this.canApprove)
+
+          )
+
+      },
+    },
+    {
+      hint: 'Verify',
+      icon: 'check',
+      text: 'Verify',
+      onClick: (e: any) => this.onVerifyClick(e),
+      visible: (e: any) => {
+        return this.canVerify && e.row.data.STATUS === 'OPEN';
+      },
+    },
+    {
+      hint: 'Approve',
+      icon: 'check',
+      text: 'Approve',
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) => {
+        return this.canApprove &&
+          (
+            e.row.data.STATUS === 'VERIFIED' || (this.canVerify ? false : e.row.data.STATUS === 'OPEN')
+          )
+
+      },
+    },
+    {
+      hint: 'View',
+      icon: 'check',
+      text: 'View',
+      onClick: (e: any) => this.onViewClick(e),
+      visible: (e: any) =>
+        this.canView &&
+        (
+          e.row.data.STATUS === 'APPROVED' ||
+          (e.row.data.STATUS === 'VERIFIED' && !this.canApprove)
+        )
+
+    },
+  ];
   constructor(
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
-
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -151,8 +214,8 @@ export class TransferInInventoryComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
     console.log(packingRights, 'PACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -163,12 +226,14 @@ export class TransferInInventoryComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
+
     }
     this.getTransferInList();
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -250,56 +315,7 @@ export class TransferInInventoryComponent {
     }
   }
 
-  // applyDateFilter() {
-  //   if (!this.selectedDateRange || !this.transferInList) {
-  //     this.filteredTrInList = this.transferInList;
-  //     return;
-  //   }
-  //   if (this.selectedDateRange === 'all') {
-  //     this.filteredTrInList = this.transferInList; // show full list
-  //     return;
-  //   }
-  //   const today = new Date();
-  //   let startDate: Date;
-  //   const endDate = new Date(); // today
 
-  //   switch (this.selectedDateRange) {
-  //     case 'today':
-  //       startDate = new Date();
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     case 'last7':
-  //       startDate = new Date();
-  //       startDate.setDate(today.getDate() - 6);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     case 'last15':
-  //       startDate = new Date();
-  //       startDate.setDate(today.getDate() - 14);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     case 'last30':
-  //       startDate = new Date();
-  //       startDate.setDate(today.getDate() - 29);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     default:
-  //       this.filteredTrInList = this.transferInList;
-  //       return;
-  //   }
-
-  //   this.filteredTrInList = this.transferInList.filter((item: any) => {
-  //     if (!item.TRANSFER_DATE) {
-  //       console.warn('Missing TRANSFER_DATE in item:', item);
-  //       return false;
-  //     }
-
-  //     const invoiceDate = item.TRANSFER_DATE;
-  //     return invoiceDate >= startDate && invoiceDate <= endDate;
-  //   });
-  //     this.applyStoreFilter();
-
-  // }
   applyDateFilter() {
     if (!this.selectedDateRange || !this.transferInList) {
       this.dateFilteredList = [...this.transferInList];
@@ -513,15 +529,15 @@ export class TransferInInventoryComponent {
 
   onEditTransferIn(event: any) {
     event.cancel = true;
-    const trInId = event.data.TRANS_ID;
-    const status = event.data.STATUS;
+    const trInId = event.row.data.TRANS_ID;
+    const status = event.row.data.STATUS;
     this.dataService
       .selectTransferInForInventory(trInId)
       .subscribe((response: any) => {
         this.selectedTrIn = response;
         console.log(this.selectedTrIn, 'SELECTEDTROUT');
         this.isEditTransferIn = true;
-        this.isReadOnlyTrIn = status === 'APPROVED';
+        this.cdr.detectChanges();
       });
   }
 
@@ -592,6 +608,45 @@ export class TransferInInventoryComponent {
   onStoreChanged(e: any) {
     console.log('Selected store IDs:', this.selectedStoreid);
     this.applyStoreFilter(); // ✅ ONLY store filter
+  }
+  onViewClick(e: any) {
+    const trInId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+    this.dataService
+      .selectTransferInForInventory(trInId)
+      .subscribe((response: any) => {
+        this.selectedTrIn = response;
+        console.log(this.selectedTrIn, 'SELECTEDTROUT');
+        this.isEditTransferIn = true;
+        this.cdr.detectChanges();
+      });
+
+  }
+  onVerifyClick(e: any) {
+    const trInId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+    this.dataService
+      .selectTransferInForInventory(trInId)
+      .subscribe((response: any) => {
+        this.selectedTrIn = response;
+        console.log(this.selectedTrIn, 'SELECTEDTROUT');
+        this.isEditTransferIn = true;
+        this.cdr.detectChanges();
+      });
+
+  }
+  onApproveClick(e: any) {
+    const trInId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+    this.dataService
+      .selectTransferInForInventory(trInId)
+      .subscribe((response: any) => {
+        this.selectedTrIn = response;
+        console.log(this.selectedTrIn, 'SELECTEDTROUT');
+        this.isEditTransferIn = true;
+        this.cdr.detectChanges();
+      });
+
   }
 }
 

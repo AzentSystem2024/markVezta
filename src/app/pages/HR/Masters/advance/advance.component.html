@@ -597,7 +597,7 @@
         <dx-button text="Cancel" (onClick)="close()"></dx-button>
         <dx-button
           [visible]="!isEditReadOnly"
-          [text]="approveValue ? 'Update & Commit' : 'Update'"
+          [text]="buttonText"
           stylingMode="contained"
           (onClick)="Update_advance()"
         ></dx-button>

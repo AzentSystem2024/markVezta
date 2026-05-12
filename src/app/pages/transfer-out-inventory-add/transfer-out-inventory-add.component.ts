@@ -61,10 +61,13 @@ export class TransferOutInventoryAddComponent {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() ActionStatus: any = {};
+
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
+
 
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
@@ -124,6 +127,8 @@ export class TransferOutInventoryAddComponent {
   ) { }
 
   ngOnInit() {
+    console.log('--------------Status-------------:', this.ActionStatus);
+
     console.log(this.isReadOnlyMode, 'READONLYMODE');
     this.isEditDataAvailable();
 
@@ -594,7 +599,7 @@ export class TransferOutInventoryAddComponent {
 
     // ---------- EDIT MODE ----------
     if (this.isEditing) {
-      if (this.transferOutFormData.IS_APPROVED) {
+      if (this.ActionStatus === 'ApprovalScreen') {
         // APPROVE API
         confirm(
           'Are you sure you want to approve this transfer?',
@@ -623,7 +628,25 @@ export class TransferOutInventoryAddComponent {
             });
           }
         });
-      } else {
+      }
+      else if (this.ActionStatus == 'VerifyScreen') {
+        this.dataService.verifyTransferOutForInventory
+          (payload).subscribe({
+            next: (res: any) => {
+              if (res.flag === 1) {
+                notify('Transfer Verifed successfully!', 'success', 3000);
+                this.popupClosed.emit();
+              } else {
+                notify('Error Verify transfer: ' + res.message, 'error', 3000);
+              }
+            },
+            error: (err: any) => {
+              notify('Something went wrong while Verify.', 'error', 3000);
+            },
+          });
+        
+      }
+      else {
         // UPDATE API
         this.dataService.updateTransferOutForInventory(payload).subscribe({
           next: (res: any) => {
@@ -710,7 +733,7 @@ export class TransferOutInventoryAddComponent {
       'Apr',
       'May',
       'Jun',
-      'Jul',  
+      'Jul',
       'Aug',
       'Sep',
       'Oct',
@@ -733,140 +756,140 @@ export class TransferOutInventoryAddComponent {
   }
 
   getBase64ImageFromURL(url: string): Promise<string> {
-  return fetch(url)
-    .then(res => res.blob())
-    .then(blob => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+    return fetch(url)
+      .then(res => res.blob())
+      .then(blob => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
       });
-    });
-}
+  }
 
- async  generatePDF(data: any) {
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
+  async generatePDF(data: any) {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-  // ============================================================
-  // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
-  // ============================================================
+    // ============================================================
+    // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
+    // ============================================================
 
-  const headerY = 10;
+    const headerY = 10;
 
-  // --- Logo placeholder (replace with addImage if needed)
-  const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
+    // --- Logo placeholder (replace with addImage if needed)
+    const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
 
-  doc.addImage(logoBase64, 'PNG', 15, headerY, 35, 50);
+    doc.addImage(logoBase64, 'PNG', 15, headerY, 35, 50);
 
-  // --- Title
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text('TRANSFER OUT', pageWidth / 2, headerY + 25, {
-    align: 'center',
-  });
-
- // ============================================================
-  // 2) RIGHT SIDE DETAILS (FIXED - WRAPPING ADDED)
-  // ============================================================
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('en-GB');
-  };
-
-  const rightDetails = [
-    `ISSUE DATE: ${formatDate(data.TRANSFER_DATE)}`,
-    `TRANSFER NO: ${data.DOC_NO}`,
-    `TRANSFER FROM: ${data.COMPANY_NAME}`,
-    `TRANSFER TO: ${data.STORE_CODE}`,
-    `REASON: ${data.REASON_ID || ''}`,
-    `NARRATION: ${data.NARRATION || ''}`,
-  ];
-
-  const rightMargin = 20;   // distance from right edge
-  const maxWidth = 70;      // width of text block
-
-  let y = headerY + 5;
-
-  rightDetails.forEach((line) => {
-    //  wrap long text داخل عرض محدد
-    const wrappedText = doc.splitTextToSize(line, maxWidth);
-
-    //  draw aligned to right
-    doc.text(wrappedText, pageWidth - rightMargin, y, {
-      align: 'right',
+    // --- Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('TRANSFER OUT', pageWidth / 2, headerY + 25, {
+      align: 'center',
     });
 
-    //  dynamic spacing
-    y += wrappedText.length * 6;
-  });
+    // ============================================================
+    // 2) RIGHT SIDE DETAILS (FIXED - WRAPPING ADDED)
+    // ============================================================
 
-  // ============================================================
-  // 2) TABLE
-  // ============================================================
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
 
-  const tableStartY = y + 10;
+    const formatDate = (dateStr: string) => {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-GB');
+    };
 
-  const rows = data.DETAILS.map((item: any, index: number) => [
-    index + 1,
-    item.BARCODE,
-    item.DESCRIPTION,
-    item.UOM,
-    Number(item.QUANTITY_AVAILABLE || 0).toFixed(2),
-    Number(item.QUANTITY || 0).toFixed(2),
-  ]);
+    const rightDetails = [
+      `ISSUE DATE: ${formatDate(data.TRANSFER_DATE)}`,
+      `TRANSFER NO: ${data.DOC_NO}`,
+      `TRANSFER FROM: ${data.COMPANY_NAME}`,
+      `TRANSFER TO: ${data.STORE_CODE}`,
+      `REASON: ${data.REASON_ID || ''}`,
+      `NARRATION: ${data.NARRATION || ''}`,
+    ];
 
-  autoTable(doc, {
-    startY: tableStartY,
-    theme: 'grid',
-    margin: { left: 15, right: 15 },
-    styles: {
-      fontSize: 9,
-      cellPadding: 2,
-    },
+    const rightMargin = 20;   // distance from right edge
+    const maxWidth = 70;      // width of text block
 
-    headStyles: {
-      fillColor: [200, 210, 220],
-      textColor: 0,
-      halign: 'center',
-      fontStyle: 'bold',
-    },
+    let y = headerY + 5;
 
-    columnStyles: {
-      0: { cellWidth: 12, halign: 'center' },
-      1: { cellWidth: 35 },
-      2: { cellWidth: 60 },
-      3: { cellWidth: 20, halign: 'center' },
-      4: { cellWidth: 30, halign: 'right' },
-      5: { cellWidth: 30, halign: 'right' },
-    },
+    rightDetails.forEach((line) => {
+      //  wrap long text داخل عرض محدد
+      const wrappedText = doc.splitTextToSize(line, maxWidth);
 
-    head: [
-      [
-        'Sl No',
-        'Barcode',
-        'Description',
-        'UOM',
-        'QTY Available',
-        'QTY Issued',
+      //  draw aligned to right
+      doc.text(wrappedText, pageWidth - rightMargin, y, {
+        align: 'right',
+      });
+
+      //  dynamic spacing
+      y += wrappedText.length * 6;
+    });
+
+    // ============================================================
+    // 2) TABLE
+    // ============================================================
+
+    const tableStartY = y + 10;
+
+    const rows = data.DETAILS.map((item: any, index: number) => [
+      index + 1,
+      item.BARCODE,
+      item.DESCRIPTION,
+      item.UOM,
+      Number(item.QUANTITY_AVAILABLE || 0).toFixed(2),
+      Number(item.QUANTITY || 0).toFixed(2),
+    ]);
+
+    autoTable(doc, {
+      startY: tableStartY,
+      theme: 'grid',
+      margin: { left: 15, right: 15 },
+      styles: {
+        fontSize: 9,
+        cellPadding: 2,
+      },
+
+      headStyles: {
+        fillColor: [200, 210, 220],
+        textColor: 0,
+        halign: 'center',
+        fontStyle: 'bold',
+      },
+
+      columnStyles: {
+        0: { cellWidth: 12, halign: 'center' },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 60 },
+        3: { cellWidth: 20, halign: 'center' },
+        4: { cellWidth: 30, halign: 'right' },
+        5: { cellWidth: 30, halign: 'right' },
+      },
+
+      head: [
+        [
+          'Sl No',
+          'Barcode',
+          'Description',
+          'UOM',
+          'QTY Available',
+          'QTY Issued',
+        ],
       ],
-    ],
 
-    body: rows,
-  });
+      body: rows,
+    });
 
-  // ============================================================
-  // 3) OPEN PDF
-  // ============================================================
+    // ============================================================
+    // 3) OPEN PDF
+    // ============================================================
 
-  doc.output('dataurlnewwindow');
-}
+    doc.output('dataurlnewwindow');
+  }
 
   convertNumberToWords(num: number): string {
     if (num === 0) return 'Zero';
