@@ -44,8 +44,8 @@
             [showInfo]="showInfo"
             [showNavigationButtons]="showNavButtons"
           ></dxo-pager> -->
-    <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
-    </dxo-editing>
+    <!-- <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true"> -->
+    <!-- </dxo-editing> -->
     <dxo-toolbar>
       <dxi-item location="before">
         <div class="grid-header">Goods Receipt Note</div>
@@ -136,10 +136,87 @@
       [cellTemplate]="statusCellRender"
     ></dxi-column>
 
-    <dxi-column type="buttons" [buttons]="allButtonsEditDelete"> </dxi-column>
-    <!-- </dxi-column> -->
-    <!-- <dxi-column type="buttons" width="100" [buttons]="customButtons">
-    </dxi-column> -->
+    <!-- <dxi-column type="buttons" [buttons]="allButtonsEditDelete"> </dxi-column> -->
+    <dxi-column caption="Actions" [width]="140" cellTemplate="actionTemplate">
+    </dxi-column>
+    <div *dxTemplate="let cellData of 'actionTemplate'">
+      <!-- Verify / Approve / View -->
+      <span
+        *ngIf="
+          canVerify ||
+          (canApprove && cellData.data.STATUS === 'Verified') ||
+          (canView && cellData.data.STATUS === 'Approved')
+        "
+        style="
+          position: relative;
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          margin-right: 12px;
+          margin-top: -4px;
+          cursor: pointer;
+          vertical-align: middle;
+        "
+        [title]="
+          cellData.data.STATUS === 'Approved'
+            ? 'View'
+            : cellData.data.STATUS === 'Verified'
+              ? 'Approve'
+              : 'Verify'
+        "
+        (click)="onVerifyClick({ row: { data: cellData.data } })"
+      >
+        <!-- Badge -->
+        <i
+          class="fas fa-certificate"
+          [style.color]="
+            cellData.data.STATUS === 'Approved'
+              ? '#10B981'
+              : cellData.data.STATUS === 'Verified'
+                ? '#0073D8'
+                : '#FFA500'
+          "
+          style="font-size: 18px; position: absolute; top: 0; left: 0"
+        ></i>
+
+        <!-- Tick -->
+        <i
+          class="fas fa-check"
+          style="
+            color: white;
+            font-size: 7px;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            pointer-events: none;
+          "
+        ></i>
+      </span>
+
+      <!-- Edit -->
+      <i
+        *ngIf="
+          canEdit &&
+          !['Approved', 'Verified', 'Closed'].includes(cellData.data.STATUS)
+        "
+        class="dx-icon dx-icon-edit"
+        style="cursor: pointer; margin-right: 10px"
+        title="Edit"
+        (click)="onEditingRow({ data: cellData.data, cancel: false })"
+      ></i>
+
+      <!-- Delete -->
+      <i
+        *ngIf="
+          canDelete &&
+          !['Approved', 'Verified', 'Closed'].includes(cellData.data.STATUS)
+        "
+        class="dx-icon dx-icon-trash"
+        style="cursor: pointer"
+        title="Delete"
+        (click)="deleteGrnData({ data: cellData.data })"
+      ></i>
+    </div>
   </dx-data-grid>
 </div>
 
@@ -158,49 +235,23 @@
   <app-grn-new-form></app-grn-new-form>
 </form-popup>
 
-<!-- <dx-popup
-    [(visible)]="isEditPopupOpened"
-    title="Edit Goods Receipt Note"
-    [height]="'100vh'"
-    [width]="width"
-    (save)="updateGrnData()"
-  
-  >
-  <app-grn-edit-form
-  [formdata]="selectedRowData"
-  ></app-grn-edit-form>
-  <dxi-toolbar-item toolbar="bottom" location="after">
-    <div
-        class="form-popup-buttons-container" 
-        [class.flex-buttons]="width <= 360"
-      >
-      <dx-button
-      text="Print"
-      stylingMode="outlined"
-      type="normal"
-      icon="print"
-      (onClick)="PrintGrn()"
-    ></dx-button>
-      <dx-button
-        text="Cancel"
-        stylingMode="outlined"
-        type="normal"
-       (onClick)="closeEdit()"
-      ></dx-button>
-      <dx-button
-        text="Save"
-        stylingMode="contained"
-        type="default"
-        (onClick)="updateGrnData()"
-      ></dx-button>
-    </div>
-    </dxi-toolbar-item>
-
-</dx-popup> -->
-
+//EDIT POPUP//
 <form-popup
   [(visible)]="isVerifyPopupOpened"
   titleText="Edit Goods Receipt Note"
+  [height]="'100vh'"
+  [width]="width"
+  [(isApproved)]="isApproved"
+  [showApprove]="canApprove"
+  (save)="editGrnData()"
+>
+  <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
+</form-popup>
+
+//VERIFY POPUP//
+<form-popup
+  [(visible)]="isVerifyOpened"
+  titleText="Verify Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
   [(isApproved)]="isApproved"
@@ -210,7 +261,7 @@
   <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
 </form-popup>
 
-<form-popup
+<!-- <form-popup
   [(visible)]="isApprovePopupOpened"
   titleText="Approve Goods Receipt Note"
   [height]="'100vh'"
@@ -218,7 +269,7 @@
   (save)="approveGrnData()"
 >
   <app-grn-approve-form [formdata]="selectedRowData"></app-grn-approve-form>
-</form-popup>
+</form-popup> -->
 
 <dx-popup
   [(visible)]="isViewPopupOpened"

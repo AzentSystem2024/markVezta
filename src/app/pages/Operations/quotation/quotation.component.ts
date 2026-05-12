@@ -103,6 +103,13 @@ export class QuotationComponent {
   companyID: any;
   storeFromSession: any;
   selectedCompanyId: any;
+  canVerify: any;
+  isViewInvoice: boolean;
+  isApproveInvoice: boolean;
+  isVerifyInvoice: boolean;
+  isVerifyQuotation: boolean;
+  isApproveQuotation: boolean;
+  isViewQuotation: boolean;
   onExporting(event: any) {
     const fileName = 'Credit_Note';
     this.dataService.exportDataGrid(event, fileName);
@@ -156,7 +163,7 @@ export class QuotationComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -183,6 +190,7 @@ export class QuotationComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
       // this.getItemsList();
@@ -544,6 +552,27 @@ export class QuotationComponent {
       });
   }
 
+  onVerifyQuotation(event: any) {
+    const rowData = event.row.data;
+    console.log(rowData);
+    const quotationId = rowData.ID;
+    const transStatus = rowData.TRANS_STATUS;
+    console.log(quotationId, transStatus, 'IDANDSTATUS');
+    this.isReadOnlyQuotation = transStatus === 5;
+    this.dataService
+      .selectSalesQuotation(quotationId)
+      .subscribe((response: any) => {
+        this.selectedQuotation = response.Data;
+        if (transStatus === 5) {
+          this.isViewQuotation = true;
+        } else if (transStatus === 2) {
+          this.isApproveQuotation = true;
+        } else {
+          this.isVerifyQuotation = true;
+        }
+      });
+  }
+
   onDeleteQuotation(event: any) {
     const quotationId = event.data.ID;
     const status = event.data.TRANS_STATUS;
@@ -613,6 +642,9 @@ export class QuotationComponent {
   handleClose() {
     this.isAddQuotation = false;
     this.isEditQuotation = false;
+    this.isVerifyQuotation= false;
+    this.isApproveQuotation= false;
+    this.isViewQuotation= false;
     this.getQuotationList();
   }
 }

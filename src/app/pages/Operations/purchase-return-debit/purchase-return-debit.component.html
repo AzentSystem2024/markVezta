@@ -245,16 +245,23 @@
 
         <!-- Delete -->
         <i
-          *ngIf="
-            canDelete &&
-            !['Approved', 'Verified', 'Closed'].includes(
-              cellData.data.TRANS_STATUS
-            )
-          "
+          *ngIf="canDelete"
           class="dx-icon dx-icon-trash"
-          style="cursor: pointer"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
           title="Delete"
-          (click)="onDeletePurchaseReturn({ data: cellData.data })"
+          (click)="
+            onDeletePurchaseReturn({ data: cellData.data, cancel: false })
+          "
         ></i>
       </div>
     </dx-data-grid>
@@ -299,8 +306,8 @@
   [height]="'100vh'"
   [title]="
     selectedPurchaseReturn?.TRANS_STATUS === 2
-      ? 'Approve Invoice'
-      : 'Verify Invoice'
+      ? 'Approve Purchase Return'
+      : 'Verify Purchase Return'
   "
   (popupClosed)="handleClose()"
 >
@@ -320,7 +327,7 @@
   [(visible)]="isApproveInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="Approve Invoice"
+  title="Approve Purchase Return"
   (onHiding)="handleClose()"
 >
   <app-purchase-return-debit-form
@@ -338,7 +345,7 @@
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="Invoice"
+  title="Purchase Return"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
