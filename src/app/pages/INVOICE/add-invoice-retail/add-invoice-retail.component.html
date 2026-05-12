@@ -303,6 +303,19 @@
             [visible]="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
           ></dx-check-box>
         </div>
+
+        <dx-button
+                #saveButtonRef
+                text="PDF"
+                 [visible]="isReadOnlyMode ||
+    invoiceFormData.IS_APPROVED
+  "
+                (onClick)="openPDF()"
+                stylingMode="contained"
+                type="default"
+                [width]="120"
+              ></dx-button>
+        
         <dx-button
           text="Cancel"
           stylingMode="outlined"
