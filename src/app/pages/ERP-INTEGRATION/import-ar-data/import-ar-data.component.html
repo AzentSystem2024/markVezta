@@ -1,0 +1,166 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="importLogs"
+    [columns]="['FileName', 'ImportedDate', 'TotalRows']"
+    [showBorders]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    [columnAutoWidth]="true"
+    [height]="'80vh'"
+    noDataText=" "
+    [pager]="{
+      showInfo: true,
+      infoText: 'Page {0} of {1}',
+      showNavigationButtons: true,
+    }"
+  >
+    <dxo-filter-row
+      [visible]="showFilterRow"
+      [applyFilter]="currentFilter"
+    ></dxo-filter-row>
+
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10, 20, 30, 40]"
+    ></dxo-pager>
+
+    <dxo-load-panel
+      [enabled]="true"
+      [showPane]="true"
+      [showIndicator]="true"
+    ></dxo-load-panel>
+
+    <dxo-toolbar>
+      <dxi-item location="before" locateInMenu="never">
+        <div class="grid-header">Import AR Data</div>
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
+
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="importButtonOptions"
+      ></dxi-item>
+    </dxo-toolbar>
+  </dx-data-grid>
+
+  <!-- Hidden File Input -->
+  <input
+    type="file"
+    #fileInput
+    accept=".xlsx,.xls"
+    style="display: none"
+    (change)="OnFileChanged($event)"
+  />
+
+  <!-- Popup -->
+  <dx-popup
+    [(visible)]="isPopupVisible"
+    [width]="'95%'"
+    [height]="'90%'"
+    [showTitle]="true"
+    title="Imported Excel Preview"
+    [dragEnabled]="true"
+    [closeOnOutsideClick]="false"
+  >
+    <div *dxTemplate="let data of 'content'" class="popup-content-wrapper">
+      <!-- Grid -->
+      <dx-data-grid
+        #dataGrid      class="grid theme-dependent"
+        [dataSource]="Imported_Ar_DataSource"
+        [columns]="gridColumns"
+        [showBorders]="true"
+        [rowAlternationEnabled]="true"
+        [columnAutoWidth]="false"
+        [allowColumnResizing]="true"
+        [allowColumnReordering]="true"
+        [height]="'calc(100% - 70px)'"
+      >
+        <dxo-filter-row
+          [visible]="showFilterRow"
+          [applyFilter]="currentFilter"
+        ></dxo-filter-row>
+
+        <dxo-header-filter [visible]="true">
+          <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter>
+
+        <dxo-paging [pageSize]="10"></dxo-paging>
+
+        <dxo-pager
+          [visible]="true"
+          [showInfo]="true"
+          infoText="Page {0} of {1}"
+          [showNavigationButtons]="true"
+          [showPageSizeSelector]="true"
+          [allowedPageSizes]="[10, 20, 30, 40]"
+        ></dxo-pager>
+
+        <dxo-scrolling
+          mode="virtual"
+          rowRenderingMode="virtual"
+          columnRenderingMode="virtual"
+          showScrollbar="always"
+          preloadEnabled="true"
+          useNative="false"
+        >
+        </dxo-scrolling>
+      </dx-data-grid>
+
+      <!-- Footer Buttons -->
+      <div class="row mt-3">
+        <div class="col-12 d-flex justify-content-end gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-secondary popup-btn"
+            (click)="isPopupVisible = false"
+          >
+            <i class="bi bi-x-circle me-1"></i>
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-success popup-btn"
+            (click)="saveImportedData()"
+          >
+            <i class="bi bi-save me-1"></i>
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </dx-popup>
+</div>

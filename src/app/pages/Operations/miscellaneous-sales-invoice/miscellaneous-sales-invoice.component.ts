@@ -43,7 +43,6 @@ import { FormTextboxModule } from 'src/app/components';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
-import { MiscPurchInvoiceFormModule } from '../misc-purch-invoice-form/misc-purch-invoice-form.component';
 import { MiscellaneousSalesInvoiceFormModule } from '../miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 
 @Component({
@@ -160,7 +159,7 @@ export class MiscellaneousSalesInvoiceComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    const userDataString = localStorage.getItem('userData');
+    const userDataString = localStorage.getItem('userData') || '{}';
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
@@ -339,7 +338,9 @@ export class MiscellaneousSalesInvoiceComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 
