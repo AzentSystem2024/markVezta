@@ -1313,8 +1313,55 @@ export class PurchaseOrderComponent {
   }
 
   deletePOData(event: any) {
-    const ID = event.data.ID;
-    this.service.DeletePoData(ID).subscribe((response: any) => {});
+    if (event.data.STATUS === 5) {
+      event.cancel = true;
+
+      notify('Invoice cannot be deleted.', 'error', 2000);
+
+      return;
+    }
+
+    event.cancel = true;
+
+    confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    ).then((dialogResult: boolean) => {
+      if (dialogResult) {
+        const invoiceId = event.data.ID;
+
+        this.service.DeletePoData(invoiceId).subscribe(
+          (response: any) => {
+            if (response) {
+              notify(
+                {
+                  message: 'Purchase Order Deleted Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+
+              this.getPurchaseOrderList();
+
+              setTimeout(() => {
+                this.dataGrid.instance.refresh();
+              }, 100);
+            } else {
+              notify(
+                {
+                  message: 'Your Data Not deleted',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            console.error('Error deleting invoice:', error);
+          },
+        );
+      }
+    });
   }
 
   CloseEditForm() {
