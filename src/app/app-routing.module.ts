@@ -1207,7 +1207,8 @@ const routes: Routes = [
         component: SalesInvoiceRetailComponent,
         canActivate: [AuthGuardService],
       },
-      {
+
+         {
         path: 'item-store-price-approve',
         component: ItemStorePriceApproveComponent,
         canActivate: [AuthGuardService],
