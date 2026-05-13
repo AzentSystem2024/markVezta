@@ -436,28 +436,14 @@ export class SaleReturnFormComponent {
     if (selectedRows.length > 0) {
       selectedRows.forEach((row: any) => {
         const exists = this.mainGridData.some(
-          (item) => item.SALE_DET_ID === row.SALE_DET_ID,
+          (item) =>
+            item.SALE_DET_ID === row.SALE_DET_ID &&
+            item.ITEM_ID === row.ITEM_ID &&
+            item.SALE_NO === row.DOC_NO,
         );
 
         if (!exists) {
           const gstPerc = Number(row.GST_PERC) || 0;
-
-          // let cgst = 0;
-          // let sgst = 0;
-          // let igst = 0;
-
-          // // ✅ SAME STATE → Split GST
-          // if (this.sameState) {
-          //   cgst = Number(row.CGST);
-          //   sgst = Number(row.SGST);
-          //   igst = 0;
-          // }
-          // // ✅ DIFFERENT STATE → IGST
-          // else {
-          //   cgst = 0;
-          //   sgst = 0;
-          //   igst = gstPerc;
-          // }
 
           this.mainGridData.push({
             SALE_DET_ID: row.SALE_DET_ID,
