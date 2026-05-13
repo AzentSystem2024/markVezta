@@ -560,7 +560,7 @@ export class AdvanceComponent {
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
-      this.canView = packingRights.canView;
+      this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
     }
@@ -862,7 +862,121 @@ export class AdvanceComponent {
   //  =======================Update Advance=================================
   // ======================Delete data in advance===========================
 
+  // Update_advance() {
+  //   this.isFormSubmitted = true;
+
+  //   const id = this.id;
+  //   const emp_id = this.emp_id;
+  //   const date = this.date_value;
+  //   const adv_type_id = this.adv_type_id_value;
+  //   const advance_Amount = this.Advance_Amount_value;
+  //   const rec_amount = this.reco_Amount_value;
+  //   const rec_start_month = this.reco_stat_month;
+  //   const rec_install_count = this.reco_inst_count_value;
+  //   const rec_install_amount = this.reco_install_Amount_value;
+  //   const remarks = this.remark_value;
+  //   const pay_head_id = this.Payment_Head;
+  //   const trans_id = this.selectTransId;
+  //   const cheque_no = this.selected_Cheque_No;
+  //   const cheque_date = this.selected_Cheque_Date;
+
+  //   this.selected_pay_type_id =
+  //     this.selectedPaymentMode === '13'
+  //       ? 1
+  //       : this.selectedPaymentMode === '14'
+  //         ? 2
+  //         : this.selected_pay_type_id;
+
+  //   const pay_Type_id = this.selected_pay_type_id;
+  //   if (!emp_id || !date || !adv_type_id || !advance_Amount) {
+  //     notify(
+  //       {
+  //         message: 'Please fill all the required fields.',
+  //         position: { at: 'top right', my: 'top right' },
+  //         displayTime: 500,
+  //       },
+  //       'error',
+  //     );
+  //     this.isEditPopUp = true;
+  //     return;
+  //   }
+
+  //   if (this.approveValue === true) {
+  //     confirm(
+  //       'It will approve and commit. Are you sure you want to commit?',
+  //       'Confirm Commit',
+  //     ).then((result) => {
+  //       if (result) {
+  //         this.dataService
+  //           .Api_Approve_advance(
+  //             id,
+  //             emp_id,
+  //             date,
+  //             adv_type_id,
+  //             advance_Amount,
+  //             rec_amount,
+  //             rec_start_month,
+  //             rec_install_count,
+  //             rec_install_amount,
+  //             remarks,
+  //             pay_head_id,
+  //             trans_id,
+  //             cheque_no,
+  //             cheque_date,
+  //             pay_Type_id,
+  //           )
+  //           .subscribe((res: any) => {
+  //             notify(
+  //               {
+  //                 message: 'Advance approved and committed successfully',
+  //                 position: { at: 'top right', my: 'top right' },
+  //                 displayTime: 500,
+  //               },
+  //               'success',
+  //             );
+  //             // this.resetFormAfterUpdate();
+  //             this.isEditPopUp = false;
+  //             this.get_advance_list();
+  //           });
+  //       } else {
+  //         notify('Approval cancelled.', 'info', 2000);
+  //       }
+  //     });
+  //   } else {
+  //     this.dataService
+  //       .Api_Update_advance(
+  //         id,
+  //         emp_id,
+  //         date,
+  //         adv_type_id,
+  //         advance_Amount,
+  //         rec_amount,
+  //         rec_start_month,
+  //         rec_install_count,
+  //         rec_install_amount,
+  //         remarks,
+  //         pay_head_id,
+  //         trans_id,
+  //         cheque_no,
+  //         cheque_date,
+  //         pay_Type_id,
+  //       )
+  //       .subscribe((res: any) => {
+  //         notify(
+  //           {
+  //             message: 'Advance updated successfully',
+  //             position: { at: 'top right', my: 'top right' },
+  //             displayTime: 500,
+  //           },
+  //           'success',
+  //         );
+  //         // this.resetFormAfterUpdate();
+  //         this.isEditPopUp = false;
+  //       });
+  //   }
+  // }
   Update_advance() {
+
     this.isFormSubmitted = true;
 
     const id = this.id;
@@ -888,7 +1002,9 @@ export class AdvanceComponent {
           : this.selected_pay_type_id;
 
     const pay_Type_id = this.selected_pay_type_id;
+
     if (!emp_id || !date || !adv_type_id || !advance_Amount) {
+
       notify(
         {
           message: 'Please fill all the required fields.',
@@ -897,55 +1013,35 @@ export class AdvanceComponent {
         },
         'error',
       );
+
       this.isEditPopUp = true;
       return;
     }
 
-    if (this.approveValue === true) {
-      confirm(
-        'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit',
-      ).then((result) => {
-        if (result) {
-          this.dataService
-            .Api_Approve_advance(
-              id,
-              emp_id,
-              date,
-              adv_type_id,
-              advance_Amount,
-              rec_amount,
-              rec_start_month,
-              rec_install_count,
-              rec_install_amount,
-              remarks,
-              pay_head_id,
-              trans_id,
-              cheque_no,
-              cheque_date,
-              pay_Type_id,
-            )
-            .subscribe((res: any) => {
-              notify(
-                {
-                  message: 'Advance approved and committed successfully',
-                  position: { at: 'top right', my: 'top right' },
-                  displayTime: 500,
-                },
-                'success',
-              );
-              // this.resetFormAfterUpdate();
-              this.isEditPopUp = false;
-              this.get_advance_list();
-            });
-        } else {
-          notify('Approval cancelled.', 'info', 2000);
-        }
-      });
-    } else {
+    // COMMON PARAMS
+    const params = [
+      id,
+      emp_id,
+      date,
+      adv_type_id,
+      advance_Amount,
+      rec_amount,
+      rec_start_month,
+      rec_install_count,
+      rec_install_amount,
+      remarks,
+      pay_head_id,
+      trans_id,
+      cheque_no,
+      cheque_date,
+      pay_Type_id,
+    ];
+
+    // UPDATE
+    if (this.buttonText === 'Update') {
+
       this.dataService
-        .Api_Update_advance(
-          id,
+        .Api_Update_advance(id,
           emp_id,
           date,
           adv_type_id,
@@ -959,9 +1055,9 @@ export class AdvanceComponent {
           trans_id,
           cheque_no,
           cheque_date,
-          pay_Type_id,
-        )
+          pay_Type_id,)
         .subscribe((res: any) => {
+
           notify(
             {
               message: 'Advance updated successfully',
@@ -970,12 +1066,96 @@ export class AdvanceComponent {
             },
             'success',
           );
-          // this.resetFormAfterUpdate();
+
           this.isEditPopUp = false;
+          this.get_advance_list();
+
         });
+
+    }
+
+    // VERIFY
+    else if (this.buttonText === 'Verify') {
+
+      this.dataService
+        .Api_Verify_advance(id,
+          emp_id,
+          date,
+          adv_type_id,
+          advance_Amount,
+          rec_amount,
+          rec_start_month,
+          rec_install_count,
+          rec_install_amount,
+          remarks,
+          pay_head_id,
+          trans_id,
+          cheque_no,
+          cheque_date,
+          pay_Type_id)
+        .subscribe((res: any) => {
+
+          notify(
+            {
+              message: 'Advance verified successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+
+          this.isEditPopUp = false;
+          this.get_advance_list();
+
+        });
+
+    }
+
+    // APPROVE
+    else if (this.buttonText === 'Approve') {
+
+      confirm(
+        'It will approve and commit. Are you sure?',
+        'Confirm Approve',
+      ).then((result) => {
+
+        if (result) {
+
+          this.dataService
+            .Api_Approve_advance(id,
+              emp_id,
+              date,
+              adv_type_id,
+              advance_Amount,
+              rec_amount,
+              rec_start_month,
+              rec_install_count,
+              rec_install_amount,
+              remarks,
+              pay_head_id,
+              trans_id,
+              cheque_no,
+              cheque_date,
+              pay_Type_id)
+            .subscribe((res: any) => {
+
+              notify(
+                {
+                  message: 'Advance approved successfully',
+                  position: { at: 'top right', my: 'top right' },
+                  displayTime: 500,
+                },
+                'success',
+              );
+
+              this.isEditPopUp = false;
+              this.get_advance_list();
+
+            });
+        }
+      });
     }
   }
-
   deleteData(event: any) {
     const id = event.data.ID;
     this.dataService.Api_Delete_advance(id).subscribe((res: any) => {

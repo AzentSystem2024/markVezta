@@ -145,6 +145,10 @@ export class DeliveryNoteFinanceComponent implements OnInit {
       value: 'OPEN',
     },
   ];
+  canVerify: any;
+  isViewDelivery: boolean;
+  isApproveDelivery: boolean;
+  isVerifyDelivery: boolean;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -168,6 +172,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
     this.sessionData_tax();
     this.getDeliveryNotes();
@@ -499,6 +504,36 @@ export class DeliveryNoteFinanceComponent implements OnInit {
         this.selectedDelivery = response.Data; // ✅ FIX
         this.isEditDelivery = true;
         this.isReadOnlyDelivery = status === 'APPROVED';
+      });
+  }
+
+  onVerifyDeliveryNote(event: any) {
+    const rowData = event.row.data;
+
+    const invoiceId = rowData.TRANS_ID;
+    const transStatus = rowData.TRANS_STATUS;
+
+    this.isReadOnlyDelivery = transStatus === 5;
+
+    this.dataService
+      .selectInvoiceRetail(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedDelivery = response.Data;
+
+        // APPROVED -> OPEN VIEW PAGE
+        if (transStatus === 5) {
+          this.isViewDelivery = true;
+        }
+
+        // VERIFIED -> OPEN APPROVE PAGE
+        else if (transStatus === 2) {
+          this.isApproveDelivery = true;
+        }
+
+        // OPEN VERIFY PAGE
+        else {
+          this.isVerifyDelivery = true;
+        }
       });
   }
 

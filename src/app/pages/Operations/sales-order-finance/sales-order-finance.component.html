@@ -34,11 +34,11 @@
       (onCellPrepared)="onCellPrepared($event)"
       (onRowRemoving)="onDeleteSalesOrder($event)"
     >
-      <dxo-editing
+      <!-- <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
-      ></dxo-editing>
+      ></dxo-editing> -->
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="false"
@@ -169,10 +169,105 @@
           dataSource: getStatusFilterData,
           encodeHtml: false,
         }"
-        [fixed]="true"
-        fixedPosition="right"
       >
       </dxi-column>
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditSalesOrder({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="onDeleteSalesOrder({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="
+            (cellData.data.TRANS_STATUS === 2 && canApprove) ||
+            (cellData.data.TRANS_STATUS !== 2 && canVerify)
+          "
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.TRANS_STATUS === 5
+              ? 'Approved'
+              : cellData.data.TRANS_STATUS === 2
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifySalesOrder({ row: { data: cellData.data } })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.TRANS_STATUS === 5
+                ? '#10B981'
+                : cellData.data.TRANS_STATUS === 2
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
     </dx-data-grid>
   </div>
 </div>
@@ -212,6 +307,64 @@
   </ng-container>
 </dx-popup>
 
+<dx-popup
+  *ngIf="isVerifySalesOrder"
+  [(visible)]="isVerifySalesOrder"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  [title]="
+    selectedSalesOrder?.TRANS_STATUS === 2
+      ? 'Approve Sales Order'
+      : 'Verify Sales Order'
+  "
+  (popupClosed)="handleClose()"
+>
+  <app-sales-order-finance-popup-form
+    [isEditing]="true"
+    [EditingResponseData]="selectedSalesOrder"
+    [isVerifyMode]="selectedSalesOrder?.TRANS_STATUS !== 2"
+    [isApproveMode]="selectedSalesOrder?.TRANS_STATUS === 2"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-sales-order-finance-popup-form>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isApproveSalesOrder"
+  [(visible)]="isApproveSalesOrder"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Invoice"
+  (onHiding)="handleClose()"
+>
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [EditingResponseData]="selectedSalesOrder"
+    [isApproveMode]="true"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-add-invoice-retail>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isViewSalesOrder"
+  [width]="'90vw'"
+  [height]="'95vh'"
+  title="Sales Order"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewSalesOrder">
+    <app-sales-order-finance-popup-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedSalesOrder"
+      [isReadOnlyMode]="isReadOnlySalesOrder"
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+    ></app-sales-order-finance-popup-form>
+  </ng-container>
+</dx-popup>
 <app-custom-date-popup
   [(visible)]="showCustomDatePopup"
   [startDate]="customStartDate"

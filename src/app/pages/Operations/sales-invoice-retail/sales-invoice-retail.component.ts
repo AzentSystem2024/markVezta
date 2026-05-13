@@ -39,7 +39,6 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
-import { InvoiceListComponent } from '../invoice-list/invoice-list.component';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
@@ -47,14 +46,12 @@ import notify from 'devextreme/ui/notify';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import { AddSalesInvoiceRetailModule } from '../add-sales-invoice-retail/add-sales-invoice-retail.component';
 
-
 @Component({
   selector: 'app-sales-invoice-retail',
   templateUrl: './sales-invoice-retail.component.html',
-  styleUrls: ['./sales-invoice-retail.component.scss']
+  styleUrls: ['./sales-invoice-retail.component.scss'],
 })
 export class SalesInvoiceRetailComponent {
-
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: any = DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -156,7 +153,7 @@ export class SalesInvoiceRetailComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -164,16 +161,14 @@ export class SalesInvoiceRetailComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    const userDataString = localStorage.getItem('userData');
+    const userDataString = localStorage.getItem('userData') || '{}';
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/invoice');
-    console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
+      .find((menu: any) => menu.Path === currentUrl);
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -257,7 +252,6 @@ export class SalesInvoiceRetailComponent {
           });
         }),
     });
-    console.log(this.InvoiceDataSource, 'INVOICEDATASOURCE');
   }
 
   private getDateRangePayload(range: string) {
@@ -343,17 +337,14 @@ export class SalesInvoiceRetailComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
     this.financialYeaDate = sessionYear[0].DATE_FROM;
-
     this.formatted_from_date = this.financialYeaDate;
-
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -634,4 +625,4 @@ export class SalesInvoiceRetailComponent {
   exports: [SalesInvoiceRetailComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalesInvoiceRetailModule { }
+export class SalesInvoiceRetailModule {}

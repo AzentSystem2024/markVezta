@@ -295,15 +295,30 @@ export class GrnComponent implements OnInit {
     this.ClearFormData();
   }
 
-  onClickSaveNewData() {
+  async onClickSaveNewData() {
     if (this.isSaving) {
       return;
     }
 
-    this.isSaving = true;
-
     const data = this.grnNewForm.getNewGrnData();
     data.IS_APPROVED = this.isApproved;
+
+    // ✅ Confirmation for Verify / Approve
+    const actionMessage = this.isVerifyMode
+      ? 'Are you sure you want to verify this GRN?'
+      : data.IS_APPROVED
+        ? 'Are you sure you want to approve this GRN?'
+        : '';
+
+    if (actionMessage) {
+      const confirmed = await confirm(actionMessage, 'Confirmation');
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    this.isSaving = true;
 
     this.service
       .saveGrnData(data)
@@ -317,9 +332,12 @@ export class GrnComponent implements OnInit {
           if (res.Message === 'Success' && res.Flag === 1) {
             notify(
               {
-                message: data.IS_APPROVED
-                  ? 'Data Saved & Approved Successfully'
-                  : 'Data Saved Successfully',
+                message: this.isVerifyMode
+                  ? 'Data Verified Successfully'
+                  : data.IS_APPROVED
+                    ? 'Data Saved & Approved Successfully'
+                    : 'Data Saved Successfully',
+
                 position: { at: 'top center', my: 'top center' },
               },
               'success',
@@ -352,39 +370,50 @@ export class GrnComponent implements OnInit {
         },
       });
   }
+  // updateGrnData() {
+  //   const data = this.grnEditForm.getNewGrnData();
+  //   console.log(data, 'grn upated data');
 
-  updateGrnData() {
-    const data = this.grnEditForm.getNewGrnData();
-    console.log(data, 'grn upated data');
+  //   this.service.updateGrnData(data).subscribe((res) => {
+  //     console.log('data updated', res);
+  //     if (res.Message === 'Success' && res.Flag === 1) {
+  //       notify(
+  //         {
+  //           message: 'Data Updated Successfully',
+  //           position: { at: 'top center', my: 'top center' },
+  //         },
+  //         'success',
+  //       );
 
-    this.service.updateGrnData(data).subscribe((res) => {
-      console.log('data updated', res);
-      if (res.Message === 'Success' && res.Flag === 1) {
-        notify(
-          {
-            message: 'Data Updated Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success',
-        );
+  //       this.isEditPopupOpened = false;
+  //       this.getGrnLogData();
+  //     } else {
+  //       notify(
+  //         {
+  //           message: 'Your Data Not Updated',
+  //           position: { at: 'top right', my: 'top right' },
+  //         },
+  //         'error',
+  //       );
+  //     }
+  //   });
+  // }
 
-        this.isEditPopupOpened = false;
-        this.getGrnLogData();
-      } else {
-        notify(
-          {
-            message: 'Your Data Not Updated',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      }
-    });
-  }
-
-  editGrnData() {
+  async editGrnData() {
     const data = this.grnVerifyForm.getNewGrnData();
     console.log(data, 'grn verified data');
+
+    //  Confirmation only for Approve
+    if (this.isApproved === true) {
+      const confirmed = await confirm(
+        'Are you sure you want to approve this GRN?',
+        'Confirmation',
+      );
+
+      if (!confirmed) {
+        return;
+      }
+    }
 
     this.service.updateGrnData(data).subscribe((res) => {
       console.log('data verified', res);

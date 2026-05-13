@@ -37,8 +37,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
+        [allowUpdating]="true"
+        [allowDeleting]="true"
       ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -164,7 +164,12 @@
       >
       </dxi-column>
 
-      <dxi-column type="buttons"></dxi-column>
+      <dxi-column
+        caption="Actions"
+        type="buttons"
+        [width]="200"
+        [buttons]="allButtons"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </div>
@@ -240,6 +245,7 @@
       [isEditing]="true"
       [EditingResponseData]="selectedTrOut"
       [isReadOnlyMode]="isReadOnlyTrOut"
+      [ActionStatus]="StatusType"
       (popupClosed)="handleClose()"
     ></app-transfer-out-inventory-add>
   </ng-container>

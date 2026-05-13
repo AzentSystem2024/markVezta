@@ -254,8 +254,6 @@
   titleText="Verify Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
-  [(isApproved)]="isApproved"
-  [showApprove]="canApprove"
   (save)="verifyGrnData()"
 >
   <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
@@ -272,7 +270,7 @@
 </form-popup> -->
 
 <dx-popup
-  [(visible)]="isViewPopupOpened"
+  [(visible)]="isViewOpened"
   title="View Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
@@ -282,6 +280,17 @@
     [grnId]="selectedGrnId"
   ></app-grn-view-form>
 </dx-popup>
+<!-- <dx-popup
+  [(visible)]="isViewPopupOpened"
+  title="View Goods Receipt Note"
+  [height]="'100vh'"
+  [width]="width"
+>
+  <app-grn-view-form
+    [formdata]="selectedRowData"
+    [grnId]="selectedGrnId"
+  ></app-grn-view-form>
+</dx-popup> -->
 
 <dx-popup
   [(visible)]="showTemplatePopup"

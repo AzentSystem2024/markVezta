@@ -44,6 +44,7 @@ import notify from 'devextreme/ui/notify';
 import { DataService } from '../services';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-sale-return-form',
@@ -59,6 +60,8 @@ export class SaleReturnFormComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -433,28 +436,14 @@ export class SaleReturnFormComponent {
     if (selectedRows.length > 0) {
       selectedRows.forEach((row: any) => {
         const exists = this.mainGridData.some(
-          (item) => item.SALE_DET_ID === row.SALE_DET_ID,
+          (item) =>
+            item.SALE_DET_ID === row.SALE_DET_ID &&
+            item.ITEM_ID === row.ITEM_ID &&
+            item.SALE_NO === row.DOC_NO,
         );
 
         if (!exists) {
           const gstPerc = Number(row.GST_PERC) || 0;
-
-          // let cgst = 0;
-          // let sgst = 0;
-          // let igst = 0;
-
-          // // ✅ SAME STATE → Split GST
-          // if (this.sameState) {
-          //   cgst = Number(row.CGST);
-          //   sgst = Number(row.SGST);
-          //   igst = 0;
-          // }
-          // // ✅ DIFFERENT STATE → IGST
-          // else {
-          //   cgst = 0;
-          //   sgst = 0;
-          //   igst = gstPerc;
-          // }
 
           this.mainGridData.push({
             SALE_DET_ID: row.SALE_DET_ID,
@@ -463,7 +452,7 @@ export class SaleReturnFormComponent {
             SALE_NO: row.DOC_NO,
             // GRN_DET_ID: row.GRN_DET_ID,
             TRANSFER_NO: row.DOC_NO,
-            TRANSFER_DATE: row.PURCH_DATE,
+            TRANSFER_DATE: row.SALE_DATE,
             ITEM_NAME: row.ITEM_NAME,
             PENDING_QTY: row.PENDING_QTY,
             PRICE: row.PRICE,
@@ -724,29 +713,128 @@ export class SaleReturnFormComponent {
     // ==============================
     // SAVE / APPROVE API CALL
     // ==============================
+    // SAVE / VERIFY / APPROVE API CALL
+    // ==============================
+    // SAVE / VERIFY / APPROVE API CALL
+    // ==============================
     this.isSaving = true;
 
     let apiCall$;
 
+    // APPROVE CONFIRMATION
+    if (this.isEditing && this.isApproveMode) {
+      confirm(
+        'Are you sure you want to approve this Sales Return?',
+        'Confirm Approval',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          apiCall$ = this.dataService.approveSaleReturn(payload);
+
+          apiCall$.subscribe(
+            () => {
+              this.isSaving = false;
+
+              notify('Sales return approved successfully', 'success', 3000);
+
+              this.resetSaleReturnForm();
+              this.popupClosed.emit();
+            },
+            (error) => {
+              this.isSaving = false;
+
+              console.error(error);
+
+              notify('Failed to approve sales return', 'error', 3000);
+            },
+          );
+        } else {
+          this.isSaving = false;
+        }
+      });
+
+      return;
+    }
+
+    // VERIFY CONFIRMATION
+    if (this.isEditing && this.isVerifyMode) {
+      confirm(
+        'Are you sure you want to verify this Sales Return?',
+        'Confirm Verification',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          apiCall$ = this.dataService.verifySaleReturn(payload);
+
+          apiCall$.subscribe(
+            () => {
+              this.isSaving = false;
+
+              notify('Sales return verified successfully', 'success', 3000);
+
+              this.resetSaleReturnForm();
+              this.popupClosed.emit();
+            },
+            (error) => {
+              this.isSaving = false;
+
+              console.error(error);
+
+              notify('Failed to verify sales return', 'error', 3000);
+            },
+          );
+        } else {
+          this.isSaving = false;
+        }
+      });
+
+      return;
+    }
+
+    // NORMAL SAVE / UPDATE
     if (this.isEditing) {
-      // Editing mode
-      if (this.salesReturnFormData.IS_APPROVED) {
-        apiCall$ = this.dataService.approveSaleReturn(payload);
-      } else {
-        apiCall$ = this.dataService.updateSaleReturn(payload);
-      }
+      apiCall$ = this.dataService.updateSaleReturn(payload);
     } else {
-      // Add mode (always insert)
       apiCall$ = this.dataService.saveSaleReturn(payload);
     }
 
     apiCall$.subscribe(
       () => {
         this.isSaving = false;
+
         notify(
-          this.salesReturnFormData.IS_APPROVED
-            ? 'Sales return approved successfully'
+          this.isEditing
+            ? 'Sales return updated successfully'
             : 'Sales return saved successfully',
+          'success',
+          3000,
+        );
+
+        this.resetSaleReturnForm();
+        this.popupClosed.emit();
+      },
+      (error) => {
+        this.isSaving = false;
+
+        console.error(error);
+
+        notify(
+          this.isEditing
+            ? 'Failed to update sales return'
+            : 'Failed to save sales return',
+          'error',
+          3000,
+        );
+      },
+    );
+
+    apiCall$.subscribe(
+      () => {
+        this.isSaving = false;
+        notify(
+          this.isApproveMode
+            ? 'Sales return approved successfully'
+            : this.isVerifyMode
+              ? 'Sales return verified successfully'
+              : 'Sales return saved successfully',
           'success',
           3000,
         );
