@@ -63,7 +63,7 @@ export class SaleReturnComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -118,7 +118,7 @@ export class SaleReturnComponent {
   isEditDebitNote: boolean = false;
   isViewCreditNote: boolean = false;
   selectedDebitNote: any;
-  isViewDebitNote: boolean;
+  isViewDebitNote: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -135,22 +135,26 @@ export class SaleReturnComponent {
   isEmptyDatagrid: boolean = false;
   sessionData: any;
   selected_vat_id: any;
-  saleReturnDataSource;
+  saleReturnDataSource: any;
   companyID: any;
   saleReturnArray: any[] = [];
   saleReturnCount = 0;
-  isAddSaleReturn: boolean;
+  isAddSaleReturn: boolean = false;
   selectedSaleReturn: any;
-  isEditSaleReturn: boolean;
-  isReadOnlySaleReturn: boolean;
-  isViewSaleReturn: boolean;
+  isEditSaleReturn: boolean = false;
+  isReadOnlySaleReturn: boolean = false;
+  isViewSaleReturn: boolean = false;
   vatTitle: any;
+  canVerify: any;
+  isViewSalesReturn: boolean;
+  isApproveSalesReturn: boolean;
+  isVerifySalesReturn: boolean;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -181,6 +185,7 @@ export class SaleReturnComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.getSaleReturnList();
@@ -326,7 +331,14 @@ export class SaleReturnComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    // icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
     icon.title = status === 5 ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';
@@ -521,7 +533,35 @@ export class SaleReturnComponent {
     });
   }
 
-  onDeletePurchaseReturn(event: any) {
+  onVerifySalesReturn(event: any) {
+    const rowData = event.row.data;
+
+    const returnId = rowData.TRANS_ID;
+    const status = rowData.TRANS_STATUS;
+
+    this.isReadOnlySaleReturn = status === 5;
+
+    this.dataService.selectSaleReturn(returnId).subscribe((response: any) => {
+      this.selectedSaleReturn = response;
+
+      // APPROVED -> OPEN VIEW PAGE
+      if (status === 5) {
+        this.isViewSalesReturn = true;
+      }
+
+      // VERIFIED -> OPEN APPROVE PAGE
+      else if (status === 2) {
+        this.isApproveSalesReturn = true;
+      }
+
+      // OPEN VERIFY PAGE
+      else {
+        this.isVerifySalesReturn = true;
+      }
+    });
+  }
+
+  onDeleteSaleReturn(event: any) {
     const returnId = event.data.TRANS_ID;
     console.log(returnId);
     const status = event.data.TRANS_STATUS;
@@ -631,4 +671,4 @@ export class SaleReturnComponent {
   exports: [SaleReturnComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SaleReturnModule { }
+export class SaleReturnModule {}

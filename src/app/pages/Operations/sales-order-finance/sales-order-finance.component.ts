@@ -124,6 +124,10 @@ export class SalesOrderFinanceComponent {
   salesOrderList: any;
   isAddSalesOrder: boolean;
   companyID: any;
+  canVerify: any;
+  isViewSalesOrder: boolean;
+  isApproveSalesOrder: boolean;
+  isVerifySalesOrder: boolean;
 
   constructor(
     private dataService: DataService,
@@ -156,6 +160,7 @@ export class SalesOrderFinanceComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
     this.getsalesOrderList();
   }
@@ -521,6 +526,34 @@ export class SalesOrderFinanceComponent {
     });
   }
 
+  onVerifySalesOrder(e: any) {
+    console.log(e, 'EVENT');
+    const rowData = e.row.data;
+    const orderId = rowData.ID;
+    const status = rowData.TRANS_STATUS;
+
+    this.isReadOnlySalesOrder = status === 5;
+
+    this.dataService.selectSalesOrder(orderId).subscribe((response: any) => {
+      this.selectedSalesOrder = response.Data;
+
+      // APPROVED -> OPEN VIEW PAGE
+      if (status === 5) {
+        this.isViewSalesOrder = true;
+      }
+
+      // VERIFIED -> OPEN APPROVE PAGE
+      else if (status === 2) {
+        this.isApproveSalesOrder = true;
+      }
+
+      // OPEN VERIFY PAGE
+      else {
+        this.isVerifySalesOrder = true;
+      }
+    });
+  }
+
   onDeleteSalesOrder(event: any) {
     const orderId = event.data.ID;
     const status = event.data.TRANS_STATUS;
@@ -579,6 +612,9 @@ export class SalesOrderFinanceComponent {
   handleClose() {
     this.isAddSalesOrder = false;
     this.isEditSalesOrder = false;
+    this.isVerifySalesOrder = false;
+    this.isApproveSalesOrder = false;
+    this.isViewSalesOrder = false;
     this.getsalesOrderList();
   }
 

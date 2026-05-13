@@ -145,6 +145,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
       value: 'OPEN',
     },
   ];
+  canVerify: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -168,6 +169,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
     this.sessionData_tax();
     this.getDeliveryNotes();
@@ -501,6 +503,8 @@ export class DeliveryNoteFinanceComponent implements OnInit {
         this.isReadOnlyDelivery = status === 'APPROVED';
       });
   }
+
+  onVerifyDeliveryNote(event: any) {}
 
   onDeleteDelivery(event: any) {
     const deliveryId = event.data.ID;

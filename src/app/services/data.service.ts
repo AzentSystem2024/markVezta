@@ -573,6 +573,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SaleReturn/commit`, data);
   }
 
+  verifySaleReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SaleReturn/verify`, data);
+  }
+
   selectSaleReturn(id: number) {
     return this.http.post<any>(`${this.apiUrl}SaleReturn/select/` + id, {});
   }
@@ -830,6 +835,11 @@ export class DataService {
   approveSalesOrder(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}SalesOrder/approve`, data);
+  }
+
+  verifySalesOrder(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalesOrder/verify`, data);
   }
 
   deleteSalesOrder(id: number) {
