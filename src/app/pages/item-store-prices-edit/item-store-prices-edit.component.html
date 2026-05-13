@@ -61,12 +61,12 @@
         ></dxi-item>
 
         <!-- <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item> -->
-        <dxi-item
+        <!-- <dxi-item
           location="after"
           template="ApproveButtons"
           cssClass="bottom-toolbar-buttons"
         >
-        </dxi-item>
+        </dxi-item> -->
         <dxi-item
           location="after"
           template="cancelButton"
@@ -141,11 +141,11 @@
       </div>
       <div *dxTemplate="let data of 'saveButton'">
         <dx-button
-          [text]="isApproved ? 'Approve' : 'Save'"
+          text="'Update'"
           stylingMode="contained"
           type="default"
           (onClick)="onSaveButtonClick()"
-          [disabled]="isApplyButtonDisabled || !areRowsSelected() || isSaving"
+          [disabled]="isSaving"
           [loading]="isSaving"
           style="width: 100px"
         ></dx-button>

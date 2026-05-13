@@ -1081,11 +1081,11 @@ const routes: Routes = [
         component: PromotionApproveComponent,
         canActivate: [AuthGuardService],
       },
-      {
-        path: 'item-store-properties-log',
-        component: ItemStorePropertiesLogComponent,
-        canActivate: [AuthGuardService],
-      },
+      // {
+      //   path: 'item-store-properties-log',
+      //   component: ItemStorePropertiesLogComponent,
+      //   canActivate: [AuthGuardService],
+      // },
       {
         path: 'promotion-schema',
         component: PromotionSchemaLogComponent,

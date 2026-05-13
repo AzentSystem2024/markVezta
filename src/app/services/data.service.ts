@@ -545,6 +545,11 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}PurchaseReturn/approve`, data);
   }
+
+  verifyPurchaseReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseReturn/verify`, data);
+  }
   deletePurchaseReturn(id: number) {
     return this.http.post<any>(`${this.apiUrl}PurchaseReturn/delete/` + id, {});
   }
@@ -664,6 +669,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}TransferOutInv/update`, data);
   }
 
+    verifyTransferOutForInventory(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOutInv/verify`, data);
+  }
   approveTransferOutForInventory(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}TransferOutInv/approve`, data);
@@ -740,6 +749,11 @@ export class DataService {
   approveSalesQuotation(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Quotation/approve`, data);
+  }
+
+  verifySalesQuotation(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Quotation/verify`, data);
   }
 
   getTermsAndConditions(): Observable<any> {
@@ -1126,6 +1140,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}PurchaseInvoice/update`, data);
   }
 
+  verifyPurchaseInvoice(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PurchaseInvoice/verify`, data);
+  }
+
   approvePurchaseInvoice(data: Object): Observable<any> {
     return this.http.post(`${this.apiUrl}PurchaseInvoice/approve`, data);
   }
@@ -1155,6 +1174,11 @@ export class DataService {
   updateMiscPayment(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscPayment/update`, data);
+  }
+
+  verifyMiscPayment(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscPayment/verify`, data);
   }
 
   selectMiscPayment(id: number) {
@@ -1188,6 +1212,11 @@ export class DataService {
   updateMiscReceipt(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}MiscReceipt/update`, data);
+  }
+
+  verifyMiscReceipt(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}MiscReceipt/verify`, data);
   }
 
   approveMiscReceipt(data: Object): Observable<any> {
@@ -4600,6 +4629,43 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}Advance/update`, reqBody);
   }
 
+  //=====================verify============================
+  Api_Verify_advance(id: any,
+    emp_id: any,
+    date: any,
+    adv_type_id: any,
+    advance_Amount: any,
+    rec_amount: any,
+    rec_start_month: any,
+    rec_install_count: any,
+    rec_install_amount: any,
+    remarks: any,
+    pay_head_id: any,
+    trans_id: any,
+    cheque_no: any,
+    cheque_date: any,
+    pay_Type_id: any,) {
+    const reqBody = {
+      ID: id,
+      EMP_ID: emp_id,
+      DATE: date,
+      ADV_TYPE_ID: adv_type_id,
+      ADVANCE_AMOUNT: advance_Amount,
+      REC_AMOUNT: rec_amount,
+      REC_START_MONTH: rec_start_month,
+      REC_INSTALL_COUNT: rec_install_count,
+      REC_INSTALL_AMOUNT: rec_install_amount,
+      REMARKS: remarks,
+      TRANS_ID: trans_id,
+      EMP_NAME: '',
+      ADV_TYPE_NAME: '',
+      STATUS: '',
+      PAY_HEAD_ID: pay_head_id,
+      CHEQUE_NO: cheque_no,
+      CHEQUE_DATE: cheque_date,
+      PAY_TYPE_ID: pay_Type_id,
+    }; return this.http.post(`${this.apiUrl}Advance/verify`, reqBody);
+  }
   //===================================APPROVE ADVANCE=================================
 
   Api_Approve_advance(

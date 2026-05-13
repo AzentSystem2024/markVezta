@@ -41,7 +41,7 @@ import { DataService } from 'src/app/services';
 import { WorksheetService } from 'src/app/services/worksheet.service';
 import { ItemStorePropertiesEditModule } from '../item-store-properties-edit/item-store-properties-edit.component';
 import { EditItemStorePropertyModule } from 'src/app/pop-up/operations/edit-item-store-property/edit-item-store-property.component';
-
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-item-store-properties-log',
   templateUrl: './item-store-properties-log.component.html',
@@ -60,9 +60,18 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   editPackPopupOpened: boolean = false;
   selectedData: any;
   isOpen: boolean = false;
-  allButtons = ['edit', 'delete'];
+  // allButtons = ['edit', 'delete'];
   totalRecords: any;
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  isFilterOpened = false;
+  canVerify = false;
+  StatusType: any
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -90,26 +99,143 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     `;
     },
   };
+  allButtons = [
+    {
+      name: 'edit',
+      onClick: (e: any) => this.openEditingStart(e),
+      visible: (e: any) => {
+
+        return this.canEdit &&
+          (
+            e.row.data.Status === 'Open'
+          )
+      }
+
+    },
+    {
+      name: 'delete',
+      visible: (e: any) => {
+        const status = e.row.data.Status;
+
+        return this.canDelete &&
+          (
+            (e.row.data.Status == 'Open') || (status === 'Verified' && this.canApprove)
+
+          )
+
+      },
+    },
+    {
+      hint: 'Verify',
+      icon: 'check',
+      text: 'Verify',
+      onClick: (e: any) => this.onVerifyClick(e),
+      visible: (e: any) => {
+        return this.canVerify && e.row.data.Status === 'Open';
+
+
+      },
+    },
+    {
+      hint: 'Approve',
+      icon: 'check',
+      text: 'Approve',
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) => {
+        return this.canApprove &&
+          (
+            e.row.data.Status === 'Verified'
+          )
+
+      },
+    },
+    {
+      hint: 'View',
+      icon: 'check',
+      text: 'View',
+      onClick: (e: any) => this.onViewClick(e),
+      visible: (e: any) =>
+        this.canView &&
+        (
+          e.row.data.Status === 'Approved' ||
+          (e.row.data.Status === 'Verified' && !this.canApprove)
+        )
+
+    },
+  ];
   constructor(
     private dataservice: DataService,
     private router: Router,
     private zone: NgZone,
+    private cdr: ChangeDetectorRef
+
   ) { }
 
   ngOnInit() {
+
+    console.log('--call ng On init--')
+
+    const currentUrl = this.router.url;
+
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    // this.sessionData_tax();
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      console.log(packingRights, '====packing rights====');
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
+      console.log(this.canVerify, 'VERIFY RIGHTS');
+    }
     this.listWorkisheetItemProperty();
     this.userId = sessionStorage.getItem('UserId');
+
+  }
+  private getRowState(row: any) {
+    const status = (row?.Status || '')
+    const isEditable = status == 'Open';
+    const isApproved = status === 'approved';
+    const isVerified = status === 'verified' || status === 'approved';
+    return { isVerified, isApproved, isEditable };
   }
 
   openEditingStart(event: any) {
+    console.log(event, '====editing start event data====');
     event.cancel = true; // Prevent the default editing action
-    const selectedId = event.data.ID; // Get the selected row ID
+    const selectedId = event.row.data.ID; // Get the selected row ID
+    this.StatusType = event.row.data.Status
+    this.StatusType = 'EditScreen'
+
+
     this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
       console.log(res, '============selected data for edit===========');
       this.selectedData = res;
-
       this.editPackPopupOpened = true;
+      this.cdr.detectChanges();
+
     });
+  }
+
+  getStatusFlagClass(status: string): string {
+    return status === 'Open'
+      ? 'flag-white'
+      : status === 'Verified'
+        ? 'flag-orange'
+        : status === 'Approved'
+          ? 'flag-green'
+          : '';
   }
 
   refreshButtonOptions = {
@@ -120,6 +246,19 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     text: '',
   };
 
+  onViewClick(e: any) {
+    e.cancel = true; // Prevent the default editing action
+    const selectedId = e.row.data.ID; // Get the selected row ID
+    // this.StatusType = e.row.data.Status
+    this.StatusType = 'ViewScreen'
+
+    this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
+      console.log(res, '============selected data for edit===========');
+      this.selectedData = res;
+      this.editPackPopupOpened = true;
+      this.cdr.detectChanges();
+    });
+  }
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
@@ -135,7 +274,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
         this.dataGrid.instance.getDataSource = this.logList;
         this.totalRecords = this.logList.length;
       });
-    this.isOpen = this.logList.Status === 'Open';
+    // this.isOpen = this.logList.Status === 'Open';
     console.log(this.isOpen, '====is open====');
   }
 
@@ -196,14 +335,21 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   }
 
   onApproveClick(e: any) {
-    const rowData = e.row.data; // Access the row data
-    const worksheetId = rowData?.ID;
-    if (worksheetId) {
-      this.approveWorksheetById(worksheetId);
-    } else {
-      console.warn('Worksheet ID is invalid.');
-    }
+    e.cancel = true; // Prevent the default editing action
+    const selectedId = e.row.data.ID; // Get the selected row ID
+    // this.StatusType = e.row.data.Status
+    this.StatusType = 'ApprovalScreen'
+
+
+    this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
+      console.log(res, '============selected data for edit===========');
+      this.selectedData = res;
+      this.editPackPopupOpened = true;
+      this.cdr.detectChanges();
+
+    });
   }
+
 
   approveItemStore(selectedWorksheetData: any) {
     const payload = {
@@ -272,13 +418,19 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   }
 
   onVerifyClick(e: any) {
-    const rowData = e.row.data; // Access the row data
-    const worksheetId = rowData?.ID;
-    if (worksheetId) {
-      this.verifyWorksheetById(worksheetId);
-    } else {
-      console.warn('Worksheet ID is invalid.');
-    }
+    e.cancel = true; // Prevent the default editing action
+    const selectedId = e.row.data.ID; // Get the selected row ID
+    this.StatusType = 'VerificationScreen'
+    // this.StatusType = e.row.data.Status
+
+
+    this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
+      console.log(res, '============selected data for edit===========');
+      this.selectedData = res;
+      this.editPackPopupOpened = true;
+      this.cdr.detectChanges();
+
+    });
   }
 
   verifyWorksheetById(worksheetId: number) {
@@ -387,9 +539,7 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   onAddClick() {
     this.router.navigate(['/item-change-property-add']);
   }
-  getStatusFlagClass(Status: string): string {
-    return Status === '1' ? 'flag-red' : 'flag-green';
-  }
+
 }
 @NgModule({
   imports: [

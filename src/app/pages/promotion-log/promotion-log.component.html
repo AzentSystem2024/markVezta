@@ -22,7 +22,7 @@
       <dxo-editing
         mode="popup"
         [allowUpdating]="true"
-        [allowDeleting]="isDeleteVisible"
+        [allowDeleting]="true"
       ></dxo-editing>
       <dxo-search-panel
         [visible]="true"
@@ -80,10 +80,14 @@
         <i
           class="fas fa-flag"
           [ngClass]="getStatusFlagClass(cellData.value)"
-          [attr.title]="cellData.value == 'Open' ? 'Open ' : 'Approve '"
-          style="cursor: default; align-items: center"
+          [attr.title]="cellData.value"
         ></i>
       </div>
+      <dxi-column
+        type="buttons"
+        [width]="200"
+        [buttons]="allButtons"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </div>
@@ -98,6 +102,7 @@
     <app-edit-promotion
       (popupClosed)="handleClose()"
       [selectedData]="selectedPromotion"
+      [status]="StatusType"
     ></app-edit-promotion>
   </div>
 </dx-popup>

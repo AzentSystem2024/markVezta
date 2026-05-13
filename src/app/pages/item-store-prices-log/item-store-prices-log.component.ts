@@ -80,8 +80,14 @@ export class ItemStorePricesLogComponent {
     {
       name: 'delete',
       visible: (e: any) => {
-        const { isVerified, isApproved } = this.getRowState(e.row.data);
-        return this.canDelete && !isVerified && !isApproved;
+        const status = e.row.data.Status;
+
+        return this.canDelete &&
+          (
+            (e.row.data.Status == 'Open') || (status === 'Verified' && this.canApprove)
+
+          )
+
       },
     },
     {
@@ -90,10 +96,8 @@ export class ItemStorePricesLogComponent {
       text: 'Verify',
       onClick: (e: any) => this.onVerifyClick(e),
       visible: (e: any) => {
-        this.canVerify &&
-          (
-            e.row.data.Status === 'Open'
-          )
+        return this.canVerify && e.row.data.Status === 'Open';
+
 
       },
     },
@@ -102,10 +106,10 @@ export class ItemStorePricesLogComponent {
       icon: 'check',
       text: 'Approve',
       onClick: (e: any) => this.onApproveClick(e),
-       visible: (e: any) => {
-        this.canVerify &&
+      visible: (e: any) => {
+        return this.canApprove &&
           (
-            e.row.data.Status === 'Verify'
+            e.row.data.Status === 'Verified'
           )
 
       },
@@ -195,6 +199,8 @@ export class ItemStorePricesLogComponent {
   ) { }
 
   ngOnInit() {
+
+
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -205,7 +211,7 @@ export class ItemStorePricesLogComponent {
 
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/credit-note');
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -215,6 +221,7 @@ export class ItemStorePricesLogComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
+      console.log(this.canVerify, 'VERIFY RIGHTS');
     }
 
     this.router.events
@@ -235,8 +242,14 @@ export class ItemStorePricesLogComponent {
     }
   }
 
-  getStatusFlagClass(Status: string): string {
-    return Status === 'Open' ? 'flag-red' : 'flag-green';
+  getStatusFlagClass(status: string): string {
+    return status === 'Open'
+      ? 'flag-white'
+      : status === 'Verified'
+        ? 'flag-orange'
+        : status === 'Approved'
+          ? 'flag-green'
+          : '';
   }
 
   listItemsByMultipleStoreIds() {

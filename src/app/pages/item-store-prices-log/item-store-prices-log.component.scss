@@ -63,11 +63,15 @@
   font-weight: 400;
   padding-right: 25px;
 }
-
-.flag-red {
-  color: rgb(241, 95, 10);
+.flag-white {
+  color: white; /* or rgb(245, 240, 240) */
+  text-shadow:
+    0 0 1px black,
+    0 0 2px black;
 }
-
+.flag-orange {
+  color: orange !important;
+}
 .flag-green {
-  color: green;
+  color: green !important;
 }

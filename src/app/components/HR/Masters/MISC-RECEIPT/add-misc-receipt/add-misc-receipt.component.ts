@@ -66,6 +66,7 @@ export class AddMiscReceiptComponent {
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Input() canApprove: boolean = false;
+  @Input() status: any;
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild('miscFormGroup') miscFormGroup: DxValidationGroupComponent;
   @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;
@@ -90,6 +91,7 @@ export class AddMiscReceiptComponent {
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
   @Input() MiscReceiptId: any;
+   @Input() verifypopup: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -653,6 +655,7 @@ export class AddMiscReceiptComponent {
   }
 
   onSaveMiscReceipt() {
+    
     if (!this.miscFormData?.PAY_HEAD_ID) {
       notify('Please select ledger before saving.', 'warning', 2000);
       return;
@@ -923,61 +926,132 @@ export class AddMiscReceiptComponent {
       DETAILS: details,
     };
 
-    const apiCall = this.isApproved
-      ? this.dataService.approveMiscReceipt(payload)
-      : this.dataService.updateMiscReceipt(payload);
+    // const apiCall = this.isApproved
+    //   ? this.dataService.approveMiscReceipt(payload)
+    //   : this.dataService.updateMiscReceipt(payload);
 
-    const successMsg = this.isApproved
-      ? 'Miscellaneous Receipt approved successfully'
-      : 'Miscellaneous Receipt updated successfully';
+    // const successMsg = this.isApproved
+    //   ? 'Miscellaneous Receipt approved successfully'
+    //   : 'Miscellaneous Receipt updated successfully';
 
-    const errorMsg = this.isApproved
-      ? 'Failed to approve Misc Receipt'
-      : 'Failed to update Misc Receipt';
-    if (this.isApproved) {
-      const result = confirm(
-        'Are you sure you want to approve this Miscellaneous Receipt?',
-        'Confirm Approval',
-      );
-      result.then((dialogResult) => {
-        if (dialogResult) {
-          this.isSaving = true;
-          this.dataService.approveMiscReceipt(payload).subscribe(
-            (res: any) => {
-              if (res.flag === 1) {
-                this.isSaving = false;
-                notify(successMsg, 'success', 2000);
-                this.popupClosed.emit();
-              } else {
-                notify(errorMsg, 'error', 2000);
-              }
-            },
-            () => {
-              this.isSaving = false; // ✅ ADD
-              notify(errorMsg, 'error', 2000);
-            },
-          );
-        }
-      });
+    // const errorMsg = this.isApproved
+    //   ? 'Failed to approve Misc Receipt'
+    //   : 'Failed to update Misc Receipt';
+    // if (this.isApproved) {
+    //   const result = confirm(
+    //     'Are you sure you want to approve this Miscellaneous Receipt?',
+    //     'Confirm Approval',
+    //   );
+    //   result.then((dialogResult) => {
+    //     if (dialogResult) {
+    //       this.isSaving = true;
+    //       this.dataService.approveMiscReceipt(payload).subscribe(
+    //         (res: any) => {
+    //           if (res.flag === 1) {
+    //             this.isSaving = false;
+    //             notify(successMsg, 'success', 2000);
+    //             this.popupClosed.emit();
+    //           } else {
+    //             notify(errorMsg, 'error', 2000);
+    //           }
+    //         },
+    //         () => {
+    //           this.isSaving = false; // ✅ ADD
+    //           notify(errorMsg, 'error', 2000);
+    //         },
+    //       );
+    //     }
+    //   });
+    // } else {
+    //   this.isSaving = true;
+    //   // ✅ Update directly
+    //   this.dataService.updateMiscReceipt(payload).subscribe(
+    //     (res: any) => {
+    //       if (res.flag === 1) {
+    //         this.isSaving = false;
+    //         notify(successMsg, 'success', 2000);
+    //         this.popupClosed.emit();
+    //       } else {
+    //         notify(errorMsg, 'error', 2000);
+    //       }
+    //     },
+    //     () => {
+    //       this.isSaving = false; // ✅ ADD
+    //       notify(errorMsg, 'error', 2000);
+    //     },
+    //   );
+    // }
+
+    console.log(this.status);
+
+let apiCall;
+
+if (
+  this.status === 'Open' &&
+  this.verifypopup === true
+) {
+  apiCall = this.dataService.verifyMiscReceipt(payload);
+
+} else if (
+  this.status === 'Verify'
+) {
+  apiCall = this.dataService.approveMiscReceipt(payload);
+
+} else {
+  apiCall = this.dataService.updateMiscReceipt(payload);
+}
+
+this.isSaving = true;
+
+apiCall.subscribe({
+  next: (res: any) => {
+    this.isSaving = false;
+
+    let message = '';
+
+    if (
+      this.status === 'Open' &&
+      this.verifypopup === true
+    ) {
+      message = 'Miscellaneous Receipt verified successfully';
+
+    } else if (
+      this.status === 'Verify'
+    ) {
+      message = 'Miscellaneous Receipt approved successfully';
+
     } else {
-      this.isSaving = true;
-      // ✅ Update directly
-      this.dataService.updateMiscReceipt(payload).subscribe(
-        (res: any) => {
-          if (res.flag === 1) {
-            this.isSaving = false;
-            notify(successMsg, 'success', 2000);
-            this.popupClosed.emit();
-          } else {
-            notify(errorMsg, 'error', 2000);
-          }
-        },
-        () => {
-          this.isSaving = false; // ✅ ADD
-          notify(errorMsg, 'error', 2000);
-        },
-      );
+      message = 'Miscellaneous Receipt updated successfully';
     }
+
+    notify(
+      {
+        message,
+        position: {
+          at: 'top right',
+          my: 'top right',
+        },
+      },
+      'success',
+      3000,
+    );
+
+    this.popupClosed?.emit();
+  },
+
+  error: (err) => {
+    this.isSaving = false;
+
+    console.error('Operation failed', err);
+
+    notify(
+      'Operation failed',
+      'error',
+      3000,
+    );
+  },
+});
+
     // apiCall.subscribe((res: any) => {
     //   if (res.flag === 1) {
     //     notify(successMsg, 'success', 2000);
@@ -987,6 +1061,8 @@ export class AddMiscReceiptComponent {
     //   }
     // });
   }
+
+
   Cancel() {
     this.popupClosed.emit();
   }

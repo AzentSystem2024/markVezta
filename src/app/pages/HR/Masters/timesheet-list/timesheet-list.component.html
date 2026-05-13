@@ -100,51 +100,78 @@
 
         <!-- Buttons -->
         <dxi-item location="after">
-          <div
-            class="month-selector"
-            style="display: flex; align-items: center; gap: 8px"
-          >
-            <dx-button
-              icon="chevronleft"
-              (onClick)="goToPreviousMonth()"
-            ></dx-button>
-            <span class="month-label" (click)="toggleCalendar()">
-              {{ selectedMonth | date: "MMMM yyyy" }}
-            </span>
-            <dx-button
-              icon="chevronright"
-              (onClick)="goToNextMonth()"
-            ></dx-button>
-          </div>
-          <div *ngIf="calendarVisible" class="calendar-popup">
-            <div class="calendar-header">
-              <button class="year-button" (click)="previousYear()">&lt;</button>
-
-              <span class="year-clickable" (click)="toggleYearSelector()">{{
-                selectedYear
-              }}</span>
-
-              <button class="year-button" (click)="nextYear()">&gt;</button>
-            </div>
-
+          <ng-template dxTemplate>
             <div
-              class="year-selector-popup"
-              *ngIf="yearSelectorVisible"
-              (click)="$event.stopPropagation()"
+              class="month-selector"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                position: relative;
+              "
             >
-              <div class="year-grid">
-                <div
-                  class="year-option"
-                  *ngFor="let year of years"
-                  (click)="selectYear(year, $event)"
-                >
-                  {{ year }}
+              <!-- Previous Month -->
+              <dx-button
+                icon="chevronleft"
+                [disabled]="false"
+                [focusStateEnabled]="false"
+                [activeStateEnabled]="true"
+                [hoverStateEnabled]="true"
+                (onClick)="goToPreviousMonth()"
+              >
+              </dx-button>
+
+              <!-- Month Label -->
+              <span class="month-label" (click)="toggleCalendar()">
+                {{ selectedMonth | date: "MMMM yyyy" }}
+              </span>
+
+              <!-- Next Month -->
+              <dx-button
+                icon="chevronright"
+                [disabled]="false"
+                [focusStateEnabled]="false"
+                [activeStateEnabled]="true"
+                [hoverStateEnabled]="true"
+                (onClick)="goToNextMonth()"
+              >
+              </dx-button>
+
+              <!-- Calendar Popup -->
+              <div *ngIf="calendarVisible" class="calendar-popup">
+                <div class="calendar-header">
+                  <button class="year-button" (click)="previousYear()">
+                    &lt;
+                  </button>
+
+                  <span class="year-clickable" (click)="toggleYearSelector()">
+                    {{ selectedYear }}
+                  </span>
+
+                  <button class="year-button" (click)="nextYear()">&gt;</button>
                 </div>
+
+                <!-- Year Selector -->
+                <div
+                  class="year-selector-popup"
+                  *ngIf="yearSelectorVisible"
+                  (click)="$event.stopPropagation()"
+                >
+                  <div class="year-grid">
+                    <div
+                      class="year-option"
+                      *ngFor="let year of years"
+                      (click)="selectYear(year, $event)"
+                    >
+                      {{ year }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="calendar-body"></div>
               </div>
             </div>
-
-            <div class="calendar-body"></div>
-          </div>
+          </ng-template>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
         <dxi-item
@@ -155,7 +182,12 @@
           widget="dxButton"
         >
         </dxi-item>
-
+        <dxi-item
+          *ngIf="canVerify"
+          location="after"
+          widget="dxButton"
+          [options]="VerifyButtonOptions"
+        ></dxi-item>
         <dxi-item
           *ngIf="canApprove"
           location="after"
@@ -231,7 +263,7 @@
   [(visible)]="editTimesheetPopupOpened"
   [width]="'95vw'"
   [height]="'95vh'"
-  [title]="popupTitle"
+  title="Edit Timesheet"
   (onHiding)="handleClose()"
 >
   <app-timesheet-edit

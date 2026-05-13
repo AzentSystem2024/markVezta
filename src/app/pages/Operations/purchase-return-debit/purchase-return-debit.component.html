@@ -34,11 +34,11 @@
       (onRowRemoving)="onDeletePurchaseReturn($event)"
       (onCellPrepared)="onCellPrepared($event)"
     >
-      <dxo-editing
+      <!-- <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
-      ></dxo-editing>
+      ></dxo-editing> -->
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="false"
@@ -164,10 +164,106 @@
           dataSource: getStatusFilterData,
           encodeHtml: false,
         }"
-        [fixed]="true"
-        fixedPosition="right"
       >
       </dxi-column>
+
+      <dxi-column caption="Actions" [width]="140" cellTemplate="actionTemplate">
+      </dxi-column>
+
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Verify / Approve / View -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          class="dx-icon dx-icon-edit"
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditPurchaseReturn({ data: cellData.data, cancel: false })"
+        ></i>
+        <span
+          *ngIf="
+            canVerify ||
+            (canApprove && cellData.data.TRANS_STATUS === 'Verified') ||
+            (canView && cellData.data.TRANS_STATUS === 'Approved')
+          "
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.TRANS_STATUS === 5
+              ? 'Approved'
+              : cellData.data.TRANS_STATUS === 2
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifyPurchaseReturn({ row: { data: cellData.data } })"
+        >
+          <!-- Badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.TRANS_STATUS === 5
+                ? '#10B981'
+                : cellData.data.TRANS_STATUS === 2
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- Tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+
+        <!-- Edit -->
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="
+            onDeletePurchaseReturn({ data: cellData.data, cancel: false })
+          "
+        ></i>
+      </div>
     </dx-data-grid>
   </div>
 </div>
@@ -201,6 +297,65 @@
       [canApprove]="canApprove"
     ></app-purchase-return-debit-form>
   </ng-container>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isVerifyInvoice"
+  [(visible)]="isVerifyInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  [title]="
+    selectedPurchaseReturn?.TRANS_STATUS === 2
+      ? 'Approve Purchase Return'
+      : 'Verify Purchase Return'
+  "
+  (popupClosed)="handleClose()"
+>
+  <app-purchase-return-debit-form
+    [isEditing]="true"
+    [EditingResponseData]="selectedPurchaseReturn"
+    [isVerifyMode]="selectedPurchaseReturn?.TRANS_STATUS !== 2"
+    [isApproveMode]="selectedPurchaseReturn?.TRANS_STATUS === 2"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-purchase-return-debit-form>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isApproveInvoice"
+  [(visible)]="isApproveInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Purchase Return"
+  (onHiding)="handleClose()"
+>
+  <app-purchase-return-debit-form
+    [isEditing]="true"
+    [EditingResponseData]="selectedPurchaseReturn"
+    [isApproveMode]="true"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-purchase-return-debit-form>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isViewInvoice"
+  [(visible)]="isViewInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Purchase Return"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-purchase-return-debit-form
+    [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlyPurchaseReturn"
+    [EditingResponseData]="selectedPurchaseReturn"
+    (popupClosed)="handleClose()"
+  ></app-purchase-return-debit-form>
+  <!-- </ng-container> -->
 </dx-popup>
 
 <app-custom-date-popup

@@ -58,6 +58,8 @@ export class EditPromotionComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
   @Input() selectedData: any = {};
+  @Input() status: any = {};
+
   @Output() popupClosed = new EventEmitter<void>();
 
 
@@ -235,6 +237,8 @@ export class EditPromotionComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+
+    console.log('--------------Status-------------:', this.status);
     this.listItemsByMultipleStoreIds()
     if (this.itemStoresList) {
       setTimeout(() => {
@@ -549,7 +553,8 @@ export class EditPromotionComponent {
 
     }
 
-    if (this.approveValue === true) {
+
+    if (this.status === 'ApprovalScreen') {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit'
@@ -607,8 +612,74 @@ export class EditPromotionComponent {
           notify('Approval cancelled.', 'info', 2000);
         }
       });
+      this.cdr.detectChanges();
 
-    } else {
+    }
+    else if (this.status === 'VerifyScreen') {
+      this.dataservice.verifyPromotion(payload).subscribe(
+        (response: any) => {
+          console.log(response, 'SAVE RESPONSE');
+
+          try {
+            if (response.flag === 1) {
+              notify(
+                {
+                  message: 'Promotion verified successfully',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'success'
+              );
+
+              this.popupClosed.emit();
+              this.dataGrid.instance.refresh();
+
+            } else if (response.flag === 0) {
+              // 🔹 Extract IDs
+              const match = response.message.match(/Item IDs:\s*([\d,]+)/);
+              let itemNames: string[] = [];
+
+              if (match && match[1]) {
+                const ids = match[1].split(',').map((id: string) => Number(id.trim()));
+
+                itemNames = this.itemStoresList
+                  .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
+                  .map((item: any) => item.DESCRIPTION); // adjust key if needed
+              }
+
+              const finalMessage =
+                itemNames.length > 0
+                  ? `Promotion already exists for: ${itemNames.join(', ')}`
+                  : response.message;
+
+              notify(
+                {
+                  message: finalMessage,
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error'
+              );
+            }
+
+          } catch (error) {
+            notify(
+              {
+                message: 'Update operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error'
+            );
+          }
+        },
+        (error) => {
+          console.error('Error saving promotion:', error);
+          notify('Update failed.', 'error', 2000);
+        }
+      );
+      this.cdr.detectChanges();
+
+    }
+
+    else {
       this.dataservice.updatePromotion(payload).subscribe(
         (response: any) => {
           console.log(response, 'SAVE RESPONSE');
@@ -668,6 +739,8 @@ export class EditPromotionComponent {
           notify('Update failed.', 'error', 2000);
         }
       );
+      this.cdr.detectChanges();
+
     }
   }
   combineDateAndTime(time: Date) {
@@ -1117,6 +1190,18 @@ export class EditPromotionComponent {
       timeZone: 'Asia/Kolkata'
     });
     this.toTime
+  }
+
+  getButtonText(): string {
+    if (this.status == 'ApprovalScreen') {
+      return 'Approve';
+    } else if (this.status == 'VerifyScreen') {
+      return 'Verify';
+    }
+    else {
+      return 'Update';
+    }
+
   }
 }
 

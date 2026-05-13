@@ -130,6 +130,8 @@ export class TimesheetAddComponent {
     }
 
     this.sesstion_Details();
+    this.fetchTimesheetList();
+
     this.getEmployeeDropdown();
     this.getStoreDropdown();
     this.loadDepartment();
@@ -148,7 +150,6 @@ export class TimesheetAddComponent {
 
       this.timesheetFormData.TS_MONTH = formattedDate;
     }
-    this.fetchTimesheetList();
   }
   getStoreDropdown() {
     const payload = {
@@ -518,15 +519,7 @@ export class TimesheetAddComponent {
           AMOUNT: Number(salary.AMOUNT) || 0,
         }));
     }
-    // Format dates before sending
-    // this.timesheetFormData.LEAVE_FROM = this.formatDateOnly(
-    //   this.timesheetFormData.LEAVE_FROM || '',
-    // );
 
-    // this.timesheetFormData.LEAVE_TO = this.formatDateOnly(
-    //   this.timesheetFormData.LEAVE_TO || '',
-    // );
-    // Send to backend
     const totalworkdays = this.timesheetDetails.reduce(
       (sum, item) => sum + (Number(item.DAYS) || 0),
       0,
@@ -538,6 +531,21 @@ export class TimesheetAddComponent {
         WORKED_DAYS: totalworkdays,
         COMPANY_ID: this.selected_Company_id,
       };
+
+      const invalidStore = this.timesheetDetails.some(
+        (item) => !item.STORE_ID || Number(item.STORE_ID) === 0,
+      );
+
+      if (invalidStore) {
+        notify(
+          {
+            message: 'Store is mandatory in Timesheet Details',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+        return;
+      }
 
       this.dataService.saveTimesheetData(payload).subscribe((response: any) => {
         if ((response.flag = '1')) {

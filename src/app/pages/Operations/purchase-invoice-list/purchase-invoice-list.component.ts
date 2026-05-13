@@ -69,6 +69,7 @@ export class PurchaseInvoiceListComponent {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;
+  statusFinder: any;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -133,8 +134,10 @@ export class PurchaseInvoiceListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   isAddInvoice: boolean = false;
+  isVerifyInvoice:boolean = false;
   isViewInvoice: boolean = false;
   isEditInvoice: boolean = false;
+  Approvepopup:boolean = false;
   selectedInvoice: any;
   isEditInvoiceReadOnly: boolean = false;
   selected_Company_id: any;
@@ -299,6 +302,82 @@ export class PurchaseInvoiceListComponent {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
     this.getPurchaseInvoiceList();
+  }
+
+
+   allActionButtons = [
+    {
+      name: 'edit',
+
+      hint: 'Edit',
+
+      icon: 'edit',
+
+      text: 'Edit',
+
+       onClick: (e) => {
+        setTimeout(() => this.onEditInvoice(e));
+      },
+
+      visible: (e) => this.canEdit && e.row.data.STATUS === 'Open' 
+    },
+
+    {
+      name: 'delete',
+
+      hint: 'Delete',
+
+      icon: 'trash',
+
+      text: 'Delete',
+
+      // onClick: (e) => this.onDeleteClick(e),
+
+      visible: (e) => e.row.data.STATUS !== 'Approved' || e.row.data.STATUS === 'Open' || e.row.data.STATUS !== 'Verified' && this.canApprove,
+    },
+
+    { 
+      hint: 'Verify',
+
+      icon: 'check',
+
+      text: 'Verify',
+
+      onClick: (e) => {
+        setTimeout(() => this.onVerifyClick(e));
+      },
+
+      visible: (e) =>
+        e.row.data.STATUS !== 'Verified',
+    },
+
+    {
+      hint: 'Approve',
+
+      icon: 'check',
+
+      text: 'Approve',
+
+      onClick: (e) => {
+        setTimeout(() => this.onApproveClick(e));
+      },
+
+      visible: (e) => e.row.data.STATUS === 'Verified',
+    },
+  ];
+
+   //===================Status flag=========================
+  getStatusFlagClass(status: string): string {
+    switch (status) {
+      case 'Open':
+        return 'flag-open'; // White or gray
+      case 'Verified':
+        return 'flag-verified'; // Orange
+      case 'Approved':
+        return 'flag-approved'; // Green
+      default:
+        return '';
+    }
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
@@ -529,17 +608,58 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
-  onEditInvoice(event: any) {
-    event.cancel = true;
-    const invoiceId = event.data.TRANS_ID;
-    const transStatus = event.data.STATUS;
+   // ============================Verify Popup function=========================================
+  onVerifyClick(e: any): void {
+    console.log(e,'event--------------')
+    this.isEditInvoice = false;
+    this.isVerifyInvoice = true;
+    const transStatus = e.row.data.STATUS;
+    e.cancel = true;
+    this.statusFinder = e.row.data.STATUS;
+    const id = e.row.data.TRANS_ID;
+    console.log(id, '===================id');
+    this.dataService.selectPurchaseInvoice(id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedInvoice = res.Data;
+      console.log(this.selectedInvoice, '==============select data====verify');
+      // this.get_employes_details_value_select();
+      this.isEditInvoiceReadOnly = transStatus === 'Approved';
+    });
+  }
 
+   // ============================Approve Popup function=========================================
+  onApproveClick(e: any): void {
+    this.isVerifyInvoice = true;
+    e.cancel = true;
+    const id = e.row.data.TRANS_ID;
+    this.statusFinder = e.row.data.STATUS;
+    const transStatus = e.row.data.STATUS;
+    console.log(this.statusFinder)
+    console.log(id, '===================id');
+    this.dataService.selectPurchaseInvoice(id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedInvoice = res.Data;
+      console.log(this.selectedInvoice, '==============select data====verify');
+      // this.get_employes_details_value_select();
+      this.isEditInvoiceReadOnly = transStatus === 'Approved';
+    });
+  }
+
+
+  onEditInvoice(event: any) {
+    console.log(event,'event------------')
+    event.cancel = true;
+    const invoiceId = event.row.data.TRANS_ID;
+    const transStatus = event.row.data.STATUS;
+    this.statusFinder = event.row.data.STATUS;
+    this.isVerifyInvoice = false;
+    this.isEditInvoice = true;
     this.dataService
       .selectPurchaseInvoice(invoiceId)
       .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
 
-        this.isEditInvoice = true;
+        
         this.isEditInvoiceReadOnly = transStatus === 'Approved'; //read-only if Approved
       });
   }
@@ -586,6 +706,9 @@ export class PurchaseInvoiceListComponent {
   handleClose() {
     this.isAddInvoice = false;
     this.isEditInvoice = false;
+    this.isVerifyInvoice = false;
+
+  this.Approvepopup = false;
     this.getPurchaseInvoiceList();
     this.addInvoiceComp.resetInvoiceForm();
   }
