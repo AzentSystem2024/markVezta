@@ -54,6 +54,7 @@ import { tap } from 'rxjs';
 import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-quotation-form',
@@ -959,204 +960,513 @@ export class QuotationFormComponent {
     this.popupClosed.emit();
   }
 
-  printQuotation() {
-    const data = this.quotationFormData;
-    console.log(data);
+  // printQuotation() {
+  //   const data = this.quotationFormData;
+  //   console.log(data);
 
-    const formatDate = (dateStr: string) => {
-      if (!dateStr) return '';
-      const d = new Date(dateStr);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      return `${day}-${month}-${year}`;
+  //   const formatDate = (dateStr: string) => {
+  //     if (!dateStr) return '';
+  //     const d = new Date(dateStr);
+  //     const day = String(d.getDate()).padStart(2, '0');
+  //     const month = String(d.getMonth() + 1).padStart(2, '0');
+  //     const year = d.getFullYear();
+  //     return `${day}-${month}-${year}`;
+  //   };
+
+  //   const qtnDate = formatDate(data.QTN_DATE);
+
+  //   const customerName =
+  //     this.customer.find((c) => c.ID === data.CUST_ID)?.DESCRIPTION || '';
+  //   const salesmanName =
+  //     this.salesman.find((s) => s.ID === data.SALESMAN_ID)?.DESCRIPTION || '';
+
+  //   const paymentTerm =
+  //     this.paymentTerms.find((pt) => pt.ID === data.PAY_TERM_ID)?.DESCRIPTION ||
+  //     '';
+  //   const deliveryTerm =
+  //     this.deliveryTerms.find((dt) => dt.ID === data.DELIVERY_TERM_ID)
+  //       ?.DESCRIPTION || '';
+
+  //   const content = document.createElement('div');
+  //   content.innerHTML = `
+  //   <div style="font-family: Arial, sans-serif; font-size: 13px; margin: 20px;">
+      
+  //     <!-- COMPANY HEADER -->
+  //     <div style="text-align: center; margin-bottom: 20px;">
+  //       <h2 style="margin-top: 5px;">Quotation</h2>
+  //     </div>
+
+  //     <!-- HEADER INFO -->
+  //     <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
+  //       <div>
+  //         <div><b>Date:</b> ${qtnDate}</div>
+  //         <div><b>Quotation No:</b> ${data.QTN_NO}</div>
+  //         <div><b>Customer:</b> ${customerName}</div>
+  //         <div><b>Contact Name:</b> ${data.CONTACT_NAME}</div>
+  //       </div>
+  //       <div>
+  //         <div><b>Reference No:</b> ${data.REF_NO}</div>
+  //         <div><b>Salesman:</b> ${salesmanName}</div>
+  //         <div><b>Subject:</b> ${data.SUBJECT}</div>
+  //       </div>
+  //     </div>
+
+  //     <!-- GRID -->
+  //     <div id="printGridWrapper"></div>
+
+  //     <!-- FOOTER -->
+  //     <div style="display: flex; justify-content: space-between; margin-top: 30px; border-top: 2px solid #000; padding-top: 10px;">
+  //       <div style="width: 48%;">
+  //         <p style="font-weight: bold; text-decoration: underline;">Terms and Conditions</p>
+  //         <p><b>Payment:</b> ${paymentTerm}</p>
+  //         <p><b>Delivery:</b> ${deliveryTerm}</p>
+  //         <p><b>Validity:</b> ${data.VALID_DAYS}</p>
+  //       </div>
+  //       <div style="width: 48%; text-align: right;">
+  //         <p><b>Net Amount:</b> ${data.NET_AMOUNT?.toFixed(2) || '0.00'}</p>
+  //         <p><b>Remarks:</b> ${data.NARRATION || ''}</p>
+  //       </div>
+  //     </div>
+
+  //     <!-- FOOTER NOTE -->
+  //     <div style="margin-top: 50px; text-align: center; font-style: italic;">
+  //       This quotation is valid for ${
+  //         data.VALID_DAYS
+  //       } days from the date of issue.
+  //     </div>
+  //   </div>
+  // `;
+
+  //   // Create grid HTML with styling
+  //   const gridWrapper = document.createElement('div');
+  //   gridWrapper.innerHTML = `
+  //   <table border="1" style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px;">
+  //     <thead style="background-color: #f0f0f0;">
+  //       <tr>
+  //         <th>Sl No</th>
+  //         <th>Item Code</th>
+  //         <th>Description</th>
+  //         <th>Matrix Code</th>
+  //         <th>Remarks</th>
+  //         <th>UOM</th>
+  //         <th>Tax %</th>
+  //         <th>Qty</th>
+  //         <th>Price</th>
+  //         <th>Gross Amount</th>
+  //         <th>Discount%</th>
+  //         <th>Amount</th>
+  //         <th>Tax Amount</th>
+  //         <th>Total</th>
+  //       </tr>
+  //     </thead>
+  //     <tbody>
+  //       ${data.Details.map(
+  //         (item: any, index: number) => `
+  //         <tr>
+  //           <td style="text-align: center">${index + 1}</td>
+  //           <td>${item.ITEM_CODE || ''}</td>
+  //           <td>${item.DESCRIPTION || ''}</td>
+  //           <td>${item.MATRIX_CODE || ''}</td>
+  //           <td>${item.REMARKS || ''}</td>
+  //           <td>${item.UOM || ''}</td>
+  //           <td style="text-align: right">${item.TAX_PERCENT || ''}</td>
+  //           <td style="text-align: right">${item.STOCK_QTY || ''}</td>
+  //           <td style="text-align: right">${item.PRICE?.toFixed(2) || ''}</td>
+  //           <td style="text-align: right">${
+  //             item.GROSS_AMOUNT?.toFixed(2) || ''
+  //           }</td>
+  //           <td style="text-align: right">${
+  //             item.DISC_PERCENT?.toFixed(2) || ''
+  //           }</td>
+  //           <td style="text-align: right">${item.AMOUNT?.toFixed(2) || ''}</td>
+  //           <td style="text-align: right">${
+  //             item.TAX_AMOUNT?.toFixed(2) || ''
+  //           }</td>
+  //           <td style="text-align: right">${
+  //             item.TOTAL_AMOUNT?.toFixed(2) || ''
+  //           }</td>
+  //         </tr>
+  //       `,
+  //       ).join('')}
+  //     </tbody>
+  //   </table>
+  // `;
+  //   content.querySelector('#printGridWrapper')?.appendChild(gridWrapper);
+
+  //   // -------------------------
+  //   // ADD TERMS & CONDITIONS ARRAY BELOW
+  //   if (data.TERMS && data.TERMS.length > 0) {
+  //     const termsWrapper = document.createElement('div');
+  //     termsWrapper.innerHTML = `
+  //     <div style="margin-top: 30px;">
+  //       <h3 style="border-top: 1px solid #000; padding-top: 5px;">Terms & Conditions</h3>
+  //       <ol style="margin-left: 20px; font-size: 12px;">
+  //         ${data.TERMS.map(
+  //           (term: any, index: number) => `
+  //           <li>${term.TERMS}</li>
+  //         `,
+  //         ).join('')}
+  //       </ol>
+  //     </div>
+  //   `;
+  //     content.appendChild(termsWrapper);
+  //   }
+  //   // -------------------------
+
+  //   // Print window
+  //   const printWindow = window.open(
+  //     '',
+  //     '_blank',
+  //     'width=1200,height=900,scrollbars=yes',
+  //   );
+  //   if (printWindow) {
+  //     printWindow.document.write(`
+  //     <html>
+  //       <head>
+  //         <title>Quotation Print</title>
+  //         <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.1.3/css/dx.light.css">
+  //         <style>
+  //           body { font-family: Arial, sans-serif; font-size: 13px; margin: 0; padding: 0; }
+  //           table { width: 100%; border-collapse: collapse; }
+  //           th, td { border: 1px solid #000; padding: 5px; }
+  //           th { background-color: #f0f0f0; text-align: center; }
+  //           td { padding: 4px; }
+  //           .footer { font-size: 12px; }
+  //           ol { padding-left: 20px; }
+  //         </style>
+  //       </head>
+  //       <body>${content.innerHTML}</body>
+  //     </html>
+  //   `);
+  //     printWindow.document.close();
+
+  //     setTimeout(() => {
+  //       printWindow.focus();
+  //       printWindow.print();
+  //     }, 500);
+  //   }
+
+  //   // Save PDF
+  //   html2canvas(content).then((canvas) => {
+  //     const imgData = canvas.toDataURL('image/png');
+  //     const pdf = new jsPDF('p', 'mm', 'a4');
+  //     const imgProps = pdf.getImageProperties(imgData);
+  //     const pdfWidth = pdf.internal.pageSize.getWidth();
+  //     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+  //     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  //     pdf.save(`Quotation_${data.QTN_NO}.pdf`);
+  //   });
+  // }
+
+  printQuotation() {
+    console.log('Open PDF clicked');
+    const returnId = this.EditingResponseData.ID;
+    console.log(returnId)
+    // Example:
+    this.dataService
+      .selectSalesQuotation(returnId)
+      .subscribe((res: any) => {
+        this.generatePDF(res);
+      });
+  }
+
+   getBase64ImageFromURL(url: string): Promise<string> {
+  return fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    });
+}
+
+ async  generatePDF(data: any) {
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // ============================================================
+  // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
+  // ============================================================
+
+  const headerY = 10;
+
+  // --- Logo placeholder (replace with addImage if needed)
+  const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
+
+  doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 35);
+
+  // --- Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('SALES QUOTATION', pageWidth / 2, headerY + 25, {
+    align: 'center',
+  });
+
+ // ======================================================
+  // RIGHT HEADER DETAILS
+  // ======================================================
+
+  doc.setFontSize(10);
+
+  doc.setFont('helvetica', 'normal');
+
+  doc.text('Quotation No :', 135, 15);
+
+doc.text(
+  `${data.Data.QTN_NO}`,
+  195,
+  15,
+  { align: 'right' }
+);
+
+  doc.text('Reference No :', 135, 22);
+
+doc.text(
+  `${data.Data.REF_NO}`,
+  195,
+  22,
+  { align: 'right' }
+);
+
+doc.text('Date :', 135, 29);
+
+doc.text(
+  `${data.Data.QTN_DATE}`,
+  195,
+  29,
+  { align: 'right' }
+);
+
+
+   // ======================================================
+  // BUYER DETAILS
+  // ======================================================
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Buyer Details', 12, 60);
+
+  doc.setFont('helvetica', 'normal');
+
+  doc.text('Store:', 12, 67);
+
+// doc.text(
+//   `${data.Data.ADDRESS1}`,
+//   38,
+//   67
+// );
+
+  doc.text('Salesman:', 12, 74);
+  // doc.text(`${data.Data.PHONE}`, 38, 74);
+
+  doc.text('Tel:', 12, 83);
+  // doc.text(`${data.Data.GST_NO}`, 38, 83);
+
+  
+  // ======================================================
+  // SELLER DETAILS
+  // ======================================================
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Seller Details', 140, 60);
+
+  doc.setFont('helvetica', 'normal');
+
+  doc.text('Name:', 140, 67);
+
+  const customerName = doc.splitTextToSize(data.Data.CUST_NAME, 35);
+doc.text(customerName, 165, 67);
+
+  doc.text('Contact Name:', 140, 80);
+  doc.text(`${data.Data.CONTACT_NAME}`, 165, 80);
+
+  doc.text('Tel:', 140, 87);
+  // doc.text(`${data.Data.ZIP}`, 165, 83);
+
+
+  // ======================================================
+// QUOTATION INFO TABLE (Ship Method / Payment / Currency)
+// ======================================================
+
+autoTable(doc, {
+  startY: 95,
+  head: [[
+    'Ship Method',
+    'Payment Terms',
+    'Currency',
+    'Remark (If any)',
+    'Validity'
+  ]],
+  body: [[
+    data.Data.DELIVERY_TERM_NAME,
+    data.Data.PAY_TERM_NAME,
+    data.Data.CURRENCY || '',
+    data.Data.NARRATION || '',
+    `${data.Data.VALID_DAYS} days`
+  ]],
+  theme: 'grid',
+  styles: {
+    fontSize: 8,
+    halign: 'center',
+    valign: 'middle'
+  },
+  headStyles: {
+    fillColor: [210, 225, 240],
+    textColor: 0,
+    fontStyle: 'bold'
+  }
+});
+
+
+// ======================================================
+// ITEM DETAILS TABLE
+// ======================================================
+
+const itemRows = data.Data.Details.map((item: any) => [
+  item.ITEM_CODE,
+  item.ITEM_NAME,
+  item.UOM,
+  item.QUANTITY,
+  item.PRICE,
+  item.AMOUNT,
+  item.DISC_PERCENT,
+  item.AMOUNT,
+  item.TAX_PERCENT,
+  item.TOTAL_AMOUNT
+]);
+
+autoTable(doc, {
+  startY: (doc as any).lastAutoTable.finalY + 10,
+  head: [[
+    'Item Code',
+    'Description',
+    'UOM',
+    'Qty',
+    'Price',
+    'Amount',
+    'Disc(%)',
+    'Taxable',
+    'Tax(%)',
+    'Total Price'
+  ]],
+  body: itemRows,
+  foot: [[
+    '',
+    'TOTAL',
+    '',
+    data.Data.Details.reduce((sum: number, item: any) => sum + item.QUANTITY, 0),
+    '',
+    data.Data.GROSS_AMOUNT,
+    '',
+    '',
+    '',
+    data.Data.NET_AMOUNT
+  ]],
+  theme: 'grid',
+  styles: {
+    fontSize: 8,
+    cellPadding: 2,
+    halign: 'center'
+  },
+  headStyles: {
+    fillColor: [210, 225, 240],
+    textColor: 0,
+    fontStyle: 'bold'
+  },
+  footStyles: {
+    fontStyle: 'bold',
+    fillColor: [255, 255, 255],
+    textColor: 0
+  }
+});
+
+
+// ======================================================
+// AMOUNT IN WORDS
+// ======================================================
+
+const amountY = (doc as any).lastAutoTable.finalY + 10;
+
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(10);
+
+doc.text('Amount Chargeable (in words):', 60, amountY);
+
+doc.setTextColor(0, 102, 204);
+doc.text('AED Three Thousand One Hundred Thirty Five Only', 120, amountY);
+
+doc.setTextColor(0);
+
+
+  // ============================================================
+  // 3) OPEN PDF
+  // ============================================================
+
+  doc.output('dataurlnewwindow');
+}
+
+  convertNumberToWords(num: number): string {
+    if (num === 0) return 'Zero';
+
+    const a = [
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
+    ];
+
+    const b = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
+    ];
+
+    const inWords = (n: number, suffix: string): string => {
+      if (n === 0) return '';
+      if (n < 20) return a[n] + ' ' + suffix + ' ';
+      return b[Math.floor(n / 10)] + ' ' + a[n % 10] + ' ' + suffix + ' ';
     };
 
-    const qtnDate = formatDate(data.QTN_DATE);
+    let str = '';
 
-    const customerName =
-      this.customer.find((c) => c.ID === data.CUST_ID)?.DESCRIPTION || '';
-    const salesmanName =
-      this.salesman.find((s) => s.ID === data.SALESMAN_ID)?.DESCRIPTION || '';
+    str += inWords(Math.floor(num / 10000000), 'Crore');
+    str += inWords(Math.floor((num / 100000) % 100), 'Lakh');
+    str += inWords(Math.floor((num / 1000) % 100), 'Thousand');
+    str += inWords(Math.floor((num / 100) % 10), 'Hundred');
 
-    const paymentTerm =
-      this.paymentTerms.find((pt) => pt.ID === data.PAY_TERM_ID)?.DESCRIPTION ||
-      '';
-    const deliveryTerm =
-      this.deliveryTerms.find((dt) => dt.ID === data.DELIVERY_TERM_ID)
-        ?.DESCRIPTION || '';
+    if (num > 100 && num % 100 > 0) str += 'and ';
 
-    const content = document.createElement('div');
-    content.innerHTML = `
-    <div style="font-family: Arial, sans-serif; font-size: 13px; margin: 20px;">
-      
-      <!-- COMPANY HEADER -->
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="margin-top: 5px;">Quotation</h2>
-      </div>
+    str += inWords(num % 100, '');
 
-      <!-- HEADER INFO -->
-      <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-        <div>
-          <div><b>Date:</b> ${qtnDate}</div>
-          <div><b>Quotation No:</b> ${data.QTN_NO}</div>
-          <div><b>Customer:</b> ${customerName}</div>
-          <div><b>Contact Name:</b> ${data.CONTACT_NAME}</div>
-        </div>
-        <div>
-          <div><b>Reference No:</b> ${data.REF_NO}</div>
-          <div><b>Salesman:</b> ${salesmanName}</div>
-          <div><b>Subject:</b> ${data.SUBJECT}</div>
-        </div>
-      </div>
-
-      <!-- GRID -->
-      <div id="printGridWrapper"></div>
-
-      <!-- FOOTER -->
-      <div style="display: flex; justify-content: space-between; margin-top: 30px; border-top: 2px solid #000; padding-top: 10px;">
-        <div style="width: 48%;">
-          <p style="font-weight: bold; text-decoration: underline;">Terms and Conditions</p>
-          <p><b>Payment:</b> ${paymentTerm}</p>
-          <p><b>Delivery:</b> ${deliveryTerm}</p>
-          <p><b>Validity:</b> ${data.VALID_DAYS}</p>
-        </div>
-        <div style="width: 48%; text-align: right;">
-          <p><b>Net Amount:</b> ${data.NET_AMOUNT?.toFixed(2) || '0.00'}</p>
-          <p><b>Remarks:</b> ${data.NARRATION || ''}</p>
-        </div>
-      </div>
-
-      <!-- FOOTER NOTE -->
-      <div style="margin-top: 50px; text-align: center; font-style: italic;">
-        This quotation is valid for ${
-          data.VALID_DAYS
-        } days from the date of issue.
-      </div>
-    </div>
-  `;
-
-    // Create grid HTML with styling
-    const gridWrapper = document.createElement('div');
-    gridWrapper.innerHTML = `
-    <table border="1" style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px;">
-      <thead style="background-color: #f0f0f0;">
-        <tr>
-          <th>Sl No</th>
-          <th>Item Code</th>
-          <th>Description</th>
-          <th>Matrix Code</th>
-          <th>Remarks</th>
-          <th>UOM</th>
-          <th>Tax %</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Gross Amount</th>
-          <th>Discount%</th>
-          <th>Amount</th>
-          <th>Tax Amount</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.Details.map(
-          (item: any, index: number) => `
-          <tr>
-            <td style="text-align: center">${index + 1}</td>
-            <td>${item.ITEM_CODE || ''}</td>
-            <td>${item.DESCRIPTION || ''}</td>
-            <td>${item.MATRIX_CODE || ''}</td>
-            <td>${item.REMARKS || ''}</td>
-            <td>${item.UOM || ''}</td>
-            <td style="text-align: right">${item.TAX_PERCENT || ''}</td>
-            <td style="text-align: right">${item.STOCK_QTY || ''}</td>
-            <td style="text-align: right">${item.PRICE?.toFixed(2) || ''}</td>
-            <td style="text-align: right">${
-              item.GROSS_AMOUNT?.toFixed(2) || ''
-            }</td>
-            <td style="text-align: right">${
-              item.DISC_PERCENT?.toFixed(2) || ''
-            }</td>
-            <td style="text-align: right">${item.AMOUNT?.toFixed(2) || ''}</td>
-            <td style="text-align: right">${
-              item.TAX_AMOUNT?.toFixed(2) || ''
-            }</td>
-            <td style="text-align: right">${
-              item.TOTAL_AMOUNT?.toFixed(2) || ''
-            }</td>
-          </tr>
-        `,
-        ).join('')}
-      </tbody>
-    </table>
-  `;
-    content.querySelector('#printGridWrapper')?.appendChild(gridWrapper);
-
-    // -------------------------
-    // ADD TERMS & CONDITIONS ARRAY BELOW
-    if (data.TERMS && data.TERMS.length > 0) {
-      const termsWrapper = document.createElement('div');
-      termsWrapper.innerHTML = `
-      <div style="margin-top: 30px;">
-        <h3 style="border-top: 1px solid #000; padding-top: 5px;">Terms & Conditions</h3>
-        <ol style="margin-left: 20px; font-size: 12px;">
-          ${data.TERMS.map(
-            (term: any, index: number) => `
-            <li>${term.TERMS}</li>
-          `,
-          ).join('')}
-        </ol>
-      </div>
-    `;
-      content.appendChild(termsWrapper);
-    }
-    // -------------------------
-
-    // Print window
-    const printWindow = window.open(
-      '',
-      '_blank',
-      'width=1200,height=900,scrollbars=yes',
-    );
-    if (printWindow) {
-      printWindow.document.write(`
-      <html>
-        <head>
-          <title>Quotation Print</title>
-          <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.1.3/css/dx.light.css">
-          <style>
-            body { font-family: Arial, sans-serif; font-size: 13px; margin: 0; padding: 0; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #000; padding: 5px; }
-            th { background-color: #f0f0f0; text-align: center; }
-            td { padding: 4px; }
-            .footer { font-size: 12px; }
-            ol { padding-left: 20px; }
-          </style>
-        </head>
-        <body>${content.innerHTML}</body>
-      </html>
-    `);
-      printWindow.document.close();
-
-      setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-      }, 500);
-    }
-
-    // Save PDF
-    html2canvas(content).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Quotation_${data.QTN_NO}.pdf`);
-    });
+    return str.trim();
   }
+
 }
 
 @NgModule({

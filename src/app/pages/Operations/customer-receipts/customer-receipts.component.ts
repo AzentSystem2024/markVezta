@@ -80,6 +80,7 @@ export class CustomerReceiptsComponent {
 
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -140,6 +141,7 @@ export class CustomerReceiptsComponent {
   customerReciptList: any;
   selectedReceipt: any;
   isEditReceipt: boolean = false;
+  isVerifyReceipt:boolean = false;
   isViewReceipt: boolean = false;
   filteredReceiptList: any;
 
@@ -176,6 +178,7 @@ export class CustomerReceiptsComponent {
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
+      this.canVerify = packingRights.CanVerify;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
@@ -332,14 +335,19 @@ export class CustomerReceiptsComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
+   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -521,6 +529,19 @@ export class CustomerReceiptsComponent {
     }
   }
 
+  onVerifyInvoice(e:any){
+    e.cancel = true;
+    const receiptId = e.row.data.TRANS_ID;
+    const transStatus = e.row.data.TRANS_STATUS;
+    this.dataService
+      .selectCustomerReceipt(receiptId)
+      .subscribe((response: any) => {
+        this.selectedReceipt = response.Data;
+        this.isVerifyReceipt = true;
+        this.isEditReceipt = false;
+        this.isReadOnlyReceipt = transStatus === 5;
+      });
+  }
   onEditReceiptNote(event: any) {
     event.cancel = true;
     const receiptId = event.data.TRANS_ID;
@@ -598,6 +619,7 @@ export class CustomerReceiptsComponent {
     this.isAddCustomerReceipt = false;
     this.isEditReceipt = false;
     this.isViewReceipt = false;
+    this.isVerifyReceipt = false;
     this.getCustomerReceipts();
   }
 

@@ -110,7 +110,8 @@ export class CreditNoteListComponent {
   isAddCreditNote: boolean = false;
   creditNotes: any;
   selectedCreditNote: any;
-  isEditCreditNote: boolean;
+  isEditCreditNote: boolean = false;
+  isVerifyCreditNote:boolean = false;
   selectedCompanyId: any;
   isViewCreditNote: boolean = false;
   dateRanges = [
@@ -128,6 +129,7 @@ export class CreditNoteListComponent {
   filteredInvoiceList: any;
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -175,6 +177,7 @@ export class CreditNoteListComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
+      this.canVerify = packingRights.CanVerify;
       this.canApprove = packingRights.CanApprove;
     }
 
@@ -341,14 +344,20 @@ export class CreditNoteListComponent {
     }
   }
 
+ 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -356,6 +365,7 @@ export class CreditNoteListComponent {
 
     cellElement.appendChild(icon);
   }
+
 
   getStatusFilterData = [
     {
@@ -569,6 +579,33 @@ export class CreditNoteListComponent {
       });
   }
 
+
+  onVerifyCreditNote(e:any){
+    e.cancel = true; // Prevent default popup editing
+    const creditId = e.row.data.TRANS_ID;
+    this.CreditNoteid = e.row.data.TRANS_ID;
+    this.selectedCredit = creditId;
+    const transStatus = e.row.data.TRANS_STATUS;
+
+    this.dataService
+      .selectCreditNote(this.CreditNoteid)
+      .subscribe((response: any) => {
+        this.selectedCreditNote = structuredClone(response.Data);
+
+        if (transStatus === 5) {
+          // Open view popup
+          this.isViewCreditNote = true;
+        } else {
+          // Open edit popup
+          this.isVerifyCreditNote = true;
+        }
+
+        this.selectedCreditNoteForEdit = JSON.parse(
+          JSON.stringify(this.selectedCreditNote),
+        );
+      });
+  }
+
   onDeleteCreditNote(event: any) {
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
@@ -615,8 +652,9 @@ export class CreditNoteListComponent {
   handleClose() {
     this.isAddCreditNote = false;
     this.isEditCreditNote = false;
+    this.isVerifyCreditNote = false;
     this.isViewCreditNote = false;
-    this.selectedDateRange = 'today';
+    // this.selectedDateRange = 'today';
     this.getCreditNotes();
   }
 }

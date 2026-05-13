@@ -152,6 +152,8 @@ export class UserEditFormComponent {
   CompanyList_data: any = {};
   CompanyData: any;
   countryCode: any;
+  sessionData: any;
+  storeid: any;
   // Use this function to display based on dropdown state
   countryDisplay(item: any) {
     if (!item) return '';
@@ -194,8 +196,16 @@ export class UserEditFormComponent {
     this.user_role_dropdown();
     this.get_Company_details();
     this.updateMobileNumber();
+    this.sesstion_Details();
   }
 
+
+   sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.storeid = this.sessionData.Configuration[0].STORE_ID
+    console.log(this.storeid)
+  } 
+  
   Closepop() {
     this.isEditPopupOpened = false;
     this.closeForm.emit(); // Emit the close event to parent component
@@ -669,6 +679,7 @@ export class UserEditFormComponent {
     const payload = {
       ...this.newUserData,
       COMPANY_ID: this.selectedRows,
+      STORE_ID : this.storeid,
       MOBILE: this.countryCode + '-' + this.newUserData.MOBILE,
     };
 
