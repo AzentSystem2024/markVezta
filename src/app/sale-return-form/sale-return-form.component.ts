@@ -452,7 +452,7 @@ export class SaleReturnFormComponent {
             SALE_NO: row.DOC_NO,
             // GRN_DET_ID: row.GRN_DET_ID,
             TRANSFER_NO: row.DOC_NO,
-            TRANSFER_DATE: row.PURCH_DATE,
+            TRANSFER_DATE: row.SALE_DATE,
             ITEM_NAME: row.ITEM_NAME,
             PENDING_QTY: row.PENDING_QTY,
             PRICE: row.PRICE,
