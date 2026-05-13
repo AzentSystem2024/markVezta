@@ -1,13 +1,4 @@
-import {
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  EventEmitter,
-  Input,
-  NgModule,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, NgModule, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -29,7 +20,6 @@ import {
   DxTabPanelModule,
   DxTabsModule,
   DxNumberBoxModule,
-  DxDataGridComponent,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -39,12 +29,7 @@ import {
   DxiGroupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
-import notify from 'devextreme/ui/notify';
 import { FormTextboxModule } from 'src/app/components';
-import { SaleReturnFormComponent } from 'src/app/sale-return-form/sale-return-form.component';
-import { DataService } from 'src/app/services';
-import { confirm } from 'devextreme/ui/dialog';
-import dxSelectBox from 'devextreme/ui/select_box';
 
 @Component({
   selector: 'app-add-sales-invoice-retail',

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
@@ -103,11 +104,74 @@ export class TransferOutInventoryComponent {
     `;
     },
   };
-  isAddTransferOut: boolean;
+  isAddTransferOut: boolean=false;
   transferOutList: any;
   selecteTrOut: any;
-  isEditTransferOut: boolean;
+  isEditTransferOut: boolean=false;
   selectedTrOut: any;
+  canVerify: boolean = false;
+  allButtons = [
+    {
+      name: 'edit',
+      onClick: (e: any) => this.onEditTransferOut(e),
+      visible: (e: any) => {
+
+        return this.canEdit &&
+          (
+            e.row.data.STATUS === 'OPEN'
+          )
+      }
+
+    },
+    {
+      name: 'delete',
+      visible: (e: any) => {
+        const status = e.row.data.STATUS;
+
+        return this.canDelete &&
+          (
+            (e.row.data.STATUS == 'OPEN') || (status === 'VERIFIED' && this.canApprove)
+
+          )
+
+      },
+    },
+    {
+      hint: 'Verify',
+      icon: 'check',
+      text: 'Verify',
+      onClick: (e: any) => this.onVerifyClick(e),
+      visible: (e: any) => {
+        return this.canVerify && e.row.data.STATUS === 'OPEN';
+      },
+    },
+    {
+      hint: 'Approve',
+      icon: 'check',
+      text: 'Approve',
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) => {
+        return this.canApprove &&
+          (
+            e.row.data.STATUS === 'VERIFIED' || (this.canVerify ? false : e.row.data.STATUS === 'OPEN')
+          )
+
+      },
+    },
+    {
+      hint: 'View',
+      icon: 'check',
+      text: 'View',
+      onClick: (e: any) => this.onViewClick(e),
+      visible: (e: any) =>
+        this.canView &&
+        (
+          e.row.data.STATUS === 'APPROVED' ||
+          (e.row.data.STATUS === 'VERIFIED' && !this.canApprove)
+        )
+
+    },
+  ];
 
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -128,10 +192,12 @@ export class TransferOutInventoryComponent {
   selectedStoreid: any;
   Store: any[] = [];
   dateFilteredList: any = [];
+  StatusType: any;
   constructor(
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -156,6 +222,7 @@ export class TransferOutInventoryComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
     this.sessionData_tax();
     this.store_dropdown()
@@ -507,22 +574,32 @@ export class TransferOutInventoryComponent {
     }
   }
   onEditTransferOut(event: any) {
+    console.log('Edit button clicked for row:', event.row.data);
     event.cancel = true;
-    const trOutId = event.data.TRANS_ID;
-    const status = event.data.STATUS;
+    const trOutId = event.row.data.TRANS_ID;
+    const status = event.row.data.STATUS;
+    this.isEditTransferOut = true;
+    this.StatusType = 'EditScreen'
+
+    this.select_function(trOutId)
+  }
+
+  select_function(trOutId: any) {
     this.dataService
       .selectTransferOutForInventory(trOutId)
       .subscribe((response: any) => {
         this.selectedTrOut = response;
-        this.isEditTransferOut = true;
-        this.isReadOnlyTrOut = status === 'APPROVED';
+        this.cdr.detectChanges();
+
+
       });
+
   }
 
   onDeleteTrOuT(event: any) {
-    const trOutId = event.data.ID;
-    const status = event.data.STATUS;
-    if (event.data.STATUS === 'APPROVED') {
+    const trOutId = event.row.data.ID;
+    const status = event.row.data.STATUS;
+    if (event.row.data.STATUS === 'APPROVED') {
       event.cancel = true;
       notify('This cannot be deleted.', 'error', 2000);
       return;
@@ -594,15 +671,58 @@ export class TransferOutInventoryComponent {
   }
 
   onStoreChanged(e: any) {
-
-
-    // this.selectedStoreid = ids;
     console.log('Selected store IDs:', this.selectedStoreid);
-
-
     this.applyStoreFilter(); // ✅ ONLY store filter
   }
+  onViewClick(e: any) {
+    console.log('Edit button clicked for row:', e.row.data);
+    e.cancel = true;
+    const trOutId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+    this.StatusType = 'viewScreen'
 
+    this.dataService
+      .selectTransferOutForInventory(trOutId)
+      .subscribe((response: any) => {
+        this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+        this.cdr.detectChanges();
+      });
+  }
+  onApproveClick(e: any) {
+    console.log('Edit button clicked for row:', e.row.data);
+    e.cancel = true;
+    const trOutId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+    this.dataService
+      .selectTransferOutForInventory(trOutId)
+      .subscribe((response: any) => {
+        this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+        this.cdr.detectChanges();
+        this.StatusType = 'ApprovalScreen'
+
+
+      });
+  }
+  onVerifyClick(e: any) {
+    console.log('Edit button clicked for row:', e.row.data);
+    e.cancel = true;
+    const trOutId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+    this.isEditTransferOut = true;
+    this.cdr.detectChanges();
+    this.StatusType = 'VerifyScreen'
+
+
+    this.dataService
+      .selectTransferOutForInventory(trOutId)
+      .subscribe((response: any) => {
+        this.selectedTrOut = response;
+
+
+      });
+  }
 }
 
 @NgModule({

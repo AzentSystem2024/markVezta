@@ -165,7 +165,6 @@ import { ImportItemsTemplateComponent } from './pages/MASTER/import-items-templa
 import { PromotionLogComponent } from './pages/promotion-log/promotion-log.component';
 import { PromotionComponent } from './pages/promotion/promotion.component';
 import { PromotionSchemaLogComponent } from './pages/promotion-schema-log/promotion-schema-log.component';
-// import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
 import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
 import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
 import { CurrencyListComponent } from './pages/currency-list/currency-list.component';
@@ -173,15 +172,9 @@ import { ItemBrandListComponent } from './pages/item-brand-list/item-brand-list.
 import { PromotionEditComponent } from './pages/promotion-edit/promotion-edit.component';
 import { ItemStorePropertiesComponent } from './pages/item-store-properties/item-store-properties.component';
 import { PromotionViewComponent } from './pages/promotion-view/promotion-view.component';
-import { InvoiceRetailComponent } from './pages/Operations/invoice-retail/invoice-retail.component';
-// import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
-// import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
-// import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
 import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
 import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
 import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
-import { MiscPurchaseInvoiceComponent } from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
-import { MiscellaneousSalesInvoiceComponent } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { StorewiseStockViewComponent } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
 import { SalesSummaryComponent } from './pages/REPORT/sales-summary/sales-summary.component';
 import { SalesDetailComponent } from './pages/REPORT/sales-detail/sales-detail.component';
@@ -190,24 +183,17 @@ import { ConsignmentReturnDetailComponent } from './pages/REPORT/consignment-ret
 import { ItemwisesalesComponent } from './pages/REPORT/itemwisesales/itemwisesales.component';
 import { ItemWiseSalesSummaryComponent } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
 import { DiscountWiseSalesComponent } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
-import {
-  TenderComponent,
-  TenderModule,
-} from './pages/REPORT/tender/tender.component';
+import { TenderComponent } from './pages/REPORT/tender/tender.component';
 import { TenderSummaryComponent } from './pages/REPORT/tender-summary/tender-summary.component';
 import { ZReportComponent } from './pages/REPORT/zreport/zreport.component';
-import { SalesInvoiceRetailComponent } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
 import { ItemStorePriceApproveComponent } from './pages/item-store-price-approve/item-store-price-approve.component';
-// import { LandedCostListComponent } from './pages/landed-cost-list/landed-cost-list.component';
-// import { TendersListComponent } from './pages/tenders-list/tenders-list.component';
-// import { PromotionComponent } from './pages/promotion/promotion.component';
+import { ImportArDataComponent } from './pages/ERP-INTEGRATION/import-ar-data/import-ar-data.component';
+import { InvoiceRetailComponent } from './pages/OPERATIONS/invoice-retail/invoice-retail.component';
+import { MiscPurchaseInvoiceComponent } from './pages/OPERATIONS/misc-purchase-invoice/misc-purchase-invoice.component';
+import { MiscellaneousSalesInvoiceComponent } from './pages/OPERATIONS/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
+import { SalesInvoiceRetailComponent } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
 
 const routes: Routes = [
-  //  {
-  //   path: 'miscellaneous-sales-invoice',
-  //   component: MiscellaneousSalesInvoiceComponent,
-  //   canActivate: [AuthGuardService],
-  // },
   {
     path: '',
     redirectTo: '/auth/login',
@@ -1222,12 +1208,16 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
 
-      {
+         {
         path: 'item-store-price-approve',
         component: ItemStorePriceApproveComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'import-ar',
+        component: ImportArDataComponent,
+        canActivate: [AuthGuardService],
+      },
 
       {
         path: '**',
