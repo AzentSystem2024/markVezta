@@ -346,6 +346,12 @@ export class DataService {
     return this.http.post(`${this.apiUrl}ACTransactions/debitupdate`, data);
   }
 
+    verifyDebitNote(items: any) {
+    const data = items;
+    // console.log(data,"insert service")
+    return this.http.post(`${this.apiUrl}ACTransactions/verify`, data);
+  }
+
   commitDebitNote(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}ACTransactions/commit`, data);

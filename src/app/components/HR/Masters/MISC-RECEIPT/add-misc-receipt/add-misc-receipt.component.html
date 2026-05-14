@@ -315,7 +315,7 @@
   </div>
 </dx-validation-group>
 
-<div class="form-popup-buttons-container" *ngIf="!isReadOnlyMode">
+<div class="form-popup-buttons-container">
   <div class="popup-footer">
     <dx-button
       text="Cancel"
@@ -324,6 +324,7 @@
       type="normal"
     ></dx-button>
     <dx-button
+     *ngIf="!isReadOnlyMode"
       #saveButtonRef
       [text]="
         isSaving
@@ -364,7 +365,7 @@
   </div>
 </div>
 
-<div class="form-popup-buttons-container" *ngIf="isReadOnlyMode">
+<!-- <div class="form-popup-buttons-container" *ngIf="isReadOnlyMode">
   <div class="popup-footer">
     <dx-button
       icon="fas fa-file-pdf"
@@ -377,7 +378,7 @@
     >
     </dx-button>
   </div>
-</div>
+</div> -->
 
 <dx-popup
   [(visible)]="isPdfPopupVisible"

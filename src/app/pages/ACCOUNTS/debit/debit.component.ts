@@ -74,6 +74,7 @@ export class DebitComponent {
   debitList: any;
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -107,6 +108,7 @@ export class DebitComponent {
   };
   isAddDebitNote: boolean = false;
   isEditDebitNote: boolean = false;
+  isVerifyDebitNote :boolean = false;
   isViewCreditNote: boolean = false;
   selectedDebitNote: any;
   isViewDebitNote: boolean;
@@ -178,6 +180,7 @@ export class DebitComponent {
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
+      this.canVerify = packingRights.CanVerify;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
@@ -311,14 +314,20 @@ export class DebitComponent {
     this.getDebitNoteList();
   }
 
+
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -529,6 +538,26 @@ export class DebitComponent {
     }
   }
 
+  onVerifyInvoice(e:any){
+    e.cancel = true; // Prevent default popup editing
+    const debitId = e.row.data.TRANS_ID;
+    this.DNid = e.row.data.TRANS_ID;
+    this.selectedDN = debitId;
+    const transStatus = e.row.data.TRANS_STATUS;
+
+    this.dataService.selectDebitNote(debitId).subscribe((response: any) => {
+      this.selectedDebitNote = response.Data;
+      if (transStatus === 5) {
+        // Open view popup
+        this.isViewDebitNote = true;
+      } else {
+        // Open edit popup
+        this.isVerifyDebitNote = true;
+      }
+    });
+  }
+
+
   onEditDebitNote(event: any) {
     event.cancel = true; // Prevent default popup editing
     const debitId = event.data.TRANS_ID;
@@ -594,6 +623,7 @@ export class DebitComponent {
   handleClose() {
     this.isAddDebitNote = false;
     this.isEditDebitNote = false;
+    this.isVerifyDebitNote = false;
     this.isViewDebitNote = false;
     if (this.addDebitComponent) {
       this.addDebitComponent.resetDebitNoteForm();
