@@ -206,6 +206,7 @@
                     "
                   >
                     <dx-check-box
+                      *ngIf="canApprove"
                       [(value)]="isApproved"
                       text="Approve"
                       [readOnly]="isReadOnlyMode"
@@ -222,9 +223,7 @@
 
                       <dx-button
                         *ngIf="!isReadOnlyMode"
-                        [text]="
-                          isApproved ? 'Approve' : isEditing ? 'Update' : 'Save'
-                        "
+                        [text]="getButtonText()"
                         type="default"
                         stylingMode="contained"
                         [disabled]="isReadOnlyMode"

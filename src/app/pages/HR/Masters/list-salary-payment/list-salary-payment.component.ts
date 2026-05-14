@@ -124,6 +124,8 @@ export class ListSalaryPaymentComponent {
   salaryPaymentList: any;
   sessionData: any;
   selectedCompanyId: any;
+  StatusType: string;
+  canVerify: any;
 
   constructor(
     private dataService: DataService,
@@ -149,6 +151,7 @@ export class ListSalaryPaymentComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify
     }
     this.sessionData_tax();
     this.selectedDateRange = 'today';
@@ -246,8 +249,8 @@ export class ListSalaryPaymentComponent {
   onEditOrViewSalaryPayment(e: any) {
     e.cancel = true;
     const miscId = e.data.TRANS_ID;
-
     const status = e.data.TRANS_STATUS;
+    this.StatusType = 'Editscreen'
     this.dataService.selectSalaryPayment(miscId).subscribe({
       next: (response: any) => {
         this.selectedSalaryData = response.Data;
@@ -339,8 +342,13 @@ export class ListSalaryPaymentComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -532,6 +540,23 @@ export class ListSalaryPaymentComponent {
     this.customEndDate = e.end;
 
     this.getSalaryPaymentList(); // your existing function
+  }
+
+  onverifyClick(e: any) {
+    const miscId = e.row.data.TRANS_ID;
+    this.StatusType = 'verifyscreen'
+
+    const status = e.data.TRANS_STATUS;
+    this.dataService.selectSalaryPayment(miscId).subscribe({
+      next: (response: any) => {
+        this.selectedSalaryData = response.Data;
+        this.editSalaryPopup = true;
+        this.isReadOnlyPayment = status === 5;
+      },
+      error: (err) => {
+        console.error('Failed to fetch salary revision:', err);
+      },
+    });
   }
 }
 

@@ -357,14 +357,14 @@ import { SupplierFinListModule } from './components/HR/Masters/Supplier/supplier
 import { SupplierFinFormModule } from './components/HR/Masters/Supplier/supplier-fin-form/supplier-fin-form.component';
 import { SupplierFinEditModule } from './components/HR/Masters/Supplier/supplier-fin-edit/supplier-fin-edit.component';
 import { PayrollViewReportModule } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
-import { InvoiceRetailModule } from './pages/Operations/invoice-retail/invoice-retail.component';
+import { InvoiceRetailModule } from './pages/OPERATIONS/invoice-retail/invoice-retail.component';
 import { AddInvoiceRetailModule } from './pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
 import { EditItemStorePropertyModule } from './pop-up/operations/edit-item-store-property/edit-item-store-property.component';
-import { MiscPurchaseInvoiceModule } from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
-import { MiscPurchInvoiceFormModule } from './pages/Operations/misc-purch-invoice-form/misc-purch-invoice-form.component';
+import { MiscPurchaseInvoiceModule } from './pages/OPERATIONS/misc-purchase-invoice/misc-purchase-invoice.component';
+import { MiscPurchInvoiceFormModule } from './pages/OPERATIONS/misc-purch-invoice-form/misc-purch-invoice-form.component';
 import { EditPromotionModule } from './pages/edit-promotion/edit-promotion.component';
-import { MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
-import { MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
+import { MiscellaneousSalesInvoiceModule } from './pages/OPERATIONS/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
+import { MiscellaneousSalesInvoiceFormModule } from './pages/OPERATIONS/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
 import { StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
 import { SalesSummaryModule } from './pages/REPORT/sales-summary/sales-summary.component';
 import { SalesDetailModule } from './pages/REPORT/sales-detail/sales-detail.component';
@@ -377,7 +377,7 @@ import { ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-pr
 import { TenderModule } from './pages/REPORT/tender/tender.component';
 import { TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
 import { ZReportModule } from './pages/REPORT/zreport/zreport.component';
-import { SalesInvoiceRetailModule } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
+import { SalesInvoiceRetailModule } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
 import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 @NgModule({

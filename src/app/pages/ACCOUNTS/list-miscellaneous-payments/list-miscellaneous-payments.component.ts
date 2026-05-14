@@ -624,8 +624,7 @@ export class ListMiscellaneousPaymentsComponent {
    // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
     console.log(e,'event--------------')
-    this.editMiscPopupOpened = false
-    this.verifyMiscPopupOpened = true;
+    
     e.cancel = true;
   const transStatus = e.row.data.TRANS_STATUS;
   this.statusFinder = e.row.data.TRANS_STATUS;
@@ -633,16 +632,18 @@ export class ListMiscellaneousPaymentsComponent {
     console.log(id, '===================id');
     this.dataService.selectMiscPayment(id).subscribe((res: any) => {
       console.log(res);
-      this.selectedmiscellaneousData = res;
+      this.selectedmiscellaneousData = {...res};
       console.log(this.selectedmiscellaneousData, '==============select data====verify');
       // this.get_employes_details_value_select();
       this.isReadOnlyPayment = transStatus === 'Approve';
+      this.editMiscPopupOpened = false
+    this.verifyMiscPopupOpened = true;
     });
   }
 
    // ============================Approve Popup function=========================================
   onApproveClick(e: any): void {
-    this.verifyMiscPopupOpened = true;
+   
     e.cancel = true;
     const transStatus = e.row.data.TRANS_STATUS;
     this.statusFinder = e.row.data.TRANS_STATUS;
@@ -650,15 +651,16 @@ export class ListMiscellaneousPaymentsComponent {
     console.log(id, '===================id');
     this.dataService.selectMiscPayment(id).subscribe((res: any) => {
       console.log(res);
-      this.selectedmiscellaneousData = res;
+      this.selectedmiscellaneousData = {...res};
       console.log(this.selectedmiscellaneousData, '==============select data====verify');
       // this.get_employes_details_value_select();
       this.isReadOnlyPayment = transStatus === 'Approve';
+       this.verifyMiscPopupOpened = true;
     });
   }
 
   onEditOrViewMiscPayment(e: any) {
-    this.editMiscPopupOpened = true;
+   
     e.cancel = true;
     const miscId = e.data.TRANS_ID;
 
@@ -667,10 +669,11 @@ export class ListMiscellaneousPaymentsComponent {
     this.selectedMiscPayment = miscId;
     this.dataService.selectMiscPayment(miscId).subscribe({
       next: (response: any) => {
-        this.selectedmiscellaneousData = response;
+        this.selectedmiscellaneousData = {...response};
 
         
         this.isReadOnlyPayment = status === 5;
+         this.editMiscPopupOpened = true;
       },
       error: (err) => {
         console.error('Failed to fetch salary revision:', err);

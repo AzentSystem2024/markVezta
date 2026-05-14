@@ -157,7 +157,7 @@ export class PromotionLogComponent {
     },
     {
       hint: 'Verify',
-      icon: 'check',
+      template: 'verifyTemplate',
       text: 'Verify',
       onClick: (e: any) => this.onVerifyClick(e),
       visible: (e: any) => {
@@ -168,7 +168,7 @@ export class PromotionLogComponent {
     },
     {
       hint: 'Approve',
-      icon: 'check',
+      template: 'ApproveTemplate',
       text: 'Approve',
       onClick: (e: any) => this.onApproveClick(e),
       visible: (e: any) => {
@@ -181,9 +181,8 @@ export class PromotionLogComponent {
     },
     {
       hint: 'View',
-      icon: 'check',
+      template: 'ViewTemplate',
       text: 'View',
-      onClick: (e: any) => this.onViewClick(e),
       visible: (e: any) =>
         this.canView &&
         (
@@ -193,6 +192,41 @@ export class PromotionLogComponent {
 
     },
   ];
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+    {
+      text: 'Verified',
+      value: 'Verified',
+    },
+  ];
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.Status;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -374,23 +408,29 @@ export class PromotionLogComponent {
   }
 
   onVerifyClick(e: any) {
+    if (e.row.data.Status == 'Approved') {
+      this.onViewClick(e.row.data.ID)
+    }
+    else {
 
-    e.cancel = true;
-    const selectedId = e.row.data.ID;
-    console.log('Edit row triggered for ID:', selectedId, e);
-    const status = e.row.data.Status
-    this.StatusType = 'VerifyScreen'
 
-    console.log(this.StatusType, '=============StatusType----------------')
-    this.dataservice
-      .selectPromotionWorksheet(selectedId)
-      .subscribe((response: any) => {
-        this.selectedPromotion = response;
-        console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
-        this.editPackPopupOpened = true;
-        this.cdr.detectChanges();
+      e.cancel = true;
+      const selectedId = e.row.data.ID;
+      console.log('Edit row triggered for ID:', selectedId, e);
+      const status = e.row.data.Status
+      this.StatusType = 'VerifyScreen'
 
-      })
+      console.log(this.StatusType, '=============StatusType----------------')
+      this.dataservice
+        .selectPromotionWorksheet(selectedId)
+        .subscribe((response: any) => {
+          this.selectedPromotion = response;
+          console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');
+          this.editPackPopupOpened = true;
+          this.cdr.detectChanges();
+
+        })
+    }
   }
 
   verifyWorksheetById(worksheetId: number, e: any) {
@@ -497,16 +537,12 @@ export class PromotionLogComponent {
           ? 'flag-green'
           : '';
   }
-  onViewClick(e: any) {
-    e.cancel = true;
-    const selectedId = e.row.data.ID;
-    console.log('Edit row triggered for ID:', selectedId, e);
-    const status = e.row.data.Status
+  onViewClick(id: any) {
+    console.log('Edit row triggered for ID:', id);
     this.StatusType = 'viewScreen'
 
-    console.log(status, '=============ststus----------------')
     this.dataservice
-      .selectPromotionWorksheet(selectedId)
+      .selectPromotionWorksheet(id)
       .subscribe((response: any) => {
         this.selectedPromotion = response;
         console.log(this.selectedPromotion, 'SELECTEDPROMOTION-verify');

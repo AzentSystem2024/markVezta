@@ -184,7 +184,7 @@
             >
             </dx-button>
             <dx-button
-              [text]="approveValue ? 'Update & Commit' : 'Update'"
+              [text]="getButtonText()"
               (onClick)="UpdateStockAdjustment()"
               stylingMode="contained"
               [visible]="!readOnlyTrue"

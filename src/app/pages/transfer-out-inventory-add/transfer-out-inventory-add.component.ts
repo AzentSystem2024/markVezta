@@ -60,6 +60,8 @@ import autoTable from 'jspdf-autotable';
 export class TransferOutInventoryAddComponent {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
+  @Input() selectedDocStatus: any;
+
   @Input() isReadOnlyMode: boolean = false;
   @Input() ActionStatus: any = {};
 
@@ -599,7 +601,8 @@ export class TransferOutInventoryAddComponent {
 
     // ---------- EDIT MODE ----------
     if (this.isEditing) {
-      if (this.ActionStatus === 'ApprovalScreen') {
+      console.log(this.selectedDocStatus, '==========')
+      if (this.selectedDocStatus == 'VERIFY' || this.isApproved) {
         // APPROVE API
         confirm(
           'Are you sure you want to approve this transfer?',
@@ -629,7 +632,7 @@ export class TransferOutInventoryAddComponent {
           }
         });
       }
-      else if (this.ActionStatus == 'VerifyScreen') {
+      else if (this.selectedDocStatus == 'OPEN' && this.ActionStatus == 'verifyscreen') {
         this.dataService.verifyTransferOutForInventory
           (payload).subscribe({
             next: (res: any) => {
@@ -644,7 +647,7 @@ export class TransferOutInventoryAddComponent {
               notify('Something went wrong while Verify.', 'error', 3000);
             },
           });
-        
+
       }
       else {
         // UPDATE API

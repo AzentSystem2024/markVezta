@@ -46,6 +46,7 @@
     display: inherit;
   }
 }
+
 .flag-white {
   color: white; /* or rgb(245, 240, 240) */
   text-shadow:
@@ -57,4 +58,13 @@
 }
 .flag-green {
   color: green !important;
+}
+::ng-deep .dx-command-edit {
+  white-space: nowrap !important;
+}
+
+::ng-deep .dx-command-edit .dx-link {
+  margin-right: 10px;
+  display: inline-flex !important;
+  align-items: center;
 }

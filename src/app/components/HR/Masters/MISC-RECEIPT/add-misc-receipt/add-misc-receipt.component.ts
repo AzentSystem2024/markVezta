@@ -984,73 +984,78 @@ export class AddMiscReceiptComponent {
 
     console.log(this.status);
 
-let apiCall;
+const executeApiCall = (apiCall: any, successMessage: string) => {
+  this.isSaving = true;
 
-if (
-  this.status === 'Open' &&
-  this.verifypopup === true
-) {
-  apiCall = this.dataService.verifyMiscReceipt(payload);
+  apiCall.subscribe({
+    next: (res: any) => {
+      this.isSaving = false;
 
-} else if (
-  this.status === 'Verify'
-) {
-  apiCall = this.dataService.approveMiscReceipt(payload);
+      notify(
+        {
+          message: successMessage,
+          position: {
+            at: 'top right',
+            my: 'top right',
+          },
+        },
+        'success',
+        3000,
+      );
+
+      this.popupClosed?.emit();
+    },
+
+    error: (err) => {
+      this.isSaving = false;
+
+      console.error('Operation failed', err);
+
+      notify('Operation failed', 'error', 3000);
+    },
+  });
+};
+
+if (this.status === 'Open' && this.verifypopup === true) {
+  const result = confirm(
+    'Are you sure you want to verify this Miscellaneous Payment?',
+    'Confirm Verification'
+  );
+
+  result.then((dialogResult) => {
+    if (dialogResult) {
+      this.ngZone.run(() => {
+        executeApiCall(
+          this.dataService.verifyMiscReceipt(payload),
+          'Miscellaneous Receipt verified successfully'
+        );
+      });
+    }
+  });
+
+} else if (this.status === 'Verify') {
+  const result = confirm(
+    'Are you sure you want to approve this Miscellaneous Payment?',
+    'Confirm Approval'
+  );
+
+  result.then((dialogResult) => {
+    if (dialogResult) {
+      this.ngZone.run(() => {
+        executeApiCall(
+          this.dataService.approveMiscReceipt(payload),
+          'Miscellaneous Receipt approved successfully'
+        );
+      });
+    }
+  });
 
 } else {
-  apiCall = this.dataService.updateMiscReceipt(payload);
+  executeApiCall(
+    this.dataService.updateMiscReceipt(payload),
+    'Miscellaneous Receipt updated successfully'
+  );
 }
-
-this.isSaving = true;
-
-apiCall.subscribe({
-  next: (res: any) => {
-    this.isSaving = false;
-
-    let message = '';
-
-    if (
-      this.status === 'Open' &&
-      this.verifypopup === true
-    ) {
-      message = 'Miscellaneous Receipt verified successfully';
-
-    } else if (
-      this.status === 'Verify'
-    ) {
-      message = 'Miscellaneous Receipt approved successfully';
-
-    } else {
-      message = 'Miscellaneous Receipt updated successfully';
-    }
-
-    notify(
-      {
-        message,
-        position: {
-          at: 'top right',
-          my: 'top right',
-        },
-      },
-      'success',
-      3000,
-    );
-
-    this.popupClosed?.emit();
-  },
-
-  error: (err) => {
-    this.isSaving = false;
-
-    console.error('Operation failed', err);
-
-    notify(
-      'Operation failed',
-      'error',
-      3000,
-    );
-  },
-});
 
     // apiCall.subscribe((res: any) => {
     //   if (res.flag === 1) {

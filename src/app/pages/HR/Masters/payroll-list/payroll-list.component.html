@@ -35,6 +35,7 @@
       (onSelectionChanged)="onSelectionChanged($event)"
       (onCellPrepared)="onCellPrepared($event)"
       (onEditorPreparing)="onEditorPreparing($event)"
+      [selectedRowKeys]="selectedRowKeys"
     >
       <dxo-editing
         mode="popup"
@@ -166,6 +167,12 @@
           widget="dxButton"
           [options]="approveButtonOptions"
         ></dxi-item> -->
+        <dxi-item
+          *ngIf="canVerify"
+          location="after"
+          widget="dxButton"
+          [options]="VerifyButtonOptions"
+        ></dxi-item>
         <dxi-item
           *ngIf="canApprove"
           location="after"
