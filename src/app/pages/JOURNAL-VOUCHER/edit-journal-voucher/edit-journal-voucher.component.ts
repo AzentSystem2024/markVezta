@@ -115,7 +115,7 @@ export class EditJournalVoucherComponent {
   ) {}
 
   ngOnInit() {
-    console.log(this.isVerifyMode, 'ISVERIFYMODEEEEEEEEEEEEEEE');
+    console.log(this.isApproveMode, 'ISVERIFYMODEEEEEEEEEEEEEEE');
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(

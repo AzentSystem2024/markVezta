@@ -306,17 +306,12 @@
   [(visible)]="isApproveJV"
   [width]="'95vw'"
   [height]="'100vh'"
-  [title]="
-    selectedJournalVoucher?.TRANS_STATUS === 2
-      ? 'Approve Invoice'
-      : 'Verify Invoice'
-  "
+  title="Approve Journal Voucher"
   (popupClosed)="handleClose()"
 >
   <app-edit-journal-voucher
     [isEditing]="true"
     [journalVoucherFormData]="selectedJournalVoucher"
-    [isVerifyMode]="selectedJournalVoucher?.TRANS_STATUS !== 2"
     [isApproveMode]="selectedJournalVoucher?.TRANS_STATUS === 2"
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
