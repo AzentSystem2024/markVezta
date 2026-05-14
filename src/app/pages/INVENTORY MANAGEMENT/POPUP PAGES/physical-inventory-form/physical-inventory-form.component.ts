@@ -62,6 +62,8 @@ export class PhysicalInventoryFormComponent {
   supplierTagBox!: DxTagBoxComponent;
   @ViewChild('departmentTagBox', { static: false })
   departmentTagBox!: DxTagBoxComponent;
+  @Input() status: any
+
   @ViewChild('brandTagBox', { static: false })
   brandTagBox!: DxTagBoxComponent;
   @ViewChild('categoryTagBox', { static: false })
@@ -145,6 +147,7 @@ export class PhysicalInventoryFormComponent {
   category: any;
 
   history: any;
+  selectedStatus: any;
 
   constructor(
     private dataService: DataService,
@@ -391,6 +394,7 @@ export class PhysicalInventoryFormComponent {
     // 🔹 Check if edit mode is active and data is passed in
     if (this.isEditing && this.EditingResponseData) {
       console.log('Edit Mode Active:', this.EditingResponseData);
+      this.selectedStatus = this.EditingResponseData.STATUS
 
       const editData = this.EditingResponseData;
       console.log('Raw edit data:', editData.STORE_ID);
@@ -735,45 +739,120 @@ export class PhysicalInventoryFormComponent {
       payload.ID = this.inventoryFormData.ID;
     }
     // 🔄 API call to save inventory
+    // const proceedWithSave = () => {
+    //   const apiCall = (this.isEditing ||this.seletedStatus==2)
+    //     ? this.isApproved
+    //       ? this.dataService.approvePhysicalInventory(payload) // ✅ Approve API
+    //       : this.dataService.updatePhysicalInventory(payload) // ✅ Update API
+    //     : this.dataService.savePhysicalInventory(payload); // ✅ Insert API
+
+    //   apiCall.subscribe({
+    //     next: (response: any) => {
+    //       if (response.Flag === '1') {
+    //         const message =
+    //           response.Message ||
+    //           (this.isApproved
+    //             ? 'Inventory approved successfully!'
+    //             : this.isEditing
+    //               ? 'Inventory updated successfully!'
+    //               : 'Inventory saved successfully!');
+
+    //         notify(message, 'success', 2000);
+
+    //         // Emit popup close or navigate
+    //         this.popupClosed?.emit?.();
+    //         this.getVoucherNo();
+    //         // if (!this.isEditing && !this.isApproved) {
+    //         // ✅ call your voucher number API
+    //         // }
+    //       } else {
+    //         notify(
+    //           response.Message || 'Failed to save inventory',
+    //           'error',
+    //           2000,
+    //         );
+    //       }
+    //     },
+    //     error: (err) => {
+    //       console.error('Error saving inventory:', err);
+    //       notify('An error occurred while saving inventory.', 'error', 3000);
+    //     },
+    //   });
+    // };
     const proceedWithSave = () => {
-      const apiCall = this.isEditing
-        ? this.isApproved
-          ? this.dataService.approvePhysicalInventory(payload) // ✅ Approve API
-          : this.dataService.updatePhysicalInventory(payload) // ✅ Update API
-        : this.dataService.savePhysicalInventory(payload); // ✅ Insert API
+
+      let apiCall;
+      let successMessage = '';
+
+      // ================= SAVE =================
+      if (!this.isEditing) {
+
+        apiCall = this.dataService.savePhysicalInventory(payload);
+        successMessage = 'Inventory saved successfully!';
+
+      }
+
+      // ================= APPROVE =================
+      else if (this.selectedStatus == 2 || this.isApproved) {
+
+        apiCall = this.dataService.approvePhysicalInventory(payload);
+        successMessage = 'Inventory approved successfully!';
+
+      }
+
+      // ================= VERIFY =================
+      else if (this.status === 'verifyscreen') {
+
+        apiCall = this.dataService.VerifyPhysicalInventory(payload);
+        successMessage = 'Inventory verified successfully!';
+
+      }
+
+      // ================= UPDATE =================
+      else {
+
+        apiCall = this.dataService.updatePhysicalInventory(payload);
+        successMessage = 'Inventory updated successfully!';
+
+      }
 
       apiCall.subscribe({
+
         next: (response: any) => {
+
           if (response.Flag === '1') {
-            const message =
-              response.Message ||
-              (this.isApproved
-                ? 'Inventory approved successfully!'
-                : this.isEditing
-                  ? 'Inventory updated successfully!'
-                  : 'Inventory saved successfully!');
 
-            notify(message, 'success', 2000);
+            notify(successMessage, 'success', 2000);
 
-            // Emit popup close or navigate
             this.popupClosed?.emit?.();
             this.getVoucherNo();
-            // if (!this.isEditing && !this.isApproved) {
-            // ✅ call your voucher number API
-            // }
+
           } else {
+
             notify(
-              response.Message || 'Failed to save inventory',
+              response.Message || 'Operation failed',
               'error',
-              2000,
+              2000
             );
+
           }
+
         },
+
         error: (err) => {
-          console.error('Error saving inventory:', err);
-          notify('An error occurred while saving inventory.', 'error', 3000);
+
+          console.error('Error:', err);
+
+          notify(
+            'An error occurred while processing inventory.',
+            'error',
+            3000
+          );
+
         },
+
       });
+
     };
 
     // 5️⃣ Ask for confirmation before approving
@@ -828,6 +907,23 @@ export class PhysicalInventoryFormComponent {
         console.error('Error fetching voucher number:', err);
       },
     });
+  }
+  getButtonText(): string {
+    if (this.status == 'Editscreen') {
+      return 'Update';
+    } else if (this.status == 'verifyscreen') {
+      console.log(this.status, this.selectedStatus)
+      if (this.selectedStatus == 1) {
+        return 'Verify';
+
+      } else {
+        return 'Approve';
+
+      }
+    }
+    else {
+      return 'Approsve';
+    }
   }
 
 }

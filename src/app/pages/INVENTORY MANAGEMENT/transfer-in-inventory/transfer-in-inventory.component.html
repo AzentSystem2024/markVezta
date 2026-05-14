@@ -153,7 +153,7 @@
       ></dxi-column>
       <dxi-column
         caption="Status"
-        dataField="TRANS_STATUS"
+        dataField="STATUS"
         [width]="80"
         [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
@@ -164,12 +164,110 @@
       >
       </dxi-column>
 
-      <dxi-column
+      <!-- <dxi-column
         caption="Actions"
         type="buttons"
         [width]="200"
         [buttons]="allButtons"
-      ></dxi-column>
+      ></dxi-column> -->
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.STATUS === 'VERIFY' ||
+            cellData.data.STATUS === 'APPROVED'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.STATUS === 'VERIFY' ||
+            cellData.data.STATUS === 'APPROVED'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditTransferIn({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.STATUS === 'VERIFY' ||
+            cellData.data.STATUS === 'APPROVED'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.STATUS === 'VERIFY' ||
+            cellData.data.STATUS === 'APPROVED'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="onDeleteTrIn({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="canVerify"
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.STATUS === 'APPROVED'
+              ? 'Approved'
+              : cellData.data.STATUS === 'VERIFY'
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifyClick({ row: { data: cellData.data } })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.STATUS === 'APPROVED'
+                ? '#10B981'
+                : cellData.data.STATUS === 'VERIFY'
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
     </dx-data-grid>
   </div>
 </div>
@@ -181,43 +279,6 @@
   (applyDates)="onCustomDateApplied($event)"
 >
 </app-custom-date-popup>
-
-<!-- <dx-popup
-  [(visible)]="showCustomDatePopup"
-  [showTitle]="true"
-  title="Select Dates"
-  [width]="350"
-  [height]="170"
-  [dragEnabled]="false"
->
-  <div>
-    <div class="date-range-container">
-      <dx-date-box
-        [(value)]="customStartDate"
-        type="date"
-        width="300"
-        placeholder="From Date"
-      >
-      </dx-date-box>
-
-      <dx-date-box
-        [(value)]="customEndDate"
-        type="date"
-        placeholder="To Date"
-        width="300"
-      >
-      </dx-date-box>
-    </div>
-
-    <div class="button-container">
-      <dx-button
-        text="Apply"
-        type="default"
-        (onClick)="applyCustomDateFilter()"
-      ></dx-button>
-    </div>
-  </div>
-</dx-popup> -->
 
 <dx-popup
   [(visible)]="isAddTransferIn"
@@ -247,6 +308,8 @@
       [isReadOnlyMode]="isReadOnlyTrIn"
       [ActionStatus]="StatusType"
       (popupClosed)="handleClose()"
+      [status]="StatusType"
+      [selectedDocStatus]="selected_Data_Status"
     ></app-transfer-in-inventory-form>
   </ng-container>
 </dx-popup>

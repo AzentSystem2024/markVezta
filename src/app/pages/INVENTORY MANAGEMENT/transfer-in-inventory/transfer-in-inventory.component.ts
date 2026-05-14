@@ -197,6 +197,7 @@ export class TransferInInventoryComponent {
 
     },
   ];
+  selected_Data_Status: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -271,14 +272,34 @@ export class TransferInInventoryComponent {
       });
   }
 
+  // statusCellRender(cellElement: any, cellInfo: any) {
+  //   const status = cellInfo.data.STATUS;
+
+  //   const icon = document.createElement('i');
+  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
+  //   icon.style.fontSize = '18px';
+  //   icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
+  //   icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
+
+  //   icon.style.display = 'flex';
+  //   icon.style.justifyContent = 'center';
+  //   icon.style.alignItems = 'center';
+
+  //   cellElement.appendChild(icon);
+  // }
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
+    icon.style.color =
+      status === 'APPROVED'
+        ? '#10B981' // Approved
+        : status === 'VERIFY'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'APPROVED' ? 'Approved' : status === 'VERIFY' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -366,7 +387,7 @@ export class TransferInInventoryComponent {
       return d >= startDate && d <= endDate;
     });
 
-    // ✅ ALWAYS apply store after date
+    //     ALWAYS apply store after date
     this.applyStoreFilter();
   }
   applyStoreFilter() {
@@ -529,8 +550,11 @@ export class TransferInInventoryComponent {
 
   onEditTransferIn(event: any) {
     event.cancel = true;
-    const trInId = event.row.data.TRANS_ID;
-    const status = event.row.data.STATUS;
+    console.log(event, '==================event=====================')
+    const trInId = event.data.TRANS_ID;
+    this.selected_Data_Status = event.data.STATUS;
+    this.StatusType = 'Editscreen'
+
     this.dataService
       .selectTransferInForInventory(trInId)
       .subscribe((response: any) => {
@@ -607,11 +631,11 @@ export class TransferInInventoryComponent {
   //===========filter data based on store id in transfer in list=================
   onStoreChanged(e: any) {
     console.log('Selected store IDs:', this.selectedStoreid);
-    this.applyStoreFilter(); // ✅ ONLY store filter
+    this.applyStoreFilter(); //     ONLY store filter
   }
   onViewClick(e: any) {
     const trInId = e.row.data.TRANS_ID;
-    const status = e.row.data.STATUS;
+    this.selected_Data_Status = e.row.data.STATUS;
     this.dataService
       .selectTransferInForInventory(trInId)
       .subscribe((response: any) => {
@@ -624,7 +648,9 @@ export class TransferInInventoryComponent {
   }
   onVerifyClick(e: any) {
     const trInId = e.row.data.TRANS_ID;
-    const status = e.row.data.STATUS;
+    this.StatusType = 'verifyscreen'
+    this.isReadOnlyTrIn = e.row.data.STATUS == 'APPROVED'
+    this.selected_Data_Status = e.row.data.STATUS;
     this.dataService
       .selectTransferInForInventory(trInId)
       .subscribe((response: any) => {

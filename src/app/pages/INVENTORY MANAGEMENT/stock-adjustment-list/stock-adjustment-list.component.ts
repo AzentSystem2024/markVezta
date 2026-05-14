@@ -100,10 +100,11 @@ export class StockAdjustmentListComponent {
   isAddStock_adj: boolean = false;
   Stock_adjustment_list: any;
   selected_Data: any;
-  is_Edit_popup: boolean;
+  is_Edit_popup: boolean = false;
   selectedTrOut: any;
   isReadOnlyMode: boolean = false;
-
+  canVerify: boolean = false
+  StatusType: any
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'Last 7 Days', value: 'last7' },
@@ -167,6 +168,8 @@ export class StockAdjustmentListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
+
     }
     this.sessionData_tax();
     this.get_stock_adjustment_list();
@@ -318,7 +321,7 @@ export class StockAdjustmentListComponent {
 
       let dateFilteredData: any[];
 
-      // ✅ Step 1: Date filter
+      //    Step 1: Date filter
       if (this.selectedDateRange === 'all') {
         dateFilteredData = allData;
       } else {
@@ -332,12 +335,12 @@ export class StockAdjustmentListComponent {
         });
       }
 
-      // ✅ Step 2: Store filter
+      //    Step 2: Store filter
       if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
         this.filteredStockList = dateFilteredData;
       } else {
         this.filteredStockList = dateFilteredData.filter((item: any) =>
-          this.selectedStoreid.includes(Number(item.STORE_ID)) // ✅ IMPORTANT
+          this.selectedStoreid.includes(Number(item.STORE_ID)) //    IMPORTANT
         );
       }
     });
@@ -349,14 +352,35 @@ export class StockAdjustmentListComponent {
     return `${month}/${day}/${year}`;
   }
 
+  // statusCellRender(cellElement: any, cellInfo: any) {
+  //   const status = cellInfo.data.TRANS_STATUS;
+
+  //   const icon = document.createElement('i');
+  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
+  //   icon.style.fontSize = '18px';
+  //   icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+  //   icon.title = status === 5 ? 'APPROVED' : 'OPEN';
+
+  //   icon.style.display = 'flex';
+  //   icon.style.justifyContent = 'center';
+  //   icon.style.alignItems = 'center';
+
+  //   cellElement.appendChild(icon);
+  // }
+
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'APPROVED' : 'OPEN';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -364,6 +388,8 @@ export class StockAdjustmentListComponent {
 
     cellElement.appendChild(icon);
   }
+
+
 
   delete_Data(e: any) {
     const id = e.data.ID;
@@ -408,8 +434,10 @@ export class StockAdjustmentListComponent {
     event.cancel = true;
     this.is_Edit_popup = true;
     const id = event.data.ID;
+    this.StatusType = 'Editscreen'
     this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
       this.selected_Data = res.Data;
+
     });
   }
 
@@ -494,12 +522,12 @@ export class StockAdjustmentListComponent {
     this.is_Edit_popup = false;
     this.get_stock_adjustment_list();
   }
-  
+
   onStoreChanged(e: any) {
 
     console.log('Selected store IDs:', this.selectedStoreid);
 
-    this.get_stock_adjustment_list(); // ✅ re-fetch + apply both filters
+    this.get_stock_adjustment_list(); //    re-fetch + apply both filters
   }
   store_dropdown() {
     const payload = {
@@ -508,6 +536,29 @@ export class StockAdjustmentListComponent {
     }
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
+    });
+  }
+  onVerifyClick(e: any) {
+    console.log(e, '----event----')
+    this.is_Edit_popup = true;
+    const id = e.row.data.ID;
+    this.StatusType = 'verifyscreen'
+    this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
+      this.selected_Data = res.Data;
+
+    });
+
+
+
+  }
+  onverifyClick(e: any) {
+    console.log(e, '----event----')
+    this.is_Edit_popup = true;
+    const id = e.row.data.ID;
+    this.StatusType = 'verifyscreen'
+    this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
+      this.selected_Data = res.Data;
+
     });
   }
 }

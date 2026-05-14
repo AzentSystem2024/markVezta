@@ -60,6 +60,10 @@ import autoTable from 'jspdf-autotable';
 })
 export class TransferInInventoryFormComponent {
   @Input() isEditing: boolean = false;
+  @Input() status: any
+
+  @Input() selectedDocStatus: any
+
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
@@ -171,6 +175,8 @@ export class TransferInInventoryFormComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
     const data = this.EditingResponseData;
+    console.log(this.selectedDocStatus, '=================selectedDocStatus=================')
+    console.log(this.status, '========================statsu type=======================')
 
     this.transferInFormData = {
       TRANS_ID: data.TRANS_ID,
@@ -519,7 +525,7 @@ export class TransferInInventoryFormComponent {
 
     // ---------- EDIT MODE ----------
     if (this.isEditing) {
-      if (this.transferInFormData.IS_APPROVED) {
+      if (this.selectedDocStatus == 'VERIFY') {
         // APPROVE API
         confirm(
           'Are you sure you want to approve this transfer?',
@@ -546,8 +552,27 @@ export class TransferInInventoryFormComponent {
             });
           }
         });
-      } else {
+      } else if (this.selectedDocStatus == 'OPEN' && this.status == 'verifyscreen') {
         // UPDATE API
+        this.dataService.VerifyTransferInForInventory(payload).subscribe({
+          next: (result: any) => {
+            if (result.Flag === 1) {
+              notify('Transfer updated successfully!', 'success', 3000);
+              this.popupClosed.emit();
+            } else {
+              notify(
+                'Error updating transfer: ' + result.message,
+                'error',
+                3000,
+              );
+            }
+          },
+          error: (err) => {
+            console.error('Update error:', err);
+            notify('Something went wrong while updating.', 'error', 3000);
+          },
+        });
+      } else {
         this.dataService.updateTransferInForInventory(payload).subscribe({
           next: (result: any) => {
             if (result.Flag === 1) {

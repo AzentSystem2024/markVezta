@@ -129,7 +129,7 @@ export class TimesheetListComponent {
   // selectedRowKeys: any[] = [];
   timesheetData: any;
   timesheet: any;
-  selectedMonthForAdd: string;
+  selectedMonthForAdd: any;
   calendarVisible = false;
   months = Array.from({ length: 12 }, (_, i) => new Date(2022, i, 1)); // Example for 2022
   monthNames = [
@@ -205,8 +205,8 @@ export class TimesheetListComponent {
     this.CompanyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -371,11 +371,9 @@ export class TimesheetListComponent {
   getStatusFlagClass(status: string): string {
     switch (status) {
       case 'Open':
-        return 'flag-open';
-      case 'Pending':
-        return 'flag-pending'; // White or gray
+        return 'flag-orange';
       case 'Verified':
-        return 'flag-verified'; // Orange
+        return 'flag-verified'; // blue
       case 'Approved':
         return 'flag-approved'; // Green
       default:

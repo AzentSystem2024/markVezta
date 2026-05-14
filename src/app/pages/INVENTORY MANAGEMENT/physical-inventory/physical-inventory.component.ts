@@ -66,6 +66,7 @@ export class PhysicalInventoryComponent {
   canView = false;
   canDelete = false;
   canApprove = false;
+  canVerify = false
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
@@ -127,7 +128,8 @@ export class PhysicalInventoryComponent {
   inventoryList: any;
   isAddInventory: boolean = false;
   selectedInventory: any = false;
-  isEditSalesOrder: boolean = false;;
+  isEditSalesOrder: boolean = false;
+  StatusType: any;
   isReadOnlySalesOrder: boolean = false;;
   isEditInventory: boolean = false;;
   isReadOnlyInventory: boolean = false;;
@@ -166,12 +168,12 @@ export class PhysicalInventoryComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify
     }
     this.getInventoryList();
     this.getDropdownList()
   }
   sessionData_tax() {
-    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     console.log(this.sessionData, '=================session data==========');
     this.selected_vat_id = this.sessionData.VAT_ID;
@@ -249,14 +251,34 @@ export class PhysicalInventoryComponent {
         this.applyDateFilter();
       });
   }
+  // statusCellRender(cellElement: any, cellInfo: any) {
+  //   const status = cellInfo.data.TRANS_STATUS;
+
+  //   const icon = document.createElement('i');
+  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
+  //   icon.style.fontSize = '18px';
+  //   icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+  //   icon.title = status === 5 ? 'APPROVED' : 'OPEN';
+
+  //   icon.style.display = 'flex';
+  //   icon.style.justifyContent = 'center';
+  //   icon.style.alignItems = 'center';
+
+  //   cellElement.appendChild(icon);
+  // }
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'APPROVED' : 'OPEN';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -264,6 +286,7 @@ export class PhysicalInventoryComponent {
 
     cellElement.appendChild(icon);
   }
+
 
   getStatusFilterData = [
     {
@@ -293,62 +316,7 @@ export class PhysicalInventoryComponent {
     }
   }
 
-  // applyDateFilter() {
-  //   if (!this.selectedDateRange || !this.inventoryList) {
-  //     this.filteredInventoryList = this.inventoryList;
-  //     return;
-  //   }
 
-  //   if (this.selectedDateRange === 'all') {
-  //     this.filteredInventoryList = this.inventoryList;
-  //     return;
-  //   }
-
-  //   const today = new Date();
-  //   let startDate: Date;
-  //   let endDate: Date;
-
-  //   switch (this.selectedDateRange) {
-  //     case 'today':
-  //       startDate = new Date(today);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       endDate = new Date(today);
-  //       endDate.setHours(23, 59, 59, 999);
-  //       break;
-  //     case 'last7':
-  //       startDate = new Date(today);
-  //       startDate.setDate(today.getDate() - 6);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       endDate = new Date(today);
-  //       endDate.setHours(23, 59, 59, 999);
-  //       break;
-  //     case 'last15':
-  //       startDate = new Date(today);
-  //       startDate.setDate(today.getDate() - 14);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       endDate = new Date(today);
-  //       endDate.setHours(23, 59, 59, 999);
-  //       break;
-  //     case 'last30':
-  //       startDate = new Date(today);
-  //       startDate.setDate(today.getDate() - 29);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       endDate = new Date(today);
-  //       endDate.setHours(23, 59, 59, 999);
-  //       break;
-  //     default:
-  //       this.filteredInventoryList = this.inventoryList;
-  //       return;
-  //   }
-
-  //   // Filter from the original list, not the previously filtered one
-  //   this.filteredInventoryList = this.inventoryList.filter((item: any) => {
-  //     if (!item.PHYSICAL_DATE) return false;
-
-  //     const invoiceDate = new Date(item.PHYSICAL_DATE); // ensure it's a Date object
-  //     return invoiceDate >= startDate && invoiceDate <= endDate;
-  //   });
-  // }
   applyDateFilter() {
     if (!this.inventoryList) return;
 
@@ -587,6 +555,8 @@ export class PhysicalInventoryComponent {
     event.cancel = true;
     const orderId = event.data.TRANS_ID;
     const status = event.data.TRANS_STATUS;
+    this.StatusType = 'Editscreen'
+
     this.dataService
       .selectPhysicalInventory(orderId)
       .subscribe((response: any) => {
@@ -745,7 +715,22 @@ export class PhysicalInventoryComponent {
 
   }
 
+  onVerifyClick(e: any) {
 
+    e.cancel = true;
+    const orderId = e.row.data.TRANS_ID;
+    const status = e.row.data.TRANS_STATUS;
+    this.StatusType = 'verifyscreen'
+
+    this.dataService
+      .selectPhysicalInventory(orderId)
+      .subscribe((response: any) => {
+        this.selectedInventory = response.Data;
+        console.log(this.selectedInventory, 'SELECTEDTROUT');
+        this.isEditInventory = true;
+        this.isReadOnlyInventory = status === 5;
+      });
+  }
 
 
 }

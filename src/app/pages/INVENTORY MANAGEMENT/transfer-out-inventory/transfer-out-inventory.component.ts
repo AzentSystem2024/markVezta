@@ -104,10 +104,10 @@ export class TransferOutInventoryComponent {
     `;
     },
   };
-  isAddTransferOut: boolean=false;
+  isAddTransferOut: boolean = false;
   transferOutList: any;
   selecteTrOut: any;
-  isEditTransferOut: boolean=false;
+  isEditTransferOut: boolean = false;
   selectedTrOut: any;
   canVerify: boolean = false;
   allButtons = [
@@ -138,7 +138,7 @@ export class TransferOutInventoryComponent {
     },
     {
       hint: 'Verify',
-      icon: 'check',
+      icon: 'material-symbols:verified-outline',
       text: 'Verify',
       onClick: (e: any) => this.onVerifyClick(e),
       visible: (e: any) => {
@@ -147,7 +147,7 @@ export class TransferOutInventoryComponent {
     },
     {
       hint: 'Approve',
-      icon: 'check',
+      icon: 'material-symbols:verified-outline',
       text: 'Approve',
       onClick: (e: any) => this.onApproveClick(e),
       visible: (e: any) => {
@@ -160,7 +160,7 @@ export class TransferOutInventoryComponent {
     },
     {
       hint: 'View',
-      icon: 'check',
+      icon: 'material-symbols:verified-outline',
       text: 'View',
       onClick: (e: any) => this.onViewClick(e),
       visible: (e: any) =>
@@ -193,6 +193,7 @@ export class TransferOutInventoryComponent {
   Store: any[] = [];
   dateFilteredList: any = [];
   StatusType: any;
+  selected_Data_Status: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -270,14 +271,47 @@ export class TransferOutInventoryComponent {
       });
   }
 
+  // statusCellRender(cellElement: any, cellInfo: any) {
+  //   const status = cellInfo.data.STATUS;
+
+  //   const icon = document.createElement('i');
+  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
+  //   icon.style.fontSize = '18px';
+  //   // icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
+  //   // icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
+  //   icon.style.color =
+  //     status === 'APPROVED'
+  //       ? '#10B981'
+  //       : status === 'VERIFY'
+  //         ? '#0073D8'
+  //         : '#FFA500';
+
+  //   icon.title =
+  //     status === 'APPROVED'
+  //       ? 'APPROVED'
+  //       : status === 'VERIFY'
+  //         ? 'VERIFY'
+  //         : 'OPEN';
+
+  //   icon.style.display = 'flex';
+  //   icon.style.justifyContent = 'center';
+  //   icon.style.alignItems = 'center';
+
+  //   cellElement.appendChild(icon);
+  // }
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
+    icon.style.color =
+      status === 'APPROVED'
+        ? '#10B981' // Approved
+        : status === 'VERIFY'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'APPROVED' ? 'Approved' : status === 'VERIFY' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -285,6 +319,7 @@ export class TransferOutInventoryComponent {
 
     cellElement.appendChild(icon);
   }
+
 
   getStatusFilterData = [
     {
@@ -577,7 +612,7 @@ export class TransferOutInventoryComponent {
     console.log('Edit button clicked for row:', event.row.data);
     event.cancel = true;
     const trOutId = event.row.data.TRANS_ID;
-    const status = event.row.data.STATUS;
+    this.selected_Data_Status = event.row.data.STATUS;
     this.isEditTransferOut = true;
     this.StatusType = 'EditScreen'
 
@@ -709,7 +744,7 @@ export class TransferOutInventoryComponent {
     console.log('Edit button clicked for row:', e.row.data);
     e.cancel = true;
     const trOutId = e.row.data.TRANS_ID;
-    const status = e.row.data.STATUS;
+    this.selected_Data_Status = e.row.data.STATUS;
     this.isEditTransferOut = true;
     this.cdr.detectChanges();
     this.StatusType = 'VerifyScreen'

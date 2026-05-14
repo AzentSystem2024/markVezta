@@ -53,7 +53,8 @@ export class PrepaymentPostingListComponent {
   calendarVisible: boolean = false;
   yearSelectorVisible: boolean = false;
   isAddPopupPrepaymentPosting: boolean = false;
-  selectedMonthForAdd: string;
+  selectedMonthForAdd: any;
+  StatusType: any
   prepaymentList: any;
   // editPackPopupOpened:boolean
   years: number[] = [];
@@ -130,6 +131,7 @@ export class PrepaymentPostingListComponent {
   selected_Company_id: any;
   isFilterOpened: boolean;
   companyID: any;
+  canVerify: any;
   constructor(
     private ngZone: NgZone,
     private dataservice: DataService,
@@ -159,10 +161,46 @@ export class PrepaymentPostingListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify
     }
 
     // this.getAccountsGroupList();
   }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.TRANS_STATUS;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+    {
+      text: 'Verified',
+      value: 'Verified',
+    },
+  ];
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
@@ -220,6 +258,8 @@ export class PrepaymentPostingListComponent {
   }
 
   onEditPrePayment(e: any) {
+    this.StatusType = 'Editscreen'
+
     e.cancel = true;
     this.isEditPopupPrepaymentPosting = true;
     this.selected_Data(e);
@@ -244,6 +284,7 @@ export class PrepaymentPostingListComponent {
   }
   onDeletePrepayment(event: any) {
     event.cancel = true;
+    console.log(event, '=============')
 
     if (event.data.TRANS_STATUS === 'Approved') {
       event.cancel = true;
@@ -362,24 +403,6 @@ export class PrepaymentPostingListComponent {
     );
     console.log(this.formatToQuarterEnd(this.selectedMonth));
     this.get_prepayment_posting_list();
-    // this.getTimesheet();
-    //    const payload ={
-    //      CompanyId: this.CompanyID,
-    //      Month: this.selectedMonth.toLocaleDateString('en-US', {
-    //   month: 'long',
-    //   year: 'numeric',
-    // }).replace(/\s/g, ''), // removes the space → "July2025"
-    //   }
-    //   this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-    //     console.log(response, 'Timesheet List Response');
-    //     this.timesheetList = response.data
-    //     // console.log(
-    //     //   this.timesheetList,
-    //     //   'Filtered Timesheet for',
-    //     //   selectedMonthStr
-    //     // );
-    //   });
-    // this.fetchTimesheetList();
   }
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -388,6 +411,20 @@ export class PrepaymentPostingListComponent {
       this.get_prepayment_posting_list();
     }
   }
+  onVerifyClick(e: any) {
+    e.cancel = true;
+    this.StatusType = 'verifyscreen'
+
+    this.isEditPopupPrepaymentPosting = true;
+    const id = e.row.data.TRANS_ID;
+    this.prepaymentpostingId = e.row.data.TRANS_ID;
+    this.selectedprepaymentposting = id;
+    this.dataservice.select_Prepayment_Posting(id).subscribe((Res: any) => {
+      this.selecte_prepayment_Data = Res.Data;
+    });
+  }
+
+
 }
 
 @NgModule({
