@@ -32,6 +32,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import jsPDF from 'jspdf';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-pdc-edit-form',
@@ -41,9 +42,11 @@ import jsPDF from 'jspdf';
 export class PdcEditFormComponent {
   @Output() formClosed = new EventEmitter<void>();
   @Input() selectedPDC: any;
-  @Input() isReadOnly: boolean = false;
+  @Input() isEditReadOnly: boolean = false;
   @Input() PDCid: any;
    @Input() canApprove :boolean = false;
+   @Input() isVerifyMode: boolean = false;
+   @Input() VerifyPDCPopupOpened:boolean = false;
   isPdfPopupVisible: boolean = false;
   pdfSrc: SafeResourceUrl | null = null;
 
@@ -191,10 +194,51 @@ export class PdcEditFormComponent {
       AMOUNT: +this.PDCFormData.AMOUNT || 0,
       REMARKS: this.PDCFormData.REMARKS || '',
       IS_PAYMENT: this.PDCFormData.IS_PAYMENT?.name === 'Issued', // true if Issued
-      ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
+      // ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
+      ENTRY_STATUS: this.isVerifyMode
+  ? 2
+  : this.PDCFormData.ENTRY_STATUS
+    ? 5
+    : 1,
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
+      
     };
 
+    if (this.isVerifyMode === true) {
+    confirm(
+      'Are you sure you want to verify this PDC?',
+      'Confirm Verification'
+    ).then((result) => {
+      if (result) {
+        this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+          if (res.Message === 'Success') {
+            notify('PDC verified successfully', 'success', 2000);
+            this.formClosed.emit();
+          }
+        });
+      }
+    });
+
+    return;
+  }
+
+    if (this.PDCFormData.ENTRY_STATUS === 5 ) {
+    confirm(
+      'Are you sure you want to approve this PDC?',
+      'Confirm Approval'
+    ).then((result) => {
+      if (result) {
+        this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+          if (res.Message === 'Success') {
+            notify('PDC approved successfully', 'success', 2000);
+            this.formClosed.emit();
+          }
+        });
+      }
+    });
+
+    return;
+  }
     this.dataservice.Update_PDC(payload).subscribe((res: any) => {
       if (res.Message === 'Success') {
         notify(

@@ -31,6 +31,7 @@ import { PdcEditFormModule } from '../../../components/HR/Masters/PDC/pdc-edit-f
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { pack } from 'html2canvas/dist/types/css/types/color';
 
 @Component({
   selector: 'app-pdc-list',
@@ -50,6 +51,7 @@ export class PdcListComponent {
   showPageSizeSelector = true;
   addPDCPopupOpened: boolean = false;
   editPDCPopupOpened: boolean = false;
+  VerifyPDCPopupOpened : boolean = false;
   selectedEmployee: any;
   selectedDateRange: any = 'today';
   selectedEntryDateRange: any = 'today';
@@ -64,6 +66,7 @@ export class PdcListComponent {
 
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -115,6 +118,7 @@ export class PdcListComponent {
     { id: 1, name: 'Open' },
     { id: 2, name: 'Approved' },
     { id: 3, name: 'Closed' },
+    { id: 4, name: 'verified' },
   ];
 
   selectedStatus = this.StatusfilterOptions[0].id;
@@ -186,6 +190,7 @@ export class PdcListComponent {
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
+      this.canVerify = packingRights.CanVerify;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
@@ -395,19 +400,21 @@ export class PdcListComponent {
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = (cellInfo.data.ENTRY_STATUS || '').trim();
-
-    // Clean up existing content to avoid duplicates
-    while (cellElement.firstChild) {
-      cellElement.removeChild(cellElement.firstChild);
-    }
+    const status = cellInfo.data.ENTRY_STATUS;
 
     const icon = document.createElement('i');
-    icon.className = 'fas fa-flag';
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-
-    icon.style.color = status === 'Approved' ? 'green' : 'orange';
-    icon.title = status === 'Approved' ? 'Approved' : 'Open';
+    icon.style.color =
+    status === 'Closed'
+      ? '#EF4444' 
+      :status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Closed'
+      ? 'Closed' : status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -606,12 +613,52 @@ export class PdcListComponent {
     },
   ];
 
+   getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
+
+  onVerifyInvoice(e:any){
+    e.cancel = true;
+    const status = e.row.data?.ENTRY_STATUS?.trim();
+     this.isEditReadOnly =
+    status === 'Approved' || status === 'Closed';
+    this.VerifyPDCPopupOpened = true;
+    this.selectedVerify_PDC(e);
+  }
+
   onEditPDC(event: any) {
     event.cancel = true;
     const status = event.data?.ENTRY_STATUS?.trim();
-    this.isEditReadOnly = status === 'Approved';
+     this.isEditReadOnly =
+    status === 'Approved' || status === 'Closed';
     this.editPDCPopupOpened = true;
     this.selected_PDC(event);
+  }
+
+    selectedVerify_PDC(event: any) {
+    const id = event.row.data.ID;
+    this.PDCid = event.row.data.ID;
+    this.selectPDC = id;
+    this.dataservice.Select_PDC(id).subscribe((res: any) => {
+      this.selectedPDC = res.Data[0];
+      //  Trim and compare status to handle trailing spaces
+      const status = (this.selectedPDC.ENTRY_STATUS || '').trim();
+
+      //  Set checkbox based on status
+      this.selectedPDC.ENTRY_STATUS = status === 'Approved';
+
+      this.selectedPDC.BENEFICIARY_TYPE =
+        this.selectedPDC.BENEFICIARY_TYPE?.id ||
+        this.selectedPDC.BENEFICIARY_TYPE ||
+        null;
+    });
   }
 
   selected_PDC(event: any) {
@@ -722,6 +769,7 @@ export class PdcListComponent {
   handleClose() {
     this.addPDCPopupOpened = false;
     this.editPDCPopupOpened = false;
+    this.VerifyPDCPopupOpened = false;
     this.get_PDC_list();
   }
 }
