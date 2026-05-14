@@ -64,6 +64,8 @@ export class SalesOrderFinancePopupFormComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild('popupGridRef', { static: false })
@@ -1478,6 +1480,52 @@ export class SalesOrderFinancePopupFormComponent {
       return; // stop further execution
     }
 
+    // --- Verify Mode ---
+    if (this.isVerifyMode) {
+      const result = confirm(
+        'Are you sure you want to verify this Sales Order?',
+        'Confirm Verify',
+      );
+
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.isSaving = true;
+
+          this.callApi(
+            this.dataService.verifySalesOrder(payload),
+            'Sales Order verified successfully!',
+          );
+        } else {
+          notify('Verification cancelled.', 'info', 1500);
+        }
+      });
+
+      return;
+    }
+
+    // --- Approve Mode ---
+    if (this.isApproveMode) {
+      const result = confirm(
+        'Are you sure you want to approve this Sales Order?',
+        'Confirm Approval',
+      );
+
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.isSaving = true;
+
+          this.callApi(
+            this.dataService.approveSalesOrder(payload),
+            'Sales Order approved successfully!',
+          );
+        } else {
+          notify('Approval cancelled.', 'info', 1500);
+        }
+      });
+
+      return;
+    }
+
     if (this.salesOrderFormData.ID) {
       console.log('SALESORDEREDIT');
       console.log(payload, 'PAYLOAD');
@@ -1532,7 +1580,7 @@ export class SalesOrderFinancePopupFormComponent {
           notify(response.Message || 'Operation failed.', 'error', 2000);
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isSaving = false; // STOP loading
         console.error('API failed:', err);
 

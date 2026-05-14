@@ -386,8 +386,10 @@ export class PurchaseOrderComponent {
     // 🎨 Color logic
     if (['Approved', 'Closed', 'Partial'].includes(status)) {
       icon.style.color = '#5cac6fff';
+    } else if (['Verified'].includes(status)) {
+      icon.style.color = '#0073D8';
     } else {
-      icon.style.color = '#d87f7fff';
+      icon.style.color = '#FFA500';
     }
 
     // 🏷️ Title logic (FIXED)
@@ -548,7 +550,7 @@ export class PurchaseOrderComponent {
 
   onVerifyClick(e: any) {
     const rowData = e.row.data;
-
+    console.log(rowData, 'ROWDATA');
     const id = rowData.ID;
     const status = rowData.STATUS;
 
@@ -1122,9 +1124,7 @@ export class PurchaseOrderComponent {
         }
       });
     } else {
-      const apiCall = this.isVerifyMode
-        ? this.service.verifyPoData(data)
-        : this.service.updatePoData(data);
+      const apiCall = this.service.updatePoData(data);
 
       apiCall
         .pipe(
@@ -1162,60 +1162,206 @@ export class PurchaseOrderComponent {
   }
 
   VerifyPurchaseOrder() {
-    const data = this.poVerifyForm.getNewPoData();
+    const result = confirm(
+      'Are you sure you want to verify this Purchase Order?',
+      'Confirm Verification',
+    );
 
-    this.service.verifyPoData(data).subscribe((res) => {
-      if (res) {
-        notify(
-          {
-            message: 'Data Verified Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success',
+    result.then((dialogResult) => {
+      if (dialogResult) {
+        const data = this.poEditForm.getNewPoData();
+
+        // Combine country code + mobile
+        // convert mobile before API
+        this.poEditForm.preparePoDetailsForSubmit();
+
+        const suppCode = (this.poEditForm.supplierCountryCode || '+91').replace(
+          '+',
+          '',
         );
-        this.CloseEditForm();
-        this.getPurchaseOrderList();
-      } else {
-        notify(
-          {
-            message: 'Your Data Not Verified',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
+
+        const contactCode = (
+          this.poEditForm.shippingCountryCode || '+91'
+        ).replace('+', '');
+
+        // SUPPLIER MOBILE
+        if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
+          data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
+        }
+
+        // CONTACT MOBILE
+        if (data.CONTACT_MOBILE && !data.CONTACT_MOBILE.includes('-')) {
+          data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
+        }
+
+        data.PoDetails = [...this.poEditForm.poData.PoDetails];
+
+        data.PoDetails = data.PoDetails.map((item: any) => ({
+          ...item,
+          PRICE: item.SUPP_PRICE,
+        }));
+
+        const invalidPriceItem = data.PoDetails.find(
+          (item: any) =>
+            item.SUPP_PRICE === null ||
+            item.SUPP_PRICE === undefined ||
+            item.SUPP_PRICE === '' ||
+            Number(item.SUPP_PRICE) <= 0,
         );
+
+        if (invalidPriceItem) {
+          notify(
+            {
+              message: 'Please enter price for all items',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'error',
+          );
+          return;
+        }
+
+        // VERIFY API ONLY
+        this.service.verifyPoData(data).subscribe((res) => {
+          if (res) {
+            notify(
+              {
+                message: 'Purchase Order Verified Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.CloseEditForm();
+            this.getPurchaseOrderList();
+          } else {
+            notify(
+              {
+                message: 'Verification Failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        });
       }
     });
   }
 
   ApprovePurchaseOrder() {
-    const data = this.poApproveForm.getNewPoData();
+    const result = confirm(
+      'Are you sure you want to approve this Purchase Order?',
+      'Confirm Approval',
+    );
 
-    this.service.ApprovePoData(data).subscribe((res) => {
-      if (res) {
-        notify(
-          {
-            message: 'Data Approved Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success',
+    result.then((dialogResult) => {
+      if (dialogResult) {
+        const data = this.poEditForm.getNewPoData();
+
+        // convert mobile before API
+        this.poEditForm.preparePoDetailsForSubmit();
+
+        const suppCode = (this.poEditForm.supplierCountryCode || '+91').replace(
+          '+',
+          '',
         );
-        this.CloseEditForm();
-        this.getPurchaseOrderList();
-      } else {
-        notify(
-          {
-            message: 'Your Data Not Approved',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
+
+        const contactCode = (
+          this.poEditForm.shippingCountryCode || '+91'
+        ).replace('+', '');
+
+        // SUPPLIER MOBILE
+        if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
+          data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
+        }
+
+        // CONTACT MOBILE
+        if (data.CONTACT_MOBILE && !data.CONTACT_MOBILE.includes('-')) {
+          data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
+        }
+
+        // PRICE MAPPING
+        data.PoDetails = [...this.poEditForm.poData.PoDetails];
+        data.PoDetails = data.PoDetails.map((item: any) => ({
+          ...item,
+          PRICE: item.SUPP_PRICE,
+        }));
+
+        this.service.ApprovePoData(data).subscribe((res) => {
+          if (res) {
+            notify(
+              {
+                message: 'Data Approved Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.CloseEditForm();
+            this.getPurchaseOrderList();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not Approved',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        });
       }
     });
   }
 
   deletePOData(event: any) {
-    const ID = event.data.ID;
-    this.service.DeletePoData(ID).subscribe((response: any) => {});
+    if (event.data.STATUS === 5) {
+      event.cancel = true;
+
+      notify('Invoice cannot be deleted.', 'error', 2000);
+
+      return;
+    }
+
+    event.cancel = true;
+
+    confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    ).then((dialogResult: boolean) => {
+      if (dialogResult) {
+        const invoiceId = event.data.ID;
+
+        this.service.DeletePoData(invoiceId).subscribe(
+          (response: any) => {
+            if (response) {
+              notify(
+                {
+                  message: 'Purchase Order Deleted Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+
+              this.getPurchaseOrderList();
+
+              setTimeout(() => {
+                this.dataGrid.instance.refresh();
+              }, 100);
+            } else {
+              notify(
+                {
+                  message: 'Your Data Not deleted',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            console.error('Error deleting invoice:', error);
+          },
+        );
+      }
+    });
   }
 
   CloseEditForm() {

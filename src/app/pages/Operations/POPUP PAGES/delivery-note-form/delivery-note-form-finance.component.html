@@ -26,6 +26,7 @@
           (onRowUpdated)="onRowUpdated($event)"
           (onCellValueChanged)="onCellValueChanged($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
+          (onRowRemoved)="onRowRemoved($event)"
         >
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-toolbar>
@@ -324,6 +325,7 @@
     rowAlternationInterval="2"
     [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
     focusStateEnabled="false"
+    (onRowPrepared)="onPendingSORowPrepared($event)"
   >
     <dxo-editing mode="popup"></dxo-editing>
     <dxo-paging [pageSize]="10"></dxo-paging>

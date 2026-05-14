@@ -142,9 +142,107 @@
         dataField="TRANS_STATUS"
         [cellTemplate]="statusCellRender"
         caption="Status"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false,
+        }"
       ></dxi-column>
 
-      <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column>
+       <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditingStart({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="DeletePrePayment({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="canVerify"
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.TRANS_STATUS === 'Approved'
+              ? 'Approved'
+              : cellData.data.TRANS_STATUS === 'Verified'
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifyInvoice({ row: { data: cellData.data } })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.TRANS_STATUS === 'Approved'
+                ? '#10B981'
+                : cellData.data.TRANS_STATUS === 'Verified'
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
     </dx-data-grid>
 
     <dx-popup
@@ -179,6 +277,26 @@
     [PrepaymentId]="selectprepayment"
   ></app-pre-payment-edit>
 </dx-popup>
+
+<dx-popup
+  [(visible)]="verifyPrePaymentPopupOpened"
+  [width]="'50vw'"
+  [height]="'auto'"
+  title="PrePayment Invoice"
+  (onHiding)="handleClose()"
+>
+  <app-pre-payment-edit
+    [selectedPrePayment]="selectedPrePayment"
+    [isOpen]="verifyPrePaymentPopupOpened"
+    [isReadOnly]="isEditReadOnly"
+    (formClosed)="handleClose()"
+    [canApprove]="canApprove"
+    [PrepaymentId]="selectprepayment"
+    [verifyPrePaymentPopupOpened]="verifyPrePaymentPopupOpened"
+  ></app-pre-payment-edit>
+</dx-popup>
+
+
 
 <app-custom-date-popup
   [(visible)]="showCustomDatePopup"

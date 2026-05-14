@@ -215,16 +215,7 @@
                     caption="UOM"
                     [allowEditing]="false"
                   ></dxi-column>
-                  <dxi-column
-                    dataField="TAX_PERCENT"
-                    [caption]="
-                      selected_vat_id == sessionData.VAT_ID &&
-                      sessionData.VAT_ID == 2
-                        ? ' Tax %'
-                        : ' Tax %'
-                    "
-                    dataType="number"
-                  ></dxi-column>
+
                   <dxi-column
                     dataField="STOCK_QTY"
                     caption="Quantity"
@@ -257,6 +248,16 @@
                     [calculateCellValue]="calculateAmount"
                     dataType="number"
                     [format]="{ type: 'fixedPoint', precision: 2 }"
+                  ></dxi-column>
+                  <dxi-column
+                    dataField="TAX_PERCENT"
+                    [caption]="
+                      selected_vat_id == sessionData.VAT_ID &&
+                      sessionData.VAT_ID == 2
+                        ? ' Tax %'
+                        : ' Tax %'
+                    "
+                    dataType="number"
                   ></dxi-column>
                   <dxi-column
                     dataField="TAX_AMOUNT"

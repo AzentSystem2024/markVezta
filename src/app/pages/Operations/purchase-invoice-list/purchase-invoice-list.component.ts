@@ -78,6 +78,7 @@ export class PurchaseInvoiceListComponent {
   filteredPurchaseInvoices: any;
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -165,6 +166,7 @@ export class PurchaseInvoiceListComponent {
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
+      this.canVerify = packingRights.CanVerify;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
@@ -380,13 +382,20 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
+
+   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.STATUS;
+
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 'Approved' ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 'Approved' ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -649,9 +658,9 @@ export class PurchaseInvoiceListComponent {
   onEditInvoice(event: any) {
     console.log(event,'event------------')
     event.cancel = true;
-    const invoiceId = event.row.data.TRANS_ID;
-    const transStatus = event.row.data.STATUS;
-    this.statusFinder = event.row.data.STATUS;
+    const invoiceId = event.data.TRANS_ID;
+    const transStatus = event.data.STATUS;
+    this.statusFinder = event.data.STATUS;
     this.isVerifyInvoice = false;
     this.isEditInvoice = true;
     this.dataService

@@ -285,6 +285,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}AC_CreditNote/update`, data);
   }
 
+  verifyCreditNote(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}AC_CreditNote/verify`, data);
+  }
+
   getDocNo(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}AC_CreditNote/DocNo`, data);
   }
@@ -555,6 +560,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SaleReturn/commit`, data);
   }
 
+  verifySaleReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SaleReturn/verify`, data);
+  }
+
   selectSaleReturn(id: number) {
     return this.http.post<any>(`${this.apiUrl}SaleReturn/select/` + id, {});
   }
@@ -818,6 +828,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SalesOrder/approve`, data);
   }
 
+  verifySalesOrder(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalesOrder/verify`, data);
+  }
+
   deleteSalesOrder(id: number) {
     return this.http.post<any>(`${this.apiUrl}SalesOrder/delete/` + id, {});
   }
@@ -984,6 +999,11 @@ export class DataService {
   updateReceipt(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Receipt/update`, data);
+  }
+
+  verifyReceipt(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Receipt/verify`, data);
   }
 
   commitCustomerReceipt(items: any) {
@@ -1301,6 +1321,11 @@ export class DataService {
 
   Update_PrePayment(payload: any) {
     const getEndpoint = `${this.apiUrl}PrePayment/update`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Verify_PrePayment(payload: any) {
+    const getEndpoint = `${this.apiUrl}PrePayment/verify`;
     return this.http.post(getEndpoint, payload);
   }
 
@@ -5681,7 +5706,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //======================USER===================
-  //=============GET USER DATA=============
+  //=============GET USER DATA=============ser/insert
   get_User_data() {
     return this.http.post(`${this.apiUrl}user/list`, {});
   }
@@ -5698,6 +5723,7 @@ The result can be exported to HTML or Markdown.`;
       USER_ROLE: data.UserRoleID,
       COMPANY_ID: data.COMPANY_ID,
       EMAIL: data.Email,
+      STORE_ID: data.STORE_ID,
       IS_INACTIVE: data.IsInactive,
     };
     return this.http.post(url, reqBody);
@@ -5715,6 +5741,7 @@ The result can be exported to HTML or Markdown.`;
       MOBILE: data.MOBILE,
       USER_ROLE: data.USER_ROLE,
       COMPANY_ID: data.COMPANY_ID,
+      STORE_ID: data.STORE_ID,
       EMAIL: data.EMAIL,
       IS_INACTIVE: data.IS_INACTIVE,
     };

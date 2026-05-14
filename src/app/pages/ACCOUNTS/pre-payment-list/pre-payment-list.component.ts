@@ -51,10 +51,12 @@ export class PrePaymentListComponent {
   showHeaderFilter = true;
   addPrepaymentPopupOpened: boolean = false;
   editPrePaymentPopupOpened: boolean = false;
+  verifyPrePaymentPopupOpened : boolean = false;
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -154,6 +156,7 @@ export class PrePaymentListComponent {
   handleClose() {
     this.addPrepaymentPopupOpened = false;
     this.editPrePaymentPopupOpened = false;
+    this.verifyPrePaymentPopupOpened = false;
     this.get_PrePaymentList();
   }
 
@@ -173,6 +176,7 @@ export class PrePaymentListComponent {
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
+      this.canVerify = packingRights.CanVerify;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
@@ -213,6 +217,37 @@ export class PrePaymentListComponent {
     },
   ];
 
+   getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
+
+  onVerifyInvoice(e:any){
+     e.cancel = true;
+    console.log(e)
+     const status = e.row.data?.TRANS_STATUS?.trim();
+    this.isEditReadOnly = status === 'Approved';
+    this.editPrePaymentPopupOpened = false;
+    this.verifyPrePaymentPopupOpened = true;
+    this.verifyselectPrePayment(e);
+  }
+
+  onApproveInvoice(e:any){
+     e.cancel = true;
+    console.log(e)
+     const status = e.row.data?.TRANS_STATUS?.trim();
+    this.isEditReadOnly = status === 'Approved';
+    this.verifyPrePaymentPopupOpened = true;
+    this.editPrePaymentPopupOpened = false;
+    this.verifyselectPrePayment(e);
+  }
+
   onEditingStart(event: any) {
     event.cancel = true;
     const status = event.data?.TRANS_STATUS?.trim();
@@ -232,19 +267,18 @@ export class PrePaymentListComponent {
   // }
 
   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = (cellInfo.data.TRANS_STATUS || '').trim();
-
-    // Clean up existing content to avoid duplicates
-    while (cellElement.firstChild) {
-      cellElement.removeChild(cellElement.firstChild);
-    }
+    const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
-    icon.className = 'fas fa-flag';
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-
-    icon.style.color = status === 'Approved' ? 'green' : 'orange';
-    icon.title = status === 'Approved' ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -253,6 +287,28 @@ export class PrePaymentListComponent {
     cellElement.appendChild(icon);
   }
 
+  verifyselectPrePayment(event: any) {
+  const rowData = event.row?.data || event.data;
+
+  if (!rowData) {
+    console.log('No row data found', event);
+    return;
+  }
+
+  const id = rowData.TRANS_ID;
+
+  this.PrepaymentId = id;
+  this.selectprepayment = id;
+
+  console.log('Calling Select_PrePayment with ID:', id);
+
+  this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
+    this.selectedPrePayment = {
+      ...res.Data,
+      TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved',
+    };
+  });
+}
   selectPrePayment(event: any) {
     const id = event.data.TRANS_ID;
     this.PrepaymentId = event.data.TRANS_ID;

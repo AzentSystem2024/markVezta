@@ -145,7 +145,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -265,12 +265,14 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
 
     this.selectedCustomerId = this.deliveryFormData.CUST_ID;
 
+    this.getSalesOrderList();
+
     this.updateTotalQty();
 
     console.log('Edit Mode: deliveryFormData loaded:', this.deliveryFormData);
   }
 
-  reindexDetails() { }
+  reindexDetails() {}
 
   getDocNo() {
     const payload = {
@@ -405,6 +407,42 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     this.salesOrderPopupOpened = true;
   }
 
+  // selectSalesOrder() {
+  //   const selectedRows = this.quotationGrid.instance.getSelectedRowsData();
+
+  //   if (selectedRows.length === 0) {
+  //     alert('Please select at least one sales order.');
+  //     return;
+  //   }
+
+  //   // Map each selected row into the DETAILS format
+  //   this.deliveryFormData.Details = selectedRows.map((row: any) => ({
+  //     ID: row.ID,
+  //     DESCRIPTION: row.DESCRIPTION || '',
+  //     UOM: row.UOM || '',
+  //     QUANTITY: row.QUANTITY || 0,
+  //     SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
+  //     PACKING_ID: row.PACKING_ID || 0,
+  //     ITEM_ID: row.ITEM_ID,
+  //     ITEM_CODE: row.ITEM_CODE,
+  //     REMARKS: row.REMARKS,
+  //   }));
+
+  //   // Optionally store all SO_DETAIL_IDs as an array
+  //   // this.deliveryFormData.SO_DETAIL_IDs = selectedRows.map(
+  //   //   (r: any) => r.SO_DETAIL_ID
+  //   // );
+
+  //   // Refresh main grid after update
+  //   this.itemsGridRef.instance.refresh();
+
+  //   // Close popup
+  //   this.salesOrderPopupOpened = false;
+
+  //   console.log('Selected SO_DETAIL_IDs:', this.deliveryFormData.SO_DETAIL_IDs);
+  //   console.log('Updated DETAILS:', this.deliveryFormData.Details);
+  // }
+
   selectSalesOrder() {
     const selectedRows = this.quotationGrid.instance.getSelectedRowsData();
 
@@ -413,32 +451,36 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       return;
     }
 
-    // Map each selected row into the DETAILS format
-    this.deliveryFormData.Details = selectedRows.map((row: any) => ({
-      ID: row.ID,
-      DESCRIPTION: row.DESCRIPTION || '',
-      UOM: row.UOM || '',
-      QUANTITY: row.QUANTITY || 0,
-      SO_DETAIL_ID: row.SO_DETAIL_ID || 0,
-      PACKING_ID: row.PACKING_ID || 0,
-      ITEM_ID: row.ITEM_ID,
-      ITEM_CODE: row.ITEM_CODE,
-      REMARKS: row.REMARKS,
-    }));
+    const newRows = selectedRows
+      .filter((row: any) => {
+        return !this.deliveryFormData.Details.some(
+          (item: any) =>
+            item.SO_DETAIL_ID === row.ID ||
+            item.SO_DETAIL_ID === row.SO_DETAIL_ID,
+        );
+      })
+      .map((row: any) => ({
+        ID: row.ID,
+        DESCRIPTION: row.DESCRIPTION || '',
+        UOM: row.UOM || '',
+        QUANTITY: row.QUANTITY || 0,
+        SO_DETAIL_ID: row.SO_DETAIL_ID || row.ID || 0,
+        PACKING_ID: row.PACKING_ID || 0,
+        ITEM_ID: row.ITEM_ID,
+        ITEM_CODE: row.ITEM_CODE,
+        REMARKS: row.REMARKS,
+        DELIVERED_QUANTITY: row.QUANTITY || 0,
+      }));
 
-    // Optionally store all SO_DETAIL_IDs as an array
-    // this.deliveryFormData.SO_DETAIL_IDs = selectedRows.map(
-    //   (r: any) => r.SO_DETAIL_ID
-    // );
+    this.deliveryFormData.Details = [
+      ...this.deliveryFormData.Details,
+      ...newRows,
+    ];
 
-    // Refresh main grid after update
     this.itemsGridRef.instance.refresh();
+    this.quotationGrid.instance.refresh();
 
-    // Close popup
     this.salesOrderPopupOpened = false;
-
-    console.log('Selected SO_DETAIL_IDs:', this.deliveryFormData.SO_DETAIL_IDs);
-    console.log('Updated DETAILS:', this.deliveryFormData.Details);
   }
 
   getItemsList() {
@@ -503,7 +545,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     }
   }
 
-  onAddItems() { }
+  onAddItems() {}
 
   validateQtyReceived = (e: any) => {
     const issued = e.data?.QUANTITY_ISSUED || 0;
@@ -544,7 +586,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     console.log('Updated TOTAL_QTY:', this.deliveryFormData.TOTAL_QTY);
   }
 
-  handleClose() { }
+  handleClose() {}
 
   cancel() {
     this.popupClosed.emit();
@@ -581,8 +623,10 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       }
       if (item.DELIVERED_QUANTITY > item.QUANTITY) {
         notify(
-          `Row ${index + 1
-          }: Delivered Quantity cannot exceed Ordered Quantity (${item.QUANTITY
+          `Row ${
+            index + 1
+          }: Delivered Quantity cannot exceed Ordered Quantity (${
+            item.QUANTITY
           }).`,
         );
         isValid = false;
@@ -686,6 +730,27 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         });
       }
     }
+  }
+
+  onPendingSORowPrepared(e: any) {
+    if (e.rowType !== 'data') return;
+
+    const row = e.data;
+
+    const alreadySelected = this.deliveryFormData.Details.some(
+      (item: any) =>
+        item.SO_DETAIL_ID === row.ID || item.SO_DETAIL_ID === row.SO_DETAIL_ID,
+    );
+
+    if (alreadySelected) {
+      e.rowElement.style.opacity = '0.4';
+      e.rowElement.style.pointerEvents = 'none';
+    }
+  }
+
+  onRowRemoved(e: any) {
+    this.quotationGrid?.instance?.refresh();
+    this.itemsGridRef?.instance?.refresh();
   }
 
   resetForm() {
@@ -1142,4 +1207,4 @@ function numberToWordsIndianNumber(num: number) {
   exports: [DeliveryNoteFormFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFormFinanceModule { }
+export class DeliveryNoteFormFinanceModule {}

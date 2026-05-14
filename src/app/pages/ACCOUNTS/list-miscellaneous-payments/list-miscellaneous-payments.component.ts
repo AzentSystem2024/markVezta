@@ -420,14 +420,19 @@ export class ListMiscellaneousPaymentsComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
+   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#6EFF46' : '#F53434';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 'Approve'
+        ? '#10B981' // Approved
+        : status === 'Verify'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approve' ? 'Approved' : status === 'Verify' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';

@@ -956,17 +956,6 @@ export class AddInvoiceRetailComponent {
     } else {
       apiCall = this.dataService.saveRetailInvoice(payload);
     }
-    // if (this.isEditing && this.invoiceFormData.IS_APPROVED) {
-    //   //  EDIT + APPROVE
-    //   apiCall = this.dataService.approveRetailInvoice(payload);
-    // } else if (this.isEditing) {
-    //   //  EDIT ONLY
-    //   apiCall = this.dataService.updateRetailInvoice(payload);
-    // } else {
-    //   //  ADD
-    //   apiCall = this.dataService.saveRetailInvoice(payload);
-    // }
-
     //  API CALL
     apiCall.subscribe({
       next: () => {
@@ -1047,332 +1036,286 @@ export class AddInvoiceRetailComponent {
     this.getDocNo();
   }
 
-    openPDF() {
+  openPDF() {
     console.log('Open PDF clicked');
     const returnId = this.EditingResponseData.TRANS_ID;
     // Example:
-    this.dataService
-      .selectInvoiceRetail(returnId)
-      .subscribe((res: any) => {
-        this.generatePDF(res);
-      });
-  }
-
-   getBase64ImageFromURL(url: string): Promise<string> {
-  return fetch(url)
-    .then(res => res.blob())
-    .then(blob => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
+    this.dataService.selectInvoiceRetail(returnId).subscribe((res: any) => {
+      this.generatePDF(res);
     });
-}
-
-  async generatePDF(data:any){
-     const doc = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = doc.internal.pageSize.getWidth();
-
-
-       // ============================================================
-  // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
-  // ============================================================
-
-  const headerY = 10;
-
-  // --- Logo placeholder (replace with addImage if needed)
-  const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
-
-  doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 40);
-
-  // --- Title
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text('SALES INVOICE', pageWidth / 2, headerY + 25, {
-    align: 'center',
-  });
-
-  // ======================================================
-  // RIGHT HEADER DETAILS
-  // ======================================================
-
-  doc.setFontSize(10);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Invoice No :', 135, 15);
-
-doc.text(
-  `${data.Data.SALE_NO}`,
-  195,
-  15,
-  { align: 'right' }
-);
-
-  doc.text('Reference No :', 135, 22);
-
-doc.text(
-  `${data.Data.REF_NO}`,
-  195,
-  22,
-  { align: 'right' }
-);
-
-doc.text('Date :', 135, 29);
-
-doc.text(
-  `${data.Data.TRANS_DATE}`,
-  195,
-  29,
-  { align: 'right' }
-);
-
-   // ======================================================
-  // SELLER DETAILS
-  // ======================================================
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Seller Details', 12, 60);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Address', 12, 67);
-
-doc.text(
-  `${data.Data.ADDRESS1}`,
-  38,
-  67
-);
-
-  doc.text('Tel', 12, 74);
-  doc.text(`${data.Data.PHONE}`, 38, 74);
-
-  doc.text('TRN', 12, 83);
-  doc.text(`${data.Data.GST_NO}`, 38, 83);
-
-  // ======================================================
-  // BUYER DETAILS
-  // ======================================================
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Buyer Details', 140, 60);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Address', 140, 67);
-
-  doc.text(
-  `${data.Data.CUST_ADDRESS1} ${data.Data.CITY}`,
-  165,
-  67
-);
-
-  doc.text('Tel', 140, 74);
-  doc.text(`${data.Data.CUST_PHONE}`, 165, 74);
-
-  doc.text('TRN', 140, 83);
-  doc.text(`${data.Data.ZIP}`, 165, 83);
-
-
-   // ======================================================
-  // TABLE
-  // ======================================================
-
-  const details = data?.Data?.Details || [];
-
-const tableData = details.map((item: any) => [
-  item.ITEM_CODE || '',
-  item.DESCRIPTION || '',
-  item.UOM || '',
-  item.COST || 0,
-  item.QUANTITY || 0,
-  item.AMOUNT || 0,
-  item.DISC_AMT || 0,
-  item.TAX_AMOUNT || 0,
-  item.TOTAL_AMOUNT || 0,
-]);
-
-  autoTable(doc, {
-    startY: 110,
-
-    head: [
-      [
-        'Item Code',
-        'Description',
-        'UOM',
-        'Cost',
-        'Qty',
-        'Amount',
-        'Dis(amt)',
-        'VAT(amt)',
-        'Total Price',
-      ],
-    ],
-
-    body: tableData,
-
-    styles: {
-      fontSize: 8,
-      cellPadding: 3,
-    },
-
-    headStyles: {
-      fillColor: [220, 230, 242],
-      textColor: 0,
-      fontStyle: 'bold',
-    },
-
-    theme: 'plain',
-
-    didDrawCell: (data1) => {
-      if (data1.section === 'head') {
-        doc.setDrawColor(220);
-        doc.rect(
-          data1.cell.x,
-          data1.cell.y,
-          data1.cell.width,
-          data1.cell.height
-        );
-      }
-    },
-  });
-
-
-  // ======================================================
-  // TOTAL SECTION
-  // ======================================================
-
-  const totalQty = details.reduce(
-  (sum: number, item: any) => sum + Number(item.QUANTITY || 0),
-  0
-);
-
-const totalAmount = details.reduce(
-  (sum: number, item: any) => sum + Number(item.AMOUNT || 0),
-  0
-);
-
-const totalDiscount = details.reduce(
-  (sum: number, item: any) => sum + Number(item.DISC_AMT || 0),
-  0
-);
-
-const totalVat = details.reduce(
-  (sum: number, item: any) => sum + Number(item.TAX_AMOUNT || 0),
-  0
-);
-
-const totalPrice = details.reduce(
-  (sum: number, item: any) => sum + Number(item.TOTAL_AMOUNT || 0),
-  0
-);
-
-  const finalY = (doc as any).lastAutoTable.finalY + 15;
-
-  doc.setDrawColor(200);
-  doc.line(12, finalY - 5, 198, finalY - 5);
-
-  doc.setFont('helvetica', 'bold');
-
-  doc.text('TOTAL', 45, finalY + 5);
-
-  doc.text(`${totalQty}`, 112, finalY + 5);
-
-doc.text(`${totalAmount.toFixed(2)}`, 132, finalY + 5);
-
-doc.text(`${totalDiscount.toFixed(2)}`, 152, finalY + 5);
-
-doc.text(`${totalVat.toFixed(2)}`, 172, finalY + 5);
-
-doc.text(`${totalPrice.toFixed(2)}`, 198, finalY + 5, {
-  align: 'right',
-});
-
-  // ======================================================
-  // AMOUNT IN WORDS
-  // ======================================================
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text(
-    `Amount Chargeable (in words):`,
-    55,
-    finalY + 20
-  );
-
-  doc.setTextColor(0, 102, 204);
-
-  doc.setFont('helvetica', 'bold');
-
-  doc.text(
-  `AED ${this.convertNumberToWords(totalPrice)}`,
-  108,
-  finalY + 20
-);
-   
-  // ======================================================
-// PAYMENT INSTRUCTIONS
-// ======================================================
-
-const paymentY = 230;
-
-doc.setTextColor(0, 0, 0);
-
-doc.setFont('helvetica', 'bold');
-doc.setFontSize(11);
-
-doc.text('Payment Instructions', 12, paymentY);
-
-// LEFT LABELS
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(9);
-
-doc.text('Bank Name:', 12, paymentY + 12);
-doc.text('Account Name:', 12, paymentY + 20);
-doc.text('Account #:', 12, paymentY + 28);
-doc.text('SWIFT/BIC:', 12, paymentY + 36);
-
-// VALUES
-doc.text('Global Commercial Bank', 55, paymentY + 12);
-
-doc.text('Vezta V1.0 Enterprises', 55, paymentY + 20);
-
-doc.text('1234 5678 9012', 55, paymentY + 28);
-
-doc.text('GCBKUS33XXX', 55, paymentY + 36);
-
-// CONTACT
-doc.text(
-  'Tel:8908765432   |   Mob:8908765432',
-  12,
-  paymentY + 48
-);
-
-doc.text(
-  'Email: info@gmail.com   |   www.company.com',
-  12,
-  paymentY + 56
-);
-
-// THANK YOU MESSAGE
-doc.setFont('helvetica', 'italic');
-
-doc.text(
-  'Thank you for your business!',
-  145,
-  paymentY + 56
-);
-
-      // ============================================================
-  // 3) OPEN PDF
-  // ============================================================
-
-  doc.output('dataurlnewwindow');
   }
 
-   convertNumberToWords(num: number): string {
+  getBase64ImageFromURL(url: string): Promise<string> {
+    return fetch(url)
+      .then((res) => res.blob())
+      .then((blob) => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      });
+  }
+
+  async generatePDF(data: any) {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // ============================================================
+    // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
+    // ============================================================
+
+    const headerY = 10;
+
+    // --- Logo placeholder (replace with addImage if needed)
+    const logoBase64 = await this.getBase64ImageFromURL(
+      'assets/images/image16.png',
+    );
+
+    doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 40);
+
+    // --- Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('SALES INVOICE', pageWidth / 2, headerY + 25, {
+      align: 'center',
+    });
+
+    // ======================================================
+    // RIGHT HEADER DETAILS
+    // ======================================================
+
+    doc.setFontSize(10);
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text('Invoice No :', 135, 15);
+
+    doc.text(`${data.Data.SALE_NO}`, 195, 15, { align: 'right' });
+
+    doc.text('Reference No :', 135, 22);
+
+    doc.text(`${data.Data.REF_NO}`, 195, 22, { align: 'right' });
+
+    doc.text('Date :', 135, 29);
+
+    doc.text(`${data.Data.TRANS_DATE}`, 195, 29, { align: 'right' });
+
+    // ======================================================
+    // SELLER DETAILS
+    // ======================================================
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Seller Details', 12, 60);
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text('Address', 12, 67);
+
+    doc.text(`${data.Data.ADDRESS1}`, 38, 67);
+
+    doc.text('Tel', 12, 74);
+    doc.text(`${data.Data.PHONE}`, 38, 74);
+
+    doc.text('TRN', 12, 83);
+    doc.text(`${data.Data.GST_NO}`, 38, 83);
+
+    // ======================================================
+    // BUYER DETAILS
+    // ======================================================
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buyer Details', 140, 60);
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text('Address', 140, 67);
+
+    doc.text(`${data.Data.CUST_ADDRESS1} ${data.Data.CITY}`, 165, 67);
+
+    doc.text('Tel', 140, 74);
+    doc.text(`${data.Data.CUST_PHONE}`, 165, 74);
+
+    doc.text('TRN', 140, 83);
+    doc.text(`${data.Data.ZIP}`, 165, 83);
+
+    // ======================================================
+    // TABLE
+    // ======================================================
+
+    const details = data?.Data?.Details || [];
+
+    const tableData = details.map((item: any) => [
+      item.ITEM_CODE || '',
+      item.DESCRIPTION || '',
+      item.UOM || '',
+      item.COST || 0,
+      item.QUANTITY || 0,
+      item.AMOUNT || 0,
+      item.DISC_AMT || 0,
+      item.TAX_AMOUNT || 0,
+      item.TOTAL_AMOUNT || 0,
+    ]);
+
+    autoTable(doc, {
+      startY: 110,
+
+      head: [
+        [
+          'Item Code',
+          'Description',
+          'UOM',
+          'Cost',
+          'Qty',
+          'Amount',
+          'Dis(amt)',
+          'VAT(amt)',
+          'Total Price',
+        ],
+      ],
+
+      body: tableData,
+
+      styles: {
+        fontSize: 8,
+        cellPadding: 3,
+      },
+
+      headStyles: {
+        fillColor: [220, 230, 242],
+        textColor: 0,
+        fontStyle: 'bold',
+      },
+
+      theme: 'plain',
+
+      didDrawCell: (data1) => {
+        if (data1.section === 'head') {
+          doc.setDrawColor(220);
+          doc.rect(
+            data1.cell.x,
+            data1.cell.y,
+            data1.cell.width,
+            data1.cell.height,
+          );
+        }
+      },
+    });
+
+    // ======================================================
+    // TOTAL SECTION
+    // ======================================================
+
+    const totalQty = details.reduce(
+      (sum: number, item: any) => sum + Number(item.QUANTITY || 0),
+      0,
+    );
+
+    const totalAmount = details.reduce(
+      (sum: number, item: any) => sum + Number(item.AMOUNT || 0),
+      0,
+    );
+
+    const totalDiscount = details.reduce(
+      (sum: number, item: any) => sum + Number(item.DISC_AMT || 0),
+      0,
+    );
+
+    const totalVat = details.reduce(
+      (sum: number, item: any) => sum + Number(item.TAX_AMOUNT || 0),
+      0,
+    );
+
+    const totalPrice = details.reduce(
+      (sum: number, item: any) => sum + Number(item.TOTAL_AMOUNT || 0),
+      0,
+    );
+
+    const finalY = (doc as any).lastAutoTable.finalY + 15;
+
+    doc.setDrawColor(200);
+    doc.line(12, finalY - 5, 198, finalY - 5);
+
+    doc.setFont('helvetica', 'bold');
+
+    doc.text('TOTAL', 45, finalY + 5);
+
+    doc.text(`${totalQty}`, 112, finalY + 5);
+
+    doc.text(`${totalAmount.toFixed(2)}`, 132, finalY + 5);
+
+    doc.text(`${totalDiscount.toFixed(2)}`, 152, finalY + 5);
+
+    doc.text(`${totalVat.toFixed(2)}`, 172, finalY + 5);
+
+    doc.text(`${totalPrice.toFixed(2)}`, 198, finalY + 5, {
+      align: 'right',
+    });
+
+    // ======================================================
+    // AMOUNT IN WORDS
+    // ======================================================
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text(`Amount Chargeable (in words):`, 55, finalY + 20);
+
+    doc.setTextColor(0, 102, 204);
+
+    doc.setFont('helvetica', 'bold');
+
+    doc.text(`AED ${this.convertNumberToWords(totalPrice)}`, 108, finalY + 20);
+
+    // ======================================================
+    // PAYMENT INSTRUCTIONS
+    // ======================================================
+
+    const paymentY = 230;
+
+    doc.setTextColor(0, 0, 0);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+
+    doc.text('Payment Instructions', 12, paymentY);
+
+    // LEFT LABELS
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    doc.text('Bank Name:', 12, paymentY + 12);
+    doc.text('Account Name:', 12, paymentY + 20);
+    doc.text('Account #:', 12, paymentY + 28);
+    doc.text('SWIFT/BIC:', 12, paymentY + 36);
+
+    // VALUES
+    doc.text('Global Commercial Bank', 55, paymentY + 12);
+
+    doc.text('Vezta V1.0 Enterprises', 55, paymentY + 20);
+
+    doc.text('1234 5678 9012', 55, paymentY + 28);
+
+    doc.text('GCBKUS33XXX', 55, paymentY + 36);
+
+    // CONTACT
+    doc.text('Tel:8908765432   |   Mob:8908765432', 12, paymentY + 48);
+
+    doc.text('Email: info@gmail.com   |   www.company.com', 12, paymentY + 56);
+
+    // THANK YOU MESSAGE
+    doc.setFont('helvetica', 'italic');
+
+    doc.text('Thank you for your business!', 145, paymentY + 56);
+
+    // ============================================================
+    // 3) OPEN PDF
+    // ============================================================
+
+    doc.output('dataurlnewwindow');
+  }
+
+  convertNumberToWords(num: number): string {
     if (num === 0) return 'Zero';
 
     const a = [
