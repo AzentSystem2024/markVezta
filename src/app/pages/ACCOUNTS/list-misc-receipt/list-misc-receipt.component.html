@@ -152,7 +152,7 @@
         caption="Status"
         dataField="TRANS_STATUS"
         [width]="80"
-        cellTemplate="statusCellTemplate"
+        [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,

@@ -331,6 +331,12 @@ export class DataService {
     return this.http.post(`${this.apiUrl}ACTransactions/debitupdate`, data);
   }
 
+    verifyDebitNote(items: any) {
+    const data = items;
+    // console.log(data,"insert service")
+    return this.http.post(`${this.apiUrl}ACTransactions/verify`, data);
+  }
+
   commitDebitNote(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}ACTransactions/commit`, data);
@@ -699,6 +705,10 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}TransferIn/update`, data);
   }
+  VerifyTransferInForInventory(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferIn/verify`, data);
+  }
 
   approveTransferInForInventory(items: any) {
     const data = items;
@@ -917,6 +927,10 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}PhysicalStock/Approve`, data);
   }
+  VerifyPhysicalInventory(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}PhysicalStock/verify`, data);
+  }
 
   deletePhysicalInventory(id: number) {
     return this.http.post<any>(`${this.apiUrl}PhysicalStock/delete/` + id, {});
@@ -1043,6 +1057,11 @@ export class DataService {
 
   approvePayroll(data: Object): Observable<any> {
     return this.http.post(`${this.apiUrl}salary/approve`, data);
+  }
+
+
+  VerifyPayroll(data: Object): Observable<any> {
+    return this.http.post(`${this.apiUrl}salary/verify`, data);
   }
 
   deletePayroll(TS_ID: number) {
@@ -5975,6 +5994,12 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}Depreciation/update`, payload);
   }
+  //===========================insert depreciation=============================
+
+  Verify_Depreciation_api(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}Depreciation/verify`, payload);
+  }
 
   Approve_Depreciation_api(item: any) {
     const payload = item;
@@ -6084,7 +6109,11 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'PrePayment_Posting/Edit';
     return this.http.post(getEndpoint, payload);
   }
-
+  Verify_prepayment_data(item: any) {
+    const payload = item;
+    const getEndpoint = this.apiUrl + 'PrePayment_Posting/verify';
+    return this.http.post(getEndpoint, payload);
+  }
   Approve_prepayment_data(item: any) {
     const payload = item;
     const getEndpoint = this.apiUrl + 'PrePayment_Posting/commit';
@@ -6125,6 +6154,10 @@ The result can be exported to HTML or Markdown.`;
   Update_Stock_Adjustment_Data(item: any) {
     const payload = item;
     return this.http.post(`${this.apiUrl}StockAdjustment/edit`, payload);
+  }
+  Verify_Stock_Adjustment_Data(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}StockAdjustment/verify`, payload);
   }
   List_Stock_Adjustment_Data(item: any) {
     const payload = item;

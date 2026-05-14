@@ -1488,7 +1488,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
 
     const netAmount = totalAmount + totalGST;
     const dueAmount = Number(this.creditFormData[0]?.DUE_AMOUNT) || 0;
-    // ✅ Validation check
+    // Validation check
     if (netAmount > dueAmount) {
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       this.isUpdating = false;
@@ -1501,7 +1501,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
           const hasLedger = !!item.ledgerCode || !!item.ledgerName;
           const hasAmount = Number(item.Amount) > 0;
 
-          // ✅ ONLY include rows that actually matter
+          //  ONLY include rows that actually matter
           return hasLedger && hasAmount;
         })
         .map((item: any, index: number) => {
@@ -1513,7 +1513,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
 
           const amount = Number(item.Amount) || 0;
 
-          // ✅ SINGLE SOURCE OF TRUTH
+          // SINGLE SOURCE OF TRUTH
           const gstAmount = this.calculateGstFromRow(item);
 
           return {
@@ -1528,7 +1528,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
             CGST: Number(item.CGST) || 0,
             SGST: Number(item.SGST) || 0,
 
-            // ✅ ALWAYS CORRECT (even if row untouched)
+            //  ALWAYS CORRECT (even if row untouched)
             GST_AMOUNT: gstAmount,
 
             REMARKS: item.particulars || '',
@@ -1591,7 +1591,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
       return;
     }
 
-    if (this.isVerifyCreditNote === true) {
+   if (this.isVerifyCreditNote === true) {
   const verifyPayload = {
     TRANS_ID: this.creditFormData[0].TRANS_ID,
     TRANS_TYPE: 37,
@@ -1612,27 +1612,37 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
     VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
   };
 
-  this.dataService.verifyCreditNote(verifyPayload).subscribe(
-    (response: any) => {
-      this.isUpdating = false;
+  confirm(
+    'Are you sure you want to verify this Credit Note?',
+    'Confirm Verification'
+  ).then((result) => {
+    if (result) {
+      this.dataService.verifyCreditNote(verifyPayload).subscribe(
+        (response: any) => {
+          this.isUpdating = false;
 
-      if (response.flag === 1 || response.Flag === 1) {
-        notify(
-          {
-            message: 'Credit Note Verified Successfully',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
+          if (response.flag === 1 || response.Flag === 1) {
+            notify(
+              {
+                message: 'Credit Note Verified Successfully',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
 
-        this.popupClosed.emit();
-      }
-    },
-    (error) => {
+            this.popupClosed.emit();
+          }
+        },
+        (error) => {
+          this.isUpdating = false;
+          notify('Error while verifying Credit Note', 'error', 3000);
+        },
+      );
+    } else {
       this.isUpdating = false;
-      notify('Error while verifying Credit Note', 'error', 3000);
-    },
-  );
+      notify('Verification cancelled.', 'info', 2000);
+    }
+  });
 
   return;
 }

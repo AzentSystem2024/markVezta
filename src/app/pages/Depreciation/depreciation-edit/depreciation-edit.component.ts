@@ -49,7 +49,9 @@ export class DepreciationEditComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() SelectDepreciationData: any = {};
   @Input() DepreciationId: any;
-  @Input() canApprove : boolean = false;
+  @Input() status: any;
+  @Input() statusId: any;
+  @Input() canApprove: boolean = false;
   depreciationDate: any;
   approveValue: boolean = false;
   DepreciationPayload: any = {
@@ -81,11 +83,12 @@ export class DepreciationEditComponent {
   isPdfPopupVisible: boolean = false;
   selected_Company_id: any;
   isSaving = false;
+  selectedStatus: any;
 
   constructor(
     private dataService: DataService,
     private sanitizer: DomSanitizer,
-  ) {}
+  ) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (
@@ -104,10 +107,12 @@ export class DepreciationEditComponent {
     }
     this.bindDepreciationData(this.SelectDepreciationData);
     this.selectedRowsInGrid = this.Active_fixed_asset_list.filter(
-      (row) => row.Depreciation_amount > 0,
-    ).map((row) => row.ID);
+      (row: any) => row.Depreciation_amount > 0,
+    ).map((row: any) => row.ID);
 
     // this.Process_function()
+    this.selectedStatus = this.SelectDepreciationData.TRANS_STATUS;
+
 
     if (this.SelectDepreciationData.TRANS_STATUS == '5') {
       this.readOnly = true;
@@ -233,7 +238,7 @@ export class DepreciationEditComponent {
   //   this.Active_fixed_asset_list = [...this.Active_fixed_asset_list];
   // }
 
-  onSelectAllChange(event: any) {}
+  onSelectAllChange(event: any) { }
   // formatDateToDMY(date: Date): string {
   //   const day = date.getDate(); // no leading zero
   //   const month = date.getMonth() + 1; // January is 0
@@ -255,7 +260,7 @@ export class DepreciationEditComponent {
     const date = event.value;
     this.depreciationDate = date;
   }
-  onEditorPreparing(event: any) {}
+  onEditorPreparing(event: any) { }
   calculateDepreciationDays() {
     const currentDate = this.depreciationDate;
 
@@ -273,7 +278,7 @@ export class DepreciationEditComponent {
     return new Date(year, month, day);
   }
 
-  onCellValueChanged(event: any) {}
+  onCellValueChanged(event: any) { }
   onDepreciationDateChange(newDate: Date) {
     this.depreciationDate = newDate;
     this.calculateDepreciationDays();
@@ -433,7 +438,9 @@ export class DepreciationEditComponent {
       }
     }
     this.isSaving = true;
-    if (this.approveValue === true) {
+    if (this.approveValue === true || this.statusId == '2') {
+
+      console.log(payload, '=================pay===')
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -467,6 +474,31 @@ export class DepreciationEditComponent {
           notify('Approval cancelled.', 'info', 2000);
         }
       });
+    }
+    else if (this.status == 'verifyscreen' && this.statusId == '1') {
+      this.dataService.Verify_Depreciation_api(payload).subscribe(
+        (res: any) => {
+          this.isSaving = false;
+
+          this.popupClosed.emit();
+          notify(
+            {
+              message: 'Depreciation Update  successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+          this.get_Depreciation_list();
+          this.grandTotal = 0;
+          this.selectedRowsInGrid = [];
+        },
+        (error) => {
+          this.isSaving = false; // ✅ STOP loading
+          notify('Failed to update depreciation.', 'error', 2000);
+          console.error(error);
+        },
+      );
     } else {
       this.dataService.Update_Depreciation_api(payload).subscribe(
         (res: any) => {
@@ -494,7 +526,7 @@ export class DepreciationEditComponent {
     }
   }
 
-  onApprovedChanged(event: any) {}
+  onApprovedChanged(event: any) { }
   SetDefaultRest() {
     this.grandTotal = 0;
     this.selectedRowsInGrid = [];
@@ -529,6 +561,23 @@ export class DepreciationEditComponent {
     const url = URL.createObjectURL(blob);
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
+
+  getButtonText(): string {
+    if (this.status == 'Editscreen') {
+      return 'Update';
+    } else if (this.status == 'verifyscreen') {
+      if (!this.approveValue && this.statusId == '1') {
+        return 'Verify';
+
+      } else {
+        return 'Approve';
+
+      }
+    }
+    else {
+      return 'Approsve';
+    }
+  }
 }
 
 @NgModule({
@@ -553,4 +602,4 @@ export class DepreciationEditComponent {
   declarations: [DepreciationEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DepreciationEditModule {}
+export class DepreciationEditModule { }

@@ -183,6 +183,8 @@ export class PromotionComponent {
   isHappyHoursEnabledvalue: any;
   selectedMode: 'price' | 'schema' = 'price';
   is_promotion_level: boolean = false
+  approveValue: boolean = false
+  canApprove: boolean = false
   constructor(
     private dataservice: DataService,
     private router: Router,

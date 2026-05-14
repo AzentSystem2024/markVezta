@@ -161,7 +161,11 @@
   color: #000;
 }
 
-.flag-open {
+.flag-orange {
+  color: #ffa500; /* or rgb(245, 240, 240) */
+}
+
+.flag-pending {
   color: white; /* or rgb(245, 240, 240) */
   text-shadow:
     0 0 1px black,
@@ -169,13 +173,12 @@
 }
 
 .flag-verified {
-  color: orange;
+  color: #0073d8;
 }
 
 .flag-approved {
-  color: green;
+  color: #10b981;
 }
-
 .year-button {
   width: 32px;
   height: 32px;

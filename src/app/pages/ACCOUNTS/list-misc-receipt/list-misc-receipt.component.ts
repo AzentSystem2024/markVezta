@@ -364,40 +364,62 @@ export class ListMiscReceiptComponent {
   }
 
     // ============================Verify Popup function=========================================
-  onVerifyClick(e: any): void {
-    console.log(e,'event--------------')
-    this.editMiscPopup = false
-    this.verifypopup = true;
-    e.cancel = true;
+onVerifyClick(e: any): void {
+  e.cancel = true;
+
   const transStatus = e.row.data.TRANS_STATUS;
-  this.statusFinder = e.row.data.TRANS_STATUS;
-    const id = e.row.data.TRANS_ID;
-    console.log(id, '===================id');
-    this.dataService.selectMiscReceipt(id).subscribe((res: any) => {
-      console.log(res);
-      this.selectedmiscellaneousData = res.Data;
-      console.log(this.selectedmiscellaneousData, '==============select data====verify');
-      // this.get_employes_details_value_select();
+  const id = e.row.data.TRANS_ID;
+
+  this.statusFinder = transStatus;
+
+  // reset previous data
+  this.selectedmiscellaneousData = null;
+  this.verifypopup = false;
+
+  this.dataService.selectMiscReceipt(id).subscribe({
+    next: (res: any) => {
+      this.selectedmiscellaneousData = { ...res.Data };
       this.isReadOnlyPayment = transStatus === 'Approve';
-    });
-  }
+
+      // open popup AFTER data arrives
+      this.verifypopup = true;
+    },
+    error: (err) => {
+      console.error('Error loading verify data:', err);
+    }
+  });
+}
 
    // ============================Approve Popup function=========================================
-  onApproveClick(e: any): void {
-    this.verifypopup = true;
-    e.cancel = true;
-    const transStatus = e.row.data.TRANS_STATUS;
-    this.statusFinder = e.row.data.TRANS_STATUS;
-    const id = e.row.data.TRANS_ID;
-    console.log(id, '===================id');
-    this.dataService.selectMiscReceipt(id).subscribe((res: any) => {
+ onApproveClick(e: any): void {
+  e.cancel = true;
+
+  const transStatus = e.row.data.TRANS_STATUS;
+  const id = e.row.data.TRANS_ID;
+
+  this.statusFinder = transStatus;
+
+  // Clear stale data
+  this.selectedmiscellaneousData = null;
+  this.verifypopup = false;
+
+  this.dataService.selectMiscReceipt(id).subscribe({
+    next: (res: any) => {
       console.log(res);
-      this.selectedmiscellaneousData = res.Data;
-      console.log(this.selectedmiscellaneousData, '==============select data====verify');
-      // this.get_employes_details_value_select();
+
+      // assign fresh object reference
+      this.selectedmiscellaneousData = { ...res.Data };
+
       this.isReadOnlyPayment = transStatus === 'Approve';
-    });
-  }
+
+      // open popup only after data is ready
+      this.verifypopup = true;
+    },
+    error: (err) => {
+      console.error('Error loading approve data:', err);
+    }
+  });
+}
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -645,7 +667,7 @@ export class ListMiscReceiptComponent {
     const status = e.data.TRANS_STATUS;
     this.dataService.selectMiscReceipt(miscId).subscribe({
       next: (response: any) => {
-        this.selectedmiscellaneousData = response.Data;
+        this.selectedmiscellaneousData = { ...response.Data };
 
         this.editMiscPopup = true;
         this.isReadOnlyPayment = status === 'Approve';

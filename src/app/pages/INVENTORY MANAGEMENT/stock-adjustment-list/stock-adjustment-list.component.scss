@@ -1,5 +1,40 @@
-  .button-container{
-    margin-top: 30px;
-    margin-left: 40%;
+.button-container {
+  margin-top: 30px;
+  margin-left: 40%;
+}
 
-  }
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.flag-open {
+  color: white; /* or rgb(245, 240, 240) */
+  text-shadow:
+    0 0 1px black,
+    0 0 2px black;
+}
+
+.flag-pending {
+  color: black;
+}
+
+.flag-verified {
+  color: orange;
+}
+
+.flag-approved {
+  color: green;
+}
+::ng-deep .grndropdown {
+  margin-top: -8px; /* adjust -4px / -8px as needed */
+}
+::ng-deep .dx-toolbar .dx-toolbar-items-container {
+  align-items: flex-start !important;
+}
+::ng-deep .verify-btn .dx-icon {
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900;
+  color: green;
+}
