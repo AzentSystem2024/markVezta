@@ -51,7 +51,7 @@
       [applyFilter]="currentFilter"
     ></dxo-filter-row>
 
-    <dxo-header-filter [visible]="true">
+    <dxo-header-filter [visible]="isFilterOpened">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 
@@ -131,6 +131,7 @@
     title="Imported Excel Preview"
     [dragEnabled]="true"
     [closeOnOutsideClick]="false"
+    (onHiding)="refreshGrid()"
   >
     <div *dxTemplate="let data of 'content'" class="popup-content-wrapper">
       <!-- Grid -->
@@ -150,7 +151,7 @@
           [applyFilter]="currentFilter"
         ></dxo-filter-row>
 
-        <dxo-header-filter [visible]="true">
+        <dxo-header-filter [visible]="isFilterOpened">
           <dxo-search [enabled]="true"></dxo-search>
         </dxo-header-filter>
 
@@ -158,12 +159,11 @@
 
         <dxo-pager
           [visible]="true"
-          [showInfo]="true"
-          infoText="Page {0} of {1}"
-          [showNavigationButtons]="true"
           [showPageSizeSelector]="true"
-          [allowedPageSizes]="[10, 20, 30, 40]"
-        ></dxo-pager>
+          [allowedPageSizes]="[10, 20, 50, 100]"
+          [showInfo]="true"
+        >
+        </dxo-pager>
 
         <dxo-scrolling
           mode="virtual"
@@ -174,6 +174,12 @@
           useNative="false"
         >
         </dxo-scrolling>
+        <dxo-load-panel
+          [enabled]="true"
+          [showPane]="true"
+          [showIndicator]="true"
+        >
+        </dxo-load-panel>
       </dx-data-grid>
 
       <!-- Footer Buttons -->
@@ -201,65 +207,68 @@
     </div>
   </dx-popup>
 
-
   <dx-popup
-  [(visible)]="isDetailsPopupVisible"
-  [width]="'95%'"
-  [height]="'90%'"
-  [showTitle]="true"
-  title="Import AR Details"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="false"
->
-  <div *dxTemplate="let data of 'content'">
-
-    <dx-data-grid
-      class="grid theme-dependent"
-      [dataSource]="importDetailViewData"
-      [showBorders]="true"
-      [columnAutoWidth]="true"
-      [allowColumnResizing]="true"
-      [allowColumnReordering]="true"
-      [rowAlternationEnabled]="true"
-      [height]="'100%'"
-    >
-
-      <!-- Dynamic Columns -->
-      <!-- <dxi-column
-        *ngFor="let col of detailColumns"
-        [dataField]="col"
-        [caption]="col"
+    [(visible)]="isDetailsPopupVisible"
+    [width]="'95%'"
+    [height]="'90%'"
+    [showTitle]="true"
+    title="Import AR Details"
+    [dragEnabled]="true"
+    [closeOnOutsideClick]="false"
+    (onHiding)="refreshGrid()"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <dx-data-grid
+        class="grid theme-dependent"
+        [dataSource]="importDetailViewData"
+        [showBorders]="true"
+        [columnAutoWidth]="true"
+        [allowColumnResizing]="true"
+        [allowColumnReordering]="true"
+        [rowAlternationEnabled]="true"
+        [height]="'100%'"
       >
-      </dxi-column> -->
+        <!-- Dynamic Columns -->
+        <dxi-column
+          *ngFor="let col of detailViewColumns"
+          [dataField]="col"
+          [caption]="col"
+          width="150"
+        >
+        </dxi-column>
 
-      <dxo-filter-row
-        [visible]="true"
-        applyFilter="auto"
-      ></dxo-filter-row>
+        <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
 
-      <dxo-header-filter [visible]="true">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
+        <dxo-header-filter [visible]="isFilterOpened">
+          <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter>
 
-      <dxo-paging [pageSize]="10"></dxo-paging>
+        <dxo-paging [pageSize]="10"></dxo-paging>
 
-      <dxo-pager
-        [visible]="true"
-        [showPageSizeSelector]="true"
-        [allowedPageSizes]="[10, 20, 50, 100]"
-        [showInfo]="true"
-      >
-      </dxo-pager>
+        <dxo-pager
+          [visible]="true"
+          [showPageSizeSelector]="true"
+          [allowedPageSizes]="[10, 20, 50, 100]"
+          [showInfo]="true"
+        >
+        </dxo-pager>
+        <dxo-scrolling
+          mode="virtual"
+          rowRenderingMode="virtual"
+          columnRenderingMode="virtual"
+          showScrollbar="always"
+          preloadEnabled="true"
+          useNative="false"
+        >
+        </dxo-scrolling>
 
-      <dxo-load-panel
-        [enabled]="true"
-        [showPane]="true"
-        [showIndicator]="true"
-      >
-      </dxo-load-panel>
-
-    </dx-data-grid>
-
-  </div>
-</dx-popup>
+        <dxo-load-panel
+          [enabled]="true"
+          [showPane]="true"
+          [showIndicator]="true"
+        >
+        </dxo-load-panel>
+      </dx-data-grid>
+    </div>
+  </dx-popup>
 </div>
