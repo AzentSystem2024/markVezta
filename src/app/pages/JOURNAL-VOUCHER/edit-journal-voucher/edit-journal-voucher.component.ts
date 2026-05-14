@@ -63,6 +63,9 @@ export class EditJournalVoucherComponent {
   @ViewChild('narrationRefBox') narrationRefBox: DxTextBoxComponent;
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() isVerifyMode: boolean = false;
+  @Input() canApprove: boolean = false;
+  @Input() isApproveMode: boolean = false;
   @Input() journalVoucherFormData: any = {
     TRANS_ID: 0,
     TRANS_DATE: new Date(),
@@ -93,7 +96,7 @@ export class EditJournalVoucherComponent {
   canEdit = false;
   canView = false;
   canDelete = false;
-  canApprove = false;
+  // canApprove = false;
   canPrint = false;
   Company_list: any = [];
   selectedDeptId: any;
@@ -109,9 +112,10 @@ export class EditJournalVoucherComponent {
     private dataService: DataService,
     private router: Router,
     private sanitizer: DomSanitizer,
-  ) { }
+  ) {}
 
   ngOnInit() {
+    console.log(this.isVerifyMode, 'ISVERIFYMODEEEEEEEEEEEEEEE');
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -121,8 +125,8 @@ export class EditJournalVoucherComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/journal-voucher');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/journal-voucher');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -715,8 +719,8 @@ export class EditJournalVoucherComponent {
     const nextSlNo =
       this.journalVoucherFormData.DETAILS.length > 0
         ? Math.max(
-          ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
-        ) + 1
+            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
+          ) + 1
         : 1;
 
     const newRow = {
@@ -874,7 +878,7 @@ export class EditJournalVoucherComponent {
     }
 
     // Step 3: handle APPROVED flow
-    if (this.journalVoucherFormData.IS_APPROVED) {
+    if (this.journalVoucherFormData.IS_APPROVED || this.isApproveMode) {
       console.log('approved???????????????????????????????????');
 
       confirm(
@@ -931,6 +935,11 @@ export class EditJournalVoucherComponent {
     }
 
     // ✅ Step 4: normal UPDATE flow
+    if (this.isVerifyMode === true) {
+      this.journalVoucherFormData.IS_VERIFIED = true;
+    } else {
+      this.journalVoucherFormData.IS_VERIFIED = false;
+    }
     const payload = {
       TRANS_ID: this.journalVoucherFormData.TRANS_ID,
       DOC_NO: this.journalVoucherFormData.DOC_NO,
@@ -948,13 +957,57 @@ export class EditJournalVoucherComponent {
       TRANS_STATUS: 1,
       DETAILS: transformedDetails,
       IS_APPROVED: false,
+      IS_VERIFIED: this.journalVoucherFormData.IS_VERIFIED,
     };
     this.isSaving = true;
+    if (this.isVerifyMode === true) {
+      const result = confirm(
+        'Are you sure you want to verify this Journal Voucher?',
+        'Confirm Verification',
+      );
+
+      result.then((dialogResult: boolean) => {
+        if (dialogResult) {
+          this.updateJournalVoucher(payload);
+        }
+      });
+    } else {
+      this.updateJournalVoucher(payload);
+    }
+    // this.dataService.updateJournalVoucher(payload).subscribe(
+    //   (response: any) => {
+    //     this.isSaving = false;
+    //     if (response.flag === 1) {
+    //       notify('Journal voucher updated successfully!', 'success', 3000);
+    //       this.popupClosed.emit();
+    //     } else {
+    //       notify(`Update failed: ${response.Message}`, 'error', 4000);
+    //     }
+    //   },
+    //   (error) => {
+    //     this.isSaving = false;
+    //     console.error('Update error:', error);
+    //     alert('Something went wrong while updating');
+    //   },
+    // );
+  }
+
+  updateJournalVoucher(payload: any) {
+    this.isSaving = true;
+
     this.dataService.updateJournalVoucher(payload).subscribe(
       (response: any) => {
         this.isSaving = false;
+
         if (response.flag === 1) {
-          notify('Journal voucher updated successfully!', 'success', 3000);
+          notify(
+            this.isVerifyMode
+              ? 'Journal voucher verified successfully!'
+              : 'Journal voucher updated successfully!',
+            'success',
+            3000,
+          );
+
           this.popupClosed.emit();
         } else {
           notify(`Update failed: ${response.Message}`, 'error', 4000);
@@ -962,7 +1015,9 @@ export class EditJournalVoucherComponent {
       },
       (error) => {
         this.isSaving = false;
+
         console.error('Update error:', error);
+
         alert('Something went wrong while updating');
       },
     );
@@ -1011,4 +1066,4 @@ export class EditJournalVoucherComponent {
   exports: [EditJournalVoucherComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditJournalVoucherModule { }
+export class EditJournalVoucherModule {}

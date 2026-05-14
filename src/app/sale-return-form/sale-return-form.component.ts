@@ -156,13 +156,14 @@ export class SaleReturnFormComponent {
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
     const configStore = userData.Configuration?.[0];
+    console.log(configStore, 'CONFIGSTOREEEEEEEEEEE');
     this.selectedCompanyId = selectedCompany.COMPANY_ID;
     this.companyStateId = selectedCompany.STATE_ID;
     this.userID = userData.USER_ID;
     this.finID = userData.FINANCIAL_YEARS[0].FIN_ID;
     this.salesReturnFormData.COMPANY_ID = selectedCompany.COMPANY_ID;
     this.companyList = [selectedCompany];
-
+    this.getStoreData();
     // this.HSNCODE = userData.GeneralSettings.HSN_CODE;
     // this.GST = userData.GeneralSettings.GST_PERC;
 
@@ -182,12 +183,12 @@ export class SaleReturnFormComponent {
           DESCRIPTION: configStore.STORE_NAME,
         },
       ];
-
       // Auto select store
       this.salesReturnFormData.STORE_ID = configStore.STORE_ID;
     } else {
       this.filteredStoreList = this.storeList;
     }
+    console.log(this.filteredStoreList, 'FILTEREDSTORELIST');
     if (!this.isEditing) {
       this.getDocNo();
     }
