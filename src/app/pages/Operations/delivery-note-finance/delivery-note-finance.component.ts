@@ -283,7 +283,13 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
+    // icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
+    icon.style.color =
+      status === 'APPROVED'
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
     icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
 
     icon.style.display = 'flex';
@@ -501,22 +507,23 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     this.dataService
       .selectDeliveryNoteFinance(deliveryId)
       .subscribe((response: any) => {
-        this.selectedDelivery = response.Data; // ✅ FIX
+        this.selectedDelivery = response.Data; // FIX
         this.isEditDelivery = true;
         this.isReadOnlyDelivery = status === 'APPROVED';
       });
   }
 
   onVerifyDeliveryNote(event: any) {
+    console.log(event, 'event');
     const rowData = event.row.data;
 
-    const invoiceId = rowData.TRANS_ID;
-    const transStatus = rowData.TRANS_STATUS;
+    const invoiceId = rowData.ID;
+    const transStatus = rowData.STATUS;
 
     this.isReadOnlyDelivery = transStatus === 5;
 
     this.dataService
-      .selectInvoiceRetail(invoiceId)
+      .selectDeliveryNoteFinance(invoiceId)
       .subscribe((response: any) => {
         this.selectedDelivery = response.Data;
 
@@ -590,6 +597,9 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   handleClose() {
     this.isAddDelivery = false;
     this.isEditDelivery = false;
+    this.isVerifyDelivery = false;
+    this.isApproveDelivery = false;
+    this.isViewDelivery = false;
     this.getDeliveryNotes();
   }
 

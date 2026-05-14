@@ -2,7 +2,6 @@
   <dx-data-grid
     class="grid theme-dependent"
     [dataSource]="importLogs"
-    [columns]="['FileName', 'ImportedDate', 'TotalRows']"
     [showBorders]="true"
     [rowAlternationEnabled]="true"
     rowAlternationInterval="2"
@@ -11,12 +10,42 @@
     [columnAutoWidth]="true"
     [height]="'80vh'"
     noDataText=" "
-    [pager]="{
-      showInfo: true,
-      infoText: 'Page {0} of {1}',
-      showNavigationButtons: true,
-    }"
   >
+    <!-- ================= Columns ================= -->
+
+    <dxi-column dataField="DocNo" caption="Doc No"></dxi-column>
+    <dxi-column dataField="FileName" caption="File Name"></dxi-column>
+    <dxi-column
+      dataField="ImportedTime"
+      caption="Imported Time"
+      dataType="datetime"
+    ></dxi-column>
+    <dxi-column dataField="ImportedBy" caption="Imported By"></dxi-column>
+
+    <!-- ================= Action Column ================= -->
+    <dxi-column
+      caption="Action"
+      alignment="center"
+      [width]="120"
+      cellTemplate="actionTemplate"
+    >
+    </dxi-column>
+
+    <!-- ================= Action Button Template ================= -->
+
+    <div *dxTemplate="let data of 'actionTemplate'">
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        (click)="showImportDetails(data.data)"
+      >
+        <i class="bi bi-eye"></i>
+        View
+      </button>
+    </div>
+
+    <!-- ================= Filter ================= -->
+
     <dxo-filter-row
       [visible]="showFilterRow"
       [applyFilter]="currentFilter"
@@ -26,18 +55,26 @@
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 
+    <!-- ================= Paging ================= -->
+
     <dxo-paging [pageSize]="10"></dxo-paging>
+
     <dxo-pager
       [visible]="true"
+      [showInfo]="true"
+      infoText="Page {0} of {1}"
+      [showNavigationButtons]="true"
       [showPageSizeSelector]="true"
       [allowedPageSizes]="[10, 20, 30, 40]"
-    ></dxo-pager>
+    >
+    </dxo-pager>
 
-    <dxo-load-panel
-      [enabled]="true"
-      [showPane]="true"
-      [showIndicator]="true"
-    ></dxo-load-panel>
+    <!-- ================= Load Panel ================= -->
+
+    <dxo-load-panel [enabled]="true" [showPane]="true" [showIndicator]="true">
+    </dxo-load-panel>
+
+    <!-- ================= Toolbar ================= -->
 
     <dxo-toolbar>
       <dxi-item location="before" locateInMenu="never">
@@ -48,31 +85,31 @@
         location="after"
         widget="dxButton"
         [options]="searchButtonOptions"
-      ></dxi-item>
+      >
+      </dxi-item>
 
       <!-- Refresh -->
       <dxi-item
         location="after"
         widget="dxButton"
         [options]="refreshButtonOptions"
-      ></dxi-item>
+      >
+      </dxi-item>
 
       <!-- Divider -->
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
       </dxi-item>
 
-      <dxi-item
-        name="exportButton"
-        location="after"
-        cssClass="export-btn"
-      ></dxi-item>
+      <dxi-item name="exportButton" location="after" cssClass="export-btn">
+      </dxi-item>
 
       <dxi-item
         location="after"
         widget="dxButton"
         [options]="importButtonOptions"
-      ></dxi-item>
+      >
+      </dxi-item>
     </dxo-toolbar>
   </dx-data-grid>
 
@@ -98,12 +135,12 @@
     <div *dxTemplate="let data of 'content'" class="popup-content-wrapper">
       <!-- Grid -->
       <dx-data-grid
-        #dataGrid      class="grid theme-dependent"
+        #dataGrid
+        class="grid theme-dependent"
         [dataSource]="Imported_Ar_DataSource"
         [columns]="gridColumns"
         [showBorders]="true"
         [rowAlternationEnabled]="true"
-        [columnAutoWidth]="false"
         [allowColumnResizing]="true"
         [allowColumnReordering]="true"
         [height]="'calc(100% - 70px)'"
@@ -163,4 +200,66 @@
       </div>
     </div>
   </dx-popup>
+
+
+  <dx-popup
+  [(visible)]="isDetailsPopupVisible"
+  [width]="'95%'"
+  [height]="'90%'"
+  [showTitle]="true"
+  title="Import AR Details"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+>
+  <div *dxTemplate="let data of 'content'">
+
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="importDetailViewData"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [allowColumnReordering]="true"
+      [rowAlternationEnabled]="true"
+      [height]="'100%'"
+    >
+
+      <!-- Dynamic Columns -->
+      <!-- <dxi-column
+        *ngFor="let col of detailColumns"
+        [dataField]="col"
+        [caption]="col"
+      >
+      </dxi-column> -->
+
+      <dxo-filter-row
+        [visible]="true"
+        applyFilter="auto"
+      ></dxo-filter-row>
+
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-pager
+        [visible]="true"
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10, 20, 50, 100]"
+        [showInfo]="true"
+      >
+      </dxo-pager>
+
+      <dxo-load-panel
+        [enabled]="true"
+        [showPane]="true"
+        [showIndicator]="true"
+      >
+      </dxo-load-panel>
+
+    </dx-data-grid>
+
+  </div>
+</dx-popup>
 </div>

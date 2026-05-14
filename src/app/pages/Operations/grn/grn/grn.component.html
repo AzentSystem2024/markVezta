@@ -258,27 +258,23 @@
 >
   <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
 </form-popup>
-
-<!-- <form-popup
+<form-popup
   [(visible)]="isApprovePopupOpened"
   titleText="Approve Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
   (save)="approveGrnData()"
 >
-  <app-grn-approve-form [formdata]="selectedRowData"></app-grn-approve-form>
-</form-popup> -->
+  <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
+</form-popup>
 
 <dx-popup
-  [(visible)]="isViewOpened"
+  [(visible)]="isViewPopupOpened"
   title="View Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
 >
-  <app-grn-view-form
-    [formdata]="selectedRowData"
-    [grnId]="selectedGrnId"
-  ></app-grn-view-form>
+  <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
 </dx-popup>
 <!-- <dx-popup
   [(visible)]="isViewPopupOpened"

@@ -69,6 +69,7 @@
         caption="Remarks"
         [allowEditing]="false"
       ></dxi-column>
+      <!--       
       <dxi-column
         dataField="Status"
         caption="Status"
@@ -85,9 +86,182 @@
       </div>
       <dxi-column
         type="buttons"
-        [width]="200"
+        [width]="300"
         [buttons]="allButtons"
       ></dxi-column>
+      <div *dxTemplate="let data of 'verifyTemplate'">
+        <span style="margin-right: 8px">
+          <i
+            class="fas fa-certificate"
+            style="color: #ffa500; font-size: 18px"
+          ></i>
+
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
+
+      <div *dxTemplate="let data of 'ApproveTemplate'">
+        <span style="margin-right: 8px">
+          <i
+            class="fas fa-certificate"
+            style="color: #0073d8; font-size: 18px"
+          ></i>
+
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
+
+      <div *dxTemplate="let data of 'ViewTemplate'">
+   
+          <i
+            class="fas fa-certificate"
+            style="color: #10b981; font-size: 18px"
+          ></i>
+
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+      </div> -->
+
+      <dxi-column
+        caption="Status"
+        dataField="Status"
+        [width]="80"
+        [cellTemplate]="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false,
+        }"
+      >
+      </dxi-column>
+      <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.Status === 'Verified' ||
+            cellData.data.Status === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.Status === 'Verified' ||
+            cellData.data.Status === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="openEditingStart({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.Status === 'Verified' ||
+            cellData.data.Status === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.Status === 'Verified' ||
+            cellData.data.Status === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="onRowRemoving({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="canVerify"
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.Status === 'Approved'
+              ? 'Approved'
+              : cellData.data.Status === 'Verified'
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifyClick({ row: { data: cellData.data } })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.Status === 'Approved'
+                ? '#10B981'
+                : cellData.data.Status === 'Verified'
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
     </dx-data-grid>
   </div>
 </div>

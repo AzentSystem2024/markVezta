@@ -217,7 +217,7 @@
       ></dxi-column>
 
       <!-- <dxi-column dataField="STATUS" caption="Status"></dxi-column> -->
-      <dxi-column
+      <!-- <dxi-column
         dataField="TRANS_STATUS"
         caption="Status"
         cellTemplate="statusCellTemplate"
@@ -232,7 +232,7 @@
           [attr.title]="cellData.value"
           style="margin-left: 10px; cursor: default"
         ></i>
-      </div>
+      </div> -->
       <!-- <dxi-column
         type="buttons"
         [buttons]="allActionButtons"
@@ -240,7 +240,119 @@
         fixed="true"
         fixedPosition="right"
       ></dxi-column> -->
-      <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column>
+      <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
+
+      <dxi-column
+        caption="Status"
+        dataField="TRANS_STATUS"
+        [width]="80"
+        [cellTemplate]="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false,
+        }"
+      >
+      </dxi-column>
+      <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 'Verified' ||
+            cellData.data.TRANS_STATUS === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 'Verified' ||
+            cellData.data.TRANS_STATUS === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditPrePayment({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.TRANS_STATUS === 'Verified' ||
+            cellData.data.TRANS_STATUS === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.TRANS_STATUS === 'Verified' ||
+            cellData.data.TRANS_STATUS === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="onDeletePrepayment({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="canVerify"
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.TRANS_STATUS === 'Approved'
+              ? 'Approved'
+              : cellData.data.TRANS_STATUS === 'Verified'
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifyClick({ row: { data: cellData.data } })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.TRANS_STATUS === 'Approved'
+                ? '#10B981'
+                : cellData.data.TRANS_STATUS === 'Verified'
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
     </dx-data-grid>
   </div>
 </div>
@@ -251,7 +363,10 @@
   title="New Prepayment Posting"
   (onHiding)="handleClose()"
 >
-  <app-prepayment-posting-add (popupClosed)="handleClose()" [canApprove]="canApprove"></app-prepayment-posting-add>
+  <app-prepayment-posting-add
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  ></app-prepayment-posting-add>
 </dx-popup>
 
 <dx-popup
@@ -267,6 +382,7 @@
     (popupClosed)="handleClose()"
     [prepaymentpostingId]="selectedprepaymentposting"
     [canApprove]="canApprove"
+    [status]="StatusType"
   >
   </app-prepayment-posting-edit>
 </dx-popup>

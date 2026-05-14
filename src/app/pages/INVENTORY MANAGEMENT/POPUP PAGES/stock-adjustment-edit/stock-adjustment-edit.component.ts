@@ -56,6 +56,8 @@ export class StockAdjustmentEditComponent {
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @Input() EditingResponseData: any = {};
+  @Input() status: any
+
   @Output() popupClosed = new EventEmitter<void>();
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -124,6 +126,7 @@ export class StockAdjustmentEditComponent {
   storename: any;
   hidecost: any;
   IS_HQ_App: boolean = false;
+  selectedStatus: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -159,7 +162,7 @@ export class StockAdjustmentEditComponent {
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
-      this.canView = packingRights.canView;
+      this.canView = packingRights.CanView;
       this.hidecost = packingRights.HideCost;
       this.canApprove = packingRights.CanApprove;
     }
@@ -187,15 +190,20 @@ export class StockAdjustmentEditComponent {
       console.log(this.adjustmentFormData);
       this.selecte_Date_Details = this.adjustmentFormData.Details;
       const editable = this.adjustmentFormData.STATUS;
+      this.selectedStatus = this.adjustmentFormData.STATUS;
       console.log(editable);
+      this.readOnlyTrue = editable == 5
+      this.approveValue = editable == 5
+
       // this.readOnlyTrue=
-      if (editable == 5) {
-        this.readOnlyTrue = true;
-        this.approveValue = true;
-      } else {
-        this.readOnlyTrue = false;
-        this.approveValue = false;
-      }
+      // if (editable == 5) {
+      //   this.readOnlyTrue = true;
+      //   this.approveValue = true;
+      // } else {
+      //   this.readOnlyTrue = false;
+      //   this.approveValue = false;
+      // }
+      console.log(this.status)
     }
   }
   onSelectItems() {
@@ -311,6 +319,7 @@ export class StockAdjustmentEditComponent {
   }
   onPopupHiding() { }
   updateNetAmount(event: any) { }
+
   UpdateStockAdjustment() {
     console.log(this.adjustmentFormData);
     const ITEM_Details = this.adjustmentFormData.Details;
@@ -359,7 +368,7 @@ export class StockAdjustmentEditComponent {
       notify('Please add at least one item', 'error');
       return;
     }
-    if (this.approveValue == true) {
+    if (this.selectedStatus == 2) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -396,7 +405,27 @@ export class StockAdjustmentEditComponent {
           notify('Approval cancelled.', 'info', 2000);
         }
       });
-    } else {
+    }
+
+    else if (this.status == 'verifyscreen') {
+      {
+        this.dataService
+          .Verify_Stock_Adjustment_Data(payload)
+          .subscribe((res: any) => {
+            console.log(res);
+            notify(
+              {
+                message: ' Stock Adjustment Updated successfully',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 1000,
+              },
+              'success',
+            );
+            this.popupClosed.emit();
+          });
+      }
+    }
+    else {
       this.dataService
         .Update_Stock_Adjustment_Data(payload)
         .subscribe((res: any) => {
@@ -442,13 +471,30 @@ export class StockAdjustmentEditComponent {
     // calculate Amount also
     row.AMOUNT = (row.ADJ_QTY || 0) * (row.COST || 0);
 
-    // 🔥 reassign array to trigger Angular + DevExtreme refresh
+    //  reassign array to trigger Angular + DevExtreme refresh
     this.adjustmentFormData.Details = [...this.adjustmentFormData.Details];
     // force UI refresh
     e.component.refresh(true);
   }
-}
 
+  getButtonText(): string {
+    if (this.status == 'Editscreen') {
+      return 'Update';
+    } else if (this.status == 'verifyscreen') {
+      console.log(this.status, this.selectedStatus)
+      if (this.selectedStatus == 1) {
+        return 'Verify';
+
+      } else {
+        return 'Approve';
+
+      }
+    }
+    else {
+      return 'Approsve';
+    }
+  }
+}
 @NgModule({
   imports: [
     BrowserModule,

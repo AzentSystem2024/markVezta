@@ -39,6 +39,8 @@ export class PrepaymentPostingEditComponent {
   @Input() selecteprepaymentData: any = {};
   @Output() popupClosed = new EventEmitter<void>();
   @Input() prepaymentpostingId: any;
+  @Input() status: any;
+
   @Input() canApprove: boolean = false;
   selectedMonthYear: string | number | Date;
   PrepaymentList: any;
@@ -68,6 +70,7 @@ export class PrepaymentPostingEditComponent {
   selectedstoreId: any;
   transDate: Date | string | number | null = null;
   isSaving = false;
+  selectedStatus: any;
 
   constructor(
     private dataservice: DataService,
@@ -99,6 +102,7 @@ export class PrepaymentPostingEditComponent {
       );
       console.log('Converted transDate:', this.transDate);
 
+      this.selectedStatus = this.selecteprepaymentData[0].TRANS_STATUS
       if (this.selecteprepaymentData[0].TRANS_STATUS == 'Approved') {
         this.approveValue = true;
         this.isEditReadOnly = true;
@@ -205,7 +209,7 @@ export class PrepaymentPostingEditComponent {
     };
 
     this.isSaving = true;
-    if (this.approveValue === true) {
+    if (this.approveValue || this.selectedStatus == 'Verified') {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -240,6 +244,27 @@ export class PrepaymentPostingEditComponent {
           //   notify('Approval cancelled.', 'info', 2000);
         }
       });
+    } else if (this.status === 'verifyscreen' || this.selectedStatus == 'Open') {
+      this.dataservice.Verify_prepayment_data(payload).subscribe(
+        (res: any) => {
+          this.isSaving = false;
+          console.log('Updated:', res);
+          notify(
+            {
+              message: 'Prepayment posting updated successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+          this.popupClosed.emit();
+        },
+        (error) => {
+          this.isSaving = false; // ✅ STOP loading
+          console.error(error);
+          notify('Failed to update Prepayment posting.', 'error', 2000);
+        },
+      );
     } else {
       this.dataservice.Update_prepayment_data(payload).subscribe(
         (res: any) => {
@@ -291,6 +316,24 @@ export class PrepaymentPostingEditComponent {
     const url = URL.createObjectURL(blob);
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
+
+
+  getButtonText(): string {
+    if (this.status == 'Editscreen') {
+      return 'Update';
+    } else if (this.status == 'verifyscreen') {
+      if (!this.approveValue && this.selectedStatus == 'Open') {
+        return 'Verify';
+
+      } else {
+        return 'Approve';
+
+      }
+    }
+    else {
+      return 'Approsve';
+    }
+  }
 }
 
 @NgModule({
@@ -312,4 +355,4 @@ export class PrepaymentPostingEditComponent {
   exports: [PrepaymentPostingEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PrepaymentPostingEditModule {}
+export class PrepaymentPostingEditModule { }

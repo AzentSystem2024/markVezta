@@ -188,7 +188,7 @@
             caption="Price"
             dataType="number"
             format="#,##0.00"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="PENDING_QTY"
@@ -213,7 +213,7 @@
             caption="Amount"
             dataType="number"
             format="#,##0.00"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
             [calculateCellValue]="calculateAmount"
           ></dxi-column>
           <dxi-column
@@ -390,6 +390,8 @@
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+      (onSelectionChanged)="onPendingSelectionChanged($event)"
+      (onRowPrepared)="onPendingRowPrepared($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager

@@ -263,9 +263,7 @@
       type="normal"
     ></dx-button>
     <dx-button
-      [text]="
-        isSaving ? 'Updating...' : approveValue ? 'Update & Commit' : 'Update'
-      "
+      [text]="getButtonText()"
       [disabled]="isSaving"
       [visible]="isEdit"
       stylingMode="contained"

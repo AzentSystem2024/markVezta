@@ -145,7 +145,13 @@ export class GrnComponent implements OnInit {
     icon.className = 'fas fa-flag';
     icon.style.fontSize = '18px';
 
-    icon.style.color = status === 'Approved' ? 'green' : 'orange';
+    // icon.style.color = status === 'Approved' ? 'green' : 'orange';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
     icon.title = status === 'Approved' ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';
@@ -507,7 +513,7 @@ export class GrnComponent implements OnInit {
             );
 
             this.getGrnLogData();
-            this.isVerifyPopupOpened = false;
+            this.isVerifyOpened = false;
           }
         }
 
@@ -526,32 +532,35 @@ export class GrnComponent implements OnInit {
   }
 
   approveGrnData() {
-    console.log(
-      '======================================================================================',
+    const result = confirm(
+      'Are you sure you want to approve this GRN?',
+      'Confirm Approval',
     );
-    const data = this.grnApproveForm.getNewGrnData();
-    console.log(data, 'grn approved data');
-
-    this.service.approveGrnData(data).subscribe((res) => {
-      console.log('data approved', res);
-      if ((res.Message = 'Success')) {
-        notify(
-          {
-            message: 'Data Approved Successfully',
-            position: { at: 'top center', my: 'top center' },
-          },
-          'success',
-        );
-        this.getGrnLogData();
-        this.isApprovePopupOpened = false;
-      } else {
-        notify(
-          {
-            message: 'Your Data Not Approved',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
+    result.then((dialogResult: boolean) => {
+      if (dialogResult) {
+        const data = this.grnVerifyForm.getNewGrnData();
+        this.service.approveGrnData(data).subscribe((res) => {
+          console.log('data approved', res);
+          if ((res.Message = 'Success')) {
+            notify(
+              {
+                message: 'Data Approved Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            this.getGrnLogData();
+            this.isApprovePopupOpened = false;
+          } else {
+            notify(
+              {
+                message: 'Your Data Not Approved',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        });
       }
     });
   }
@@ -810,34 +819,31 @@ export class GrnComponent implements OnInit {
   }
 
   onVerifyClick(event: any) {
-    event.cancel = true;
-    console.log(event.row.data, 'VERIFYCLICKEDDDDDDDDDD');
+    console.log(event, 'EVENTTTTTT');
     const rowData = event.row.data;
+    console.log(event.row.data.ID, '=================');
+    const invoiceId = rowData.ID;
+    const transStatus = rowData.STATUS;
 
-    const grnId = rowData.ID;
-    const status = rowData.STATUS;
-    this.service.selectGrnData(grnId).subscribe((res) => {
-      this.selectedRowData = res;
+    // this.isReadOnlyInvoice = transStatus === 5;
 
-      // APPROVED -> VIEW
-      if (status === 'Approved') {
-        this.isViewOpened = true;
-        return;
+    this.service.selectGrnData(invoiceId).subscribe((response: any) => {
+      this.selectedRowData = response;
+
+      // APPROVED -> OPEN VIEW PAGE
+      if (transStatus === 'Approved') {
+        this.isViewPopupOpened = true;
       }
 
-      // VERIFIED -> APPROVE
-      if (status === 'Verified') {
-        this.isApproved = true;
-        this.isVerifyMode = false;
-
-        this.isApproveOpened = true;
-        return;
+      // VERIFIED -> OPEN APPROVE PAGE
+      else if (transStatus === 'Verified') {
+        this.isApprovePopupOpened = true;
       }
 
-      // OPEN -> VERIFY
-      this.isVerifyMode = true;
-
-      this.isVerifyOpened = true;
+      // OPEN VERIFY PAGE
+      else {
+        this.isVerifyOpened = true;
+      }
     });
   }
 

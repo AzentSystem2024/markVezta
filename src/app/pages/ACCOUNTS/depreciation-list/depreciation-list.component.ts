@@ -81,6 +81,8 @@ export class DepreciationListComponent {
   EndDate: Date;
   showCustomDatePopup = false;
   selectedDateRange: string = 'today';
+  canVerify: boolean = false
+  StatusType: any
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'Last 7 Days', value: 'last7' },
@@ -90,6 +92,22 @@ export class DepreciationListComponent {
     // { label: 'Custom', value: 'custom' },
     { label: this.customLabel, value: 'custom' },
   ];
+
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+    {
+      text: 'Verified',
+      value: 'Verified',
+    },
+  ];
+
   gridButtons = [
     'edit',
     {
@@ -137,6 +155,7 @@ export class DepreciationListComponent {
   DepreciationId: any;
   selectedDepreciation: any;
   selected_Company_id: any;
+  statusId: any;
 
   addDepreciation() {
     this.AddDepreciationPopupVisible = true;
@@ -157,15 +176,6 @@ export class DepreciationListComponent {
       this.startDate = new Date(today);
       this.EndDate = new Date(today);
 
-      //   this.dataService.list_Depreciation_api().subscribe((res:any)=>{
-      //     this.allDepreciationLid=res.Data
-      //   })
-      //     const hasOpenData =this.allDepreciationLid?.some((item: any) => item.TRANS_STATUS === '1');
-
-      // if (hasOpenData) {
-      //   alert('Please approve or delete all open depreciation records before adding a new one.');
-      //   return;
-      // }
     }
 
     const currentUrl = this.router.url;
@@ -180,15 +190,19 @@ export class DepreciationListComponent {
       .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
+      console.log(packingRights, '=====================================')
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
-      this.canView = packingRights.canView;
+      this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
-    }
+      this.canVerify = packingRights.CanVerify;
 
-    this.get_Depreciation_list();
+    }
+    this.sesstion_Details();
+
+
   }
 
   toggleFilters() {
@@ -220,6 +234,7 @@ export class DepreciationListComponent {
     const id = event.data.TRANS_ID;
     this.DepreciationId = event.data.ID;
     this.selectedDepreciation = id;
+    this.StatusType = 'Editscreen'
     this.dataService.select_Depreciation_Asset(id).subscribe((res: any) => {
       this.Selected_Depreciation_data = res.Data;
     });
@@ -246,6 +261,28 @@ export class DepreciationListComponent {
     this.get_Depreciation_list();
   }
   Selected_Depreciation_data() { }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.TRANS_STATUS;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === '5'
+        ? '#10B981' // Approved
+        : status === '2'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === '5' ? 'Approved' : status === '2' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
+
   onDateRangeChanged(e: any) {
     const today = new Date();
     this.selectedDateRange = e.value;
@@ -280,13 +317,11 @@ export class DepreciationListComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.get_Depreciation_list();
   }
-
   ngOnInit() {
-    this.sesstion_Details();
   }
 
   get_Depreciation_list() {
@@ -305,6 +340,8 @@ export class DepreciationListComponent {
         const end = new Date(this.EndDate);
         end.setHours(23, 59, 59, 999);
 
+        console.log('-----today data-------------------')
+        console.log(start, end)
         this.Depreciation_List = allData.filter((item: any) => {
           const itemDate = new Date(item[dateField]);
           return itemDate >= start && itemDate <= end;
@@ -356,44 +393,6 @@ export class DepreciationListComponent {
     this.showCustomDatePopup = false;
   }
 
-  // applyCustomDateFilter() {
-  //   // if (!(this.customStartDate && this.customEndDate)) return;
-
-  //   const start = new Date(this.customStartDate);
-  //   start.setHours(0, 0, 0, 0);
-
-  //   const end = new Date(this.customEndDate);
-  //   end.setHours(23, 59, 59, 999);
-  // //
-  //   // Filter data
-  //   this.dataService.list_Depreciation_api().subscribe((res: any) => {
-  //     const allData = res.Data;
-  //     this.Depreciation_List = allData.filter((item: any) => {
-  //       const itemDate = new Date(item.DEPR_DATE);
-  //       return itemDate >= start && itemDate <= end;
-  //     });
-  //   });
-
-  //   // ✅ Update custom label
-  //   const fromLabel = this.formatAsDDMMYYYY(start);
-  //   const toLabel = this.formatAsDDMMYYYY(end);
-  //   this.customLabel = `${fromLabel} to ${toLabel}`;
-
-  //   // ✅ Reassign array to trigger change detection
-  //   this.dateRanges = [
-  //     { label: 'Today', value: 'today' },
-  //     { label: 'Last 7 Days', value: 'last7' },
-  //     { label: 'Last 15 Days', value: 'last15' },
-  //     { label: 'Last 30 Days', value: 'last30' },
-  //         { label: 'All', value: 'all' },
-  //     { label: this.customLabel, value: 'custom' }
-  //   ];
-
-  //   // Keep the selected value
-  //   this.selectedDateRange = 'custom';
-
-  //   this.showCustomDatePopup = false;
-  // }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -412,6 +411,20 @@ export class DepreciationListComponent {
     this.customEndDate = e.end;
 
     this.applyCustomDateFilter(); // your existing function
+  }
+
+  onVerifyClick(e: any) {
+    this.EditDepreciationPopupVisible = true;
+    this.DepreciationAddComponent.Active_fixedasset_List();
+    const id = e.row.data.TRANS_ID;
+    this.DepreciationId = e.row.data.ID;
+    this.selectedDepreciation = id;
+    this.StatusType = 'verifyscreen'
+    this.statusId = e.row.data.TRANS_STATUS
+
+    this.dataService.select_Depreciation_Asset(id).subscribe((res: any) => {
+      this.Selected_Depreciation_data = res.Data;
+    });
   }
 }
 

@@ -126,7 +126,8 @@ export class PayrollListComponent {
     },
   ];
   selectedMonth: Date = new Date();
-  selectedMonthForAdd: string;
+  selectedMonthForAdd: any;
+  selectedRowKeys: any
   calendarVisible = false;
   months = Array.from({ length: 12 }, (_, i) => new Date(2022, i, 1));
   monthNames = [
@@ -192,6 +193,7 @@ export class PayrollListComponent {
   };
   selectedRows: any;
   approveDisabled = true;
+  canVerify: any;
 
   constructor(
     private dataService: DataService,
@@ -229,7 +231,7 @@ export class PayrollListComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/payroll');
+      .find((menu) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -238,6 +240,7 @@ export class PayrollListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify
     }
 
     this.getPayrollList();
@@ -309,6 +312,12 @@ export class PayrollListComponent {
     );
 
     this.approveDisabled = selectedRows.length === 0 || hasApproved;
+    const firstStatus = selectedRows[0]?.STATUS;
+    const hasMixedStatus = selectedRows.some((row: any) => row.STATUS !== firstStatus);
+
+    // only same-status selection allowed for approve action
+    if (hasMixedStatus) return;
+
   }
 
   onEditorPreparing(e: any) {
@@ -453,15 +462,24 @@ export class PayrollListComponent {
   getStatusFlagClass(status: string): string {
     switch (status) {
       case 'Open':
-        return 'flag-open'; // White or gray
+        return 'flag-orange';
       case 'Verified':
-        return 'flag-verified'; // Orange
+        return 'flag-verified'; // blue
       case 'Approved':
         return 'flag-approved'; // Green
       default:
         return '';
     }
   }
+  VerifyButtonOptions: any = {
+    text: 'Verify',
+    type: 'default',
+    stylingMode: 'contained',
+    width: 100,
+    disabled: false,
+    onClick: () => this.VerifyBulkRows(),
+  };
+
 
   toggleFilterRow(): void {
     setTimeout(() => {
@@ -661,7 +679,41 @@ export class PayrollListComponent {
     this.viewPayrollPopupOpened = false;
     this.getPayrollList();
   }
+  //===========================verify====================
+  VerifyBulkRows() {
+    console.log('PAYROLLAPPROVE');
+    const selectedRows = this.dataGrid.instance.getSelectedRowsData();
+    const validRows = selectedRows.filter(
+      (row: any) => row.STATUS !== 'Approved',
+    );
+    if (validRows.length === 0) {
+      notify('Please select at least one non-approved row.', 'warning', 3000);
+      return;
+    }
+
+    // const result = confirm(
+    //   'This will Verify the salary. Are you sure?',
+    //   'Confirm Approval',
+    // );
+
+    // result.then((dialogResult) => {
+    // if (dialogResult) {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userId,
+      PAYDETAIL_ID: selectedRows.map((row: any) => row.SALARY_BILL_NO),
+    };
+
+    this.dataService.VerifyPayroll(payload).subscribe((response: any) => {
+      notify('Payroll approved successfully.', 'success', 3000);
+      this.dataGrid.instance.clearSelection();
+      this.getPayrollList();
+    });
+  }
 }
+// );
+// }
+// }
 
 @NgModule({
   imports: [
