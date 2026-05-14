@@ -825,34 +825,6 @@ export class SaleReturnFormComponent {
         );
       },
     );
-
-    apiCall$.subscribe(
-      () => {
-        this.isSaving = false;
-        notify(
-          this.isApproveMode
-            ? 'Sales return approved successfully'
-            : this.isVerifyMode
-              ? 'Sales return verified successfully'
-              : 'Sales return saved successfully',
-          'success',
-          3000,
-        );
-        this.resetSaleReturnForm();
-        this.popupClosed.emit();
-      },
-      (error) => {
-        this.isSaving = false;
-        console.error(error);
-        notify(
-          this.salesReturnFormData.IS_APPROVED
-            ? 'Failed to approve sales return'
-            : 'Failed to save sales return',
-          'error',
-          3000,
-        );
-      },
-    );
   }
 
   cancel() {
@@ -1361,6 +1333,43 @@ export class SaleReturnFormComponent {
     }
 
     return convert(Math.floor(amount)) + ' Rupees Only';
+  }
+
+  onPendingSelectionChanged(e: any) {
+    const grid = e.component;
+
+    e.selectedRowsData.forEach((row: any) => {
+      const alreadyAdded = this.mainGridData.some(
+        (item: any) =>
+          item.SALE_DET_ID === row.SALE_DET_ID &&
+          item.ITEM_ID === row.ITEM_ID &&
+          item.SALE_NO === row.DOC_NO,
+      );
+
+      if (alreadyAdded) {
+        grid.deselectRows([row]);
+
+        notify('This invoice is already added to the grid', 'warning', 2000);
+      }
+    });
+  }
+
+  onPendingRowPrepared(e: any) {
+    if (e.rowType !== 'data') return;
+
+    const row = e.data;
+
+    const alreadyAdded = this.mainGridData.some(
+      (item: any) =>
+        item.SALE_DET_ID === row.SALE_DET_ID &&
+        item.ITEM_ID === row.ITEM_ID &&
+        item.SALE_NO === row.DOC_NO,
+    );
+
+    if (alreadyAdded) {
+      e.rowElement.style.opacity = '0.4';
+      e.rowElement.style.pointerEvents = 'none';
+    }
   }
 }
 
