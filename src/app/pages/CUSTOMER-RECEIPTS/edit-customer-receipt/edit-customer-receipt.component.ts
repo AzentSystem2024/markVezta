@@ -49,6 +49,7 @@ import { AddCutomerReceiptComponent } from '../add-cutomer-receipt/add-cutomer-r
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-edit-customer-receipt',
@@ -64,6 +65,7 @@ export class EditCustomerReceiptComponent {
   @Input() readOnlyMode: boolean = false;
   @Input() isReadOnlyMode: boolean = false;
   @Input() canApprove: boolean = false;
+  @Input() isVerifyReceipt: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -732,9 +734,14 @@ export class EditCustomerReceiptComponent {
         }
       });
     } else {
-      this.isSaving = true;
-      this.UpdateReceipt(); // normal update
-    }
+  this.isSaving = true;
+
+  if (this.isVerifyReceipt === true) {
+    this.VerifyReceipt();
+  } else {
+    this.UpdateReceipt();
+  }
+}
   }
 
   onConfirmCommit(): void {
@@ -845,6 +852,62 @@ export class EditCustomerReceiptComponent {
       },
     });
   }
+
+
+
+  VerifyReceipt() {
+  if (!this.selectedDistributorId || this.selectedDistributorId == '') {
+    notify('Please select a customer', 'warning', 3000);
+    return;
+  }
+
+  const selectedRows =
+    this.itemsGridRef?.instance?.getSelectedRowsData() || [];
+
+  const validDetails = selectedRows
+    .filter((row: any) => Number(row.AMOUNT) > 0)
+    .map((row: any) => ({
+      BILL_ID: row.BILL_ID,
+      AMOUNT: Number(row.AMOUNT),
+    }));
+
+  if (validDetails.length === 0) {
+    notify(
+      'Please enter a valid Received Amount for at least one selected row',
+      'warning',
+      3000,
+    );
+    return;
+  }
+
+  const netAmount = validDetails.reduce(
+    (sum: number, row: any) => sum + row.AMOUNT,
+    0,
+  );
+
+  this.receiprtFormData.NET_AMOUNT = netAmount;
+
+  const payload = {
+    ...this.receiprtFormData,
+    DISTRIBUTOR_ID: this.selectedDistributorId,
+    REC_DETAIL: validDetails,
+  };
+
+  this.dataService.verifyReceipt(payload).subscribe({
+    next: (response: any) => {
+      this.isSaving = false;
+
+      if (response.Flag == 1 || response.flag == 1) {
+        notify('Receipt verified successfully', 'success', 3000);
+        this.popupClosed.emit();
+      }
+    },
+    error: () => {
+      this.isSaving = false;
+      notify('An error occurred while verifying the receipt', 'error', 3000);
+    },
+  });
+}
 
   resetFillAmountForm() {
     this.fillAmountData.field1 = 0;

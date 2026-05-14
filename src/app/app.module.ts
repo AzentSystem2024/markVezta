@@ -10,7 +10,6 @@ import {
   ChangePasswordFormModule,
   LoginFormModule,
 } from './components';
-
 import {
   AuthService,
   ScreenService,
@@ -33,7 +32,6 @@ import { ItemBrandListModule } from './pages/item-brand-list/item-brand-list.com
 import { ItmBrandFormModule } from './components/library/itm-brand-form/itm-brand-form.component';
 import { CurrencyListModule } from './pages/currency-list/currency-list.component';
 import { CurrencyFormModule } from './components/library/currency-form/currency-form.component';
-// import { CustomerListModule } from './pages/customer-list/customer-list.component';
 import { CategoryListModule } from './pages/MASTER/category-list/category-list.component';
 import { CategoryFormModule } from './components/library/category-form/category-form.component';
 import { VatClassListModule } from './pages/MASTER/vat-class-list/vat-class-list.component';
@@ -53,7 +51,6 @@ import { ItemProperty1FormModule } from './components/library/item-property1-for
 import { ItemProperty2FormModule } from './components/library/item-property2-form/item-property2-form.component';
 import { SalesmanListModule } from './pages/salesman-list/salesman-list.component';
 import { SalesmanFormModule } from './components/library/salesman-form/salesman-form.component';
-// import { CustomerFormModule } from './components/library/customer-form/customer-form.component';
 import { LandedCostListModule } from './pages/landed-cost-list/landed-cost-list.component';
 import { TendersListModule } from './pages/tenders-list/tenders-list.component';
 import { TendersFormModule } from './components/library/tenders-form/tenders-form.component';
@@ -62,11 +59,6 @@ import { ReasonsListModule } from './pages/MASTER/reasons-list/reasons-list.comp
 import { ReasonsFormModule } from './components/library/reasons-form/reasons-form.component';
 import { ItemsListModule } from './pages/MASTER/items-list/items-list.component';
 import { ItemsFormModule } from './components/library/items-form/items-form.component';
-// import { SubcategoryListComponent, SubCategoryListModule } from './pages/subcategory-list/subcategory-list.component';
-// // import {
-//   SubcategoryFormComponent,
-//   SubCategoryFormModule,
-// } from './components/library/subcategory-form/subcategory-form.component';
 import { SubCategoryListModule } from './pages/MASTER/subcategory-list/subcategory-list.component';
 import { SubCategoryFormModule } from './components/library/subcategory-form/subcategory-form.component';
 import { UomListModule } from './pages/MASTER/uom-list/uom-list.component';
@@ -93,7 +85,6 @@ import { ItemStorePropertiesEditModule } from './pages/item-store-properties-edi
 import { UserLevelsModule } from './pages/MASTER/user-levels/user-levels.component';
 import { UserLevelsFormModule } from './components/library/user-levels-form/user-levels-form.component';
 import { UserLevelsEditFormModule } from './components/library/user-levels-edit-form/user-levels-edit-form.component';
-
 import { PurchaseOrderNewFormModule } from './pop-up/operations/purchase-order-new-form/purchase-order-new-form.component';
 import { PurchaseOrderEditFormModule } from './pop-up/operations/purchase-order-edit-form/purchase-order-edit-form.component';
 import { PurchaseOrderVerifyFormModule } from './pop-up/operations/purchase-order-verify-form/purchase-order-verify-form.component';
@@ -108,7 +99,6 @@ import { GrnEditFormModule } from './pop-up/operations/grn-edit-form/grn-edit-fo
 import { GrnVerifyFormModule } from './pop-up/operations/grn-verify-form/grn-verify-form.component';
 import { GrnApproveFormModule } from './pop-up/operations/grn-approve-form/grn-approve-form.component';
 import { GrnViewFormModule } from './pop-up/operations/grn-view-form/grn-view-form.component';
-
 import { PurchaseReturnNewFormModule } from './pop-up/operations/purchase-return-new-form/purchase-return-new-form.component';
 import { PurchaseReturnEditFormModule } from './pop-up/operations/purchase-return-edit-form/purchase-return-edit-form.component';
 import { PurchaseReturnVerifyFormModule } from './pop-up/operations/purchase-return-verify-form/purchase-return-verify-form.component';
@@ -124,10 +114,6 @@ import { TransferInNewFormModule } from './pop-up/operations/transfer-in-new-for
 import { TransferInEditFormModule } from './pop-up/operations/transfer-in-edit-form/transfer-in-edit-form.component';
 import { TransferInViewFormModule } from './pop-up/operations/transfer-in-view-form/transfer-in-view-form.component';
 import { ItemStorePricesModule } from './pages/OPERATIONS/item-store-prices/item-store-prices.component';
-// import {
-//   ItemStorePricesLogComponent,
-//   ItemStorePricesLogModule,
-// } from './pages/OPERATIONS/item-store-prices-log/item-store-prices-log.component';
 import { ItemStorePricesEditModule } from './pages/item-store-prices-edit/item-store-prices-edit.component';
 import { ItemStorePriceVerifyApproveModule } from './pages/item-store-price-verify-approve/item-store-price-verify-approve.component';
 import { ItemStorePriceViewModule } from './pages/item-store-price-view/item-store-price-view.component';
@@ -367,60 +353,32 @@ import { SalesOrderFinancePopupFormModule } from './pages/OPERATIONS/sales-order
 import { PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { StoresListModule } from './pages/MASTER/stores-list/stores-list.component';
-import {
-  SupplierFinListComponent,
-  SupplierFinListModule,
-} from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
-import {
-  SupplierFinFormComponent,
-  SupplierFinFormModule,
-} from './components/HR/Masters/Supplier/supplier-fin-form/supplier-fin-form.component';
-import {
-  SupplierFinEditComponent,
-  SupplierFinEditModule,
-} from './components/HR/Masters/Supplier/supplier-fin-edit/supplier-fin-edit.component';
-import {
-  PayrollViewReportComponent,
-  PayrollViewReportModule,
-} from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
-import {
-  InvoiceRetailComponent,
-  InvoiceRetailModule,
-} from './pages/Operations/invoice-retail/invoice-retail.component';
-import {
-  AddInvoiceRetailComponent,
-  AddInvoiceRetailModule,
-} from './pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
-import {
-  EditItemStorePropertyComponent,
-  EditItemStorePropertyModule,
-} from './pop-up/operations/edit-item-store-property/edit-item-store-property.component';
-import {
-  MiscPurchaseInvoiceComponent,
-  MiscPurchaseInvoiceModule,
-} from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
-import {
-  MiscPurchInvoiceFormComponent,
-  MiscPurchInvoiceFormModule,
-} from './pages/Operations/misc-purch-invoice-form/misc-purch-invoice-form.component';
-import { EditPromotionComponent, EditPromotionModule } from './pages/edit-promotion/edit-promotion.component';
-import { MiscellaneousSalesInvoiceComponent, MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
-import { MiscellaneousSalesInvoiceFormComponent, MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
-import { StorewiseStockViewComponent, StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
-import { SalesSummaryComponent, SalesSummaryModule } from './pages/REPORT/sales-summary/sales-summary.component';
-import { SalesDetailComponent, SalesDetailModule } from './pages/REPORT/sales-detail/sales-detail.component';
-import { ConsignmentSummaryComponent, ConsignmentSummaryModule } from './pages/REPORT/consignment-summary/consignment-summary.component';
-import { ConsignmentReturnDetailComponent, ConsignmentReturnDetailModule } from './pages/REPORT/consignment-return-detail/consignment-return-detail.component';
-import { ItemwisesalesComponent, ItemwisesalesModule } from './pages/REPORT/itemwisesales/itemwisesales.component';
-import { ItemWiseSalesSummaryComponent, ItemWiseSalesSummaryModule } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
-import { DiscountWiseSalesComponent, DiscountWiseSalesModule } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
-import { ViewPromotionWizardComponent, ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
-// import { ItemStorePropertiesViewComponent, ItemStorePropertiesViewModule } from './pages/item-store-properties-view/item-store-properties-view.component';
-import { TenderComponent, TenderModule } from './pages/REPORT/tender/tender.component';
-import { TenderSummaryComponent, TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
-import { ZReportComponent, ZReportModule } from './pages/REPORT/zreport/zreport.component';
-import { SalesInvoiceRetailComponent, SalesInvoiceRetailModule } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
-import { AddSalesInvoiceRetailComponent, AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { SupplierFinListModule } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
+import { SupplierFinFormModule } from './components/HR/Masters/Supplier/supplier-fin-form/supplier-fin-form.component';
+import { SupplierFinEditModule } from './components/HR/Masters/Supplier/supplier-fin-edit/supplier-fin-edit.component';
+import { PayrollViewReportModule } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
+import { InvoiceRetailModule } from './pages/OPERATIONS/invoice-retail/invoice-retail.component';
+import { AddInvoiceRetailModule } from './pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
+import { EditItemStorePropertyModule } from './pop-up/operations/edit-item-store-property/edit-item-store-property.component';
+import { MiscPurchaseInvoiceModule } from './pages/OPERATIONS/misc-purchase-invoice/misc-purchase-invoice.component';
+import { MiscPurchInvoiceFormModule } from './pages/OPERATIONS/misc-purch-invoice-form/misc-purch-invoice-form.component';
+import { EditPromotionModule } from './pages/edit-promotion/edit-promotion.component';
+import { MiscellaneousSalesInvoiceModule } from './pages/OPERATIONS/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
+import { MiscellaneousSalesInvoiceFormModule } from './pages/OPERATIONS/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
+import { StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
+import { SalesSummaryModule } from './pages/REPORT/sales-summary/sales-summary.component';
+import { SalesDetailModule } from './pages/REPORT/sales-detail/sales-detail.component';
+import { ConsignmentSummaryModule } from './pages/REPORT/consignment-summary/consignment-summary.component';
+import { ConsignmentReturnDetailModule } from './pages/REPORT/consignment-return-detail/consignment-return-detail.component';
+import { ItemwisesalesModule } from './pages/REPORT/itemwisesales/itemwisesales.component';
+import { ItemWiseSalesSummaryModule } from './pages/REPORT/item-wise-sales-summary/item-wise-sales-summary.component';
+import { DiscountWiseSalesModule } from './pages/REPORT/discount-wise-sales/discount-wise-sales.component';
+import { ViewPromotionWizardModule } from './pages/view-promotion-wizard/view-promotion-wizard.component';
+import { TenderModule } from './pages/REPORT/tender/tender.component';
+import { TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
+import { ZReportModule } from './pages/REPORT/zreport/zreport.component';
+import { SalesInvoiceRetailModule } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
+import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -580,7 +538,6 @@ import { AddSalesInvoiceRetailComponent, AddSalesInvoiceRetailModule } from './p
     TimesheetAddModule,
     TimesheetEditModule,
     StaffEOSModule,
-
     TimesheetVerifyModule,
     TimesheetApproveModule,
     TimesheetViewModule,
@@ -595,7 +552,6 @@ import { AddSalesInvoiceRetailComponent, AddSalesInvoiceRetailModule } from './p
     MiscPaymentGstEditModule,
     PayrollListModule,
     PayrollAddModule,
-
     PayrollVerifyModule,
     PayrollApproveModule,
     PayrollViewModule,

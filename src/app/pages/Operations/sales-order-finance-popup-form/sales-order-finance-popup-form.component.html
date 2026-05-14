@@ -285,6 +285,7 @@
                   [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
                   [readOnly]="isReadOnlyMode"
                   stylingMode="outlined"
+                  [visible]="!isVerifyMode || !isApproveMode"
                 >
                 </dx-check-box>
               </div>

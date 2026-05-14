@@ -313,7 +313,30 @@
     </app-purchase-order-edit-form>
   </form-popup>
 
-  <dx-popup
+  <form-popup
+    *ngIf="isApprovePopupOpened"
+    [(visible)]="isApprovePopupOpened"
+    [width]="width"
+    [height]="height"
+    titleText="Approve Purchase Order"
+    [showNetAmount]="true"
+    [isEditMode]="true"
+    [showApprove]="false"
+    [isSaveDisabled]="isSaving"
+    (save)="ApprovePurchaseOrder()"
+  >
+    <app-purchase-order-edit-form
+      [formdata]="selectedRowData"
+      (closeForm)="CloseEditForm()"
+      (netEditSupplierAmountChange)="netVerifySupplierAmount = $event"
+      (netEditAmountChange)="netVerifyAmount = $event"
+      (netEditQuantityChange)="netVerifyQuantity = $event"
+      (showSupplierAmount)="showSupplierAmount = $event"
+    >
+    </app-purchase-order-edit-form>
+  </form-popup>
+
+  <!-- <dx-popup
     [(visible)]="isVerifyPopupOpened"
     title="Verify Purchase Order"
     [height]="'100vh'"
@@ -364,7 +387,7 @@
         ></dx-button>
       </div>
     </dxi-toolbar-item>
-  </dx-popup>
+  </dx-popup> -->
 
   <dx-popup
     *ngIf="isViewPopupOpened"

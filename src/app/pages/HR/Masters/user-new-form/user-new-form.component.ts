@@ -95,6 +95,8 @@ export class UserNewFormComponent {
   isAddFormPopupOpened: boolean;
   clearData: any;
   mobile_limit: any;
+  sessionData: any;
+  storeid: any;
 
   constructor(
     private fb: FormBuilder,
@@ -167,7 +169,15 @@ export class UserNewFormComponent {
     this.updateMobileNumber(); // Update mobile field with the default country code
     this.get_Company_details();
     this.user_role_dropdown();
+    this.sesstion_Details();
   }
+
+   sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.storeid = this.sessionData.Configuration[0].STORE_ID
+    console.log(this.storeid)
+  }
+
   getUSerData() {
     this.dataservice.get_User_data().subscribe((data) => {
       this.userList = data;
@@ -705,11 +715,23 @@ export class UserNewFormComponent {
     });
   }
 
-  getNewUserData = () => ({
+  // getNewUserData = () => ({
+  //   ...this.newUserData,
+  //   COMPANY_ID: this.selectedRows,
+  //   STORE_ID: this.storeid,
+  //   Mobile: this.newUserData.countryCode + '-' + this.newUserData.Mobile,
+  // });
+
+  getNewUserData = () => {
+  console.log('storeid inside payload:', this.storeid);
+
+  return {
     ...this.newUserData,
     COMPANY_ID: this.selectedRows,
-    Mobile: this.newUserData.countryCode + '-' + this.newUserData.Mobile,
-  });
+    STORE_ID: this.storeid,
+    MOBILE: this.newUserData.countryCode + '-' + this.newUserData.Mobile,
+  };
+};
 }
 
 @NgModule({

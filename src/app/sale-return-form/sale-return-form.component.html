@@ -157,25 +157,25 @@
           <dxi-column
             dataField="ITEM_ID"
             caption="Item ID"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
             [visible]="false"
           ></dxi-column>
           <dxi-column
             dataField="TRANSFER_NO"
             caption="Invoice No"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="TRANSFER_DATE"
             caption="Date"
             dataType="date"
             format="dd-MM-yyyy"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="ITEM_NAME"
             caption="Item Name"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="HSN_CODE"
@@ -188,7 +188,7 @@
             caption="Price"
             dataType="number"
             format="#,##0.00"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="PENDING_QTY"
@@ -213,7 +213,7 @@
             caption="Amount"
             dataType="number"
             format="#,##0.00"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="false"
             [calculateCellValue]="calculateAmount"
           ></dxi-column>
           <dxi-column
@@ -390,6 +390,8 @@
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+      (onSelectionChanged)="onPendingSelectionChanged($event)"
+      (onRowPrepared)="onPendingRowPrepared($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager

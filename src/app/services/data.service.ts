@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, from, of, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, from } from 'rxjs';
 import { DateTime } from 'luxon';
-import { map, groupBy, mergeMap, toArray, catchError } from 'rxjs/operators';
+import { map, groupBy, mergeMap, toArray } from 'rxjs/operators';
 import { Task } from 'src/app/types/task';
 import { Contact } from 'src/app/types/contact';
 import { Sale, SalesOrOpportunitiesByCategory } from '../types/analytics';
@@ -12,7 +12,7 @@ import { saveAs } from 'file-saver-es';
 import { exportDataGrid as exportDataGridToPdf } from 'devextreme/pdf_exporter';
 import { exportDataGrid as exportDataGridToXLSX } from 'devextreme/excel_exporter';
 import { environment } from 'src/environments/environment';
-import { AnyARecord, AnyCnameRecord } from 'dns';
+import { AnyARecord } from 'dns';
 
 const API_URL = 'https://js.devexpress.com/Demos/RwaService/api';
 const version = '1.0';
@@ -36,6 +36,7 @@ export interface ItemStorePayload {
 @Injectable()
 export class DataService {
   selected_Company_id: any;
+  userId: any;
   selected_fin_id: any;
   private months: { name: string; value: any }[] = [
     { name: 'All', value: '' },
@@ -57,20 +58,6 @@ export class DataService {
   worksheetData$ = this.worksheetDataSubject.asObservable();
 
   private apiUrl = environment.apiUrl;
-  private apiUrlList =
-    'http://veztaapi.diligenzit.com/api/worksheetitemproperty/itempropertylist';
-  private apiUrlForStoreProperties =
-    'http://103.180.120.134/veztaretail/api/worksheetitemproperty/insert';
-  private apiUrlForStorePropertyUpdate =
-    'http://103.180.120.134/veztaretail/api/worksheetitemproperty/update';
-  private apiUrlForSelectWorksheet =
-    'http://103.180.120.134/veztaretail/api/worksheetitemproperty/select';
-  private apiUrlForVerify =
-    'http://103.180.120.134/veztaretail/api/worksheetitemproperty/verify';
-  private apiUrlForApproval =
-    'http://103.180.120.134/veztaretail/api/worksheetitemproperty/approval';
-  private apiUrlForDelete =
-    'http://103.180.120.134/veztaretail/api/worksheetitemproperty/delete';
 
   constructor(private http: HttpClient) {
     // this.sesstion_Details();
@@ -90,12 +77,10 @@ export class DataService {
     const storedData = sessionStorage.getItem('savedUserData');
     if (storedData) {
       const sessionData = JSON.parse(storedData);
-
       this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
+      this.userId = sessionData.USER_ID;
       this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     } else {
-      // Handle the case where session data is not available, e.g., set defaults or throw an error
       console.error('Session data not found');
     }
   }
@@ -300,6 +285,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}AC_CreditNote/update`, data);
   }
 
+  verifyCreditNote(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}AC_CreditNote/verify`, data);
+  }
+
   getDocNo(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}AC_CreditNote/DocNo`, data);
   }
@@ -392,9 +382,6 @@ export class DataService {
   getMonths(): { name: string; value: number }[] {
     return this.months;
   }
-  //   getSupplierWithState(): Observable<any> {
-  //   return this.http.post(`${this.apiUrl}supplier/suppdtl`, {});
-  // }
 
   insertInvoice(items: any) {
     const data = items;
@@ -571,6 +558,11 @@ export class DataService {
   approveSaleReturn(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}SaleReturn/commit`, data);
+  }
+
+  verifySaleReturn(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SaleReturn/verify`, data);
   }
 
   selectSaleReturn(id: number) {
@@ -840,6 +832,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SalesOrder/approve`, data);
   }
 
+  verifySalesOrder(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalesOrder/verify`, data);
+  }
+
   deleteSalesOrder(id: number) {
     return this.http.post<any>(`${this.apiUrl}SalesOrder/delete/` + id, {});
   }
@@ -1010,6 +1007,11 @@ export class DataService {
   updateReceipt(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Receipt/update`, data);
+  }
+
+  verifyReceipt(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Receipt/verify`, data);
   }
 
   commitCustomerReceipt(items: any) {
@@ -1332,6 +1334,11 @@ export class DataService {
 
   Update_PrePayment(payload: any) {
     const getEndpoint = `${this.apiUrl}PrePayment/update`;
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Verify_PrePayment(payload: any) {
+    const getEndpoint = `${this.apiUrl}PrePayment/verify`;
     return this.http.post(getEndpoint, payload);
   }
 
@@ -4643,7 +4650,8 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=====================verify============================
-  Api_Verify_advance(id: any,
+  Api_Verify_advance(
+    id: any,
     emp_id: any,
     date: any,
     adv_type_id: any,
@@ -4657,7 +4665,8 @@ The result can be exported to HTML or Markdown.`;
     trans_id: any,
     cheque_no: any,
     cheque_date: any,
-    pay_Type_id: any,) {
+    pay_Type_id: any,
+  ) {
     const reqBody = {
       ID: id,
       EMP_ID: emp_id,
@@ -4677,7 +4686,8 @@ The result can be exported to HTML or Markdown.`;
       CHEQUE_NO: cheque_no,
       CHEQUE_DATE: cheque_date,
       PAY_TYPE_ID: pay_Type_id,
-    }; return this.http.post(`${this.apiUrl}Advance/verify`, reqBody);
+    };
+    return this.http.post(`${this.apiUrl}Advance/verify`, reqBody);
   }
   //===================================APPROVE ADVANCE=================================
 
@@ -5709,7 +5719,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //======================USER===================
-  //=============GET USER DATA=============
+  //=============GET USER DATA=============ser/insert
   get_User_data() {
     return this.http.post(`${this.apiUrl}user/list`, {});
   }
@@ -5726,6 +5736,7 @@ The result can be exported to HTML or Markdown.`;
       USER_ROLE: data.UserRoleID,
       COMPANY_ID: data.COMPANY_ID,
       EMAIL: data.Email,
+      STORE_ID: data.STORE_ID,
       IS_INACTIVE: data.IsInactive,
     };
     return this.http.post(url, reqBody);
@@ -5743,6 +5754,7 @@ The result can be exported to HTML or Markdown.`;
       MOBILE: data.MOBILE,
       USER_ROLE: data.USER_ROLE,
       COMPANY_ID: data.COMPANY_ID,
+      STORE_ID: data.STORE_ID,
       EMAIL: data.EMAIL,
       IS_INACTIVE: data.IS_INACTIVE,
     };
@@ -6638,5 +6650,46 @@ The result can be exported to HTML or Markdown.`;
 
   Select_SalesInvoice_Retail(id: number) {
     return this.http.post<any>(`${this.apiUrl}SalesPOS/select/` + id, {});
+  }
+
+  // ================ ERP INTEGRATION ---- IMPORT AR DATA ==============
+
+   // =========== import columns fetching API ==============
+  import_AR_Columns() {
+    return this.http.post(`${this.apiUrl}ImportAR/columns`, {});
+  }
+
+  // ========== import AR lookUp list ============
+  import_AR_LookUp_List() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      CompanyID: sessionData.SELECTED_COMPANY.COMPANY_ID,
+    };
+    return this.http.post(`${this.apiUrl}ImportAR/list`, payload);
+  }
+
+  // ======= import Ar data detailed view API ========
+  import_AR_Details_View(logId: any) {
+    const payload = {
+      LogID:logId,
+    };
+    return this.http.post(`${this.apiUrl}ImportAR/view`, payload);
+  }
+
+  // =========== import AR data API ==============
+  import_AR_Data(batchNo: any, FileName: any, FileData: any) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      CompanyID: sessionData.SELECTED_COMPANY.COMPANY_ID,
+      UserID: sessionData.USER_ID,
+      BatchNo: batchNo,
+      FileName: FileName,
+      data: FileData,
+    };
+    return this.http.post(`${this.apiUrl}ImportAR/import`, payload);
   }
 }
