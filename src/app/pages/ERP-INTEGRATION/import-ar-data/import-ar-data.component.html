@@ -12,7 +12,6 @@
     noDataText=" "
   >
     <!-- ================= Columns ================= -->
-
     <dxi-column dataField="DocNo" caption="Doc No"></dxi-column>
     <dxi-column dataField="FileName" caption="File Name"></dxi-column>
     <dxi-column
@@ -32,20 +31,19 @@
     </dxi-column>
 
     <!-- ================= Action Button Template ================= -->
-
-    <div *dxTemplate="let data of 'actionTemplate'">
-      <button
-        type="button"
-        class="btn btn-sm btn-primary"
-        (click)="showImportDetails(data.data)"
+    <div class="action-buttons" *dxTemplate="let data of 'actionTemplate'">
+      <dx-button
+        icon="detailslayout"
+        hint="View Imported Data"
+        stylingMode="text"
+        width="24"
+        height="24"
+        (onClick)="showImportDetails(data.data)"
       >
-        <i class="bi bi-eye"></i>
-        View
-      </button>
+      </dx-button>
     </div>
 
     <!-- ================= Filter ================= -->
-
     <dxo-filter-row
       [visible]="showFilterRow"
       [applyFilter]="currentFilter"
@@ -56,7 +54,6 @@
     </dxo-header-filter>
 
     <!-- ================= Paging ================= -->
-
     <dxo-paging [pageSize]="10"></dxo-paging>
 
     <dxo-pager
@@ -69,13 +66,10 @@
     >
     </dxo-pager>
 
-    <!-- ================= Load Panel ================= -->
-
-    <dxo-load-panel [enabled]="true" [showPane]="true" [showIndicator]="true">
-    </dxo-load-panel>
+    <!-- <dxo-load-panel [enabled]="true" [showPane]="true" [showIndicator]="true">
+    </dxo-load-panel> -->
 
     <!-- ================= Toolbar ================= -->
-
     <dxo-toolbar>
       <dxi-item location="before" locateInMenu="never">
         <div class="grid-header">Import AR Data</div>
@@ -122,11 +116,11 @@
     (change)="OnFileChanged($event)"
   />
 
-  <!-- Popup -->
+  <!-- excel data fetching Popup  -->
   <dx-popup
     [(visible)]="isPopupVisible"
     [width]="'95%'"
-    [height]="'90%'"
+    [height]="'95%'"
     [showTitle]="true"
     title="Imported Excel Preview"
     [dragEnabled]="true"
@@ -147,11 +141,11 @@
         [height]="'calc(100% - 70px)'"
       >
         <dxo-filter-row
-          [visible]="showFilterRow"
+          [visible]="false"
           [applyFilter]="currentFilter"
         ></dxo-filter-row>
 
-        <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-header-filter [visible]="true">
           <dxo-search [enabled]="true"></dxo-search>
         </dxo-header-filter>
 
@@ -207,10 +201,11 @@
     </div>
   </dx-popup>
 
+  <!-- imported data showing popup  -->
   <dx-popup
     [(visible)]="isDetailsPopupVisible"
     [width]="'95%'"
-    [height]="'90%'"
+    [height]="'95%'"
     [showTitle]="true"
     title="Import AR Details"
     [dragEnabled]="true"
@@ -218,7 +213,19 @@
     (onHiding)="refreshGrid()"
   >
     <div *dxTemplate="let data of 'content'">
+      <!-- Process Pending Button -->
+      <div class="mb-2 d-flex justify-content-end">
+        <dx-button
+          text="Process Pending"
+          icon="refresh"
+          type="default"
+          stylingMode="contained"
+          (onClick)="processPendingRows()"
+        >
+        </dx-button>
+      </div>
       <dx-data-grid
+        #detailGrid
         class="grid theme-dependent"
         [dataSource]="importDetailViewData"
         [showBorders]="true"
@@ -227,7 +234,12 @@
         [allowColumnReordering]="true"
         [rowAlternationEnabled]="true"
         [height]="'100%'"
+        (onCellPrepared)="onCellPrepared($event)"
+        (onEditorPreparing)="onEditorPreparing($event)"
+
       >
+        <dxo-selection mode="multiple" showCheckBoxesMode="always">
+        </dxo-selection>
         <!-- Dynamic Columns -->
         <dxi-column
           *ngFor="let col of detailViewColumns"
@@ -236,10 +248,18 @@
           width="150"
         >
         </dxi-column>
+        <dxi-column
+          dataField="Status"
+          caption="Status"
+          width="120"
+          fixed="true"
+          fixedPosition="right"
+        >
+        </dxi-column>
 
-        <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
+        <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
 
-        <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-header-filter [visible]="true">
           <dxo-search [enabled]="true"></dxo-search>
         </dxo-header-filter>
 
@@ -271,4 +291,55 @@
       </dx-data-grid>
     </div>
   </dx-popup>
+
+  <dx-load-panel
+    [visible]="isLoading"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [hideOnOutsideClick]="false"
+    message="Loading ..."
+  >
+  </dx-load-panel>
+
+  <!-- Progress Section -->
+  <dx-load-panel
+    [visible]="isProcessingRows"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [hideOnOutsideClick]="false"
+    shadingColor="rgba(0,0,0,0.4)"
+    message="Processing Pending Rows..."
+  >
+    <div *dxTemplate="let data of 'content'">
+      <div class="text-center">
+        <div class="mb-2">
+          Total :
+          <b>{{ totalRequestCount }}</b>
+        </div>
+
+        <div class="mb-2">
+          Completed :
+          <b class="text-success">
+            {{ completedRequestCount }}
+          </b>
+        </div>
+
+        <div class="mb-2">
+          Failed :
+          <b class="text-danger">
+            {{ failedRequestCount }}
+          </b>
+        </div>
+
+        <div class="mb-2">
+          Pending :
+          <b class="text-warning">
+            {{ pendingRequestCount }}
+          </b>
+        </div>
+      </div>
+    </div>
+  </dx-load-panel>
 </div>

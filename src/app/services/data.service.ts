@@ -331,7 +331,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}ACTransactions/debitupdate`, data);
   }
 
-    verifyDebitNote(items: any) {
+  verifyDebitNote(items: any) {
     const data = items;
     // console.log(data,"insert service")
     return this.http.post(`${this.apiUrl}ACTransactions/verify`, data);
@@ -1058,7 +1058,6 @@ export class DataService {
   approvePayroll(data: Object): Observable<any> {
     return this.http.post(`${this.apiUrl}salary/approve`, data);
   }
-
 
   VerifyPayroll(data: Object): Observable<any> {
     return this.http.post(`${this.apiUrl}salary/verify`, data);
@@ -6660,7 +6659,7 @@ The result can be exported to HTML or Markdown.`;
 
   // ================ ERP INTEGRATION ---- IMPORT AR DATA ==============
 
-   // =========== import columns fetching API ==============
+  // =========== import columns fetching API ==============
   import_AR_Columns() {
     return this.http.post(`${this.apiUrl}ImportAR/columns`, {});
   }
@@ -6679,7 +6678,7 @@ The result can be exported to HTML or Markdown.`;
   // ======= import Ar data detailed view API ========
   import_AR_Details_View(logId: any) {
     const payload = {
-      LogID:logId,
+      LogID: logId,
     };
     return this.http.post(`${this.apiUrl}ImportAR/view`, payload);
   }
@@ -6697,5 +6696,11 @@ The result can be exported to HTML or Markdown.`;
       data: FileData,
     };
     return this.http.post(`${this.apiUrl}ImportAR/import`, payload);
+  }
+
+  // ========= PROCESS SELECTED PENDING LIST ==========
+  process_pending_rows(rowdata: any) {
+    const payload = { TransactionID: rowdata.ApexTransactionNumber };
+    return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
   }
 }

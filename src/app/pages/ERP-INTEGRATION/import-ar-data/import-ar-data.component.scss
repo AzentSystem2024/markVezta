@@ -69,3 +69,11 @@
 .dx-popup-content {
   padding: 12px !important;
 }
+::ng-deep .action-buttons .dx-button-has-icon .dx-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  margin-inline-end: 0;
+  margin-inline-start: 0;
+  color: rgb(37, 139, 242) !important;
+}
