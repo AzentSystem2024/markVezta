@@ -85,6 +85,7 @@ export class EmployeeLeaveComponent {
   today = new Date();
   canAdd = false;
   canEdit = false;
+  canVerify = false;
   canView = false;
   canDelete = false;
   canApprove = false;
@@ -269,6 +270,7 @@ export class EmployeeLeaveComponent {
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
+      this.canVerify = packingRights.CanVerify;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
@@ -290,6 +292,51 @@ export class EmployeeLeaveComponent {
     // Set minDate to the 1st day of the next month
   }
 
+
+ statusCellRender(cellElement: any, cellInfo: any) {
+  const status = cellInfo.data.STATUS;
+
+  const icon = document.createElement('i');
+  icon.className = 'fas fa-flag';
+  icon.style.fontSize = '18px';
+
+  switch (status) {
+    case 'Approved':
+      icon.style.color = '#10B981'; // Green
+      icon.title = 'Approved';
+      break;
+
+    case 'Verified':
+      icon.style.color = '#0073D8'; // Blue
+      icon.title = 'Verified';
+      break;
+
+    case 'Travelled':
+      icon.style.color = '#FFD700'; // Yellow
+      icon.title = 'Travelled';
+      break;
+
+    case 'Rejoined':
+      icon.style.color = '#8B4513'; // Brown
+      icon.title = 'Rejoined';
+      break;
+
+    case 'Left Service':
+      icon.style.color = '#DC2626'; // Red
+      icon.title = 'Left Service';
+      break;
+
+    default:
+      icon.style.color = '#FFA500'; // Open = Orange
+      icon.title = 'Open';
+  }
+
+  icon.style.display = 'flex';
+  icon.style.justifyContent = 'center';
+  icon.style.alignItems = 'center';
+
+  cellElement.appendChild(icon);
+}
 
   //========================STATUS====================
   onVerifyClick(e: any): void {
