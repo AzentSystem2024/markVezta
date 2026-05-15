@@ -143,11 +143,11 @@
     </dx-text-box>
   </div>
 
-  <div style="margin-bottom: 1.5rem" *ngIf="canApprove || isVerifyMode !== true">
+  <div style="margin-bottom: 1.5rem" *ngIf="!isVerifyMode && !isApproveMode && canApprove">
     <dx-check-box
       text="Approve"
       [readOnly]="isEditReadOnly"
-      [(value)]="PDCFormData.ENTRY_STATUS"
+      [value]="false"
     >
     </dx-check-box>
   </div>

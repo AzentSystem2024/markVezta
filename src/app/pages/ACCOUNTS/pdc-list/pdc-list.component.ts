@@ -118,7 +118,7 @@ export class PdcListComponent {
     { id: 1, name: 'Open' },
     { id: 2, name: 'Approved' },
     { id: 3, name: 'Closed' },
-    { id: 4, name: 'verified' },
+    { id: 4, name: 'Verified' },
   ];
 
   selectedStatus = this.StatusfilterOptions[0].id;
@@ -554,7 +554,8 @@ export class PdcListComponent {
         !selectedStatus ||
         (selectedStatus === 1 && item.ENTRY_STATUS === 'Open') ||
         (selectedStatus === 2 && item.ENTRY_STATUS === 'Approved') ||
-        (selectedStatus === 3 && item.ENTRY_STATUS === 'Closed');
+        (selectedStatus === 3 && item.ENTRY_STATUS === 'Closed') ||
+        (selectedStatus === 4 && item.ENTRY_STATUS === 'Verified');
 
       return typeMatch && statusMatch;
     });
@@ -587,7 +588,8 @@ export class PdcListComponent {
         !status ||
         (status === 1 && item.ENTRY_STATUS?.trim() === 'Open') ||
         (status === 2 && item.ENTRY_STATUS?.trim() === 'Approved') ||
-        (status === 3 && item.ENTRY_STATUS?.trim() === 'Closed');
+        (status === 3 && item.ENTRY_STATUS?.trim() === 'Closed') ||
+        (status === 4 && item.ENTRY_STATUS?.trim() === 'Verified');
 
       let chequeDateValid = true;
       if (dueStart && dueEnd && item.CHEQUE_DATE) {
@@ -642,43 +644,41 @@ export class PdcListComponent {
     this.selected_PDC(event);
   }
 
-    selectedVerify_PDC(event: any) {
-    const id = event.row.data.ID;
-    this.PDCid = event.row.data.ID;
-    this.selectPDC = id;
-    this.dataservice.Select_PDC(id).subscribe((res: any) => {
-      this.selectedPDC = res.Data[0];
-      //  Trim and compare status to handle trailing spaces
-      const status = (this.selectedPDC.ENTRY_STATUS || '').trim();
+   selectedVerify_PDC(event: any) {
+  const id = event.row.data.ID;
+  this.PDCid = id;
+  this.selectPDC = id;
 
-      //  Set checkbox based on status
-      this.selectedPDC.ENTRY_STATUS = status === 'Approved';
+  this.dataservice.Select_PDC(id).subscribe((res: any) => {
+    this.selectedPDC = {
+      ...res.Data[0],
+      ENTRY_STATUS: (res.Data[0].ENTRY_STATUS || '').trim()
+    };
 
-      this.selectedPDC.BENEFICIARY_TYPE =
-        this.selectedPDC.BENEFICIARY_TYPE?.id ||
-        this.selectedPDC.BENEFICIARY_TYPE ||
-        null;
-    });
-  }
+    this.selectedPDC.BENEFICIARY_TYPE =
+      this.selectedPDC.BENEFICIARY_TYPE?.id ||
+      this.selectedPDC.BENEFICIARY_TYPE ||
+      null;
+  });
+}
 
-  selected_PDC(event: any) {
-    const id = event.data.ID;
-    this.PDCid = event.data.ID;
-    this.selectPDC = id;
-    this.dataservice.Select_PDC(id).subscribe((res: any) => {
-      this.selectedPDC = res.Data[0];
-      //  Trim and compare status to handle trailing spaces
-      const status = (this.selectedPDC.ENTRY_STATUS || '').trim();
+selected_PDC(event: any) {
+  const id = event.data.ID;
+  this.PDCid = id;
+  this.selectPDC = id;
 
-      //  Set checkbox based on status
-      this.selectedPDC.ENTRY_STATUS = status === 'Approved';
+  this.dataservice.Select_PDC(id).subscribe((res: any) => {
+    this.selectedPDC = {
+      ...res.Data[0],
+      ENTRY_STATUS: (res.Data[0].ENTRY_STATUS || '').trim()
+    };
 
-      this.selectedPDC.BENEFICIARY_TYPE =
-        this.selectedPDC.BENEFICIARY_TYPE?.id ||
-        this.selectedPDC.BENEFICIARY_TYPE ||
-        null;
-    });
-  }
+    this.selectedPDC.BENEFICIARY_TYPE =
+      this.selectedPDC.BENEFICIARY_TYPE?.id ||
+      this.selectedPDC.BENEFICIARY_TYPE ||
+      null;
+  });
+}
 
   DeletePDC(event: any) {
     const id = event.data.ID;
