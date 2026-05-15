@@ -278,6 +278,7 @@ export class PdcAddFormComponent {
       IS_PAYMENT: this.PDCFormData.IS_PAYMENT?.name === 'Issued', // true if Issued
       ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
+      IS_VERIFIED : false,
     };
 
     this.dataservice.Insert_PDC(payload).subscribe((res: any) => {

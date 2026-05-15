@@ -965,7 +965,7 @@ export class EditDebitComponent {
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       return;
     }
-    if (this.debitFormData.IS_APPROVED) {
+    if (this.debitFormData.IS_APPROVED || this.debitFormData[0].TRANS_STATUS ===2) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
