@@ -127,6 +127,7 @@
     [shading]="false"
     [toolbarItems]="toolbarItems"
     [resizeEnabled]="false"
+    (onHiding)="this.clinicianComponent.reset_newClinicianFormData()"
   >
     <div>
       <app-clinician-new-form></app-clinician-new-form>
