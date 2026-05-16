@@ -356,7 +356,13 @@ export class SupplierPaymentListComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    // icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
     icon.title = status === 5 ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';
@@ -571,7 +577,8 @@ export class SupplierPaymentListComponent {
 
   onVerifyPayment(event: any) {
     const rowData = event.row.data;
-
+    console.log(event, 'ROWDATAAAAAAAAAAAAA');
+    console.log(rowData, 'ROWDATAAAAAAAAAAAAA');
     const invoiceId = rowData.TRANS_ID;
     const transStatus = rowData.TRANS_STATUS;
 
@@ -581,7 +588,9 @@ export class SupplierPaymentListComponent {
       .selectSupplierPayment(invoiceId)
       .subscribe((response: any) => {
         this.selectedReceipt = response.Data;
-
+        console.log(this.selectedReceipt, '-------------');
+        console.log(typeof this.selectedReceipt[0].TRANS_STATUS);
+        this.isReadOnlyReceipt = transStatus === 5;
         // APPROVED -> OPEN VIEW PAGE
         if (transStatus === 5) {
           this.isViewPayment = true;

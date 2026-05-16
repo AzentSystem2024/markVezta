@@ -271,6 +271,7 @@
 </app-custom-date-popup>
 
 <dx-popup
+  *ngIf="addSupllierPayment"
   [(visible)]="addSupllierPayment"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -287,6 +288,7 @@
 </dx-popup>
 
 <dx-popup
+  *ngIf="isEditReceipt"
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -311,7 +313,7 @@
   [width]="'95vw'"
   [height]="'100vh'"
   [title]="
-    selectedReceipt?.TRANS_STATUS === 2 ? 'Approve Invoice' : 'Verify Invoice'
+    selectedReceipt?.TRANS_STATUS === 2 ? 'Approve Payment' : 'Verify Payment'
   "
   (popupClosed)="handleClose()"
 >
@@ -324,4 +326,40 @@
     [canApprove]="canApprove"
   >
   </app-edit-supplier-payment>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isApprovePayment"
+  [(visible)]="isApprovePayment"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Payment"
+  (onHiding)="handleClose()"
+>
+  <app-edit-supplier-payment
+    [isEditing]="true"
+    [paymentData]="selectedReceipt"
+    [isVerifyMode]="selectedReceipt?.[0]?.TRANS_STATUS !== 2"
+    [isApproveMode]="selectedReceipt?.[0]?.TRANS_STATUS === 2"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-edit-supplier-payment>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isViewPayment"
+  [(visible)]="isViewPayment"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="View Supplier Payment"
+  (onHiding)="handleClose()"
+>
+  <app-edit-supplier-payment
+    [paymentData]="selectedReceipt"
+    [isReadOnlyMode]="isReadOnlyReceipt"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+    [supplierPaymentId]="selectedSupplierPayment"
+  ></app-edit-supplier-payment>
 </dx-popup>

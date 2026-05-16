@@ -148,6 +148,8 @@ export class SaleReturnFormComponent {
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
+    console.log(this.isVerifyMode, 'ISVERIFYMODE');
+    console.log(this.isApproveMode, 'ISAPPROVEMODE');
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
 
@@ -677,6 +679,11 @@ export class SaleReturnFormComponent {
     // ==============================
     // FINAL PAYLOAD
     // ==============================
+    if (this.isVerifyMode) {
+      this.salesReturnFormData.IS_VERIFIED = true;
+    } else {
+      this.salesReturnFormData.IS_VERIFIED = false;
+    }
     const payload = {
       ...this.salesReturnFormData,
       ID: this.salesReturnFormData.TRANS_ID,
@@ -699,6 +706,7 @@ export class SaleReturnFormComponent {
       NET_AMOUNT: Number(netAmount.toFixed(2)),
 
       Details: details,
+      IS_VERIFIED: this.salesReturnFormData.IS_VERIFIED,
     };
 
     // ==============================
@@ -710,14 +718,6 @@ export class SaleReturnFormComponent {
         : 'FINAL SAVE PAYLOAD:',
       payload,
     );
-
-    // ==============================
-    // SAVE / APPROVE API CALL
-    // ==============================
-    // SAVE / VERIFY / APPROVE API CALL
-    // ==============================
-    // SAVE / VERIFY / APPROVE API CALL
-    // ==============================
     this.isSaving = true;
 
     let apiCall$;
@@ -763,7 +763,7 @@ export class SaleReturnFormComponent {
         'Confirm Verification',
       ).then((dialogResult) => {
         if (dialogResult) {
-          apiCall$ = this.dataService.verifySaleReturn(payload);
+          apiCall$ = this.dataService.updateSaleReturn(payload);
 
           apiCall$.subscribe(
             () => {

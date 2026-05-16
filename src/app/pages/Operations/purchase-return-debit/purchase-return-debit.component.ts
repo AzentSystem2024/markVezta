@@ -551,17 +551,22 @@ export class PurchaseReturnDebitComponent {
       });
   }
 
-  onVerifyPurchaseReturn(event: any) {
-    const rowData = event.row.data;
+  onVerifyPurchaseReturn(event: any, rowData: any) {
+    event.stopPropagation();
 
     const invoiceId = rowData.TRANS_ID;
     const transStatus = rowData.TRANS_STATUS;
 
+    // Close all popups first
+    this.handleClose();
+
     this.isReadOnlyPurchaseReturn = transStatus === 5;
+
     this.dataService
       .selectPurchaseReturn(invoiceId)
       .subscribe((response: any) => {
         this.selectedPurchaseReturn = response;
+
         if (transStatus === 5) {
           this.isViewInvoice = true;
         } else if (transStatus === 2) {
