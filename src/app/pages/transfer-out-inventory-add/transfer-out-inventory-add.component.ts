@@ -130,7 +130,6 @@ export class TransferOutInventoryAddComponent {
 
   ngOnInit() {
     console.log('--------------Status-------------:', this.ActionStatus);
-
     console.log(this.isReadOnlyMode, 'READONLYMODE');
     this.isEditDataAvailable();
 
@@ -632,7 +631,7 @@ export class TransferOutInventoryAddComponent {
           }
         });
       }
-      else if (this.selectedDocStatus == 'OPEN' && this.ActionStatus == 'verifyscreen') {
+      else if (this.selectedDocStatus == 'OPEN' && this.ActionStatus == 'VerifyScreen') {
         this.dataService.verifyTransferOutForInventory
           (payload).subscribe({
             next: (res: any) => {
