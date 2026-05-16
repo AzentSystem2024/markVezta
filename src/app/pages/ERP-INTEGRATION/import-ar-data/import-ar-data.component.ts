@@ -5,6 +5,7 @@ import {
   ElementRef,
   NgModule,
   NgZone,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -16,6 +17,7 @@ import {
   DxDataGridComponent,
   DxDataGridModule,
   DxFormModule,
+  DxLoadPanelModule,
   DxPopupModule,
   DxTextBoxModule,
   DxValidatorModule,
@@ -26,26 +28,32 @@ import { DataService } from 'src/app/services/data.service';
 import * as XLSX from 'xlsx';
 import notify from 'devextreme/ui/notify';
 import { alert } from 'devextreme/ui/dialog';
+import DataSource from 'devextreme/data/data_source';
+import CustomStore from 'devextreme/data/custom_store';
 @Component({
   selector: 'app-import-ar-data',
   templateUrl: './import-ar-data.component.html',
   styleUrls: ['./import-ar-data.component.scss'],
 })
-export class ImportArDataComponent implements OnInit {
+export class ImportArDataComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid!: DxDataGridComponent;
+
+  @ViewChild('detailGrid', { static: false })
+  detailGrid!: DxDataGridComponent;
 
   @ViewChild('fileInput', { static: false })
   fileInput!: ElementRef;
 
-  isFilterOpened: boolean = true;
-  showFilterRow: boolean = true;
+  isFilterOpened: boolean = false;
+  showFilterRow: boolean = false;
   currentFilter: string = 'auto';
   isPopupVisible: boolean = false;
+  isLoading: boolean = false;
 
   uploadedFileName: string = '';
 
-  importLogs: any[] = [];
+  importLogs: DataSource | null = null;
   Imported_Ar_DataSource: any[] = [];
   gridColumns: any[] = [];
 
@@ -87,6 +95,7 @@ export class ImportArDataComponent implements OnInit {
   importDetailViewData: any;
   detailViewColumns: any[] = [];
   isDetailsPopupVisible: boolean = false;
+  clickedRowID: any;
 
   constructor(
     private ngZone: NgZone,
@@ -96,6 +105,10 @@ export class ImportArDataComponent implements OnInit {
   ngOnInit(): void {
     this.fetchImportColumns();
     this.fetch_import_logs();
+  }
+
+  ngOnDestroy(): void {
+    this.isLoading = false;
   }
 
   // === fetch import columns list =====
@@ -114,15 +127,53 @@ export class ImportArDataComponent implements OnInit {
 
   // === fetch import logs list =====
   fetch_import_logs() {
-    this.srvce.import_AR_LookUp_List().subscribe({
-      next: (response: any) => {
-        if (response && response.data) {
-          this.importLogs = response.data;
-        } else {
-          console.error('Invalid response format:', response);
-        }
-      },
-      error: (error) => {},
+    this.importLogs = new DataSource({
+      store: new CustomStore({
+        key: 'ID',
+        load: () => {
+          // this.isLoading = true;
+
+          return this.srvce
+            .import_AR_LookUp_List()
+            .toPromise()
+            .then((response: any) => {
+              if (response && response.data) {
+                return (response.data || []).map((item: any) => {
+                  let indianTime = null;
+
+                  if (item.ImportedTime) {
+                    const utcDate = new Date(item.ImportedTime + 'Z');
+
+                    indianTime = utcDate.toLocaleString('en-IN', {
+                      timeZone: 'Asia/Kolkata',
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      hour12: true,
+                    });
+                  }
+
+                  return {
+                    ...item,
+                    ImportedTime: indianTime,
+                  };
+                });
+              }
+
+              return [];
+            })
+            .catch((error) => {
+              console.error(error);
+              return [];
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+        },
+      }),
     });
   }
 
@@ -130,7 +181,7 @@ export class ImportArDataComponent implements OnInit {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
       this.isPopupVisible = false;
-      this.fetch_import_logs();
+      // this.fetch_import_logs();
     }
   }
 
@@ -391,6 +442,8 @@ export class ImportArDataComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
+
     // ================= Convert Verified Field =================
     this.Imported_Ar_DataSource.forEach((row: any) => {
       if (row.Verified === 1 || row.Verified === '1') {
@@ -428,7 +481,7 @@ export class ImportArDataComponent implements OnInit {
     // All chunks completed
     if (index >= chunks.length) {
       notify('Data imported successfully', 'success', 3000);
-      // Close popup
+      this.isLoading = false;
       this.isPopupVisible = false;
       return;
     }
@@ -448,16 +501,23 @@ export class ImportArDataComponent implements OnInit {
       },
       error: (error: any) => {
         notify('Error while importing data', 'error', 4000);
+        this.isLoading = false;
         return;
       },
     });
   }
 
   showImportDetails(rowData: any) {
-    const logId = rowData.ID;
+    this.clickedRowID = rowData.ID;
 
-    this.srvce.import_AR_Details_View(logId).subscribe({
+    // ================= Show Loader =================
+    this.isLoading = true;
+
+    this.srvce.import_AR_Details_View(this.clickedRowID).subscribe({
       next: (response: any) => {
+        // ================= Hide Loader =================
+        this.isLoading = false;
+
         // API Success
         if (response?.flag === 1) {
           if (response?.data) {
@@ -485,7 +545,6 @@ export class ImportArDataComponent implements OnInit {
 
             // ================= Open Popup =================
             this.isDetailsPopupVisible = true;
-            // notify('Detail data loaded successfully', 'success', 2000);
           } else {
             notify('No detail data available', 'warning', 3000);
           }
@@ -502,9 +561,55 @@ export class ImportArDataComponent implements OnInit {
       },
 
       error: (error: any) => {
+        // ================= Hide Loader =================
+        this.isLoading = false;
+
         notify('Error while loading detail data', 'error', 4000);
       },
     });
+  }
+
+  onCellPrepared(e: any) {
+    // ===== Disable Selection Checkbox =====
+    if (
+      e.rowType === 'data' &&
+      e.column.command === 'select' &&
+      e.data.Status?.trim() === 'Posted'
+    ) {
+      // Disable selection cell
+      e.cellElement.style.pointerEvents = 'none';
+      e.cellElement.style.opacity = '0.5';
+
+      // Hide checkbox
+      const checkbox = e.cellElement.querySelector('.dx-select-checkbox');
+
+      if (checkbox) {
+        (checkbox as HTMLElement).style.display = 'none';
+      }
+    }
+
+    // ===== Status Column Color =====
+    if (e.rowType === 'data' && e.column.dataField === 'Status') {
+      const status = e.value?.trim();
+
+      // Open
+      if (status === 'Open') {
+        e.cellElement.style.color = '#ff6f0f';
+        e.cellElement.style.fontWeight = '600';
+      }
+
+      // Posted
+      else if (status === 'Posted') {
+        e.cellElement.style.color = '#03b12b';
+        e.cellElement.style.fontWeight = '600';
+      }
+
+      // Failed
+      else if (status === 'Failed') {
+        e.cellElement.style.color = '#ff2929';
+        e.cellElement.style.fontWeight = '600';
+      }
+    }
   }
 }
 @NgModule({
@@ -521,6 +626,7 @@ export class ImportArDataComponent implements OnInit {
     DxCheckBoxModule,
     ReactiveFormsModule,
     DxValidatorModule,
+    DxLoadPanelModule,
   ],
   providers: [],
   declarations: [ImportArDataComponent],

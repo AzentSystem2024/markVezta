@@ -720,29 +720,51 @@ export class EditCustomerReceiptComponent {
     this.showFillAmountPopup = false;
   }
 
-  onSaveClick(): void {
-    if (this.receiprtFormData.IS_APPROVED) {
-      const result = confirm(
-        'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit',
-      );
+onSaveClick(): void {
+  const status = this.receiprtFormData.TRANS_STATUS;
+  console.log(status)
+  // APPROVE / COMMIT
+  if (
+    this.receiprtFormData.IS_APPROVED ||
+    this.receiprtFormData.TRANS_STATUS === 2 && this.canApprove ===true
+  ) {
+    confirm(
+      'It will approve and commit. Are you sure you want to commit?',
+      'Confirm Commit'
+    ).then((dialogResult) => {
+      if (dialogResult) {
+        this.isSaving = true;
+        this.commitReceipt();
+      }
+    });
 
-      result.then((dialogResult) => {
-        if (dialogResult) {
-          this.isSaving = true;
-          this.commitReceipt(); // call your API if user clicked "Yes"
-        }
-      });
-    } else {
-  this.isSaving = true;
+    return;
+  }
 
+  // VERIFY
   if (this.isVerifyReceipt === true) {
-    this.VerifyReceipt();
-  } else {
-    this.UpdateReceipt();
+    confirm(
+      'Are you sure you want to verify this Customer Receipt?',
+      'Confirm Verification'
+    ).then((dialogResult) => {
+      if (dialogResult) {
+        this.isSaving = true;
+        this.VerifyReceipt();
+      } else {
+        this.isSaving = false;
+        notify('Verification cancelled', 'info', 2000);
+      }
+    });
+
+    return;
   }
+
+  // NORMAL UPDATE
+  this.isSaving = true;
+  this.UpdateReceipt();
 }
-  }
+
+
 
   onConfirmCommit(): void {
     this.showCommitConfirmPopup = false;

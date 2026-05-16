@@ -208,7 +208,7 @@
               </div>
 
               <!-- ================= RIGHT SIDE ================= -->
-              <div style="display: flex; align-items: center; gap: 10px">
+              <div style="display: flex; flex-direction: column; gap: 5px">
                 <div style="display: flex; flex-direction: column; gap: 5px">
                   <dx-button
                     text="Promotion"
@@ -219,30 +219,29 @@
                     width="250"
                   >
                   </dx-button>
-                  <div class="d-flex">
-                    <dx-button
-                      [text]="getButtonText()"
-                      stylingMode="contained"
-                      type="default"
-                      class="mt-2"
-                      (onClick)="savePromotion()"
-                    >
-                    </dx-button>
-                  </div>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 5px">
-                  <!-- <dx-check-box
+
+                <div style="display: flex">
+                  <dx-check-box
                     [(value)]="approveValue"
                     text="Approve"
                     [readOnly]="readOnly"
                     (onValueChanged)="onApprovedChanged($event)"
                     style="margin: 10px"
                   >
-                  </dx-check-box> -->
+                  </dx-check-box>
+                  <dx-button
+                    [text]="getButtonText()"
+                    stylingMode="contained"
+                    type="default"
+                    class="mt-2"
+                    (onClick)="savePromotion()"
+                  >
+                  </dx-button>
                 </div>
               </div>
 
-              <div></div>
+              <div style="display: flex; align-items: center; gap: 10px"></div>
             </div>
           </div>
         </dxi-item>

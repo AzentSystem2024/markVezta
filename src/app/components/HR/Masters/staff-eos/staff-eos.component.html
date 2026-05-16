@@ -103,7 +103,7 @@
       caption="Remarks "
       [width]="150"
     ></dxi-column>
-
+    <!-- 
     <dxi-column
       dataField="STATUS"
       caption="Status"
@@ -129,7 +129,122 @@
       fixed="true"
       fixedPosition="right"
       width="150"
-    ></dxi-column>
+    ></dxi-column> -->
+
+    <dxi-column
+      caption="Status"
+      dataField="STATUS"
+      [width]="80"
+      [cellTemplate]="statusCellRender"
+      [allowHeaderFiltering]="true"
+      [headerFilter]="{
+        dataSource: getStatusFilterData,
+        encodeHtml: false,
+      }"
+    >
+    </dxi-column>
+    <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
+    <dxi-column
+      type="buttons"
+      caption="Actions"
+      [width]="140"
+      cellTemplate="actionTemplate"
+    >
+    </dxi-column>
+    <div *dxTemplate="let cellData of 'actionTemplate'">
+      <!-- Edit -->
+      <i
+        *ngIf="canEdit"
+        class="dx-icon dx-icon-edit"
+        [style.opacity]="
+          cellData.data.STATUS === 'Verified' ||
+          cellData.data.STATUS === 'Left Service'
+            ? '0.4'
+            : '1'
+        "
+        [style.pointer-events]="
+          cellData.data.STATUS === 'Verified' ||
+          cellData.data.STATUS === 'Left Service'
+            ? 'none'
+            : 'auto'
+        "
+        style="cursor: pointer; margin-right: 10px"
+        title="Edit"
+        (click)="onEditingStart({ data: cellData.data, cancel: false })"
+      ></i>
+
+      <!-- Delete -->
+      <i
+        *ngIf="canDelete"
+        class="dx-icon dx-icon-trash"
+        [style.opacity]="
+          cellData.data.STATUS === 'Verified' ||
+          cellData.data.STATUS === 'Left Service'
+            ? '0.4'
+            : '1'
+        "
+        [style.pointer-events]="
+          cellData.data.STATUS === 'Verified' ||
+          cellData.data.STATUS === 'Left Service'
+            ? 'none'
+            : 'auto'
+        "
+        style="cursor: pointer; margin-right: 10px"
+        title="Delete"
+        (click)="deleteData({ data: cellData.data, cancel: false })"
+      ></i>
+
+      <!-- Verify -->
+      <span
+        *ngIf="
+          (cellData.data.STATUS === 'Verified' && canApprove) ||
+          (cellData.data.STATUS !== 'Verified' && canVerify)
+        "
+        style="
+          position: relative;
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          margin-left: 10px;
+          cursor: pointer;
+          vertical-align: middle;
+        "
+        [title]="
+          cellData.data.STATUS === 'Left Service'
+            ? 'Left Service'
+            : cellData.data.STATUS === 'Verified'
+              ? 'Approve'
+              : 'Verify'
+        "
+        (click)="onVerifyClick({ row: { data: cellData.data } })"
+      >
+        <!-- Blue badge -->
+        <i
+          class="fas fa-certificate"
+          [style.color]="
+            cellData.data.STATUS === 'Left Service'
+              ? '#EF4444'
+              : cellData.data.STATUS === 'Verified'
+                ? '#0073D8'
+                : '#FFA500'
+          "
+          style="font-size: 18px; position: absolute; top: 0; left: 0"
+        ></i>
+
+        <!-- White tick -->
+        <i
+          class="fas fa-check"
+          style="
+            color: white;
+            font-size: 7px;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            pointer-events: none;
+          "
+        ></i>
+      </span>
+    </div>
   </dx-data-grid>
 </div>
 <!-- ============================================Add form============================== -->
@@ -695,6 +810,7 @@
             label="Document No"
             [(value)]="selected_data.DOC_NO"
             [readOnly]="true"
+            [readOnly]="true"
             labelMode="floating"
           ></dx-text-box>
         </dxi-item>
@@ -711,6 +827,7 @@
             [(value)]="selected_data.EOS_DATE"
             [readOnly]="true"
             labelMode="floating"
+            [readOnly]="true"
           ></dx-date-box>
         </dxi-item>
       </dxi-item>
@@ -718,6 +835,7 @@
       <dxi-item class="select-box">
         <dx-text-box
           displayExpr="DESCRIPTION"
+          [readOnly]="true"
           valueExpr="ID"
           label="Employee"
           [readOnly]="true"

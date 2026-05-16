@@ -65,7 +65,7 @@ export class StaffEOSComponent {
   selecte_Data_VA: any;
   get_Details_Data: any = [];
   editpopup: boolean = false;
-  all_workingdays: any;
+  all_workingdays: any = '0';
   staffEosSource: any = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -172,6 +172,7 @@ export class StaffEOSComponent {
   //====================Header filter=========================
 
   isFilterVisible = false;
+  canVerify: any;
 
   toggle() {
     if (this.isFilterVisible) {
@@ -224,8 +225,23 @@ export class StaffEOSComponent {
       this.canPrint = packingRights.CanEdit;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify
     }
   }
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+    {
+      text: 'Verified',
+      value: 'Verified',
+    },
+  ];
 
   //--------------Session storage----------------
   sesstion_Details() {
@@ -365,6 +381,27 @@ export class StaffEOSComponent {
       this.getStaffEosData(selected);
     }
   }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.STATUS;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Left Service'
+        ? '#EF4444' // Left Service
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Left Service' ? 'Left Service' : status === 'verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
 
   applyCustomDate() {
     if (!this.fromDate || !this.toDate) {
@@ -384,7 +421,7 @@ export class StaffEOSComponent {
   // =======================onEdit====================================
 
   onEditingStart(event: any) {
-    this.all_workingdays = 0;
+    this.all_workingdays = "0";
     event.cancel = true;
     const statusValue = event.data.STATUS;
     const id = event.data.ID;
@@ -491,7 +528,7 @@ export class StaffEOSComponent {
     const reason_id = this.formSource.value.reason_ID;
     const remarks = this.formSource.value.Remarks;
     const relieving_date = this.formSource.value.RELIEVING_DATE;
-    const days = this.all_workingdays.toString();
+    const days = this.all_workingdays.toString() || '';
     console.log(relieving_date, '========relvieing data s payload');
 
     //  Check for duplicate entry based on employee ID
@@ -596,7 +633,7 @@ export class StaffEOSComponent {
     const Add_Remarks = this.Add_Remarks;
     const ded_Remarks = this.ded_Remarks;
     const relieving_date = this.selected_data.RELIEVING_DATE;
-    const days = this.all_workingdays.toString();
+    const days = this.all_workingdays.toString() || '';;
 
     console.log(
       id,
@@ -758,7 +795,6 @@ export class StaffEOSComponent {
   }
   // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
-    this.verifypopup = true;
     e.cancel = true;
 
     const id = e.row?.data?.ID;
@@ -767,7 +803,15 @@ export class StaffEOSComponent {
       console.log(res);
       this.selected_data = res;
       console.log(this.selected_data, '==============select data====verify');
-      // this.get_employes_details_value_select();
+      if (this.selected_data.STATUS == 'Open') {
+        this.verifypopup = true
+
+      } else if (this.selected_data.STATUS == 'Verified') {
+        this.Approvepopup = true
+      }
+      else {
+        this.isviewpopup = true
+      }
     });
   }
 
@@ -780,7 +824,7 @@ export class StaffEOSComponent {
     const remarks = this.selected_data.REMARKS;
     const date = this.selected_data.EOS_DATE;
     const relieving_date = this.selected_data.RELIEVING_DATE;
-    const days = this.all_workingdays.toString();
+    const days = this.all_workingdays.toString() || '';
 
     console.log(id, user_id, store_id, emp_id, reason_id, remarks, date);
     console.log('===================verify data');

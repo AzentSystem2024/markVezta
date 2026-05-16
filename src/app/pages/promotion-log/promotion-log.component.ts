@@ -39,6 +39,7 @@ import { EditPromotionModule } from '../edit-promotion/edit-promotion.component'
 import { ViewPromotionWizardModule } from '../view-promotion-wizard/view-promotion-wizard.component';
 import { filter } from 'rxjs/operators';
 import { ChangeDetectorRef } from '@angular/core';
+import { PromotionComponent, PromotionModule } from '../promotion/promotion.component';
 
 @Component({
   selector: 'app-promotion-log',
@@ -48,6 +49,18 @@ import { ChangeDetectorRef } from '@angular/core';
 export class PromotionLogComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
+  @ViewChild(PromotionComponent)
+  promotionComponent!: PromotionComponent;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter: boolean = true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  isAddPopup: boolean = false
+  auto: string = 'auto';
   customButtons = [
     {
       hint: 'Verify',
@@ -83,7 +96,6 @@ export class PromotionLogComponent {
       visible: (e: any) => !e.row.data.isVerified && !e.row.data.isApproved,
     },
   ];
-  showHeaderFilter = true;
   isVerified: boolean = false;
   isApproved: boolean = false;
   promotionLogList: any;
@@ -99,7 +111,6 @@ export class PromotionLogComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  isFilterOpened = false;
   canVerify = false;
   StatusType: any;
   addButtonOptions = {
@@ -219,7 +230,7 @@ export class PromotionLogComponent {
         : status === 'Verified'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -383,11 +394,11 @@ export class PromotionLogComponent {
   }
 
   openEditingStart(event: any) {
+    console.log('Edit row triggered for ID:', event);
 
     event.cancel = true;
-    const selectedId = event.row.data.ID;
+    const selectedId = event.data.ID;
     console.log('Edit row triggered for ID:', selectedId, event);
-    const status = event.row.data.Status
     this.StatusType = 'EditScreen'
 
     console.log(status, '=============ststus----------------')
@@ -404,7 +415,8 @@ export class PromotionLogComponent {
   }
 
   onAddClick() {
-    this.router.navigate(['/promotion-add']);
+    // this.router.navigate(['/promotion-add']);
+    this.isAddPopup = true
   }
 
   onVerifyClick(e: any) {
@@ -521,6 +533,10 @@ export class PromotionLogComponent {
 
     this.editPackPopupOpened = false
     this.getPromotionLogList()
+    this.isAddPopup = false
+    if (this.promotionComponent) {
+      this.promotionComponent.resetForm();
+    }
 
   }
   isDeleteVisible = (e: any) => {
@@ -584,7 +600,8 @@ export class PromotionLogComponent {
     DxValidationGroupModule,
     DxValidatorModule,
     EditPromotionModule,
-    ViewPromotionWizardModule
+    ViewPromotionWizardModule,
+    PromotionModule
   ],
   providers: [],
   exports: [],

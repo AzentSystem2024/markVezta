@@ -91,7 +91,6 @@ export class AddCutomerReceiptComponent {
     COMPANY_ID: 1,
     STORE_ID: 0,
     FIN_ID: 1,
-    TRANS_STATUS: 1,
     REF_NO: '',
     UNIT_ID: 1,
     DISTRIBUTOR_ID: '',

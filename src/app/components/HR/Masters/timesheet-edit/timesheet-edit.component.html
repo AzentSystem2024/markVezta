@@ -51,6 +51,7 @@
           [(value)]="timesheetFormData.EMP_ID"
           placeholder="Select Employee"
           width="100%"
+          [searchEnabled]="true"
           (onValueChanged)="onEmployeeSelected($event)"
           [readOnly]="is_approve"
         >

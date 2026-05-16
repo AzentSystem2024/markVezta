@@ -162,12 +162,12 @@
           *ngIf="canEdit"
           class="dx-icon dx-icon-edit"
           [style.opacity]="
-            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+            cellData.data.TRANS_STATUS === 'Verify' || cellData.data.TRANS_STATUS === 'Approved'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+            cellData.data.TRANS_STATUS === 'Verify' || cellData.data.TRANS_STATUS === 'Approved'
               ? 'none'
               : 'auto'
           "
@@ -181,12 +181,12 @@
           *ngIf="canDelete"
           class="dx-icon dx-icon-trash"
           [style.opacity]="
-            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+            cellData.data.TRANS_STATUS === 'Verify' || cellData.data.TRANS_STATUS === 'Approved'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 'Verified' || cellData.data.TRANS_STATUS === 'Approved'
+            cellData.data.TRANS_STATUS === 'Verify' || cellData.data.TRANS_STATUS === 'Approved'
               ? 'none'
               : 'auto'
           "
@@ -197,7 +197,10 @@
 
         <!-- Verify -->
         <span
-          *ngIf="canVerify"
+          *ngIf="
+            (cellData.data.TRANS_STATUS === 2 && canApprove) ||
+            (cellData.data.TRANS_STATUS !== 2 && canVerify)
+          "
           style="
             position: relative;
             display: inline-block;
@@ -210,7 +213,7 @@
           [title]="
             cellData.data.TRANS_STATUS === 'Approved'
               ? 'Approved'
-              : cellData.data.TRANS_STATUS === 'Verified'
+              : cellData.data.TRANS_STATUS === 'Verify'
                 ? 'Approve'
                 : 'Verify'
           "
@@ -222,7 +225,7 @@
             [style.color]="
               cellData.data.TRANS_STATUS === 'Approved'
                 ? '#10B981'
-                : cellData.data.TRANS_STATUS === 'Verified'
+                : cellData.data.TRANS_STATUS === 'Verify'
                   ? '#0073D8'
                   : '#FFA500'
             "
@@ -290,7 +293,7 @@
     [isOpen]="verifyPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"
     (formClosed)="handleClose()"
-    [canApprove]="canApprove"
+    [canApprove]="false"
     [PrepaymentId]="selectprepayment"
     [verifyPrePaymentPopupOpened]="verifyPrePaymentPopupOpened"
   ></app-pre-payment-edit>

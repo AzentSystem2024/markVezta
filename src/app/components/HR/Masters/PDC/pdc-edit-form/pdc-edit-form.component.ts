@@ -32,6 +32,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import jsPDF from 'jspdf';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-pdc-edit-form',
@@ -41,9 +42,13 @@ import jsPDF from 'jspdf';
 export class PdcEditFormComponent {
   @Output() formClosed = new EventEmitter<void>();
   @Input() selectedPDC: any;
-  @Input() isReadOnly: boolean = false;
+  @Input() isEditReadOnly: boolean = false;
   @Input() PDCid: any;
    @Input() canApprove :boolean = false;
+   @Input() isVerifyMode: boolean = false;
+   @Input() isApproveMode: boolean = false;
+
+   @Input() VerifyPDCPopupOpened:boolean = false;
   isPdfPopupVisible: boolean = false;
   pdfSrc: SafeResourceUrl | null = null;
 
@@ -83,6 +88,76 @@ export class PdcEditFormComponent {
     ENTRY_STATUS: '',
     AC_TRANS_ID: '',
   };
+  entryStatus: any;
+
+    ngOnChanges(changes: SimpleChanges): void {
+      console.log(this.isVerifyMode,":geyueuryuirirg")
+    if (changes['selectedPDC'] && changes['selectedPDC'].currentValue) {
+      const data = changes['selectedPDC'].currentValue;
+      console.log(data,'==========data')
+      this.entryStatus = data.ENTRY_STATUS
+      console.log(this.entryStatus)
+      this.PDCFormData = {
+        ID: data.ID,
+        BANK_HEAD_ID: data.BANK_HEAD_ID,
+        CUST_ID: data.CUST_ID === 0 ? null : data.CUST_ID,
+        SUPP_ID: data.SUPP_ID === 0 ? null : data.SUPP_ID,
+        BENEFICIARY_NAME: data.BENEFICIARY_NAME || '',
+        BENEFICIARY_TYPE: data.BENEFICIARY_TYPE,
+        ENTRY_DATE: this.parseDate(data.ENTRY_DATE),
+        ENTRY_NO: data.ENTRY_NO,
+        CHEQUE_NO: data.CHEQUE_NO,
+        CHEQUE_DATE: this.parseDate(data.CHEQUE_DATE),
+        AMOUNT: data.AMOUNT,
+        REMARKS: data.REMARKS,
+        IS_PAYMENT: data.IS_PAYMENT
+          ? this.priorities.find((p) => p.name === 'Issued')
+          : this.priorities.find((p) => p.name === 'Received'),
+        ENTRY_STATUS: data.ENTRY_STATUS,
+        AC_TRANS_ID: data.AC_TRANS_ID,
+      };
+console.log(this.isApproveMode,":-------------fhytyu")
+      this.selectedType = this.PDCFormData.IS_PAYMENT;
+      this.selectedBeneficiaryType = this.BeneficiaryType.find(
+        (b) => b.id === data.BENEFICIARY_TYPE,
+      );
+      this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
+
+      // ✅ Map numeric type to object for radio group
+      // this.selectedBeneficiaryType = this.BeneficiaryType.find(
+      //   (p) => p.id === data.BENEFICIARY_TYPE
+      // );
+      if (data.BENEFICIARY_TYPE) {
+        this.selectedBeneficiaryType = this.BeneficiaryType.find(
+          (b) => b.id === data.BENEFICIARY_TYPE,
+        );
+        this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType?.id;
+      }
+
+      this.get_Supplier_dropdown();
+    }
+
+    // if (!this.selectedPDC) {
+    //   // Initialize default values for Add mode
+    //   this.selectedType = this.priorities[0];
+    //   this.selectedBeneficiaryType = this.BeneficiaryType[0];
+    //   this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
+
+    // }
+
+    if (!this.selectedPDC) {
+      setTimeout(() => {
+        this.selectedType = this.priorities[0];
+        this.selectedBeneficiaryType = this.BeneficiaryType[0];
+        this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
+        this.onPriorityChanged({ value: this.selectedType });
+        this.onBeneficiaryTypeChanged({
+          value: this.selectedBeneficiaryTypeID,
+        });
+      });
+    }
+  }
+
   onBeneficiaryTypeChanged(e: any) {
     //  this.selectedBeneficiaryType = e.value
 
@@ -136,9 +211,25 @@ export class PdcEditFormComponent {
    
   }
 
-  onSupplierChanged(event: any) {}
+  onSupplierChanged(event: any) {
+  this.PDCFormData.SUPP_ID = event.value;
 
-  onCustomerChanged(event: any) {}
+  const supplier = this.Supplier?.find(
+    (item: any) => item.ID === event.value
+  );
+
+  this.PDCFormData.BENEFICIARY_NAME = supplier?.DESCRIPTION || '';
+}
+
+  onCustomerChanged(event: any) {
+  this.PDCFormData.CUST_ID = event.value;
+
+  const customer = this.Customer?.find(
+    (item: any) => item.ID === event.value
+  );
+
+  this.PDCFormData.BENEFICIARY_NAME = customer?.DESCRIPTION || '';
+}
 
   cancel() {
     this.formClosed.emit();
@@ -163,6 +254,7 @@ export class PdcEditFormComponent {
   }
 
   savePDC() {
+    console.log(this.entryStatus,'=====entryvstatus')
     if (
       !this.PDCFormData.BANK_HEAD_ID ||
       !this.PDCFormData.CHEQUE_NO ||
@@ -182,7 +274,13 @@ export class PdcEditFormComponent {
       BANK_HEAD_ID: this.PDCFormData.BANK_HEAD_ID || 0,
       CUST_ID: this.PDCFormData.CUST_ID || 0,
       SUPP_ID: this.PDCFormData.SUPP_ID || 0,
-      BENEFICIARY_NAME: this.PDCFormData.BENEFICIARY_NAME || '',
+      // BENEFICIARY_NAME: this.PDCFormData.BENEFICIARY_NAME || '',
+      BENEFICIARY_NAME:
+  this.selectedBeneficiaryTypeID === 1
+    ? this.Supplier?.find((x: any) => x.ID === this.PDCFormData.SUPP_ID)?.DESCRIPTION || ''
+    : this.selectedBeneficiaryTypeID === 2
+    ? this.Customer?.find((x: any) => x.ID === this.PDCFormData.CUST_ID)?.DESCRIPTION || ''
+    : this.PDCFormData.BENEFICIARY_NAME || '',
       BENEFICIARY_TYPE: this.selectedBeneficiaryTypeID || 0,
 
       ENTRY_DATE: this.formatDate(this.PDCFormData.ENTRY_DATE),
@@ -191,10 +289,51 @@ export class PdcEditFormComponent {
       AMOUNT: +this.PDCFormData.AMOUNT || 0,
       REMARKS: this.PDCFormData.REMARKS || '',
       IS_PAYMENT: this.PDCFormData.IS_PAYMENT?.name === 'Issued', // true if Issued
-      ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
+      // ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
+     ENTRY_STATUS: this.isVerifyMode
+  ? 2
+  : this.isApproveMode || this.PDCFormData.ENTRY_STATUS
+    ? 5
+    : 1,
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
+      
     };
 
+    if (this.isVerifyMode === true) {
+    confirm(
+      'Are you sure you want to verify this PDC?',
+      'Confirm Verification'
+    ).then((result) => {
+      if (result) {
+        this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+          if (res.Message === 'Success') {
+            notify('PDC verified successfully', 'success', 2000);
+            this.formClosed.emit();
+          }
+        });
+      }
+    });
+
+    return; 
+  }
+
+    if (this.isApproveMode || this.PDCFormData.ENTRY_STATUS) {
+    confirm(
+      'Are you sure you want to approve this PDC?',
+      'Confirm Approval'
+    ).then((result) => {
+      if (result) {
+        this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+          if (res.Message === 'Success') {
+            notify('PDC approved successfully', 'success', 2000);
+            this.formClosed.emit();
+          }
+        });
+      }
+    });
+
+    return;
+  }
     this.dataservice.Update_PDC(payload).subscribe((res: any) => {
       if (res.Message === 'Success') {
         notify(
@@ -239,6 +378,7 @@ export class PdcEditFormComponent {
   }
 
   ngOnInit(): void {
+    
     if (!this.selectedPDC) {
       // Initialize default values for Add mode
       this.selectedType = this.priorities[0];
@@ -250,69 +390,7 @@ export class PdcEditFormComponent {
     this.get_Bank_dropdown();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedPDC'] && changes['selectedPDC'].currentValue) {
-      const data = changes['selectedPDC'].currentValue;
-      this.PDCFormData = {
-        ID: data.ID,
-        BANK_HEAD_ID: data.BANK_HEAD_ID,
-        CUST_ID: data.CUST_ID === 0 ? null : data.CUST_ID,
-        SUPP_ID: data.SUPP_ID === 0 ? null : data.SUPP_ID,
-        BENEFICIARY_NAME: data.BENEFICIARY_NAME || '',
-        BENEFICIARY_TYPE: data.BENEFICIARY_TYPE,
-        ENTRY_DATE: this.parseDate(data.ENTRY_DATE),
-        ENTRY_NO: data.ENTRY_NO,
-        CHEQUE_NO: data.CHEQUE_NO,
-        CHEQUE_DATE: this.parseDate(data.CHEQUE_DATE),
-        AMOUNT: data.AMOUNT,
-        REMARKS: data.REMARKS,
-        IS_PAYMENT: data.IS_PAYMENT
-          ? this.priorities.find((p) => p.name === 'Issued')
-          : this.priorities.find((p) => p.name === 'Received'),
-        ENTRY_STATUS: data.ENTRY_STATUS,
-        AC_TRANS_ID: data.AC_TRANS_ID,
-      };
 
-      this.selectedType = this.PDCFormData.IS_PAYMENT;
-      this.selectedBeneficiaryType = this.BeneficiaryType.find(
-        (b) => b.id === data.BENEFICIARY_TYPE,
-      );
-      this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
-
-      // ✅ Map numeric type to object for radio group
-      // this.selectedBeneficiaryType = this.BeneficiaryType.find(
-      //   (p) => p.id === data.BENEFICIARY_TYPE
-      // );
-      if (data.BENEFICIARY_TYPE) {
-        this.selectedBeneficiaryType = this.BeneficiaryType.find(
-          (b) => b.id === data.BENEFICIARY_TYPE,
-        );
-        this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType?.id;
-      }
-
-      this.get_Supplier_dropdown();
-    }
-
-    // if (!this.selectedPDC) {
-    //   // Initialize default values for Add mode
-    //   this.selectedType = this.priorities[0];
-    //   this.selectedBeneficiaryType = this.BeneficiaryType[0];
-    //   this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
-
-    // }
-
-    if (!this.selectedPDC) {
-      setTimeout(() => {
-        this.selectedType = this.priorities[0];
-        this.selectedBeneficiaryType = this.BeneficiaryType[0];
-        this.selectedBeneficiaryTypeID = this.selectedBeneficiaryType.id;
-        this.onPriorityChanged({ value: this.selectedType });
-        this.onBeneficiaryTypeChanged({
-          value: this.selectedBeneficiaryTypeID,
-        });
-      });
-    }
-  }
 
   parseDate(dateStr: string): Date {
     if (!dateStr) return null;

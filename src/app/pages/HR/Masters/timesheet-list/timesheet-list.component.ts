@@ -455,15 +455,11 @@ export class TimesheetListComponent {
 
   onEditingStart(e: any) {
     e.cancel = true;
+    console.log(e, '============mingcute:certificate-fill=====================')
 
-    if (e.row?.data?.STATUS == 'Approved') {
-      this.popupTitle = 'Edit Timesheet';
-      this.isViewMode = true;
-    } else {
-      this.popupTitle = 'View Timesheet';
-      this.isViewMode = false;
-    }
     this.editTimesheetPopupOpened = true;
+
+    // this.editTimesheetPopupOpened = true;
     const timesheetId = e.data.ID;
     const status = e.data.STATUS;
 
@@ -471,7 +467,24 @@ export class TimesheetListComponent {
       this.selectedTimesheet = response;
     });
   }
+  onEditingStartVerify(e: any) {
+    console.log("call this function")
+    e.cancel = true;
 
+    if (e.row?.data?.STATUS == 'Approved') {
+
+      this.viewTimesheetPopupOpened = true;
+    } else {
+      this.editTimesheetPopupOpened = true;
+    }
+    // this.editTimesheetPopupOpened = true;
+    const timesheetId = e.data.ID;
+    const status = e.data.STATUS;
+
+    this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
+      this.selectedTimesheet = response;
+    });
+  }
   onEditOrViewTimesheet(e: any) {
     e.cancel = true;
     const timesheetId = e.data.ID;
@@ -674,6 +687,41 @@ export class TimesheetListComponent {
       e.cellElement.style.pointerEvents = 'none';
     }
   }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.STATUS;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+    {
+      text: 'Verified',
+      value: 'Verified',
+    },
+  ];
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));

@@ -67,7 +67,7 @@
             "
           >
             <!-- 🔹 Heading -->
-            <div class="grid-header">{{ heading }}</div>
+            <!-- <div class="grid-header">{{ heading }}</div> -->
 
             <!-- 🔹 Main Row -->
             <div
@@ -443,20 +443,18 @@
   [showCloseButton]="true"
 >
   <div *dxTemplate="let data of 'content'" class="popup-content">
-    <div class="form-row">
-      <dx-radio-group
-        [(value)]="selectedMode"
-        [items]="[
-          { text: 'Price Level Promotion', value: 'price' },
-          { text: 'Schema Level Promotion', value: 'schema' },
-        ]"
-        displayExpr="text"
-        valueExpr="value"
-        layout="horizontal"
-        (onValueChanged)="onModeChange($event)"
-      >
-      </dx-radio-group>
-    </div>
+    <dx-radio-group
+      [(value)]="selectedMode"
+      [items]="[
+        { text: 'Price Level Promotion', value: 'price' },
+        { text: 'Schema Level Promotion', value: 'schema' },
+      ]"
+      displayExpr="text"
+      valueExpr="value"
+      layout="horizontal"
+      (onValueChanged)="onModeChange($event)"
+    >
+    </dx-radio-group>
     <div class="promo-form" [class.disabled]="selectedMode !== 'price'">
       <div class="form-row">
         <label>Promotion</label>

@@ -199,7 +199,10 @@
 
         <!-- Verify -->
         <span
-          *ngIf="canVerify"
+          *ngIf="
+            (cellData.data.STATUS === 2 && canApprove) ||
+            (cellData.data.STATUS !== 2 && canVerify)
+          "
           style="
             position: relative;
             display: inline-block;
