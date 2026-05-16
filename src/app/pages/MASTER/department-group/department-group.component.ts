@@ -21,13 +21,14 @@ import {
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { DepartmentComponent } from '../department/department.component';
 
 @Component({
-  selector: 'app-department',
-  templateUrl: './department.component.html',
-  styleUrls: ['./department.component.scss'],
+  selector: 'app-department-group',
+  templateUrl: './department-group.component.html',
+  styleUrls: ['./department-group.component.scss'],
 })
-export class DepartmentComponent {
+export class DepartmentGroupComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent | undefined;
 
@@ -44,7 +45,7 @@ export class DepartmentComponent {
   list_of_duplication: any;
   Department: any[] = [];
   departmentComponent: any;
-  formData = { IS_ACTIVE: false };
+  formData = { IS_INACTIVE: false };
   editingIndex: number | undefined;
   isLoading: boolean = false;
 
@@ -63,7 +64,6 @@ export class DepartmentComponent {
     hint: 'Add new entry',
 
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addDepartment());
     },
 
@@ -96,16 +96,17 @@ export class DepartmentComponent {
     private fb: FormBuilder,
     private dataservice: DataService,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
   ) {
     this.formsource = this.fb.group({
       CODE: ['', Validators.required],
       DEPT_NAME: ['', Validators.required],
-      IS_ACTIVE: [false],
-      COMPANY_ID: ['', Validators.required]
+      IS_INACTIVE: [false],
+      COMPANY_ID: ['', Validators.required],
     });
 
     const currentUrl = this.router.url.replace('/', '');
+
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -166,7 +167,7 @@ export class DepartmentComponent {
   };
 
   formatStatus(data: any) {
-    return data.IS_ACTIVE ? 'Active' : 'Inactive';
+    return data.IS_INACTIVE ? 'Active' : 'Inactive';
   }
 
   getSerialNumber = (rowIndex: number) => {
@@ -194,46 +195,49 @@ export class DepartmentComponent {
     this.formsource.reset({
       CODE: '',
       DEPT_NAME: '',
-      IS_ACTIVE: true, // add if you have checkbox or default value
+      IS_INACTIVE: false, // add if you have checkbox or default value
     });
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.COMPANY_ID = String(this.sessionData.SELECTED_COMPANY.COMPANY_ID);
     this.COMPANY_NAME = this.sessionData.SELECTED_COMPANY.COMPANY_NAME;
   }
 
-
   //===================get data list========================
   get_Department_List() {
     const payload = {
-      COMPANY_ID: this.COMPANY_ID
-    }
+      COMPANY_ID: this.COMPANY_ID,
+    };
     this.isLoading = true;
-    this.dataservice.get_Department_List(payload).subscribe((res: any) => {
-      if (res) {
-        this.Department = res.datas.map((item: any, index: any) => ({
-          ...item,
-          SlNo: index + 1, // Assign serial number
-        }));
-      }
-    });
+    this.dataservice
+      .get_Department_Group_List(payload)
+      .subscribe((res: any) => {
+        if (res) {
+          this.Department = res.datas.map((item: any, index: any) => ({
+            ...item,
+            SlNo: index + 1, // Assign serial number
+          }));
+        }
+      });
   }
 
   //============Add data============
   Add_Department() {
     const CODE = this.formsource.value.CODE?.trim();
     const DEPT_NAME = this.formsource.value.DEPT_NAME;
-    const IS_ACTIVE = this.formsource.value.IS_ACTIVE;
-    const COMPANY_ID = this.COMPANY_ID
+    const IS_INACTIVE = this.formsource.value.IS_INACTIVE;
+    const COMPANY_ID = this.COMPANY_ID;
 
     this.formsource.reset();
 
     const isDuplicate = this.Department.some((data: any) => {
       return (
         data.DEPT_NAME?.toLowerCase().trim() ===
-        DEPT_NAME?.toLowerCase().trim() ||
+          DEPT_NAME?.toLowerCase().trim() ||
         data.CODE?.toLowerCase().trim() === CODE?.toLowerCase().trim()
       );
     });
@@ -254,20 +258,22 @@ export class DepartmentComponent {
 
     if (CODE && DEPT_NAME) {
       this.dataservice
-        .Insert_Department_Api(CODE, DEPT_NAME, IS_ACTIVE, COMPANY_ID)
-        .subscribe((response) => {
-          notify(
-            {
-              message: 'Data succesfully added',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
-          this.formsource.reset();
-          this.AddDepartmentPopup = false;
+        .Insert_Department_Group_Api(CODE, DEPT_NAME, IS_INACTIVE, COMPANY_ID)
+        .subscribe((response:any) => {
+          if (response.flag === '1') {
+            notify(
+              {
+                message: 'Data succesfully added',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 500,
+              },
+              'success',
+            );
+            this.formsource.reset();
+            this.AddDepartmentPopup = false;
 
-          this.get_Department_List();
+            this.get_Department_List();
+          }
         });
     } else {
       notify(
@@ -285,49 +291,57 @@ export class DepartmentComponent {
   //==================edit data=======================
   Edit_Department() {
     const CODE = this.editingRowData.CODE;
-    const DEPT_NAME = this.editingRowData.DEPT_NAME;
-    const IS_ACTIVE = this.editingRowData.IS_ACTIVE;
+    const DEPT_NAME = this.editingRowData.DESCRIPTION;
+    const IS_INACTIVE = this.editingRowData.IS_INACTIVE;
     const ID = this.editingRowData.ID;
-    const COMPANY_ID = this.COMPANY_ID
+    const COMPANY_ID = this.COMPANY_ID;
 
-    this.get_Department_List();
+    // this.get_Department_List();
 
-    const isDuplicate = this.Department?.some((item: any) => {
-      if (item.ID === ID) return false; // Skip current item (being edited)
+    // const isDuplicate = this.Department?.some((item: any) => {
+    //   if (item.ID === ID) return false; // Skip current item (being edited)
 
-      return (
-        (item.CODE?.trim().toLowerCase() || '') ===
-        (CODE?.trim().toLowerCase() || '') ||
-        (item.DEPT_NAME?.trim().toLowerCase() || '') ===
-        (DEPT_NAME?.trim().toLowerCase() || '')
-      );
-    });
+    //   return (
+    //     (item.CODE?.trim().toLowerCase() || '') ===
+    //       (CODE?.trim().toLowerCase() || '') ||
+    //     (item.DEPT_NAME?.trim().toLowerCase() || '') ===
+    //       (DEPT_NAME?.trim().toLowerCase() || '')
+    //   );
+    // });
 
-    if (isDuplicate) {
-      notify(
-        {
-          message: 'Data already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'error',
-      );
-      return;
-    }
-    this.formsource.reset();
+    // if (isDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'Data already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 500,
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // }
+    // this.formsource.reset();
     if (CODE && DEPT_NAME) {
       this.dataservice
-        .Update_Department_Api(ID, CODE, DEPT_NAME, IS_ACTIVE, COMPANY_ID)
+        .Update_Department_Group_Api(
+          ID,
+          CODE,
+          DEPT_NAME,
+          IS_INACTIVE,
+          COMPANY_ID,
+        )
         .subscribe((response: any) => {
-          notify(
-            {
-              message: 'Data succesfully added',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
-          this.get_Department_List();
+          if (response.flag === '1') {
+            notify(
+              {
+                message: 'Data succesfully updated',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 500,
+              },
+              'success',
+            );
+            this.get_Department_List();
+          }
         });
       this.UpdateDepartmentPopup = false;
       this.get_Department_List();
@@ -351,16 +365,19 @@ export class DepartmentComponent {
   Select_Department(event: any) {
     const ID = event.data.ID;
 
-    this.dataservice.Select_Department_Api(ID).subscribe((response: any) => {
-      this.selectedData = response;
-    });
+    this.dataservice
+      .Select_Department_Group_Api(ID)
+      .subscribe((response: any) => {
+        this.selectedData = response;
+      });
   }
 
   //==========delete data================
   delete_Department(event: any) {
     const ID = event.data.ID;
-    this.dataservice.Delete_Department_Api(ID).subscribe((response: any) => {
-    });
+    this.dataservice
+      .Delete_Department_Group_Api(ID)
+      .subscribe((response: any) => {});
   }
 }
 @NgModule({
@@ -379,6 +396,6 @@ export class DepartmentComponent {
   ],
   providers: [],
   exports: [],
-  declarations: [DepartmentComponent],
+  declarations: [DepartmentGroupComponent],
 })
-export class DepartmentModule { }
+export class DepartmentGroupModule {}
