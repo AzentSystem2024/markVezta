@@ -145,7 +145,11 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
       caption="Net Amount"
     ></dxi-column>
-
+    <dxi-column
+      dataField="NARRATION"
+      caption="Narration"
+      width="140"
+    ></dxi-column>
     <dxi-column
       caption="Status"
       dataField="STATUS"
@@ -155,9 +159,11 @@
         dataSource: getStatusFilterData,
         encodeHtml: false,
       }"
+      width="80"
+      alignment="center"
     >
     </dxi-column>
-    <dxi-column caption="Actions" [width]="140" cellTemplate="actionTemplate">
+    <dxi-column caption="Actions" [width]="110" cellTemplate="actionTemplate">
     </dxi-column>
 
     <div *dxTemplate="let cellData of 'actionTemplate'">
@@ -166,7 +172,8 @@
         *ngIf="
           canVerify ||
           (canApprove && cellData.data.STATUS === 'Verified') ||
-          (canView && cellData.data.STATUS === 'Approved')
+          (canView && cellData.data.STATUS === 'Approved') ||
+          (canView && cellData.data.STATUS === 'Closed')
         "
         style="
           position: relative;
@@ -179,7 +186,8 @@
           vertical-align: middle;
         "
         [title]="
-          cellData.data.STATUS === 'Approved'
+          cellData.data.STATUS === 'Approved' ||
+          cellData.data.STATUS === 'Closed'
             ? 'View'
             : cellData.data.STATUS === 'Verified'
               ? 'Approve'
@@ -191,7 +199,8 @@
         <i
           class="fas fa-certificate"
           [style.color]="
-            cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Closed'
               ? '#10B981'
               : cellData.data.STATUS === 'Verified'
                 ? '#0073D8'
@@ -335,59 +344,6 @@
     >
     </app-purchase-order-edit-form>
   </form-popup>
-
-  <!-- <dx-popup
-    [(visible)]="isVerifyPopupOpened"
-    title="Verify Purchase Order"
-    [height]="'100vh'"
-    [width]="width"
-  >
-    <dxi-toolbar-item toolbar="bottom" location="center">
-      <div
-        class="form-popup-buttons-container"
-        [class.flex-buttons]="width <= 360"
-      >
-        <div style="display: flex; align-items: center">
-          <label style="margin-right: 8px">Quantity</label>
-          <dx-text-box
-            [width]="150"
-            [readOnly]="true"
-            [(value)]="netVerifyQuantity"
-            placeholder="0"
-            [rtlEnabled]="true"
-          ></dx-text-box>
-          <label style="margin-right: 8px; margin-left: 8px">Net Amount</label>
-          <dx-text-box
-            *ngIf="showSupplierAmount"
-            [width]="150"
-            [readOnly]="true"
-            [(value)]="netVerifySupplierAmount"
-            placeholder="0.00"
-            [rtlEnabled]="true"
-          ></dx-text-box
-          >&nbsp;
-          <dx-text-box
-            [width]="150"
-            [readOnly]="true"
-            [(value)]="netVerifyAmount"
-            placeholder="0.00"
-            [rtlEnabled]="true"
-          ></dx-text-box>
-        </div>
-        <dx-button
-          *ngIf="isEditPopupOpened"
-          text="Cancel"
-          stylingMode="outlined"
-          type="normal"
-        ></dx-button>
-        <dx-button
-          text="Verify"
-          stylingMode="contained"
-          type="default"
-        ></dx-button>
-      </div>
-    </dxi-toolbar-item>
-  </dx-popup> -->
 
   <dx-popup
     *ngIf="isViewPopupOpened"

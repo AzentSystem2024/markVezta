@@ -375,7 +375,13 @@ export class JournalVoucherListComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    // icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
     icon.title = status === 5 ? 'Approved' : 'Open';
 
     icon.style.display = 'flex';

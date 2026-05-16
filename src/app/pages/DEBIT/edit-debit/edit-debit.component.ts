@@ -62,7 +62,8 @@ export class EditDebitComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() debitFormData: any;
   @Input() canApprove: boolean = false;
-  @Input() isVerifyDebitNote : boolean = false;
+  @Input() isVerifyDebitNote: boolean = false;
+  @Input() isApproveMode: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -965,7 +966,7 @@ export class EditDebitComponent {
       notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
       return;
     }
-    if (this.debitFormData.IS_APPROVED || this.debitFormData[0].TRANS_STATUS ===2) {
+    if (this.debitFormData.IS_APPROVED || this.isApproveMode) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -1057,107 +1058,105 @@ export class EditDebitComponent {
       });
       this.isUpdating = false;
       return; // 🚫 Prevent running normal update block
-    } 
+    }
     if (this.isVerifyDebitNote === true) {
-  confirm(
-    'Are you sure you want to verify this Debit Note?',
-    'Confirm Verification'
-  ).then((result) => {
-    if (result) {
-      const verifyPayload = {
-        TRANS_ID: this.debitFormData[0].TRANS_ID,
-        TRANS_TYPE: 36,
-        COMPANY_ID: this.selectedCompanyId,
-        FIN_ID: this.finId,
-        STORE_ID: this.selectedstoreId,
-        TRANS_DATE: this.formatDate(this.transDate),
-        TRANS_STATUS: 1,
-        NARRATION: this.debitFormData[0].NARRATION,
-        INVOICE_ID: this.debitFormData[0].INVOICE_ID || 0,
-        INVOICE_NO: this.debitFormData[0].INVOICE_NO || '',
-        SUPP_ID: this.debitFormData[0].SUPP_ID || 0,
-        DISTRIBUTOR_ID: this.debitFormData[0].DISTRIBUTOR_ID || 0,
-        PARTY_NAME: this.debitFormData.PARTY_NAME,
-        IS_APPROVED: false,
-        VEHICLE_NO: this.debitFormData[0].VEHICLE_NO,
-        ROUND_OFF: this.debitFormData[0].ROUND_OFF,
+      confirm(
+        'Are you sure you want to verify this Debit Note?',
+        'Confirm Verification',
+      ).then((result) => {
+        if (result) {
+          const verifyPayload = {
+            TRANS_ID: this.debitFormData[0].TRANS_ID,
+            TRANS_TYPE: 36,
+            COMPANY_ID: this.selectedCompanyId,
+            FIN_ID: this.finId,
+            STORE_ID: this.selectedstoreId,
+            TRANS_DATE: this.formatDate(this.transDate),
+            TRANS_STATUS: 1,
+            NARRATION: this.debitFormData[0].NARRATION,
+            INVOICE_ID: this.debitFormData[0].INVOICE_ID || 0,
+            INVOICE_NO: this.debitFormData[0].INVOICE_NO || '',
+            SUPP_ID: this.debitFormData[0].SUPP_ID || 0,
+            DISTRIBUTOR_ID: this.debitFormData[0].DISTRIBUTOR_ID || 0,
+            PARTY_NAME: this.debitFormData.PARTY_NAME,
+            IS_APPROVED: false,
+            VEHICLE_NO: this.debitFormData[0].VEHICLE_NO,
+            ROUND_OFF: this.debitFormData[0].ROUND_OFF,
 
-        NOTE_DETAIL: this.noteDetails
-          .filter(
-            (item: any) =>
-              item.ledgerCode ||
-              item.ledgerName ||
-              item.Amount ||
-              item.gstAmount ||
-              item.particulars ||
-              item.CGST ||
-              item.SGST,
-          )
-          .map((item: any, index: number) => {
-            const match = this.ledgerList.find(
-              (l: any) =>
-                l.HEAD_CODE === item.ledgerCode ||
-                l.HEAD_NAME === item.ledgerName,
-            );
+            NOTE_DETAIL: this.noteDetails
+              .filter(
+                (item: any) =>
+                  item.ledgerCode ||
+                  item.ledgerName ||
+                  item.Amount ||
+                  item.gstAmount ||
+                  item.particulars ||
+                  item.CGST ||
+                  item.SGST,
+              )
+              .map((item: any, index: number) => {
+                const match = this.ledgerList.find(
+                  (l: any) =>
+                    l.HEAD_CODE === item.ledgerCode ||
+                    l.HEAD_NAME === item.ledgerName,
+                );
 
-            const gstAmount = this.calculateTaxAmount(item);
+                const gstAmount = this.calculateTaxAmount(item);
 
-            return {
-              SL_NO: item.SL_NO || index + 1,
-              HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
-              AMOUNT: Number(item.Amount) || 0,
-              GST_PERC: Number(item.GST_ID) || 0,
-              GST_AMOUNT: gstAmount,
-              REMARKS: item.particulars || '',
-              CGST: item.CGST || 0,
-              SGST: item.SGST || 0,
-            };
-          }),
-      };
+                return {
+                  SL_NO: item.SL_NO || index + 1,
+                  HEAD_ID: match?.HEAD_ID || item.HEAD_ID,
+                  AMOUNT: Number(item.Amount) || 0,
+                  GST_PERC: Number(item.GST_ID) || 0,
+                  GST_AMOUNT: gstAmount,
+                  REMARKS: item.particulars || '',
+                  CGST: item.CGST || 0,
+                  SGST: item.SGST || 0,
+                };
+              }),
+          };
 
-      verifyPayload.NOTE_DETAIL.forEach((row: any) => {
-        if (row.CGST > 0 || row.SGST > 0) {
-          row.GST_PERC = 0;
-        } else if (row.GST_PERC > 0) {
-          row.CGST = 0;
-          row.SGST = 0;
+          verifyPayload.NOTE_DETAIL.forEach((row: any) => {
+            if (row.CGST > 0 || row.SGST > 0) {
+              row.GST_PERC = 0;
+            } else if (row.GST_PERC > 0) {
+              row.CGST = 0;
+              row.SGST = 0;
+            }
+          });
+
+          this.dataService.verifyDebitNote(verifyPayload).subscribe(
+            (response: any) => {
+              this.isUpdating = false;
+
+              if (response.flag === 1 || response.Flag === 1) {
+                notify(
+                  {
+                    message: 'Debit Note Verified Successfully',
+                    position: {
+                      at: 'top right',
+                      my: 'top right',
+                    },
+                  },
+                  'success',
+                );
+
+                this.popupClosed.emit();
+              }
+            },
+            (error) => {
+              this.isUpdating = false;
+              notify('Error while verifying Debit Note', 'error', 3000);
+            },
+          );
+        } else {
+          this.isUpdating = false;
+          notify('Verification cancelled.', 'info', 2000);
         }
       });
 
-      this.dataService.verifyDebitNote(verifyPayload).subscribe(
-        (response: any) => {
-          this.isUpdating = false;
-
-          if (response.flag === 1 || response.Flag === 1) {
-            notify(
-              {
-                message: 'Debit Note Verified Successfully',
-                position: {
-                  at: 'top right',
-                  my: 'top right',
-                },
-              },
-              'success',
-            );
-
-            this.popupClosed.emit();
-          }
-        },
-        (error) => {
-          this.isUpdating = false;
-          notify('Error while verifying Debit Note', 'error', 3000);
-        }
-      );
+      return;
     } else {
-      this.isUpdating = false;
-      notify('Verification cancelled.', 'info', 2000);
-    }
-  });
-
-  return;
-}
-
-    else {
       const payload = {
         TRANS_ID: this.debitFormData[0].TRANS_ID,
         TRANS_TYPE: 36,

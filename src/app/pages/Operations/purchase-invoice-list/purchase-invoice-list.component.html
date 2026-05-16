@@ -154,7 +154,7 @@
         }"
       >
       </dxi-column>
-       <!-- <dxi-column
+      <!-- <dxi-column
       type="buttons"
       [buttons]="allActionButtons"
       fixed="true"
@@ -162,7 +162,7 @@
       width="150"
     ></dxi-column> -->
 
-     <dxi-column
+      <dxi-column
         type="buttons"
         caption="Actions"
         [width]="140"
@@ -176,12 +176,14 @@
           *ngIf="canEdit"
           class="dx-icon dx-icon-edit"
           [style.opacity]="
-            cellData.data.STATUS === 'Verified' || cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.STATUS === 'Verified' || cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
               ? 'none'
               : 'auto'
           "
@@ -195,12 +197,14 @@
           *ngIf="canDelete"
           class="dx-icon dx-icon-trash"
           [style.opacity]="
-            cellData.data.STATUS === 'Verified' || cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.STATUS === 'Verified' || cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
               ? 'none'
               : 'auto'
           "
@@ -224,9 +228,11 @@
           [title]="
             cellData.data.STATUS === 'Approved'
               ? 'Approved'
-              : cellData.data.STATUS === 'Verified'
-                ? 'Approve'
-                : 'Verify'
+              : cellData.data.STATUS === 'Closed'
+                ? 'Closed'
+                : cellData.data.STATUS === 'Verified'
+                  ? 'Approve'
+                  : 'Verify'
           "
           (click)="onVerifyClick({ row: { data: cellData.data } })"
         >
@@ -236,9 +242,11 @@
             [style.color]="
               cellData.data.STATUS === 'Approved'
                 ? '#10B981'
-                : cellData.data.STATUS === 'Verified'
-                  ? '#0073D8'
-                  : '#FFA500'
+                : cellData.data.STATUS === 'Closed'
+                  ? '#10B981'
+                  : cellData.data.STATUS === 'Verified'
+                    ? '#0073D8'
+                    : '#FFA500'
             "
             style="font-size: 18px; position: absolute; top: 0; left: 0"
           ></i>
@@ -257,7 +265,6 @@
           ></i>
         </span>
       </div>
-
     </dx-data-grid>
   </div>
 </div>
@@ -305,8 +312,10 @@
 >
   <ng-container *ngIf="isVerifyInvoice">
     <app-edit-purchase-invoice
-    [isVerifyInvoice]="true"
-    [status]="statusFinder"
+      [isVerifyInvoice]="true"
+      [isVerifyMode]="selectedInvoice?.STATUS !== 'Verified'"
+      [isApproveMode]="selectedInvoice?.STATUS == 'Verified'"
+      [status]="statusFinder"
       [invoiceFormData]="selectedInvoice"
       [readOnly]="isEditInvoiceReadOnly"
       (popupClosed)="handleClose()"
@@ -314,7 +323,6 @@
     ></app-edit-purchase-invoice>
   </ng-container>
 </dx-popup>
-
 
 <app-custom-date-popup
   [(visible)]="showCustomDatePopup"

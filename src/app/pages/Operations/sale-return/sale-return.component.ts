@@ -603,8 +603,8 @@ export class SaleReturnComponent {
   }
 
   onCellPrepared(e: any) {
-    console.log('DELETEEEEEEEEEE');
-    console.log(e, 'eventttttttttttttttttttt');
+    // console.log('DELETEEEEEEEEEE');
+    // console.log(e, 'eventttttttttttttttttttt');
     if (e.rowType === 'data' && e.column.command === 'edit') {
       if (e.data.TRANS_STATUS === 5) {
         const deleteButton = e.cellElement.querySelector('.dx-link-delete');
@@ -624,6 +624,8 @@ export class SaleReturnComponent {
     this.isAddSaleReturn = false;
     this.isEditSaleReturn = false;
     this.isViewSaleReturn = false;
+    this.isVerifySalesReturn = false;
+    this.isApproveSalesReturn = false;
     if (this.SaleReturnFormComponent) {
       this.SaleReturnFormComponent.resetSaleReturnForm();
     }

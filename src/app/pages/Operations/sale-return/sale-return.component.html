@@ -319,6 +319,43 @@
   >
   </app-sale-return-form>
 </dx-popup>
+
+<dx-popup
+  *ngIf="isApproveSalesReturn"
+  [(visible)]="isApproveSalesReturn"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Sales Return"
+  (popupClosed)="handleClose()"
+>
+  <app-sale-return-form
+    [isEditing]="true"
+    [EditingResponseData]="selectedSaleReturn"
+    [isVerifyMode]="selectedSaleReturn?.Header?.TRANS_STATUS !== 2"
+    [isApproveMode]="selectedSaleReturn?.Header?.TRANS_STATUS === 2"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-sale-return-form>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isViewSalesReturn"
+  [(visible)]="isViewSalesReturn"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Invoice"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-sale-return-form
+    [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlySaleReturn"
+    [EditingResponseData]="selectedSaleReturn"
+    (popupClosed)="handleClose()"
+  ></app-sale-return-form>
+  <!-- </ng-container> -->
+</dx-popup>
 <!-- <dx-popup
   [(visible)]="showCustomDatePopup"
   [showTitle]="true"

@@ -298,14 +298,14 @@
             ></dx-text-box>
           </div>
         </div>
-        <dx-check-box
+        <!-- <dx-check-box
           *ngIf="!isEditing && !isReadOnlyMode && canApprove"
           [(value)]="miscFormData.IS_APPROVED"
           text="Approve"
           style="margin-top: 10px"
-        ></dx-check-box>
+        ></dx-check-box> -->
         <dx-check-box
-          *ngIf="isEditing && !isReadOnlyMode  && canApprove"
+          *ngIf="isEditing && !isReadOnlyMode && canApprove"
           [(value)]="isApproved"
           text="Approve"
           style="margin-top: 10px"
@@ -324,19 +324,19 @@
       type="normal"
     ></dx-button>
     <dx-button
-     *ngIf="!isReadOnlyMode"
+      *ngIf="!isReadOnlyMode"
       #saveButtonRef
       [text]="
         isSaving
           ? miscFormData?.IS_APPROVED || isApproved
-            ? 'Committing...'
+            ? 'Saving...'
             : 'Saving...'
           : miscFormData?.IS_APPROVED
-            ? 'Commit'
+            ? 'Save'
             : isEditing
               ? isApproved
-                ? 'Commit'
-                : 'Update'
+                ? 'Save'
+                : 'Save'
               : 'Save'
       "
       [disabled]="isSaving"

@@ -522,9 +522,7 @@ export class AddPurchaseInvoiceComponent {
   };
 
   isGRNAlreadySelected = (rowData: any) => {
-    return this.mainGridData?.some(
-      (item) => item.GRN_DET_ID === rowData.GRN_DET_ID,
-    );
+    return this.mainGridData?.some((item) => item.ITEM_ID === rowData.ITEM_ID);
   };
 
   onPopupSelectionChanged(e: any) {
@@ -601,7 +599,7 @@ export class AddPurchaseInvoiceComponent {
         HSN_CODE: row.HSN_CODE,
 
         //  GST FROM GRN
-        VAT_PERC: gstPerc, // IGST %
+        VAT_PERC: row.VAT_PERC, // IGST %
         // CGST: cgst,
         // SGST: sgst,
 

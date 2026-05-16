@@ -58,6 +58,8 @@ export class MiscPurchInvoiceFormComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -606,9 +608,18 @@ export class MiscPurchInvoiceFormComponent {
     }
 
     // 2. Approval check
-    if (this.invoiceFormData.IS_APPROVED === true) {
+    if (this.invoiceFormData.IS_APPROVED === true || this.isApproveMode) {
       confirm(
         'Are you sure you want to approve and commit this invoice?',
+        'Confirmation',
+      ).then((result: boolean) => {
+        if (result) {
+          this.proceedSave();
+        }
+      });
+    } else if (this.isVerifyMode) {
+      confirm(
+        'Are you sure you want to verify this invoice?',
         'Confirmation',
       ).then((result: boolean) => {
         if (result) {
@@ -683,6 +694,7 @@ export class MiscPurchInvoiceFormComponent {
       NARRATION: this.invoiceFormData.NARRATION,
       IS_APPROVED: this.invoiceFormData.IS_APPROVED,
       REF_NO: this.invoiceFormData.REF_NO,
+      IS_VERIFIED: this.isVerifyMode ? true : false,
       Details: filteredDetails.map((row: any) => ({
         COMPANY_ID: this.selectedCompanyId,
         STORE_ID: this.storeID,
@@ -702,8 +714,11 @@ export class MiscPurchInvoiceFormComponent {
     if (!this.isEditing) {
       //  ADD
       request$ = this.dataService.saveMiscPurchInvoice(payload);
+    } else if (this.isVerifyMode) {
+      // VERIFY
+      request$ = this.dataService.updateMiscPurchInvoice(payload);
     } else {
-      if (this.invoiceFormData.IS_APPROVED) {
+      if (this.invoiceFormData.IS_APPROVED || this.isApproveMode) {
         // EDIT + APPROVE
         request$ = this.dataService.approveMiscPurchInvoice(payload);
       } else {
@@ -722,6 +737,12 @@ export class MiscPurchInvoiceFormComponent {
           message = this.invoiceFormData.IS_APPROVED
             ? 'Invoice approved successfully'
             : 'Invoice saved successfully';
+        } else if (this.isVerifyMode) {
+          message = this.invoiceFormData.IS_VERIFIED
+            ? 'Invoice verified successfully'
+            : 'Invoice verified successfully';
+        } else if (this.isApproveMode) {
+          message = 'Invoice approved successfully';
         } else {
           message = this.invoiceFormData.IS_APPROVED
             ? 'Invoice approved successfully'

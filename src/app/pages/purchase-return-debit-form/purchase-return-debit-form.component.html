@@ -363,6 +363,7 @@
               "
               [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
               [readOnly]="isReadOnlyMode"
+              [visible]="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
             ></dx-check-box>
           </div>
 
