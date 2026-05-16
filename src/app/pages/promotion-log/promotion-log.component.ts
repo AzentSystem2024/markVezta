@@ -230,7 +230,7 @@ export class PromotionLogComponent {
         : status === 'Verified'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
