@@ -6683,6 +6683,11 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}ImportAR/view`, payload);
   }
 
+   // ======= import Ar data detailed view API ========
+  import_AR_Full_List() {
+    return this.http.post(`${this.apiUrl}ImportAR/arlist`, {});
+  }
+
   // =========== import AR data API ==============
   import_AR_Data(batchNo: any, FileName: any, FileData: any) {
     const sessionData = JSON.parse(
@@ -6700,7 +6705,7 @@ The result can be exported to HTML or Markdown.`;
 
   // ========= PROCESS SELECTED PENDING LIST ==========
   process_pending_rows(rowdata: any) {
-    const payload = { TransactionID: rowdata.ApexTransactionNumber };
+    const payload = { TransactionID: rowdata.ID };
     return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
   }
 }

@@ -1,0 +1,146 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+  #detailGrid
+    class="grid theme-dependent"
+    [dataSource]="importDataList"
+    [showBorders]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    [columnAutoWidth]="true"
+    [height]="'80vh'"
+    noDataText=" "
+    keyExpr="ID"
+    (onCellPrepared)="onCellPrepared($event)"
+    (onEditorPreparing)="onEditorPreparing($event)"
+  >
+    <dxo-selection mode="multiple" showCheckBoxesMode="always"> </dxo-selection>
+    <dxi-column type="selection" [allowSelectAll]="true"> </dxi-column>
+    <dxi-column
+      *ngFor="let col of detailViewColumns"
+      [dataField]="col"
+      [caption]="col"
+      [visible]="col !== 'ID'"
+      width="150"
+      [fixed]="col === 'FailureReason' || col === 'Status'"
+      [fixedPosition]="'right'"
+      [alignment]="
+        col === 'Status' ? 'center' : col === 'TransactionID' ? 'left' : 'left'
+      "
+    >
+    </dxi-column>
+
+    <!-- ================= Filter ================= -->
+    <dxo-filter-row
+      [visible]="showFilterRow"
+      [applyFilter]="currentFilter"
+    ></dxo-filter-row>
+
+    <dxo-header-filter [visible]="isFilterOpened">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+
+    <!-- ================= Paging ================= -->
+    <dxo-paging [pageSize]="10"></dxo-paging>
+
+    <dxo-pager
+      [visible]="true"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10, 20, 30, 40]"
+    >
+    </dxo-pager>
+    <dxo-scrolling
+      mode="virtual"
+      rowRenderingMode="virtual"
+      columnRenderingMode="virtual"
+      showScrollbar="always"
+      preloadEnabled="true"
+      useNative="false"
+    >
+    </dxo-scrolling>
+
+    <dxo-load-panel [enabled]="true" [showPane]="true" [showIndicator]="true">
+    </dxo-load-panel>
+
+    <!-- ================= Toolbar ================= -->
+    <dxo-toolbar>
+      <dxi-item location="before" locateInMenu="never">
+        <div class="grid-header">AR List</div>
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      >
+      </dxi-item>
+
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      >
+      </dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <dxi-item name="exportButton" location="after" cssClass="export-btn">
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="ReProcessButtonOptions"
+      >
+      </dxi-item>
+    </dxo-toolbar>
+  </dx-data-grid>
+
+  <!-- Progress Section -->
+  <dx-load-panel
+    [visible]="isProcessingRows"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [hideOnOutsideClick]="false"
+    shadingColor="rgba(0,0,0,0.4)"
+    message="Processing Pending Rows..."
+  >
+    <div *dxTemplate="let data of 'content'">
+      <div class="text-center">
+        <div class="mb-2">
+          Total :
+          <b>{{ totalRequestCount }}</b>
+        </div>
+
+        <div class="mb-2">
+          Completed :
+          <b class="text-success">
+            {{ completedRequestCount }}
+          </b>
+        </div>
+
+        <div class="mb-2">
+          Failed :
+          <b class="text-danger">
+            {{ failedRequestCount }}
+          </b>
+        </div>
+
+        <div class="mb-2">
+          Pending :
+          <b class="text-warning">
+            {{ pendingRequestCount }}
+          </b>
+        </div>
+      </div>
+    </div>
+  </dx-load-panel>
+</div>

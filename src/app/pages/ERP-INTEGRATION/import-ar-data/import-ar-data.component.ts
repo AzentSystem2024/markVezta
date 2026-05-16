@@ -95,14 +95,6 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   importDetailViewData: any;
   detailViewColumns: any[] = [];
   isDetailsPopupVisible: boolean = false;
-
-  // ================= Progress Variables =================
-  isProcessingRows: boolean = false;
-
-  totalRequestCount: number = 0;
-  completedRequestCount: number = 0;
-  failedRequestCount: number = 0;
-  pendingRequestCount: number = 0;
   clickedRowID: any;
 
   constructor(
@@ -578,104 +570,46 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   }
 
   onCellPrepared(e: any) {
-    // Status Column Color
-    if (e.rowType === 'data' && e.column.dataField === 'Status') {
-      const status = e.value;
+    // ===== Disable Selection Checkbox =====
+    if (
+      e.rowType === 'data' &&
+      e.column.command === 'select' &&
+      e.data.Status?.trim() === 'Posted'
+    ) {
+      // Disable selection cell
+      e.cellElement.style.pointerEvents = 'none';
+      e.cellElement.style.opacity = '0.5';
 
-      // Pending
-      if (status === 'Pending') {
-        e.cellElement.style.backgroundColor = '#fff3cd';
-        e.cellElement.style.color = '#856404';
+      // Hide checkbox
+      const checkbox = e.cellElement.querySelector('.dx-select-checkbox');
+
+      if (checkbox) {
+        (checkbox as HTMLElement).style.display = 'none';
+      }
+    }
+
+    // ===== Status Column Color =====
+    if (e.rowType === 'data' && e.column.dataField === 'Status') {
+      const status = e.value?.trim();
+
+      // Open
+      if (status === 'Open') {
+        e.cellElement.style.color = '#ff6f0f';
         e.cellElement.style.fontWeight = '600';
       }
 
-      // Success
-      else if (status === 'Success') {
-        e.cellElement.style.backgroundColor = '#d4edda';
-        e.cellElement.style.color = '#155724';
+      // Posted
+      else if (status === 'Posted') {
+        e.cellElement.style.color = '#03b12b';
         e.cellElement.style.fontWeight = '600';
       }
 
       // Failed
       else if (status === 'Failed') {
-        e.cellElement.style.backgroundColor = '#f8d7da';
-        e.cellElement.style.color = '#721c24';
+        e.cellElement.style.color = '#ff2929';
         e.cellElement.style.fontWeight = '600';
       }
     }
-  }
-
-  // ================= Allow Checkbox Only For Pending / Failed =================
-  onEditorPreparing(e: any) {
-    if (e.parentType === 'dataRow' && e.command === 'select') {
-      const status = e.row?.data?.Status;
-      if (status !== 'Pending' && status !== 'Failed') {
-        e.editorOptions.disabled = true;
-      }
-    }
-  }
-
-  // ================= Process Pending Rows =================
-  async processPendingRows() {
-    // Selected Rows
-    const selectedRows = this.detailGrid.instance.getSelectedRowsData();
-    if (!selectedRows || selectedRows.length === 0) {
-      notify('Please select rows', 'warning', 3000);
-      return;
-    }
-    // Pending Rows Only
-    const pendingRows = selectedRows.filter((x: any) => x.Status === 'Pending');
-    if (pendingRows.length === 0) {
-      notify('Please select pending rows only', 'warning', 3000);
-      return;
-    }
-    // ================= Initialize Counters =================
-    this.isProcessingRows = true;
-    this.totalRequestCount = pendingRows.length;
-    this.completedRequestCount = 0;
-    this.failedRequestCount = 0;
-    this.pendingRequestCount = pendingRows.length;
-
-    // ================= Process One By One =================
-    for (const row of pendingRows) {
-      try {
-        // ================= API Call Per Row =================
-        const response: any = await this.srvce
-          .process_pending_rows(row)
-          .toPromise();
-
-        // ================= Success =================
-        if (response?.flag === 1) {
-          this.completedRequestCount++;
-        } else {
-          this.failedRequestCount++;
-        }
-      } catch (error: any) {
-        console.error(error);
-
-        this.failedRequestCount++;
-      }
-
-      // ================= Update Pending Count =================
-      this.pendingRequestCount =
-        this.totalRequestCount -
-        (this.completedRequestCount + this.failedRequestCount);
-    }
-    // ================= Completed =================
-    this.isProcessingRows = false;
-    this.detailGrid.instance.clearSelection();
-    notify(
-      `Processing completed.
-     Success : ${this.completedRequestCount}
-     Failed : ${this.failedRequestCount}`,
-      'success',
-      5000,
-    );
-
-    // ==== Refresh Grid After Full Completion =======
-    this.showImportDetails({
-      ID: this.clickedRowID,
-    });
   }
 }
 @NgModule({
