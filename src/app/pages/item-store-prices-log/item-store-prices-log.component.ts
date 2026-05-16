@@ -262,6 +262,20 @@ export class ItemStorePricesLogComponent {
       },
     );
   }
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+    {
+      text: 'Verified',
+      value: 'Verified',
+    },
+  ];
   getLoglist() {
     this.dataservice
       .getWorksheetItemStorePrices()
@@ -283,6 +297,27 @@ export class ItemStorePricesLogComponent {
           }
         });
       });
+  }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.Status;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
   }
 
   selectWorksheetById(worksheetId: number) {
@@ -501,20 +536,36 @@ export class ItemStorePricesLogComponent {
       console.warn('Invalid worksheet ID');
       return;
     }
-
+    console.log(e, '=================E===============================')
     this.dataservice.selectWorksheetForPrice(worksheetId).subscribe(
       (response) => {
         const selectedWorksheetData = response;
         this.selectedWorksheetData = response;
 
         this.dataservice.setWorksheetData(this.selectedWorksheetData);
+        if (e.row.data.Status == "Open") {
+          this.router.navigate(['/item-store-prices-verify'], {
+            state: {
+              worksheetData: this.selectedWorksheetData,
+              status: status,
+            },
+          });
+        }
+        else if (e.row.data.Status == "Verified")
+          this.router.navigate(['/item-store-price-approve'], {
+            state: {
+              worksheetData: this.selectedWorksheetData,
+              status: status,
+            },
+          });
+        else {
 
-        this.router.navigate(['/item-store-prices-verify'], {
-          state: {
-            worksheetData: this.selectedWorksheetData,
-            status: status,
-          },
-        });
+          this.router.navigate(['/change-price-view'], {
+            state: {
+              worksheetData: this.selectedWorksheetData,
+            },
+          });
+        }
         this.verifyItemStore(selectedWorksheetData, e);
         // this.dataGrid.instance.refresh();
       },

@@ -319,6 +319,27 @@ export class PayrollListComponent {
     if (hasMixedStatus) return;
 
   }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.STATUS;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
 
   onEditorPreparing(e: any) {
     if (
@@ -487,21 +508,6 @@ export class PayrollListComponent {
     });
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color = status === 'Approved' ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 'Approved' ? 'Approved' : 'Pending';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {

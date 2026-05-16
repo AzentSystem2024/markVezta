@@ -138,7 +138,6 @@ export class PrepaymentPostingListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {
-    this.get_prepayment_posting_list();
     this.sesstion_Details();
   }
   ngOnInit() {
@@ -176,10 +175,10 @@ export class PrepaymentPostingListComponent {
     icon.style.color =
       status === 'Approved'
         ? '#10B981' // Approved
-        : status === 'verified'
+        : status === 'Verify'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verify' ? 'Verify' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -202,9 +201,11 @@ export class PrepaymentPostingListComponent {
     },
   ];
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.get_prepayment_posting_list();
+
   }
   get_prepayment_posting_list() {
     const payload = {

@@ -385,6 +385,40 @@ export class AdvanceComponent {
     //   this.approveAdvancePopUp = false;
     // }
   }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.STATUS;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+    cellElement.appendChild(icon);
+  }
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+    {
+      text: 'Verified',
+      value: 'Verified',
+    },
+  ];
   // Add a class variable to track first load
   initialLoad: boolean = true;
   //=================Get Advance List=========================
@@ -805,9 +839,15 @@ export class AdvanceComponent {
     const id = event.row.data.TRANS_ID;
     this.dataService.select_Advance(id).subscribe((res: any) => {
       this.selected_Data = res;
-
+      this.isEditPopUp = true;
+      if (this.selected_Data.STATUS == 'Verified') {
+        this.buttonText = 'Approve';
+      } else if (this.selected_Data.STATUS == 'Open') {
+        this.buttonText = 'Verify';
+      } else {
+        // this.buttonText = 'View';
+      }
       this.id = this.selected_Data.ID;
-
       this.Advance_Amount_value = this.selected_Data.ADVANCE_AMOUNT;
       this.adv_no_value = this.selected_Data.ADV_NO;
       this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
@@ -1334,7 +1374,6 @@ export class AdvanceComponent {
   onApproveClick = (e: any) => {
     e.cancel = true;
     this.approveValue = true;
-    this.buttonText = 'Approve';
     this.isEditPopUp = true;
     this.isEditReadOnly = false;
     this.select_api_Advance_Approve(e);
@@ -1344,13 +1383,7 @@ export class AdvanceComponent {
   }
   onVerifyClick = (e: any) => {
     e.cancel = true;
-    this.isEditPopUp = true;
-    this.isEditReadOnly = false;
-    this.buttonText = 'Verify';
-
     this.select_api_Advance_Verify(e);
-
-
   }
 }
 
