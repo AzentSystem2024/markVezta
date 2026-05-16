@@ -385,6 +385,7 @@ import { ClinicianNewFormModule } from './pages/MASTER/POPUP PAGES/clinician-new
 import { CptMasterNewFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-new-form/cpt-master-new-form.component';
 import {  CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
 import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
+import {  DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
 
 
 @NgModule({
@@ -786,6 +787,7 @@ import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component'
     CPTMasterModule,
     CptMasterNewFormModule,
     CptMasterEditFormModule,
+    DepartmentGroupModule
   ],
 
   providers: [
