@@ -922,7 +922,7 @@ export class PhysicalInventoryFormComponent {
       }
     }
     else {
-      return 'Approsve';
+      return 'Save';
     }
   }
 

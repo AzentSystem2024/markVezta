@@ -127,6 +127,7 @@ export class StockAdjustmentEditComponent {
   hidecost: any;
   IS_HQ_App: boolean = false;
   selectedStatus: any;
+  StoreIDData: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -194,6 +195,7 @@ export class StockAdjustmentEditComponent {
       console.log(editable);
       this.readOnlyTrue = editable == 5
       this.approveValue = editable == 5
+      this.StoreIDData = this.adjustmentFormData.STORE_ID
 
       // this.readOnlyTrue=
       // if (editable == 5) {

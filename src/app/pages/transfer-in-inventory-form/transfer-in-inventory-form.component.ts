@@ -177,7 +177,7 @@ export class TransferInInventoryFormComponent {
     const data = this.EditingResponseData;
     console.log(this.selectedDocStatus, '=================selectedDocStatus=================')
     console.log(this.status, '========================statsu type=======================')
-
+    this.StoreIDData = data.STORE_ID
     this.transferInFormData = {
       TRANS_ID: data.TRANS_ID,
       // ID: data.ID,
@@ -245,7 +245,6 @@ export class TransferInInventoryFormComponent {
       if (this.IS_HQ_App) {
         // 🔹 HQ App → show only store with ID = 1
         this.stores = response.filter((item: any) => item.ID === 1);
-        this.StoreIDData = 1;
 
 
       } else {

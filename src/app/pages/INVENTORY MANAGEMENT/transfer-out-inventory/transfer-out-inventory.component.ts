@@ -609,11 +609,10 @@ export class TransferOutInventoryComponent {
     }
   }
   onEditTransferOut(event: any) {
-    console.log('Edit button clicked for row:', event.row.data);
+    console.log('Edit button clicked for row:', event);
     event.cancel = true;
-    const trOutId = event.row.data.TRANS_ID;
-    this.selected_Data_Status = event.row.data.STATUS;
-    this.isEditTransferOut = true;
+    const trOutId = event.data.TRANS_ID;
+    this.selected_Data_Status = event.data.STATUS;
     this.StatusType = 'EditScreen'
 
     this.select_function(trOutId)
@@ -624,6 +623,8 @@ export class TransferOutInventoryComponent {
       .selectTransferOutForInventory(trOutId)
       .subscribe((response: any) => {
         this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+
         this.cdr.detectChanges();
 
 
@@ -714,7 +715,6 @@ export class TransferOutInventoryComponent {
     e.cancel = true;
     const trOutId = e.row.data.TRANS_ID;
     const status = e.row.data.STATUS;
-    this.StatusType = 'viewScreen'
 
     this.dataService
       .selectTransferOutForInventory(trOutId)
@@ -735,7 +735,6 @@ export class TransferOutInventoryComponent {
         this.selectedTrOut = response;
         this.isEditTransferOut = true;
         this.cdr.detectChanges();
-        this.StatusType = 'ApprovalScreen'
 
 
       });
@@ -745,15 +744,25 @@ export class TransferOutInventoryComponent {
     e.cancel = true;
     const trOutId = e.row.data.TRANS_ID;
     this.selected_Data_Status = e.row.data.STATUS;
-    this.isEditTransferOut = true;
     this.cdr.detectChanges();
-    this.StatusType = 'VerifyScreen'
 
 
     this.dataService
       .selectTransferOutForInventory(trOutId)
       .subscribe((response: any) => {
         this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+        console.log(this.selected_Data_Status, "STSSSSSSUSSS")
+        if (this.selected_Data_Status === 'OPEN') {
+          this.StatusType = 'VerifyScreen'
+        } else if (
+          this.selected_Data_Status = 'VERIFY') {
+          this.StatusType = 'ApprovalScreen'
+
+        } else {
+          this.StatusType = 'viewScreen'
+
+        }
 
 
       });
