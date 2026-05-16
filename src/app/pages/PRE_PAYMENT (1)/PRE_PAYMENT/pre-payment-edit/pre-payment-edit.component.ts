@@ -36,6 +36,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-pre-payment-edit',
@@ -116,6 +117,7 @@ export class PrePaymentEditComponent {
   gstPercent: number = 0; // GST %
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
+  transStatus: any;
   // isSaving = false;
 
   constructor(
@@ -472,7 +474,11 @@ export class PrePaymentEditComponent {
     ) {
       const data = changes['selectedPrePayment'].currentValue;
       console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
+      console.log(data.TRANS_STATUS,'===========statusss')
+      this.transStatus = data.TRANS_STATUS
+      console.log(this.transStatus)
       this.PrePaymentFormData = data;
+      console.log(this.PrePaymentFormData)
 
       // Bind details to grid data source
       this.ExpenseAmountDetails = (data.Details || []).map((item) => ({
@@ -516,7 +522,11 @@ export class PrePaymentEditComponent {
       NO_OF_DAYS: Number(this.PrePaymentFormData.NO_OF_DAYS) || null,
       EXPENSE_AMOUNT: Number(this.PrePaymentFormData.EXPENSE_AMOUNT) || null,
       NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
-      TRANS_STATUS: this.PrePaymentFormData.TRANS_STATUS ? 5 : 1,
+  //     TRANS_STATUS: this.verifyPrePaymentPopupOpened 
+  // ? 2
+  // : this.PrePaymentFormData.TRANS_STATUS
+  //   ? 5
+  //   : 1,
       STORE_ID: this.selectedstoreId,
       //  Map from the grid data source, not the form object
       PREPAY_DETAIL: result,
@@ -524,44 +534,77 @@ export class PrePaymentEditComponent {
 
     console.log('Payload to save PrePayment:', payload);
 
-    if (this.verifyPrePaymentPopupOpened === true) {
-  this.dataservice.Verify_PrePayment(payload).subscribe(
-    (res: any) => {
-      this.isSaving = false;
+const currentStatus = this.transStatus;
 
-      notify({
-        message: 'PrePayment Verified successfully',
-        type: 'success',
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 500,
-      });
-
-      this.formClosed.emit();
-    },
-    (error) => {
-      this.isSaving = false;
-      notify('Error while verifying PrePayment', 'error', 2000);
-      console.error(error);
-    },
-  );
-
-  return;
-}
-   else if (this.PrePaymentFormData.TRANS_STATUS === true) {
-      this.dataservice.Approve_PrePayment(payload).subscribe(
-        (approveRes: any) => {
+console.log(currentStatus,'current status')
+console.log(this.verifyPrePaymentPopupOpened,'verifyprepaymnetpopup')
+if (
+  this.verifyPrePaymentPopupOpened &&
+  currentStatus === 'Open'
+) {
+  confirm(
+    'Are you sure you want to verify this PrePayment?',
+    'Confirm Verification'
+  ).then((result) => {
+    if (result) {
+      this.dataservice.Verify_PrePayment(payload).subscribe(
+        (res: any) => {
           this.isSaving = false;
-          console.log('Response from approve PrePayment:', approveRes);
-          //  this.resetForm();
+
+          notify({
+            message: 'PrePayment Verified successfully',
+            type: 'success',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          });
+
           this.formClosed.emit();
         },
         (error) => {
-          this.isSaving = false; //  STOP loading
-          notify('Error while approving PrePayment', 'error', 2000);
-          console.error(error);
-        },
+          this.isSaving = false;
+          notify('Error while verifying PrePayment', 'error', 2000);
+        }
       );
     } else {
+      this.isSaving = false;
+    }
+  });
+
+  return;
+}
+
+else if (currentStatus === 'Verify' || this.PrePaymentFormData.TRANS_STATUS === true) {
+  confirm(
+    'Are you sure you want to approve this PrePayment?',
+    'Confirm Approval'
+  ).then((result) => {
+    if (result) {
+      this.dataservice.Approve_PrePayment(payload).subscribe(
+        (res: any) => {
+          this.isSaving = false;
+
+          notify({
+            message: 'PrePayment Approved successfully',
+            type: 'success',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          });
+
+          this.formClosed.emit();
+        },
+        (error) => {
+          this.isSaving = false;
+          notify('Error while approving PrePayment', 'error', 2000);
+        }
+      );
+    } else {
+      this.isSaving = false;
+    }
+  });
+
+  return;
+}
+else {
       this.dataservice.Update_PrePayment(payload).subscribe(
         (res: any) => {
           this.isSaving = false;

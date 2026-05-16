@@ -379,9 +379,12 @@ import { TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summar
 import { ZReportModule } from './pages/REPORT/zreport/zreport.component';
 import { SalesInvoiceRetailModule } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
 import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { ClinicianMasterModule } from './pages/MASTER/clinician-master/clinician-master.component';
+import { ClinicianEditFormModule } from './pages/MASTER/POPUP PAGES/clinician-edit-form/clinician-edit-form.component';
+import { ClinicianNewFormModule } from './pages/MASTER/POPUP PAGES/clinician-new-form/clinician-new-form.component';
 
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -773,6 +776,9 @@ import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoic
     ZReportModule,
     SalesInvoiceRetailModule,
     AddSalesInvoiceRetailModule,
+    ClinicianMasterModule,
+    ClinicianEditFormModule,
+    ClinicianNewFormModule,
   ],
 
   providers: [
@@ -787,4 +793,4 @@ import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoic
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -303,7 +303,10 @@
       "
     >
       <div *ngIf="journalVoucherFormData">
-        <div class="approve-container" *ngIf="canApprove">
+        <div
+          class="approve-container"
+          *ngIf="canApprove && !isVerifyMode && !isApproveMode"
+        >
           <dx-check-box
             [(value)]="journalVoucherFormData.IS_APPROVED"
             text="Approve"

@@ -66,6 +66,8 @@ export class EditSupplierPaymentComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Input() supplierPaymentId: any;
   @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';

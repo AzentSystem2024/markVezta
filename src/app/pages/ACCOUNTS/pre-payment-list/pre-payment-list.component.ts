@@ -31,6 +31,7 @@ import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-paym
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-pre-payment-list',
@@ -275,10 +276,10 @@ export class PrePaymentListComponent {
     icon.style.color =
       status === 'Approved'
         ? '#10B981' // Approved
-        : status === 'Verified'
+        : status === 'Verify'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
+    icon.title = status === 'Approved' ? 'Approved' : status === 'Verify' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -305,8 +306,9 @@ export class PrePaymentListComponent {
   this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
     this.selectedPrePayment = {
       ...res.Data,
-      TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved',
+      // TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved',
     };
+    console.log(this.selectedPrePayment,"eerertrt====")
   });
 }
   selectPrePayment(event: any) {
@@ -314,30 +316,60 @@ export class PrePaymentListComponent {
     this.PrepaymentId = event.data.TRANS_ID;
     this.selectprepayment = id;
     this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
+      console.log(res,)
       // Store original string if needed
       this.selectedPrePayment = {
         ...res.Data,
         TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved', //  boolean for checkbox
       };
+      console.log(this.selectedPrePayment)
     });
   }
 
-  DeletePrePayment(event: any) {
-    const id = event.data.TRANS_ID;
-    this.dataservice.Delete_PrePayment(id).subscribe((res: any) => {
-      console.log('response from delete api:', res);
-      if (res.Message === 'Success') {
-        notify(
-          {
-            message: 'Deleted successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success',
-        );
-      }
-    });
+ DeletePrePayment(e: any) {
+  const miscId = e.data.TRANS_ID;
+  e.cancel = true;
+
+  if (e.data.TRANS_STATUS === 5) {
+    notify('This Prepayment cannot be deleted.', 'error', 2000);
+    return;
   }
+
+  confirm(
+    'Are you sure you want to delete this Prepayment?',
+    'Confirm Delete'
+  ).then((result) => {
+    if (result) {
+      this.dataservice.Delete_PrePayment(miscId).subscribe(
+        (response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Prepayment Deleted Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.get_PrePaymentList();
+          } else {
+            notify(
+              {
+                message: 'Data not deleted',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        },
+        (error) => {
+          console.error('Delete error:', error);
+          notify('Error while deleting', 'error', 2000);
+        }
+      );
+    }
+  });
+}
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;

@@ -117,6 +117,11 @@ export class JournalVoucherListComponent {
   JVid: any;
   sessionData: any;
   selectedCompanyId: any;
+  canVerify: any;
+  isReadOnlyJV: boolean;
+  isViewJV: boolean;
+  isApproveJV: boolean;
+  isVerifyJV: boolean;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -163,7 +168,7 @@ export class JournalVoucherListComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -182,6 +187,7 @@ export class JournalVoucherListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.sessionData_tax();
@@ -582,6 +588,36 @@ export class JournalVoucherListComponent {
       });
   }
 
+  onVerifyJV(event: any) {
+    const rowData = event.row.data;
+
+    const invoiceId = rowData.TRANS_ID;
+    const transStatus = rowData.TRANS_STATUS;
+
+    this.isReadOnlyJV = transStatus === 5;
+
+    this.dataService
+      .selectJournalVoucher(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedJournalVoucher = response.Data;
+
+        // APPROVED -> OPEN VIEW PAGE
+        if (transStatus === 5) {
+          this.isViewJournalVoucher = true;
+        }
+
+        // VERIFIED -> OPEN APPROVE PAGE
+        else if (transStatus === 2) {
+          this.isApproveJV = true;
+        }
+
+        // OPEN VERIFY PAGE
+        else {
+          this.isVerifyJV = true;
+        }
+      });
+  }
+
   onDeleteJournalVoucher(event: any) {
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
@@ -625,6 +661,8 @@ export class JournalVoucherListComponent {
     this.isAddJournalVoucher = false;
     this.isEditJournalVoucher = false;
     this.isViewJournalVoucher = false;
+    this.isVerifyJV = false;
+    this.isApproveJV = false;
     if (this.addJournalVoucherFormComponent) {
       this.addJournalVoucherFormComponent.resetJournalVoucherForm();
     }

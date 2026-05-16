@@ -15,14 +15,14 @@
     <dx-date-box
       label="Date"
       labelMode="floating"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       displayFormat="dd-MM-yyyy"
       [(value)]="PDCFormData.ENTRY_DATE"
     ></dx-date-box>
 
     <dx-radio-group
       [items]="priorities"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [(value)]="selectedType"
       layout="horizontal"
       [stylingMode]="'outlined'"
@@ -40,7 +40,7 @@
       [(value)]="selectedBeneficiaryTypeID"
       valueExpr="id"
       displayExpr="name"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       layout="horizontal"
       [itemDisabled]="isBeneficiaryTypeDisabled"
       (onValueChanged)="onBeneficiaryTypeChanged($event)"
@@ -56,7 +56,7 @@
       [valueExpr]="'ID'"
       [displayExpr]="'DESCRIPTION'"
       [items]="Supplier"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [(value)]="PDCFormData.SUPP_ID"
       (onValueChanged)="onSupplierChanged($event)"
     >
@@ -66,7 +66,7 @@
       *ngIf="selectedBeneficiaryType?.id === 2"
       label="Customer"
       labelMode="floating"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [valueExpr]="'ID'"
       [displayExpr]="'DESCRIPTION'"
       [items]="Customer"
@@ -82,7 +82,7 @@
       [valueExpr]="'ID'"
       [displayExpr]="'DESCRIPTION'"
       [items]="Supplier"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [(value)]="PDCFormData.BENEFICIARY_NAME"
     >
     </dx-text-box>
@@ -93,7 +93,7 @@
       label="Cheque No"
       labelMode="floating"
       [width]="'16vw'"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [(value)]="PDCFormData.CHEQUE_NO"
     >
     </dx-text-box>
@@ -103,7 +103,7 @@
       labelMode="floating"
       [width]="'16vw'"
       displayFormat="dd-MM-yyyy"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [(value)]="PDCFormData.CHEQUE_DATE"
     >
     </dx-date-box>
@@ -112,7 +112,7 @@
       label="Amount"
       [width]="'16vw'"
       labelMode="floating"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [inputAttr]="{ style: 'text-align: right' }"
       [(value)]="PDCFormData.AMOUNT"
@@ -124,7 +124,7 @@
     <dx-select-box
       label="Bank Ac."
       labelMode="floating"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [valueExpr]="'ID'"
       [displayExpr]="'DESCRIPTION'"
       [items]="Bank"
@@ -137,17 +137,17 @@
     <dx-text-box
       label="Remarks"
       labelMode="floating"
-      [readOnly]="isReadOnly"
+      [readOnly]="isEditReadOnly"
       [(value)]="PDCFormData.REMARKS"
     >
     </dx-text-box>
   </div>
 
-  <div style="margin-bottom: 1.5rem" *ngIf="canApprove">
+  <div style="margin-bottom: 1.5rem" *ngIf="canApprove || isVerifyMode !== true">
     <dx-check-box
       text="Approve"
-      [readOnly]="isReadOnly"
-      [(value)]="PDCFormData.ENTRY_STATUS"
+      [readOnly]="isEditReadOnly"
+      [value]="false"
     >
     </dx-check-box>
   </div>
@@ -170,7 +170,7 @@
       (onClick)="cancel()"
     ></dx-button>
     <dx-button
-      *ngIf="!isReadOnly"
+      *ngIf="!isEditReadOnly"
       text="Update"
       type="default"
       (onClick)="savePDC()"

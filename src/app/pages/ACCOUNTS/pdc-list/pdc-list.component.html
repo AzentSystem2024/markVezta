@@ -185,10 +185,116 @@
         [cellTemplate]="statusCellRender"
         width="100  "
         alignment="right"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false,
+        }"
       >
       </dxi-column>
 
-      <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column>
+       <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditPDC({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="DeletePDC({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="
+            cellData.data.ENTRY_STATUS === 'Closed' ||
+            (cellData.data.ENTRY_STATUS === 'Verified' && canApprove) ||
+            (cellData.data.ENTRY_STATUS !== 'Verified' && canVerify)
+          "
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+          cellData.data.ENTRY_STATUS === 'Closed'
+      ? 'Closed'
+           : cellData.data.ENTRY_STATUS === 'Approved'
+              ? 'Approved'
+              : cellData.data.ENTRY_STATUS === 'Verified'
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onVerifyInvoice({ row: { data: cellData.data } })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+            cellData.data.ENTRY_STATUS === 'Closed'
+      ? '#EF4444'
+              :cellData.data.ENTRY_STATUS === 'Approved'
+                ? '#10B981'
+                : cellData.data.ENTRY_STATUS === 'Verified'
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
+      </div>
     </dx-data-grid>
 
     <dx-popup
@@ -221,6 +327,26 @@
     (formClosed)="handleClose()"
     [PDCid]="selectPDC"
     [canApprove]="canApprove"
+  ></app-pdc-edit-form>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="VerifyPDCPopupOpened"
+  [width]="'50vw'"
+  [height]="'90vh'"
+  title="Edit PDC"
+  (onHiding)="handleClose()"
+>
+  <app-pdc-edit-form
+    [selectedPDC]="selectedPDC"
+    [isOpen]="VerifyPDCPopupOpened"
+    [isEditReadOnly]="isEditReadOnly"
+    (formClosed)="handleClose()"
+    [PDCid]="selectPDC"
+    [canApprove]="false"
+    [isVerifyMode]="selectedPDC?.ENTRY_STATUS !== 'Verified'"
+    [isApproveMode]="selectedPDC?.ENTRY_STATUS === 'Verified'"
+    [VerifyPDCPopupOpened]="VerifyPDCPopupOpened"
   ></app-pdc-edit-form>
 </dx-popup>
 

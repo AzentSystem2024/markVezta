@@ -5,6 +5,7 @@ import {
   ElementRef,
   NgModule,
   NgZone,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -16,6 +17,7 @@ import {
   DxDataGridComponent,
   DxDataGridModule,
   DxFormModule,
+  DxLoadPanelModule,
   DxPopupModule,
   DxTextBoxModule,
   DxValidatorModule,
@@ -26,26 +28,32 @@ import { DataService } from 'src/app/services/data.service';
 import * as XLSX from 'xlsx';
 import notify from 'devextreme/ui/notify';
 import { alert } from 'devextreme/ui/dialog';
+import DataSource from 'devextreme/data/data_source';
+import CustomStore from 'devextreme/data/custom_store';
 @Component({
   selector: 'app-import-ar-data',
   templateUrl: './import-ar-data.component.html',
   styleUrls: ['./import-ar-data.component.scss'],
 })
-export class ImportArDataComponent implements OnInit {
+export class ImportArDataComponent implements OnInit, OnDestroy {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid!: DxDataGridComponent;
+
+  @ViewChild('detailGrid', { static: false })
+  detailGrid!: DxDataGridComponent;
 
   @ViewChild('fileInput', { static: false })
   fileInput!: ElementRef;
 
-  isFilterOpened: boolean = true;
-  showFilterRow: boolean = true;
+  isFilterOpened: boolean = false;
+  showFilterRow: boolean = false;
   currentFilter: string = 'auto';
   isPopupVisible: boolean = false;
+  isLoading: boolean = false;
 
   uploadedFileName: string = '';
 
-  importLogs: any[] = [];
+  importLogs: DataSource | null = null;
   Imported_Ar_DataSource: any[] = [];
   gridColumns: any[] = [];
 
@@ -87,6 +95,7 @@ export class ImportArDataComponent implements OnInit {
   importDetailViewData: any;
   detailViewColumns: any[] = [];
   isDetailsPopupVisible: boolean = false;
+  clickedRowID: any;
 
   constructor(
     private ngZone: NgZone,
@@ -98,37 +107,73 @@ export class ImportArDataComponent implements OnInit {
     this.fetch_import_logs();
   }
 
+  ngOnDestroy(): void {
+    this.isLoading = false;
+  }
+
   // === fetch import columns list =====
   fetchImportColumns() {
     this.srvce.import_AR_Columns().subscribe({
       next: (response: any) => {
         if (response && response.data) {
           this.ImportColumnData = response.data;
-          console.log('Import Columns Response : ', this.ImportColumnData);
         } else {
           console.error('Invalid response format:', response);
         }
       },
-      error: (error) => {
-        console.log('Error fetching import columns:', error);
-      },
+      error: (error) => {},
     });
   }
 
   // === fetch import logs list =====
   fetch_import_logs() {
-    this.srvce.import_AR_LookUp_List().subscribe({
-      next: (response: any) => {
-        if (response && response.data) {
-          console.log('Import Logs Response : ', response);
-          this.importLogs = response.data;
-        } else {
-          console.error('Invalid response format:', response);
-        }
-      },
-      error: (error) => {
-        console.log('Error fetching import logs:', error);
-      },
+    this.importLogs = new DataSource({
+      store: new CustomStore({
+        key: 'ID',
+        load: () => {
+          // this.isLoading = true;
+
+          return this.srvce
+            .import_AR_LookUp_List()
+            .toPromise()
+            .then((response: any) => {
+              if (response && response.data) {
+                return (response.data || []).map((item: any) => {
+                  let indianTime = null;
+
+                  if (item.ImportedTime) {
+                    const utcDate = new Date(item.ImportedTime + 'Z');
+
+                    indianTime = utcDate.toLocaleString('en-IN', {
+                      timeZone: 'Asia/Kolkata',
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      hour12: true,
+                    });
+                  }
+
+                  return {
+                    ...item,
+                    ImportedTime: indianTime,
+                  };
+                });
+              }
+
+              return [];
+            })
+            .catch((error) => {
+              console.error(error);
+              return [];
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+        },
+      }),
     });
   }
 
@@ -136,7 +181,7 @@ export class ImportArDataComponent implements OnInit {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
       this.isPopupVisible = false;
-      this.fetch_import_logs();
+      // this.fetch_import_logs();
     }
   }
 
@@ -156,30 +201,24 @@ export class ImportArDataComponent implements OnInit {
 
     if (target.files.length !== 1) {
       notify('Please select one file', 'warning', 3000);
-
       return;
     }
 
     const file = target.files[0];
-
     // Store uploaded file name
     this.uploadedFileName = file.name;
-
     const reader: FileReader = new FileReader();
 
     reader.onload = async (e: any) => {
       try {
         const binaryString: string = e.target.result;
-
         const workbook: XLSX.WorkBook = XLSX.read(binaryString, {
           type: 'binary',
           cellDates: false,
         });
 
         const sheetName: string = workbook.SheetNames[0];
-
         const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
-
         // Raw Excel Data
         const excelData: any[] = XLSX.utils.sheet_to_json(worksheet, {
           defval: null,
@@ -189,14 +228,11 @@ export class ImportArDataComponent implements OnInit {
         // Empty File Validation
         if (excelData.length === 0) {
           notify('Excel file is empty', 'warning', 3000);
-
           return;
         }
 
         // Excel Column Names
         const excelColumns: string[] = Object.keys(excelData[0]);
-
-        console.log('Excel Columns : ', excelColumns);
 
         // Import Column Titles
         const importCaptions: string[] = this.ImportColumnData.map((x: any) =>
@@ -207,7 +243,7 @@ export class ImportArDataComponent implements OnInit {
           x.trim().toLowerCase(),
         );
 
-        // Column Count Validation
+        // ================= Column Count Validation =================
         if (importCaptions.length !== excelColumnNames.length) {
           await alert(
             `Column count mismatch.<br><br>
@@ -219,17 +255,17 @@ export class ImportArDataComponent implements OnInit {
           return;
         }
 
-        // Missing Columns
+        // ================= Missing Columns =================
         const invalidColumns: string[] = importCaptions.filter(
           (caption: string) => !excelColumnNames.includes(caption),
         );
 
-        // Extra Columns
+        // ================= Extra Columns =================
         const extraColumns: string[] = excelColumnNames.filter(
           (col: string) => !importCaptions.includes(col),
         );
 
-        // Validation Error
+        // ================= Validation Error =================
         if (invalidColumns.length > 0 || extraColumns.length > 0) {
           let errorMessage = '';
 
@@ -244,24 +280,89 @@ export class ImportArDataComponent implements OnInit {
             errorMessage +=
               `<b>Extra Columns :</b><br>` + extraColumns.join(', ');
           }
-
           await alert(errorMessage, 'Column Validation');
-
           return;
         }
 
-        // Convert Empty String To Null
-        excelData.forEach((row: any) => {
+        // ================= Create Column Type Map =================
+        const columnTypeMap: any = {};
+
+        this.ImportColumnData.forEach((col: any) => {
+          columnTypeMap[col.ColumnTitle.trim().toLowerCase()] =
+            col.ColumnType.toLowerCase();
+        });
+
+        // ================= Convert Values Based On Column Type =================
+        excelData.forEach((row: any, rowIndex: number) => {
           Object.keys(row).forEach((key: string) => {
-            // Empty / Blank => null
-            if (row[key] === '' || row[key] === undefined || row[key] === ' ') {
-              row[key] = null;
+            const originalKey = key;
+            const lowerKey = key.trim().toLowerCase();
+
+            const columnType = columnTypeMap[lowerKey];
+
+            let value = row[originalKey];
+
+            // ================= Empty Value Handling =================
+            if (
+              value === '' ||
+              value === undefined ||
+              value === null ||
+              value === ' '
+            ) {
+              row[originalKey] = null;
+              return;
             }
 
-            // Date Conversion
-            if (key && key.toLowerCase().includes('date')) {
-              const value = row[key];
+            // ================= STRING =================
+            if (columnType === 'string') {
+              row[originalKey] = String(value).trim();
+            }
 
+            // ================= INT =================
+            else if (columnType === 'int') {
+              const intValue = parseInt(value, 10);
+
+              row[originalKey] = isNaN(intValue) ? null : intValue;
+            }
+
+            // ================= DECIMAL =================
+            else if (columnType === 'decimal') {
+              const decimalValue = parseFloat(value);
+
+              row[originalKey] = isNaN(decimalValue)
+                ? null
+                : Number(decimalValue);
+            }
+
+            // ================= BOOLEAN =================
+            else if (columnType === 'boolean') {
+              if (
+                value === true ||
+                value === 'true' ||
+                value === 'TRUE' ||
+                value === 1 ||
+                value === '1' ||
+                value === 'yes' ||
+                value === 'YES'
+              ) {
+                row[originalKey] = 1;
+              } else if (
+                value === false ||
+                value === 'false' ||
+                value === 'FALSE' ||
+                value === 0 ||
+                value === '0' ||
+                value === 'no' ||
+                value === 'NO'
+              ) {
+                row[originalKey] = 0;
+              } else {
+                row[originalKey] = null;
+              }
+            }
+
+            // ================= DATETIME =================
+            else if (columnType === 'datetime') {
               // Excel Date Number
               if (typeof value === 'number') {
                 const excelDate = XLSX.SSF.parse_date_code(value);
@@ -271,7 +372,9 @@ export class ImportArDataComponent implements OnInit {
                   const month = String(excelDate.m).padStart(2, '0');
                   const year = excelDate.y;
 
-                  row[key] = `${year}-${month}-${day}`;
+                  row[originalKey] = `${year}-${month}-${day}`;
+                } else {
+                  row[originalKey] = null;
                 }
               }
 
@@ -281,18 +384,31 @@ export class ImportArDataComponent implements OnInit {
                 const month = String(value.getMonth() + 1).padStart(2, '0');
                 const year = value.getFullYear();
 
-                row[key] = `${year}-${month}-${day}`;
+                row[originalKey] = `${year}-${month}-${day}`;
+              }
+
+              // String Date
+              else {
+                const date = new Date(value);
+
+                if (!isNaN(date.getTime())) {
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const year = date.getFullYear();
+
+                  row[originalKey] = `${year}-${month}-${day}`;
+                } else {
+                  row[originalKey] = null;
+                }
               }
             }
           });
         });
 
-        // Bind Grid Data
+        // ================= Bind Grid Data =================
         this.Imported_Ar_DataSource = excelData;
 
-        console.log('Excel Data : ', this.Imported_Ar_DataSource);
-
-        // Dynamic Columns
+        // ================= Dynamic Columns =================
         if (excelData.length > 0) {
           this.gridColumns = Object.keys(excelData[0]).map((key) => ({
             dataField: key,
@@ -301,15 +417,11 @@ export class ImportArDataComponent implements OnInit {
           }));
         }
 
-        console.log('Grid Columns : ', this.gridColumns);
-
-        // Open Popup
+        // ================= Open Popup =================
         this.isPopupVisible = true;
 
         notify('Excel loaded successfully', 'success', 3000);
       } catch (error) {
-        console.log(error);
-
         notify('Error while reading excel file', 'error', 4000);
       }
     };
@@ -327,10 +439,27 @@ export class ImportArDataComponent implements OnInit {
       this.Imported_Ar_DataSource.length === 0
     ) {
       notify('No data available to save', 'warning', 3000);
-
       return;
     }
+
+    this.isLoading = true;
+
+    // ================= Convert Verified Field =================
+    this.Imported_Ar_DataSource.forEach((row: any) => {
+      if (row.Verified === 1 || row.Verified === '1') {
+        row.Verified = true;
+      } else if (row.Verified === 0 || row.Verified === '0') {
+        row.Verified = false;
+      } else if (
+        row.Verified === null ||
+        row.Verified === undefined ||
+        row.Verified === ''
+      ) {
+        row.Verified = null;
+      }
+    });
     const chunkSize = 100;
+
     // Same Batch Number for all chunks
     const batchNo = 'BATCH_' + new Date().getTime();
     // Create Chunks
@@ -352,7 +481,7 @@ export class ImportArDataComponent implements OnInit {
     // All chunks completed
     if (index >= chunks.length) {
       notify('Data imported successfully', 'success', 3000);
-      // Close popup
+      this.isLoading = false;
       this.isPopupVisible = false;
       return;
     }
@@ -372,32 +501,55 @@ export class ImportArDataComponent implements OnInit {
       },
       error: (error: any) => {
         notify('Error while importing data', 'error', 4000);
+        this.isLoading = false;
         return;
       },
     });
   }
 
   showImportDetails(rowData: any) {
-    const logId = rowData.ID;
-    this.srvce.import_AR_Details_View(logId).subscribe({
+    this.clickedRowID = rowData.ID;
+
+    // ================= Show Loader =================
+    this.isLoading = true;
+
+    this.srvce.import_AR_Details_View(this.clickedRowID).subscribe({
       next: (response: any) => {
+        // ================= Hide Loader =================
+        this.isLoading = false;
+
         // API Success
-        if (response?.flag === '1') {
+        if (response?.flag === 1) {
           if (response?.data) {
-            this.importDetailViewData = response.data || [];
-            // Dynamic Columns
+            // ================= Convert Verified Field To String =================
+            this.importDetailViewData = (response.data || []).map(
+              (item: any) => ({
+                ...item,
+                Verified:
+                  item.Verified === true
+                    ? 1
+                    : item.Verified === false
+                      ? ''
+                      : item.Verified === null || item.Verified === undefined
+                        ? null
+                        : String(item.Verified),
+              }),
+            );
+
+            // ================= Dynamic Columns =================
             if (this.importDetailViewData.length > 0) {
               this.detailViewColumns = Object.keys(
                 this.importDetailViewData[0],
               );
             }
-            // Open Popup
+
+            // ================= Open Popup =================
             this.isDetailsPopupVisible = true;
-            // notify('Detail data loaded successfully', 'success', 2000);
           } else {
             notify('No detail data available', 'warning', 3000);
           }
         }
+
         // API Failed
         else {
           notify(
@@ -407,10 +559,57 @@ export class ImportArDataComponent implements OnInit {
           );
         }
       },
+
       error: (error: any) => {
+        // ================= Hide Loader =================
+        this.isLoading = false;
+
         notify('Error while loading detail data', 'error', 4000);
       },
     });
+  }
+
+  onCellPrepared(e: any) {
+    // ===== Disable Selection Checkbox =====
+    if (
+      e.rowType === 'data' &&
+      e.column.command === 'select' &&
+      e.data.Status?.trim() === 'Posted'
+    ) {
+      // Disable selection cell
+      e.cellElement.style.pointerEvents = 'none';
+      e.cellElement.style.opacity = '0.5';
+
+      // Hide checkbox
+      const checkbox = e.cellElement.querySelector('.dx-select-checkbox');
+
+      if (checkbox) {
+        (checkbox as HTMLElement).style.display = 'none';
+      }
+    }
+
+    // ===== Status Column Color =====
+    if (e.rowType === 'data' && e.column.dataField === 'Status') {
+      const status = e.value?.trim();
+
+      // Open
+      if (status === 'Open') {
+        e.cellElement.style.color = '#ff6f0f';
+        e.cellElement.style.fontWeight = '600';
+      }
+
+      // Posted
+      else if (status === 'Posted') {
+        e.cellElement.style.color = '#03b12b';
+        e.cellElement.style.fontWeight = '600';
+      }
+
+      // Failed
+      else if (status === 'Failed') {
+        e.cellElement.style.color = '#ff2929';
+        e.cellElement.style.fontWeight = '600';
+      }
+    }
   }
 }
 @NgModule({
@@ -427,6 +626,7 @@ export class ImportArDataComponent implements OnInit {
     DxCheckBoxModule,
     ReactiveFormsModule,
     DxValidatorModule,
+    DxLoadPanelModule,
   ],
   providers: [],
   declarations: [ImportArDataComponent],

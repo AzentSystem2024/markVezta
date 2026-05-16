@@ -138,6 +138,12 @@ export class SupplierPaymentListComponent {
   sessionData: any;
   selectedCompanyId: any;
   companyID: any;
+  isReadOnlyJV: boolean;
+  isReadOnlyPayment: boolean;
+  isViewPayment: boolean;
+  isApprovePayment: boolean;
+  isVerifyPayment: boolean;
+  canVerify: any;
 
   constructor(
     private dataService: DataService,
@@ -167,6 +173,7 @@ export class SupplierPaymentListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.getSupplierPayments();
@@ -174,7 +181,9 @@ export class SupplierPaymentListComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -538,7 +547,7 @@ export class SupplierPaymentListComponent {
     }
   }
 
-  onEditReceiptNote(event: any) {
+  onEditPayment(event: any) {
     event.cancel = true; // Prevent default popup editing
 
     const receiptId = event.data.TRANS_ID;
@@ -560,7 +569,37 @@ export class SupplierPaymentListComponent {
       });
   }
 
-  onDeleteReceiptNote(event: any) {
+  onVerifyPayment(event: any) {
+    const rowData = event.row.data;
+
+    const invoiceId = rowData.TRANS_ID;
+    const transStatus = rowData.TRANS_STATUS;
+
+    this.isReadOnlyPayment = transStatus === 5;
+
+    this.dataService
+      .selectSupplierPayment(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedReceipt = response.Data;
+
+        // APPROVED -> OPEN VIEW PAGE
+        if (transStatus === 5) {
+          this.isViewPayment = true;
+        }
+
+        // VERIFIED -> OPEN APPROVE PAGE
+        else if (transStatus === 2) {
+          this.isApprovePayment = true;
+        }
+
+        // OPEN VERIFY PAGE
+        else {
+          this.isVerifyPayment = true;
+        }
+      });
+  }
+
+  onDeletePayment(event: any) {
     if (event.data.TRANS_STATUS === 5) {
       event.cancel = true;
       notify('Customer Receipt cannot be deleted.', 'error', 2000);
@@ -605,6 +644,9 @@ export class SupplierPaymentListComponent {
   handleClose() {
     this.addSupllierPayment = false;
     this.isEditReceipt = false;
+    this.isVerifyPayment = false;
+    this.isApprovePayment = false;
+    this.isViewPayment = false;
     this.getSupplierPayments();
     if (this.addSupplierPaymentComponent) {
       this.addSupplierPaymentComponent.resetForm();
@@ -658,4 +700,4 @@ export class SupplierPaymentListComponent {
   exports: [SupplierPaymentListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierPaymentListModule { }
+export class SupplierPaymentListModule {}
