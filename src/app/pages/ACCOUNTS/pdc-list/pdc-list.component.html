@@ -343,7 +343,9 @@
     [isEditReadOnly]="isEditReadOnly"
     (formClosed)="handleClose()"
     [PDCid]="selectPDC"
-    [canApprove]="canApprove"
+    [canApprove]="false"
+    [isVerifyMode]="selectedPDC?.ENTRY_STATUS !== 'Verified'"
+    [isApproveMode]="selectedPDC?.ENTRY_STATUS === 'Verified'"
     [VerifyPDCPopupOpened]="VerifyPDCPopupOpened"
   ></app-pdc-edit-form>
 </dx-popup>

@@ -117,6 +117,7 @@ export class PrePaymentEditComponent {
   gstPercent: number = 0; // GST %
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
+  transStatus: any;
   // isSaving = false;
 
   constructor(
@@ -473,7 +474,11 @@ export class PrePaymentEditComponent {
     ) {
       const data = changes['selectedPrePayment'].currentValue;
       console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
+      console.log(data.TRANS_STATUS,'===========statusss')
+      this.transStatus = data.TRANS_STATUS
+      console.log(this.transStatus)
       this.PrePaymentFormData = data;
+      console.log(this.PrePaymentFormData)
 
       // Bind details to grid data source
       this.ExpenseAmountDetails = (data.Details || []).map((item) => ({
@@ -529,12 +534,10 @@ export class PrePaymentEditComponent {
 
     console.log('Payload to save PrePayment:', payload);
 
-const currentStatus = (this.PrePaymentFormData.TRANS_STATUS || '')
-  .toString()
-  .trim()
-  .toLowerCase();
+const currentStatus = this.transStatus;
 
-
+console.log(currentStatus,'current status')
+console.log(this.verifyPrePaymentPopupOpened,'verifyprepaymnetpopup')
 if (
   this.verifyPrePaymentPopupOpened &&
   currentStatus === 'Open'
@@ -570,7 +573,7 @@ if (
   return;
 }
 
-else if (currentStatus === 'Verify') {
+else if (currentStatus === 'Verify' || this.PrePaymentFormData.TRANS_STATUS === true) {
   confirm(
     'Are you sure you want to approve this PrePayment?',
     'Confirm Approval'

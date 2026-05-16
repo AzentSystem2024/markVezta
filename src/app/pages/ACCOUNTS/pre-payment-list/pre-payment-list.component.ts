@@ -306,8 +306,9 @@ export class PrePaymentListComponent {
   this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
     this.selectedPrePayment = {
       ...res.Data,
-      TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved',
+      // TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved',
     };
+    console.log(this.selectedPrePayment,"eerertrt====")
   });
 }
   selectPrePayment(event: any) {
@@ -315,11 +316,13 @@ export class PrePaymentListComponent {
     this.PrepaymentId = event.data.TRANS_ID;
     this.selectprepayment = id;
     this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
+      console.log(res,)
       // Store original string if needed
       this.selectedPrePayment = {
         ...res.Data,
         TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved', //  boolean for checkbox
       };
+      console.log(this.selectedPrePayment)
     });
   }
 

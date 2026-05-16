@@ -158,31 +158,29 @@ export class PdcAddFormComponent {
     this.sesstion_Details();
   }
 
-  onSupplierChanged(event: any) {
-    this.selectedSupplierId = event.value;
+onSupplierChanged(event: any) {
+  this.selectedSupplierId = event.value;
+  this.PDCFormData.SUPP_ID = event.value;
 
-    // Find and log the selected supplier's DESCRIPTION
-    const selectedSupplier = this.Supplier.find(
-      (item: any) => item.ID === this.selectedSupplierId,
-    );
-    if (selectedSupplier) {
-    }
+  const selectedSupplier = this.Supplier.find(
+    (item: any) => item.ID === this.selectedSupplierId,
+  );
 
-    this.selectedBeneficiaryCommonName = selectedSupplier.DESCRIPTION;
-  }
+  this.selectedBeneficiaryCommonName =
+    selectedSupplier?.DESCRIPTION || '';
+}
 
-  onCustomerChanged(event: any) {
-    this.selectedCustomerId = event.value;
+onCustomerChanged(event: any) {
+  this.selectedCustomerId = event.value;
+  this.PDCFormData.CUST_ID = event.value;
 
-    // Find and log the selected supplier's DESCRIPTION
-    const selectedCustomer = this.Supplier.find(
-      (item: any) => item.ID === this.selectedCustomerId,
-    );
-    if (selectedCustomer) {
-    }
+  const selectedCustomer = this.Customer.find(
+    (item: any) => item.ID === this.selectedCustomerId,
+  );
 
-    this.selectedBeneficiaryCommonName = selectedCustomer.DESCRIPTION;
-  }
+  this.selectedBeneficiaryCommonName =
+    selectedCustomer?.DESCRIPTION || '';
+}
 
   cancel() {
     this.resetForm();
@@ -252,7 +250,11 @@ export class PdcAddFormComponent {
       !this.PDCFormData.AMOUNT ||
       !this.PDCFormData.REMARKS ||
       !this.selectedBeneficiaryTypeID ||
-      !this.selectedBeneficiaryCommonName
+      !(
+  this.selectedBeneficiaryTypeID === 3
+    ? this.PDCFormData.BENEFICIARY_NAME
+    : this.selectedBeneficiaryCommonName
+)
     ) {
       notify('Please fill all the fields before saving.', 'error', 3000);
       return; //  Stop function if fields are missing
@@ -266,7 +268,11 @@ export class PdcAddFormComponent {
       SUPP_ID: this.PDCFormData.SUPP_ID || 0,
       ENTRY_NO: this.PDCFormData.ENTRT_NO,
       // BENEFICIARY_NAME: this.PDCFormData.BENEFICIARY_NAME || '',
-      BENEFICIARY_NAME: this.selectedBeneficiaryCommonName || '',
+      // BENEFICIARY_NAME: this.selectedBeneficiaryCommonName || '',
+      BENEFICIARY_NAME:
+  this.selectedBeneficiaryTypeID === 3
+    ? this.PDCFormData.BENEFICIARY_NAME || ''
+    : this.selectedBeneficiaryCommonName || '',
 
       // BENEFICIARY_TYPE: this.PDCFormData.BENEFICIARY_TYPE || 0,
       BENEFICIARY_TYPE: this.selectedBeneficiaryTypeID || 0,
