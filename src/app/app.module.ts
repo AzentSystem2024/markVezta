@@ -382,6 +382,10 @@ import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoic
 import { ClinicianMasterModule } from './pages/MASTER/clinician-master/clinician-master.component';
 import { ClinicianEditFormModule } from './pages/MASTER/POPUP PAGES/clinician-edit-form/clinician-edit-form.component';
 import { ClinicianNewFormModule } from './pages/MASTER/POPUP PAGES/clinician-new-form/clinician-new-form.component';
+import { CptMasterNewFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-new-form/cpt-master-new-form.component';
+import {  CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
+import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -779,6 +783,9 @@ import { ClinicianNewFormModule } from './pages/MASTER/POPUP PAGES/clinician-new
     ClinicianMasterModule,
     ClinicianEditFormModule,
     ClinicianNewFormModule,
+    CPTMasterModule,
+    CptMasterNewFormModule,
+    CptMasterEditFormModule,
   ],
 
   providers: [

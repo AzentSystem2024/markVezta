@@ -199,21 +199,33 @@ export class ClinicianMasterComponent {
     });
   }
 
-  onClickSaveNewClinician = () => {
-    const {
-      ClinicianLicense,
-      ClinicianName,
-      ClinicianShortName,
-      SpecialityID,
-      MajorID,
-      ProfessionID,
-      CategoryID,
-      Gender,
-      DepartmentID,
-    } = this.clinicianComponent.getnewClinicianData();
+  // ================= Common Notification Method =================
+  showNotification(
+    message: string,
+    type: 'success' | 'error' | 'warning' = 'success',
+    displayTime: number = 3000,
+  ) {
+    notify(
+      {
+        message,
+        position: { at: 'top right', my: 'top right' },
+        displayTime,
+      },
+      type,
+    );
+  }
 
-    this.dataService
-      .Insert_Clinician_Data(
+  // ================= Save New Clinician =================
+  onClickSaveNewClinician = () => {
+    try {
+      const clinicianData = this.clinicianComponent?.getnewClinicianData?.();
+
+      if (!clinicianData) {
+        this.showNotification('Invalid clinician data', 'error');
+        return;
+      }
+
+      const {
         ClinicianLicense,
         ClinicianName,
         ClinicianShortName,
@@ -223,47 +235,82 @@ export class ClinicianMasterComponent {
         CategoryID,
         Gender,
         DepartmentID,
-      )
-      .subscribe((response: any) => {
-        if (response) {
-          notify(
-            {
-              message: `New Clinician saved Successfully`,
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.isAddClinicianPopupOpened = false;
-          this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: `Your Data Not Saved`,
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+      } = clinicianData;
+
+      // ===== Basic Validation =====
+      if (!ClinicianName?.trim()) {
+        this.showNotification('Clinician Name is required', 'warning');
+        return;
+      }
+
+      if (!ClinicianLicense?.trim()) {
+        this.showNotification('Clinician License is required', 'warning');
+        return;
+      }
+
+      this.dataService
+        .Insert_Clinician_Data(
+          ClinicianLicense,
+          ClinicianName,
+          ClinicianShortName,
+          SpecialityID,
+          MajorID,
+          ProfessionID,
+          CategoryID,
+          Gender,
+          DepartmentID,
+        )
+        .subscribe({
+          next: (response: any) => {
+            if (response?.flag === '1') {
+              this.showNotification(
+                'New Clinician saved successfully',
+                'success',
+              );
+
+              this.clinicianComponent.reset_newClinicianFormData();
+              this.isAddClinicianPopupOpened = false;
+
+              this.dataGrid?.instance?.refresh();
+            } else {
+              this.showNotification(
+                response?.message || 'Failed to save clinician',
+                'error',
+              );
+            }
+          },
+
+          error: (error: any) => {
+            console.error('Insert Clinician Error:', error);
+
+            this.showNotification(
+              error?.error?.message || 'Server error while saving clinician',
+              'error',
+            );
+          },
+        });
+    } catch (error) {
+      console.error('Save Clinician Exception:', error);
+
+      this.showNotification(
+        'Unexpected error occurred while saving clinician',
+        'error',
+      );
+    }
   };
 
+  // ================= Update Clinician =================
   onClickUpdateNewClinician = () => {
-    const data = this.clinicianEditComponent.getnewClinicianData();
-    const {
-      ID,
-      ClinicianLicense,
-      ClinicianName,
-      ClinicianShortName,
-      SpecialityID,
-      MajorID,
-      ProfessionID,
-      CategoryID,
-      Gender,
-      DepartmentID,
-    } = this.clinicianEditComponent.getnewClinicianData();
+    try {
+      const clinicianData =
+        this.clinicianEditComponent?.getnewClinicianData?.();
 
-    this.dataService
-      .update_Clinician_data(
+      if (!clinicianData) {
+        this.showNotification('Invalid clinician data', 'error');
+        return;
+      }
+
+      const {
         ID,
         ClinicianLicense,
         ClinicianName,
@@ -274,56 +321,118 @@ export class ClinicianMasterComponent {
         CategoryID,
         Gender,
         DepartmentID,
-      )
-      .subscribe((response: any) => {
-        if (response) {
-          notify(
-            {
-              message: `Clinician updated Successfully`,
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.isEditClinicianPopupOpened = false;
-          this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: `Your Data Not Saved`,
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+      } = clinicianData;
+
+      // ===== Validation =====
+      if (!ID) {
+        this.showNotification('Invalid Clinician ID', 'warning');
+        return;
+      }
+
+      if (!ClinicianName?.trim()) {
+        this.showNotification('Clinician Name is required', 'warning');
+        return;
+      }
+
+      this.dataService
+        .update_Clinician_data(
+          ID,
+          ClinicianLicense,
+          ClinicianName,
+          ClinicianShortName,
+          SpecialityID,
+          MajorID,
+          ProfessionID,
+          CategoryID,
+          Gender,
+          DepartmentID,
+        )
+        .subscribe({
+          next: (response: any) => {
+            if (response?.flag === '1') {
+              this.showNotification(
+                'Clinician updated successfully',
+                'success',
+              );
+
+              this.isEditClinicianPopupOpened = false;
+
+              this.dataGrid?.instance?.refresh();
+            } else {
+              this.showNotification(
+                response?.message || 'Failed to update clinician',
+                'error',
+              );
+            }
+          },
+
+          error: (error: any) => {
+            console.error('Update Clinician Error:', error);
+
+            this.showNotification(
+              error?.error?.message || 'Server error while updating clinician',
+              'error',
+            );
+          },
+        });
+    } catch (error) {
+      console.error('Update Clinician Exception:', error);
+
+      this.showNotification(
+        'Unexpected error occurred while updating clinician',
+        'error',
+      );
+    }
   };
 
+  // ================= Delete Clinician =================
   onRowRemoving(event: any) {
     event.cancel = true;
-    let SelectedRow = event.key;
-    this.dataService.Remove_Clinician_Row_Data(SelectedRow.ID).subscribe(() => {
-      try {
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success',
-        );
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'error',
-        );
+
+    try {
+      const selectedRow = event?.key;
+
+      if (!selectedRow?.ID) {
+        this.showNotification('Invalid clinician selected', 'warning');
+        return;
       }
-      event.component.refresh();
-      this.dataGrid.instance.refresh();
-    });
+
+      this.dataService.Remove_Clinician_Row_Data(selectedRow.ID).subscribe({
+        next: (response: any) => {
+          if (response?.flag === '1' || response) {
+            this.showNotification(
+              'Delete operation successful',
+              'success',
+              2000,
+            );
+
+            event.component?.refresh();
+            this.dataGrid?.instance?.refresh();
+          } else {
+            this.showNotification(
+              response?.message || 'Delete operation failed',
+              'error',
+            );
+          }
+        },
+
+        error: (error: any) => {
+          console.error('Delete Clinician Error:', error);
+
+          this.showNotification(
+            error?.error?.message || 'Server error while deleting clinician',
+            'error',
+          );
+        },
+      });
+    } catch (error) {
+      console.error('Delete Clinician Exception:', error);
+
+      this.showNotification(
+        'Unexpected error occurred while deleting clinician',
+        'error',
+      );
+    }
   }
 
   onExporting(event: any) {
