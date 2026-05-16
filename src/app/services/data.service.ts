@@ -129,6 +129,90 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}ArticleCategory/list/` + id, {});
   }
 
+  //======Facility Drop down data=====================
+  Get_GropDown(dropDownField: any) {
+    const Url = `${this.apiUrl}dropdown`;
+    const reqBody = { name: dropDownField };
+    return this.http.post(Url, reqBody);
+  }
+
+  //========================================================CLINICIAN=========================================================
+  //===========Get all data list========
+  get_Clinian_Table_Data() {
+    const Url = `${this.apiUrl}clinician/list`;
+    const reqBody = {
+      list: [],
+    };
+    return this.http.post(Url, reqBody);
+  }
+
+  //=======insert data ==========
+  Insert_Clinician_Data(
+    ClinicianLicense: any,
+    ClinicianName: any,
+    ClinicianShortName: any,
+    SpecialityID: any,
+    MajorID: any,
+    ProfessionID: any,
+    CategoryID: any,
+    Gender: any,
+    DepartmentID: any,
+  ) {
+    const url = `${this.apiUrl}clinician/insert`;
+    const reqBody = {
+      ClinicianLicense: ClinicianLicense,
+      ClinicianName: ClinicianName,
+      ClinicianShortName: ClinicianShortName,
+      SpecialityID: SpecialityID,
+      MajorID: MajorID,
+      ProfessionID: ProfessionID,
+      CategoryID: CategoryID,
+      Gender: Gender,
+      DepartmentID: DepartmentID,
+    };
+
+    return this.http.post(url, reqBody);
+  }
+
+  //=====Update Denial category data======
+  update_Clinician_data(
+    id: any,
+    ClinicianLicense: any,
+    ClinicianName: any,
+    ClinicianShortName: any,
+    SpecialityID: any,
+    MajorID: any,
+    ProfessionID: any,
+    CategoryID: any,
+    Gender: any,
+    DepartmentID: any,
+  ) {
+    const url = `${this.apiUrl}clinician/update`;
+    const reqBody = {
+      ID: id,
+      ClinicianLicense: ClinicianLicense,
+      ClinicianName: ClinicianName,
+      ClinicianShortName: ClinicianShortName,
+      SpecialityID: SpecialityID,
+      MajorID: MajorID,
+      ProfessionID: ProfessionID,
+      CategoryID: CategoryID,
+      Gender: Gender,
+      DepartmentID: DepartmentID,
+    };
+
+    return this.http.post(url, reqBody);
+  }
+
+  //=====Remove Denial category Data==========
+  Remove_Clinician_Row_Data(id: any) {
+    return this.http.post(`${this.apiUrl}clinician/delete/${id}`, {});
+  }
+
+  selectClinician(id: any) {
+    return this.http.post(`${this.apiUrl}clinician/select/${id}`, {});
+  }
+
   public getDropdownDataForAccounts(type: any): Observable<any> {
     const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
@@ -6683,7 +6767,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}ImportAR/view`, payload);
   }
 
-   // ======= import Ar data detailed view API ========
+  // ======= import Ar data detailed view API ========
   import_AR_Full_List() {
     return this.http.post(`${this.apiUrl}ImportAR/arlist`, {});
   }

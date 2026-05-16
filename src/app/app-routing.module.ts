@@ -193,6 +193,7 @@ import { MiscPurchaseInvoiceComponent } from './pages/OPERATIONS/misc-purchase-i
 import { MiscellaneousSalesInvoiceComponent } from './pages/OPERATIONS/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { SalesInvoiceRetailComponent } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
 import { ARImportedListComponent } from './pages/ERP-INTEGRATION/ar-imported-list/ar-imported-list.component';
+import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinician-master.component';
 
 const routes: Routes = [
   {
@@ -1222,6 +1223,11 @@ const routes: Routes = [
       {
         path: 'ar-list',
         component: ARImportedListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'clinician',
+        component: ClinicianMasterComponent,
         canActivate: [AuthGuardService],
       },
 
