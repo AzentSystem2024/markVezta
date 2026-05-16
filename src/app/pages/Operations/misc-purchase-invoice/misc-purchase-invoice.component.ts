@@ -146,12 +146,15 @@ export class MiscPurchaseInvoiceComponent {
     },
   ];
   isReadOnlyInvoice: boolean = false;
+  canVerify: any;
+  isApproveInvoice: boolean;
+  isVerifyInvoice: boolean;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -159,7 +162,7 @@ export class MiscPurchaseInvoiceComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    const userDataString:any = localStorage.getItem('userData')|| {};
+    const userDataString: any = localStorage.getItem('userData') || {};
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
@@ -176,6 +179,7 @@ export class MiscPurchaseInvoiceComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.getInvoiceList();
@@ -340,7 +344,9 @@ export class MiscPurchaseInvoiceComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -489,8 +495,19 @@ export class MiscPurchaseInvoiceComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 'Approved' ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 'Approved' ? 'Approved' : 'Open';
+    // icon.style.color = status === 'Approved' ? '#5cac6fff' : '#d87f7fff';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title =
+      status === 'Approved'
+        ? 'Approved'
+        : status === 'Verified'
+          ? 'Verified'
+          : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -528,6 +545,36 @@ export class MiscPurchaseInvoiceComponent {
           this.isViewInvoice = true;
         } else {
           this.isEditInvoice = true;
+        }
+      });
+  }
+
+  onVerifyInvoice(event: any) {
+    const rowData = event.row.data;
+
+    const invoiceId = rowData.TRANS_ID;
+    const transStatus = rowData.STATUS;
+
+    this.isReadOnlyInvoice = transStatus === 'Approved';
+
+    this.dataService
+      .selectMiscPurchInvoice(invoiceId)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+
+        // APPROVED -> OPEN VIEW PAGE
+        if (transStatus === 'Approved') {
+          this.isViewInvoice = true;
+        }
+
+        // VERIFIED -> OPEN APPROVE PAGE
+        else if (transStatus === 'Verified') {
+          this.isApproveInvoice = true;
+        }
+
+        // OPEN VERIFY PAGE
+        else {
+          this.isVerifyInvoice = true;
         }
       });
   }
@@ -586,6 +633,8 @@ export class MiscPurchaseInvoiceComponent {
       this.isAddInvoice = false;
       this.isEditInvoice = false;
       this.isViewInvoice = false;
+      this.isVerifyInvoice = false;
+      this.isApproveInvoice = false;
 
       this.getInvoiceList();
     });
@@ -630,4 +679,4 @@ export class MiscPurchaseInvoiceComponent {
   exports: [MiscPurchaseInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class MiscPurchaseInvoiceModule { }
+export class MiscPurchaseInvoiceModule {}

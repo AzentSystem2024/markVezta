@@ -91,7 +91,7 @@ export class AddMiscReceiptComponent {
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
   @Input() MiscReceiptId: any;
-   @Input() verifypopup: boolean = false;
+  @Input() verifypopup: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -655,7 +655,6 @@ export class AddMiscReceiptComponent {
   }
 
   onSaveMiscReceipt() {
-    
     if (!this.miscFormData?.PAY_HEAD_ID) {
       notify('Please select ledger before saving.', 'warning', 2000);
       return;
@@ -878,7 +877,7 @@ export class AddMiscReceiptComponent {
 
     this.getValidInvoiceRows().forEach((row) => {
       const selectedLedger = this.ledgerList.find(
-        (l) => l.HEAD_CODE === row.ledgerCode,
+        (l: any) => l.HEAD_CODE === row.ledgerCode,
       );
       if (!selectedLedger) return; // skip invalid row
 
@@ -984,78 +983,76 @@ export class AddMiscReceiptComponent {
 
     console.log(this.status);
 
-const executeApiCall = (apiCall: any, successMessage: string) => {
-  this.isSaving = true;
+    const executeApiCall = (apiCall: any, successMessage: string) => {
+      this.isSaving = true;
 
-  apiCall.subscribe({
-    next: (res: any) => {
-      this.isSaving = false;
+      apiCall.subscribe({
+        next: (res: any) => {
+          this.isSaving = false;
 
-      notify(
-        {
-          message: successMessage,
-          position: {
-            at: 'top right',
-            my: 'top right',
-          },
+          notify(
+            {
+              message: successMessage,
+              position: {
+                at: 'top right',
+                my: 'top right',
+              },
+            },
+            'success',
+            3000,
+          );
+
+          this.popupClosed?.emit();
         },
-        'success',
-        3000,
+
+        error: (err: any) => {
+          this.isSaving = false;
+
+          console.error('Operation failed', err);
+
+          notify('Operation failed', 'error', 3000);
+        },
+      });
+    };
+
+    if (this.status === 'Open' && this.verifypopup === true) {
+      const result = confirm(
+        'Are you sure you want to verify this Miscellaneous Payment?',
+        'Confirm Verification',
       );
 
-      this.popupClosed?.emit();
-    },
-
-    error: (err) => {
-      this.isSaving = false;
-
-      console.error('Operation failed', err);
-
-      notify('Operation failed', 'error', 3000);
-    },
-  });
-};
-
-if (this.status === 'Open' && this.verifypopup === true) {
-  const result = confirm(
-    'Are you sure you want to verify this Miscellaneous Payment?',
-    'Confirm Verification'
-  );
-
-  result.then((dialogResult) => {
-    if (dialogResult) {
-      this.ngZone.run(() => {
-        executeApiCall(
-          this.dataService.verifyMiscReceipt(payload),
-          'Miscellaneous Receipt verified successfully'
-        );
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.ngZone.run(() => {
+            executeApiCall(
+              this.dataService.verifyMiscReceipt(payload),
+              'Miscellaneous Receipt verified successfully',
+            );
+          });
+        }
       });
-    }
-  });
+    } else if (this.status === 'Verify') {
+      const result = confirm(
+        'Are you sure you want to approve this Miscellaneous Payment?',
+        'Confirm Approval',
+      );
 
-} else if (this.status === 'Verify') {
-  const result = confirm(
-    'Are you sure you want to approve this Miscellaneous Payment?',
-    'Confirm Approval'
-  );
-
-  result.then((dialogResult) => {
-    if (dialogResult) {
-      this.ngZone.run(() => {
-        executeApiCall(
-          this.dataService.approveMiscReceipt(payload),
-          'Miscellaneous Receipt approved successfully'
-        );
+      result.then((dialogResult) => {
+        if (dialogResult) {
+          this.ngZone.run(() => {
+            executeApiCall(
+              this.dataService.approveMiscReceipt(payload),
+              'Miscellaneous Receipt approved successfully',
+            );
+          });
+        }
       });
+    } else {
+      executeApiCall(
+        this.dataService.updateMiscReceipt(payload),
+        'Miscellaneous Receipt updated successfully',
+      );
     }
-  });
-
-} else {
-  executeApiCall(
-    this.dataService.updateMiscReceipt(payload),
-    'Miscellaneous Receipt updated successfully'
-  );
-}
 
     // apiCall.subscribe((res: any) => {
     //   if (res.flag === 1) {
@@ -1066,7 +1063,6 @@ if (this.status === 'Open' && this.verifypopup === true) {
     //   }
     // });
   }
-
 
   Cancel() {
     this.popupClosed.emit();

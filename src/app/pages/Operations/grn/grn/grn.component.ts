@@ -149,10 +149,17 @@ export class GrnComponent implements OnInit {
     icon.style.color =
       status === 'Approved'
         ? '#10B981' // Approved
-        : status === 'Verified'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : 'Open';
+        : status === 'Closed'
+          ? '#10B981'
+          : status === 'Verified'
+            ? '#0073D8' // Verified
+            : '#FFA500'; // Open
+    icon.title =
+      status === 'Approved'
+        ? 'Approved'
+        : status === 'Closed'
+          ? 'Closed'
+          : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -831,7 +838,7 @@ export class GrnComponent implements OnInit {
       this.selectedRowData = response;
 
       // APPROVED -> OPEN VIEW PAGE
-      if (transStatus === 'Approved') {
+      if (transStatus === 'Approved' || transStatus === 'Closed') {
         this.isViewPopupOpened = true;
       }
 

@@ -465,17 +465,17 @@ export class PurchaseReturnDebitFormComponent {
           let igst = 0;
 
           //  SAME STATE → Split GST
-          if (this.sameState) {
-            cgst = gstPerc / 2;
-            sgst = gstPerc / 2;
-            igst = 0;
-          }
-          //  DIFFERENT STATE → IGST
-          else {
-            cgst = 0;
-            sgst = 0;
-            igst = gstPerc;
-          }
+          // if (this.sameState) {
+          //   cgst = gstPerc / 2;
+          //   sgst = gstPerc / 2;
+          //   igst = 0;
+          // }
+          // //  DIFFERENT STATE → IGST
+          // else {
+          //   cgst = 0;
+          //   sgst = 0;
+          //   igst = gstPerc;
+          // }
 
           this.mainGridData.push({
             DETAIL_ID: row.DETAIL_ID,

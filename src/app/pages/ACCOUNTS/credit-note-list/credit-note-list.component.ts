@@ -101,6 +101,7 @@ export class CreditNoteListComponent {
     onClick: () => this.toggleFilters(),
   };
   vatTitle: any;
+  isApproveCreditNote: boolean;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -111,7 +112,7 @@ export class CreditNoteListComponent {
   creditNotes: any;
   selectedCreditNote: any;
   isEditCreditNote: boolean = false;
-  isVerifyCreditNote:boolean = false;
+  isVerifyCreditNote: boolean = false;
   selectedCompanyId: any;
   isViewCreditNote: boolean = false;
   dateRanges = [
@@ -152,7 +153,7 @@ export class CreditNoteListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private zone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -226,7 +227,7 @@ export class CreditNoteListComponent {
         // ✅ single bind
         this.filteredInvoiceList = this.creditNotes;
       },
-      error: () => { },
+      error: () => {},
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -344,7 +345,6 @@ export class CreditNoteListComponent {
     }
   }
 
- 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
@@ -365,7 +365,6 @@ export class CreditNoteListComponent {
 
     cellElement.appendChild(icon);
   }
-
 
   getStatusFilterData = [
     {
@@ -579,8 +578,7 @@ export class CreditNoteListComponent {
       });
   }
 
-
-  onVerifyCreditNote(e:any){
+  onVerifyCreditNote(e: any) {
     e.cancel = true; // Prevent default popup editing
     const creditId = e.row.data.TRANS_ID;
     this.CreditNoteid = e.row.data.TRANS_ID;
@@ -595,6 +593,8 @@ export class CreditNoteListComponent {
         if (transStatus === 5) {
           // Open view popup
           this.isViewCreditNote = true;
+        } else if (transStatus === 2) {
+          this.isApproveCreditNote = true;
         } else {
           // Open edit popup
           this.isVerifyCreditNote = true;
@@ -654,6 +654,7 @@ export class CreditNoteListComponent {
     this.isEditCreditNote = false;
     this.isVerifyCreditNote = false;
     this.isViewCreditNote = false;
+    this.isApproveCreditNote = false;
     // this.selectedDateRange = 'today';
     this.getCreditNotes();
   }
@@ -700,4 +701,4 @@ export class CreditNoteListComponent {
   exports: [CreditNoteListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CreditNoteListModule { }
+export class CreditNoteListModule {}

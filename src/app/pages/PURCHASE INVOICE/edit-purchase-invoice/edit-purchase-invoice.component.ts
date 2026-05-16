@@ -67,6 +67,8 @@ export class EditPurchaseInvoiceComponent {
   popupVisible = false;
   @Input() isVerifyInvoice: boolean = false;
   @Input() status: any;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -127,6 +129,8 @@ export class EditPurchaseInvoiceComponent {
   }
 
   ngOnInit() {
+    console.log(this.isVerifyMode, '[[[[[[[[[[[[');
+    console.log(this.isApproveMode, 'APPROVEEEEEE');
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
 
@@ -166,10 +170,10 @@ export class EditPurchaseInvoiceComponent {
       this.itemsGridRef?.instance?.refresh();
     }, 100);
 
-    console.log(this.status)
+    console.log(this.status);
 
-    if(this.status === 'Approved') {
-      this.readOnly === true
+    if (this.status === 'Approved') {
+      this.readOnly === true;
     }
   }
 
@@ -469,7 +473,7 @@ export class EditPurchaseInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
+            (r: any) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'GST'));
@@ -490,7 +494,7 @@ export class EditPurchaseInvoiceComponent {
           const visibleRows = grid.getVisibleRows();
 
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
+            (r: any) => r?.data === e.row?.data,
           );
           setTimeout(() => {
             grid.focus(grid.getCellElement(rowIndex, 'VAT_AMOUNT'));
@@ -574,7 +578,7 @@ export class EditPurchaseInvoiceComponent {
   }
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
-
+    const rowsToAdd = [];
     selectedRows.forEach((row) => {
       const exists = this.mainGridData.some(
         (item) => item.GRN_DET_ID === row.GRN_DET_ID,
@@ -614,7 +618,8 @@ export class EditPurchaseInvoiceComponent {
         HSN_CODE: row.HSN_CODE,
 
         // ✅ GST FROM GRN
-        VAT_PERC: gstPerc,
+        // VAT_PERC: gstPerc,
+        VAT_PERC: row.VAT_PERC,
         // CGST: cgst,
         // SGST: sgst,
 
@@ -821,7 +826,7 @@ export class EditPurchaseInvoiceComponent {
     // this.purchaseInvoiceFormData.STORE_ID = this.store_id;
     this.purchaseInvoiceFormData.FIN_ID = this.fin_id;
 
-    if (this.status === 'Verified') {
+    if (this.purchaseInvoiceFormData.IS_APPROVED == true) {
       // Ask confirmation only if approving
       const result = confirm(
         'Are you sure you want to approve and commit this invoice?',
@@ -841,50 +846,59 @@ export class EditPurchaseInvoiceComponent {
 
   // Separated logic to keep code clean
   submitInvoice() {
-    // const apiCall = this.isApproved
-    //   ? this.dataService.approvePurchaseInvoice(this.purchaseInvoiceFormData)
-    //   : this.dataService.updatePurchaseInvoice(this.purchaseInvoiceFormData);
- console.log(this.status)
+    console.log(this.status);
+
     let apiCall;
 
-if (this.status === 'Open' && this.isVerifyInvoice === true) {
+    // VERIFY CONFIRMATION
+    if (this.isVerifyMode) {
+      confirm(
+        'Are you sure you want to verify this invoice?',
+        'Confirm Verification',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          apiCall = this.dataService.verifyPurchaseInvoice(
+            this.purchaseInvoiceFormData,
+          );
 
-  apiCall = this.dataService.verifyPurchaseInvoice(
-    this.purchaseInvoiceFormData
-  );
+          this.handleApiResponse(apiCall, 'Invoice verified successfully');
+        }
+      });
 
-} else if (this.status === 'Verified') {
+      return;
+    }
 
-  apiCall = this.dataService.approvePurchaseInvoice(
-    this.purchaseInvoiceFormData
-  );
+    // APPROVE CONFIRMATION
+    else if (this.isApproveMode) {
+      confirm(
+        'Are you sure you want to approve this invoice?',
+        'Confirm Approval',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          apiCall = this.dataService.approvePurchaseInvoice(
+            this.purchaseInvoiceFormData,
+          );
 
-} else {
+          this.handleApiResponse(apiCall, 'Invoice approved successfully');
+        }
+      });
 
-  apiCall = this.dataService.updatePurchaseInvoice(
-    this.purchaseInvoiceFormData
-  );
+      return;
+    }
 
-}
+    // NORMAL UPDATE
+    apiCall = this.dataService.updatePurchaseInvoice(
+      this.purchaseInvoiceFormData,
+    );
 
+    this.handleApiResponse(apiCall, 'Invoice updated successfully');
+  }
+
+  handleApiResponse(apiCall: any, message: string) {
     apiCall.subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isSaving = false;
-        let message = '';
 
-if (this.status === 'Open') {
-
-  message = 'Invoice verified successfully';
-
-} else if (this.status === 'Verified') {
-
-  message = 'Invoice approved successfully';
-
-} else {
-
-  message = 'Invoice updated successfully';
-
-}
         notify(
           {
             message,
@@ -893,10 +907,13 @@ if (this.status === 'Open') {
           'success',
           3000,
         );
+
         this.popupClosed?.emit();
       },
-      error: (err) => {
+
+      error: (err: any) => {
         this.isSaving = false;
+
         console.error('Operation failed', err);
       },
     });

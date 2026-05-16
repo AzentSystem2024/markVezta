@@ -466,6 +466,13 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     });
   }
 
+  getFormattedSupplierPrice = (rowData: any) => {
+    const symbol = rowData?.CURRENCY_SYMBOL || '';
+    const price = Number(rowData?.SUPP_PRICE || 0).toFixed(2);
+
+    return symbol ? `${symbol} ${price}` : price;
+  };
+
   getStoreOrCompanyByid() {
     const payload = {
       // SUPP_ID: this.newPoData.SUPP_ID,
@@ -1625,4 +1632,4 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   declarations: [PurchaseOrderNewFormComponent],
   exports: [PurchaseOrderNewFormComponent],
 })
-export class PurchaseOrderNewFormModule { }
+export class PurchaseOrderNewFormModule {}

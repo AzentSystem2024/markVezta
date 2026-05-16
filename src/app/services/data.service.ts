@@ -92,7 +92,7 @@ export class DataService {
   getActiveLedger(): Observable<any> {
     return this.http.post(`${this.apiUrl}accountHead/getlist`, {});
   }
-  
+
   getAccountHeadList(): Observable<any> {
     return this.http.post(`${this.apiUrl}AccountHead/list`, {});
   }
@@ -4262,6 +4262,65 @@ The result can be exported to HTML or Markdown.`;
 
     return this.http.post(getEndpoint, reqBody);
   }
+
+
+
+
+   //---------------HR Masters-----------------
+  get_Department_Group_List(payload: any) {
+    const getEndpoint = this.apiUrl + 'DepartmentGroup/list';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //===============Add Api=========================
+  Insert_Department_Group_Api(
+    CODE: any,
+    DEPT_NAME: any,
+    IS_INACTIVE: boolean,
+    COMPANY_ID: any,
+  ) {
+    const getEndpoint = this.apiUrl + 'DepartmentGroup/save';
+    const reqBody = {
+      CODE: CODE,
+      DESCRIPTION: DEPT_NAME,
+      IS_INACTIVE: IS_INACTIVE,
+      COMPANY_ID: COMPANY_ID,
+    };
+    return this.http.post(getEndpoint, reqBody);
+  }
+
+   Update_Department_Group_Api(
+    ID: any,
+    CODE: any,
+    DEPT_NAME: any,
+    IS_ACTIVE: any,
+    COMPANY_ID: any,
+  ) {
+    const getEndpoint = this.apiUrl + 'DepartmentGroup/save';
+    const reqBody = {
+      ID: ID,
+      CODE: CODE,
+      DESCRIPTION: DEPT_NAME,
+      IS_INACTIVE: IS_ACTIVE,
+      COMPANY_ID: COMPANY_ID,
+    };
+
+    return this.http.post(getEndpoint, reqBody);
+  }
+
+
+
+   Select_Department_Group_Api(ID: any) {
+    const getEndpoint = this.apiUrl + `DepartmentGroup/select/${ID}`;
+    return this.http.post(getEndpoint, {});
+  }
+
+  Delete_Department_Group_Api(ID: any) {
+    const getEndpoint = this.apiUrl + `DepartmentGroup/delete/${ID}`;
+    return this.http.post(getEndpoint, {});
+  }
+
+
 
   Select_Department_Api(ID: any) {
     const getEndpoint = this.apiUrl + `Department/select/${ID}`;

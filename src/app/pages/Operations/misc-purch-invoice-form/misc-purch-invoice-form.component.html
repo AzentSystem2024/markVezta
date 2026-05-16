@@ -264,7 +264,7 @@
         <div class="approve-container" *ngIf="canApprove">
           <dx-check-box
             text="Approve"
-            [visible]="!isReadOnlyMode"
+            [visible]="!isReadOnlyMode || isEditing"
             [(value)]="invoiceFormData.IS_APPROVED"
           ></dx-check-box>
         </div>

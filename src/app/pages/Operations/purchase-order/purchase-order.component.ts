@@ -403,6 +403,9 @@ export class PurchaseOrderComponent {
       case 'Partial':
         icon.title = 'Partially Completed';
         break;
+      case 'Verified':
+        icon.title = 'Verified';
+        break;
       default:
         icon.title = 'Open';
     }
@@ -558,7 +561,7 @@ export class PurchaseOrderComponent {
       this.selectedRowData = res;
 
       // APPROVED -> VIEW
-      if (status === 'Approved') {
+      if (status === 'Approved' || status === 'Closed') {
         this.isViewPopupOpened = true;
         return;
       }
