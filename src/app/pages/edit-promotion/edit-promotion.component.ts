@@ -212,6 +212,7 @@ export class EditPromotionComponent {
   wsId: any;
   selected_Data_id: any;
   is_promotion_level: boolean = false
+  selectedStatus: any;
   constructor(
     private dataservice: DataService,
     private router: Router,
@@ -248,11 +249,20 @@ export class EditPromotionComponent {
 
         console.log('Changes in EditPromotionComponent:', data);
         this.selected_Data_id = data.ID;
+        setTimeout(() => {
+
+          this.selectedRowKeys = (data?.worksheet_promotion_schema || [])
+            .map((item: any) => item.ITEM_ID);
+
+          console.log('selectedRowKeys', this.selectedRowKeys);
+
+        }, 100);
 
 
-        //    1. GRID SELECTION
-        this.selectedRowKeys = (data?.worksheet_promotion_schema || [])
-          .map((item: any) => item.ITEM_ID); //  must match keyExpr
+
+        //===========status
+
+        this.selectedStatus = data.Status
 
         //    2. TOOLBAR DATA
         const first = data?.worksheet_promotion_schema?.[0];
@@ -540,21 +550,21 @@ export class EditPromotionComponent {
       ID: this.selected_Data_id || 0,
       WS_NO: this.wsNo || '',
       WS_DATE: this.wsDate ? new Date(this.wsDate) : new Date(),
-
       STORE_ID: this.selectedStoreId?.join(',') || '',
-
       USER_ID: this.userId || 0,
       COMPANY_ID: this.selected_Company_id || 0,
-
       NARRATION: this.narration || '',
-
-
-      worksheet_promotion_schema: grid_Data
+      worksheet_promotion_schema: grid_Data,
+      worksheet_item_store: (this.selectedStoreId || []).map((id: any) => ({
+        ID: null,
+        WS_ID: null,
+        STORE_ID: id
+      }))
 
     }
 
 
-    if (this.status === 'ApprovalScreen') {
+    if (this.selectedStatus == '2' || this.approveValue) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit'
@@ -1192,16 +1202,22 @@ export class EditPromotionComponent {
     this.toTime
   }
 
+
   getButtonText(): string {
-    if (this.status == 'ApprovalScreen') {
-      return 'Approve';
+    if (this.status == 'EditScreen') {
+      return 'Update';
     } else if (this.status == 'VerifyScreen') {
-      return 'Verify';
+      if (this.selectedStatus == '1') {
+        return 'Verify';
+
+      } else {
+        return 'Approve';
+
+      }
     }
     else {
-      return 'Update';
+      return 'Approve';
     }
-
   }
 }
 

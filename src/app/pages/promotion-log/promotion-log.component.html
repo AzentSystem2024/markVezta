@@ -15,6 +15,27 @@
       (onRowRemoving)="onRowRemoving($event)"
       [selection]="{ mode: 'single' }"
     >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
       <dxo-scrolling
         mode="standard"
         columnRenderingMode="virtual"
@@ -216,7 +237,10 @@
 
         <!-- Verify -->
         <span
-          *ngIf="canVerify"
+          *ngIf="
+            (cellData.data.Status === 'Verified' && canApprove) ||
+            (cellData.data.Status !== 'Verified' && canVerify)
+          "
           style="
             position: relative;
             display: inline-block;
@@ -265,6 +289,17 @@
     </dx-data-grid>
   </div>
 </div>
+<!-- //===  Insert Popup==================== -->
+<dx-popup
+  [(visible)]="isAddPopup"
+  [width]="'80vw'"
+  [height]="'90vh'"
+  title="Add Promotion"
+  (onHiding)="handleClose()"
+>
+  <app-promotion (popupClosed)="handleClose()"></app-promotion>
+</dx-popup>
+
 <dx-popup
   [(visible)]="editPackPopupOpened"
   [width]="'80vw'"
@@ -280,6 +315,7 @@
     ></app-edit-promotion>
   </div>
 </dx-popup>
+
 <dx-popup
   [(visible)]="ViewPopupOpened"
   [width]="'80vw'"

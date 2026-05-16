@@ -47,6 +47,7 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./timesheet-edit.component.scss'],
 })
 export class TimesheetEditComponent {
+
   @Output() popupClosed = new EventEmitter<void>();
   @Input() timesheet: any;
   @Input() existingTimesheets: any[] = [];
@@ -97,7 +98,7 @@ export class TimesheetEditComponent {
   timesheetList: any = [];
   is_approve: boolean = false;
   Stores_List: any = [];
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['timesheet'] && changes['timesheet'].currentValue) {
@@ -109,6 +110,7 @@ export class TimesheetEditComponent {
 
       const existingSalary = this.timesheetFormData.TIMESHEET_SALARY || [];
       this.getSalaryHead(existingSalary);
+      console.log(this.timesheetFormData)
       this.is_approve = this.timesheetFormData.STATUS === 'Approved';
       this.timesheetDetails = (
         this.timesheetFormData.TIMESHEET_DETAIL || []
@@ -181,16 +183,16 @@ export class TimesheetEditComponent {
       NAME: 'EMPLOYEE',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      const employee_res = response;
-      console.log(employee_res);
+      this.employee = response;
+      console.log(this.employee);
       console.log(this.timesheetList);
 
-      if (employee_res) {
-        this.employee = employee_res.filter(
-          (emp) =>
-            !this.timesheetList?.some((ts) => Number(ts.EMP_ID) === emp.ID),
-        );
-      }
+      // if (employee_res) {
+      //   this.employee = employee_res.filter(
+      //     (emp) =>
+      //       !this.timesheetList?.some((ts) => Number(ts.EMP_ID) === emp.ID),
+      //   );
+      // }
 
       console.log(this.employee, 'empployeeeeeeeeeee');
       this.setEmployeeName(); // <-- MOVE setEmployeeName here
@@ -597,4 +599,4 @@ export class TimesheetEditComponent {
   exports: [TimesheetEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetEditModule {}
+export class TimesheetEditModule { }

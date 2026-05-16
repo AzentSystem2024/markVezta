@@ -249,7 +249,7 @@ export class ViewPromotionWizardComponent {
       this.itemStoresList = schemaList.map((item: any) => ({
         ID: item.ITEM_ID,
         BARCODE: item.BARCODE,
-        DESCRIPTION: item.DESCRIPTION,
+        ITEM_DESCRIPTION: item.ITEM_DESCRIPTION,
         CAT_NAME: item.CAT_NAME,
         DEPT_NAME: item.DEPT_NAME,
         COST: item.COST,

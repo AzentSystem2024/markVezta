@@ -11,7 +11,7 @@
 >
   <!-- Column 1: Month + Employee Fields -->
   <!-- Column 2: Leave Period -->
-  <div style="width: 100%; margin-bottom: 10px;">
+  <div style="width: 100%; margin-bottom: 10px">
     <dx-text-box
       label="Month"
       [labelMode]="'floating'"
@@ -39,7 +39,7 @@
     <p style="margin: 0 0 0"><strong>Employee</strong></p>
     <div style="display: flex; gap: 20px; flex-wrap: wrap">
       <!-- Month Field -->
-      
+
       <!-- Employee Field -->
       <div style="flex: 1 1 45%; min-width: 200px">
         <dx-select-box
@@ -48,10 +48,12 @@
           [dataSource]="employee"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          [(value)]="timesheetFormData.EMP_NAME"
+          [(value)]="timesheetFormData.EMP_ID"
           placeholder="Select Employee"
           width="100%"
-          [readOnly]="true"
+          [searchEnabled]="true"
+          (onValueChanged)="onEmployeeSelected($event)"
+          [readOnly]="is_approve"
         >
         </dx-select-box>
       </div>
@@ -76,28 +78,28 @@
     <!-- Single row for all 3 fields -->
     <div style="display: flex; gap: 20px; flex-wrap: wrap">
       <!-- From Date -->
-      <dx-text-box
+      <dx-date-box
         [(value)]="timesheetFormData.LEAVE_FROM"
         label="From"
         [labelMode]="'floating'"
+        displayFormat="dd-MM-yyyy"
         type="date"
         [readOnly]="true"
-        placeholder="Select From Date"
         style="flex: 1 1 30%"
-      ></dx-text-box>
+      ></dx-date-box>
 
       <!-- Total Days Worked -->
 
-      <!-- Upto Date -->
-      <dx-text-box
+      <dx-date-box
         [(value)]="timesheetFormData.LEAVE_TO"
         label="To"
         [labelMode]="'floating'"
+        displayFormat="dd-MM-yyyy"
         type="date"
         placeholder="Select Upto Date"
         style="flex: 1 1 30%"
         [readOnly]="true"
-      ></dx-text-box>
+      ></dx-date-box>
       <dx-number-box
         [(value)]="timesheetFormData.DAYS"
         label="Total Days Worked"
@@ -133,7 +135,7 @@
             enabled: true,
             text: 'Loading...',
             showIndicator: true,
-            showPane: true
+            showPane: true,
           }"
           class="grid theme-dependent"
           [dataSource]="timesheetDetails"
@@ -149,26 +151,80 @@
           rowAlternationInterval="2"
           [selection]="{ mode: 'single' }"
           focusStateEnabled="false"
-
           [autoNavigateToFocusedRow]="false"
-
-          [editing]="{ mode: 'cell', allowUpdating: true }"
-
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: timesheetFormData.STATUS !== 'Approved',
+          }"
+          (onRowUpdated)="onTimesheetDetailsUpdated($event)"
+          (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
         >
-          <dxi-column dataField="STORE" caption="Store" [allowEditing]="false">
+          <dxi-column dataField="STORE_ID" caption="Store">
             <dxo-lookup
-              [dataSource]="stores"
-              displayExpr="STORE_NAME"
+              [dataSource]="Stores_List"
+              displayExpr="DESCRIPTION"
               valueExpr="ID"
               [allowClearing]="false"
-              [value]="timesheetDetails.STORE" 
-              
+            >
+              <dxi-validation-rule type="required" message="Store is required">
+              </dxi-validation-rule>
+            </dxo-lookup>
+          </dxi-column>
+          <dxi-column dataField="DEPT_ID" caption="Department">
+            <dxo-lookup
+              [dataSource]="Departments"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [allowClearing]="false"
             ></dxo-lookup>
           </dxi-column>
 
-          <dxi-column dataField="DAYS" caption="Worked Days" [allowEditing]="false"></dxi-column>
-          <dxi-column dataField="NORMAL_OT" caption="OT Hours" [allowEditing]="false"></dxi-column>
-          <dxi-column dataField="HOLIDAY_OT" caption="Holiday OT" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="DAYS" caption="Worked Days">
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateDays"
+              message="Worked days cannot exceed total allowed days"
+            ></dxi-validation-rule>
+          </dxi-column>
+          <dxi-column
+            dataField="NORMAL_OT"
+            caption="OT Hours"
+            [editorOptions]="{ max: 12 }"
+          ></dxi-column>
+          <dxi-column
+            dataField="HOLIDAY_OT"
+            caption="Holiday OT"
+            [editorOptions]="{ max: 12 }"
+          ></dxi-column>
+          <dxo-summary>
+            <!-- Footer Summary with custom alignment -->
+
+            <!-- Count summary -->
+            <dxi-total-item
+              column="DEPARTMENT"
+              summaryType="count"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'DEPARTMENT'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="DAYS"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'DAYS'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="NORMAL_OT"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'NORMAL_OT'"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="HOLIDAY_OT"
+              summaryType="sum"
+              [displayFormat]="'Total : {0}'"
+              [showInColumn]="'HOLIDAY_OT'"
+            ></dxi-total-item>
+          </dxo-summary>
         </dx-data-grid>
       </div>
     </div>
@@ -195,7 +251,7 @@
             enabled: true,
             text: 'Loading...',
             showIndicator: true,
-            showPane: true
+            showPane: true,
           }"
           class="grid theme-dependent"
           [dataSource]="salaryDataSource"
@@ -212,8 +268,11 @@
           [selection]="{ mode: 'single' }"
           focusStateEnabled="false"
           [autoNavigateToFocusedRow]="false"
-          [editing]="{ mode: 'cell', allowUpdating: true }"
-         
+          [editing]="{
+            mode: 'cell',
+            allowUpdating: timesheetFormData.STATUS !== 'Approved',
+          }"
+          (onRowUpdated)="onSalaryHeadUpdated($event)"
         >
           <dxi-column dataField="SALARY_HEAD_ID" caption="Salary Head">
             <dxo-lookup
@@ -225,7 +284,12 @@
             </dxo-lookup>
           </dxi-column>
 
-          <dxi-column dataField="AMOUNT" caption="Amount" [allowEditing]="false"></dxi-column>
+          <dxi-column
+            dataField="AMOUNT"
+            caption="Amount"
+            alignment="right"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
+          ></dxi-column>
         </dx-data-grid>
       </div>
 
@@ -234,7 +298,6 @@
   </div>
 
   <div style="display: flex; gap: 20px; width: 100%; margin-top: 10px">
-
     <div
       class="timesheet-extra-container"
       style="
@@ -245,72 +308,37 @@
         box-sizing: border-box;
       "
     >
-      <p style="margin: 0 0 10px"><strong>Summary</strong></p>
-
-  
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          flex-wrap: wrap;
-        "
-      >
-        <div style="flex: 1 1 22%">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <div style="flex: 8">
           <dx-text-box
-            placeholder="Total Days Worked"
-            [(value)]="timesheetFormData.WORKED_DAYS"
-            label="Total Days Worked"
+            placeholder="Remarks"
+            [(value)]="timesheetFormData.REMARKS"
+            label="Remarks"
             [labelMode]="'floating'"
-            [readOnly]="true"
+            [readOnly]="is_approve"
           ></dx-text-box>
         </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Normal OT"
-            [(value)]="timesheetFormData.NORMAL_OT"
-            label="Normal OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
-          <dx-text-box
-            placeholder="Holiday OT"
-            [(value)]="timesheetFormData.HOLIDAY_OT"
-            label="Holiday OT"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-          ></dx-text-box>
-        </div>
-        <div style="flex: 1 1 22%">
+        <div style="flex: 2">
           <dx-text-box
             placeholder="Deduction of Days"
             [(value)]="timesheetFormData.DAYS_DEDUCTED"
             label="Deduction of Days"
             [labelMode]="'floating'"
-           [readOnly]="true"
+            [readOnly]="is_approve"
           ></dx-text-box>
         </div>
-        <div style="flex: 1 1 22%">
-            <dx-text-box
-              placeholder="Remarks"
-              [(value)]="timesheetFormData.REMARKS"
-              label="Remarks"
-              [labelMode]="'floating'"
-              [readOnly]="true"
-            ></dx-text-box>
-          </div>
       </div>
     </div>
   </div>
-  
-  
-  
 </div>
 
 <!-- Buttons Section -->
-<!-- <div class="fixed-footer">
+<div class="fixed-footer">
   <dx-button text="Cancel" (onClick)="handleClose()" class="ml-2"></dx-button>
-  <dx-button text="Save" type="default" (onClick)="updateTimesheet()"></dx-button>
-</div> -->
+  <dx-button
+    text="Update"
+    type="default"
+    (onClick)="updateTimesheet()"
+    [visible]="!is_approve"
+  ></dx-button>
+</div>

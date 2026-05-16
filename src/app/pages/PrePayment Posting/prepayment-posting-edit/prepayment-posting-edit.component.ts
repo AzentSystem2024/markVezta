@@ -209,7 +209,7 @@ export class PrepaymentPostingEditComponent {
     };
 
     this.isSaving = true;
-    if (this.approveValue || this.selectedStatus == 'Verified') {
+    if (this.approveValue || this.selectedStatus == 'Verify') {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -244,7 +244,7 @@ export class PrepaymentPostingEditComponent {
           //   notify('Approval cancelled.', 'info', 2000);
         }
       });
-    } else if (this.status === 'verifyscreen' || this.selectedStatus == 'Open') {
+    } else if (this.status === 'verifyscreen' && this.selectedStatus == 'Open') {
       this.dataservice.Verify_prepayment_data(payload).subscribe(
         (res: any) => {
           this.isSaving = false;

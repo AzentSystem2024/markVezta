@@ -222,7 +222,10 @@
 
         <!-- Verify -->
         <span
-          *ngIf="canVerify"
+          *ngIf="
+            (cellData.data.STATUS === 'VERIFY' && canApprove) ||
+            (cellData.data.STATUS !== 'VERIFY' && canVerify)
+          "
           style="
             position: relative;
             display: inline-block;
