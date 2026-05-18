@@ -108,7 +108,7 @@ export class DebitComponent {
   };
   isAddDebitNote: boolean = false;
   isEditDebitNote: boolean = false;
-  isVerifyDebitNote :boolean = false;
+  isVerifyDebitNote: boolean = false;
   isViewCreditNote: boolean = false;
   selectedDebitNote: any;
   isViewDebitNote: boolean;
@@ -132,6 +132,7 @@ export class DebitComponent {
   DNid: any;
   selectedCompanyId: any;
   vatTitle: any;
+  isApproveDebitNote: boolean;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -158,7 +159,7 @@ export class DebitComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -234,7 +235,7 @@ export class DebitComponent {
         this.filteredJournalVoucherList = this.debitList;
         this.isEmptyDatagrid = this.debitList.length === 0;
       },
-      error: () => { },
+      error: () => {},
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -313,7 +314,6 @@ export class DebitComponent {
     }
     this.getDebitNoteList();
   }
-
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
@@ -538,7 +538,7 @@ export class DebitComponent {
     }
   }
 
-  onVerifyInvoice(e:any){
+  onVerifyInvoice(e: any) {
     e.cancel = true; // Prevent default popup editing
     const debitId = e.row.data.TRANS_ID;
     this.DNid = e.row.data.TRANS_ID;
@@ -550,13 +550,14 @@ export class DebitComponent {
       if (transStatus === 5) {
         // Open view popup
         this.isViewDebitNote = true;
+      } else if (transStatus === 2) {
+        this.isApproveDebitNote = true;
       } else {
         // Open edit popup
         this.isVerifyDebitNote = true;
       }
     });
   }
-
 
   onEditDebitNote(event: any) {
     event.cancel = true; // Prevent default popup editing
@@ -625,6 +626,7 @@ export class DebitComponent {
     this.isEditDebitNote = false;
     this.isVerifyDebitNote = false;
     this.isViewDebitNote = false;
+    this.isApproveDebitNote = false;
     if (this.addDebitComponent) {
       this.addDebitComponent.resetDebitNoteForm();
     }
@@ -683,4 +685,4 @@ export class DebitComponent {
   exports: [DebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DebitModule { }
+export class DebitModule {}

@@ -12,7 +12,12 @@
     noDataText=" "
   >
     <!-- ================= Columns ================= -->
-    <dxi-column dataField="DocNo" caption="Doc No"></dxi-column>
+    <dxi-column
+      dataField="DocNo"
+      caption="Doc No"
+      alignment="left"
+      [width]="'auto'"
+    ></dxi-column>
     <dxi-column dataField="FileName" caption="File Name"></dxi-column>
     <dxi-column
       dataField="ImportedTime"
@@ -59,7 +64,6 @@
     <dxo-pager
       [visible]="true"
       [showInfo]="true"
-      infoText="Page {0} of {1}"
       [showNavigationButtons]="true"
       [showPageSizeSelector]="true"
       [allowedPageSizes]="[10, 20, 30, 40]"
@@ -213,17 +217,6 @@
     (onHiding)="refreshGrid()"
   >
     <div *dxTemplate="let data of 'content'">
-      <!-- Process Pending Button -->
-      <div class="mb-2 d-flex justify-content-end">
-        <dx-button
-          text="Process Pending"
-          icon="refresh"
-          type="default"
-          stylingMode="contained"
-          (onClick)="processPendingRows()"
-        >
-        </dx-button>
-      </div>
       <dx-data-grid
         #detailGrid
         class="grid theme-dependent"
@@ -234,26 +227,18 @@
         [allowColumnReordering]="true"
         [rowAlternationEnabled]="true"
         [height]="'100%'"
+        keyExpr="ID"
         (onCellPrepared)="onCellPrepared($event)"
-        (onEditorPreparing)="onEditorPreparing($event)"
-
       >
-        <dxo-selection mode="multiple" showCheckBoxesMode="always">
-        </dxo-selection>
         <!-- Dynamic Columns -->
         <dxi-column
           *ngFor="let col of detailViewColumns"
           [dataField]="col"
           [caption]="col"
+          [visible]="col !== 'ID'"
           width="150"
-        >
-        </dxi-column>
-        <dxi-column
-          dataField="Status"
-          caption="Status"
-          width="120"
-          fixed="true"
-          fixedPosition="right"
+          [fixed]="col === 'FailureReason' || col === 'Status'"
+          [fixedPosition]="'right'"
         >
         </dxi-column>
 
@@ -300,46 +285,5 @@
     [hideOnOutsideClick]="false"
     message="Loading ..."
   >
-  </dx-load-panel>
-
-  <!-- Progress Section -->
-  <dx-load-panel
-    [visible]="isProcessingRows"
-    [showIndicator]="true"
-    [showPane]="true"
-    [shading]="true"
-    [hideOnOutsideClick]="false"
-    shadingColor="rgba(0,0,0,0.4)"
-    message="Processing Pending Rows..."
-  >
-    <div *dxTemplate="let data of 'content'">
-      <div class="text-center">
-        <div class="mb-2">
-          Total :
-          <b>{{ totalRequestCount }}</b>
-        </div>
-
-        <div class="mb-2">
-          Completed :
-          <b class="text-success">
-            {{ completedRequestCount }}
-          </b>
-        </div>
-
-        <div class="mb-2">
-          Failed :
-          <b class="text-danger">
-            {{ failedRequestCount }}
-          </b>
-        </div>
-
-        <div class="mb-2">
-          Pending :
-          <b class="text-warning">
-            {{ pendingRequestCount }}
-          </b>
-        </div>
-      </div>
-    </div>
   </dx-load-panel>
 </div>

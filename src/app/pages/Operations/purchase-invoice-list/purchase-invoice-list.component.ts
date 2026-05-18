@@ -135,10 +135,10 @@ export class PurchaseInvoiceListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   isAddInvoice: boolean = false;
-  isVerifyInvoice:boolean = false;
+  isVerifyInvoice: boolean = false;
   isViewInvoice: boolean = false;
   isEditInvoice: boolean = false;
-  Approvepopup:boolean = false;
+  Approvepopup: boolean = false;
   selectedInvoice: any;
   isEditInvoiceReadOnly: boolean = false;
   selected_Company_id: any;
@@ -148,7 +148,7 @@ export class PurchaseInvoiceListComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -306,8 +306,7 @@ export class PurchaseInvoiceListComponent {
     this.getPurchaseInvoiceList();
   }
 
-
-   allActionButtons = [
+  allActionButtons = [
     {
       name: 'edit',
 
@@ -317,11 +316,11 @@ export class PurchaseInvoiceListComponent {
 
       text: 'Edit',
 
-       onClick: (e) => {
+      onClick: (e) => {
         setTimeout(() => this.onEditInvoice(e));
       },
 
-      visible: (e) => this.canEdit && e.row.data.STATUS === 'Open' 
+      visible: (e) => this.canEdit && e.row.data.STATUS === 'Open',
     },
 
     {
@@ -335,10 +334,13 @@ export class PurchaseInvoiceListComponent {
 
       // onClick: (e) => this.onDeleteClick(e),
 
-      visible: (e) => e.row.data.STATUS !== 'Approved' || e.row.data.STATUS === 'Open' || e.row.data.STATUS !== 'Verified' && this.canApprove,
+      visible: (e) =>
+        e.row.data.STATUS !== 'Approved' ||
+        e.row.data.STATUS === 'Open' ||
+        (e.row.data.STATUS !== 'Verified' && this.canApprove),
     },
 
-    { 
+    {
       hint: 'Verify',
 
       icon: 'check',
@@ -349,8 +351,7 @@ export class PurchaseInvoiceListComponent {
         setTimeout(() => this.onVerifyClick(e));
       },
 
-      visible: (e) =>
-        e.row.data.STATUS !== 'Verified',
+      visible: (e) => e.row.data.STATUS !== 'Verified',
     },
 
     {
@@ -368,7 +369,7 @@ export class PurchaseInvoiceListComponent {
     },
   ];
 
-   //===================Status flag=========================
+  //===================Status flag=========================
   getStatusFlagClass(status: string): string {
     switch (status) {
       case 'Open':
@@ -382,8 +383,7 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
-
-   statusCellRender(cellElement: any, cellInfo: any) {
+  statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
@@ -395,7 +395,12 @@ export class PurchaseInvoiceListComponent {
         : status === 'Verified'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
+    icon.title =
+      status === 'Approved'
+        ? 'Approved'
+        : status === 'Verified'
+          ? 'Verified'
+          : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -617,11 +622,11 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
-   // ============================Verify Popup function=========================================
+  // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
-    console.log(e,'event--------------')
+    console.log(e, 'event--------------');
     this.isEditInvoice = false;
-    this.isVerifyInvoice = true;
+
     const transStatus = e.row.data.STATUS;
     e.cancel = true;
     this.statusFinder = e.row.data.STATUS;
@@ -633,17 +638,18 @@ export class PurchaseInvoiceListComponent {
       console.log(this.selectedInvoice, '==============select data====verify');
       // this.get_employes_details_value_select();
       this.isEditInvoiceReadOnly = transStatus === 'Approved';
+      this.isVerifyInvoice = true;
     });
   }
 
-   // ============================Approve Popup function=========================================
+  // ============================Approve Popup function=========================================
   onApproveClick(e: any): void {
     this.isVerifyInvoice = true;
     e.cancel = true;
     const id = e.row.data.TRANS_ID;
     this.statusFinder = e.row.data.STATUS;
     const transStatus = e.row.data.STATUS;
-    console.log(this.statusFinder)
+    console.log(this.statusFinder);
     console.log(id, '===================id');
     this.dataService.selectPurchaseInvoice(id).subscribe((res: any) => {
       console.log(res);
@@ -654,22 +660,21 @@ export class PurchaseInvoiceListComponent {
     });
   }
 
-
   onEditInvoice(event: any) {
-    console.log(event,'event------------')
+    console.log(event, 'event------------');
     event.cancel = true;
     const invoiceId = event.data.TRANS_ID;
     const transStatus = event.data.STATUS;
     this.statusFinder = event.data.STATUS;
     this.isVerifyInvoice = false;
-    this.isEditInvoice = true;
+
     this.dataService
       .selectPurchaseInvoice(invoiceId)
       .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
 
-        
         this.isEditInvoiceReadOnly = transStatus === 'Approved'; //read-only if Approved
+        this.isEditInvoice = true;
       });
   }
 
@@ -717,7 +722,7 @@ export class PurchaseInvoiceListComponent {
     this.isEditInvoice = false;
     this.isVerifyInvoice = false;
 
-  this.Approvepopup = false;
+    this.Approvepopup = false;
     this.getPurchaseInvoiceList();
     this.addInvoiceComp.resetInvoiceForm();
   }
@@ -780,4 +785,4 @@ export class PurchaseInvoiceListComponent {
   exports: [PurchaseInvoiceListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseInvoiceListModule { }
+export class PurchaseInvoiceListModule {}

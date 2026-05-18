@@ -75,6 +75,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   VatClass: any;
   @Input() boolean = false;
   @Input() isVerifyCreditNote: boolean = false;
+  @Input() isApproveMode: boolean = false;
   @Input()
   set creditFormData(value: any) {
     if (!value || !value.length) return;
@@ -1536,7 +1537,10 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
         });
 
     // APPROVE / COMMIT path
-    if (this.creditFormData[0].IS_APPROVED || this.creditFormData[0].TRANS_STATUS === 2) {
+    if (
+      this.creditFormData[0].IS_APPROVED ||
+      this.creditFormData[0].TRANS_STATUS === 2
+    ) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -1591,61 +1595,61 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
       return;
     }
 
-   if (this.isVerifyCreditNote === true) {
-  const verifyPayload = {
-    TRANS_ID: this.creditFormData[0].TRANS_ID,
-    TRANS_TYPE: 37,
-    COMPANY_ID: this.selectedCompanyId,
-    FIN_ID: this.finId,
-    STORE_ID: 1,
-    TRANS_DATE: this.formatDateOnly(this.transDate),
-    TRANS_STATUS: 1,
-    NARRATION: this.creditFormData[0].NARRATION,
-    INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
-    INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
-    UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
-    DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
-    PARTY_NAME: this.creditFormData.PARTY_NAME,
-    IS_APPROVED: false,
-    NOTE_DETAIL: buildNoteDetail(),
-    ROUND_OFF: this.creditFormData[0].ROUND_OFF,
-    VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
-  };
+    if (this.isVerifyCreditNote === true) {
+      const verifyPayload = {
+        TRANS_ID: this.creditFormData[0].TRANS_ID,
+        TRANS_TYPE: 37,
+        COMPANY_ID: this.selectedCompanyId,
+        FIN_ID: this.finId,
+        STORE_ID: 1,
+        TRANS_DATE: this.formatDateOnly(this.transDate),
+        TRANS_STATUS: 1,
+        NARRATION: this.creditFormData[0].NARRATION,
+        INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
+        INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
+        UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
+        DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
+        PARTY_NAME: this.creditFormData.PARTY_NAME,
+        IS_APPROVED: false,
+        NOTE_DETAIL: buildNoteDetail(),
+        ROUND_OFF: this.creditFormData[0].ROUND_OFF,
+        VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
+      };
 
-  confirm(
-    'Are you sure you want to verify this Credit Note?',
-    'Confirm Verification'
-  ).then((result) => {
-    if (result) {
-      this.dataService.verifyCreditNote(verifyPayload).subscribe(
-        (response: any) => {
+      confirm(
+        'Are you sure you want to verify this Credit Note?',
+        'Confirm Verification',
+      ).then((result) => {
+        if (result) {
+          this.dataService.verifyCreditNote(verifyPayload).subscribe(
+            (response: any) => {
+              this.isUpdating = false;
+
+              if (response.flag === 1 || response.Flag === 1) {
+                notify(
+                  {
+                    message: 'Credit Note Verified Successfully',
+                    position: { at: 'top right', my: 'top right' },
+                  },
+                  'success',
+                );
+
+                this.popupClosed.emit();
+              }
+            },
+            (error) => {
+              this.isUpdating = false;
+              notify('Error while verifying Credit Note', 'error', 3000);
+            },
+          );
+        } else {
           this.isUpdating = false;
+          notify('Verification cancelled.', 'info', 2000);
+        }
+      });
 
-          if (response.flag === 1 || response.Flag === 1) {
-            notify(
-              {
-                message: 'Credit Note Verified Successfully',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'success',
-            );
-
-            this.popupClosed.emit();
-          }
-        },
-        (error) => {
-          this.isUpdating = false;
-          notify('Error while verifying Credit Note', 'error', 3000);
-        },
-      );
-    } else {
-      this.isUpdating = false;
-      notify('Verification cancelled.', 'info', 2000);
+      return;
     }
-  });
-
-  return;
-}
 
     // NORMAL UPDATE path
     const payload = {

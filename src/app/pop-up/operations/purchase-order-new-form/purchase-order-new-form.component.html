@@ -241,10 +241,10 @@
             (input)="onSupplierMobileInput($event)"
           >
             <dx-validator>
-              <dxi-validation-rule
+              <!-- <dxi-validation-rule
                 type="required"
                 message="Contact number is required"
-              ></dxi-validation-rule>
+              ></dxi-validation-rule> -->
 
               <dxi-validation-rule
                 type="custom"
@@ -520,6 +520,12 @@
       dataType="string"
       [allowEditing]="false"
     ></dxi-column>
+    <!-- <dxi-column
+      dataField="CURRENCY_CODE"
+      caption="Currency"
+      dataType="string"
+      [allowEditing]="false"
+    ></dxi-column> -->
     <!-- Conditionally add local currency column -->
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
@@ -530,6 +536,7 @@
       [allowEditing]="true"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [editorOptions]="{ format: '#0.00' }"
+      [calculateDisplayValue]="getFormattedSupplierPrice"
     >
     </dxi-column>
 

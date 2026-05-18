@@ -26,14 +26,12 @@ import { ApplyPipeModule } from 'src/app/pipes/apply.pipe';
   styleUrls: ['./form-popup.component.scss'],
 })
 export class FormPopupComponent {
-
-
   @Output() closeAndRefresh: EventEmitter<void> = new EventEmitter<void>();
 
   @Output() closePopup: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('validationGroup', { static: true })
-  validationGroup: DxValidationGroupComponent;
+  validationGroup!: DxValidationGroupComponent;
   @Input() isEditMode: boolean = false;
   @Output() isApprovedChange = new EventEmitter<boolean>();
 
@@ -50,7 +48,7 @@ export class FormPopupComponent {
 
   @Input() titleText = '';
 
-  @Input() width = 480;
+  @Input() width: any = 480;
 
   @Input() height: string | number = 'auto';
 
@@ -59,9 +57,10 @@ export class FormPopupComponent {
   @Input() visible = false;
 
   @Input() isSaveDisabled: boolean = false;
-  
+
   @Input() saveButtonText: any = 'Save';
 
+  @Input() customValidate?: () => boolean;
 
   @Output() save = new EventEmitter();
 
@@ -69,7 +68,7 @@ export class FormPopupComponent {
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Input() showApprove: boolean = true; // default: visible
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   constructor(protected screen: ScreenService) {}
 
   isValid() {
@@ -93,7 +92,7 @@ export class FormPopupComponent {
     this.cancel.emit();
   }
 
-  getWrapperAttrs = (inputWrapperAttr) => {
+  getWrapperAttrs = (inputWrapperAttr: any) => {
     return {
       ...inputWrapperAttr,
       class: `${inputWrapperAttr.class} form-popup`,

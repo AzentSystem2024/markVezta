@@ -210,6 +210,27 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     const isVerified = status === 'verified' || status === 'approved';
     return { isVerified, isApproved, isEditable };
   }
+  statusCellRender(cellElement: any, cellInfo: any) {
+    console.log(cellInfo, '==========cellInfo==============')
+    const status = cellInfo.data.Status;
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag'; // Font Awesome flag icon
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981' // Approved
+        : status === 'Verified'
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+
+    cellElement.appendChild(icon);
+  }
 
   openEditingStart(event: any) {
     console.log(event, '====editing start event data====');
@@ -250,11 +271,18 @@ export class ItemStorePropertiesLogComponent implements OnInit {
     e.cancel = true; // Prevent the default editing action
     const selectedId = e.row.data.ID; // Get the selected row ID
     // this.StatusType = e.row.data.Status
-    this.StatusType = 'ViewScreen'
 
     this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
       console.log(res, '============selected data for edit===========');
       this.selectedData = res;
+      if (this.selectedData.Status == '2') {
+
+      } else if (this.selectedData.Status == '1') {
+        this.StatusType = 'ViewScreen'
+
+      } else {
+
+      }
       this.editPackPopupOpened = true;
       this.cdr.detectChanges();
     });
@@ -420,13 +448,24 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   onVerifyClick(e: any) {
     e.cancel = true; // Prevent the default editing action
     const selectedId = e.row.data.ID; // Get the selected row ID
-    this.StatusType = 'VerificationScreen'
     // this.StatusType = e.row.data.Status
 
 
     this.dataservice.selectWorksheet(selectedId).subscribe((res: any) => {
       console.log(res, '============selected data for edit===========');
       this.selectedData = res;
+      if (this.selectedData.Status == '2') {
+        this.StatusType = 'ApprovalScreen'
+
+
+      } else if (this.selectedData.Status == '1') {
+        this.StatusType = 'VerificationScreen'
+
+
+      } else {
+        this.StatusType = 'ViewScreen'
+
+      }
       this.editPackPopupOpened = true;
       this.cdr.detectChanges();
 

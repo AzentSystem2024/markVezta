@@ -349,7 +349,10 @@
   "
 >
   <!-- Checkbox right above buttons -->
-  <div class="approve-container" *ngIf="canApprove">
+  <div
+    class="approve-container"
+    *ngIf="canApprove && !isVerifyMode && !isApproveMode"
+  >
     <dx-check-box
       *ngIf="isReadOnlyMode"
       [(value)]="isApprovedForView"
@@ -372,7 +375,7 @@
     </dx-button> -->
 
     <dx-check-box
-      *ngIf="!isReadOnlyMode"
+      *ngIf="!isReadOnlyMode && !isVerifyMode && !isApproveMode"
       [(value)]="isApproved"
       text="Approve"
     ></dx-check-box>
@@ -390,11 +393,11 @@
       [text]="
         isSaving
           ? isApproved
-            ? 'Updating & Committing...'
-            : 'Updating...'
+            ? 'Saving...'
+            : 'Saving...'
           : isApproved
-            ? 'Update & Commit'
-            : 'Update'
+            ? 'Save'
+            : 'Save'
       "
       [disabled]="isSaving"
       stylingMode="contained"

@@ -158,7 +158,8 @@
           vertical-align: middle;
         "
         [title]="
-          cellData.data.STATUS === 'Approved'
+          cellData.data.STATUS === 'Approved' ||
+          cellData.data.STATUS === 'Closed'
             ? 'View'
             : cellData.data.STATUS === 'Verified'
               ? 'Approve'
@@ -170,7 +171,8 @@
         <i
           class="fas fa-certificate"
           [style.color]="
-            cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Closed'
               ? '#10B981'
               : cellData.data.STATUS === 'Verified'
                 ? '#0073D8'

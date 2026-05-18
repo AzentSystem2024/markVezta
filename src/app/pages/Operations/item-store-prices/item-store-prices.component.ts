@@ -488,7 +488,7 @@ export class ItemStorePricesComponent {
     }
     const companyId = 1;
     const userId = 1;
-    const narration = 'Narration';
+    const narration = '';
     const defaultStoreId = 1;
     const worksheetItemPrice = Object.values(this.updatedItems).map((item) => ({
       ITEM_ID: item.ITEM_ID,
@@ -524,7 +524,7 @@ export class ItemStorePricesComponent {
       USER_ID: userId,
       // STORE_ID: this.storeIds || defaultStoreId,
       STORE_ID: String(this.storeIds || defaultStoreId),
-      NARRATION: narration,
+      NARRATION: this.narrationText,
       worksheet_item_price: worksheetItemPrice,
     };
 
@@ -540,7 +540,7 @@ export class ItemStorePricesComponent {
       if (isNaN(mrp) || isNaN(standardPrice)) {
         return false;
       }
-console.log(mrp, standardPrice,"MRP, Standard Price")
+      console.log(mrp, standardPrice, "MRP, Standard Price")
       return mrp <= standardPrice;
     });
 

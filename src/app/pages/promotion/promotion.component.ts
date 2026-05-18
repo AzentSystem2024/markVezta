@@ -2,8 +2,10 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  EventEmitter,
   NgModule,
   NgZone,
+  Output,
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -42,6 +44,8 @@ import notify from 'devextreme/ui/notify';
 import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
+import { confirm } from 'devextreme/ui/dialog';
+
 
 @Component({
   selector: 'app-promotion',
@@ -52,6 +56,8 @@ export class PromotionComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
   itemsList: any;
+  @Output() popupClosed = new EventEmitter<void>();
+
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -156,7 +162,7 @@ export class PromotionComponent {
   filteredItemStoresList: any;
   selectedRowForNewList: any;
   selectedRowNew: any;
-  heading: any = 'Items on Promotion';
+  // heading: any = 'Items on Promotion';
   popupForItemsToGet: boolean = false;
   selectedItems: any;
   isBuy: any;
@@ -172,6 +178,8 @@ export class PromotionComponent {
   selectedTabIndex: any = 0;
   wsId: any;
   price_level: any;
+  isSaving: boolean = false;
+  storeDetails: any;
   get displayTimeRange(): string {
     return this.fromTime && this.toTime
       ? `${this.fromTime} - ${this.toTime}`
@@ -184,8 +192,14 @@ export class PromotionComponent {
   selectedMode: 'price' | 'schema' = 'price';
   is_promotion_level: boolean = false
   approveValue: boolean = false
-  canApprove: boolean = false
-  constructor(
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  isFilterOpened = false;
+  canVerify = false; constructor(
     private dataservice: DataService,
     private router: Router,
     private ngZone: NgZone,
@@ -215,13 +229,38 @@ export class PromotionComponent {
   };
 
   ngOnInit() {
+    const currentUrl = this.router.url;
+
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    // this.sessionData_tax();
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      console.log(packingRights, '====packing rights====');
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
+      console.log(this.canVerify, 'VERIFY RIGHTS');
+    }
+
     console.log('==========test data=============');
     this.AllowCommitWithSave = sessionStorage.getItem('AllowCommitWithSave');
     this.userId = sessionStorage.getItem('UserId');
     this.sesstion_Details();
     this.loadStores();
     const defaultStoreId = '1';
-    this.listItemsByMultipleStoreIds(defaultStoreId);
+    this.listItemsByMultipleStoreIds();
     this.schemaOptions();
     this.loadDropdownData();
   }
@@ -396,7 +435,7 @@ export class PromotionComponent {
     }
   }
 
-  listItemsByMultipleStoreIds(storeIds: string): void {
+  listItemsByMultipleStoreIds(): void {
     const allStoreIds = '2,3,4'; // Define all store IDs here
 
     // Determine the payload based on the storeId
@@ -1036,71 +1075,145 @@ export class PromotionComponent {
       NARRATION: this.narration || '',
 
       worksheet_promotion_schema: grid_Data,
+      worksheet_item_store: (this.selectedStoreId || []).map((id: any) => ({
+        ID: null,
+        WS_ID: null,
+        STORE_ID: id
+      }))
     };
 
     console.log(payload, 'PAYLOAD IN SAVE');
 
     // Call the savePromotion API
-    this.dataservice.savePromotion(payload).subscribe((response: any) => {
-      console.log(response, 'SAVE RESPONSE');
-      try {
-        if (response.flag === 1) {
-          notify(
-            {
-              message: 'Promotion added successfully',
-              position: { at: 'top right', my: 'top right' },
+    if (this.approveValue) {
+      confirm(
+        'It will approve and commit. Are you sure you want to commit?',
+        'Confirm Commit'
+      ).then((result) => {
+        if (result) {
+          this.dataservice.approvePromotion(payload).subscribe(
+            (res: any) => {
+              this.isSaving = false;
+
+              if (res.flag === 1) {
+                notify(
+                  {
+                    message: 'Approved and committed successfully',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 500,
+                  },
+                  'success'
+                );
+
+                this.resetForm();
+                // this.router.navigate(['/promotions']);
+                this.popupClosed.emit();
+
+                this.dataGrid.instance.refresh();
+
+              } else if (res.flag === 0) {
+                // 🔹 Extract IDs
+                const match = res.message.match(/Item IDs:\s*([\d,]+)/);
+                let itemNames: string[] = [];
+
+                if (match && match[1]) {
+                  const ids = match[1].split(',').map((id: string) => Number(id.trim()));
+
+                  itemNames = this.itemStoresList
+                    .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
+                    .map((item: any) => item.DESCRIPTION); // adjust key if needed
+                }
+
+                const finalMessage =
+                  itemNames.length > 0
+                    ? `Already exists for: ${itemNames.join(', ')}`
+                    : res.message;
+
+                notify(
+                  {
+                    message: finalMessage,
+                    position: { at: 'top right', my: 'top right' },
+                  },
+                  'error'
+                );
+              }
             },
-            'success'
+            (error) => {
+              this.isSaving = false;
+              notify('Failed to approve.', 'error', 2000);
+              console.error(error);
+            }
           );
+        } else {
+          this.isSaving = false;
+          notify('Approval cancelled.', 'info', 2000);
+        }
+      });
+      // this.cdr.detectChanges();
 
-          this.resetForm();
-          this.router.navigate(['/promotions']);
-          this.dataGrid.instance.refresh();
+    }
+    else {
+      this.dataservice.savePromotion(payload).subscribe((response: any) => {
+        console.log(response, 'SAVE RESPONSE');
+        try {
+          if (response.flag === 1) {
+            notify(
+              {
+                message: 'Promotion added successfully',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success'
+            );
 
-        } else if (response.flag === 0) {
+            this.resetForm();
+            this.popupClosed.emit();
+            this.dataGrid.instance.refresh();
 
-          // 🔹 Extract IDs from message
-          const match = response.message.match(/Item IDs:\s*([\d,]+)/);
-          let itemNames: string[] = [];
+          } else if (response.flag === 0) {
 
-          if (match && match[1]) {
-            const ids = match[1].split(',').map((id: string) => Number(id.trim()));
-            console.log(this.itemStoresList)
-            // 🔹 Map IDs to names from itemStoresList
-            itemNames = this.itemStoresList
-              .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
-              .map((item: any) => item.DESCRIPTION); // adjust key if needed
+            // 🔹 Extract IDs from message
+            const match = response.message.match(/Item IDs:\s*([\d,]+)/);
+            let itemNames: string[] = [];
+
+            if (match && match[1]) {
+              const ids = match[1].split(',').map((id: string) => Number(id.trim()));
+              console.log(this.itemStoresList)
+              // 🔹 Map IDs to names from itemStoresList
+              itemNames = this.itemStoresList
+                .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
+                .map((item: any) => item.DESCRIPTION); // adjust key if needed
+            }
+
+            // 🔹 Final message
+            const finalMessage =
+              itemNames.length > 0
+                ? `Promotion already exists for: ${itemNames.join(', ')}`
+                : response.message;
+
+            notify(
+              {
+                message: finalMessage,
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error'
+            );
           }
 
-          // 🔹 Final message
-          const finalMessage =
-            itemNames.length > 0
-              ? `Promotion already exists for: ${itemNames.join(', ')}`
-              : response.message;
-
+        } catch (error) {
           notify(
             {
-              message: finalMessage,
+              message: 'Add operation failed',
               position: { at: 'top right', my: 'top right' },
             },
             'error'
           );
         }
-
-      } catch (error) {
-        notify(
-          {
-            message: 'Add operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        );
-      }
-    });
+      });
+    }
   }
 
   Cancel() {
-    this.router.navigate(['/promotions']);
+    this.popupClosed.emit();
     this.resetForm();
   }
   formatTime(date: any) {
@@ -1146,6 +1259,11 @@ export class PromotionComponent {
     this.narration = '';
     this.selectedRowKeys = [];
     this.isHappyHoursEnabled = false;
+    this.approveValue = false
+    this.itemStoresList = []
+
+
+    this.listItemsByMultipleStoreIds()
   }
   onPriceLevel(e: any) {
 

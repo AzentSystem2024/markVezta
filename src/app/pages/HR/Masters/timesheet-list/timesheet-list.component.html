@@ -224,7 +224,7 @@
       <dxi-column dataField="OT_HOURS" caption="OT Hours"></dxi-column>
       <dxi-column dataField="LESS_HOURS" caption="Less Hours"></dxi-column>
 
-      <dxi-column
+      <!-- <dxi-column
         dataField="STATUS"
         caption="Status"
         cellTemplate="statusCellTemplate"
@@ -239,6 +239,119 @@
           [attr.title]="cellData.value"
           style="margin-left: 10px; cursor: default"
         ></i>
+      </div> -->
+      <dxi-column dataField="STATUS" cellTemplate="statusCellRender">
+      </dxi-column>
+
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <i
+          class="fas fa-flag"
+          [style.color]="
+            data.data.STATUS === 'Approved'
+              ? '#10B981'
+              : data.data.STATUS === 'Verified'
+                ? '#0073D8'
+                : '#FFA500'
+          "
+        ></i>
+      </div>
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <!-- Edit -->
+        <i
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Edit"
+          (click)="onEditingStart({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved'
+              ? 'none'
+              : 'auto'
+          "
+          style="cursor: pointer; margin-right: 10px"
+          title="Delete"
+          (click)="onDeleteTimesheet({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Verify -->
+        <span
+          *ngIf="SessioncanVerify"
+          style="
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+          "
+          [title]="
+            cellData.data.STATUS === 'Approved'
+              ? 'Approved'
+              : cellData.data.STATUS === 'Verified'
+                ? 'Approve'
+                : 'Verify'
+          "
+          (click)="onEditingStart({ data: cellData.data, cancel: false })"
+        >
+          <!-- Blue badge -->
+          <i
+            class="fas fa-certificate"
+            [style.color]="
+              cellData.data.STATUS === 'Approved'
+                ? '#10B981'
+                : cellData.data.STATUS === 'Verified'
+                  ? '#0073D8'
+                  : '#FFA500'
+            "
+            style="font-size: 18px; position: absolute; top: 0; left: 0"
+          ></i>
+
+          <!-- White tick -->
+          <i
+            class="fas fa-check"
+            style="
+              color: white;
+              font-size: 7px;
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              pointer-events: none;
+            "
+          ></i>
+        </span>
       </div>
     </dx-data-grid>
   </div>

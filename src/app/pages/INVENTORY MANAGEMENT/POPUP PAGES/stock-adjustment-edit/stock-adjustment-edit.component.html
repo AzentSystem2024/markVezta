@@ -62,6 +62,7 @@
             <dxi-item location="after" locateInMenu="auto">
               <div class="stacked-toolbar-group">
                 <dx-select-box
+                  [(value)]="StoreIDData"
                   [dataSource]="stores"
                   displayExpr="DESCRIPTION"
                   valueExpr="ID"

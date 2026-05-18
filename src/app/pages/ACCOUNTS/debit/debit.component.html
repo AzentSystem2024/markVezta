@@ -178,7 +178,7 @@
       >
       </dxi-column>
 
-       <dxi-column
+      <dxi-column
         type="buttons"
         caption="Actions"
         [width]="140"
@@ -276,7 +276,6 @@
           ></i>
         </span>
       </div>
-
     </dx-data-grid>
   </div>
 </div>
@@ -314,7 +313,7 @@
   [(visible)]="isVerifyDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Edit Debit Note"
+  title="Verify Debit Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isVerifyDebitNote">
@@ -323,6 +322,23 @@
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
       [isVerifyDebitNote]="isVerifyDebitNote"
+    ></app-edit-debit>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isApproveDebitNote"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Approve Debit Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isApproveDebitNote">
+    <app-edit-debit
+      [debitFormData]="selectedDebitNote"
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+      [isApproveMode]="true"
     ></app-edit-debit>
   </ng-container>
 </dx-popup>

@@ -159,7 +159,7 @@
       >
       </dxi-column>
 
-       <dxi-column
+      <dxi-column
         type="buttons"
         caption="Actions"
         [width]="140"
@@ -306,7 +306,6 @@
   </ng-container>
 </dx-popup>
 
-
 <dx-popup
   [(visible)]="isVerifyCreditNote"
   [width]="'90vw'"
@@ -320,6 +319,23 @@
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
       [isVerifyCreditNote]="isVerifyCreditNote"
+    ></app-edit-credit-note>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isApproveCreditNote"
+  [width]="'90vw'"
+  [height]="'100vh'"
+  title="Approve Credit Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isApproveCreditNote">
+    <app-edit-credit-note
+      [creditFormData]="selectedCreditNoteForEdit"
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+      [isApproveMode]="true"
     ></app-edit-credit-note>
   </ng-container>
 </dx-popup>

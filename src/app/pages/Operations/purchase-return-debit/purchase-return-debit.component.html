@@ -212,7 +212,7 @@
                 ? 'Approve'
                 : 'Verify'
           "
-          (click)="onVerifyPurchaseReturn({ row: { data: cellData.data } })"
+          (click)="onVerifyPurchaseReturn($event, cellData.data)"
         >
           <!-- Badge -->
           <i

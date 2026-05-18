@@ -105,7 +105,7 @@ export class DepartmentComponent {
       COMPANY_ID: ['', Validators.required]
     });
 
-    const currentUrl = this.router.url;
+    const currentUrl = this.router.url.replace('/', '');
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );

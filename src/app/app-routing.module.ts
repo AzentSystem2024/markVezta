@@ -192,6 +192,10 @@ import { InvoiceRetailComponent } from './pages/OPERATIONS/invoice-retail/invoic
 import { MiscPurchaseInvoiceComponent } from './pages/OPERATIONS/misc-purchase-invoice/misc-purchase-invoice.component';
 import { MiscellaneousSalesInvoiceComponent } from './pages/OPERATIONS/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { SalesInvoiceRetailComponent } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
+import { ARImportedListComponent } from './pages/ERP-INTEGRATION/ar-imported-list/ar-imported-list.component';
+import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinician-master.component';
+import { CPTMasterComponent } from './pages/MASTER/cpt-master/cpt-master.component';
+import { DepartmentGroupComponent } from './pages/MASTER/department-group/department-group.component';
 
 const routes: Routes = [
   {
@@ -1208,7 +1212,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
 
-         {
+      {
         path: 'item-store-price-approve',
         component: ItemStorePriceApproveComponent,
         canActivate: [AuthGuardService],
@@ -1216,6 +1220,26 @@ const routes: Routes = [
       {
         path: 'import-ar',
         component: ImportArDataComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'ar-list',
+        component: ARImportedListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'clinician',
+        component: ClinicianMasterComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'cpt-master',
+        component: CPTMasterComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'department-group',
+        component: DepartmentGroupComponent,
         canActivate: [AuthGuardService],
       },
 

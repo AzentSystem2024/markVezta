@@ -128,6 +128,7 @@ export class DepartmentMeComponent implements OnInit {
     this.isAddDepartmentPopupOpened = true;
     this.departmentComponent?.resetButton();
   }
+  
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Department-list');
   }

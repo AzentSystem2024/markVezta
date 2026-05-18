@@ -140,6 +140,8 @@ export class EditSupplierPaymentComponent {
   }
 
   ngOnInit() {
+    console.log(this.isApproveMode, 'ISAPPROVEMODE');
+    console.log(this.isVerifyMode, 'ISVERIFYMODE');
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -694,7 +696,7 @@ export class EditSupplierPaymentComponent {
     }
   }
 
-  saveReceipt() {
+  async saveReceipt() {
     if (!this.selectedSupplierId) {
       notify('Please select a supplier.', 'warning', 3000);
       return;
@@ -733,6 +735,11 @@ export class EditSupplierPaymentComponent {
       notify('Please select a ledger.', 'warning', 3000);
       return;
     }
+    if (this.isVerifyMode) {
+      this.paymentFormData.IS_VERIFIED = true;
+    } else {
+      this.paymentFormData.IS_VERIFIED = false;
+    }
     const payload = {
       TRANS_ID: this.paymentFormData.TRANS_ID,
       TRANS_TYPE: 21,
@@ -754,7 +761,19 @@ export class EditSupplierPaymentComponent {
       NET_AMOUNT: this.calculateNetAmount(validSuppDetails),
       SUPP_DETAIL: validSuppDetails,
       PDC_ID: this.paymentFormData.PDC_ID || null,
+      IS_VERIFIED: this.paymentFormData.IS_VERIFIED,
     };
+    // ✅ Verification confirmation
+    if (payload.IS_VERIFIED) {
+      const verifyResult = await confirm(
+        'Are you sure you want to verify this payment?',
+        'Confirm Verification',
+      );
+
+      if (!verifyResult) {
+        return;
+      }
+    }
     if (this.receiptMode === 'PDC' && this.paymentFormData.PDC_ID) {
       payload.PDC_ID = this.paymentFormData.PDC_ID;
     }
@@ -770,7 +789,7 @@ export class EditSupplierPaymentComponent {
       }
     }
     // ✅ If approved checkbox is checked, call the approve API
-    if (this.isApproved) {
+    if (this.isApproved || this.isApproveMode) {
       const result = confirm(
         'Are you sure you want to approve and commit this invoice?',
         'Confirm Approval',

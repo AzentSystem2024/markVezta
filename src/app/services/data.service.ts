@@ -88,9 +88,11 @@ export class DataService {
   getAccountGroupHeadList(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}listGroupHead/list`, data);
   }
+
   getActiveLedger(): Observable<any> {
     return this.http.post(`${this.apiUrl}accountHead/getlist`, {});
   }
+
   getAccountHeadList(): Observable<any> {
     return this.http.post(`${this.apiUrl}AccountHead/list`, {});
   }
@@ -129,6 +131,225 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}ArticleCategory/list/` + id, {});
   }
 
+  //======Facility Drop down data=====================
+  Get_GropDown(dropDownField: any) {
+    const Url = `${this.apiUrl}dropdown`;
+    const reqBody = { name: dropDownField };
+    return this.http.post(Url, reqBody);
+  }
+
+  Get_User_Facility_List_Data() {
+    const userid = sessionStorage.getItem('UserID');
+    const url = `${this.apiUrl}facility/getAllUserFacility?userID=${userid}`;
+    return this.http.post(url, {});
+  }
+
+  //========================================================CLINICIAN=========================================================
+  //===========Get all data list========
+  get_Clinian_Table_Data() {
+    const Url = `${this.apiUrl}clinician/list`;
+    const reqBody = {
+      list: [],
+    };
+    return this.http.post(Url, reqBody);
+  }
+
+  //=======insert data ==========
+  Insert_Clinician_Data(
+    ClinicianLicense: any,
+    ClinicianName: any,
+    ClinicianShortName: any,
+    SpecialityID: any,
+    MajorID: any,
+    ProfessionID: any,
+    CategoryID: any,
+    Gender: any,
+    DepartmentID: any,
+  ) {
+    const url = `${this.apiUrl}clinician/insert`;
+    const reqBody = {
+      ClinicianLicense: ClinicianLicense,
+      ClinicianName: ClinicianName,
+      ClinicianShortName: ClinicianShortName,
+      SpecialityID: SpecialityID,
+      MajorID: MajorID,
+      ProfessionID: ProfessionID,
+      CategoryID: CategoryID,
+      Gender: Gender,
+      DepartmentID: DepartmentID,
+    };
+
+    return this.http.post(url, reqBody);
+  }
+
+  //=====Update Denial category data======
+  update_Clinician_data(
+    id: any,
+    ClinicianLicense: any,
+    ClinicianName: any,
+    ClinicianShortName: any,
+    SpecialityID: any,
+    MajorID: any,
+    ProfessionID: any,
+    CategoryID: any,
+    Gender: any,
+    DepartmentID: any,
+  ) {
+    const url = `${this.apiUrl}clinician/update`;
+    const reqBody = {
+      ID: id,
+      ClinicianLicense: ClinicianLicense,
+      ClinicianName: ClinicianName,
+      ClinicianShortName: ClinicianShortName,
+      SpecialityID: SpecialityID,
+      MajorID: MajorID,
+      ProfessionID: ProfessionID,
+      CategoryID: CategoryID,
+      Gender: Gender,
+      DepartmentID: DepartmentID,
+    };
+
+    return this.http.post(url, reqBody);
+  }
+
+  //=====Remove Denial category Data==========
+  Remove_Clinician_Row_Data(id: any) {
+    return this.http.post(`${this.apiUrl}clinician/delete/${id}`, {});
+  }
+
+  selectClinician(id: any) {
+    return this.http.post(`${this.apiUrl}clinician/select/${id}`, {});
+  }
+
+  //==========================================CPT MASTER==========================================================
+  //======Cpt Master List===========
+  get_CptMaster_List() {
+    const Url = `${this.apiUrl}cptmaster/list`;
+    const reqBody = {
+      list: [],
+    };
+
+    return this.http.post(Url, reqBody);
+  }
+  //======Add Cpt Master data========
+  Insert_CptMaster_Data(
+    CPTTypeID: any,
+    CPTCode: any,
+    CPTName: any,
+    description: any,
+    CPTGroup: any,
+    DepartmentID: any,
+    CPTDepartmentID: any,
+    CostDepartmentID: any,
+    CostDriveID: any,
+    FixedQuantity: any,
+    IsDifferentCPTDepartment: any,
+    IsDifferentLedger: any,
+    selectedLedgerID: any,
+    CPTEncounterDepartments: any,
+    data: any,
+  ) {
+    const url = `${this.apiUrl}cptmaster/insert`;
+    const reqBody = {
+      CPTTypeID: CPTTypeID,
+      CPTCode: CPTCode,
+      CPTName: CPTName,
+      Description: description,
+      CPTGroup: CPTGroup,
+      DepartmentID: DepartmentID,
+      CPTDepartmentID: CPTDepartmentID,
+      CostDepartmentID: CostDepartmentID,
+      CostDriveID: CostDriveID,
+      FixedQuantity: FixedQuantity,
+      IsDifferentCPTDepartment: IsDifferentCPTDepartment == 1 ? true : false,
+      IsDifferentLedger: false,
+      SelectedLedgerID: '0',
+      CPTEncounterDepartments: CPTEncounterDepartments,
+      data: data,
+    };
+
+    return this.http.post(url, reqBody);
+  }
+
+  //=====Update Cpt Master data======
+  update_CptMaster_data(
+    id: any,
+    CPTTypeID: any,
+    CPTCode: any,
+    CPTName: any,
+    description: any,
+    CPTGroup: any,
+    DepartmentID: any,
+    CPTDepartmentID: any,
+    CostDepartmentID: any,
+    CostDriveID: any,
+    FixedQuantity: any,
+    IsDifferentCPTDepartment: any,
+    IsDifferentLedger: any,
+    selectedLedgerID: any,
+    CPTEncounterDepartments: any,
+    data: any,
+  ) {
+    const url = `${this.apiUrl}cptmaster/update`;
+
+    /* ===============================
+     NORMALIZE PAYLOAD (IMPORTANT)
+     =============================== */
+
+    let finalDepartmentID = DepartmentID;
+    let finalCPTDepartmentID = CPTDepartmentID;
+    let finalEncounterDepartments = CPTEncounterDepartments;
+    let finalIsDifferent = IsDifferentCPTDepartment;
+
+    // COMMON department selected
+    if (finalIsDifferent === 0) {
+      finalEncounterDepartments = [];
+    }
+
+    // SEPARATE department selected
+    if (finalIsDifferent === 1) {
+      finalDepartmentID = null;
+      finalCPTDepartmentID = null;
+    }
+
+    const reqBody = {
+      ID: id,
+      CPTTypeID: CPTTypeID,
+      CPTCode: CPTCode,
+      CPTName: CPTName,
+      Description: description,
+      CPTGroup: CPTGroup,
+      DepartmentID: finalDepartmentID,
+      CPTDepartmentID: finalCPTDepartmentID,
+      CostDepartmentID: CostDepartmentID,
+      CostDriveID: CostDriveID,
+      FixedQuantity: FixedQuantity,
+      IsDifferentCPTDepartment: IsDifferentCPTDepartment == 1 ? true : false,
+      IsDifferentLedger: false,
+      SelectedLedgerID: '0',
+      CPTEncounterDepartments: finalEncounterDepartments || [],
+      data: data,
+    };
+
+    return this.http.post(url, reqBody);
+  }
+
+  //=====Remove Cpt Master Data==========
+  Remove_CptMaster_Row_Data(id: any) {
+    return this.http.post(`${this.apiUrl}cptmaster/delete/${id}`, {});
+  }
+
+  getSubDepartmentDropDownData(DepartmentID: any) {
+    const Data = {
+      DepartmentID,
+    };
+    return this.http.post(`${this.apiUrl}cptmaster/getSubDepartment`, Data);
+  }
+
+  selectCptMaster(id: any) {
+    return this.http.post(`${this.apiUrl}cptmaster/select/${id}`, {});
+  }
+
   public getDropdownDataForAccounts(type: any): Observable<any> {
     const reqBodyData = { name: type };
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
@@ -157,9 +378,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
-  //  getItemsListForArticle(): Observable<any> {
-  //   return this.http.post(`${this.apiUrl}article/getItems`, {});
-  // }
+  
 
   getLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
@@ -4044,6 +4263,65 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
+
+
+
+   //---------------HR Masters-----------------
+  get_Department_Group_List(payload: any) {
+    const getEndpoint = this.apiUrl + 'DepartmentGroup/list';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //===============Add Api=========================
+  Insert_Department_Group_Api(
+    CODE: any,
+    DEPT_NAME: any,
+    IS_INACTIVE: boolean,
+    COMPANY_ID: any,
+  ) {
+    const getEndpoint = this.apiUrl + 'DepartmentGroup/save';
+    const reqBody = {
+      CODE: CODE,
+      DESCRIPTION: DEPT_NAME,
+      IS_INACTIVE: IS_INACTIVE,
+      COMPANY_ID: COMPANY_ID,
+    };
+    return this.http.post(getEndpoint, reqBody);
+  }
+
+   Update_Department_Group_Api(
+    ID: any,
+    CODE: any,
+    DEPT_NAME: any,
+    IS_ACTIVE: any,
+    COMPANY_ID: any,
+  ) {
+    const getEndpoint = this.apiUrl + 'DepartmentGroup/save';
+    const reqBody = {
+      ID: ID,
+      CODE: CODE,
+      DESCRIPTION: DEPT_NAME,
+      IS_INACTIVE: IS_ACTIVE,
+      COMPANY_ID: COMPANY_ID,
+    };
+
+    return this.http.post(getEndpoint, reqBody);
+  }
+
+
+
+   Select_Department_Group_Api(ID: any) {
+    const getEndpoint = this.apiUrl + `DepartmentGroup/select/${ID}`;
+    return this.http.post(getEndpoint, {});
+  }
+
+  Delete_Department_Group_Api(ID: any) {
+    const getEndpoint = this.apiUrl + `DepartmentGroup/delete/${ID}`;
+    return this.http.post(getEndpoint, {});
+  }
+
+
+
   Select_Department_Api(ID: any) {
     const getEndpoint = this.apiUrl + `Department/select/${ID}`;
     return this.http.post(getEndpoint, {});
@@ -6683,6 +6961,11 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}ImportAR/view`, payload);
   }
 
+  // ======= import Ar data detailed view API ========
+  import_AR_Full_List() {
+    return this.http.post(`${this.apiUrl}ImportAR/arlist`, {});
+  }
+
   // =========== import AR data API ==============
   import_AR_Data(batchNo: any, FileName: any, FileData: any) {
     const sessionData = JSON.parse(
@@ -6700,7 +6983,7 @@ The result can be exported to HTML or Markdown.`;
 
   // ========= PROCESS SELECTED PENDING LIST ==========
   process_pending_rows(rowdata: any) {
-    const payload = { TransactionID: rowdata.ApexTransactionNumber };
+    const payload = { TransactionID: rowdata.ID };
     return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
   }
 }
