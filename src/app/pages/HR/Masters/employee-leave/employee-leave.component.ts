@@ -28,6 +28,7 @@ import { DataService } from 'src/app/services';
 import { name } from '@devexpress/analytics-core/analytics-diagram';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-employee-leave',
@@ -863,122 +864,140 @@ export class EmployeeLeaveComponent {
   }
 
   //===================Verify Employee Leave========================
-  Verify_Data() {
-    const User_Id = sessionStorage.getItem('UserId');
-    const Store_Id = sessionStorage.getItem('StoreId');
-    const ID = this.selectedData.ID;
-    const Date = this.selectedData.DOC_DATE;
-    const Employee_ID = this.selectedData.EMP_ID;
-    const Leave_type = this.selectedData.LEAVE_TYPE_ID;
-    const Leave_days = this.selectedData.VAC_DAYS;
-    const Leave_credit = this.selectedData.LEAVE_CREDIT;
-    const Dept_date = this.selectedData.DEPT_DATE;
-    const Expected_rejoin_date = this.selectedData.EXPECT_RETURN;
-    const Remarks = this.selectedData.REMARKS;
-    const Leave_salary_payable = this.selectedData.LS_PAYABLE;
-    const Is_ticket = this.selectedData.IS_TICKET;
-    const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
-    const Travelled_date = this.selectedData.TRAVELLED_DATE;
-    const Rejoin_date = this.selectedData.REJOIN_DATE;
-    const Actual_days = this.selectedData.ACTUAL_DAYS;
-    const Deduct_days = this.selectedData.DEDUCT_DAYS;
-    const Left_reason = this.selectedData.LEFT_REASON;
+Verify_Data() {
+  const User_Id = sessionStorage.getItem('UserId');
+  const Store_Id = sessionStorage.getItem('StoreId');
+  const ID = this.selectedData.ID;
+  const Date = this.selectedData.DOC_DATE;
+  const Employee_ID = this.selectedData.EMP_ID;
+  const Leave_type = this.selectedData.LEAVE_TYPE_ID;
+  const Leave_days = this.selectedData.VAC_DAYS;
+  const Leave_credit = this.selectedData.LEAVE_CREDIT;
+  const Dept_date = this.selectedData.DEPT_DATE;
+  const Expected_rejoin_date = this.selectedData.EXPECT_RETURN;
+  const Remarks = this.selectedData.REMARKS;
+  const Leave_salary_payable = this.selectedData.LS_PAYABLE;
+  const Is_ticket = this.selectedData.IS_TICKET;
+  const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
+  const Travelled_date = this.selectedData.TRAVELLED_DATE;
+  const Rejoin_date = this.selectedData.REJOIN_DATE;
+  const Actual_days = this.selectedData.ACTUAL_DAYS;
+  const Deduct_days = this.selectedData.DEDUCT_DAYS;
+  const Left_reason = this.selectedData.LEFT_REASON;
 
-    this.dataservice
-      .Verify_EmployeeLeave_Api(
-        User_Id,
-        Store_Id,
-        ID,
-        Date,
-        Employee_ID,
-        Leave_type,
-        Leave_days,
-        Leave_credit,
-        Dept_date,
-        Expected_rejoin_date,
-        Remarks,
-        Leave_salary_payable,
-        Is_ticket,
-        Last_rejoin_date,
-        Travelled_date,
-        Rejoin_date,
-        Actual_days,
-        Deduct_days,
-        Left_reason,
-      )
-      .subscribe((res: any) => {
-        notify(
-          {
-            message: 'Data updated successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success',
-        );
-        this.UpdateVacationPopup = false;
-        this.VerifyPopup = false;
-        this.get_EmployeeLeaveList();
-      });
-  }
+  const result = confirm(
+    'Are you sure you want to verify this Employee Leave?',
+    'Confirm Verification'
+  );
 
+  result.then((dialogResult) => {
+    if (dialogResult) {
+      this.dataservice
+        .Verify_EmployeeLeave_Api(
+          User_Id,
+          Store_Id,
+          ID,
+          Date,
+          Employee_ID,
+          Leave_type,
+          Leave_days,
+          Leave_credit,
+          Dept_date,
+          Expected_rejoin_date,
+          Remarks,
+          Leave_salary_payable,
+          Is_ticket,
+          Last_rejoin_date,
+          Travelled_date,
+          Rejoin_date,
+          Actual_days,
+          Deduct_days,
+          Left_reason,
+        )
+        .subscribe((res: any) => {
+          notify(
+            {
+              message: 'Data verified successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+
+          this.UpdateVacationPopup = false;
+          this.VerifyPopup = false;
+          this.get_EmployeeLeaveList();
+        });
+    }
+  });
+}
   //===================Approve Employee Leave========================
-  Approve_Data() {
-    const User_Id = sessionStorage.getItem('UserId');
-    const Store_Id = sessionStorage.getItem('StoreId');
-    const ID = this.selectedData.ID;
-    const Date = this.selectedData.DOC_DATE;
-    const Employee_ID = this.selectedData.EMP_ID;
-    const Leave_type = this.selectedData.LEAVE_TYPE_ID;
-    const Leave_days = this.selectedData.VAC_DAYS;
-    const Leave_credit = this.selectedData.LEAVE_CREDIT;
-    const Dept_date = this.selectedData.DEPT_DATE;
-    const Expected_rejoin_date = this.selectedData.EXPECT_RETURN;
-    const Remarks = this.selectedData.REMARKS;
-    const Leave_salary_payable = this.selectedData.LS_PAYABLE;
-    const Is_ticket = this.selectedData.IS_TICKET;
-    const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
-    const Travelled_date = this.selectedData.TRAVELLED_DATE;
-    const Rejoin_date = this.selectedData.REJOIN_DATE;
-    const Actual_days = this.selectedData.ACTUAL_DAYS;
-    const Deduct_days = this.selectedData.DEDUCT_DAYS;
-    const Left_reason = this.selectedData.LEFT_REASON;
+ Approve_Data() {
+  const User_Id = sessionStorage.getItem('UserId');
+  const Store_Id = sessionStorage.getItem('StoreId');
+  const ID = this.selectedData.ID;
+  const Date = this.selectedData.DOC_DATE;
+  const Employee_ID = this.selectedData.EMP_ID;
+  const Leave_type = this.selectedData.LEAVE_TYPE_ID;
+  const Leave_days = this.selectedData.VAC_DAYS;
+  const Leave_credit = this.selectedData.LEAVE_CREDIT;
+  const Dept_date = this.selectedData.DEPT_DATE;
+  const Expected_rejoin_date = this.selectedData.EXPECT_RETURN;
+  const Remarks = this.selectedData.REMARKS;
+  const Leave_salary_payable = this.selectedData.LS_PAYABLE;
+  const Is_ticket = this.selectedData.IS_TICKET;
+  const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
+  const Travelled_date = this.selectedData.TRAVELLED_DATE;
+  const Rejoin_date = this.selectedData.REJOIN_DATE;
+  const Actual_days = this.selectedData.ACTUAL_DAYS;
+  const Deduct_days = this.selectedData.DEDUCT_DAYS;
+  const Left_reason = this.selectedData.LEFT_REASON;
 
-    this.dataservice
-      .Approve_EmployeeLeave_Api(
-        User_Id,
-        Store_Id,
-        ID,
-        Date,
-        Employee_ID,
-        Leave_type,
-        Leave_days,
-        Leave_credit,
-        Dept_date,
-        Expected_rejoin_date,
-        Remarks,
-        Leave_salary_payable,
-        Is_ticket,
-        Last_rejoin_date,
-        Travelled_date,
-        Rejoin_date,
-        Actual_days,
-        Deduct_days,
-        Left_reason,
-      )
-      .subscribe((res: any) => {
-        notify(
-          {
-            message: 'Data updated successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success',
-        );
+  const result = confirm(
+    'Are you sure you want to approve this Employee Leave?',
+    'Confirm Approval'
+  );
 
-        this.ApprovePopup = false;
-        this.get_EmployeeLeaveList();
-      });
-  }
+  result.then((dialogResult) => {
+    if (dialogResult) {
+      this.dataservice
+        .Approve_EmployeeLeave_Api(
+          User_Id,
+          Store_Id,
+          ID,
+          Date,
+          Employee_ID,
+          Leave_type,
+          Leave_days,
+          Leave_credit,
+          Dept_date,
+          Expected_rejoin_date,
+          Remarks,
+          Leave_salary_payable,
+          Is_ticket,
+          Last_rejoin_date,
+          Travelled_date,
+          Rejoin_date,
+          Actual_days,
+          Deduct_days,
+          Left_reason,
+        )
+        .subscribe((res: any) => {
+          notify(
+            {
+              message: 'Data approved successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+
+          this.ApprovePopup = false;
+          this.get_EmployeeLeaveList();
+        });
+    }
+  });
+}
 
   //===================View Employee Leave========================
   View_Data() {
@@ -1189,90 +1208,92 @@ export class EmployeeLeaveComponent {
       });
   }
 
-  Rejoin_Data() {
-    this.selectedData.STATUS = this.selectedStatusType;
-    if (this.selectedStatusType == 'Rejoined') {
-      this.formsource.value.REJOIN_DATE = true;
-      this.formsource.value.LEFT_REASON = false;
-    }
-    if (this.selectedStatusType == 'Left Service') {
-      this.formsource.value.REJOIN_DATE = false;
-      this.formsource.value.LEFT_REASON = true;
-    }
+ Rejoin_Data() {
+  this.selectedData.STATUS = this.selectedStatusType;
 
-    const User_Id = sessionStorage.getItem('UserId');
-    const Store_Id = sessionStorage.getItem('StoreId');
-    const ID = this.selectedData.ID;
-    const CurrentDate = this.selectedData.DOC_DATE;
-    const Employee_ID = this.selectedData.EMP_ID;
-    const Leave_type = this.selectedData.LEAVE_TYPE_ID;
-    const Leave_days = this.selectedData.VAC_DAYS;
-    const Leave_credit = this.selectedData.LEAVE_CREDIT;
-    const Dept_date = this.selectedData.DEPT_DATE;
-    const Expected_rejoin_date = this.selectedData.EXPECT_RETURN;
-    const Remarks = this.selectedData.REMARKS;
-    const Leave_salary_payable = this.selectedData.LS_PAYABLE;
-    const Is_ticket = this.selectedData.IS_TICKET;
-    const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
-    const Travelled_date = this.selectedData.TRAVELLED_DATE;
-    const Rejoin_date = this.selectedData.REJOIN_DATE;
-    const Actual_days = this.selectedData.ACTUAL_DAYS;
-    const Deduct_days = this.selectedData.DEDUCT_DAYS;
-    const Left_reason = this.selectedData.LEFT_REASON;
-
-    this.dataservice
-      .Update_EmployeeLeave_Api(
-        User_Id,
-        Store_Id,
-        ID,
-        CurrentDate,
-        Employee_ID,
-        Leave_type,
-        Leave_days,
-        Leave_credit,
-        Dept_date,
-        Expected_rejoin_date,
-        Remarks,
-        Leave_salary_payable,
-        Is_ticket,
-        Last_rejoin_date,
-        Travelled_date,
-        Rejoin_date,
-        Actual_days,
-        Deduct_days,
-        Left_reason,
-      )
-      .subscribe((res: any) => {
-        if (
-          this.selectedStatusType === 'Left Service' &&
-          !this.selectedData.LEFT_REASON
-        ) {
-          notify(
-            {
-              message: 'Please select a reason',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'error',
-          );
-          return;
-        } else {
-          notify(
-            {
-              message: 'Data updated successfully',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
-          this.selectedStatusType = '';
-          this.RejoinPopup = false;
-          this.get_EmployeeLeaveList();
-          this.autofillExpectedRejoinDate();
-        }
-      });
+  // Validation BEFORE API
+  if (this.selectedStatusType === 'Left Service' && !this.selectedData.LEFT_REASON) {
+    notify(
+      {
+        message: 'Please select a reason',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 500,
+      },
+      'error',
+    );
+    return;
   }
 
+  if (this.selectedStatusType === 'Rejoined' && !this.selectedData.REJOIN_DATE) {
+    notify(
+      {
+        message: 'Please select rejoin date',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 500,
+      },
+      'error',
+    );
+    return;
+  }
+
+  const User_Id = sessionStorage.getItem('UserId');
+  const Store_Id = sessionStorage.getItem('StoreId');
+  const ID = this.selectedData.ID;
+  const CurrentDate = this.selectedData.DOC_DATE;
+  const Employee_ID = this.selectedData.EMP_ID;
+  const Leave_type = this.selectedData.LEAVE_TYPE_ID;
+  const Leave_days = this.selectedData.VAC_DAYS;
+  const Leave_credit = this.selectedData.LEAVE_CREDIT;
+  const Dept_date = this.selectedData.DEPT_DATE;
+  const Expected_rejoin_date = this.selectedData.EXPECT_RETURN;
+  const Remarks = this.selectedData.REMARKS;
+  const Leave_salary_payable = this.selectedData.LS_PAYABLE;
+  const Is_ticket = this.selectedData.IS_TICKET;
+  const Last_rejoin_date = this.selectedData.LAST_REJOIN_DATE;
+  const Travelled_date = this.selectedData.TRAVELLED_DATE;
+  const Rejoin_date = this.selectedData.REJOIN_DATE;
+  const Actual_days = this.selectedData.ACTUAL_DAYS;
+  const Deduct_days = this.selectedData.DEDUCT_DAYS;
+  const Left_reason = this.selectedData.LEFT_REASON;
+
+  this.dataservice
+    .Update_EmployeeLeave_Api(
+      User_Id,
+      Store_Id,
+      ID,
+      CurrentDate,
+      Employee_ID,
+      Leave_type,
+      Leave_days,
+      Leave_credit,
+      Dept_date,
+      Expected_rejoin_date,
+      Remarks,
+      Leave_salary_payable,
+      Is_ticket,
+      Last_rejoin_date,
+      Travelled_date,
+      Rejoin_date,
+      Actual_days,
+      Deduct_days,
+      Left_reason,
+    )
+    .subscribe((res: any) => {
+      notify(
+        {
+          message: 'Data updated successfully',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'success',
+      );
+
+      this.selectedStatusType = '';
+      this.RejoinPopup = false;
+      this.get_EmployeeLeaveList();
+      this.autofillExpectedRejoinDate();
+    });
+}
   onStatusChange(status: string) {
     this.selectedStatusType = status;
 
