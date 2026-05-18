@@ -242,6 +242,10 @@
       ? '#10B981'
       : cellData.data.STATUS === 'Verified'
         ? '#0073D8'
+        : cellData.data.STATUS === 'Rejoined'
+            ? '#8B4513'
+            : cellData.data.STATUS === 'Left Service'
+              ? '#DC2626'
         : '#FFA500'
 "
             style="font-size: 18px; position: absolute; top: 0; left: 0"
