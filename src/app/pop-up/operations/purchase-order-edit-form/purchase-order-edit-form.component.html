@@ -456,11 +456,11 @@
       width="auto"
       [allowEditing]="false"
     ></dxi-column> -->
-    <dxi-column
+    <!-- <dxi-column
       dataField="HSN_CODE"
       caption="HSN Code"
       dataType="string"
-    ></dxi-column>
+    ></dxi-column> -->
     <!-- Conditionally add local currency column -->
     <dxi-column
       caption="Price"
@@ -470,6 +470,7 @@
       [allowEditing]="true"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [editorOptions]="{ format: '#0.00' }"
+      [calculateDisplayValue]="getFormattedSupplierPrice"
     >
     </dxi-column>
 

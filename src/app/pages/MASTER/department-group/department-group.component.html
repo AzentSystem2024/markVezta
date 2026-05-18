@@ -129,11 +129,16 @@
 >
   <dx-form class="plain-styled-form" [formGroup]="formsource">
     <dxi-item>
-      <dx-text-box label="Code" formControlName="CODE"> </dx-text-box>
+      <dx-text-box label="Code" labelMode="floating" formControlName="CODE">
+      </dx-text-box>
     </dxi-item>
 
     <dxi-item>
-      <dx-text-box label="Department Group" formControlName="DEPT_NAME">
+      <dx-text-box
+        label="Department Group"
+        labelMode="floating"
+        formControlName="DEPT_NAME"
+      >
       </dx-text-box>
     </dxi-item>
   </dx-form>
@@ -141,18 +146,24 @@
 
 <form-popup
   [(visible)]="UpdateDepartmentPopup"
-  titleText="Update Department Group"
+  titleText="Edit Department Group"
   (save)="Edit_Department()"
   [showApprove]="false"
 >
   <dx-form class="plain-styled-form">
     <dxi-item>
-      <dx-text-box label="Code" [(value)]="editingRowData.CODE"> </dx-text-box>
+      <dx-text-box
+        label="Code"
+        labelMode="floating"
+        [(value)]="editingRowData.CODE"
+      >
+      </dx-text-box>
     </dxi-item>
 
     <dxi-item>
       <dx-text-box
         label="Department Group"
+        labelMode="floating"
         [(value)]="editingRowData.DESCRIPTION"
       >
       </dx-text-box>

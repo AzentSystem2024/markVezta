@@ -172,8 +172,8 @@
         *ngIf="
           canVerify ||
           (canApprove && cellData.data.STATUS === 'Verified') ||
-          (canView && cellData.data.STATUS === 'Approved') ||
-          (canView && cellData.data.STATUS === 'Closed')
+          cellData.data.STATUS === 'Approved' ||
+          cellData.data.STATUS === 'Closed'
         "
         style="
           position: relative;

@@ -96,7 +96,10 @@
     <dxi-column dataField="CPTGroup" caption="Group"></dxi-column>
     <dxi-column dataField="Department" caption="Department"></dxi-column>
     <dxi-column dataField="CPTDepartment" caption="Sub Department"></dxi-column>
-    <dxi-column dataField="CostDepartment" caption="Cost Center"></dxi-column>
+    <dxi-column
+      dataField="CostDepartment"
+      caption="Costing Department"
+    ></dxi-column>
     <dxi-column
       dataField="FixedQuantity"
       caption="Fixed Quantity"
@@ -110,10 +113,11 @@
     [(visible)]="isAddFormPopupOpened"
     (save)="onClickSaveNewCptType()"
     titleText="New CPT Master"
-    [height]="'80vh'"
-    [width]="'60%'"
+    [height]="'auto'"
+    [width]="'700'"
     (clear)="resetCptForm()"
     [customValidate]="validateCptForm"
+    [showApprove]="false"
   >
     <app-cpt-master-new-form
       *ngIf="isAddFormPopupOpened"
@@ -126,10 +130,11 @@
     [(visible)]="isEditFormPopupOpened"
     (save)="onClickUpdateNewCptType()"
     titleText="Edit CPT Master"
-    [height]="'80vh'"
-    [width]="'60%'"
+    [height]="'auto'"
+    [width]="'700'"
     (clear)="clearEditForm()"
     [customValidate]="validateCptEditForm"
+    [showApprove]="false"
   >
     <app-cpt-master-edit-form
       *ngIf="isEditFormPopupOpened"

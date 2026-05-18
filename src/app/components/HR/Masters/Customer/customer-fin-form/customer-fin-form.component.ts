@@ -80,12 +80,12 @@ export class CustomerFinFormComponent {
     EMAIL: '',
     MOBILE_NO: '',
     FAX_NO: '',
-    CREDIT_LIMIT: '',
+    CREDIT_LIMIT: 0,
     CURRENT_CREDIT: 0.0,
-    PAY_TERM_ID: '',
+    PAY_TERM_ID: 0,
     NOTES: '',
-    PRICE_CLASS_ID: '',
-    DISCOUNT_PERCENT: '',
+    PRICE_CLASS_ID: 0,
+    DISCOUNT_PERCENT: 0,
     CUST_VAT_RULE_ID: 0,
     VAT_REGNO: '',
     CUSTOMER_TYPE: 0,
@@ -124,13 +124,13 @@ export class CustomerFinFormComponent {
   Phone_limit: number | undefined;
   mobile_limit_Delivery_Address: number | undefined;
   CountryDropdownDataList: any = [];
+  selectedCompanyId: any;
+  companyList: any[];
 
   constructor(
     private service: DataService,
     authservice: AuthService,
   ) {
-    this.sesstion_Details();
-
     this.sessionData_tax();
     service.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
@@ -208,7 +208,7 @@ export class CustomerFinFormComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
+    console.log(this.selected_Company_id, 'SELECTEDCOMPANYIDDDDDDDDDDDDDDDDD');
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     this.DEFAULT_COUNTRY_CODE =
@@ -293,7 +293,7 @@ export class CustomerFinFormComponent {
     const id = this.selecte_countyId;
     const payload = {
       NAME: 'STATE_NAME',
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: this.selectedCompanyId,
       COUNTRY_ID: this.selecte_countyId,
     };
     this.service.getStateData_Api(payload).subscribe((data: any) => {
@@ -307,6 +307,7 @@ export class CustomerFinFormComponent {
   }
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
+    console.log(this.selecte_countyId, 'COUNTRYID');
     this.getStateDropDown();
 
     const selectedCountry = this.CountryDropdownDataList.find(
@@ -340,6 +341,22 @@ export class CustomerFinFormComponent {
   }
 
   ngOnInit(): void {
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      const selectedCompany = userData?.SELECTED_COMPANY;
+      if (selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = selectedCompany.COMPANY_ID;
+
+        this.companyList = [selectedCompany]; // Show only selected company
+      }
+
+      const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+    }
+    this.sesstion_Details();
     this.get_Country_Dropdown_List();
     this.getDealerDropDown();
     this.getPaymentTerms();
@@ -349,7 +366,7 @@ export class CustomerFinFormComponent {
     this.getPriceLevelDropDown();
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
-    this.sesstion_Details();
+    // this.sesstion_Details();
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
