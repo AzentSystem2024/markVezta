@@ -158,6 +158,22 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
     this.getAccountsGroupList();
   }
 
+  isEditDisabled = (e: any): boolean => {
+  return !(
+    this.canEdit &&
+    e.row?.data?.IS_DIRECT === true &&
+    e.row?.data?.IS_SYS_HEAD === false
+  );
+};
+
+isDeleteDisabled = (e: any): boolean => {
+  return !(
+    this.canDelete &&
+    e.row?.data?.IS_DIRECT === true &&
+    e.row?.data?.IS_SYS_HEAD === false
+  );
+};
+
   getFilterButtonOptions() {
     return {
       icon: 'filter',
