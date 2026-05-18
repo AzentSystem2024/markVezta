@@ -39,6 +39,16 @@ export class StateFormComponent implements OnInit {
   ngOnInit(): void {
     this.getCountryDropDown();
   }
+
+  resetStateForm() {
+  this.formStateData = {
+    STATE_CODE: '',
+    STATE_NAME: '',
+    COUNTRY_ID: '',
+  };
+
+  this.newState = this.formStateData;
+}
 }
 @NgModule({
   imports: [
