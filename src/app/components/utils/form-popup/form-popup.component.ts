@@ -26,8 +26,6 @@ import { ApplyPipeModule } from 'src/app/pipes/apply.pipe';
   styleUrls: ['./form-popup.component.scss'],
 })
 export class FormPopupComponent {
-
-
   @Output() closeAndRefresh: EventEmitter<void> = new EventEmitter<void>();
 
   @Output() closePopup: EventEmitter<void> = new EventEmitter<void>();
@@ -50,7 +48,7 @@ export class FormPopupComponent {
 
   @Input() titleText = '';
 
-  @Input() width:any = 480;
+  @Input() width: any = 480;
 
   @Input() height: string | number = 'auto';
 
@@ -59,11 +57,10 @@ export class FormPopupComponent {
   @Input() visible = false;
 
   @Input() isSaveDisabled: boolean = false;
-  
+
   @Input() saveButtonText: any = 'Save';
 
-   @Input() customValidate?: () => boolean;
-
+  @Input() customValidate?: () => boolean;
 
   @Output() save = new EventEmitter();
 
@@ -78,17 +75,12 @@ export class FormPopupComponent {
     return this.validationGroup.instance.validate().isValid;
   }
 
-   onSaveClick() {
+  onSaveClick() {
     if (!this.isValid()) {
       return;
     }
-
-  if (this.customValidate && !this.customValidate()) {
-    return;
-  }
-    
     this.save.emit();
-    this.close();
+    // this.close();
   }
 
   close() {
@@ -100,7 +92,7 @@ export class FormPopupComponent {
     this.cancel.emit();
   }
 
-  getWrapperAttrs = (inputWrapperAttr:any) => {
+  getWrapperAttrs = (inputWrapperAttr: any) => {
     return {
       ...inputWrapperAttr,
       class: `${inputWrapperAttr.class} form-popup`,
