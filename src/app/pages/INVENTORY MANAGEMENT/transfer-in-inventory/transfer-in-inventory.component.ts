@@ -554,6 +554,7 @@ export class TransferInInventoryComponent {
     const trInId = event.data.TRANS_ID;
     this.selected_Data_Status = event.data.STATUS;
     this.StatusType = 'Editscreen'
+    this.isReadOnlyTrIn = false
 
     this.dataService
       .selectTransferInForInventory(trInId)

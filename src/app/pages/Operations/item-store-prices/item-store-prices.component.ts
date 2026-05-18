@@ -326,7 +326,9 @@ export class ItemStorePricesComponent {
     return this.selectedPriceColumns.includes(code);
   }
 
-  onPriceColumnChange() { }
+  onPriceColumnChange() {
+    console.log(this.selectedPriceColumns, '=================selectedPriceColumns===========================')
+  }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -445,6 +447,7 @@ export class ItemStorePricesComponent {
     const rowId = updatedData.ID;
     this.updatedItems[rowId] = {
       ITEM_ID: rowId,
+      ITEM_CODE: updatedData.ITEM_CODE,
       SALE_PRICE: updatedData.SALE_PRICE || 0.0,
       SALE_PRICE1: updatedData.SALE_PRICE1 || 0.0,
       SALE_PRICE2: updatedData.SALE_PRICE2 || 0.0,
@@ -490,8 +493,10 @@ export class ItemStorePricesComponent {
     const userId = 1;
     const narration = '';
     const defaultStoreId = 1;
+    console.log(this.updatedItems, '==============updatedItems===================')
     const worksheetItemPrice = Object.values(this.updatedItems).map((item) => ({
       ITEM_ID: item.ITEM_ID,
+      ITEM_CODE: item.ITEM_CODE,
       SALE_PRICE: item.SALE_PRICE ?? null,
       SALE_PRICE1: item.SALE_PRICE1 ?? null,
       SALE_PRICE2: item.SALE_PRICE2 ?? null,
@@ -527,26 +532,44 @@ export class ItemStorePricesComponent {
       NARRATION: this.narrationText,
       worksheet_item_price: worksheetItemPrice,
     };
-
     console.log('Final payload before validation:', payload);
+    if (!payload.worksheet_item_price) {
+      notify(
+        {
+          message: 'Please update at least one price',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error'
+      );
+      return;
+    }
+
     const invalidItems = payload.worksheet_item_price.filter((item: any) => {
+      // If PRICE_NEW is null/undefined, use SALE_PRICE
       const mrp =
-        Number(item.PRICE_NEW) >= 0
+        item.PRICE_NEW != null
           ? Number(item.PRICE_NEW)
           : Number(item.SALE_PRICE);
 
-      const standardPrice = Number(item.PRICE_LEVEL1_NEW);
+      const standardPrice =
+        item.PRICE_LEVEL1_NEW != null
+          ? Number(item.PRICE_LEVEL1_NEW)
+          : Number(item.SALE_PRICE1);
 
+      // Skip invalid number cases
       if (isNaN(mrp) || isNaN(standardPrice)) {
         return false;
       }
-      console.log(mrp, standardPrice, "MRP, Standard Price")
+
+      console.log(mrp, standardPrice, 'MRP, Standard Price');
+
+      // MRP must be greater than Standard Price
       return mrp <= standardPrice;
     });
 
     if (invalidItems.length > 0) {
       const itemCodes = invalidItems
-        .map((item: any) => item.ITEM_CODE)
+        .map((item: any) => item.ITEM_CODE || item.ITEM_ID)
         .join(', ');
 
       notify(
@@ -555,7 +578,94 @@ export class ItemStorePricesComponent {
         5000,
       );
 
-      this.isSaving = false; //  stop loading
+      this.isSaving = false;
+      return;
+    }
+
+    console.log('========selectedPriceColumns==================', this.selectedPriceColumns)
+
+
+    const invalidItems_required: string[] = [];
+
+    payload.worksheet_item_price.forEach((item: any) => {
+      const missingFields: string[] = [];
+
+      // Check MRP
+      if (this.selectedPriceColumns.includes('MRP')) {
+        const mrp =
+          item.PRICE_NEW
+
+        if (mrp == null) {
+          missingFields.push('MRP');
+        }
+      }
+
+      // Check PRICE1
+      if (this.selectedPriceColumns.includes('PRICE1')) {
+        const price1 =
+          item.PRICE_LEVEL1_NEW
+
+        if (price1 == null) {
+          missingFields.push('Standard Price');
+        }
+      }
+
+      // Check PRICE2
+      if (this.selectedPriceColumns.includes('PRICE2')) {
+        const price2 =
+          item.PRICE_LEVEL2_NEW
+
+        if (price2 == null) {
+          missingFields.push('Price 2');
+        }
+      }
+
+      // Check PRICE3
+      if (this.selectedPriceColumns.includes('PRICE3')) {
+        const price3 =
+          item.PRICE_LEVEL3_NEW
+        if (price3 == null) {
+          missingFields.push('Price 3');
+        }
+      }
+
+      // Check PRICE4
+      if (this.selectedPriceColumns.includes('PRICE4')) {
+        const price4 =
+          item.PRICE_LEVEL4_NEW
+
+        if (price4 == null) {
+          missingFields.push('Price 4');
+        }
+      }
+
+      // Check PRICE5
+      if (this.selectedPriceColumns.includes('PRICE5')) {
+        const price5 =
+          item.PRICE_LEVEL5_NEW!
+
+        if (price5 == null) {
+          missingFields.push('Price 5');
+        }
+      }
+
+      if (missingFields.length > 0) {
+        console.log(missingFields, '==========missing fileds================')
+        invalidItems_required.push(
+          `${item.ITEM_CODE} (${missingFields.join(', ')})`
+        );
+      }
+    });
+    console.log('============invalidItems_required=====', invalidItems_required)
+
+    if (invalidItems_required.length > 0) {
+      notify(
+        `Required price values missing for: ${invalidItems_required.join(' , ')}`,
+        'error',
+        5000
+      );
+
+      this.isSaving = false;
       return;
     }
     this.dataservice.saveWorksheetPrice(payload).subscribe(

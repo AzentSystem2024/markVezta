@@ -11,7 +11,6 @@
     (onRowUpdating)="onRowUpdating($event)"
     (onEditingStart)="onEditingStart($event)"
   >
-
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
       [visible]="true"
@@ -23,22 +22,26 @@
     ></dxo-pager>
     <dxo-load-panel [showPane]="false"></dxo-load-panel>
     <dxo-scrolling mode="virtual"></dxo-scrolling>
-  
+
     <dxo-filter-row [visible]="isFilterOpened"></dxo-filter-row>
     <dxo-header-filter [visible]="isFilterOpened">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
-  <dxo-popup
-    title="Edit Landed Cost"
-    [showTitle]="true"
-    [width]="500"
-    [height]="450"
-  ></dxo-popup>
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
+      <dxo-popup
+        title="Edit Landed Cost"
+        [showTitle]="true"
+        [width]="500"
+        [height]="450"
+      ></dxo-popup>
 
-  <!-- <dxo-form>
+      <!-- <dxo-form>
     <dxi-item>
       <div *dxTemplate>
         <app-landed-cost-form
@@ -47,58 +50,56 @@
       </div>
     </dxi-item>
   </dxo-form> -->
-</dxo-editing>
-    
+    </dxo-editing>
+
     <dxo-toolbar>
+      <!-- Title -->
+      <dxi-item location="before">
+        <div
+          class="grid-header"
+          style="font-weight: 600; font-size: 20px; margin-left: 12px"
+        >
+          Landed Cost
+        </div>
+      </dxi-item>
 
-  <!-- Title -->
-  <dxi-item location="before">
-    <div
-      class="grid-header"
-      style="font-weight: 600; font-size: 20px; margin-left: 12px"
-    >
-      Landed Cost
-    </div>
-  </dxi-item>
+      <!-- Search Toggle -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
 
-  <!-- Search Toggle -->
-  <dxi-item
-    location="after"
-    locateInMenu="auto"
-    widget="dxButton"
-    [options]="searchButtonOptions"
-  ></dxi-item>
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
 
-  <!-- Refresh -->
-  <dxi-item
-    location="after"
-    locateInMenu="auto"
-    widget="dxButton"
-    [options]="refreshButtonOptions"
-  ></dxi-item>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
-  <!-- Divider -->
-  <dxi-item location="after">
-    <div class="toolbar-divider"></div>
-  </dxi-item>
+      <!-- Export -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
 
-  <!-- Export -->
-  <dxi-item
-    name="exportButton"
-    location="after"
-    cssClass="export-btn"
-  ></dxi-item>
-
-  <!-- Add Button -->
-  <dxi-item
-    location="after"
-    locateInMenu="auto"
-    widget="dxButton"
-    [options]="addButtonOptions"
-    [visible]="canAdd"
-  ></dxi-item>
-
-</dxo-toolbar>
+      <!-- Add Button -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="addButtonOptions"
+        [visible]="canAdd"
+      ></dxi-item>
+    </dxo-toolbar>
 
     <dxi-column dataField="CODE" caption="Code" [visible]="false"> </dxi-column>
 
@@ -123,13 +124,26 @@
       </dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="VALUE" caption="Value" alignment="left"></dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       dataField="IS_INACTIVE"
       caption="Status"
       dataType="string"
       [calculateCellValue]="calculateStatus"
     >
-    </dxi-column>
+    </dxi-column> -->
+    <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      cellTemplate="statusCellTemplate"
+    ></dxi-column>
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value === false ? 'Active' : 'Inactive'"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+    </div>
   </dx-data-grid>
   <form-popup
     [(visible)]="isAddLandedcostPopupOpened"
@@ -149,8 +163,8 @@
     [showApprove]="false"
   >
     <app-landed-cost-form
-    #editForm
-    [formData]="editingRowData"
+      #editForm
+      [formData]="editingRowData"
     ></app-landed-cost-form>
   </form-popup>
 </div>
