@@ -254,8 +254,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     const menuGroups = this.menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -1050,6 +1050,13 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       this.SupplierList = res;
     });
   }
+
+  getFormattedSupplierPrice = (rowData: any) => {
+    const symbol = rowData?.CURRENCY_SYMBOL || '';
+    const price = Number(rowData?.SUPP_PRICE || 0).toFixed(2);
+
+    return symbol ? `${symbol} ${price}` : price;
+  };
 
   GetStoresList() {
     const payload = {

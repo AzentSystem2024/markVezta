@@ -814,7 +814,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     /* ---------------- TAXABLE ---------------- */
 
     item.taxable = parseFloat((item.Amount - item.discountAmount).toFixed(2));
-
+    console.log(item.taxable, 'TAXABLEEEEEEEEEEE');
     /* ---------------- GST / IGST ---------------- */
 
     const itemGst = Number(item.GST_PERC || 0);

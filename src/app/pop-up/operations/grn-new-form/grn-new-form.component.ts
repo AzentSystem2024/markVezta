@@ -665,9 +665,9 @@ export class GrnNewFormComponent implements OnInit {
 
       updatedRow.AMOUNT = (receivedQty * localprice).toFixed(2); // Format to 2 decimal places
 
-      // 🔑 Find and replace in poDetails
+      // Find and replace in poDetails
       const idx = this.poDetails.findIndex(
-        (r) =>
+        (r: any) =>
           r.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID &&
           r.ITEM_ID === updatedRow.ITEM_ID,
       );
@@ -679,25 +679,25 @@ export class GrnNewFormComponent implements OnInit {
 
       console.log(this.poDetails[idx], ' Updated row now bound to grid');
 
-      this.totalQuantity = this.poDetails.reduce((sum, item) => {
+      this.totalQuantity = this.poDetails.reduce((sum: any, item: any) => {
         return sum + Number(item.RECEIVED_QTY || 0);
       }, 0);
       console.log(this.poDetails, 'poDetails');
 
       this.newGrnData.NET_AMOUNT = this.poDetails
-        .reduce((sum, item) => {
+        .reduce((sum: any, item: any) => {
           return sum + Number(item.AMOUNT || 0);
         }, 0)
         .toFixed(2); // Ensure the total is also formatted with 2 decimal places
       console.log(this.newGrnData.NET_AMOUNT, 'net amount');
       this.LocalNetAmount = this.poDetails
-        .reduce((sum, item) => {
+        .reduce((sum: any, item: any) => {
           return sum + Number(item.AMOUNT || 0);
         }, 0)
         .toFixed(2); // Ensure the total is also formatted with 2 decimal places
 
       this.newGrnData.SUPP_NET_AMOUNT = this.poDetails
-        .reduce((sum, item) => {
+        .reduce((sum: any, item: any) => {
           return sum + Number(item.SUPP_AMOUNT || 0);
         }, 0)
         .toFixed(2); // Ensure the total is also formatted with 2 decimal places
@@ -707,20 +707,22 @@ export class GrnNewFormComponent implements OnInit {
       this.formattedNetAmount = `${this.newGrnData.SUPP_NET_AMOUNT}`;
 
       // Update costingMethodDataGrid for rows with CURRENCY as 'USD %'
-      this.costingMethodDataGrid = this.costingMethodDataGrid.map((row) => {
-        if (row.CURRENCY.includes('%')) {
-          row.TOTAL = ((this.LocalNetAmount * row.RATE) / 100).toFixed(2);
-        }
-        return row;
-      });
+      this.costingMethodDataGrid = this.costingMethodDataGrid.map(
+        (row: any) => {
+          if (row.CURRENCY.includes('%')) {
+            row.TOTAL = ((this.LocalNetAmount * row.RATE) / 100).toFixed(2);
+          }
+          return row;
+        },
+      );
 
       let totalCost = Number(updatedRow.AMOUNT);
 
       // Reflect costingMethodDataGrid's Description data
-      this.poDetails = this.poDetails.map((item) => {
+      this.poDetails = this.poDetails.map((item: any) => {
         let sumCost = 0; // Initialize sumCost for the current row
 
-        this.costingMethodDataGrid.forEach((costItem) => {
+        this.costingMethodDataGrid.forEach((costItem: any) => {
           const proportionalValue =
             (Number(item.AMOUNT) / Number(this.LocalNetAmount)) *
             Number(costItem.TOTAL);
@@ -801,7 +803,7 @@ export class GrnNewFormComponent implements OnInit {
       // Add only unique items to GRNDetail
       bindedData.forEach((item) => {
         const isDuplicate = this.newGrnData.GRNDetails.some(
-          (existingItem) =>
+          (existingItem: any) =>
             existingItem.PO_DETAIL_ID === item.PO_DETAIL_ID &&
             existingItem.ITEM_ID === item.ITEM_ID,
         );
@@ -829,7 +831,7 @@ export class GrnNewFormComponent implements OnInit {
         this.newGrnData.GRN_Item_Cost = [];
       }
 
-      this.costingMethodDataGrid.forEach((costItem) => {
+      this.costingMethodDataGrid.forEach((costItem: any) => {
         console.log(costItem, 'costitem');
         // Calculate the proportional value for the cost item
         const proportionalValue =
@@ -846,7 +848,7 @@ export class GrnNewFormComponent implements OnInit {
 
         // Check for duplicates before adding to GRN_Item_Cost
         const isDuplicate = this.newGrnData.GRN_Item_Cost.some(
-          (existingCost) =>
+          (existingCost: any) =>
             existingCost.STORE_ID === costData.STORE_ID &&
             existingCost.COST_ID === costData.COST_ID &&
             existingCost.ITEM_ID === costData.ITEM_ID,
@@ -956,7 +958,7 @@ export class GrnNewFormComponent implements OnInit {
 
   getTotalQuantity(): any {
     return this.poDetails.reduce(
-      (total, item) => total + (item.QUANTITY || 0),
+      (total: any, item: any) => total + (item.QUANTITY || 0),
       0,
     );
   }
@@ -1062,10 +1064,13 @@ export class GrnNewFormComponent implements OnInit {
       }
 
       // Update the total cost for the item
-      const sumCost = this.costingMethodDataGrid.reduce((sum, costItem) => {
-        const costKey = costItem.DESCRIPTION.toUpperCase();
-        return sum + (Number(updatedItem[costKey]) || 0);
-      }, 0);
+      const sumCost = this.costingMethodDataGrid.reduce(
+        (sum: any, costItem: any) => {
+          const costKey = costItem.DESCRIPTION.toUpperCase();
+          return sum + (Number(updatedItem[costKey]) || 0);
+        },
+        0,
+      );
 
       updatedItem.TOTAL_COST = (Number(item.AMOUNT) + sumCost).toFixed(2);
 
@@ -1162,7 +1167,9 @@ export class GrnNewFormComponent implements OnInit {
   onCostDropdownValueChanged(e: any) {
     console.log(e, 'evenyt');
     const id = e.value; // Get the selected ID
-    const selectedCost = this.landedCostList.find((cost) => cost.ID === id); // Find the cost by ID
+    const selectedCost = this.landedCostList.find(
+      (cost: any) => cost.ID === id,
+    ); // Find the cost by ID
 
     if (selectedCost) {
       console.log(selectedCost, '+++');
@@ -1229,10 +1236,13 @@ export class GrnNewFormComponent implements OnInit {
             lastAddedCost.RATE;
 
           // Update the total cost for the item
-          const sumCost = this.costingMethodDataGrid.reduce((sum, costItem) => {
-            const costKey = costItem.DESCRIPTION.toUpperCase();
-            return sum + (Number(updatedItem[costKey]) || 0);
-          }, 0);
+          const sumCost = this.costingMethodDataGrid.reduce(
+            (sum: any, costItem: any) => {
+              const costKey = costItem.DESCRIPTION.toUpperCase();
+              return sum + (Number(updatedItem[costKey]) || 0);
+            },
+            0,
+          );
 
           console.log(sumCost, 'sumcost');
 
@@ -1313,7 +1323,7 @@ export class GrnNewFormComponent implements OnInit {
 
     // 1. Remove from poDetails
     this.poDetails = this.poDetails.filter(
-      (item) =>
+      (item: any) =>
         !(
           item.ITEM_ID === removed.ITEM_ID &&
           item.PO_DETAIL_ID === removed.PO_DETAIL_ID
@@ -1322,7 +1332,7 @@ export class GrnNewFormComponent implements OnInit {
 
     // 2. Remove from demoArray
     this.demoArray = this.demoArray.filter(
-      (item) =>
+      (item: any) =>
         !(
           item.ITEM_ID === removed.ITEM_ID &&
           item.PO_DETAIL_ID === removed.PO_DETAIL_ID
@@ -1341,7 +1351,7 @@ export class GrnNewFormComponent implements OnInit {
     // 4. Remove from GRNDetails
     if (Array.isArray(this.newGrnData.GRNDetails)) {
       this.newGrnData.GRNDetails = this.newGrnData.GRNDetails.filter(
-        (item) =>
+        (item: any) =>
           !(
             item.ITEM_ID === removed.ITEM_ID &&
             item.PO_DETAIL_ID === removed.PO_DETAIL_ID
@@ -1352,22 +1362,22 @@ export class GrnNewFormComponent implements OnInit {
     // 5. Remove related GRN_Item_Cost
     if (Array.isArray(this.newGrnData.GRN_Item_Cost)) {
       this.newGrnData.GRN_Item_Cost = this.newGrnData.GRN_Item_Cost.filter(
-        (cost) => cost.ITEM_ID !== removed.ITEM_ID,
+        (cost: any) => cost.ITEM_ID !== removed.ITEM_ID,
       );
     }
 
     // 6. Recalculate totals
     this.totalQuantity = this.poDetails.reduce(
-      (sum, item) => sum + Number(item.RECEIVED_QTY || 0),
+      (sum: any, item: any) => sum + Number(item.RECEIVED_QTY || 0),
       0,
     );
 
     this.newGrnData.NET_AMOUNT = this.poDetails
-      .reduce((sum, item) => sum + Number(item.AMOUNT || 0), 0)
+      .reduce((sum: any, item: any) => sum + Number(item.AMOUNT || 0), 0)
       .toFixed(2);
 
     this.newGrnData.SUPP_NET_AMOUNT = this.poDetails
-      .reduce((sum, item) => sum + Number(item.SUPP_AMOUNT || 0), 0)
+      .reduce((sum: any, item: any) => sum + Number(item.SUPP_AMOUNT || 0), 0)
       .toFixed(2);
 
     this.LocalNetAmount = this.newGrnData.NET_AMOUNT;
@@ -1376,7 +1386,7 @@ export class GrnNewFormComponent implements OnInit {
     this.formattedNetAmount = `${this.newGrnData.SUPP_NET_AMOUNT}`;
 
     // 7. Recalculate costing (IMPORTANT)
-    this.costingMethodDataGrid = this.costingMethodDataGrid.map((row) => {
+    this.costingMethodDataGrid = this.costingMethodDataGrid.map((row: any) => {
       if (row.CURRENCY.includes('%')) {
         row.TOTAL = (
           (Number(this.LocalNetAmount || 0) * Number(row.RATE || 0)) /
