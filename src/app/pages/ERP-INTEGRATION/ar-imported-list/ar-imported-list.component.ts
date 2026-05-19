@@ -42,6 +42,14 @@ export class ARImportedListComponent {
   importDataList: DataSource | null = null;
   detailViewColumns: any[] = [];
 
+  // Store all detail data
+  importDetailData: any[] = [];
+  filteredDetailData: any[] = [];
+  detailsDataColumns: any[] = [];
+
+  expandedRowKeys: any[] = [];
+  detailDataMap: { [key: string]: any[] } = {};
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -89,60 +97,124 @@ export class ARImportedListComponent {
   ) {}
 
   ngOnInit(): void {
-    this.fetch_import_logs();
+    this.fetch_Full_import_list();
   }
 
-  // === fetch import logs list =====
-  fetch_import_logs() {
+  // ====== Fetch Import data list =======
+  fetch_Full_import_list() {
     this.importDataList = new DataSource({
       store: new CustomStore({
-        key: 'ID',
-        load: () => {
-          // this.isLoading = true;
+        key: 'HeaderID',
 
+        load: () => {
           return this.srvce
             .import_AR_Full_List()
             .toPromise()
             .then((response: any) => {
-              if (response && response.data) {
-                const Finaldata = (response.data || []).map((item: any) => ({
-                  ...item,
-                  Verified:
-                    item.Verified === true
-                      ? 1
-                      : item.Verified === false
-                        ? ''
-                        : item.Verified === null || item.Verified === undefined
-                          ? null
-                          : String(item.Verified),
-                }));
+              // ================= Header Data =================
+              const headerData = response?.header || [];
 
-                // ================= Dynamic Columns =================
-                if (Finaldata.length > 0) {
-                  this.detailViewColumns = Object.keys(Finaldata[0]);
-                }
+              // ================= Store Detail Data =================
+              this.importDetailData = (response?.detail || []).map(
+                (item: any) => {
+                  const updatedItem: any = { ...item };
 
-                return Finaldata;
+                  Object.keys(updatedItem).forEach((key: string) => {
+                    const value = updatedItem[key];
+
+                    // ================= Verified Field =================
+                    if (key === 'Verified') {
+                      updatedItem[key] =
+                        value === true
+                          ? 1
+                          : value === false
+                            ? ''
+                            : value === null || value === undefined
+                              ? null
+                              : String(value);
+                    }
+
+                    // ================= Date Field Conversion =================
+                    // Column name contains "date"
+                    else if (key.toLowerCase().includes('date') && value) {
+                      const date = new Date(value);
+
+                      if (!isNaN(date.getTime())) {
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          '0',
+                        );
+                        const year = date.getFullYear();
+
+                        // Display Format => dd-MM-yyyy
+                        updatedItem[key] = `${day}-${month}-${year}`;
+                      }
+                    }
+                  });
+
+                  return updatedItem;
+                },
+              );
+              this.detailsDataColumns = Object.keys(
+                this.importDetailData[0] || {},
+              );
+
+              // ================= Format Header Data =================
+              const Finaldata = headerData.map((item: any) => ({
+                ...item,
+
+                Verified:
+                  item.Verified === true
+                    ? 1
+                    : item.Verified === false
+                      ? ''
+                      : item.Verified === null || item.Verified === undefined
+                        ? null
+                        : String(item.Verified),
+              }));
+
+              // ================= Dynamic Columns =================
+              if (Finaldata.length > 0) {
+                this.detailViewColumns = Object.keys(Finaldata[0]);
               }
 
-              return [];
+              return Finaldata;
             })
             .catch((error) => {
               console.error(error);
               return [];
-            })
-            .finally(() => {
-              // this.isLoading = false;
             });
         },
       }),
     });
   }
 
+  // ================= Row Expanding =================
+  onRowExpanding(e: any) {
+    const headerID = e.key;
+    // Prevent duplicate keys
+    if (!this.expandedRowKeys.includes(headerID)) {
+      this.expandedRowKeys.push(headerID);
+    }
+    // Load only if not already loaded
+    if (!this.detailDataMap[headerID]) {
+      this.detailDataMap[headerID] = this.importDetailData.filter(
+        (x: any) => x.HeaderID === headerID,
+      );
+    }
+  }
+
+  // ================= Row Collapsing =================
+  onRowCollapsing(e: any) {
+    const headerID = e.key;
+    this.expandedRowKeys = this.expandedRowKeys.filter((x) => x !== headerID);
+    delete this.detailDataMap[headerID];
+  }
+
   refreshGrid() {
     if (this.detailGrid?.instance) {
       this.detailGrid.instance.refresh();
-      // this.fetch_import_logs();
     }
   }
 
