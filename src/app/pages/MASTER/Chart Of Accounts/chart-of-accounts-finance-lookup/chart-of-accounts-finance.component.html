@@ -117,6 +117,21 @@
         fixedPosition="right"
       >
       </dxi-column>
+      <dxi-column type="buttons" [width]="120" fixed="true" fixedPosition="right">
+
+      <dxi-button
+        name="edit"
+        hint="Edit"
+        [disabled]="isEditDisabled">
+      </dxi-button>
+
+      <dxi-button
+        name="delete"
+        hint="Delete"
+        [disabled]="isDeleteDisabled">
+      </dxi-button>
+
+    </dxi-column> 
     </dx-data-grid>
   </div>
 </div>

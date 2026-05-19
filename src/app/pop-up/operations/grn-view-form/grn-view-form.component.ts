@@ -668,11 +668,6 @@ export class GrnViewFormComponent {
         SL_NO: index + 1, // Add SL_NO starting from 1
         QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QUANTITY,
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-        // QTY_BASE_UNIT: `${item.RECEIVED_QTY / item.UOM_MULTIPLE} ${item.UOM}`,
-        // QTY_BASE_UNIT: item.UOM_MULTIPLE
-        //   ? `${item.RECEIVED_QTY / item.UOM_MULTIPLE} ${item.UOM}`
-        //   : `${item.RECEIVED_QTY} ${item.UOM}`,
-        // QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
         QTY_BASE_UNIT:
           item.UOM_MULTIPLE > 0
             ? `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`

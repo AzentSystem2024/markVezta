@@ -18,6 +18,7 @@ import {
   DxValidationGroupComponent,
   DxValidatorModule,
 } from 'devextreme-angular';
+import notify from 'devextreme/ui/notify';
 import { FormPhotoUploaderModule, FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 
@@ -32,6 +33,7 @@ export class VatCalssFinanceEditComponent {
 
   @Input() selectedData: any = {};
   @Output() formClosed = new EventEmitter<void>();
+  @Input() vatClassList: any[] = [];
 
   formVatclassData:any = {
     ID: 0,
@@ -161,30 +163,97 @@ export class VatCalssFinanceEditComponent {
     // this.selected_Company_id = 0;
   }
 
+  // UpdateData() {
+  //   const {
+  //     ID,
+  //     CODE,
+  //     VAT_NAME,
+  //     VAT_PERC,
+  //     IGST_INPUT_HEAD_ID,
+  //     IGST_OUTPUT_HEAD_ID,
+  //   } = this.formVatclassData;
+  //   this.dataservice
+  //     .updateVatclass_Finance(
+  //       ID,
+  //       CODE,
+  //       VAT_NAME,
+  //       VAT_PERC,
+  //       IGST_INPUT_HEAD_ID,
+  //       IGST_OUTPUT_HEAD_ID,
+  //       this.selected_Company_id,
+  //     )
+  //     .subscribe((response) => {
+  //       console.log(response);
+  //       this.formClosed.emit();
+  //     });
+  // }
+
   UpdateData() {
-    const {
+  const {
+    ID,
+    CODE,
+    VAT_NAME,
+    VAT_PERC,
+    IGST_INPUT_HEAD_ID,
+    IGST_OUTPUT_HEAD_ID,
+  } = this.formVatclassData;
+
+  const duplicateCode = this.vatClassList.some(
+    (item: any) =>
+      item.ID !== ID &&
+      item.CODE?.trim().toLowerCase() === CODE?.trim().toLowerCase()
+  );
+
+  if (duplicateCode) {
+    notify(
+      {
+        message: 'Code already exists',
+        position: { at: 'top right', my: 'top right' },
+      },
+      'warning'
+    );
+    return;
+  }
+
+  const duplicateVatName = this.vatClassList.some(
+    (item: any) =>
+      item.ID !== ID &&
+      item.VAT_NAME?.trim().toLowerCase() === VAT_NAME?.trim().toLowerCase()
+  );
+
+  if (duplicateVatName) {
+    notify(
+      {
+        message: 'VAT Name already exists',
+        position: { at: 'top right', my: 'top right' },
+      },
+      'warning'
+    );
+    return;
+  }
+
+  this.dataservice
+    .updateVatclass_Finance(
       ID,
       CODE,
       VAT_NAME,
       VAT_PERC,
       IGST_INPUT_HEAD_ID,
       IGST_OUTPUT_HEAD_ID,
-    } = this.formVatclassData;
-    this.dataservice
-      .updateVatclass_Finance(
-        ID,
-        CODE,
-        VAT_NAME,
-        VAT_PERC,
-        IGST_INPUT_HEAD_ID,
-        IGST_OUTPUT_HEAD_ID,
-        this.selected_Company_id,
-      )
-      .subscribe((response) => {
-        console.log(response);
-        this.formClosed.emit();
-      });
-  }
+      this.selected_Company_id
+    )
+    .subscribe((response) => {
+      notify(
+        {
+          message: 'Data updated successfully',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'success'
+      );
+
+      this.formClosed.emit();
+    });
+}
 
   closePopup() {
     this.formClosed.emit();

@@ -146,17 +146,16 @@ export class SupplierFormComponent implements OnInit {
 
   // in SupplierFormComponent (Add/Edit form)
   resetPartialForm() {
-
-     this.newSupplier = {
-    ...this.newSupplier,
-    ADDRESS2: '',
-    ADDRESS3: '',
-    NOTES: '',
-    PHONE: '',
-    FAX_NO: '',
-    VAT_RULE_ID :'',
-    SUPP_CAT_ID: ''
-  };
+    this.newSupplier = {
+      ...this.newSupplier,
+      ADDRESS2: '',
+      ADDRESS3: '',
+      NOTES: '',
+      PHONE: '',
+      FAX_NO: '',
+      VAT_RULE_ID: '',
+      SUPP_CAT_ID: '',
+    };
 
     this.newSupplier.ADDRESS2 = '';
     this.newSupplier.ADDRESS3 = '';
@@ -257,7 +256,7 @@ export class SupplierFormComponent implements OnInit {
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.CountryId = event.value;
-   
+
     this.get_State_Dropdown_List();
 
     const selectedCountry = this.CountryDropdownData.find(

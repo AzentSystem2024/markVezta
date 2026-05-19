@@ -110,10 +110,11 @@
     [(visible)]="isAddFormPopupOpened"
     (save)="onClickSaveNewCptType()"
     titleText="New CPT Master"
-    [height]="'80vh'"
-    [width]="'60%'"
+    [height]="'auto'"
+    [width]="'700'"
     (clear)="resetCptForm()"
     [customValidate]="validateCptForm"
+    [showApprove]="false"
   >
     <app-cpt-master-new-form
       *ngIf="isAddFormPopupOpened"
@@ -126,10 +127,11 @@
     [(visible)]="isEditFormPopupOpened"
     (save)="onClickUpdateNewCptType()"
     titleText="Edit CPT Master"
-    [height]="'80vh'"
-    [width]="'60%'"
+    [height]="'auto'"
+    [width]="'700'"
     (clear)="clearEditForm()"
     [customValidate]="validateCptEditForm"
+    [showApprove]="false"
   >
     <app-cpt-master-edit-form
       *ngIf="isEditFormPopupOpened"

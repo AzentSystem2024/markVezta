@@ -490,7 +490,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
         item.taxable = parseFloat(
           (item.Amount - item.discountAmount).toFixed(2),
         );
-
+        console.log(item.taxable, '--====TAXABLEEEEEEEEEE');
         let discSupplierAmount = 0; // Initialize discount amount
 
         if (
@@ -706,7 +706,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.PoID = this.formdata.ID;
       this.newPoData = { ...this.formdata };
       this.newPoData.PoDetails = this.formdata.PoDetails || [];
-
+      this.SupplierCurrencySymbol =
+        this.newPoData.CURRENCY || this.newPoData.CURRENCY_NAME || '';
       this.extractSupplierCountryCode();
       this.extractShippingCountryCode();
 
@@ -728,7 +729,12 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       // STEP 2: MAP ITEMS (GST LOGIC FIXED)
       // STEP 2: MAP ITEMS (USE SUPP_AMOUNT AS TAXABLE)
       this.savedItems = this.newPoData.PoDetails.map((item, index) => {
-        const taxable = Number(item.SUPP_AMOUNT || 0); // 🔥 Use SUPP_AMOUNT directly
+        // const taxable = Number(item.SUPP_AMOUNT || 0); // 🔥 Use SUPP_AMOUNT directly
+        const suppAmount = Number(item.SUPP_AMOUNT || 0);
+
+        const discountPercentage = Number(item.DISC_PERCENT || 0);
+
+        const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
         const vatPerc = Number(item.VAT_PERC || 0);
 
         const vatAmount = Number(item.TAX_AMOUNT || 0);
@@ -773,6 +779,12 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.calculateTotalIncludingTax();
     }
   }
+
+  formatSupplierPrice = (cellInfo: any) => {
+    return `${this.SupplierCurrencySymbol} ${Number(
+      cellInfo.value || 0,
+    ).toFixed(2)}`;
+  };
 
   openFile(base64Data: string, fileName: string) {
     if (!base64Data) {
@@ -859,7 +871,12 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.get_pdf(res);
     });
   }
+  getFormattedSupplierPrice = (rowData: any) => {
+    const symbol = rowData?.CURRENCY_SYMBOL || '';
+    const price = Number(rowData?.SUPP_PRICE || 0).toFixed(2);
 
+    return symbol ? `${symbol} ${price}` : price;
+  };
   get_pdf(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.width;
@@ -1404,23 +1421,39 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
       'Qty',
       'Unit Price',
+      // 'Discount %',
       'Taxable(Amt)',
       'VAT(%)',
       'VAT(Amt)',
       'Total Price',
     ];
 
-    const itemData = data.PoDetails.map((item: any) => [
-      item.ITEM_CODE || '',
-      item.ITEM_DESC || '',
+    const itemData = data.PoDetails.map((item: any) => {
+      const suppAmount = Number(item.SUPP_AMOUNT || 0);
 
-      item.QUANTITY || '',
-      item.PRICE || '',
-      item.SUPP_AMOUNT || '',
-      item.VAT_PERC || '',
-      item.TAX_AMOUNT || '',
-      item.TOTAL_AMOUNT || '',
-    ]);
+      const discountPercentage = Number(item.DISC_PERCENT || 0);
+
+      const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
+
+      return [
+        item.ITEM_CODE || '',
+        item.ITEM_DESC || '',
+
+        item.QUANTITY || '',
+
+        Number(item.PRICE || 0).toFixed(2),
+
+        // discountPercentage.toFixed(2),
+
+        taxable.toFixed(2),
+
+        Number(item.VAT_PERC || 0).toFixed(2),
+
+        Number(item.TAX_AMOUNT || 0).toFixed(2),
+
+        Number(item.TOTAL_AMOUNT || 0).toFixed(2),
+      ];
+    });
 
     // underline
 

@@ -349,12 +349,12 @@
       width="auto"
       [allowEditing]="false"
     ></dxi-column> -->
-    <dxi-column
+    <!-- <dxi-column
       dataField="HSN_CODE"
       caption="HSN Code"
       dataType="string"
       [allowEditing]="false"
-    ></dxi-column>
+    ></dxi-column> -->
     <!-- Conditionally add local currency column -->
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
@@ -364,6 +364,7 @@
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [editorOptions]="{ format: '#0' }"
+      [customizeText]="formatSupplierPrice"
     >
     </dxi-column>
     <dxi-column

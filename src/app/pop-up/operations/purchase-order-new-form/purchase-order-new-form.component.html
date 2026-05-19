@@ -68,7 +68,7 @@
             ? 'Store'
             : 'Location'
         "
-        [items]="filteredStoreList"
+        [items]="StoreList"
         displayExpr="DESCRIPTION"
         valueExpr="ID"
         [(value)]="newPoData.STORE_ID"
@@ -514,12 +514,12 @@
       width="auto"
       [allowEditing]="false"
     ></dxi-column> -->
-    <dxi-column
+    <!-- <dxi-column
       dataField="HSN_CODE"
       caption="HSN Code"
       dataType="string"
       [allowEditing]="false"
-    ></dxi-column>
+    ></dxi-column> -->
     <!-- <dxi-column
       dataField="CURRENCY_CODE"
       caption="Currency"
