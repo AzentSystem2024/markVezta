@@ -54,6 +54,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   uploadedFileName: string = '';
 
   importLogs: DataSource | null = null;
+  arDataImportedList: any[] = [];
   Imported_Ar_DataSource: any[] = [];
   gridColumns: any[] = [];
 
@@ -138,6 +139,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
             .toPromise()
             .then((response: any) => {
               if (response && response.data) {
+                this.arDataImportedList = response.data;
                 return (response.data || []).map((item: any) => {
                   let indianTime = null;
 
@@ -205,36 +207,75 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
     }
 
     const file = target.files[0];
+
+    const isFileAlreadyImported = this.arDataImportedList?.some(
+      (item: any) =>
+        item.FileName?.trim().toLowerCase() === file.name?.trim().toLowerCase(),
+    );
+
+    if (isFileAlreadyImported) {
+      notify(
+        {
+          message: 'This file is already imported',
+          position: {
+            at: 'top right',
+            my: 'top right',
+            offset: '0 20',
+          },
+        },
+        'warning',
+        3000,
+      );
+
+      event.target.value = '';
+      return;
+    }
+
     // Store uploaded file name
     this.uploadedFileName = file.name;
+
     const reader: FileReader = new FileReader();
 
     reader.onload = async (e: any) => {
       try {
         const binaryString: string = e.target.result;
+
         const workbook: XLSX.WorkBook = XLSX.read(binaryString, {
           type: 'binary',
           cellDates: false,
         });
 
         const sheetName: string = workbook.SheetNames[0];
+
         const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
-        // Raw Excel Data
+
+        // ================= Raw Excel Data =================
         const excelData: any[] = XLSX.utils.sheet_to_json(worksheet, {
           defval: null,
           raw: true,
         });
 
-        // Empty File Validation
+        // ================= Empty File Validation =================
         if (excelData.length === 0) {
-          notify('Excel file is empty', 'warning', 3000);
+          notify(
+            {
+              message: 'This file is empty',
+              position: {
+                at: 'top right',
+                my: 'top right',
+                offset: '0 20',
+              },
+            },
+            'warning',
+            3000,
+          );
           return;
         }
 
-        // Excel Column Names
+        // ================= Excel Column Names =================
         const excelColumns: string[] = Object.keys(excelData[0]);
 
-        // Import Column Titles
+        // ================= Import Column Titles =================
         const importCaptions: string[] = this.ImportColumnData.map((x: any) =>
           x.ColumnTitle?.trim().toLowerCase(),
         );
@@ -280,7 +321,9 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
             errorMessage +=
               `<b>Extra Columns :</b><br>` + extraColumns.join(', ');
           }
+
           await alert(errorMessage, 'Column Validation');
+
           return;
         }
 
@@ -293,9 +336,10 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
         });
 
         // ================= Convert Values Based On Column Type =================
-        excelData.forEach((row: any, rowIndex: number) => {
+        excelData.forEach((row: any) => {
           Object.keys(row).forEach((key: string) => {
             const originalKey = key;
+
             const lowerKey = key.trim().toLowerCase();
 
             const columnType = columnTypeMap[lowerKey];
@@ -363,7 +407,10 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
             // ================= DATETIME =================
             else if (columnType === 'datetime') {
-              // Excel Date Number
+              let displayDate: string | null = null;
+              let apiDate: string | null = null;
+
+              // Excel Serial Date
               if (typeof value === 'number') {
                 const excelDate = XLSX.SSF.parse_date_code(value);
 
@@ -372,9 +419,11 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
                   const month = String(excelDate.m).padStart(2, '0');
                   const year = excelDate.y;
 
-                  row[originalKey] = `${year}-${month}-${day}`;
-                } else {
-                  row[originalKey] = null;
+                  // UI Format
+                  displayDate = `${day}-${month}-${year}`;
+
+                  // API Format
+                  apiDate = `${year}-${month}-${day}`;
                 }
               }
 
@@ -384,7 +433,8 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
                 const month = String(value.getMonth() + 1).padStart(2, '0');
                 const year = value.getFullYear();
 
-                row[originalKey] = `${year}-${month}-${day}`;
+                displayDate = `${day}-${month}-${year}`;
+                apiDate = `${year}-${month}-${day}`;
               }
 
               // String Date
@@ -396,11 +446,16 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
                   const month = String(date.getMonth() + 1).padStart(2, '0');
                   const year = date.getFullYear();
 
-                  row[originalKey] = `${year}-${month}-${day}`;
-                } else {
-                  row[originalKey] = null;
+                  displayDate = `${day}-${month}-${year}`;
+                  apiDate = `${year}-${month}-${day}`;
                 }
               }
+
+              // Show in Grid
+              row[originalKey] = displayDate;
+
+              // Save API Format Separately
+              row[`${originalKey}_API`] = apiDate;
             }
           });
         });
@@ -410,19 +465,43 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
         // ================= Dynamic Columns =================
         if (excelData.length > 0) {
-          this.gridColumns = Object.keys(excelData[0]).map((key) => ({
-            dataField: key,
-            caption: key,
-            width: '150',
-          }));
+          this.gridColumns = Object.keys(excelData[0])
+            .filter((key) => !key.endsWith('_API'))
+            .map((key) => ({
+              dataField: key,
+              caption: key,
+              width: '150',
+            }));
         }
 
         // ================= Open Popup =================
         this.isPopupVisible = true;
 
-        notify('Excel loaded successfully', 'success', 3000);
+        notify(
+          {
+            message: 'Excel loaded successfully',
+            position: {
+              at: 'top right',
+              my: 'top right',
+              offset: '0 20',
+            },
+          },
+          'success',
+          3000,
+        );
       } catch (error) {
-        notify('Error while reading excel file', 'error', 4000);
+        notify(
+          {
+            message: 'Error while reading excel file',
+            position: {
+              at: 'top right',
+              my: 'top right',
+              offset: '0 20',
+            },
+          },
+          'error',
+          4000,
+        );
       }
     };
 
@@ -444,30 +523,48 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
 
-    // ================= Convert Verified Field =================
-    this.Imported_Ar_DataSource.forEach((row: any) => {
-      if (row.Verified === 1 || row.Verified === '1') {
-        row.Verified = true;
-      } else if (row.Verified === 0 || row.Verified === '0') {
-        row.Verified = false;
-      } else if (
-        row.Verified === null ||
-        row.Verified === undefined ||
-        row.Verified === ''
-      ) {
-        row.Verified = null;
-      }
-    });
-    const chunkSize = 100;
+    // ================= Prepare API Payload =================
+    const payloadData = this.Imported_Ar_DataSource.map((row: any) => {
+      const newRow = { ...row };
 
-    // Same Batch Number for all chunks
+      // ================= Convert Verified Field =================
+      if (newRow.Verified === 1 || newRow.Verified === '1') {
+        newRow.Verified = true;
+      } else if (newRow.Verified === 0 || newRow.Verified === '0') {
+        newRow.Verified = false;
+      } else if (
+        newRow.Verified === null ||
+        newRow.Verified === undefined ||
+        newRow.Verified === ''
+      ) {
+        newRow.Verified = null;
+      }
+
+      // ================= Replace Display Date With API Date =================
+      Object.keys(newRow).forEach((key) => {
+        if (key.endsWith('_API')) {
+          const originalKey = key.replace('_API', '');
+
+          // Replace UI Date with API Date
+          newRow[originalKey] = newRow[key];
+
+          // Remove Extra API Field
+          delete newRow[key];
+        }
+      });
+      return newRow;
+    });
+
+    const chunkSize = 5000;
+    // ================= Same Batch Number For All Chunks =================
     const batchNo = 'BATCH_' + new Date().getTime();
-    // Create Chunks
+    // ================= Create Chunks =================
     const chunks: any[] = [];
-    for (let i = 0; i < this.Imported_Ar_DataSource.length; i += chunkSize) {
-      chunks.push(this.Imported_Ar_DataSource.slice(i, i + chunkSize));
+    for (let i = 0; i < payloadData.length; i += chunkSize) {
+      chunks.push(payloadData.slice(i, i + chunkSize));
     }
-    // Start Upload
+
+    // ================= Start Upload =================
     this.uploadChunkData(chunks, batchNo, this.uploadedFileName, 0);
   }
 
@@ -518,22 +615,50 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
         // ================= Hide Loader =================
         this.isLoading = false;
 
-        // API Success
+        // ================= API Success =================
         if (response?.flag === 1) {
           if (response?.data) {
-            // ================= Convert Verified Field To String =================
+            // ================= Convert Data =================
             this.importDetailViewData = (response.data || []).map(
-              (item: any) => ({
-                ...item,
-                Verified:
-                  item.Verified === true
-                    ? 1
-                    : item.Verified === false
-                      ? ''
-                      : item.Verified === null || item.Verified === undefined
-                        ? null
-                        : String(item.Verified),
-              }),
+              (item: any) => {
+                const updatedItem: any = { ...item };
+
+                Object.keys(updatedItem).forEach((key: string) => {
+                  const value = updatedItem[key];
+
+                  // ================= Verified Field =================
+                  if (key === 'Verified') {
+                    updatedItem[key] =
+                      value === true
+                        ? 1
+                        : value === false
+                          ? ''
+                          : value === null || value === undefined
+                            ? null
+                            : String(value);
+                  }
+
+                  // ================= Date Field Conversion =================
+                  // Column name contains "date"
+                  else if (key.toLowerCase().includes('date') && value) {
+                    const date = new Date(value);
+
+                    if (!isNaN(date.getTime())) {
+                      const day = String(date.getDate()).padStart(2, '0');
+                      const month = String(date.getMonth() + 1).padStart(
+                        2,
+                        '0',
+                      );
+                      const year = date.getFullYear();
+
+                      // Display Format => dd-MM-yyyy
+                      updatedItem[key] = `${day}-${month}-${year}`;
+                    }
+                  }
+                });
+
+                return updatedItem;
+              },
             );
 
             // ================= Dynamic Columns =================
@@ -550,7 +675,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
           }
         }
 
-        // API Failed
+        // ================= API Failed =================
         else {
           notify(
             response?.message || 'Failed to load detail data',
@@ -570,7 +695,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   }
 
   onCellPrepared(e: any) {
-    // ===== Disable Selection Checkbox =====
+    // ================= Disable Selection Checkbox =================
     if (
       e.rowType === 'data' &&
       e.column.command === 'select' &&
@@ -588,7 +713,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
       }
     }
 
-    // ===== Status Column Color =====
+    // ================= Status Column Color =================
     if (e.rowType === 'data' && e.column.dataField === 'Status') {
       const status = e.value?.trim();
 

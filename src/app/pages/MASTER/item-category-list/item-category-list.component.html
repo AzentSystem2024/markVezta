@@ -29,7 +29,11 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
 
-      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      >
         <dxo-popup
           title="Edit Category"
           [showTitle]="true"
@@ -86,23 +90,28 @@
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
+
       <dxi-column dataField="CODE" caption="Code">
         <dxi-validation-rule type="required" message="Code is required">
           <dxi-validation-rule type="required" message="Code is required">
           </dxi-validation-rule>
         </dxi-validation-rule>
       </dxi-column>
+
       <dxi-column dataField="CAT_NAME" caption="Category">
         <dxi-validation-rule type="required" message="Category is required">
           <dxi-validation-rule type="required" message="Category is required">
           </dxi-validation-rule>
         </dxi-validation-rule>
       </dxi-column>
+
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+      <dxi-column *ngIf="IsLedgerEnabled" dataField="HEAD_NAME" caption="Ledger"></dxi-column>
     </dx-data-grid>
   </div>
 </div>
 
+<!-- ========== save foem popup ========== -->
 <form-popup
   [width]="500"
   height="'auto'"
@@ -114,6 +123,7 @@
   <app-category-form (popupClosed)="handleClose()"></app-category-form>
 </form-popup>
 
+<!-- ========== Edit form popup ==========  -->
 <dx-popup
   [(visible)]="editItemCategory"
   [height]="'auto'"

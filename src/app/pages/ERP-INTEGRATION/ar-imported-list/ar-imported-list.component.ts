@@ -25,6 +25,11 @@ import DataSource from 'devextreme/data/data_source';
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services/data.service';
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
+import {
+  ERPJVModule,
+  ERPJVComponent,
+} from '../POPUP-PAGES/erp-jv/erp-jv.component';
 
 @Component({
   selector: 'app-ar-imported-list',
@@ -35,12 +40,23 @@ export class ARImportedListComponent {
   @ViewChild('detailGrid', { static: false })
   detailGrid!: DxDataGridComponent;
 
+  @ViewChild(ERPJVComponent)
+  JournalVoucherFormComponent!: ERPJVComponent;
+
   isFilterOpened: boolean = false;
   showFilterRow: boolean = false;
   currentFilter: string = 'auto';
 
   importDataList: DataSource | null = null;
   detailViewColumns: any[] = [];
+
+  // Store all detail data
+  importDetailData: any[] = [];
+  filteredDetailData: any[] = [];
+  detailsDataColumns: any[] = [];
+
+  expandedRowKeys: any[] = [];
+  detailDataMap: { [key: string]: any[] } = {};
 
   searchButtonOptions = {
     icon: 'search',
@@ -63,7 +79,7 @@ export class ARImportedListComponent {
   };
 
   ReProcessButtonOptions = {
-    text: 'Re-Process',
+    text: 'Process',
     icon: 'refresh',
     type: 'default',
     stylingMode: 'contained',
@@ -82,67 +98,129 @@ export class ARImportedListComponent {
   failedRequestCount: number = 0;
   pendingRequestCount: number = 0;
 
+  isViewJournalVoucher: boolean = false;
+  selectedJournalVoucher: any[] = [];
+  selectedTransID: any;
+
+  isLoading: boolean = false;
+
   constructor(
     private ngZone: NgZone,
     private srvce: DataService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
-    this.fetch_import_logs();
+    this.fetch_Full_import_list();
   }
 
-  // === fetch import logs list =====
-  fetch_import_logs() {
+  // ====== Fetch Import data list =======
+  fetch_Full_import_list() {
+    //  Common Formatter
+    const formatData = (data: any[] = []) => {
+      return data.map((item: any) => {
+        const updatedItem: any = { ...item };
+
+        Object.keys(updatedItem).forEach((key: string) => {
+          const value = updatedItem[key];
+
+          // Verified Field
+          if (key === 'Verified') {
+            updatedItem[key] =
+              value === true
+                ? 1
+                : value === false
+                  ? ''
+                  : value == null
+                    ? null
+                    : String(value);
+
+            return;
+          }
+
+          // Date Field Conversion
+          if (
+            value &&
+            typeof value === 'string' &&
+            key.toLowerCase().includes('date')
+          ) {
+            const date = new Date(value);
+
+            if (!isNaN(date.getTime())) {
+              updatedItem[key] = [
+                String(date.getDate()).padStart(2, '0'),
+                String(date.getMonth() + 1).padStart(2, '0'),
+                date.getFullYear(),
+              ].join('-');
+            }
+          }
+        });
+
+        return updatedItem;
+      });
+    };
+
+    // DataSource
     this.importDataList = new DataSource({
       store: new CustomStore({
-        key: 'ID',
-        load: () => {
-          // this.isLoading = true;
+        key: 'HeaderID',
 
-          return this.srvce
-            .import_AR_Full_List()
-            .toPromise()
-            .then((response: any) => {
-              if (response && response.data) {
-                const Finaldata = (response.data || []).map((item: any) => ({
-                  ...item,
-                  Verified:
-                    item.Verified === true
-                      ? 1
-                      : item.Verified === false
-                        ? ''
-                        : item.Verified === null || item.Verified === undefined
-                          ? null
-                          : String(item.Verified),
-                }));
+        load: async () => {
+          try {
+            const response: any = await this.srvce
+              .import_AR_Full_List()
+              .toPromise();
 
-                // ================= Dynamic Columns =================
-                if (Finaldata.length > 0) {
-                  this.detailViewColumns = Object.keys(Finaldata[0]);
-                }
+            // Header Data
+            const headerData = formatData(response?.header || []);
 
-                return Finaldata;
-              }
+            // Detail Data
+            this.importDetailData = formatData(response?.detail || []);
 
-              return [];
-            })
-            .catch((error) => {
-              console.error(error);
-              return [];
-            })
-            .finally(() => {
-              // this.isLoading = false;
-            });
+            // Dynamic Detail Columns
+            this.detailsDataColumns = Object.keys(
+              this.importDetailData?.[0] || {},
+            );
+
+            // Dynamic Header Columns
+            this.detailViewColumns = Object.keys(headerData?.[0] || {});
+
+            return headerData;
+          } catch (error) {
+            console.error(error);
+            return [];
+          }
         },
       }),
     });
   }
 
+  // ================= Row Expanding =================
+  onRowExpanding(e: any) {
+    const headerID = e.key;
+    // Prevent duplicate keys
+    if (!this.expandedRowKeys.includes(headerID)) {
+      this.expandedRowKeys.push(headerID);
+    }
+    // Load only if not already loaded
+    if (!this.detailDataMap[headerID]) {
+      this.detailDataMap[headerID] = this.importDetailData.filter(
+        (x: any) => x.HeaderID === headerID,
+      );
+    }
+  }
+
+  // ================= Row Collapsing =================
+  onRowCollapsing(e: any) {
+    const headerID = e.key;
+    this.expandedRowKeys = this.expandedRowKeys.filter((x) => x !== headerID);
+    delete this.detailDataMap[headerID];
+  }
+
   refreshGrid() {
     if (this.detailGrid?.instance) {
       this.detailGrid.instance.refresh();
-      // this.fetch_import_logs();
     }
   }
 
@@ -167,6 +245,7 @@ export class ARImportedListComponent {
       // Disable selection cell
       e.cellElement.style.pointerEvents = 'none';
       e.cellElement.style.opacity = '0.5';
+      e.cellElement.setAttribute('title', 'Click to open journal voucher');
 
       // Hide checkbox
       const checkbox = e.cellElement.querySelector('.dx-select-checkbox');
@@ -200,6 +279,57 @@ export class ARImportedListComponent {
     }
   }
 
+  onCellClick(e: any) {
+    console.log('clicked row data:', e.data);
+
+    if (e.rowType !== 'data') {
+      return;
+    }
+
+    // Only Status column
+    if (e.column?.dataField !== 'Status') {
+      return;
+    }
+
+    // Only Posted status
+    if (e.data?.Status !== 'Posted') {
+      return;
+    }
+
+    this.selectedTransID = e.data?.AcTransID;
+
+    if (!this.selectedTransID) {
+      notify('Transaction ID not found', 'warning', 3000);
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.srvce.select_Erp_JournalVoucher(this.selectedTransID).subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+
+        if (res.flag === 1) {
+          this.selectedJournalVoucher = res?.Data || null;
+          this.isViewJournalVoucher = true;
+        } else {
+          notify('Journal Voucher not found', 'error', 3000);
+        }
+      },
+
+      error: (err: any) => {
+        this.isLoading = false;
+
+        console.error(err);
+        notify('Failed to load Journal Voucher', 'error', 3000);
+      },
+    });
+  }
+
+  handleClose() {
+    this.isViewJournalVoucher = false;
+  }
+
   // ================= Allow Checkbox Only For Pending / Failed =================
   onEditorPreparing(e: any) {
     if (e.parentType === 'dataRow' && e.command === 'select') {
@@ -220,27 +350,35 @@ export class ARImportedListComponent {
       return;
     }
 
-    // Pending Rows Only
+    //  Pending Rows Only
     const pendingRows = selectedRows.filter(
       (x: any) => x.Status === 'Open' || x.Status === 'Failed',
     );
+
     if (pendingRows.length === 0) {
       notify('Please select pending rows only', 'warning', 3000);
       return;
     }
-    // ================= Initialize Counters =================
+
+    //  Initialize Counters
     this.isProcessingRows = true;
+
     this.totalRequestCount = pendingRows.length;
     this.completedRequestCount = 0;
     this.failedRequestCount = 0;
     this.pendingRequestCount = pendingRows.length;
-    // ================= Process One By One =================
+
+    // Force initial UI update
+    this.cdr.detectChanges();
+
+    //  Process One By One
     for (const row of pendingRows) {
       try {
         const response: any = await this.srvce
           .process_pending_rows(row)
           .toPromise();
-        // ================= Success =================
+
+        //  Success
         if (response?.flag === '1') {
           this.completedRequestCount++;
         } else {
@@ -248,40 +386,40 @@ export class ARImportedListComponent {
         }
       } catch (error: any) {
         console.error(error);
+        //  Failed
         this.failedRequestCount++;
       }
-      // ================= Update Pending Count =================
+      //  Update Pending Count
       this.pendingRequestCount =
         this.totalRequestCount -
         (this.completedRequestCount + this.failedRequestCount);
+      // Force UI Update
+      this.cdr.detectChanges();
     }
-    // ================= Completed =================
+    //  Completed
     this.isProcessingRows = false;
-    // Force UI update immediately
+    // Final UI refresh
     this.cdr.detectChanges();
-    // Wait for loader DOM removal
+    //  Wait for Loader Removal
     await new Promise((resolve) => setTimeout(resolve, 500));
-    // Clear selection
+    //  Clear Selection
     this.detailGrid?.instance.clearSelection();
     await new Promise((resolve) => setTimeout(resolve, 100));
-    // Clear filters
+    //  Clear Filters
     this.detailGrid?.instance.clearFilter();
     await new Promise((resolve) => setTimeout(resolve, 100));
-    // Clear search
+    //  Clear Search
     this.detailGrid?.instance.searchByText('');
-
+    //  Notification
     notify(
       `Processing completed.
-   Success : ${this.completedRequestCount}
-   Failed : ${this.failedRequestCount}`,
+      Success : ${this.completedRequestCount}
+      Failed : ${this.failedRequestCount}`,
       'success',
       5000,
     );
-
-    // Final delay before refresh
+    //  Refresh Grid
     await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Refresh grid
     this.refreshGrid();
   }
 }
@@ -299,6 +437,7 @@ export class ARImportedListComponent {
     ReactiveFormsModule,
     DxValidatorModule,
     DxLoadPanelModule,
+    ERPJVModule,
   ],
   providers: [],
   declarations: [ARImportedListComponent],
