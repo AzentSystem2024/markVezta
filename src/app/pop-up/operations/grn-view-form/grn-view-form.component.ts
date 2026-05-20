@@ -166,6 +166,7 @@ export class GrnViewFormComponent {
 
   newGrnData = this.grnData;
   getNewGrnData = () => ({ ...this.newGrnData });
+  currency: any;
 
   constructor(
     private service: DataService,
@@ -585,6 +586,13 @@ export class GrnViewFormComponent {
   }
 
   ngOnInit(): void {
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    this.currency = userData.GeneralSettings.SYMBOL;
+    console.log(this.currency, 'CURRENCYYYYYYYYYYYYYYYYYY');
     this.getSupplierData();
     this.getStoreData();
     this.sesstion_Details();

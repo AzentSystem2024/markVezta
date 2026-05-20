@@ -538,6 +538,7 @@
       <dxi-total-item
         column="total"
         summaryType="sum"
+        [customizeText]="formatTotalAmount"
         displayFormat="{0}"
         [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >

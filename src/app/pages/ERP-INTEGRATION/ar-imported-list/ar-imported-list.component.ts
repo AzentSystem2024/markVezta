@@ -80,7 +80,7 @@ export class ARImportedListComponent {
 
   ReProcessButtonOptions = {
     text: 'Process',
-    icon: 'refresh',
+    icon: '',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Import AR Data',

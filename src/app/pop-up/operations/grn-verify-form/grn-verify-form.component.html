@@ -181,7 +181,7 @@
       [allowEditing]="false"
     ></dxi-column>
     <dxi-column
-      *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2"
+      *ngIf="currency !== currencySymbol"
       dataField="SUPP_PRICE"
       caption="PRICE {{ currencySymbol }}"
       [width]="'auto'"
@@ -190,9 +190,6 @@
       alignment="right"
     ></dxi-column>
     <dxi-column
-      *ngIf="
-        !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
-      "
       dataField="PRICE"
       caption="PRICE {{ localCurrencySymbol }}"
       [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -246,6 +243,7 @@
       [allowEditing]="false"
     ></dxi-column> -->
     <dxi-column
+      *ngIf="currency !== currencySymbol"
       dataField="SUPP_AMOUNT"
       caption="AMOUNT {{ currencySymbol }}"
       [allowEditing]="false"
