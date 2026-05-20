@@ -192,6 +192,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   storeItems: any;
   isHQApp: any;
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
+  supplierCurrencySymbol: any;
 
   constructor(
     private service: DataService,
@@ -466,7 +467,12 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     });
   }
 
+  getCurrencySymbol(rowData: any) {
+    this.supplierCurrencySymbol = rowData?.CURRENCY_SYMBOL || '';
+  }
+
   getFormattedSupplierPrice = (rowData: any) => {
+    this.SupplierCurrencySymbol = rowData?.CURRENCY_SYMBOL || '';
     const symbol = rowData?.CURRENCY_SYMBOL || '';
     const price = Number(rowData?.SUPP_PRICE || 0).toFixed(2);
 

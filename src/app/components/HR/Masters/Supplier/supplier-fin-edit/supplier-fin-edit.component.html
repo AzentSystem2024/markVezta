@@ -88,7 +88,7 @@
                 label="Country code *"
                 [searchEnabled]="true"
                 labelMode="floating"
-                [(value)]="countryCodePhone"
+                [(value)]="countryCode"
                 [items]="countryCodes"
                 valueExpr="CODE"
                 [displayExpr]="countryDisplay"
@@ -252,7 +252,7 @@
 
         <dxi-item itemType="group" [colCount]="1">
           <dxi-item>
-            <div *dxTemplate>
+            <!-- <div *dxTemplate>
               <dx-select-box
                 label="Category"
                 [items]="SupplierCategory"
@@ -263,7 +263,7 @@
                 labelMode="floating"
               >
               </dx-select-box>
-            </div>
+            </div> -->
           </dxi-item>
         </dxi-item>
 

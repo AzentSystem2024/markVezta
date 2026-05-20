@@ -668,6 +668,7 @@ export class GrnViewFormComponent {
         SL_NO: index + 1, // Add SL_NO starting from 1
         QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QUANTITY,
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
+        SUPP_AMOUNT: Number(item.SUPP_AMOUNT),
         QTY_BASE_UNIT:
           item.UOM_MULTIPLE > 0
             ? `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`
@@ -1225,6 +1226,17 @@ export class GrnViewFormComponent {
     // -------------------- EXPORT --------------------
     doc.output('dataurlnewwindow');
   }
+  getAmountValue = (rowData: any) => {
+    const suppAmount = Number(rowData.SUPP_AMOUNT || 0);
+
+    // ✅ If SUPP_AMOUNT has value, show it
+    if (suppAmount > 0) {
+      return suppAmount;
+    }
+
+    // ✅ Otherwise show AMOUNT
+    return Number(rowData.AMOUNT || 0);
+  };
 }
 
 function numberToWordsIndianNumber(num: number) {

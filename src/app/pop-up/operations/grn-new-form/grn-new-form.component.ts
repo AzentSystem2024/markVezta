@@ -208,6 +208,8 @@ export class GrnNewFormComponent implements OnInit {
   docNo: any;
   isHQApp: boolean = false;
   filteredStoreList: any[] = [];
+  isLocalCurrency: boolean = false;
+  currency: any;
 
   // add.component.ts
 
@@ -233,6 +235,8 @@ export class GrnNewFormComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
+    this.currency = userData.GeneralSettings.SYMBOL;
+    console.log(this.currency, 'GENERALSETTINGSSSSSSSSSSSSSSSS');
     this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
     console.log(this.isHQApp, 'USERDATASTRINGGGGGGGGGGGG');
     const configStore = userData.Configuration?.[0];
@@ -388,7 +392,7 @@ export class GrnNewFormComponent implements OnInit {
         this.currencySymbol =
           res.Podetails.length > 0 ? res.Podetails[0].CURRENCY_SYMBOL : ''; // Extract the first item's currency symbol
         console.log(this.poDetails, 'Updated poDetails with SL_NO');
-
+        console.log(this.currencySymbol, '===========weqwewee');
         // Populate landedCost
         this.landedCost = res.LandedCost;
         console.log(this.landedCost, 'landedcost');
@@ -492,6 +496,8 @@ export class GrnNewFormComponent implements OnInit {
       .getPendingPo(storeid, this.supplierId, this.selected_Company_id)
       .subscribe((res: any) => {
         this.poList = res.data;
+        this.isLocalCurrency = this.poList.IS_LOCAL_CURRENCY;
+        console.log(this.poList, 'ISLOCALCURRENCYYYYYYYY');
         this.filteredPOList = [...this.poList];
       });
   }
@@ -999,43 +1005,6 @@ export class GrnNewFormComponent implements OnInit {
     this.ref.detectChanges();
   }
 
-  // onPurchaseOrderSelected(event: any): void {
-  //   const selectedRow = event.selectedRowsData[0];
-
-  //   console.log(selectedRow, 'selected row');
-
-  //   //   // Bind the supplier ID from the selected row to the dx-select-box
-  //   this.newGrnData.SUPP_ID = 132;
-  //   //103
-
-  //   this.poDetails = this.poDetails.map((item: any) => {
-  //     const updatedItem = { ...item };
-
-  //     // Dynamically add columns based on costingMethodDataGrid
-  //     this.costingMethodDataGrid.forEach((costItem: any) => {
-  //       const key = costItem.DESCRIPTION.toUpperCase(); // Standardize key
-  //       updatedItem[key] = costItem.TOTAL; // Add TOTAL value
-  //     });
-
-  //     return updatedItem;
-  //   });
-
-  //   console.log(this.poDetails, 'Updated poDetails');
-
-  //   this.ref.detectChanges();
-  // }
-
-  // calculateQuantity = (rowData: any) => {
-  //   // Return static values based on some condition or row data
-  //   console.log(rowData,"+++")
-  //   if (rowData.id === 1) {
-  //     return 100;
-  //   } else if (rowData.id === 2) {
-  //     return 50;
-  //   }
-  //   return 0; // Default value
-  // };
-
   onCostingGridValueChanged(event: any): void {
     const updatedRow = event.data; // The row being edited
     const rate = Number(updatedRow.RATE); // New rate value
@@ -1401,6 +1370,18 @@ export class GrnNewFormComponent implements OnInit {
 
     console.log('After delete → poDetails:', this.poDetails);
   }
+
+  getAmountValue = (rowData: any) => {
+    const suppAmount = Number(rowData.SUPP_AMOUNT || 0);
+
+    // ✅ If SUPP_AMOUNT has value, show it
+    if (suppAmount > 0) {
+      return suppAmount;
+    }
+
+    // ✅ Otherwise show AMOUNT
+    return Number(rowData.AMOUNT || 0);
+  };
 }
 @NgModule({
   imports: [

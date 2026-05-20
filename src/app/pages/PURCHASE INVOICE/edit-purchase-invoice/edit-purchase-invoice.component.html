@@ -357,7 +357,10 @@
                 gap: 6px;
               "
             >
-              <div class="approve-container" *ngIf="canApprove">
+              <div
+                class="approve-container"
+                *ngIf="canApprove && !isVerifyMode && !isApproveMode"
+              >
                 <dx-check-box
                   *ngIf="!readOnly"
                   text="Approve"
