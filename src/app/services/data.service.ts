@@ -466,6 +466,10 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}ACTransactions/select/` + id, {});
   }
 
+  select_Erp_JournalVoucher(id: number) {
+    return this.http.post<any>(`${this.apiUrl}ACTransactions/selecterp/` + id, {});
+  }
+
   updateJournalVoucher(items: any) {
     const data = items;
     // console.log(data,"insert service")

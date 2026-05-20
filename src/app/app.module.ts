@@ -386,6 +386,7 @@ import { CptMasterNewFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-ne
 import {  CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
 import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
 import {  DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
+import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.component';
 
 
 @NgModule({
@@ -787,7 +788,8 @@ import {  DepartmentGroupModule } from './pages/MASTER/department-group/departme
     CPTMasterModule,
     CptMasterNewFormModule,
     CptMasterEditFormModule,
-    DepartmentGroupModule
+    DepartmentGroupModule,
+    ERPJVModule
   ],
 
   providers: [

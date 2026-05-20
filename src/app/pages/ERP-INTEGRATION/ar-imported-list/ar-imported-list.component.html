@@ -16,6 +16,7 @@
     (onRowCollapsing)="onRowCollapsing($event)"
     (onCellPrepared)="onCellPrepared($event)"
     (onEditorPreparing)="onEditorPreparing($event)"
+    (onCellClick)="onCellClick($event)"
   >
     <dxo-selection mode="multiple" showCheckBoxesMode="always"> </dxo-selection>
     <dxi-column type="selection" [allowSelectAll]="true"> </dxi-column>
@@ -24,7 +25,7 @@
       [dataField]="col"
       [caption]="col"
       [visible]="col !== 'HeaderID'"
-      [width]="col === 'FailureReason' || col === 'Status' ? 'auto' : 150"
+      [width]="col === 'Status' ? 'auto' : 150"
       [fixed]="col === 'FailureReason' || col === 'Status'"
       [fixedPosition]="'right'"
       [alignment]="
@@ -133,6 +134,31 @@
       </dxi-item>
     </dxo-toolbar>
   </dx-data-grid>
+
+  <dx-popup
+    [(visible)]="isViewJournalVoucher"
+    [width]="'90vw'"
+    [height]="'100vh'"
+    title="Journal Voucher"
+    (onHiding)="handleClose()"
+  >
+    <app-erp-jv
+      [journalVoucherFormData]="selectedJournalVoucher"
+      (popupClosed)="handleClose()"
+      [JVid]="selectedTransID"
+    ></app-erp-jv>
+  </dx-popup>
+
+  <dx-load-panel
+    [visible]="isLoading"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [hideOnOutsideClick]="false"
+    shadingColor="rgba(0,0,0,0.4)"
+    message="Loading..."
+  >
+  </dx-load-panel>
 
   <!-- Progress Section -->
   <dx-load-panel

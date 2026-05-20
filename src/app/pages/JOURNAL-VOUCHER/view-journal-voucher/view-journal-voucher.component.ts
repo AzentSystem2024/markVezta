@@ -71,12 +71,12 @@ export class ViewJournalVoucherComponent {
     DETAILS: [],
   };
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @Input() JVid: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter:boolean= true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -85,7 +85,7 @@ export class ViewJournalVoucherComponent {
   ledgerNameEditorOptions: any = {};
   isReadOnly = false;
   Company_list: any = [];
-  logoBase64: string;
+  logoBase64: string='';
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
@@ -137,6 +137,7 @@ export class ViewJournalVoucherComponent {
       this.Company_list = res;
     });
   }
+
   ngOnChanges(changes: SimpleChanges) {
     if (
       changes['journalVoucherFormData'] &&
@@ -192,6 +193,7 @@ export class ViewJournalVoucherComponent {
       }
     }
   }
+  
   getStoreData() {
     const payload = {
       NAME: 'STORE',
