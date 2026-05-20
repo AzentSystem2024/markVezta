@@ -1277,25 +1277,30 @@ export class PromotionComponent {
     return new Date(e.value) >= new Date(this.fromDate);
   };
   onFromTimeChanged(e: any) {
-    const iso = e.value; // example: "2026-04-22T19:30:00.000Z"
-    const timeHHmm = new Date(iso).toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Kolkata'
-    });
-    this.fromTime
+
+    this.fromTime = this.formatDateTime(e.value);
+
   }
 
   onToTimeChanged(e: any) {
-    const iso = e.value; // example: "2026-04-22T19:30:00.000Z"
-    const timeHHmm = new Date(iso).toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Kolkata'
-    });
-    this.toTime
+
+    this.toTime = this.formatDateTime(e.value);
+
+  }
+  formatDateTime(date: any): string {
+
+    const d = new Date(date);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    const milliseconds = String(d.getMilliseconds()).padStart(3, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
   }
 }
 

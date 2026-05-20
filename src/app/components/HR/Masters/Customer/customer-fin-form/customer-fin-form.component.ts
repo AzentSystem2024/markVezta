@@ -90,7 +90,6 @@ export class CustomerFinFormComponent {
     VAT_REGNO: '',
     CUSTOMER_TYPE: 0,
     WAREHOUSE_ID: 0,
-    CUST_TYPE: 0,
     DEALER_TYPE: 0,
     DEALER_ID: null,
     IS_COMPANY_BRANCH: 0,
@@ -125,7 +124,8 @@ export class CustomerFinFormComponent {
   mobile_limit_Delivery_Address: number | undefined;
   CountryDropdownDataList: any = [];
   selectedCompanyId: any;
-  companyList: any[];
+  companyList: any = [];
+  Customer_type_list: any = []
 
   constructor(
     private service: DataService,
@@ -181,7 +181,6 @@ export class CustomerFinFormComponent {
       DeliveryAddresses: this.savedAddresses,
       MOBILE_NO: this.countryCode + '-' + this.mobileNumber,
       PHONE: this.PhonenumberCode + '-' + this.newCustomer.PHONE,
-      CUST_TYPE: 1,
       IS_COMPANY_BRANCH: this.IS_COMPANY_BRANCH_VALUE ? 1 : 0,
 
       // DELIVERY_ADDRESS: deliveryAddressArray,
@@ -345,6 +344,7 @@ export class CustomerFinFormComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.customer_Type_Dropdown()
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -394,7 +394,7 @@ export class CustomerFinFormComponent {
     this.savedAddresses = [];
     if (this.formCustomerData) {
       this.formCustomerData.DEALER_ID = null;
-      this.formCustomerData.CUST_TYPE = 0;
+      // this.formCustomerData.CUST_TYPE = 0;
 
       this.formCustomerData.DEALER_TYPE = 0;
     }
@@ -467,9 +467,9 @@ export class CustomerFinFormComponent {
     this.editingIndex = i;
   }
 
-  onDropdownClosed() {}
-  onDropdownOpened() {}
-  updateMobileNumber() {}
+  onDropdownClosed() { }
+  onDropdownOpened() { }
+  updateMobileNumber() { }
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}`;
@@ -518,6 +518,17 @@ export class CustomerFinFormComponent {
     const value = e.event.target.value;
     e.event.target.value = value.replace(/\D/g, '');
   }
+  //=======customer type drp=========================
+
+  customer_Type_Dropdown() {
+    const payload = {
+      NAME: 'CUSTOMER_TYPE'
+    }
+    this.service.customer_type_drp(payload).subscribe((res: any) => {
+      console.log(res)
+      this.Customer_type_list = res
+    })
+  }
 }
 
 @NgModule({
@@ -542,4 +553,4 @@ export class CustomerFinFormComponent {
   declarations: [CustomerFinFormComponent],
   exports: [CustomerFinFormComponent],
 })
-export class CustomerFinFormModule {}
+export class CustomerFinFormModule { }

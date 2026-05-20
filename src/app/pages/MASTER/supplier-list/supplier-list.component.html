@@ -17,7 +17,11 @@
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
     <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
     </dxo-editing>
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
@@ -82,46 +86,11 @@
     ></dxi-column>
     <dxi-column dataField="SUPP_CODE" caption="Code"></dxi-column>
     <dxi-column dataField="SUPP_NAME" caption="Supplier Name"></dxi-column>
-    <!-- <dxi-column dataField="CONTACT_NAME" caption="Contact Name"></dxi-column> -->
-    <!-- <dxi-column dataField="ADDRESS1" caption="Address"></dxi-column>
-  <dxi-column dataField="ADDRESS2" [visible]="false" ></dxi-column>
-  <dxi-column dataField="ADDRESS3" [visible]="false" ></dxi-column> -->
-    <!-- <dxi-column dataField="ZIP" caption="Zip Code" [visible]="false"></dxi-column> -->
     <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column>
     <dxi-column dataField="STATE_NAME" caption="State"> </dxi-column>
     <dxi-column dataField="CITY" caption="City"></dxi-column>
-
     <dxi-column dataField="PHONE" caption="Phone"></dxi-column>
     <dxi-column dataField="EMAIL" caption="Email"></dxi-column>
-    <!-- <dxi-column dataField="MOBILE_NO" caption="Address"></dxi-column> -->
-    <!-- <dxi-column dataField="FAX_NO" caption="Fax"></dxi-column> -->
-    <!-- <dxi-column dataField="CURRENCY_ID" caption="Currency"> 
-    
-    <dxo-lookup
-    [dataSource]="currency"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    >
-    </dxo-lookup>
-  </dxi-column> -->
-    <!-- <dxi-column dataField="PAY_TERM_ID" caption="Payment Terms" [visible]="false">
-    <dxo-lookup
-    [dataSource]="PaymentTermsDropdownData"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    >
-    </dxo-lookup>    
-  </dxi-column>
-  <dxi-column dataField="VAT_RULE_ID" caption="Tax Rule" [visible]="false">
-    <dxo-lookup
-    [dataSource]="vatrule"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    >
-    </dxo-lookup>    
-  </dxi-column>    -->
-    <!-- <dxi-column dataField="VAT_REGNO" caption="Tax Registration No." [visible]="false"></dxi-column> -->
-    <!-- <dxi-column dataField="NOTES" caption="Notes" [visible]="false"></dxi-column> -->
     <dxi-column type="buttons" width="110" [buttons]="allButtonsEditDelete">
     </dxi-column>
   </dx-data-grid>

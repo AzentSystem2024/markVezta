@@ -47,12 +47,13 @@ export class ItemProperty2EditComponent {
   selected_Company_id: any;
   poData: any;
 
-  constructor(private service: DataService) {}
+  constructor(private service: DataService) { }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       const data = changes['selectedData'].currentValue;
       this.formItemProperty2Data = data;
     }
+    this.sessionDetails()
   }
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -62,6 +63,8 @@ export class ItemProperty2EditComponent {
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+
+    this.showItemProperty2()
     // THIS IS THE MISSING LINK
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
@@ -95,7 +98,7 @@ export class ItemProperty2EditComponent {
       (item: any) =>
         item.ID !== payload.ID &&
         item.DESCRIPTION?.toLowerCase().trim() ===
-          payload.DESCRIPTION?.toLowerCase().trim(),
+        payload.DESCRIPTION?.toLowerCase().trim(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -164,4 +167,4 @@ export class ItemProperty2EditComponent {
   declarations: [ItemProperty2EditComponent],
   exports: [ItemProperty2EditComponent],
 })
-export class ItemProperty2EditModule {}
+export class ItemProperty2EditModule { }

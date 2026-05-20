@@ -49,11 +49,13 @@ export class ItemProperty1EditComponent {
   selected_Company_id: any;
   poData: any;
 
-  constructor(private service: DataService) {}
+  constructor(private service: DataService) { }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       const data = changes['selectedData'].currentValue;
       this.formItemProperty1Data = data;
+
+      this.sessionDetails()
     }
   }
   showItemProperty1() {
@@ -63,6 +65,8 @@ export class ItemProperty1EditComponent {
     this.service.getItemProperty1Data(payload).subscribe((response) => {
       this.itemproperty1 = response;
     });
+    console.log(this.itemproperty1, '      this.itemproperty1')
+
   }
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -70,13 +74,16 @@ export class ItemProperty1EditComponent {
     this.companyID = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    this.showItemProperty1()
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     // THIS IS THE MISSING LINK
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
+
   }
   UpdateData() {
+    console.log('-----------call this function====================')
     const result = this.validationGroup.instance.validate();
     if (!result.isValid) {
       return;
@@ -84,80 +91,77 @@ export class ItemProperty1EditComponent {
     const payload = {
       ...this.formItemProperty1Data,
     };
-    const itemProppayload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.service.getItemProperty1Data(itemProppayload).subscribe((response) => {
-      this.itemproperty1 = response;
 
-      // this.showItemProperty1()
 
-      // Exclude the current record (by ID) from duplicate check
-      const isCodeDuplicate = this.itemproperty1.some(
-        (item: any) =>
-          item.ID !== payload.ID &&
-          item.CODE?.toLowerCase().trim() ===
-            payload.CODE?.toLowerCase().trim(),
+    console.log(this.itemproperty1, '      this.itemproperty1')
+
+
+    // Exclude the current record (by ID) from duplicate check
+    const isCodeDuplicate = this.itemproperty1.some(
+      (item: any) =>
+        item.ID !== payload.ID &&
+        item.CODE?.toLowerCase().trim() ===
+        payload.CODE?.toLowerCase().trim(),
+    );
+
+    const isDescriptionDuplicate = this.itemproperty1.some(
+      (item: any) =>
+        item.ID !== payload.ID &&
+        item.DESCRIPTION?.toLowerCase().trim() ===
+        payload.DESCRIPTION?.toLowerCase().trim(),
+    );
+
+    if (isCodeDuplicate && isDescriptionDuplicate) {
+      notify(
+        {
+          message: 'Both Code and Description already exist',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'error',
       );
-
-      const isDescriptionDuplicate = this.itemproperty1.some(
-        (item: any) =>
-          item.ID !== payload.ID &&
-          item.DESCRIPTION?.toLowerCase().trim() ===
-            payload.DESCRIPTION?.toLowerCase().trim(),
+      return;
+    } else if (isCodeDuplicate) {
+      notify(
+        {
+          message: 'This Code already exists',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'error',
       );
+      return;
+    } else if (isDescriptionDuplicate) {
+      notify(
+        {
+          message: 'This Description already exists',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'error',
+      );
+      return;
+    }
 
-      if (isCodeDuplicate && isDescriptionDuplicate) {
-        notify(
-          {
-            message: 'Both Code and Description already exist',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'error',
-        );
-        return;
-      } else if (isCodeDuplicate) {
-        notify(
-          {
-            message: 'This Code already exists',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'error',
-        );
-        return;
-      } else if (isDescriptionDuplicate) {
-        notify(
-          {
-            message: 'This Description already exists',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'error',
-        );
-        return;
-      }
-
-      this.service.updateItemProperty1(payload).subscribe((res: any) => {
-        this.formClosed.emit();
-        notify(
-          {
-            message: 'Data updated successfully',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'success',
-        );
-      });
+    this.service.updateItemProperty1(payload).subscribe((res: any) => {
+      this.formClosed.emit();
+      notify(
+        {
+          message: 'Data updated successfully',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'success',
+      );
     });
+
   }
 
   closePopup() {
     this.formClosed.emit();
   }
-}
 
+}
 @NgModule({
   imports: [
     DxTextBoxModule,
@@ -174,4 +178,4 @@ export class ItemProperty1EditComponent {
   declarations: [ItemProperty1EditComponent],
   exports: [ItemProperty1EditComponent],
 })
-export class ItemProperty1EditModule {}
+export class ItemProperty1EditModule { }

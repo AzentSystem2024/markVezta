@@ -43,10 +43,10 @@ export class TendersFormComponent implements OnInit, OnChanges {
   isInactive: boolean = false;
   VATRuleDropdownData: any[] = [];
   TenderTypeDropdownData: any[] = [];
-  tenders:any;
+  tenders: any;
 
-  formTenderData :any = {
-    ID:0,
+  formTenderData: any = {
+    ID: 0,
     CODE: '',
     IS_INACTIVE: this.isInactive,
     DESCRIPTION: '',
@@ -58,14 +58,18 @@ export class TendersFormComponent implements OnInit, OnChanges {
     ALLOW_DECLARATION: false,
     ADDITIONAL_INFO_REQUIRED: false,
   };
-  constructor(private service: DataService) {}
+  constructor(private service: DataService) { }
   newTender = this.formTenderData;
 
-  getNewTenderData = () => ({ ...this.newTender });
+  getNewTenderData = () => ({
+    ...this.newTender,
+    ADDITIONAL_INFO_REQUIRED: this.additionalInformationRequired
+
+  });
 
   getVATRuleDropDown() {
     const dropdowncurrency = {
-      name:'CURRENCY'
+      name: 'CURRENCY'
     }
     this.service.getDropdownData(dropdowncurrency).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
@@ -73,7 +77,7 @@ export class TendersFormComponent implements OnInit, OnChanges {
   }
   getTenderTypeDropDown() {
     const dropdowntender = {
-      name:'TENDERTYPE'
+      name: 'TENDERTYPE'
     }
     this.service.getDropdownData(dropdowntender).subscribe((data: any) => {
       this.TenderTypeDropdownData = data;
@@ -84,14 +88,14 @@ export class TendersFormComponent implements OnInit, OnChanges {
     this.getTenderTypeDropDown();
     this.getVATRuleDropDown();
   }
-  
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['formData'] && this.formData) {
       this.newTender = this.formData;
       this.allowOpening = this.formData.ALLOW_OPENING;
       this.allowDeclaration = this.formData.ALLOW_DECLARATION;
       this.additionalInformationRequired = this.formData.ADDITIONAL_INFO_REQUIRED;
-  
+
       console.log(this.formData, 'formData received in child');
     }
   }
@@ -124,7 +128,20 @@ export class TendersFormComponent implements OnInit, OnChanges {
 
       return code === value && item.ID !== currentId;
     });
-  };  
+  };
+  validateTenderDescription = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.tenders?.length) return true;
+
+    const currentId = this.newTender?.ID || 0;
+
+    return !this.tenders.some((item: any) => {
+      const code = (item.DESCRIPTION || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId;
+    });
+  };
 }
 
 @NgModule({
@@ -144,4 +161,4 @@ export class TendersFormComponent implements OnInit, OnChanges {
   declarations: [TendersFormComponent],
   exports: [TendersFormComponent],
 })
-export class TendersFormModule {}
+export class TendersFormModule { }

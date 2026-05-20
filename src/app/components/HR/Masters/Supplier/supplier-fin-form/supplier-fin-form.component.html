@@ -13,9 +13,9 @@
               <dxi-validation-rule type="required" message="Code is required">
               </dxi-validation-rule>
               <dxi-validation-rule
-                  type="pattern"
-                  [pattern]="'^[a-zA-Z0-9]+$'"
-                  message="Code should be alphanumeric only"
+                type="pattern"
+                [pattern]="'^[a-zA-Z0-9]+$'"
+                message="Code should be alphanumeric only"
               ></dxi-validation-rule>
               <dxi-validation-rule
                 type="custom"
@@ -23,7 +23,6 @@
                 message="Code already exists"
               ></dxi-validation-rule>
             </dx-validator>
-            
           </dx-text-box>
         </div>
       </dxi-item>
@@ -204,14 +203,17 @@
             [items]="VATRuleDropdownData"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
-            [(value)]="newSupplier.VAT_RULE_ID"
+            [(value)]="SELECTED_VAT_RULE"
             placeholder="Select Tax Rule"
             labelMode="floating"
             [searchEnabled]="true"
             (onValueChanged)="onTaxRuleChange()"
           >
             <dx-validator>
-              <dxi-validation-rule type="required" message="Tax rule is required">
+              <dxi-validation-rule
+                type="required"
+                message="Tax rule is required"
+              >
               </dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
@@ -484,12 +486,12 @@
             [disabled]="newSupplier.VAT_RULE_ID != 2"
           >
             <dx-validator>
-            <dxi-validation-rule
-              type="custom"
-              [validationCallback]="validateVAT"
-              message="VAT Registration Number is required when Tax is applicable"
-            ></dxi-validation-rule>
-          </dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateVAT"
+                message="VAT Registration Number is required when Tax is applicable"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-text-box>
         </div>
       </dxi-item>
@@ -588,4 +590,3 @@
     </dxi-item>
   </dxi-item>
 </dx-form>
-

@@ -168,33 +168,6 @@ export class ReasonsListComponent {
     e.selectedRowKeys;
   }
   onClickSaveReasons() {
-    // const {
-    //   CODE,
-    //   DESCRIPTION,
-    //   ARABIC_DESCRIPTION,
-    //   START_DATE,
-    //   END_DATE,
-    //   REASON_TYPE,
-    //   DISCOUNT_TYPE,
-    //   AC_HEAD_ID,
-    //   COMPANY_ID,
-    //   DISCOUNT_PERCENT,
-    //   REASON_STORES,
-    // } = this.reasonComponent.getNewReasonsData();
-    // console.log(
-    //   'inserted data',
-    //   CODE,
-    //   DESCRIPTION,
-    //   ARABIC_DESCRIPTION,
-    //   START_DATE,
-    //   END_DATE,
-    //   REASON_TYPE,
-    //   DISCOUNT_TYPE,
-    //   DISCOUNT_PERCENT,
-    //   REASON_STORES,
-    //   COMPANY_ID,
-    // );
-
 
     const component = this.isEditMode
       ? this.editFormComponent
@@ -262,8 +235,14 @@ export class ReasonsListComponent {
       );
       return;
     }
+    console.log(data, '===========data============')
+    console.log(data.REASON_STORES, '===========data============')
+
+    // console.log(data.reason_stores,'===========data============')
+
 
     if (
+      !data.REASON_STORES ||
       !REASON_STORES ||
       !Array.isArray(REASON_STORES) ||
       REASON_STORES.length === 0 ||

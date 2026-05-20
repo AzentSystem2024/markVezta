@@ -36,7 +36,7 @@ import { AuthService, DataService } from 'src/app/services';
 })
 export class SupplierFinFormComponent {
   @ViewChild(DxValidationGroupComponent)
-  validationGroup: DxValidationGroupComponent;
+  validationGroup!: DxValidationGroupComponent;
 
   @ViewChild('landedCostGrid', { static: false })
   landedCostGrid!: DxDataGridComponent; // reference to dx-data-grid
@@ -53,7 +53,7 @@ export class SupplierFinFormComponent {
   stateLabel: any;
   Country: any[] = [];
   State: any[] = [];
-  selected_Company_id: number;
+  selected_Company_id: any;
   selectedStateId: any[] = [];
   StateId: any;
   isCurrencyAccepted: boolean = true;
@@ -89,6 +89,7 @@ export class SupplierFinFormComponent {
     // Supplier_cost:''
     Supplier_cost: [] as { COST_ID: number; SUPP_ID: number }[],
   };
+
   landedcost: any[] = [];
   costFactors: any[] = [];
   CountryId: any;
@@ -107,6 +108,7 @@ export class SupplierFinFormComponent {
   Phone_limit: any;
 
   supplier: any;
+  SELECTED_VAT_RULE: any = 1
 
   constructor(
     private service: DataService,
@@ -125,6 +127,20 @@ export class SupplierFinFormComponent {
       this.countryCodes = data;
     });
     this.listSupplier();
+  }
+
+  ngOnInit(): void {
+    this.loadDropdownData();
+    this.getPaymentTerms();
+    //  this.showCountry();
+    this.getVATRuleDropDown();
+    this.getSuppliercategoryDropDown();
+    this.getStateDropDown();
+    this.getCurrency();
+    this.getCurrency_Dropdown();
+    this.newSupplier.VAT_RULE_ID = 1
+    console.log(this.SELECTED_VAT_RULE
+      , '===========vat rule id============')
   }
   newSupplier = this.formSupplierData;
 
@@ -300,16 +316,6 @@ export class SupplierFinFormComponent {
     this.get_State_Dropdown_List();
   }
 
-  ngOnInit(): void {
-    this.loadDropdownData();
-    this.getPaymentTerms();
-    //  this.showCountry();
-    this.getVATRuleDropDown();
-    this.getSuppliercategoryDropDown();
-    this.getStateDropDown();
-    this.getCurrency();
-    this.getCurrency_Dropdown();
-  }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
     var inputElement = event.target as HTMLInputElement;
@@ -432,4 +438,4 @@ export class SupplierFinFormComponent {
   exports: [SupplierFinFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierFinFormModule {}
+export class SupplierFinFormModule { }

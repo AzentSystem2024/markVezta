@@ -272,6 +272,7 @@ export class EditPromotionComponent {
 
 
           this.fromDate = first.DATE_FROM ? new Date(first.DATE_FROM) : null;
+
           this.toDate = first.DATE_TO ? new Date(first.DATE_TO) : null;
 
           this.timeFrom = first.TIME_FROM
@@ -316,7 +317,7 @@ export class EditPromotionComponent {
         //    4. OTHER HEADER DATA
         this.wsNo = data.WS_NO;
         this.wsDate = data.WS_DATE
-          ? new Date(data.WS_DATE).toISOString().split('T')[0]
+          ? this.formatDateOnly(data.WS_DATE)
           : '';
 
 
@@ -325,6 +326,18 @@ export class EditPromotionComponent {
     }
 
     console.log('Selected Data in EditPromotionComponent:', this.selectedData);
+
+    console.log(this.fromDate, '=================fromDate==================')
+  }
+  //=================Date formatting button=================
+  formatDateOnly(date: any): string {
+    const d = new Date(date);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
   mergePromotionData() {
     if (!this.selectedData || !this.itemStoresList) return;
@@ -509,8 +522,8 @@ export class EditPromotionComponent {
 
           PROMOTION_PRICE: Number(item.PROMOTION_PRICE) || 0,
 
-          DATE_FROM: this.fromDate || new Date(),
-          DATE_TO: this.toDate || new Date(),
+          DATE_FROM: this.convertUtcToDateOnly(this.fromDate),
+          DATE_TO: this.convertUtcToDateOnly(this.toDate),
 
           TIME_FROM: this.fromTime || new Date(),
           TIME_TO: this.toTime || new Date(),
@@ -626,65 +639,63 @@ export class EditPromotionComponent {
 
     }
     else if (this.status === 'VerifyScreen') {
-      this.dataservice.verifyPromotion(payload).subscribe(
-        (response: any) => {
-          console.log(response, 'SAVE RESPONSE');
-
-          try {
-            if (response.flag === 1) {
-              notify(
-                {
-                  message: 'Promotion verified successfully',
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'success'
-              );
-
+      confirm(
+        'It will Verify. Are you sure you want to Verify?',
+        'Confirm Verify'
+      ).then((result) => {
+        if (result) {
+          this.dataservice.verifyPromotion(payload).subscribe(
+            (res: any) => {
+              this.isSaving = false;
               this.popupClosed.emit();
-              this.dataGrid.instance.refresh();
 
-            } else if (response.flag === 0) {
-              // 🔹 Extract IDs
-              const match = response.message.match(/Item IDs:\s*([\d,]+)/);
-              let itemNames: string[] = [];
+              if (res.flag === 1) {
+                notify(
+                  {
+                    message: ' Verify successfully',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 500,
+                  },
+                  'success'
+                );
+              } else if (res.flag === 0) {
+                // 🔹 Extract IDs
+                const match = res.message.match(/Item IDs:\s*([\d,]+)/);
+                let itemNames: string[] = [];
 
-              if (match && match[1]) {
-                const ids = match[1].split(',').map((id: string) => Number(id.trim()));
+                if (match && match[1]) {
+                  const ids = match[1].split(',').map((id: string) => Number(id.trim()));
 
-                itemNames = this.itemStoresList
-                  .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
-                  .map((item: any) => item.DESCRIPTION); // adjust key if needed
+                  itemNames = this.itemStoresList
+                    .filter((item: any) => ids.includes(item.ID)) // adjust key if needed
+                    .map((item: any) => item.DESCRIPTION); // adjust key if needed
+                }
+
+                const finalMessage =
+                  itemNames.length > 0
+                    ? `Already exists for: ${itemNames.join(', ')}`
+                    : res.message;
+
+                notify(
+                  {
+                    message: finalMessage,
+                    position: { at: 'top right', my: 'top right' },
+                  },
+                  'error'
+                );
               }
-
-              const finalMessage =
-                itemNames.length > 0
-                  ? `Promotion already exists for: ${itemNames.join(', ')}`
-                  : response.message;
-
-              notify(
-                {
-                  message: finalMessage,
-                  position: { at: 'top right', my: 'top right' },
-                },
-                'error'
-              );
+            },
+            (error) => {
+              this.isSaving = false;
+              notify('Verify to approve.', 'error', 2000);
+              console.error(error);
             }
-
-          } catch (error) {
-            notify(
-              {
-                message: 'Update operation failed',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'error'
-            );
-          }
-        },
-        (error) => {
-          console.error('Error saving promotion:', error);
-          notify('Update failed.', 'error', 2000);
+          );
+        } else {
+          this.isSaving = false;
+          notify('Verify cancelled.', 'info', 2000);
         }
-      );
+      });
       this.cdr.detectChanges();
 
     }
@@ -1179,6 +1190,7 @@ export class EditPromotionComponent {
     if (!this.fromDate || !e.value) return true;
 
     return new Date(e.value) >= new Date(this.fromDate);
+
   };
   onFromTimeChanged(e: any) {
     const iso = e.value; // example: "2026-04-22T19:30:00.000Z"
@@ -1219,7 +1231,19 @@ export class EditPromotionComponent {
       return 'Approve';
     }
   }
+  convertUtcToDateOnly(dateString: string): string {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
 }
+
 
 @NgModule({
   imports: [

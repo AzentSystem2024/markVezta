@@ -378,7 +378,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
-  
+
 
   getLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
@@ -1903,6 +1903,7 @@ export class DataService {
     CODE: any,
     BRAND_NAME: any,
     COMPANY_ID: any,
+
   ): Observable<any> {
     const data = { ID, CODE, BRAND_NAME, COMPANY_ID };
 
@@ -4266,7 +4267,7 @@ The result can be exported to HTML or Markdown.`;
 
 
 
-   //---------------HR Masters-----------------
+  //---------------HR Masters-----------------
   get_Department_Group_List(payload: any) {
     const getEndpoint = this.apiUrl + 'DepartmentGroup/list';
     return this.http.post(getEndpoint, payload);
@@ -4289,7 +4290,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
-   Update_Department_Group_Api(
+  Update_Department_Group_Api(
     ID: any,
     CODE: any,
     DEPT_NAME: any,
@@ -4310,7 +4311,7 @@ The result can be exported to HTML or Markdown.`;
 
 
 
-   Select_Department_Group_Api(ID: any) {
+  Select_Department_Group_Api(ID: any) {
     const getEndpoint = this.apiUrl + `DepartmentGroup/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
@@ -6985,5 +6986,11 @@ The result can be exported to HTML or Markdown.`;
   process_pending_rows(rowdata: any) {
     const payload = { TransactionID: rowdata.ID };
     return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
+  }
+
+  //============================customer type===============
+  customer_type_drp(item: any) {
+    const reqBody = item;
+    return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   }
 }
