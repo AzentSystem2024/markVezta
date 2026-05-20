@@ -23,11 +23,7 @@
       </dxo-header-filter> -->
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
-    <dxo-editing
-      mode="popup"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
-    >
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-popup
         title="Edit Customer"
         [showTitle]="true"
@@ -442,9 +438,7 @@
     (cancel)="onCancelCustomer()"
     (save)="onClickSaveCustomer()"
   >
-    <app-customer-fin-form
-      [deafult_vat_rule]="deafult_vat_rule"
-    ></app-customer-fin-form>
+    <app-customer-fin-form></app-customer-fin-form>
   </form-popup>
   <form-popup
     [(visible)]="isEditCustomerPopupOpened"

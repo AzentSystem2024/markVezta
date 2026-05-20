@@ -335,7 +335,8 @@ isDimensionDisabled = true;
     this.dataservice.Trial_Balance_Diamensions_Api(payload).subscribe((res: any) => {
       this.isEmptyDatagrid = false;
 
-      this.TrialBalanceReport = res.data;
+      // this.TrialBalanceReport = res.data;
+      this.TrialBalanceReport = [...res.data];
       console.log(this.TrialBalanceReport);
     });
   }

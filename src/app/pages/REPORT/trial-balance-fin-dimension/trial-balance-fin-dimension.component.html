@@ -19,7 +19,7 @@
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
-      [headerFilter]="{ visible: false }"
+      [headerFilter]="{ visible: true }"
       [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
       [columnFixing]="{
         enabled: true,
@@ -28,6 +28,13 @@
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
+    <dxo-header-filter
+  [visible]="true"
+  [allowSelectAll]="true"
+  [height]="400"
+>
+  <dxo-search [enabled]="true"></dxo-search>
+</dxo-header-filter>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -266,21 +273,23 @@
         dataField="MainGroup"
         caption="Main Group"
         dataType="string"
+        [allowHeaderFiltering]="true"
       ></dxi-column>
       <dxi-column
         dataField="SubGroup"
         caption="Sub Group"
         alignment="left"
+        [allowHeaderFiltering]="true"
         dataType="number"
       ></dxi-column>
-      <dxi-column dataField="Category" caption="Category"></dxi-column>
+      <dxi-column dataField="Category" caption="Category" [allowHeaderFiltering]="true"></dxi-column>
       <!-- <dxi-column dataField="LedgerCode" caption="Ledger Code"></dxi-column>
       <dxi-column dataField="LedgerName" caption="Ledger Name"></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column> -->
-      <dxi-column dataField="Code" caption="Code"></dxi-column> 
-      <dxi-column dataField="Description" caption="Description"></dxi-column> 
-      <dxi-column caption="Opening Balance" cssClass="opening-header">
+      <dxi-column dataField="Code" caption="Code" [allowHeaderFiltering]="true" filterType="include"></dxi-column> 
+      <dxi-column dataField="Description" caption="Description" [allowHeaderFiltering]="true"></dxi-column> 
+      <dxi-column caption="Opening Balance" cssClass="opening-header" [allowHeaderFiltering]="true">
         <dxi-column
           dataField="OpeningBalanceDebit"
           caption="Debit"
@@ -289,6 +298,7 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
+          [allowHeaderFiltering]="true"
         ></dxi-column>
         <dxi-column
           dataField="OpeningBalanceCredit"
@@ -298,6 +308,7 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
+          [allowHeaderFiltering]="true"
         >
         </dxi-column>
       </dxi-column>
@@ -311,6 +322,7 @@
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
+          [allowHeaderFiltering]="true"
         ></dxi-column>
         <dxi-column
           dataField="DuringThePeriodCredit"
@@ -320,6 +332,7 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
+          [allowHeaderFiltering]="true"
         >
         </dxi-column>
       </dxi-column>
@@ -334,6 +347,7 @@
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
+          [allowHeaderFiltering]="true"
         ></dxi-column>
         <dxi-column
           dataField="ClosingBalanceCredit"
@@ -342,6 +356,7 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
+          [allowHeaderFiltering]="true"
         >
         </dxi-column>
       </dxi-column>
