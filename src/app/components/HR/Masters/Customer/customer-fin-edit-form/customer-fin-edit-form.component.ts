@@ -101,6 +101,7 @@ export class CustomerFinEditFormComponent {
     DEALER_ID: null,
     DeliveryAddresses: [] as any[],
     IS_COMPANY_BRANCH_VALUE: 0,
+    CUSTOMER_TYPE: 0,
   };
 
   IS_COMPANY_BRANCH_VALUE: boolean = false;
@@ -132,7 +133,7 @@ export class CustomerFinEditFormComponent {
   Phone_limit: number | undefined;
   mobile_limit_Delivery_Address: number = 0;
   savedAddresses: any[] = [];
-
+  Customer_type_list: any = []
   constructor(private service: DataService) {
     this.getStateDropDown();
     this.showCountry();
@@ -142,6 +143,7 @@ export class CustomerFinEditFormComponent {
     service.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
     });
+    this.customer_Type_Dropdown()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -364,7 +366,7 @@ export class CustomerFinEditFormComponent {
     });
   }
 
-  onStateSelectionChanged(event: any) {}
+  onStateSelectionChanged(event: any) { }
 
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
@@ -458,7 +460,7 @@ export class CustomerFinEditFormComponent {
     };
   }
 
-  closePopup() {}
+  closePopup() { }
 
   saveDeliveryAddress() {
     // Validate that at least one field is filled
@@ -587,6 +589,18 @@ export class CustomerFinEditFormComponent {
     const value = e.event.target.value;
     e.event.target.value = value.replace(/\D/g, '');
   }
+
+  //=======customer type drp=========================
+
+  customer_Type_Dropdown() {
+    const payload = {
+      NAME: 'CUSTOMER_TYPE'
+    }
+    this.service.customer_type_drp(payload).subscribe((res: any) => {
+      console.log(res)
+      this.Customer_type_list = res
+    })
+  }
 }
 
 @NgModule({
@@ -610,4 +624,4 @@ export class CustomerFinEditFormComponent {
   declarations: [CustomerFinEditFormComponent],
   exports: [CustomerFinEditFormComponent],
 })
-export class CustomerFinEditFormModule {}
+export class CustomerFinEditFormModule { }

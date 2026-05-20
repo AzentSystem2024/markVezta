@@ -1,101 +1,97 @@
 <div class="view-wrapper list-page">
-    <dx-data-grid
-      class="grid theme-dependent"
-      [dataSource]="currency"
-      [rowAlternationEnabled]="true"
-      rowAlternationInterval="2"
-      [height]="'82vh'"
-      (onRowRemoving)="onRowRemoving($event)"
-      (onRowUpdating)="onRowUpdating($event)"
-      [showBorders]="true"
-      [allowColumnReordering]="true"
-      [allowColumnResizing]="true"
-      (onExporting)="onExporting($event)"
-      (onEditingStart)="onEditingStart($event)"
-    >
-    <dxo-filter-row
-    [visible]="showFilterRow"
-  ></dxo-filter-row>
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="currency"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [height]="'82vh'"
+    (onRowRemoving)="onRowRemoving($event)"
+    (onRowUpdating)="onRowUpdating($event)"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    (onExporting)="onExporting($event)"
+    (onEditingStart)="onEditingStart($event)"
+  >
+    <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
 
-  <dxo-header-filter [visible]="showHeaderFilter">
-    <dxo-search [enabled]="true"></dxo-search>
-  </dxo-header-filter>
+    <dxo-header-filter [visible]="showHeaderFilter">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
 
-<dxo-export
-      [enabled]="true"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
-      <dxo-popup title="Edit Currency" [showTitle]="true" [width]="450" [height]="400"  >
-        
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
+      <dxo-popup
+        title="Edit Currency"
+        [showTitle]="true"
+        [width]="450"
+        [height]="400"
+      >
       </dxo-popup>
       <dxo-form [colCount]="1">
+        <!-- CODE -->
+        <dxi-item
+          dataField="CODE"
+          editorType="dxTextBox"
+          [editorOptions]="{ labelMode: 'floating' }"
+        >
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
 
-      <!-- CODE -->
-      <dxi-item
-        dataField="CODE"
-        editorType="dxTextBox"
-        [editorOptions]="{ labelMode: 'floating' }"
-      > <dxo-label [visible]="false"></dxo-label>
-        
-      </dxi-item>
+        <!-- SYMBOL -->
+        <dxi-item
+          dataField="SYMBOL"
+          editorType="dxTextBox"
+          [editorOptions]="{ labelMode: 'floating' }"
+        >
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
 
-      <!-- SYMBOL -->
-      <dxi-item
-        dataField="SYMBOL"
-        editorType="dxTextBox"
-        [editorOptions]="{ labelMode: 'floating' }"
-      >
-         <dxo-label [visible]="false"></dxo-label>
-        
-      </dxi-item>
+        <!-- DESCRIPTION -->
+        <dxi-item
+          dataField="DESCRIPTION"
+          editorType="dxTextBox"
+          [editorOptions]="{ labelMode: 'floating' }"
+        >
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
 
-      <!-- DESCRIPTION -->
-      <dxi-item
-        dataField="DESCRIPTION"
-        editorType="dxTextBox"
-        [editorOptions]="{ labelMode: 'floating' }"
-      >
-         <dxo-label [visible]="false"></dxo-label>
-        
-      </dxi-item>
+        <!-- FRACTION UNIT -->
+        <dxi-item
+          dataField="FRACTION_UNIT"
+          editorType="dxTextBox"
+          [editorOptions]="{ labelMode: 'floating' }"
+        >
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
 
-      <!-- FRACTION UNIT -->
-      <dxi-item
-        dataField="FRACTION_UNIT"
-        editorType="dxTextBox"
-        [editorOptions]="{ labelMode: 'floating' }"
-      >
-         <dxo-label [visible]="false"></dxo-label>
-      </dxi-item>
+        <!-- EXCHANGE -->
+        <dxi-item
+          dataField="EXCHANGE"
+          editorType="dxNumberBox"
+          [editorOptions]="{
+            labelMode: 'floating',
+            min: 0,
+            step: 0.01,
+            format: '#,##0.000000',
 
-      <!-- EXCHANGE -->
-      <dxi-item
-        dataField="EXCHANGE"
-        editorType="dxNumberBox"
-        [editorOptions]="{
-          labelMode: 'floating',
-          min: 0,
-          step: 0.01,
-          format: '#0.00',
-          showSpinButtons: true
-        }"
-      >
-         <dxo-label [visible]="false"></dxo-label>
-
-        
-      </dxi-item>
-
-    </dxo-form>
+            showSpinButtons: true,
+          }"
+        >
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
+      </dxo-form>
     </dxo-editing>
     <dxo-search-panel
       [visible]="true"
       placeholder="Data Search"
     ></dxo-search-panel>
     <dxo-toolbar>
-
       <!-- Title -->
       <dxi-item location="before">
         <div class="grid-header">Currency</div>
@@ -134,50 +130,53 @@
         [options]="addButtonOptions"
         [visible]="canAdd"
       ></dxi-item>
-
     </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
-      <dxi-validation-rule type="required" message="Code is required"></dxi-validation-rule>
+      <dxi-validation-rule
+        type="required"
+        message="Code is required"
+      ></dxi-validation-rule>
 
-    <dxi-validation-rule
-      type="pattern"
-      [pattern]="'^[A-Z0-9]+$'"
-      message="Only uppercase letters and numbers allowed"
-    ></dxi-validation-rule>
+      <dxi-validation-rule
+        type="pattern"
+        [pattern]="'^[A-Z0-9]+$'"
+        message="Only uppercase letters and numbers allowed"
+      ></dxi-validation-rule>
 
-    <!-- ✅ SAME duplicate validation -->
-    <dxi-validation-rule
-      type="custom"
-      [validationCallback]="validateCodeExistsGrid.bind(this)"
-      message="Code already exists"
-    ></dxi-validation-rule>
+      <!-- ✅ SAME duplicate validation -->
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validateCodeExistsGrid.bind(this)"
+        message="Code already exists"
+      ></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="SYMBOL" caption="Symbol">
-      <dxi-validation-rule type="required" message="Symbol is required"></dxi-validation-rule>
+      <dxi-validation-rule
+        type="required"
+        message="Symbol is required"
+      ></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Description">
-      <dxi-validation-rule type="required" message="Description is required"></dxi-validation-rule>
+      <dxi-validation-rule
+        type="required"
+        message="Description is required"
+      ></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="FRACTION_UNIT" caption="Fraction Unit">
-      
-      <dxi-validation-rule type="required" message="Fraction Unit is required">
-  
-      </dxi-validation-rule>
+      <!-- <dxi-validation-rule type="required" message="Fraction Unit is required">
+      </dxi-validation-rule> -->
     </dxi-column>
     <dxi-column dataField="EXCHANGE" caption="Exchange">
       <dxi-validation-rule type="required" message="Exchange is required">
- 
-        </dxi-validation-rule>
-  
+      </dxi-validation-rule>
     </dxi-column>
-    </dx-data-grid>
-    <form-popup
-        [(visible)]="isAddCurrencyPopupOpened"
-        (save)="onClickSaveCurrency()"
-        titleText="New Currency"
-        [showApprove]="false"
-      >
-      <app-currency-form #currencyForm></app-currency-form>
-        
-      </form-popup>
-    </div>
+  </dx-data-grid>
+  <form-popup
+    [(visible)]="isAddCurrencyPopupOpened"
+    (save)="onClickSaveCurrency()"
+    titleText="New Currency"
+    [showApprove]="false"
+  >
+    <app-currency-form #currencyForm></app-currency-form>
+  </form-popup>
+</div>

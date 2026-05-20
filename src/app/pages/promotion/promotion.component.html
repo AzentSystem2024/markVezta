@@ -91,7 +91,7 @@
               >
                 <!-- From & To Date -->
                 <div style="display: flex; flex-direction: column; gap: 10px">
-                  <div style="display: flex; align-items: center; gap: 10px">
+                  <div style="display: flex; align-items: center; gap: 5px">
                     <label style="width: 90px">From Date:</label>
                     <dx-date-box
                       [(value)]="fromDate"
@@ -105,7 +105,7 @@
                     </dx-date-box>
                   </div>
 
-                  <div style="display: flex; align-items: center; gap: 10px">
+                  <div style="display: flex; align-items: center; gap: 5px">
                     <label style="width: 90px">To Date:</label>
                     <dx-date-box
                       [(value)]="toDate"
@@ -124,7 +124,7 @@
                         </dxi-validation-rule> </dx-validator
                     ></dx-date-box>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 10px">
+                  <div style="display: flex; align-items: center; gap: 5px">
                     <label style="width: 90px">Narration:</label>
 
                     <dx-text-box
@@ -137,7 +137,7 @@
                 </div>
 
                 <!-- Time -->
-                <div style="display: flex; flex-direction: column; gap: 5px">
+                <div style="display: flex; flex-direction: column; gap: 15px">
                   <dx-switch
                     [(value)]="isHappyHoursEnabledvalue"
                     (onValueChanged)="onHappyHoursChanged($event)"
@@ -166,7 +166,7 @@
                 </div>
 
                 <!-- Days + Store -->
-                <div style="display: flex; flex-direction: column; gap: 5px">
+                <div style="display: flex; flex-direction: column; gap: 10px">
                   <dx-tag-box
                     [items]="daysOfWeek"
                     [(value)]="selectedDays"
@@ -199,7 +199,6 @@
                     displayExpr="text"
                     valueExpr="value"
                     placeholder="Price level"
-                    width="300"
                     [searchEnabled]="true"
                     (onValueChanged)="onPriceLevel($event)"
                   ></dx-select-box>
@@ -216,14 +215,14 @@
                     margin-top: 5px;
                   "
                 >
-                  <dx-button
+                  <!-- <dx-button
                     text="Cancel"
                     hint="Cancel"
                     stylingMode="outlined"
                     type="normal"
                     width="100"
                     (onClick)="Cancel()"
-                  ></dx-button>
+                  ></dx-button> -->
 
                   <dx-button
                     icon="formula"
@@ -235,12 +234,12 @@
                   ></dx-button>
                 </div>
                 <div class="d-flex">
-                  <dx-check-box
+                  <!-- <dx-check-box
                     *ngIf="canApprove"
                     [(value)]="approveValue"
                     text="Approve"
                     style="margin: 10px"
-                  ></dx-check-box>
+                  ></dx-check-box> -->
                   <dx-button
                     text="Save"
                     hint="Save"

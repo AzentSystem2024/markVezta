@@ -132,7 +132,7 @@
                 </div>
 
                 <!-- Time -->
-                <div style="display: flex; flex-direction: column; gap: 5px">
+                <div style="display: flex; flex-direction: column; gap: 15px">
                   <dx-switch
                     [(value)]="isHappyHoursEnabled"
                     (onValueChanged)="onHappyHoursChanged($event)"
@@ -164,7 +164,7 @@
                 </div>
 
                 <!-- Days + Store -->
-                <div style="display: flex; flex-direction: column; gap: 5px">
+                <div style="display: flex; flex-direction: column; gap: 10px">
                   <dx-tag-box
                     [items]="daysOfWeek"
                     [(value)]="selectedDays"
@@ -222,14 +222,14 @@
                 </div>
 
                 <div style="display: flex">
-                  <dx-check-box
+                  <!-- <dx-check-box
                     [(value)]="approveValue"
                     text="Approve"
                     [readOnly]="readOnly"
                     (onValueChanged)="onApprovedChanged($event)"
                     style="margin: 10px"
                   >
-                  </dx-check-box>
+                  </dx-check-box> -->
                   <dx-button
                     [text]="getButtonText()"
                     stylingMode="contained"

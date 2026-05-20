@@ -39,12 +39,13 @@ export class ItemProperty3EditComponent {
   selected_Company_id: any;
   poData: any;
 
-  constructor(private service: DataService) {}
+  constructor(private service: DataService) { }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
       const data = changes['selectedData'].currentValue;
       this.formItemProperty3Data = data;
     }
+    this.sessionDetails()
   }
 
   sessionDetails() {
@@ -55,6 +56,8 @@ export class ItemProperty3EditComponent {
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.showItemProperty3();
+
     // THIS IS THE MISSING LINK
     this.poData.COMPANY_ID = this.companyID;
     this.poData.USER_ID = sessionData.USER_ID;
@@ -73,7 +76,6 @@ export class ItemProperty3EditComponent {
       ...this.formItemProperty3Data,
     };
 
-    this.showItemProperty3();
     // Exclude the current record (by ID) from duplicate check
     const isCodeDuplicate = this.itemproperty3.some(
       (item: any) =>
@@ -85,7 +87,7 @@ export class ItemProperty3EditComponent {
       (item: any) =>
         item.ID !== payload.ID &&
         item.DESCRIPTION?.toLowerCase().trim() ===
-          payload.DESCRIPTION?.toLowerCase().trim(),
+        payload.DESCRIPTION?.toLowerCase().trim(),
     );
 
     if (isCodeDuplicate && isDescriptionDuplicate) {
@@ -153,4 +155,4 @@ export class ItemProperty3EditComponent {
   declarations: [ItemProperty3EditComponent],
   exports: [ItemProperty3EditComponent],
 })
-export class ItemProperty3EditModule {}
+export class ItemProperty3EditModule { }

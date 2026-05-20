@@ -381,13 +381,24 @@
       <dxi-item itemType="group">
         <dxi-item [colSpan]="2">
           <div *dxTemplate>
-            <dx-check-box
+            <dx-select-box
+              label="Customer Type"
+              [items]="Customer_type_list"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [(value)]="formCustomerData.CUSTOMER_TYPE"
+              placeholder="Select customer type"
+              labelMode="floating"
+              (onValueChanged)="onDealerSelected($event)"
+            ></dx-select-box>
+
+            <!-- <dx-check-box
               [(value)]="IS_COMPANY_BRANCH_VALUE"
               text="Company Branch"
               stylingMode="outlined"
               hint="Company Branch"
               labelMode="floating"
-            ></dx-check-box>
+            ></dx-check-box> -->
             <!-- <dx-radio-group
               [(value)]="formCustomerData.CUST_TYPE"
               [items]="dealerTypeOptions"

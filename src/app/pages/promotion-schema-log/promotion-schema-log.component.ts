@@ -53,8 +53,8 @@ import { Router } from '@angular/router';
 export class PromotionSchemaLogComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent | undefined;
-  @ViewChild(DxValidationGroupComponent) validationGroup: DxValidationGroupComponent;
-  @ViewChild('editValidationGroup') editValidationGroup: DxValidationGroupComponent;
+  @ViewChild(DxValidationGroupComponent) validationGroup!: DxValidationGroupComponent;
+  @ViewChild('editValidationGroup') editValidationGroup!: DxValidationGroupComponent;
 
   showHeaderFilter = true;
   logList: any;
@@ -67,7 +67,7 @@ export class PromotionSchemaLogComponent {
   itemToDelete: any;
   popupWidth = 600;
   popupHeight = 400;
-  selectedSchemaTypeID: number;
+  selectedSchemaTypeID: any;
   promotionSchema: any[] = [];
   selectedPromotionSchema: any;
   isMultiple: boolean = false;
@@ -337,6 +337,11 @@ export class PromotionSchemaLogComponent {
   }
 
   onAddClick() {
+    if (this.validationGroup?.instance) {
+      this.validationGroup.instance.reset();
+    }
+
+
     this.id = null;
     this.isPopupVisible = true;
 
@@ -714,6 +719,9 @@ export class PromotionSchemaLogComponent {
   }
   onNewCancel() {
     this.isPopupVisible = false;
+    if (this.validationGroup?.instance) {
+      this.validationGroup.instance.reset();
+    }
     this.resetPopup(); // optional but recommended
   }
 

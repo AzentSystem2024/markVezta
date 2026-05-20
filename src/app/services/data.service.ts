@@ -1905,6 +1905,7 @@ export class DataService {
     CODE: any,
     BRAND_NAME: any,
     COMPANY_ID: any,
+
   ): Observable<any> {
     const data = { ID, CODE, BRAND_NAME, COMPANY_ID };
 
@@ -6996,5 +6997,11 @@ The result can be exported to HTML or Markdown.`;
     };
 
     return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
+  }
+
+  //============================customer type===============
+  customer_type_drp(item: any) {
+    const reqBody = item;
+    return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   }
 }
