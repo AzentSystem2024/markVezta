@@ -74,8 +74,8 @@ export class ListMiscReceiptComponent {
   canPrint = false;
   selectedMiscReceipt: any;
   MiscReceiptId: any;
-    statusFinder: any;
-
+  statusFinder: any;
+  PopupTitle: any
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -143,10 +143,10 @@ export class ListMiscReceiptComponent {
   addMiscReceiptPopup: boolean = false;
   addMiscPopup: boolean = false;
   editMiscPopup: boolean = false;
-  verifypopup : boolean = false;
-  Approvepopup:boolean=false;
+  verifypopup: boolean = false;
+  Approvepopup: boolean = false;
 
-   allActionButtons = [
+  allActionButtons = [
     {
       name: 'edit',
 
@@ -155,7 +155,7 @@ export class ListMiscReceiptComponent {
       icon: 'edit',
 
       text: 'Edit',
-      visible: (e) => this.canEdit && e.row.data.TRANS_STATUS === 'Open' 
+      visible: (e) => this.canEdit && e.row.data.TRANS_STATUS === 'Open'
     },
 
     {
@@ -203,7 +203,7 @@ export class ListMiscReceiptComponent {
   ];
 
 
-    //===================Status flag=========================
+  //===================Status flag=========================
   getStatusFlagClass(status: string): string {
     switch (status) {
       case 'Open':
@@ -363,63 +363,63 @@ export class ListMiscReceiptComponent {
     this.addMiscPopup = true;
   }
 
-    // ============================Verify Popup function=========================================
-onVerifyClick(e: any): void {
-  e.cancel = true;
+  // ============================Verify Popup function=========================================
+  onVerifyClick(e: any): void {
+    e.cancel = true;
 
-  const transStatus = e.row.data.TRANS_STATUS;
-  const id = e.row.data.TRANS_ID;
+    const transStatus = e.row.data.TRANS_STATUS;
+    const id = e.row.data.TRANS_ID;
 
-  this.statusFinder = transStatus;
+    this.statusFinder = transStatus;
 
-  // reset previous data
-  this.selectedmiscellaneousData = null;
-  this.verifypopup = false;
+    // reset previous data
+    this.selectedmiscellaneousData = null;
+    this.verifypopup = false;
 
-  this.dataService.selectMiscReceipt(id).subscribe({
-    next: (res: any) => {
-      this.selectedmiscellaneousData = { ...res.Data };
-      this.isReadOnlyPayment = transStatus === 'Approve';
+    this.dataService.selectMiscReceipt(id).subscribe({
+      next: (res: any) => {
+        this.selectedmiscellaneousData = { ...res.Data };
+        this.isReadOnlyPayment = transStatus === 'Approve';
 
-      // open popup AFTER data arrives
-      this.verifypopup = true;
-    },
-    error: (err) => {
-      console.error('Error loading verify data:', err);
-    }
-  });
-}
+        // open popup AFTER data arrives
+        this.verifypopup = true;
+      },
+      error: (err) => {
+        console.error('Error loading verify data:', err);
+      }
+    });
+  }
 
-   // ============================Approve Popup function=========================================
- onApproveClick(e: any): void {
-  e.cancel = true;
+  // ============================Approve Popup function=========================================
+  onApproveClick(e: any): void {
+    e.cancel = true;
 
-  const transStatus = e.row.data.TRANS_STATUS;
-  const id = e.row.data.TRANS_ID;
+    const transStatus = e.row.data.TRANS_STATUS;
+    const id = e.row.data.TRANS_ID;
 
-  this.statusFinder = transStatus;
+    this.statusFinder = transStatus;
 
-  // Clear stale data
-  this.selectedmiscellaneousData = null;
-  this.verifypopup = false;
+    // Clear stale data
+    this.selectedmiscellaneousData = null;
+    this.verifypopup = false;
 
-  this.dataService.selectMiscReceipt(id).subscribe({
-    next: (res: any) => {
-      console.log(res);
+    this.dataService.selectMiscReceipt(id).subscribe({
+      next: (res: any) => {
+        console.log(res);
 
-      // assign fresh object reference
-      this.selectedmiscellaneousData = { ...res.Data };
+        // assign fresh object reference
+        this.selectedmiscellaneousData = { ...res.Data };
 
-      this.isReadOnlyPayment = transStatus === 'Approve';
+        this.isReadOnlyPayment = transStatus === 'Approve';
 
-      // open popup only after data is ready
-      this.verifypopup = true;
-    },
-    error: (err) => {
-      console.error('Error loading approve data:', err);
-    }
-  });
-}
+        // open popup only after data is ready
+        this.verifypopup = true;
+      },
+      error: (err) => {
+        console.error('Error loading approve data:', err);
+      }
+    });
+  }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
