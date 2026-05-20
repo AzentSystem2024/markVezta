@@ -60,12 +60,12 @@ export class JournalVoucherListComponent {
   @ViewChild(AddJournalVoucharComponent)
   addJournalVoucherFormComponent!: AddJournalVoucharComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @ViewChild('journalChild') journalChild: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter:boolean= true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -84,12 +84,12 @@ export class JournalVoucherListComponent {
   canApprove = false;
   canPrint = false;
 
-  startDate: Date;
-  endDate: Date;
+  startDate: Date= new Date();
+  endDate: Date= new Date();
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -118,10 +118,10 @@ export class JournalVoucherListComponent {
   sessionData: any;
   selectedCompanyId: any;
   canVerify: any;
-  isReadOnlyJV: boolean;
-  isViewJV: boolean;
-  isApproveJV: boolean;
-  isVerifyJV: boolean;
+  isReadOnlyJV: boolean = false;
+  isViewJV: boolean = false;
+  isApproveJV: boolean = false;
+  isVerifyJV: boolean = false;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -141,16 +141,18 @@ export class JournalVoucherListComponent {
   showCustomDatePopup = false;
   customStartDate: any = null;
   customEndDate: any = null;
-  filteredJournalVoucherList: {
-    billNo: string;
-    ledgerCode: string;
-    ledgerName: string;
-    particulars: string;
-    debitAmount: number;
-    creditAmount: number;
-    voucherDate: string;
-  }[];
-  isEditJournalVoucher: boolean;
+  filteredJournalVoucherList:
+    | {
+        billNo: string;
+        ledgerCode: string;
+        ledgerName: string;
+        particulars: string;
+        debitAmount: number;
+        creditAmount: number;
+        voucherDate: string;
+      }[]
+    | undefined;
+  isEditJournalVoucher: boolean = false;
   selectedJournalVoucher: any;
   isViewJournalVoucher: boolean = false;
   refreshButtonOptions = {
@@ -163,6 +165,17 @@ export class JournalVoucherListComponent {
     },
     text: '',
   };
+
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
 
   constructor(
     private dataService: DataService,
@@ -195,7 +208,7 @@ export class JournalVoucherListComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -391,20 +404,11 @@ export class JournalVoucherListComponent {
     cellElement.appendChild(icon);
   }
 
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 'Approved',
-    },
-    {
-      text: 'Open',
-      value: 'Open',
-    },
-  ];
+  
 
   handlePopupShown() {
     setTimeout(() => {
-      this.journalChild?.focusRefField(); // ✅ Calls method in child component
+      this.journalChild?.focusRefField(); // Calls method in child component
     }, 100);
   }
 
@@ -566,9 +570,6 @@ export class JournalVoucherListComponent {
   }
 
   onEditJournalVoucher(event: any) {
-    // If TRANS_STATUS is true, cancel the editing and show a message
-
-    // Otherwise proceed with your normal logic
     event.cancel = true; // Prevent default popup editing
     const journalId = event.data.TRANS_ID;
     this.JVid = event.data.TRANS_ID;

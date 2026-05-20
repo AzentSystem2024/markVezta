@@ -184,6 +184,13 @@
     <dxi-column dataField="DESCRIPTION" caption="Description">
       <dxi-validation-rule type="required" message="Description is required">
       </dxi-validation-rule>
+
+      <!-- Duplicate -->
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validateGridDescription"
+        message="Description already exists"
+      ></dxi-validation-rule>
     </dxi-column>
 
     </dx-data-grid>

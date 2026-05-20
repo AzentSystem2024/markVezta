@@ -214,29 +214,29 @@ export class SubDepartmentComponent implements OnInit {
       return;
     }
 
-    if (isCodeDuplicate) {
-      notify(
-        {
-          message: 'This Code already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error',
-      );
-      return;
-    }
+    // if (isCodeDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'This Code already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 1000,
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // }
 
-    if (isDescriptionDuplicate) {
-      notify(
-        {
-          message: 'This Description already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error',
-      );
-      return;
-    }
+    // if (isDescriptionDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'This Description already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 1000,
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // }
 
     this.dataservice
       .Save_SubDepartment_Data(CODE, DESCRIPTION, DEPARTMENT_ID)

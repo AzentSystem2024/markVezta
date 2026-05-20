@@ -24,7 +24,7 @@ import { DxSelectBoxTypes } from 'devextreme-angular/ui/select-box';
   templateUrl: './reasons-form.component.html',
   styleUrls: ['./reasons-form.component.scss'],
 })
-export class ReasonsFormComponent implements OnChanges{
+export class ReasonsFormComponent implements OnChanges {
   @Input() formData: any;
   stores: any;
   customer: boolean = false;
@@ -55,7 +55,7 @@ export class ReasonsFormComponent implements OnChanges{
   userID: any;
   companyID: any;
   selected_Company_id: any;
-  constructor(private service: DataService) {}
+  constructor(private service: DataService) { }
   newReasons = this.formReasonsData;
 
   getNewReasonsData = () => ({
@@ -63,25 +63,30 @@ export class ReasonsFormComponent implements OnChanges{
     COMPANY_ID: this.companyID,
     DISCOUNT_TYPE: this.newReasons.DISCOUNT_TYPE ?? 0,
     DISCOUNT_PERCENT: this.newReasons.DISCOUNT_PERCENT ?? 0,
+    REASON_STORES:
+      this.formData.REASON_STORES ||
+      this.formData.reason_stores ||
+      [],
+
   });
 
   ngOnChanges(changes: SimpleChanges) {
-      if (changes['formData'] && this.formData) {
-        this.newReasons = this.formData;
-    
-        console.log(this.formData, 'formData received in child');
+    if (changes['formData'] && this.formData) {
+      this.newReasons = this.formData;
 
-        //  Convert reason_stores → selectedRows (for grid selection)
-        if (this.formData.reason_stores && Array.isArray(this.formData.reason_stores)) {
-          this.selectedRows = this.formData.reason_stores.map(
-            (x: any) => Number(x.STORE_ID)
-          );
-        } else {
-          this.selectedRows = [];
-        }
+      console.log(this.formData, 'formData received in child');
+
+      //  Convert reason_stores → selectedRows (for grid selection)
+      if (this.formData.reason_stores && Array.isArray(this.formData.reason_stores)) {
+        this.selectedRows = this.formData.reason_stores.map(
+          (x: any) => Number(x.STORE_ID)
+        );
+      } else {
+        this.selectedRows = [];
       }
     }
-  
+  }
+
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -146,17 +151,17 @@ export class ReasonsFormComponent implements OnChanges{
       this.ac_ledger_Data = res;
     });
   }
-  
+
   onSelectionChanged(e: any) {
-  const selected_valued = e.selectedRowsData;
+    const selected_valued = e.selectedRowsData;
 
-  const restored_Data = selected_valued.map((item) => ({
-    ID: item.ID,
-    STORE_ID: item.STORE_NO ?? 0,
-  }));
+    const restored_Data = selected_valued.map((item) => ({
+      ID: item.ID,
+      STORE_ID: item.STORE_NO ?? 0,
+    }));
 
-  this.newReasons.REASON_STORES = restored_Data; // ✅ FIX
-}
+    this.newReasons.REASON_STORES = restored_Data; // ✅ FIX
+  }
 
   onValueChangedSDate(event: any) {
     this.formReasonsData.START_DATE = event.value;
@@ -206,4 +211,4 @@ export class ReasonsFormComponent implements OnChanges{
   declarations: [ReasonsFormComponent],
   exports: [ReasonsFormComponent],
 })
-export class ReasonsFormModule {}
+export class ReasonsFormModule { }

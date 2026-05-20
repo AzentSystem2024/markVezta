@@ -293,6 +293,9 @@ export class SupplierFormComponent implements OnInit {
     this.getStateDropDown();
     this.getCurrency();
     this.getCurrency_Dropdown();
+
+    this.newSupplier.VAT_RULE_ID = "1"
+    console.log(this.newSupplier.VAT_RULE_ID, '===========vat rule id============')
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
@@ -386,4 +389,4 @@ export class SupplierFormComponent implements OnInit {
   exports: [SupplierFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierFormModule {}
+export class SupplierFormModule { }

@@ -236,9 +236,13 @@
                 [text]="
                   isReadOnlyMode
                     ? 'PDF'
-                    : transferInFormData.IS_APPROVED
-                      ? 'Commit'
-                      : 'Save'
+                    : selectedDocStatus == 'VERIFY'
+                      ? 'Approve'
+                      : selectedDocStatus == 'OPEN' && status == 'verifyscreen'
+                        ? 'Verify'
+                        : isEditing
+                          ? 'Update'
+                          : 'Save'  
                 "
                 (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()"
                 stylingMode="contained"

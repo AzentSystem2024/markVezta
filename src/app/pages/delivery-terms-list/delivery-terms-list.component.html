@@ -158,6 +158,13 @@
         type="required"
         message="Description is required"
     ></dxi-validation-rule>
+
+    <!--  Duplicate validation -->
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validateGridDeliveryDescription"
+        message="Description already exists"
+      ></dxi-validation-rule>
     </dxi-column>
   </dx-data-grid>
   <form-popup

@@ -178,6 +178,22 @@ export class ItemBrandListComponent implements OnInit {
         });
     }
   }
+  validateBrandCode = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+    if (!value || !this.brandDataSource?.length) {
+      return true;
+    }
+    const currentId =
+      e?.data?.ID ||
+      0;
+
+    return !this.brandDataSource.some((item: any) => {
+      return (
+        item.ID !== currentId &&
+        (item.CODE || '').trim().toLowerCase() === value
+      );
+    });
+  };
   onRowUpdating(event: any) {
     const updataDate = event.newData;
     const oldData = event.oldData;

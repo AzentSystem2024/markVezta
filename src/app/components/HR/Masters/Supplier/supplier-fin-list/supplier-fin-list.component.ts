@@ -132,6 +132,7 @@ export class SupplierFinListComponent {
       </div>
     `,
   };
+  defaultVatRuleId: number;
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -203,7 +204,11 @@ export class SupplierFinListComponent {
   };
 
   addSupplier() {
+    this.defaultVatRuleId = 1;
     this.isAddSupplierPopupOpened = true;
+    // setTimeout(() => {
+    //   this.supplierForm.setDefaultValues();
+    // });
   }
 
   showSupplier() {

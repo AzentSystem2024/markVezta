@@ -206,6 +206,10 @@
             ></dx-text-box> -->
             <div class="approve-container">
               <dx-check-box
+                *ngIf="
+                  !isEditing ||
+                  (selectedDocStatus == 'OPEN' && ActionStatus == 'EditScreen')
+                "
                 [value]="
                   isReadOnlyMode ? true : transferOutFormData.IS_APPROVED
                 "
@@ -229,13 +233,17 @@
                 type="normal"
               ></dx-button>
               <dx-button
-                #saveButtonRef
                 [text]="
                   isReadOnlyMode
                     ? 'PDF'
-                    : transferOutFormData.IS_APPROVED
-                      ? 'Commit'
-                      : 'Save'
+                    : selectedDocStatus == 'VERIFY' || isApproved
+                      ? 'Approve'
+                      : selectedDocStatus == 'OPEN' &&
+                          ActionStatus == 'VerifyScreen'
+                        ? 'Verify'
+                        : isEditing
+                          ? 'Update'
+                          : 'Save'
                 "
                 (onClick)="isReadOnlyMode ? openPDF() : saveTransferOut()"
                 stylingMode="contained"

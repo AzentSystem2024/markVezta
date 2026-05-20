@@ -42,14 +42,14 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./item-category-list.component.scss'],
 })
 export class ItemCategoryListComponent implements OnInit {
-  @ViewChild(CategoryFormComponent) categoryComponent: CategoryFormComponent;
+  @ViewChild(CategoryFormComponent) categoryComponent!: CategoryFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  CategoryDataSource: DataSource;
+  CategoryDataSource: DataSource | undefined;
   categoryArray: any[] = [];
   categoryCount = 0;
   DepartmentDropdownData: any;
@@ -109,6 +109,8 @@ export class ItemCategoryListComponent implements OnInit {
     elementAttr: { class: 'toolbar-icon-btn' }, //  global style
     onClick: () => this.toggleFilters(),
   };
+  IsLedgerEnabled: any;
+
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -270,9 +272,11 @@ export class ItemCategoryListComponent implements OnInit {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
 
     this.COMPANY_ID = sessionData.SELECTED_COMPANY.COMPANY_ID;
+      const configuration = sessionData?.GeneralSettings || {};
+    this.IsLedgerEnabled = configuration?.ENABLE_ITEM_CATEGORY_ACCOUNTS || true;
   }
 
   showCategory() {
@@ -303,14 +307,14 @@ export class ItemCategoryListComponent implements OnInit {
     });
   }
 
-  getDepartmentDropDown() {
-    const dropdowndepartment = 'DEPARTMENT';
-    this.dataservice
-      .getDropdownData(dropdowndepartment)
-      .subscribe((data: any) => {
-        this.DepartmentDropdownData = data;
-      });
-  }
+  // getDepartmentDropDown() {
+  //   const dropdowndepartment = 'DEPARTMENT';
+  //   this.dataservice
+  //     .getDropdownData(dropdowndepartment)
+  //     .subscribe((data: any) => {
+  //       this.DepartmentDropdownData = data;
+  //     });
+  // }
   ngOnInit(): void {
     const currentUrl = this.router.url;
 
@@ -340,7 +344,7 @@ export class ItemCategoryListComponent implements OnInit {
 
     this.sesstion_Details();
     this.showCategory();
-    this.getDepartmentDropDown();
+    // this.getDepartmentDropDown();
   }
   refresh = () => {
     this.dataGrid.instance.refresh();

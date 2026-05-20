@@ -41,7 +41,7 @@ export class UomEditComponent {
   uomList: any;
   selected_Company_id: any;
 
-  constructor(private service: DataService) {}
+  constructor(private service: DataService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
@@ -94,6 +94,7 @@ export class UomEditComponent {
     // const company_id = this.selected_Company_id
 
     // DUPLICATION CHECK (ignore same ID)
+    console.log(this.uomList, '==========uomList============')
     const isDuplicate = this.uomList?.some(
       (item: any) =>
         item.UOM?.trim().toLowerCase() === uom?.toLowerCase() && item.ID !== id,
@@ -155,4 +156,4 @@ export class UomEditComponent {
   declarations: [UomEditComponent],
   exports: [UomEditComponent],
 })
-export class UomEditModule {}
+export class UomEditModule { }

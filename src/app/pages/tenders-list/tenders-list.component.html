@@ -32,7 +32,11 @@
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
       <dxo-popup
         title="Edit Tenders"
         [showTitle]="true"
@@ -148,7 +152,7 @@
         displayExpr="DESCRIPTION"
         valueExpr="ID"
       ></dxo-lookup> -->
-    </dxi-column> 
+    </dxi-column>
     <dxi-column dataField="CURRENCY_DESCRIPTION" caption="Currency">
       <!-- <dxo-lookup
         [dataSource]="currencyList"
@@ -190,7 +194,19 @@
       dataType="boolean"
       [visible]="false"
     ></dxi-column>
-    <dxi-column dataField="STATUS" caption="Status"></dxi-column>
+    <dxi-column
+      dataField="STATUS"
+      caption="Status"
+      cellTemplate="statusCellTemplate"
+    ></dxi-column>
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value === 'Inactive' ? 'Inactive' : 'Active'"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+    </div>
   </dx-data-grid>
   <form-popup
     [(visible)]="isAddTendersPopupOpened"
@@ -207,9 +223,6 @@
     titleText="Edit Tenders"
     [showApprove]="false"
   >
-    <app-tenders-form
-    #editForm
-    [formData]="editingRowData"
-    ></app-tenders-form>
+    <app-tenders-form #editForm [formData]="editingRowData"></app-tenders-form>
   </form-popup>
 </div>

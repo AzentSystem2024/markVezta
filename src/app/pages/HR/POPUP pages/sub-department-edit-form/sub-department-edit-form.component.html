@@ -47,6 +47,13 @@
               type="required"
               message="Description is required"
             ></dxi-validation-rule>
+
+            <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateSubDepartmentName"
+                message="Description already exists"
+          ></dxi-validation-rule>
+          
           </dx-validator>
         </dx-text-box>
       </dxi-item>
@@ -61,6 +68,7 @@
           [(value)]="formSubDepartmentData.DEPARTMENT_ID"
           label="Department *"
           labelMode="floating"
+          [searchEnabled]="true"
           ><dx-validator>
             <dxi-validation-rule
               type="required"

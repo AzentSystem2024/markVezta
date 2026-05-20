@@ -614,6 +614,7 @@ export class TransferOutInventoryComponent {
     const trOutId = event.data.TRANS_ID;
     this.selected_Data_Status = event.data.STATUS;
     this.StatusType = 'EditScreen'
+    this.isReadOnlyTrOut = false
 
     this.select_function(trOutId)
   }
@@ -744,6 +745,14 @@ export class TransferOutInventoryComponent {
     e.cancel = true;
     const trOutId = e.row.data.TRANS_ID;
     this.selected_Data_Status = e.row.data.STATUS;
+    if (e.row.data.STATUS == 'APPROVED') {
+      this.isReadOnlyTrOut = true;
+      console.log(this.isReadOnlyTrOut, '================this.isReadOnlyTrOut===================')
+    }
+    else {
+      this.isReadOnlyTrOut = false;
+
+    }
     this.cdr.detectChanges();
 
 

@@ -198,27 +198,28 @@ export class DepartmentMeComponent implements OnInit {
         'error',
       );
       return;
-    } else if (isCodeDuplicate) {
-      notify(
-        {
-          message: 'This Code already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error',
-      );
-      return;
-    } else if (isDescriptionDuplicate) {
-      notify(
-        {
-          message: 'This Description already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error',
-      );
-      return;
-    }
+    } 
+    // else if (isCodeDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'This Code already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 1000,
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // } else if (isDescriptionDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'This Description already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 1000,
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // }
 
     this.dataservice
       .Insert_Department_Me_Api(CODE, DEPT_NAME, COMPANY_ID, COST_BUCKET_ID)

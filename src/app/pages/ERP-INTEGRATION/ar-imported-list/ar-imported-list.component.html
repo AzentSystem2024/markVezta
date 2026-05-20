@@ -1,6 +1,6 @@
 <div class="view-wrapper list-page">
   <dx-data-grid
-  #detailGrid
+    #detailGrid
     class="grid theme-dependent"
     [dataSource]="importDataList"
     [showBorders]="true"
@@ -11,9 +11,12 @@
     [columnAutoWidth]="true"
     [height]="'80vh'"
     noDataText=" "
-    keyExpr="ID"
+    keyExpr="HeaderID"
+    (onRowExpanding)="onRowExpanding($event)"
+    (onRowCollapsing)="onRowCollapsing($event)"
     (onCellPrepared)="onCellPrepared($event)"
     (onEditorPreparing)="onEditorPreparing($event)"
+    (onCellClick)="onCellClick($event)"
   >
     <dxo-selection mode="multiple" showCheckBoxesMode="always"> </dxo-selection>
     <dxi-column type="selection" [allowSelectAll]="true"> </dxi-column>
@@ -21,8 +24,8 @@
       *ngFor="let col of detailViewColumns"
       [dataField]="col"
       [caption]="col"
-      [visible]="col !== 'ID'"
-      width="150"
+      [visible]="col !== 'HeaderID'"
+      [width]="col === 'Status' ? 'auto' : 150"
       [fixed]="col === 'FailureReason' || col === 'Status'"
       [fixedPosition]="'right'"
       [alignment]="
@@ -30,6 +33,35 @@
       "
     >
     </dxi-column>
+
+    <dxo-master-detail [enabled]="true" template="detailTemplate">
+    </dxo-master-detail>
+
+    <div class="ms-4" *dxTemplate="let masterData of 'detailTemplate'">
+      <dx-data-grid
+        [dataSource]="detailDataMap[masterData.key] || []"
+        noDataText="No details available"
+        [showBorders]="true"
+        [columnAutoWidth]="false"
+        [rowAlternationEnabled]="true"
+        [height]="
+          (detailDataMap[masterData.key]?.length || 0) < 5 ? 'auto' : 200
+        "
+        (onCellPrepared)="onCellPrepared($event)"
+      >
+        <dxi-column
+          *ngFor="let col of detailsDataColumns"
+          [dataField]="col"
+          [caption]="col"
+          [visible]="col !== 'HeaderID'"
+          [width]="col === 'FailureReason' || col === 'Status' ? 'auto' : 150"
+          [fixed]="col === 'FailureReason' || col === 'Status'"
+          [fixedPosition]="'right'"
+          [alignment]="col === 'Status' ? 'center' : 'left'"
+        >
+        </dxi-column>
+      </dx-data-grid>
+    </div>
 
     <!-- ================= Filter ================= -->
     <dxo-filter-row
@@ -102,6 +134,31 @@
       </dxi-item>
     </dxo-toolbar>
   </dx-data-grid>
+
+  <dx-popup
+    [(visible)]="isViewJournalVoucher"
+    [width]="'90vw'"
+    [height]="'100vh'"
+    title="Journal Voucher"
+    (onHiding)="handleClose()"
+  >
+    <app-erp-jv
+      [journalVoucherFormData]="selectedJournalVoucher"
+      (popupClosed)="handleClose()"
+      [JVid]="selectedTransID"
+    ></app-erp-jv>
+  </dx-popup>
+
+  <dx-load-panel
+    [visible]="isLoading"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [hideOnOutsideClick]="false"
+    shadingColor="rgba(0,0,0,0.4)"
+    message="Loading..."
+  >
+  </dx-load-panel>
 
   <!-- Progress Section -->
   <dx-load-panel

@@ -122,9 +122,10 @@
     (save)="onClickSaveState()"
     titleText="New State"
     [showApprove]="false"
+    (visibleChange)="!$event && CloseEditForm()"
   >
     <div ngIf="isAddStatePopupOpened">
-      <app-state-form (formClosed)="CloseEditForm()"></app-state-form>
+      <app-state-form></app-state-form>
     </div>
   </form-popup>
 

@@ -139,11 +139,14 @@ export class StateListComponent {
     this.isAddStatePopupOpened = true;
   }
 
-  CloseEditForm() {
-    this.isEditPopupOpened = false;
-    this.isAddStatePopupOpened = false;
-    this.showState();
-  }
+CloseEditForm() {
+  this.isEditPopupOpened = false;
+  this.isAddStatePopupOpened = false;
+
+  this.stateComponent?.resetStateForm();   // reset form
+
+  this.showState();
+}
 
   showState() {
     this.StateDataSource = new DataSource({
@@ -269,9 +272,10 @@ export class StateListComponent {
               'success',
             );
 
-            this.formClosed.emit();
-            this.isAddStatePopupOpened = false;
-            this.showState();
+           this.formClosed.emit();
+this.stateComponent?.resetStateForm();
+this.isAddStatePopupOpened = false;
+this.showState();
           } catch (error) {
             notify(
               {
@@ -285,42 +289,37 @@ export class StateListComponent {
       });
   }
 
-  onRowRemoving(event: any) {
-    const selectedRow = event.data;
-    const { ID, STATE_CODE, STATE_NAME, COUNTRY_ID } = selectedRow;
+onRowRemoving(event: any) {
+  const selectedRow = event.data;
+  const { ID, STATE_CODE, STATE_NAME, COUNTRY_ID } = selectedRow;
 
-    event.cancel = new Promise((resolve, reject) => {
-      this.dataservice
-        .removeState(ID, STATE_CODE, STATE_NAME, COUNTRY_ID)
-        .subscribe({
-          next: () => {
-            notify(
-              {
-                message: 'Delete operation successful',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'success',
-            );
+  event.cancel = true; // stop default delete
 
-            this.dataGrid?.instance.refresh();
-            this.showState();
-
-            resolve(false); // allow delete → popup closes
+  this.dataservice
+    .removeState(ID, STATE_CODE, STATE_NAME, COUNTRY_ID)
+    .subscribe({
+      next: () => {
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
           },
-          error: () => {
-            notify(
-              {
-                message: 'Delete operation failed',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'error',
-            );
+          'success'
+        );
 
-            resolve(true); // cancel delete → popup stays
+        this.showState(); // reload datasource only
+      },
+      error: () => {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
           },
-        });
+          'error'
+        );
+      },
     });
-  }
+}
 
   getCountryDropDown() {
     this.dataservice.getCountryData().subscribe((data: any) => {

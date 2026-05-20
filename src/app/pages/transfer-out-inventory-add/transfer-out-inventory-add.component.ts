@@ -61,16 +61,12 @@ export class TransferOutInventoryAddComponent {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() selectedDocStatus: any;
-
-  @Input() isReadOnlyMode: boolean = false;
+  @Input() isReadOnlyMode: any
   @Input() ActionStatus: any = {};
-
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
-
-
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @ViewChild('itemsGridRef', { static: false })
@@ -632,20 +628,35 @@ export class TransferOutInventoryAddComponent {
         });
       }
       else if (this.selectedDocStatus == 'OPEN' && this.ActionStatus == 'VerifyScreen') {
-        this.dataService.verifyTransferOutForInventory
-          (payload).subscribe({
-            next: (res: any) => {
-              if (res.flag === 1) {
-                notify('Transfer Verifed successfully!', 'success', 3000);
-                this.popupClosed.emit();
-              } else {
-                notify('Error Verify transfer: ' + res.message, 'error', 3000);
-              }
-            },
-            error: (err: any) => {
-              notify('Something went wrong while Verify.', 'error', 3000);
-            },
-          });
+
+        confirm(
+          'Are you sure you want to Verify this transfer?',
+          'Confirm Verify',
+        ).then((result) => {
+          if (result) {
+            this.dataService.verifyTransferOutForInventory(payload).subscribe({
+              next: (res: any) => {
+                if (res.flag === 1) {
+                  notify('Transfer Verify successfully!', 'success', 3000);
+                  this.ngZone.run(() => {
+                    this.popupClosed.emit();
+                  });
+                } else {
+                  notify(
+                    'Error Verify transfer: ' + res.message,
+                    'error',
+                    3000,
+                  );
+                }
+              },
+              error: (err) => {
+                console.error('verifyTransferOutForInventory error:', err);
+                notify('Something went wrong while Verify.', 'error', 3000);
+              },
+            });
+          }
+        });
+
 
       }
       else {

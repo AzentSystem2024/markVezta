@@ -1,11 +1,11 @@
-import { Component,NgModule } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DxValidatorModule } from 'devextreme-angular/ui/validator';
 import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
 import { FormPhotoUploaderModule } from '../../utils/form-photo-uploader/form-photo-uploader.component';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators,ValidationErrors,ValidatorFn  } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { DxNumberBoxModule, DxSelectBoxModule, DxValidationGroupModule } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 
@@ -15,32 +15,32 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./currency-form.component.scss']
 })
 export class CurrencyFormComponent {
-  currency:any;
-  stateForm: FormGroup;
-  formCurrencyData:any = {
+  currency: any;
+  stateForm!: FormGroup;
+  formCurrencyData: any = {
     CODE: '',
-    SYMBOL:'',
+    SYMBOL: '',
     DESCRIPTION: '',
-    FRACTION_UNIT:'',
-    EXCHANGE:''
+    FRACTION_UNIT: '',
+    EXCHANGE: ''
   };
   numericPattern: string = '^-?\\d*\\.?\\d+$';
   exchangeError: string;
 
-  constructor(private fb: FormBuilder, private service : DataService) {}
+  constructor(private fb: FormBuilder, private service: DataService) { }
 
-  
 
-  newCurrency=this.formCurrencyData;
+
+  newCurrency = this.formCurrencyData;
 
   getNewCurrencyData = () => ({ ...this.newCurrency });
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.showCurrency();
   }
 
   showCurrency() {
-    this.service.getCurrencyData().subscribe((response:any) => {
+    this.service.getCurrencyData().subscribe((response: any) => {
       this.currency = response;
     });
   }
@@ -92,5 +92,5 @@ export class CurrencyFormComponent {
   declarations: [CurrencyFormComponent],
   exports: [CurrencyFormComponent],
 })
-export class CurrencyFormModule {}
+export class CurrencyFormModule { }
 

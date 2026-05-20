@@ -1,20 +1,18 @@
 <div class="view-wrapper list-page">
-  
-    <dx-data-grid
-      #dataGrid
-      class="grid theme-dependent"
-      [height]="'82vh'"
-      [dataSource]="brandDataSource"
-      [rowAlternationEnabled]="true"
-      rowAlternationInterval="2"
-      (onRowRemoving)="onRowRemoving($event)"
-      (onRowUpdating)="onRowUpdating($event)"
-      [showBorders]="true"
-      [allowColumnReordering]="true"
-      [allowColumnResizing]="true"
-      (onExporting)="onExporting($event)"
-    >
-
+  <dx-data-grid
+    #dataGrid
+    class="grid theme-dependent"
+    [height]="'82vh'"
+    [dataSource]="brandDataSource"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    (onRowRemoving)="onRowRemoving($event)"
+    (onRowUpdating)="onRowUpdating($event)"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    (onExporting)="onExporting($event)"
+  >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
       [visible]="true"
@@ -32,26 +30,29 @@
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 
-<dxo-export
-      [enabled]="true"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
-      <dxo-popup title="Edit Item Brand" [showTitle]="true" [width]="500" [height]="'auto'"></dxo-popup>
-      <dxo-form
-        [colCount]="1"
-        labelMode="floating"
-      >
-
-        <dxi-item
-          dataField="CODE"
-          [editorOptions]="{ placeholder: 'Code' }"
-        >
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
+      <dxo-popup
+        title="Edit Item Brand"
+        [showTitle]="true"
+        [width]="500"
+        [height]="'auto'"
+      ></dxo-popup>
+      <dxo-form [colCount]="1" labelMode="floating">
+        <dxi-item dataField="CODE" [editorOptions]="{ placeholder: 'Code' }">
           <dxi-validation-rule
             type="required"
             message="Code is required"
+          ></dxi-validation-rule>
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateBrandCode"
+            message="Code already exists"
           ></dxi-validation-rule>
         </dxi-item>
 
@@ -64,100 +65,90 @@
             message="Brand name is required"
           ></dxi-validation-rule>
         </dxi-item>
-
       </dxo-form>
     </dxo-editing>
     <dxo-search-panel
       [visible]="true"
       placeholder="Data Search"
     ></dxo-search-panel>
-    
+
     <dxo-toolbar>
+      <!-- Title -->
+      <dxi-item location="before">
+        <div
+          class="grid-header"
+          style="font-weight: 600; font-size: 20px; margin-left: 12px"
+        >
+          Item Brand
+        </div>
+      </dxi-item>
 
-    <!-- Title -->
-    <dxi-item location="before">
-      <div
-        class="grid-header"
-        style="font-weight: 600; font-size: 20px; margin-left: 12px"
-      >
-        Item Brand
-      </div>
-    </dxi-item>
+      <!-- Search Toggle Button -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
 
-    <!-- Search Toggle Button -->
-    <dxi-item
-      location="after"
-      locateInMenu="auto"
-      widget="dxButton"
-      [options]="searchButtonOptions"
-    ></dxi-item>
+      <!-- Refresh Button -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
 
-    <!-- Refresh Button -->
-    <dxi-item
-      location="after"
-      locateInMenu="auto"
-      widget="dxButton"
-      [options]="refreshButtonOptions"
-    ></dxi-item>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
-    <!-- Divider -->
-    <dxi-item location="after">
-      <div class="toolbar-divider"></div>
-    </dxi-item>
+      <!-- Export -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
 
-    <!-- Export -->
-    <dxi-item
-      name="exportButton"
-      location="after"
-      cssClass="export-btn"
-    ></dxi-item>
-
-    <!-- Add Button -->
-    <dxi-item
-      location="after"
-      locateInMenu="auto"
-      widget="dxButton"
-      [visible]="canAdd"
-      [options]="addButtonOptions"
-    ></dxi-item>
-
-</dxo-toolbar>
+      <!-- Add Button -->
+      <dxi-item
+        location="after"
+        locateInMenu="auto"
+        widget="dxButton"
+        [visible]="canAdd"
+        [options]="addButtonOptions"
+      ></dxi-item>
+    </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
       <dxi-validation-rule type="required" message="Code is required">
       </dxi-validation-rule>
 
       <dxi-validation-rule
-      type="pattern"
-      [pattern]="'^[a-zA-Z0-9]+$'"
-      message="Code should be alphanumeric only"
-    ></dxi-validation-rule>
+        type="pattern"
+        [pattern]="'^[a-zA-Z0-9]+$'"
+        message="Code should be alphanumeric only"
+      ></dxi-validation-rule>
 
       <dxi-validation-rule
-      type="custom"
-      [validationCallback]="validateGridBrandCode"
-      message="Code already exists"
-    ></dxi-validation-rule>
- 
+        type="custom"
+        [validationCallback]="validateGridBrandCode"
+        message="Code already exists"
+      ></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="BRAND_NAME" caption="Brand Name">
       <dxi-validation-rule type="required" message="Code is required">
-        <dxi-validation-rule
-        type="pattern"
-        
-        message="Brand name is required"
-      >
-      </dxi-validation-rule>
+        <dxi-validation-rule type="pattern" message="Brand name is required">
+        </dxi-validation-rule>
       </dxi-validation-rule>
     </dxi-column>
-    </dx-data-grid>
-    <form-popup
+  </dx-data-grid>
+  <form-popup
     [(visible)]="isAddBrandPopupOpened"
     (save)="onClickSaveBrand()"
     titleText="New Brand"
     [showApprove]="false"
-      >
-      <app-itm-brand-form></app-itm-brand-form>
-
-        
-      </form-popup>
-    </div>
+  >
+    <app-itm-brand-form></app-itm-brand-form>
+  </form-popup>
+</div>

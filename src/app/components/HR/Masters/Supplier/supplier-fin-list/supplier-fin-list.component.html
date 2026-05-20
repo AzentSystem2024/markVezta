@@ -139,7 +139,10 @@
     (cancel)="onCancelSupplier()"
     (onHidden)="handleFormClosed()"
   >
-    <app-supplier-fin-form #supplierForm></app-supplier-fin-form>
+    <app-supplier-fin-form
+      #supplierForm
+      [defaultVatRuleId]="defaultVatRuleId"
+    ></app-supplier-fin-form>
   </form-popup>
 
   <dx-popup
@@ -155,4 +158,3 @@
     ></app-supplier-fin-edit>
   </dx-popup>
 </div>
-

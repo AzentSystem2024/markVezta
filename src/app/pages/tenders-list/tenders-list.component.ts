@@ -14,6 +14,7 @@ import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { DxCheckBoxModule } from 'devextreme-angular';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tenders-list',
@@ -338,6 +339,11 @@ export class TendersListComponent implements OnInit {
     }
     this.showTenders(); // reload API
   }
+  getStatusFlagClass(status: string): string {
+    return status === 'Inactive'
+      ? 'flag-red'
+      : 'flag-green';
+  }
 }
 @NgModule({
   imports: [
@@ -346,6 +352,7 @@ export class TendersListComponent implements OnInit {
     FormPopupModule,
     TendersFormModule,
     DxCheckBoxModule,
+    CommonModule
   ],
   providers: [],
   exports: [],
