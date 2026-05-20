@@ -378,11 +378,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 735d559c8164973c28995d8a0d0489b6d58c058b
   getLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
   }
