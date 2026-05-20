@@ -789,6 +789,10 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     return symbol ? `${symbol} ${price}` : price;
   };
 
+  formatTotalAmount = (data: any) => {
+    return `${this.SupplierCurrencySymbol} ${data.value}`;
+  };
+
   openFile(base64Data: string, fileName: string) {
     if (!base64Data) {
       console.error('No file data available to open.');

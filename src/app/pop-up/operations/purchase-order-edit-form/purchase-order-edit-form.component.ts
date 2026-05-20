@@ -1060,6 +1060,9 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
     return symbol ? `${symbol} ${price}` : price;
   };
+  formatTotalAmount = (data: any) => {
+    return `${this.CurrencySymbol} ${data.value}`;
+  };
 
   GetStoresList() {
     const payload = {

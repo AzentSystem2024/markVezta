@@ -172,6 +172,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   showPageSizeSelector = true;
   showInfo = true;
   showNavButtons = true;
+  currency: any;
 
   constructor(
     private service: DataService,
@@ -1021,7 +1022,13 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    console.log('///////////////////////////////////////////////////////');
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    this.currency = userData.GeneralSettings.SYMBOL;
+    console.log(this.currency, 'CURRENCYYYYYYYYYYYYYYYYYY');
     this.sesstion_Details();
     this.getSupplierData();
     this.getStoreData();
@@ -1038,7 +1045,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       }
 
       this.currencySymbol = this.formdata.CURRENCY_SYMBOL;
-
+      console.log(this.currencySymbol, 'CURRENCYSYMBOLLLLLLLLLL==');
       this.today = this.formdata.GRN_DATE;
 
       this.cwidth = '100';

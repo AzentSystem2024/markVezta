@@ -479,6 +479,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     return symbol ? `${symbol} ${price}` : price;
   };
 
+  formatTotalAmount = (data: any) => {
+    return `${this.SupplierCurrencySymbol} ${data.value}`;
+  };
+
   getStoreOrCompanyByid() {
     const payload = {
       // SUPP_ID: this.newPoData.SUPP_ID,
