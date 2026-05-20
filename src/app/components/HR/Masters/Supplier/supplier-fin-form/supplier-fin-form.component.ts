@@ -108,7 +108,7 @@ export class SupplierFinFormComponent {
   Phone_limit: any;
 
   supplier: any;
-  SELECTED_VAT_RULE: any = 1
+
 
   constructor(
     private service: DataService,
@@ -139,8 +139,7 @@ export class SupplierFinFormComponent {
     this.getCurrency();
     this.getCurrency_Dropdown();
     this.newSupplier.VAT_RULE_ID = 1
-    console.log(this.SELECTED_VAT_RULE
-      , '===========vat rule id============')
+    console.log(this.newSupplier.VAT_RULE_ID, '===========vat rule id============')
   }
   newSupplier = this.formSupplierData;
 

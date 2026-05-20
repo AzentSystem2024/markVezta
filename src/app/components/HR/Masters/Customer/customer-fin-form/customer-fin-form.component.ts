@@ -4,6 +4,8 @@ import {
   enableProdMode,
   OnInit,
   ViewChild,
+  SimpleChanges,
+  Input,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -37,6 +39,8 @@ import { AuthService, DataService } from 'src/app/services';
 export class CustomerFinFormComponent {
   @ViewChild('mobileBoxRef', { static: false }) mobileBoxRef: any;
   CountryDropdownData: any;
+  @Input() deafult_vat_rule: any;
+
   VATRuleDropdownData: any[] = [];
   Warehouse: any[] = [];
   selectedWarehouseId: any[] = [];
@@ -86,7 +90,7 @@ export class CustomerFinFormComponent {
     NOTES: '',
     PRICE_CLASS_ID: 0,
     DISCOUNT_PERCENT: 0,
-    CUST_VAT_RULE_ID: 0,
+    CUST_VAT_RULE_ID: 1,
     VAT_REGNO: '',
     CUSTOMER_TYPE: 0,
     WAREHOUSE_ID: 0,
@@ -137,6 +141,20 @@ export class CustomerFinFormComponent {
     });
 
     this.getStateDropDown();
+    this.newCustomer.CUST_VAT_RULE_ID = 1
+  }
+  newCustomer = this.formCustomerData;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log("call this ng on cahnges functions")
+    if (
+      changes['deafult_vat_rule'] &&
+      changes['deafult_vat_rule'].currentValue
+    ) {
+      this.newCustomer.CUST_VAT_RULE_ID = this.deafult_vat_rule;
+      console.log(this.deafult_vat_rule, '============deafult_vat_rule==============')
+      console.log(this.newCustomer.CUST_VAT_RULE_ID)
+    }
   }
   onCountrycodeChange(e: any) {
     const payload = {
@@ -158,7 +176,6 @@ export class CustomerFinFormComponent {
       this.mobileBoxRef?.instance?.validate();
     });
   }
-  newCustomer = this.formCustomerData;
 
   // getNewCustomerData = () => ({ ...this.newCustomer });
   getNewCustomerData = () => {
@@ -315,7 +332,7 @@ export class CustomerFinFormComponent {
 
     if (!selectedCountry) return;
 
-    // 🔥 match by name (IMPORTANT)
+    //  match by name (IMPORTANT)
     const matchedCountry = this.countryCodes.find(
       (c: any) =>
         c.COUNTRY_NAME?.toLowerCase().trim() ===
@@ -367,6 +384,8 @@ export class CustomerFinFormComponent {
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
     // this.sesstion_Details();
+    this.newCustomer = this.createDefaultCustomer();
+
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
@@ -392,12 +411,22 @@ export class CustomerFinFormComponent {
     this.locationValue = '';
     this.phoneValue = '';
     this.savedAddresses = [];
+    this.newCustomer.CUST_VAT_RULE_ID = 1
+    this.newCustomer.FAX_NO = ''
+    this.newCustomer.PAY_TERM_ID = 0
+    this.newCustomer.PRICE_CLASS_ID = 0
     if (this.formCustomerData) {
       this.formCustomerData.DEALER_ID = null;
       // this.formCustomerData.CUST_TYPE = 0;
 
       this.formCustomerData.DEALER_TYPE = 0;
     }
+
+
+
+
+    this.newCustomer = this.createDefaultCustomer(); // important
+
   }
 
   savedAddresses: any[] = [];
@@ -529,6 +558,43 @@ export class CustomerFinFormComponent {
       this.Customer_type_list = res
     })
   }
+  createDefaultCustomer() {
+    return {
+      COMPANY_ID: this.selected_Company_id,
+      CUST_CODE: '',
+      FIRST_NAME: '',
+      LAST_NAME: '',
+      DOB: new Date(),
+      NATIONALITY: '',
+      CONTACT_NAME: '',
+      ADDRESS1: '',
+      ADDRESS2: '',
+      ADDRESS3: '',
+      ZIP: '',
+      STATE_ID: '',
+      CITY: '',
+      COUNTRY_ID: '',
+      PHONE: '',
+      EMAIL: '',
+      MOBILE_NO: '',
+      FAX_NO: '',
+      CREDIT_LIMIT: 0,
+      CURRENT_CREDIT: 0,
+      PAY_TERM_ID: 0,
+      NOTES: '',
+      PRICE_CLASS_ID: 0,
+      DISCOUNT_PERCENT: 0,
+      CUST_VAT_RULE_ID: 1, // default always 1
+      VAT_REGNO: '',
+      CUSTOMER_TYPE: 0,
+      WAREHOUSE_ID: 0,
+      DEALER_TYPE: 0,
+      DEALER_ID: null,
+      IS_COMPANY_BRANCH: 0,
+      DeliveryAddresses: []
+    };
+  }
+
 }
 
 @NgModule({

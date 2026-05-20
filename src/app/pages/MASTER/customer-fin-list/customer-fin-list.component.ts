@@ -154,7 +154,7 @@ export class CustomerFinListComponent {
     NOTES: '',
     PRICE_CLASS_ID: '',
     DISCOUNT_PERCENT: '',
-    CUST_VAT_RULE_ID: '',
+    CUST_VAT_RULE_ID: 1,
     VAT_REGNO: '',
     IS_COMPANY_BRANCH: 0,
   };
@@ -177,6 +177,7 @@ export class CustomerFinListComponent {
   changed_Customer_Data: any;
 
   selected_fin_id: any;
+  deafult_vat_rule: number;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -224,7 +225,9 @@ export class CustomerFinListComponent {
   }
 
   addCustomer() {
-    this.isAddCustomerPopupOpened = true;
+    this.deafult_vat_rule = 1
+    this.customerComponent?.resetPartialForm(); // optional
+
     this.sesstion_Details();
 
     this.formCustomerData = {
@@ -254,10 +257,13 @@ export class CustomerFinListComponent {
       NOTES: '',
       PRICE_CLASS_ID: '',
       DISCOUNT_PERCENT: '',
-      CUST_VAT_RULE_ID: '',
+      CUST_VAT_RULE_ID: 1,
       VAT_REGNO: '',
       IS_COMPANY_BRANCH: 0,
+
     };
+    this.isAddCustomerPopupOpened = true;
+
   }
   OnEditCustomer(e: any) {
     e.cancel = true;
