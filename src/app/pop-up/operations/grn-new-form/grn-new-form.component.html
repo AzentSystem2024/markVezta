@@ -239,9 +239,6 @@
       [calculateCellValue]="getAmountValue"
     ></dxi-column>
     <dxi-column
-      *ngIf="
-        !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
-      "
       dataField="AMOUNT"
       [width]="cwidth"
       caption="AMOUNT {{ localCurrencySymbol }}"

@@ -91,9 +91,7 @@ export class ERPJVComponent {
   storeList: any;
   departmentList: any;
 
-  constructor(
-    private dataService: DataService,
-  ) {
+  constructor(private dataService: DataService) {
     this.Deparment_Drop_down();
   }
 
@@ -120,7 +118,7 @@ export class ERPJVComponent {
     ) {
       const incomingData = changes['journalVoucherFormData'].currentValue;
       const transformedDetails = (incomingData.DETAILS || []).map(
-        (item: any) => {
+        (item: any, index: number) => {
           const matchedLedger = this.ledgerList?.find(
             (l: any) =>
               l.HEAD_CODE === item.LEDGER_CODE ||
@@ -130,8 +128,9 @@ export class ERPJVComponent {
           return {
             // Keep all original API fields
             ...item,
+            // Manual SL No
+            billNo: index + 1,
             // Grid binding fields
-            billNo: item.SL_NO ?? '',
             ledgerCode: matchedLedger?.HEAD_CODE ?? item.LEDGER_CODE ?? '',
             ledgerName: matchedLedger?.HEAD_NAME ?? item.LEDGER_NAME ?? '',
             particulars: item.PARTICULARS ?? '',

@@ -175,7 +175,7 @@
     ></dxi-column>
     <dxi-column
       dataField="SUPP_PRICE"
-      caption="PRICE"
+      [caption]="'PRICE ' + currencySymbol"
       [width]="'auto'"
       [allowEditing]="false"
       alignment="right"
@@ -234,7 +234,7 @@
     ></dxi-column>
     <dxi-column
       dataField="SUPP_AMOUNT"
-      caption="AMOUNT {{ currencySymbol }}"
+      [caption]="'AMOUNT ' + currencySymbol"
       [allowEditing]="false"
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
