@@ -387,6 +387,7 @@ import {  CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-
 import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
 import {  DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
 import { TrialBalanceFinDimensionComponent, TrialBalanceFinDimensionModule } from './pages/REPORT/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
+import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.component';
 
 
 @NgModule({
@@ -790,6 +791,7 @@ import { TrialBalanceFinDimensionComponent, TrialBalanceFinDimensionModule } fro
     CptMasterEditFormModule,
     DepartmentGroupModule,
     TrialBalanceFinDimensionModule,
+    ERPJVModule
   ],
 
   providers: [

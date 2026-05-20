@@ -42,14 +42,16 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
     CODE: '',
     CAT_NAME: '',
     LOYALTY_POINT: 0,
-    COST_HEAD_ID: '5',
+    COST_HEAD_ID: null,
     DEPT_ID: '',
-    COMPANY_ID: '1',
+    COMPANY_ID: '',
   };
   DepartmentDropdownData: any;
+  item_Ledger_DropdownData: any;
   newCategory: any;
   category: any = [];
   selected_Company_id: any;
+  IsLedgerEnabled: any;
 
   constructor(private service: DataService) {}
 
@@ -57,29 +59,21 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedData'] && changes['selectedData'].currentValue) {
-      console.log(
-        'Received selectedData:',
-        changes['selectedData'].currentValue,
-      );
-
       // Merge selectedData into formCategoryData
       this.formCategoryData = {
         ...this.formCategoryData, // keep defaults
         ...changes['selectedData'].currentValue, // override with incoming
       };
-
-     
     }
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    console.log(sessionData, '=================session data==========');
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id==============',
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+      const configuration = sessionData?.GeneralSettings || {};
+    this.IsLedgerEnabled = configuration?.ENABLE_ITEM_CATEGORY_ACCOUNTS || true;
   }
 
   showCategory() {
@@ -88,10 +82,9 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
     };
     this.service.getCategoryData(payload).subscribe((response) => {
       this.category = response;
-      console.log(response);
     });
   }
-  
+
   getDepartmentDropDown() {
     const dropdowndepartment = 'DEPARTMENT';
     const payload = {
@@ -101,7 +94,14 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
     this.service.getDropdownData(payload).subscribe((data: any) => {
       this.DepartmentDropdownData = data;
     });
+
+    this.service
+      .getDropdownData({ name: 'CATEGORY_LEDGER' })
+      .subscribe((data: any) => {
+        this.item_Ledger_DropdownData = data;
+      });
   }
+
   ngOnInit(): void {
     this.sesstion_Details();
     this.getDepartmentDropDown();
@@ -111,59 +111,72 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
   closePopup() {
     this.popupClosed.emit();
   }
+
   UpdateData() {
     const result = this.validationGroup.instance.validate();
+
     if (!result.isValid) {
       return;
     }
-    console.log('edit category');
-    const payload = {
+
+    const requestPayload = {
       COMPANY_ID: this.selected_Company_id,
     };
-    this.service.getCategoryData(payload).subscribe((response) => {
-      this.category = response;
-      console.log(response);
+
+    this.service.getCategoryData(requestPayload).subscribe((response) => {
+      this.category = response || [];
 
       const payload = {
         ...this.formCategoryData,
       };
 
-      // Exclude the current record (by ID) from duplicate check
+      const currentId = payload.ID;
+
+      const codeValue = payload.CODE?.trim().toLowerCase();
+      const categoryNameValue = payload.CAT_NAME?.trim().toLowerCase();
+      const departmentId = payload.DEPT_ID;
+
+      // Duplicate check: CODE + DEPARTMENT_ID combination
       const isCodeDuplicate = this.category.some(
         (item: any) =>
-          item.ID !== payload.ID &&
-          item.CODE?.toLowerCase().trim() ===
-            payload.CODE?.toLowerCase().trim(),
+          item.ID !== currentId &&
+          item.CODE?.trim().toLowerCase() === codeValue &&
+          item.DEPT_ID === departmentId,
       );
 
+      // Duplicate check: Category Name only
       const isDescriptionDuplicate = this.category.some(
         (item: any) =>
-          item.ID !== payload.ID &&
-          item.CAT_NAME?.toLowerCase().trim() ===
-            payload.CAT_NAME?.toLowerCase().trim(),
+          item.ID !== currentId &&
+          item.CAT_NAME?.trim().toLowerCase() === categoryNameValue,
       );
 
       if (isCodeDuplicate && isDescriptionDuplicate) {
         notify(
           {
-            message: 'Both Code and Category already exist',
+            message:
+              'Both Code + Department combination and Category already exist',
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
           'error',
         );
         return;
-      } else if (isCodeDuplicate) {
+      }
+
+      if (isCodeDuplicate) {
         notify(
           {
-            message: 'This Code already exists',
+            message: 'This Code already exists for the selected Department',
             position: { at: 'top right', my: 'top right' },
             displayTime: 1000,
           },
           'error',
         );
         return;
-      } else if (isDescriptionDuplicate) {
+      }
+
+      if (isDescriptionDuplicate) {
         notify(
           {
             message: 'This Item Category already exists',
@@ -176,8 +189,6 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
       }
 
       this.service.updateCategory(payload).subscribe((res: any) => {
-        console.log(res);
-
         if (res?.flag === '1') {
           this.popupClosed.emit();
 
@@ -187,7 +198,7 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
               position: { at: 'top right', my: 'top right' },
               displayTime: 1000,
             },
-            'success'
+            'success',
           );
         } else {
           notify(
@@ -196,7 +207,7 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
               position: { at: 'top right', my: 'top right' },
               displayTime: 2000,
             },
-            'error'
+            'error',
           );
         }
       });

@@ -89,20 +89,8 @@
       </div>
     </dxi-item>
 
-    <dxi-item [colSpan]="2">
+    <!-- <dxi-item [colSpan]="2">
       <div *dxTemplate>
-        <!-- <dx-select-box
-          label="Cost Drive"
-          [(value)]="newCptMasterData.CostDriveID"
-          [height]="40"
-          labelMode="floating"
-          [items]="CostDrive_DropDownData"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [searchEnabled]="true"
-        >
-        </dx-select-box> -->
-
         <dx-number-box
         label="CPT Fixed Quantity"
         [(value)]="newCptMasterData.FixedQuantity"
@@ -116,7 +104,7 @@
       >
       </dx-number-box>
       </div>
-    </dxi-item>
+    </dxi-item> -->
 
     <dxi-item [colSpan]="2">
       <div *dxTemplate>
@@ -131,7 +119,7 @@
           valueExpr="ID"
           (onValueChanged)="onCostCenterChanged($event)"
         >
-        <dx-validator>
+          <dx-validator>
             <dxi-validation-rule
               type="required"
               message="Costing Department is required"
@@ -147,27 +135,24 @@
     <dxi-item itemType="empty" [colSpan]="6"></dxi-item>
 
     <dxi-item *ngIf="newCptMasterData.CostDepartmentID === 1" [colSpan]="6">
-    <div *dxTemplate>
-      <dx-radio-group
-        [items]="[
-          { id: 0, text: 'Common Department for all Encounter Types' },
-          { id: 1, text: 'Separate Department for each Encounter Type' }
-        ]"
-        valueExpr="id"
-        displayExpr="text"
-        layout="vertical"
-        [(value)]="departmentMode"
-        (onValueChanged)="onRadioButtonChanged($event)"
-      >
-      </dx-radio-group>
-    </div>
-  </dxi-item>
+      <div *dxTemplate>
+        <dx-radio-group
+          [items]="[
+            { id: 0, text: 'Common Department for all Encounter Types' },
+            { id: 1, text: 'Separate Department for each Encounter Type' },
+          ]"
+          valueExpr="id"
+          displayExpr="text"
+          layout="vertical"
+          [(value)]="departmentMode"
+          (onValueChanged)="onRadioButtonChanged($event)"
+        >
+        </dx-radio-group>
+      </div>
+    </dxi-item>
 
     <dxi-item
-      *ngIf="
-        newCptMasterData.CostDepartmentID == 1 &&
-        departmentMode ==0
-      "
+      *ngIf="newCptMasterData.CostDepartmentID == 1 && departmentMode == 0"
       [colSpan]="3"
     >
       <div *dxTemplate>
@@ -192,11 +177,10 @@
       </div>
     </dxi-item>
 
-     <dxi-item  
-     *ngIf="
-        newCptMasterData.CostDepartmentID == 1 &&
-        departmentMode ==0 "
-     [colSpan]="3">
+    <dxi-item
+      *ngIf="newCptMasterData.CostDepartmentID == 1 && departmentMode == 0"
+      [colSpan]="3"
+    >
       <div *dxTemplate>
         <dx-select-box
           label="Sub Department"
@@ -213,42 +197,38 @@
     </dxi-item>
 
     <dxi-item
-  *ngIf="
-    newCptMasterData.CostDepartmentID == 1 &&
-    departmentMode ==1
-  "
-  [colSpan]="3"
->
-  <div *dxTemplate>
-    <dx-data-grid
-      #encounterGrid
-      [dataSource]="newCptMasterData.CPTEncounterDepartments"
-      height="175"
-      [showBorders]="true"
+      *ngIf="newCptMasterData.CostDepartmentID == 1 && departmentMode == 1"
+      [colSpan]="3"
     >
-      <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+      <div *dxTemplate>
+        <dx-data-grid
+          #encounterGrid
+          [dataSource]="newCptMasterData.CPTEncounterDepartments"
+          height="175"
+          [showBorders]="true"
+        >
+          <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
 
-      <dxi-column dataField="EncounterType"></dxi-column>
+          <dxi-column dataField="EncounterType"></dxi-column>
 
-      <dxi-column
-        dataField="DepartmentID"
-        caption="Department"
-      >
-      <dxo-lookup
-      [dataSource]="department_DropDownData"
-      valueExpr="ID"
-      displayExpr="DESCRIPTION">
-    </dxo-lookup>
+          <dxi-column dataField="DepartmentID" caption="Department">
+            <dxo-lookup
+              [dataSource]="department_DropDownData"
+              valueExpr="ID"
+              displayExpr="DESCRIPTION"
+            >
+            </dxo-lookup>
 
-    <dxi-validation-rule
-      type="custom"
-      [validationCallback]="validateDepartment"
-      message="Department is required">
-    </dxi-validation-rule>
-    </dxi-column>
-    </dx-data-grid>
-  </div>
- </dxi-item>
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateDepartment"
+              message="Department is required"
+            >
+            </dxi-validation-rule>
+          </dxi-column>
+        </dx-data-grid>
+      </div>
+    </dxi-item>
   </dxi-item>
 
   <!-- <dxi-item [colSpan]="6">
@@ -381,4 +361,3 @@
     </div>
   </dxi-item> -->
 </dx-form>
-

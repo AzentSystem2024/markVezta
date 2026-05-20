@@ -17,6 +17,7 @@ import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import DataSource from 'devextreme/data/data_source';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-landed-cost-list',
@@ -165,25 +166,115 @@ export class LandedCostListComponent implements OnInit {
     });
   }
 
-  onClickSaveLandedcost() {
-    // const {
-    //   DESCRIPTION,
-    //   IS_LOCAL_CURRENCY,
-    //   IS_FIXED_AMOUNT,
-    //   VALUE,
-    //   COMPANY_ID,
-    //   IS_INACTIVE,
-    // } = this.landedcostComponent.getNewLandedcost();
-    // console.log(
-    //   'inserted data',
-    //   DESCRIPTION,
-    //   IS_LOCAL_CURRENCY,
-    //   IS_FIXED_AMOUNT,
-    //   VALUE,
-    //   COMPANY_ID,
-    //   IS_INACTIVE,
-    // );
+  // onClickSaveLandedcost() {
+  //   // const {
+  //   //   DESCRIPTION,
+  //   //   IS_LOCAL_CURRENCY,
+  //   //   IS_FIXED_AMOUNT,
+  //   //   VALUE,
+  //   //   COMPANY_ID,
+  //   //   IS_INACTIVE,
+  //   // } = this.landedcostComponent.getNewLandedcost();
+  //   // console.log(
+  //   //   'inserted data',
+  //   //   DESCRIPTION,
+  //   //   IS_LOCAL_CURRENCY,
+  //   //   IS_FIXED_AMOUNT,
+  //   //   VALUE,
+  //   //   COMPANY_ID,
+  //   //   IS_INACTIVE,
+  //   // );
 
+  //   const component = this.isEditMode
+  //     ? this.editFormComponent
+  //     : this.addFormComponent;
+
+  //   const data = component.getNewLandedcost();
+
+  //   console.log('FINAL DATA', data);
+
+  //   const {
+  //     DESCRIPTION,
+  //     IS_LOCAL_CURRENCY,
+  //     IS_FIXED_AMOUNT,
+  //     VALUE,
+  //     COMPANY_ID,
+  //     IS_INACTIVE,
+  //   } = data;
+
+  //   if (this.isEditMode && this.currentEditId) {
+  //     this.dataservice
+  //       .updateLandedcostData(
+  //         this.currentEditId,
+  //         DESCRIPTION,
+  //         IS_LOCAL_CURRENCY,
+  //         IS_FIXED_AMOUNT,
+  //         VALUE,
+  //         COMPANY_ID,
+  //         IS_INACTIVE
+  //       )
+  //       .subscribe((response: any) => {
+  //         if (response?.flag === '1') {
+  //           notify(
+  //             {
+  //               message: 'Landed Cost updated successfully',
+  //               position: { at: 'top right', my: 'top right' },
+  //             },
+  //             'success'
+  //           );
+
+  //           this.isEditLandedcostPopupOpened = false;
+  //           this.showLandedcost();
+  //         }
+  //       });
+
+  //     return;
+  //   }
+
+  //   this.dataservice
+  //     .postLandedcostData(
+  //       DESCRIPTION,
+  //       IS_LOCAL_CURRENCY,
+  //       IS_FIXED_AMOUNT,
+  //       VALUE,
+  //       COMPANY_ID,
+  //       IS_INACTIVE
+  //     )
+  //     .subscribe({
+  //       next: (response: any) => {
+  //         if (response?.flag === '1') {
+  //           notify(
+  //             {
+  //               message: 'Landed Cost saved successfully',
+  //               position: { at: 'top right', my: 'top right' },
+  //             },
+  //             'success'
+  //           );
+
+  //           this.showLandedcost();
+  //           this.isAddLandedcostPopupOpened = false;
+  //         } else {
+  //           notify(
+  //             {
+  //               message: response?.message || 'Save failed',
+  //               position: { at: 'top right', my: 'top right' },
+  //             },
+  //             'error'
+  //           );
+  //         }
+  //       },
+  //       error: () => {
+  //         notify(
+  //           {
+  //             message: 'Server error while saving',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'error'
+  //         );
+  //       },
+  //     });
+  // }
+  onClickSaveLandedcost() {
     const component = this.isEditMode
       ? this.editFormComponent
       : this.addFormComponent;
@@ -201,6 +292,42 @@ export class LandedCostListComponent implements OnInit {
       IS_INACTIVE,
     } = data;
 
+    // Get current grid data
+    const list =
+      this.landedCostDataSource?._items || [];
+
+    // Duplicate check
+    const duplicateItem = list.find((item: any) => {
+      const sameDescription =
+        item.DESCRIPTION?.trim().toLowerCase() ===
+        DESCRIPTION?.trim().toLowerCase();
+
+      // ADD MODE
+      if (!this.isEditMode) {
+        return sameDescription;
+      }
+
+      // EDIT MODE
+      return (
+        sameDescription &&
+        item.ID !== this.currentEditId
+      );
+    });
+
+    if (duplicateItem) {
+      notify(
+        {
+          message: 'This Description already exists',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'error',
+      );
+
+      return;
+    }
+
+    // EDIT
     if (this.isEditMode && this.currentEditId) {
       this.dataservice
         .updateLandedcostData(
@@ -230,6 +357,7 @@ export class LandedCostListComponent implements OnInit {
       return;
     }
 
+    // ADD
     this.dataservice
       .postLandedcostData(
         DESCRIPTION,
@@ -273,6 +401,7 @@ export class LandedCostListComponent implements OnInit {
         },
       });
   }
+
   onRowUpdating(event: any) {
     const updatedData = { ...event.oldData, ...event.newData };
 
@@ -312,6 +441,7 @@ export class LandedCostListComponent implements OnInit {
   }
   onRowRemoving(event: any) {
     const selectedRow = event.data;
+
     const {
       ID,
       DESCRIPTION,
@@ -322,38 +452,45 @@ export class LandedCostListComponent implements OnInit {
       IS_INACTIVE,
     } = selectedRow;
 
-    this.dataservice
-      .removeLandedcost(
-        ID,
-        DESCRIPTION,
-        IS_LOCAL_CURRENCY,
-        IS_FIXED_AMOUNT,
-        VALUE,
-        COMPANY_ID,
-        IS_INACTIVE,
-      )
-      .subscribe(() => {
-        try {
-          // Your delete logic here
-          notify(
-            {
-              message: 'Delete operation successful',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'success',
-          );
-          this.dataGrid.instance.refresh();
-          this.showLandedcost();
-        } catch (error) {
-          notify(
-            {
-              message: 'Delete operation failed',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+    event.cancel = new Promise((resolve, reject) => {
+      this.dataservice
+        .removeLandedcost(
+          ID,
+          DESCRIPTION,
+          IS_LOCAL_CURRENCY,
+          IS_FIXED_AMOUNT,
+          VALUE,
+          COMPANY_ID,
+          IS_INACTIVE,
+        )
+        .subscribe({
+          next: () => {
+            notify(
+              {
+                message: 'Delete operation successful',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'success',
+            );
+
+            this.showLandedcost();
+
+            resolve(false); // close delete popup
+          },
+
+          error: () => {
+            notify(
+              {
+                message: 'Delete operation failed',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+
+            reject(); // keep popup open
+          },
+        });
+    });
   }
 
   selectLandedCostData(id: any) {
@@ -418,6 +555,10 @@ export class LandedCostListComponent implements OnInit {
     }
     this.showLandedcost();
   }
+  getStatusFlagClass(IS_INACTIVE: boolean): string {
+    return IS_INACTIVE ? 'flag-red' : 'flag-green';
+  }
+
 }
 
 @NgModule({
@@ -428,6 +569,7 @@ export class LandedCostListComponent implements OnInit {
     LandedCostFormModule,
     DxCheckBoxModule,
     DxRadioGroupModule,
+    CommonModule
   ],
   providers: [],
   exports: [],

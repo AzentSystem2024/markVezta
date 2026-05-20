@@ -10,6 +10,7 @@
     <!-- Code -->
     <dxi-item>
       <dx-text-box
+        class="mt-3"
         [(value)]="newCategory.CODE"
         label="Code *"
         labelMode="floating"
@@ -18,16 +19,16 @@
             type="required"
             message="Code is required"
           ></dxi-validation-rule>
-           <dxi-validation-rule
+          <dxi-validation-rule
             type="pattern"
             [pattern]="'^[a-zA-Z0-9]+$'"
             message="Code should be alphanumeric only"
           ></dxi-validation-rule>
           <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateCategoryCode"
-                message="Code already exists"
-              ></dxi-validation-rule>
+            type="custom"
+            [validationCallback]="validateCategoryCode"
+            message="Code already exists"
+          ></dxi-validation-rule>
         </dx-validator>
       </dx-text-box>
     </dxi-item>
@@ -35,6 +36,7 @@
     <!-- Category Name -->
     <dxi-item>
       <dx-text-box
+        class="mt-3"
         [(value)]="newCategory.CAT_NAME"
         label="Category Name *"
         labelMode="floating"
@@ -56,10 +58,10 @@
     <!-- Department -->
     <dxi-item>
       <dx-select-box
+        class="mt-3"
         [items]="DepartmentDropdownData"
         displayExpr="DESCRIPTION"
         valueExpr="ID"
-        placeholder="Select Department"
         [(value)]="newCategory.DEPT_ID"
         label="Department *"
         labelMode="floating"
@@ -72,5 +74,24 @@
         </dx-validator>
       </dx-select-box>
     </dxi-item>
+  </dxi-item>
+
+  <dxi-item *ngIf="IsLedgerEnabled">
+    <dx-select-box
+      class="mt-3"
+      [items]="item_Ledger_DropdownData"
+      displayExpr="DESCRIPTION"
+      valueExpr="ID"
+      [(value)]="newCategory.COST_HEAD_ID"
+      label="Ledger *"
+      labelMode="floating"
+      [searchEnabled]="true"
+      ><dx-validator>
+        <dxi-validation-rule
+          type="required"
+          message="Ledger is required"
+        ></dxi-validation-rule>
+      </dx-validator>
+    </dx-select-box>
   </dxi-item>
 </dx-form>

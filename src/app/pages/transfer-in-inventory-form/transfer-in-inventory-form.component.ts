@@ -355,13 +355,6 @@ export class TransferInInventoryFormComponent {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
-  // onCellPrepared(e: any) {
-  //   if (e.rowType === 'data' && e.column.dataField === 'QUANTITY_RECEIVED') {
-  //     e.cellElement.style.backgroundColor = '#0f4964ff'; // light yellow
-  //     e.cellElement.style.fontWeight = 'bold';
-  //   }
-  // }
-
   validateQtyReceived = (e: any) => {
     const issued = e.data?.QUANTITY_ISSUED || 0;
     const received = e.value || 0;
@@ -553,23 +546,30 @@ export class TransferInInventoryFormComponent {
         });
       } else if (this.selectedDocStatus == 'OPEN' && this.status == 'verifyscreen') {
         // UPDATE API
-        this.dataService.VerifyTransferInForInventory(payload).subscribe({
-          next: (result: any) => {
-            if (result.Flag === 1) {
-              notify('Transfer updated successfully!', 'success', 3000);
-              this.popupClosed.emit();
-            } else {
-              notify(
-                'Error updating transfer: ' + result.message,
-                'error',
-                3000,
-              );
-            }
-          },
-          error: (err) => {
-            console.error('Update error:', err);
-            notify('Something went wrong while updating.', 'error', 3000);
-          },
+        confirm(
+          'Are you sure you want to approve this transfer?',
+          'Confirm verify',
+        ).then((res) => {
+          if (res) {
+            this.dataService.VerifyTransferInForInventory(payload).subscribe({
+              next: (result: any) => {
+                if (result.Flag === 1) {
+                  notify('Transfer verify successfully!', 'success', 3000);
+                  this.popupClosed.emit();
+                } else {
+                  notify(
+                    'Error verify transfer: ' + result.message,
+                    'error',
+                    3000,
+                  );
+                }
+              },
+              error: (err) => {
+                console.error('verify error:', err);
+                notify('Something went wrong while verify.', 'error', 3000);
+              },
+            });
+          }
         });
       } else {
         this.dataService.updateTransferInForInventory(payload).subscribe({

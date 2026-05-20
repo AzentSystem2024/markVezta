@@ -193,8 +193,15 @@ export class StockAdjustmentEditComponent {
       const editable = this.adjustmentFormData.STATUS;
       this.selectedStatus = this.adjustmentFormData.STATUS;
       console.log(editable);
-      this.readOnlyTrue = editable == 5
-      this.approveValue = editable == 5
+
+      if (editable == 5) {
+        this.readOnlyTrue = true
+        this.approveValue = true
+      }
+      else {
+        this.readOnlyTrue = false
+        this.approveValue = false
+      }
       this.StoreIDData = this.adjustmentFormData.STORE_ID
 
       // this.readOnlyTrue=
@@ -410,22 +417,42 @@ export class StockAdjustmentEditComponent {
     }
 
     else if (this.status == 'verifyscreen') {
-      {
-        this.dataService
-          .Verify_Stock_Adjustment_Data(payload)
-          .subscribe((res: any) => {
-            console.log(res);
-            notify(
-              {
-                message: ' Stock Adjustment Updated successfully',
-                position: { at: 'top right', my: 'top right' },
-                displayTime: 1000,
-              },
-              'success',
-            );
-            this.popupClosed.emit();
-          });
-      }
+      confirm(
+        'It will approve and commit. Are you sure you want to commit?',
+        'Confirm Commit',
+      ).then((result) => {
+        if (result) {
+          this.dataService
+            .Verify_Stock_Adjustment_Data(payload)
+            .subscribe((res: any) => {
+              console.log('Verify :', res);
+              if (res.Flag == '1') {
+                notify(
+                  {
+                    message: 'Stock Adjustment Verify  successfully',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 500,
+                  },
+                  'success',
+                );
+                this.popupClosed.emit();
+              } else {
+                notify(
+                  {
+                    message: res.Message || 'insert failed',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 500,
+                  },
+                  'error',
+                );
+              }
+
+              // this.resetFormAfterUpdate();
+            });
+        } else {
+          notify('Verify cancelled.', 'info', 2000);
+        }
+      });
     }
     else {
       this.dataService

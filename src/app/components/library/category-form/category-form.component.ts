@@ -24,17 +24,19 @@ export class CategoryFormComponent implements OnInit {
   @Output() popupClosed = new EventEmitter<void>();
 
   DepartmentDropdownData: any;
+  item_Ledger_DropdownData:any
   formCategoryData = {
     CODE: '',
     CAT_NAME: '',
     LOYALTY_POINT: 0,
-    COST_HEAD_ID: 0,
+    COST_HEAD_ID: null,
     DEPT_ID: '',
     COMPANY_ID: 0,
   };
-  COMPANY_ID: string;
+  COMPANY_ID: string= '';
   newCategory = this.formCategoryData;
   category:any;
+  IsLedgerEnabled: any;
 
   constructor(private service: DataService) {}
 
@@ -47,8 +49,10 @@ export class CategoryFormComponent implements OnInit {
   getNewCategoryData = () => ({ ...this.newCategory });
 
   session_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
     this.COMPANY_ID = String(sessionData.SELECTED_COMPANY.COMPANY_ID);
+    const configuration = sessionData?.GeneralSettings || {};
+    this.IsLedgerEnabled = configuration?.ENABLE_ITEM_CATEGORY_ACCOUNTS || true;
   }
 
   getDepartmentDropDown() {
@@ -62,6 +66,12 @@ export class CategoryFormComponent implements OnInit {
       this.DepartmentDropdownData = data;
       this.popupClosed.emit();
     });
+
+     this.service
+      .getDropdownData({ name: 'CATEGORY_LEDGER' })
+      .subscribe((data: any) => {
+        this.item_Ledger_DropdownData = data;
+      });
   }
 
   showItemCategory() {
@@ -77,13 +87,9 @@ export class CategoryFormComponent implements OnInit {
 
   validateCategoryCode = (e: any): boolean => {
     const value = (e.value || '').trim().toLowerCase();
-
     if (!value || !this.category?.length) return true;
-
-
     return !this.category.some((item: any) => {
       const code = (item.CODE || '').trim().toLowerCase();
-
       return code === value;
     });
   };  

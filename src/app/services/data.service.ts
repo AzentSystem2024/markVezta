@@ -378,8 +378,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}article/List`, {});
   }
 
-  
-
   getLastAliasNo(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/Lastaliasno`, {});
   }
@@ -466,6 +464,10 @@ export class DataService {
 
   selectJournalVoucher(id: number) {
     return this.http.post<any>(`${this.apiUrl}ACTransactions/select/` + id, {});
+  }
+
+  select_Erp_JournalVoucher(id: number) {
+    return this.http.post<any>(`${this.apiUrl}ACTransactions/selecterp/` + id, {});
   }
 
   updateJournalVoucher(items: any) {
@@ -4263,10 +4265,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
-
-
-
-   //---------------HR Masters-----------------
+  //---------------HR Masters-----------------
   get_Department_Group_List(payload: any) {
     const getEndpoint = this.apiUrl + 'DepartmentGroup/list';
     return this.http.post(getEndpoint, payload);
@@ -4289,7 +4288,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
-   Update_Department_Group_Api(
+  Update_Department_Group_Api(
     ID: any,
     CODE: any,
     DEPT_NAME: any,
@@ -4308,9 +4307,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, reqBody);
   }
 
-
-
-   Select_Department_Group_Api(ID: any) {
+  Select_Department_Group_Api(ID: any) {
     const getEndpoint = this.apiUrl + `DepartmentGroup/select/${ID}`;
     return this.http.post(getEndpoint, {});
   }
@@ -4319,8 +4316,6 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + `DepartmentGroup/delete/${ID}`;
     return this.http.post(getEndpoint, {});
   }
-
-
 
   Select_Department_Api(ID: any) {
     const getEndpoint = this.apiUrl + `Department/select/${ID}`;
@@ -6989,7 +6984,17 @@ The result can be exported to HTML or Markdown.`;
 
   // ========= PROCESS SELECTED PENDING LIST ==========
   process_pending_rows(rowdata: any) {
-    const payload = { TransactionID: rowdata.ID };
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      CompanyID: sessionData.SELECTED_COMPANY.COMPANY_ID,
+      UserID: sessionData.USER_ID,
+      TransactionID: rowdata.HeaderID,
+      StoreID: sessionData.Configuration[0].STORE_ID,
+      FinID: sessionData.FINANCIAL_YEARS[0].FIN_ID,
+    };
+
     return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
   }
 }
