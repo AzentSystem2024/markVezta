@@ -328,16 +328,14 @@
       #saveButtonRef
       [text]="
         isSaving
-          ? miscFormData?.IS_APPROVED || isApproved
-            ? 'Saving...'
-            : 'Saving...'
-          : miscFormData?.IS_APPROVED
+          ? 'Saving...'
+          : !isEditing
             ? 'Save'
-            : isEditing
-              ? isApproved
-                ? 'Save'
-                : 'Save'
-              : 'Save'
+            : status === 'Open' && verifypopup
+              ? 'Verify'
+              : status === 'Verify'
+                ? 'Approve'
+                : 'Update'
       "
       [disabled]="isSaving"
       stylingMode="contained"

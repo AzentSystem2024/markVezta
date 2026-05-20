@@ -366,23 +366,31 @@ export class ListMiscReceiptComponent {
   // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
     e.cancel = true;
-
     const transStatus = e.row.data.TRANS_STATUS;
     const id = e.row.data.TRANS_ID;
-
     this.statusFinder = transStatus;
-
     // reset previous data
     this.selectedmiscellaneousData = null;
     this.verifypopup = false;
+
 
     this.dataService.selectMiscReceipt(id).subscribe({
       next: (res: any) => {
         this.selectedmiscellaneousData = { ...res.Data };
         this.isReadOnlyPayment = transStatus === 'Approve';
+        if (this.selectedmiscellaneousData.TRANS_STATUS == 2) {
+          this.PopupTitle = 'Approve Miscellaneous Receipt '
+        }
+        else if (this.selectedmiscellaneousData.TRANS_STATUS == 2) {
+          this.PopupTitle = 'View Miscellaneous Receipt '
 
+        }
+        else {
+          this.PopupTitle = 'Verify Miscellaneous Receipt'
+        }
         // open popup AFTER data arrives
         this.verifypopup = true;
+
       },
       error: (err) => {
         console.error('Error loading verify data:', err);
