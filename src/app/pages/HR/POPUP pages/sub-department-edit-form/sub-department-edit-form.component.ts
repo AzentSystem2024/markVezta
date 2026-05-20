@@ -120,27 +120,28 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
           'error',
         );
         return;
-      } else if (isCodeDuplicate) {
-        notify(
-          {
-            message: 'This Code already exists',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'error',
-        );
-        return;
-      } else if (isDescriptionDuplicate) {
-        notify(
-          {
-            message: 'This Description already exists',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 1000,
-          },
-          'error',
-        );
-        return;
-      }
+      } 
+      // else if (isCodeDuplicate) {
+      //   notify(
+      //     {
+      //       message: 'This Code already exists',
+      //       position: { at: 'top right', my: 'top right' },
+      //       displayTime: 1000,
+      //     },
+      //     'error',
+      //   );
+      //   return;
+      // } else if (isDescriptionDuplicate) {
+      //   notify(
+      //     {
+      //       message: 'This Description already exists',
+      //       position: { at: 'top right', my: 'top right' },
+      //       displayTime: 1000,
+      //     },
+      //     'error',
+      //   );
+      //   return;
+      // }
 
       this.service.Update_SubDepartment_Data(payload).subscribe((res: any) => {
         this.popupClosed.emit();
@@ -175,6 +176,20 @@ export class SubDepartmentEditFormComponent implements OnInit, OnChanges {
     return (
       item.ID !== this.formSubDepartmentData.ID && //  exclude current record
       code === value
+    );
+  });
+};
+validateSubDepartmentName = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.subDepartment?.length) return true;
+
+  return !this.subDepartment.some((item: any) => {
+    const name = (item.DESCRIPTION || '').trim().toLowerCase();
+
+    return (
+      item.ID !== this.formSubDepartmentData.ID && //  exclude current record
+      name === value
     );
   });
 };

@@ -45,6 +45,16 @@ export class DeliveryTermsFormComponent implements OnInit {
       return item.CODE?.toLowerCase() === value;
     });
   };
+
+  validateDeliveryName = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.delivery_terms) return true;
+
+    return !this.delivery_terms.some((item: any) => {
+      return item.DESCRIPTION?.toLowerCase() === value;
+    });
+  };
 }
 @NgModule({
   imports: [

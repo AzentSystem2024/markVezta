@@ -87,6 +87,20 @@ export class CategoryFormComponent implements OnInit {
       return code === value;
     });
   };  
+
+  validateCategoryName  = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.category?.length) return true;
+
+
+    return !this.category.some((item: any) => {
+      const code = (item.CAT_NAME || '').trim().toLowerCase();
+
+      return code === value;
+    });
+  };  
+
 }
 @NgModule({
   imports: [

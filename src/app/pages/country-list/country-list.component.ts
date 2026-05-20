@@ -112,6 +112,7 @@ export class CountryListComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           this.showCountry();
+          this.isAddCountryPopupOpened = false;
         }
       });
   }
@@ -269,20 +270,49 @@ export class CountryListComponent implements OnInit {
     this.showCountry();
   }
 
-  validateGridCountryCode = (e: any): boolean => {
-    const value = (e.value || '').trim();
+validateGridCountryCode = (e: any): boolean => {
+  const value = (e.value || '').trim();
 
-    if (!value || !this.countryArray) return true;
+  if (!value || !this.countryArray?.length) return true;
 
-    const currentId = e.data?.ID; // 🔥 important for edit
+  const currentId = e.data?.ID;
 
-    return !this.countryArray.some((item: any) => {
-      const sameCode = (item.CODE || '').trim() === value;
-      const isSameId = Number(item.ID) === Number(currentId);
+  return !this.countryArray.some((item: any) => {
+    const sameCode = (item.CODE || '').trim() === value;
+    const isSameId = Number(item.ID) === Number(currentId);
 
-      return sameCode && !isSameId;
-    });
-  };
+    return sameCode && !isSameId;
+  });
+};
+
+validateGridCountryName = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.countryArray?.length) return true;
+
+  const currentId = e.data?.ID;
+
+  return !this.countryArray.some((item: any) => {
+    const sameName =
+      (item.COUNTRY_NAME || '').trim().toLowerCase() === value;
+
+    const isSameId = Number(item.ID) === Number(currentId);
+
+    return sameName && !isSameId;
+  });
+};
+
+onCodeChange = (e: any) => {
+  let value = e.value || '';
+
+  if (value && !value.startsWith('+')) {
+    value = '+' + value;
+  }
+
+  value = value.replace(/[^0-9+]/g, '');
+
+  e.component.option('value', value);
+};
 }
 @NgModule({
   imports: [

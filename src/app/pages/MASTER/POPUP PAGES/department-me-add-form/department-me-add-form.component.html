@@ -47,6 +47,12 @@
               type="required"
               message="Department Name is required"
             ></dxi-validation-rule>
+
+             <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateDepartmentName"
+                message="Name already exists"
+            ></dxi-validation-rule>
           </dx-validator>
         </dx-text-box>
       </div>
@@ -55,11 +61,12 @@
     <dxi-item>
       <div *dxTemplate>
         <dx-select-box
-          label="Cost Bucket *"
+          label="Cost Bucket"
           labelMode="floating"
           [items]="Cost_Bucket_DropDownData"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
+          [searchEnabled]="true"
           [(value)]="newDepartment.COST_BUCKET_ID"
         >
         </dx-select-box>

@@ -6185,6 +6185,12 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
+    // REPORT============
+  Trial_Balance_Diamensions_Api(payload: any) {
+    const getEndpoint = this.apiUrl + 'AcReports/TrialBalance/Dimension';
+    return this.http.post(getEndpoint, payload);
+  }
+
   //================================Fixed assests===============================
 
   list_Fixed_Asset_api(item: any) {

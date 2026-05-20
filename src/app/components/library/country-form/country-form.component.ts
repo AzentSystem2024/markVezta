@@ -112,6 +112,16 @@ export class CountryFormComponent {
     });
   };
 
+  validateCountryName = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!value || !this.country?.length) return true;
+
+    return !this.country.some((item: any) => {
+      return (item.COUNTRY_NAME || '').trim() === value;
+    });
+  };
+
   onCodeChange(e: any) {
     let value = e.value || '';
 

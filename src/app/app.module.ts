@@ -386,10 +386,11 @@ import { CptMasterNewFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-ne
 import {  CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
 import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
 import {  DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
+import { TrialBalanceFinDimensionComponent, TrialBalanceFinDimensionModule } from './pages/REPORT/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -787,7 +788,8 @@ import {  DepartmentGroupModule } from './pages/MASTER/department-group/departme
     CPTMasterModule,
     CptMasterNewFormModule,
     CptMasterEditFormModule,
-    DepartmentGroupModule
+    DepartmentGroupModule,
+    TrialBalanceFinDimensionModule,
   ],
 
   providers: [

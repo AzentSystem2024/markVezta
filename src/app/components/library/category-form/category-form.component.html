@@ -43,6 +43,12 @@
             type="required"
             message="Category name is required"
           ></dxi-validation-rule>
+
+           <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateCategoryName"
+                message="Code already exists"
+              ></dxi-validation-rule>
         </dx-validator>
       </dx-text-box>
     </dxi-item>

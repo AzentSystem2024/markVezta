@@ -256,6 +256,21 @@ export class PaymentTermsListComponent {
       return sameCode && !isSameId;
     });
   };
+
+  validateGridDescription = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.payment_terms) return true;
+
+    const currentId = e.data?.ID;
+
+    return !this.payment_terms.some((item: any) => {
+      const sameCode = item.DESCRIPTION?.toLowerCase() === value;
+      const isSameId = Number(item.ID) === Number(currentId);
+
+      return sameCode && !isSameId;
+    });
+  };
 }
 @NgModule({
   imports: [
