@@ -162,6 +162,12 @@ export class SupplierFinFormComponent {
     }
   }
 
+  deafulvalue() {
+    console.log('==open =====');
+    this.newSupplier.VAT_RULE_ID = 1
+    this.formSupplierData.VAT_RULE_ID = 1
+
+  }
   listSupplier() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
