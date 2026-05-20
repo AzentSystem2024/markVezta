@@ -201,6 +201,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   isFilterOpened: boolean;
   vatTitle: any;
   storeItems: any;
+  CurrencySymbol: any;
 
   constructor(
     private service: DataService,
@@ -301,7 +302,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
       this.newPoData = { ...this.formdata };
       this.newPoData.PoDetails = this.formdata.PoDetails || [];
-
+      this.CurrencySymbol = this.newPoData.CURRENCY_SYMBOL || '';
+      console.log(this.newPoData.CURRENCY_SYMBOL, 'CURRENCY_NAME====');
       this.extractSupplierCountryCode();
       this.extractShippingCountryCode();
 
@@ -1052,7 +1054,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   getFormattedSupplierPrice = (rowData: any) => {
-    const symbol = rowData?.CURRENCY_SYMBOL || '';
+    // this.CurrencySymbol = rowData?.CURRENCY_SYMBOL || '';
+    const symbol = this.newPoData.CURRENCY_SYMBOL || '';
     const price = Number(rowData?.SUPP_PRICE || 0).toFixed(2);
 
     return symbol ? `${symbol} ${price}` : price;

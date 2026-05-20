@@ -76,6 +76,19 @@ export class SubDepartmentAddFormComponent implements OnInit {
       return code === value;
     });
   };  
+
+  validateSubDepartmentName = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.subDepartment?.length) return true;
+
+
+    return !this.subDepartment.some((item: any) => {
+      const name = (item.DESCRIPTION || '').trim().toLowerCase();
+
+      return name === value;
+    });
+  };  
 }
 @NgModule({
   imports: [

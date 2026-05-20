@@ -138,29 +138,29 @@ export class DepartmentMeEditFormComponent implements OnChanges {
       return;
     }
 
-    if (isCodeDuplicate) {
-      notify(
-        {
-          message: 'This Code already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error',
-      );
-      return;
-    }
+    // if (isCodeDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'This Code already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 1000,
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // }
 
-    if (isDescriptionDuplicate) {
-      notify(
-        {
-          message: 'This Description already exists',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 1000,
-        },
-        'error',
-      );
-      return;
-    }
+    // if (isDescriptionDuplicate) {
+    //   notify(
+    //     {
+    //       message: 'This Description already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 1000,
+    //     },
+    //     'error',
+    //   );
+    //   return;
+    // }
 
     // API Call with response check
     this.dataservice
@@ -274,6 +274,22 @@ export class DepartmentMeEditFormComponent implements OnChanges {
       return code === value && item.ID !== currentId; //  ignore same record
     });
 };
+
+validateDepartmentName = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value) return true;
+
+  const currentId = this.formDepartmentData.ID;
+
+  return !this.department.some((item: any) => {
+    return (
+      item.ID !== currentId &&
+      (item.DEPT_NAME || '').trim().toLowerCase() === value
+    );
+  });
+};
+
 }
 
 @NgModule({

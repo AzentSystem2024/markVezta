@@ -379,6 +379,46 @@ export class DepartmentGroupComponent {
       .Delete_Department_Group_Api(ID)
       .subscribe((response: any) => {});
   }
+
+  validateDepartmentGroupCode = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.Department?.length) return true;
+
+  // edit popup row id
+  const currentId =
+    this.editingRowData?.ID || null;
+
+  return !this.Department.some((item: any) => {
+    const code = (item.CODE || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId;
+  });
+};
+
+validateDepartmentGroupName = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.Department?.length) return true;
+
+  const currentId =
+    this.editingRowData?.ID || null;
+
+  return !this.Department.some((item: any) => {
+    const name =
+      (item.DEPT_NAME || item.DESCRIPTION || '')
+        .trim()
+        .toLowerCase();
+
+    return name === value && item.ID !== currentId;
+  });
+};
+
+getStatusFlagClass(status: any): string {
+  return status?.toLowerCase() === 'active'
+    ? 'green-flag'
+    : 'red-flag';
+}
 }
 @NgModule({
   imports: [

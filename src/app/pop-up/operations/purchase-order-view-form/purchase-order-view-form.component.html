@@ -357,7 +357,6 @@
     ></dxi-column> -->
     <!-- Conditionally add local currency column -->
     <dxi-column
-      *ngIf="showLocalCurrencyColumn"
       caption="Price ({{ SupplierCurrencySymbol }})"
       dataField="SUPP_PRICE"
       width="100"
@@ -367,14 +366,14 @@
       [customizeText]="formatSupplierPrice"
     >
     </dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       caption="Price"
       dataField="SUPP_PRICE"
       width="100"
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [editorOptions]="{ format: '#0' }"
-    ></dxi-column>
+    ></dxi-column> -->
     <dxi-column
       caption="Qty"
       dataField="qtyOrdered"
@@ -389,7 +388,7 @@
       }"
     ></dxi-column>
     <dxi-column
-      caption="Amount"
+      caption="Amount ({{ SupplierCurrencySymbol }})"
       [visible]="false"
       dataField="Amount"
       width="auto"
@@ -405,7 +404,7 @@
       [editorOptions]="{ format: '#0', mode: 'number' }"
     ></dxi-column>
     <dxi-column
-      caption="Disc Amount"
+      caption="Disc Amount ({{ SupplierCurrencySymbol }})"
       [visible]="false"
       dataField="discountAmount"
       width="auto"
@@ -422,7 +421,7 @@
     >
     </dxi-column> -->
     <dxi-column
-      caption="Taxable"
+      caption="Taxable ({{ SupplierCurrencySymbol }})"
       dataField="taxable"
       width="100"
       [allowEditing]="false"

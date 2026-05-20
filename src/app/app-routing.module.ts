@@ -196,6 +196,7 @@ import { ARImportedListComponent } from './pages/ERP-INTEGRATION/ar-imported-lis
 import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinician-master.component';
 import { CPTMasterComponent } from './pages/MASTER/cpt-master/cpt-master.component';
 import { DepartmentGroupComponent } from './pages/MASTER/department-group/department-group.component';
+import { TrialBalanceFinDimensionComponent } from './pages/REPORT/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 
 const routes: Routes = [
   {
@@ -1240,6 +1241,11 @@ const routes: Routes = [
       {
         path: 'department-group',
         component: DepartmentGroupComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'trial-balance-fin-dimension',
+        component: TrialBalanceFinDimensionComponent,
         canActivate: [AuthGuardService],
       },
 

@@ -160,18 +160,15 @@
       [allowEditing]="false"
     ></dxi-column>
     <dxi-column
-      *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2"
+      *ngIf="currency !== currencySymbol"
       dataField="SUPP_PRICE"
-      caption="PRICE {{ currencySymbol }}"
+      [caption]="'PRICE ' + currencySymbol"
       [width]="'auto'"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
       alignment="right"
     ></dxi-column>
     <dxi-column
-      *ngIf="
-        !(selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2)
-      "
       dataField="PRICE"
       caption="PRICE {{ localCurrencySymbol }}"
       [width]="'auto'"
@@ -225,20 +222,21 @@
         mode: 'number',
       }"
     ></dxi-column>
-    <dxi-column
+    <!-- <dxi-column
       dataField="QTY_BASE_UNIT"
       [width]="cwidth"
       caption="QTY IN STOCK UNIT"
       [allowEditing]="false"
-    ></dxi-column>
+    ></dxi-column> -->
     <dxi-column
-      *ngIf="selected_vat_id == sessionData?.VAT_ID && sessionData?.VAT_ID == 2"
+      *ngIf="currency !== currencySymbol"
       dataField="SUPP_AMOUNT"
       [width]="cwidth"
       [format]="{ type: 'fixedPoint', precision: 2 }"
-      caption="AMOUNT {{ currencySymbol }}"
+      [caption]="'AMOUNT ' + currencySymbol"
       [allowEditing]="false"
       alignment="right"
+      [calculateCellValue]="getAmountValue"
     ></dxi-column>
     <dxi-column
       *ngIf="
@@ -250,6 +248,7 @@
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       alignment="right"
+      [calculateCellValue]="getAmountValue"
     ></dxi-column>
 
     <ng-container *ngFor="let costItem of costingMethodDataGrid">

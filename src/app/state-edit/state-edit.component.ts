@@ -70,7 +70,13 @@ export class StateEditComponent {
     this.showState();
   }
 
-  onRowUpdating() {
+  onRowUpdating(validationGroup: any) {
+    const result = validationGroup.instance.validate();
+
+  if (!result.isValid) {
+    return;
+  }
+
     const payload = {
       ID: this.formStateData.ID,
       STATE_CODE: this.formStateData.STATE_CODE,

@@ -141,6 +141,12 @@
       <dxi-column dataField="COUNTRY_NAME" caption="Country Name">
         <dxi-validation-rule type="required" message="Country name is required">
         </dxi-validation-rule>
+        <!-- ✅ Duplicate check -->
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validateGridCountryName"
+        message="Code already exists"
+      ></dxi-validation-rule>
       </dxi-column>
     </dx-data-grid>
   </div>
@@ -149,6 +155,7 @@
     (save)="onClickSaveCountry()"
     titleText="New Country"
     [showApprove]="false"
+    [height]="250"
   >
     <app-country-form></app-country-form>
   </form-popup>

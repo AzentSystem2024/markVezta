@@ -225,6 +225,22 @@ export class DeliveryTermsListComponent {
       return sameCode && !isSameId;
     });
   };
+
+  validateGridDeliveryDescription = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.delivery_terms) return true;
+
+    // get current row ID (works for edit & add)
+    const currentId = e.data?.ID;
+
+    return !this.delivery_terms.some((item: any) => {
+      const sameCode = item.DESCRIPTION?.toLowerCase() === value;
+      const isSameId = Number(item.ID) === Number(currentId);
+
+      return sameCode && !isSameId;
+    });
+  };
 }
 @NgModule({
   imports: [

@@ -226,21 +226,33 @@ export class ItemcategoryEditComponent implements OnInit, OnChanges {
   }
 
   validateCategoryCode = (e: any): boolean => {
-    const codeValue = (e.value || '').trim().toLowerCase();
-    const departmentId = this.formCategoryData?.DEPT_ID;
-    if (!codeValue || !departmentId || !this.category?.length) {
-      return true;
-    }
-    const currentId = this.formCategoryData?.ID;
-    return !this.category.some((item: any) => {
-      const code = (item.CODE || '').trim().toLowerCase();
-      return (
-        code === codeValue &&
-        item.DEPT_ID === departmentId &&
-        item.ID !== currentId
-      );
-    });
-  };
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.category?.length) return true;
+
+  const currentId = this.formCategoryData?.ID; // current editing row
+
+  return !this.category.some((item: any) => {
+    const code = (item.CODE || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId; // ignore same record
+  });
+};
+
+validateCategoryName = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.category?.length) return true;
+
+  const currentId = this.formCategoryData?.ID; // current editing row
+
+  return !this.category.some((item: any) => {
+    const code = (item.CAT_NAME || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId; // ignore same record
+  });
+};
+
 }
 
 @NgModule({
