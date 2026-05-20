@@ -556,31 +556,28 @@
             </div>
           </dxi-item>
         </dxi-item>
-        <!-- <dxi-item itemType="group" [colCount]="1">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-select-box
-            [label]="
-              selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-                ? '  VAT Rule'
-                : ' GST Rule'
-            "
-            [items]="VATRuleDropdownData"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="newCustomer.CUST_VAT_RULE_ID"
-            placeholder="Select VAT Rule"
-            labelMode="floating"
-            
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="Select VAT rule">
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-select-box>
-        </div>
-      </dxi-item>
-    </dxi-item> -->
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item>
+            <div *dxTemplate>
+              <dx-select-box
+                [items]="VATRuleDropdownData"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                [(value)]="newCustomer.CUST_VAT_RULE_ID"
+                placeholder="Select VAT Rule *"
+                labelMode="floating"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="State is required"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-select-box>
+            </div>
+          </dxi-item>
+        </dxi-item>
         <dxi-item itemType="group" [colCount]="1">
           <dxi-item>
             <div *dxTemplate>

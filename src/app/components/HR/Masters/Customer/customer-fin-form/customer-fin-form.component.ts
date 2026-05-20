@@ -137,7 +137,10 @@ export class CustomerFinFormComponent {
     });
 
     this.getStateDropDown();
+    this.newCustomer.CUST_VAT_RULE_ID = 1
   }
+  newCustomer = this.formCustomerData;
+
   onCountrycodeChange(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
@@ -158,7 +161,6 @@ export class CustomerFinFormComponent {
       this.mobileBoxRef?.instance?.validate();
     });
   }
-  newCustomer = this.formCustomerData;
 
   // getNewCustomerData = () => ({ ...this.newCustomer });
   getNewCustomerData = () => {
@@ -392,12 +394,20 @@ export class CustomerFinFormComponent {
     this.locationValue = '';
     this.phoneValue = '';
     this.savedAddresses = [];
+    this.newCustomer.CUST_VAT_RULE_ID = 1
+    this.newCustomer.FAX_NO = ''
+    this.newCustomer.PAY_TERM_ID = 0
+    this.newCustomer.PRICE_CLASS_ID = 0
     if (this.formCustomerData) {
       this.formCustomerData.DEALER_ID = null;
       // this.formCustomerData.CUST_TYPE = 0;
 
       this.formCustomerData.DEALER_TYPE = 0;
     }
+
+
+
+
   }
 
   savedAddresses: any[] = [];
@@ -528,6 +538,12 @@ export class CustomerFinFormComponent {
       console.log(res)
       this.Customer_type_list = res
     })
+  }
+  deafulvalue() {
+    console.log('==open =====');
+    this.newCustomer.CUST_VAT_RULE_ID = 1
+    this.formCustomerData.CUST_VAT_RULE_ID = 1
+
   }
 }
 

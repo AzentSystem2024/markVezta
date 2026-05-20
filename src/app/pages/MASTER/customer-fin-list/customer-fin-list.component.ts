@@ -49,20 +49,16 @@ import { AnyCnameRecord } from 'dns';
 })
 export class CustomerFinListComponent {
   @ViewChild(CustomerFinFormComponent)
-  customerComponent: CustomerFinFormComponent;
-
+  customerComponent!: CustomerFinFormComponent;
   @ViewChild(CustomerFinEditFormComponent)
-  selectedCustomerData: CustomerFinEditFormComponent;
-
+  selectedCustomerData!: CustomerFinEditFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
-  // @ViewChild(SFormComponent) supplierForm!: SupplierFormComponent;
-  CustomerDataSource: DataSource;
+  dataGrid!: DxDataGridComponent;
+  CustomerDataSource!: DataSource;
   customerList: any[] = [];
   customerRowCount = 0;
   country: any;
   selected_Company_id: any = null; // or ''
-
   PaymentTermsDropdownData: any;
   PriceClassDropdownData: any;
   VatRuleDropdownData: any;
@@ -154,25 +150,14 @@ export class CustomerFinListComponent {
     NOTES: '',
     PRICE_CLASS_ID: '',
     DISCOUNT_PERCENT: '',
-    CUST_VAT_RULE_ID: '',
+    CUST_VAT_RULE_ID: 1,
     VAT_REGNO: '',
     IS_COMPANY_BRANCH: 0,
   };
 
   //==========================Dummy data===========================
 
-  // addButtonOptions = {
-  //   text: 'New',
-  //   icon: 'bi bi-file-earmark-plus',
-  //   type: 'default',
-  //   stylingMode: 'contained',
-  //   hint: 'Add new entry',
-  //   onClick: () => {
-  //     // Run inside Angular's zone
-  //     this.ngZone.run(() => this.addCustomer());
-  //   },
-  //   elementAttr: { class: 'add-button' },
-  // };
+
   Selected_Customer_Data: any;
   changed_Customer_Data: any;
 
@@ -224,40 +209,14 @@ export class CustomerFinListComponent {
   }
 
   addCustomer() {
+
     this.isAddCustomerPopupOpened = true;
+    setTimeout(() => {
+      this.customerComponent.deafulvalue()
+    });
+
     this.sesstion_Details();
 
-    this.formCustomerData = {
-      WAREHOUSE_ID: '',
-      DELIVERY_ADDRESS_ID: '',
-      COMPANY_ID: 0,
-      CUST_CODE: '',
-      FIRST_NAME: '',
-      LAST_NAME: '',
-      DOB: new Date(),
-      NATIONALITY: '',
-      CONTACT_NAME: '',
-      ADDRESS1: '',
-      ADDRESS2: '',
-      ADDRESS3: '',
-      ZIP: '',
-      STATE_ID: '',
-      CITY: '',
-      COUNTRY_ID: '',
-      PHONE: '',
-      EMAIL: '',
-      MOBILE_NO: '',
-      FAX_NO: '',
-      CREDIT_LIMIT: '',
-      CURRENT_CREDIT: '',
-      PAY_TERM_ID: '',
-      NOTES: '',
-      PRICE_CLASS_ID: '',
-      DISCOUNT_PERCENT: '',
-      CUST_VAT_RULE_ID: '',
-      VAT_REGNO: '',
-      IS_COMPANY_BRANCH: 0,
-    };
   }
   OnEditCustomer(e: any) {
     e.cancel = true;

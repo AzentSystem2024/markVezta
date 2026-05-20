@@ -705,6 +705,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.fileDetails.DOC_ID = this.formdata.ID;
       this.PoID = this.formdata.ID;
       this.newPoData = { ...this.formdata };
+      console.log(this.newPoData.CURRENCY_SYMBOL, 'CURRENCYSYMBOLLLLLLLLLL');
       this.newPoData.PoDetails = this.formdata.PoDetails || [];
       this.SupplierCurrencySymbol =
         this.newPoData.CURRENCY || this.newPoData.CURRENCY_NAME || '';
@@ -781,9 +782,15 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   }
 
   formatSupplierPrice = (cellInfo: any) => {
-    return `${this.SupplierCurrencySymbol} ${Number(
-      cellInfo.value || 0,
-    ).toFixed(2)}`;
+    const symbol = this.newPoData?.CURRENCY_SYMBOL || '';
+
+    const price = Number(cellInfo.value || 0).toFixed(2);
+
+    return symbol ? `${symbol} ${price}` : price;
+  };
+
+  formatTotalAmount = (data: any) => {
+    return `${this.SupplierCurrencySymbol} ${data.value}`;
   };
 
   openFile(base64Data: string, fileName: string) {

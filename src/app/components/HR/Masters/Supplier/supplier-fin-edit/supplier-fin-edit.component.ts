@@ -222,19 +222,36 @@ export class SupplierFinEditComponent {
 
       this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
 
+      this.isCurrencyAccepted = !(this.supplierData.Supplier_cost?.length > 0);
+
       console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
 
       // ✅ FIX 1: Handle MOBILE safely
-      const MobileNo = this.supplierData.MOBILE_NO;
+      const MobileNo = this.supplierData.MOBILE_NO || '';
 
-      if (MobileNo && MobileNo.includes('-')) {
-        const [countryCode, number] = MobileNo.split('-');
-        this.countryCode = countryCode;
+      if (MobileNo.includes('-')) {
+        let [code, number] = MobileNo.split('-');
+
+        code = code?.trim();
+        number = number?.trim();
+
+        // check dropdown format
+        const hasPlusInList = this.countryCodes?.some((x: any) =>
+          x.CODE?.toString().startsWith('+'),
+        );
+
+        // normalize based on dropdown values
+        if (hasPlusInList) {
+          if (!code.startsWith('+')) {
+            code = '+' + code;
+          }
+        } else {
+          code = code.replace('+', '');
+        }
+
+        this.countryCode = code;
         this.Supplier_mobile = number;
-      } else {
-        this.Supplier_mobile = '';
       }
-
       // ✅ FIX 2: Handle PHONE safely
       const phoneNo = this.supplierData.PHONE || '';
 
@@ -244,23 +261,20 @@ export class SupplierFinEditComponent {
         code = code?.trim();
         number = number?.trim();
 
-        // ✅ ADD THIS
-        if (code && !code.startsWith('+')) {
-          code = '+' + code;
+        const hasPlusInList = this.countryCodes?.some((x: any) =>
+          x.CODE?.toString().startsWith('+'),
+        );
+
+        if (hasPlusInList) {
+          if (!code.startsWith('+')) {
+            code = '+' + code;
+          }
+        } else {
+          code = code.replace('+', '');
         }
 
         this.countryCodePhone = code;
         this.PhoneNumber = number;
-      } else {
-        let code = this.DEFAULT_COUNTRY_CODE || '';
-
-        // ✅ ADD THIS (for fallback also)
-        if (code && !code.startsWith('+')) {
-          code = '+' + code;
-        }
-
-        this.countryCodePhone = code;
-        this.PhoneNumber = phoneNo;
       }
 
       console.log(this.countryCodePhone, this.PhoneNumber);
@@ -274,40 +288,85 @@ export class SupplierFinEditComponent {
   // ngOnChanges(changes: SimpleChanges): void {
   //   if (changes['supplierData'] && changes['supplierData'].currentValue) {
   //     console.log('SupplierData:', this.supplierData);
+
   //     this.Supplier_Category = this.supplierData.SUPP_CAT_ID;
+
   //     setTimeout(() => {
   //       this.purchType = Number(this.supplierData.PURCH_TYPE);
   //       console.log('Radio value:', this.purchType);
   //       this.cdr.detectChanges();
   //     });
-  //     //  this.get_Country_Dropdown_List()
+
   //     this.get_State_Dropdown_List();
 
   //     const savedCostIDs = (this.supplierData.Supplier_cost || []).map(
   //       (cost: any) => cost.COST_ID,
   //     );
+
   //     console.log('Saved Cost IDs:', savedCostIDs);
+
   //     const selectedCosts = (this.landedcost || []).filter((cost: any) =>
   //       savedCostIDs.includes(cost.ID),
   //     );
+
   //     this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
 
   //     console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
-  //     const MobileNo = this.supplierData.MOBILE_NO;
-  //     const [countryCode, number] = MobileNo.split('-');
-  //     this.countryCode = countryCode;
-  //     this.Supplier_mobile = number;
+
+  //     // ✅ FIX 1: Handle MOBILE safely
+  //     const MobileNo = this.supplierData.MOBILE_NO || '';
+
+  //     if (MobileNo.includes('-')) {
+  //       let [code, number] = MobileNo.split('-');
+
+  //       code = code?.trim();
+  //       number = number?.trim();
+
+  //       // check dropdown format
+  //       const hasPlusInList = this.countryCodes?.some((x: any) =>
+  //         x.CODE?.toString().startsWith('+'),
+  //       );
+
+  //       // normalize based on dropdown values
+  //       if (hasPlusInList) {
+  //         if (!code.startsWith('+')) {
+  //           code = '+' + code;
+  //         }
+  //       } else {
+  //         code = code.replace('+', '');
+  //       }
+
+  //       this.countryCode = code;
+  //       this.Supplier_mobile = number;
+  //     }
+  //     // ✅ FIX 2: Handle PHONE safely
   //     const phoneNo = this.supplierData.PHONE || '';
+
   //     if (phoneNo.includes('-')) {
-  //       const [code, number] = phoneNo.split('-');
+  //       let [code, number] = phoneNo.split('-');
+
+  //       code = code?.trim();
+  //       number = number?.trim();
+
+  //       const hasPlusInList = this.countryCodes?.some((x: any) =>
+  //         x.CODE?.toString().startsWith('+'),
+  //       );
+
+  //       if (hasPlusInList) {
+  //         if (!code.startsWith('+')) {
+  //           code = '+' + code;
+  //         }
+  //       } else {
+  //         code = code.replace('+', '');
+  //       }
+
   //       this.countryCodePhone = code;
   //       this.PhoneNumber = number;
-  //     } else {
-  //       // fallback
-  //       this.countryCodePhone = this.DEFAULT_COUNTRY_CODE; // or ''
-  //       this.PhoneNumber = phoneNo;
   //     }
+
   //     console.log(this.countryCodePhone, this.PhoneNumber);
+
+  //     // keep your existing calls unchanged
   //     this.onCountrycodeChange({ value: this.countryCode });
   //     this.onCountrycodeChangePhone({ value: this.countryCodePhone });
   //   }
@@ -509,7 +568,7 @@ export class SupplierFinEditComponent {
       SUPP_CAT_ID: this.Supplier_Category,
       PURCH_TYPE: this.purchType,
       MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
-      PHONE: this.countryCode + '-' + this.PhoneNumber,
+      PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
     };
     console.log(payload, 'PAYLOADINEDIT');
     this.dataservice

@@ -203,7 +203,7 @@
             [items]="VATRuleDropdownData"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
-            [(value)]="SELECTED_VAT_RULE"
+            [(value)]="newSupplier.VAT_RULE_ID"
             placeholder="Select Tax Rule"
             labelMode="floating"
             [searchEnabled]="true"
@@ -222,7 +222,7 @@
     </dxi-item>
     <dxi-item itemType="group" [colCount]="1">
       <dxi-item>
-        <div *dxTemplate>
+        <!-- <div *dxTemplate>
           <dx-select-box
             label="Category"
             [items]="SupplierCategory"
@@ -234,7 +234,7 @@
             labelMode="floating"
           >
           </dx-select-box>
-        </div>
+        </div> -->
       </dxi-item>
 
       <!-- <dxi-item>
@@ -375,7 +375,7 @@
             label="Country code *"
             [searchEnabled]="true"
             labelMode="floating"
-            [(value)]="countryCode"
+            [(value)]="countryCodePhone"
             [items]="countryCodes"
             valueExpr="CODE"
             [displayExpr]="countryDisplay"

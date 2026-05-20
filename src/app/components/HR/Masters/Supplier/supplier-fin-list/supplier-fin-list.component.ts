@@ -206,9 +206,9 @@ export class SupplierFinListComponent {
   addSupplier() {
     this.defaultVatRuleId = 1;
     this.isAddSupplierPopupOpened = true;
-    // setTimeout(() => {
-    //   this.supplierForm.setDefaultValues();
-    // });
+    setTimeout(() => {
+      this.supplierForm.deafulvalue();
+    });
   }
 
   showSupplier() {

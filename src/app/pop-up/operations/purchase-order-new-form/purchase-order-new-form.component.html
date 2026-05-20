@@ -529,14 +529,13 @@
     <!-- Conditionally add local currency column -->
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
-      caption="Price"
+      [caption]="'Price (' + SupplierCurrencySymbol + ')'"
       dataField="SUPP_PRICE"
       alignment="right"
       width="100"
       [allowEditing]="true"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [editorOptions]="{ format: '#0.00' }"
-      [calculateDisplayValue]="getFormattedSupplierPrice"
     >
     </dxi-column>
 
@@ -581,7 +580,7 @@
     ></dxi-column>
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
-      caption="Taxable"
+      [caption]="'Taxable (' + SupplierCurrencySymbol + ')'"
       dataField="taxable"
       alignment="right"
       width="100"
@@ -628,7 +627,7 @@
     </dxi-column> -->
 
     <dxi-column
-      caption="Tax Amount"
+      [caption]="'Tax Amount (' + SupplierCurrencySymbol + ')'"
       alignment="right"
       dataField="vatAmount"
       width="100"
@@ -638,7 +637,7 @@
 
     <dxi-column
       *ngIf="showLocalCurrencyColumn"
-      caption="Total"
+      [caption]="'Total (' + SupplierCurrencySymbol + ')'"
       dataField="total"
       alignment="right"
       width="100"
@@ -687,10 +686,10 @@
       <dxi-total-item
         column="total"
         summaryType="sum"
+        [customizeText]="formatTotalAmount"
         displayFormat="{0}"
         [valueFormat]="{ type: 'fixedPoint', precision: 2 }"
       >
-        <!-- <dxo-format [precision]="2" type="fixedPoint"></dxo-format> -->
       </dxi-total-item>
     </dxo-summary>
 
