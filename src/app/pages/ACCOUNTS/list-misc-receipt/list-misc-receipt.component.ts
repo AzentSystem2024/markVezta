@@ -381,7 +381,7 @@ export class ListMiscReceiptComponent {
         if (this.selectedmiscellaneousData.TRANS_STATUS == 2) {
           this.PopupTitle = 'Approve Miscellaneous Receipt '
         }
-        else if (this.selectedmiscellaneousData.TRANS_STATUS == 2) {
+        else if (this.selectedmiscellaneousData.TRANS_STATUS == 5) {
           this.PopupTitle = 'View Miscellaneous Receipt '
         }
         else {
