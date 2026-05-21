@@ -134,6 +134,9 @@ export class DebitComponent {
   vatTitle: any;
   isApproveDebitNote: boolean;
 
+  popupTitle: string = '';
+popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
+
   //========================Export data ==========================
   onExporting(event: any) {
     const fileName = 'Debit_Note';
@@ -547,15 +550,21 @@ export class DebitComponent {
 
     this.dataService.selectDebitNote(debitId).subscribe((response: any) => {
       this.selectedDebitNote = response.Data;
-      if (transStatus === 5) {
-        // Open view popup
-        this.isViewDebitNote = true;
-      } else if (transStatus === 2) {
-        this.isApproveDebitNote = true;
-      } else {
-        // Open edit popup
-        this.isVerifyDebitNote = true;
-      }
+       if (transStatus === 5) {
+      this.popupMode = 'view';
+      this.popupTitle = 'View Debit Note';
+      this.isViewDebitNote = true;
+
+    } else if (transStatus === 2) {
+      this.popupMode = 'approve';
+      this.popupTitle = 'Approve Debit Note';
+      this.isApproveDebitNote = true;
+
+    } else {
+      this.popupMode = 'verify';
+      this.popupTitle = 'Verify Debit Note';
+      this.isVerifyDebitNote = true;
+    }
     });
   }
 
@@ -569,12 +578,14 @@ export class DebitComponent {
     this.dataService.selectDebitNote(debitId).subscribe((response: any) => {
       this.selectedDebitNote = response.Data;
       if (transStatus === 5) {
-        // Open view popup
-        this.isViewDebitNote = true;
-      } else {
-        // Open edit popup
-        this.isEditDebitNote = true;
-      }
+      this.popupMode = 'view';
+      this.popupTitle = 'View Debit Note';
+      this.isViewDebitNote = true;
+    } else {
+      this.popupMode = 'edit';
+      this.popupTitle = 'Edit Debit Note';
+      this.isEditDebitNote = true;
+    }
     });
   }
 
@@ -617,6 +628,8 @@ export class DebitComponent {
   }
 
   addDebitNote() {
+    this.popupMode = 'new';
+  this.popupTitle = 'New Debit Note';
     this.isAddDebitNote = true;
     this.cdr.detectChanges();
   }

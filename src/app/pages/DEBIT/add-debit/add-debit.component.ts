@@ -71,6 +71,7 @@ export class AddDebitComponent {
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
+  @Input() mode: string = 'new';
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -152,6 +153,21 @@ export class AddDebitComponent {
   vatTitle: any;
   showSubType: boolean;
   VatClass: any;
+
+  get actionButtonText(): string {
+  switch (this.mode) {
+    case 'verify':
+      return 'Verify';
+    case 'approve':
+      return 'Approve';
+    case 'view':
+      return 'View';
+    case 'edit':
+      return 'Update';
+    default:
+      return 'Save';
+  }
+}
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();

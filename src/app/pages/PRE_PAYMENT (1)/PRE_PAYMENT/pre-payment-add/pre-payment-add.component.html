@@ -278,8 +278,9 @@
         (onClick)="cancel()"
       ></dx-button>
       <dx-button
+        *ngIf="mode !== 'view'"
         class="action-btn"
-        [text]="isSaving ? 'Saving...' : 'Save'"
+        [text]="isSaving ? 'Processing...' : actionButtonText"
         [disabled]="isSaving"
         stylingMode="contained"
         type="default"

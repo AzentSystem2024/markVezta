@@ -94,6 +94,26 @@ export class EditDebitComponent {
   @ViewChild('saveButtonRef', { static: false }) saveButtonRef!: any;
   @ViewChild('itemsGridRef', { static: false })
   itemsGridRef!: DxDataGridComponent;
+  @Input() mode: string = 'new';
+
+  get actionButtonText(): string {
+  switch (this.mode) {
+    case 'verify':
+      return 'Verify';
+
+    case 'approve':
+      return 'Approve';
+
+    case 'edit':
+      return 'Update';
+
+    case 'view':
+      return 'View';
+
+    default:
+      return 'Save';
+  }
+}
 
   netAmountDisplay: any;
   formattedTransDate: string;
