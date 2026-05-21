@@ -29,13 +29,6 @@
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
       (onCellClick)="onCellClick($event)"
     >
-    <dxo-header-filter
-  [visible]="true"
-  [allowSelectAll]="true"
-  [height]="400"
->
-  <dxo-search [enabled]="true"></dxo-search>
-</dxo-header-filter>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -168,13 +161,11 @@
         dataField="MainGroup"
         caption="Main Group"
         dataType="string"
-        [allowHeaderFiltering]="true"
       ></dxi-column>
       <dxi-column
         dataField="SubGroup"
         caption="Sub Group"
         alignment="left"
-        [allowHeaderFiltering]="true"
         dataType="number"
       ></dxi-column>
       <dxi-column dataField="Category" caption="Category" [allowHeaderFiltering]="true"></dxi-column>
@@ -196,7 +187,6 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
-          [allowHeaderFiltering]="true"
         ></dxi-column>
         <dxi-column
           dataField="OpeningBalanceCredit"
@@ -206,7 +196,6 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
-          [allowHeaderFiltering]="true"
         >
         </dxi-column>
       </dxi-column>
@@ -220,7 +209,6 @@
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
-          [allowHeaderFiltering]="true"
         ></dxi-column>
         <dxi-column
           dataField="DuringThePeriodCredit"
@@ -230,7 +218,6 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
-          [allowHeaderFiltering]="true"
         >
         </dxi-column>
       </dxi-column>
@@ -245,7 +232,6 @@
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
-          [allowHeaderFiltering]="true"
         ></dxi-column>
         <dxi-column
           dataField="ClosingBalanceCredit"
@@ -254,7 +240,6 @@
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
-          [allowHeaderFiltering]="true"
         >
         </dxi-column>
       </dxi-column>

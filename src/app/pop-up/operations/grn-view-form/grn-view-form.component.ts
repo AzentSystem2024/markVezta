@@ -586,6 +586,7 @@ export class GrnViewFormComponent {
   }
 
   ngOnInit(): void {
+    console.log('GRNVIEWWWWWWWWWWWWWWWWWWW');
     const userDataString = localStorage.getItem('userData');
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',

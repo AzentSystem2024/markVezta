@@ -366,23 +366,30 @@ export class ListMiscReceiptComponent {
   // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
     e.cancel = true;
-
     const transStatus = e.row.data.TRANS_STATUS;
     const id = e.row.data.TRANS_ID;
-
     this.statusFinder = transStatus;
-
     // reset previous data
     this.selectedmiscellaneousData = null;
     this.verifypopup = false;
+
 
     this.dataService.selectMiscReceipt(id).subscribe({
       next: (res: any) => {
         this.selectedmiscellaneousData = { ...res.Data };
         this.isReadOnlyPayment = transStatus === 'Approve';
-
+        if (this.selectedmiscellaneousData.TRANS_STATUS == 2) {
+          this.PopupTitle = 'Approve Miscellaneous Receipt '
+        }
+        else if (this.selectedmiscellaneousData.TRANS_STATUS == 5) {
+          this.PopupTitle = 'View Miscellaneous Receipt '
+        }
+        else {
+          this.PopupTitle = 'Verify Miscellaneous Receipt'
+        }
         // open popup AFTER data arrives
         this.verifypopup = true;
+
       },
       error: (err) => {
         console.error('Error loading verify data:', err);
@@ -393,25 +400,18 @@ export class ListMiscReceiptComponent {
   // ============================Approve Popup function=========================================
   onApproveClick(e: any): void {
     e.cancel = true;
-
     const transStatus = e.row.data.TRANS_STATUS;
     const id = e.row.data.TRANS_ID;
-
     this.statusFinder = transStatus;
-
     // Clear stale data
     this.selectedmiscellaneousData = null;
     this.verifypopup = false;
-
     this.dataService.selectMiscReceipt(id).subscribe({
       next: (res: any) => {
         console.log(res);
-
         // assign fresh object reference
         this.selectedmiscellaneousData = { ...res.Data };
-
         this.isReadOnlyPayment = transStatus === 'Approve';
-
         // open popup only after data is ready
         this.verifypopup = true;
       },
@@ -430,9 +430,7 @@ export class ListMiscReceiptComponent {
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
