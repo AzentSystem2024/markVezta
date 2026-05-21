@@ -198,6 +198,7 @@ import { DepartmentGroupComponent } from './pages/MASTER/department-group/depart
 import { TrialBalanceFinDimensionComponent } from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-list.component';
 import { DenialListComponent } from './pages/MASTER/denial-list/denial-list.component';
+import { ARReportPageComponent } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 
 const routes: Routes = [
   {
@@ -1081,18 +1082,11 @@ const routes: Routes = [
         component: PromotionApproveComponent,
         canActivate: [AuthGuardService],
       },
-      // {
-      //   path: 'item-store-properties-log',
-      //   component: ItemStorePropertiesLogComponent,
-      //   canActivate: [AuthGuardService],
-      // },
       {
         path: 'promotion-schema',
         component: PromotionSchemaLogComponent,
         canActivate: [AuthGuardService],
       },
-      //   canActivate: [AuthGuardService],
-      // },
       {
         path: 'supplier-me',
         component: SupplierFinListComponent,
@@ -1241,6 +1235,11 @@ const routes: Routes = [
       {
         path: 'trial-balance-fin-dimension',
         component: TrialBalanceFinDimensionComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'ar-report',
+        component: ARReportPageComponent,
         canActivate: [AuthGuardService],
       },
       {
