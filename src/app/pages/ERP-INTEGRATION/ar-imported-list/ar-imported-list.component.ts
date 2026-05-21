@@ -19,6 +19,7 @@ import {
   DxValidatorModule,
   DxLoadPanelModule,
   DxDataGridComponent,
+  DxSelectBoxModule,
 } from 'devextreme-angular';
 import CustomStore from 'devextreme/data/custom_store';
 import DataSource from 'devextreme/data/data_source';
@@ -30,6 +31,8 @@ import {
   ERPJVModule,
   ERPJVComponent,
 } from '../POPUP-PAGES/erp-jv/erp-jv.component';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import dxSelectBox from 'devextreme/ui/select_box';
 
 @Component({
   selector: 'app-ar-imported-list',
@@ -104,6 +107,18 @@ export class ARImportedListComponent {
 
   isLoading: boolean = false;
 
+  dateRanges = [
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+  selectedDateRange: any = 'last7';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup: boolean = false;
+
   constructor(
     private ngZone: NgZone,
     private srvce: DataService,
@@ -112,6 +127,154 @@ export class ARImportedListComponent {
   ) {}
 
   ngOnInit(): void {
+    this.fetch_Full_import_list();
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} to ${to}`;
+    }
+
+    return item.label;
+  };
+
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.showCustomDatePopup = true;
+      return;
+    }
+
+    // reset custom label
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+    );
+
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    this.fetch_Full_import_list();
+  }
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+      if (innerList) {
+        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
+        innerList.on('itemClick', (clickEvent: any) => {
+          const clickedValue = clickEvent.itemData.value;
+          if (clickedValue === 'custom') {
+            this.openCustomDatePopup();
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
+
+  openCustomDatePopup() {
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.showCustomDatePopup = true;
+  }
+
+  private getDateRange(): { fromDate: string | null; toDate: string | null } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'all':
+        return { fromDate: null, toDate: null };
+
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+    }
+
+    return {
+      fromDate: fromDate ? this.formatDate(fromDate) : null,
+      toDate: toDate ? this.formatDate(toDate) : null,
+    };
+  }
+
+  private formatDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
+
+  applyCustomDateFilter() {
+    if (!this.customStartDate || !this.customEndDate) return;
+
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
+
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        : option,
+    );
+
+    this.selectedDateRange = 'custom';
+    this.showCustomDatePopup = false;
+
     this.fetch_Full_import_list();
   }
 
@@ -168,8 +331,14 @@ export class ARImportedListComponent {
 
         load: async () => {
           try {
+            const { fromDate, toDate } = this.getDateRange();
+
+            const payload = {
+              DATE_FROM: fromDate,
+              DATE_TO: toDate,
+            };
             const response: any = await this.srvce
-              .import_AR_Full_List()
+              .import_AR_Full_List(payload)
               .toPromise();
 
             // Header Data
@@ -438,6 +607,8 @@ export class ARImportedListComponent {
     DxValidatorModule,
     DxLoadPanelModule,
     ERPJVModule,
+    CustomDatePopupModule,
+    DxSelectBoxModule
   ],
   providers: [],
   declarations: [ARImportedListComponent],

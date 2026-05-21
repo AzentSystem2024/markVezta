@@ -65,6 +65,8 @@ export class CustomerFinEditFormComponent {
   locationValue: any;
   phoneValue: any;
   editingIndex: number | null = null;
+   @Input() customersArray: any[] = [];
+
 
   formCustomerData: any = {
     WAREHOUSE_ID: '',
@@ -601,6 +603,34 @@ export class CustomerFinEditFormComponent {
       this.Customer_type_list = res
     })
   }
+
+  validateCustomerCode = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.customersArray?.length) return true;
+
+  const currentId = this.formCustomerData?.ID || 0;
+
+  return !this.customersArray.some((item: any) => {
+    const code = (item.CUST_CODE || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId;
+  });
+};
+
+validateCustomername = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.customersArray?.length) return true;
+
+  const currentId = this.formCustomerData?.ID || 0;
+
+  return !this.customersArray.some((item: any) => {
+    const code = (item.CONTACT_NAME || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId;
+  });
+};
 }
 
 @NgModule({

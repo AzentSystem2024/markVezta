@@ -18,7 +18,6 @@ import {
 } from './services';
 import { UnauthenticatedContentModule } from './layouts/unauthenticated-content/unauthenticated-content';
 import { AppRoutingModule } from './app-routing.module';
-import { DenialListModule } from './pages/Denial-list/denial-list.component';
 import { AnalyticsDashboardModule } from './pages/analytics-dashboard/analytics-dashboard.component';
 import { ThemeService } from './services';
 import { DxFormModule } from 'devextreme-angular';
@@ -386,11 +385,11 @@ import { CptMasterNewFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-ne
 import { CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
 import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
 import { DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
-import {
-  TrialBalanceFinDimensionComponent,
-  TrialBalanceFinDimensionModule,
-} from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
+import { TrialBalanceFinDimensionModule } from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.component';
+import { DenialListModule } from './pages/MASTER/denial-list/denial-list.component';
+import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/denial-new-form.component';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -794,6 +793,8 @@ import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.c
     DepartmentGroupModule,
     TrialBalanceFinDimensionModule,
     ERPJVModule,
+    DenialListModule,
+    DenialNewFormModule
   ],
 
   providers: [

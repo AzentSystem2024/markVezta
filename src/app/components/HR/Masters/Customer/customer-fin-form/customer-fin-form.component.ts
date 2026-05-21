@@ -4,6 +4,7 @@ import {
   enableProdMode,
   OnInit,
   ViewChild,
+  Input,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -60,6 +61,7 @@ export class CustomerFinFormComponent {
   locationValue: any;
   phoneValue: any;
   editingIndex: number | null = null;
+  @Input() customersArray: any[] = [];
 
   formCustomerData: any = {
     COMPANY_ID: this.selected_Company_id,
@@ -545,6 +547,35 @@ export class CustomerFinFormComponent {
     this.formCustomerData.CUST_VAT_RULE_ID = 1
 
   }
+
+  validateCustomerCode = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.customersArray?.length) return true;
+
+  const currentId = this.newCustomer?.ID || 0;
+
+  return !this.customersArray.some((item: any) => {
+    const code = (item.CUST_CODE || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId;
+  });
+};
+
+validateCustomername = (e: any): boolean => {
+  const value = (e.value || '').trim().toLowerCase();
+
+  if (!value || !this.customersArray?.length) return true;
+
+  const currentId = this.newCustomer?.ID || 0;
+
+  return !this.customersArray.some((item: any) => {
+    const code = (item.CONTACT_NAME || '').trim().toLowerCase();
+
+    return code === value && item.ID !== currentId;
+  });
+};
+
 }
 
 @NgModule({
