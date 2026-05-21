@@ -295,12 +295,25 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         item.ITEM_ID === updatedData.ITEM_ID &&
         item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
+    const localAmount =
+      Number(updatedRow.QUANTITY || 0) * Number(updatedRow.PRICE || 0);
+
+    const suppAmount =
+      Number(updatedRow.QUANTITY || 0) * Number(updatedRow.SUPP_PRICE || 0);
+
     const enrichedData = {
       ...updatedData,
-      ITEM_NAME: updatedRow.DESCRIPTION || updatedData.DESCRIPTION || '', // or whatever the field is
+
+      ITEM_NAME: updatedRow.DESCRIPTION || updatedData.DESCRIPTION || '',
       STORE_NAME: updatedRow.STORE_NAME || updatedData.STORE_NAME || '',
-      AMOUNT: (updatedRow.QUANTITY || 0) * (updatedRow.PRICE || 0),
-      SUPP_AMOUNT: (updatedRow.QUANTITY || 0) * (updatedRow.SUPP_PRICE || 0),
+
+      RATE: Number(updatedRow.PRICE || 0),
+
+      AMOUNT: Number(localAmount.toFixed(2)),
+
+      SUPP_PRICE: Number(updatedRow.SUPP_PRICE || 0),
+
+      SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
     };
     console.log(enrichedData, 'enrichedData');
 
@@ -361,10 +374,13 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       updatedRow.QTY_BASE_UNIT = `${baseUnitValue} ${updatedRow.UOM}`;
       console.log(updatedRow.QTY_BASE_UNIT, 'updatedRow.QTY_BASE_UNIT');
       // Calculate the amount
-      updatedRow.SUPP_AMOUNT = (receivedQty * price).toFixed(2); // Format to 2 decimal places
-      console.log(updatedRow.SUPP_AMOUNT, 'updatedRow.SUPP_AMOUNT');
+      updatedRow.SUPP_AMOUNT = (
+        Number(receivedQty || 0) * Number(updatedRow.SUPP_PRICE || 0)
+      ).toFixed(2);
 
-      updatedRow.AMOUNT = (receivedQty * localprice).toFixed(2); // Format to 2 decimal places
+      updatedRow.AMOUNT = (
+        Number(receivedQty || 0) * Number(updatedRow.PRICE || 0)
+      ).toFixed(2); // Format to 2 decimal places
       updatedRow.UNIT_COST = (
         Number(updatedRow.PO_TAXABLE_AMOUNT || 0) / Number(receivedQty || 0)
       ).toFixed(2);
@@ -503,12 +519,19 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         ITEM_ID: item.ITEM_ID,
         QUANTITY: Number(item.QUANTITY),
         RATE: Number(item.PRICE),
-        // SUPP_AMOUNT: Number(item.LOCAL_AMOUNT),
-        AMOUNT: Number(item.PRICE * item.QUANTITY),
+        AMOUNT: Number(
+          (Number(item.PRICE || 0) * Number(item.QUANTITY || 0)).toFixed(2),
+        ),
+
+        SUPP_AMOUNT: Number(
+          (Number(item.SUPP_PRICE || 0) * Number(item.QUANTITY || 0)).toFixed(
+            2,
+          ),
+        ),
         DISC_PERCENT: Number(item.DISC_PERCENT),
 
         SUPP_PRICE: Number(item.SUPP_PRICE),
-        SUPP_AMOUNT: Number(item.QUANTITY * item.SUPP_PRICE),
+        // SUPP_AMOUNT: Number(item.QUANTITY * item.SUPP_PRICE),
         UOM_PURCH: item.UOM_PURCH,
         UOM: item.UOM,
         COST: item.UNIT_COST,
