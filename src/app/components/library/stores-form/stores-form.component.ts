@@ -368,6 +368,21 @@ export class StoresFormComponent implements OnInit {
       return code === value && item.ID !== currentId;
     });
   };  
+
+  validateStoreName = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.storesArray?.length) return true;
+
+    const currentId = this.newStores?.ID || 0;
+
+    return !this.storesArray.some((item: any) => {
+      const code = (item.STORE_NAME || '').trim().toLowerCase();
+
+      return code === value && item.ID !== currentId;
+    });
+  };  
+
 }
 @NgModule({
   imports: [

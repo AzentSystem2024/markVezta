@@ -19,7 +19,7 @@
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
-      [headerFilter]="{ visible: true }"
+      [headerFilter]="headerFilterConfig"
       [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
       [columnFixing]="{
         enabled: true,
@@ -159,9 +159,7 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-      <dxo-header-filter [visible]="true">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
+      
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
@@ -184,17 +182,12 @@
       <dxi-column dataField="LedgerName" caption="Ledger Name"></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column> -->
-      <dxi-column dataField="Code" caption="Code" [allowHeaderFiltering]="true" filterType="include"></dxi-column> 
+      <dxi-column dataField="Code" caption="Code" [allowHeaderFiltering]="true" filterType="include" [headerFilter]="{
+    allowSelectAll: true,
+    search: { enabled: true }
+  }"></dxi-column> 
       <dxi-column dataField="Description" caption="Description" [allowHeaderFiltering]="true"></dxi-column> 
       <dxi-column caption="Opening Balance" cssClass="opening-header" [allowHeaderFiltering]="true">
-      <dxi-column dataField="Category" caption="Category"></dxi-column>
-      <dxi-column dataField="Code" caption="Code" width="200"></dxi-column>
-      <dxi-column
-        dataField="Description"
-        caption="Description"
-        width="200"
-      ></dxi-column>
-      <dxi-column caption="Opening Balance" cssClass="opening-header">
         <dxi-column
           dataField="OpeningBalanceDebit"
           caption="Debit"
