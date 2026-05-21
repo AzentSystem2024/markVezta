@@ -191,6 +191,7 @@ export class TimesheetListComponent {
   canVerify: boolean = false;
   SessioncanApprove: boolean = false;
   SessioncanVerify: boolean = false;
+  PopupTitle: string;
   constructor(
     private dataService: DataService,
     private zone: NgZone,
@@ -472,10 +473,12 @@ export class TimesheetListComponent {
     e.cancel = true;
 
     if (e.row?.data?.STATUS == 'Approved') {
-
+      this.PopupTitle = 'View Timesheet'
       this.viewTimesheetPopupOpened = true;
     } else {
       this.editTimesheetPopupOpened = true;
+      this.PopupTitle = 'Edit Timesheet'
+
     }
     // this.editTimesheetPopupOpened = true;
     const timesheetId = e.data.ID;

@@ -45,7 +45,6 @@ import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component'
 import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
 import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
-import { InvoiceListComponent } from '../pages/Operations/invoice-list/invoice-list.component';
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 
@@ -62,7 +61,7 @@ export class CustomDatePopupComponent {
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() applyDates = new EventEmitter<any>();
 
-  selectedYear: number | null = null;
+  selectedYear: any = null;
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';

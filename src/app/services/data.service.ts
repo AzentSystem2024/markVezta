@@ -467,7 +467,10 @@ export class DataService {
   }
 
   select_Erp_JournalVoucher(id: number) {
-    return this.http.post<any>(`${this.apiUrl}ACTransactions/selecterp/` + id, {});
+    return this.http.post<any>(
+      `${this.apiUrl}ACTransactions/selecterp/` + id,
+      {},
+    );
   }
 
   updateJournalVoucher(items: any) {
@@ -1765,13 +1768,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}itemvizard/itempricewizard`, {});
   }
 
-  //denail
-  public getDenialsData() {
-    return this.http.get<any>(
-      'http://103.180.120.134/projectx/api/DenialMaster/List',
-    );
-  }
-  //uservelel_menus
   get_userLevel_menuList() {
     const Url = `${this.apiUrl}/userlevel/usermenulist`;
     const reqBody = {
@@ -1905,7 +1901,6 @@ export class DataService {
     CODE: any,
     BRAND_NAME: any,
     COMPANY_ID: any,
-
   ): Observable<any> {
     const data = { ID, CODE, BRAND_NAME, COMPANY_ID };
 
@@ -3438,37 +3433,6 @@ export class DataService {
     // });
     // const options = { headers: headers };
     return this.http.post(url, reqBodyData);
-  }
-
-  //====================Add Denials========================
-  addDenial(CODE: any, DESCRIPTION: any, TYPE_ID: any, CATEGORY_ID: any) {
-    const DenialAddData = { CODE, DESCRIPTION, TYPE_ID, CATEGORY_ID };
-    return this.http.post(
-      'http://projectxapi.diligenzit.com/api/DenialMaster/insert',
-      DenialAddData,
-    );
-  }
-
-  //------------update Denial--------------------------
-  updateDenial(
-    ID: any,
-    CODE: any,
-    DESCRIPTION: any,
-    TYPE_ID: any,
-    CATEGORY_ID: any,
-  ) {
-    const DenialUpdateData = { ID, CODE, DESCRIPTION, TYPE_ID, CATEGORY_ID };
-    return this.http.post(
-      'http://103.180.120.134/projectx/api/DenialMaster/Update',
-      DenialUpdateData,
-    );
-  }
-
-  //================REmove Denial=========================
-  removeDenial(id: any) {
-    return this.http.get(
-      'http://103.180.120.134/projectx/api/DenialMaster/delete/' + id,
-    );
   }
 
   public getContacts = () =>
@@ -6181,7 +6145,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-    // REPORT============
+  // REPORT============
   Trial_Balance_Diamensions_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AcReports/TrialBalance/Dimension';
     return this.http.post(getEndpoint, payload);
@@ -6964,8 +6928,9 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // ======= import Ar data detailed view API ========
-  import_AR_Full_List() {
-    return this.http.post(`${this.apiUrl}ImportAR/arlist`, {});
+  import_AR_Full_List(datas: any) {
+    const payload = { FromDate: datas.DATE_FROM, ToDate: datas.DATE_TO };
+    return this.http.post(`${this.apiUrl}ImportAR/arlist`, payload);
   }
 
   // =========== import AR data API ==============
@@ -7003,5 +6968,53 @@ The result can be exported to HTML or Markdown.`;
   customer_type_drp(item: any) {
     const reqBody = item;
     return this.http.post(`${this.apiUrl}dropdown`, reqBody);
+  }
+
+  //==========================================Denia MASTER==========================================================
+
+  //====================denials Fetching==================
+  getDenialsData() {
+    return this.http.post<any>(`${this.apiUrl}DenialMaster/List`, {});
+  }
+
+  //====================Add Denials========================
+  addDenial(
+    DenialCode: any,
+    Description: any,
+    DenialTypeID: any,
+    DenialCategoryID: any,
+  ) {
+    const DenialAddData = {
+      DenialCode,
+      Description,
+      DenialTypeID,
+      DenialCategoryID,
+    };
+
+    return this.http.post(`${this.apiUrl}DenialMaster/Insert`, DenialAddData);
+  }
+
+  //------------update Denial--------------------------
+  updateDenial(
+    ID: any,
+    DenialCode: any,
+    Description: any,
+    DenialTypeID: any,
+    DenialCategoryID: any,
+  ) {
+    const UpdateData = {
+      ID,
+      DenialCode,
+      Description,
+      DenialTypeID,
+      DenialCategoryID,
+    };
+
+    return this.http.post(`${this.apiUrl}DenialMaster/Update`, UpdateData);
+  }
+
+  //================REmove Denial=========================
+  removeDenial(id: any) {
+    return this.http.post(`${this.apiUrl}DenialMaster/delete/${id}`, {});
   }
 }
