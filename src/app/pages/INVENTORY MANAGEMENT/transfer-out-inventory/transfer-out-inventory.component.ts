@@ -194,6 +194,7 @@ export class TransferOutInventoryComponent {
   dateFilteredList: any = [];
   StatusType: any;
   selected_Data_Status: any;
+  buttonText: string;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -614,8 +615,8 @@ export class TransferOutInventoryComponent {
     const trOutId = event.data.TRANS_ID;
     this.selected_Data_Status = event.data.STATUS;
     this.StatusType = 'EditScreen'
+    this.buttonText = 'Update Transfer Out';
     this.isReadOnlyTrOut = false
-
     this.select_function(trOutId)
   }
 
@@ -722,6 +723,16 @@ export class TransferOutInventoryComponent {
       .subscribe((response: any) => {
         this.selectedTrOut = response;
         this.isEditTransferOut = true;
+        if (this.selected_Data_Status === 'OPEN') {
+          this.StatusType = 'VerifyScreen';
+          this.buttonText = 'Verify';
+        } else if (this.selected_Data_Status === 'VERIFY') {
+          this.StatusType = 'ApprovalScreen';
+          this.buttonText = 'Approve';
+        } else {
+          this.StatusType = 'viewScreen';
+          this.buttonText = 'View';
+        }
         this.cdr.detectChanges();
       });
   }
@@ -751,11 +762,8 @@ export class TransferOutInventoryComponent {
     }
     else {
       this.isReadOnlyTrOut = false;
-
     }
     this.cdr.detectChanges();
-
-
     this.dataService
       .selectTransferOutForInventory(trOutId)
       .subscribe((response: any) => {
@@ -764,16 +772,18 @@ export class TransferOutInventoryComponent {
         console.log(this.selected_Data_Status, "STSSSSSSUSSS")
         if (this.selected_Data_Status === 'OPEN') {
           this.StatusType = 'VerifyScreen'
+          this.buttonText = 'Verify Transfer Out';
+
         } else if (
           this.selected_Data_Status = 'VERIFY') {
+          this.buttonText = 'Approve Transfer Out';
           this.StatusType = 'ApprovalScreen'
 
         } else {
           this.StatusType = 'viewScreen'
+          this.buttonText = 'View Transfer Out';
 
         }
-
-
       });
   }
 }

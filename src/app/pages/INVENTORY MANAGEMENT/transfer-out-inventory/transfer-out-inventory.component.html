@@ -324,7 +324,7 @@
   [(visible)]="isAddTransferOut"
   [width]="'75vw'"
   [height]="'90vh'"
-  title="Transfer Out"
+  title=" New Transfer Out"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddTransferOut">
@@ -338,7 +338,7 @@
   [(visible)]="isEditTransferOut"
   [width]="'75vw'"
   [height]="'90vh'"
-  title="Transfer Out"
+  [title]="buttonText"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditTransferOut">
