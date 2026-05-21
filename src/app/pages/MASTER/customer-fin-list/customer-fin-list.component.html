@@ -438,7 +438,7 @@
     (cancel)="onCancelCustomer()"
     (save)="onClickSaveCustomer()"
   >
-    <app-customer-fin-form></app-customer-fin-form>
+    <app-customer-fin-form [customersArray]="customerList"></app-customer-fin-form>
   </form-popup>
   <form-popup
     [(visible)]="isEditCustomerPopupOpened"
@@ -451,6 +451,7 @@
     <app-customer-fin-edit-form
       [selectedCustomerData]="Selected_Customer_Data"
       (customerUpdated)="onCustomerUpdated($event)"
+      [customersArray]="customerList"
     ></app-customer-fin-edit-form>
   </form-popup>
 </div>

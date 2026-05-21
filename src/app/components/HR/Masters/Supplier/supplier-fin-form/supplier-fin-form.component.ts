@@ -423,6 +423,16 @@ export class SupplierFinFormComponent {
       (item: any) => item.SUPP_CODE?.toLowerCase() === value,
     );
   };
+
+  validateSupplierName = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.supplier) return true;
+
+    return !this.supplier.some(
+      (item: any) => item.SUPP_NAME?.toLowerCase() === value,
+    );
+  };
 }
 @NgModule({
   imports: [

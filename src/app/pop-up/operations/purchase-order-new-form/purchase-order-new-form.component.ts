@@ -1233,7 +1233,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       SUPP_GROSS_AMOUNT: '',
       SUPP_NET_AMOUNT: '',
       EXCHANGE_PRICE: '',
-      ISSUED_EMP_ID: '0',
+      ISSUED_EMP_ID: '',
       PoDetails: [],
       ...defaultDates, // Preserve the date values
     };

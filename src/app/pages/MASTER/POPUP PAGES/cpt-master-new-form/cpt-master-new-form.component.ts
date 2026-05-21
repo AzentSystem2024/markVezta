@@ -24,6 +24,7 @@ import {
   DxTagBoxModule,
   DxTextAreaModule,
   DxTextBoxModule,
+  DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
 import { FormTextboxModule } from 'src/app/components';
@@ -32,6 +33,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { DxiValidationRuleModule } from 'devextreme-angular/ui/nested';
 
 @Component({
   selector: 'app-cpt-master-new-form',
@@ -485,6 +487,8 @@ export class CptMasterNewFormComponent implements OnInit {
     DxDropDownBoxModule,
     DxButtonModule,
     DxRadioGroupModule,
+    DxValidationGroupModule,
+    DxiValidationRuleModule,
   ],
   declarations: [CptMasterNewFormComponent],
   exports: [CptMasterNewFormComponent],

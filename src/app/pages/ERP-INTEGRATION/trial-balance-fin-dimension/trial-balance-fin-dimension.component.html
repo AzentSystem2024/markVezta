@@ -19,7 +19,7 @@
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
-      [headerFilter]="{ visible: false }"
+      [headerFilter]="isFilterRowVisible ? { visible: true } : { visible: false }"
       [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
       [columnFixing]="{
         enabled: true,
@@ -153,9 +153,7 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-      <dxo-header-filter [visible]="true">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
+      
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
