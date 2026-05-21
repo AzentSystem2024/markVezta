@@ -89,6 +89,7 @@ export class AddMiscellaneousPaymentComponent {
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
   dataGrid: DxDataGridComponent;
   @Input() MiscPaymentId: any;
+  @Input() mode: string = 'new';
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -166,6 +167,85 @@ export class AddMiscellaneousPaymentComponent {
   Store: any;
  @Input() verifyMiscPopupOpened: boolean = false;
 
+ get popupTitle(): string {
+  switch (this.mode) {
+    case 'new':
+      return 'New Miscellaneous Payment';
+
+    case 'edit':
+      return 'Edit Miscellaneous Payment';
+
+    case 'verify':
+      return 'Verify Miscellaneous Payment';
+
+    case 'approve':
+      return 'Approve Miscellaneous Payment';
+
+    case 'view':
+      return 'View Miscellaneous Payment';
+
+    default:
+      return 'Miscellaneous Payment';
+  }
+} 
+
+get actionButtonText(): string {
+  if (this.isSaving) {
+    switch (this.mode) {
+      case 'new':
+        return 'Saving...';
+
+      case 'edit':
+        return 'Updating...';
+
+      case 'verify':
+        return 'Verifying...';
+
+      case 'approve':
+        return 'Approving...';
+
+      default:
+        return 'Processing...';
+    }
+  }
+
+  switch (this.mode) {
+    case 'new':
+      return 'Save';
+
+    case 'edit':
+      return 'Update';
+
+    case 'verify':
+      return 'Verify';
+
+    case 'approve':
+      return 'Approve';
+
+    default:
+      return '';
+  }
+}
+
+onActionClick() {
+  switch (this.mode) {
+    case 'new':
+      this.onSave();
+      break;
+
+    case 'edit':
+      this.onUpdateMiscReceipt();
+      break;
+
+    case 'verify':
+      this.onUpdateMiscReceipt();
+      break;
+
+    case 'approve':
+      this.onUpdateMiscReceipt();
+      break;
+  }
+}
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
@@ -273,8 +353,8 @@ export class AddMiscellaneousPaymentComponent {
     // Populate pendingInvoicelist from DetailList
     if (Array.isArray(data.DetailList) && data.DetailList.length > 0) {
       this.pendingInvoicelist = data.DetailList.map((item: any) => ({
-        ledgerCode: data.LEDGER_CODE ?? '', // coming from parent object
-        ledgerName: data.LEDGER_NAME ?? '',
+        ledgerCode: item.LEDGER_CODE || '',
+      ledgerName: item.LEDGER_NAME || '',
         DESCRIPTION: item.REMARKS ?? '',
         AMOUNT: item.AMOUNT ?? null,
         STORE_ID : item.STORE_ID ?? null,

@@ -284,12 +284,13 @@
   [(visible)]="isAddDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="New Debit Note"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <app-add-debit
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
+    [mode]="'new'"
   ></app-add-debit>
 </dx-popup>
 
@@ -297,14 +298,16 @@
   [(visible)]="isEditDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Edit Debit Note"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditDebitNote">
     <app-edit-debit
+    [mode]="'edit'"
       [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
+      
     ></app-edit-debit>
   </ng-container>
 </dx-popup>
@@ -313,7 +316,7 @@
   [(visible)]="isVerifyDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Verify Debit Note"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isVerifyDebitNote">
@@ -321,6 +324,7 @@
       [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
+      [mode]="'verify'"
       [isVerifyDebitNote]="isVerifyDebitNote"
     ></app-edit-debit>
   </ng-container>
@@ -330,11 +334,12 @@
   [(visible)]="isApproveDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Approve Debit Note"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isApproveDebitNote">
     <app-edit-debit
+      [mode]="'approve'"
       [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
@@ -347,7 +352,7 @@
   [(visible)]="isViewDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="View Debit Note"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isViewDebitNote">

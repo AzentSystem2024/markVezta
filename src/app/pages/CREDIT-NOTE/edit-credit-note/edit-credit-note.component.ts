@@ -160,6 +160,16 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   subType: boolean = false;
   subTypeList: any;
 
+
+get actionButtonText(): string {
+  if (this.isVerifyCreditNote) return 'Verify';
+  if (this.isApproveMode) return 'Approve';
+  return 'Update';
+}
+get isReadOnlyMode(): boolean {
+  return this.creditHeader?.TRANS_STATUS === 5 && !this.isApproveMode;
+}
+
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -1462,231 +1472,175 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
     return `${year}-${month}-${day}`;
   }
 
-  updateCreditNote() {
-    if (this.isUpdating) {
-      return;
-    }
-    this.isUpdating = true;
-    // 1) Ensure in-progress edits are committed
-    this.itemsGridRef?.instance?.saveEditData();
+ updateCreditNote() {
+  if (this.isUpdating) return;
 
-    // small util to compute GST
-    const calculateTaxAmount = (item: any): number => {
-      const amount = Number(item.Amount) || 0;
-      const gstPerc = Number(item.GST_PERC) || 0;
-      return +((amount * gstPerc) / 100).toFixed(2);
-    };
-    const details = this.noteDetails || [];
-    let totalAmount = 0;
-    let totalGST = 0;
+  this.isUpdating = true;
 
-    details.forEach((item: any) => {
-      const amount = Number(item.Amount) || 0;
-      const gstPerc = Number(item.GST_PERC) || 0;
-      totalAmount += amount;
-      totalGST += (amount * gstPerc) / 100;
-    });
+  // commit pending grid edits
+  this.itemsGridRef?.instance?.saveEditData();
 
-    const netAmount = totalAmount + totalGST;
-    const dueAmount = Number(this.creditFormData[0]?.DUE_AMOUNT) || 0;
-    // Validation check
-    if (netAmount > dueAmount) {
-      notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
-      this.isUpdating = false;
-      return;
-    }
-    // Build NOTE_DETAIL consistently (use same shape for both branches)
-    const buildNoteDetail = () =>
-      (this.noteDetails || [])
-        .filter((item: any) => {
-          const hasLedger = !!item.ledgerCode || !!item.ledgerName;
-          const hasAmount = Number(item.Amount) > 0;
+  const details = this.noteDetails || [];
+  let totalAmount = 0;
+  let totalGST = 0;
 
-          //  ONLY include rows that actually matter
-          return hasLedger && hasAmount;
-        })
-        .map((item: any, index: number) => {
-          const match = this.ledgerList.find(
-            (l: any) =>
-              l.HEAD_CODE === item.ledgerCode ||
-              l.HEAD_NAME === item.ledgerName,
-          );
+  details.forEach((item: any) => {
+    const amount = Number(item.Amount) || 0;
+    const gstPerc = Number(item.GST_PERC) || 0;
 
-          const amount = Number(item.Amount) || 0;
+    totalAmount += amount;
+    totalGST += (amount * gstPerc) / 100;
+  });
 
-          // SINGLE SOURCE OF TRUTH
-          const gstAmount = this.calculateGstFromRow(item);
+  const netAmount = totalAmount + totalGST;
+  const dueAmount = Number(this.creditFormData[0]?.DUE_AMOUNT) || 0;
 
-          return {
-            SL_NO: item.SL_NO || index + 1,
-            HEAD_ID: match?.HEAD_ID || item.HEAD_ID || null,
+  if (netAmount > dueAmount) {
+    notify('Net Amount cannot exceed Due Amount.', 'error', 2500);
+    this.isUpdating = false;
+    return;
+  }
 
-            AMOUNT: amount,
+  const buildNoteDetail = () =>
+    (this.noteDetails || [])
+      .filter((item: any) => {
+        const hasLedger = !!item.ledgerCode || !!item.ledgerName;
+        const hasAmount = Number(item.Amount) > 0;
+        return hasLedger && hasAmount;
+      })
+      .map((item: any, index: number) => {
+        const match = this.ledgerList.find(
+          (l: any) =>
+            l.HEAD_CODE === item.ledgerCode ||
+            l.HEAD_NAME === item.ledgerName,
+        );
 
-            // Preserve exactly what row already has
-            // GST_PERC: Number(item.GST_PERC) || 0,
-            GST_PERC: item.GST_ID,
-            CGST: Number(item.CGST) || 0,
-            SGST: Number(item.SGST) || 0,
-
-            //  ALWAYS CORRECT (even if row untouched)
-            GST_AMOUNT: gstAmount,
-
-            REMARKS: item.particulars || '',
-          };
-        });
-
-    // APPROVE / COMMIT path
-    if (
-      this.creditFormData[0].IS_APPROVED ||
-      this.creditFormData[0].TRANS_STATUS === 2
-    ) {
-      confirm(
-        'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit',
-      ).then((result) => {
-        this.isUpdating = true;
-        if (result) {
-          const payload = {
-            TRANS_ID: this.creditFormData[0].TRANS_ID,
-            IS_APPROVED: true,
-            TRANS_TYPE: 37,
-            COMPANY_ID: this.selectedCompanyId,
-            FIN_ID: this.finId,
-            STORE_ID: this.selectedstoreId,
-            // TRANS_DATE: this.transDate,
-            TRANS_DATE: this.formatDateOnly(this.transDate),
-
-            TRANS_STATUS: 1,
-            NARRATION: this.creditFormData[0].NARRATION,
-            INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
-            INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
-            UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
-            DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
-            PARTY_NAME: this.creditFormData.PARTY_NAME,
-            NOTE_DETAIL: buildNoteDetail(),
-            ROUND_OFF: this.creditFormData[0].ROUND_OFF,
-            VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
-          };
-
-          this.dataService.commitCreditNote(payload).subscribe(
-            (response: any) => {
-              if (response.flag === 1) {
-                notify('Credit Note approved successfully!', 'success', 3000);
-                this.popupClosed.emit();
-                this.isUpdating = false;
-              } else {
-                notify(`Approval failed: ${response.Message}`, 'error', 4000);
-                this.isUpdating = false;
-              }
-            },
-            (error) => {
-              console.error('Approval error:', error);
-              alert('Something went wrong while approving');
-              this.isUpdating = false;
-            },
-          );
-        } else {
-          notify('Approval cancelled.', 'info', 2000);
-          this.isUpdating = false;
-        }
+        return {
+          SL_NO: item.SL_NO || index + 1,
+          HEAD_ID: match?.HEAD_ID || item.HEAD_ID || null,
+          AMOUNT: Number(item.Amount) || 0,
+          GST_PERC: item.GST_ID,
+          CGST: Number(item.CGST) || 0,
+          SGST: Number(item.SGST) || 0,
+          GST_AMOUNT: this.calculateGstFromRow(item),
+          REMARKS: item.particulars || '',
+        };
       });
-      this.isUpdating = false;
-      return;
-    }
 
-    if (this.isVerifyCreditNote === true) {
+  const basePayload = {
+    TRANS_ID: this.creditFormData[0].TRANS_ID,
+    TRANS_TYPE: 37,
+    COMPANY_ID: this.selectedCompanyId,
+    FIN_ID: this.finId,
+    STORE_ID: this.selectedstoreId,
+    TRANS_DATE: this.formatDateOnly(this.transDate),
+    TRANS_STATUS: 1,
+    NARRATION: this.creditFormData[0].NARRATION,
+    INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
+    INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
+    UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
+    DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
+    PARTY_NAME: this.creditFormData[0].PARTY_NAME,
+    NOTE_DETAIL: buildNoteDetail(),
+    ROUND_OFF: this.creditFormData[0].ROUND_OFF,
+    VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
+  };
+
+  // ================= VERIFY MODE =================
+  if (this.isVerifyCreditNote) {
+    confirm(
+      'Are you sure you want to verify this Credit Note?',
+      'Confirm Verification'
+    ).then((result) => {
+      if (!result) {
+        this.isUpdating = false;
+        notify('Verification cancelled.', 'info', 2000);
+        return;
+      }
+
       const verifyPayload = {
-        TRANS_ID: this.creditFormData[0].TRANS_ID,
-        TRANS_TYPE: 37,
-        COMPANY_ID: this.selectedCompanyId,
-        FIN_ID: this.finId,
-        STORE_ID: 1,
-        TRANS_DATE: this.formatDateOnly(this.transDate),
-        TRANS_STATUS: 1,
-        NARRATION: this.creditFormData[0].NARRATION,
-        INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
-        INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
-        UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
-        DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
-        PARTY_NAME: this.creditFormData.PARTY_NAME,
+        ...basePayload,
         IS_APPROVED: false,
-        NOTE_DETAIL: buildNoteDetail(),
-        ROUND_OFF: this.creditFormData[0].ROUND_OFF,
-        VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
       };
 
-      confirm(
-        'Are you sure you want to verify this Credit Note?',
-        'Confirm Verification',
-      ).then((result) => {
-        if (result) {
-          this.dataService.verifyCreditNote(verifyPayload).subscribe(
-            (response: any) => {
-              this.isUpdating = false;
-
-              if (response.flag === 1 || response.Flag === 1) {
-                notify(
-                  {
-                    message: 'Credit Note Verified Successfully',
-                    position: { at: 'top right', my: 'top right' },
-                  },
-                  'success',
-                );
-
-                this.popupClosed.emit();
-              }
-            },
-            (error) => {
-              this.isUpdating = false;
-              notify('Error while verifying Credit Note', 'error', 3000);
-            },
-          );
-        } else {
+      this.dataService.verifyCreditNote(verifyPayload).subscribe(
+        (response: any) => {
           this.isUpdating = false;
-          notify('Verification cancelled.', 'info', 2000);
+
+          if (response.flag === 1 || response.Flag === 1) {
+            notify('Credit Note Verified Successfully', 'success', 3000);
+            this.popupClosed.emit();
+          }
+        },
+        () => {
+          this.isUpdating = false;
+          notify('Error while verifying Credit Note', 'error', 3000);
         }
-      });
-
-      return;
-    }
-
-    // NORMAL UPDATE path
-    const payload = {
-      TRANS_ID: this.creditFormData[0].TRANS_ID,
-      TRANS_TYPE: 37,
-      COMPANY_ID: this.selectedCompanyId,
-      FIN_ID: this.finId,
-      STORE_ID: 1,
-      // TRANS_DATE: this.transDate,
-      TRANS_DATE: this.formatDateOnly(this.transDate),
-      TRANS_STATUS: 1,
-      NARRATION: this.creditFormData[0].NARRATION,
-      INVOICE_ID: this.creditFormData[0].INVOICE_ID || 0,
-      INVOICE_NO: this.creditFormData[0].INVOICE_NO || '',
-      UNIT_ID: this.creditFormData[0].UNIT_ID || 0,
-      DISTRIBUTOR_ID: this.creditFormData[0].DISTRIBUTOR_ID || 0,
-      PARTY_NAME: this.creditFormData.PARTY_NAME,
-      IS_APPROVED: false,
-      NOTE_DETAIL: buildNoteDetail(), // <- includes GST_PERC and GST_AMOUNT
-      ROUND_OFF: this.creditFormData[0].ROUND_OFF,
-      VEHICLE_NO: this.creditFormData[0].VEHICLE_NO,
-    };
-
-    this.dataService.updateCreditNote(payload).subscribe((response) => {
-      if (response) {
-        notify(
-          {
-            message: 'Credit Note Updated Successfully',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.popupClosed.emit();
-        this.isUpdating = false;
-      }
+      );
     });
+
+    return;
   }
+
+  // ================= APPROVE MODE =================
+  if (this.isApproveMode) {
+    confirm(
+      'It will approve and commit. Are you sure?',
+      'Confirm Approval'
+    ).then((result) => {
+      if (!result) {
+        this.isUpdating = false;
+        notify('Approval cancelled.', 'info', 2000);
+        return;
+      }
+
+      const approvePayload = {
+        ...basePayload,
+        IS_APPROVED: true,
+      };
+
+      this.dataService.commitCreditNote(approvePayload).subscribe(
+        (response: any) => {
+          this.isUpdating = false;
+
+          if (response.flag === 1) {
+            notify('Credit Note Approved Successfully', 'success', 3000);
+            this.popupClosed.emit();
+          } else {
+            notify(response.Message || 'Approval failed', 'error', 3000);
+          }
+        },
+        () => {
+          this.isUpdating = false;
+          notify('Approval failed', 'error', 3000);
+        }
+      );
+    });
+
+    return;
+  }
+
+  // ================= NORMAL UPDATE MODE =================
+  const updatePayload = {
+    ...basePayload,
+    IS_APPROVED: false,
+  };
+
+  this.dataService.updateCreditNote(updatePayload).subscribe(
+    (response) => {
+      this.isUpdating = false;
+
+      if (response) {
+        notify('Credit Note Updated Successfully', 'success', 3000);
+        this.popupClosed.emit();
+      }
+    },
+    () => {
+      this.isUpdating = false;
+      notify('Update failed', 'error', 3000);
+    }
+  );
+}
 
   onRowRemoved(e: any) {
     const removedData = e.data;

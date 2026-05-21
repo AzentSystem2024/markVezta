@@ -43,6 +43,22 @@ export class PrePaymentAddComponent {
   @ViewChild('prepayDetailGrid') prepayDetailGrid: DxDataGridComponent;
   @Input() canApprove: boolean = false;
   @Output() formClosed = new EventEmitter<void>();
+  @Input() mode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
+
+  get actionButtonText(): string {
+  switch (this.mode) {
+    case 'verify':
+      return 'Verify';
+    case 'approve':
+      return 'Approve';
+    case 'view':
+      return 'View';
+    case 'edit':
+      return 'Update';
+    default:
+      return 'Save';
+  }
+}
 
   selectedRows: any[] = [];
   ExpenseAmountDetails: any[] = [];

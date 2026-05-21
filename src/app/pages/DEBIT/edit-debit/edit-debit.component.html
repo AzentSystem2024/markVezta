@@ -361,16 +361,10 @@
       type="normal"
     ></dx-button>
     <dx-button
+    
       #saveButtonRef
-      [text]="
-        isUpdating
-          ? debitFormData.IS_APPROVED
-            ? 'Committing…'
-            : 'Updating…'
-          : debitFormData.IS_APPROVED
-            ? 'Save'
-            : 'Save'
-      "
+      *ngIf="mode !== 'view'"
+      [text]="isUpdating ? actionButtonText + '...' : actionButtonText"
       [disabled]="isUpdating"
       (onClick)="updateDebitNote()"
       stylingMode="contained"

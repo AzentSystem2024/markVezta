@@ -280,7 +280,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="fixed-footer" *ngIf="!isReadOnly">
+    <div class="fixed-footer" *ngIf="!isReadOnly && transStatus !== 'Approved'">
       <dx-button
         text="Cancel"
         stylingMode="outlined"
@@ -290,7 +290,7 @@
       ></dx-button>
       <dx-button
         class="action-btn"
-        [text]="isSaving ? 'Saving...' : 'Save'"
+        [text]="isSaving ? 'Processing...' : actionButtonText"
         stylingMode="contained"
         type="default"
         (onClick)="savePrePayment()"
