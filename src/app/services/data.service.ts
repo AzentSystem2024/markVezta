@@ -6964,8 +6964,9 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // ======= import Ar data detailed view API ========
-  import_AR_Full_List() {
-    return this.http.post(`${this.apiUrl}ImportAR/arlist`, {});
+  import_AR_Full_List(datas:any) {
+    const payload={FromDate:datas.DATE_FROM,ToDate:datas.DATE_TO}
+    return this.http.post(`${this.apiUrl}ImportAR/arlist`, payload);
   }
 
   // =========== import AR data API ==============

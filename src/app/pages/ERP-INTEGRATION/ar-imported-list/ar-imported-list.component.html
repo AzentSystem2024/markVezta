@@ -103,6 +103,13 @@
         <div class="grid-header">AR List</div>
       </dxi-item>
 
+      <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
       <dxi-item
         location="after"
         widget="dxButton"
@@ -133,6 +140,23 @@
       >
       </dxi-item>
     </dxo-toolbar>
+    <!-- ---- custom daterange select box template ---- -->
+    <div *dxTemplate="let data of 'dateFilterTemplate'">
+      <dx-select-box
+        [dataSource]="dateRanges"
+        [displayExpr]="displayExpr"
+        valueExpr="value"
+        [(value)]="selectedDateRange"
+        (onValueChanged)="onDateRangeChanged($event)"
+        (onOpened)="attachItemClickHandler($event)"
+        width="220"
+      >
+        <!-- This controls the dropdown list rendering -->
+        <div *dxTemplate="let item of 'item'">
+          {{ item.value === "custom" ? "Custom" : item.label }}
+        </div>
+      </dx-select-box>
+    </div>
   </dx-data-grid>
 
   <dx-popup
@@ -148,6 +172,14 @@
       [JVid]="selectedTransID"
     ></app-erp-jv>
   </dx-popup>
+
+  <app-custom-date-popup
+    [(visible)]="showCustomDatePopup"
+    [startDate]="customStartDate"
+    [endDate]="customEndDate"
+    (applyDates)="onCustomDateApplied($event)"
+  >
+  </app-custom-date-popup>
 
   <dx-load-panel
     [visible]="isLoading"

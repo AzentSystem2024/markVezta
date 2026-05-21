@@ -64,11 +64,11 @@ export class PurchaseInvoiceListComponent {
   @ViewChild(AddPurchaseInvoiceComponent)
   addInvoiceComp!: AddPurchaseInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   statusFinder: any;
   showFilterRow = true;
   isFilterOpened = false;
@@ -178,7 +178,9 @@ export class PurchaseInvoiceListComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -316,11 +318,11 @@ export class PurchaseInvoiceListComponent {
 
       text: 'Edit',
 
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onEditInvoice(e));
       },
 
-      visible: (e) => this.canEdit && e.row.data.STATUS === 'Open',
+      visible: (e: any) => this.canEdit && e.row.data.STATUS === 'Open',
     },
 
     {
@@ -334,7 +336,7 @@ export class PurchaseInvoiceListComponent {
 
       // onClick: (e) => this.onDeleteClick(e),
 
-      visible: (e) =>
+      visible: (e: any) =>
         e.row.data.STATUS !== 'Approved' ||
         e.row.data.STATUS === 'Open' ||
         (e.row.data.STATUS !== 'Verified' && this.canApprove),
@@ -347,11 +349,11 @@ export class PurchaseInvoiceListComponent {
 
       text: 'Verify',
 
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onVerifyClick(e));
       },
 
-      visible: (e) => e.row.data.STATUS !== 'Verified',
+      visible: (e: any) => e.row.data.STATUS !== 'Verified',
     },
 
     {
@@ -361,11 +363,11 @@ export class PurchaseInvoiceListComponent {
 
       text: 'Approve',
 
-      onClick: (e) => {
+      onClick: (e: any) => {
         setTimeout(() => this.onApproveClick(e));
       },
 
-      visible: (e) => e.row.data.STATUS === 'Verified',
+      visible: (e: any) => e.row.data.STATUS === 'Verified',
     },
   ];
 

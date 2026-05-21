@@ -68,7 +68,6 @@
             valueExpr="ID"
             [searchEnabled]="true"
             [showSelectionControls]="true"
-            [maxDisplayedTags]="100"
             [showMultiTagOnly]="true"
             [multiline]="false"
             [(value)]="selectedDiamensions"
@@ -105,6 +104,7 @@
             displayExpr="name"
             valueExpr="value"
             [(value)]="selectedmonth"
+            width="120"
             (onValueChanged)="onMonthValueChanged($event)"
             [dropDownOptions]="{ width: 'auto' }"
           >
@@ -113,7 +113,7 @@
 
         <dxi-item>
           <dx-date-box
-            [width]="150"
+            [width]="120"
             label="Date From"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
@@ -123,7 +123,7 @@
         </dxi-item>
         <dxi-item>
           <dx-date-box
-            [width]="150"
+            [width]="120"
             label="Date To"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
@@ -133,8 +133,9 @@
           </dx-date-box>
         </dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto">
+        <dxi-item>
           <dx-button
+            class="mt-2"
             text="Apply"
             type="default"
             icon="todo"
@@ -171,11 +172,11 @@
         dataType="number"
       ></dxi-column>
       <dxi-column dataField="Category" caption="Category"></dxi-column>
-      <dxi-column dataField="Code" caption="Code"></dxi-column>
+      <dxi-column dataField="Code" caption="Code" width="200"></dxi-column>
       <dxi-column
         dataField="Description"
         caption="Description"
-        width="180"
+        width="200"
       ></dxi-column>
       <dxi-column caption="Opening Balance" cssClass="opening-header">
         <dxi-column
@@ -274,9 +275,7 @@
       [rowAlternationEnabled]="true"
     >
       <dxi-column dataField="Dimension" caption="Dimension"></dxi-column>
-
       <dxi-column dataField="Code" caption="Code"></dxi-column>
-
       <dxi-column dataField="Description" caption="Description"></dxi-column>
     </dx-data-grid>
   </dx-popup>
