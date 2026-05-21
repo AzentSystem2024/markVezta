@@ -100,6 +100,9 @@ export class TendersListComponent implements OnInit {
   }
   addTenders() {
     this.isAddTendersPopupOpened = true;
+    this.tendersComponent.ResetFuction()
+    this.isEditMode = false;
+
   }
 
   showTenders() {
@@ -112,6 +115,7 @@ export class TendersListComponent implements OnInit {
     const component = this.isEditMode
       ? this.editFormComponent
       : this.addFormComponent;
+    console.log(component, '=======================type of components===================')
 
     const data = component.getNewTenderData();
 

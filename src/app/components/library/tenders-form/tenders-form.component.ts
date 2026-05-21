@@ -44,7 +44,8 @@ export class TendersFormComponent implements OnInit, OnChanges {
   VATRuleDropdownData: any[] = [];
   TenderTypeDropdownData: any[] = [];
   tenders: any;
-
+  IsHQApp: boolean = true
+  Ledger_list: any = []
   formTenderData: any = {
     ID: 0,
     CODE: '',
@@ -57,15 +58,39 @@ export class TendersFormComponent implements OnInit, OnChanges {
     ALLOW_OPENING: false,
     ALLOW_DECLARATION: false,
     ADDITIONAL_INFO_REQUIRED: false,
+    AC_HEAD_ID: null,
   };
-  constructor(private service: DataService) { }
+  constructor(private service: DataService) {
+    this.get_Session_details()
+    this.get_Ledger_drop()
+  }
   newTender = this.formTenderData;
+
+  get_Session_details() {
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.IsHQApp = menuResponse.GeneralSettings.IS_HQ_APP
+  }
 
   getNewTenderData = () => ({
     ...this.newTender,
-    ADDITIONAL_INFO_REQUIRED: this.additionalInformationRequired
-
+    ADDITIONAL_INFO_REQUIRED: this.additionalInformationRequired,
+    ALLOW_DECLARATION: this.allowDeclaration,
+    ALLOW_OPENING: this.allowOpening,
+    CURRENCY_ID: this.newTender.CURRENCY_ID === ''
+      ? 0
+      : this.newTender.CURRENCY_ID
   });
+
+
+  get_Ledger_drop() {
+    this.service.get_ac_ledger_drp().subscribe((res: any) => {
+      console.log(res)
+      this.Ledger_list = res
+
+    })
+  }
 
   getVATRuleDropDown() {
     const dropdowncurrency = {
@@ -142,6 +167,22 @@ export class TendersFormComponent implements OnInit, OnChanges {
       return code === value && item.ID !== currentId;
     });
   };
+  //======================reset function
+
+  ResetFuction() {
+    console.log("=============close thus function==========================")
+
+    // this.newTender.DISPLAY_ORDER = 0;
+    this.allowOpening = false;
+    this.allowDeclaration = false;
+    this.formTenderData.ADDITIONAL_INFO_REQUIRED = false;
+    this.additionalInformationRequired = false
+  }
+  //===================== Ledger validaiton--------============================
+  validateLedger = (e: any) => {
+    return e.value !== 0 && e.value !== null && e.value !== undefined;
+  };
+
 }
 
 @NgModule({

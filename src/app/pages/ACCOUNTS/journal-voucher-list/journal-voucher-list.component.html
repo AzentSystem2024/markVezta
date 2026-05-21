@@ -250,11 +250,13 @@
   </div>
 </div>
 
+<!-- //============================Popup Screen============================= -->
+
 <dx-popup
   [(visible)]="isAddJournalVoucher"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Journal Voucher"
+  title=" New Journal Voucher"
   (onHiding)="handleClose()"
 >
   <app-add-journal-vouchar
@@ -272,6 +274,7 @@
   (onHiding)="handleClose()"
 >
   <app-edit-journal-voucher
+    [isEditing]="true"
     [journalVoucherFormData]="selectedJournalVoucher"
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
@@ -323,7 +326,7 @@
   [(visible)]="isViewJournalVoucher"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Journal Voucher"
+  title=" View Journal Voucher"
   (onHiding)="handleClose()"
 >
   <app-view-journal-voucher
