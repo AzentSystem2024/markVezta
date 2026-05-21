@@ -383,15 +383,17 @@ import { ClinicianMasterModule } from './pages/MASTER/clinician-master/clinician
 import { ClinicianEditFormModule } from './pages/MASTER/POPUP PAGES/clinician-edit-form/clinician-edit-form.component';
 import { ClinicianNewFormModule } from './pages/MASTER/POPUP PAGES/clinician-new-form/clinician-new-form.component';
 import { CptMasterNewFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-new-form/cpt-master-new-form.component';
-import {  CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
+import { CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
 import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
-import {  DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
-import { TrialBalanceFinDimensionComponent, TrialBalanceFinDimensionModule } from './pages/REPORT/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
+import { DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
+import {
+  TrialBalanceFinDimensionComponent,
+  TrialBalanceFinDimensionModule,
+} from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.component';
 
-
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -791,7 +793,7 @@ import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.c
     CptMasterEditFormModule,
     DepartmentGroupModule,
     TrialBalanceFinDimensionModule,
-    ERPJVModule
+    ERPJVModule,
   ],
 
   providers: [

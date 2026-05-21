@@ -23,11 +23,7 @@
       </dxo-header-filter> -->
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
-    <dxo-editing
-      mode="popup"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
-    >
+    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
       <dxo-popup
         title="Edit Customer"
         [showTitle]="true"
