@@ -78,6 +78,7 @@ export class PrePaymentListComponent {
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup = false;
+  popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
 
   constructor(
     private dataservice: DataService,
@@ -88,6 +89,27 @@ export class PrePaymentListComponent {
     this.get_PrePaymentList();
   }
 
+ get popupTitle(): string {
+  switch (this.popupMode) {
+    case 'new':
+      return 'New PrePayment Invoice';
+
+    case 'edit':
+      return 'Edit PrePayment Invoice';
+
+    case 'verify':
+      return 'Verify PrePayment Invoice';
+
+    case 'approve':
+      return 'Approve PrePayment Invoice';
+
+    case 'view':
+      return 'View PrePayment Invoice';
+
+    default:
+      return 'PrePayment Invoice';
+  }
+}
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -151,6 +173,7 @@ export class PrePaymentListComponent {
   };
 
   addPrepayment() {
+    this.popupMode = 'new';
     this.addPrepaymentPopupOpened = true;
   }
 
@@ -233,7 +256,16 @@ export class PrePaymentListComponent {
      e.cancel = true;
     console.log(e)
      const status = e.row.data?.TRANS_STATUS?.trim();
-    this.isEditReadOnly = status === 'Approved';
+     if (status === 'Approved') {
+    this.popupMode = 'view';
+    this.isEditReadOnly = true;
+  } else if (status === 'Verify') {
+    this.popupMode = 'approve';
+  } else {
+    this.popupMode = 'verify';
+  }
+
+    // this.isEditReadOnly = status === 'Approved';
     this.editPrePaymentPopupOpened = false;
     this.verifyPrePaymentPopupOpened = true;
     this.verifyselectPrePayment(e);
@@ -252,7 +284,17 @@ export class PrePaymentListComponent {
   onEditingStart(event: any) {
     event.cancel = true;
     const status = event.data?.TRANS_STATUS?.trim();
-    this.isEditReadOnly = status === 'Approved';
+
+    if (status === 'Approved') {
+    this.popupMode = 'view';
+    this.isEditReadOnly = true;
+  } else {
+    this.popupMode = 'edit';
+    this.isEditReadOnly = false;
+  }
+
+
+    // this.isEditReadOnly = status === 'Approved';
     this.editPrePaymentPopupOpened = true;
     this.selectPrePayment(event);
   }

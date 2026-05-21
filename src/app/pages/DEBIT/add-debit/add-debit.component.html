@@ -382,15 +382,7 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      [text]="
-        isSaving
-          ? debitFormData.IS_APPROVED
-            ? 'Committing…'
-            : 'Saving…'
-          : debitFormData.IS_APPROVED
-            ? 'Save'
-            : 'Save'
-      "
+      [text]="isSaving ? actionButtonText + '...' : actionButtonText"
       [disabled]="isSaving"
       (onClick)="saveDebitNote()"
       stylingMode="contained"

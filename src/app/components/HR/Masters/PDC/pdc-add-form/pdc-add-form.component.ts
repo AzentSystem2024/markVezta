@@ -37,6 +37,7 @@ export class PdcAddFormComponent {
   @Input() selectedPDC: any;
   @Output() pdcInserted = new EventEmitter<any>();
   @Input() canApprove :boolean = false;
+  @Input() popupMode: string = 'new';
 
   Supplier: any;
   priorities_value: any;

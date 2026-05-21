@@ -144,6 +144,14 @@
       stylingMode="outlined"
       (onClick)="cancel()"
     ></dx-button>
-    <dx-button text="Save" type="default" (onClick)="savePDC()"></dx-button>
+    <dx-button
+  [text]="popupMode === 'new' ? 'Save' :
+          popupMode === 'verify' ? 'Verify' :
+          popupMode === 'approve' ? 'Approve' :
+          'Update'"
+  type="default"
+  (onClick)="savePDC()"
+>
+</dx-button>
   </div>
 </div>

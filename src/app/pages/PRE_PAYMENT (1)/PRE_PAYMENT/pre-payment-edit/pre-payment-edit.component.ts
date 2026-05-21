@@ -120,6 +120,34 @@ export class PrePaymentEditComponent {
   transStatus: any;
   // isSaving = false;
 
+  get popupTitle(): string {
+  if (this.isReadOnly) {
+    return 'View PrePayment Invoice';
+  }
+
+  if (this.verifyPrePaymentPopupOpened && this.transStatus === 'Open') {
+    return 'Verify PrePayment Invoice';
+  }
+
+  if (this.transStatus === 'Verify') {
+    return 'Approve PrePayment Invoice';
+  }
+
+  return 'Edit PrePayment Invoice';
+}
+
+get actionButtonText(): string {
+  if (this.verifyPrePaymentPopupOpened && this.transStatus === 'Open') {
+    return 'Verify';
+  }
+
+  if (this.transStatus === 'Verify') {
+    return 'Approve';
+  }
+
+  return 'Update';
+}
+
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
@@ -589,7 +617,7 @@ else if (currentStatus === 'Verify' || this.PrePaymentFormData.TRANS_STATUS === 
             position: { at: 'top right', my: 'top right' },
             displayTime: 500,
           });
-
+          
           this.formClosed.emit();
         },
         (error) => {

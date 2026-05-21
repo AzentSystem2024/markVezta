@@ -268,11 +268,12 @@
   [(visible)]="addMiscPaymentPopup"
   [width]="'75vw'"
   [height]="'100vh'"
-  title="Miscellaneous Payment"
+  title="New Miscellaneous Payment"
   (onHiding)="handleClose()"
 >
   <app-add-miscellaneous-payment
     *ngIf="addMiscPaymentPopup"
+    [mode]="'new'"
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
   ></app-add-miscellaneous-payment>
@@ -282,12 +283,13 @@
   [(visible)]="editMiscPopupOpened"
   [width]="'75vw'"
   [height]="'100vh'"
-  title="Miscellaneous Payment"
+  title="Edit Miscellaneous Payment"
   (onHiding)="handleClose()"
 >
   <app-add-miscellaneous-payment
     *ngIf="editMiscPopupOpened"
     [isEditing]="true"
+    [mode]="'edit'"
     [verifyMiscPopupOpened]="false"
     [canApprove]="canApprove"
     [EditingResponseData]="selectedmiscellaneousData"
@@ -301,11 +303,24 @@
   [(visible)]="verifyMiscPopupOpened"
   [width]="'75vw'"
   [height]="'100vh'"
-  title="Miscellaneous Payment"
+   [title]="
+    statusFinder === 'Verify'
+      ? 'Approve Miscellaneous Payment'
+      : statusFinder === 'Approve'
+        ? 'View Miscellaneous Payment'
+        : 'Verify Miscellaneous Payment'
+  "
   (onHiding)="handleClose()"
 >
   <app-add-miscellaneous-payment
     *ngIf="verifyMiscPopupOpened"
+    [mode]="
+    statusFinder === 'Verify'
+      ? 'approve'
+      : statusFinder === 'Approve'
+        ? 'view'
+        : 'verify'
+  "
     [isEditing]="true"
     [status]="statusFinder"
     [verifyMiscPopupOpened]="true"

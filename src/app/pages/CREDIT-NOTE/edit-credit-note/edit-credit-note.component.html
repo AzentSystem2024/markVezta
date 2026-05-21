@@ -338,15 +338,8 @@
       type="normal"
     ></dx-button>
     <dx-button
-      [text]="
-        isUpdating
-          ? creditFormData.IS_APPROVED
-            ? 'Committing…'
-            : 'Updating…'
-          : creditFormData.IS_APPROVED
-            ? 'Save'
-            : 'Save'
-      "
+      *ngIf="!isReadOnlyMode"
+  [text]="isUpdating ? actionButtonText + '...' : actionButtonText"
       [disabled]="isUpdating"
       (onClick)="updateCreditNote()"
       stylingMode="contained"

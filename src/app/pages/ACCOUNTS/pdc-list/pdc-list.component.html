@@ -301,13 +301,14 @@
       [(visible)]="addPDCPopupOpened"
       [width]="'60vw'"
       [height]="'auto'"
-      title="Add PDC"
+      [title]="popupTitle"
       (onHiding)="handleClose()"
     >
       <app-pdc-add-form
         [canApprove]="canApprove"
         [isOpen]="addPDCPopupOpened"
         (formClosed)="handleClose()"
+        [popupMode]="popupMode"
       ></app-pdc-add-form>
     </dx-popup>
   </div>
@@ -317,7 +318,7 @@
   [(visible)]="editPDCPopupOpened"
   [width]="'50vw'"
   [height]="'90vh'"
-  title="Edit PDC"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <app-pdc-edit-form
@@ -327,6 +328,7 @@
     (formClosed)="handleClose()"
     [PDCid]="selectPDC"
     [canApprove]="canApprove"
+    [popupMode]="popupMode"
   ></app-pdc-edit-form>
 </dx-popup>
 
@@ -334,8 +336,9 @@
   [(visible)]="VerifyPDCPopupOpened"
   [width]="'50vw'"
   [height]="'90vh'"
-  title="Edit PDC"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
+  [popupMode]="popupMode"
 >
   <app-pdc-edit-form
     [selectedPDC]="selectedPDC"
@@ -344,6 +347,7 @@
     (formClosed)="handleClose()"
     [PDCid]="selectPDC"
     [canApprove]="false"
+    [showApprove]="false"
     [isVerifyMode]="selectedPDC?.ENTRY_STATUS !== 'Verified'"
     [isApproveMode]="selectedPDC?.ENTRY_STATUS === 'Verified'"
     [VerifyPDCPopupOpened]="VerifyPDCPopupOpened"

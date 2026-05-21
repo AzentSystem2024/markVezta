@@ -171,7 +171,7 @@
     ></dx-button>
     <dx-button
       *ngIf="!isEditReadOnly"
-      text="Update"
+       [text]="actionButtonText"
       type="default"
       (onClick)="savePDC()"
     ></dx-button>

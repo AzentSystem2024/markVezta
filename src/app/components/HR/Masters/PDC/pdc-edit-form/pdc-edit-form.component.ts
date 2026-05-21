@@ -47,10 +47,11 @@ export class PdcEditFormComponent {
    @Input() canApprove :boolean = false;
    @Input() isVerifyMode: boolean = false;
    @Input() isApproveMode: boolean = false;
-
+  // @Input() popupMode: string = 'new';
    @Input() VerifyPDCPopupOpened:boolean = false;
   isPdfPopupVisible: boolean = false;
   pdfSrc: SafeResourceUrl | null = null;
+  @Input() popupMode: string = '';
 
   Supplier: any;
   selectedBeneficiaryTypeID: any;
@@ -89,6 +90,18 @@ export class PdcEditFormComponent {
     AC_TRANS_ID: '',
   };
   entryStatus: any;
+
+ get actionButtonText(): string {
+  if (this.isVerifyMode) {
+    return 'Verify';
+  }
+
+  if (this.isApproveMode) {
+    return 'Approve';
+  }
+
+  return 'Update';
+}
 
     ngOnChanges(changes: SimpleChanges): void {
       console.log(this.isVerifyMode,":geyueuryuirirg")
@@ -290,50 +303,50 @@ console.log(this.isApproveMode,":-------------fhytyu")
       REMARKS: this.PDCFormData.REMARKS || '',
       IS_PAYMENT: this.PDCFormData.IS_PAYMENT?.name === 'Issued', // true if Issued
       // ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
-     ENTRY_STATUS: this.isVerifyMode
+    ENTRY_STATUS: this.isVerifyMode
   ? 2
-  : this.isApproveMode || this.PDCFormData.ENTRY_STATUS
+  : this.isApproveMode
     ? 5
     : 1,
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
       
     };
 
-    if (this.isVerifyMode === true) {
-    confirm(
-      'Are you sure you want to verify this PDC?',
-      'Confirm Verification'
-    ).then((result) => {
-      if (result) {
-        this.dataservice.Update_PDC(payload).subscribe((res: any) => {
-          if (res.Message === 'Success') {
-            notify('PDC verified successfully', 'success', 2000);
-            this.formClosed.emit();
-          }
-        });
-      }
-    });
+  if (this.isVerifyMode) {
+  confirm(
+    'Are you sure you want to verify this PDC?',
+    'Confirm Verification'
+  ).then((result) => {
+    if (result) {
+      this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+        if (res.Message === 'Success') {
+          notify('PDC verified successfully', 'success', 2000);
+          this.formClosed.emit();
+        }
+      });
+    }
+  });
 
-    return; 
-  }
+  return;
+}
 
-    if (this.isApproveMode || this.PDCFormData.ENTRY_STATUS) {
-    confirm(
-      'Are you sure you want to approve this PDC?',
-      'Confirm Approval'
-    ).then((result) => {
-      if (result) {
-        this.dataservice.Update_PDC(payload).subscribe((res: any) => {
-          if (res.Message === 'Success') {
-            notify('PDC approved successfully', 'success', 2000);
-            this.formClosed.emit();
-          }
-        });
-      }
-    });
+if (this.isApproveMode) {
+  confirm(
+    'Are you sure you want to approve this PDC?',
+    'Confirm Approval'
+  ).then((result) => {
+    if (result) {
+      this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+        if (res.Message === 'Success') {
+          notify('PDC approved successfully', 'success', 2000);
+          this.formClosed.emit();
+        }
+      });
+    }
+  });
 
-    return;
-  }
+  return;
+}
     this.dataservice.Update_PDC(payload).subscribe((res: any) => {
       if (res.Message === 'Success') {
         notify(

@@ -403,27 +403,13 @@
       (onClick)="cancel()"
     ></dx-button>
     <dx-button
-      *ngIf="!isReadOnlyMode"
+      *ngIf="mode !== 'view'"
       #saveButtonRef
-      [text]="
-        isSaving
-          ? miscFormData?.IS_APPROVED || isApproved
-            ? 'Committing...'
-            : isEditing
-              ? 'Updating...'
-              : 'Saving...'
-          : miscFormData?.IS_APPROVED
-            ? 'Commit'
-            : isEditing
-              ? isApproved
-                ? 'Commit'
-                : 'Update'
-              : 'Save'
-      "
+      [text]="actionButtonText"
       [disabled]="isSaving"
       stylingMode="contained"
       type="default"
-      (onClick)="isEditing ? onUpdateMiscReceipt() : onSave()"
+      (onClick)="onActionClick()"
     >
     </dx-button>
 
