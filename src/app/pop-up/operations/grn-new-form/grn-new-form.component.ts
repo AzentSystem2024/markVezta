@@ -671,8 +671,10 @@ export class GrnNewFormComponent implements OnInit {
 
       updatedRow.AMOUNT = (receivedQty * localprice).toFixed(2); // Format to 2 decimal places
       updatedRow.UNIT_COST = (
-        Number(updatedRow.AMOUNT || 0) / Number(receivedQty || 0)
+        Number(updatedRow.PO_TAXABLE_AMOUNT || 0) / Number(receivedQty || 0)
       ).toFixed(2);
+
+      updatedRow.COST = updatedRow.UNIT_COST;
       // Find and replace in poDetails
       const idx = this.poDetails.findIndex(
         (r: any) =>
@@ -751,7 +753,7 @@ export class GrnNewFormComponent implements OnInit {
         // Ensure RECEIVED_QTY is greater than zero to avoid division by zero
         if (Number(item.RECEIVED_QTY) > 0) {
           item.UNIT_COST = (
-            Number(item.AMOUNT || 0) / Number(item.RECEIVED_QTY || 0)
+            Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.RECEIVED_QTY || 0)
           ).toFixed(2);
 
           item.COST = item.UNIT_COST;
