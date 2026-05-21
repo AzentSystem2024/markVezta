@@ -12,7 +12,6 @@ import {
   SideNavOuterToolbarComponent,
   UnauthenticatedContentComponent,
 } from './layouts';
-import { DenialListComponent } from './pages/Denial-list/denial-list.component';
 import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
 import { AppResetPasswordComponent } from './pages/reset-password-form/reset-password-form.component';
 import { DepartmentListComponent } from './pages/MASTER/item-department-list/department-list.component';
@@ -67,7 +66,7 @@ import { CreditNoteListComponent } from './pages/ACCOUNTS/credit-note-list/credi
 import { MonthlyPlanComponent } from './pages/ARTICLE/monthly-plan/monthly-plan.component';
 import { LedgerStatementComponent } from './pages/REPORT/ledger-statement/ledger-statement.component';
 import { DebitComponent } from './pages/ACCOUNTS/debit/debit.component';
-import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-list.component';
+
 import { TrialBalanceReportComponent } from './pages/REPORT/trial-balance-report/trial-balance-report.component';
 import { JournalBookComponent } from './pages/ACCOUNTS/journal-book/journal-book.component';
 import { CustomerListComponent } from './pages/MASTER/customer-list/customer-list.component';
@@ -197,6 +196,8 @@ import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinic
 import { CPTMasterComponent } from './pages/MASTER/cpt-master/cpt-master.component';
 import { DepartmentGroupComponent } from './pages/MASTER/department-group/department-group.component';
 import { TrialBalanceFinDimensionComponent } from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
+import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-list.component';
+import { DenialListComponent } from './pages/MASTER/denial-list/denial-list.component';
 
 const routes: Routes = [
   {
@@ -261,12 +262,6 @@ const routes: Routes = [
       {
         path: 'analytics-dashboard',
         component: AnalyticsDashboardComponent,
-        canActivate: [AuthGuardService],
-      },
-
-      {
-        path: 'denial-list-page',
-        component: DenialListComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1246,6 +1241,11 @@ const routes: Routes = [
       {
         path: 'trial-balance-fin-dimension',
         component: TrialBalanceFinDimensionComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'denial',
+        component: DenialListComponent,
         canActivate: [AuthGuardService],
       },
 

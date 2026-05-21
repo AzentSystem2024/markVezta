@@ -19,7 +19,6 @@
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
-      [headerFilter]="isFilterRowVisible ? { visible: true } : { visible: false }"
       [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
       [columnFixing]="{
         enabled: true,
@@ -30,7 +29,7 @@
       (onCellClick)="onCellClick($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -153,9 +152,17 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-      
+
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+        [allowSelectAll]="true"
+        [search]="{ enabled: true, mode: 'contains' }"
+      >
+      </dxo-header-filter>
+
       <dxo-filter-row
-        [visible]="isFilterRowVisible"
+        [visible]="true"
         [applyFilter]="auto"
       ></dxo-filter-row>
       <dxi-column
