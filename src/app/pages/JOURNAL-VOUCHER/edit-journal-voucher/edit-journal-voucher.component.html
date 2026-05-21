@@ -325,12 +325,16 @@
         <dx-button
           [text]="
             isSaving
-              ? journalVoucherFormData?.IS_APPROVED
-                ? 'Saving...'
-                : 'Updating...'
-              : journalVoucherFormData?.IS_APPROVED
-                ? 'Save'
-                : 'Save'
+              ? isVerifyMode
+                ? 'Verifying...'
+                : journalVoucherFormData?.IS_APPROVED || isApproveMode
+                  ? 'Approving...'
+                  : 'Updating...'
+              : isVerifyMode
+                ? 'Verify'
+                : journalVoucherFormData?.IS_APPROVED || isApproveMode
+                  ? 'Approve'
+                  : 'Update'
           "
           [visible]="canEdit"
           [disabled]="isSaving"

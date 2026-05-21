@@ -188,7 +188,7 @@
               <div *dxTemplate>
                 <div class="checkbox">Accepted Currency</div>
                 <dx-check-box
-                  [value]="isCurrencyAccepted"
+                  [(value)]="isCurrencyAccepted"
                   (onValueChanged)="toggleCurrencyDropdown($event.value)"
                   [elementAttr]="{ 'aria-label': 'Checked' }"
                 ></dx-check-box>

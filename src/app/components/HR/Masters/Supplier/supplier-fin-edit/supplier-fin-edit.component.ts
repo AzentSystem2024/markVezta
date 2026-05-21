@@ -87,7 +87,7 @@ export class SupplierFinEditComponent {
     CURRENCY_ID: '', // Check if number or string is expected
     PAY_TERM_ID: '', // Same here: ensure it's a number if necessary
     VAT_RULE_ID: '',
-
+    IS_DEFAULT_CURRENCY: true,
     Supplier_cost: [],
   };
 
@@ -222,7 +222,9 @@ export class SupplierFinEditComponent {
 
       this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
 
-      this.isCurrencyAccepted = !(this.supplierData.Supplier_cost?.length > 0);
+      // this.isCurrencyAccepted = !(this.supplierData.Supplier_cost?.length > 0);
+      this.isCurrencyAccepted = this.supplierData.IS_DEFAULT_CURRENCY
+      console.log(this.isCurrencyAccepted, '==============================accepted currency=====================')
 
       console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
 
@@ -569,6 +571,7 @@ export class SupplierFinEditComponent {
       PURCH_TYPE: this.purchType,
       MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
       PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
+      IS_DEFAULT_CURRENCY: this.isCurrencyAccepted
     };
     console.log(payload, 'PAYLOADINEDIT');
     this.dataservice
@@ -728,4 +731,4 @@ export class SupplierFinEditComponent {
   declarations: [SupplierFinEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierFinEditModule {}
+export class SupplierFinEditModule { }
