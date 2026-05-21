@@ -576,7 +576,7 @@ export class GrnNewFormComponent implements OnInit {
 
     // Optionally match on ITEM_ID or PO_DETAIL_ID (adjust based on your key fields)
     const index = this.demoArray.findIndex(
-      (item: any) =>
+      (item) =>
         item.ITEM_ID === updatedData.ITEM_ID &&
         item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
@@ -670,11 +670,7 @@ export class GrnNewFormComponent implements OnInit {
       console.log(updatedRow.SUPP_AMOUNT, 'updatedRow.SUPP_AMOUNT');
 
       updatedRow.AMOUNT = (receivedQty * localprice).toFixed(2); // Format to 2 decimal places
-      updatedRow.UNIT_COST = (
-        Number(updatedRow.PO_TAXABLE_AMOUNT || 0) / Number(receivedQty || 0)
-      ).toFixed(2);
 
-      updatedRow.COST = updatedRow.UNIT_COST;
       // Find and replace in poDetails
       const idx = this.poDetails.findIndex(
         (r: any) =>
@@ -753,10 +749,8 @@ export class GrnNewFormComponent implements OnInit {
         // Ensure RECEIVED_QTY is greater than zero to avoid division by zero
         if (Number(item.RECEIVED_QTY) > 0) {
           item.UNIT_COST = (
-            Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.RECEIVED_QTY || 0)
+            Number(totalCost) / Number(item.RECEIVED_QTY)
           ).toFixed(2);
-
-          item.COST = item.UNIT_COST;
         } else {
           item.UNIT_COST = '0.00'; // Default value if RECEIVED_QTY is zero or undefined
         }
