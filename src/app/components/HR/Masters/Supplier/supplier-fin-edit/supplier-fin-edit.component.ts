@@ -689,6 +689,23 @@ export class SupplierFinEditComponent {
       return sameCode && !isSameId;
     });
   };
+
+  validateSupplierName = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
+
+    if (!value || !this.supplier) return true;
+
+    const currentId = this.supplierData?.ID; //  FIX HERE
+
+    return !this.supplier.some((item: any) => {
+      const sameCode = item.SUPP_NAME?.toLowerCase() === value;
+
+      // skip current editing record
+      const isSameId = Number(item.ID) === Number(currentId);
+
+      return sameCode && !isSameId;
+    });
+  };
 }
 @NgModule({
   imports: [

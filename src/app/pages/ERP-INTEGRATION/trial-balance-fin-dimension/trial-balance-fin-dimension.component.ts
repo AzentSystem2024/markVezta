@@ -462,6 +462,21 @@ export class TrialBalanceFinDimensionComponent {
       .join(' - ');
   };
 
+  headerFilterConfig = {
+  visible: true,
+  allowSelectAll: true,
+  search: {
+    enabled: true
+  }
+};
+
+onHeaderFilterChanged(e: any) {
+  const searchedItems = e.component.getDataSource().items();
+  const allValues = searchedItems.map((x: any) => x.value);
+
+  e.component.option('filterValues', allValues);
+}
+
   onViewClick(e: any) {
     this.HeadId = e.row.data.HeadID;
     console.log(this.HeadId);

@@ -155,6 +155,12 @@
         type="required"
         message="Symbol is required"
       ></dxi-validation-rule>
+
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validateSymbolExistsGrid.bind(this)"
+        message="Symbol already exists"
+      ></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Description">
       <dxi-validation-rule

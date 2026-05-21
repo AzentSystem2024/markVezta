@@ -1,15 +1,15 @@
-@use "../../../variables.scss" as *;
+@use "../../../../variables.scss" as *;
 @use "sass:math";
 
 :host {
-  --side-panel-toolbar-height: 76px;
+  --side-panel-toolbar-height: 72px;
 
   width: 100%;
   display: contents;
 }
 
 .view-wrapper {
-  position: absolute;
+  position: relative;
   top: 0;
   bottom: 0;
   left: 0;
@@ -17,6 +17,7 @@
   flex-direction: row;
 
   .grid {
+    height: 45%;
     .name-template {
       .position {
         font-size: 12px;
@@ -49,12 +50,20 @@
   }
 }
 
-.edit-cell {
-  position: relative;
-
-  contact-status {
-    position: absolute;
-    margin-top: 10px;
-    margin-left: 11px;
-  }
+.dx-datagrid {
+  height: 85vh;
 }
+// ::ng-deep .add-button {
+//   background-color: #007bff !important;
+//   color: white;
+//   font-weight: bold;
+
+//   border-radius: 6px;
+
+//   box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1) !important;
+
+//   &:hover {
+//     background-color: #0056b3 !important;
+//     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2) !important;
+//   }
+// }

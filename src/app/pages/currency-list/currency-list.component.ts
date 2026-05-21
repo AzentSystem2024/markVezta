@@ -313,6 +313,19 @@ export class CurrencyListComponent implements OnInit {
     return !exists;
   };
 
+  validateSymbolExistsGrid = (e: any) => {
+    if (!e.value) return true;
+
+    const inputCode = e.value.toString().trim().toUpperCase();
+
+    const exists = this.currency?.some(
+      (item: any) =>
+        item.SYMBOL?.toUpperCase() === inputCode &&
+        item.ID !== this.currentEditId // ✅ skip current row
+    );
+
+    return !exists;
+  };
 }
 
 @NgModule({

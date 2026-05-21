@@ -70,6 +70,19 @@ export class CurrencyFormComponent {
     return !exists; // return false → validation error
   };
 
+
+   validateSymbolExists = (e: any) => {
+    if (!e.value) return true;
+
+    const inputCode = e.value.toString().trim().toUpperCase();
+
+    const exists = this.currency?.some(
+      (item: any) => item.SYMBOL?.toUpperCase() === inputCode
+    );
+
+    return !exists; // return false → validation error
+  };
+
   get exchangeControl() {
     return this.stateForm.get('EXCHANGE');
   }
