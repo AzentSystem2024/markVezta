@@ -86,6 +86,7 @@ export class SupplierFinFormComponent {
     SUPP_CAT_ID: 0,
     PURCH_TYPE: 0,
     IS_COMPANY_BRANCH: false,
+    IS_DEFAULT_CURRENCY: true,
     // Supplier_cost:''
     Supplier_cost: [] as { COST_ID: number; SUPP_ID: number }[],
   };
@@ -138,7 +139,7 @@ export class SupplierFinFormComponent {
     this.getStateDropDown();
     this.getCurrency();
     this.getCurrency_Dropdown();
-    this.newSupplier.VAT_RULE_ID = 1
+    this.newSupplier.VAT_RULE_ID = 2
     console.log(this.newSupplier.VAT_RULE_ID, '===========vat rule id============')
   }
   newSupplier = this.formSupplierData;
@@ -147,6 +148,7 @@ export class SupplierFinFormComponent {
     ...this.newSupplier,
     MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
     PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
+    IS_DEFAULT_CURRENCY: this.isCurrencyAccepted
   });
 
   toggleCurrencyDropdown(checked: boolean) {
@@ -164,8 +166,8 @@ export class SupplierFinFormComponent {
 
   deafulvalue() {
     console.log('==open =====');
-    this.newSupplier.VAT_RULE_ID = 1
-    this.formSupplierData.VAT_RULE_ID = 1
+    this.newSupplier.VAT_RULE_ID = 2
+    this.formSupplierData.VAT_RULE_ID = 2
 
   }
   listSupplier() {
@@ -193,7 +195,7 @@ export class SupplierFinFormComponent {
     this.newSupplier.ADDRESS3 = '';
     this.newSupplier.NOTES = '';
     this.newSupplier.PHONE = '';
-    this.newSupplier.SUPP_CAT_ID = '';
+    this.newSupplier.SUPP_CAT_ID = 0;
     // Clear Supplier_cost
     this.formSupplierData.Supplier_cost = [];
 

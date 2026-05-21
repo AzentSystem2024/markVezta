@@ -576,13 +576,17 @@ export class GrnNewFormComponent implements OnInit {
 
     // Optionally match on ITEM_ID or PO_DETAIL_ID (adjust based on your key fields)
     const index = this.demoArray.findIndex(
-      (item: any) =>
+      (item) =>
         item.ITEM_ID === updatedData.ITEM_ID &&
         item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
-    const amount =
+    // const amount =
+    //   Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.PRICE || 0);
+    const localAmount =
       Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.PRICE || 0);
 
+    const suppAmount =
+      Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.SUPP_PRICE || 0);
     const enrichedData = {
       ...updatedData,
 
@@ -591,13 +595,11 @@ export class GrnNewFormComponent implements OnInit {
 
       QUANTITY: Number(updatedRow.RECEIVED_QTY),
 
-      RATE: Number(amount.toFixed(2)), // ADD THIS
-      AMOUNT: Number(amount.toFixed(2)),
+      RATE: Number(updatedRow.PRICE || 0), // ADD THIS
+      AMOUNT: Number(localAmount.toFixed(2)),
 
       SUPP_PRICE: Number(updatedRow.SUPP_PRICE || 0),
-      SUPP_AMOUNT: Number(
-        (updatedRow.RECEIVED_QTY * updatedRow.SUPP_PRICE).toFixed(2),
-      ),
+      SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
 
       UOM_PURCH: updatedRow.UOM_PURCH,
       UOM: updatedRow.UOM,
@@ -670,9 +672,17 @@ export class GrnNewFormComponent implements OnInit {
       console.log(updatedRow.SUPP_AMOUNT, 'updatedRow.SUPP_AMOUNT');
 
       updatedRow.AMOUNT = (receivedQty * localprice).toFixed(2); // Format to 2 decimal places
-      updatedRow.UNIT_COST = (
-        Number(updatedRow.AMOUNT || 0) / Number(receivedQty || 0)
-      ).toFixed(2);
+      const suppAmount =
+        Number(updatedRow.SUPP_PRICE || 0) * Number(receivedQty || 0);
+
+      const discountAmount =
+        (suppAmount * Number(updatedRow.DISC_PERCENT || 0)) / 100;
+
+      const netAmount = suppAmount - discountAmount;
+
+      updatedRow.UNIT_COST = (netAmount / Number(receivedQty || 0)).toFixed(2);
+
+      updatedRow.COST = updatedRow.UNIT_COST;
       // Find and replace in poDetails
       const idx = this.poDetails.findIndex(
         (r: any) =>
@@ -750,13 +760,22 @@ export class GrnNewFormComponent implements OnInit {
         console.log(totalCost, 'totalCost');
         // Ensure RECEIVED_QTY is greater than zero to avoid division by zero
         if (Number(item.RECEIVED_QTY) > 0) {
-          item.UNIT_COST = (
-            Number(item.AMOUNT || 0) / Number(item.RECEIVED_QTY || 0)
-          ).toFixed(2);
+          const suppAmount =
+            Number(item.SUPP_PRICE || 0) * Number(item.RECEIVED_QTY || 0);
+
+          const discountAmount =
+            (suppAmount * Number(item.DISC_PERCENT || 0)) / 100;
+
+          const netAmount = suppAmount - discountAmount;
+
+          item.UNIT_COST = (netAmount / Number(item.RECEIVED_QTY || 0)).toFixed(
+            2,
+          );
 
           item.COST = item.UNIT_COST;
         } else {
-          item.UNIT_COST = '0.00'; // Default value if RECEIVED_QTY is zero or undefined
+          item.UNIT_COST = '0.00';
+          item.COST = '0.00';
         }
 
         return item;
@@ -781,7 +800,10 @@ export class GrnNewFormComponent implements OnInit {
 
       const bindedData = this.updatedItems.map((item) => {
         const amount = Number(item.PRICE) * Number(item.RECEIVED_QTY);
-
+        const localAmount =
+          Number(item.PRICE || 0) * Number(item.RECEIVED_QTY || 0);
+        const suppAmount =
+          Number(item.SUPP_PRICE || 0) * Number(item.RECEIVED_QTY || 0);
         return {
           COMPANY_ID: this.selected_Company_id,
           STORE_ID: this.newGrnData.STORE_ID,
@@ -790,12 +812,12 @@ export class GrnNewFormComponent implements OnInit {
           QUANTITY: Number(item.RECEIVED_QTY),
 
           RATE: Number(amount.toFixed(2)), //  RATE = AMOUNT
-          AMOUNT: Number(amount.toFixed(2)),
+          AMOUNT: Number(localAmount.toFixed(2)),
 
           DISC_PERCENT: Number(item.DISC_PERCENT || 0),
 
           SUPP_PRICE: Number(item.SUPP_PRICE),
-          SUPP_AMOUNT: Number((item.RECEIVED_QTY * item.SUPP_PRICE).toFixed(2)),
+          SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
 
           UOM_PURCH: item.UOM_PURCH,
           UOM: item.UOM,
@@ -1225,9 +1247,19 @@ export class GrnNewFormComponent implements OnInit {
 
           // Ensure RECEIVED_QTY is greater than zero to avoid division by zero
           if (Number(item.RECEIVED_QTY) > 0) {
+            const suppAmount =
+              Number(item.SUPP_PRICE || 0) * Number(item.RECEIVED_QTY || 0);
+
+            const discountAmount =
+              (suppAmount * Number(item.DISC_PERCENT || 0)) / 100;
+
+            const netAmount = suppAmount - discountAmount;
+
             updatedItem.UNIT_COST = (
-              Number(updatedItem.TOTAL_COST) / Number(item.RECEIVED_QTY)
+              netAmount / Number(item.RECEIVED_QTY || 0)
             ).toFixed(2);
+
+            updatedItem.COST = updatedItem.UNIT_COST;
           } else {
             updatedItem.UNIT_COST = '0.00'; // Default value if RECEIVED_QTY is zero or undefined
           }
@@ -1375,16 +1407,16 @@ export class GrnNewFormComponent implements OnInit {
     console.log('After delete → poDetails:', this.poDetails);
   }
 
+  getSuppAmountValue = (rowData: any) => {
+    return (
+      Number(rowData.RECEIVED_QTY || 0) * Number(rowData.SUPP_PRICE || 0)
+    ).toFixed(2);
+  };
+
   getAmountValue = (rowData: any) => {
-    const suppAmount = Number(rowData.SUPP_AMOUNT || 0);
-
-    // ✅ If SUPP_AMOUNT has value, show it
-    if (suppAmount > 0) {
-      return suppAmount;
-    }
-
-    // ✅ Otherwise show AMOUNT
-    return Number(rowData.AMOUNT || 0);
+    return (
+      Number(rowData.RECEIVED_QTY || 0) * Number(rowData.PRICE || 0)
+    ).toFixed(2);
   };
 }
 @NgModule({

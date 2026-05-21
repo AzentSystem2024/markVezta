@@ -739,6 +739,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.newPoData.SUPP_GROSS_AMOUNT = this.savedItems
       .reduce((sum, item) => sum + Number(item.taxable_Supplier || 0), 0)
       .toFixed(2);
+    console.log('GROSS_AMOUNT:', this.newPoData.GROSS_AMOUNT);
   }
 
   calculateTotalVATAmount() {
@@ -860,7 +861,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       ITEM_ID: item.ITEM_ID,
       QUANTITY: qtyOrdered,
       PRICE: item.SUPP_PRICE,
-      AMOUNT: item.Amount,
+      // AMOUNT: item.Amount,
+      AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       DISC_PERCENT: discPerc,
 
       // ✅ IMPORTANT
@@ -874,7 +876,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       ITEM_DESC: item.DESCRIPTION,
       UOM: item.UOM,
       SUPP_PRICE: item.SUPP_PRICE,
-      SUPP_AMOUNT: item.SUPP_AMOUNT,
+      // SUPP_AMOUNT: item.SUPP_AMOUNT,
+      SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
     };
 
     const index = this.poData.PoDetails.findIndex(

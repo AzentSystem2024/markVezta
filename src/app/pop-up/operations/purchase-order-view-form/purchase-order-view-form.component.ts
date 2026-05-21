@@ -790,7 +790,15 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   };
 
   formatTotalAmount = (data: any) => {
-    return `${this.SupplierCurrencySymbol} ${data.value}`;
+    const symbol = this.newPoData?.CURRENCY_SYMBOL || '';
+
+    console.log('Currency Symbol:', symbol);
+
+    console.log('Total Value:', data.value);
+
+    const formattedValue = Number(data.value || 0).toFixed(2);
+
+    return symbol ? `${symbol} ${formattedValue}` : formattedValue;
   };
 
   openFile(base64Data: string, fileName: string) {

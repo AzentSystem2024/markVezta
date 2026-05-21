@@ -287,7 +287,7 @@
   [(visible)]="isAddTransferIn"
   [width]="'70vw'"
   [height]="'90vh'"
-  title="Transfer In"
+  title=" New Transfer In"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddTransferIn">
@@ -301,7 +301,7 @@
   [(visible)]="isEditTransferIn"
   [width]="'70vw'"
   [height]="'90vh'"
-  title="Transfer In"
+  [title]="buttonText"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditTransferIn">

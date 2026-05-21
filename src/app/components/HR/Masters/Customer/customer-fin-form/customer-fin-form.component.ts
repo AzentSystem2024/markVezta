@@ -139,7 +139,7 @@ export class CustomerFinFormComponent {
     });
 
     this.getStateDropDown();
-    this.newCustomer.CUST_VAT_RULE_ID = 1
+    this.newCustomer.CUST_VAT_RULE_ID = 2
   }
   newCustomer = this.formCustomerData;
 
@@ -396,7 +396,7 @@ export class CustomerFinFormComponent {
     this.locationValue = '';
     this.phoneValue = '';
     this.savedAddresses = [];
-    this.newCustomer.CUST_VAT_RULE_ID = 1
+    this.newCustomer.CUST_VAT_RULE_ID = 2
     this.newCustomer.FAX_NO = ''
     this.newCustomer.PAY_TERM_ID = 0
     this.newCustomer.PRICE_CLASS_ID = 0
@@ -543,8 +543,8 @@ export class CustomerFinFormComponent {
   }
   deafulvalue() {
     console.log('==open =====');
-    this.newCustomer.CUST_VAT_RULE_ID = 1
-    this.formCustomerData.CUST_VAT_RULE_ID = 1
+    this.newCustomer.CUST_VAT_RULE_ID = 2
+    this.formCustomerData.CUST_VAT_RULE_ID = 2
 
   }
 

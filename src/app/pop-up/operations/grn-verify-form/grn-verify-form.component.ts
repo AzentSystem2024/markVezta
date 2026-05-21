@@ -295,12 +295,25 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         item.ITEM_ID === updatedData.ITEM_ID &&
         item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
+    const localAmount =
+      Number(updatedRow.QUANTITY || 0) * Number(updatedRow.PRICE || 0);
+
+    const suppAmount =
+      Number(updatedRow.QUANTITY || 0) * Number(updatedRow.SUPP_PRICE || 0);
+
     const enrichedData = {
       ...updatedData,
-      ITEM_NAME: updatedRow.DESCRIPTION || updatedData.DESCRIPTION || '', // or whatever the field is
+
+      ITEM_NAME: updatedRow.DESCRIPTION || updatedData.DESCRIPTION || '',
       STORE_NAME: updatedRow.STORE_NAME || updatedData.STORE_NAME || '',
-      AMOUNT: (updatedRow.QUANTITY || 0) * (updatedRow.PRICE || 0),
-      SUPP_AMOUNT: (updatedRow.QUANTITY || 0) * (updatedRow.SUPP_PRICE || 0),
+
+      RATE: Number(updatedRow.PRICE || 0),
+
+      AMOUNT: Number(localAmount.toFixed(2)),
+
+      SUPP_PRICE: Number(updatedRow.SUPP_PRICE || 0),
+
+      SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
     };
     console.log(enrichedData, 'enrichedData');
 
@@ -361,23 +374,51 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       updatedRow.QTY_BASE_UNIT = `${baseUnitValue} ${updatedRow.UOM}`;
       console.log(updatedRow.QTY_BASE_UNIT, 'updatedRow.QTY_BASE_UNIT');
       // Calculate the amount
-      updatedRow.SUPP_AMOUNT = (receivedQty * price).toFixed(2); // Format to 2 decimal places
-      console.log(updatedRow.SUPP_AMOUNT, 'updatedRow.SUPP_AMOUNT');
+      updatedRow.SUPP_AMOUNT = (
+        Number(receivedQty || 0) * Number(updatedRow.SUPP_PRICE || 0)
+      ).toFixed(2);
 
-      updatedRow.AMOUNT = (receivedQty * localprice).toFixed(2); // Format to 2 decimal places
+      updatedRow.AMOUNT = (
+        Number(receivedQty || 0) * Number(updatedRow.PRICE || 0)
+      ).toFixed(2); // Format to 2 decimal places
+      updatedRow.UNIT_COST = (
+        Number(updatedRow.PO_TAXABLE_AMOUNT || 0) / Number(receivedQty || 0)
+      ).toFixed(2);
 
-      // 🔑 Find and replace in poDetails
+      updatedRow.COST = updatedRow.UNIT_COST;
+      //  Find and replace in poDetails
       const idx = this.poDetails.findIndex(
-        (r) =>
+        (r: any) =>
           r.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID &&
           r.ITEM_ID === updatedRow.ITEM_ID,
       );
 
       if (idx > -1) {
-        this.poDetails[idx] = { ...this.poDetails[idx], ...updatedRow };
-        this.poDetails = [...this.poDetails]; // force Angular to detect change
-      }
+        this.poDetails[idx] = {
+          ...this.poDetails[idx],
+          ...updatedRow,
 
+          UNIT_COST:
+            Number(receivedQty || 0) > 0
+              ? (
+                  Number(updatedRow.PO_TAXABLE_AMOUNT || 0) /
+                  Number(receivedQty || 0)
+                ).toFixed(2)
+              : '0.00',
+
+          COST:
+            Number(receivedQty || 0) > 0
+              ? (
+                  Number(updatedRow.PO_TAXABLE_AMOUNT || 0) /
+                  Number(receivedQty || 0)
+                ).toFixed(2)
+              : '0.00',
+        };
+
+        this.poDetails = [...this.poDetails];
+
+        this.ref.detectChanges();
+      }
       console.log(this.poDetails[idx], '✅ Updated row now bound to grid');
 
       this.totalQuantity = this.poDetails.reduce((sum, item) => {
@@ -441,11 +482,14 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         console.log(totalCost, 'totalCost');
         // Ensure QUANTITY is greater than zero to avoid division by zero
         if (Number(item.QUANTITY) > 0) {
-          item.UNIT_COST = (Number(totalCost) / Number(item.QUANTITY)).toFixed(
-            2,
-          );
+          item.UNIT_COST = (
+            Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0)
+          ).toFixed(2);
+
+          item.COST = item.UNIT_COST;
         } else {
-          item.UNIT_COST = '0.00'; // Default value if QUANTITY is zero or undefined
+          item.UNIT_COST = '0.00';
+          item.COST = '0.00';
         }
 
         return item;
@@ -475,12 +519,19 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         ITEM_ID: item.ITEM_ID,
         QUANTITY: Number(item.QUANTITY),
         RATE: Number(item.PRICE),
-        // SUPP_AMOUNT: Number(item.LOCAL_AMOUNT),
-        AMOUNT: Number(item.PRICE * item.QUANTITY),
+        AMOUNT: Number(
+          (Number(item.PRICE || 0) * Number(item.QUANTITY || 0)).toFixed(2),
+        ),
+
+        SUPP_AMOUNT: Number(
+          (Number(item.SUPP_PRICE || 0) * Number(item.QUANTITY || 0)).toFixed(
+            2,
+          ),
+        ),
         DISC_PERCENT: Number(item.DISC_PERCENT),
 
         SUPP_PRICE: Number(item.SUPP_PRICE),
-        SUPP_AMOUNT: Number(item.QUANTITY * item.SUPP_PRICE),
+        // SUPP_AMOUNT: Number(item.QUANTITY * item.SUPP_PRICE),
         UOM_PURCH: item.UOM_PURCH,
         UOM: item.UOM,
         COST: item.UNIT_COST,
@@ -850,7 +901,11 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       AMOUNT: Number(item.QUANTITY * item.PRICE),
       INVOICE_QTY: 0,
       DISC_PERCENT: Number(item.DISC_PERCENT),
-      COST: Number(item.COST || 0),
+      // COST: Number(item.COST || 0),
+      COST: Number(
+        item.UNIT_COST ||
+          Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0),
+      ).toFixed(2),
       SUPP_PRICE: Number(item.QUANTITY * item.SUPP_PRICE),
       PRICE: Number(item.PRICE),
       SUPP_AMOUNT: Number(item.SUPP_AMOUNT || 0),
@@ -1122,6 +1177,19 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
         QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
         DESCRIPTION: item.ITEM_NAME,
+        UNIT_COST:
+          Number(item.QUANTITY || 0) > 0
+            ? (
+                Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0)
+              ).toFixed(2)
+            : '0.00',
+
+        COST:
+          Number(item.QUANTITY || 0) > 0
+            ? (
+                Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0)
+              ).toFixed(2)
+            : '0.00',
       }));
 
       console.log(this.poDetails, 'podetails');

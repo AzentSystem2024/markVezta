@@ -252,10 +252,11 @@
       [(visible)]="addPrepaymentPopupOpened"
       [width]="'50vw'"
       [height]="'auto'"
-      title="Add PrePayment Invoice"
+      [title]="popupTitle"
       (onHiding)="handleClose()"
     >
       <app-pre-payment-add
+      [mode]="popupMode"
         [isOpen]="addPrepaymentPopupOpened"
         (formClosed)="handleClose()"
         [canApprove]="canApprove"
@@ -268,10 +269,11 @@
   [(visible)]="editPrePaymentPopupOpened"
   [width]="'50vw'"
   [height]="'auto'"
-  title="PrePayment Invoice"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <app-pre-payment-edit
+  [mode]="popupMode"
     [selectedPrePayment]="selectedPrePayment"
     [isOpen]="editPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"
@@ -285,10 +287,11 @@
   [(visible)]="verifyPrePaymentPopupOpened"
   [width]="'50vw'"
   [height]="'auto'"
-  title="PrePayment Invoice"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
   <app-pre-payment-edit
+  [mode]="popupMode"
     [selectedPrePayment]="selectedPrePayment"
     [isOpen]="verifyPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"

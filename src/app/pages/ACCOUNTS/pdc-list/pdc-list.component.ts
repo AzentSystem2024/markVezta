@@ -42,6 +42,30 @@ export class PdcListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   isEditReadOnly: boolean = false;
+  popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
+popupTitle = 'New PDC';
+
+setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
+  this.popupMode = mode;
+
+  switch (mode) {
+    case 'new':
+      this.popupTitle = 'New PDC';
+      break;
+    case 'edit':
+      this.popupTitle = 'Edit PDC';
+      break;
+    case 'verify':
+      this.popupTitle = 'Verify PDC';
+      break;
+    case 'approve':
+      this.popupTitle = 'Approve PDC';
+      break;
+    case 'view':
+      this.popupTitle = 'View PDC';
+      break;
+  }
+}
 
   PDCListDataSource: any[] = [];
   fullPDCList: any[] = [];
@@ -389,6 +413,7 @@ export class PdcListComponent {
   }
 
   addPDC() {
+    this.setPopupMode('new');
     this.addPDCPopupOpened = true;
   }
 
@@ -629,8 +654,18 @@ export class PdcListComponent {
   onVerifyInvoice(e:any){
     e.cancel = true;
     const status = e.row.data?.ENTRY_STATUS?.trim();
-     this.isEditReadOnly =
-    status === 'Approved' || status === 'Closed';
+   if (status === 'Verified') {
+    this.setPopupMode('approve');
+    this.isEditReadOnly = false;
+  } else if (status === 'Approved' || status === 'Closed') {
+    this.setPopupMode('view');
+    this.isEditReadOnly = true;
+  } else {
+    this.setPopupMode('verify');
+    this.isEditReadOnly = false;
+  }
+    //  this.isEditReadOnly =
+    // status === 'Approved' || status === 'Closed';
     this.VerifyPDCPopupOpened = true;
     this.selectedVerify_PDC(e);
   }
@@ -638,8 +673,15 @@ export class PdcListComponent {
   onEditPDC(event: any) {
     event.cancel = true;
     const status = event.data?.ENTRY_STATUS?.trim();
-     this.isEditReadOnly =
-    status === 'Approved' || status === 'Closed';
+    if (status === 'Approved' || status === 'Closed') {
+    this.setPopupMode('view');
+    this.isEditReadOnly = true;
+  } else {
+    this.setPopupMode('edit');
+    this.isEditReadOnly = false;
+  }
+    //  this.isEditReadOnly =
+    // status === 'Approved' || status === 'Closed';
     this.editPDCPopupOpened = true;
     this.selected_PDC(event);
   }

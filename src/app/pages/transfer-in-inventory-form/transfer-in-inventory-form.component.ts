@@ -544,7 +544,9 @@ export class TransferInInventoryFormComponent {
             });
           }
         });
-      } else if (this.selectedDocStatus == 'OPEN' && this.status == 'verifyscreen') {
+      } else if
+
+        (this.selectedDocStatus == 'OPEN' && this.status == 'VerifyScreen') {
         // UPDATE API
         confirm(
           'Are you sure you want to approve this transfer?',
