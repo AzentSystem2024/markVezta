@@ -346,7 +346,8 @@ export class ProfitAndLossDimensionComponent {
         };
       },
     );
-
+ console.log(allDimensionData , 'All Dimensions')
+ console.log(this.selectedDiamensions,'Selected dimensions')
     // Show only selected dimensions
     this.dimensionPopupData = allDimensionData.filter((x: any) =>
       this.selectedDiamensions.includes(x.ID),
