@@ -10,6 +10,7 @@ import {
   DxLoadIndicatorModule,
   DxLoadPanelModule,
   DxNumberBoxModule,
+  DxPopupModule,
   DxSelectBoxModule,
   DxTagBoxModule,
   DxTextBoxModule,
@@ -58,6 +59,10 @@ export class BalanceSheetDimensionComponent {
    Diamensions: any[] = [];
    selectedDiamensions: number[] = [2];
 
+    dimensionPopupVisible: boolean = false;
+    dimensionPopupData: any[] = [];
+  selectedRowData: any = null;
+
   constructor(
     private dataservice: DataService,
     private fb: FormBuilder,
@@ -79,9 +84,7 @@ export class BalanceSheetDimensionComponent {
   }
 
   ngOnInit() {
-    // initialize with today's date
-    // this.onToDateChange({ value: this.defaultDate });
-    //get datasource======== function call==========
+    
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -234,12 +237,70 @@ export class BalanceSheetDimensionComponent {
     return `${year}-${month}-${day}`;
   }
 
+  onCellClick(e: any) {
+    if (e.rowType !== 'data') {
+      return;
+    }
+
+    if (
+      e.column?.dataField !== 'CODE' &&
+      e.column?.dataField !== 'DESCRIPTION'
+    ) {
+      return;
+    }
+
+    // ================= Fixed Dropdown Order =================
+    const fixedDimensionOrder = [1, 2, 3, 4, 5];
+
+    // ================= Selected Dimensions In Fixed Order =================
+    const selectedInFixedOrder = fixedDimensionOrder.filter((id) =>
+      this.selectedDiamensions.includes(id),
+    );
+
+    // ================= Split Values =================
+    const codeValues = (e.data.CODE || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    const descriptionValues = (e.data.DESCRIPTION || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    // ================= Correct Mapping =================
+    const mappedData = selectedInFixedOrder.map((id: number, index: number) => {
+      const dimension = this.Diamensions.find((x: any) => x.ID == id);
+
+      return {
+        ID: id,
+
+        Dimension: dimension?.DESCRIPTION || dimension?.SHORT_NAME || '',
+        Code: codeValues[index] || '',
+        Description: descriptionValues[index] || '',
+      };
+    });
+
+    // ================= Reorder To User Selection Order =================
+    this.dimensionPopupData = this.selectedDiamensions
+      .map((selectedId: number) =>
+        mappedData.find((x: any) => x.ID === selectedId),
+      )
+      .filter(Boolean);
+
+    console.log(this.dimensionPopupData);
+
+    this.dimensionPopupVisible = true;
+  }
+
+
   get_DataSource() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.finID,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
+      DimensionCode: String(this.selectedDiamensions),
     };
 
     const payloadData = {
@@ -247,6 +308,7 @@ export class BalanceSheetDimensionComponent {
       finId: payload.FIN_ID,
       dateFrom: payload.DATE_FROM,
       dateTo: payload.DATE_TO,
+      DimensionCode : payload.DimensionCode
     };
 
     sessionStorage.removeItem('viewclickvalue');
@@ -307,6 +369,7 @@ export class BalanceSheetDimensionComponent {
     DxSelectBoxModule,
     DxButtonModule,
     DxTagBoxModule,
+    DxPopupModule,
   ],
   providers: [],
   exports: [],

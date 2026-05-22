@@ -232,49 +232,104 @@ export class AddSupplierPaymentComponent {
     });
   }
 
-  onEditorPreparing(e: any) {
-    if (e.dataField === 'RECEIVED_AMOUNT') {
-      e.editorOptions = e.editorOptions || {};
+  // onEditorPreparing(e: any) {
+  //   if (e.dataField === 'RECEIVED_AMOUNT') {
+  //     e.editorOptions = e.editorOptions || {};
 
-      // Let the editor inherit row height naturally (no fixed height)
-      e.editorOptions.elementAttr = {
-        style: `
+  //     // Let the editor inherit row height naturally (no fixed height)
+  //     e.editorOptions.elementAttr = {
+  //       style: `
+  //       height: 100%;
+  //       margin: 0;
+  //       padding: 0;
+  //       display: flex;
+  //       align-items: center;
+  //     `,
+  //     };
+
+  //     // Make sure the input fits snugly inside
+  //     e.editorOptions.inputAttr = {
+  //       style: `
+  //       height: 100%;
+  //       padding: 0 4px;
+  //       box-sizing: border-box;
+  //     `,
+  //     };
+
+  //     // Remove spin buttons to prevent layout changes
+  //     if (e.editorName === 'dxNumberBox') {
+  //       e.editorOptions.showSpinButtons = false;
+  //     }
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = this.itemsGridRef?.instance;
+  //         const visibleRows = grid.getVisibleRows();
+
+  //         const rowIndex = visibleRows.findIndex(
+  //           (r) => r?.data === e.row?.data,
+  //         );
+  //         setTimeout(() => {
+  //           grid.focus(grid.getCellElement(rowIndex, 'GST'));
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+  // }
+
+
+  onEditorPreparing(e: any) {
+  if (e.parentType === 'dataRow' && e.dataField === 'RECEIVED_AMOUNT') {
+    const grid = this.itemsGridRef?.instance;
+
+    // check whether current row is selected
+    const isSelected = grid.isRowSelected(e.row.key);
+
+    // enable edit only for selected rows
+    e.editorOptions.disabled = !isSelected;
+
+    if (!isSelected) {
+      e.cancel = true;
+      return;
+    }
+
+    e.editorOptions = e.editorOptions || {};
+
+    e.editorOptions.elementAttr = {
+      style: `
         height: 100%;
         margin: 0;
         padding: 0;
         display: flex;
         align-items: center;
       `,
-      };
+    };
 
-      // Make sure the input fits snugly inside
-      e.editorOptions.inputAttr = {
-        style: `
+    e.editorOptions.inputAttr = {
+      style: `
         height: 100%;
         padding: 0 4px;
         box-sizing: border-box;
       `,
-      };
+    };
 
-      // Remove spin buttons to prevent layout changes
-      if (e.editorName === 'dxNumberBox') {
-        e.editorOptions.showSpinButtons = false;
-      }
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
-
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
-          setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
-          }, 50);
-        }
-      };
+    if (e.editorName === 'dxNumberBox') {
+      e.editorOptions.showSpinButtons = false;
     }
+
+    e.editorOptions.onKeyDown = (event: any) => {
+      if (event.event.key === 'Enter') {
+        const visibleRows = grid.getVisibleRows();
+        const rowIndex = visibleRows.findIndex(
+          (r) => r?.data === e.row?.data,
+        );
+
+        setTimeout(() => {
+          grid.focus(grid.getCellElement(rowIndex + 1, 'RECEIVED_AMOUNT'));
+        }, 50);
+      }
+    };
   }
+}
 
   onGridContentReady(e: any) {
     if (e.component) {
@@ -443,21 +498,28 @@ export class AddSupplierPaymentComponent {
     this.paymentFormData.PDC_ID = selectedCheque.ID;
     this.pdcPopupVisible = false;
   }
+onSelectionChanged(e: any) {
+  this.selectedRowsCount = e.selectedRowsData.length;
+
+  this.totalPending = e.selectedRowsData.reduce(
+    (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
+    0,
+  );
+
+  this.itemsGridRef?.instance.refresh();
+}
+
   // onSelectionChanged(e: any) {
   //   this.selectedRowsCount = e.selectedRowsData.length;
+
+  //   // Calculate selected total balance
+  //   this.totalPending = e.selectedRowsData.reduce(
+  //     (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
+  //     0,
+  //   );
+
+  //   console.log('Selected Balance Total:', this.totalPending.toFixed(2));
   // }
-
-  onSelectionChanged(e: any) {
-    this.selectedRowsCount = e.selectedRowsData.length;
-
-    // Calculate selected total balance
-    this.totalPending = e.selectedRowsData.reduce(
-      (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-      0,
-    );
-
-    console.log('Selected Balance Total:', this.totalPending.toFixed(2));
-  }
 
   onFillAmountClick() {
     if (this.selectedRowsCount === 0) {
