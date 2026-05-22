@@ -7017,4 +7017,16 @@ The result can be exported to HTML or Markdown.`;
   removeDenial(id: any) {
     return this.http.post(`${this.apiUrl}DenialMaster/delete/${id}`, {});
   }
+
+    //=================PROFIT & LOSS DIMENSION===================
+  Profit_Loss_Dimension_Api(payload: any) {
+    const getEndpoint = this.apiUrl + 'AC_Report/profitlossdimension';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   //===========Balance sheet Dimension======================
+  Balance_Sheet_Dimension_Api(payload: any) {
+    const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheet';
+    return this.http.post(getEndpoint, payload);
+  }
 }

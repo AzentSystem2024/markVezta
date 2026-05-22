@@ -447,9 +447,11 @@ export class JournalBookComponent {
           this.selectedInvoice = response.Data;
           this.loadingInvoice = false;
 
-          this.isEditInvoice = true;
-          this.cdr.detectChanges();
-        });
+             setTimeout(() => {
+        this.isEditInvoice = true;
+        this.cdr.detectChanges();
+      }, 0);
+          });
     } else if (TransType === 27) {
       this.dataService
         .selectCustomerReceipt(trans_id)
