@@ -316,47 +316,44 @@ export class TrialBalanceFinDimensionComponent {
       return;
     }
 
-    // Fixed Financial Dimension Order
+    // ================= Fixed Dropdown Order =================
     const fixedDimensionOrder = [1, 2, 3, 4, 5];
 
-    const codeValues = (e.data.Code || '').split(' - ');
-    const descriptionValues = (e.data.Description || '').split(' - ');
-
-    // Create full mapping first
-    const allDimensionData = fixedDimensionOrder.map(
-      (id: number, index: number) => {
-        const dimension = this.Diamensions.find((x: any) => x.ID == id);
-
-        let codeValue = codeValues[index] || '';
-        let descriptionValue = descriptionValues[index] || '';
-
-        // First empty value
-        if (index === 0 && !codeValue.trim()) {
-          codeValue = '- -';
-        }
-
-        // Other empty values
-        if (!codeValue.trim()) {
-          codeValue = ' ';
-        }
-
-        if (!descriptionValue.trim()) {
-          descriptionValue = ' ';
-        }
-
-        return {
-          ID: id,
-          Dimension: dimension?.DESCRIPTION || '',
-          Code: codeValue,
-          Description: descriptionValue,
-        };
-      },
+    // ================= Selected Dimensions In Fixed Order =================
+    const selectedInFixedOrder = fixedDimensionOrder.filter((id) =>
+      this.selectedDiamensions.includes(id),
     );
 
-    // Show only selected dimensions
-    this.dimensionPopupData = allDimensionData.filter((x: any) =>
-      this.selectedDiamensions.includes(x.ID),
-    );
+    // ================= Split Values =================
+    const codeValues = (e.data.Code || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    const descriptionValues = (e.data.Description || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    // ================= Correct Mapping =================
+    const mappedData = selectedInFixedOrder.map((id: number, index: number) => {
+      const dimension = this.Diamensions.find((x: any) => x.ID == id);
+
+      return {
+        ID: id,
+
+        Dimension: dimension?.DESCRIPTION || dimension?.SHORT_NAME || '',
+        Code: codeValues[index] || '',
+        Description: descriptionValues[index] || '',
+      };
+    });
+
+    // ================= Reorder To User Selection Order =================
+    this.dimensionPopupData = this.selectedDiamensions
+      .map((selectedId: number) =>
+        mappedData.find((x: any) => x.ID === selectedId),
+      )
+      .filter(Boolean);
 
     console.log(this.dimensionPopupData);
 
