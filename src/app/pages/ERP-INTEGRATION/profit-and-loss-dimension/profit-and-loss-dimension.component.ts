@@ -26,15 +26,12 @@ import {
 } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 
-
-
 @Component({
   selector: 'app-profit-and-loss-dimension',
   templateUrl: './profit-and-loss-dimension.component.html',
-  styleUrls: ['./profit-and-loss-dimension.component.scss']
+  styleUrls: ['./profit-and-loss-dimension.component.scss'],
 })
 export class ProfitAndLossDimensionComponent {
-
   @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
   @ViewChild(DxDataGridComponent) grid!: DxDataGridComponent;
   refreshButtonOptions = {
@@ -76,14 +73,14 @@ export class ProfitAndLossDimensionComponent {
   totalRevenue: number = 0;
   totalExpense: number = 0;
 
-  selectedYear: number | null = null;
+  selectedYear: any = null;
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
-   Diamensions: any[] = [];
-   selectedDiamensions: number[] = [2];
+  Diamensions: any[] = [];
+  selectedDiamensions: number[] = [2];
 
-    dimensionPopupVisible: boolean = false;
+  dimensionPopupVisible: boolean = false;
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
 
@@ -121,7 +118,7 @@ export class ProfitAndLossDimensionComponent {
     this.get_DataSource();
   }
 
-   //================ Year value change ===================
+  //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
     this.selectedmonth = '';
@@ -157,8 +154,10 @@ export class ProfitAndLossDimensionComponent {
     }
   }
 
-   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+  sesstion_Details() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -168,7 +167,6 @@ export class ProfitAndLossDimensionComponent {
     }
     this.get_DataSource();
   }
-
 
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
@@ -181,7 +179,9 @@ export class ProfitAndLossDimensionComponent {
   }
 
   get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.savedUserData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     //   ;
     this.company_list = this.savedUserData.Companies;
   }
@@ -191,24 +191,20 @@ export class ProfitAndLossDimensionComponent {
     if (this.fin_id.length) {
       this.finID = this.fin_id[0].FIN_ID;
     }
-    // console.log(this.fin_id, '========financial year');
   }
 
   onCompanyChange(event: any) {
     this.company_id = event.value;
-    // console.log(this.company_id, '=====company id');
   }
 
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
-    //       // example: "2025-04-01"
   }
 
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
-    //      // example: "2025-04-01"
   }
 
   formatDate(date: Date): string {
@@ -218,8 +214,7 @@ export class ProfitAndLossDimensionComponent {
     return `${year}-${month}-${day}`;
   }
 
-
-   onDimensionChange(e: any) {
+  onDimensionChange(e: any) {
     let selected = e.value || [];
 
     // force ID 2 to remain selected
@@ -259,7 +254,7 @@ export class ProfitAndLossDimensionComponent {
       FIN_ID: this.finID,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
-      DimensionCode : String(this.selectedDiamensions),
+      DimensionCode: String(this.selectedDiamensions),
     };
 
     const payloadData = {
@@ -267,7 +262,7 @@ export class ProfitAndLossDimensionComponent {
       finId: payload.FIN_ID,
       dateFrom: payload.DATE_FROM,
       dateTo: payload.DATE_TO,
-      DimensionCode : payload.DimensionCode
+      DimensionCode: payload.DimensionCode,
     };
 
     sessionStorage.removeItem('viewclickvalue');
@@ -294,9 +289,7 @@ export class ProfitAndLossDimensionComponent {
     });
   }
 
-
-   onCellClick(e: any) {
-    console.log(e)
+  onCellClick(e: any) {
     if (e.rowType !== 'data') {
       return;
     }
@@ -308,57 +301,51 @@ export class ProfitAndLossDimensionComponent {
       return;
     }
 
-    // Fixed Financial Dimension Order
+    // ================= Fixed Dropdown Order =================
     const fixedDimensionOrder = [1, 2, 3, 4, 5];
 
-    const codeValues = (e.data.CODE || '').split(' - ');
-    const descriptionValues = (e.data.DESCRIPTION || '').split(' - ');
-    console.log(codeValues,descriptionValues)
-
-    // Create full mapping first
-    const allDimensionData = fixedDimensionOrder.map(
-      (id: number, index: number) => {
-        const dimension = this.Diamensions.find((x: any) => x.ID == id);
-
-        let codeValue = codeValues[index] || '';
-        let descriptionValue = descriptionValues[index] || '';
-        console.log(codeValue,descriptionValue)
-
-        // First empty value
-        if (index === 0 && !codeValue.trim()) {
-          codeValue = '- -';
-        }
-
-        // Other empty values
-        if (!codeValue.trim()) {
-          codeValue = ' ';
-        }
-
-        if (!descriptionValue.trim()) {
-          descriptionValue = ' ';
-        }
-
-        return {
-          ID: id,
-          Dimension: dimension?.DESCRIPTION || '',
-          CODE: codeValue,
-          DESCRIPTION: descriptionValue,
-        };
-      },
+    // ================= Selected Dimensions In Fixed Order =================
+    const selectedInFixedOrder = fixedDimensionOrder.filter((id) =>
+      this.selectedDiamensions.includes(id),
     );
- console.log(allDimensionData , 'All Dimensions')
- console.log(this.selectedDiamensions,'Selected dimensions')
-    // Show only selected dimensions
-    this.dimensionPopupData = allDimensionData.filter((x: any) =>
-      this.selectedDiamensions.includes(x.ID),
-    );
+
+    // ================= Split Values =================
+    const codeValues = (e.data.CODE || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    const descriptionValues = (e.data.DESCRIPTION || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    // ================= Correct Mapping =================
+    const mappedData = selectedInFixedOrder.map((id: number, index: number) => {
+      const dimension = this.Diamensions.find((x: any) => x.ID == id);
+
+      return {
+        ID: id,
+
+        Dimension: dimension?.DESCRIPTION || dimension?.SHORT_NAME || '',
+        Code: codeValues[index] || '',
+        Description: descriptionValues[index] || '',
+      };
+    });
+
+    // ================= Reorder To User Selection Order =================
+    this.dimensionPopupData = this.selectedDiamensions
+      .map((selectedId: number) =>
+        mappedData.find((x: any) => x.ID === selectedId),
+      )
+      .filter(Boolean);
 
     console.log(this.dimensionPopupData);
 
     this.dimensionPopupVisible = true;
   }
 
-    Diamension_dropdown() {
+  Diamension_dropdown() {
     const payload = {
       NAME: 'DIAMENSIONS',
     };
@@ -374,7 +361,7 @@ export class ProfitAndLossDimensionComponent {
   }
 
   typeSorting = (a: string, b: string) => {
-    const order = {
+    const order: any = {
       REVENUES: 1,
       EXPENSES: 2,
     };
@@ -382,14 +369,7 @@ export class ProfitAndLossDimensionComponent {
     return (order[a] || 99) - (order[b] || 99);
   };
 
- onHeaderFilterChanged(e: any) {
-  const searchedItems = e.component.getDataSource().items();
-  const allValues = searchedItems.map((x: any) => x.value);
-
-  e.component.option('filterValues', allValues);
-}
-
-  onRowPrepared(e) {
+  onRowPrepared(e: any) {
     if (e.rowType === 'data' && e.data.isSummary) {
       e.rowElement.style.fontWeight = 'bold';
       // e.rowElement.style.backgroundColor = '#f0f0f0';
@@ -399,7 +379,7 @@ export class ProfitAndLossDimensionComponent {
   calculateNetProfit() {
     let revenue = 0,
       expense = 0;
-    this.ProfitLossReport.forEach((row) => {
+    this.ProfitLossReport.forEach((row: any) => {
       const type = (row.TYPE_NAME || '').trim().toUpperCase();
       const amount = Number(row.AMOUNT || 0);
       if (type === 'REVENUES') revenue += amount;
@@ -430,7 +410,7 @@ export class ProfitAndLossDimensionComponent {
     }
   }
 
-   onViewClick(e: any) {
+  onViewClick(e: any) {
     //
     this.HeadId = e.row.data.HEAD_ID;
     // console.log(this.HeadId);
@@ -442,8 +422,6 @@ export class ProfitAndLossDimensionComponent {
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
   }
-
-
 }
 @NgModule({
   imports: [
