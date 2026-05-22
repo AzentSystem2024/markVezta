@@ -200,6 +200,7 @@ import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-li
 import { DenialListComponent } from './pages/MASTER/denial-list/denial-list.component';
 import { ProfitAndLossDimensionComponent } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionComponent } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
+import { ARReportPageComponent } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 
 const routes: Routes = [
   {
@@ -1083,18 +1084,11 @@ const routes: Routes = [
         component: PromotionApproveComponent,
         canActivate: [AuthGuardService],
       },
-      // {
-      //   path: 'item-store-properties-log',
-      //   component: ItemStorePropertiesLogComponent,
-      //   canActivate: [AuthGuardService],
-      // },
       {
         path: 'promotion-schema',
         component: PromotionSchemaLogComponent,
         canActivate: [AuthGuardService],
       },
-      //   canActivate: [AuthGuardService],
-      // },
       {
         path: 'supplier-me',
         component: SupplierFinListComponent,
@@ -1243,6 +1237,11 @@ const routes: Routes = [
       {
         path: 'trial-balance-fin-dimension',
         component: TrialBalanceFinDimensionComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'ar-report',
+        component: ARReportPageComponent,
         canActivate: [AuthGuardService],
       },
       {

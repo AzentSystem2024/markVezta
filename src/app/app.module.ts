@@ -391,6 +391,7 @@ import { DenialListModule } from './pages/MASTER/denial-list/denial-list.compone
 import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/denial-new-form.component';
 import { ProfitAndLossDimensionComponent, ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionComponent, BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
+import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 
 
 @NgModule({
@@ -799,6 +800,7 @@ import { BalanceSheetDimensionComponent, BalanceSheetDimensionModule } from './p
     DenialNewFormModule,
     ProfitAndLossDimensionModule,
     BalanceSheetDimensionModule,
+    ARReportPageModule
   ],
 
   providers: [

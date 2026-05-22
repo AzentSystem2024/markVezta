@@ -44,7 +44,7 @@ export class AgedPayablesComponent {
   selected_Company_id: any;
   selectedSupplierId: any;
   isEditInvoiceReadOnly: boolean = true;
-  selectedYear: number | null = null;
+  selectedYear: any = null;
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
@@ -133,15 +133,11 @@ export class AgedPayablesComponent {
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
-
-    // Find and log the selected supplier's DESCRIPTION
     const selectedSupplier = this.Supplier.find(
       (item: any) => item.ID === this.selectedSupplierId,
     );
     if (selectedSupplier) {
     }
-
-    // this.selectedBeneficiaryCommonName = selectedSupplier.DESCRIPTION;
   }
 
   onToDateChange(event: any) {
@@ -167,38 +163,21 @@ export class AgedPayablesComponent {
     });
   }
 
-  //   onViewClick(e: any) {
-  //   //  const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
-  //   const trans_id = e.row.data.TRANS_ID;
-
-  //     this.dataservice
-  //       .selectPurchaseInvoice(trans_id)
-  //       .subscribe((response: any) => {
-  //         this.selectedInvoice = response.Data;
-
-  //         this.isEditInvoice = true;
-  //         this.cdr.detectChanges();
-  //
-  // // this.isEditInvoiceReadOnly = transStatus === 'Approved';
-
-  //   }
-
   onViewClick(e: any) {
     this.PurchId = e.row.data.PURCH_ID;
     this.SuppId = e.row.data.SUPP_ID;
     sessionStorage.removeItem('PURCHID');
     sessionStorage.removeItem('SUPPID');
-
     sessionStorage.setItem('PURCHID', this.PurchId);
-
     sessionStorage.setItem('SUPPID', this.SuppId);
-
     // Navigate to ledger-statement route
     this.router.navigate(['/aged-payable-details']);
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -208,7 +187,9 @@ export class AgedPayablesComponent {
   }
 
   get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.savedUserData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.company_list = this.savedUserData.Companies;
   }
 
@@ -357,9 +338,8 @@ export class AgedPayablesComponent {
         alignByColumn: true,
       },
     ],
-    calculateCustomSummary: (options) => {
+    calculateCustomSummary: (options: any) => {
       if (options.name === 'summaryRow') {
-        // Custom logic if needed
       }
     },
   };

@@ -13,6 +13,7 @@ import { exportDataGrid as exportDataGridToPdf } from 'devextreme/pdf_exporter';
 import { exportDataGrid as exportDataGridToXLSX } from 'devextreme/excel_exporter';
 import { environment } from 'src/environments/environment';
 import { AnyARecord } from 'dns';
+import { DxDataGridComponent } from 'devextreme-angular';
 
 const API_URL = 'https://js.devexpress.com/Demos/RwaService/api';
 const version = '1.0';
@@ -6150,6 +6151,11 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'AcReports/TrialBalance/Dimension';
     return this.http.post(getEndpoint, payload);
   }
+  // REPORT============
+  AR_Report_Data_Fetching_Api(payload: any) {
+    const getEndpoint = this.apiUrl + 'arreport/getReportData';
+    return this.http.post(getEndpoint, payload);
+  }
 
   //================================Fixed assests===============================
 
@@ -7028,5 +7034,28 @@ The result can be exported to HTML or Markdown.`;
   Balance_Sheet_Dimension_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheet';
     return this.http.post(getEndpoint, payload);
+    //================Column location finding==================
+  makeColumnVisible(dataGrid: DxDataGridComponent, columnName: string) {
+    const columns = dataGrid.instance.getVisibleColumns();
+    const columnIndex = columns.findIndex(
+      (column:any) => column.caption === columnName
+    );
+    if (columnIndex !== -1) {
+      const columnWidth = 150;
+      const gridElement = dataGrid.instance.element();
+      const visibleWidth = gridElement.clientWidth + 400;
+      const scrollLeft = columnIndex * columnWidth - visibleWidth / 2;
+      // Scroll to the calculated position
+      dataGrid.instance.getScrollable().scrollTo({ left: scrollLeft });
+      // Highlight the column
+      dataGrid.instance.columnOption(
+        columnName,
+        'cssClass',
+        'highlighted-column'
+      );
+      setTimeout(() => {
+        dataGrid.instance.columnOption(columnName, 'cssClass', null);
+      }, 3000);
+    }
   }
 }

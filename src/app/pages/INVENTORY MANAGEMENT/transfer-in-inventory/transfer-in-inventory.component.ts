@@ -198,6 +198,7 @@ export class TransferInInventoryComponent {
     },
   ];
   selected_Data_Status: any;
+  buttonText: string;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -555,7 +556,7 @@ export class TransferInInventoryComponent {
     this.selected_Data_Status = event.data.STATUS;
     this.StatusType = 'Editscreen'
     this.isReadOnlyTrIn = false
-
+    this.buttonText = 'Update Transfer In'
     this.dataService
       .selectTransferInForInventory(trInId)
       .subscribe((response: any) => {
@@ -651,6 +652,8 @@ export class TransferInInventoryComponent {
     const trInId = e.row.data.TRANS_ID;
     this.StatusType = 'verifyscreen'
     this.isReadOnlyTrIn = e.row.data.STATUS == 'APPROVED'
+
+    console.log(e, '==============event status============')
     this.selected_Data_Status = e.row.data.STATUS;
     this.dataService
       .selectTransferInForInventory(trInId)
@@ -658,9 +661,23 @@ export class TransferInInventoryComponent {
         this.selectedTrIn = response;
         console.log(this.selectedTrIn, 'SELECTEDTROUT');
         this.isEditTransferIn = true;
-        this.cdr.detectChanges();
-      });
+        if (this.isReadOnlyTrIn) {
 
+          this.StatusType = 'viewScreen';
+          this.buttonText = 'View Transfer In';
+
+        } else if (this.selected_Data_Status === 'OPEN') {
+
+          this.StatusType = 'VerifyScreen';
+          this.buttonText = 'Verify Transfer In';
+
+        } else if (this.selected_Data_Status === 'VERIFY') {
+
+          this.StatusType = 'ApprovalScreen';
+          this.buttonText = 'Approve Transfer In';
+        }
+      });
+    this.cdr.detectChanges();
   }
   onApproveClick(e: any) {
     const trInId = e.row.data.TRANS_ID;
@@ -676,6 +693,9 @@ export class TransferInInventoryComponent {
 
   }
 }
+
+
+
 
 
 @NgModule({

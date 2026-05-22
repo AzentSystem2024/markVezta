@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   DxButtonModule,
@@ -171,12 +170,10 @@ export class TrialBalanceFinDimensionComponent {
 
   constructor(
     private dataservice: DataService,
-    private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {
     this.get_sessionstorage_data();
-    this.get_fin_id();
     this.sesstion_Details();
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
@@ -199,7 +196,6 @@ export class TrialBalanceFinDimensionComponent {
 
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
-    this.store_dropdown();
     this.Diamension_dropdown();
     this.get_DataSource();
   }
@@ -244,9 +240,7 @@ export class TrialBalanceFinDimensionComponent {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
   }
 
@@ -265,19 +259,6 @@ export class TrialBalanceFinDimensionComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.company_list = this.savedUserData.Companies;
-  }
-
-  get_fin_id() {
-    this.fin_id = this.savedUserData.FINANCIAL_YEARS;
-    if (this.fin_id.length) {
-      this.finID = this.fin_id[0].FIN_ID;
-    }
-    console.log(this.fin_id, '========financial year');
-  }
-
-  onCompanyChange(event: any) {
-    this.company_id = event.value;
-    console.log(this.company_id, '=====company id');
   }
 
   onFromDateChange(event: any) {
@@ -317,11 +298,10 @@ export class TrialBalanceFinDimensionComponent {
       .subscribe((res: any) => {
         this.isEmptyDatagrid = false;
 
-      // this.TrialBalanceReport = res.data;
-      this.TrialBalanceReport = [...res.data];
-      console.log(this.TrialBalanceReport);
-    });
-    
+        // this.TrialBalanceReport = res.data;
+        this.TrialBalanceReport = [...res.data];
+        console.log(this.TrialBalanceReport);
+      });
   }
 
   onCellClick(e: any) {
@@ -336,74 +316,48 @@ export class TrialBalanceFinDimensionComponent {
       return;
     }
 
-    // Fixed Financial Dimension Order
+    // ================= Fixed Dropdown Order =================
     const fixedDimensionOrder = [1, 2, 3, 4, 5];
 
-    const codeValues = (e.data.Code || '').split(' - ');
-    const descriptionValues = (e.data.Description || '').split(' - ');
-
-    // Create full mapping first
-    const allDimensionData = fixedDimensionOrder.map(
-      (id: number, index: number) => {
-        const dimension = this.Diamensions.find((x: any) => x.ID == id);
-
-        let codeValue = codeValues[index] || '';
-        let descriptionValue = descriptionValues[index] || '';
-
-        // First empty value
-        if (index === 0 && !codeValue.trim()) {
-          codeValue = '- -';
-        }
-
-        // Other empty values
-        if (!codeValue.trim()) {
-          codeValue = ' ';
-        }
-
-        if (!descriptionValue.trim()) {
-          descriptionValue = ' ';
-        }
-
-        return {
-          ID: id,
-          Dimension: dimension?.DESCRIPTION || '',
-          Code: codeValue,
-          Description: descriptionValue,
-        };
-      },
+    // ================= Selected Dimensions In Fixed Order =================
+    const selectedInFixedOrder = fixedDimensionOrder.filter((id) =>
+      this.selectedDiamensions.includes(id),
     );
 
-    // Show only selected dimensions
-    this.dimensionPopupData = allDimensionData.filter((x: any) =>
-      this.selectedDiamensions.includes(x.ID),
-    );
+    // ================= Split Values =================
+    const codeValues = (e.data.Code || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    const descriptionValues = (e.data.Description || '')
+      .split(' - ')
+      .map((x: string) => x.trim())
+      .filter((x: string) => x);
+
+    // ================= Correct Mapping =================
+    const mappedData = selectedInFixedOrder.map((id: number, index: number) => {
+      const dimension = this.Diamensions.find((x: any) => x.ID == id);
+
+      return {
+        ID: id,
+
+        Dimension: dimension?.DESCRIPTION || dimension?.SHORT_NAME || '',
+        Code: codeValues[index] || '',
+        Description: descriptionValues[index] || '',
+      };
+    });
+
+    // ================= Reorder To User Selection Order =================
+    this.dimensionPopupData = this.selectedDiamensions
+      .map((selectedId: number) =>
+        mappedData.find((x: any) => x.ID === selectedId),
+      )
+      .filter(Boolean);
 
     console.log(this.dimensionPopupData);
 
     this.dimensionPopupVisible = true;
-  }
-
-  updateStoreHint() {
-    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-      this.storeHint = 'No store selected';
-      return;
-    }
-
-    const selectedNames = this.Store.filter((x: any) =>
-      this.selectedStoreid.includes(x.ID),
-    ).map((x: any) => x.DESCRIPTION);
-
-    this.storeHint = selectedNames.join(', ');
-  }
-
-  store_dropdown() {
-    const payload = {
-      NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
-      this.Store = res;
-    });
   }
 
   Diamension_dropdown() {
@@ -461,21 +415,6 @@ export class TrialBalanceFinDimensionComponent {
       .map((item) => `${item.DESCRIPTION}(${item.SHORT_NAME})`)
       .join(' - ');
   };
-
-  headerFilterConfig = {
-  visible: true,
-  allowSelectAll: true,
-  search: {
-    enabled: true
-  }
-};
-
-onHeaderFilterChanged(e: any) {
-  const searchedItems = e.component.getDataSource().items();
-  const allValues = searchedItems.map((x: any) => x.value);
-
-  e.component.option('filterValues', allValues);
-}
 
   onViewClick(e: any) {
     this.HeadId = e.row.data.HeadID;
