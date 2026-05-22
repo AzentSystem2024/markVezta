@@ -339,7 +339,6 @@ export class StockAdjustmentEditComponent {
       STORE_ID: this.storeFromSession,
       ADJ_ID: 0,
       NET_AMOUNT: 0,
-
       REASON_ID: 0,
       ITEM_ID: item.ITEM_ID, // map from old
       COST: item.COST,
@@ -377,7 +376,7 @@ export class StockAdjustmentEditComponent {
       notify('Please add at least one item', 'error');
       return;
     }
-    if (this.selectedStatus == 2) {
+    if (this.selectedStatus == 2 || this.approveValue) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -418,8 +417,8 @@ export class StockAdjustmentEditComponent {
 
     else if (this.status == 'verifyscreen') {
       confirm(
-        'It will approve and commit. Are you sure you want to commit?',
-        'Confirm Commit',
+        'It will Verify . Are you sure you want to Verify?',
+        'Confirm Verify',
       ).then((result) => {
         if (result) {
           this.dataService
@@ -510,7 +509,6 @@ export class StockAdjustmentEditComponent {
     if (this.status == 'Editscreen') {
       return 'Update';
     } else if (this.status == 'verifyscreen') {
-      console.log(this.status, this.selectedStatus)
       if (this.selectedStatus == 1) {
         return 'Verify';
 
@@ -520,7 +518,7 @@ export class StockAdjustmentEditComponent {
       }
     }
     else {
-      return 'Approsve';
+      return 'Approve';
     }
   }
 }

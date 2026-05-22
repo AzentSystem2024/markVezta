@@ -127,6 +127,7 @@ export class StockAdjustmentListComponent {
   filteredStockList: any;
   selectedCompanyId: any;
   Store: any[] = [];
+  buttonText: string;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -435,6 +436,7 @@ export class StockAdjustmentListComponent {
     this.is_Edit_popup = true;
     const id = event.data.ID;
     this.StatusType = 'Editscreen'
+    this.buttonText = 'Update Stock Adjustment'
     this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
       this.selected_Data = res.Data;
 
@@ -545,7 +547,15 @@ export class StockAdjustmentListComponent {
     this.StatusType = 'verifyscreen'
     this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
       this.selected_Data = res.Data;
-
+      console.log('==call This=======')
+      console.log(this.selected_Data, '=====selected data==========')
+      if (this.selected_Data.STATUS == 1) {
+        this.buttonText = 'Verify Stock Adjustment'
+      } else if (this.selected_Data.STATUS == 2) {
+        this.buttonText = 'Approve Stock Adjustment'
+      } else {
+        this.buttonText = 'View Stock Adjustment'
+      }
     });
 
 
