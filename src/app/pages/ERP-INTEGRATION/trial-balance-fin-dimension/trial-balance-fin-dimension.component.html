@@ -16,7 +16,6 @@
       rowAlternationInterval="2"
       [summary]="summaryColumnsData"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
       [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
@@ -161,10 +160,7 @@
       >
       </dxo-header-filter>
 
-      <dxo-filter-row
-        [visible]="true"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
+      <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
       <dxi-column
         dataField="MainGroup"
         caption="Main Group"
