@@ -179,7 +179,9 @@ export class AddPurchaseInvoiceComponent {
   totalDiscAmount: any;
   isHQApp: any;
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
-
+  selectSupplierDetails: any;
+  is_default: boolean = false
+  CurrencyCode: any;
   constructor(private dataService: DataService) {
     this.sessionData_tax();
   }
@@ -240,7 +242,7 @@ export class AddPurchaseInvoiceComponent {
     });
   }
 
-  onStoreValueChanged(event: any) {}
+  onStoreValueChanged(event: any) { }
   // getStoreData() {
   //   const payload = {
   //     NAME: 'STORE',
@@ -291,6 +293,8 @@ export class AddPurchaseInvoiceComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
@@ -359,6 +363,32 @@ export class AddPurchaseInvoiceComponent {
 
   applySupplierChange(supplierId: any) {
     this.selectedSupplierId = supplierId;
+    this.dataService.selectSupplier(this.selectedSupplierId).subscribe((res: any) => {
+      console.log(res)
+      this.selectSupplierDetails = res
+
+      this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
+      if (this.is_default) {
+        const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+        this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+
+      }
+      else {
+        const currency_id = this.selectSupplierDetails.CURRENCY_ID
+
+        this.dataService.getCurrencyData().subscribe((response: any) => {
+          const currencylist = response;
+
+          const selectedCurrencyDetails = currencylist.find(
+            (item: any) => item.ID === currency_id
+          );
+          if (selectedCurrencyDetails) {
+            this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
+          }
+          console.log(this.CurrencyCode)
+        });
+      }
+    })
 
     this.mainGridData = [];
     this.itemsGridRef?.instance?.refresh();
@@ -631,6 +661,17 @@ export class AddPurchaseInvoiceComponent {
       notify(
         {
           message: 'Please select a supplier before saving the invoice.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return; // stop execution here
+    }
+    if (!this.purchaseInvoiceFormData.SUPP_INV_NO) {
+      notify(
+        {
+          message: 'Please Enter a Refferce No before saving the invoice.',
           position: { at: 'top right', my: 'top right' },
         },
         'warning',
@@ -967,4 +1008,4 @@ export class AddPurchaseInvoiceComponent {
   exports: [AddPurchaseInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddPurchaseInvoiceModule {}
+export class AddPurchaseInvoiceModule { }

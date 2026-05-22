@@ -76,7 +76,7 @@ export class JournalBookComponent {
   selected_Head_Id: any;
   selected_fin_id: any;
   isEditReadOnly: boolean = true;
-  isReadOnlyInvoice:boolean = true;
+  isReadOnlyInvoice: boolean = true;
   isViewJournalVoucher: boolean = false;
   formatted_from_date: string;
   formatted_To_date: string;
@@ -129,9 +129,9 @@ export class JournalBookComponent {
   selectedTrIn: any;
   isEditTransferIn: boolean = false;
   isReadOnlyTrIn: boolean = true;
-  isMiscViewInvoice : boolean = false;
+  isMiscViewInvoice: boolean = false;
   isEditCustomerReceipt: boolean = false;
-  viewPayrollPopupOpened : boolean = false;
+  viewPayrollPopupOpened: boolean = false;
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -365,9 +365,9 @@ export class JournalBookComponent {
       FinId: this.selected_fin_id,
       DateFrom: this.formatted_from_date ?? this.selected_from_date,
       DateTo: this.formatted_To_date ?? this.selected_To_date,
-       STORE_ID: this.selectedStoreid?.length
-    ? this.selectedStoreid.join(',') // FINAL FIX
-    : ''
+      STORE_ID: this.selectedStoreid?.length
+        ? this.selectedStoreid.join(',') // FINAL FIX
+        : ''
     };
 
     this.JournalBookDataSource = new DataSource({
@@ -435,9 +435,9 @@ export class JournalBookComponent {
         );
       });
     } else if (TransType === 25) {
-       this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
+      this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
-          this.isViewInvoice = true;
+        this.isViewInvoice = true;
       });
     } else if (TransType === 19) {
       console.log("PURCHINVVVVVVVVVVVVVVVVVVVVVVVVVVV")
@@ -445,10 +445,12 @@ export class JournalBookComponent {
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
           this.selectedInvoice = response.Data;
-          this.loadingInvoice = false;
+          console.log(this.selectedInvoice)
+          setTimeout(() => {
+            this.isEditInvoice = true;
+            this.cdr.detectChanges();
+          }, 0);
 
-          this.isEditInvoice = true;
-          this.cdr.detectChanges();
         });
     } else if (TransType === 27) {
       this.dataService
@@ -562,18 +564,18 @@ export class JournalBookComponent {
           'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
       });
-    } 
+    }
     else if (TransType === 105) {
       this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
-      this.selectedInvoice = response;
+        this.selectedInvoice = response;
         this.isMiscViewInvoice = true;
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
-    } 
+    }
     else if (TransType === 29) {
       this.dataService.viewSelectedPayrollForReport(trans_id).subscribe((response: any) => {
-      this.selectedPayroll = response;
+        this.selectedPayroll = response;
         this.viewPayrollPopupOpened = true;
         this.cdr.detectChanges();
         console.log(this.selectedPayroll, 'Selected_Depreciation_data=====');
@@ -665,25 +667,25 @@ export class JournalBookComponent {
     this.viewPayrollPopupOpened = false;
   }
 
-    storeHint: string = '';
+  storeHint: string = '';
 
-updateStoreHint() {
-  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-    this.storeHint = 'No store selected';
-    return;
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store
+      .filter(x => this.selectedStoreid.includes(x.ID))
+      .map(x => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
   }
 
-  const selectedNames = this.Store
-    .filter(x => this.selectedStoreid.includes(x.ID))
-    .map(x => x.DESCRIPTION);
-
-  this.storeHint = selectedNames.join(', ');
-}
-
-    store_dropdown(){
+  store_dropdown() {
     const payload = {
-      NAME :'STORE',
-      COMPANY_ID : this.selected_Company_id
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
@@ -751,4 +753,4 @@ updateStoreHint() {
   exports: [],
   declarations: [JournalBookComponent],
 })
-export class JournalBookModule {}
+export class JournalBookModule { }
