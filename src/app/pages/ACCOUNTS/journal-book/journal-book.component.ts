@@ -451,6 +451,10 @@ export class JournalBookComponent {
             this.cdr.detectChanges();
           }, 0);
 
+          setTimeout(() => {
+            this.isEditInvoice = true;
+            this.cdr.detectChanges();
+          }, 0);
         });
     } else if (TransType === 27) {
       this.dataService
@@ -596,9 +600,7 @@ export class JournalBookComponent {
           );
         });
     }
-    //else {
-    //   console.log(Unknown TRANS_TYPE_ID: ${TransType});
-    // }
+
   }
 
   summaryColumnsData = {

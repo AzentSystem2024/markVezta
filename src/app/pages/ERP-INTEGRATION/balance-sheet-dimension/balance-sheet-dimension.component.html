@@ -2,7 +2,7 @@
   <div class="grid-container">
     <dx-data-grid
       class="grid theme-dependent"
-      [dataSource]="TrialBalanceReport"
+      [dataSource]="BalanceSheetReport"
       width="100%"
       height="82vh"
       [showBorders]="true"
@@ -11,14 +11,17 @@
       [showColumnLines]="true"
       [columnAutoWidth]="true"
       [groupPanel]="{ visible: true }"
-      [grouping]="{ autoExpandAll: false }"
+      [grouping]="{ autoExpandAll: true }"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
-      [summary]="summaryColumnsData"
-      [allowColumnReordering]="true"
-      id="dataGrid"
+      [remoteOperations]="false"
       [scrolling]="{ mode: 'virtual' }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      (onRowPrepared)="onRowPrepared($event)"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      (onContentReady)="onContentReady($event)"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -50,7 +53,7 @@
               margin-right: 3px;
             "
           >
-            Trial Balance with Dimension
+            Balance Sheet with Dimensions
           </div>
         </dxi-item>
 
@@ -59,9 +62,8 @@
             labelMode="floating"
             labelLocation="left"
             label="Financial Dimension"
-            [width]="200"
+            [width]="170"
             [dataSource]="Diamensions"
-            placeholder="Select Dimension"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
             [searchEnabled]="true"
@@ -85,7 +87,7 @@
             labelMode="floating"
             labelLocation="left"
             label="Year"
-            [width]="100"
+            [width]="'100'"
             [(value)]="selectedYear"
             [dataSource]="years"
             (onValueChanged)="onYearChanged($event)"
@@ -98,11 +100,11 @@
             labelMode="floating"
             labelLocation="left"
             label="month"
+            [width]="'120'"
             [dataSource]="monthDataSource"
             displayExpr="name"
             valueExpr="value"
             [(value)]="selectedmonth"
-            width="120"
             (onValueChanged)="onMonthValueChanged($event)"
             [dropDownOptions]="{ width: 'auto' }"
           >
@@ -119,13 +121,14 @@
             (onValueChanged)="onFromDateChange($event)"
           ></dx-date-box>
         </dxi-item>
+
         <dxi-item>
           <dx-date-box
             [width]="120"
             label="Date To"
             labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
             [value]="formatted_To_date"
+            [displayFormat]="'dd-MM-yyyy'"
             (onValueChanged)="onToDateChange($event)"
           >
           </dx-date-box>
@@ -133,7 +136,6 @@
 
         <dxi-item>
           <dx-button
-            class="mt-2"
             text="Apply"
             type="default"
             icon="todo"
@@ -151,116 +153,74 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-
-      <dxo-header-filter
-        [visible]="true"
-        [allowSearch]="true"
-        [allowSelectAll]="true"
-        [search]="{ enabled: true, mode: 'contains' }"
-      >
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
 
-      <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
       <dxi-column
-        dataField="MainGroup"
-        caption="Main Group"
+        dataField="TYPE_NAME"
+        caption="Category"
         dataType="string"
+        [groupIndex]="0"
       ></dxi-column>
+
       <dxi-column
-        dataField="SubGroup"
-        caption="Sub Group"
+        dataField="MAIN_GROUP_NAME"
+        caption="Group"
         alignment="left"
         dataType="number"
+        [groupIndex]="1"
       ></dxi-column>
-      <dxi-column dataField="Category" caption="Category"></dxi-column>
-      <dxi-column dataField="Code" caption="Code" width="200"></dxi-column>
+
+      <dxi-column dataField="PARTICULARS" caption="Particulars"></dxi-column>
+
+      <dxi-column dataField="CODE" caption="Code" width="200"></dxi-column>
+
       <dxi-column
-        dataField="Description"
+        dataField="DESCRIPTION"
         caption="Description"
         width="200"
       ></dxi-column>
-      <dxi-column caption="Opening Balance" cssClass="opening-header">
-        <dxi-column
-          dataField="OpeningBalanceDebit"
-          caption="Debit"
-          cssClass="opening-sub-header"
-          [allowEditing]="false"
-          alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        ></dxi-column>
-        <dxi-column
-          dataField="OpeningBalanceCredit"
-          caption="Credit"
-          cssClass="opening-sub-header"
-          alignment="center"
-          alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        >
-        </dxi-column>
-      </dxi-column>
-
-      <dxi-column caption="During the Period" cssClass="DuringPeriod-header">
-        <dxi-column
-          dataField="DuringThePeriodDebit"
-          caption="Debit"
-          alignment="right"
-          cssClass="DuringPeriod-sub-header"
-          [allowEditing]="false"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        ></dxi-column>
-        <dxi-column
-          dataField="DuringThePeriodCredit"
-          caption="Credit"
-          alignment="center"
-          cssClass="DuringPeriod-sub-header"
-          alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        >
-        </dxi-column>
-      </dxi-column>
-
-      <dxi-column caption="Closing Balance" cssClass="closing-header">
-        <dxi-column
-          dataField="ClosingBalanceDebit"
-          caption="Debit"
-          alignment="right"
-          [width]="130"
-          cssClass="closing-sub-header"
-          [allowEditing]="false"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        ></dxi-column>
-        <dxi-column
-          dataField="ClosingBalanceCredit"
-          caption="Credit"
-          cssClass="closing-sub-header"
-          alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        >
-        </dxi-column>
-      </dxi-column>
 
       <dxi-column
-        *ngIf="TrialBalanceReport.length > 0"
+        dataField="AMOUNT"
+        caption="Amount"
+        dataType="number"
+        format="#,##0.00"
+      ></dxi-column>
+
+      <!-- Group summary for MAIN_GROUP_NAME -->
+      <dxo-summary>
+        <dxi-group-item
+          column="AMOUNT"
+          summaryType="sum"
+          [alignByColumn]="true"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-group-item>
+      </dxo-summary>
+
+      <dxi-column
+        *ngIf="BalanceSheetReport.length > 0"
         type="buttons"
-        [width]="100"
+        [width]="80"
       >
         <dxi-button
           hint="View"
           icon="eyeopen"
           text="View"
+          width="80"
           [onClick]="onViewClick.bind(this)"
         ></dxi-button>
       </dxi-column>
     </dx-data-grid>
   </div>
 
-  <dx-popup
+   <dx-popup
     [(visible)]="dimensionPopupVisible"
     [width]="700"
     [height]="500"

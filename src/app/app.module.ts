@@ -389,11 +389,13 @@ import { TrialBalanceFinDimensionModule } from './pages/ERP-INTEGRATION/trial-ba
 import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.component';
 import { DenialListModule } from './pages/MASTER/denial-list/denial-list.component';
 import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/denial-new-form.component';
+import { ProfitAndLossDimensionComponent, ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
+import { BalanceSheetDimensionComponent, BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -796,6 +798,8 @@ import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-re
     ERPJVModule,
     DenialListModule,
     DenialNewFormModule,
+    ProfitAndLossDimensionModule,
+    BalanceSheetDimensionModule,
     ARReportPageModule
   ],
 

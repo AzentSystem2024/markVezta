@@ -198,6 +198,8 @@ import { DepartmentGroupComponent } from './pages/MASTER/department-group/depart
 import { TrialBalanceFinDimensionComponent } from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-list.component';
 import { DenialListComponent } from './pages/MASTER/denial-list/denial-list.component';
+import { ProfitAndLossDimensionComponent } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
+import { BalanceSheetDimensionComponent } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageComponent } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 
 const routes: Routes = [
@@ -1245,6 +1247,16 @@ const routes: Routes = [
       {
         path: 'denial',
         component: DenialListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'profitAndLoss-Dimension',
+        component: ProfitAndLossDimensionComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'BalanceSheet-Dimension',
+        component: BalanceSheetDimensionComponent,
         canActivate: [AuthGuardService],
       },
 
