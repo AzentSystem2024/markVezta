@@ -596,9 +596,7 @@ export class JournalBookComponent {
           );
         });
     }
-    //else {
-    //   console.log(Unknown TRANS_TYPE_ID: ${TransType});
-    // }
+   
   }
 
   summaryColumnsData = {

@@ -7032,7 +7032,7 @@ The result can be exported to HTML or Markdown.`;
 
    //===========Balance sheet Dimension======================
   Balance_Sheet_Dimension_Api(payload: any) {
-    const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheet';
+    const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheetDimension';
     return this.http.post(getEndpoint, payload);
   }
     //================Column location finding==================

@@ -99,7 +99,7 @@
             labelMode="floating"
             labelLocation="left"
             label="Year"
-            [width]="150"
+            [width]="100"
             [(value)]="selectedYear"
             [dataSource]="years"
             (onValueChanged)="onYearChanged($event)"
@@ -156,21 +156,7 @@
           >
           </dx-button>
         </dxi-item>
-        <!-- <dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            class="mt-2"
-            (onClick)="get_DataSource()"
-          >
-          </dx-button>
-        </dxi-item> -->
-
+       
         <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
@@ -187,7 +173,7 @@
         [applyFilter]="auto"
       ></dxo-filter-row>
 
-      <!-- <dxi-column dataField="DEPARTMENT_NAME" caption="Department Name" dataType="string"></dxi-column> -->
+     
       <dxi-column
         dataField="TYPE_NAME"
         caption="Category"
@@ -241,5 +227,26 @@
       </dxi-column>
     </dx-data-grid>
   </div>
+
+   <dx-popup
+    [(visible)]="dimensionPopupVisible"
+    [width]="700"
+    [height]="500"
+    title="Financial Dimension Details"
+    [showCloseButton]="true"
+    [dragEnabled]="true"
+    [hideOnOutsideClick]="true"
+  >
+    <dx-data-grid
+      [dataSource]="dimensionPopupData"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+    >
+      <dxi-column dataField="Dimension" caption="Dimension"></dxi-column>
+      <dxi-column dataField="Code" caption="Code"></dxi-column>
+      <dxi-column dataField="Description" caption="Description"></dxi-column>
+    </dx-data-grid>
+  </dx-popup>
 </div>
 
