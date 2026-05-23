@@ -238,11 +238,11 @@
                     ? 'PDF'
                     : selectedDocStatus == 'VERIFY'
                       ? 'Approve'
-                      : selectedDocStatus == 'OPEN' && status == 'verifyscreen'
+                      : selectedDocStatus == 'OPEN' && status == 'VerifyScreen'
                         ? 'Verify'
                         : isEditing
                           ? 'Update'
-                          : 'Save'  
+                          : 'Save'
                 "
                 (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()"
                 stylingMode="contained"

@@ -106,15 +106,6 @@
             >
             </dx-date-box>
 
-            <!-- <dx-date-box
-        [width]="150"
-        label="From Date"
-        labelMode="floating"
-            [(value)]="selected_from_date"
-              displayFormat="yyyy-MM-dd"
-        >
-
-        </dx-date-box> -->
           </dxi-item>
         </div>
 
@@ -188,7 +179,7 @@
             </dx-button>
           </dxi-item>
         </div>
-        <!-- <dxi-item name="exportButton"></dxi-item> -->
+      
       </dxo-toolbar>
       <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>
@@ -202,16 +193,13 @@
       <dxo-header-filter [visible]="true">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
-      <!-- <dxo-filter-row
-      [visible]="isFilterRowVisible"
-      [applyFilter]="auto"
-    ></dxo-filter-row> -->
+     
       <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-      <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
+    
       <dxi-column
         dataField="Date"
         caption="Date"
@@ -240,10 +228,7 @@
       >
       </dxi-column>
 
-      <!-- <dxi-column dataField="BALANCE" caption="Balance"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column> -->
+     
       <dxi-column *ngIf="journalBookCount > 0" type="buttons" [width]="100">
         <dxi-button
           hint="View"
@@ -256,51 +241,6 @@
   </div>
 </div>
 
-<!-- <dx-popup
-  [(visible)]="editLedgerPopup"
-  [width]="'50vw'"
-  [height]="'55vh'"
-  title="View Ledger statement"
-  (onHiding)="handleClose()"
->
-<form>
-  <div style="display: flex;">
-    <dx-text-box></dx-text-box>
-      <dx-text-box></dx-text-box>
-  </div>
-</form>
-  
-</dx-popup> -->
-<!-- =================header filter======================== -->
-<!-- <dx-popup
-  [(visible)]="isCustomDatePopupVisible"
-  [width]="'300px'"
-  title="Select Custom Date Range"
-  [showCloseButton]="true"
-  [dragEnabled]="false"
-  [closeOnOutsideClick]="true"
-  [height]="'300px'"
->
-  <div class="p-3">
-    <dx-date-box
-      [(value)]="fromDate"
-      type="date"
-      displayFormat="yyyy-MM-dd"
-      label="From Date"
-    >
-    </dx-date-box>
-
-    <dx-date-box
-      [(value)]="toDate"
-      type="date"
-      displayFormat="yyyy-MM-dd"
-      label="To Date"
-    >
-    </dx-date-box>
-
-    <button class="custom-apply-btn" (click)="applyCustomDate()">Apply</button>
-  </div>
-</dx-popup> -->
 
 <dx-popup
   *ngIf="isViewProduction"

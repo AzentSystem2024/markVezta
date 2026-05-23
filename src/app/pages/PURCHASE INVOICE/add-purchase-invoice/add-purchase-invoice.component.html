@@ -32,7 +32,7 @@
         <!-- Left side -->
         <div style="display: flex; gap: 4px">
           <dx-text-box
-            label="Reference No."
+            label="PJV No."
             labelMode="floating"
             [(value)]="purchaseInvoiceFormData.DOC_NO"
             [width]="200"
@@ -41,13 +41,36 @@
           </dx-text-box>
 
           <dx-date-box
-            label="Date"
+            label=" Doc.Date"
+            type="date"
+            [(value)]="purchaseInvoiceFormData.PURCH_DATE"
+            labelMode="floating"
+            [width]="200"
+            [displayFormat]="'dd-MM-yyyy'"
+            [readOnly]="true"
+          >
+          </dx-date-box>
+          <dx-text-box
+            label="Reference No."
+            labelMode="floating"
+            [(value)]="purchaseInvoiceFormData.SUPP_INV_NO"
+            [width]="200"
+          >
+            <!-- <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Reference No is required"
+              >
+              </dxi-validation-rule>
+            </dx-validator> -->
+          </dx-text-box>
+          <dx-date-box
+            label=" Reference Date"
             type="date"
             [(value)]="purchaseInvoiceFormData.SUPP_INV_DATE"
             labelMode="floating"
             [width]="200"
             [displayFormat]="'dd-MM-yyyy'"
-            [readOnly]="true"
           >
           </dx-date-box>
         </div>
@@ -75,6 +98,7 @@
             [(value)]="purchaseInvoiceFormData.SUPP_ID"
             [width]="300"
             label="Supplier"
+            [searchEnabled]="true"
             labelMode="floating"
             [searchEnabled]="true"
             (onValueChanged)="onSupplierChanged($event)"
@@ -143,13 +167,13 @@
           </dxo-filter-builder>
           <dxi-column
             dataField="TRANSFER_NO"
-            caption="Transfer No"
+            caption="GRN No"
             [width]="120"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
             dataField="GRN_DATE"
-            caption="Date"
+            caption="GRN Date"
             dataType="date"
             format="dd-MM-yyyy"
             [width]="120"
@@ -158,18 +182,18 @@
 
           <dxi-column
             dataField="ITEM_NAME"
-            caption="Item Name"
+            caption="Item "
             [allowEditing]="false"
           ></dxi-column>
-          <dxi-column
+          <!-- <dxi-column
             dataField="HSN_CODE"
             caption="HSN Code"
             dataType="string"
             [allowEditing]="false"
-          ></dxi-column>
+          ></dxi-column> -->
           <dxi-column
             dataField="PRICE"
-            caption="Price"
+            [caption]="'Price(' + CurrencyCode + ')'"
             dataType="number"
             format="#,##0.00"
             [width]="120"
@@ -177,10 +201,16 @@
           ></dxi-column>
           <dxi-column
             dataField="PENDING_QTY"
-            caption="Invoice Pending GRN"
             dataType="number"
             [allowEditing]="false"
+            headerCellTemplate="pendingQtyHeader"
           ></dxi-column>
+          <div *dxTemplate="let data of 'pendingQtyHeader'">
+            <div style="text-align: center; line-height: 16px">
+              Invoice <br />
+              Pending Qty
+            </div>
+          </div>
           <dxi-column
             dataField="QUANTITY"
             caption="Qty"
@@ -193,10 +223,9 @@
               message="Quantity cannot be greater than Pending Qty"
             ></dxi-validation-rule>
           </dxi-column>
-
           <dxi-column
             dataField="AMOUNT"
-            caption="Amount"
+            [caption]="'Amount(' + CurrencyCode + ')'"
             dataType="number"
             format="#,##0.00"
             [width]="140"
@@ -205,20 +234,33 @@
           ></dxi-column>
           <dxi-column
             dataField="DISC_PERCENT"
-            caption="Discount %"
             dataType="number"
             [width]="140"
-            [allowEditing]="true"
+            [allowEditing]="false"
+            headerCellTemplate="Discountpecheader"
           ></dxi-column>
+          <div *dxTemplate="let data of 'Discountpecheader'">
+            <div style="text-align: center; line-height: 16px">
+              Discount <br />
+              %
+            </div>
+          </div>
+
           <dxi-column
             dataField="DISC_AMT"
-            caption="Discount Amount"
             dataType="number"
             format="#,##0.00"
             [width]="140"
             [allowEditing]="false"
             [calculateCellValue]="calculateDiscAmt"
+            headerCellTemplate="DiscountAmountHeader"
           ></dxi-column>
+          <div *dxTemplate="let data of 'DiscountAmountHeader'">
+            <div style="text-align: center; line-height: 16px">
+              Discount <br />
+              Amount ({{ CurrencyCode }})
+            </div>
+          </div>
           <dxi-column
             dataField="VAT_PERC"
             [caption]="vatTilte + ' %'"
@@ -229,22 +271,34 @@
 
           <dxi-column
             dataField="TAX_AMOUNT"
-            [caption]="vatTilte + ' Amount'"
             dataType="number"
             format="#,##0.00"
             [width]="140"
             [allowEditing]="false"
             [calculateCellValue]="calculateGstAmount"
+            headerCellTemplate="TaxAmountHeader"
           ></dxi-column>
+          <div *dxTemplate="let data of 'TaxAmountHeader'">
+            <div style="text-align: center; line-height: 16px">
+              {{ vatTilte }} <br />
+              Amount ({{ CurrencyCode }})
+            </div>
+          </div>
           <dxi-column
             dataField="TOTAL_AMOUNT"
-            caption="Total Amount"
             dataType="number"
             format="#,##0.00"
             [width]="140"
             [allowEditing]="false"
             [calculateCellValue]="calculateTotal"
+            headerCellTemplate="TotalAmountHeader"
           ></dxi-column>
+          <div *dxTemplate="let data of 'TotalAmountHeader'">
+            <div style="text-align: center; line-height: 16px">
+              Total <br />
+              Amount ({{ CurrencyCode }})
+            </div>
+          </div>
           <dxo-summary>
             <dxi-total-item
               column="QUANTITY"
@@ -306,18 +360,19 @@
               [value]="formattedNetAmount"
               [width]="150"
               [readOnly]="true"
+              [inputAttr]="{ style: 'text-align: right;' }"
             ></dx-text-box>
           </div>
         </div>
         <div class="form-footer-wrapper">
           <!-- LEFT SECTION -->
           <div class="left-section">
-            <dx-text-box
+            <!-- <dx-text-box
               label="Vehicle No"
               labelMode="floating"
               [(value)]="purchaseInvoiceFormData.VEHICLE_NO"
               [width]="200"
-            ></dx-text-box>
+            ></dx-text-box> -->
             <dx-text-box
               label="Remark"
               labelMode="floating"

@@ -1,38 +1,58 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
-  DxDropDownBoxModule,
-  DxListModule,
   DxLoadIndicatorModule,
   DxLoadPanelModule,
   DxNumberBoxModule,
   DxPopupModule,
   DxSelectBoxModule,
-  DxSortableModule,
   DxTagBoxModule,
   DxTextBoxModule,
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
-
 import { DataService } from 'src/app/services';
 
 @Component({
-  selector: 'app-trial-balance-fin-dimension',
-  templateUrl: './trial-balance-fin-dimension.component.html',
-  styleUrls: ['./trial-balance-fin-dimension.component.scss'],
+  selector: 'app-profit-and-loss-dimension',
+  templateUrl: './profit-and-loss-dimension.component.html',
+  styleUrls: ['./profit-and-loss-dimension.component.scss'],
 })
-export class TrialBalanceFinDimensionComponent {
-  isFilterRowVisible: boolean = false;
+export class ProfitAndLossDimensionComponent {
+  @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent) grid!: DxDataGridComponent;
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
 
-  TrialBalanceReport: any = [];
+  isFilterRowVisible: boolean = false;
+  ProfitLossReport: any = [];
   auto: string = 'auto';
   isEmptyDatagrid: boolean = true;
+  expandedOnce = false;
+  revenueTotalForSummary = 0;
+  expenseTotalForSummary = 0;
+
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   company_list: any = [];
@@ -41,140 +61,41 @@ export class TrialBalanceFinDimensionComponent {
   company_id: any;
   from_Date: any;
   To_Date: any;
-  TrialBalance_datasource: any;
+  selected_Company_id: any;
   finID: any;
   fromDate: any;
   ToDate: any;
   formatted_from_date: any;
   formatted_To_date: any;
   HeadId: any;
-  selected_Company_id: any;
-  selected_fin_id: any;
+
+  netProfit: number = 0;
+  totalRevenue: number = 0;
+  totalExpense: number = 0;
+
   selectedYear: any = null;
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
-  selected_from_date: any;
-  Store: any;
-  selectedStoreid: any;
   Diamensions: any[] = [];
-  storeHint: string = '';
   selectedDiamensions: number[] = [2];
-  isDimensionDisabled = true;
 
   dimensionPopupVisible: boolean = false;
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
 
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'OpeningBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'OpeningBalanceDebit',
-        alignment: 'right',
-      },
-      {
-        column: 'OpeningBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'OpeningBalanceCredit',
-        alignment: 'right',
-      },
-      {
-        column: 'DuringThePeriodDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DuringThePeriodDebit',
-        alignment: 'left',
-      },
-      {
-        column: 'DuringThePeriodCredit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DuringThePeriodCredit',
-        alignment: 'right',
-      },
-      {
-        column: 'ClosingBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'ClosingBalanceDebit',
-        alignment: 'left',
-      },
-      {
-        column: 'ClosingBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'ClosingBalanceCredit',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'OpeningBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'OpeningBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'DuringThePeriodDebit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'DuringThePeriodCredit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'ClosingBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'ClosingBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-    ],
-    calculateCustomSummary: (options: any) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
-  };
-
   constructor(
     private dataservice: DataService,
+    private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private zone: NgZone,
   ) {
     this.get_sessionstorage_data();
+    this.get_fin_id();
     this.sesstion_Details();
+    this.Diamension_dropdown();
+
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
@@ -183,9 +104,7 @@ export class TrialBalanceFinDimensionComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
-  }
 
-  ngOnInit() {
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -196,7 +115,6 @@ export class TrialBalanceFinDimensionComponent {
 
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
-    this.Diamension_dropdown();
     this.get_DataSource();
   }
 
@@ -241,7 +159,13 @@ export class TrialBalanceFinDimensionComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_DataSource();
   }
 
   toggleFilterRow = () => {
@@ -250,7 +174,7 @@ export class TrialBalanceFinDimensionComponent {
   };
 
   onExporting(event: any) {
-    const fileName = 'TrialBalanceReport';
+    const fileName = 'ProfitLossReport';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
@@ -258,19 +182,29 @@ export class TrialBalanceFinDimensionComponent {
     this.savedUserData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    //   ;
     this.company_list = this.savedUserData.Companies;
+  }
+
+  get_fin_id() {
+    this.fin_id = this.savedUserData.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
+    }
+  }
+
+  onCompanyChange(event: any) {
+    this.company_id = event.value;
   }
 
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_from_date = this.formatDate(rawDate);
-    // example: "2025-04-01"
   }
 
   onToDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
     this.formatted_To_date = this.formatDate(rawDate);
-    // example: "2025-04-01"
   }
 
   formatDate(date: Date): string {
@@ -280,28 +214,79 @@ export class TrialBalanceFinDimensionComponent {
     return `${year}-${month}-${day}`;
   }
 
+  onDimensionChange(e: any) {
+    let selected = e.value || [];
+
+    // force ID 2 to remain selected
+    if (!selected.includes(2)) {
+      selected.push(2);
+    }
+
+    // this.selectedDiamensions = [...new Set(selected)];
+  }
+
+  getSelectedDimensionHint() {
+    if (!this.selectedDiamensions?.length) {
+      return '';
+    }
+
+    return this.Diamensions.filter((x) =>
+      this.selectedDiamensions.includes(x.ID),
+    )
+      .map((x) => `${x.DESCRIPTION}${x.SHORT_NAME}`)
+      .join(' - ');
+  }
+
+  isLastTag(item: any): boolean {
+    const selectedItems = this.Diamensions.filter((x) =>
+      this.selectedDiamensions.includes(x.ID),
+    );
+
+    return selectedItems[selectedItems.length - 1]?.ID === item.ID;
+  }
+
   get_DataSource() {
-    const payload = {
-      companyId: this.selected_Company_id,
-      finId: this.selected_fin_id,
-      dateFrom: this.formatted_from_date,
-      dateTo: this.formatted_To_date,
+    const grid = this.dataGrid?.instance;
+    grid?.beginCustomLoading('Loading...');
+
+    let payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.finID,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
       DimensionCode: String(this.selectedDiamensions),
     };
 
-    sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
+    const payloadData = {
+      companyId: payload.COMPANY_ID,
+      finId: payload.FIN_ID,
+      dateFrom: payload.DATE_FROM,
+      dateTo: payload.DATE_TO,
+      DimensionCode: payload.DimensionCode,
+    };
 
-    console.log(JSON.parse(sessionStorage.getItem('viewclickvalue') || '{}'));
+    sessionStorage.removeItem('viewclickvalue');
+    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-    this.dataservice
-      .Trial_Balance_Diamensions_Api(payload)
-      .subscribe((res: any) => {
+    // console.log(JSON.parse(sessionStorage.getItem('viewclickvalue')));
+    // console.log(payload, '==========payload================');
+
+    this.dataservice.Profit_Loss_Dimension_Api(payload).subscribe({
+      next: (res: any) => {
         this.isEmptyDatagrid = false;
+        // console.log(res, '----------list --------------------------');
 
-        // this.TrialBalanceReport = res.data;
-        this.TrialBalanceReport = [...res.data];
-        console.log(this.TrialBalanceReport);
-      });
+        this.ProfitLossReport = res.data;
+
+        this.calculateNetProfit();
+
+        this.dataGrid.instance.refresh(); // force grid to recalc summaries
+      },
+      error: () => {},
+      complete: () => {
+        grid?.endCustomLoading();
+      },
+    });
   }
 
   onCellClick(e: any) {
@@ -310,8 +295,8 @@ export class TrialBalanceFinDimensionComponent {
     }
 
     if (
-      e.column?.dataField !== 'Code' &&
-      e.column?.dataField !== 'Description'
+      e.column?.dataField !== 'CODE' &&
+      e.column?.dataField !== 'DESCRIPTION'
     ) {
       return;
     }
@@ -325,12 +310,12 @@ export class TrialBalanceFinDimensionComponent {
     );
 
     // ================= Split Values =================
-    const codeValues = (e.data.Code || '')
+    const codeValues = (e.data.CODE || '')
       .split(' - ')
       .map((x: string) => x.trim())
       .filter((x: string) => x);
 
-    const descriptionValues = (e.data.Description || '')
+    const descriptionValues = (e.data.DESCRIPTION || '')
       .split(' - ')
       .map((x: string) => x.trim())
       .filter((x: string) => x);
@@ -375,53 +360,64 @@ export class TrialBalanceFinDimensionComponent {
     });
   }
 
-  onDimensionChange(e: any) {
-    let selected = e.value || [];
+  typeSorting = (a: string, b: string) => {
+    const order: any = {
+      REVENUES: 1,
+      EXPENSES: 2,
+    };
 
-    // force ID 2 to remain selected
-    if (!selected.includes(2)) {
-      selected.push(2);
-    }
-
-    // this.selectedDiamensions = [...new Set(selected)];
-  }
-
-  getSelectedDimensionHint() {
-    if (!this.selectedDiamensions?.length) {
-      return '';
-    }
-
-    return this.Diamensions.filter((x) =>
-      this.selectedDiamensions.includes(x.ID),
-    )
-      .map((x) => `${x.DESCRIPTION}${x.SHORT_NAME}`)
-      .join(' - ');
-  }
-
-  isLastTag(item: any): boolean {
-    const selectedItems = this.Diamensions.filter((x) =>
-      this.selectedDiamensions.includes(x.ID),
-    );
-
-    return selectedItems[selectedItems.length - 1]?.ID === item.ID;
-  }
-
-  formatSelectedDimensions = (selectedItems: any[]) => {
-    if (!selectedItems || !selectedItems.length) {
-      return '';
-    }
-
-    return selectedItems
-      .map((item) => `${item.DESCRIPTION}(${item.SHORT_NAME})`)
-      .join(' - ');
+    return (order[a] || 99) - (order[b] || 99);
   };
 
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data.isSummary) {
+      e.rowElement.style.fontWeight = 'bold';
+      // e.rowElement.style.backgroundColor = '#f0f0f0';
+    }
+  }
+
+  calculateNetProfit() {
+    let revenue = 0,
+      expense = 0;
+    this.ProfitLossReport.forEach((row: any) => {
+      const type = (row.TYPE_NAME || '').trim().toUpperCase();
+      const amount = Number(row.AMOUNT || 0);
+      if (type === 'REVENUES') revenue += amount;
+      else if (type === 'EXPENSES') expense += amount;
+    });
+    this.netProfit = revenue - expense;
+  }
+
+  onCellPrepared(e: any) {
+    if (
+      e.rowType === 'totalFooter' &&
+      e.column &&
+      e.column.dataField === 'AMOUNT'
+    ) {
+      const formatted = (Number(this.netProfit) || 0).toLocaleString(
+        undefined,
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        },
+      );
+
+      e.cellElement.innerHTML = `
+      <div style="text-align: right; font-weight: bold; margin-top: 5px; padding-right: 20px;">
+        Net Profit: ${formatted}
+      </div>
+    `;
+    }
+  }
+
   onViewClick(e: any) {
-    this.HeadId = e.row.data.HeadID;
-    console.log(this.HeadId);
+    //
+    this.HeadId = e.row.data.HEAD_ID;
+    // console.log(this.HeadId);
+    sessionStorage.removeItem('HEADID');
 
     sessionStorage.setItem('HEADID', this.HeadId);
-    console.log(sessionStorage.getItem('HEADID'));
+    // console.log(sessionStorage.getItem('HEADID'));
 
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
@@ -444,13 +440,10 @@ export class TrialBalanceFinDimensionComponent {
     DxSelectBoxModule,
     DxButtonModule,
     DxTagBoxModule,
-    DxSortableModule,
-    DxListModule,
-    DxDropDownBoxModule,
     DxPopupModule,
   ],
   providers: [],
   exports: [],
-  declarations: [TrialBalanceFinDimensionComponent],
+  declarations: [ProfitAndLossDimensionComponent],
 })
-export class TrialBalanceFinDimensionModule {}
+export class ProfitAndLossDimensionModule {}

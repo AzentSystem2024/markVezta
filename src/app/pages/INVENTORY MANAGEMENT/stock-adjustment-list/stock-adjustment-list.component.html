@@ -311,7 +311,7 @@
   [(visible)]="isAddStock_adj"
   [width]="'75vw'"
   [height]="'85vh'"
-  title="Stock Adjustment"
+  title=" New Stock Adjustment"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddStock_adj">
@@ -325,7 +325,7 @@
   [(visible)]="is_Edit_popup"
   [width]="'90vw'"
   [height]="'85vh'"
-  title=" Stock Adjustment"
+  [title]="buttonText"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="is_Edit_popup">

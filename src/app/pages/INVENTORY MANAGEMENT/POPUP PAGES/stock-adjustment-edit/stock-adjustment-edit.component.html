@@ -153,15 +153,16 @@
             </dx-text-box>
           </div>
           <div class="footer-right">
-            <dx-text-box
+            <dx-number-box
               #narrationRef
               [(value)]="adjustmentFormData.NET_AMOUNT"
               label="Net Amount"
               labelMode="floating"
-              class="narration-box"
               [readOnly]="true"
+              [format]="'#,##0.00'"
+              class="narration-box text-right-box"
             >
-            </dx-text-box>
+            </dx-number-box>
           </div>
           <div class="footer-right">
             <dx-check-box
