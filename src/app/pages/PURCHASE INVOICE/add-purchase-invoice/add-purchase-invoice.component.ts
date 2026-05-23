@@ -502,6 +502,7 @@ export class AddPurchaseInvoiceComponent {
   calculateAmount = (row: any) => {
     return (parseFloat(row.PRICE) || 0) * (parseFloat(row.QUANTITY) || 0);
   };
+
   calculateDiscAmt = (rowData: any) => {
     const qty = Number(rowData?.QUANTITY) || 0;
     const price = Number(rowData?.PRICE) || 0;
@@ -625,14 +626,9 @@ export class AddPurchaseInvoiceComponent {
         PRICE: row.PRICE,
         PENDING_QTY: row.PENDING_QTY,
         QUANTITY: 0,
-
+        DISC_PERCENT: row.DISC_PERCENT,
         HSN_CODE: row.HSN_CODE,
-
-        //  GST FROM GRN
         VAT_PERC: row.VAT_PERC, // IGST %
-        // CGST: cgst,
-        // SGST: sgst,
-
         AMOUNT: 0,
         VAT_AMOUNT: 0,
         TOTAL_AMOUNT: 0,

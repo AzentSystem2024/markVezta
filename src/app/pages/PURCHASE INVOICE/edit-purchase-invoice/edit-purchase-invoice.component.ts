@@ -669,6 +669,7 @@ export class EditPurchaseInvoiceComponent {
         RATE: row.RATE,
         PRICE: row.RATE,
         PENDING_QTY: row.PENDING_QTY,
+        DISC_PERCENT: row.DISC_PERCENT,
         QUANTITY: 0,
 
         HSN_CODE: row.HSN_CODE,
