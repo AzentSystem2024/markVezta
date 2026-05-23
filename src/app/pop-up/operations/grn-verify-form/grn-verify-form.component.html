@@ -79,7 +79,13 @@
         min-width: 0;
       "
     >
+      <dx-text-box
+        *ngIf="isReadOnly"
+        [value]="PONO"
+        [readOnly]="true"
+      ></dx-text-box>
       <dx-drop-down-box
+        *ngIf="!isReadOnly"
         width="100%"
         style="min-width: 0"
         labelMode="floating"
@@ -183,7 +189,7 @@
     <dxi-column
       *ngIf="currency !== currencySymbol"
       dataField="SUPP_PRICE"
-      caption="PRICE {{ currencySymbol }}"
+      [caption]="'PRICE (' + currencySymbol + ')'"
       [width]="'auto'"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
@@ -192,6 +198,15 @@
     <dxi-column
       dataField="PRICE"
       caption="PRICE {{ localCurrencySymbol }}"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+      [allowEditing]="false"
+      alignment="right"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="DISC_PERCENT"
+      caption="Disc %"
       [format]="{ type: 'fixedPoint', precision: 2 }"
       [allowEditing]="false"
       alignment="right"
@@ -230,7 +245,7 @@
     <dxi-column
       dataField="QUANTITY"
       caption="QTY RECEIVED"
-      [allowEditing]="true"
+      [allowEditing]="!isReadOnly"
       [editorOptions]="{
         showSpinButtons: true,
         min: 0,
@@ -246,7 +261,7 @@
     <dxi-column
       *ngIf="currency !== currencySymbol"
       dataField="SUPP_AMOUNT"
-      caption="AMOUNT {{ currencySymbol }}"
+      [caption]="'AMOUNT (' + currencySymbol + ')'"
       [allowEditing]="false"
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -297,6 +312,7 @@
       [height]="30"
       [width]="400"
       [maxLength]="500"
+      [readOnly]="isReadOnly"
     >
     </dx-text-area>
   </div>

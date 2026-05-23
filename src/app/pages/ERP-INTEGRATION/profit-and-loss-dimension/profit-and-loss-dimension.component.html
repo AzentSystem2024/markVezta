@@ -11,8 +11,6 @@
       [allowColumnResizing]="false"
       [showColumnLines]="true"
       [columnAutoWidth]="true"
-      [groupPanel]="{ visible: true }"
-      [grouping]="{ autoExpandAll: true }"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [remoteOperations]="false"
@@ -20,10 +18,6 @@
       (onCellPrepared)="onCellPrepared($event)"
       (onRowPrepared)="onRowPrepared($event)"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
-      id="dataGrid"
-      [headerFilter]="{ visible: false }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -33,7 +27,7 @@
       (onCellClick)="onCellClick($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -59,12 +53,12 @@
           </div>
         </dxi-item>
 
-          <dxi-item>
+        <dxi-item>
           <dx-tag-box
             labelMode="floating"
             labelLocation="left"
             label="Financial Dimension"
-            [width]="200"
+            [width]="170"
             [dataSource]="Diamensions"
             placeholder="Select Dimension"
             displayExpr="DESCRIPTION"
@@ -85,13 +79,12 @@
           </dx-tag-box>
         </dxi-item>
 
-
         <dxi-item>
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
             label="Year"
-            [width]="150"
+            [width]="'100'"
             [(value)]="selectedYear"
             [dataSource]="years"
             (onValueChanged)="onYearChanged($event)"
@@ -104,6 +97,7 @@
             labelMode="floating"
             labelLocation="left"
             label="month"
+            [width]="'120'"
             [dataSource]="monthDataSource"
             displayExpr="name"
             valueExpr="value"
@@ -116,7 +110,7 @@
 
         <dxi-item>
           <dx-date-box
-            [width]="150"
+            [width]="120"
             label="Date From"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
@@ -124,9 +118,10 @@
             (onValueChanged)="onFromDateChange($event)"
           ></dx-date-box>
         </dxi-item>
+
         <dxi-item>
           <dx-date-box
-            [width]="150"
+            [width]="120"
             label="Date To"
             labelMode="floating"
             [value]="formatted_To_date"
@@ -135,8 +130,8 @@
           >
           </dx-date-box>
         </dxi-item>
-        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
-        <dxi-item location="after" locateInMenu="auto">
+
+        <dxi-item>
           <dx-button
             text="Apply"
             type="default"
@@ -146,42 +141,21 @@
           >
           </dx-button>
         </dxi-item>
-        <!-- <dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
 
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            class="mt-2"
-            (onClick)="get_DataSource()"
-          >
-          </dx-button>
-        </dxi-item> -->
-        <dxi-item
-          location="after"
-          locateInMenu="auto"
-          widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
+        <dxi-item widget="dxButton" [options]="refreshButtonOptions"></dxi-item>
         <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
-      <dxo-grouping
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+
+      <dxo-grouping *ngIf="ProfitLossReport.length > 0"
         [autoExpandAll]="true"
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-      <dxo-header-filter [visible]="true">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
 
       <dxi-column
         dataField="TYPE_NAME"
@@ -242,7 +216,7 @@
     </dx-data-grid>
   </div>
 
- <dx-popup
+  <dx-popup
     [(visible)]="dimensionPopupVisible"
     [width]="700"
     [height]="500"

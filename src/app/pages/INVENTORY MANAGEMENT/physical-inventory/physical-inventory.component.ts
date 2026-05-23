@@ -139,6 +139,7 @@ export class PhysicalInventoryComponent {
   Store: any[] = [];
   selectedStoreid: any[] = [];
   IS_HQ_App: boolean = false;
+  buttonText: any
   constructor(
     private dataService: DataService,
     private router: Router,

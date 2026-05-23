@@ -123,24 +123,24 @@
           </dxi-item>
         </div>
 
-         <dxi-item>
-      <dx-tag-box
-  label="Store"
-  labelMode="floating"
-  displayExpr="DESCRIPTION"
-  valueExpr="ID"
-  [items]="Store"
-  [searchEnabled]="true"
-  [(value)]="selectedStoreid"
-  [showSelectionControls]="true"
-  [maxDisplayedTags]="100"
-  [showMultiTagOnly]="true"
-  [multiline]="false"
-  [hint]="storeHint"
-  [width]="200"
-  (onValueChanged)="updateStoreHint()"
-></dx-tag-box>
-    </dxi-item>
+        <dxi-item>
+          <dx-tag-box
+            label="Store"
+            labelMode="floating"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [items]="Store"
+            [searchEnabled]="true"
+            [(value)]="selectedStoreid"
+            [showSelectionControls]="true"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [hint]="storeHint"
+            [width]="200"
+            (onValueChanged)="updateStoreHint()"
+          ></dx-tag-box>
+        </dxi-item>
 
         <dxi-item
           location="after"
@@ -339,60 +339,60 @@
     (popupClosed)="handleClose()"
   ></app-add-invoice-retail>
 
-<dx-popup
-  *ngIf="isEditCustomerReceipt"
-  [(visible)]="isEditCustomerReceipt"
-  [width]="'75vw'"
-  [height]="'100vh'"
-  [deferRendering]="false"
-  title="View Receipt"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditCustomerReceipt">
-    <app-edit-customer-receipt
-      [receiprtFormData]="selectedReceipt"
-      [isReadOnlyMode]="isReadOnlyReceipt"
-      (popupClosed)="handleClose()"
-    ></app-edit-customer-receipt>
-  </ng-container>
-</dx-popup>
+  <dx-popup
+    *ngIf="isEditCustomerReceipt"
+    [(visible)]="isEditCustomerReceipt"
+    [width]="'75vw'"
+    [height]="'100vh'"
+    [deferRendering]="false"
+    title="View Receipt"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="isEditCustomerReceipt">
+      <app-edit-customer-receipt
+        [receiprtFormData]="selectedReceipt"
+        [isReadOnlyMode]="isReadOnlyReceipt"
+        (popupClosed)="handleClose()"
+      ></app-edit-customer-receipt>
+    </ng-container>
+  </dx-popup>
 
-<dx-popup
-  *ngIf="isEditInvoice"
-  [(visible)]="isEditInvoice"
-  [width]="'100vw'"
-  [height]="'100vh'"
-  [deferRendering]="false"
-  title="Purchase Invoice"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditInvoice">
-    <app-edit-purchase-invoice
-      [invoiceFormData]="selectedInvoice"
-      [readOnly]="isEditInvoiceReadOnly"
-      (popupClosed)="handleClose()"
-    ></app-edit-purchase-invoice>
-  </ng-container>
-</dx-popup>
+  <dx-popup
+    *ngIf="isEditInvoice"
+    [(visible)]="isEditInvoice"
+    [width]="'100vw'"
+    [height]="'100vh'"
+    [deferRendering]="false"
+    title="Purchase Invoice"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="isEditInvoice">
+      <app-edit-purchase-invoice
+        [invoiceFormData]="selectedInvoice"
+        [readOnly]="isEditInvoiceReadOnly"
+        (popupClosed)="handleClose()"
+      ></app-edit-purchase-invoice>
+    </ng-container>
+  </dx-popup>
 
-<dx-popup
-  *ngIf="editMiscPopup"
-  [(visible)]="editMiscPopup"
-  [width]="'100vw'"
-  [height]="'100vh'"
-  title="Miscellaneous Receipt"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="editMiscPopup">
-    <app-add-misc-receipt
-      *ngIf="editMiscPopup"
-      [isEditing]="true"
-      [EditingResponseData]="selectedmiscellaneousData"
-      [isReadOnlyMode]="isReadOnlyPayment"
-      (popupClosed)="handleClose()"
-    ></app-add-misc-receipt>
-  </ng-container>
-  <!-- <ng-container *ngIf="editMiscPopup">
+  <dx-popup
+    *ngIf="editMiscPopup"
+    [(visible)]="editMiscPopup"
+    [width]="'100vw'"
+    [height]="'100vh'"
+    title="Miscellaneous Receipt"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="editMiscPopup">
+      <app-add-misc-receipt
+        *ngIf="editMiscPopup"
+        [isEditing]="true"
+        [EditingResponseData]="selectedmiscellaneousData"
+        [isReadOnlyMode]="isReadOnlyPayment"
+        (popupClosed)="handleClose()"
+      ></app-add-misc-receipt>
+    </ng-container>
+    <!-- <ng-container *ngIf="editMiscPopup">
   <app-add-misc-receipt
     *ngIf="editMiscPopup"
     [EditingResponseData]="selectedmiscellaneousData"
@@ -400,28 +400,28 @@
     (popupClosed)="handleClose()"
   ></app-add-misc-receipt>
   </ng-container> -->
-</dx-popup>
+  </dx-popup>
 
-<!-- Prepayment -->
-<dx-popup
-  *ngIf="editPrePaymentPopupOpened"
-  [(visible)]="editPrePaymentPopupOpened"
-  [width]="'90vw'"
-  [height]="'100vh'"
-  title="PrePayment Invoice"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="editPrePaymentPopupOpened">
-    <app-pre-payment-edit
-      [selectedPrePayment]="selectedPrePayment"
-      [isReadOnly]="isEditReadOnly"
-      (formClosed)="handleClose()"
-    ></app-pre-payment-edit>
-  </ng-container>
-</dx-popup>
+  <!-- Prepayment -->
+  <dx-popup
+    *ngIf="editPrePaymentPopupOpened"
+    [(visible)]="editPrePaymentPopupOpened"
+    [width]="'90vw'"
+    [height]="'100vh'"
+    title="PrePayment Invoice"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="editPrePaymentPopupOpened">
+      <app-pre-payment-edit
+        [selectedPrePayment]="selectedPrePayment"
+        [isReadOnly]="isEditReadOnly"
+        (formClosed)="handleClose()"
+      ></app-pre-payment-edit>
+    </ng-container>
+  </dx-popup>
 
-<!-- Supplier Payment -->
-<!-- <dx-popup
+  <!-- Supplier Payment -->
+  <!-- <dx-popup
   [(visible)]="isEditReceipt"
   [width]="'75vw'"
   [height]="'100vh'"
@@ -436,159 +436,158 @@
   ></app-edit-supplier-payment>
 </dx-popup> -->
 
-<dx-popup
-  *ngIf="isEditReceipt"
-  [(visible)]="isEditReceipt"
-  [width]="'75vw'"
-  [height]="'calc(100vh - 16px)'"
-  title="Supplier Payment"
-  (onHiding)="handleClose()"
->
-  <app-edit-supplier-payment
-    [paymentData]="selectedReceipt"
-    [isReadOnlyMode]="isReadOnlyReceipt"
-    [supplierPaymentId]="selectedSupplierPayment"
-    (popupClosed)="handleClose()"
-  ></app-edit-supplier-payment>
-</dx-popup>
-
-<!-- purchase return -->
-<dx-popup
-  *ngIf="isEditPurchaseReturn"
-  [(visible)]="isEditPurchaseReturn"
-  [width]="'100vw'"
-  [height]="'100vh'"
-  title="Purchase Return(Debit Note)"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditPurchaseReturn">
-    <app-purchase-return-debit-form
-      [isEditing]="true"
-      [EditingResponseData]="selectedPurchaseReturn"
-      [isReadOnlyMode]="isReadOnlyPurchaseReturn"
-      (popupClosed)="handleClose()"
-    ></app-purchase-return-debit-form>
-  </ng-container>
-</dx-popup>
-
-<!-- Misc payment -->
-<dx-popup
-  *ngIf="editMiscPopupOpened"
-  [(visible)]="editMiscPopupOpened"
-  [width]="'75vw'"
-  [height]="'100vh'"
-  title="Miscellaneous Payment"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="editMiscPopupOpened">
-    <app-add-miscellaneous-payment
-      *ngIf="editMiscPopupOpened"
-      [isEditing]="true"
-      [EditingResponseData]="selectedmiscellaneousData"
-      [isReadOnlyMode]="isReadOnlyPayment"
-      (popupClosed)="handleClose()"
-      [MiscPaymentId]="selectedMiscPayment"
-    ></app-add-miscellaneous-payment>
-  </ng-container>
-</dx-popup>
-
-<dx-popup
-  *ngIf="isEditPopupPrepaymentPosting"
-  [(visible)]="isEditPopupPrepaymentPosting"
-  [width]="'95vw'"
-  [height]="'100vh'"
-  title="Edit Prepayment Posting"
-  (onHiding)="handleClose()"
->
-  <app-prepayment-posting-edit
-    *ngIf="isEditPopupPrepaymentPosting"
-    [selecteprepaymentData]="selecte_prepayment_Data"
-    (popupClosed)="handleClose()"
+  <dx-popup
+    *ngIf="isEditReceipt"
+    [(visible)]="isEditReceipt"
+    [width]="'75vw'"
+    [height]="'calc(100vh - 16px)'"
+    title="Supplier Payment"
+    (onHiding)="handleClose()"
   >
-  </app-prepayment-posting-edit>
-</dx-popup>
-
-<dx-popup
-  *ngIf="isEditTransferOut"
-  [(visible)]="isEditTransferOut"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Transfer Out"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditTransferOut">
-    <app-transfer-out-inventory-add
-      [isEditing]="true"
-      [EditingResponseData]="selectedTrOut"
-      [isReadOnlyMode]="isReadOnlyTrOut"
+    <app-edit-supplier-payment
+      [paymentData]="selectedReceipt"
+      [isReadOnlyMode]="isReadOnlyReceipt"
+      [supplierPaymentId]="selectedSupplierPayment"
       (popupClosed)="handleClose()"
-    ></app-transfer-out-inventory-add>
-  </ng-container>
-</dx-popup>
+    ></app-edit-supplier-payment>
+  </dx-popup>
 
-<dx-popup
-  *ngIf="isEditTransferIn"
-  [(visible)]="isEditTransferIn"
-  [width]="'70vw'"
-  [height]="'90vh'"
-  title="Transfer In"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditTransferIn">
-    <app-transfer-in-inventory-form
-      [isEditing]="true"
-      [EditingResponseData]="selectedTrIn"
-      [isReadOnlyMode]="isReadOnlyTrIn"
+  <!-- purchase return -->
+  <dx-popup
+    *ngIf="isEditPurchaseReturn"
+    [(visible)]="isEditPurchaseReturn"
+    [width]="'100vw'"
+    [height]="'100vh'"
+    title="Purchase Return(Debit Note)"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="isEditPurchaseReturn">
+      <app-purchase-return-debit-form
+        [isEditing]="true"
+        [EditingResponseData]="selectedPurchaseReturn"
+        [isReadOnlyMode]="isReadOnlyPurchaseReturn"
+        (popupClosed)="handleClose()"
+      ></app-purchase-return-debit-form>
+    </ng-container>
+  </dx-popup>
+
+  <!-- Misc payment -->
+  <dx-popup
+    *ngIf="editMiscPopupOpened"
+    [(visible)]="editMiscPopupOpened"
+    [width]="'75vw'"
+    [height]="'100vh'"
+    title="Miscellaneous Payment"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="editMiscPopupOpened">
+      <app-add-miscellaneous-payment
+        *ngIf="editMiscPopupOpened"
+        [isEditing]="true"
+        [EditingResponseData]="selectedmiscellaneousData"
+        [isReadOnlyMode]="isReadOnlyPayment"
+        (popupClosed)="handleClose()"
+        [MiscPaymentId]="selectedMiscPayment"
+      ></app-add-miscellaneous-payment>
+    </ng-container>
+  </dx-popup>
+
+  <dx-popup
+    *ngIf="isEditPopupPrepaymentPosting"
+    [(visible)]="isEditPopupPrepaymentPosting"
+    [width]="'95vw'"
+    [height]="'100vh'"
+    title="Edit Prepayment Posting"
+    (onHiding)="handleClose()"
+  >
+    <app-prepayment-posting-edit
+      *ngIf="isEditPopupPrepaymentPosting"
+      [selecteprepaymentData]="selecte_prepayment_Data"
       (popupClosed)="handleClose()"
-    ></app-transfer-in-inventory-form>
-  </ng-container>
-</dx-popup>
+    >
+    </app-prepayment-posting-edit>
+  </dx-popup>
 
-<dx-popup
-  *ngIf="isEditSaleReturn"
-  [(visible)]="isEditSaleReturn"
-  [width]="'90vw'"
-  [height]="'100vh'"
-  title="Sale Return"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditSaleReturn">
-    <app-sale-return-form
-      [isEditing]="true"
-      [EditingResponseData]="selectedSaleReturn"
-      [isReadOnlyMode]="isReadOnlySaleReturn"
+  <dx-popup
+    *ngIf="isEditTransferOut"
+    [(visible)]="isEditTransferOut"
+    [width]="'75vw'"
+    [height]="'90vh'"
+    title="Transfer Out"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="isEditTransferOut">
+      <app-transfer-out-inventory-add
+        [isEditing]="true"
+        [EditingResponseData]="selectedTrOut"
+        [isReadOnlyMode]="isReadOnlyTrOut"
+        (popupClosed)="handleClose()"
+      ></app-transfer-out-inventory-add>
+    </ng-container>
+  </dx-popup>
+
+  <dx-popup
+    *ngIf="isEditTransferIn"
+    [(visible)]="isEditTransferIn"
+    [width]="'70vw'"
+    [height]="'90vh'"
+    title="Transfer In"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="isEditTransferIn">
+      <app-transfer-in-inventory-form
+        [isEditing]="true"
+        [EditingResponseData]="selectedTrIn"
+        [isReadOnlyMode]="isReadOnlyTrIn"
+        (popupClosed)="handleClose()"
+      ></app-transfer-in-inventory-form>
+    </ng-container>
+  </dx-popup>
+
+  <dx-popup
+    *ngIf="isEditSaleReturn"
+    [(visible)]="isEditSaleReturn"
+    [width]="'90vw'"
+    [height]="'100vh'"
+    title="Sale Return"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="isEditSaleReturn">
+      <app-sale-return-form
+        [isEditing]="true"
+        [EditingResponseData]="selectedSaleReturn"
+        [isReadOnlyMode]="isReadOnlySaleReturn"
+        (popupClosed)="handleClose()"
+      ></app-sale-return-form>
+    </ng-container>
+  </dx-popup>
+
+  <dx-popup
+    *ngIf="isMiscViewInvoice"
+    [(visible)]="isMiscViewInvoice"
+    [width]="'95vw'"
+    [height]="'100vh'"
+    title="View Misc Sales Invoice"
+    (onHiding)="handleClose()"
+  >
+    <ng-container *ngIf="isMiscViewInvoice">
+      <app-misc-sales-invoice-form
+        [invoiceFormData]="selectedInvoice"
+        (popupClosed)="handleClose()"
+      ></app-misc-sales-invoice-form>
+    </ng-container>
+  </dx-popup>
+
+  <dx-popup
+    [(visible)]="viewPayrollPopupOpened"
+    [width]="'75vw'"
+    [height]="'90vh'"
+    title="Payroll"
+    (onHiding)="handleClose()"
+  >
+    <app-payroll-view-report
+      *ngIf="viewPayrollPopupOpened"
+      [payroll]="selectedPayroll"
       (popupClosed)="handleClose()"
-    ></app-sale-return-form>
-  </ng-container>
-</dx-popup>
-
-<dx-popup
-  *ngIf="isMiscViewInvoice"
-  [(visible)]="isMiscViewInvoice"
-  [width]="'95vw'"
-  [height]="'100vh'"
-  title="View Misc Sales Invoice"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isMiscViewInvoice">
-    <app-misc-sales-invoice-form
-      [invoiceFormData]="selectedInvoice"
-      (popupClosed)="handleClose()"
-    ></app-misc-sales-invoice-form>
-  </ng-container>
-</dx-popup>
-
-
-<dx-popup
-  [(visible)]="viewPayrollPopupOpened"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Payroll"
-  (onHiding)="handleClose()"
->
-  <app-payroll-view-report
-    *ngIf="viewPayrollPopupOpened"
-    [payroll]="selectedPayroll"
-    (popupClosed)="handleClose()"
-  ></app-payroll-view-report>
-</dx-popup>
+    ></app-payroll-view-report> </dx-popup
+></dx-popup>

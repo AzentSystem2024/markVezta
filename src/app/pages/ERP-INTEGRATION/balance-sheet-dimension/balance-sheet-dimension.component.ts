@@ -19,14 +19,12 @@ import {
 } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 
-
 @Component({
   selector: 'app-balance-sheet-dimension',
   templateUrl: './balance-sheet-dimension.component.html',
-  styleUrls: ['./balance-sheet-dimension.component.scss']
+  styleUrls: ['./balance-sheet-dimension.component.scss'],
 })
 export class BalanceSheetDimensionComponent {
-
   isFilterRowVisible: boolean = false;
 
   BalanceSheetReport: any = [];
@@ -52,15 +50,15 @@ export class BalanceSheetDimensionComponent {
   HeadId: any;
   defaultDate: Date = new Date();
 
-  selectedYear: number | null = null;
+  selectedYear: any = null;
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
-   Diamensions: any[] = [];
-   selectedDiamensions: number[] = [2];
+  Diamensions: any[] = [];
+  selectedDiamensions: number[] = [2];
 
-    dimensionPopupVisible: boolean = false;
-    dimensionPopupData: any[] = [];
+  dimensionPopupVisible: boolean = false;
+  dimensionPopupData: any[] = [];
   selectedRowData: any = null;
 
   constructor(
@@ -84,7 +82,6 @@ export class BalanceSheetDimensionComponent {
   }
 
   ngOnInit() {
-    
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -135,7 +132,7 @@ export class BalanceSheetDimensionComponent {
     }
   }
 
-   Diamension_dropdown() {
+  Diamension_dropdown() {
     const payload = {
       NAME: 'DIAMENSIONS',
     };
@@ -150,15 +147,12 @@ export class BalanceSheetDimensionComponent {
     });
   }
 
-    onDimensionChange(e: any) {
+  onDimensionChange(e: any) {
     let selected = e.value || [];
-
     // force ID 2 to remain selected
     if (!selected.includes(2)) {
       selected.push(2);
     }
-
-    // this.selectedDiamensions = [...new Set(selected)];
   }
 
   getSelectedDimensionHint() {
@@ -177,18 +171,16 @@ export class BalanceSheetDimensionComponent {
     const selectedItems = this.Diamensions.filter((x) =>
       this.selectedDiamensions.includes(x.ID),
     );
-
     return selectedItems[selectedItems.length - 1]?.ID === item.ID;
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
     const sessionYear = sessionData.FINANCIAL_YEARS;
     const financialYeaDate = sessionYear[0].DATE_FROM;
-
     this.formatted_from_date = financialYeaDate;
   }
 
@@ -203,7 +195,9 @@ export class BalanceSheetDimensionComponent {
   }
 
   get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.savedUserData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.company_list = this.savedUserData.Companies;
   }
 
@@ -235,6 +229,38 @@ export class BalanceSheetDimensionComponent {
     const month = ('0' + (date.getMonth() + 1)).slice(-2);
     const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
+  }
+
+  get_DataSource() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.finID,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+      DimensionCode: String(this.selectedDiamensions),
+    };
+
+    const payloadData = {
+      companyId: payload.COMPANY_ID,
+      finId: payload.FIN_ID,
+      dateFrom: payload.DATE_FROM,
+      dateTo: payload.DATE_TO,
+      DimensionCode: payload.DimensionCode,
+    };
+
+    sessionStorage.removeItem('viewclickvalue');
+    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
+
+    this.dataservice
+      .Balance_Sheet_Dimension_Api(payload)
+      .subscribe((res: any) => {
+        this.isEmptyDatagrid = false;
+
+        this.BalanceSheetReport = res.data;
+
+        this.calculateCustomSummaries();
+        this.expandedOnce = false; //  reset when new data is loaded
+      });
   }
 
   onCellClick(e: any) {
@@ -293,37 +319,6 @@ export class BalanceSheetDimensionComponent {
     this.dimensionPopupVisible = true;
   }
 
-
-  get_DataSource() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.finID,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
-      DimensionCode: String(this.selectedDiamensions),
-    };
-
-    const payloadData = {
-      companyId: payload.COMPANY_ID,
-      finId: payload.FIN_ID,
-      dateFrom: payload.DATE_FROM,
-      dateTo: payload.DATE_TO,
-      DimensionCode : payload.DimensionCode
-    };
-
-    sessionStorage.removeItem('viewclickvalue');
-    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
-
-    this.dataservice.Balance_Sheet_Dimension_Api(payload).subscribe((res: any) => {
-      this.isEmptyDatagrid = false;
-
-      this.BalanceSheetReport = res.data;
-
-      this.calculateCustomSummaries();
-      this.expandedOnce = false; //  reset when new data is loaded
-    });
-  }
-
   onViewClick(e: any) {
     this.HeadId = e.row.data.HEAD_ID;
 
@@ -333,7 +328,7 @@ export class BalanceSheetDimensionComponent {
     this.router.navigate(['/ledger-statement']);
   }
 
-  onRowPrepared(e) {
+  onRowPrepared(e: any) {
     if (e.rowType === 'data' && e.data.isSummary) {
       e.rowElement.style.fontWeight = 'bold';
       // e.rowElement.style.backgroundColor = '#f0f0f0';
@@ -345,7 +340,7 @@ export class BalanceSheetDimensionComponent {
     this.BalanceSheetReport = [...this.BalanceSheetReport];
   }
 
-  onContentReady(e) {
+  onContentReady(e: any) {
     if (!this.expandedOnce && e.component.getDataSource().isLoaded()) {
       e.component.expandAll();
       this.expandedOnce = true; //  prevents infinite loop

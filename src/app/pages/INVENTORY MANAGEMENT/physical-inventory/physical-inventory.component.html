@@ -381,7 +381,7 @@
   [(visible)]="isEditInventory"
   [width]="'75vw'"
   [height]="'100vh'"
-  title="Physical Inventory"
+  [title]="buttonText"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditInventory">
