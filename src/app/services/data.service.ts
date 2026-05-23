@@ -1354,8 +1354,12 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SupplierPayment/commit`, data);
   }
 
-  deleteSupplierPayment(id: number) {
-    return this.http.delete<any>(`${this.apiUrl}SupplierPayment/delete/${id}`);
+
+    deleteSupplierPayment(id: number) {
+    return this.http.post<any>(
+      `${this.apiUrl}SupplierPayment/delete/` + id,
+      {},
+    );
   }
 
   //PURCHASE INVOICE
@@ -7035,6 +7039,13 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheetDimension';
     return this.http.post(getEndpoint, payload);
   }
+
+   //===========AC_Default_Settings=====================
+  AC_Default_Settings_Api(payload: any) {
+    const getEndpoint = this.apiUrl + 'ACDefaults/settings';
+    return this.http.post(getEndpoint, payload);
+  }
+
     //================Column location finding==================
   makeColumnVisible(dataGrid: DxDataGridComponent, columnName: string) {
     const columns = dataGrid.instance.getVisibleColumns();

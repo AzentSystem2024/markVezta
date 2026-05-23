@@ -130,6 +130,9 @@ export class AddSupplierPaymentComponent {
   isFillAmountValid: boolean;
   isSaving = false;
   finID: any;
+  settings: any;
+  CashID: any;
+  BankID: any;
 
   constructor(
     private dataService: DataService,
@@ -137,6 +140,7 @@ export class AddSupplierPaymentComponent {
   ) {
     this.sesstion_Details();
     this.getDocNo();
+    this.AC_Default();
   }
 
   ngOnInit() {
@@ -166,13 +170,32 @@ export class AddSupplierPaymentComponent {
     this.getPdcofSelectedSupplier();
     this.sesstion_Details();
     this.getDocNo();
+    this.AC_Default();
+   
   }
+
+
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
+
+    AC_Default(){
+   const payload = {
+    CompanyID : this.selected_Company_id
+   }
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
+      console.log(res)
+      this.settings = res.Data
+      this.CashID = this.settings.GP_CASH_ID;  
+      console.log(this.CashID) 
+      this.BankID = this.settings.GP_BANK_ID;
+      console.log(this.BankID)
+    })
+  }
+
   getDocNo() {
     const payload = {
       TRANS_TYPE: 21,
@@ -276,23 +299,33 @@ export class AddSupplierPaymentComponent {
   //   }
   // }
 
+selectAllRows() {
+  if (!this.itemsGridRef?.instance || !this.pendingInvoicelist?.length) {
+    return;
+  }
 
-  onEditorPreparing(e: any) {
+  const allKeys = this.pendingInvoicelist.map((item: any) => item.BILL_ID);
+
+  this.itemsGridRef.instance.selectRows(allKeys, false);
+}
+
+clearSelection() {
+  this.itemsGridRef?.instance.clearSelection();
+}
+
+ onEditorPreparing(e: any) {
   if (e.parentType === 'dataRow' && e.dataField === 'RECEIVED_AMOUNT') {
     const grid = this.itemsGridRef?.instance;
 
-    // check whether current row is selected
-    const isSelected = grid.isRowSelected(e.row.key);
+    if (!grid) return;
 
-    // enable edit only for selected rows
-    e.editorOptions.disabled = !isSelected;
-
-    if (!isSelected) {
-      e.cancel = true;
-      return;
-    }
+    const selectedKeys = grid.getSelectedRowKeys();
+    const isSelected = selectedKeys.includes(e.row.key);
 
     e.editorOptions = e.editorOptions || {};
+
+    // disable editing for unselected rows
+    e.editorOptions.readOnly = !isSelected;
 
     e.editorOptions.elementAttr = {
       style: `
@@ -320,7 +353,7 @@ export class AddSupplierPaymentComponent {
       if (event.event.key === 'Enter') {
         const visibleRows = grid.getVisibleRows();
         const rowIndex = visibleRows.findIndex(
-          (r) => r?.data === e.row?.data,
+          (r) => r?.data === e.row?.data
         );
 
         setTimeout(() => {
@@ -415,11 +448,11 @@ export class AddSupplierPaymentComponent {
     );
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13,
+        (item: any) => item.GROUP_ID === this.CashID,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
@@ -431,7 +464,7 @@ export class AddSupplierPaymentComponent {
       );
     } else if (this.receiptMode === 'PDC') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
       console.log(this.filteredLedgerList, 'FILTEREDLEDGERLIST');
     } else {
@@ -498,17 +531,29 @@ export class AddSupplierPaymentComponent {
     this.paymentFormData.PDC_ID = selectedCheque.ID;
     this.pdcPopupVisible = false;
   }
+
 onSelectionChanged(e: any) {
   this.selectedRowsCount = e.selectedRowsData.length;
 
+  const selectedKeys = e.selectedRowKeys || [];
+
+  // selected rows total
   this.totalPending = e.selectedRowsData.reduce(
     (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
     0,
   );
 
-  this.itemsGridRef?.instance.refresh();
-}
+  // clear received amount for unselected rows
+  this.pendingInvoicelist.forEach((row: any) => {
+    if (!selectedKeys.includes(row.BILL_ID)) {
+      row.RECEIVED_AMOUNT = 0;
+    }
+  });
 
+  // refresh grid + summary
+  this.pendingInvoicelist = [...this.pendingInvoicelist];
+  this.itemsGridRef.instance.refresh();
+}
   // onSelectionChanged(e: any) {
   //   this.selectedRowsCount = e.selectedRowsData.length;
 
@@ -534,27 +579,31 @@ onSelectionChanged(e: any) {
     // ✅ only show popup, no auto-fill into field1
     this.showFillAmountPopup = true;
   }
-  autoFillReceivedAmounts() {
-    const fillAmount = Number(this.fillAmountData.field1);
+autoFillReceivedAmounts() {
+  const fillAmount = Number(this.fillAmountData.field1);
 
-    if (isNaN(fillAmount) || fillAmount <= 0) {
-      notify('Please enter a valid fill amount first.', 'warning', 3000);
-      return;
-    }
+  if (isNaN(fillAmount) || fillAmount <= 0) {
+    notify('Please enter a valid fill amount first.', 'warning', 3000);
+    return;
+  }
 
-    let remaining = fillAmount;
-    const selectedRows =
-      this.itemsGridRef?.instance?.getSelectedRowsData() || [];
+  let remaining = fillAmount;
 
-    if (selectedRows.length === 0) {
-      notify('Please select at least one row', 'warning', 3000);
-      return;
-    }
+  const selectedKeys =
+    this.itemsGridRef?.instance?.getSelectedRowKeys() || [];
 
-    const EPSILON = 0.01; // tolerance
+  if (selectedKeys.length === 0) {
+    notify('Please select at least one row', 'warning', 3000);
+    return;
+  }
 
-    selectedRows.forEach((row: any) => {
-      const pending = Number(row.PENDING_AMOUNT);
+  const EPSILON = 0.01;
+
+  // loop through full invoice list in display order
+  this.pendingInvoicelist.forEach((row: any) => {
+    // only process selected rows
+    if (selectedKeys.includes(row.BILL_ID)) {
+      const pending = Number(row.PENDING_AMOUNT) || 0;
 
       if (remaining > EPSILON) {
         row.RECEIVED_AMOUNT = Math.min(pending, remaining);
@@ -562,11 +611,28 @@ onSelectionChanged(e: any) {
       } else {
         row.RECEIVED_AMOUNT = 0;
       }
-    });
+    }
+  });
 
-    // ✅ Refresh grid
-    this.pendingInvoicelist = [...this.pendingInvoicelist];
+  this.pendingInvoicelist = [...this.pendingInvoicelist];
+}
+
+calculateSelectedPendingSummary = (options: any) => {
+  if (options.name === 'selectedPendingTotal') {
+    if (options.summaryProcess === 'start') {
+      options.totalValue = 0;
+    }
+
+    if (options.summaryProcess === 'calculate') {
+      const selectedKeys =
+        this.itemsGridRef?.instance?.getSelectedRowKeys() || [];
+
+      if (selectedKeys.includes(options.value.BILL_ID)) {
+        options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
+      }
+    }
   }
+};
 
   handleCancel() {
     this.popupClosed.emit();
@@ -600,31 +666,35 @@ onSelectionChanged(e: any) {
     this.isFillAmountValid = true;
   }
 
-  submitAmountPopup() {
-    const enteredAmount = Number(this.fillAmountData.field1); // convert to number
+submitAmountPopup() {
+  const enteredAmount = Number(this.fillAmountData.field1);
 
-    if (isNaN(enteredAmount)) {
-      notify('Please enter a valid amount', 'warning', 3000);
-      return;
-    }
-
-    if (enteredAmount > this.totalPendingAmount) {
-      notify(
-        'The amount cannot be greater than the total pending amount',
-        'error',
-        3000,
-      );
-      return;
-    }
-
-    // ✅ Call the function to auto-fill the grid
-    this.autoFillReceivedAmounts();
-
-    // ✅ Reset form and close popup
-    this.amountError = '';
-    this.resetFillAmountForm();
-    this.showFillAmountPopup = false;
+  if (isNaN(enteredAmount) || enteredAmount <= 0) {
+    notify('Please enter a valid amount', 'warning', 3000);
+    return;
   }
+
+  if (this.selectedRowsCount === 0) {
+    notify('Please select at least one row', 'warning', 3000);
+    return;
+  }
+
+  // check against selected rows pending total
+  if (enteredAmount > this.totalPending) {
+    notify(
+      'The amount cannot be greater than the selected rows pending amount',
+      'error',
+      3000,
+    );
+    return;
+  }
+
+  this.autoFillReceivedAmounts();
+
+  this.amountError = '';
+  this.resetFillAmountForm();
+  this.showFillAmountPopup = false;
+}
 
   getReceiptNo() {
     const payload = {
@@ -691,6 +761,16 @@ onSelectionChanged(e: any) {
     // 🔧 FIX: Assign SUPP_DETAIL before calling the doc
     this.paymentFormData.SUPP_DETAIL = validDetails;
 
+    if (this.paymentFormData.CHEQUE_DATE) {
+  const d = new Date(this.paymentFormData.CHEQUE_DATE);
+
+  this.paymentFormData.CHEQUE_DATE =
+    d.getFullYear() +
+    '-' +
+    String(d.getMonth() + 1).padStart(2, '0') +
+    '-' +
+    String(d.getDate()).padStart(2, '0');
+}
     // Set PAY_TYPE_ID based on receiptMode
     const payTypeMapping: any = {
       Cash: 1,

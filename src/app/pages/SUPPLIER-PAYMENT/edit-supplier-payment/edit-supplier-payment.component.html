@@ -80,7 +80,7 @@
                     label="Supplier"
                     labelMode="floating"
                     (onValueChanged)="onSupplierChanged($event)"
-                    [readOnly]="true"
+                    [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
                 </div>
               </div>
@@ -149,25 +149,26 @@
             ></dxi-validation-rule>
           </dxi-column>
 
-          <dxo-summary>
-            <dxi-total-item
-              column="PENDING_AMOUNT"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="Total: {0}"
-              alignment="right"
-            >
-            </dxi-total-item>
 
-            <dxi-total-item
-              column="Received Amount"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="Total: {0}"
-              alignment="right"
-            >
-            </dxi-total-item>
-          </dxo-summary>
+                  <dxo-summary [calculateCustomSummary]="calculateSelectedPendingSummary">
+  <dxi-total-item
+    name="selectedPendingTotal"
+    summaryType="custom"
+    showInColumn="PENDING_AMOUNT"
+    valueFormat="#,##0.00"
+    displayFormat="Total: {0}"
+    alignment="right">
+  </dxi-total-item>
+
+  <dxi-total-item
+    column="Received Amount"
+    summaryType="sum"
+    valueFormat="#,##0.00"
+    displayFormat="Total: {0}"
+    alignment="right">
+  </dxi-total-item>
+</dxo-summary>
+
         </dx-data-grid>
         <div style="display: flex; justify-content: flex-end; margin-top: 5px">
           <dx-button
@@ -390,15 +391,7 @@
     <dx-button
       *ngIf="!isReadOnlyMode"
       #saveButtonRef
-      [text]="
-        isSaving
-          ? isApproved
-            ? 'Saving...'
-            : 'Saving...'
-          : isApproved
-            ? 'Save'
-            : 'Save'
-      "
+      [text]="getActionButtonText()"
       [disabled]="isSaving"
       stylingMode="contained"
       type="default"
