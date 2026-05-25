@@ -480,9 +480,13 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   };
 
   formatTotalAmount = (data: any) => {
-    return `${this.SupplierCurrencySymbol} ${data.value}`;
+    return `${this.SupplierCurrencySymbol} ${Number(
+      data.value || 0,
+    ).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
-
   getStoreOrCompanyByid() {
     const payload = {
       // SUPP_ID: this.newPoData.SUPP_ID,
@@ -736,9 +740,10 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.newPoData.GROSS_AMOUNT = this.savedItems
       .reduce((sum, item) => sum + Number(item.taxable || 0), 0)
       .toFixed(2);
-    this.newPoData.SUPP_GROSS_AMOUNT = this.savedItems
-      .reduce((sum, item) => sum + Number(item.taxable_Supplier || 0), 0)
-      .toFixed(2);
+    // this.newPoData.SUPP_GROSS_AMOUNT = this.savedItems
+    //   .reduce((sum, item) => sum + Number(item.taxable_Supplier || 0), 0)
+    //   .toFixed(2);
+    this.newPoData.SUPP_GROSS_AMOUNT = this.newPoData.GROSS_AMOUNT;
     console.log('GROSS_AMOUNT:', this.newPoData.GROSS_AMOUNT);
   }
 
@@ -756,7 +761,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     ).toFixed(2); // Returns "276.40" as a string
 
     // Set SUPP_NET_AMOUNT equal to SUPP_GROSS_AMOUNT
-    this.newPoData.SUPP_NET_AMOUNT = this.newPoData.SUPP_GROSS_AMOUNT;
+    // this.newPoData.SUPP_NET_AMOUNT = this.newPoData.SUPP_GROSS_AMOUNT;
+    this.newPoData.SUPP_NET_AMOUNT = this.newPoData.NET_AMOUNT;
 
     // Determine the amount to emit based on currency comparison
     const amountToEmitInLocalCurrency = `${this.newPoData.NET_AMOUNT} ${this.localCurrencyCode}`;
@@ -812,7 +818,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     /* ---------------- AMOUNT ---------------- */
 
     item.Amount = parseFloat((qtyOrdered * item.SUPP_PRICE).toFixed(2));
-    item.SUPP_AMOUNT = item.Amount;
+    // item.SUPP_AMOUNT = item.Amount;
 
     /* ---------------- DISCOUNT ---------------- */
 
@@ -827,7 +833,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     item.taxable = parseFloat((item.Amount - item.discountAmount).toFixed(2));
     console.log(item.taxable, 'TAXABLEEEEEEEEEEE');
     /* ---------------- GST / IGST ---------------- */
-
+    item.SUPP_AMOUNT = item.taxable;
     const itemGst = Number(item.GST_PERC || 0);
 
     let totalTaxPerc = 0;
@@ -847,7 +853,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     /* ---------------- TOTAL ---------------- */
 
     item.total = parseFloat((item.taxable + item.vatAmount).toFixed(2));
-
+    item.SUPP_AMOUNT = item.taxable;
+    item.AMOUNT = item.total;
     /* ---------------- UPDATE TOTALS ---------------- */
 
     this.calculateTotalQuantity();
@@ -861,8 +868,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       ITEM_ID: item.ITEM_ID,
       QUANTITY: qtyOrdered,
       PRICE: item.SUPP_PRICE,
-      // AMOUNT: item.Amount,
-      AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+      AMOUNT: item.SUPP_AMOUNT,
+      // AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       DISC_PERCENT: discPerc,
 
       // ✅ IMPORTANT
@@ -876,8 +883,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       ITEM_DESC: item.DESCRIPTION,
       UOM: item.UOM,
       SUPP_PRICE: item.SUPP_PRICE,
-      // SUPP_AMOUNT: item.SUPP_AMOUNT,
-      SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+      SUPP_AMOUNT: item.taxable,
+      // SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
     };
 
     const index = this.poData.PoDetails.findIndex(

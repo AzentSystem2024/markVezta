@@ -732,10 +732,13 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.savedItems = this.newPoData.PoDetails.map((item, index) => {
         // const taxable = Number(item.SUPP_AMOUNT || 0); // 🔥 Use SUPP_AMOUNT directly
         const suppAmount = Number(item.SUPP_AMOUNT || 0);
+        const baseAmount = item.QUANTITY * item.SUPP_PRICE; //====10*20=== 200
+        const discountAmount = (baseAmount * (item.DISC_PERCENT || 0)) / 100; //=== 200*20/100=40
 
         const discountPercentage = Number(item.DISC_PERCENT || 0);
+        const taxable = baseAmount - discountAmount;
 
-        const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
+        // const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
         const vatPerc = Number(item.VAT_PERC || 0);
 
         const vatAmount = Number(item.TAX_AMOUNT || 0);
@@ -760,7 +763,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
           VAT_PERC: vatPerc,
 
           vatAmount: vatAmount,
-
+          SUPP_AMOUNT: item.SUPP_AMOUNT,
           total: Number(item.TOTAL_AMOUNT || 0),
           HSN_CODE: item.HSN_CODE,
         };
@@ -1575,32 +1578,32 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
         2: {
           cellWidth: 18,
-          halign: 'left',
+          halign: 'center',
         },
 
         3: {
           cellWidth: 22,
-          halign: 'left',
+          halign: 'center',
         },
 
         4: {
           cellWidth: 24,
-          halign: 'left',
+          halign: 'center',
         },
 
         5: {
           cellWidth: 16,
-          halign: 'left',
+          halign: 'center',
         },
 
         6: {
           cellWidth: 24,
-          halign: 'left',
+          halign: 'center',
         },
 
         7: {
           cellWidth: 24,
-          halign: 'left',
+          halign: 'center',
         },
       },
 
@@ -1636,19 +1639,19 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.text('Total', 55, finalY + 10);
 
     doc.text(String(totalQty), 95, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
 
     doc.text(this.formatAmount(totalTaxable), 138, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
 
     doc.text(this.formatAmount(totalVat), 170, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
 
     doc.text(this.formatAmount(totalPrice), 198, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
     // =========================
     // FOOTER COMPANY DETAILS

@@ -561,7 +561,11 @@ export class PurchaseOrderComponent {
       this.selectedRowData = res;
 
       // APPROVED -> VIEW
-      if (status === 'Approved' || status === 'Closed') {
+      if (
+        status === 'Approved' ||
+        status === 'Closed' ||
+        status === 'Partial'
+      ) {
         this.isViewPopupOpened = true;
         return;
       }

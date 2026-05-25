@@ -91,6 +91,7 @@ export class PdcAddFormComponent {
     this.dataservice.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
       this.PDCFormData.ENTRY_NO = response.DOC_NO;
+      console.log(this.PDCFormData.ENTRY_NO)
     });
   }
 

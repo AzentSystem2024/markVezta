@@ -32,12 +32,7 @@
           [height]="'45vh'"
           [columnResizingMode]="'nextColumn'"
           rowAlternationInterval="2"
-          [selection]="{
-  mode: 'multiple',
-  showCheckBoxesMode: 'always',
-  allowSelectAll: true,
-  selectAllMode: 'allPages'
-}"
+          [selection]="{ mode: 'multiple' }"
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
