@@ -338,6 +338,7 @@
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
   ></app-add-invoice-retail>
+</dx-popup>
 
   <dx-popup
     *ngIf="isEditCustomerReceipt"
@@ -589,5 +590,5 @@
       *ngIf="viewPayrollPopupOpened"
       [payroll]="selectedPayroll"
       (popupClosed)="handleClose()"
-    ></app-payroll-view-report> </dx-popup
-></dx-popup>
+    ></app-payroll-view-report> 
+    </dx-popup>
