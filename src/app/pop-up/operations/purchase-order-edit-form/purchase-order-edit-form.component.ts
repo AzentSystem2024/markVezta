@@ -181,7 +181,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     SUPP_GROSS_AMOUNT: '',
     SUPP_NET_AMOUNT: '',
     EXCHANGE_RATE: '',
-    ISSUED_EMP_ID: '',
+    ISSUED_EMP_ID: null,
     USER_ID: 0,
     PoDetails: [],
   };
