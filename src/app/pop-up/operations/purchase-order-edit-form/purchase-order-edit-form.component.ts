@@ -985,8 +985,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         ITEM_DESC: item.DESCRIPTION,
         UOM: item.UOM,
         SUPP_PRICE: item.SUPP_PRICE,
-        // SUPP_AMOUNT: item.SUPP_AMOUNT,
-        SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+        SUPP_AMOUNT: item.SUPP_AMOUNT,
+        // SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       };
 
       // Check if the item already exists in PoDetails
