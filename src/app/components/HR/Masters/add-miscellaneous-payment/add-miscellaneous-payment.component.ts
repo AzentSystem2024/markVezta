@@ -166,6 +166,9 @@ export class AddMiscellaneousPaymentComponent {
   selected_Company_id: any;
   Store: any;
  @Input() verifyMiscPopupOpened: boolean = false;
+  BankID: any;
+  settings: any;
+  CashID: any;
 
  get popupTitle(): string {
   switch (this.mode) {
@@ -290,12 +293,27 @@ onActionClick() {
     }
     this.getLedgerCodeDropdown();
     this.sessionData_tax();
+    this.AC_Default();
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
       this.beneficiaryNameRef.instance.focus();
     }, 500); // allow grid/toolbar to fully render
+  }
+
+      AC_Default(){
+   const payload = {
+    CompanyID : this.selected_Company_id
+   }
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
+      console.log(res)
+      this.settings = res.Data
+      this.CashID = this.settings.GP_CASH_ID;  
+      console.log(this.CashID) 
+      this.BankID = this.settings.GP_BANK_ID;
+      console.log(this.BankID)
+    })
   }
 
   getPendingNo() {
@@ -776,15 +794,15 @@ onActionClick() {
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13,
+        (item: any) => item.GROUP_ID === this.CashID,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
+        (item: any) => item.GROUP_ID !== this.CashID && item.GROUP_ID !== this.BankID,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others

@@ -124,6 +124,9 @@ export class AddCutomerReceiptComponent {
   selectedCustomer: any;
   isFillAmountValid: boolean;
   isSaving = false;
+  CashID: any;
+  BankID: any;
+  settings: any;
 
   constructor(
     private dataService: DataService,
@@ -146,6 +149,7 @@ export class AddCutomerReceiptComponent {
     this.getLedgerCodeDropdown();
     this.getCompanyListDropdown(); // only fetches distributor list
     this.getPdcofSelectedSupplier();
+    this.AC_Default();
   }
 
   sessionDetails() {
@@ -153,6 +157,21 @@ export class AddCutomerReceiptComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
   }
 
+          AC_Default(){
+   const payload = {
+    CompanyID : this.selectedCompanyId
+   }
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
+      console.log(res)
+      this.settings = res.Data
+      this.CashID = this.settings.GP_CASH_ID;  
+      console.log(this.CashID) 
+      this.BankID = this.settings.GP_BANK_ID;
+      console.log(this.BankID)
+    })
+  }
+
+  
   getSlNo = (rowData: any, index?: number): number => {
     // index is not provided by default, so we calculate based on array position
     if (!this.pendingInvoiceList) return 0;
@@ -300,11 +319,11 @@ export class AddCutomerReceiptComponent {
   applyReceiptModeFilter() {
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13,
+        (item: any) => item.GROUP_ID === this.CashID,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
@@ -316,7 +335,7 @@ export class AddCutomerReceiptComponent {
       );
     } else if (this.receiptMode === 'PDC') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
