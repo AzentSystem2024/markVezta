@@ -489,7 +489,7 @@
     ></dxi-column> -->
     <dxi-column
       caption="Total"
-      dataField="SUPP_AMOUNT"
+      dataField="total"
       width="auto"
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -536,7 +536,7 @@
       </dxi-total-item>
 
       <dxi-total-item
-        column="SUPP_AMOUNT"
+        column="total"
         summaryType="sum"
         [customizeText]="formatTotalAmount"
         displayFormat="{0}"
