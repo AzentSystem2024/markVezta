@@ -55,7 +55,7 @@ import notify from 'devextreme/ui/notify';
   templateUrl: './items-form.component.html',
   styleUrls: ['./items-form.component.scss'],
 })
-export class ItemsFormComponent implements OnInit,AfterViewInit {
+export class ItemsFormComponent implements OnInit, AfterViewInit {
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid: DxDataGridComponent;
   @ViewChild(DxFormComponent, { static: false }) form: DxFormComponent;
@@ -544,14 +544,14 @@ export class ItemsFormComponent implements OnInit,AfterViewInit {
     if (!this.datasource || this.datasource.length === 0) {
       this.datasource = [
         {
-           ID: Date.now(), // ✅ FIX (unique key)
+          ID: Date.now(), // ✅ FIX (unique key)
           SUPP_ID: null,
           CURRENCY: '',
           REORDER_NO: null,
           COST: null,
           IS_PRIMARY: false,
-          IS_CONSIGNMENT: false
-        }
+          IS_CONSIGNMENT: false,
+        },
       ];
     }
 
@@ -872,50 +872,46 @@ export class ItemsFormComponent implements OnInit,AfterViewInit {
     }
 
     if (event.parentType === 'dataRow' && event.dataField === 'COST') {
-  event.editorOptions.onValueChanged = (e: any) => {
+      event.editorOptions.onValueChanged = (e: any) => {
+        const grid = event.component;
 
-    const grid = event.component;
+        grid.cellValue(event.row.rowIndex, 'COST', e.value);
 
-    grid.cellValue(event.row.rowIndex, 'COST', e.value);
+        if (e.value && Number(e.value) > 0) {
+          const rows = grid.getVisibleRows();
+          const lastRow = rows[rows.length - 1]?.data;
 
-    if (e.value && Number(e.value) > 0) {
+          // 🚫 prevent duplicate empty row
+          if (lastRow && !lastRow.SUPP_ID && !lastRow.COST) {
+            return;
+          }
 
-      const rows = grid.getVisibleRows();
-      const lastRow = rows[rows.length - 1]?.data;
+          grid.saveEditData();
 
-      // 🚫 prevent duplicate empty row
-      if (lastRow && !lastRow.SUPP_ID && !lastRow.COST) {
-        return;
-      }
+          setTimeout(() => {
+            grid.addRow();
 
-      grid.saveEditData();
+            setTimeout(() => {
+              const visibleRows = grid.getVisibleRows();
 
-     setTimeout(() => {
-  grid.addRow();
+              // 🔥 new row is ALWAYS first (index 0)
+              const newRow = visibleRows[0];
 
-  setTimeout(() => {
-    const visibleRows = grid.getVisibleRows();
+              if (!newRow) return;
 
-    // 🔥 new row is ALWAYS first (index 0)
-    const newRow = visibleRows[0];
+              const rowIndex = newRow.rowIndex;
+              const rowKey = newRow.key;
 
-    if (!newRow) return;
+              // 🔥 force focus using key
+              grid.option('focusedRowKey', rowKey);
 
-          const rowIndex = newRow.rowIndex;
-          const rowKey = newRow.key;
-
-          // 🔥 force focus using key
-          grid.option('focusedRowKey', rowKey);
-
-          // 🔥 open editor
-          grid.editCell(rowIndex, 'SUPP_ID');
-
-        }, 100);
-
-      }, 0);
+              // 🔥 open editor
+              grid.editCell(rowIndex, 'SUPP_ID');
+            }, 100);
+          }, 0);
+        }
+      };
     }
-  };
-}
   }
   onRowClick(e: any) {}
 

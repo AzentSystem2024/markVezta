@@ -125,7 +125,7 @@
     <dxi-column caption="SUPPLIER NAME" dataField="SUPPPLIER_NAME"></dxi-column>
     <dxi-column
       caption="NET AMOUNT"
-      dataField="NET_AMOUNT"
+      dataField="SUPP_NET_AMOUNT"
       dataType="number"
       width="130"
       [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -237,8 +237,9 @@
   <app-grn-new-form></app-grn-new-form>
 </form-popup>
 
-//EDIT POPUP//
+<!-- EDIT POPUP -->
 <form-popup
+  *ngIf="isVerifyPopupOpened"
   [(visible)]="isVerifyPopupOpened"
   titleText="Edit Goods Receipt Note"
   [height]="'100vh'"
@@ -247,30 +248,42 @@
   [showApprove]="canApprove"
   (save)="editGrnData()"
 >
-  <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
+  <app-grn-verify-form
+    #editVerifyForm
+    [formdata]="selectedRowData"
+  ></app-grn-verify-form>
 </form-popup>
 
-//VERIFY POPUP//
+<!-- VERIFY POPUP -->
 <form-popup
+  *ngIf="isVerifyOpened"
   [(visible)]="isVerifyOpened"
   titleText="Verify Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
-  (save)="editGrnData()"
+  (save)="verifyGrnData()"
 >
-  <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
+  <app-grn-verify-form
+    #verifyForm
+    [formdata]="selectedRowData"
+  ></app-grn-verify-form>
 </form-popup>
 <form-popup
+  *ngIf="isApprovePopupOpened"
   [(visible)]="isApprovePopupOpened"
   titleText="Approve Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
   (save)="approveGrnData()"
 >
-  <app-grn-verify-form [formdata]="selectedRowData"></app-grn-verify-form>
+  <app-grn-verify-form
+    #approveForm
+    [formdata]="selectedRowData"
+  ></app-grn-verify-form>
 </form-popup>
 
 <dx-popup
+  *ngIf="isViewPopupOpened"
   [(visible)]="isViewPopupOpened"
   title="View Goods Receipt Note"
   [height]="'100vh'"

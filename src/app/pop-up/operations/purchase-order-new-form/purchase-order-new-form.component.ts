@@ -480,9 +480,13 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   };
 
   formatTotalAmount = (data: any) => {
-    return `${this.SupplierCurrencySymbol} ${data.value}`;
+    return `${this.SupplierCurrencySymbol} ${Number(
+      data.value || 0,
+    ).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
-
   getStoreOrCompanyByid() {
     const payload = {
       // SUPP_ID: this.newPoData.SUPP_ID,
@@ -749,26 +753,49 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   }
 
   // Calculate Total Including VAT
+
   calculateTotalIncludingTax() {
-    // Calculate the NET_AMOUNT by adding GROSS_AMOUNT and TAX_AMOUNT
-    this.newPoData.NET_AMOUNT = (
-      Number(this.newPoData.GROSS_AMOUNT) + Number(this.newPoData.TAX_AMOUNT)
-    ).toFixed(2); // Returns "276.40" as a string
+    // Total SUPP_AMOUNT summary
+    const totalSuppAmount = this.savedItems.reduce(
+      (sum, item) => sum + Number(item.SUPP_AMOUNT || 0),
+      0,
+    );
 
-    // Set SUPP_NET_AMOUNT equal to SUPP_GROSS_AMOUNT
-    this.newPoData.SUPP_NET_AMOUNT = this.newPoData.SUPP_GROSS_AMOUNT;
+    // Assign to NET_AMOUNT
+    this.newPoData.NET_AMOUNT = totalSuppAmount.toFixed(2);
 
-    // Determine the amount to emit based on currency comparison
+    // Supplier net amount
+    this.newPoData.SUPP_NET_AMOUNT = totalSuppAmount.toFixed(2);
+
+    // Emit values
     const amountToEmitInLocalCurrency = `${this.newPoData.NET_AMOUNT} ${this.localCurrencyCode}`;
 
     const amountToEmitInSupplierCurrency = `${this.newPoData.SUPP_NET_AMOUNT} ${this.SupplierCurrencySymbol}`;
 
-    // Emit the formatted NET_AMOUNT with local or supplier currency symbol
-    this.netAmountChange.emit(amountToEmitInLocalCurrency); // Emit NET_AMOUNT with the currency
+    this.netAmountChange.emit(amountToEmitInLocalCurrency);
 
-    // Emit SUPP_NET_AMOUNT with the supplier currency symbol
-    this.netSupplierAmountChange.emit(amountToEmitInSupplierCurrency); // Emit SUPP_NET_AMOUNT with the supplier currency symbol
+    this.netSupplierAmountChange.emit(amountToEmitInSupplierCurrency);
   }
+  // calculateTotalIncludingTax() {
+  //   // Calculate the NET_AMOUNT by adding GROSS_AMOUNT and TAX_AMOUNT
+  //   this.newPoData.NET_AMOUNT = (
+  //     Number(this.newPoData.GROSS_AMOUNT) + Number(this.newPoData.TAX_AMOUNT)
+  //   ).toFixed(2); // Returns "276.40" as a string
+
+  //   // Set SUPP_NET_AMOUNT equal to SUPP_GROSS_AMOUNT
+  //   this.newPoData.SUPP_NET_AMOUNT = this.newPoData.SUPP_GROSS_AMOUNT;
+
+  //   // Determine the amount to emit based on currency comparison
+  //   const amountToEmitInLocalCurrency = `${this.newPoData.NET_AMOUNT} ${this.localCurrencyCode}`;
+
+  //   const amountToEmitInSupplierCurrency = `${this.newPoData.SUPP_NET_AMOUNT} ${this.SupplierCurrencySymbol}`;
+
+  //   // Emit the formatted NET_AMOUNT with local or supplier currency symbol
+  //   this.netAmountChange.emit(amountToEmitInLocalCurrency); // Emit NET_AMOUNT with the currency
+
+  //   // Emit SUPP_NET_AMOUNT with the supplier currency symbol
+  //   this.netSupplierAmountChange.emit(amountToEmitInSupplierCurrency); // Emit SUPP_NET_AMOUNT with the supplier currency symbol
+  // }
 
   onContentReady(e: any) {
     if (this.needSummaryUpdate) {
@@ -861,8 +888,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       ITEM_ID: item.ITEM_ID,
       QUANTITY: qtyOrdered,
       PRICE: item.SUPP_PRICE,
-      // AMOUNT: item.Amount,
-      AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+      AMOUNT: item.Amount,
+      // AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       DISC_PERCENT: discPerc,
 
       // ✅ IMPORTANT
@@ -876,8 +903,8 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       ITEM_DESC: item.DESCRIPTION,
       UOM: item.UOM,
       SUPP_PRICE: item.SUPP_PRICE,
-      // SUPP_AMOUNT: item.SUPP_AMOUNT,
-      SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+      SUPP_AMOUNT: item.SUPP_AMOUNT,
+      // SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
     };
 
     const index = this.poData.PoDetails.findIndex(

@@ -1033,7 +1033,6 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
   // Expose this method to verify component
   getNewGrnData = () => {
-    // Check if there are items
     if (!this.poDetails || this.poDetails.length === 0) {
       notify(
         {
@@ -1043,10 +1042,10 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         'warning',
         2000,
       );
+
       return null;
     }
 
-    // Validate RECEIVED_QTY
     const invalidRow = this.poDetails.find(
       (item: any) =>
         item.QUANTITY === null ||
@@ -1064,26 +1063,40 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         'error',
         2000,
       );
+
       return null;
     }
 
-    const prepared = this.preparePayload(); // all rows from poDetails
+    // ✅ ALWAYS USE LATEST UPDATED DATA
+    this.newGrnData.GRNDetails = this.poDetails.map((item: any) => ({
+      ...item,
 
-    // Merge edits from demoArray into prepared.GRNDetails
-    const mergedDetails = prepared.GRNDetails.map((row: any) => {
-      const editedRow = this.demoArray?.find(
-        (demo: any) => demo.ITEM_ID === row.ITEM_ID,
-      );
-      return editedRow ? { ...row, ...editedRow } : row; // overwrite if edited
-    });
+      QUANTITY: Number(item.QUANTITY || 0),
+
+      RATE: Number(item.RATE || item.PRICE || 0),
+
+      PRICE: Number(item.PRICE || 0),
+
+      AMOUNT: Number(item.AMOUNT || 0),
+
+      SUPP_PRICE: Number(item.SUPP_PRICE || 0),
+
+      SUPP_AMOUNT: Number(item.SUPP_AMOUNT || 0),
+
+      DISC_PERCENT: Number(item.DISC_PERCENT || 0),
+
+      COST: Number(item.COST || 0),
+    }));
+
+    console.log(this.newGrnData.GRNDetails, 'FINAL VERIFY GRNDETAILS');
 
     return {
-      ...prepared,
-      GRNDetails: mergedDetails, //  full list with edits merged
-      // GRN_DATE: new Date(), //  override with current date
+      ...this.newGrnData,
+      GRNDetails: this.newGrnData.GRNDetails,
       GRN_DATE: this.newGrnData.GRN_DATE,
     };
   };
+
   onEditorPreparing(e: any) {
     if (e.dataField === 'QUANTITY') {
       e.editorOptions = e.editorOptions || {};
@@ -1166,6 +1179,28 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       });
 
       console.log(this.newGrnData.GRN_Item_Cost, 'Updated GRN_Item_Cost Data');
+
+      this.newGrnData.GRNDetails = this.poDetails.map((item: any) => ({
+        ...item,
+
+        QUANTITY: Number(item.QUANTITY || 0),
+
+        RATE: Number(item.RATE || item.PRICE || 0),
+
+        PRICE: Number(item.PRICE || 0),
+
+        AMOUNT: Number(item.AMOUNT || 0),
+
+        SUPP_PRICE: Number(item.SUPP_PRICE || 0),
+
+        SUPP_AMOUNT: Number(item.SUPP_AMOUNT || 0),
+
+        DISC_PERCENT: Number(item.DISC_PERCENT || 0),
+
+        COST: Number(item.COST || 0),
+      }));
+
+      console.log(this.newGrnData.GRNDetails, 'UPDATED FINAL GRNDETAILS');
     } else {
       console.warn('Data sources are not available.');
     }
@@ -1347,9 +1382,6 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       }));
 
       console.log(this.newGrnData.GRNDetails, 'cccccccccc');
-
-      const data = this.getNewGrnData();
-      console.log('******************', data);
 
       // Step 1: Get unique DESCRIPTION values
       const uniqueDescriptions = Array.from(
