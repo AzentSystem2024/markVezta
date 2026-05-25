@@ -1578,32 +1578,32 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
         2: {
           cellWidth: 18,
-          halign: 'left',
+          halign: 'center',
         },
 
         3: {
           cellWidth: 22,
-          halign: 'left',
+          halign: 'center',
         },
 
         4: {
           cellWidth: 24,
-          halign: 'left',
+          halign: 'center',
         },
 
         5: {
           cellWidth: 16,
-          halign: 'left',
+          halign: 'center',
         },
 
         6: {
           cellWidth: 24,
-          halign: 'left',
+          halign: 'center',
         },
 
         7: {
           cellWidth: 24,
-          halign: 'left',
+          halign: 'center',
         },
       },
 
@@ -1639,19 +1639,19 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.text('Total', 55, finalY + 10);
 
     doc.text(String(totalQty), 95, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
 
     doc.text(this.formatAmount(totalTaxable), 138, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
 
     doc.text(this.formatAmount(totalVat), 170, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
 
     doc.text(this.formatAmount(totalPrice), 198, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
     // =========================
     // FOOTER COMPANY DETAILS

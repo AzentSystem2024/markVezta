@@ -100,6 +100,9 @@ export class EditMiscReceiptComponent {
     },
   ];
   miscFormData: any;
+  CashID: any;
+  settings: any;
+  BankID: any;
 
   constructor(private dataService: DataService) {}
 
@@ -112,6 +115,7 @@ export class EditMiscReceiptComponent {
       this.companyId = userData?.SELECTED_COMPANY?.COMPANY_ID;
       this.finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
     }
+    this.AC_Default();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -185,6 +189,20 @@ export class EditMiscReceiptComponent {
     }
   }
 
+          AC_Default(){
+   const payload = {
+    CompanyID : this.companyId
+   }
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
+      console.log(res)
+      this.settings = res.Data
+      this.CashID = this.settings.GP_CASH_ID;  
+      console.log(this.CashID) 
+      this.BankID = this.settings.GP_BANK_ID;
+      console.log(this.BankID)
+    })
+  }
+  
   getLedgerCodeDropdown() {
     this.dataService.getAccountHeadList().subscribe({
       next: (response: any) => {
@@ -202,15 +220,15 @@ export class EditMiscReceiptComponent {
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13,
+        (item: any) => item.GROUP_ID === this.CashID,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
+        (item: any) => item.GROUP_ID !== this.CashID && item.GROUP_ID !== this.BankID,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
