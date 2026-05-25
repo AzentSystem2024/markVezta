@@ -480,9 +480,13 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   };
 
   formatTotalAmount = (data: any) => {
-    return `${this.SupplierCurrencySymbol} ${data.value}`;
+    return `${this.SupplierCurrencySymbol} ${Number(
+      data.value || 0,
+    ).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
-
   getStoreOrCompanyByid() {
     const payload = {
       // SUPP_ID: this.newPoData.SUPP_ID,
