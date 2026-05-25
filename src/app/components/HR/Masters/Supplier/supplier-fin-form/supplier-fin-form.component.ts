@@ -305,6 +305,8 @@ export class SupplierFinFormComponent {
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+      this.countryCodePhone = selectedCountry.CODE; // for phone number
+
     } else {
       // 5️ Fallback if no country found
       this.countryCode = '';

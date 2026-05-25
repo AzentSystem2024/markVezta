@@ -266,10 +266,12 @@ export class SupplierFormComponent implements OnInit {
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+      s
     } else {
       // 5️ Fallback if no country found
       this.countryCode = '';
       this.DEFAULT_COUNTRY_CODE = '';
+      this.countryCodePhone = '';
       console.warn(' No matching country found for ID:', this.selecte_countyId);
     }
   }

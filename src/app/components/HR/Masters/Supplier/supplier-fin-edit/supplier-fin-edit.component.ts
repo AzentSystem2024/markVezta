@@ -493,6 +493,7 @@ export class SupplierFinEditComponent {
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+      this.countryCodePhone = selectedCountry.CODE; // for phone number
       console.log('Selected Country:', selectedCountry.DESCRIPTION);
       console.log('Auto-filled Country Code:', this.DEFAULT_COUNTRY_CODE);
     } else {

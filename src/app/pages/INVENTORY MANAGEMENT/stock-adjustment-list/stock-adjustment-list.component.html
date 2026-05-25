@@ -327,7 +327,13 @@
   [height]="'85vh'"
   [title]="buttonText"
   (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
   <ng-container *ngIf="is_Edit_popup">
     <app-stock-adjustment-edit
       [isEditing]="true"

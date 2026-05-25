@@ -18,11 +18,10 @@
                     ></dxi-validation-rule>
 
                     <dxi-validation-rule
-                    type="pattern"
-                    [pattern]="'^[a-zA-Z0-9]+$'"
-                    message="Only alphanumeric allowed"
-                  ></dxi-validation-rule>
-
+                      type="pattern"
+                      [pattern]="'^[a-zA-Z0-9]+$'"
+                      message="Only alphanumeric allowed"
+                    ></dxi-validation-rule>
                   </dx-validator>
                 </dx-text-box>
               </div>
@@ -68,7 +67,6 @@
                       message="This field is required"
                     ></dxi-validation-rule>
                   </dx-validator>
-
                 </dx-select-box>
               </div>
             </dxi-item>
@@ -651,12 +649,12 @@
                   [searchEnabled]="true"
                   [(value)]="newItems.COSTING_METHOD"
                 >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="This field is required"
-                  ></dxi-validation-rule>
-                </dx-validator>
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
                 </dx-select-box>
               </div>
               <div class="inventory-item">
@@ -979,14 +977,14 @@
                   [showSpinButtons]="true"
                   [disabled]="!newItems.PARENT_ITEM_ID"
                 >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="custom"
-                    [validationCallback]="validateChildQty"
-                    message="Child Quantity must be greater than 0"
-                  ></dxi-validation-rule>
-                </dx-validator>
-              </dx-number-box>
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="custom"
+                      [validationCallback]="validateChildQty"
+                      message="Child Quantity must be greater than 0"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-number-box>
               </dxi-item>
             </dxi-item>
             <dxi-item
@@ -1136,70 +1134,71 @@
     <dxi-tab title="Supplier" *ngIf="newItems.TYPE_ID !== 8">
       <dxi-item>
         <div class="grid-container">
-        <dx-data-grid
-          #supplierGridRef
-          class="grid theme-dependent"
-          rowAlternationInterval="2"
-          [rowAlternationEnabled]="true"
-          [columnAutoWidth]="true"
-          height="300"
-          keyExpr="ID"
-          [showBorders]="true"
-          [dataSource]="datasource"
-          (onEditorPreparing)="onEditorPreparing($event)"
-          (onRowInserted)="onRowInserted($event)"
-          [editing]="{
-          mode: 'cell',
-          allowUpdating: true,
-          allowDeleting: true,
-          allowAdding: false,
-          useIcons: true,
-        }"
-        >
-          <!-- <dxo-editing mode="row" [allowAdding]="true" [allowDeleting]="true"> -->
-          <!-- </dxo-editing> -->
+          <dx-data-grid
+            #supplierGridRef
+            class="grid theme-dependent"
+            rowAlternationInterval="2"
+            [rowAlternationEnabled]="true"
+            [columnAutoWidth]="true"
+            height="300"
+            keyExpr="ID"
+            [showBorders]="true"
+            [dataSource]="datasource"
+            (onEditorPreparing)="onEditorPreparing($event)"
+            (onRowInserted)="onRowInserted($event)"
+            [editing]="{
+              mode: 'cell',
+              allowUpdating: true,
+              allowDeleting: true,
+              allowAdding: true,
+              useIcons: true,
+              newRowPosition: 'last',
+            }"
+          >
+            <!-- <dxo-editing mode="row" [allowAdding]="true" [allowDeleting]="true"> -->
+            <!-- </dxo-editing> -->
 
-          <dxo-scrolling mode="virtual"></dxo-scrolling>
-          <!-- <dxo-selection mode="multiple"> </dxo-selection> -->
-          <dxi-column dataField="SUPP_ID" caption="Supplier Name">
-            <dxo-lookup
-              [dataSource]="supplier"
-              displayExpr="SUPP_NAME"
-              valueExpr="ID"
+            <dxo-scrolling mode="virtual"></dxo-scrolling>
+            <!-- <dxo-selection mode="multiple"> </dxo-selection> -->
+            <dxi-column dataField="SUPP_ID" caption="Supplier Name">
+              <dxo-lookup
+                [dataSource]="supplier"
+                displayExpr="SUPP_NAME"
+                valueExpr="ID"
+              >
+              </dxo-lookup>
+              <!-- <dxi-validation-rule type="required"></dxi-validation-rule> -->
+            </dxi-column>
+            <dxi-column
+              dataField="CURRENCY"
+              caption="Currency"
+              [editorOptions]="{ readOnly: true }"
             >
-            </dxo-lookup>
-            <!-- <dxi-validation-rule type="required"></dxi-validation-rule> -->
-          </dxi-column>
-          <dxi-column
-            dataField="CURRENCY"
-            caption="Currency"
-            [editorOptions]="{ readOnly: true }"
-          >
-          </dxi-column>
-          <dxi-column
-            dataField="REORDER_NO"
-            caption="Reorder No"
-            dataType="number"
-          ></dxi-column>
-          <dxi-column
-            dataField="COST"
-            caption="Cost"
-            dataType="number"
-            format="#,##0.00"
-            alignment="right"
-          >
-            <!-- <dxi-validation-rule type="required"></dxi-validation-rule> -->
-          </dxi-column>
-          <dxi-column
-            dataField="IS_PRIMARY"
-            dataType="boolean"
-            caption="Primary"
-            [editorOptions]="{ enableTwoStateBehavior: true }"
-          ></dxi-column>
+            </dxi-column>
+            <dxi-column
+              dataField="REORDER_NO"
+              caption="Reorder No"
+              dataType="number"
+            ></dxi-column>
+            <dxi-column
+              dataField="COST"
+              caption="Cost"
+              dataType="number"
+              format="#,##0.00"
+              alignment="right"
+            >
+              <!-- <dxi-validation-rule type="required"></dxi-validation-rule> -->
+            </dxi-column>
+            <dxi-column
+              dataField="IS_PRIMARY"
+              dataType="boolean"
+              caption="Primary"
+              [editorOptions]="{ enableTwoStateBehavior: true }"
+            ></dxi-column>
 
-          <dxi-column dataField="IS_CONSIGNMENT" [visible]="false">
-          </dxi-column>
-        </dx-data-grid>
+            <dxi-column dataField="IS_CONSIGNMENT" [visible]="false">
+            </dxi-column>
+          </dx-data-grid>
         </div>
       </dxi-item>
     </dxi-tab>
