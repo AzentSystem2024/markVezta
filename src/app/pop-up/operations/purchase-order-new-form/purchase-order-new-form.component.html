@@ -643,7 +643,6 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column> -->
     <dxi-column
-      *ngIf="showLocalCurrencyColumn"
       [caption]="'Total (' + SupplierCurrencySymbol + ')'"
       dataField="SUPP_AMOUNT"
       alignment="right"
@@ -691,7 +690,7 @@
       </dxi-total-item>
 
       <dxi-total-item
-        column="total"
+        column="SUPP_AMOUNT"
         summaryType="sum"
         [customizeText]="formatTotalAmount"
         displayFormat="{0}"
