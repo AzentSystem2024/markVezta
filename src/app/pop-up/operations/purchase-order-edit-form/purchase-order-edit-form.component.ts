@@ -423,7 +423,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       QUANTITY: item.qtyOrdered,
       PRICE: item.PURCH_PRICE || 0,
       RATE: item.PURCH_PRICE || 0,
-      AMOUNT: item.Amount,
+      AMOUNT: item.taxable,
       // AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       DISC_PERCENT: item.discountPercentage || 0,
       TAX_PERC: item.VAT_PERC,
@@ -972,8 +972,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         ITEM_ID: item.ITEM_ID,
         QUANTITY: qtyOrdered,
         // PRICE: item.SUPP_PRICE || 0,
-        // AMOUNT: item.Amount,
-        AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+        AMOUNT: item.taxable,
+        // AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
         DISC_PERCENT: updatedRow.discountPercentage,
         // VAT_PERC : updatedRow.VAT_PERC,
         TAX_PERC: updatedRow.VAT_PERC || 0, // IGST only
@@ -985,7 +985,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         ITEM_DESC: item.DESCRIPTION,
         UOM: item.UOM,
         SUPP_PRICE: item.SUPP_PRICE,
-        SUPP_AMOUNT: item.SUPP_AMOUNT,
+        SUPP_AMOUNT: item.taxable_Supplier,
         // SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       };
 

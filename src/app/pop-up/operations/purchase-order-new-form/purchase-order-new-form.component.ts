@@ -883,7 +883,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       ITEM_DESC: item.DESCRIPTION,
       UOM: item.UOM,
       SUPP_PRICE: item.SUPP_PRICE,
-      SUPP_AMOUNT: item.TAX_AMOUNT,
+      SUPP_AMOUNT: item.taxable,
       // SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
     };
 
