@@ -1070,7 +1070,10 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       maximumFractionDigits: 2,
     });
 
-    return `${this.CurrencySymbol} ${formattedValue}`;
+    // return `${this.CurrencySymbol} ${formattedValue}`;
+    return this.CurrencySymbol === this.menuResponse?.GeneralSettings?.SYMBOL
+      ? formattedValue
+      : `${this.CurrencySymbol} ${formattedValue}`;
   };
 
   GetStoresList() {
