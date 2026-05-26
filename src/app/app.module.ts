@@ -142,7 +142,7 @@ import { EmployeeAddFormModule } from './components/HR/Masters/employee-add-form
 import { EmployeeEditFormFormModule } from './components/HR/Masters/employee-edit-form/employee-edit-form.component';
 import { SalaryHeadsModule } from './components/HR/Masters/salary-heads/salary-heads.component';
 import { AdvanceTypesModule } from './components/HR/Masters/advance-types/advance-types.component';
-import { PayRevisionModule } from './components/HR/Masters/pay-revision/pay-revision.component';
+import { PayRevisionModule } from './components/HR/Masters/pay-revision/pay-revision.component';  
 import { PayRevisionEditModule } from './components/HR/Masters/pay-revision-edit/pay-revision-edit.component';
 import { PayRevisionAddModule } from './components/HR/Masters/pay-revision-add/pay-revision-add.component';
 import { PayRevisionVerifyModule } from './components/HR/Masters/pay-revision-verify/pay-revision-verify.component';
@@ -203,11 +203,11 @@ import { DebitModule } from './pages/ACCOUNTS/debit/debit.component';
 import { AddDebitModule } from './pages/DEBIT/add-debit/add-debit.component';
 import { EditDebitModule } from './pages/DEBIT/edit-debit/edit-debit.component';
 import { ViewDebitModule } from './pages/DEBIT/view-debit/view-debit.component';
-import { InvoiceListModule } from './pages/Operations/invoice-list/invoice-list.component';
+import { InvoiceListModule } from './pages/OPERATIONS/invoice-list/invoice-list.component';
 import { AddInvoiceModule } from './pages/INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from './pages/INVOICE/edit-invoice/edit-invoice.component';
 import { ViewInvoiceModule } from './pages/INVOICE/view-invoice/view-invoice.component';
-import { CustomerReceiptsModule } from './pages/Operations/customer-receipts/customer-receipts.component';
+import { CustomerReceiptsModule } from './pages/OPERATIONS/customer-receipts/customer-receipts.component';
 import { AddCutomerReceiptModule } from './pages/CUSTOMER-RECEIPTS/add-cutomer-receipt/add-cutomer-receipt.component';
 import { EditCustomerReceiptModule } from './pages/CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 import { ViewCustomerReceiptModule } from './pages/CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
@@ -228,7 +228,7 @@ import { DepreciationEditModule } from './pages/Depreciation/depreciation-edit/d
 import { SupplierPaymentListModule } from './pages/ACCOUNTS/supplier-payment-list/supplier-payment-list.component';
 import { OpeningBalanceModule } from './pages/ACCOUNTS/opening-balance/opening-balance.component';
 import { AddSupplierPaymentModule } from './pages/SUPPLIER-PAYMENT/add-supplier-payment/add-supplier-payment.component';
-import { PurchaseInvoiceListModule } from './pages/Operations/purchase-invoice-list/purchase-invoice-list.component';
+import { PurchaseInvoiceListModule } from './pages/OPERATIONS/purchase-invoice-list/purchase-invoice-list.component';
 import { AddPurchaseInvoiceModule } from './pages/PURCHASE INVOICE/add-purchase-invoice/add-purchase-invoice.component';
 import { EditPurchaseInvoiceModule } from './pages/PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { EditSupplierPaymentModule } from './pages/SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
@@ -310,7 +310,7 @@ import { MiscPaymentGstEditModule } from './components/HR/Masters/misc-payment-g
 import { PrePaymentGstListModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
 import { PrePaymentGstAddModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-add/prepayment-gst-add.component';
 import { PrePaymentGstEditModule } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-edit/prepayment-gst-edit.component';
-import { InvoiceTrOutModule } from './pages/Operations/invoice-tr-out/invoice-tr-out.component';
+import { InvoiceTrOutModule } from './pages/OPERATIONS/invoice-tr-out/invoice-tr-out.component';
 import { InvoiceTrOutAddModule } from './pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
 import { EditInvoiceTrOutModule } from './pages/INVOICE/edit-invoice-tr-out/edit-invoice-tr-out.component';
 import { ViewInvoiceTrOutModule } from './pages/INVOICE/view-invoice-tr-out/view-invoice-tr-out.component';
@@ -377,7 +377,7 @@ import { TenderModule } from './pages/REPORT/tender/tender.component';
 import { TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summary.component';
 import { ZReportModule } from './pages/REPORT/zreport/zreport.component';
 import { SalesInvoiceRetailModule } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
-import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { AddSalesInvoiceRetailModule } from './pages/OPERATIONS/add-sales-invoice-retail/add-sales-invoice-retail.component';
 import { ClinicianMasterModule } from './pages/MASTER/clinician-master/clinician-master.component';
 import { ClinicianEditFormModule } from './pages/MASTER/POPUP PAGES/clinician-edit-form/clinician-edit-form.component';
 import { ClinicianNewFormModule } from './pages/MASTER/POPUP PAGES/clinician-new-form/clinician-new-form.component';
@@ -389,13 +389,12 @@ import { TrialBalanceFinDimensionModule } from './pages/ERP-INTEGRATION/trial-ba
 import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.component';
 import { DenialListModule } from './pages/MASTER/denial-list/denial-list.component';
 import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/denial-new-form.component';
-import { ProfitAndLossDimensionComponent, ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
-import { BalanceSheetDimensionComponent, BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
+import { ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
+import { BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 
-
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -800,7 +799,7 @@ import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-re
     DenialNewFormModule,
     ProfitAndLossDimensionModule,
     BalanceSheetDimensionModule,
-    ARReportPageModule
+    ARReportPageModule,
   ],
 
   providers: [

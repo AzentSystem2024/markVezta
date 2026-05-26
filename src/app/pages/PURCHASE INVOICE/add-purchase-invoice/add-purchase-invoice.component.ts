@@ -44,7 +44,6 @@ import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.compo
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { PurchaseInvoiceListComponent } from '../../Operations/purchase-invoice-list/purchase-invoice-list.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';

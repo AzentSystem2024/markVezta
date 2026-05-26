@@ -74,7 +74,7 @@ import { FixedAsstesListComponent } from './pages/ACCOUNTS/fixed-asstes-list/fix
 import { DepreciationListComponent } from './pages/ACCOUNTS/depreciation-list/depreciation-list.component';
 import { SupplierPaymentListComponent } from './pages/ACCOUNTS/supplier-payment-list/supplier-payment-list.component';
 import { OpeningBalanceComponent } from './pages/ACCOUNTS/opening-balance/opening-balance.component';
-import { PurchaseInvoiceListComponent } from './pages/Operations/purchase-invoice-list/purchase-invoice-list.component';
+
 import { ListMiscReceiptComponent } from './pages/ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
 import { ListSalaryPaymentComponent } from './pages/HR/Masters/list-salary-payment/list-salary-payment.component';
 import { EmployeeSalarySettingsComponent } from './pages/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -117,7 +117,7 @@ import { BankReconciliationAddComponent } from './pages/bank-reconciliation-add/
 import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoice-pdf-view.component';
 import { MiscPaymentGstListComponent } from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
 import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
-import { InvoiceTrOutComponent } from './pages/Operations/invoice-tr-out/invoice-tr-out.component';
+
 import { SettingsListComponent } from './pages/SETTINGS/settings-list/settings-list.component';
 import { GstReportComponent } from './pages/REPORT/gst-report/gst-report.component';
 import { LedgerSettingsListComponent } from './pages/SETTINGS/ledger-settings-list/ledger-settings-list.component';
@@ -130,7 +130,7 @@ import { AdvanceComponent } from './pages/HR/Masters/advance/advance.component';
 import { SubDepartmentComponent } from './pages/HR/Masters/sub-department/sub-department.component';
 import { SalaryHeadListComponent } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
-import { CustomerReceiptsComponent } from './pages/Operations/customer-receipts/customer-receipts.component';
+
 import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
 import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock-adjustment-list/stock-adjustment-list.component';
 import { DepreciationReportComponent } from './pages/Depreciation/depreciation-report/depreciation-report.component';
@@ -196,11 +196,15 @@ import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinic
 import { CPTMasterComponent } from './pages/MASTER/cpt-master/cpt-master.component';
 import { DepartmentGroupComponent } from './pages/MASTER/department-group/department-group.component';
 import { TrialBalanceFinDimensionComponent } from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
-import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-list.component';
+
 import { DenialListComponent } from './pages/MASTER/denial-list/denial-list.component';
 import { ProfitAndLossDimensionComponent } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionComponent } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageComponent } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
+import { InvoiceListComponent } from './pages/OPERATIONS/invoice-list/invoice-list.component';
+import { CustomerReceiptsComponent } from './pages/OPERATIONS/customer-receipts/customer-receipts.component';
+import { InvoiceTrOutComponent } from './pages/OPERATIONS/invoice-tr-out/invoice-tr-out.component';
+import { PurchaseInvoiceListComponent } from './pages/OPERATIONS/purchase-invoice-list/purchase-invoice-list.component';
 
 const routes: Routes = [
   {
