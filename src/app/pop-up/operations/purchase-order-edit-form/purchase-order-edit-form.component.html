@@ -463,7 +463,11 @@
     ></dxi-column> -->
     <!-- Conditionally add local currency column -->
     <dxi-column
-      [caption]="'Price (' + CurrencySymbol + ')'"
+      [caption]="
+        CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Price'
+          : 'Price (' + CurrencySymbol + ')'
+      "
       dataField="SUPP_PRICE"
       alignment="right"
       width="100"
@@ -513,7 +517,11 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
-      [caption]="'Taxable (' + CurrencySymbol + ')'"
+      [caption]="
+        CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Taxable'
+          : 'Taxable (' + CurrencySymbol + ')'
+      "
       dataField="taxable_Supplier"
       alignment="right"
       width="100"
@@ -558,7 +566,11 @@
     ></dxi-column> -->
 
     <dxi-column
-      [caption]="'Tax Amount (' + CurrencySymbol + ')'"
+      [caption]="
+        CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Tax Amt'
+          : 'Tax Amt (' + CurrencySymbol + ')'
+      "
       alignment="right"
       dataField="vatAmount"
       width="100"
@@ -566,7 +578,11 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
     <dxi-column
-      [caption]="'Total (' + CurrencySymbol + ')'"
+      [caption]="
+        CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Total'
+          : 'Total (' + CurrencySymbol + ')'
+      "
       dataField="total"
       alignment="right"
       width="100"
