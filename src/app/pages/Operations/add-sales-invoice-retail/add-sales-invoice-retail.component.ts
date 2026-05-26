@@ -39,7 +39,7 @@ import { FormTextboxModule } from 'src/app/components';
 export class AddSalesInvoiceRetailComponent {
  @Input() EditingResponseData: any;
   
-    // ✅ MAIN FORM MODEL
+    // MAIN FORM MODEL
   invoiceFormData: any = {
     DOC_NO: '',
     TRANS_DATE: null,

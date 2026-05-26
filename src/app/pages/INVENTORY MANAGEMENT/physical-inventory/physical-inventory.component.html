@@ -383,7 +383,13 @@
   [height]="'100vh'"
   [title]="buttonText"
   (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
   <ng-container *ngIf="isEditInventory">
     <app-physical-inventory-form
       [isEditing]="true"

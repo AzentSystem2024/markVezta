@@ -187,7 +187,8 @@
         "
         [title]="
           cellData.data.STATUS === 'Approved' ||
-          cellData.data.STATUS === 'Closed'
+          cellData.data.STATUS === 'Closed' ||
+          cellData.data.STATUS === 'Partial'
             ? 'View'
             : cellData.data.STATUS === 'Verified'
               ? 'Approve'
@@ -200,7 +201,8 @@
           class="fas fa-certificate"
           [style.color]="
             cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Closed'
+            cellData.data.STATUS === 'Closed' ||
+            cellData.data.STATUS === 'Partial'
               ? '#10B981'
               : cellData.data.STATUS === 'Verified'
                 ? '#0073D8'
@@ -227,7 +229,9 @@
       <i
         *ngIf="
           canEdit &&
-          !['Approved', 'Verified', 'Closed'].includes(cellData.data.STATUS)
+          !['Approved', 'Verified', 'Closed', 'Partial'].includes(
+            cellData.data.STATUS
+          )
         "
         class="dx-icon dx-icon-edit"
         style="cursor: pointer; margin-right: 10px"
@@ -239,7 +243,9 @@
       <i
         *ngIf="
           canDelete &&
-          !['Approved', 'Verified', 'Closed'].includes(cellData.data.STATUS)
+          !['Approved', 'Verified', 'Closed', 'Partial'].includes(
+            cellData.data.STATUS
+          )
         "
         class="dx-icon dx-icon-trash"
         style="cursor: pointer"

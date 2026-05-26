@@ -52,7 +52,8 @@
               "ace-builds",
               "file-saver",
               "html2canvas",
-              "country-list-with-dial-code-and-flag"
+              "country-list-with-dial-code-and-flag",
+              "dompurify"
             ],
             "outputPath": "build",
             "index": "src/index.html",

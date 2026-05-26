@@ -90,6 +90,8 @@ export class BalanceSheetDimensionComponent {
       '-' +
       String(today.getDate()).padStart(2, '0');
 
+    this.selectedYear = null;
+    this.selectedmonth = null;
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
     this.Diamension_dropdown();

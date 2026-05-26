@@ -118,6 +118,7 @@ export class EditPurchaseInvoiceComponent {
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
   selectSupplierDetails: any;
   is_default: any;
+  Currency_Code: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -327,7 +328,7 @@ export class EditPurchaseInvoiceComponent {
       this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
       if (this.is_default) {
         const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
-        this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+        this.Currency_Code = null
       }
       else {
         const currency_id = this.selectSupplierDetails.CURRENCY_ID
@@ -339,9 +340,9 @@ export class EditPurchaseInvoiceComponent {
             (item: any) => item.ID === currency_id
           );
           if (selectedCurrencyDetails) {
-            this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
+            this.Currency_Code = selectedCurrencyDetails.SYMBOL;
           }
-          console.log(this.CurrencyCode)
+          console.log(this.Currency_Code)
         });
       }
     })
@@ -356,7 +357,7 @@ export class EditPurchaseInvoiceComponent {
       this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
       if (this.is_default) {
         const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
-        this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+        this.Currency_Code = null
       }
       else {
         const currency_id = this.selectSupplierDetails.CURRENCY_ID
@@ -368,9 +369,9 @@ export class EditPurchaseInvoiceComponent {
             (item: any) => item.ID === currency_id
           );
           if (selectedCurrencyDetails) {
-            this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
+            this.Currency_Code = selectedCurrencyDetails.SYMBOL;
           }
-          console.log(this.CurrencyCode)
+          console.log(this.Currency_Code)
         });
       }
     })

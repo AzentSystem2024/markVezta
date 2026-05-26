@@ -634,17 +634,10 @@
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
-    <!-- <dxi-column
-      [caption]="'Total (' + SupplierCurrencySymbol + ')'"
-      dataField="AMOUNT"
-      alignment="right"
-      width="100"
-      [allowEditing]="false"
-      [format]="{ type: 'fixedPoint', precision: 2 }"
-    ></dxi-column> -->
+
     <dxi-column
       [caption]="'Total (' + SupplierCurrencySymbol + ')'"
-      dataField="SUPP_AMOUNT"
+      dataField="total"
       alignment="right"
       width="100"
       [allowEditing]="false"
@@ -690,7 +683,7 @@
       </dxi-total-item>
 
       <dxi-total-item
-        column="SUPP_AMOUNT"
+        column="total"
         summaryType="sum"
         [customizeText]="formatTotalAmount"
         displayFormat="{0}"

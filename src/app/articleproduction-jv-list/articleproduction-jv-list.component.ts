@@ -50,7 +50,7 @@ import {
   InvoiceTrOutAddComponent,
   InvoiceTrOutAddModule,
 } from '../pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
-import { InvoiceTrOutComponent } from '../pages/Operations/invoice-tr-out/invoice-tr-out.component';
+import { InvoiceTrOutComponent } from '../pages/OPERATIONS/invoice-tr-out/invoice-tr-out.component';
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 import { Router } from '@angular/router';
@@ -170,7 +170,7 @@ export class ArticleproductionJvListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -652,4 +652,4 @@ export class ArticleproductionJvListComponent {
   exports: [ArticleproductionJvListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ArticleproductionJvListModule { }
+export class ArticleproductionJvListModule {}

@@ -732,10 +732,13 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.savedItems = this.newPoData.PoDetails.map((item, index) => {
         // const taxable = Number(item.SUPP_AMOUNT || 0); // 🔥 Use SUPP_AMOUNT directly
         const suppAmount = Number(item.SUPP_AMOUNT || 0);
+        const baseAmount = item.QUANTITY * item.SUPP_PRICE; //====10*20=== 200
+        const discountAmount = (baseAmount * (item.DISC_PERCENT || 0)) / 100; //=== 200*20/100=40
 
         const discountPercentage = Number(item.DISC_PERCENT || 0);
+        const taxable = baseAmount - discountAmount;
 
-        const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
+        // const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
         const vatPerc = Number(item.VAT_PERC || 0);
 
         const vatAmount = Number(item.TAX_AMOUNT || 0);
@@ -760,7 +763,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
           VAT_PERC: vatPerc,
 
           vatAmount: vatAmount,
-
+          SUPP_AMOUNT: item.SUPP_AMOUNT,
           total: Number(item.TOTAL_AMOUNT || 0),
           HSN_CODE: item.HSN_CODE,
         };

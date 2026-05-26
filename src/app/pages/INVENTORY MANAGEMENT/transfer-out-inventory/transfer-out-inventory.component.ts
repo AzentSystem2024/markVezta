@@ -775,7 +775,7 @@ export class TransferOutInventoryComponent {
           this.buttonText = 'Verify Transfer Out';
 
         } else if (
-          this.selected_Data_Status = 'VERIFY') {
+          this.selected_Data_Status === 'VERIFY') {
           this.buttonText = 'Approve Transfer Out';
           this.StatusType = 'ApprovalScreen'
 

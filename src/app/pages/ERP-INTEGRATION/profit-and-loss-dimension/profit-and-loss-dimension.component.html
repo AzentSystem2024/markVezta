@@ -142,7 +142,6 @@
           </dx-button>
         </dxi-item>
 
-        <dxi-item widget="dxButton" [options]="refreshButtonOptions"></dxi-item>
         <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
@@ -151,7 +150,8 @@
       </dxo-header-filter>
       <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
 
-      <dxo-grouping *ngIf="ProfitLossReport.length > 0"
+      <dxo-grouping
+        *ngIf="ProfitLossReport.length > 0"
         [autoExpandAll]="true"
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
@@ -161,24 +161,26 @@
         dataField="TYPE_NAME"
         caption="Category"
         dataType="string"
-        [groupIndex]="0"
         sortOrder="asc"
         [sortingMethod]="typeSorting"
       ></dxi-column>
+
       <dxi-column
         dataField="MAIN_GROUP_NAME"
         caption="Group"
         alignment="left"
         dataType="number"
-        [groupIndex]="1"
       ></dxi-column>
+
       <dxi-column dataField="HEAD_NAME" caption="Particulars"></dxi-column>
       <dxi-column dataField="CODE" caption="Code" width="200"></dxi-column>
+
       <dxi-column
         dataField="DESCRIPTION"
         caption="Description"
         width="200"
       ></dxi-column>
+
       <dxi-column
         dataField="AMOUNT"
         caption="Amount"

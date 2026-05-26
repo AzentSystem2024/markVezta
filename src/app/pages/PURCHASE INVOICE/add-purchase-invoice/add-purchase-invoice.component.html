@@ -193,7 +193,7 @@
           ></dxi-column> -->
           <dxi-column
             dataField="PRICE"
-            [caption]="'Price(' + CurrencyCode + ')'"
+            [caption]="CurrencyCode ? 'Price (' + CurrencyCode + ')' : 'Price'"
             dataType="number"
             format="#,##0.00"
             [width]="120"
@@ -225,7 +225,9 @@
           </dxi-column>
           <dxi-column
             dataField="AMOUNT"
-            [caption]="'Amount(' + CurrencyCode + ')'"
+            [caption]="
+              CurrencyCode ? 'Amount (' + CurrencyCode + ')' : 'Amount'
+            "
             dataType="number"
             format="#,##0.00"
             [width]="140"
@@ -238,7 +240,6 @@
             [width]="140"
             [allowEditing]="false"
             headerCellTemplate="Discountpecheader"
-
           ></dxi-column>
           <div *dxTemplate="let data of 'Discountpecheader'">
             <div style="text-align: center; line-height: 16px">
@@ -259,7 +260,7 @@
           <div *dxTemplate="let data of 'DiscountAmountHeader'">
             <div style="text-align: center; line-height: 16px">
               Discount <br />
-              Amount ({{ CurrencyCode }})
+              Amount <span *ngIf="CurrencyCode"> ({{ CurrencyCode }})</span>
             </div>
           </div>
           <dxi-column
@@ -282,7 +283,7 @@
           <div *dxTemplate="let data of 'TaxAmountHeader'">
             <div style="text-align: center; line-height: 16px">
               {{ vatTilte }} <br />
-              Amount ({{ CurrencyCode }})
+              Amount<span *ngIf="CurrencyCode"> ({{ CurrencyCode }})</span>
             </div>
           </div>
           <dxi-column
@@ -297,7 +298,7 @@
           <div *dxTemplate="let data of 'TotalAmountHeader'">
             <div style="text-align: center; line-height: 16px">
               Total <br />
-              Amount ({{ CurrencyCode }})
+              Amount<span *ngIf="CurrencyCode"> ({{ CurrencyCode }})</span>
             </div>
           </div>
           <dxo-summary>
@@ -535,7 +536,7 @@
         dataType="number"
       ></dxi-column>
       <dxi-column
-        dataField="PRICE"
+        dataField="RATE"
         caption="Price"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>

@@ -567,7 +567,7 @@
     ></dxi-column>
     <dxi-column
       [caption]="'Total (' + CurrencySymbol + ')'"
-      dataField="SUPP_AMOUNT"
+      dataField="total"
       alignment="right"
       width="100"
       [allowEditing]="false"
@@ -621,7 +621,7 @@
       </dxi-total-item>
 
       <dxi-total-item
-        column="SUPP_AMOUNT"
+        column="total"
         summaryType="sum"
         [customizeText]="formatTotalAmount"
         displayFormat="{0}"

@@ -912,7 +912,6 @@ export class PhysicalInventoryFormComponent {
     if (this.status == 'Editscreen') {
       return 'Update';
     } else if (this.status == 'verifyscreen') {
-      console.log(this.status, this.selectedStatus)
       if (this.selectedStatus == 1) {
         return 'Verify';
 

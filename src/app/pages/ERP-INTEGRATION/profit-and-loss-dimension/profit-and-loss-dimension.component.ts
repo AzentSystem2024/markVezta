@@ -112,7 +112,8 @@ export class ProfitAndLossDimensionComponent {
       String(today.getMonth() + 1).padStart(2, '0') +
       '-' +
       String(today.getDate()).padStart(2, '0');
-
+ this.selectedYear = null;
+    this.selectedmonth = null;
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
     this.get_DataSource();

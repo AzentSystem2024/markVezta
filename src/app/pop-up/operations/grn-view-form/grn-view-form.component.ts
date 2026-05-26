@@ -43,10 +43,10 @@ export class GrnViewFormComponent {
   @Input() formdata: any;
   @Input() grnId: any;
 
-  financialYeaDate: string;
+  financialYeaDate: string='';
   selected_vat_id: any;
   sessionData: any;
-  formatted_from_date: string;
+  formatted_from_date: string='';
   selected_fin_id: any;
   selected_Company_id: any;
   costingMethodDataGrid: any;
