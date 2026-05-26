@@ -130,7 +130,9 @@ export class PhysicalInventoryComponent {
   selectedInventory: any = false;
   isEditSalesOrder: boolean = false;
   StatusType: any;
-  isReadOnlySalesOrder: boolean = false;;
+  isReadOnlySalesOrder: boolean = false;
+  selected_Data: any;
+  ;
   isEditInventory: boolean = false;;
   isReadOnlyInventory: boolean = false;;
   store: any;
@@ -565,6 +567,8 @@ export class PhysicalInventoryComponent {
         console.log(this.selectedInventory, 'SELECTEDTROUT');
         this.isEditInventory = true;
         this.isReadOnlyInventory = status === 5;
+        this.buttonText = 'Edit Physical Inventory'
+
       });
   }
 
@@ -717,7 +721,6 @@ export class PhysicalInventoryComponent {
   }
 
   onVerifyClick(e: any) {
-
     e.cancel = true;
     const orderId = e.row.data.TRANS_ID;
     const status = e.row.data.TRANS_STATUS;
@@ -730,6 +733,16 @@ export class PhysicalInventoryComponent {
         console.log(this.selectedInventory, 'SELECTEDTROUT');
         this.isEditInventory = true;
         this.isReadOnlyInventory = status === 5;
+        this.selected_Data = this.selectedInventory.STATUS
+        console.log(this.selected_Data, 'selected dataaaaaaaaaaaaaaaaaaa') // Check the value of selected_Data
+        if (this.selected_Data.STATUS == 1) {
+          this.buttonText = 'Verify Physical Inventory'
+        } else if (this.selected_Data.STATUS == 2) {
+          this.buttonText = 'Approve Physical Inventory'
+        } else if (this.selected_Data.STATUS == 5) {
+          this.buttonText = 'View Physical Inventory'
+        }
+
       });
   }
 

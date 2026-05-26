@@ -294,7 +294,7 @@ export class AddPurchaseInvoiceComponent {
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
-    this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+    // this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
@@ -339,8 +339,8 @@ export class AddPurchaseInvoiceComponent {
 
       this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
       if (this.is_default) {
-        const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
-        this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+        // const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+        this.CurrencyCode = null
 
       }
       else {

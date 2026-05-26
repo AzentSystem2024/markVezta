@@ -187,7 +187,9 @@
           ></dxi-column> -->
           <dxi-column
             dataField="RATE"
-            [caption]="'Price(' + CurrencyCode + ')'"
+            [caption]="
+              Currency_Code ? 'Price (' + Currency_Code + ')' : 'Price'
+            "
             dataType="number"
             format="#,##0.00"
             [width]="120"
@@ -220,7 +222,9 @@
 
           <dxi-column
             dataField="AMOUNT"
-            [caption]="'Amount(' + CurrencyCode + ')'"
+            [caption]="
+              Currency_Code ? 'Amount (' + Currency_Code + ')' : 'Amount'
+            "
             dataType="number"
             format="#,##0.00"
             [width]="140"
@@ -246,7 +250,7 @@
           <div *dxTemplate="let data of 'DiscountAmountHeader'">
             <div style="text-align: center; line-height: 16px">
               Discount <br />
-              Amount ({{ CurrencyCode }})
+              Amount <span *ngIf="Currency_Code"> ({{ Currency_Code }})</span>
             </div>
           </div>
           <dxi-column
@@ -284,7 +288,7 @@
           <div *dxTemplate="let data of 'TaxAmountHeader'">
             <div style="text-align: center; line-height: 16px">
               {{ vatTilte }} <br />
-              Amount ({{ CurrencyCode }})
+              Amount <span *ngIf="Currency_Code"> ({{ Currency_Code }})</span>
             </div>
           </div>
           <dxi-column
@@ -299,7 +303,7 @@
           <div *dxTemplate="let data of 'TotalAMount'">
             <div style="text-align: center; line-height: 16px">
               Total <br />
-              Amount ({{ CurrencyCode }})
+              Amount <span *ngIf="Currency_Code"> ({{ Currency_Code }})</span>
             </div>
           </div>
           <dxo-summary>
