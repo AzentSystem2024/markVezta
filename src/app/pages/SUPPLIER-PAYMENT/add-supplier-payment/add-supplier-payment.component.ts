@@ -652,7 +652,7 @@ calculateSelectedPendingSummary = (options: any) => {
   }
 
     Cancel(){
-     this.autoFillReceivedAmounts();
+    //  this.autoFillReceivedAmounts();
 
   // this.amountError = '';
   this.resetFillAmountForm();
