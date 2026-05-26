@@ -116,6 +116,8 @@ export class EditPurchaseInvoiceComponent {
   totalDiscAmount: any;
   isHQApp: any;
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
+  selectSupplierDetails: any;
+  is_default: any;
 
   constructor(private dataService: DataService) {
     const userDataString = localStorage.getItem('userData');
@@ -317,10 +319,61 @@ export class EditPurchaseInvoiceComponent {
       this.pendingGRNs = response.Data;
       console.log(this.pendingGRNs, 'PENDINGGRNSSSSSSSSSSSSSSSSSSSSSSSSS');
     });
+
+    this.dataService.selectSupplier(this.selectedSupplierId).subscribe((res: any) => {
+      console.log(res)
+      this.selectSupplierDetails = res
+
+      this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
+      if (this.is_default) {
+        const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+        this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+      }
+      else {
+        const currency_id = this.selectSupplierDetails.CURRENCY_ID
+
+        this.dataService.getCurrencyData().subscribe((response: any) => {
+          const currencylist = response;
+
+          const selectedCurrencyDetails = currencylist.find(
+            (item: any) => item.ID === currency_id
+          );
+          if (selectedCurrencyDetails) {
+            this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
+          }
+          console.log(this.CurrencyCode)
+        });
+      }
+    })
   }
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
+    this.dataService.selectSupplier(this.selectedSupplierId).subscribe((res: any) => {
+      console.log(res)
+      this.selectSupplierDetails = res
+
+      this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
+      if (this.is_default) {
+        const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+        this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+      }
+      else {
+        const currency_id = this.selectSupplierDetails.CURRENCY_ID
+
+        this.dataService.getCurrencyData().subscribe((response: any) => {
+          const currencylist = response;
+
+          const selectedCurrencyDetails = currencylist.find(
+            (item: any) => item.ID === currency_id
+          );
+          if (selectedCurrencyDetails) {
+            this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
+          }
+          console.log(this.CurrencyCode)
+        });
+      }
+    })
     const selectedSupplier = this.distributorList.find(
       (supplier: any) => supplier.ID === this.selectedSupplierId,
     );
@@ -373,6 +426,9 @@ export class EditPurchaseInvoiceComponent {
     }
 
     console.log('Selected Supplier:', selectedSupplier);
+  }
+  CurrencyCode(CurrencyCode: any) {
+    throw new Error('Method not implemented.');
   }
   calculateDiscAmt = (rowData: any) => {
     const qty = Number(rowData?.QUANTITY) || 0;
@@ -613,6 +669,7 @@ export class EditPurchaseInvoiceComponent {
         RATE: row.RATE,
         PRICE: row.RATE,
         PENDING_QTY: row.PENDING_QTY,
+        DISC_PERCENT: row.DISC_PERCENT,
         QUANTITY: 0,
 
         HSN_CODE: row.HSN_CODE,
@@ -837,6 +894,10 @@ export class EditPurchaseInvoiceComponent {
           this.isSaving = true;
           this.submitInvoice(); // Call actual API logic
         }
+        else {
+          this.isSaving = false;
+
+        }
       });
     } else {
       this.isSaving = true;
@@ -978,9 +1039,8 @@ export class EditPurchaseInvoiceComponent {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${
-      months[date.getMonth()]
-    }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
+      }-${date.getFullYear().toString().slice(-2)}`;
   }
 
   onPopupClose() {
@@ -1658,4 +1718,4 @@ export class EditPurchaseInvoiceComponent {
   exports: [EditPurchaseInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditPurchaseInvoiceModule {}
+export class EditPurchaseInvoiceModule { }

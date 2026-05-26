@@ -141,6 +141,9 @@ export class AddMiscReceiptComponent {
   isPdfPopupVisible: boolean = false;
   isSaving = false;
   logoBase64: string;
+  settings: any;
+  CashID: any;
+  BankID: any;
 
   constructor(
     private dataService: DataService,
@@ -156,6 +159,7 @@ export class AddMiscReceiptComponent {
   }
   ngOnInit() {
     this.sessionDetails();
+    
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -183,6 +187,7 @@ export class AddMiscReceiptComponent {
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
     });
+    this.AC_Default();
   }
   private async convertToBase64(path: string): Promise<string> {
     const response = await fetch(path);
@@ -198,6 +203,20 @@ export class AddMiscReceiptComponent {
     setTimeout(() => {
       this.beneficiaryNameRef.instance.focus();
     }, 500); // allow grid/toolbar to fully render
+  }
+
+        AC_Default(){
+   const payload = {
+    CompanyID : this.companyId
+   }
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
+      console.log(res)
+      this.settings = res.Data
+      this.CashID = this.settings.GP_CASH_ID;  
+      console.log(this.CashID) 
+      this.BankID = this.settings.GP_BANK_ID;
+      console.log(this.BankID)
+    })
   }
 
   getVoucherNo() {
@@ -590,15 +609,15 @@ export class AddMiscReceiptComponent {
 
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13,
+        (item: any) => item.GROUP_ID === this.CashID,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
+        (item: any) => item.GROUP_ID !== this.CashID && item.GROUP_ID !== this.BankID,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others

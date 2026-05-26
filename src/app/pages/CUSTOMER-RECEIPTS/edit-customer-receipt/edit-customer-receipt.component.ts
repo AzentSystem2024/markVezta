@@ -104,6 +104,9 @@ export class EditCustomerReceiptComponent {
   selectedCustomer: any;
   private lastReceiptMode: string | null = null;
   isSaving = false;
+  settings: any;
+  CashID: any;
+  BankID: any;
 
   constructor(private dataService: DataService) {}
 
@@ -125,6 +128,7 @@ export class EditCustomerReceiptComponent {
     this.getLedgerCodeDropdown();
     // this.getCompanyListDropdown();
     this.getReceiptNo();
+    this.AC_Default();
   }
 
   sessionDetails() {
@@ -209,6 +213,20 @@ export class EditCustomerReceiptComponent {
 
       this.customerType = firstReceipt.DISTRIBUTOR_ID ? 'Dealer' : 'Unit';
     }
+  }
+
+           AC_Default(){
+   const payload = {
+    CompanyID : this.selectedCompanyId
+   }
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
+      console.log(res)
+      this.settings = res.Data
+      this.CashID = this.settings.GP_CASH_ID;  
+      console.log(this.CashID) 
+      this.BankID = this.settings.GP_BANK_ID;
+      console.log(this.BankID)
+    })
   }
 
   getSlNo = (rowData: any, index?: number): number => {
@@ -342,11 +360,11 @@ export class EditCustomerReceiptComponent {
   applyReceiptModeFilter() {
     if (this.receiptMode === 'Cash') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 13,
+        (item: any) => item.GROUP_ID === this.CashID,
       );
     } else if (this.receiptMode === 'Bank') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
@@ -358,7 +376,7 @@ export class EditCustomerReceiptComponent {
       );
     } else if (this.receiptMode === 'PDC') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID === 14,
+        (item: any) => item.GROUP_ID === this.BankID,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others

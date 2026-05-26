@@ -178,7 +178,9 @@ export class AddPurchaseInvoiceComponent {
   totalDiscAmount: any;
   isHQApp: any;
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
-
+  selectSupplierDetails: any;
+  is_default: boolean = false
+  CurrencyCode: any;
   constructor(private dataService: DataService) {
     this.sessionData_tax();
   }
@@ -239,7 +241,7 @@ export class AddPurchaseInvoiceComponent {
     });
   }
 
-  onStoreValueChanged(event: any) {}
+  onStoreValueChanged(event: any) { }
   // getStoreData() {
   //   const payload = {
   //     NAME: 'STORE',
@@ -290,6 +292,8 @@ export class AddPurchaseInvoiceComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
@@ -325,39 +329,35 @@ export class AddPurchaseInvoiceComponent {
     this.applySupplierChange(newSupplierId);
   }
 
-  // updateGstColumnVisibility() {
-  //   const companyState = this.companyState?.trim().toLowerCase();
-  //   const supplierState =
-  //     this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
-
-  //   if (!companyState || !supplierState) {
-  //     // Hide all if state info not ready
-  //     this.showGST = false;
-  //     this.showCGST = false;
-  //     this.showSGST = false;
-  //     return;
-  //   }
-
-  //   if (companyState === supplierState) {
-  //     // ✅ SAME STATE → CGST + SGST
-  //     this.showCGST = true;
-  //     this.showSGST = true;
-  //     this.showGST = false;
-  //   } else {
-  //     //  DIFFERENT STATE → IGST
-  //     this.showGST = true;
-  //     this.showCGST = false;
-  //     this.showSGST = false;
-  //   }
-
-  //   //  IMPORTANT: force grid to redraw columns
-  //   setTimeout(() => {
-  //     this.itemsGridRef?.instance?.repaint();
-  //   }, 0);
-  // }
 
   applySupplierChange(supplierId: any) {
     this.selectedSupplierId = supplierId;
+    this.dataService.selectSupplier(this.selectedSupplierId).subscribe((res: any) => {
+      console.log(res)
+      this.selectSupplierDetails = res
+
+      this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
+      if (this.is_default) {
+        const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+        this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
+
+      }
+      else {
+        const currency_id = this.selectSupplierDetails.CURRENCY_ID
+
+        this.dataService.getCurrencyData().subscribe((response: any) => {
+          const currencylist = response;
+
+          const selectedCurrencyDetails = currencylist.find(
+            (item: any) => item.ID === currency_id
+          );
+          if (selectedCurrencyDetails) {
+            this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
+          }
+          console.log(this.CurrencyCode)
+        });
+      }
+    })
 
     this.mainGridData = [];
     this.itemsGridRef?.instance?.refresh();
@@ -471,6 +471,7 @@ export class AddPurchaseInvoiceComponent {
   calculateAmount = (row: any) => {
     return (parseFloat(row.PRICE) || 0) * (parseFloat(row.QUANTITY) || 0);
   };
+
   calculateDiscAmt = (rowData: any) => {
     const qty = Number(rowData?.QUANTITY) || 0;
     const price = Number(rowData?.PRICE) || 0;
@@ -591,17 +592,12 @@ export class AddPurchaseInvoiceComponent {
         UOM: row.UOM,
         TRANSFER_NO: row.GRN_NO,
         GRN_DATE: row.GRN_DATE,
-        PRICE: row.PRICE,
+        PRICE: row.RATE,
         PENDING_QTY: row.PENDING_QTY,
         QUANTITY: 0,
-
+        DISC_PERCENT: row.DISC_PERCENT,
         HSN_CODE: row.HSN_CODE,
-
-        //  GST FROM GRN
         VAT_PERC: row.VAT_PERC, // IGST %
-        // CGST: cgst,
-        // SGST: sgst,
-
         AMOUNT: 0,
         VAT_AMOUNT: 0,
         TOTAL_AMOUNT: 0,
@@ -630,6 +626,17 @@ export class AddPurchaseInvoiceComponent {
       notify(
         {
           message: 'Please select a supplier before saving the invoice.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return; // stop execution here
+    }
+    if (!this.purchaseInvoiceFormData.SUPP_INV_NO) {
+      notify(
+        {
+          message: 'Please Enter a Refferce No before saving the invoice.',
           position: { at: 'top right', my: 'top right' },
         },
         'warning',
@@ -966,4 +973,4 @@ export class AddPurchaseInvoiceComponent {
   exports: [AddPurchaseInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddPurchaseInvoiceModule {}
+export class AddPurchaseInvoiceModule { }

@@ -38,7 +38,7 @@ import { DataService } from 'src/app/services';
 })
 export class GrnVerifyFormComponent implements OnInit, OnChanges {
   @Input() formdata: any;
-
+  @Input() isReadOnly: boolean = false;
   financialYeaDate: string;
   selected_vat_id: any;
   sessionData: any;
@@ -173,6 +173,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   showInfo = true;
   showNavButtons = true;
   currency: any;
+  PONO: any;
 
   constructor(
     private service: DataService,
@@ -295,11 +296,32 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         item.ITEM_ID === updatedData.ITEM_ID &&
         item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
     );
-    const localAmount =
-      Number(updatedRow.QUANTITY || 0) * Number(updatedRow.PRICE || 0);
+    // const localAmount =
+    //   Number(updatedRow.QUANTITY || 0) * Number(updatedRow.PRICE || 0);
 
-    const suppAmount =
-      Number(updatedRow.QUANTITY || 0) * Number(updatedRow.SUPP_PRICE || 0);
+    // const suppAmount =
+    //   Number(updatedRow.QUANTITY || 0) * Number(updatedRow.SUPP_PRICE || 0);
+
+    const qty = Number(updatedRow.QUANTITY || 0);
+
+    const price = Number(updatedRow.PRICE || 0);
+    const suppPrice = Number(updatedRow.SUPP_PRICE || 0);
+
+    const discPerc = Number(
+      updatedRow.DISC_PERCENT || updatedRow.DISC_PERC || 0,
+    );
+
+    // Gross amounts
+    const grossLocalAmount = qty * price;
+    const grossSuppAmount = qty * suppPrice;
+
+    // Discount values
+    const localDiscount = (grossLocalAmount * discPerc) / 100;
+    const suppDiscount = (grossSuppAmount * discPerc) / 100;
+
+    // Final amounts after discount
+    const localAmount = grossLocalAmount - localDiscount;
+    const suppAmount = grossSuppAmount - suppDiscount;
 
     const enrichedData = {
       ...updatedData,
@@ -374,15 +396,36 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       updatedRow.QTY_BASE_UNIT = `${baseUnitValue} ${updatedRow.UOM}`;
       console.log(updatedRow.QTY_BASE_UNIT, 'updatedRow.QTY_BASE_UNIT');
       // Calculate the amount
-      updatedRow.SUPP_AMOUNT = (
-        Number(receivedQty || 0) * Number(updatedRow.SUPP_PRICE || 0)
-      ).toFixed(2);
+      // updatedRow.SUPP_AMOUNT = (
+      //   Number(receivedQty || 0) * Number(updatedRow.SUPP_PRICE || 0)
+      // ).toFixed(2);
+
+      // updatedRow.AMOUNT = (
+      //   Number(receivedQty || 0) * Number(updatedRow.PRICE || 0)
+      // ).toFixed(2); // Format to 2 decimal places
+
+      const discPerc = Number(
+        updatedRow.DISC_PERCENT || updatedRow.DISC_PERC || 0,
+      );
+
+      const grossAmount =
+        Number(receivedQty || 0) * Number(updatedRow.PRICE || 0);
+
+      const grossSuppAmount =
+        Number(receivedQty || 0) * Number(updatedRow.SUPP_PRICE || 0);
 
       updatedRow.AMOUNT = (
-        Number(receivedQty || 0) * Number(updatedRow.PRICE || 0)
-      ).toFixed(2); // Format to 2 decimal places
+        grossAmount -
+        (grossAmount * discPerc) / 100
+      ).toFixed(2);
+
+      updatedRow.SUPP_AMOUNT = (
+        grossSuppAmount -
+        (grossSuppAmount * discPerc) / 100
+      ).toFixed(2);
+
       updatedRow.UNIT_COST = (
-        Number(updatedRow.PO_TAXABLE_AMOUNT || 0) / Number(receivedQty || 0)
+        Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
       ).toFixed(2);
 
       updatedRow.COST = updatedRow.UNIT_COST;
@@ -401,16 +444,14 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
           UNIT_COST:
             Number(receivedQty || 0) > 0
               ? (
-                  Number(updatedRow.PO_TAXABLE_AMOUNT || 0) /
-                  Number(receivedQty || 0)
+                  Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
                 ).toFixed(2)
               : '0.00',
 
           COST:
             Number(receivedQty || 0) > 0
               ? (
-                  Number(updatedRow.PO_TAXABLE_AMOUNT || 0) /
-                  Number(receivedQty || 0)
+                  Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
                 ).toFixed(2)
               : '0.00',
         };
@@ -520,13 +561,19 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         QUANTITY: Number(item.QUANTITY),
         RATE: Number(item.PRICE),
         AMOUNT: Number(
-          (Number(item.PRICE || 0) * Number(item.QUANTITY || 0)).toFixed(2),
+          (
+            Number(item.PRICE || 0) *
+            Number(item.QUANTITY || 0) *
+            (1 - Number(item.DISC_PERCENT || item.DISC_PERC || 0) / 100)
+          ).toFixed(2),
         ),
 
         SUPP_AMOUNT: Number(
-          (Number(item.SUPP_PRICE || 0) * Number(item.QUANTITY || 0)).toFixed(
-            2,
-          ),
+          (
+            Number(item.SUPP_PRICE || 0) *
+            Number(item.QUANTITY || 0) *
+            (1 - Number(item.DISC_PERCENT || item.DISC_PERC || 0) / 100)
+          ).toFixed(2),
         ),
         DISC_PERCENT: Number(item.DISC_PERCENT),
 
@@ -546,13 +593,20 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       // Add only unique items to GRNDetail
       bindedData.forEach((item) => {
-        const isDuplicate = this.newGrnData.GRNDetails.some(
+        const existingIndex = this.newGrnData.GRNDetails.findIndex(
           (existingItem) =>
             existingItem.PO_DETAIL_ID === item.PO_DETAIL_ID &&
             existingItem.ITEM_ID === item.ITEM_ID,
         );
 
-        if (!isDuplicate) {
+        if (existingIndex > -1) {
+          // UPDATE existing row
+          this.newGrnData.GRNDetails[existingIndex] = {
+            ...this.newGrnData.GRNDetails[existingIndex],
+            ...item,
+          };
+        } else {
+          // ADD new row
           this.newGrnData.GRNDetails.push(item);
         }
       });
@@ -609,32 +663,32 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       );
     }
 
-    this.newGrnData.GRNDetails = {
-      ID: updatedData.ID,
-      COMPANY_ID: updatedData.COMPANY_ID,
-      STORE_ID: updatedData.STORE_ID || 0,
-      PO_DETAIL_ID: updatedData.PO_DETAIL_ID || 0,
-      GRN_ID: 0,
-      ITEM_ID: updatedData.ITEM_ID || 0,
-      QUANTITY: Number(updatedData.QUANTITY || 0),
-      RATE: Number(updatedData.PRICE || 0),
-      // LOCAL_AMOUNT: Number(updatedData.LOCAL_AMOUNT || 0),
-      AMOUNT: Number(updatedData.AMOUNT || 0),
-      INVOICE_QTY: 0,
-      DISC_PERCENT: Number(updatedData.DISC_PERCENT || 0),
-      COST: Number(updatedData.UNIT_COST || 0),
-      SUPP_PRICE: Number(updatedData.SUPP_PRICE || 0),
-      SUPP_AMOUNT: Number(updatedData.SUPP_AMOUNT || 0),
-      RETURN_QTY: 0,
-      UOM_PURCH: updatedData.UOM_PURCH || '',
-      UOM: updatedData.UOM || '',
-      UOM_MULTIPLE: Number(updatedData.UOM_MULTIPLE || 1),
-      STORE_NAME: updatedData.STORE_NAME || '',
-      ITEM_NAME: updatedData.DESCRIPTION || '',
-      ITEM_CODE: updatedData.ITEM_CODE || '',
-      PO_QUANTITY: Number(updatedData.QUANTITY || 0),
-      GRN_QUANTITY: Number(updatedData.GRN_QTY || 0),
-    };
+    // this.newGrnData.GRNDetails = {
+    //   ID: updatedData.ID,
+    //   COMPANY_ID: updatedData.COMPANY_ID,
+    //   STORE_ID: updatedData.STORE_ID || 0,
+    //   PO_DETAIL_ID: updatedData.PO_DETAIL_ID || 0,
+    //   GRN_ID: 0,
+    //   ITEM_ID: updatedData.ITEM_ID || 0,
+    //   QUANTITY: Number(updatedData.QUANTITY || 0),
+    //   RATE: Number(updatedData.PRICE || 0),
+    //   // LOCAL_AMOUNT: Number(updatedData.LOCAL_AMOUNT || 0),
+    //   AMOUNT: Number(updatedData.AMOUNT || 0),
+    //   INVOICE_QTY: 0,
+    //   DISC_PERCENT: Number(updatedData.DISC_PERCENT || 0),
+    //   COST: Number(updatedData.UNIT_COST || 0),
+    //   SUPP_PRICE: Number(updatedData.SUPP_PRICE || 0),
+    //   SUPP_AMOUNT: Number(updatedData.SUPP_AMOUNT || 0),
+    //   RETURN_QTY: 0,
+    //   UOM_PURCH: updatedData.UOM_PURCH || '',
+    //   UOM: updatedData.UOM || '',
+    //   UOM_MULTIPLE: Number(updatedData.UOM_MULTIPLE || 1),
+    //   STORE_NAME: updatedData.STORE_NAME || '',
+    //   ITEM_NAME: updatedData.DESCRIPTION || '',
+    //   ITEM_CODE: updatedData.ITEM_CODE || '',
+    //   PO_QUANTITY: Number(updatedData.QUANTITY || 0),
+    //   GRN_QUANTITY: Number(updatedData.GRN_QTY || 0),
+    // };
 
     console.log(this.newGrnData.GRNDetails, ' Transformed GRNDetails');
   }
@@ -889,49 +943,96 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   }
 
   preparePayload() {
-    this.newGrnData.GRNDetails = this.poDetails.map((item: any) => ({
-      ID: item.ID || 0,
-      COMPANY_ID: this.selected_Company_id,
-      STORE_ID: this.newGrnData.STORE_ID,
-      PO_DETAIL_ID: item.PO_DETAIL_ID,
-      GRN_ID: this.newGrnData.ID || 0,
-      ITEM_ID: item.ITEM_ID,
-      // QUANTITY: Number(item.PO_QUANTITY),
-      RATE: Number(item.RATE),
-      AMOUNT: Number(item.QUANTITY * item.PRICE),
-      INVOICE_QTY: 0,
-      DISC_PERCENT: Number(item.DISC_PERCENT),
-      // COST: Number(item.COST || 0),
-      COST: Number(
-        item.UNIT_COST ||
-          Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0),
-      ).toFixed(2),
-      SUPP_PRICE: Number(item.QUANTITY * item.SUPP_PRICE),
-      PRICE: Number(item.PRICE),
-      SUPP_AMOUNT: Number(item.SUPP_AMOUNT || 0),
-      RETURN_QTY: 0,
-      UOM_PURCH: item.UOM_PURCH,
-      UOM: item.UOM,
-      UOM_MULTIPLE: Number(item.UOM_MULTIPLE),
-      QTY_BASE_UNIT: item.QTY_BASE_UNIT,
-      STORE_NAME: item.STORE_NAME,
-      ITEM_NAME: item.ITEM_NAME,
-      ITEM_CODE: item.ITEM_CODE,
-      PO_QUANTITY: Number(item.PO_QUANTITY),
-      GRN_QUANTITY: Number(item.QUANTITY || 0),
-      QUANTITY: Number(item.QUANTITY || 0),
-    }));
+    this.newGrnData.GRNDetails = this.poDetails.map((item: any) => {
+      const qty = Number(item.QUANTITY || 0);
+
+      const price = Number(item.PRICE || 0);
+
+      const suppPrice = Number(item.SUPP_PRICE || 0);
+
+      const discPerc = Number(item.DISC_PERCENT || item.DISC_PERC || 0);
+
+      // =====================================
+      // DISCOUNT CALCULATIONS
+      // =====================================
+
+      const grossAmount = qty * price;
+
+      const grossSuppAmount = qty * suppPrice;
+
+      const amount = grossAmount - (grossAmount * discPerc) / 100;
+
+      const suppAmount = grossSuppAmount - (grossSuppAmount * discPerc) / 100;
+
+      // =====================================
+      // UNIT COST
+      // =====================================
+
+      const unitCost = qty > 0 ? Number((suppAmount / qty).toFixed(2)) : 0;
+
+      return {
+        ID: item.ID || 0,
+
+        COMPANY_ID: this.selected_Company_id,
+
+        STORE_ID: this.newGrnData.STORE_ID,
+
+        PO_DETAIL_ID: item.PO_DETAIL_ID,
+
+        GRN_ID: this.newGrnData.ID || 0,
+
+        ITEM_ID: item.ITEM_ID,
+
+        QUANTITY: qty,
+
+        RATE: price,
+
+        AMOUNT: Number(amount.toFixed(2)),
+
+        INVOICE_QTY: 0,
+
+        DISC_PERCENT: discPerc,
+
+        COST: unitCost,
+
+        SUPP_PRICE: suppPrice,
+
+        PRICE: price,
+
+        SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
+
+        RETURN_QTY: 0,
+
+        UOM_PURCH: item.UOM_PURCH,
+
+        UOM: item.UOM,
+
+        UOM_MULTIPLE: Number(item.UOM_MULTIPLE || 1),
+
+        QTY_BASE_UNIT: item.QTY_BASE_UNIT,
+
+        STORE_NAME: item.STORE_NAME,
+
+        ITEM_NAME: item.ITEM_NAME || item.DESCRIPTION,
+
+        ITEM_CODE: item.ITEM_CODE,
+
+        PO_QUANTITY: Number(item.PO_QUANTITY || 0),
+
+        GRN_QUANTITY: qty,
+      };
+    });
 
     // Refresh costs
     this.onCostContentReady(null);
 
-    console.log(this.newGrnData, ' Final GRN Payload');
+    console.log(this.newGrnData, 'Final GRN Payload');
+
     return this.newGrnData;
   }
 
   // Expose this method to verify component
   getNewGrnData = () => {
-    // Check if there are items
     if (!this.poDetails || this.poDetails.length === 0) {
       notify(
         {
@@ -941,10 +1042,10 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         'warning',
         2000,
       );
+
       return null;
     }
 
-    // Validate RECEIVED_QTY
     const invalidRow = this.poDetails.find(
       (item: any) =>
         item.QUANTITY === null ||
@@ -962,26 +1063,40 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         'error',
         2000,
       );
+
       return null;
     }
 
-    const prepared = this.preparePayload(); // all rows from poDetails
+    // ✅ ALWAYS USE LATEST UPDATED DATA
+    this.newGrnData.GRNDetails = this.poDetails.map((item: any) => ({
+      ...item,
 
-    // Merge edits from demoArray into prepared.GRNDetails
-    const mergedDetails = prepared.GRNDetails.map((row: any) => {
-      const editedRow = this.demoArray?.find(
-        (demo: any) => demo.ITEM_ID === row.ITEM_ID,
-      );
-      return editedRow ? { ...row, ...editedRow } : row; // overwrite if edited
-    });
+      QUANTITY: Number(item.QUANTITY || 0),
+
+      RATE: Number(item.RATE || item.PRICE || 0),
+
+      PRICE: Number(item.PRICE || 0),
+
+      AMOUNT: Number(item.AMOUNT || 0),
+
+      SUPP_PRICE: Number(item.SUPP_PRICE || 0),
+
+      SUPP_AMOUNT: Number(item.SUPP_AMOUNT || 0),
+
+      DISC_PERCENT: Number(item.DISC_PERCENT || 0),
+
+      COST: Number(item.COST || 0),
+    }));
+
+    console.log(this.newGrnData.GRNDetails, 'FINAL VERIFY GRNDETAILS');
 
     return {
-      ...prepared,
-      GRNDetails: mergedDetails, //  full list with edits merged
-      // GRN_DATE: new Date(), //  override with current date
+      ...this.newGrnData,
+      GRNDetails: this.newGrnData.GRNDetails,
       GRN_DATE: this.newGrnData.GRN_DATE,
     };
   };
+
   onEditorPreparing(e: any) {
     if (e.dataField === 'QUANTITY') {
       e.editorOptions = e.editorOptions || {};
@@ -1064,6 +1179,28 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       });
 
       console.log(this.newGrnData.GRN_Item_Cost, 'Updated GRN_Item_Cost Data');
+
+      this.newGrnData.GRNDetails = this.poDetails.map((item: any) => ({
+        ...item,
+
+        QUANTITY: Number(item.QUANTITY || 0),
+
+        RATE: Number(item.RATE || item.PRICE || 0),
+
+        PRICE: Number(item.PRICE || 0),
+
+        AMOUNT: Number(item.AMOUNT || 0),
+
+        SUPP_PRICE: Number(item.SUPP_PRICE || 0),
+
+        SUPP_AMOUNT: Number(item.SUPP_AMOUNT || 0),
+
+        DISC_PERCENT: Number(item.DISC_PERCENT || 0),
+
+        COST: Number(item.COST || 0),
+      }));
+
+      console.log(this.newGrnData.GRNDetails, 'UPDATED FINAL GRNDETAILS');
     } else {
       console.warn('Data sources are not available.');
     }
@@ -1105,7 +1242,13 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
       this.cwidth = '100';
 
-      this.newGrnData = { ...this.formdata };
+      this.newGrnData = {
+        ...this.formdata,
+
+        GRNDetails: this.poDetails?.length
+          ? [...this.poDetails]
+          : [...(this.formdata.GRNDetails || [])],
+      };
 
       if (this.newGrnData.STORE_ID) {
         this.service
@@ -1128,7 +1271,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       this.newGrnData.GRNDetails = this.formdata.GRNDetails;
 
       this.newGrnData.GRN_Item_Cost = this.formdata.GRN_Item_Cost;
-
+      this.PONO = this.formdata.PO_NO;
       this.newGrnData.GRN_Cost = this.formdata.GRN_Cost;
       this.selectedPONo = this.newGrnData.PO_NO;
 
@@ -1177,17 +1320,18 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
         QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
         DESCRIPTION: item.ITEM_NAME,
+        DISC_PERCENT: Number(item.DISC_PERCENT),
         UNIT_COST:
           Number(item.QUANTITY || 0) > 0
             ? (
-                Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0)
+                Number(item.SUPP_AMOUNT || 0) / Number(item.QUANTITY || 0)
               ).toFixed(2)
             : '0.00',
 
         COST:
           Number(item.QUANTITY || 0) > 0
             ? (
-                Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0)
+                Number(item.SUPP_AMOUNT || 0) / Number(item.QUANTITY || 0)
               ).toFixed(2)
             : '0.00',
       }));
@@ -1238,9 +1382,6 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       }));
 
       console.log(this.newGrnData.GRNDetails, 'cccccccccc');
-
-      const data = this.getNewGrnData();
-      console.log('******************', data);
 
       // Step 1: Get unique DESCRIPTION values
       const uniqueDescriptions = Array.from(

@@ -562,369 +562,329 @@ export class GrnNewFormComponent implements OnInit {
 
   updateCell(event: any) {
     const updatedRow = { ...event.oldData, ...event.data };
-    // const updatedRow = event.key; // Get the updated row
-    const updatedData = event.data; // Get the updated data
-    console.log(updatedData, 'updateddata');
-    console.log(updatedRow, 'full updatedRow');
 
-    // const demmoArray=push.updateData
+    const updatedData = event.data;
 
-    // Ensure demoArray is initialized
+    console.log(updatedRow, 'updatedRow');
+
     if (!Array.isArray(this.demoArray)) {
       this.demoArray = [];
     }
 
-    // Optionally match on ITEM_ID or PO_DETAIL_ID (adjust based on your key fields)
-    const index = this.demoArray.findIndex(
-      (item) =>
-        item.ITEM_ID === updatedData.ITEM_ID &&
-        item.PO_DETAIL_ID === updatedData.PO_DETAIL_ID,
+    // =====================================
+    // BASIC VALUES
+    // =====================================
+
+    const qty = Number(updatedRow.RECEIVED_QTY || 0);
+
+    const localPrice = Number(updatedRow.PRICE || 0);
+
+    const suppPrice = Number(updatedRow.SUPP_PRICE || 0);
+
+    const discPerc = Number(
+      updatedRow.DISC_PERCENT || updatedRow.DISC_PERC || 0,
     );
-    // const amount =
-    //   Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.PRICE || 0);
-    const localAmount =
-      Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.PRICE || 0);
 
-    const suppAmount =
-      Number(updatedRow.RECEIVED_QTY || 0) * Number(updatedRow.SUPP_PRICE || 0);
+    // =====================================
+    // VALIDATION
+    // =====================================
+
+    const qtyToReceive = Number(updatedRow.QTY_TO_RECEIVE || 0);
+
+    if (qty > qtyToReceive) {
+      notify(
+        {
+          message: "Qty received can't be higher than qty pending",
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        2000,
+      );
+
+      updatedData.RECEIVED_QTY = 0;
+
+      return;
+    }
+
+    // =====================================
+    // AMOUNT CALCULATIONS
+    // =====================================
+
+    const grossLocalAmount = qty * localPrice;
+
+    const grossSuppAmount = qty * suppPrice;
+
+    const localDiscount = (grossLocalAmount * discPerc) / 100;
+
+    const suppDiscount = (grossSuppAmount * discPerc) / 100;
+
+    const localAmount = grossLocalAmount - localDiscount;
+
+    const suppAmount = grossSuppAmount - suppDiscount;
+
+    // =====================================
+    // UNIT COST
+    // =====================================
+
+    const unitCost = qty > 0 ? Number((suppAmount / qty).toFixed(2)) : 0;
+
+    // =====================================
+    // UPDATE ROW VALUES
+    // =====================================
+
+    updatedRow.AMOUNT = Number(localAmount.toFixed(2));
+
+    updatedRow.SUPP_AMOUNT = Number(suppAmount.toFixed(2));
+
+    updatedRow.UNIT_COST = unitCost;
+
+    updatedRow.COST = unitCost;
+
+    // =====================================
+    // BASE UNIT
+    // =====================================
+
+    const uomMultiple = Number(updatedRow.UOM_MULTIPLE || 1);
+
+    const baseUnitValue = qty / uomMultiple;
+
+    updatedRow.QTY_BASE_UNIT = `${baseUnitValue} ${updatedRow.UOM}`;
+
+    // =====================================
+    // DEMO ARRAY
+    // =====================================
+
     const enrichedData = {
-      ...updatedData,
+      ...updatedRow,
 
-      ITEM_ID: updatedRow.ITEM_ID,
-      PO_DETAIL_ID: updatedRow.PO_DETAIL_ID,
+      QUANTITY: qty,
 
-      QUANTITY: Number(updatedRow.RECEIVED_QTY),
+      RATE: localPrice,
 
-      RATE: Number(updatedRow.PRICE || 0), // ADD THIS
+      DISC_PERCENT: discPerc,
+
       AMOUNT: Number(localAmount.toFixed(2)),
 
-      SUPP_PRICE: Number(updatedRow.SUPP_PRICE || 0),
+      SUPP_PRICE: suppPrice,
+
       SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
 
-      UOM_PURCH: updatedRow.UOM_PURCH,
-      UOM: updatedRow.UOM,
-      UOM_MULTIPLE: updatedRow.UOM_MULTIPLE,
+      COST: unitCost,
 
       ITEM_NAME: updatedRow.DESCRIPTION || '',
+
       STORE_NAME: updatedRow.STORE_NAME || '',
     };
 
-    console.log(enrichedData, 'enrichedData');
+    const demoIndex = this.demoArray.findIndex(
+      (item) =>
+        item.ITEM_ID === updatedRow.ITEM_ID &&
+        item.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID,
+    );
 
-    // const enrichedData = {
-    //   ...updatedRow, // full row data
-    //   ITEM_NAME: updatedRow.DESCRIPTION ?? '',
-    //   STORE_NAME: updatedRow.STORE_NAME ?? '',
-    //   AMOUNT:
-    //     (Number(updatedRow.RECEIVED_QTY) || 0) *
-    //     (Number(updatedRow.PRICE) || 0),
-    //   SUPP_AMOUNT:
-    //     (Number(updatedRow.RECEIVED_QTY) || 0) *
-    //     (Number(updatedRow.SUPP_PRICE) || 0),
-    // };
-
-    console.log(enrichedData, 'enrichedData ');
-    if (index > -1) {
-      // Update existing entry
-      this.demoArray[index] = { ...this.demoArray[index], ...enrichedData };
+    if (demoIndex > -1) {
+      this.demoArray[demoIndex] = {
+        ...this.demoArray[demoIndex],
+        ...enrichedData,
+      };
     } else {
-      // Push new entry
-      this.demoArray.push({ ...enrichedData });
+      this.demoArray.push(enrichedData);
     }
 
-    console.log(this.demoArray, ' demoArray (stored updated rows)');
-    // this.GRNDetails
+    console.log(this.demoArray, 'demoArray');
 
-    if ('RECEIVED_QTY' in updatedData) {
-      const receivedQty = Number(updatedData.RECEIVED_QTY);
-      console.log(receivedQty, 'receivedQty');
-      const uomMultiple = Number(updatedRow.UOM_MULTIPLE);
-      const price = Number(updatedRow.SUPP_PRICE);
-      console.log(price, 'price');
-      const localprice = Number(updatedRow.PRICE);
-      const qtyToReceive = Number(updatedRow.QTY_TO_RECEIVE);
+    // =====================================
+    // UPDATE PO DETAILS
+    // =====================================
 
-      if (receivedQty > qtyToReceive) {
-        // Show a notification if the condition is met
+    const poIndex = this.poDetails.findIndex(
+      (r: any) =>
+        r.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID &&
+        r.ITEM_ID === updatedRow.ITEM_ID,
+    );
 
-        notify(
-          {
-            message: "Qty received can't be higher than qty pending",
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-          2000,
-        );
+    if (poIndex > -1) {
+      this.poDetails[poIndex] = {
+        ...this.poDetails[poIndex],
+        ...updatedRow,
+      };
+    }
 
-        // Optionally reset the RECEIVED_QTY field or prevent further processing
-        updatedData.RECEIVED_QTY = 0; // Reset to QTY_TO_RECEIVE value
+    this.poDetails = [...this.poDetails];
 
-        return; // Exit the function to prevent further processing
+    // =====================================
+    // TOTALS
+    // =====================================
+
+    this.totalQuantity = this.poDetails.reduce(
+      (sum: number, item: any) => sum + Number(item.RECEIVED_QTY || 0),
+      0,
+    );
+
+    this.newGrnData.NET_AMOUNT = this.poDetails
+      .reduce((sum: number, item: any) => sum + Number(item.AMOUNT || 0), 0)
+      .toFixed(2);
+
+    this.LocalNetAmount = this.newGrnData.NET_AMOUNT;
+
+    this.newGrnData.SUPP_NET_AMOUNT = this.poDetails
+      .reduce(
+        (sum: number, item: any) => sum + Number(item.SUPP_AMOUNT || 0),
+        0,
+      )
+      .toFixed(2);
+
+    this.formattedLocalNetAmount = `${this.newGrnData.NET_AMOUNT}`;
+
+    this.formattedNetAmount = `${this.newGrnData.SUPP_NET_AMOUNT}`;
+
+    // =====================================
+    // COSTING GRID
+    // =====================================
+
+    this.costingMethodDataGrid = this.costingMethodDataGrid.map((row: any) => {
+      if (row.CURRENCY.includes('%')) {
+        row.TOTAL = (
+          (Number(this.LocalNetAmount || 0) * Number(row.RATE || 0)) /
+          100
+        ).toFixed(2);
       }
 
-      const baseUnitValue = receivedQty / uomMultiple; // Convert to base unit
-      console.log(baseUnitValue, 'baseUnitValue');
-      // Format the QTY_BASE_UNIT as "<calculated value> <UOM>"
-      updatedRow.QTY_BASE_UNIT = `${baseUnitValue} ${updatedRow.UOM}`;
-      console.log(updatedRow.QTY_BASE_UNIT, 'updatedRow.QTY_BASE_UNIT');
-      // Calculate the amount
-      updatedRow.SUPP_AMOUNT = (receivedQty * price).toFixed(2); // Format to 2 decimal places
-      console.log(updatedRow.SUPP_AMOUNT, 'updatedRow.SUPP_AMOUNT');
+      return row;
+    });
 
-      updatedRow.AMOUNT = (receivedQty * localprice).toFixed(2); // Format to 2 decimal places
-      const suppAmount =
-        Number(updatedRow.SUPP_PRICE || 0) * Number(receivedQty || 0);
+    // =====================================
+    // UPDATE ITEM COSTS
+    // =====================================
 
-      const discountAmount =
-        (suppAmount * Number(updatedRow.DISC_PERCENT || 0)) / 100;
-
-      const netAmount = suppAmount - discountAmount;
-
-      updatedRow.UNIT_COST = (netAmount / Number(receivedQty || 0)).toFixed(2);
-
-      updatedRow.COST = updatedRow.UNIT_COST;
-      // Find and replace in poDetails
-      const idx = this.poDetails.findIndex(
-        (r: any) =>
-          r.PO_DETAIL_ID === updatedRow.PO_DETAIL_ID &&
-          r.ITEM_ID === updatedRow.ITEM_ID,
-      );
-
-      if (idx > -1) {
-        this.poDetails[idx] = { ...this.poDetails[idx], ...updatedRow };
-        this.poDetails = [...this.poDetails]; // force Angular to detect change
-      }
-
-      console.log(this.poDetails[idx], ' Updated row now bound to grid');
-
-      this.totalQuantity = this.poDetails.reduce((sum: any, item: any) => {
-        return sum + Number(item.RECEIVED_QTY || 0);
-      }, 0);
-      console.log(this.poDetails, 'poDetails');
-
-      this.newGrnData.NET_AMOUNT = this.poDetails
-        .reduce((sum: any, item: any) => {
-          return sum + Number(item.AMOUNT || 0);
-        }, 0)
-        .toFixed(2); // Ensure the total is also formatted with 2 decimal places
-      console.log(this.newGrnData.NET_AMOUNT, 'net amount');
-      this.LocalNetAmount = this.poDetails
-        .reduce((sum: any, item: any) => {
-          return sum + Number(item.AMOUNT || 0);
-        }, 0)
-        .toFixed(2); // Ensure the total is also formatted with 2 decimal places
-
-      this.newGrnData.SUPP_NET_AMOUNT = this.poDetails
-        .reduce((sum: any, item: any) => {
-          return sum + Number(item.SUPP_AMOUNT || 0);
-        }, 0)
-        .toFixed(2); // Ensure the total is also formatted with 2 decimal places
-
-      this.formattedLocalNetAmount = `${this.newGrnData.NET_AMOUNT}`;
-
-      this.formattedNetAmount = `${this.newGrnData.SUPP_NET_AMOUNT}`;
-
-      // Update costingMethodDataGrid for rows with CURRENCY as 'USD %'
-      this.costingMethodDataGrid = this.costingMethodDataGrid.map(
-        (row: any) => {
-          if (row.CURRENCY.includes('%')) {
-            row.TOTAL = ((this.LocalNetAmount * row.RATE) / 100).toFixed(2);
-          }
-          return row;
-        },
-      );
-
-      let totalCost = Number(updatedRow.AMOUNT);
-
-      // Reflect costingMethodDataGrid's Description data
-      this.poDetails = this.poDetails.map((item: any) => {
-        let sumCost = 0; // Initialize sumCost for the current row
-
-        this.costingMethodDataGrid.forEach((costItem: any) => {
-          const proportionalValue =
-            (Number(item.AMOUNT) / Number(this.LocalNetAmount)) *
-            Number(costItem.TOTAL);
-
-          // Add the proportional value to the item's respective field
-          item[costItem.DESCRIPTION.toUpperCase()] =
-            proportionalValue.toFixed(2);
-
-          // Accumulate the proportional value in sumCost
-          sumCost += proportionalValue;
-
-          console.log(sumCost, '%%%%');
-        });
-
-        // Add the total cost (sumCost + AMOUNT) to the item
-        const totalCost = (Number(item.AMOUNT) + sumCost).toFixed(2);
-        console.log(totalCost, 'totalCost');
-        // Ensure RECEIVED_QTY is greater than zero to avoid division by zero
-        if (Number(item.RECEIVED_QTY) > 0) {
-          const suppAmount =
-            Number(item.SUPP_PRICE || 0) * Number(item.RECEIVED_QTY || 0);
-
-          const discountAmount =
-            (suppAmount * Number(item.DISC_PERCENT || 0)) / 100;
-
-          const netAmount = suppAmount - discountAmount;
-
-          item.UNIT_COST = (netAmount / Number(item.RECEIVED_QTY || 0)).toFixed(
-            2,
-          );
-
-          item.COST = item.UNIT_COST;
-        } else {
-          item.UNIT_COST = '0.00';
-          item.COST = '0.00';
-        }
-
-        return item;
-      });
-
-      console.log(this.poDetails, 'Updated poDetails with costing data');
-
-      // Add the updated row to the array of updated items
-      const existingIndex = this.updatedItems.findIndex(
-        (item) => item.SL_NO === updatedRow.SL_NO,
-      );
-
-      if (existingIndex > -1) {
-        // Update the existing row in the array
-        this.updatedItems[existingIndex] = { ...updatedRow };
-      } else {
-        // Add the new row to the array
-        this.updatedItems.push({ ...updatedRow });
-      }
-
-      console.log(this.updatedItems, 'All Updated Rows');
-
-      const bindedData = this.updatedItems.map((item) => {
-        const amount = Number(item.PRICE) * Number(item.RECEIVED_QTY);
-        const localAmount =
-          Number(item.PRICE || 0) * Number(item.RECEIVED_QTY || 0);
-        const suppAmount =
-          Number(item.SUPP_PRICE || 0) * Number(item.RECEIVED_QTY || 0);
-        return {
-          COMPANY_ID: this.selected_Company_id,
-          STORE_ID: this.newGrnData.STORE_ID,
-          PO_DETAIL_ID: item.PO_DETAIL_ID,
-          ITEM_ID: item.ITEM_ID,
-          QUANTITY: Number(item.RECEIVED_QTY),
-
-          RATE: Number(amount.toFixed(2)), //  RATE = AMOUNT
-          AMOUNT: Number(localAmount.toFixed(2)),
-
-          DISC_PERCENT: Number(item.DISC_PERCENT || 0),
-
-          SUPP_PRICE: Number(item.SUPP_PRICE),
-          SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
-
-          UOM_PURCH: item.UOM_PURCH,
-          UOM: item.UOM,
-          COST: Number(item.UNIT_COST || 0),
-        };
-      });
-
-      console.log(bindedData, 'binded data');
-
-      // Ensure GRNDetail is initialized as an array if not already
-      // if (!Array.isArray(this.newGrnData.GRNDetails)) {
-      //   this.newGrnData.GRNDetails = [];
-      // }
-
-      // Add only unique items to GRNDetail
-      bindedData.forEach((item) => {
-        const isDuplicate = this.newGrnData.GRNDetails.some(
-          (existingItem: any) =>
-            existingItem.PO_DETAIL_ID === item.PO_DETAIL_ID &&
-            existingItem.ITEM_ID === item.ITEM_ID,
-        );
-
-        if (!isDuplicate) {
-          this.newGrnData.GRNDetails.push(item);
-        }
-      });
-
-      //     // Check if the item already exists in PoDetails
-      //   const detailItemIndex = this.grnData.GRNDetails.findIndex(
-      //     (detailItem: any) => detailItem.ITEM_ID === bindedData.ITEM_ID
-      // );
-
-      // if (detailItemIndex !== -1) {
-      //     // If item already exists in PoDetails, update it
-      //     this.poData.PoDetails[detailItemIndex] = { ...detailItem };
-      // } else {
-      //     // If item does not exist, add it to PoDetails
-      //     this.poData.PoDetails.push({ ...detailItem });
-      // }
-
-      // Add GRN_Item_Cost
-      if (!Array.isArray(this.newGrnData.GRN_Item_Cost)) {
-        this.newGrnData.GRN_Item_Cost = [];
-      }
+    this.poDetails = this.poDetails.map((item: any) => {
+      let sumCost = 0;
 
       this.costingMethodDataGrid.forEach((costItem: any) => {
-        console.log(costItem, 'costitem');
-        // Calculate the proportional value for the cost item
         const proportionalValue =
-          (Number(updatedRow.AMOUNT) / Number(this.LocalNetAmount)) *
-          Number(costItem.TOTAL);
+          (Number(item.AMOUNT || 0) / Number(this.LocalNetAmount || 1)) *
+          Number(costItem.TOTAL || 0);
 
-        // Create the cost data object
-        const costData = {
-          STORE_ID: this.newGrnData.STORE_ID,
-          COST_ID: costItem.ID, // Use the DESCRIPTION field for COST_ID
-          ITEM_ID: updatedRow.ITEM_ID,
-          SUPP_AMOUNT: proportionalValue.toFixed(2), // Use the calculated proportional value for AMOUNT
-        };
+        item[costItem.DESCRIPTION.toUpperCase()] = proportionalValue.toFixed(2);
 
-        // Check for duplicates before adding to GRN_Item_Cost
-        const isDuplicate = this.newGrnData.GRN_Item_Cost.some(
-          (existingCost: any) =>
-            existingCost.STORE_ID === costData.STORE_ID &&
-            existingCost.COST_ID === costData.COST_ID &&
-            existingCost.ITEM_ID === costData.ITEM_ID,
-        );
-
-        if (!isDuplicate) {
-          this.newGrnData.GRN_Item_Cost.push(costData);
-        }
+        sumCost += proportionalValue;
       });
 
-      console.log(
-        this.newGrnData.GRN_Item_Cost,
-        'Updated GRN_Item_Cost with Proportional Values',
-      );
+      item.TOTAL_COST = (Number(item.AMOUNT || 0) + sumCost).toFixed(2);
+
+      const qty = Number(item.RECEIVED_QTY || 0);
+
+      const suppAmount = Number(item.SUPP_AMOUNT || 0);
+
+      item.UNIT_COST = qty > 0 ? (suppAmount / qty).toFixed(2) : '0.00';
+
+      item.COST = item.UNIT_COST;
+
+      return item;
+    });
+
+    // =====================================
+    // UPDATED ITEMS
+    // =====================================
+
+    const updatedIndex = this.updatedItems.findIndex(
+      (item) => item.SL_NO === updatedRow.SL_NO,
+    );
+
+    if (updatedIndex > -1) {
+      this.updatedItems[updatedIndex] = {
+        ...updatedRow,
+      };
+    } else {
+      this.updatedItems.push({
+        ...updatedRow,
+      });
     }
 
-    this.newGrnData.GRNDetails = {
-      ID: updatedData.ID,
-      COMPANY_ID: updatedData.COMPANY_ID,
-      STORE_ID: updatedData.STORE_ID || 0,
-      PO_DETAIL_ID: updatedData.PO_DETAIL_ID || 0,
-      GRN_ID: 0,
-      ITEM_ID: updatedData.ITEM_ID || 0,
-      QUANTITY: Number(updatedData.RECEIVED_QTY || 0),
-      RATE: Number(updatedData.PRICE || 0),
-      // LOCAL_AMOUNT: Number(updatedData.LOCAL_AMOUNT || 0),
-      AMOUNT: Number(updatedData.AMOUNT || 0),
-      INVOICE_QTY: 0,
-      DISC_PERCENT: Number(updatedData.DISC_PERCENT || 0),
-      COST: Number(updatedData.UNIT_COST || 0),
-      SUPP_PRICE: Number(updatedData.SUPP_PRICE || 0),
-      SUPP_AMOUNT: Number(updatedData.SUPP_AMOUNT || 0),
-      RETURN_QTY: 0,
-      UOM_PURCH: updatedData.UOM_PURCH || '',
-      UOM: updatedData.UOM || '',
-      UOM_MULTIPLE: Number(updatedData.UOM_MULTIPLE || 1),
-      STORE_NAME: updatedData.STORE_NAME || '',
-      ITEM_NAME: updatedData.DESCRIPTION || '',
-      ITEM_CODE: updatedData.ITEM_CODE || '',
-      PO_QUANTITY: Number(updatedData.QUANTITY || 0),
-      GRN_QUANTITY: Number(updatedData.GRN_QTY || 0),
-    };
+    // =====================================
+    // BINDED DATA
+    // =====================================
 
-    console.log(this.newGrnData.GRNDetails, ' Transformed GRNDetails');
+    const bindedData = this.updatedItems.map((item) => {
+      const qty = Number(item.RECEIVED_QTY || 0);
+
+      const localPrice = Number(item.PRICE || 0);
+
+      const suppPrice = Number(item.SUPP_PRICE || 0);
+
+      const discPerc = Number(item.DISC_PERCENT || item.DISC_PERC || 0);
+
+      const grossLocalAmount = qty * localPrice;
+
+      const grossSuppAmount = qty * suppPrice;
+
+      const localAmount =
+        grossLocalAmount - (grossLocalAmount * discPerc) / 100;
+
+      const suppAmount = grossSuppAmount - (grossSuppAmount * discPerc) / 100;
+
+      return {
+        COMPANY_ID: this.selected_Company_id,
+
+        STORE_ID: this.newGrnData.STORE_ID,
+
+        PO_DETAIL_ID: item.PO_DETAIL_ID,
+
+        ITEM_ID: item.ITEM_ID,
+
+        QUANTITY: qty,
+
+        RATE: localPrice,
+
+        AMOUNT: Number(localAmount.toFixed(2)),
+
+        DISC_PERCENT: discPerc,
+
+        SUPP_PRICE: suppPrice,
+
+        SUPP_AMOUNT: Number(suppAmount.toFixed(2)),
+
+        UOM_PURCH: item.UOM_PURCH,
+
+        UOM: item.UOM,
+
+        COST: qty > 0 ? Number((suppAmount / qty).toFixed(2)) : 0,
+      };
+    });
+
+    // =====================================
+    // GRN DETAILS
+    // =====================================
+
+    this.newGrnData.GRNDetails = [...bindedData];
+
+    // =====================================
+    // GRN ITEM COST
+    // =====================================
+
+    this.newGrnData.GRN_Item_Cost = [];
+
+    this.poDetails.forEach((item: any) => {
+      this.costingMethodDataGrid.forEach((costItem: any) => {
+        const proportionalValue =
+          (Number(item.AMOUNT || 0) / Number(this.LocalNetAmount || 1)) *
+          Number(costItem.TOTAL || 0);
+
+        this.newGrnData.GRN_Item_Cost.push({
+          STORE_ID: this.newGrnData.STORE_ID,
+
+          COST_ID: costItem.ID,
+
+          ITEM_ID: item.ITEM_ID,
+
+          SUPP_AMOUNT: proportionalValue.toFixed(2),
+        });
+      });
+    });
+
+    console.log(this.newGrnData.GRN_Item_Cost, 'GRN_Item_Cost');
+
+    this.ref.detectChanges();
   }
 
   // onGrnContentReady(e: any) {
@@ -1408,15 +1368,31 @@ export class GrnNewFormComponent implements OnInit {
   }
 
   getSuppAmountValue = (rowData: any) => {
-    return (
-      Number(rowData.RECEIVED_QTY || 0) * Number(rowData.SUPP_PRICE || 0)
-    ).toFixed(2);
+    const qty = Number(rowData.RECEIVED_QTY || 0);
+
+    const suppPrice = Number(rowData.SUPP_PRICE || 0);
+
+    const discPerc = Number(rowData.DISC_PERCENT || rowData.DISC_PERC || 0);
+
+    const grossAmount = qty * suppPrice;
+
+    const discount = (grossAmount * discPerc) / 100;
+
+    return (grossAmount - discount).toFixed(2);
   };
 
   getAmountValue = (rowData: any) => {
-    return (
-      Number(rowData.RECEIVED_QTY || 0) * Number(rowData.PRICE || 0)
-    ).toFixed(2);
+    const qty = Number(rowData.RECEIVED_QTY || 0);
+
+    const price = Number(rowData.PRICE || 0);
+
+    const discPerc = Number(rowData.DISC_PERCENT || rowData.DISC_PERC || 0);
+
+    const grossAmount = qty * price;
+
+    const discount = (grossAmount * discPerc) / 100;
+
+    return (grossAmount - discount).toFixed(2);
   };
 }
 @NgModule({

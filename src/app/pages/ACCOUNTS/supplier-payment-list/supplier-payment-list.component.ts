@@ -46,6 +46,7 @@ import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-supplier-payment-list',
@@ -604,15 +605,65 @@ export class SupplierPaymentListComponent {
       });
   }
 
+  // onDeletePayment(event: any) {
+  //   if (event.data.TRANS_STATUS === 5) {
+  //     event.cancel = true;
+  //     notify('Customer Receipt cannot be deleted.', 'error', 2000);
+  //     return;
+  //   }
+  //   const receiptId = event.data.TRANS_ID;
+  //   event.cancel = true;
+  //   // Call your delete API
+  //   this.dataService.deleteSupplierPayment(receiptId).subscribe(
+  //     (response: any) => {
+  //       if (response) {
+  //         notify(
+  //           {
+  //             message: 'Receipt Deleted Successfully',
+  //             position: { at: 'top center', my: 'top center' },
+  //           },
+  //           'success',
+  //         );
+  //         this.getSupplierPayments();
+  //         // this.dataGrid.instance.refresh();
+  //       } else {
+  //         notify(
+  //           {
+  //             message: 'Your Data Not deleted',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'error',
+  //         );
+  //       }
+  //       // or whatever method you use to refresh `employeeList`
+  //     },
+  //     (error) => {
+  //       console.error('Error deleting employee:', error);
+  //     },
+  //   );
+  // }
+
   onDeletePayment(event: any) {
-    if (event.data.TRANS_STATUS === 5) {
-      event.cancel = true;
-      notify('Customer Receipt cannot be deleted.', 'error', 2000);
-      return;
-    }
-    const receiptId = event.data.TRANS_ID;
+  if (event.data.TRANS_STATUS === 5) {
     event.cancel = true;
-    // Call your delete API
+    notify('Customer Receipt cannot be deleted.', 'error', 2000);
+    return;
+  }
+
+  event.cancel = true; // prevent default delete immediately
+
+  const receiptId = event.data.TRANS_ID;
+
+  const result = confirm(
+    'Are you sure you want to delete this Supplier payment?',
+    'Confirm Delete'
+  );
+
+  result.then((dialogResult: boolean) => {
+    if (!dialogResult) {
+      return; // user clicked No
+    }
+
     this.dataService.deleteSupplierPayment(receiptId).subscribe(
       (response: any) => {
         if (response) {
@@ -623,24 +674,32 @@ export class SupplierPaymentListComponent {
             },
             'success',
           );
+
           this.getSupplierPayments();
-          // this.dataGrid.instance.refresh();
         } else {
           notify(
             {
-              message: 'Your Data Not deleted',
+              message: 'Data not deleted',
               position: { at: 'top right', my: 'top right' },
             },
             'error',
           );
         }
-        // or whatever method you use to refresh `employeeList`
       },
       (error) => {
-        console.error('Error deleting employee:', error);
+        console.error('Delete error:', error);
+
+        notify(
+          {
+            message: 'Delete failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
       },
     );
-  }
+  });
+}
 
   addSupplierPayment() {
     this.addSupllierPayment = true;

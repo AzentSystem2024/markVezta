@@ -273,7 +273,7 @@
   [(visible)]="isAddInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
-  title="New Invoice"
+  title="New Purchase Invoice"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
@@ -288,9 +288,15 @@
   [(visible)]="isEditInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
-  title="Purchase Invoice"
+  [title]="buttonText"
   (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
   <ng-container *ngIf="isEditInvoice">
     <app-edit-purchase-invoice
       [invoiceFormData]="selectedInvoice"
@@ -307,9 +313,15 @@
   [(visible)]="isVerifyInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
-  title="Purchase Invoice"
+  [title]="buttonText"
   (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
   <ng-container *ngIf="isVerifyInvoice">
     <app-edit-purchase-invoice
       [isVerifyInvoice]="true"
@@ -331,4 +343,3 @@
   (applyDates)="onCustomDateApplied($event)"
 >
 </app-custom-date-popup>
-

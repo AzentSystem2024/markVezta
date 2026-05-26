@@ -488,7 +488,7 @@ export class GrnComponent implements OnInit {
     });
   }
 
-  verifyGrnData() {
+  async verifyGrnData() {
     confirm(
       this.isApproved
         ? 'Are you sure you want to approve this GRN?'

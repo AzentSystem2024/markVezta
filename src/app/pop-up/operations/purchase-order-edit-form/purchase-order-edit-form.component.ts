@@ -181,7 +181,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     SUPP_GROSS_AMOUNT: '',
     SUPP_NET_AMOUNT: '',
     EXCHANGE_RATE: '',
-    ISSUED_EMP_ID: '',
+    ISSUED_EMP_ID: null,
     USER_ID: 0,
     PoDetails: [],
   };
@@ -423,8 +423,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       QUANTITY: item.qtyOrdered,
       PRICE: item.PURCH_PRICE || 0,
       RATE: item.PURCH_PRICE || 0,
-      // AMOUNT: item.Amount,
-      AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+      AMOUNT: item.taxable,
+      // AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       DISC_PERCENT: item.discountPercentage || 0,
       TAX_PERC: item.VAT_PERC,
       VAT_PERC: item.VAT_PERC,
@@ -443,8 +443,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
       UOM: item.UOM,
 
       SUPP_PRICE: item.SUPP_PRICE,
-      // SUPP_AMOUNT: item.taxable_Supplier,
-      SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+      SUPP_AMOUNT: item.taxable_Supplier,
+      // SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
     }));
   }
 
@@ -972,8 +972,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         ITEM_ID: item.ITEM_ID,
         QUANTITY: qtyOrdered,
         // PRICE: item.SUPP_PRICE || 0,
-        // AMOUNT: item.Amount,
-        AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+        AMOUNT: item.taxable,
+        // AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
         DISC_PERCENT: updatedRow.discountPercentage,
         // VAT_PERC : updatedRow.VAT_PERC,
         TAX_PERC: updatedRow.VAT_PERC || 0, // IGST only
@@ -985,8 +985,8 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
         ITEM_DESC: item.DESCRIPTION,
         UOM: item.UOM,
         SUPP_PRICE: item.SUPP_PRICE,
-        // SUPP_AMOUNT: item.SUPP_AMOUNT,
-        SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
+        SUPP_AMOUNT: item.taxable_Supplier,
+        // SUPP_AMOUNT: Number(this.newPoData.GROSS_AMOUNT || 0),
       };
 
       // Check if the item already exists in PoDetails
@@ -1065,7 +1065,12 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     return symbol ? `${symbol} ${price}` : price;
   };
   formatTotalAmount = (data: any) => {
-    return `${this.CurrencySymbol} ${data.value}`;
+    const formattedValue = Number(data.value || 0).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    return `${this.CurrencySymbol} ${formattedValue}`;
   };
 
   GetStoresList() {

@@ -708,7 +708,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       console.log(this.newPoData.CURRENCY_SYMBOL, 'CURRENCYSYMBOLLLLLLLLLL');
       this.newPoData.PoDetails = this.formdata.PoDetails || [];
       this.SupplierCurrencySymbol =
-        this.newPoData.CURRENCY || this.newPoData.CURRENCY_NAME || '';
+        this.newPoData.CURRENCY || this.newPoData.CURRENCY_SYMBOL || '';
       this.extractSupplierCountryCode();
       this.extractShippingCountryCode();
 
@@ -732,10 +732,13 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.savedItems = this.newPoData.PoDetails.map((item, index) => {
         // const taxable = Number(item.SUPP_AMOUNT || 0); // 🔥 Use SUPP_AMOUNT directly
         const suppAmount = Number(item.SUPP_AMOUNT || 0);
+        const baseAmount = item.QUANTITY * item.SUPP_PRICE; //====10*20=== 200
+        const discountAmount = (baseAmount * (item.DISC_PERCENT || 0)) / 100; //=== 200*20/100=40
 
         const discountPercentage = Number(item.DISC_PERCENT || 0);
+        const taxable = baseAmount - discountAmount;
 
-        const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
+        // const taxable = suppAmount - (suppAmount * discountPercentage) / 100;
         const vatPerc = Number(item.VAT_PERC || 0);
 
         const vatAmount = Number(item.TAX_AMOUNT || 0);
@@ -760,7 +763,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
           VAT_PERC: vatPerc,
 
           vatAmount: vatAmount,
-
+          SUPP_AMOUNT: item.SUPP_AMOUNT,
           total: Number(item.TOTAL_AMOUNT || 0),
           HSN_CODE: item.HSN_CODE,
         };
@@ -789,14 +792,28 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     return symbol ? `${symbol} ${price}` : price;
   };
 
+  // formatTotalAmount = (data: any) => {
+  //   const symbol = this.newPoData?.CURRENCY_SYMBOL || '';
+
+  //   console.log('Currency Symbol:', symbol);
+
+  //   console.log('Total Value:', data.value);
+
+  //   const formattedValue = Number(data.value || 0).toLocaleString('en-IN', {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   });
+
+  //   return symbol ? `${symbol} ${formattedValue}` : formattedValue;
+  // };
+
   formatTotalAmount = (data: any) => {
-    const symbol = this.newPoData?.CURRENCY_SYMBOL || '';
+    const symbol = this.SupplierCurrencySymbol || '';
 
-    console.log('Currency Symbol:', symbol);
-
-    console.log('Total Value:', data.value);
-
-    const formattedValue = Number(data.value || 0).toFixed(2);
+    const formattedValue = Number(data.value || 0).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
     return symbol ? `${symbol} ${formattedValue}` : formattedValue;
   };
@@ -1232,7 +1249,12 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.generatePoPdf(res);
     });
   }
-
+  formatAmount(value: any): string {
+    return Number(value || 0).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
   generatePoPdf(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.width;
@@ -1263,9 +1285,9 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
     let y = 35;
 
-    const labelX = 145;
-    const colonX = 170;
-    const valueX = 175;
+    const labelX = 135;
+    const colonX = 160;
+    const valueX = 165;
 
     const yPos: any = {};
 
@@ -1324,19 +1346,39 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.text(':', colonX, y);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text(data.SUPP_NAME || '', valueX, y);
+    const supplierMaxWidth = 42;
+
+    const supplierText = doc.splitTextToSize(
+      data.SUPP_NAME || '',
+      supplierMaxWidth,
+    );
+
+    doc.text(supplierText, valueX, y);
+
     yPos.supplier = y;
 
+    // move Y based on line count
+    y += supplierText.length > 1 ? supplierText.length * 4 : 4;
+
     // ADDRESS
-    y += 7;
+    y += 3;
+
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(90, 110, 130);
     doc.text('Address', labelX, y);
     doc.text(':', colonX, y);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text(data.SUPP_ADDRESS1 || '', valueX, y);
+    const supplierAddressText = doc.splitTextToSize(
+      data.SUPP_ADDRESS1 || '',
+      40,
+    );
+
+    doc.text(supplierAddressText, valueX, y);
+
     yPos.address = y;
+
+    y += supplierAddressText.length * 4;
 
     // =========================
     // RIGHT SIDE (FIXED)
@@ -1353,7 +1395,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
     doc.text(data.COMPANY_NAME || '', rValueX, yPos.storeVat, {
-      maxWidth: 50,
+      maxWidth: 75,
     });
 
     // Contact Person → align with Supplier
@@ -1410,9 +1452,10 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       tableWidth: 190, // or 'wrap' (see below)
 
       styles: {
-        fontSize: 9,
-        cellPadding: 3,
+        fontSize: 8,
+        cellPadding: 2,
         valign: 'middle',
+        halign: 'center',
         lineWidth: 0,
       },
 
@@ -1456,17 +1499,29 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
         item.QUANTITY || '',
 
-        Number(item.PRICE || 0).toFixed(2),
+        this.formatAmount(item.PRICE),
 
         // discountPercentage.toFixed(2),
 
-        taxable.toFixed(2),
+        this.formatAmount(taxable),
 
-        Number(item.VAT_PERC || 0).toFixed(2),
+        this.formatAmount(item.VAT_PERC),
 
-        Number(item.TAX_AMOUNT || 0).toFixed(2),
+        this.formatAmount(item.TAX_AMOUNT),
 
-        Number(item.TOTAL_AMOUNT || 0).toFixed(2),
+        this.formatAmount(item.TOTAL_AMOUNT),
+
+        // Number(item.PRICE || 0).toFixed(2),
+
+        // // discountPercentage.toFixed(2),
+
+        // taxable.toFixed(2),
+
+        // Number(item.VAT_PERC || 0).toFixed(2),
+
+        // Number(item.TAX_AMOUNT || 0).toFixed(2),
+
+        // Number(item.TOTAL_AMOUNT || 0).toFixed(2),
       ];
     });
 
@@ -1511,37 +1566,44 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       },
 
       columnStyles: {
-        0: { cellWidth: 28 },
-        1: { cellWidth: 42 },
+        0: {
+          cellWidth: 28,
+          halign: 'left',
+        },
+
+        1: {
+          cellWidth: 42,
+          halign: 'left',
+        },
 
         2: {
-          halign: 'center',
           cellWidth: 18,
+          halign: 'center',
         },
 
         3: {
-          halign: 'center',
           cellWidth: 22,
+          halign: 'center',
         },
 
         4: {
-          halign: 'center',
           cellWidth: 24,
+          halign: 'center',
         },
 
         5: {
-          halign: 'center',
           cellWidth: 16,
+          halign: 'center',
         },
 
         6: {
-          halign: 'center',
           cellWidth: 24,
+          halign: 'center',
         },
 
         7: {
-          halign: 'center',
           cellWidth: 24,
+          halign: 'center',
         },
       },
 
@@ -1577,21 +1639,20 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.text('Total', 55, finalY + 10);
 
     doc.text(String(totalQty), 95, finalY + 10, {
-      align: 'right',
+      align: 'center',
     });
 
-    doc.text(totalTaxable.toFixed(2), 138, finalY + 10, {
-      align: 'right',
+    doc.text(this.formatAmount(totalTaxable), 138, finalY + 10, {
+      align: 'center',
     });
 
-    doc.text(totalVat.toFixed(2), 170, finalY + 10, {
-      align: 'right',
+    doc.text(this.formatAmount(totalVat), 170, finalY + 10, {
+      align: 'center',
     });
 
-    doc.text(totalPrice.toFixed(2), 198, finalY + 10, {
-      align: 'right',
+    doc.text(this.formatAmount(totalPrice), 198, finalY + 10, {
+      align: 'center',
     });
-
     // =========================
     // FOOTER COMPANY DETAILS
     // =========================

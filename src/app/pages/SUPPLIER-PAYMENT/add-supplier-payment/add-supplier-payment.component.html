@@ -10,10 +10,14 @@
     "
   >
     <div class="salary-grid-wrapper" style="padding: 0 10px">
+      <div style="display:flex; gap:10px; margin-bottom:5px; justify-content:flex-end;">
+  </div>
+
       <div class="grid-container">
         <dx-data-grid
           #itemsGridRef
           [dataSource]="pendingInvoicelist"
+          keyExpr="BILL_ID"
           [showBorders]="true"
           [showRowLines]="true"
           [showColumnLines]="true"
@@ -27,12 +31,8 @@
           [allowColumnResizing]="true"
           [height]="'45vh'"
           [columnResizingMode]="'nextColumn'"
-          [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
-          [selection]="{
-            mode: 'multiple',
-            showCheckBoxesMode: 'always',
-          }"
+          [selection]="{ mode: 'multiple' }"
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
@@ -159,25 +159,24 @@
             ></dxi-validation-rule>
           </dxi-column>
 
-          <dxo-summary>
-            <dxi-total-item
-              column="PENDING_AMOUNT"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="Total: {0}"
-              alignment="right"
-            >
-            </dxi-total-item>
+        <dxo-summary [calculateCustomSummary]="calculateSelectedPendingSummary">
+  <dxi-total-item
+    name="selectedPendingTotal"
+    summaryType="custom"
+    showInColumn="PENDING_AMOUNT"
+    valueFormat="#,##0.00"
+    displayFormat="Total: {0}"
+    alignment="right">
+  </dxi-total-item>
 
-            <dxi-total-item
-              column="RECEIVED_AMOUNT"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="Total: {0}"
-              alignment="right"
-            >
-            </dxi-total-item>
-          </dxo-summary>
+  <dxi-total-item
+    column="RECEIVED_AMOUNT"
+    summaryType="sum"
+    valueFormat="#,##0.00"
+    displayFormat="Total: {0}"
+    alignment="right">
+  </dxi-total-item>
+</dxo-summary>
         </dx-data-grid>
 
         <!-- Fill Amount Button below grid -->
