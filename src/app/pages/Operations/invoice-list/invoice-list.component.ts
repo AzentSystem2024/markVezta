@@ -42,7 +42,6 @@ import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credi
 import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
 import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
 import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { DebitComponent } from '../../ACCOUNTS/debit/debit.component';
 import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
 import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
 import { DataService } from 'src/app/services';
@@ -65,7 +64,7 @@ import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-pop
 export class InvoiceListComponent {
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -126,12 +125,12 @@ export class InvoiceListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredInvoiceList: any;
-  InvoiceDataSource: DataSource;
+  InvoiceDataSource!: DataSource;
   invoiceArray: any[] = [];
   invoiceCount = 0;
   isEditInvoice: boolean = false;
   selectedInvoice: any;
-  isViewInvoice: boolean;
+  isViewInvoice: boolean=false;
 
   sessionData: any;
   selected_Company_id: any;
@@ -164,7 +163,7 @@ export class InvoiceListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    const userDataString = localStorage.getItem('userData');
+    const userDataString = localStorage.getItem('userData')||'{}';
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
@@ -365,7 +364,7 @@ export class InvoiceListComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 

@@ -238,7 +238,6 @@
             [width]="140"
             [allowEditing]="false"
             headerCellTemplate="Discountpecheader"
-
           ></dxi-column>
           <div *dxTemplate="let data of 'Discountpecheader'">
             <div style="text-align: center; line-height: 16px">
@@ -535,7 +534,7 @@
         dataType="number"
       ></dxi-column>
       <dxi-column
-        dataField="PRICE"
+        dataField="RATE"
         caption="Price"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>

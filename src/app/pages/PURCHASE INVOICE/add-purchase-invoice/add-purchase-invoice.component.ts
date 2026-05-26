@@ -44,7 +44,6 @@ import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.compo
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { PurchaseInvoiceListComponent } from '../../Operations/purchase-invoice-list/purchase-invoice-list.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
@@ -330,36 +329,6 @@ export class AddPurchaseInvoiceComponent {
     this.applySupplierChange(newSupplierId);
   }
 
-  // updateGstColumnVisibility() {
-  //   const companyState = this.companyState?.trim().toLowerCase();
-  //   const supplierState =
-  //     this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
-
-  //   if (!companyState || !supplierState) {
-  //     // Hide all if state info not ready
-  //     this.showGST = false;
-  //     this.showCGST = false;
-  //     this.showSGST = false;
-  //     return;
-  //   }
-
-  //   if (companyState === supplierState) {
-  //     // ✅ SAME STATE → CGST + SGST
-  //     this.showCGST = true;
-  //     this.showSGST = true;
-  //     this.showGST = false;
-  //   } else {
-  //     //  DIFFERENT STATE → IGST
-  //     this.showGST = true;
-  //     this.showCGST = false;
-  //     this.showSGST = false;
-  //   }
-
-  //   //  IMPORTANT: force grid to redraw columns
-  //   setTimeout(() => {
-  //     this.itemsGridRef?.instance?.repaint();
-  //   }, 0);
-  // }
 
   applySupplierChange(supplierId: any) {
     this.selectedSupplierId = supplierId;
@@ -623,7 +592,7 @@ export class AddPurchaseInvoiceComponent {
         UOM: row.UOM,
         TRANSFER_NO: row.GRN_NO,
         GRN_DATE: row.GRN_DATE,
-        PRICE: row.PRICE,
+        PRICE: row.RATE,
         PENDING_QTY: row.PENDING_QTY,
         QUANTITY: 0,
         DISC_PERCENT: row.DISC_PERCENT,

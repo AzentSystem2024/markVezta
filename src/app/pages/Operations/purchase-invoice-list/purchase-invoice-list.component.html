@@ -290,7 +290,13 @@
   [height]="'100vh'"
   [title]="buttonText"
   (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
   <ng-container *ngIf="isEditInvoice">
     <app-edit-purchase-invoice
       [invoiceFormData]="selectedInvoice"
@@ -309,7 +315,13 @@
   [height]="'100vh'"
   [title]="buttonText"
   (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
   <ng-container *ngIf="isVerifyInvoice">
     <app-edit-purchase-invoice
       [isVerifyInvoice]="true"

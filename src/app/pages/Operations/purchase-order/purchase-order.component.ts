@@ -46,7 +46,6 @@ import {
   PurchaseOrderViewFormModule,
 } from 'src/app/pop-up/operations/purchase-order-view-form/purchase-order-view-form.component';
 import { DataService } from 'src/app/services';
-import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { confirm } from 'devextreme/ui/dialog';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { finalize } from 'rxjs/operators';
@@ -60,17 +59,17 @@ export class PurchaseOrderComponent {
   @ViewChild('PurchaseOrderNewFormComponent')
   PurchaseOrderNewFormComponent!: PurchaseOrderNewFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @ViewChild(PurchaseOrderNewFormComponent, { static: false })
-  poNewForm: PurchaseOrderNewFormComponent;
+  poNewForm!: PurchaseOrderNewFormComponent;
   @ViewChild(PurchaseOrderEditFormComponent, { static: false })
-  poEditForm: PurchaseOrderEditFormComponent;
+  poEditForm!: PurchaseOrderEditFormComponent;
   @ViewChild(PurchaseOrderVerifyFormComponent, { static: false })
-  poVerifyForm: PurchaseOrderVerifyFormComponent;
+  poVerifyForm!: PurchaseOrderVerifyFormComponent;
   @ViewChild(PurchaseOrderApproveFormComponent, { static: false })
-  poApproveForm: PurchaseOrderApproveFormComponent;
+  poApproveForm!: PurchaseOrderApproveFormComponent;
   @ViewChild(PurchaseOrderViewFormComponent, { static: false })
-  poViewForm: PurchaseOrderViewFormComponent;
+  poViewForm!: PurchaseOrderViewFormComponent;
   @ViewChild('paramValue', { static: false })
   public paramValue!: ElementRef;
   isAddPopupOpened: boolean = false;
@@ -132,7 +131,7 @@ export class PurchaseOrderComponent {
   // host = 'http://localhost:49834/';
   showReportDesigner: boolean = false;
 
-  showHeaderFilter: true;
+  showHeaderFilter:boolean = true;
   showFilterRow = true;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
@@ -182,7 +181,7 @@ export class PurchaseOrderComponent {
   canPrint: any;
   canView: any;
   canApprove: any;
-  isFilterOpened: boolean;
+  isFilterOpened!: boolean;
   selectedPoId: any;
   GST_PERC: any;
   HSN_CODE: any;
@@ -217,7 +216,7 @@ export class PurchaseOrderComponent {
     private router: Router,
   ) {}
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -248,7 +247,7 @@ export class PurchaseOrderComponent {
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
     }
-    const userDataString = localStorage.getItem('userData');
+    const userDataString = localStorage.getItem('userData') || '{}';
     const userData = JSON.parse(userDataString);
     this.getStoreData();
     this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
@@ -259,7 +258,7 @@ export class PurchaseOrderComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -507,7 +506,7 @@ export class PurchaseOrderComponent {
     ];
   }
 
-  onApproveClick = (e) => {
+  onApproveClick = (e: any) => {
     const id = e.row.data.ID;
     const status = e.row.data.STATUS;
     this.isApprovePopupOpened = true;
