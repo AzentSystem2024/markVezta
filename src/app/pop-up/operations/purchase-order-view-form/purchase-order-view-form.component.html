@@ -487,6 +487,14 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column> -->
     <dxi-column
+      [caption]="'Tax Amount (' + SupplierCurrencySymbol + ')'"
+      alignment="right"
+      dataField="vatAmount"
+      width="100"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
+    <dxi-column
       caption="Total"
       dataField="total"
       width="auto"
