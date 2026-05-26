@@ -537,34 +537,20 @@ onSelectionChanged(e: any) {
 
   const selectedKeys = e.selectedRowKeys || [];
 
-  // selected rows total
+  // update textbox value
   this.totalPending = e.selectedRowsData.reduce(
     (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-    0,
+    0
   );
 
-  // clear received amount for unselected rows
   this.pendingInvoicelist.forEach((row: any) => {
     if (!selectedKeys.includes(row.BILL_ID)) {
       row.RECEIVED_AMOUNT = 0;
     }
   });
 
-  // refresh grid + summary
-  this.pendingInvoicelist = [...this.pendingInvoicelist];
-  this.itemsGridRef.instance.refresh();
+  e.component.refresh(true);
 }
-  // onSelectionChanged(e: any) {
-  //   this.selectedRowsCount = e.selectedRowsData.length;
-
-  //   // Calculate selected total balance
-  //   this.totalPending = e.selectedRowsData.reduce(
-  //     (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-  //     0,
-  //   );
-
-  //   console.log('Selected Balance Total:', this.totalPending.toFixed(2));
-  // }
 
   onFillAmountClick() {
     if (this.selectedRowsCount === 0) {
@@ -619,17 +605,16 @@ autoFillReceivedAmounts() {
 
 calculateSelectedPendingSummary = (options: any) => {
   if (options.name === 'selectedPendingTotal') {
-    if (options.summaryProcess === 'start') {
-      options.totalValue = 0;
-    }
+    switch (options.summaryProcess) {
+      case 'start':
+        options.totalValue = 0;
+        break;
 
-    if (options.summaryProcess === 'calculate') {
-      const selectedKeys =
-        this.itemsGridRef?.instance?.getSelectedRowKeys() || [];
-
-      if (selectedKeys.includes(options.value.BILL_ID)) {
-        options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
-      }
+      case 'calculate':
+        if (options.component.isRowSelected(options.value.BILL_ID)) {
+          options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
+        }
+        break;
     }
   }
 };
@@ -664,6 +649,14 @@ calculateSelectedPendingSummary = (options: any) => {
       return;
     }
     this.isFillAmountValid = true;
+  }
+
+    Cancel(){
+     this.autoFillReceivedAmounts();
+
+  // this.amountError = '';
+  this.resetFillAmountForm();
+  this.showFillAmountPopup = false;
   }
 
 submitAmountPopup() {
