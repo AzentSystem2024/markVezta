@@ -87,7 +87,7 @@
             labelMode="floating"
             labelLocation="left"
             label="Year"
-            [width]="'100'"
+            [width]="100"
             [(value)]="selectedYear"
             [dataSource]="years"
             (onValueChanged)="onYearChanged($event)"
@@ -99,16 +99,15 @@
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
-            label="month"
-            [width]="'120'"
+            label="Month"
+            [width]="120"
             [dataSource]="monthDataSource"
             displayExpr="name"
             valueExpr="value"
             [(value)]="selectedmonth"
             (onValueChanged)="onMonthValueChanged($event)"
             [dropDownOptions]="{ width: 'auto' }"
-          >
-          </dx-select-box>
+          ></dx-select-box>
         </dxi-item>
 
         <dxi-item>
@@ -116,7 +115,7 @@
             [width]="120"
             label="Date From"
             labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
+            displayFormat="dd-MM-yyyy"
             [value]="formatted_from_date"
             (onValueChanged)="onFromDateChange($event)"
           ></dx-date-box>
@@ -127,11 +126,10 @@
             [width]="120"
             label="Date To"
             labelMode="floating"
+            displayFormat="dd-MM-yyyy"
             [value]="formatted_To_date"
-            [displayFormat]="'dd-MM-yyyy'"
             (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
+          ></dx-date-box>
         </dxi-item>
 
         <dxi-item>
@@ -165,7 +163,6 @@
         dataField="TYPE_NAME"
         caption="Category"
         dataType="string"
-        [groupIndex]="0"
       ></dxi-column>
 
       <dxi-column
@@ -173,7 +170,6 @@
         caption="Group"
         alignment="left"
         dataType="number"
-        [groupIndex]="1"
       ></dxi-column>
 
       <dxi-column dataField="PARTICULARS" caption="Particulars"></dxi-column>
@@ -220,7 +216,7 @@
     </dx-data-grid>
   </div>
 
-   <dx-popup
+  <dx-popup
     [(visible)]="dimensionPopupVisible"
     [width]="700"
     [height]="500"

@@ -38,13 +38,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { DebitComponent } from '../../ACCOUNTS/debit/debit.component';
-import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
 import { DataService } from 'src/app/services';
 import {
   AddCutomerReceiptComponent,
@@ -67,11 +60,11 @@ export class CustomerReceiptsComponent {
   addReceiptFormRef!: AddCutomerReceiptComponent;
 
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter:boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -85,7 +78,7 @@ export class CustomerReceiptsComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  ReceiptDataSource: DataSource;
+  ReceiptDataSource!: DataSource;
   receiptArray: any[] = [];
   receiptCount = 0;
 
@@ -145,7 +138,7 @@ export class CustomerReceiptsComponent {
   isViewReceipt: boolean = false;
   filteredReceiptList: any;
 
-  isReadOnlyReceipt: boolean;
+  isReadOnlyReceipt: boolean = false;
   sessionData: any;
   selectedCompanyId: any;
 
@@ -157,7 +150,7 @@ export class CustomerReceiptsComponent {
   ) { }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }

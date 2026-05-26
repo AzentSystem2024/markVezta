@@ -37,10 +37,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCutomerReceiptModule } from '../../CUSTOMER-RECEIPTS/add-cutomer-receipt/add-cutomer-receipt.component';
-import { CustomerReceiptsComponent } from '../../Operations/customer-receipts/customer-receipts.component';
-import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
-import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
 import { DataService } from 'src/app/services';
 import {
   AddSupplierPaymentComponent,
@@ -60,11 +56,11 @@ export class SupplierPaymentListComponent {
   @ViewChild(AddSupplierPaymentComponent)
   addSupplierPaymentComponent!: AddSupplierPaymentComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter:boolean= true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -128,21 +124,21 @@ export class SupplierPaymentListComponent {
   customEndDate: any = null;
   showCustomDatePopup = false;
   filteredSupplierPaymentList: any;
-  addSupllierPayment: boolean;
+  addSupllierPayment: boolean = false;
   selectedReceipt: any;
-  isViewReceipt: boolean;
-  isEditReceipt: boolean;
+  isViewReceipt: boolean = false;
+  isEditReceipt: boolean = false;
   isReadOnlyReceipt: boolean = false;
   selectedSupplierPayment: any;
   supplierPaymentId: any;
   sessionData: any;
   selectedCompanyId: any;
   companyID: any;
-  isReadOnlyJV: boolean;
-  isReadOnlyPayment: boolean;
-  isViewPayment: boolean;
-  isApprovePayment: boolean;
-  isVerifyPayment: boolean;
+  isReadOnlyJV: boolean = false;
+  isReadOnlyPayment: boolean = false;
+  isViewPayment: boolean = false;
+  isApprovePayment: boolean = false;
+  isVerifyPayment: boolean = false;
   canVerify: any;
 
   constructor(

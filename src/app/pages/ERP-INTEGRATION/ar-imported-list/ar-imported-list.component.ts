@@ -32,7 +32,6 @@ import {
   ERPJVComponent,
 } from '../POPUP-PAGES/erp-jv/erp-jv.component';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
-import dxSelectBox from 'devextreme/ui/select_box';
 
 @Component({
   selector: 'app-ar-imported-list',
@@ -114,6 +113,7 @@ export class ARImportedListComponent {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
+  
   selectedDateRange: any = 'last7';
   customStartDate: any = null;
   customEndDate: any = null;

@@ -44,12 +44,8 @@ import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-cr
 import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
 import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
 import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
-import {
-  AddInvoiceComponent,
-  AddInvoiceModule,
-} from '../../INVOICE/add-invoice/add-invoice.component';
+import { AddInvoiceModule } from '../../INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../../INVOICE/edit-invoice/edit-invoice.component';
-import { InvoiceListComponent } from '../invoice-list/invoice-list.component';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import notify from 'devextreme/ui/notify';
 import { DataService } from 'src/app/services';
@@ -69,11 +65,11 @@ export class InvoiceTrOutComponent {
   @ViewChild(InvoiceTrOutAddComponent)
   InvoiceTrOutAddComponent!: InvoiceTrOutAddComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter:boolean= true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -134,7 +130,7 @@ export class InvoiceTrOutComponent {
   invoiceList: any;
   isEditInvoice: boolean = false;
   selectedInvoice: any;
-  isViewInvoice: boolean;
+  isViewInvoice: boolean=false;
 
   sessionData: any;
   selected_Company_id: any;
@@ -149,7 +145,7 @@ export class InvoiceTrOutComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  isReadOnlyInvoice: boolean;
+  isReadOnlyInvoice: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -170,8 +166,8 @@ export class InvoiceTrOutComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/invoice');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/invoice');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -367,7 +363,7 @@ export class InvoiceTrOutComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 
