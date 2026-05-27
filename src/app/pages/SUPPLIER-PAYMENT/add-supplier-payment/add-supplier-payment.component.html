@@ -14,6 +14,51 @@
   </div>
 
       <div class="grid-container">
+
+        <div
+  style="
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    gap: 15px;
+  "
+>
+  <!-- Left side -->
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <dx-text-box
+      [(value)]="paymentFormData.DOC_NO"
+      label="Payment No"
+      labelMode="floating"
+      [width]="220"
+      [readOnly]="true"
+    ></dx-text-box>
+
+    <dx-select-box
+      [(value)]="paymentFormData.SUPP_ID"
+      [dataSource]="supplierList"
+      displayExpr="DESCRIPTION"
+      valueExpr="ID"
+      [width]="320"
+      [searchEnabled]="true"
+      [showClearButton]="true"
+      label="Supplier"
+      labelMode="floating"
+      (onValueChanged)="onSupplierChanged($event)"
+    ></dx-select-box>
+  </div>
+
+  <!-- Right side -->
+  <dx-date-box
+    [(value)]="paymentFormData.TRANS_DATE"
+    label="Date"
+    labelMode="floating"
+    displayFormat="dd-MM-yyyy"
+    type="date"
+    [width]="220"
+  ></dx-date-box>
+</div>
+
         <dx-data-grid
           #itemsGridRef
           [dataSource]="pendingInvoicelist"
@@ -29,10 +74,14 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'45vh'"
+          
           [columnResizingMode]="'nextColumn'"
           rowAlternationInterval="2"
-          [selection]="{ mode: 'multiple' }"
+          [selection]="{
+    mode: 'multiple',
+    showCheckBoxesMode: 'always',
+    selectAllMode: 'allPages'
+  }"
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
@@ -46,61 +95,7 @@
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
-          <dxo-toolbar>
-            <div
-              class="stacked-toolbar-group"
-              style="display: flex; flex-direction: column; gap: 2px"
-            ></div>
-            <dxi-item location="before" locateInMenu="auto">
-              <div
-                class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 0px"
-              >
-                <div style="display: flex; gap: 5px">
-                  <dx-text-box
-                    [(value)]="paymentFormData.DOC_NO"
-                    label="Payment No"
-                    labelMode="floating"
-                    [width]="200"
-                    [readOnly]="true"
-                  ></dx-text-box>
-                </div>
-                <div style="display: flex; align-items: baseline; gap: 2px">
-                  <dx-select-box
-                    class="supplier-select"
-                    #distributorRef
-                    [(value)]="paymentFormData.SUPP_ID"
-                    [dataSource]="supplierList"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [width]="320"
-                    [searchEnabled]="true"
-                    [showClearButton]="true"
-                    label="Supplier"
-                    labelMode="floating"
-                    (onValueChanged)="onSupplierChanged($event)"
-                  ></dx-select-box>
-                </div>
-              </div>
-            </dxi-item>
-
-            <dxi-item location="after" locateInMenu="auto">
-              <div class="stacked-toolbar-group"></div>
-            </dxi-item>
-            <dxi-item location="after" locateInMenu="auto">
-              <div>
-                <!-- push it down -->
-                <dx-date-box
-                  label="Date"
-                  labelMode="floating"
-                  [(value)]="paymentFormData.TRANS_DATE"
-                  displayFormat="dd-MM-yyyy"
-                  type="date"
-                  [width]="200"
-                ></dx-date-box>
-              </div>
-            </dxi-item>
-          </dxo-toolbar>
+        
           <dxi-column
             dataField="DOC_NO"
             caption="Doc No"
@@ -437,7 +432,7 @@
         margin-top: 20px;
       "
     >
-      <dx-button text="Cancel" stylingMode="outlined" type="normal"></dx-button>
+      <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="Cancel()"></dx-button>
       <dx-button
         text="Submit"
         stylingMode="contained"

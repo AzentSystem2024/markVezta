@@ -437,7 +437,7 @@ getActionButtonText(): string {
   initialSelectionDone = false;
   onGridContentReady(e: any) {
   if (e.component) {
-    this.totalPending = e.component.getTotalSummaryValue('PENDING_AMOUNT');
+    this.totalPendingAmount = e.component.getTotalSummaryValue('PENDING_AMOUNT');
   }
 
   if (!this.initialSelectionDone && this.selectedBillIds.length > 0) {
@@ -582,39 +582,29 @@ getActionButtonText(): string {
     this.pdcPopupVisible = false;
   }
 
-  // onSelectionChanged(e: any) {
-  //   this.selectedRowsCount = e.selectedRowsData.length;
-
-  //   // Calculate selected total balance
-  //   this.totalPending = e.selectedRowsData.reduce(
-  //     (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-  //     0,
-  //   );
-
-  //   console.log('Selected Balance Total:', this.totalPending.toFixed(2));
-  // }
 
 onSelectionChanged(e: any) {
+  console.log("======================================'''''")
   this.selectedRowsCount = e.selectedRowsData.length;
-
+  console.log(e)
   const selectedKeys = e.selectedRowKeys || [];
 
-  // total pending for selected rows
   this.totalPending = e.selectedRowsData.reduce(
-    (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-    0,
+    (sum: number, row: any) =>
+      sum + (Number(row.PENDING_AMOUNT) || 0),
+    0
   );
-
-  // clear amount for unselected rows
+  console.log(this.totalPending)
+  this.cdRef.detectChanges();  
+  // this.totalPending = this.totalPending.toFixed(2);
   this.mainGridData.forEach((row: any) => {
     if (!selectedKeys.includes(row.BILL_ID)) {
-      row.AMOUNT = 0;   // clear received amount
+      row.AMOUNT = 0;
     }
   });
 
-  // refresh grid
-  this.mainGridData = [...this.mainGridData];
-  this.itemsGridRef?.instance.refresh();
+  // refresh summary only
+  e.component.refresh(true);
 }
 
 onFillAmountClick() {
@@ -678,17 +668,16 @@ autoFillReceivedAmounts() {
 
 calculateSelectedPendingSummary = (options: any) => {
   if (options.name === 'selectedPendingTotal') {
-    if (options.summaryProcess === 'start') {
-      options.totalValue = 0;
-    }
+    switch (options.summaryProcess) {
+      case 'start':
+        options.totalValue = 0;
+        break;
 
-    if (options.summaryProcess === 'calculate') {
-      const selectedKeys =
-        this.itemsGridRef?.instance?.getSelectedRowKeys() || [];
-
-      if (selectedKeys.includes(options.value.BILL_ID)) {
-        options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
-      }
+      case 'calculate':
+        if (options.component.isRowSelected(options.value.BILL_ID)) {
+          options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
+        }
+        break;
     }
   }
 };
@@ -719,6 +708,14 @@ calculateSelectedPendingSummary = (options: any) => {
       // Clamp back to totalPending
       this.fillAmountData.field1 = this.totalPending;
     }
+  }
+
+  Cancel(){
+    //  this.autoFillReceivedAmounts();
+
+  // this.amountError = '';
+  this.resetFillAmountForm();
+  this.showFillAmountPopup = false;
   }
 
 submitAmountPopup() {

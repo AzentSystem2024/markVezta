@@ -184,7 +184,9 @@
       [allowEditing]="false"
     ></dxi-column>
     <dxi-column
-      *ngIf="currency !== currencySymbol"
+      *ngIf="
+        currency !== currencySymbol && currencySymbol && currencySymbol !== '0'
+      "
       dataField="SUPP_PRICE"
       caption="PRICE {{ currencySymbol }}"
       [width]="'auto'"
@@ -256,7 +258,9 @@
       [allowEditing]="false"
     ></dxi-column> -->
     <dxi-column
-      *ngIf="currency !== currencySymbol"
+      *ngIf="
+        currency !== currencySymbol && currencySymbol && currencySymbol !== '0'
+      "
       dataField="SUPP_AMOUNT"
       caption="AMOUNT {{ currencySymbol }}"
       [allowEditing]="false"

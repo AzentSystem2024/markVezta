@@ -125,11 +125,18 @@
     <dxi-column caption="SUPPLIER NAME" dataField="SUPPPLIER_NAME"></dxi-column>
     <dxi-column
       caption="NET AMOUNT"
-      dataField="SUPP_NET_AMOUNT"
+      dataField="NET_AMOUNT"
       dataType="number"
       width="130"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
+    <!-- <dxi-column
+      caption="NET AMOUNT"
+      dataField="SUPP_NET_AMOUNT"
+      dataType="number"
+      width="130"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column> -->
     <dxi-column
       caption="STATUS"
       dataField="STATUS"
@@ -292,6 +299,7 @@
   <app-grn-verify-form
     [formdata]="selectedRowData"
     [isReadOnly]="true"
+    (closePopup)="isViewPopupOpened = false"
   ></app-grn-verify-form>
 </dx-popup>
 <!-- <dx-popup

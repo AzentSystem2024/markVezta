@@ -306,7 +306,9 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
 
@@ -448,7 +450,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
         new Promise((resolve) => {
           this.dataservice.getItemsData().subscribe({
             next: (response: any) => {
-              const data = (response?.data || [])
+              const data = response?.data || [];
 
               this.itemsArray = data; // local cache
               this.itemsCount = data.length;

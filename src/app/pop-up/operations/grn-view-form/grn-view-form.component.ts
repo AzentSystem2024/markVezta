@@ -1,8 +1,10 @@
 import {
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   Input,
   NgModule,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import {
@@ -42,11 +44,11 @@ import { DataService } from 'src/app/services';
 export class GrnViewFormComponent {
   @Input() formdata: any;
   @Input() grnId: any;
-
-  financialYeaDate: string='';
+  @Output() closePopup = new EventEmitter<void>();
+  financialYeaDate: string = '';
   selected_vat_id: any;
   sessionData: any;
-  formatted_from_date: string='';
+  formatted_from_date: string = '';
   selected_fin_id: any;
   selected_Company_id: any;
   costingMethodDataGrid: any;
@@ -893,7 +895,9 @@ export class GrnViewFormComponent {
       e.cancel = true;
     }
   }
-
+  cancel() {
+    this.closePopup.emit();
+  }
   viewPdf(): void {
     console.log(this.grnId, 'ID received in viewPdf()');
 
