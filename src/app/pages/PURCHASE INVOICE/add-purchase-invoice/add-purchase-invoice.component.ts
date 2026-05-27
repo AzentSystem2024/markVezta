@@ -179,7 +179,7 @@ export class AddPurchaseInvoiceComponent {
   isHQApp: any;
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
   selectSupplierDetails: any;
-  is_default: boolean = false
+  is_default: boolean = false;
   CurrencyCode: any;
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -241,7 +241,7 @@ export class AddPurchaseInvoiceComponent {
     });
   }
 
-  onStoreValueChanged(event: any) { }
+  onStoreValueChanged(event: any) {}
   // getStoreData() {
   //   const payload = {
   //     NAME: 'STORE',
@@ -292,7 +292,9 @@ export class AddPurchaseInvoiceComponent {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    const sessiondata = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     // this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -329,35 +331,34 @@ export class AddPurchaseInvoiceComponent {
     this.applySupplierChange(newSupplierId);
   }
 
-
   applySupplierChange(supplierId: any) {
     this.selectedSupplierId = supplierId;
-    this.dataService.selectSupplier(this.selectedSupplierId).subscribe((res: any) => {
-      console.log(res)
-      this.selectSupplierDetails = res
+    this.dataService
+      .selectSupplier(this.selectedSupplierId)
+      .subscribe((res: any) => {
+        console.log(res);
+        this.selectSupplierDetails = res;
 
-      this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
-      if (this.is_default) {
-        // const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
-        this.CurrencyCode = null
+        this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY;
+        if (this.is_default) {
+          // const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+          this.CurrencyCode = null;
+        } else {
+          const currency_id = this.selectSupplierDetails.CURRENCY_ID;
 
-      }
-      else {
-        const currency_id = this.selectSupplierDetails.CURRENCY_ID
+          this.dataService.getCurrencyData().subscribe((response: any) => {
+            const currencylist = response;
 
-        this.dataService.getCurrencyData().subscribe((response: any) => {
-          const currencylist = response;
-
-          const selectedCurrencyDetails = currencylist.find(
-            (item: any) => item.ID === currency_id
-          );
-          if (selectedCurrencyDetails) {
-            this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
-          }
-          console.log(this.CurrencyCode)
-        });
-      }
-    })
+            const selectedCurrencyDetails = currencylist.find(
+              (item: any) => item.ID === currency_id,
+            );
+            if (selectedCurrencyDetails) {
+              this.CurrencyCode = selectedCurrencyDetails.SYMBOL;
+            }
+            console.log(this.CurrencyCode);
+          });
+        }
+      });
 
     this.mainGridData = [];
     this.itemsGridRef?.instance?.refresh();
@@ -468,8 +469,20 @@ export class AddPurchaseInvoiceComponent {
     this.isTrOutPopupVisible = true;
   }
 
+  // calculateAmount = (row: any) => {
+  //   return (parseFloat(row.PRICE) || 0) * (parseFloat(row.QUANTITY) || 0);
+  // };
+
   calculateAmount = (row: any) => {
-    return (parseFloat(row.PRICE) || 0) * (parseFloat(row.QUANTITY) || 0);
+    const qty = Number(row?.QUANTITY) || 0;
+    const price = Number(row?.PRICE) || 0;
+
+    const amount = qty * price;
+
+    const discPerc = Number(row?.DISC_PERCENT) || 0;
+    const discAmt = (amount * discPerc) / 100;
+
+    return amount - discAmt;
   };
 
   calculateDiscAmt = (rowData: any) => {
@@ -723,7 +736,7 @@ export class AddPurchaseInvoiceComponent {
       (item: any) => {
         const amount = this.calculateAmount(item);
         const vat = this.calculateGstAmount(item);
-        const discamt = this.calculateDiscountAmount(item);
+        const discamt = this.calculateDiscAmt(item);
         const net = this.calculateTotal(item);
 
         grossAmount += amount;
@@ -973,4 +986,4 @@ export class AddPurchaseInvoiceComponent {
   exports: [AddPurchaseInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddPurchaseInvoiceModule { }
+export class AddPurchaseInvoiceModule {}

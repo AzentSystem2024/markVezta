@@ -21,6 +21,7 @@
       "
     >
       <!-- Row 1: Supplier Invoice Date + Invoice No on left, Transaction Date on right -->
+      <!-- Row 1 -->
       <div
         style="
           display: flex;
@@ -50,32 +51,9 @@
             [readOnly]="true"
           >
           </dx-date-box>
-          <dx-text-box
-            label="Reference No."
-            labelMode="floating"
-            [(value)]="purchaseInvoiceFormData.SUPP_INV_NO"
-            [width]="200"
-          >
-            <!-- <dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="Reference No is required"
-              >
-              </dxi-validation-rule>
-            </dx-validator> -->
-          </dx-text-box>
-          <dx-date-box
-            label=" Reference Date"
-            type="date"
-            [(value)]="purchaseInvoiceFormData.SUPP_INV_DATE"
-            labelMode="floating"
-            [width]="200"
-            [displayFormat]="'dd-MM-yyyy'"
-          >
-          </dx-date-box>
         </div>
 
-        <!-- Right side (Supplier + Button together) -->
+        <!-- Right side -->
         <div style="display: flex; gap: 8px; align-items: center">
           <dx-select-box
             label="Store"
@@ -91,6 +69,7 @@
             (onValueChanged)="onStoreValueChanged($event)"
           >
           </dx-select-box>
+
           <dx-select-box
             [dataSource]="distributorList"
             displayExpr="DESCRIPTION"
@@ -100,30 +79,60 @@
             label="Supplier"
             [searchEnabled]="true"
             labelMode="floating"
-            [searchEnabled]="true"
             (onValueChanged)="onSupplierChanged($event)"
           >
           </dx-select-box>
-
-          <dx-button
-            [width]="200"
-            class="blue-outline-btn"
-            (onClick)="openPendingGrnPopup()"
-            [disabled]="!purchaseInvoiceFormData.SUPP_ID"
-          >
-            <div *dxTemplate="let data of 'content'">
-              <div style="display: flex; align-items: center; gap: 6px">
-                <span
-                  class="iconify"
-                  data-icon="mingcute:time-line"
-                  data-width="20"
-                  data-height="20"
-                ></span>
-                <span>Fill Pending GRN</span>
-              </div>
-            </div>
-          </dx-button>
         </div>
+      </div>
+
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 4px;
+        "
+      >
+        <!-- Left side -->
+        <div style="display: flex; gap: 4px">
+          <dx-text-box
+            label="Reference No."
+            labelMode="floating"
+            [(value)]="purchaseInvoiceFormData.SUPP_INV_NO"
+            [width]="200"
+          >
+          </dx-text-box>
+
+          <dx-date-box
+            label=" Reference Date"
+            type="date"
+            [(value)]="purchaseInvoiceFormData.SUPP_INV_DATE"
+            labelMode="floating"
+            [width]="200"
+            [displayFormat]="'dd-MM-yyyy'"
+          >
+          </dx-date-box>
+        </div>
+
+        <!-- Right side -->
+        <dx-button
+          [width]="180"
+          class="blue-outline-btn"
+          (onClick)="openPendingGrnPopup()"
+          [disabled]="!purchaseInvoiceFormData.SUPP_ID"
+        >
+          <div *dxTemplate="let data of 'content'">
+            <div style="display: flex; align-items: center; gap: 6px">
+              <span
+                class="iconify"
+                data-icon="mingcute:time-line"
+                data-width="20"
+                data-height="20"
+              ></span>
+              <span>Fill Pending GRN</span>
+            </div>
+          </div>
+        </dx-button>
       </div>
 
       <!-- Row 2: Supplier + Narration on left, Fill Pending GRN button on right -->
