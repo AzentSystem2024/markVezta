@@ -1,45 +1,166 @@
-<div class="dashboard-container">
-  <!-- LEFT -->
+<div class="d-flex filter-container mt-2">
+  <dx-select-box
+    label="Date Range"
+    labelMode="floating"
+    valueExpr="value"
+    displayExpr="text"
+    [dataSource]="DateDrp"
+    [searchEnabled]="true"
+    (onValueChanged)="onDateRangeChange($event)"
+  >
+  </dx-select-box>
 
-  <div class="left-panel">
-    <div class="card-title">Sales Funnel</div>
+  <dx-date-box
+    label="From Date"
+    labelMode="floating"
+    type="date"
+    displayFormat="dd-MM-yyyy"
+    [(value)]="fromDate"
+    (onValueChanged)="dateChanged()"
+  >
+  </dx-date-box>
 
-    <dx-funnel
-      [dataSource]="opportunities"
-      argumentField="stage"
-      valueField="value"
-      [palette]="customPalette"
-    >
-      <dxo-tooltip [enabled]="true"></dxo-tooltip>
-      <dxo-label [visible]="true" position="inside"></dxo-label>
-    </dx-funnel>
-  </div>
+  <dx-date-box
+    label="To Date"
+    labelMode="floating"
+    type="date"
+    [(value)]="toDate"
+    (onValueChanged)="dateChanged()"
+    displayFormat="dd-MM-yyyy"
+  >
+  </dx-date-box>
+</div>
+<div class="view-wrapper">
+  <div class="dashboard-wrapper">
+    <!-- Row 1 -->
+    <div class="dashboard-row">
+      <!-- Funnel -->
+      <div class="dashboard-card">
+        <h6 class="card-title mt-2 mb-2">Sales Funnel</h6>
 
-  <!-- RIGHT -->
+        <!-- <dx-scroll-view direction="both" showScrollbar="always" [height]="450"> -->
+        <dx-funnel
+          id="funnel"
+          [dataSource]="gross_Sales_list"
+          argumentField="STORE_NAME"
+          valueField="AMOUNT"
+          [palette]="customPalette"
+        >
+          <dxo-tooltip [enabled]="true"></dxo-tooltip>
 
-  <div class="right-panel">
-    <div class="chart-box">
-      <div class="card-title">Sales vs Returns</div>
-
-      <dx-chart [dataSource]="salesComparison">
-        <dxi-series
-          argumentField="type"
-          valueField="value"
-          type="bar"
-        ></dxi-series>
-      </dx-chart>
+          <dxo-label [visible]="true" position="inside"> </dxo-label>
+          <!-- <dxo-funnel-legend [visible]="true"></dxo-funnel-legend> -->
+          <dxo-legend
+            [visible]="true"
+            verticalAlignment="bottom"
+            horizontalAlignment="center"
+          >
+          </dxo-legend>
+          <dxo-item [borderWidth]="2" borderColor="#ffffff"> </dxo-item>
+        </dx-funnel>
+        <!-- </dx-scroll-view> -->
+      </div>
     </div>
 
-    <div class="chart-box">
-      <div class="card-title">Transactions</div>
+    <!-- Bar Chart -->
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Top Moving Items</h6>
 
-      <dx-chart [dataSource]="transactionsData">
-        <dxi-series
-          argumentField="period"
-          valueField="value"
-          type="line"
-        ></dxi-series>
-      </dx-chart>
+        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
+          <dx-chart [dataSource]="TopMovingItems_list">
+            <dxi-series
+              name="Item"
+              argumentField="DESCRIPTION"
+              valueField="BAR_VALUE"
+              type="bar"
+              color="#4472C4"
+            >
+              <dxo-label [visible]="false"></dxo-label>
+            </dxi-series>
+            <dxo-value-axis>
+              <dxo-visual-range startValue="0" endValue="10">
+              </dxo-visual-range>
+            </dxo-value-axis>
+            <dxi-series
+              name="Qty Sold"
+              argumentField="DESCRIPTION"
+              valueField="QTY_SOLD"
+              type="bar"
+              [customizePoint]="customizePoint"
+            >
+            </dxi-series>
+
+            <dxo-common-series-settings argumentField="DESCRIPTION" type="bar">
+              <dxo-label [visible]="true"></dxo-label>
+            </dxo-common-series-settings>
+
+            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
+            </dxo-legend>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeChartTooltip"
+            >
+            </dxo-tooltip>
+
+            <dxo-size [height]="400" [width]="1200"> </dxo-size>
+          </dx-chart>
+        </dx-scroll-view>
+      </div>
+    </div>
+
+    <div class="dashboard-row">
+      <div class="dashboard-card-Tender">
+        <h6 class="card-title mt-2 mb-2">Tender Summary</h6>
+
+        <!-- <dx-scroll-view direction="both" showScrollbar="always"> -->
+        <div class="chart-wrapper">
+          <dx-chart
+            [dataSource]="chartData"
+            palette="Soft Pastel"
+            [size]="{
+              height: 400,
+            }"
+          >
+            <dxo-common-series-settings
+              argumentField="STORE_NAME"
+              type="bar"
+              [barPadding]="0.3"
+            >
+              <dxo-label [visible]="true" position="outside"> </dxo-label>
+            </dxo-common-series-settings>
+
+            <dxi-series
+              *ngFor="let s of seriesList"
+              [valueField]="s.valueField"
+              [name]="s.name"
+              [type]="s.type"
+              [color]="s.color"
+            >
+            </dxi-series>
+
+            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
+            </dxo-legend>
+
+            <dxo-tooltip [enabled]="true"> </dxo-tooltip>
+          </dx-chart>
+        </div>
+        <!-- </dx-scroll-view> -->
+      </div>
     </div>
   </div>
 </div>
+
+<dx-load-panel
+  *ngIf="loadingVisible"
+  #loadPanel
+  shadingColor="rgba(0,0,0,0.4)"
+  [position]="{ of: '#fullpageDiv' }"
+  [(visible)]="loadingVisible"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  [hideOnOutsideClick]="false"
+>
+</dx-load-panel>

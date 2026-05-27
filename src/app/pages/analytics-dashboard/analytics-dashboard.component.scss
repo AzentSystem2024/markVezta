@@ -1,98 +1,82 @@
-@use "../../../variables.scss" as *;
-
 :host {
-  display: flex;
-  flex-direction: column;
-  // flex-grow: 1;
-  height: calc(100vh - 120px);
+  display: block;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .view-wrapper {
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  padding: 16px; /* keep only this */
-}
-/* =========================
-DASHBOARD CHART LAYOUT
-========================= */
-
-.dashboard-container {
-  display: flex;
-  gap: 20px;
-  flex: 1;
-  overflow: hidden;
-
-  padding: 0 16px; /* ✅ FIX: match wrapper padding */
+  padding: 16px;
   box-sizing: border-box;
 }
 
-/* COMMON CARD STYLE */
-.left-panel,
-.chart-box {
-  // background: #ffffff;
-  border-radius: 10px;
-  padding: 16px; /* ✅ uniform padding */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  display: flex;
-  flex-direction: column;
-}
-
-/* LEFT (FUNNEL) */
-.left-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* RIGHT SIDE */
-.right-panel {
-  flex: 1;
+.dashboard-wrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  overflow: hidden;
-}
-
-/* CHART BOX */
-.chart-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* TITLE */
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #333;
-}
-
-/* FORCE CHART HEIGHT */
-dx-chart,
-dx-funnel {
-  flex: 1 !important;
-  height: auto !important;
   width: 100%;
 }
 
-/* RESPONSIVE */
-@media (max-width: 1000px) {
-  .dashboard-container {
-    flex-direction: column;
-    height: auto;
-  }
-}
-.chart-box dx-chart {
-  // height: 260px; /* ✅ fixed height */
+.dashboard-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
-.left-panel dx-funnel {
+.dashboard-card {
   flex: 1;
-  margin: 0 !important; /* ✅ FIX: remove internal shift */
-  padding: 0 !important;
+  min-width: 0;
+  background: var(--base-bg);
+  border-radius: 8px;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.left-panel,
+.right-panel,
+.chart-box {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+.dashboard-card-Tender {
+  width: 100%;
+  overflow: hidden;
+  height: 600px !important;
+  background: var(--base-bg);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+dx-chart {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+::ng-deep .dx-legend-marker {
+  border-radius: 50% !important;
+}
+::ng-deep #funnel svg path {
+  stroke-linejoin: round;
+}
+.filter-container {
+  background: var(--base-bg);
+  gap: 16px;
+  align-items: center;
+  /* padding: 8px; */
+  border-radius: 8px;
+  gap: 16px;
+  align-items: center;
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); */
+  margin-left: 10px;
+  height: 50px;
+  padding-left: 16px;
+  padding-bottom: -5px;
 }
