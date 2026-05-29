@@ -1,4 +1,9 @@
-import { Component, OnInit, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  NgModule,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { map, share } from 'rxjs/operators';
 import { Observable, forkJoin } from 'rxjs';
@@ -28,7 +33,12 @@ import {
   SalesOrOpportunitiesByCategory,
 } from 'src/app/types/analytics';
 import { ApplyPipeModule } from 'src/app/pipes/apply.pipe';
-import { DxDateBoxModule, DxSelectBoxModule, DxValidationGroupModule, DxValidatorModule } from 'devextreme-angular';
+import {
+  DxDateBoxModule,
+  DxSelectBoxModule,
+  DxValidationGroupModule,
+  DxValidatorModule,
+} from 'devextreme-angular';
 
 type DashboardData =
   | SalesOrOpportunitiesByCategory
@@ -50,9 +60,7 @@ export class AnalyticsDashboardComponent implements OnInit {
     { text: 'This Month', value: 'thisMonth' },
   ];
 
-
   chartSize = { width: window.innerWidth * 0.95 };
-
 
   // Sales vs Returns
   salesComparison = [
@@ -60,7 +68,7 @@ export class AnalyticsDashboardComponent implements OnInit {
     { type: 'Sales Return', value: 20000 },
     { type: 'Net Sales', value: 130000 },
   ];
-  opportunities: any = []
+  opportunities: any = [];
   // Transactions trend
   transactionsData = [
     { period: 'Jan', value: 120 },
@@ -71,9 +79,8 @@ export class AnalyticsDashboardComponent implements OnInit {
   ];
   analyticsPanelItems = analyticsPanelItems;
   selectedDateRange: any;
-  toDate: any
-  fromDate: any
-
+  toDate: any;
+  fromDate: any;
 
   // opportunities: SalesOrOpportunitiesByCategory = null;
   sales: Sales = null;
@@ -97,10 +104,10 @@ export class AnalyticsDashboardComponent implements OnInit {
     '#14B8A6',
     '#475569',
     '#64748B',
-    '#94A3B8'
+    '#94A3B8',
   ];
 
-  itemPalette: any[] = []
+  itemPalette: any[] = [];
   selected_Company_id: any;
   selected_fin_id: any;
   gross_Sales_list: any = [];
@@ -110,10 +117,7 @@ export class AnalyticsDashboardComponent implements OnInit {
   seriesList: any[] = [];
   loadingVisible: boolean = false;
 
-  constructor(private service: DataService) {
-
-
-  }
+  constructor(private service: DataService) {}
 
   selectionChange(dates: Dates) {
     this.loadData(dates.startDate, dates.endDate);
@@ -156,12 +160,12 @@ export class AnalyticsDashboardComponent implements OnInit {
     this.isLoading = false;
     // this.loadData(startDate, endDate);
     this.onDateRangeChange({ value: 'thisYear' });
-
-
   }
   //====================session Details===========================
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -178,71 +182,60 @@ export class AnalyticsDashboardComponent implements OnInit {
     if (e.value === 'today') {
       this.fromDate = new Date();
       this.toDate = new Date();
-    }
-
-    else if (e.value === 'yesterday') {
+    } else if (e.value === 'yesterday') {
       const yesterday = new Date();
       yesterday.setDate(today.getDate() - 1);
 
       this.fromDate = yesterday;
       this.toDate = yesterday;
-    }
-
-    else if (e.value === 'thisMonth') {
-      this.fromDate = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        1
-      );
+    } else if (e.value === 'thisMonth') {
+      this.fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
       this.toDate = new Date();
-    }
-    else if (e.value === 'thisYear') {
-      this.fromDate = new Date(
-        today.getFullYear(),
-        0,
-        1
-      );
+    } else if (e.value === 'thisYear') {
+      this.fromDate = new Date(today.getFullYear(), 0, 1);
 
       this.toDate = new Date();
     }
 
-    this.getDashboardData()
+    this.getDashboardData();
   }
   dateChanged() {
     this.getDashboardData();
   }
 
   getDashboardData() {
-    this.loadingVisible = true
+    this.loadingVisible = true;
 
-    this.sesstion_Details()
+    this.sesstion_Details();
 
     const payload = {
       DATE_FROM: this.formatDate(this.fromDate),
       DATE_TO: this.formatDate(this.toDate),
       COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.selected_fin_id
+      FIN_ID: this.selected_fin_id,
     };
 
     console.log(payload);
     this.service.Dashboard_Data_api(payload).subscribe((res: any) => {
-      this.loadingVisible = false
-      this.gross_Sales_list = res.data.GrossSale
+      this.loadingVisible = false;
+      this.gross_Sales_list = res.data.GrossSale;
       // this.TopMovingItems_list = res.data.
       const item_list = res.data.TopMovingItems;
-      console.log(item_list, '==========item_list===========')
+      console.log(item_list, '==========item_list===========');
       const maxQty = item_list.reduce((max: number, item: any) => {
         return item.QTY_SOLD > max ? item.QTY_SOLD : max;
       }, 0);
-      console.log(maxQty, '==========maxQty===========')
+      console.log(maxQty, '==========maxQty===========');
 
-      this.TopMovingItems_list = res.data.TopMovingItems.map((item: any, index: number) => ({
-        ...item,
-        BAR_VALUE: maxQty + 100,
-        COLOR: this.colors[index % this.colors.length]  // ✅ using colors array
-      }));
-      this.TenderSummary_list = res.data.TenderSummary
+      this.TopMovingItems_list = res.data.TopMovingItems.map(
+        (item: any, index: number) => ({
+          DESCRIPTION: item.DESCRIPTION,
+          QTY_SOLD: item.QTY_SOLD,
+          SERIES: item.DESCRIPTION,
+        }),
+      );
+      this.TenderSummary_list = res.data.TenderSummary;
 
       this.chartData = this.TenderSummary_list.map((store: any) => {
         const obj: any = {
@@ -254,13 +247,15 @@ export class AnalyticsDashboardComponent implements OnInit {
         });
         this.generateSeries();
 
-
         return obj;
       });
 
-      console.log(this.gross_Sales_list, this.TopMovingItems_list, this.TenderSummary_list)
-
-    })
+      console.log(
+        this.gross_Sales_list,
+        this.TopMovingItems_list,
+        this.TenderSummary_list,
+      );
+    });
   }
   generateSeries() {
     const tenders = new Set<string>();
@@ -272,24 +267,22 @@ export class AnalyticsDashboardComponent implements OnInit {
     });
 
     const tenderColors: any = {
-      'Cash': '#10B981',
-      'Check': '#34D399',
+      Cash: '#10B981',
+      Check: '#34D399',
       'Credit Card': '#4F46E5',
       'Debit Card': '#0EA5E9',
-      'Voucher': '#F59E0B',
-      'On Account': '#64748B'
+      Voucher: '#F59E0B',
+      'On Account': '#64748B',
     };
     this.seriesList = Array.from(tenders).map((tender) => ({
       valueField: tender,
       name: tender,
       type: 'bar',
-      color: tenderColors[tender] || '#999999'
-
+      color: tenderColors[tender] || '#999999',
     }));
   }
 
   formatDate(date: Date): string {
-
     const year = date.getFullYear();
 
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -300,13 +293,12 @@ export class AnalyticsDashboardComponent implements OnInit {
   }
   customizeTooltip = (arg: any) => {
     return {
-      text: `${arg.item.stage} : ${arg.value}`
+      text: `${arg.item.stage} : ${arg.value}`,
     };
   };
   customizeLabel = (arg: any) => {
     return `${arg.value}`;
   };
-
 
   customizeChartTooltip(arg: any) {
     return {
@@ -314,25 +306,18 @@ export class AnalyticsDashboardComponent implements OnInit {
       ${arg.argumentText}
       <br/>
       ${arg.seriesName} : ${arg.valueText}
-    `
+    `,
     };
   }
-  barChartcustomizeTooltip() {
-
-  }
-  MillioncustomizeLabel() {
-
-  }
-  onChartInitialized(e: any) {
-
-  }
+  barChartcustomizeTooltip() {}
+  MillioncustomizeLabel() {}
+  onChartInitialized(e: any) {}
   customizeFunnelLabel = (arg: any) => {
     return `${arg.item.STORE_NAME}
 ${this.formatAmount(arg.value)}`;
   };
 
   formatAmount(value: number): string {
-
     if (value >= 1000000) {
       return (value / 1000000).toFixed(1) + 'M';
     }
@@ -343,12 +328,27 @@ ${this.formatAmount(arg.value)}`;
 
     return value.toString();
   }
+
   customizePoint = (pointInfo: any) => {
-    console.log(pointInfo, '==========pointInfo===========')
+    console.log('customizePoint fired', pointInfo);
+
+    const index = this.TopMovingItems_list.findIndex(
+      (x: any) => x.DESCRIPTION === pointInfo.argument,
+    );
+
     return {
-      color: pointInfo.data.COLOR
+      color: this.colors[index % this.colors.length],
     };
   };
+  // customizePoint = (pointInfo: any) => {
+  //   const index = this.TopMovingItems_list.findIndex(
+  //     (x: any) => x.DESCRIPTION === pointInfo.argument
+  //   );
+
+  //   return {
+  //     color: this.colors[index % this.colors.length]
+  //   };
+  // };
 }
 
 @NgModule({
@@ -376,15 +376,11 @@ ${this.formatAmount(arg.value)}`;
     DxValidationGroupModule,
     DxValidatorModule,
     DxDateBoxModule,
-    DxLoadPanelModule
-
-
-
+    DxLoadPanelModule,
   ],
   providers: [],
   exports: [],
   declarations: [AnalyticsDashboardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-
 })
-export class AnalyticsDashboardModule { }
+export class AnalyticsDashboardModule {}

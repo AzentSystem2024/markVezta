@@ -68,8 +68,8 @@
         <h6 class="card-title mt-2 mb-2">Top Moving Items</h6>
 
         <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
-          <dx-chart [dataSource]="TopMovingItems_list">
-            <dxi-series
+          <dx-chart [dataSource]="TopMovingItems_list" [palette]="colors">
+            <!-- <dxi-series
               name="Item"
               argumentField="DESCRIPTION"
               valueField="BAR_VALUE"
@@ -77,7 +77,7 @@
               color="#4472C4"
             >
               <dxo-label [visible]="false"></dxo-label>
-            </dxi-series>
+            </dxi-series> -->
             <dxo-value-axis>
               <dxo-visual-range startValue="0" endValue="10">
               </dxo-visual-range>
@@ -90,7 +90,9 @@
               [customizePoint]="customizePoint"
             >
             </dxi-series>
-
+            <dxo-common-series-settings>
+              <dxo-point [visible]="true"></dxo-point>
+            </dxo-common-series-settings>
             <dxo-common-series-settings argumentField="DESCRIPTION" type="bar">
               <dxo-label [visible]="true"></dxo-label>
             </dxo-common-series-settings>
