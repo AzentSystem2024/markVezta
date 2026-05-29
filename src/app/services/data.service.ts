@@ -1355,7 +1355,7 @@ export class DataService {
   }
 
 
-    deleteSupplierPayment(id: number) {
+  deleteSupplierPayment(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}SupplierPayment/delete/` + id,
       {},
@@ -7028,29 +7028,29 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}DenialMaster/delete/${id}`, {});
   }
 
-    //=================PROFIT & LOSS DIMENSION===================
+  //=================PROFIT & LOSS DIMENSION===================
   Profit_Loss_Dimension_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/profitlossdimension';
     return this.http.post(getEndpoint, payload);
   }
 
-   //===========Balance sheet Dimension======================
+  //===========Balance sheet Dimension======================
   Balance_Sheet_Dimension_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheetDimension';
     return this.http.post(getEndpoint, payload);
   }
 
-   //===========AC_Default_Settings=====================
+  //===========AC_Default_Settings=====================
   AC_Default_Settings_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ACDefaults/settings';
     return this.http.post(getEndpoint, payload);
   }
 
-    //================Column location finding==================
+  //================Column location finding==================
   makeColumnVisible(dataGrid: DxDataGridComponent, columnName: string) {
     const columns = dataGrid.instance.getVisibleColumns();
     const columnIndex = columns.findIndex(
-      (column:any) => column.caption === columnName
+      (column: any) => column.caption === columnName
     );
     if (columnIndex !== -1) {
       const columnWidth = 150;
@@ -7069,5 +7069,13 @@ The result can be exported to HTML or Markdown.`;
         dataGrid.instance.columnOption(columnName, 'cssClass', null);
       }, 3000);
     }
+  }
+
+  //-----------------dashbooaed data===================================
+
+  Dashboard_Data_api(item: any) {
+    const payload = item
+    return this.http.post(`${this.apiUrl}Dashboard/dashboard`, payload)
+
   }
 }

@@ -464,6 +464,8 @@
     <!-- Conditionally add local currency column -->
     <dxi-column
       [caption]="
+        !CurrencySymbol ||
+        CurrencySymbol === '0' ||
         CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
           ? 'Price'
           : 'Price (' + CurrencySymbol + ')'
@@ -518,6 +520,8 @@
     ></dxi-column>
     <dxi-column
       [caption]="
+        !CurrencySymbol ||
+        CurrencySymbol === '0' ||
         CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
           ? 'Taxable'
           : 'Taxable (' + CurrencySymbol + ')'
@@ -567,6 +571,8 @@
 
     <dxi-column
       [caption]="
+        !CurrencySymbol ||
+        CurrencySymbol === '0' ||
         CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
           ? 'Tax Amt'
           : 'Tax Amt (' + CurrencySymbol + ')'
@@ -579,6 +585,8 @@
     ></dxi-column>
     <dxi-column
       [caption]="
+        !CurrencySymbol ||
+        CurrencySymbol === '0' ||
         CurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
           ? 'Total'
           : 'Total (' + CurrencySymbol + ')'

@@ -877,9 +877,49 @@ export class GrnComponent implements OnInit {
     });
   };
 
-  deleteGrnData(event: any) {
+  // deleteGrnData(event: any) {
+  //   const ID = event.data.ID;
+  //   this.service.deleteGrnData(ID).subscribe((response: any) => {});
+  // }
+  async deleteGrnData(event: any) {
+    const confirmed = await confirm(
+      'Are you sure you want to delete this GRN?',
+      'Confirmation',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     const ID = event.data.ID;
-    this.service.deleteGrnData(ID).subscribe((response: any) => {});
+
+    this.service.deleteGrnData(ID).subscribe(
+      (response: any) => {
+        if (response) {
+          notify(
+            {
+              message: 'GRN Deleted Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
+          this.getGrnLogData();
+          // this.dataGrid.instance.refresh();
+        } else {
+          notify(
+            {
+              message: 'Your Data Not deleted',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+        // or whatever method you use to refresh `employeeList`
+      },
+      (error) => {
+        console.error('Error deleting GRN :', error);
+      },
+    );
   }
 
   formatGrnDate(rowData: any): string {

@@ -783,7 +783,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   //   this.isEditItemsPopupOpened = true;
   // }
 
-  onValueChanged(event) {}
+  onValueChanged(event) { }
 
   handleFormClosed() {
     this.isEditItemsPopupOpened = false;
@@ -838,5 +838,5 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   bootstrap: [ItemsListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsListModule {}
+export class ItemsListModule { }
 platformBrowserDynamic().bootstrapModule(ItemsListModule);

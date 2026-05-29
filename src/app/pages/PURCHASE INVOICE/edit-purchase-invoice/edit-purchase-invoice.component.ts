@@ -321,60 +321,66 @@ export class EditPurchaseInvoiceComponent {
       console.log(this.pendingGRNs, 'PENDINGGRNSSSSSSSSSSSSSSSSSSSSSSSSS');
     });
 
-    this.dataService.selectSupplier(this.selectedSupplierId).subscribe((res: any) => {
-      console.log(res)
-      this.selectSupplierDetails = res
+    this.dataService
+      .selectSupplier(this.selectedSupplierId)
+      .subscribe((res: any) => {
+        console.log(res);
+        this.selectSupplierDetails = res;
 
-      this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
-      if (this.is_default) {
-        const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
-        this.Currency_Code = null
-      }
-      else {
-        const currency_id = this.selectSupplierDetails.CURRENCY_ID
-
-        this.dataService.getCurrencyData().subscribe((response: any) => {
-          const currencylist = response;
-
-          const selectedCurrencyDetails = currencylist.find(
-            (item: any) => item.ID === currency_id
+        this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY;
+        if (this.is_default) {
+          const sessiondata = JSON.parse(
+            sessionStorage.getItem('savedUserData') || '',
           );
-          if (selectedCurrencyDetails) {
-            this.Currency_Code = selectedCurrencyDetails.SYMBOL;
-          }
-          console.log(this.Currency_Code)
-        });
-      }
-    })
+          this.Currency_Code = null;
+        } else {
+          const currency_id = this.selectSupplierDetails.CURRENCY_ID;
+
+          this.dataService.getCurrencyData().subscribe((response: any) => {
+            const currencylist = response;
+
+            const selectedCurrencyDetails = currencylist.find(
+              (item: any) => item.ID === currency_id,
+            );
+            if (selectedCurrencyDetails) {
+              this.Currency_Code = selectedCurrencyDetails.SYMBOL;
+            }
+            console.log(this.Currency_Code);
+          });
+        }
+      });
   }
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
-    this.dataService.selectSupplier(this.selectedSupplierId).subscribe((res: any) => {
-      console.log(res)
-      this.selectSupplierDetails = res
+    this.dataService
+      .selectSupplier(this.selectedSupplierId)
+      .subscribe((res: any) => {
+        console.log(res);
+        this.selectSupplierDetails = res;
 
-      this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY
-      if (this.is_default) {
-        const sessiondata = JSON.parse(sessionStorage.getItem('savedUserData') || '');
-        this.Currency_Code = null
-      }
-      else {
-        const currency_id = this.selectSupplierDetails.CURRENCY_ID
-
-        this.dataService.getCurrencyData().subscribe((response: any) => {
-          const currencylist = response;
-
-          const selectedCurrencyDetails = currencylist.find(
-            (item: any) => item.ID === currency_id
+        this.is_default = this.selectSupplierDetails.IS_DEFAULT_CURRENCY;
+        if (this.is_default) {
+          const sessiondata = JSON.parse(
+            sessionStorage.getItem('savedUserData') || '',
           );
-          if (selectedCurrencyDetails) {
-            this.Currency_Code = selectedCurrencyDetails.SYMBOL;
-          }
-          console.log(this.Currency_Code)
-        });
-      }
-    })
+          this.Currency_Code = null;
+        } else {
+          const currency_id = this.selectSupplierDetails.CURRENCY_ID;
+
+          this.dataService.getCurrencyData().subscribe((response: any) => {
+            const currencylist = response;
+
+            const selectedCurrencyDetails = currencylist.find(
+              (item: any) => item.ID === currency_id,
+            );
+            if (selectedCurrencyDetails) {
+              this.Currency_Code = selectedCurrencyDetails.SYMBOL;
+            }
+            console.log(this.Currency_Code);
+          });
+        }
+      });
     const selectedSupplier = this.distributorList.find(
       (supplier: any) => supplier.ID === this.selectedSupplierId,
     );
@@ -566,8 +572,22 @@ export class EditPurchaseInvoiceComponent {
     this.isTrOutPopupVisible = true;
   }
 
+  // calculateAmount = (row: any) => {
+  //   return (parseFloat(row.RATE) || 0) * (parseFloat(row.QUANTITY) || 0);
+  // };
+
   calculateAmount = (row: any) => {
-    return (parseFloat(row.RATE) || 0) * (parseFloat(row.QUANTITY) || 0);
+    const qty = Number(row?.QUANTITY) || 0;
+
+    // using RATE
+    const rate = Number(row?.RATE) || 0;
+
+    const amount = qty * rate;
+
+    const discPerc = Number(row?.DISC_PERCENT) || 0;
+    const discAmt = (amount * discPerc) / 100;
+
+    return amount - discAmt;
   };
 
   applyGstLogic(row: any) {
@@ -805,7 +825,7 @@ export class EditPurchaseInvoiceComponent {
       (item: any) => {
         const amount = this.calculateAmount(item);
         const vat = this.calculateGstAmount(item);
-        const discamt = this.calculateDiscountAmount(item);
+        const discamt = this.calculateDiscAmt(item);
         const net = this.calculateTotal(item);
         grossAmount += amount;
         vatAmount += vat;
@@ -894,10 +914,8 @@ export class EditPurchaseInvoiceComponent {
         if (dialogResult) {
           this.isSaving = true;
           this.submitInvoice(); // Call actual API logic
-        }
-        else {
+        } else {
           this.isSaving = false;
-
         }
       });
     } else {
@@ -1040,8 +1058,9 @@ export class EditPurchaseInvoiceComponent {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
-      }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${
+      months[date.getMonth()]
+    }-${date.getFullYear().toString().slice(-2)}`;
   }
 
   onPopupClose() {
@@ -1719,4 +1738,4 @@ export class EditPurchaseInvoiceComponent {
   exports: [EditPurchaseInvoiceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditPurchaseInvoiceModule { }
+export class EditPurchaseInvoiceModule {}
