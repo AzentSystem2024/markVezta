@@ -276,7 +276,11 @@ console.log(this.isApproveMode,":-------------fhytyu")
       !this.PDCFormData.AMOUNT ||
       !this.PDCFormData.REMARKS ||
       !this.selectedBeneficiaryTypeID ||
-      !this.PDCFormData.BENEFICIARY_NAME
+      !this.PDCFormData.BENEFICIARY_NAME ||
+      (
+    this.selectedBeneficiaryTypeID === 3 &&
+    !this.PDCFormData.BENEFICIARY_NAME
+  )
     ) {
       notify('Please fill all the fields before saving.', 'error', 3000);
       return; //  Stop function if fields are missing
