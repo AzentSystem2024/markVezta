@@ -705,7 +705,7 @@ calculateSelectedPendingSummary = (options: any) => {
         3000,
       );
 
-      // Clamp back to totalPending
+      // Clamp back to  totalPending
       this.fillAmountData.field1 = this.totalPending;
     }
   }
