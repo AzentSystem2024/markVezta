@@ -228,13 +228,11 @@ export class AnalyticsDashboardComponent implements OnInit {
       }, 0);
       console.log(maxQty, '==========maxQty===========');
 
-      this.TopMovingItems_list = res.data.TopMovingItems.map(
-        (item: any, index: number) => ({
-          DESCRIPTION: item.DESCRIPTION,
-          QTY_SOLD: item.QTY_SOLD,
-          SERIES: item.DESCRIPTION,
-        }),
-      );
+      this.TopMovingItems_list = res.data.TopMovingItems.map((item: any) => ({
+        ITEM_CODE: item.ITEM_CODE,
+        QTY_SOLD: item.QTY_SOLD,
+        DESCRIPTION: item.DESCRIPTION,
+      }));
       this.TenderSummary_list = res.data.TenderSummary;
 
       this.chartData = this.TenderSummary_list.map((store: any) => {
@@ -303,9 +301,8 @@ export class AnalyticsDashboardComponent implements OnInit {
   customizeChartTooltip(arg: any) {
     return {
       text: `
-      ${arg.argumentText}
-      <br/>
-      ${arg.seriesName} : ${arg.valueText}
+      Item : ${arg.argumentText}
+      Qty Sold : ${new Intl.NumberFormat('en-IN').format(arg.value)}
     `,
     };
   }
@@ -340,15 +337,23 @@ ${this.formatAmount(arg.value)}`;
       color: this.colors[index % this.colors.length],
     };
   };
-  // customizePoint = (pointInfo: any) => {
-  //   const index = this.TopMovingItems_list.findIndex(
-  //     (x: any) => x.DESCRIPTION === pointInfo.argument
-  //   );
+  formatNumber(value: number): string {
+    if (value === null || value === undefined) {
+      return '0';
+    }
 
-  //   return {
-  //     color: this.colors[index % this.colors.length]
-  //   };
-  // };
+    return new Intl.NumberFormat('en-IN').format(value);
+  }
+
+  customizeCommonLabel = (arg: any) => {
+    return this.formatNumber(arg.value);
+  };
+
+  customizeCommonTooltip = (arg: any) => {
+    return {
+      text: `${this.formatNumber(arg.value)}`,
+    };
+  };
 }
 
 @NgModule({
