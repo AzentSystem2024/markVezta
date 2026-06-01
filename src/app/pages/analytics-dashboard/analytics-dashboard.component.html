@@ -46,9 +46,17 @@
           valueField="AMOUNT"
           [palette]="customPalette"
         >
-          <dxo-tooltip [enabled]="true"></dxo-tooltip>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeCommonTooltip"
+          ></dxo-tooltip>
 
-          <dxo-label [visible]="true" position="inside"> </dxo-label>
+          <dxo-label
+            [visible]="true"
+            position="inside"
+            [customizeText]="customizeCommonLabel"
+          >
+          </dxo-label>
           <!-- <dxo-funnel-legend [visible]="true"></dxo-funnel-legend> -->
           <dxo-legend
             [visible]="true"
@@ -68,41 +76,29 @@
         <h6 class="card-title mt-2 mb-2">Top Moving Items</h6>
 
         <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
-          <dx-chart [dataSource]="TopMovingItems_list">
-            <dxi-series
-              name="Item"
-              argumentField="DESCRIPTION"
-              valueField="BAR_VALUE"
-              type="bar"
-              color="#4472C4"
-            >
-              <dxo-label [visible]="false"></dxo-label>
-            </dxi-series>
-            <dxo-value-axis>
-              <dxo-visual-range startValue="0" endValue="10">
-              </dxo-visual-range>
-            </dxo-value-axis>
-            <dxi-series
-              name="Qty Sold"
+          <dx-chart [dataSource]="TopMovingItems_list" palette="soft">
+            <dxo-common-series-settings
               argumentField="DESCRIPTION"
               valueField="QTY_SOLD"
               type="bar"
-              [customizePoint]="customizePoint"
+              [ignoreEmptyPoints]="true"
             >
-            </dxi-series>
-
-            <dxo-common-series-settings argumentField="DESCRIPTION" type="bar">
-              <dxo-label [visible]="true"></dxo-label>
+              <dxo-label
+                [visible]="true"
+                [customizeText]="customizeCommonLabel"
+              ></dxo-label>
             </dxo-common-series-settings>
 
-            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
-            </dxo-legend>
+            <dxo-series-template nameField="ITEM_CODE"> </dxo-series-template>
 
             <dxo-tooltip
               [enabled]="true"
               [customizeTooltip]="customizeChartTooltip"
             >
             </dxo-tooltip>
+
+            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
+            </dxo-legend>
 
             <dxo-size [height]="400" [width]="1200"> </dxo-size>
           </dx-chart>
@@ -128,7 +124,12 @@
               type="bar"
               [barPadding]="0.3"
             >
-              <dxo-label [visible]="true" position="outside"> </dxo-label>
+              <dxo-label
+                [visible]="true"
+                position="outside"
+                [customizeText]="customizeCommonLabel"
+              >
+              </dxo-label>
             </dxo-common-series-settings>
 
             <dxi-series
@@ -143,7 +144,11 @@
             <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
             </dxo-legend>
 
-            <dxo-tooltip [enabled]="true"> </dxo-tooltip>
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeCommonTooltip"
+            >
+            </dxo-tooltip>
           </dx-chart>
         </div>
         <!-- </dx-scroll-view> -->
