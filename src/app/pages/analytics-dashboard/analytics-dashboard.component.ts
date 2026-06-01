@@ -39,6 +39,7 @@ import {
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 type DashboardData =
   | SalesOrOpportunitiesByCategory
@@ -54,10 +55,13 @@ type DataLoader = (startDate: string, endDate: string) => Observable<Object>;
   providers: [DataService],
 })
 export class AnalyticsDashboardComponent implements OnInit {
-  DateDrp = [
-    { text: 'Today', value: 'today' },
-    { text: 'Yesterday', value: 'yesterday' },
-    { text: 'This Month', value: 'thisMonth' },
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
   ];
 
   chartSize = { width: window.innerWidth * 0.95 };
@@ -86,7 +90,8 @@ export class AnalyticsDashboardComponent implements OnInit {
   sales: Sales = null;
   salesByState: SalesByState = null;
   salesByCategory: SalesByStateAndCity = null;
-
+  showCustomDatePopup = false
+  customStartDate: any = null;
   isLoading: boolean = true;
   customPalette = [
     '#BAE6FD', // Transactions
@@ -116,8 +121,11 @@ export class AnalyticsDashboardComponent implements OnInit {
   chartData: any;
   seriesList: any[] = [];
   loadingVisible: boolean = false;
-
-  constructor(private service: DataService) {}
+  customEndDate: any = null;
+  startDate_of_Financial_year: any;
+  customDateRangeText: any
+  customDateLabel = '';
+  constructor(private service: DataService) { }
 
   selectionChange(dates: Dates) {
     this.loadData(dates.startDate, dates.endDate);
@@ -159,7 +167,7 @@ export class AnalyticsDashboardComponent implements OnInit {
     const [startDate, endDate] = analyticsPanelItems[4].value.split('/');
     this.isLoading = false;
     // this.loadData(startDate, endDate);
-    this.onDateRangeChange({ value: 'thisYear' });
+    this.onDateRangeChange({ value: 'today' });
   }
   //====================session Details===========================
   sesstion_Details() {
@@ -170,32 +178,53 @@ export class AnalyticsDashboardComponent implements OnInit {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.startDate_of_Financial_year = sessionData.FINANCIAL_YEARS[0].DATE_FROM;
+    console.log(this.startDate_of_Financial_year, '================startDate_of_Financial_year=================');
 
     const sessionYear = sessionData.FINANCIAL_YEARS;
     //  this.financialYeaDate=sessionYear[0].DATE_FROM
     // this.formatted_from_date=this.financialYeaDate
   }
   //--------------------date range selection----------------------------
+
   onDateRangeChange(e: any) {
+
     const today = new Date();
 
-    if (e.value === 'today') {
-      this.fromDate = new Date();
-      this.toDate = new Date();
-    } else if (e.value === 'yesterday') {
-      const yesterday = new Date();
-      yesterday.setDate(today.getDate() - 1);
+    switch (e.value) {
+      case 'today':
+        this.fromDate = new Date(today);
+        this.toDate = new Date(today);
+        break;
 
-      this.fromDate = yesterday;
-      this.toDate = yesterday;
-    } else if (e.value === 'thisMonth') {
-      this.fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      case 'last7':
+        this.fromDate = new Date(today);
+        this.fromDate.setDate(today.getDate() - 6); // including today
+        this.toDate = new Date(today);
+        break;
 
-      this.toDate = new Date();
-    } else if (e.value === 'thisYear') {
-      this.fromDate = new Date(today.getFullYear(), 0, 1);
+      case 'last15':
+        this.fromDate = new Date(today);
+        this.fromDate.setDate(today.getDate() - 14);
+        this.toDate = new Date(today);
+        break;
 
-      this.toDate = new Date();
+      case 'last30':
+        this.fromDate = new Date(today);
+        this.fromDate.setDate(today.getDate() - 29);
+        this.toDate = new Date(today);
+        break;
+
+      case 'all':
+        this.fromDate = new Date(this.startDate_of_Financial_year); // or your minimum date
+        this.toDate = new Date(today);   // or today
+        break;
+
+      case 'custom':
+        this.showCustomDatePopup = true;
+        // User will select fromDate and toDate manually.
+        return;
+
     }
 
     this.getDashboardData();
@@ -205,6 +234,10 @@ export class AnalyticsDashboardComponent implements OnInit {
   }
 
   getDashboardData() {
+
+    console.log('call this function')
+    console.log('From Date:', this.fromDate);
+    console.log('To Date:', this.toDate);
     this.loadingVisible = true;
 
     this.sesstion_Details();
@@ -254,6 +287,9 @@ export class AnalyticsDashboardComponent implements OnInit {
         this.TenderSummary_list,
       );
     });
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+    );
   }
   generateSeries() {
     const tenders = new Set<string>();
@@ -299,16 +335,18 @@ export class AnalyticsDashboardComponent implements OnInit {
   };
 
   customizeChartTooltip(arg: any) {
+    console.log(arg, '=================customizeChartTooltip arg=================');
     return {
       text: `
       Item : ${arg.argumentText}
       Qty Sold : ${new Intl.NumberFormat('en-IN').format(arg.value)}
+      Item Code : ${arg.seriesName}
     `,
     };
   }
-  barChartcustomizeTooltip() {}
-  MillioncustomizeLabel() {}
-  onChartInitialized(e: any) {}
+  barChartcustomizeTooltip() { }
+  MillioncustomizeLabel() { }
+  onChartInitialized(e: any) { }
   customizeFunnelLabel = (arg: any) => {
     return `${arg.item.STORE_NAME}
 ${this.formatAmount(arg.value)}`;
@@ -354,6 +392,215 @@ ${this.formatAmount(arg.value)}`;
       text: `${this.formatNumber(arg.value)}`,
     };
   };
+
+
+  //====================date range selection for custom date===========================
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.showCustomDatePopup = true;
+      return;
+    }
+
+    // reset custom label
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+    );
+
+    this.customStartDate = null;
+    this.customEndDate = null;
+
+    this.getDashboardData();
+  }
+
+  // applyDateFilter() {
+
+  //   if (this.selectedDateRange === 'all') {
+  //     return;
+  //   }
+  //   const today = new Date();
+  //   let startDate: Date;
+  //   const endDate = new Date(); // today
+
+  //   switch (this.selectedDateRange) {
+  //     case 'today':
+  //       startDate = new Date();
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last7':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 6);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last15':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 14);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last30':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 29);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     default:
+  //       // this.filteredPurchaseInvoices = this.purchaseInvoiceList;
+  //       return;
+  //   }
+
+
+  // }
+  applyDateFilter() {
+    const today = new Date();
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        this.fromDate = new Date(today);
+        this.toDate = new Date(today);
+        break;
+
+      case 'last7':
+        this.fromDate = new Date(today);
+        this.fromDate.setDate(today.getDate() - 6);
+        this.toDate = new Date(today);
+        break;
+
+      case 'last15':
+        this.fromDate = new Date(today);
+        this.fromDate.setDate(today.getDate() - 14);
+        this.toDate = new Date(today);
+        break;
+
+      case 'last30':
+        this.fromDate = new Date(today);
+        this.fromDate.setDate(today.getDate() - 29);
+        this.toDate = new Date(today);
+        break;
+
+      case 'all':
+        this.fromDate = null;
+        this.toDate = new Date(today);
+        break;
+
+      case 'custom':
+        if (!this.fromDate || !this.toDate) {
+          return;
+        }
+        break;
+
+      default:
+        return;
+    }
+
+    this.getDashboardData();
+  }
+
+  applyCustomDateFilter() {
+    if (!this.customStartDate || !this.customEndDate) return;
+
+    if (this.customStartDate > this.customEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
+
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        : option,
+    );
+
+    this.selectedDateRange = 'custom';
+    this.showCustomDatePopup = false;
+
+  }
+
+  private parseDateString(dateStr: string): Date {
+    if (!dateStr || typeof dateStr !== 'string') {
+      console.warn('Invalid date string:', dateStr);
+      return new Date('Invalid'); // or new Date(0) if you want a fallback
+    }
+
+    const [day, month, year] = dateStr
+      .split('-')
+      .map((part) => parseInt(part, 10));
+    return new Date(year, month - 1, day);
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} to ${to}`;
+    }
+
+    return item.label;
+  };
+
+  openCustomDatePopup() {
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.showCustomDatePopup = true;
+  }
+
+
+
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  get customStartDateFormatted(): string {
+    return this.customStartDate
+      ? this.formatAsDDMMYYYY(new Date(this.customStartDate))
+      : '';
+  }
+
+  get customEndDateFormatted(): string {
+    return this.customEndDate
+      ? this.formatAsDDMMYYYY(new Date(this.customEndDate))
+      : '';
+  }
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+    this.fromDate = new Date(this.customStartDate);
+    this.toDate = new Date(this.customEndDate);
+    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        : option,
+    );
+    this.selectedDateRange = 'custom';
+    this.showCustomDatePopup = false;
+    this.getDashboardData(); // your existing function
+  }
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+      if (innerList) {
+        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
+        innerList.on('itemClick', (clickEvent: any) => {
+          const clickedValue = clickEvent.itemData.value;
+          if (clickedValue === 'custom') {
+            this.openCustomDatePopup();
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
 }
 
 @NgModule({
@@ -382,10 +629,11 @@ ${this.formatAmount(arg.value)}`;
     DxValidatorModule,
     DxDateBoxModule,
     DxLoadPanelModule,
+    CustomDatePopupModule
   ],
   providers: [],
   exports: [],
   declarations: [AnalyticsDashboardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AnalyticsDashboardModule {}
+export class AnalyticsDashboardModule { }
