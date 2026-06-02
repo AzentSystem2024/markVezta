@@ -113,6 +113,28 @@
                 ></dx-number-box>
 
                 <dx-button
+                  type="default"
+                  stylingMode="contained"
+                  hint="Add Row"
+                  style="margin-top: 4px"
+                  (onClick)="addNewManualRow()"
+                >
+                  <div
+                    *dxTemplate="let data of 'content'"
+                    class="add-btn-content"
+                  >
+                    <span
+                      class="iconify"
+                      data-icon="formkit:add"
+                      data-width="20"
+                      data-height="20"
+                    ></span>
+
+                    <span class="add-text">Add Row</span>
+                  </div></dx-button
+                >
+
+                <!-- <dx-button
                   icon="plus"
                   type="default"
                   stylingMode="outlined"
@@ -121,7 +143,7 @@
                   [height]="30"
                   style="margin-top: 4px"
                   (onClick)="addNewManualRow()"
-                ></dx-button>
+                ></dx-button> -->
               </div>
             </div>
           </dxi-item>
@@ -339,7 +361,7 @@
     ></dx-button>
     <dx-button
       *ngIf="!isReadOnlyMode"
-  [text]="isUpdating ? actionButtonText + '...' : actionButtonText"
+      [text]="isUpdating ? actionButtonText + '...' : actionButtonText"
       [disabled]="isUpdating"
       (onClick)="updateCreditNote()"
       stylingMode="contained"

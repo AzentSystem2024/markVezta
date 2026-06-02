@@ -110,7 +110,6 @@ export class SupplierFinFormComponent {
 
   supplier: any;
 
-
   constructor(
     private service: DataService,
     authservice: AuthService,
@@ -139,8 +138,11 @@ export class SupplierFinFormComponent {
     this.getStateDropDown();
     this.getCurrency();
     this.getCurrency_Dropdown();
-    this.newSupplier.VAT_RULE_ID = 2
-    console.log(this.newSupplier.VAT_RULE_ID, '===========vat rule id============')
+    this.newSupplier.VAT_RULE_ID = 2;
+    console.log(
+      this.newSupplier.VAT_RULE_ID,
+      '===========vat rule id============',
+    );
   }
   newSupplier = this.formSupplierData;
 
@@ -148,7 +150,7 @@ export class SupplierFinFormComponent {
     ...this.newSupplier,
     MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
     PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
-    IS_DEFAULT_CURRENCY: this.isCurrencyAccepted
+    IS_DEFAULT_CURRENCY: this.isCurrencyAccepted,
   });
 
   toggleCurrencyDropdown(checked: boolean) {
@@ -166,9 +168,8 @@ export class SupplierFinFormComponent {
 
   deafulvalue() {
     console.log('==open =====');
-    this.newSupplier.VAT_RULE_ID = 2
-    this.formSupplierData.VAT_RULE_ID = 2
-
+    this.newSupplier.VAT_RULE_ID = 2;
+    this.formSupplierData.VAT_RULE_ID = 2;
   }
   listSupplier() {
     const payload = {
@@ -306,7 +307,6 @@ export class SupplierFinFormComponent {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
       this.countryCodePhone = selectedCountry.CODE; // for phone number
-
     } else {
       // 5️ Fallback if no country found
       this.countryCode = '';
@@ -457,4 +457,4 @@ export class SupplierFinFormComponent {
   exports: [SupplierFinFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierFinFormModule { }
+export class SupplierFinFormModule {}

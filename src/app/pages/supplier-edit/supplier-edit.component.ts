@@ -214,7 +214,7 @@ export class SupplierEditComponent {
         savedCostIDs.includes(cost.ID),
       );
       this.selectedLandedCostKeys = selectedCosts.map((cost: any) => cost.ID);
-
+      this.isCurrencyAccepted = this.supplierData.IS_DEFAULT_CURRENCY;
       console.log('Selected Landed Cost Keys:', this.selectedLandedCostKeys);
       const MobileNo = this.supplierData.MOBILE_NO;
       const [countryCode, number] = MobileNo.split('-');
@@ -421,6 +421,7 @@ export class SupplierEditComponent {
       PURCH_TYPE: this.purchType,
       MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
       PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
+      IS_DEFAULT_CURRENCY: this.isCurrencyAccepted,
     };
     console.log(payload, 'PAYLOADINEDIT');
     this.dataservice
