@@ -110,6 +110,7 @@ export class TransferInInventoryFormComponent {
     USER_ID: '',
     NARRATION: '',
     REASON_ID: '',
+    IS_APPROVED: false,
 
     DETAILS: [], // <-- start empty
   };
@@ -191,6 +192,7 @@ export class TransferInInventoryFormComponent {
       DETAILS: data.DETAILS ? [...data.DETAILS] : [],
       NARRATION: data.NARRATION || '',
       NET_AMOUNT: data.NET_AMOUNT,
+      IS_APPROVED: data.IS_APPROVED || false,
     };
     this.reindexDetails();
   }

@@ -402,7 +402,18 @@ export class ViewPromotionWizardComponent {
       Selected: this.selectedRowKeys.includes(item.ITEM_ID)
     }));
   }
-
+  get storeHint(): string {
+    return this.store
+      ?.filter((x: any) => this.selectedStoreId?.includes(x.ID))
+      .map((x: any) => x.STORE_NAME)
+      .join(', ') || '';
+  }
+  get daysHint(): string {
+    return this.daysOfWeek
+      ?.filter(day => this.selectedDays?.includes(day.value))
+      .map(day => day.text)
+      .join(', ') || '';
+  }
 }
 
 @NgModule({

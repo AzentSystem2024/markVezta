@@ -167,7 +167,11 @@ export class AnalyticsDashboardComponent implements OnInit {
     const [startDate, endDate] = analyticsPanelItems[4].value.split('/');
     this.isLoading = false;
     // this.loadData(startDate, endDate);
-    this.onDateRangeChange({ value: 'today' });
+    this.selectedDateRange = 'today';
+
+    this.onDateRangeChange({
+      value: 'today'
+    });
   }
   //====================session Details===========================
   sesstion_Details() {
@@ -508,7 +512,7 @@ ${this.formatAmount(arg.value)}`;
 
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        ? { ...option, label: 'custom' }
         : option,
     );
 
@@ -572,16 +576,17 @@ ${this.formatAmount(arg.value)}`;
     this.customEndDate = e.end;
     this.fromDate = new Date(this.customStartDate);
     this.toDate = new Date(this.customEndDate);
-    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
-    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+    // const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+    // const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        ? { ...option, label: 'Custom' }
         : option,
     );
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
+
     this.getDashboardData(); // your existing function
   }
   attachItemClickHandler(e: any) {

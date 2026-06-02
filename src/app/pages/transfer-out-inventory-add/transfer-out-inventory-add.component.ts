@@ -199,6 +199,8 @@ export class TransferOutInventoryAddComponent {
       NARRATION: data.NARRATION || '',
       NET_AMOUNT: data.NET_AMOUNT,
       DOC_NO: data.DOC_NO,
+      IS_APPROVED: data.IS_APPROVED || false,
+
     };
     this.transferOutFormData.DETAILS.forEach((row: any, index: number) => {
       row.SL_NO = index + 1;
@@ -450,106 +452,6 @@ export class TransferOutInventoryAddComponent {
     return `${year}-${month}-${day}`; // ✅ preserves local date
   }
 
-  // saveTransferOut() {
-  //   // 1. Validate required fields before saving
-  //   if (!this.transferOutFormData.DEST_STORE_ID) {
-  //     notify('Please select a store to transfer to', 'error');
-  //     return;
-  //   }
-  //   if (!this.transferOutFormData.REASON_ID) {
-  //     notify('Please select a reason', 'error');
-  //     return;
-  //   }
-  //   if (
-  //     !this.transferOutFormData.DETAILS ||
-  //     this.transferOutFormData.DETAILS.length === 0
-  //   ) {
-  //     notify('Please add at least one item', 'error');
-  //     return;
-  //   }
-
-  //   this.transferOutFormData.NET_AMOUNT =
-  //     this.transferOutFormData.DETAILS.reduce(
-  //       (sum: number, item: any) =>
-  //         sum + (Number(item.COST) || 0) * (Number(item.QUANTITY) || 0),
-  //       0
-  //     );
-
-  //   // 2. Format payload
-  //   const payload = {
-  //     ...this.transferOutFormData,
-  //     TRANSFER_DATE: this.formatDateLocal(
-  //       this.transferOutFormData.TRANSFER_DATE
-  //     ),
-  //     USER_ID: this.userID,
-  //     COMPANY_ID: this.companyID,
-  //     FIN_ID: this.finID,
-  //     STORE_ID: this.storeFromSession,
-  //   };
-
-  //   console.log('Final payload:', payload);
-
-  //   // 3. Decide whether to insert or update
-  //   if (this.isApproved) {
-  //     confirm(
-  //       'Are you sure you want to approve this transfer?',
-  //       'Confirm Approval'
-  //     ).then((dialogResult) => {
-  //       if (dialogResult) {
-  //         this.dataService.approveTransferOutForInventory(payload).subscribe({
-  //           next: (res: any) => {
-  //             if (res.flag === 1) {
-  //               notify('Transfer approved successfully!', 'success', 3000);
-  //               this.popupClosed.emit();
-  //             } else {
-  //               notify(
-  //                 'Error approving transfer: ' + res.message,
-  //                 'error',
-  //                 3000
-  //               );
-  //             }
-  //           },
-  //           error: (err) => {
-  //             console.error('Approve error:', err);
-  //             notify('Something went wrong while approving.', 'error', 3000);
-  //           },
-  //         });
-  //       }
-  //     });
-  //   } else if (this.isEditing) {
-  //     this.dataService.updateTransferOutForInventory(payload).subscribe({
-  //       next: (res: any) => {
-  //         if (res.flag === 1) {
-  //           notify('Transfer updated successfully!', 'success', 3000);
-  //           this.popupClosed.emit();
-  //         } else {
-  //           notify('Error updating transfer: ' + res.message, 'error', 3000);
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('Update error:', err);
-  //         notify('Something went wrong while updating.', 'error', 3000);
-  //       },
-  //     });
-  //   } else {
-  //     this.dataService.insertTransferOutForInventory(payload).subscribe({
-  //       next: (res: any) => {
-  //         if (res.flag === 1) {
-  //           notify('Transfer saved successfully!', 'success', 3000);
-  //           this.getTransferNo();
-  //           this.popupClosed.emit(); // close/reset
-  //         } else {
-  //           notify('Error saving transfer: ' + res.message, 'error', 3000);
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('Save error:', err);
-  //         notify('Something went wrong while saving.', 'error', 3000);
-  //       },
-  //     });
-  //   }
-  // }
-
   saveTransferOut() {
     // 1. Validate required fields
     if (!this.transferOutFormData.DEST_STORE_ID) {
@@ -597,7 +499,7 @@ export class TransferOutInventoryAddComponent {
     // ---------- EDIT MODE ----------
     if (this.isEditing) {
       console.log(this.selectedDocStatus, '==========')
-      if (this.selectedDocStatus == 'VERIFY' || this.isApproved) {
+      if (this.selectedDocStatus == 'VERIFY' || this.transferOutFormData.IS_APPROVED) {
         // APPROVE API
         confirm(
           'Are you sure you want to approve this transfer?',
