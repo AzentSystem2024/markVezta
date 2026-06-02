@@ -3,14 +3,16 @@
     label="Date Range"
     labelMode="floating"
     valueExpr="value"
-    displayExpr="text"
-    [dataSource]="DateDrp"
+    [displayExpr]="displayExpr"
+    [dataSource]="dateRanges"
     [searchEnabled]="true"
+    [(value)]="selectedDateRange"
     (onValueChanged)="onDateRangeChange($event)"
+    (onOpened)="attachItemClickHandler($event)"
   >
   </dx-select-box>
 
-  <dx-date-box
+  <!-- <dx-date-box
     label="From Date"
     labelMode="floating"
     type="date"
@@ -18,9 +20,9 @@
     [(value)]="fromDate"
     (onValueChanged)="dateChanged()"
   >
-  </dx-date-box>
+  </dx-date-box> -->
 
-  <dx-date-box
+  <!-- <dx-date-box
     label="To Date"
     labelMode="floating"
     type="date"
@@ -28,7 +30,7 @@
     (onValueChanged)="dateChanged()"
     displayFormat="dd-MM-yyyy"
   >
-  </dx-date-box>
+  </dx-date-box> -->
 </div>
 <div class="view-wrapper">
   <div class="dashboard-wrapper">
@@ -97,8 +99,7 @@
             >
             </dxo-tooltip>
 
-            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
-            </dxo-legend>
+            <dxo-legend [visible]="false"></dxo-legend>
 
             <dxo-size [height]="400" [width]="1200"> </dxo-size>
           </dx-chart>
@@ -156,6 +157,15 @@
     </div>
   </div>
 </div>
+
+<!-- //=============Custome popup=============== -->
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
 
 <dx-load-panel
   *ngIf="loadingVisible"
