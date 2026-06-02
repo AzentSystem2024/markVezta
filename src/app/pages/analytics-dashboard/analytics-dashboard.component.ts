@@ -40,6 +40,7 @@ import {
   DxValidatorModule,
 } from 'devextreme-angular';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import notify from 'devextreme/ui/notify';
 
 type DashboardData =
   | SalesOrOpportunitiesByCategory
@@ -244,6 +245,12 @@ export class AnalyticsDashboardComponent implements OnInit {
     console.log('To Date:', this.toDate);
     this.loadingVisible = true;
 
+    const timeoutId = setTimeout(() => {
+      this.loadingVisible = false;
+      alert('Request timeout. Please try again.');
+    }, 50000); // 50   seconds
+
+
     this.sesstion_Details();
 
     const payload = {
@@ -255,6 +262,8 @@ export class AnalyticsDashboardComponent implements OnInit {
 
     console.log(payload);
     this.service.Dashboard_Data_api(payload).subscribe((res: any) => {
+      clearTimeout(timeoutId); // stop timeout
+
       this.loadingVisible = false;
       this.gross_Sales_list = res.data.GrossSale;
       // this.TopMovingItems_list = res.data.
@@ -290,6 +299,12 @@ export class AnalyticsDashboardComponent implements OnInit {
         this.TopMovingItems_list,
         this.TenderSummary_list,
       );
+    }, (error) => {
+      clearTimeout(timeoutId); // stop timeout
+      this.loadingVisible = false;
+
+      // alert('Error occurred while loading data.');
+      notify('Error occurred while loading data.', 'error', 3000);
     });
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom' ? { ...option, label: 'Custom' } : option,

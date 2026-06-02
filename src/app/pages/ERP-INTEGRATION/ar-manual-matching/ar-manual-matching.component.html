@@ -1,0 +1,114 @@
+<dx-data-grid
+  #raGrid
+  [dataSource]="RAGridData"
+  [columns]="RAProcessPopUpColumns"
+  [showBorders]="true"
+  class="mb-1"
+  [height]="'50%'"
+  [keyExpr]="'ID'"
+  [rowAlternationEnabled]="true"
+  [paging]="{ enabled: false }"
+  [selection]="{
+    mode: 'multiple',
+    showCheckBoxesMode: 'always',
+  }"
+  [focusedRowEnabled]="false"
+  [scrolling]="{ mode: 'virtual' }"
+  [allowColumnReordering]="true"
+  [allowColumnResizing]="true"
+  [columnFixing]="{
+    enabled: true,
+    texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+  }"
+  (onSelectionChanged)="onRADataRowSelected($event)"
+>
+  <dxo-toolbar>
+    <dxi-item location="before">
+      <div class="grid-header h5 fw-bold border-bottom">Invoice Data</div>
+    </dxi-item>
+
+    <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="{
+        text: 'Multi Match',
+        icon: '',
+        type: 'default',
+        stylingMode: 'contained',
+        disabled: !isHisSelected,
+        onClick: distributeRA,
+      }"
+    >
+    </dxi-item>
+
+    <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+  </dxo-toolbar>
+
+  <dxo-sorting mode="single"></dxo-sorting>
+  <dxo-filter-row [visible]="true"></dxo-filter-row>
+  <dxo-header-filter [visible]="true"></dxo-header-filter>
+  <dxo-column-chooser
+    [height]="500"
+    hideOnOutsideClick="true"
+    [enabled]="true"
+    mode="select"
+  >
+  </dxo-column-chooser>
+</dx-data-grid>
+<dx-data-grid
+  #raGrid
+  [dataSource]="RAGridData"
+  [columns]="RAProcessPopUpColumns"
+  [showBorders]="true"
+  class="mb-1"
+  [height]="'50%'"
+  [keyExpr]="'ID'"
+  [rowAlternationEnabled]="true"
+  [paging]="{ enabled: false }"
+  [selection]="{
+    mode: 'multiple',
+    showCheckBoxesMode: 'always',
+  }"
+  [focusedRowEnabled]="false"
+  [scrolling]="{ mode: 'virtual' }"
+  [allowColumnReordering]="true"
+  [allowColumnResizing]="true"
+  [columnFixing]="{
+    enabled: true,
+    texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+  }"
+  (onSelectionChanged)="onRADataRowSelected($event)"
+>
+  <dxo-toolbar>
+    <dxi-item location="before">
+      <div class="grid-header h5 fw-bold border-bottom">Invoice Data</div>
+    </dxi-item>
+
+    <dxi-item
+      location="after"
+      widget="dxButton"
+      [options]="{
+        text: 'Multi Match',
+        icon: '',
+        type: 'default',
+        stylingMode: 'contained',
+        disabled: !isHisSelected,
+        onClick: distributeRA,
+      }"
+    >
+    </dxi-item>
+
+    <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+  </dxo-toolbar>
+
+  <dxo-sorting mode="single"></dxo-sorting>
+  <dxo-filter-row [visible]="true"></dxo-filter-row>
+  <dxo-header-filter [visible]="true"></dxo-header-filter>
+  <dxo-column-chooser
+    [height]="500"
+    hideOnOutsideClick="true"
+    [enabled]="true"
+    mode="select"
+  >
+  </dxo-column-chooser>
+</dx-data-grid>
