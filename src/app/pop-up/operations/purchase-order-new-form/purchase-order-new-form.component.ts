@@ -221,6 +221,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       'GENERALSETTINGSSSSSSSSS',
     );
     this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
+    console.log(this.vatTitle, 'VATTITLEEEEEEEEEEEEEE');
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     this.storeID = this.menuResponse.Configuration[0].STORE_ID;
     const menuGroups = this.menuResponse.MenuGroups || [];
@@ -441,9 +442,11 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.newPoData.SUPP_MOBILE = this.supplierItems[0].PHONE;
       this.showLocalCurrencyColumn =
         this.localCurrencyId !== this.newPoData.CURRENCY_ID;
-      // this.newPoData.SHIP_TO = this.supplierItems[0].COMPANY_ADDRESS;
-      // this.newPoData.CONTACT_NAME = this.supplierItems[0].COMPANY_CONTACT;
-      // this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
+      if (this.vatTitle === 'GST') {
+        this.newPoData.SHIP_TO = this.supplierItems[0].COMPANY_ADDRESS;
+        this.newPoData.CONTACT_NAME = this.supplierItems[0].COMPANY_CONTACT;
+        this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
+      }
       const suppMobile = this.supplierItems[0].PHONE;
       console.log(this.SupplierCurrencySymbol, 'SUPPLIERCURRENCYSYMBOL');
       if (!suppMobile) return;
