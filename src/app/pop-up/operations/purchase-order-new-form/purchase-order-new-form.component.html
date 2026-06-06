@@ -72,7 +72,7 @@
         displayExpr="DESCRIPTION"
         valueExpr="ID"
         [(value)]="newPoData.STORE_ID"
-        (onValueChanged)="getStoreOrCompanyByid()"
+        (onValueChanged)="vatTitle !== 'GST' && getStoreOrCompanyByid()"
         [searchEnabled]="true"
       >
       </dx-select-box>

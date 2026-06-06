@@ -148,7 +148,7 @@ export class PhysicalInventoryFormComponent {
 
   history: any;
   selectedStatus: any;
-
+  showApproveCheck: boolean = false;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -391,6 +391,7 @@ export class PhysicalInventoryFormComponent {
 
   calculateSerialNumber() { }
   isEditDataAvailable() {
+
     // 🔹 Check if edit mode is active and data is passed in
     if (this.isEditing && this.EditingResponseData) {
       console.log('Edit Mode Active:', this.EditingResponseData);

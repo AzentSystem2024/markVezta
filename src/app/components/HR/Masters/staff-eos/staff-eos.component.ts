@@ -389,12 +389,16 @@ export class StaffEOSComponent {
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
     icon.style.color =
-      status === 'Left Service'
-        ? '#EF4444' // Left Service
-        : status === 'Verified'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'Left Service' ? 'Left Service' : status === 'verified' ? 'Verified' : 'Open';
+      status == null || status === ''
+        ? '#000000' :
+        status === 'Left Service'
+          ? '#EF4444' // Left Service
+          : status === 'Verified'
+            ? '#0073D8' // Verified
+            : '#FFA500'; // Open
+    icon.title = status == null || status === ''
+      ? 'No Status'
+      : status === 'Left Service' ? 'Left Service' : status === 'verified' ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';

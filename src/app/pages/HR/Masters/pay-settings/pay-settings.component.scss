@@ -42,3 +42,18 @@
 .dx-texteditor {
   border-radius: 8px !important;
 }
+
+.filter-container {
+  background: var(--base-bg);
+  gap: 16px;
+  align-items: center;
+  /* padding: 8px; */
+  border-radius: 8px;
+  gap: 16px;
+  align-items: center;
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); */
+  margin-left: 5px;
+  height: 50px;
+  padding-left: 16px;
+  padding-bottom: -5px;
+}
