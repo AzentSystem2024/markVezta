@@ -7078,4 +7078,10 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}Dashboard/dashboard`, payload)
 
   }
+
+  // Account Summary data loading ============
+  account_Summary_Api(payload: any) {
+    const getEndpoint = this.apiUrl + 'AcReports/TrialBalance/AsOnDate';
+    return this.http.post(getEndpoint, payload);
+  }
 }

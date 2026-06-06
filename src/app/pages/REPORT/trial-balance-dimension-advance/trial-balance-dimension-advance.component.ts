@@ -67,6 +67,7 @@ export class TrialBalanceDimensionAdvanceComponent {
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
 
+
   summaryColumnsData = {
     totalItems: [
       {
@@ -168,6 +169,8 @@ export class TrialBalanceDimensionAdvanceComponent {
       }
     },
   };
+  storesCredit: any[] = [];
+  storesDebit: any[] = [];
 
   constructor(
     private dataservice: DataService,
@@ -199,7 +202,7 @@ export class TrialBalanceDimensionAdvanceComponent {
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
     this.Diamension_dropdown();
-    this.get_DataSource();
+    // this.get_DataSource();
   }
 
   //================ Year value change ===================
@@ -283,12 +286,11 @@ export class TrialBalanceDimensionAdvanceComponent {
   }
 
   get_DataSource() {
+    console.log('call this function')
     const payload = {
       companyId: this.selected_Company_id,
       finId: this.selected_fin_id,
-      dateFrom: this.formatted_from_date,
       dateTo: this.formatted_To_date,
-      DimensionCode: String(this.selectedDiamensions),
     };
 
     sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
@@ -296,16 +298,34 @@ export class TrialBalanceDimensionAdvanceComponent {
     console.log(JSON.parse(sessionStorage.getItem('viewclickvalue') || '{}'));
 
     this.dataservice
-      .Trial_Balance_Diamensions_Api(payload)
+      .account_Summary_Api(payload)
       .subscribe((res: any) => {
         this.isEmptyDatagrid = false;
 
-        // this.TrialBalanceReport = res.data;
-        this.TrialBalanceReport = [...res.data];
+        this.TrialBalanceReport = res.data;
+        // this.TrialBalanceReport = [...res.data];
+        if (this.TrialBalanceReport.length > 0) {
+          this.storesDebit = [Object.keys(this.TrialBalanceReport[0].Debit)];
+          console.log('stores in debit', this.storesDebit);
+          this.storesCredit = [Object.keys(this.TrialBalanceReport[0].Credit)];
+          console.log('stores in credit', this.storesCredit);
+        }
         console.log(this.TrialBalanceReport);
       });
   }
+  getDebitValue(store: string) {
+    // console.log('store in debit value', store);
+    return (rowData: any) => {
+      return rowData?.Debit?.[store] ?? 0;
+    };
+  }
 
+  getCreditValue(store: string) {
+    // console.log('store in credit value', store);
+    return (rowData: any) => {
+      return rowData?.Credit?.[store] ?? 0;
+    };
+  }
   onCellClick(e: any) {
     if (e.rowType !== 'data') {
       return;
