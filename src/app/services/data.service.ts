@@ -7082,7 +7082,6 @@ The result can be exported to HTML or Markdown.`;
   LedgerStatement_Dimension(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/ledgerwithdimension';
     return this.http.post(getEndpoint, payload);
-
   }
   // Account Summary data loading ============
   account_Summary_Api(payload: any) {
