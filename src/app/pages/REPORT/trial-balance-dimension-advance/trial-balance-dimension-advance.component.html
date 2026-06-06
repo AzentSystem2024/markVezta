@@ -118,11 +118,21 @@
         caption="Ledger Name"
         width="200"
       ></dxi-column>
+      <dxi-column
+        dataField="HeadID"
+        caption="Head ID"
+        [visible]="false"
+      ></dxi-column>
       <dxi-column caption="Debit">
         <dxi-column
           *ngFor="let store of storesDebit"
           [dataField]="'Debit_' + store"
           [caption]="store"
+          [format]="{
+            type: 'fixedPoint',
+            precision: 2,
+            useGrouping: true,
+          }"
         >
         </dxi-column>
       </dxi-column>
@@ -132,6 +142,11 @@
           *ngFor="let store of storesCredit"
           [dataField]="'Credit_' + store"
           [caption]="store"
+          [format]="{
+            type: 'fixedPoint',
+            precision: 2,
+            useGrouping: true,
+          }"
         >
         </dxi-column>
       </dxi-column>
@@ -148,6 +163,23 @@
           [onClick]="onViewClick.bind(this)"
         ></dxi-button>
       </dxi-column>
+
+      <dxo-summary>
+        <dxi-total-item
+          column="LedgerName"
+          summaryType="count"
+          [customizeText]="customizeTotalText"
+        >
+        </dxi-total-item>
+        <dxi-total-item
+          *ngFor="let item of summaryColumnsData.totalItems"
+          [column]="item.column"
+          [summaryType]="item.summaryType"
+          [showInColumn]="item.showInColumn"
+          [valueFormat]="item.valueFormat"
+        >
+        </dxi-total-item>
+      </dxo-summary>
     </dx-data-grid>
   </div>
 

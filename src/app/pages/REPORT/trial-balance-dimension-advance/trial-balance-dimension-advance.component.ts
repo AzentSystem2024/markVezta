@@ -66,109 +66,72 @@ export class TrialBalanceDimensionAdvanceComponent {
   dimensionPopupVisible: boolean = false;
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
-
-
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'OpeningBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'OpeningBalanceDebit',
-        alignment: 'right',
-      },
-      {
-        column: 'OpeningBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'OpeningBalanceCredit',
-        alignment: 'right',
-      },
-      {
-        column: 'DuringThePeriodDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DuringThePeriodDebit',
-        alignment: 'left',
-      },
-      {
-        column: 'DuringThePeriodCredit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DuringThePeriodCredit',
-        alignment: 'right',
-      },
-      {
-        column: 'ClosingBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'ClosingBalanceDebit',
-        alignment: 'left',
-      },
-      {
-        column: 'ClosingBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'ClosingBalanceCredit',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'OpeningBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'OpeningBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'DuringThePeriodDebit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'DuringThePeriodCredit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'ClosingBalanceDebit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'ClosingBalanceCredit',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-    ],
-    calculateCustomSummary: (options: any) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: []
   };
+  date_from: any;
+  generateSummary() {
+    const totalItems: any[] = [];
+    const groupItems: any[] = [];
+
+    this.storesDebit.forEach((store) => {
+      totalItems.push({
+        column: 'Debit_' + store,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        showInColumn: 'Debit_' + store,
+      });
+
+      groupItems.push({
+        column: 'Debit_' + store,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        alignByColumn: true,
+      });
+    });
+
+    this.storesCredit.forEach((store) => {
+      totalItems.push({
+        column: 'Credit_' + store,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        showInColumn: 'Credit_' + store,
+      });
+
+      groupItems.push({
+        column: 'Credit_' + store,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        alignByColumn: true,
+      });
+    });
+
+    this.summaryColumnsData = {
+      totalItems,
+      groupItems
+    };
+  }
   storesCredit: any[] = [];
   storesDebit: any[] = [];
 
@@ -202,8 +165,11 @@ export class TrialBalanceDimensionAdvanceComponent {
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
     this.Diamension_dropdown();
-    // this.get_DataSource();
+    this.get_DataSource();
   }
+  customizeTotalText = () => {
+    return 'Total';
+  };
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -264,6 +230,7 @@ export class TrialBalanceDimensionAdvanceComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.company_list = this.savedUserData.Companies;
+    this.date_from = this.savedUserData.FINANCIAL_YEARS[0].DATE_FROM;
   }
 
   onFromDateChange(event: any) {
@@ -288,14 +255,23 @@ export class TrialBalanceDimensionAdvanceComponent {
   get_DataSource() {
     console.log('call this function')
     const payload = {
+
+      companyId: this.selected_Company_id,
+      finId: this.selected_fin_id,
+      dateTo: this.formatted_To_date,
+    };
+    //session stora payload
+
+    const payloadForSession = {
+      dateFrom: this.date_from,
       companyId: this.selected_Company_id,
       finId: this.selected_fin_id,
       dateTo: this.formatted_To_date,
     };
 
-    // sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
+    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadForSession));
 
-    // console.log(JSON.parse(sessionStorage.getItem('viewclickvalue') || '{}'));
+    console.log(JSON.parse(sessionStorage.getItem('viewclickvalue') || '{}'));
 
     this.dataservice
       .account_Summary_Api(payload)
@@ -308,6 +284,7 @@ export class TrialBalanceDimensionAdvanceComponent {
         this.TrialBalanceReport = res.data.map((row: any) => {
 
           const newRow: any = {
+            HeadID: row.HeadID,
             MainGroup: row.MainGroup,
             SubGroup: row.SubGroup,
             Category: row.Category,
@@ -327,6 +304,10 @@ export class TrialBalanceDimensionAdvanceComponent {
         });
         this.storesDebit = Object.keys(res.data[0].Debit || {});
         this.storesCredit = Object.keys(res.data[0].Credit || {});
+        this.generateSummary();
+
+        console.log(this.summaryColumnsData);
+
       });
   }
   getDebitValue(store: string) {
@@ -455,6 +436,7 @@ export class TrialBalanceDimensionAdvanceComponent {
   };
 
   onViewClick(e: any) {
+    console.log('cell click event data', e);
     this.HeadId = e.row.data.HeadID;
     console.log(this.HeadId);
 
