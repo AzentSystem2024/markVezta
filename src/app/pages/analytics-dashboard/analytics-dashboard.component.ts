@@ -244,7 +244,6 @@ export class AnalyticsDashboardComponent implements OnInit {
     console.log('From Date:', this.fromDate);
     console.log('To Date:', this.toDate);
     this.loadingVisible = true;
-
     const timeoutId = setTimeout(() => {
       this.loadingVisible = false;
       alert('Request timeout. Please try again.');

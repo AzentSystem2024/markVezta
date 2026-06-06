@@ -108,33 +108,46 @@
         dataType="number"
       ></dxi-column>
       <dxi-column dataField="Category" caption="Category"></dxi-column>
-      <dxi-column dataField="Code" caption="Code" width="200"></dxi-column>
       <dxi-column
-        dataField="Description"
-        caption="Ledger"
+        dataField="LedgerCode"
+        caption="Ledger Code"
+        width="200"
+      ></dxi-column>
+      <dxi-column
+        dataField="LedgerName"
+        caption="Ledger Name"
         width="200"
       ></dxi-column>
       <dxi-column caption="Debit " cssClass="opening-header">
         <dxi-column
-          dataField="OpeningBalanceDebit"
-          caption="Debit"
-          cssClass="opening-sub-header"
-          [allowEditing]="false"
+          *ngFor="let store of storesDebit"
+          [caption]="store"
+          [calculateCellValue]="getDebitValue(store)"
           alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
-        ></dxi-column>
+          [allowEditing]="false"
+          [format]="{
+            type: 'fixedPoint',
+            precision: 2,
+            useGrouping: true,
+          }"
+        >
+        </dxi-column>
       </dxi-column>
 
       <dxi-column caption="Credit" cssClass="DuringPeriod-header">
         <dxi-column
-          dataField="DuringThePeriodCredit"
-          caption="Credit"
-          alignment="center"
-          cssClass="DuringPeriod-sub-header"
+          *ngFor="let store of storesCredit"
+          [caption]="store"
+          [calculateCellValue]="getCreditValue(store)"
           alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
+          [allowEditing]="false"
+          [format]="{
+            type: 'fixedPoint',
+            precision: 2,
+            useGrouping: true,
+          }"
         >
         </dxi-column>
       </dxi-column>
