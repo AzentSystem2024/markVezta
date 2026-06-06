@@ -238,7 +238,7 @@ refreshButtonOptions = {
   
         console.log(this.selected_Company_id, 'SELECTED COMPANY ID');
   
-        // ✅ CALL API HERE AFTER VALUE IS SET
+        //  CALL API HERE AFTER VALUE IS SET
         this.loadHeadList();
       }
   
@@ -314,7 +314,7 @@ refreshButtonOptions = {
                 const data = res?.data || [];
   
                 this.ledgerSummaryData = data;
-                this.ledgerRowCount = data.length; // ✅ store length
+                this.ledgerRowCount = data.length; //  store length
   
                 resolve(data);
               },
@@ -417,7 +417,7 @@ refreshButtonOptions = {
     }
   
     load_Ledgre_data() {
-      console.log('load ledger')
+     
       //  Validate main form
       const validationResult = this.formValidationGroup?.instance?.validate();
       if (!validationResult?.isValid) {
@@ -431,7 +431,7 @@ refreshButtonOptions = {
         DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
         DATE_TO: this.formatted_To_date ?? this.selected_To_date,
         STORE_ID: this.selectedStoreid?.length
-          ? this.selectedStoreid.join(',') // ✅ FINAL FIX
+          ? this.selectedStoreid.join(',') //  FINAL FIX
           : '',
            DIMENSION_CODE: this.selectedDiamensions?.length
   ? this.selectedDiamensions.join(',')
@@ -439,6 +439,7 @@ refreshButtonOptions = {
       };
   console.log(payload)
       this.createLedgerDataSource(payload);
+      this.isFilterVisible = false;
     }
   
     formatDates(cellData: any): string {
