@@ -293,23 +293,25 @@ export class TrialBalanceDimensionAdvanceComponent {
       dateTo: this.formatted_To_date,
     };
 
-    sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
+    // sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
 
-    console.log(JSON.parse(sessionStorage.getItem('viewclickvalue') || '{}'));
+    // console.log(JSON.parse(sessionStorage.getItem('viewclickvalue') || '{}'));
 
     this.dataservice
       .account_Summary_Api(payload)
       .subscribe((res: any) => {
-        this.isEmptyDatagrid = false;
+        // this.isEmptyDatagrid = false;
 
         this.TrialBalanceReport = res.data;
+
+
         // this.TrialBalanceReport = [...res.data];
-        if (this.TrialBalanceReport.length > 0) {
-          this.storesDebit = [Object.keys(this.TrialBalanceReport[0].Debit)];
-          console.log('stores in debit', this.storesDebit);
-          this.storesCredit = [Object.keys(this.TrialBalanceReport[0].Credit)];
-          console.log('stores in credit', this.storesCredit);
-        }
+        // if (this.TrialBalanceReport.length > 0) {
+        //   this.storesDebit = [this.TrialBalanceReport[0].Debit];
+        //   console.log('stores in debit', this.storesDebit);
+        //   this.storesCredit = [this.TrialBalanceReport[0].Credit];
+        //   console.log('stores in credit', this.storesCredit);
+        // }
         console.log(this.TrialBalanceReport);
       });
   }
