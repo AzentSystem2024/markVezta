@@ -7078,4 +7078,9 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}Dashboard/dashboard`, payload)
 
   }
+
+  LedgerStatement_Dimension(payload:any){
+    const getEndpoint = this.apiUrl + 'AC_Report/ledgerwithdimension';
+    return this.http.post(getEndpoint, payload);
+  }
 }

@@ -397,7 +397,7 @@ import { LedgerStatementDimensionModule } from './pages/REPORT/ledger-statement-
 import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -805,7 +805,7 @@ import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance
     ARReportPageModule,
     ARManualMatchingModule,
     TrialBalanceDimensionAdvanceModule,
-    LedgerStatementDimensionModule
+    LedgerStatementDimensionModule,
   ],
 
   providers: [
