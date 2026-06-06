@@ -302,17 +302,31 @@ export class TrialBalanceDimensionAdvanceComponent {
       .subscribe((res: any) => {
         // this.isEmptyDatagrid = false;
 
-        this.TrialBalanceReport = res.data;
+        // this.TrialBalanceReport = res.data;
 
-
-        // this.TrialBalanceReport = [...res.data];
-        // if (this.TrialBalanceReport.length > 0) {
-        //   this.storesDebit = [this.TrialBalanceReport[0].Debit];
-        //   console.log('stores in debit', this.storesDebit);
-        //   this.storesCredit = [this.TrialBalanceReport[0].Credit];
-        //   console.log('stores in credit', this.storesCredit);
-        // }
         console.log(this.TrialBalanceReport);
+        this.TrialBalanceReport = res.data.map((row: any) => {
+
+          const newRow: any = {
+            MainGroup: row.MainGroup,
+            SubGroup: row.SubGroup,
+            Category: row.Category,
+            LedgerCode: row.LedgerCode,
+            LedgerName: row.LedgerName
+          };
+
+          Object.keys(row.Debit || {}).forEach(key => {
+            newRow['Debit_' + key] = row.Debit[key];
+          });
+
+          Object.keys(row.Credit || {}).forEach(key => {
+            newRow['Credit_' + key] = row.Credit[key];
+          });
+
+          return newRow;
+        });
+        this.storesDebit = Object.keys(res.data[0].Debit || {});
+        this.storesCredit = Object.keys(res.data[0].Credit || {});
       });
   }
   getDebitValue(store: string) {

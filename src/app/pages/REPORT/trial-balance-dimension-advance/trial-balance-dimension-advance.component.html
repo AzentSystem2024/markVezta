@@ -118,36 +118,20 @@
         caption="Ledger Name"
         width="200"
       ></dxi-column>
-      <dxi-column caption="Debit " cssClass="opening-header">
+      <dxi-column caption="Debit">
         <dxi-column
           *ngFor="let store of storesDebit"
+          [dataField]="'Debit_' + store"
           [caption]="store"
-          [calculateCellValue]="getDebitValue(store)"
-          alignment="right"
-          dataType="number"
-          [allowEditing]="false"
-          [format]="{
-            type: 'fixedPoint',
-            precision: 2,
-            useGrouping: true,
-          }"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Credit" cssClass="DuringPeriod-header">
+      <dxi-column caption="Credit">
         <dxi-column
           *ngFor="let store of storesCredit"
+          [dataField]="'Credit_' + store"
           [caption]="store"
-          [calculateCellValue]="getCreditValue(store)"
-          alignment="right"
-          dataType="number"
-          [allowEditing]="false"
-          [format]="{
-            type: 'fixedPoint',
-            precision: 2,
-            useGrouping: true,
-          }"
         >
         </dxi-column>
       </dxi-column>
