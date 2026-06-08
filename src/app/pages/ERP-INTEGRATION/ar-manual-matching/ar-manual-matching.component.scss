@@ -1,0 +1,23 @@
+.form-flex-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.form-item {
+  flex: 0 0 auto;
+}
+
+.applybtn {
+  margin-left: auto;
+}
+
+::ng-deep.export-btn .grid .dx-button-mode-text {
+  color: #ffffff;
+  border-radius: 8px;
+  background-color: var(--toolbar-icon);
+  margin-top: 10px !important;
+  height: 32px;
+  // border: 2px solid var(--border-color);
+}

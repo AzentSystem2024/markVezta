@@ -393,9 +393,11 @@ import { ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and
 import { BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 import { ARManualMatchingComponent, ARManualMatchingModule } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
+import { LedgerStatementDimensionModule } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
+import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -801,7 +803,9 @@ import { ARManualMatchingComponent, ARManualMatchingModule } from './pages/ERP-I
     ProfitAndLossDimensionModule,
     BalanceSheetDimensionModule,
     ARReportPageModule,
-    ARManualMatchingModule
+    ARManualMatchingModule,
+    TrialBalanceDimensionAdvanceModule,
+    LedgerStatementDimensionModule,
   ],
 
   providers: [

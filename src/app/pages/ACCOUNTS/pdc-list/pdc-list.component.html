@@ -328,7 +328,13 @@
   [height]="'90vh'"
   title="Edit PDC"
   (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ popupTitle }}
+    </div>
+  </div>
   <app-pdc-edit-form
     [selectedPDC]="selectedPDC"
     [isOpen]="editPDCPopupOpened"
@@ -347,7 +353,13 @@
   [title]="popupTitle"
   (onHiding)="handleClose()"
   [popupMode]="popupMode"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ popupTitle }}
+    </div>
+  </div>
   <app-pdc-edit-form
     [selectedPDC]="selectedPDC"
     [isOpen]="VerifyPDCPopupOpened"

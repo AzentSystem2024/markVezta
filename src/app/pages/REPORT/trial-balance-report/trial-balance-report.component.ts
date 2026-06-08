@@ -246,7 +246,7 @@ export class TrialBalanceReportComponent {
   }
 
   get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     this.company_list = this.savedUserData.Companies;
   }
 
@@ -302,25 +302,25 @@ export class TrialBalanceReportComponent {
     });
   }
 
-   storeHint: string = '';
+  storeHint: string = '';
 
-updateStoreHint() {
-  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-    this.storeHint = 'No store selected';
-    return;
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store
+      .filter(x => this.selectedStoreid.includes(x.ID))
+      .map(x => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
   }
 
-  const selectedNames = this.Store
-    .filter(x => this.selectedStoreid.includes(x.ID))
-    .map(x => x.DESCRIPTION);
-
-  this.storeHint = selectedNames.join(', ');
-}
-
-    store_dropdown(){
+  store_dropdown() {
     const payload = {
-      NAME :'STORE',
-      COMPANY_ID : this.selected_Company_id
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
@@ -361,4 +361,4 @@ updateStoreHint() {
   exports: [],
   declarations: [TrialBalanceReportComponent],
 })
-export class TrialBalanceReportModule {}
+export class TrialBalanceReportModule { }
