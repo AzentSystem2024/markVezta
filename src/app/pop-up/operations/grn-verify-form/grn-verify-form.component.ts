@@ -213,40 +213,12 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
-  allowDeleting = (e: any) => {
+  get allowDeleting(): boolean {
     return (
-      e.row?.data?.STATUS !== 'Approved' && e.row?.data?.STATUS !== 'Closed'
+      this.newGrnData?.STATUS !== 'Approved' &&
+      this.newGrnData?.STATUS !== 'Closed'
     );
-  };
-  // onGridBoxOptionChanged(e: any) {
-  //   if (e.name === 'value') {
-  //     this.isGridBoxOpened = false;
-  //     this.ref.detectChanges();
-  //   }
-
-  //   console.log(this.selectedPONo, 'selectedpono');
-  //   const poId = this.selectedPONo[0].PO_ID;
-  //   this.newGrnData.PO_ID = poId;
-  //   // this.newGrnData.SUPP_ID = this.selectedPONo[0].SUPP_NAME;
-  //   console.log(poId, 'poID');
-  //   this.getPODetails(poId);
-  // }
-
-  // getPODetails(poId: any) {
-  //   this.service.getGrnPoDetails(poId).subscribe((res: any) => {
-  //     console.log(res, 'res');
-  //     this.poDetails = res.Podetails.map((item: any, index: number) => ({
-  //       ...item,
-  //       SL_NO: index + 1, // Add SL_NO property dynamically
-  //       QTY_TO_RECEIVE: item.PO_QUANTITY - item.RETURN_QTY_QTY,
-  //       SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
-  //       QUANTITY: item.QUANTITY || 0,
-  //     }));
-  //     console.log(this.poDetails, 'Updated poDetails with SL_NO');
-  //   });
-  //   this.newGrnData.SUPP_GROSS_AMOUNT = this.poDetails[0].SUPP_GROSS_AMOUNT;
-  //   this.newGrnData.SUPP_NET_AMOUNT = this.poDetails[0].SUPP_NET_AMOUNT;
-  // }
+  }
 
   onStoreValueChanged(e: any) {
     const storeid = e.value;

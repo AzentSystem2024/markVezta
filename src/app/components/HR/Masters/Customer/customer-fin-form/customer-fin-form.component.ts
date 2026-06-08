@@ -127,7 +127,7 @@ export class CustomerFinFormComponent {
   CountryDropdownDataList: any = [];
   selectedCompanyId: any;
   companyList: any = [];
-  Customer_type_list: any = []
+  Customer_type_list: any = [];
 
   constructor(
     private service: DataService,
@@ -139,7 +139,7 @@ export class CustomerFinFormComponent {
     });
 
     this.getStateDropDown();
-    this.newCustomer.CUST_VAT_RULE_ID = 2
+    this.newCustomer.CUST_VAT_RULE_ID = 2;
   }
   newCustomer = this.formCustomerData;
 
@@ -151,6 +151,18 @@ export class CustomerFinFormComponent {
       this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
+
+  validateEmail = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    // Empty → valid (not mandatory)
+    if (!value) return true;
+
+    // Validate only if user entered something
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailRegex.test(value);
+  };
 
   onCountrycodeChangeDeliveryAddress(e: any) {
     const payload = {
@@ -348,7 +360,7 @@ export class CustomerFinFormComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.customer_Type_Dropdown()
+    this.customer_Type_Dropdown();
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
@@ -396,20 +408,16 @@ export class CustomerFinFormComponent {
     this.locationValue = '';
     this.phoneValue = '';
     this.savedAddresses = [];
-    this.newCustomer.CUST_VAT_RULE_ID = 2
-    this.newCustomer.FAX_NO = ''
-    this.newCustomer.PAY_TERM_ID = 0
-    this.newCustomer.PRICE_CLASS_ID = 0
+    this.newCustomer.CUST_VAT_RULE_ID = 2;
+    this.newCustomer.FAX_NO = '';
+    this.newCustomer.PAY_TERM_ID = 0;
+    this.newCustomer.PRICE_CLASS_ID = 0;
     if (this.formCustomerData) {
       this.formCustomerData.DEALER_ID = null;
       // this.formCustomerData.CUST_TYPE = 0;
 
       this.formCustomerData.DEALER_TYPE = 0;
     }
-
-
-
-
   }
 
   savedAddresses: any[] = [];
@@ -479,9 +487,9 @@ export class CustomerFinFormComponent {
     this.editingIndex = i;
   }
 
-  onDropdownClosed() { }
-  onDropdownOpened() { }
-  updateMobileNumber() { }
+  onDropdownClosed() {}
+  onDropdownOpened() {}
+  updateMobileNumber() {}
   countryDisplay(item: any) {
     if (!item) return '';
     return `${item.CODE}`;
@@ -534,48 +542,46 @@ export class CustomerFinFormComponent {
 
   customer_Type_Dropdown() {
     const payload = {
-      NAME: 'CUSTOMER_TYPE'
-    }
+      NAME: 'CUSTOMER_TYPE',
+    };
     this.service.customer_type_drp(payload).subscribe((res: any) => {
-      console.log(res)
-      this.Customer_type_list = res
-    })
+      console.log(res);
+      this.Customer_type_list = res;
+    });
   }
   deafulvalue() {
     console.log('==open =====');
-    this.newCustomer.CUST_VAT_RULE_ID = 2
-    this.formCustomerData.CUST_VAT_RULE_ID = 2
-
+    this.newCustomer.CUST_VAT_RULE_ID = 2;
+    this.formCustomerData.CUST_VAT_RULE_ID = 2;
   }
 
   validateCustomerCode = (e: any): boolean => {
-  const value = (e.value || '').trim().toLowerCase();
+    const value = (e.value || '').trim().toLowerCase();
 
-  if (!value || !this.customersArray?.length) return true;
+    if (!value || !this.customersArray?.length) return true;
 
-  const currentId = this.newCustomer?.ID || 0;
+    const currentId = this.newCustomer?.ID || 0;
 
-  return !this.customersArray.some((item: any) => {
-    const code = (item.CUST_CODE || '').trim().toLowerCase();
+    return !this.customersArray.some((item: any) => {
+      const code = (item.CUST_CODE || '').trim().toLowerCase();
 
-    return code === value && item.ID !== currentId;
-  });
-};
+      return code === value && item.ID !== currentId;
+    });
+  };
 
-validateCustomername = (e: any): boolean => {
-  const value = (e.value || '').trim().toLowerCase();
+  validateCustomername = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
 
-  if (!value || !this.customersArray?.length) return true;
+    if (!value || !this.customersArray?.length) return true;
 
-  const currentId = this.newCustomer?.ID || 0;
+    const currentId = this.newCustomer?.ID || 0;
 
-  return !this.customersArray.some((item: any) => {
-    const code = (item.CONTACT_NAME || '').trim().toLowerCase();
+    return !this.customersArray.some((item: any) => {
+      const code = (item.CONTACT_NAME || '').trim().toLowerCase();
 
-    return code === value && item.ID !== currentId;
-  });
-};
-
+      return code === value && item.ID !== currentId;
+    });
+  };
 }
 
 @NgModule({
@@ -600,4 +606,4 @@ validateCustomername = (e: any): boolean => {
   declarations: [CustomerFinFormComponent],
   exports: [CustomerFinFormComponent],
 })
-export class CustomerFinFormModule { }
+export class CustomerFinFormModule {}
