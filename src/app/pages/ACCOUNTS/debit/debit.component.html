@@ -229,7 +229,8 @@
         <span
           *ngIf="
             (cellData.data.TRANS_STATUS === 2 && canApprove) ||
-            (cellData.data.TRANS_STATUS !== 2 && canVerify)
+            (cellData.data.TRANS_STATUS !== 2 && canVerify) ||
+            cellData.data.TRANS_STATUS >= 5
           "
           style="
             position: relative;
@@ -303,11 +304,10 @@
 >
   <ng-container *ngIf="isEditDebitNote">
     <app-edit-debit
-    [mode]="'edit'"
+      [mode]="'edit'"
       [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
-      
     ></app-edit-debit>
   </ng-container>
 </dx-popup>

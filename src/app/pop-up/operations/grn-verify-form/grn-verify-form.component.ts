@@ -213,7 +213,11 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
 
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
-
+  allowDeleting = (e: any) => {
+    return (
+      e.row?.data?.STATUS !== 'Approved' && e.row?.data?.STATUS !== 'Closed'
+    );
+  };
   // onGridBoxOptionChanged(e: any) {
   //   if (e.name === 'value') {
   //     this.isGridBoxOpened = false;

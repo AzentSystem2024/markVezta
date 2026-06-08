@@ -192,7 +192,7 @@
       >
       </dxi-column>
 
-       <dxi-column
+      <dxi-column
         type="buttons"
         caption="Actions"
         [width]="140"
@@ -206,12 +206,16 @@
           *ngIf="canEdit"
           class="dx-icon dx-icon-edit"
           [style.opacity]="
-            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+            cellData.data.ENTRY_STATUS === 'Verified' ||
+            cellData.data.ENTRY_STATUS === 'Approved' ||
+            cellData.data.ENTRY_STATUS === 'Closed'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+            cellData.data.ENTRY_STATUS === 'Verified' ||
+            cellData.data.ENTRY_STATUS === 'Approved' ||
+            cellData.data.ENTRY_STATUS === 'Closed'
               ? 'none'
               : 'auto'
           "
@@ -225,12 +229,16 @@
           *ngIf="canDelete"
           class="dx-icon dx-icon-trash"
           [style.opacity]="
-            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+            cellData.data.ENTRY_STATUS === 'Verified' ||
+            cellData.data.ENTRY_STATUS === 'Approved' ||
+            cellData.data.ENTRY_STATUS === 'Closed'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.ENTRY_STATUS === 'Verified' || cellData.data.ENTRY_STATUS === 'Approved' || cellData.data.ENTRY_STATUS === 'Closed'
+            cellData.data.ENTRY_STATUS === 'Verified' ||
+            cellData.data.ENTRY_STATUS === 'Approved' ||
+            cellData.data.ENTRY_STATUS === 'Closed'
               ? 'none'
               : 'auto'
           "
@@ -256,13 +264,13 @@
             vertical-align: middle;
           "
           [title]="
-          cellData.data.ENTRY_STATUS === 'Closed'
-      ? 'Closed'
-           : cellData.data.ENTRY_STATUS === 'Approved'
-              ? 'Approved'
-              : cellData.data.ENTRY_STATUS === 'Verified'
-                ? 'Approve'
-                : 'Verify'
+            cellData.data.ENTRY_STATUS === 'Closed'
+              ? 'Closed'
+              : cellData.data.ENTRY_STATUS === 'Approved'
+                ? 'Approved'
+                : cellData.data.ENTRY_STATUS === 'Verified'
+                  ? 'Approve'
+                  : 'Verify'
           "
           (click)="onVerifyInvoice({ row: { data: cellData.data } })"
         >
@@ -270,13 +278,13 @@
           <i
             class="fas fa-certificate"
             [style.color]="
-            cellData.data.ENTRY_STATUS === 'Closed'
-      ? '#EF4444'
-              :cellData.data.ENTRY_STATUS === 'Approved'
-                ? '#10B981'
-                : cellData.data.ENTRY_STATUS === 'Verified'
-                  ? '#0073D8'
-                  : '#FFA500'
+              cellData.data.ENTRY_STATUS === 'Closed'
+                ? '#EF4444'
+                : cellData.data.ENTRY_STATUS === 'Approved'
+                  ? '#10B981'
+                  : cellData.data.ENTRY_STATUS === 'Verified'
+                    ? '#0073D8'
+                    : '#FFA500'
             "
             style="font-size: 18px; position: absolute; top: 0; left: 0"
           ></i>
@@ -318,7 +326,7 @@
   [(visible)]="editPDCPopupOpened"
   [width]="'50vw'"
   [height]="'90vh'"
-  [title]="popupTitle"
+  title="Edit PDC"
   (onHiding)="handleClose()"
 >
   <app-pdc-edit-form

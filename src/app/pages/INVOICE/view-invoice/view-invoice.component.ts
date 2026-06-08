@@ -67,6 +67,8 @@ export class ViewInvoiceComponent implements OnInit, OnChanges {
   popupGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() invoiceFormData: any;
+  @Input() isEditing: boolean = false;
+  @Input() isReadOnlyMode: boolean = false;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';

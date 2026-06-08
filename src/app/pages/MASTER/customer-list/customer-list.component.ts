@@ -406,8 +406,11 @@ export class CustomerListComponent {
     });
   }
 
-  onRowRemoving(event) {
+  onRowRemoving(event: any) {
+    event.cancel = true; // prevent grid default delete
+
     const selectedRow = event.data;
+
     const {
       ID,
       CUST_CODE,
@@ -436,6 +439,7 @@ export class CustomerListComponent {
       CUST_VAT_RULE_ID,
       VAT_REGNO,
     } = selectedRow;
+
     this.dataservice
       .removeCustomerData(
         ID,
@@ -465,8 +469,8 @@ export class CustomerListComponent {
         CUST_VAT_RULE_ID,
         VAT_REGNO,
       )
-      .subscribe(() => {
-        try {
+      .subscribe({
+        next: () => {
           notify(
             {
               message: 'Customer data deleted successfully',
@@ -474,8 +478,10 @@ export class CustomerListComponent {
             },
             'success',
           );
-          this.showCustomer();
-        } catch {
+
+          this.showCustomer(); // refresh grid
+        },
+        error: () => {
           notify(
             {
               message: 'Delete operation failed',
@@ -483,7 +489,7 @@ export class CustomerListComponent {
             },
             'error',
           );
-        }
+        },
       });
   }
   ngOnInit(): void {
@@ -494,8 +500,8 @@ export class CustomerListComponent {
 
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -556,7 +562,7 @@ export class CustomerListComponent {
     //   this.StateDropdownData = data;
     // });
   }
-  onStateSelectionChanged(event: any) { }
+  onStateSelectionChanged(event: any) {}
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
@@ -664,4 +670,4 @@ export class CustomerListComponent {
   exports: [],
   declarations: [CustomerListComponent],
 })
-export class CustomerListModule { }
+export class CustomerListModule {}

@@ -340,6 +340,7 @@
           ></dx-text-box>
 
           <dx-check-box
+            *ngIf="!isVerifyDebitNote && !isApproveMode"
             [(value)]="debitFormData[0].IS_APPROVED"
             text="Approve"
             [focusStateEnabled]="debitFormData[0].IS_APPROVED"
@@ -361,7 +362,6 @@
       type="normal"
     ></dx-button>
     <dx-button
-    
       #saveButtonRef
       *ngIf="mode !== 'view'"
       [text]="isUpdating ? actionButtonText + '...' : actionButtonText"

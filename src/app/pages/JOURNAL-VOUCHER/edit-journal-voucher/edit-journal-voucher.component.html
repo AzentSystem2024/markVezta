@@ -140,13 +140,35 @@
                   </div>
                   <dx-button
                     icon="plus"
+                    type="default"
+                    stylingMode="contained"
+                    hint="Add Row"
+                    style="margin-top: 6px"
+                    (onClick)="onAddRow()"
+                  >
+                    <div
+                      *dxTemplate="let data of 'content'"
+                      class="add-btn-content"
+                    >
+                      <span
+                        class="iconify"
+                        data-icon="formkit:add"
+                        data-width="20"
+                        data-height="20"
+                      ></span>
+
+                      <span class="add-text">Add Row</span>
+                    </div></dx-button
+                  >
+                  <!-- <dx-button
+                    icon="plus"
                     stylingMode="outlined"
                     type="default"
                     hint="New Row"
                     [elementAttr]="{ class: 'small-btn' }"
                     style="margin-top: 8px"
                     (onClick)="onAddRow()"
-                  ></dx-button>
+                  ></dx-button> -->
                 </div>
               </div>
             </dxi-item>

@@ -63,6 +63,9 @@ export class EditInvoiceComponent {
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   @Input() invoiceFormData: any;
   popupVisible = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -665,7 +668,7 @@ export class EditInvoiceComponent {
       );
       return;
     }
-    if (this.invoiceFormData.IS_APPROVED) {
+    if (this.invoiceFormData.IS_APPROVED || this.isApproveMode) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
         'Confirm Commit',
@@ -747,6 +750,9 @@ export class EditInvoiceComponent {
         PARTY_NAME: this.invoiceFormData.PARTY_NAME,
         ROUND_OFF: this.invoiceFormData.ROUND_OFF,
         VEHICLE_NO: this.invoiceFormData.VEHICLE_NO,
+        IS_VERIFIED: this.isVerifyMode
+          ? true
+          : this.invoiceFormData.IS_VERIFIED,
         SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
           DN_DETAIL_ID: row.DN_DETAIL_ID || '',
           QUANTITY: row.TOTAL_PAIR_QTY || 0,
@@ -763,24 +769,49 @@ export class EditInvoiceComponent {
       };
 
       this.isUpdating = true;
-      this.dataService.updateInvoice(updatePayload).subscribe({
-        next: (response) => {
-          notify(
-            {
-              message: 'Invoice updated successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-            3000,
-          );
-          this.isUpdating = false;
-          this.popupClosed?.emit();
-        },
-        error: (err) => {
-          console.error('Error updating invoice:', err);
-          this.isUpdating = false;
-        },
-      });
+      const proceedUpdate = () => {
+        this.isUpdating = true;
+
+        this.dataService.updateInvoice(updatePayload).subscribe({
+          next: (response) => {
+            notify(
+              {
+                message: this.isVerifyMode
+                  ? 'Invoice verified successfully'
+                  : 'Invoice updated successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+              3000,
+            );
+
+            this.isUpdating = false;
+            this.popupClosed?.emit();
+          },
+          error: (err) => {
+            console.error('Error updating invoice:', err);
+            this.isUpdating = false;
+          },
+        });
+      };
+
+      // Show confirmation only in verify mode
+      if (this.isVerifyMode) {
+        confirm(
+          'Are you sure you want to verify this invoice?',
+          'Confirm Verification',
+        ).then((result) => {
+          if (result) {
+            proceedUpdate();
+          } else {
+            this.isUpdating = false;
+            this.popupClosed?.emit();
+            this.cdr.detectChanges();
+          }
+        });
+      } else {
+        proceedUpdate();
+      }
     }
   }
 

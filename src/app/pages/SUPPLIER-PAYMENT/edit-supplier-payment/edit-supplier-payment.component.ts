@@ -135,44 +135,44 @@ export class EditSupplierPaymentComponent {
   CashID: any;
 
   getFormMode(): string {
-  if (this.isReadOnlyMode) {
-    return 'view';
-  }
+    if (this.isReadOnlyMode) {
+      return 'view';
+    }
 
-  if (this.isApproveMode) {
-    return 'approve';
-  }
-
-  if (this.isVerifyMode) {
-    return 'verify';
-  }
-
-  return 'new';
-}
-
-getActionButtonText(): string {
-  if (this.isSaving) {
     if (this.isApproveMode) {
-      return 'Approving...';
+      return 'approve';
     }
 
     if (this.isVerifyMode) {
-      return 'Verifying...';
+      return 'verify';
     }
 
-    return 'Saving...';
+    return 'new';
   }
 
-  if (this.isApproveMode) {
-    return 'Approve';
-  }
+  getActionButtonText(): string {
+    if (this.isSaving) {
+      if (this.isApproveMode) {
+        return 'Approving...';
+      }
 
-  if (this.isVerifyMode) {
-    return 'Verify';
-  }
+      if (this.isVerifyMode) {
+        return 'Verifying...';
+      }
 
-  return 'Save';
-}
+      return 'Saving...';
+    }
+
+    if (this.isApproveMode) {
+      return 'Approve';
+    }
+
+    if (this.isVerifyMode) {
+      return 'Verify';
+    }
+
+    return 'Save';
+  }
 
   constructor(
     private dataService: DataService,
@@ -211,22 +211,20 @@ getActionButtonText(): string {
     // this.getReceiptNo();
   }
 
-
-      AC_Default(){
-   const payload = {
-    CompanyID : this.selectedCompanyId
-   }
-    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-      this.settings = res.Data
-      this.CashID = this.settings.GP_CASH_ID;  
-      console.log(this.CashID) 
+  AC_Default() {
+    const payload = {
+      CompanyID: this.selectedCompanyId,
+    };
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res: any) => {
+      console.log(res);
+      this.settings = res.Data;
+      this.CashID = this.settings.GP_CASH_ID;
+      console.log(this.CashID);
       this.BankID = this.settings.GP_BANK_ID;
-      console.log(this.BankID)
-    })
+      console.log(this.BankID);
+    });
   }
 
-  
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['paymentData']) {
       this.initialSelectionDone = false;
@@ -436,15 +434,16 @@ getActionButtonText(): string {
 
   initialSelectionDone = false;
   onGridContentReady(e: any) {
-  if (e.component) {
-    this.totalPendingAmount = e.component.getTotalSummaryValue('PENDING_AMOUNT');
-  }
+    if (e.component) {
+      this.totalPendingAmount =
+        e.component.getTotalSummaryValue('PENDING_AMOUNT');
+    }
 
-  if (!this.initialSelectionDone && this.selectedBillIds.length > 0) {
-    this.itemsGridRef.instance.selectRows(this.selectedBillIds, true);
-    this.initialSelectionDone = true;
+    if (!this.initialSelectionDone && this.selectedBillIds.length > 0) {
+      this.itemsGridRef.instance.selectRows(this.selectedBillIds, true);
+      this.initialSelectionDone = true;
+    }
   }
-}
 
   onCustomerChanged(event: any): void {
     console.log(event, "==============='''");
@@ -582,32 +581,37 @@ getActionButtonText(): string {
     this.pdcPopupVisible = false;
   }
 
+  onSelectionChanged(e: any) {
+    console.log("======================================'''''");
+    this.selectedRowsCount = e.selectedRowsData.length;
+    console.log(e);
+    const selectedKeys = e.selectedRowKeys || [];
 
-onSelectionChanged(e: any) {
-  console.log("======================================'''''")
-  this.selectedRowsCount = e.selectedRowsData.length;
-  console.log(e)
-  const selectedKeys = e.selectedRowKeys || [];
+    this.totalPending = e.selectedRowsData.reduce(
+      (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
+      0,
+    );
+    console.log(this.totalPending);
+    this.cdRef.detectChanges();
+    // this.totalPending = this.totalPending.toFixed(2);
+    this.mainGridData.forEach((row: any) => {
+      if (!selectedKeys.includes(row.BILL_ID)) {
+        row.AMOUNT = 0;
+      }
+    });
 
-  this.totalPending = e.selectedRowsData.reduce(
-    (sum: number, row: any) =>
-      sum + (Number(row.PENDING_AMOUNT) || 0),
-    0
-  );
-  console.log(this.totalPending)
-  this.cdRef.detectChanges();  
-  // this.totalPending = this.totalPending.toFixed(2);
-  this.mainGridData.forEach((row: any) => {
-    if (!selectedKeys.includes(row.BILL_ID)) {
-      row.AMOUNT = 0;
-    }
-  });
+    // refresh summary only
+    e.component.refresh(true);
+  }
 
-  // refresh summary only
-  e.component.refresh(true);
-}
+  formatPending = (value: any) => {
+    return new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number(value) || 0);
+  };
 
-onFillAmountClick() {
+  onFillAmountClick() {
     if (this.selectedRowsCount === 0) {
       notify(
         'Please select at least one row before proceeding.',
@@ -621,66 +625,65 @@ onFillAmountClick() {
     this.showFillAmountPopup = true;
   }
 
-autoFillReceivedAmounts() {
-  const fillAmount = Number(this.fillAmountData.field1);
+  autoFillReceivedAmounts() {
+    const fillAmount = Number(this.fillAmountData.field1);
 
-  if (isNaN(fillAmount) || fillAmount <= 0) {
-    notify('Please enter a valid fill amount first.', 'warning', 3000);
-    return;
+    if (isNaN(fillAmount) || fillAmount <= 0) {
+      notify('Please enter a valid fill amount first.', 'warning', 3000);
+      return;
+    }
+
+    const grid = this.itemsGridRef?.instance;
+    if (!grid) return;
+
+    const selectedKeys = grid.getSelectedRowKeys();
+
+    if (!selectedKeys || selectedKeys.length === 0) {
+      notify('Please select at least one row', 'warning', 3000);
+      return;
+    }
+
+    let remaining = fillAmount;
+
+    // Get rows in current grid display order
+    const visibleRows = grid.getVisibleRows();
+
+    visibleRows.forEach((row: any) => {
+      const data = row.data;
+
+      // only selected rows
+      if (selectedKeys.includes(data.BILL_ID)) {
+        const pending = Number(data.PENDING_AMOUNT) || 0;
+
+        if (remaining > 0) {
+          const amountToAssign = Math.min(pending, remaining);
+          data.AMOUNT = amountToAssign;
+          remaining -= amountToAssign;
+        } else {
+          data.AMOUNT = 0;
+        }
+      }
+    });
+
+    this.mainGridData = [...this.mainGridData];
+    grid.refresh();
   }
 
-  const grid = this.itemsGridRef?.instance;
-  if (!grid) return;
+  calculateSelectedPendingSummary = (options: any) => {
+    if (options.name === 'selectedPendingTotal') {
+      switch (options.summaryProcess) {
+        case 'start':
+          options.totalValue = 0;
+          break;
 
-  const selectedKeys = grid.getSelectedRowKeys();
-
-  if (!selectedKeys || selectedKeys.length === 0) {
-    notify('Please select at least one row', 'warning', 3000);
-    return;
-  }
-
-  let remaining = fillAmount;
-
-  // Get rows in current grid display order
-  const visibleRows = grid.getVisibleRows();
-
-  visibleRows.forEach((row: any) => {
-    const data = row.data;
-
-    // only selected rows
-    if (selectedKeys.includes(data.BILL_ID)) {
-      const pending = Number(data.PENDING_AMOUNT) || 0;
-
-      if (remaining > 0) {
-        const amountToAssign = Math.min(pending, remaining);
-        data.AMOUNT = amountToAssign;
-        remaining -= amountToAssign;
-      } else {
-        data.AMOUNT = 0;
+        case 'calculate':
+          if (options.component.isRowSelected(options.value.BILL_ID)) {
+            options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
+          }
+          break;
       }
     }
-  });
-
-  this.mainGridData = [...this.mainGridData];
-  grid.refresh();
-}
-
-
-calculateSelectedPendingSummary = (options: any) => {
-  if (options.name === 'selectedPendingTotal') {
-    switch (options.summaryProcess) {
-      case 'start':
-        options.totalValue = 0;
-        break;
-
-      case 'calculate':
-        if (options.component.isRowSelected(options.value.BILL_ID)) {
-          options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
-        }
-        break;
-    }
-  }
-};
+  };
 
   handleCancel() {
     this.popupClosed.emit();
@@ -710,43 +713,43 @@ calculateSelectedPendingSummary = (options: any) => {
     }
   }
 
-  Cancel(){
+  Cancel() {
     //  this.autoFillReceivedAmounts();
 
-  // this.amountError = '';
-  this.resetFillAmountForm();
-  this.showFillAmountPopup = false;
+    // this.amountError = '';
+    this.resetFillAmountForm();
+    this.showFillAmountPopup = false;
   }
 
-submitAmountPopup() {
-  const enteredAmount = Number(this.fillAmountData.field1);
+  submitAmountPopup() {
+    const enteredAmount = Number(this.fillAmountData.field1);
 
-  if (isNaN(enteredAmount) || enteredAmount <= 0) {
-    notify('Please enter a valid amount', 'warning', 3000);
-    return;
+    if (isNaN(enteredAmount) || enteredAmount <= 0) {
+      notify('Please enter a valid amount', 'warning', 3000);
+      return;
+    }
+
+    if (this.selectedRowsCount === 0) {
+      notify('Please select at least one row', 'warning', 3000);
+      return;
+    }
+
+    // check against selected rows pending total
+    if (enteredAmount > this.totalPending) {
+      notify(
+        'The amount cannot be greater than the selected rows pending amount',
+        'error',
+        3000,
+      );
+      return;
+    }
+
+    this.autoFillReceivedAmounts();
+
+    this.amountError = '';
+    this.resetFillAmountForm();
+    this.showFillAmountPopup = false;
   }
-
-  if (this.selectedRowsCount === 0) {
-    notify('Please select at least one row', 'warning', 3000);
-    return;
-  }
-
-  // check against selected rows pending total
-  if (enteredAmount > this.totalPending) {
-    notify(
-      'The amount cannot be greater than the selected rows pending amount',
-      'error',
-      3000,
-    );
-    return;
-  }
-
-  this.autoFillReceivedAmounts();
-
-  this.amountError = '';
-  this.resetFillAmountForm();
-  this.showFillAmountPopup = false;
-}
 
   // getReceiptNo() {
   //   this.dataService.getReceiptNo().subscribe((response: any) => {
@@ -820,59 +823,59 @@ submitAmountPopup() {
   // }
 
   onEditorPreparing(e: any) {
-  if (e.parentType === 'dataRow' && e.dataField === 'AMOUNT') {
-    const grid = this.itemsGridRef?.instance;
+    if (e.parentType === 'dataRow' && e.dataField === 'AMOUNT') {
+      const grid = this.itemsGridRef?.instance;
 
-    if (!grid) return;
+      if (!grid) return;
 
-    // check if current row is selected
-    const isSelected = grid.isRowSelected(e.row.key);
+      // check if current row is selected
+      const isSelected = grid.isRowSelected(e.row.key);
 
-    // block editing if row not selected
-    if (!isSelected) {
-      e.cancel = true;
-      return;
-    }
+      // block editing if row not selected
+      if (!isSelected) {
+        e.cancel = true;
+        return;
+      }
 
-    e.editorOptions = e.editorOptions || {};
+      e.editorOptions = e.editorOptions || {};
 
-    e.editorOptions.elementAttr = {
-      style: `
+      e.editorOptions.elementAttr = {
+        style: `
         height: 100%;
         margin: 0;
         padding: 0;
         display: flex;
         align-items: center;
       `,
-    };
+      };
 
-    e.editorOptions.inputAttr = {
-      style: `
+      e.editorOptions.inputAttr = {
+        style: `
         height: 100%;
         padding: 0 4px;
         box-sizing: border-box;
       `,
-    };
+      };
 
-    if (e.editorName === 'dxNumberBox') {
-      e.editorOptions.showSpinButtons = false;
-    }
-
-    e.editorOptions.onKeyDown = (event: any) => {
-      if (event.event.key === 'Enter') {
-        const visibleRows = grid.getVisibleRows();
-
-        const rowIndex = visibleRows.findIndex(
-          (r) => r?.data === e.row?.data,
-        );
-
-        setTimeout(() => {
-          grid.focus(grid.getCellElement(rowIndex + 1, 'AMOUNT'));
-        }, 50);
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
       }
-    };
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data,
+          );
+
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex + 1, 'AMOUNT'));
+          }, 50);
+        }
+      };
+    }
   }
-}
 
   async saveReceipt() {
     if (!this.selectedSupplierId) {
@@ -921,13 +924,12 @@ submitAmountPopup() {
 
     let formattedChequeDate = null;
 
-if (this.chequeDate) {
-  const d = new Date(this.chequeDate);
-  formattedChequeDate =
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-      d.getDate()
-    ).padStart(2, '0')}`;
-}
+    if (this.chequeDate) {
+      const d = new Date(this.chequeDate);
+      formattedChequeDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+        d.getDate(),
+      ).padStart(2, '0')}`;
+    }
     const payload = {
       TRANS_ID: this.paymentFormData.TRANS_ID,
       TRANS_TYPE: 21,
@@ -940,7 +942,7 @@ if (this.chequeDate) {
       REF_NO: this.refNo,
       CHEQUE_NO: this.chequeNo,
       // CHEQUE_DATE: this.chequeDate,
-      CHEQUE_DATE :formattedChequeDate,
+      CHEQUE_DATE: formattedChequeDate,
       BANK_NAME: this.bank || '',
       NARRATION: this.narration,
       PAY_TYPE_ID: this.getPayTypeId(this.selectedPaymentMode),

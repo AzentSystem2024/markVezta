@@ -519,7 +519,7 @@ export class AddJournalVoucharComponent {
           if (!enterPressedOnce) {
             enterPressedOnce = true;
 
-            // ✅ Open dropdown
+            //  Open dropdown
             setTimeout(() => {
               if (event.component?.open) {
                 event.component.open();
@@ -528,7 +528,7 @@ export class AddJournalVoucharComponent {
           } else {
             enterPressedOnce = false;
 
-            // ✅ Move to DEPT_ID
+            // Move to DEPT_ID
             const grid = e.component;
             const rowIndex = e.row.rowIndex;
 
