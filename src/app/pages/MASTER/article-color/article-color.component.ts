@@ -36,7 +36,8 @@ export class ArticleColorComponent {
   dataGrid: DxDataGridComponent;
   @ViewChild('formValidationGroup')
   formValidationGroup: DxValidationGroupComponent;
-
+  @ViewChild('updateValidationGroup')
+  updateValidationGroup: DxValidationGroupComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -167,8 +168,8 @@ export class ArticleColorComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/article-color');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/article-color');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -326,71 +327,49 @@ export class ArticleColorComponent {
       this.selectedData = response;
     });
   }
+
   editData() {
-    const validationResult = this.formValidationGroup?.instance?.validate();
-    const Id = this.editingRowData.ID;
+    const validationResult = this.updateValidationGroup?.instance?.validate();
+
+    if (validationResult && !validationResult.isValid) {
+      return;
+    }
+
+    // FIX: ID is inside Data
+    const Id = Number(this.selectedData?.Data?.ID);
+
     const Code = this.editingRowData.CODE;
     const Color_English = this.editingRowData.COLOR_ENGLISH;
-    // const Color_Arabic = this.editingRowData.COLOR_ARABIC;
-    // const COMPANY_ID = this.selected_Company_id
 
     const trimmedCode = Code?.trim().toLowerCase();
     const trimmedColorEnglish = Color_English?.trim().toLowerCase();
-    // const trimmedColorArabic = Color_Arabic?.trim().toLowerCase();
 
     let isCodeDuplicate = false;
     let isColorEnglishDuplicate = false;
-    // let isColorArabicDuplicate = false;
 
-    this.articleColorList?.forEach((data: any) => {
-      // Skip current record by ID
-      if (data.ID === Id) return;
+    this.articleColorList?.forEach((row: any) => {
+      // Skip current editing record
+      if (Number(row.ID) === Id) return;
 
-      const dataCode = data.CODE?.trim().toLowerCase();
-      const dataColorEnglish = data.COLOR_ENGLISH?.trim().toLowerCase();
-      // const dataColorArabic = data.COLOR_ARABIC?.trim().toLowerCase();
-
-      if (dataCode === trimmedCode) {
+      if (row.CODE?.trim().toLowerCase() === trimmedCode) {
         isCodeDuplicate = true;
       }
 
-      if (dataColorEnglish === trimmedColorEnglish) {
+      if (row.COLOR_ENGLISH?.trim().toLowerCase() === trimmedColorEnglish) {
         isColorEnglishDuplicate = true;
       }
-
-      // if (dataColorArabic === trimmedColorArabic) {
-      //   isColorArabicDuplicate = true;
-      // }
     });
 
-    // Show appropriate message
     if (isCodeDuplicate || isColorEnglishDuplicate) {
-      let message = '';
-
-      if (isCodeDuplicate && isColorEnglishDuplicate) {
-        message = 'Code, Color English, and Color Arabic already exist';
-      } else if (isCodeDuplicate && isColorEnglishDuplicate) {
-        message = 'Code and Color English already exist';
-      }
-      //  else if (isCodeDuplicate && isColorArabicDuplicate) {
-      //   message = 'Code and Color Arabic already exist';
-      // }
-      //  else if (isColorEnglishDuplicate && isColorArabicDuplicate) {
-      //   message = 'Color English and Color Arabic already exist';
-      // }
-      else if (isCodeDuplicate) {
-        message = 'Code already exists';
-      } else if (isColorEnglishDuplicate) {
-        message = 'Color English already exists';
-      }
-      // else if (isColorArabicDuplicate) {
-      //   message = 'Color Arabic already exists';
-      // }
-
       notify(
         {
-          message,
-          position: { at: 'top right', my: 'top right' },
+          message: isCodeDuplicate
+            ? 'Code already exists'
+            : 'Color English already exists',
+          position: {
+            at: 'top right',
+            my: 'top right',
+          },
           displayTime: 1000,
         },
         'error',
@@ -398,25 +377,28 @@ export class ArticleColorComponent {
 
       return;
     }
-    const Color_Arabic = '';
-    if (Code && Color_English && Color_Arabic) {
-      this.dataservice
-        .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)
-        .subscribe((res: any) => {
-          notify(
-            {
-              message: 'Data succesfully updated',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
 
-          this.formsource.reset();
-          this.get_ArticleColor_List();
-          this.UpdateArticleColorPopup = false;
-        });
-    }
+    const Color_Arabic = '';
+
+    this.dataservice
+      .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)
+      .subscribe(() => {
+        notify(
+          {
+            message: 'Data succesfully updated',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'success',
+        );
+
+        this.formsource.reset();
+        this.get_ArticleColor_List();
+        this.UpdateArticleColorPopup = false;
+      });
   }
 
   delete_Data(event: any) {
@@ -459,4 +441,4 @@ export class ArticleColorComponent {
   exports: [],
   declarations: [ArticleColorComponent],
 })
-export class ArticleColorModule { }
+export class ArticleColorModule {}
