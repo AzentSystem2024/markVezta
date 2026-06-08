@@ -423,7 +423,7 @@ export class CompanyMasterComponent {
         // 🔹 PHONE split
         if (data.PHONE) {
           const phoneParts = data.PHONE.split('-');
-          this.countryCodephone = phoneParts[0];   // +971
+          this.countryCodephone = phoneParts[0]; // +971
           this.editingRowData.PHONE = phoneParts[1]; // 578674589
         }
 
@@ -659,4 +659,4 @@ export class CompanyMasterComponent {
   exports: [],
   declarations: [CompanyMasterComponent],
 })
-export class CompanyMasterModule { }
+export class CompanyMasterModule {}

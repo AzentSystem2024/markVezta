@@ -10,54 +10,59 @@
     "
   >
     <div class="salary-grid-wrapper" style="padding: 0 10px">
-      <div style="display:flex; gap:10px; margin-bottom:5px; justify-content:flex-end;">
-  </div>
+      <div
+        style="
+          display: flex;
+          gap: 10px;
+          margin-bottom: 5px;
+          justify-content: flex-end;
+        "
+      ></div>
 
       <div class="grid-container">
-
         <div
-  style="
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    gap: 15px;
-  "
->
-  <!-- Left side -->
-  <div style="display: flex; flex-direction: column; gap: 10px">
-    <dx-text-box
-      [(value)]="paymentFormData.DOC_NO"
-      label="Payment No"
-      labelMode="floating"
-      [width]="220"
-      [readOnly]="true"
-    ></dx-text-box>
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            gap: 15px;
+          "
+        >
+          <!-- Left side -->
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <dx-text-box
+              [(value)]="paymentFormData.DOC_NO"
+              label="Payment No"
+              labelMode="floating"
+              [width]="220"
+              [readOnly]="true"
+            ></dx-text-box>
 
-    <dx-select-box
-      [(value)]="paymentFormData.SUPP_ID"
-      [dataSource]="supplierList"
-      displayExpr="DESCRIPTION"
-      valueExpr="ID"
-      [width]="320"
-      [searchEnabled]="true"
-      [showClearButton]="true"
-      label="Supplier"
-      labelMode="floating"
-      (onValueChanged)="onSupplierChanged($event)"
-    ></dx-select-box>
-  </div>
+            <dx-select-box
+              [(value)]="paymentFormData.SUPP_ID"
+              [dataSource]="supplierList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [width]="320"
+              [searchEnabled]="true"
+              [showClearButton]="true"
+              label="Supplier"
+              labelMode="floating"
+              (onValueChanged)="onSupplierChanged($event)"
+            ></dx-select-box>
+          </div>
 
-  <!-- Right side -->
-  <dx-date-box
-    [(value)]="paymentFormData.TRANS_DATE"
-    label="Date"
-    labelMode="floating"
-    displayFormat="dd-MM-yyyy"
-    type="date"
-    [width]="220"
-  ></dx-date-box>
-</div>
+          <!-- Right side -->
+          <dx-date-box
+            [(value)]="paymentFormData.TRANS_DATE"
+            label="Date"
+            labelMode="floating"
+            displayFormat="dd-MM-yyyy"
+            type="date"
+            [width]="220"
+          ></dx-date-box>
+        </div>
 
         <dx-data-grid
           #itemsGridRef
@@ -74,14 +79,13 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          
           [columnResizingMode]="'nextColumn'"
           rowAlternationInterval="2"
           [selection]="{
-    mode: 'multiple',
-    showCheckBoxesMode: 'always',
-    selectAllMode: 'allPages'
-  }"
+            mode: 'multiple',
+            showCheckBoxesMode: 'always',
+            selectAllMode: 'allPages',
+          }"
           (onContentReady)="onGridContentReady($event)"
           (onSelectionChanged)="onSelectionChanged($event)"
           (onEditorPreparing)="onEditorPreparing($event)"
@@ -95,7 +99,7 @@
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
-        
+
           <dxi-column
             dataField="DOC_NO"
             caption="Doc No"
@@ -154,24 +158,28 @@
             ></dxi-validation-rule>
           </dxi-column>
 
-        <dxo-summary [calculateCustomSummary]="calculateSelectedPendingSummary">
-  <dxi-total-item
-    name="selectedPendingTotal"
-    summaryType="custom"
-    showInColumn="PENDING_AMOUNT"
-    valueFormat="#,##0.00"
-    displayFormat="Total: {0}"
-    alignment="right">
-  </dxi-total-item>
+          <dxo-summary
+            [calculateCustomSummary]="calculateSelectedPendingSummary"
+          >
+            <dxi-total-item
+              name="selectedPendingTotal"
+              summaryType="custom"
+              showInColumn="PENDING_AMOUNT"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
 
-  <dxi-total-item
-    column="RECEIVED_AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Total: {0}"
-    alignment="right">
-  </dxi-total-item>
-</dxo-summary>
+            <dxi-total-item
+              column="RECEIVED_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+              alignment="right"
+            >
+            </dxi-total-item>
+          </dxo-summary>
         </dx-data-grid>
 
         <!-- Fill Amount Button below grid -->
@@ -404,12 +412,14 @@
     "
   >
     <!-- Display Total Pending Amount (read-only) -->
-    <dx-text-box
-      [value]="totalPending | number: '1.2-2'"
+    <dx-number-box
+      [value]="totalPending"
+      [displayValueFormatter]="formatPending"
       label="Total Pending Amount"
       labelMode="floating"
       [readOnly]="true"
-    ></dx-text-box>
+      format="#,##0.00"
+    ></dx-number-box>
 
     <!-- Editable Amount Field -->
     <dx-number-box
@@ -432,7 +442,12 @@
         margin-top: 20px;
       "
     >
-      <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="Cancel()"></dx-button>
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="Cancel()"
+      ></dx-button>
       <dx-button
         text="Submit"
         stylingMode="contained"

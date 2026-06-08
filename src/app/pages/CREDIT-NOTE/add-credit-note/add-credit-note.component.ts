@@ -663,24 +663,6 @@ export class AddCreditNoteComponent {
         }
       };
     }
-    // if (e.dataField === 'Amount') {
-    //   e.editorOptions.onKeyDown = (event: any) => {
-    //     if (event.event.key === 'Enter') {
-    //       // simulate TAB key (DevExtreme handles this correctly)
-    //       const eKey = event.event;
-
-    //       const tabEvent = new KeyboardEvent('keydown', {
-    //         key: 'Tab',
-    //         code: 'Tab',
-    //         keyCode: 9,
-    //         which: 9,
-    //         bubbles: true,
-    //       });
-
-    //       eKey.target.dispatchEvent(tabEvent);
-    //     }
-    //   };
-    // }
 
     if (e.dataField === 'GST_PERC') {
       const original = e.editorOptions.onValueChanged;

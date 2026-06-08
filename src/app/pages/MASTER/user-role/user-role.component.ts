@@ -131,14 +131,13 @@ export class UserRoleComponent implements OnInit {
       }),
   });
 
-
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -150,8 +149,8 @@ export class UserRoleComponent implements OnInit {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/user-role');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/user-role');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -162,6 +161,7 @@ export class UserRoleComponent implements OnInit {
       this.HideCost = packingRights.HideCost;
       this.canApprove = packingRights.CanApprove;
     }
+    console.log(this.dataSource, 'DATASOURCEEEEEEEEEEEEE');
   }
 
   //========================Export data ==========================
@@ -218,7 +218,7 @@ export class UserRoleComponent implements OnInit {
     const menuData = this.userlevelNewForm.getNewUSerLevelData();
     const userlevelvalues = this.userlevelNewForm.UserLevelValue;
     const userlistdata = this.userlevelNewForm.UserListdataSource;
-    console.log(menuData)
+    console.log(menuData);
     const isDuplicate = userlistdata?.some((data: any) => {
       const existingName = data.UserRoles?.toString().trim().toLowerCase();
       return existingName === userlevelvalues;
@@ -429,4 +429,4 @@ export class UserRoleComponent implements OnInit {
   exports: [],
   declarations: [UserRoleComponent],
 })
-export class UserRoleModule { }
+export class UserRoleModule {}

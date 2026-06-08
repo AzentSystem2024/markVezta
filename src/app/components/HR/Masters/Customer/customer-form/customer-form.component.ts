@@ -80,19 +80,19 @@ export class CustomerFormComponent {
     EMAIL: '',
     MOBILE_NO: '',
     FAX_NO: '',
-    CREDIT_LIMIT: '',
-    CURRENT_CREDIT: '',
-    PAY_TERM_ID: '',
+    CREDIT_LIMIT: 0,
+    CURRENT_CREDIT: 0.0,
+    PAY_TERM_ID: 0,
     NOTES: '',
-    PRICE_CLASS_ID: '',
-    DISCOUNT_PERCENT: '',
+    PRICE_CLASS_ID: 0,
+    DISCOUNT_PERCENT: 0,
     CUST_VAT_RULE_ID: 0,
     VAT_REGNO: '',
     CUSTOMER_TYPE: 0,
     WAREHOUSE_ID: 0,
     CUST_TYPE: 0,
     DEALER_TYPE: 0,
-    DEALER_ID: null,
+    DEALER_ID: 0,
     DeliveryAddresses: [] as any[],
   };
 
@@ -187,7 +187,7 @@ export class CustomerFormComponent {
   showCountry() {
     this.service.getCountryDataAPi().subscribe((response) => {
       this.CountryDropdownData = response;
-      console;
+      console.log(this.CountryDropdownData, 'CountryDropdownData');
     });
   }
   sessionData_tax() {

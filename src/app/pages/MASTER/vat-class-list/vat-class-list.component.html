@@ -32,7 +32,12 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+        [useIcons]="true"
+      >
         <dxo-popup
           title="Edit Vat Class"
           [showTitle]="true"
@@ -101,6 +106,8 @@
       <dxi-column dataField="SGST_PERC" caption="SGST" alignment="left">
       </dxi-column>
       <dxi-column dataField="IGST_PERC" caption="IGST" alignment="left">
+      </dxi-column>
+      <dxi-column type="buttons" [visible]="canEdit || canDelete" width="100">
       </dxi-column>
     </dx-data-grid>
   </div>

@@ -535,7 +535,9 @@ export class AddPurchaseInvoiceComponent {
   };
 
   isGRNAlreadySelected = (rowData: any) => {
-    return this.mainGridData?.some((item) => item.ITEM_ID === rowData.ITEM_ID);
+    return this.mainGridData?.some(
+      (item) => item.GRN_DET_ID === rowData.GRN_DET_ID,
+    );
   };
 
   onPopupSelectionChanged(e: any) {
@@ -555,6 +557,7 @@ export class AddPurchaseInvoiceComponent {
         'warning',
         2000,
       );
+      return;
     }
   }
   onPopupRowPrepared(e: any) {
@@ -570,7 +573,19 @@ export class AddPurchaseInvoiceComponent {
   }
   onTransferSelectClick() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+    // Prevent button action if duplicate exists
+    const hasDuplicate = selectedRows.some((row: any) =>
+      this.isGRNAlreadySelected(row),
+    );
 
+    if (hasDuplicate) {
+      notify(
+        'Some GRNs are already added and cannot be selected again',
+        'warning',
+        2000,
+      );
+      return;
+    }
     selectedRows.forEach((row) => {
       const exists = this.mainGridData.some(
         (item) =>
