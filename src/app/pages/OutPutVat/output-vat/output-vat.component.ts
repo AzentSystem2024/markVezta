@@ -304,20 +304,23 @@ export class OutputVatComponent {
           this.isViewJournalVoucher = true;
           this.cdr.detectChanges();
         });
-    } else if (TRANS_TYPE_ID === 36) {
-      this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-        this.selectedDebitNote = response.Data;
-        this.isViewDebitNote = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedDebitNote, 'selected debit note');
-      });
-    } else if (TRANS_TYPE_ID === 37) {
-      this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-        this.selectedCreditNote = response.Data;
-        this.isViewCreditNote = true;
-        this.cdr.detectChanges();
-      });
-    } else if (TRANS_TYPE_ID === 25) {
+    }
+    //  else if (TRANS_TYPE_ID === 36) {
+    //   this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
+    //     this.selectedDebitNote = response.Data;
+    //     this.isViewDebitNote = true;
+    //     this.cdr.detectChanges();
+    //     console.log(this.selectedDebitNote, 'selected debit note');
+    //   });
+    // }
+    //  else if (TRANS_TYPE_ID === 37) {
+    //   this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+    //     this.selectedCreditNote = response.Data;
+    //     this.isViewCreditNote = true;
+    //     this.cdr.detectChanges();
+    //   });
+    // }
+     else if (TRANS_TYPE_ID === 25) {
       this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         console.log(this.selectedInvoice)
@@ -325,24 +328,25 @@ export class OutputVatComponent {
         this.isViewInvoice = true;
         this.cdr.detectChanges();
       });
-    } else if (TRANS_TYPE_ID === 27) {
-      this.dataService
-        .selectCustomerReceipt(trans_id)
-        .subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
-          this.isViewReceipt = true;
-          this.cdr.detectChanges();
-        });
-    } else if (TRANS_TYPE_ID === 21) {
-      this.dataService
-        .selectSupplierPayment(trans_id)
-        .subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
-          this.isEditReceipt = true;
-          this.cdr.detectChanges();
-        });
-    } else {
     }
+    //  else if (TRANS_TYPE_ID === 27) {
+    //   this.dataService
+    //     .selectCustomerReceipt(trans_id)
+    //     .subscribe((response: any) => {
+    //       this.selectedReceipt = response.Data;
+    //       this.isViewReceipt = true;
+    //       this.cdr.detectChanges();
+    //     });
+    // } else if (TRANS_TYPE_ID === 21) {
+    //   this.dataService
+    //     .selectSupplierPayment(trans_id)
+    //     .subscribe((response: any) => {
+    //       this.selectedReceipt = response.Data;
+    //       this.isEditReceipt = true;
+    //       this.cdr.detectChanges();
+    //     });
+    // } else {
+    // }
   }
   // POPUP shown → allow child to render
   onPopupShown() {
