@@ -36,7 +36,8 @@ export class ArticleColorComponent {
   dataGrid: DxDataGridComponent;
   @ViewChild('formValidationGroup')
   formValidationGroup: DxValidationGroupComponent;
-
+  @ViewChild('updateValidationGroup')
+  updateValidationGroup: DxValidationGroupComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -167,8 +168,8 @@ export class ArticleColorComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/article-color');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/article-color');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -323,74 +324,78 @@ export class ArticleColorComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_ArticleColor_Api(ID).subscribe((response: any) => {
-      this.selectedData = response;
+      this.selectedData = response.Data;
     });
   }
+
   editData() {
-    const validationResult = this.formValidationGroup?.instance?.validate();
+    const validationResult = this.updateValidationGroup?.instance?.validate();
+
+    if (validationResult && !validationResult.isValid) {
+      return;
+    }
+
     const Id = this.editingRowData.ID;
-    const Code = this.editingRowData.CODE;
-    const Color_English = this.editingRowData.COLOR_ENGLISH;
-    // const Color_Arabic = this.editingRowData.COLOR_ARABIC;
-    // const COMPANY_ID = this.selected_Company_id
 
-    const trimmedCode = Code?.trim().toLowerCase();
-    const trimmedColorEnglish = Color_English?.trim().toLowerCase();
-    // const trimmedColorArabic = Color_Arabic?.trim().toLowerCase();
+    const Code = this.editingRowData.CODE?.trim();
 
-    let isCodeDuplicate = false;
-    let isColorEnglishDuplicate = false;
-    // let isColorArabicDuplicate = false;
+    const Color_English = this.editingRowData.COLOR_ENGLISH?.trim();
 
-    this.articleColorList?.forEach((data: any) => {
-      // Skip current record by ID
-      if (data.ID === Id) return;
+    const Color_Arabic = '';
+    console.log(Id, Code, Color_English, 'DATAAAAAAAAAAAAAAA');
+    // Find original row
+    const existingRow = this.articleColorList.find((x: any) => x.ID == Id);
+    console.log(existingRow, 'existingrowwwwwwwww');
+    // If values unchanged → update directly
+    if (
+      existingRow &&
+      existingRow.CODE === Code &&
+      existingRow.COLOR_ENGLISH === Color_English
+    ) {
+      this.dataservice
+        .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)
+        .subscribe(() => {
+          notify(
+            {
+              message: 'Data succesfully updated',
+              position: {
+                at: 'top right',
+                my: 'top right',
+              },
+              displayTime: 500,
+            },
+            'success',
+          );
 
-      const dataCode = data.CODE?.trim().toLowerCase();
-      const dataColorEnglish = data.COLOR_ENGLISH?.trim().toLowerCase();
-      // const dataColorArabic = data.COLOR_ARABIC?.trim().toLowerCase();
+          this.UpdateArticleColorPopup = false;
 
-      if (dataCode === trimmedCode) {
-        isCodeDuplicate = true;
-      }
+          this.get_ArticleColor_List();
+        });
 
-      if (dataColorEnglish === trimmedColorEnglish) {
-        isColorEnglishDuplicate = true;
-      }
+      return;
+    }
 
-      // if (dataColorArabic === trimmedColorArabic) {
-      //   isColorArabicDuplicate = true;
-      // }
-    });
+    const isCodeDuplicate = this.articleColorList.some(
+      (x: any) =>
+        x.ID != Id && x.CODE?.trim()?.toLowerCase() === Code?.toLowerCase(),
+    );
 
-    // Show appropriate message
-    if (isCodeDuplicate || isColorEnglishDuplicate) {
-      let message = '';
+    const isColorDuplicate = this.articleColorList.some(
+      (x: any) =>
+        x.ID != Id &&
+        x.COLOR_ENGLISH?.trim()?.toLowerCase() === Color_English?.toLowerCase(),
+    );
 
-      if (isCodeDuplicate && isColorEnglishDuplicate) {
-        message = 'Code, Color English, and Color Arabic already exist';
-      } else if (isCodeDuplicate && isColorEnglishDuplicate) {
-        message = 'Code and Color English already exist';
-      }
-      //  else if (isCodeDuplicate && isColorArabicDuplicate) {
-      //   message = 'Code and Color Arabic already exist';
-      // }
-      //  else if (isColorEnglishDuplicate && isColorArabicDuplicate) {
-      //   message = 'Color English and Color Arabic already exist';
-      // }
-      else if (isCodeDuplicate) {
-        message = 'Code already exists';
-      } else if (isColorEnglishDuplicate) {
-        message = 'Color English already exists';
-      }
-      // else if (isColorArabicDuplicate) {
-      //   message = 'Color Arabic already exists';
-      // }
-
+    if (isCodeDuplicate || isColorDuplicate) {
       notify(
         {
-          message,
-          position: { at: 'top right', my: 'top right' },
+          message: isCodeDuplicate
+            ? 'Code already exists'
+            : 'Color English already exists',
+          position: {
+            at: 'top right',
+            my: 'top right',
+          },
           displayTime: 1000,
         },
         'error',
@@ -398,39 +403,65 @@ export class ArticleColorComponent {
 
       return;
     }
-    const Color_Arabic = '';
-    if (Code && Color_English && Color_Arabic) {
-      this.dataservice
-        .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)
-        .subscribe((res: any) => {
-          notify(
-            {
-              message: 'Data succesfully updated',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
 
-          this.formsource.reset();
-          this.get_ArticleColor_List();
-          this.UpdateArticleColorPopup = false;
-        });
-    }
+    this.dataservice
+      .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)
+      .subscribe(() => {
+        notify(
+          {
+            message: 'Data succesfully updated',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'success',
+        );
+
+        this.UpdateArticleColorPopup = false;
+
+        this.get_ArticleColor_List();
+      });
   }
 
   delete_Data(event: any) {
+    event.cancel = true;
+
     const Id = event.data.ID;
-    this.dataservice.Delete_ArticleColor_Api(Id).subscribe((response: any) => {
-      notify(
-        {
-          message: 'Data succesfully deleted',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'success',
-      );
-    });
+
+    this.dataservice.Delete_ArticleColor_Api(Id).subscribe(
+      (response: any) => {
+        notify(
+          {
+            message: 'Data succesfully deleted',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'success',
+        );
+
+        this.get_ArticleColor_List();
+
+        this.dataGrid?.instance?.refresh();
+      },
+      (error) => {
+        notify(
+          {
+            message: 'Delete failed',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'error',
+        );
+      },
+    );
   }
 
   //========================Export data ==========================
@@ -459,4 +490,4 @@ export class ArticleColorComponent {
   exports: [],
   declarations: [ArticleColorComponent],
 })
-export class ArticleColorModule { }
+export class ArticleColorModule {}

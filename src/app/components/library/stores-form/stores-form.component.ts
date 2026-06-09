@@ -118,7 +118,7 @@ export class StoresFormComponent implements OnInit {
           PHONE: phonenumber,
         };
       }
-      // 👉 ADD MODE (important fix)
+      //  ADD MODE (important fix)
       else {
         this.resetForm();
       }
@@ -177,8 +177,6 @@ export class StoresFormComponent implements OnInit {
         this.creditFormData.FIN_ID = firstFinYear.FIN_ID;
       }
     }
-
-    
 
     this.get_Country_Dropdown_List();
     this.getCountryListWithFlag();
@@ -347,7 +345,7 @@ export class StoresFormComponent implements OnInit {
     this.service.getStoresData(payload).subscribe({
       next: (response: any[]) => {
         this.storesArray = response || [];
-        console.log(this.storesArray,"this.storesArray")
+        console.log(this.storesArray, 'this.storesArray');
       },
       error: () => {
         this.storesArray = [];
@@ -367,7 +365,7 @@ export class StoresFormComponent implements OnInit {
 
       return code === value && item.ID !== currentId;
     });
-  };  
+  };
 
   validateStoreName = (e: any): boolean => {
     const value = (e.value || '').trim().toLowerCase();
@@ -381,8 +379,7 @@ export class StoresFormComponent implements OnInit {
 
       return code === value && item.ID !== currentId;
     });
-  };  
-
+  };
 }
 @NgModule({
   imports: [

@@ -8,7 +8,7 @@
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
     [showColumnLines]="true"
-    (onRowRemoved)="delete_Data($event)"
+    (onRowRemoving)="delete_Data($event)"
     [height]="'82vh'"
     noDataText=" "
     [scrolling]="{ mode: 'virtual' }"

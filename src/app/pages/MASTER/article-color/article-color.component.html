@@ -9,7 +9,7 @@
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
     [scrolling]="{ mode: 'virtual' }"
-    (onRowRemoved)="delete_Data($event)"
+    (onRowRemoving)="delete_Data($event)"
     [height]="'82vh'"
     noDataText=" "
     (onEditingStart)="onEditingStart($event)"
@@ -170,7 +170,7 @@
   (save)="editData()"
   [showApprove]="false"
 >
-  <dx-validation-group #formValidationGroup>
+  <dx-validation-group #updateValidationGroup>
     <dx-form class="plain-styled-form">
       <dxi-item>
         <dx-text-box

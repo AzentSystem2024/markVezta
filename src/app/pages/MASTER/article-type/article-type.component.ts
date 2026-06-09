@@ -176,7 +176,7 @@ export class ArticleTypeComponent {
     this.Select_ArticleType(event);
   }
 
-  closePop() { }
+  closePop() {}
 
   addArticleType() {
     this.AddArticleTypePopup = true;
@@ -324,17 +324,42 @@ export class ArticleTypeComponent {
   }
 
   delete_Data(event: any) {
+    event.cancel = true;
+
     const Id = event.data.ID;
-    this.dataservice.Delete_ArticleType_Api(Id).subscribe((response: any) => {
-      notify(
-        {
-          message: 'Data succesfully deleted',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'success',
-      );
-    });
+
+    this.dataservice.Delete_ArticleType_Api(Id).subscribe(
+      (response: any) => {
+        notify(
+          {
+            message: 'Data succesfully deleted',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'success',
+        );
+
+        this.get_ArticleType_List();
+
+        this.dataGrid?.instance?.refresh();
+      },
+      (error) => {
+        notify(
+          {
+            message: 'Delete failed',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'error',
+        );
+      },
+    );
   }
 
   //========================Export data ==========================
@@ -363,4 +388,4 @@ export class ArticleTypeComponent {
   exports: [],
   declarations: [ArticleTypeComponent],
 })
-export class ArticleTypeModule { }
+export class ArticleTypeModule {}
