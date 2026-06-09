@@ -49,6 +49,7 @@ import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
 import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
+import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 
 @Component({
   selector: 'app-output-vat',
@@ -56,7 +57,12 @@ import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer
   styleUrls: ['./output-vat.component.scss'],
 })
 export class OutputVatComponent {
+  @Input() EditingResponseData: any;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
   CustomerListDataSource: any[] = [];
+  auto: string = 'auto';
+  isFilterRowVisible: boolean = false;
   isEditJournalVoucher: boolean = false;
   isViewJournalVoucher: boolean = false;
   isViewDebitNote: boolean = false;
@@ -94,6 +100,9 @@ export class OutputVatComponent {
   financialYeaDate: string;
   selected_vat_id: any;
   sessionData: any;
+  Store: any;
+  selectedStoreid: any;
+  isReadOnlyInvoice : boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -103,6 +112,7 @@ export class OutputVatComponent {
     this.get_sessionstorage_data();
     this.get_fin_id();
     this.sesstion_Details();
+    this.store_dropdown();
 
     // Detect when component is revisited
     this.router.events
@@ -115,6 +125,11 @@ export class OutputVatComponent {
 
     this.get_customer_list();
   }
+
+    toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
 
   ngOnInit() {
     this.onToDateChange({ value: this.defaultDate });
@@ -144,10 +159,36 @@ export class OutputVatComponent {
     });
   }
 
+   storeHint: string = '';
+    
+    updateStoreHint() {
+      if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+        this.storeHint = 'No store selected';
+        return;
+      }
+    
+      const selectedNames = this.Store
+        .filter(x => this.selectedStoreid.includes(x.ID))
+        .map(x => x.DESCRIPTION);
+    
+      this.storeHint = selectedNames.join(', ');
+    }
+
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   }
+
+   store_dropdown(){
+      const payload = {
+        NAME :'STORE',
+        COMPANY_ID : this.selected_Company_id
+      }
+      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+        this.Store = res;
+      });
+    }
+
 
   Load_Output_vat() {
     const payload = {
@@ -246,7 +287,7 @@ export class OutputVatComponent {
   }
 
   onViewClick(e: any) {
-    this.selectedInvoice = null;
+    // this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
     //  this.isViewInvoice= true;
@@ -277,9 +318,10 @@ export class OutputVatComponent {
         this.cdr.detectChanges();
       });
     } else if (TRANS_TYPE_ID === 25) {
-      this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+      this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
-        this.loadingInvoice = false;
+        console.log(this.selectedInvoice)
+        // this.loadingInvoice = false;
         this.isViewInvoice = true;
         this.cdr.detectChanges();
       });
@@ -310,6 +352,30 @@ export class OutputVatComponent {
   summaryColumnsData = {
     totalItems: [
       {
+        column: 'EXEMPTED',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'EXEMPTED',
+        alignment: 'right',
+      },
+      {
+        column: 'ZERO',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'ZERO',
+        alignment: 'right',
+      },
+      {
+        column: 'STANDARD_RATE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'STANDARD_RATE',
+        alignment: 'right',
+      },
+      {
         column: 'TAXABLE_AMOUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
@@ -335,6 +401,27 @@ export class OutputVatComponent {
       },
     ],
     groupItems: [
+      {
+        column: 'EXEMPTED',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'ZERO',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'STANDARD_RATE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
       {
         column: 'TAXABLE_AMOUNT',
         summaryType: 'sum',
@@ -364,137 +451,10 @@ export class OutputVatComponent {
     },
   };
 
-  //   summaryColumnsData = {
-  //     totalItems: [
-  //       // 1. Total Debitṅ
-  //                        {
-
-  //         column: 'NARRATION',
-  //         summaryType: '',
-  //         displayFormat: ' Total',cu
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'NARRATION',
-  //         alignment: 'right',
-  //       },
-  //                  {
-
-  //         column: 'NARRATION',
-  //         summaryType: '',
-  //         displayFormat: ' Closing Balance',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'NARRATION',
-  //         alignment: 'right',
-  //       },
-  //                  {
-
-  //         column: 'NARRATION',
-  //         summaryType: '',
-  //         displayFormat: ' Grand Total',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'NARRATION',
-  //         alignment: 'right',
-  //       },
-  //       {
-  //         name: 'totalDr',
-  //         column: 'TAXABLE_AMOUNT',
-  //         summaryType: 'sum',
-  //         displayFormat: ' {0}',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'DR_AMOUNT',
-  //         alignment: 'right',
-  //       },
-  //       // 2. Total Credit
-  //       {
-  //         name: 'totalCr',
-  //         column: 'CR_AMOUNT',
-  //         summaryType: 'sum',
-  //         displayFormat: ' {0}',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'CR_AMOUNT',
-  //         alignment: 'right',
-  //       },
-  //       // 3. Closing Balance (shows in Debit or Credit column based on value)
-  //       {
-  //         name: 'closingBalanceDr',
-  //         summaryType: 'custom',
-  //         displayFormat: ' {0}',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'DR_AMOUNT',
-  //         alignment: 'right',
-  //       },
-  //       {
-  //         name: 'closingBalanceCr',
-  //         summaryType: 'custom',
-  //         displayFormat: '{0}',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'CR_AMOUNT',
-  //         alignment: 'right',
-  //       },
-  //       // 4. Grand Total (sum of totals + closing balance)
-  //       {
-  //         name: 'grandTotalDr',
-  //         summaryType: 'custom',
-  //         displayFormat: ' {0}',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'DR_AMOUNT',
-  //         alignment: 'right',
-  //       },
-  //       {
-  //         name: 'grandTotalCr',
-  //         summaryType: 'custom',
-  //         displayFormat: ' {0}',
-  //         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-  //         showInColumn: 'CR_AMOUNT',
-  //         alignment: 'right',
-  //       },
-  //     ],
-
-  // calculateCustomSummary: (options: any) => {
-  //   if (options.summaryProcess === 'finalize') {
-  //     const items = this.customerSummaryData || [];
-
-  //     const totalDr = items.reduce((sum, item) => {
-  //       const val = parseFloat(
-  //         String(item?.DR_AMOUNT || '0').replace(/,/g, '').trim()
-  //       );
-  //       return sum + (isNaN(val) ? 0 : val);
-  //     }, 0);
-
-  //     const totalCr = items.reduce((sum, item) => {
-  //       const val = parseFloat(
-  //         String(item?.CR_AMOUNT || '0').replace(/,/g, '').trim()
-  //       );
-  //       return sum + (isNaN(val) ? 0 : val);
-  //     }, 0);
-
-  //     const closingBalance = totalDr - totalCr;
-
-  //     // Closing Balance Cr
-  //     if (options.name === 'closingBalanceCr') {
-  //       options.totalValue = closingBalance > 0 ? closingBalance : 0;
-  //     }
-
-  //     // Closing Balance Dr
-  //     if (options.name === 'closingBalanceDr') {
-  //       options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
-  //     }
-
-  //     // Grand Total Cr
-  //     if (options.name === 'grandTotalCr') {
-  //       options.totalValue = totalCr + (closingBalance > 0 ? closingBalance : 0);
-  //     }
-
-  //     // Grand Total Dr
-  //     if (options.name === 'grandTotalDr') {
-  //       options.totalValue = totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-  //     }
-  //   }
-  // }
-
-  //   };
+ 
 
   onExporting(event: any) {
-    const fileName = 'Ledger Statement Report';
+    const fileName = 'Output VAT';
     this.dataService.exportDataGridReport(event, fileName);
   }
 }
@@ -535,6 +495,7 @@ export class OutputVatComponent {
     ViewInvoiceModule,
     ViewCreditNoteModule,
     DxoLoadPanelModule,
+    AddInvoiceRetailModule,
   ],
   providers: [],
   declarations: [OutputVatComponent],

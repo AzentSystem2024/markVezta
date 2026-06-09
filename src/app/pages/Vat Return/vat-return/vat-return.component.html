@@ -1,89 +1,68 @@
-<div class="salary-grid-wrapper" style="padding: 10px">
+
   <div class="grid-container">
     <dx-data-grid
-      [dataSource]="gridData"
-      width="100%"
-      noDataText=""
-      height="6vh"
-      width="100%"
-      [showBorders]="true"
-      [showColumnLines]="true"
-      [columnAutoWidth]="true"
-      [wordWrapEnabled]="false"
-      [grouping]="{ autoExpandAll: false }"
-      [filterRow]="{ visible: false }"
-      [rowAlternationEnabled]="true"
-      [rowAlternationEnabled]="true"
-      rowAlternationInterval="2"
-      [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
-      id="dataGrid"
-      [headerFilter]="{ visible: false }"
-      [columnFixing]="{
-        enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
-      }"
+       #dataGrid
+    [dataSource]="gridData"
+    width="100%"
+    height="83vh"
+    [showBorders]="true"
+    [showRowLines]="true"
+    [allowColumnResizing]="false"
+    [showColumnLines]="true"
+    [columnAutoWidth]="true"
+    [groupPanel]="{ visible: true }"
+    [grouping]="{ autoExpandAll: false }"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [remoteOperations]="false"
+    [allowColumnReordering]="true"
+    [filterRow]="{ visible: false }"
+    id="dataGrid"
+    [headerFilter]="{ visible: false }"
+    [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+    [columnFixing]="{
+      enabled: true,
+      texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+    }"
+    (onExporting)="onExporting($event)"
+    [loadPanel]="{ enabled: false, text: 'Loading...' }"
     >
-      <!-- (onEditingStart)="onEditLedger($event)" -->
-      <!-- <dxo-editing
-        mode="popup"
-        [allowUpdating]="true"
-      ></dxo-editing> -->
-      <dxo-paging [pageSize]="10"></dxo-paging>
-      <!-- <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"  style="padding-right: 15px;"> </dxo-export> -->
-      <!-- <dxo-pager
-        [visible]="true"
-        [allowedPageSizes]="allowedPageSizes"
-        [displayMode]="displayMode"
-        [showPageSizeSelector]="true"
-        [showInfo]="true"
-        [showNavigationButtons]="true"
-      ></dxo-pager> -->
-      <!-- <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"  style="padding-right: 15px;"> </dxo-export> -->
+    
+       <dxo-scrolling
+      mode="virtual"
+      rowRenderingMode="virtual"
+      columnRenderingMode="virtual">
+    </dxo-scrolling>
+
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="true"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    
       <dxo-toolbar>
         <dxi-item location="before">
-          <div
-            class="grid-header"
-            style="font-weight: 600; font-size: 20px; margin-left: 12px"
-          >
-            VAT Return
-          </div>
-
-          <!-- <div class="grid-header" style="font-weight: 600 ;font-size: 20px; margin-left: 12px;">
-        Output Tax
-          </div> -->
-        </dxi-item>
-
-        <!-- <dxi-item>
-           <dx-select-box
-    [width]="200"
-    label="Company Id"
-    labelMode="floating"
-    [items]="company_list"
-    displayExpr="COMPANY_NAME"
-    valueExpr="COMPANY_ID"
-    [(value)]="selectedCompanyId"
-    [searchEnabled]="true"
-    (onValueChanged)="onCompanyChange($event)">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
         >
+          VAT Return
+        </div>
+      </dxi-item>
 
-        </dx-select-box>
-
-        </dxi-item> -->
         <dxi-item>
-          <!-- <dx-select-box
-        [width]="200"
-        label="Customer"
-        labelMode="floating"
-         [items]="customer_list"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [(value)]="select_customer_id"
-    [searchEnabled]="true"
-    (onValueChanged)="onCompanyChange($event)"
-        >
-
-        </dx-select-box> -->
+      
         </dxi-item>
         <dxi-item>
           <dx-date-box
@@ -140,13 +119,17 @@
       </dxo-header-filter>
     </dx-data-grid>
   </div>
-  <div class="pdf-container" style="margin-top: 30px">
-    <iframe
-      *ngIf="pdfSrc"
-      [src]="pdfSrc"
-      width="100%"
-      height="600"
-      style="border: 1px solid #ccc; border-radius: 4px"
-    ></iframe>
-  </div>
+  
+<div
+  class="pdf-container"
+  style="margin-top: 30px"
+  *ngIf="pdfSrc"
+>
+  <iframe
+    [src]="pdfSrc"
+    width="100%"
+    height="1000px"
+    style="border: 1px solid #ddd;"
+  >
+  </iframe>
 </div>

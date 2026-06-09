@@ -134,6 +134,7 @@ export class AddInvoiceRetailComponent {
     }
   }
   ngOnInit() {
+    console.log(this.EditingResponseData,"EditingResponseData")
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
 
