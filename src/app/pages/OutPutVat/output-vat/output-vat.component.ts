@@ -102,7 +102,7 @@ export class OutputVatComponent {
   sessionData: any;
   Store: any;
   selectedStoreid: any;
-  isReadOnlyInvoice : boolean = false;
+  isReadOnlyInvoice: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -126,7 +126,7 @@ export class OutputVatComponent {
     this.get_customer_list();
   }
 
-    toggleFilterRow = () => {
+  toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
@@ -159,36 +159,35 @@ export class OutputVatComponent {
     });
   }
 
-   storeHint: string = '';
-    
-    updateStoreHint() {
-      if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-        this.storeHint = 'No store selected';
-        return;
-      }
-    
-      const selectedNames = this.Store
-        .filter(x => this.selectedStoreid.includes(x.ID))
-        .map(x => x.DESCRIPTION);
-    
-      this.storeHint = selectedNames.join(', ');
+  storeHint: string = '';
+
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
     }
+
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
+  }
 
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   }
 
-   store_dropdown(){
-      const payload = {
-        NAME :'STORE',
-        COMPANY_ID : this.selected_Company_id
-      }
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Store = res;
-      });
-    }
-
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
 
   Load_Output_vat() {
     const payload = {
@@ -304,30 +303,46 @@ export class OutputVatComponent {
           this.isViewJournalVoucher = true;
           this.cdr.detectChanges();
         });
-    }
-    //  else if (TRANS_TYPE_ID === 36) {
-    //   this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-    //     this.selectedDebitNote = response.Data;
-    //     this.isViewDebitNote = true;
-    //     this.cdr.detectChanges();
-    //     console.log(this.selectedDebitNote, 'selected debit note');
-    //   });
-    // }
-    //  else if (TRANS_TYPE_ID === 37) {
-    //   this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-    //     this.selectedCreditNote = response.Data;
-    //     this.isViewCreditNote = true;
-    //     this.cdr.detectChanges();
-    //   });
-    // }
-     else if (TRANS_TYPE_ID === 25) {
-      this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
-        console.log(this.selectedInvoice)
-        // this.loadingInvoice = false;
-        this.isViewInvoice = true;
+    } else if (TRANS_TYPE_ID === 36) {
+      this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
+        this.selectedDebitNote = response.Data;
+        this.isViewDebitNote = true;
+        this.cdr.detectChanges();
+        console.log(this.selectedDebitNote, 'selected debit note');
+      });
+    } else if (TRANS_TYPE_ID === 37) {
+      this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+        this.selectedCreditNote = response.Data;
+        this.isViewCreditNote = true;
         this.cdr.detectChanges();
       });
+    } else if (TRANS_TYPE_ID === 25) {
+      this.dataService
+        .selectInvoiceRetail(trans_id)
+        .subscribe((response: any) => {
+          this.selectedInvoice = response.Data;
+          console.log(this.selectedInvoice);
+          // this.loadingInvoice = false;
+          this.isViewInvoice = true;
+          this.cdr.detectChanges();
+        });
+    } else if (TRANS_TYPE_ID === 27) {
+      this.dataService
+        .selectCustomerReceipt(trans_id)
+        .subscribe((response: any) => {
+          this.selectedReceipt = response.Data;
+          this.isViewReceipt = true;
+          this.cdr.detectChanges();
+        });
+    } else if (TRANS_TYPE_ID === 21) {
+      this.dataService
+        .selectSupplierPayment(trans_id)
+        .subscribe((response: any) => {
+          this.selectedReceipt = response.Data;
+          this.isEditReceipt = true;
+          this.cdr.detectChanges();
+        });
+    } else {
     }
     //  else if (TRANS_TYPE_ID === 27) {
     //   this.dataService
@@ -454,8 +469,6 @@ export class OutputVatComponent {
       }
     },
   };
-
- 
 
   onExporting(event: any) {
     const fileName = 'Output VAT';

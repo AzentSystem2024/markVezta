@@ -1,6 +1,6 @@
-  <div class="grid-container">
-    <dx-data-grid
-       #dataGrid
+<div class="grid-container">
+  <dx-data-grid
+    #dataGrid
     [dataSource]="CustomerListDataSource"
     width="100%"
     height="83vh"
@@ -26,11 +26,12 @@
     }"
     (onExporting)="onExporting($event)"
     [loadPanel]="{ enabled: false, text: 'Loading...' }"
-    >
-         <dxo-scrolling
+  >
+    <dxo-scrolling
       mode="virtual"
       rowRenderingMode="virtual"
-      columnRenderingMode="virtual">
+      columnRenderingMode="virtual"
+    >
     </dxo-scrolling>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
@@ -44,9 +45,8 @@
       [showNavigationButtons]="true"
     ></dxo-pager>
 
-
-      <dxo-toolbar>
-       <dxi-item location="before">
+    <dxo-toolbar>
+      <dxi-item location="before">
         <div
           class="grid-header"
           style="
@@ -57,71 +57,70 @@
             margin-right: 3px;
           "
         >
-         Output VAT
+          Output VAT
         </div>
       </dxi-item>
 
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="From Date"
-            labelMode="floating"
-            [value]="financialYeaDate"
-            [displayFormat]="'dd-MM-yyyy'"
-            (onValueChanged)="onFromDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="To Date"
-            labelMode="floating"
-            [value]="defaultDate"
-            displayFormat="dd-MM-yyyy"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-         <!-- Store -->
-        <dxi-item>
-          <dx-tag-box
-            label="Store"
-            labelMode="floating"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [items]="Store"
-            [searchEnabled]="true"
-            [(value)]="selectedStoreid"
-            [showSelectionControls]="true"
-            [maxDisplayedTags]="100"
-            [showMultiTagOnly]="true"
-            [multiline]="false"
-            [hint]="storeHint"
-            (onValueChanged)="updateStoreHint()"
-          ></dx-tag-box>
-        </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          [width]="150"
+          label="From Date"
+          labelMode="floating"
+          [value]="financialYeaDate"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onFromDateChange($event)"
+        >
+        </dx-date-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          [width]="150"
+          label="To Date"
+          labelMode="floating"
+          [value]="defaultDate"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+      </dxi-item>
+      <!-- Store -->
+      <dxi-item>
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Store"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [maxDisplayedTags]="100"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [hint]="storeHint"
+          (onValueChanged)="updateStoreHint()"
+        ></dx-tag-box>
+      </dxi-item>
 
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+      <dxi-item>
+        <dx-button
+          text="Apply"
+          stylingMode="contained"
+          type="default"
+          [width]="100"
+          class="mt-2"
+          (onClick)="Load_Output_vat()"
+        >
+        </dx-button>
+      </dxi-item>
 
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            stylingMode="contained"
-            type="default"
-            [width]="100"
-            class="mt-2"
-            (onClick)="Load_Output_vat()"
-          >
-          </dx-button>
-        </dxi-item>
+      <dxi-item name="exportButton"></dxi-item>
+    </dxo-toolbar>
 
-        <dxi-item name="exportButton"></dxi-item>
-      </dxo-toolbar>
-
-      <dxo-grouping
+    <dxo-grouping
       [autoExpandAll]="false"
       [contextMenuEnabled]="true"
       [expandMode]="'rowClick'"
@@ -134,73 +133,71 @@
       [applyFilter]="auto"
     ></dxo-filter-row>
 
-    
+    <dxi-column
+      dataField="STORE_NAME"
+      caption="Store Name"
+      dataType="string"
+      alignment="right"
+    ></dxi-column>
 
-<dxi-column
-        dataField="STORE_NAME"
-        caption="Store Name"
-        dataType="string"
-        alignment="right"
-      ></dxi-column>
-
-      <dxi-column caption="VAT Category" alignment="center">
-
-  <dxi-column
-    dataField="EXEMPTED"
-    caption="Exempted"
-    dataType="number"
-    format="#,##0.00"
-    alignment="right">
-  </dxi-column>
-
-  <dxi-column
-    dataField="ZERO_RATE"
-    caption="Zero"
-    dataType="number"
-    format="#,##0.00"
-    alignment="right">
-  </dxi-column>
-
-  <dxi-column
-    dataField="STANDARD_RATE"
-    caption="Standard Rate"
-    dataType="number"
-    format="#,##0.00"
-    alignment="right">
-  </dxi-column>
-
-</dxi-column>
-  
+    <dxi-column caption="VAT Category" alignment="center">
       <dxi-column
-        dataField="TAX_AMOUNT"
-        caption="Tax Amount"
+        dataField="EXEMPTED"
+        caption="Exempted"
         dataType="number"
         format="#,##0.00"
         alignment="right"
-      ></dxi-column>
-      <dxi-column
-        dataField="TOTAL"
-        caption="Total"
-        dataType="number"
-        format="#,##0.00"
-        alignment="right"
-      ></dxi-column>
-
-      <dxi-column
-        *ngIf="CustomerListDataSource.length > 0"
-        type="buttons"
-        [width]="100"
       >
-        <dxi-button
-          hint="View"
-          icon="eyeopen"
-          text="View"
-          [onClick]="onViewClick.bind(this)"
-        ></dxi-button>
       </dxi-column>
-    </dx-data-grid>
-  </div>
 
+      <dxi-column
+        dataField="ZERO_RATE"
+        caption="Zero"
+        dataType="number"
+        format="#,##0.00"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="STANDARD_RATE"
+        caption="Standard Rate"
+        dataType="number"
+        format="#,##0.00"
+        alignment="right"
+      >
+      </dxi-column>
+    </dxi-column>
+
+    <dxi-column
+      dataField="TAX_AMOUNT"
+      caption="Tax Amount"
+      dataType="number"
+      format="#,##0.00"
+      alignment="right"
+    ></dxi-column>
+    <dxi-column
+      dataField="TOTAL"
+      caption="Total"
+      dataType="number"
+      format="#,##0.00"
+      alignment="right"
+    ></dxi-column>
+
+    <dxi-column
+      *ngIf="CustomerListDataSource.length > 0"
+      type="buttons"
+      [width]="100"
+    >
+      <dxi-button
+        hint="View"
+        icon="eyeopen"
+        text="View"
+        [onClick]="onViewClick.bind(this)"
+      ></dxi-button>
+    </dxi-column>
+  </dx-data-grid>
+</div>
 
 <!-- =========================view of credit note============================== -->
 
@@ -229,8 +226,8 @@
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-add-invoice-retail
-    [isEditing]="false"
-    [isReadOnlyMode]="isReadOnlyInvoice"
+    [isEditing]="true"
+    [isReadOnlyMode]="true"
     [EditingResponseData]="selectedInvoice"
     (popupClosed)="handleClose()"
   ></app-add-invoice-retail>
