@@ -231,7 +231,8 @@ export class ArticleBrandComponent {
     const validationResult = this.formValidationGroup?.instance?.validate();
     const Code = this.formsource.get('Code')?.value;
     const Description = this.formsource.get('Description')?.value;
-    const Is_Inactive = this.formsource.get('Inactive')?.value;
+    // const Is_Inactive = this.formsource.get('Inactive')?.value;
+    const Is_Inactive = false;
 
     const payload = {
       CODE: Code,
@@ -388,17 +389,42 @@ export class ArticleBrandComponent {
     }
   }
   delete_Data(event: any) {
+    event.cancel = true;
+
     const Id = event.data.ID;
-    this.dataservice.Delete_ArticleBrand_Api(Id).subscribe((response: any) => {
-      notify(
-        {
-          message: 'Data succesfully deleted',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'success',
-      );
-    });
+
+    this.dataservice.Delete_ArticleBrand_Api(Id).subscribe(
+      (response: any) => {
+        notify(
+          {
+            message: 'Data succesfully deleted',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'success',
+        );
+
+        this.get_ArticleBrand_List();
+
+        this.dataGrid?.instance?.refresh();
+      },
+      (error) => {
+        notify(
+          {
+            message: 'Delete failed',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'error',
+        );
+      },
+    );
   }
 
   //========================Export data ==========================
@@ -427,4 +453,4 @@ export class ArticleBrandComponent {
   exports: [],
   declarations: [ArticleBrandComponent],
 })
-export class ArticleBrandModule { }
+export class ArticleBrandModule {}

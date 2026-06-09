@@ -324,7 +324,7 @@ export class ArticleColorComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_ArticleColor_Api(ID).subscribe((response: any) => {
-      this.selectedData = response;
+      this.selectedData = response.Data;
     });
   }
 
@@ -335,32 +335,58 @@ export class ArticleColorComponent {
       return;
     }
 
-    // FIX: ID is inside Data
-    const Id = Number(this.selectedData?.Data?.ID);
+    const Id = this.editingRowData.ID;
 
-    const Code = this.editingRowData.CODE;
-    const Color_English = this.editingRowData.COLOR_ENGLISH;
+    const Code = this.editingRowData.CODE?.trim();
 
-    const trimmedCode = Code?.trim().toLowerCase();
-    const trimmedColorEnglish = Color_English?.trim().toLowerCase();
+    const Color_English = this.editingRowData.COLOR_ENGLISH?.trim();
 
-    let isCodeDuplicate = false;
-    let isColorEnglishDuplicate = false;
+    const Color_Arabic = '';
+    console.log(Id, Code, Color_English, 'DATAAAAAAAAAAAAAAA');
+    // Find original row
+    const existingRow = this.articleColorList.find((x: any) => x.ID == Id);
+    console.log(existingRow, 'existingrowwwwwwwww');
+    // If values unchanged → update directly
+    if (
+      existingRow &&
+      existingRow.CODE === Code &&
+      existingRow.COLOR_ENGLISH === Color_English
+    ) {
+      this.dataservice
+        .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)
+        .subscribe(() => {
+          notify(
+            {
+              message: 'Data succesfully updated',
+              position: {
+                at: 'top right',
+                my: 'top right',
+              },
+              displayTime: 500,
+            },
+            'success',
+          );
 
-    this.articleColorList?.forEach((row: any) => {
-      // Skip current editing record
-      if (Number(row.ID) === Id) return;
+          this.UpdateArticleColorPopup = false;
 
-      if (row.CODE?.trim().toLowerCase() === trimmedCode) {
-        isCodeDuplicate = true;
-      }
+          this.get_ArticleColor_List();
+        });
 
-      if (row.COLOR_ENGLISH?.trim().toLowerCase() === trimmedColorEnglish) {
-        isColorEnglishDuplicate = true;
-      }
-    });
+      return;
+    }
 
-    if (isCodeDuplicate || isColorEnglishDuplicate) {
+    const isCodeDuplicate = this.articleColorList.some(
+      (x: any) =>
+        x.ID != Id && x.CODE?.trim()?.toLowerCase() === Code?.toLowerCase(),
+    );
+
+    const isColorDuplicate = this.articleColorList.some(
+      (x: any) =>
+        x.ID != Id &&
+        x.COLOR_ENGLISH?.trim()?.toLowerCase() === Color_English?.toLowerCase(),
+    );
+
+    if (isCodeDuplicate || isColorDuplicate) {
       notify(
         {
           message: isCodeDuplicate
@@ -378,8 +404,6 @@ export class ArticleColorComponent {
       return;
     }
 
-    const Color_Arabic = '';
-
     this.dataservice
       .Update_ArticleColor_Api(Id, Code, Color_English, Color_Arabic)
       .subscribe(() => {
@@ -395,24 +419,49 @@ export class ArticleColorComponent {
           'success',
         );
 
-        this.formsource.reset();
-        this.get_ArticleColor_List();
         this.UpdateArticleColorPopup = false;
+
+        this.get_ArticleColor_List();
       });
   }
 
   delete_Data(event: any) {
+    event.cancel = true;
+
     const Id = event.data.ID;
-    this.dataservice.Delete_ArticleColor_Api(Id).subscribe((response: any) => {
-      notify(
-        {
-          message: 'Data succesfully deleted',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'success',
-      );
-    });
+
+    this.dataservice.Delete_ArticleColor_Api(Id).subscribe(
+      (response: any) => {
+        notify(
+          {
+            message: 'Data succesfully deleted',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'success',
+        );
+
+        this.get_ArticleColor_List();
+
+        this.dataGrid?.instance?.refresh();
+      },
+      (error) => {
+        notify(
+          {
+            message: 'Delete failed',
+            position: {
+              at: 'top right',
+              my: 'top right',
+            },
+            displayTime: 500,
+          },
+          'error',
+        );
+      },
+    );
   }
 
   //========================Export data ==========================

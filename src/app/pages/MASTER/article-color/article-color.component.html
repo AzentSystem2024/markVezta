@@ -9,7 +9,7 @@
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
     [scrolling]="{ mode: 'virtual' }"
-    (onRowRemoved)="delete_Data($event)"
+    (onRowRemoving)="delete_Data($event)"
     [height]="'82vh'"
     noDataText=" "
     (onEditingStart)="onEditingStart($event)"
