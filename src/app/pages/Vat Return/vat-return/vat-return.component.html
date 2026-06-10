@@ -126,8 +126,12 @@
       <dxi-column
   dataField="GROUP_NAME"
   [groupIndex]="0"
-  [visible]="false">
+  [visible]="false"
+  groupCellTemplate="groupTemplate">
 </dxi-column>
+<div *dxTemplate="let data of 'groupTemplate'">
+  {{ data.value }}
+</div>
 
        <dxi-column
       dataField="DESCRIPTION"
@@ -396,7 +400,8 @@
   <dx-data-grid
     [dataSource]="storeVatPopupData"
     [showBorders]="true"
-    height="100%">
+    height="100%"
+     (onRowClick)="onInvoiceRowClick($event)">
 
      <dxi-column
       dataField="DOC_NO"
@@ -505,4 +510,24 @@
 </dxo-summary>
   </dx-data-grid>
 
+</dx-popup>
+
+
+<!-- VIEW PAGE OF SALES INVOICE------------------------------- -->
+ <dx-popup
+  *ngIf="isViewInvoice"
+  [(visible)]="isViewInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Invoice"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlyInvoice"
+    [EditingResponseData]="selectedInvoice"
+    (popupClosed)="handleClose()"
+  ></app-add-invoice-retail>
+  <!-- </ng-container> -->
 </dx-popup>

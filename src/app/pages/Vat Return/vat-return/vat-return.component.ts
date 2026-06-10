@@ -41,6 +41,8 @@ import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AddSalesInvoiceRetailModule } from '../../OPERATIONS/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 
 @Component({
   selector: 'app-vat-return',
@@ -72,6 +74,9 @@ isOutputVatPopup = false;
 isStoreVatPopup = false;
 outputVatPopupData: any[] = [];
 storeVatPopupData:any[] =[];
+isViewInvoice: boolean = false;
+isReadOnlyInvoice:boolean = true;
+selectedInvoice:any;
 
   constructor(
     private dataservice: DataService,
@@ -190,6 +195,18 @@ onRowStoreClick(e: any) {
         // this.isLoading = false;
       }
     });
+}
+
+onInvoiceRowClick(e: any) {
+  const trans_id = e.data.TRANS_ID;
+  this.dataservice
+      .selectInvoiceRetail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+          this.isViewInvoice = true;
+        
+      }); // Selected row data
+  this.isViewInvoice = true;       // Open Invoice popup
 }
 
   Vat_Return_Data() {
@@ -425,6 +442,9 @@ get_pdf(response: any) {
     return `${day}-${month}-${year}`;
   }
 
+handleClose(){
+
+}
 
     onExporting(event: any) {
     const fileName = 'VAT Return';
@@ -462,6 +482,7 @@ get_pdf(response: any) {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
+    AddInvoiceRetailModule,
   ],
   providers: [],
   declarations: [VatReturnComponent],
