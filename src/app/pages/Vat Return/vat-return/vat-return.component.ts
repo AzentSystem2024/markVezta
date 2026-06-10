@@ -120,6 +120,28 @@ calculateNetVat() {
     });
   }
 
+  calculateNetVatSummary(options: any) {
+
+  if (options.name === 'NetVATDue') {
+
+    if (options.summaryProcess === 'start') {
+      options.totalValue = 0;
+      options.totalExpenseVat = 0;
+      options.totalSalesVat = 0;
+    }
+
+    if (options.summaryProcess === 'calculate') {
+      options.totalExpenseVat += Number(options.value.VAT_EXPENSE || 0);
+      options.totalSalesVat += Number(options.value.VAT_SALES || 0);
+    }
+
+    if (options.summaryProcess === 'finalize') {
+      options.totalValue =
+        options.totalExpenseVat - options.totalSalesVat;
+    }
+  }
+}
+
  onRowClick(e: any) {
   // this.isLoading = true;
 

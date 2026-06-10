@@ -190,7 +190,7 @@
 
 </dxo-summary>
 
-<dxo-summary>
+<dxo-summary  [calculateCustomSummary]="calculateNetVatSummary">
 
   <!-- Group Totals -->
 
@@ -238,26 +238,16 @@
     valueFormat="#,##0.00">
   </dxi-total-item>
 
+  <dxi-total-item
+    name="NetVATDue"
+    summaryType="custom"
+    displayFormat="Net VAT Due: {0}"
+    valueFormat="#,##0.00"
+    showInColumn="DESCRIPTION">
+  </dxi-total-item>
+
 </dxo-summary>
 
-<div class="net-vat-summary">
-
-  <div>
-    <b>Total Output VAT :</b>
-    {{ salesVatTotal | number:'1.2-2' }}
-  </div>
-
-  <div>
-    <b>Total Input VAT :</b>
-    {{ expenseVatTotal | number:'1.2-2' }}
-  </div>
-
-  <div style="font-size:18px;">
-    <b>Net VAT Due :</b>
-    {{ netVatDue | number:'1.2-2' }}
-  </div>
-
-</div>
     </dx-data-grid>
   </div>
   
