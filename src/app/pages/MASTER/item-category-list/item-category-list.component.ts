@@ -272,10 +272,12 @@ export class ItemCategoryListComponent implements OnInit {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.COMPANY_ID = sessionData.SELECTED_COMPANY.COMPANY_ID;
-      const configuration = sessionData?.GeneralSettings || {};
+    const configuration = sessionData?.GeneralSettings || {};
     this.IsLedgerEnabled = configuration?.ENABLE_ITEM_CATEGORY_ACCOUNTS || true;
   }
 
@@ -322,16 +324,14 @@ export class ItemCategoryListComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(menuResponse, "menuResponse")
+    console.log(menuResponse, 'menuResponse');
 
     const menuGroups = menuResponse.MenuGroups || [];
-
 
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
       .flatMap((menu: any) => menu.Children || [])
       .find((child: any) => child.Path === currentUrl);
-
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -387,4 +387,4 @@ export class ItemCategoryListComponent implements OnInit {
   declarations: [ItemCategoryListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemCategoryModule { }
+export class ItemCategoryModule {}

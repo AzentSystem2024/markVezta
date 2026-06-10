@@ -37,20 +37,21 @@ export class UomListComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @Output() formClosed = new EventEmitter<void>();
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
   uom: any;
   UomDataSource: DataSource;
   uomArray: any[] = [];
   uomCount = 0;
   isAddUomPopupOpened = false;
   isEditUomPopupOpened = false;
-  showFilterRow = true;
   showHeaderFilter = true;
-  isFilterOpened = false;
-  readonly allowedPageSizes: any = [5, 10, 'all'];
-  displayMode: any = 'full';
-  showPageSizeSelector = true;
-  filterRowVisible: boolean = false;
-  isFilterRowVisible: boolean = false;
   selectedData: any;
   selected_Company_id: any;
   canAdd = false;
@@ -64,7 +65,7 @@ export class UomListComponent implements OnInit {
     private dataservice: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) { }
+  ) {}
 
   addButtonOptions = {
     type: 'default',
@@ -334,4 +335,4 @@ export class UomListComponent implements OnInit {
   exports: [],
   declarations: [UomListComponent],
 })
-export class UomListModule { }
+export class UomListModule {}
