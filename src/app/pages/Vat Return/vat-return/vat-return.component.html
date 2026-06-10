@@ -1,7 +1,6 @@
-
-  <div class="grid-container">
-    <dx-data-grid
-       #dataGrid
+<div class="grid-container">
+  <dx-data-grid
+    #dataGrid
     [dataSource]="VATreturn"
     width="100%"
     height="83vh"
@@ -27,12 +26,12 @@
     (onExporting)="onExporting($event)"
     [loadPanel]="{ enabled: false, text: 'Loading...' }"
     (onRowClick)="onRowClick($event)"
-    >
-    
-       <dxo-scrolling
+  >
+    <dxo-scrolling
       mode="virtual"
       rowRenderingMode="virtual"
-      columnRenderingMode="virtual">
+      columnRenderingMode="virtual"
+    >
     </dxo-scrolling>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
@@ -45,9 +44,9 @@
       [showInfo]="true"
       [showNavigationButtons]="true"
     ></dxo-pager>
-    
-      <dxo-toolbar>
-        <dxi-item location="before">
+
+    <dxo-toolbar>
+      <dxi-item location="before">
         <div
           class="grid-header"
           style="
@@ -62,205 +61,198 @@
         </div>
       </dxi-item>
 
-        <dxi-item>
-      
-        </dxi-item>
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="From Date"
-            labelMode="floating"
-            [value]="financialYeaDate"
-            [displayFormat]="'dd-MM-yyyy'"
-            (onValueChanged)="onFromDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="To Date"
-            labelMode="floating"
-            [value]="defaultDate"
-            displayFormat="dd-MM-yyyy"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
+      <dxi-item> </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          [width]="150"
+          label="From Date"
+          labelMode="floating"
+          [value]="financialYeaDate"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onFromDateChange($event)"
+        >
+        </dx-date-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          [width]="150"
+          label="To Date"
+          labelMode="floating"
+          [value]="defaultDate"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+      </dxi-item>
 
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            stylingMode="contained"
-            type="default"
-            (onClick)="Vat_Return_Data()"
-          >
-          </dx-button>
-        </dxi-item>
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+      <dxi-item>
+        <dx-button
+          text="Apply"
+          stylingMode="contained"
+          type="default"
+          (onClick)="Vat_Return_Data()"
+        >
+        </dx-button>
+      </dxi-item>
 
-        <!-- <dxi-item name="exportButton"></dxi-item>
+      <!-- <dxi-item name="exportButton"></dxi-item>
         
        -->
-      </dxo-toolbar>
+    </dxo-toolbar>
 
-      <dxo-sorting mode="none"></dxo-sorting>
-      <dxo-filter-row visible="true"></dxo-filter-row>
-      <dxo-header-filter visible="true"></dxo-header-filter>
-      <dxo-paging page-size="10"></dxo-paging>
-      <dxo-pager
-        show-page-size-selector="true"
-        show-info="true"
-        show-navigator="true"
-      ></dxo-pager>
-      <dxo-header-filter [visible]="true">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
+    <dxo-sorting mode="none"></dxo-sorting>
+    <dxo-filter-row visible="true"></dxo-filter-row>
+    <dxo-header-filter visible="true"></dxo-header-filter>
+    <dxo-paging page-size="10"></dxo-paging>
+    <dxo-pager
+      show-page-size-selector="true"
+      show-info="true"
+      show-navigator="true"
+    ></dxo-pager>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
 
-      <dxo-grouping
-  [autoExpandAll]="true">
-</dxo-grouping>
+    <dxo-grouping [autoExpandAll]="true"> </dxo-grouping>
 
-      <dxi-column
-  dataField="GROUP_NAME"
-  [groupIndex]="0"
-  [visible]="false">
-</dxi-column>
+    <dxi-column dataField="GROUP_NAME" [groupIndex]="0" [visible]="false">
+    </dxi-column>
 
-       <dxi-column
+    <dxi-column
       dataField="DESCRIPTION"
       caption="Particulars"
       dataType="string"
     ></dxi-column>
 
-      <dxi-column
-        dataField="AMOUNT"
-        caption="Amount"
-        dataType="number"
-        format="#,##0.00"
-        alignment="right"
+    <dxi-column
+      dataField="AMOUNT"
+      caption="Amount"
+      dataType="number"
+      format="#,##0.00"
+      alignment="right"
+    >
+    </dxi-column>
+
+    <dxi-column
+      dataField="VAT"
+      caption="VAT Amount"
+      dataType="number"
+      format="#,##0.00"
+      alignment="right"
+    >
+    </dxi-column>
+
+    <dxi-column
+      dataField="ADJUSTMENT"
+      caption="Adjustment"
+      dataType="number"
+      format="#,##0.00"
+      alignment="right"
+    >
+    </dxi-column>
+
+    <dxo-summary>
+      <dxi-group-item
+        column="AMOUNT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Amount: {0}"
+        [alignByColumn]="true"
       >
-      </dxi-column>
+      </dxi-group-item>
 
-      <dxi-column
-        dataField="VAT"
-        caption="VAT Amount"
-        dataType="number"
-        format="#,##0.00"
-        alignment="right"
+      <dxi-group-item
+        column="VAT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="VAT: {0}"
+        [alignByColumn]="true"
       >
-      </dxi-column>
+      </dxi-group-item>
 
-      <dxi-column
-        dataField="ADJUSTMENT"
-        caption="Adjustment"
-        dataType="number"
-        format="#,##0.00"
-        alignment="right"
+      <dxi-group-item
+        column="ADJUSTMENT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Adjustment: {0}"
+        [alignByColumn]="true"
       >
-      </dxi-column>
+      </dxi-group-item>
+    </dxo-summary>
 
-      <dxo-summary>
+    <dxo-summary [calculateCustomSummary]="calculateNetVatSummary">
+      <!-- Group Totals -->
 
-  <dxi-group-item
-    column="AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Amount: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-group-item
+        column="AMOUNT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Amount: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="VAT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="VAT: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-group-item
+        column="VAT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="VAT: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="ADJUSTMENT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Adjustment: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-group-item
+        column="ADJUSTMENT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Adjustment: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-</dxo-summary>
+      <!-- Grand Totals -->
 
-<dxo-summary  [calculateCustomSummary]="calculateNetVatSummary">
+      <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
 
-  <!-- Group Totals -->
+      <dxi-total-item column="VAT" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
 
-  <dxi-group-item
-    column="AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Amount: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-total-item
+        column="ADJUSTMENT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+      <dxi-total-item
+        name="NetVATDue"
+        summaryType="custom"
+        [displayFormat]="'Net VAT Due: ' + netVatDue"
+        valueFormat="#,##0.00"
+        showInColumn="DESCRIPTION"
+      >
+      </dxi-total-item>
+      <!-- <dxi-total-item
+        name="NetVATDue"
+        summaryType="custom"
+        displayFormat="Net VAT Due: {0}"
+        valueFormat="#,##0.00"
+        showInColumn="DESCRIPTION"
+      >
+      </dxi-total-item> -->
+    </dxo-summary>
+  </dx-data-grid>
+</div>
 
-  <dxi-group-item
-    column="VAT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="VAT: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
-
-  <dxi-group-item
-    column="ADJUSTMENT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Adjustment: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
-
-  <!-- Grand Totals -->
-
-  <dxi-total-item
-    column="AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
-
-  <dxi-total-item
-    column="VAT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
-
-  <dxi-total-item
-    column="ADJUSTMENT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
-
-  <dxi-total-item
-    name="NetVATDue"
-    summaryType="custom"
-    displayFormat="Net VAT Due: {0}"
-    valueFormat="#,##0.00"
-    showInColumn="DESCRIPTION">
-  </dxi-total-item>
-
-</dxo-summary>
-
-    </dx-data-grid>
-  </div>
-  
-<div
-  class="pdf-container"
-  style="margin-top: 30px"
-  *ngIf="pdfSrc"
->
+<div class="pdf-container" style="margin-top: 30px" *ngIf="pdfSrc">
   <iframe
     [src]="pdfSrc"
     width="100%"
     height="1000px"
-    style="border: 1px solid #ddd;"
+    style="border: 1px solid #ddd"
   >
   </iframe>
 </div>
@@ -272,19 +264,17 @@
   [height]="'80vh'"
   title="Output VAT Details"
   [showCloseButton]="true"
-  
 >
   <dx-data-grid
     [dataSource]="outputVatPopupData"
     [showBorders]="true"
     height="100%"
-    (onRowClick)="onRowStoreClick($event)">
-
-     <dxi-column
+    (onRowClick)="onRowStoreClick($event)"
+  >
+    <dxi-column
       dataField="STORE_NAME"
       caption="Store Name"
       dataType="string"
-
     ></dxi-column>
 
     <dxi-column caption="VAT Category" alignment="center">
@@ -332,61 +322,55 @@
     ></dxi-column>
 
     <dxo-summary>
+      <!-- Group Totals -->
 
-  <!-- Group Totals -->
+      <dxi-group-item
+        column="AMOUNT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Amount: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Amount: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-group-item
+        column="VAT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="VAT: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="VAT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="VAT: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-group-item
+        column="ADJUSTMENT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Adjustment: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="ADJUSTMENT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Adjustment: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <!-- Grand Totals -->
 
-  <!-- Grand Totals -->
+      <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
 
-  <dxi-total-item
-    column="AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
+      <dxi-total-item column="VAT" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
 
-  <dxi-total-item
-    column="VAT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
-
-  <dxi-total-item
-    column="ADJUSTMENT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
-
-</dxo-summary>
+      <dxi-total-item
+        column="ADJUSTMENT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+    </dxo-summary>
   </dx-data-grid>
-
 </dx-popup>
 
-
 <!-- STORE WISE DETAIL------------------------------- -->
- <dx-popup
+<dx-popup
   [(visible)]="isStoreVatPopup"
   [width]="'90vw'"
   [height]="'80vh'"
@@ -396,9 +380,9 @@
   <dx-data-grid
     [dataSource]="storeVatPopupData"
     [showBorders]="true"
-    height="100%">
-
-     <dxi-column
+    height="100%"
+  >
+    <dxi-column
       dataField="DOC_NO"
       caption="Doc No."
       dataType="string"
@@ -455,54 +439,49 @@
     ></dxi-column>
 
     <dxo-summary>
+      <!-- Group Totals -->
 
-  <!-- Group Totals -->
+      <dxi-group-item
+        column="AMOUNT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Amount: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Amount: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-group-item
+        column="VAT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="VAT: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="VAT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="VAT: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <dxi-group-item
+        column="ADJUSTMENT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+        displayFormat="Adjustment: {0}"
+        [alignByColumn]="true"
+      >
+      </dxi-group-item>
 
-  <dxi-group-item
-    column="ADJUSTMENT"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Adjustment: {0}"
-    [alignByColumn]="true">
-  </dxi-group-item>
+      <!-- Grand Totals -->
 
-  <!-- Grand Totals -->
+      <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
 
-  <dxi-total-item
-    column="AMOUNT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
+      <dxi-total-item column="VAT" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
 
-  <dxi-total-item
-    column="VAT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
-
-  <dxi-total-item
-    column="ADJUSTMENT"
-    summaryType="sum"
-    valueFormat="#,##0.00">
-  </dxi-total-item>
-
-</dxo-summary>
+      <dxi-total-item
+        column="ADJUSTMENT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+    </dxo-summary>
   </dx-data-grid>
-
 </dx-popup>
