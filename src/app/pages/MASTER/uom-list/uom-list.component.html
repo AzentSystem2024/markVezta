@@ -17,10 +17,22 @@
     [scrolling]="{ mode: 'virtual' }"
     (onExporting)="onExporting($event)"
   >
-    <dxo-paging [pageSize]="10"> </dxo-paging>
-
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
       <!-- <dxo-popup
         title="Edit UOM"
         [showTitle]="true"
