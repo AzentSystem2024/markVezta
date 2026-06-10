@@ -64,12 +64,22 @@ export class VatReturnComponent {
   pdfSrc: SafeResourceUrl | null = null;
   selected_Company_name: any;
   defaultDate: Date = new Date();
+  VATreturn:any[]=[];
+    salesVatTotal = 0;
+expenseVatTotal = 0;
+netVatDue = 0;
+isOutputVatPopup = false;
+isStoreVatPopup = false;
+outputVatPopupData: any[] = [];
+storeVatPopupData:any[] =[];
+
   constructor(
     private dataservice: DataService,
     private sanitizer: DomSanitizer,
   ) {
     this.sesstion_Details();
     this.onToDateChange({ value: this.defaultDate });
+    
   }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -85,6 +95,20 @@ export class VatReturnComponent {
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
   }
 
+
+
+calculateNetVat() {
+
+  this.salesVatTotal = this.VATreturn
+    .filter((x: any) => x.GROUP_NAME === 'VAT On Sale and Other Outputs')
+    .reduce((sum: number, x: any) => sum + Number(x.VAT || 0), 0);
+
+  this.expenseVatTotal = this.VATreturn
+    .filter((x: any) => x.GROUP_NAME === 'VAT On Expense and Other Outputs')
+    .reduce((sum: number, x: any) => sum + Number(x.VAT || 0), 0);
+
+  this.netVatDue = this.salesVatTotal - this.expenseVatTotal;
+}
   
   formatAmount(value: any): string {
     if (value === null || value === undefined || value === '') return '';
@@ -96,6 +120,56 @@ export class VatReturnComponent {
     });
   }
 
+ onRowClick(e: any) {
+  // this.isLoading = true;
+
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+    EMIRATE_ID: e.data.EMIRATE_ID
+  };
+
+  this.dataservice.Output_VAT_Report_Api(payload)
+    .subscribe({
+      next: (res: any) => {
+
+        this.outputVatPopupData = res.Data || [];
+
+        this.isOutputVatPopup = true;
+        // this.isLoading = false;
+      },
+      error: () => {
+        // this.isLoading = false;
+      }
+    });
+}
+
+onRowStoreClick(e: any) {
+  // this.isLoading = true;
+
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+    STORE_ID : e.data.STORE_ID
+  };
+
+  this.dataservice.Output_VAT_Report_Api(payload)
+    .subscribe({
+      next: (res: any) => {
+
+        this.storeVatPopupData = res.Data || [];
+
+        this.isStoreVatPopup = true;
+        // this.isLoading = false;
+      },
+      error: () => {
+        // this.isLoading = false;
+      }
+    });
+}
+
   Vat_Return_Data() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -104,19 +178,32 @@ export class VatReturnComponent {
     };
 
     this.dataservice.VAT_Return_Report_Api(payload).subscribe((res: any) => {
+      this.VATreturn = res.Details
+      this.VATreturn = res.Details.map((item: any) => ({
+  ...item,
+
+  GROUP_NAME:
+    item.TRANS_TYPE === 'PURCHASE INVOICE' ||
+    item.TRANS_TYPE === 'PURCHASE RETURN'
+      ? 'VAT On Expense and Other Outputs'
+      : 'VAT On Sale and Other Outputs'
+}));
+this.calculateNetVat();
       if (res) {
-      this.get_pdf(res); // Update iframe source
+      // this.get_pdf(res); // Update iframe source
       }
     });
   }
 
 get_pdf(response: any) {
 
-  const data = response.Data;
+  const header = response.Header;
+  const details = response.Details || [];
 
-  const sales = data.find((x: any) => x.ID === 'UNKNOWN');
-  const zero = data.find((x: any) => x.ID === 'ZERO');
-  const purch = data.find((x: any) => x.ID === 'PURCH');
+  const sales = details.find((x: any) => x.ID === 'UNKNOWN');
+  const zero = details.find((x: any) => x.ID === 'ZERO');
+
+  const purchases = details.filter((x: any) => x.ID === 'PURCH');
 
   const totalSalesAmount =
     Number(sales?.AMOUNT || 0) +
@@ -126,19 +213,27 @@ get_pdf(response: any) {
     Number(sales?.VAT || 0) +
     Number(zero?.VAT || 0);
 
-  const totalPurchaseVat =
-    Number(purch?.VAT || 0);
+  const totalPurchaseAmount = purchases.reduce(
+    (sum: number, item: any) => sum + Number(item.AMOUNT || 0),
+    0
+  );
+
+  const totalPurchaseVat = purchases.reduce(
+    (sum: number, item: any) => sum + Number(item.VAT || 0),
+    0
+  );
 
   const netVat = totalSalesVat - totalPurchaseVat;
 
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.width;
 
-  // =====================
+  // ==========================================
   // TITLE
-  // =====================
+  // ==========================================
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
+
   doc.text(
     'VALUE ADDED TAX RETURN',
     pageWidth / 2,
@@ -146,10 +241,11 @@ get_pdf(response: any) {
     { align: 'center' }
   );
 
-  // =====================
+  // ==========================================
   // COMPANY DETAILS
-  // =====================
+  // ==========================================
   doc.setFontSize(11);
+
   doc.text('Taxable Person Details', 14, 30);
 
   autoTable(doc, {
@@ -159,67 +255,62 @@ get_pdf(response: any) {
       fontSize: 10
     },
     body: [
-      ['TRN', sales?.TRN || ''],
-      ['Company Name', sales?.COMPANY_NAME || ''],
-      ['Arabic Name', sales?.ARABIC_NAME || ''],
-      ['Address', sales?.ADDRESS || '']
+      ['TRN', header?.TRN || ''],
+      ['Company Name', header?.COMPANY_NAME || ''],
+      ['Arabic Name', header?.ARABIC_NAME || ''],
+      ['Address', header?.ADDRESS || '']
     ]
   });
 
-  // =====================
+  // ==========================================
   // OUTPUT VAT
-  // =====================
+  // ==========================================
 
   const y1 = (doc as any).lastAutoTable.finalY + 10;
 
   doc.setFontSize(11);
-  doc.text('VAT On Sale and Other Outputs', 14, y1);
+  doc.text('VAT On Sales and Other Outputs', 14, y1);
 
-  autoTable(doc, {
-    startY: y1 + 5,
-    theme: 'grid',
-    head: [[
-      'Code',
-      'Description',
-      'Amount (AED)',
-      'VAT Amount (AED)',
-      'Adjustment'
-    ]],
-    body: [
-      [
-        '1',
-        'Standard Rated Supplies',
-        sales?.AMOUNT?.toFixed(2),
-        sales?.VAT?.toFixed(2),
-        '0.00'
-      ],
-      [
-        '2',
-        'Zero Rated Supplies',
-        zero?.AMOUNT?.toFixed(2),
-        '0.00',
-        '0.00'
-      ],
-      [
-        '',
-        'TOTAL',
-        totalSalesAmount.toFixed(2),
-        totalSalesVat.toFixed(2),
-        '0.00'
-      ]
-    ],
-    headStyles: {
-      fillColor: [220, 220, 220]
-    }
-  });
+  const purchaseRows = purchases.map((item: any, index: number) => [
+  index + 1,
+  item.SUPP_NAME || '',
+  Number(item.AMOUNT || 0).toFixed(2),
+  Number(item.VAT || 0).toFixed(2),
+  Number(item.ADJUSTMENT || 0).toFixed(2)
+]);
 
-  // =====================
+ autoTable(doc, {
+  startY: y1 + 5,
+  theme: 'grid',
+  head: [[
+    'Code',
+    'Description',
+    'Amount (AED)',
+    'VAT Amount (AED)',
+    'Adjustment'
+  ]],
+  body: [
+    ...purchaseRows,
+    [
+      '',
+      'TOTAL',
+      totalPurchaseAmount.toFixed(2),
+      totalPurchaseVat.toFixed(2),
+      '0.00'
+    ]
+  ],
+  headStyles: {
+    fillColor: [220, 220, 220]
+  }
+});
+
+  // ==========================================
   // INPUT VAT
-  // =====================
+  // ==========================================
 
   const y2 = (doc as any).lastAutoTable.finalY + 10;
 
-  doc.text('Input VAT', 14, y2);
+  doc.text('VAT On Expenses and Other Inputs', 14, y2);
 
   autoTable(doc, {
     startY: y2 + 5,
@@ -235,8 +326,8 @@ get_pdf(response: any) {
       [
         '3',
         'Standard Rated Expenses',
-        purch?.AMOUNT?.toFixed(2),
-        purch?.VAT?.toFixed(2),
+        totalPurchaseAmount.toFixed(2),
+        totalPurchaseVat.toFixed(2),
         '0.00'
       ]
     ],
@@ -245,9 +336,10 @@ get_pdf(response: any) {
     }
   });
 
-  // =====================
+  
+  // ==========================================
   // NET VAT
-  // =====================
+  // ==========================================
 
   const y3 = (doc as any).lastAutoTable.finalY + 10;
 
@@ -275,7 +367,6 @@ get_pdf(response: any) {
     }
   });
 
-  // Open PDF
   doc.output('dataurlnewwindow');
 }
 

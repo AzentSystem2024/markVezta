@@ -103,6 +103,8 @@ export class OutputVatComponent {
   Store: any;
   selectedStoreid: any;
   isReadOnlyInvoice: boolean = false;
+  isLoading = false;
+
 
   constructor(
     private dataService: DataService,
@@ -190,17 +192,24 @@ export class OutputVatComponent {
   }
 
   Load_Output_vat() {
+     this.isLoading = true;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
     };
 
-    this.dataService.Output_VAT_Report_Api(payload).subscribe((res: any) => {
+    this.dataService.Output_VAT_Report_Api(payload).subscribe({
+    next: (res: any) => {
       this.CustomerListDataSource = res.Data || [];
-      this.cdr.detectChanges();
       this.customerSummaryData = this.CustomerListDataSource;
-    });
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      this.isLoading = false;
+    }
+  });
   }
 
   get_sessionstorage_data() {

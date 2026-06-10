@@ -7088,4 +7088,6 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'AcReports/TrialBalance/AsOnDate';
     return this.http.post(getEndpoint, payload);
   }
+
+  
 }

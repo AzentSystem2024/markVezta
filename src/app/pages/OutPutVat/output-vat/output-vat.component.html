@@ -26,6 +26,7 @@
     }"
     (onExporting)="onExporting($event)"
     [loadPanel]="{ enabled: false, text: 'Loading...' }"
+     [loading]="isLoading"
   >
     <dxo-scrolling
       mode="virtual"
@@ -33,6 +34,10 @@
       columnRenderingMode="virtual"
     >
     </dxo-scrolling>
+
+    <dxo-load-panel
+  [enabled]="true">
+</dxo-load-panel>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
@@ -137,7 +142,7 @@
       dataField="STORE_NAME"
       caption="Store Name"
       dataType="string"
-      alignment="right"
+
     ></dxi-column>
 
     <dxi-column caption="VAT Category" alignment="center">
@@ -249,3 +254,11 @@
     (popupClosed)="handleClose()"
   ></app-view-customer-receipt>
 </dx-popup>
+
+<dx-load-panel
+  [visible]="isLoading"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  message="Loading data...">
+</dx-load-panel>
