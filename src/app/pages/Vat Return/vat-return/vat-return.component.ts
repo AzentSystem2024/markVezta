@@ -144,43 +144,71 @@ onCellClick(e: any) {
   }
 
   // TYPE = 2 → Direct drilldown
-  if (e.data.TYPE === 2) {
+  // if (e.data.TYPE === 2) {
 
-    const transId = e.data.TRANS_ID;
+  //   const transId = e.data.TRANS_ID;
 
-    this.dataservice.selectPurchaseInvoice(transId)
-      .subscribe((res: any) => {
+  //   this.dataservice.selectPurchaseInvoice(transId)
+  //     .subscribe((res: any) => {
 
-        this.selectedInvoice = res.Data;
+  //       this.selectedInvoice = res.Data;
 
-        if (this.selectedInvoice.STATUS === 'Approved') {
-          this.buttonText = 'View Purchase Invoice';
-        } else if (this.selectedInvoice.STATUS === 'Open') {
-          this.buttonText = 'Verify Purchase Invoice';
-        } else if (this.selectedInvoice.STATUS === 'Verified') {
-          this.buttonText = 'Approve Purchase Invoice';
-        }
+  //       if (this.selectedInvoice.STATUS === 'Approved') {
+  //         this.buttonText = 'View Purchase Invoice';
+  //       } else if (this.selectedInvoice.STATUS === 'Open') {
+  //         this.buttonText = 'Verify Purchase Invoice';
+  //       } else if (this.selectedInvoice.STATUS === 'Verified') {
+  //         this.buttonText = 'Approve Purchase Invoice';
+  //       }
 
-        this.isVerifyInvoice = true;
-      });
+  //       this.isVerifyInvoice = true;
+  //     });
+
+  //   return;
+  // }
+
+  // TYPE = 1 → Existing popup logic
+   if (e.data.TYPE === 1) {
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+      KEY: e.data.KEY,
+    };
+
+    this.dataservice.Output_Vat_Summary(payload).subscribe({
+      next: (res: any) => {
+        this.outputVatPopupData = res.Details || [];
+        this.isOutputVatPopup = true;
+      }
+    });
 
     return;
   }
 
-  // TYPE = 1 → Existing popup logic
+
+  if (e.data.TYPE === 2) {
+
   const payload = {
     COMPANY_ID: this.selected_Company_id,
     DATE_FROM: this.formatted_from_date,
     DATE_TO: this.formatted_To_date,
-    KEY: e.data.KEY,
+    STORE_ID: 1,
   };
 
-  this.dataservice.Output_Vat_Summary(payload).subscribe({
+  this.dataservice.Storewise_Vat_Summary(payload).subscribe({
     next: (res: any) => {
-      this.outputVatPopupData = res.Details || [];
-      this.isOutputVatPopup = true;
+      this.storeVatPopupData = res.Details || [];
+      this.isStoreVatPopup = true;
+    },
+    error: (err) => {
+      console.error(err);
     }
   });
+
+  return;
+}
 }
 
   onRowStoreClick(e: any) {
@@ -204,6 +232,7 @@ onCellClick(e: any) {
         // this.isLoading = false;
       },
     });
+    
   }
 
 onInvoiceRowClick(e: any) {
@@ -560,7 +589,8 @@ get_pdf(response: any) {
   }
 
 handleClose(){
-
+  this.isVerifyInvoice = false;
+  this.isViewInvoice = false;
 }
 
     onExporting(event: any) {

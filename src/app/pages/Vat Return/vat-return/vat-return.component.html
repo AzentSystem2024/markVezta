@@ -269,45 +269,16 @@
     ></dxi-column>
 
     <dxo-summary>
-      <!-- Group Totals -->
-
-      <dxi-group-item
-        column="AMOUNT"
-        summaryType="sum"
-        valueFormat="#,##0.00"
-        displayFormat="Amount: {0}"
-        [alignByColumn]="true"
-      >
-      </dxi-group-item>
-
-      <dxi-group-item
-        column="VAT"
-        summaryType="sum"
-        valueFormat="#,##0.00"
-        displayFormat="VAT: {0}"
-        [alignByColumn]="true"
-      >
-      </dxi-group-item>
-
-      <dxi-group-item
-        column="ADJUSTMENT"
-        summaryType="sum"
-        valueFormat="#,##0.00"
-        displayFormat="Adjustment: {0}"
-        [alignByColumn]="true"
-      >
-      </dxi-group-item>
-
       <!-- Grand Totals -->
 
-      <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00">
+      <dxi-total-item column="STANDARD_RATE" summaryType="sum" valueFormat="#,##0.00">
       </dxi-total-item>
 
-      <dxi-total-item column="VAT" summaryType="sum" valueFormat="#,##0.00">
+      <dxi-total-item column="TAX_AMOUNT" summaryType="sum" valueFormat="#,##0.00">
       </dxi-total-item>
 
       <dxi-total-item
-        column="ADJUSTMENT"
+        column="TOTAL"
         summaryType="sum"
         valueFormat="#,##0.00"
       >

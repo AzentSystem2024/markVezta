@@ -48,6 +48,13 @@ export class AgedPayablesComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+  supplier_details: {
+    SUPP_ID: any;
+    SALE_ID: any;
+    DATE_FROM: any;
+    DATE_TO: string;
+    COMPANY_ID: any;
+  };
 
   constructor(
     private dataservice: DataService,
@@ -164,14 +171,38 @@ export class AgedPayablesComponent {
   }
 
   onViewClick(e: any) {
+    console.log(e)
     this.PurchId = e.row.data.PURCH_ID;
     this.SuppId = e.row.data.SUPP_ID;
-    sessionStorage.removeItem('PURCHID');
-    sessionStorage.removeItem('SUPPID');
-    sessionStorage.setItem('PURCHID', this.PurchId);
-    sessionStorage.setItem('SUPPID', this.SuppId);
+    console.log(this.SuppId)
+     if (this.SuppId) {
+      this.supplier_details = {
+        SUPP_ID: this.SuppId,
+        SALE_ID: this.PurchId,
+        DATE_FROM: this.formatted_from_date,
+        DATE_TO: this.formatted_To_date,
+        COMPANY_ID: this.selected_Company_id,
+      };
+      sessionStorage.setItem(
+        'supplierdetails',
+        JSON.stringify(this.supplier_details),
+      );
+
+      // ✅ Retrieve and parse back into object
+      const storedData = sessionStorage.getItem('supplierdetails');
+      console.log(storedData)
+      if (storedData) {
+        this.supplier_details = JSON.parse(storedData);
+      }
+
+      this.router.navigate(['/aged-payable-details']);
+    }
+    // sessionStorage.removeItem('PURCHID');
+    // sessionStorage.removeItem('SUPPID');
+    // sessionStorage.setItem('PURCHID', this.PurchId);
+    // sessionStorage.setItem('SUPPID', this.SuppId);
     // Navigate to ledger-statement route
-    this.router.navigate(['/aged-payable-details']);
+    // this.router.navigate(['/aged-payable-details']);
   }
 
   sesstion_Details() {

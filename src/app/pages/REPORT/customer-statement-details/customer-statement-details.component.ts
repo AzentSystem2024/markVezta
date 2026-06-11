@@ -41,12 +41,13 @@ import {
   DxoLookupModule,
   DxiItemModule,
   DxiGroupModule,
-} from 'devextreme-angular/ui/nested';
+} from 'devextreme-angular/ui/nested';  
 import { filter } from 'rxjs';
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
 import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
+import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 
 @Component({
   selector: 'app-customer-statement-details',
@@ -93,6 +94,7 @@ export class CustomerStatementDetailsComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+  isReadOnlyInvoice : boolean = true;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -328,7 +330,7 @@ export class CustomerStatementDetailsComponent {
         this.cdr.detectChanges();
       });
     } else if (TRANS_TYPE_ID === 25) {
-      this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+      this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         this.loadingInvoice = false;
         this.isViewInvoice = true;
@@ -535,6 +537,7 @@ export class CustomerStatementDetailsComponent {
     DxTagBoxModule,
     ViewInvoiceModule,
     ViewCreditNoteModule,
+    AddInvoiceRetailModule
   ],
   providers: [],
   declarations: [CustomerStatementDetailsComponent],
