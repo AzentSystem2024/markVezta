@@ -13,7 +13,11 @@ import {
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.component';
-import { DxTagBoxModule, DxValidatorModule } from 'devextreme-angular';
+import {
+  DxCheckBoxModule,
+  DxTagBoxModule,
+  DxValidatorModule,
+} from 'devextreme-angular';
 
 import {
   DxSelectBoxModule,
@@ -392,6 +396,7 @@ export class StoresFormComponent implements OnInit {
     FormTextboxModule,
     DxValidatorModule,
     DxTagBoxModule,
+    DxCheckBoxModule,
   ],
   declarations: [StoresFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
