@@ -126,6 +126,7 @@ export class AddInvoiceRetailComponent {
   isHQApp: any;
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
   storeList: { ID: any; DESCRIPTION: any }[];
+  inclVAT: any;
   constructor(private dataService: DataService) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
@@ -142,7 +143,9 @@ export class AddInvoiceRetailComponent {
     this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
     const configStore = userData.Configuration?.[0];
     this.storeID = userData.Configuration[0].STORE_ID;
-    console.log(userData.Configuration[0].STORE_ID, 'USERDATA');
+    this.inclVAT = userData.GeneralSettings.INCL_VAT;
+    // this.inclVAT = false;
+    console.log(this.inclVAT, 'USERDATA');
     const selectedCompany = userData.SELECTED_COMPANY;
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     // SINGLE SOURCE OF TRUTH
@@ -366,29 +369,39 @@ export class AddInvoiceRetailComponent {
   };
 
   calculateTax = (rowData: any) => {
-    // View mode → bind backend response
-    // if (this.isReadOnlyMode) {
-    //   return rowData?.TAX_AMOUNT ?? 0;
-    // }
-
-    // Add/Edit → calculate in frontend
     const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
 
     const discPerc = Number(rowData?.DISC_PERC) || 0;
-
     const discount = (amount * discPerc) / 100;
 
-    const taxableAmount = amount - discount;
+    const totalAfterDiscount = amount - discount;
 
     const vat = Number(rowData?.TAX_PERC) || 0;
 
-    return (taxableAmount * vat) / 100;
+    // VAT already included in price
+    if (this.inclVAT) {
+      const amountWithoutVAT = totalAfterDiscount / (1 + vat / 100);
+
+      return totalAfterDiscount - amountWithoutVAT;
+    }
+
+    // Existing logic
+    return (totalAfterDiscount * vat) / 100;
   };
+
   // calculateTax = (rowData: any) => {
+  //   // View mode → bind backend response
+  //   // if (this.isReadOnlyMode) {
+  //   //   return rowData?.TAX_AMOUNT ?? 0;
+  //   // }
+
+  //   // Add/Edit → calculate in frontend
   //   const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
+
   //   const discPerc = Number(rowData?.DISC_PERC) || 0;
 
   //   const discount = (amount * discPerc) / 100;
+
   //   const taxableAmount = amount - discount;
 
   //   const vat = Number(rowData?.TAX_PERC) || 0;
@@ -397,20 +410,85 @@ export class AddInvoiceRetailComponent {
   // };
 
   calculateTotal = (rowData: any) => {
-    // if (this.isReadOnlyMode) {
-    //   return rowData?.TOTAL_AMOUNT ?? 0;
-    // }
     const amount = this.calculateAmount(rowData);
 
     const discPerc = Number(rowData?.DISC_PERC) || 0;
     const discount = (amount * discPerc) / 100;
 
-    const taxableAmount = amount - discount;
+    const totalAfterDiscount = amount - discount;
 
-    const tax = (taxableAmount * (rowData?.TAX_PERC || 0)) / 100;
+    // If price already includes VAT → don't add VAT again
+    if (this.inclVAT) {
+      return totalAfterDiscount;
+    }
 
-    return taxableAmount + tax;
+    // Existing logic for Excl. VAT
+    const tax = (totalAfterDiscount * (Number(rowData?.TAX_PERC) || 0)) / 100;
+
+    return totalAfterDiscount + tax;
   };
+
+  get totalQty(): number {
+    return (this.invoiceFormData.Details || []).reduce(
+      (sum: number, row: any) => sum + (Number(row.QUANTITY) || 0),
+      0,
+    );
+  }
+
+  get totalExclVAT(): number {
+    const total = (this.invoiceFormData.Details || []).reduce(
+      (sum: number, row: any) => {
+        const amount = (Number(row?.PRICE) || 0) * (Number(row?.QUANTITY) || 0);
+
+        const disc = (amount * (Number(row?.DISC_PERC) || 0)) / 100;
+
+        const totalAfterDiscount = amount - disc;
+
+        const vat = Number(row?.TAX_PERC) || 0;
+
+        const taxableAmount =
+          vat > 0 ? totalAfterDiscount / (1 + vat / 100) : totalAfterDiscount;
+
+        return sum + taxableAmount;
+      },
+      0,
+    );
+
+    return Number(total.toFixed(2));
+  }
+
+  get totalVAT(): number {
+    const total = (this.invoiceFormData.Details || []).reduce(
+      (sum: number, row: any) => sum + this.calculateTax(row),
+      0,
+    );
+
+    return Number(total.toFixed(2));
+  }
+
+  get totalInclVAT(): number {
+    const total = (this.invoiceFormData.Details || []).reduce(
+      (sum: number, row: any) => sum + this.calculateTotal(row),
+      0,
+    );
+
+    return Number(total.toFixed(2));
+  }
+  // calculateTotal = (rowData: any) => {
+  //   // if (this.isReadOnlyMode) {
+  //   //   return rowData?.TOTAL_AMOUNT ?? 0;
+  //   // }
+  //   const amount = this.calculateAmount(rowData);
+
+  //   const discPerc = Number(rowData?.DISC_PERC) || 0;
+  //   const discount = (amount * discPerc) / 100;
+
+  //   const taxableAmount = amount - discount;
+
+  //   const tax = (taxableAmount * (rowData?.TAX_PERC || 0)) / 100;
+
+  //   return taxableAmount + tax;
+  // };
 
   getCustomerOrUnitLst() {
     const payload = {
