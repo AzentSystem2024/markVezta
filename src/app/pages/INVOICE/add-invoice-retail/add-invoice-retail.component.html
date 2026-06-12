@@ -197,7 +197,7 @@
 
           <dxi-column
             dataField="PRICE"
-            caption="Cost"
+            caption="Price(Excl. VAT)"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [allowEditing]="!isReadOnlyMode"
@@ -305,17 +305,15 @@
         </div>
 
         <dx-button
-                #saveButtonRef
-                text="PDF"
-                 [visible]="isReadOnlyMode ||
-    invoiceFormData.IS_APPROVED
-  "
-                (onClick)="openPDF()"
-                stylingMode="contained"
-                type="default"
-                [width]="120"
-              ></dx-button>
-        
+          #saveButtonRef
+          text="PDF"
+          [visible]="isReadOnlyMode || invoiceFormData.IS_APPROVED"
+          (onClick)="openPDF()"
+          stylingMode="contained"
+          type="default"
+          [width]="120"
+        ></dx-button>
+
         <dx-button
           text="Cancel"
           stylingMode="outlined"

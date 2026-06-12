@@ -367,9 +367,9 @@ export class AddInvoiceRetailComponent {
 
   calculateTax = (rowData: any) => {
     // View mode → bind backend response
-    if (this.isReadOnlyMode) {
-      return rowData?.TAX_AMOUNT ?? 0;
-    }
+    // if (this.isReadOnlyMode) {
+    //   return rowData?.TAX_AMOUNT ?? 0;
+    // }
 
     // Add/Edit → calculate in frontend
     const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
@@ -397,9 +397,9 @@ export class AddInvoiceRetailComponent {
   // };
 
   calculateTotal = (rowData: any) => {
-    if (this.isReadOnlyMode) {
-      return rowData?.TOTAL_AMOUNT ?? 0;
-    }
+    // if (this.isReadOnlyMode) {
+    //   return rowData?.TOTAL_AMOUNT ?? 0;
+    // }
     const amount = this.calculateAmount(rowData);
 
     const discPerc = Number(rowData?.DISC_PERC) || 0;
