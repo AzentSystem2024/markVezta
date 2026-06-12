@@ -7089,5 +7089,15 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
+  // ===============VAT RETURN DRILLDOWN API=============================
+  Output_Vat_Summary(payload: any){
+    const getEndpoint = this.apiUrl + 'AC_Report/GetStoresByVatReturnKey';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   Storewise_Vat_Summary(payload: any){
+    const getEndpoint = this.apiUrl + 'AC_Report/GetTransactionsByStore';
+    return this.http.post(getEndpoint, payload);
+  }
   
 }

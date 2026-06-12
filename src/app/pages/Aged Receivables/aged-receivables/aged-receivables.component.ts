@@ -185,7 +185,7 @@ export class AgedReceivablesComponent {
   }
 
   onExporting(event: any) {
-    const fileName = 'BalanceSheetReport';
+    const fileName = 'AgedReceivableReport';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
@@ -374,6 +374,14 @@ export class AgedReceivablesComponent {
         alignment: 'right',
       },
       {
+        column: 'AGE_121_150',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'AGE_121_150',
+        alignment: 'right',
+      },
+      {
         column: 'AGE_151_180',
         summaryType: 'sum',
         displayFormat: '{0}',
@@ -386,7 +394,7 @@ export class AgedReceivablesComponent {
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'AGE_91_120',
+        showInColumn: 'AGE_ABOVE_180',
         alignment: 'right',
       },
       {
