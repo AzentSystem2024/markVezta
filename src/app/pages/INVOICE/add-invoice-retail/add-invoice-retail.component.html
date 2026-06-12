@@ -123,7 +123,7 @@
           [allowColumnReordering]="true"
           [showColumnHeaders]="true"
           [allowColumnResizing]="true"
-          [height]="'55vh'"
+          [height]="'50vh'"
           [width]="'auto'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
@@ -184,11 +184,7 @@
               pageSize: 50,
             }"
           ></dxi-column>
-          <!-- <dxi-column
-            dataField="HSN_CODE"
-            caption="HSN Code"
-            [allowEditing]="false"
-          ></dxi-column> -->
+
           <dxi-column
             dataField="UOM"
             caption="UOM"
@@ -197,7 +193,7 @@
 
           <dxi-column
             dataField="PRICE"
-            caption="Cost"
+            [caption]="inclVAT ? 'Price(Incl. VAT)' : 'Price(Excl. VAT)'"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [allowEditing]="!isReadOnlyMode"
@@ -239,7 +235,9 @@
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [calculateCellValue]="calculateTax"
+            [visibleIndex]="inclVAT ? 999 : undefined"
           ></dxi-column>
+
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total"
@@ -284,6 +282,46 @@
         </dx-data-grid>
       </div>
     </div>
+
+    <div class="invoice-summary" *ngIf="inclVAT">
+      <div class="summary-row">
+        <div class="summary-item">
+          <span>Total Excl. VAT</span>
+
+          <dx-number-box
+            [value]="totalExclVAT"
+            [readOnly]="true"
+            format="#,##0.00"
+            [width]="120"
+          >
+          </dx-number-box>
+        </div>
+
+        <div class="summary-item">
+          <span>{{ vatTitle }} Amount</span>
+
+          <dx-number-box
+            [value]="totalVAT"
+            [readOnly]="true"
+            format="#,##0.00"
+            [width]="120"
+          >
+          </dx-number-box>
+        </div>
+      </div>
+
+      <div class="summary-total">
+        <span>Total Incl. VAT</span>
+
+        <dx-number-box
+          [value]="totalInclVAT"
+          [readOnly]="true"
+          format="#,##0.00"
+          [width]="120"
+        >
+        </dx-number-box>
+      </div>
+    </div>
     <div class="remarks-container">
       <dx-text-box
         label="Remarks"
@@ -305,17 +343,15 @@
         </div>
 
         <dx-button
-                #saveButtonRef
-                text="PDF"
-                 [visible]="isReadOnlyMode ||
-    invoiceFormData.IS_APPROVED
-  "
-                (onClick)="openPDF()"
-                stylingMode="contained"
-                type="default"
-                [width]="120"
-              ></dx-button>
-        
+          #saveButtonRef
+          text="PDF"
+          [visible]="isReadOnlyMode || invoiceFormData.IS_APPROVED"
+          (onClick)="openPDF()"
+          stylingMode="contained"
+          type="default"
+          [width]="120"
+        ></dx-button>
+
         <dx-button
           text="Cancel"
           stylingMode="outlined"
