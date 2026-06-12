@@ -510,6 +510,30 @@ export class SalesSummaryComponent {
         showInColumn: 'CASH',
         alignment: 'right',
       },
+      {
+        column: 'BANK CARD',
+        summaryType: 'sum',
+        displayFormat: 'Total {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'BANK CARD',
+        alignment: 'right',
+      },
+      {
+        column: 'FAB POS CARD',
+        summaryType: 'sum',
+        displayFormat: 'Total {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'FAB POS CARD',
+        alignment: 'right',
+      },
+      {
+        column: 'ROOM CHARGE',
+        summaryType: 'sum',
+        displayFormat: 'Total {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'ROOM CHARGE',
+        alignment: 'right',
+      },
     ],
     groupItems: [
       {
@@ -535,6 +559,27 @@ export class SalesSummaryComponent {
       },
       {
         column: 'CASH',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'BANK CARD',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'FAB POS CARD',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'ROOM CHARGE',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },

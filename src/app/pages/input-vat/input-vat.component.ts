@@ -300,7 +300,7 @@ export class InputVatComponent {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
-      STORE_ID : this.selectedStoreid
+      STORE_ID: this.selectedStoreid.join(',')
       //  SUPP_ID: this.selectedSupplierId || 0
     };
 

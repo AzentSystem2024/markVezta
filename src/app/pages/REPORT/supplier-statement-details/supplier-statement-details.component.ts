@@ -88,6 +88,7 @@ export class SupplierStatementDetailsComponent {
   editPrePaymentPopupOpened: boolean = false;
   loadingInvoice = false;
   popupReady = false;
+  supplierDescription: any;
 
   constructor(
     private dataService: DataService,
@@ -97,6 +98,7 @@ export class SupplierStatementDetailsComponent {
     this.get_sessionstorage_data();
     this.get_fin_id();
     this.sesstion_Details();
+    this.supplier_dropdown();
 
     // Detect when component is revisited
     this.router.events
@@ -118,9 +120,13 @@ export class SupplierStatementDetailsComponent {
     //     this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
     //     console.log(this.HEAD_ID_LIST);
     //   });
-    const payload = {
+    this.supplier_dropdown();
+  }
+
+  supplier_dropdown(){
+     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: ' SUPPLIER',
+      NAME: 'SUPPLIER',
     };
     this.dataService.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
@@ -239,6 +245,9 @@ export class SupplierStatementDetailsComponent {
       console.log('supplierViewClick missing');
       return;
     }
+    this.selected_from_date = sessiondata.DATE_FROM
+    this.selected_To_date = sessiondata.DATE_TO
+    this.selectedSupplierId = suppid
 
     const payload = {
       COMPANY_ID: Number(sessiondata.COMPANY_ID),
@@ -258,6 +267,12 @@ export class SupplierStatementDetailsComponent {
         this.SupplierStatementDetailsDataSource = res.data || [];
 
         this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
+
+        if (this.SupplierStatementDetailsDataSource.length > 0) {
+      this.supplierDescription =
+        this.SupplierStatementDetailsDataSource[0].DESCRIPTION;
+    }
+    console.log(this.supplierDescription)
 
         this.cdr.detectChanges();
       });
