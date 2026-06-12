@@ -91,7 +91,7 @@ export class AnalyticsDashboardComponent implements OnInit {
   sales: Sales = null;
   salesByState: SalesByState = null;
   salesByCategory: SalesByStateAndCity = null;
-  showCustomDatePopup = false
+  showCustomDatePopup = false;
   customStartDate: any = null;
   isLoading: boolean = true;
   customPalette = [
@@ -124,9 +124,9 @@ export class AnalyticsDashboardComponent implements OnInit {
   loadingVisible: boolean = false;
   customEndDate: any = null;
   startDate_of_Financial_year: any;
-  customDateRangeText: any
+  customDateRangeText: any;
   customDateLabel = '';
-  constructor(private service: DataService) { }
+  constructor(private service: DataService) {}
 
   selectionChange(dates: Dates) {
     this.loadData(dates.startDate, dates.endDate);
@@ -168,10 +168,10 @@ export class AnalyticsDashboardComponent implements OnInit {
     const [startDate, endDate] = analyticsPanelItems[4].value.split('/');
     this.isLoading = false;
     // this.loadData(startDate, endDate);
-    this.selectedDateRange = 'today';
+    this.selectedDateRange = 'last30';
 
     this.onDateRangeChange({
-      value: 'today'
+      value: 'last30',
     });
   }
   //====================session Details===========================
@@ -184,7 +184,10 @@ export class AnalyticsDashboardComponent implements OnInit {
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     this.startDate_of_Financial_year = sessionData.FINANCIAL_YEARS[0].DATE_FROM;
-    console.log(this.startDate_of_Financial_year, '================startDate_of_Financial_year=================');
+    console.log(
+      this.startDate_of_Financial_year,
+      '================startDate_of_Financial_year=================',
+    );
 
     const sessionYear = sessionData.FINANCIAL_YEARS;
     //  this.financialYeaDate=sessionYear[0].DATE_FROM
@@ -193,7 +196,6 @@ export class AnalyticsDashboardComponent implements OnInit {
   //--------------------date range selection----------------------------
 
   onDateRangeChange(e: any) {
-
     const today = new Date();
 
     switch (e.value) {
@@ -222,14 +224,13 @@ export class AnalyticsDashboardComponent implements OnInit {
 
       case 'all':
         this.fromDate = new Date(this.startDate_of_Financial_year); // or your minimum date
-        this.toDate = new Date(today);   // or today
+        this.toDate = new Date(today); // or today
         break;
 
       case 'custom':
         this.showCustomDatePopup = true;
         // User will select fromDate and toDate manually.
         return;
-
     }
 
     this.getDashboardData();
@@ -239,8 +240,7 @@ export class AnalyticsDashboardComponent implements OnInit {
   }
 
   getDashboardData() {
-
-    console.log('call this function')
+    console.log('call this function');
     console.log('From Date:', this.fromDate);
     console.log('To Date:', this.toDate);
     this.loadingVisible = true;
@@ -248,7 +248,6 @@ export class AnalyticsDashboardComponent implements OnInit {
       this.loadingVisible = false;
       alert('Request timeout. Please try again.');
     }, 50000); // 50   seconds
-
 
     this.sesstion_Details();
 
@@ -260,51 +259,54 @@ export class AnalyticsDashboardComponent implements OnInit {
     };
 
     console.log(payload);
-    this.service.Dashboard_Data_api(payload).subscribe((res: any) => {
-      clearTimeout(timeoutId); // stop timeout
+    this.service.Dashboard_Data_api(payload).subscribe(
+      (res: any) => {
+        clearTimeout(timeoutId); // stop timeout
 
-      this.loadingVisible = false;
-      this.gross_Sales_list = res.data.GrossSale;
-      // this.TopMovingItems_list = res.data.
-      const item_list = res.data.TopMovingItems;
-      console.log(item_list, '==========item_list===========');
-      const maxQty = item_list.reduce((max: number, item: any) => {
-        return item.QTY_SOLD > max ? item.QTY_SOLD : max;
-      }, 0);
-      console.log(maxQty, '==========maxQty===========');
+        this.loadingVisible = false;
+        this.gross_Sales_list = res.data.GrossSale;
+        // this.TopMovingItems_list = res.data.
+        const item_list = res.data.TopMovingItems;
+        console.log(item_list, '==========item_list===========');
+        const maxQty = item_list.reduce((max: number, item: any) => {
+          return item.QTY_SOLD > max ? item.QTY_SOLD : max;
+        }, 0);
+        console.log(maxQty, '==========maxQty===========');
 
-      this.TopMovingItems_list = res.data.TopMovingItems.map((item: any) => ({
-        ITEM_CODE: item.ITEM_CODE,
-        QTY_SOLD: item.QTY_SOLD,
-        DESCRIPTION: item.DESCRIPTION,
-      }));
-      this.TenderSummary_list = res.data.TenderSummary;
+        this.TopMovingItems_list = res.data.TopMovingItems.map((item: any) => ({
+          ITEM_CODE: item.ITEM_CODE,
+          QTY_SOLD: item.QTY_SOLD,
+          DESCRIPTION: item.DESCRIPTION,
+        }));
+        this.TenderSummary_list = res.data.TenderSummary;
 
-      this.chartData = this.TenderSummary_list.map((store: any) => {
-        const obj: any = {
-          STORE_NAME: store.STORE_NAME,
-        };
+        this.chartData = this.TenderSummary_list.map((store: any) => {
+          const obj: any = {
+            STORE_NAME: store.STORE_NAME,
+          };
 
-        store.TenderTypes.forEach((t: any) => {
-          obj[t.TENDER] = t.AMOUNT;
+          store.TenderTypes.forEach((t: any) => {
+            obj[t.TENDER] = t.AMOUNT;
+          });
+          this.generateSeries();
+
+          return obj;
         });
-        this.generateSeries();
 
-        return obj;
-      });
+        console.log(
+          this.gross_Sales_list,
+          this.TopMovingItems_list,
+          this.TenderSummary_list,
+        );
+      },
+      (error) => {
+        clearTimeout(timeoutId); // stop timeout
+        this.loadingVisible = false;
 
-      console.log(
-        this.gross_Sales_list,
-        this.TopMovingItems_list,
-        this.TenderSummary_list,
-      );
-    }, (error) => {
-      clearTimeout(timeoutId); // stop timeout
-      this.loadingVisible = false;
-
-      // alert('Error occurred while loading data.');
-      notify('Error occurred while loading data.', 'error', 3000);
-    });
+        // alert('Error occurred while loading data.');
+        notify('Error occurred while loading data.', 'error', 3000);
+      },
+    );
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom' ? { ...option, label: 'Custom' } : option,
     );
@@ -353,7 +355,10 @@ export class AnalyticsDashboardComponent implements OnInit {
   };
 
   customizeChartTooltip(arg: any) {
-    console.log(arg, '=================customizeChartTooltip arg=================');
+    console.log(
+      arg,
+      '=================customizeChartTooltip arg=================',
+    );
     return {
       text: `
       Item : ${arg.argumentText}
@@ -362,9 +367,9 @@ export class AnalyticsDashboardComponent implements OnInit {
     `,
     };
   }
-  barChartcustomizeTooltip() { }
-  MillioncustomizeLabel() { }
-  onChartInitialized(e: any) { }
+  barChartcustomizeTooltip() {}
+  MillioncustomizeLabel() {}
+  onChartInitialized(e: any) {}
   customizeFunnelLabel = (arg: any) => {
     return `${arg.item.STORE_NAME}
 ${this.formatAmount(arg.value)}`;
@@ -410,7 +415,6 @@ ${this.formatAmount(arg.value)}`;
       text: `${this.formatNumber(arg.value)}`,
     };
   };
-
 
   //====================date range selection for custom date===========================
   onDateRangeChanged(e: any) {
@@ -465,7 +469,6 @@ ${this.formatAmount(arg.value)}`;
   //       // this.filteredPurchaseInvoices = this.purchaseInvoiceList;
   //       return;
   //   }
-
 
   // }
   applyDateFilter() {
@@ -525,14 +528,11 @@ ${this.formatAmount(arg.value)}`;
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom'
-        ? { ...option, label: 'custom' }
-        : option,
+      option.value === 'custom' ? { ...option, label: 'custom' } : option,
     );
 
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
-
   }
 
   private parseDateString(dateStr: string): Date {
@@ -565,8 +565,6 @@ ${this.formatAmount(arg.value)}`;
     this.showCustomDatePopup = true;
   }
 
-
-
   private formatAsDDMMYYYY(d: Date): string {
     const day = d.getDate().toString().padStart(2, '0');
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -594,9 +592,7 @@ ${this.formatAmount(arg.value)}`;
     // const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom'
-        ? { ...option, label: 'Custom' }
-        : option,
+      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
     );
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
@@ -648,11 +644,11 @@ ${this.formatAmount(arg.value)}`;
     DxValidatorModule,
     DxDateBoxModule,
     DxLoadPanelModule,
-    CustomDatePopupModule
+    CustomDatePopupModule,
   ],
   providers: [],
   exports: [],
   declarations: [AnalyticsDashboardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AnalyticsDashboardModule { }
+export class AnalyticsDashboardModule {}

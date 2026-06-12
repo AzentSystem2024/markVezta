@@ -86,12 +86,26 @@
           [visible]="canAdd"
         ></dxi-item>
       </dxo-toolbar>
-      
+
       <dxi-column dataField="CODE" caption="Code"></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column dataField="CITY" caption="City"></dxi-column>
       <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
       <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column>
+      <dxi-column
+        caption="Status"
+        dataField="IS_ACTIVE"
+        [width]="80"
+        [cellTemplate]="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
+          dataSource: getStatusFilterData,
+          encodeHtml: false,
+        }"
+        [fixed]="true"
+        fixedPosition="right"
+      >
+      </dxi-column>
     </dx-data-grid>
   </div>
 </div>

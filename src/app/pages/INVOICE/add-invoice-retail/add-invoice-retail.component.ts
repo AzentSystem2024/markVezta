@@ -134,7 +134,7 @@ export class AddInvoiceRetailComponent {
     }
   }
   ngOnInit() {
-    console.log(this.EditingResponseData,"EditingResponseData")
+    console.log(this.EditingResponseData, 'EditingResponseData');
     const userDataString = localStorage.getItem('userData');
     if (!userDataString) return;
 
@@ -364,19 +364,42 @@ export class AddInvoiceRetailComponent {
 
     return (amount * discPerc) / 100;
   };
+
   calculateTax = (rowData: any) => {
+    // View mode → bind backend response
+    if (this.isReadOnlyMode) {
+      return rowData?.TAX_AMOUNT ?? 0;
+    }
+
+    // Add/Edit → calculate in frontend
     const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
+
     const discPerc = Number(rowData?.DISC_PERC) || 0;
 
     const discount = (amount * discPerc) / 100;
+
     const taxableAmount = amount - discount;
 
     const vat = Number(rowData?.TAX_PERC) || 0;
 
     return (taxableAmount * vat) / 100;
   };
+  // calculateTax = (rowData: any) => {
+  //   const amount = (rowData?.QUANTITY || 0) * (rowData?.PRICE || 0);
+  //   const discPerc = Number(rowData?.DISC_PERC) || 0;
+
+  //   const discount = (amount * discPerc) / 100;
+  //   const taxableAmount = amount - discount;
+
+  //   const vat = Number(rowData?.TAX_PERC) || 0;
+
+  //   return (taxableAmount * vat) / 100;
+  // };
 
   calculateTotal = (rowData: any) => {
+    if (this.isReadOnlyMode) {
+      return rowData?.TOTAL_AMOUNT ?? 0;
+    }
     const amount = this.calculateAmount(rowData);
 
     const discPerc = Number(rowData?.DISC_PERC) || 0;

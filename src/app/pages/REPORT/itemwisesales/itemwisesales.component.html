@@ -1,5 +1,4 @@
 <div class="view-wrapper list-page">
-
   <!-- ================= FILTER PANEL ================= -->
   <div
     class="paramsDiv SearchParams-container"
@@ -7,7 +6,6 @@
   >
     <dx-form>
       <dxi-item itemType="group" [colCount]="6">
-
         <!-- Year -->
         <dxi-item>
           <dx-select-box
@@ -15,7 +13,8 @@
             labelMode="floating"
             [(value)]="selectedYear"
             [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)">
+            (onValueChanged)="onYearChanged($event)"
+          >
           </dx-select-box>
         </dxi-item>
 
@@ -28,7 +27,8 @@
             displayExpr="name"
             valueExpr="value"
             [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)">
+            (onValueChanged)="onMonthValueChanged($event)"
+          >
           </dx-select-box>
         </dxi-item>
 
@@ -40,7 +40,8 @@
             [(value)]="selected_from_date"
             displayFormat="dd-MM-yyyy"
             [max]="today"
-            (onValueChanged)="onFromDateChange($event)">
+            (onValueChanged)="onFromDateChange($event)"
+          >
           </dx-date-box>
         </dxi-item>
 
@@ -52,7 +53,8 @@
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
             [max]="today"
-            (onValueChanged)="onToDateChange($event)">
+            (onValueChanged)="onToDateChange($event)"
+          >
           </dx-date-box>
         </dxi-item>
 
@@ -70,10 +72,11 @@
             [showMultiTagOnly]="true"
             [multiline]="false"
             [showSelectionControls]="true"
-            (onValueChanged)="updateStoreHint()">
+            (onValueChanged)="updateStoreHint()"
+          >
           </dx-tag-box>
         </dxi-item>
-   <dxi-item>
+        <dxi-item>
           <dx-select-box
             label="Sale type"
             labelMode="floating"
@@ -83,123 +86,130 @@
             [(value)]="selectedSaletype"
             [searchEnabled]="true"
             [showSelectionControls]="true"
-            (onValueChanged)="updateStoreHint()">
+            (onValueChanged)="updateStoreHint()"
+          >
           </dx-select-box>
         </dxi-item>
 
-      <!-- Customer (smaller width) -->
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Customer"
-    labelMode="floating"
-    [(value)]="selectedCustomer"
-    [dataSource]="distributorList"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
+        <!-- Customer (smaller width) -->
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="Customer"
+            labelMode="floating"
+            [(value)]="selectedCustomer"
+            [dataSource]="distributorList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
-<!-- Empty space -->
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Department"
-    labelMode="floating"
-    [(value)]="selectedDepartment"
-    [dataSource]="Department"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
+        <!-- Empty space -->
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="Department"
+            labelMode="floating"
+            [(value)]="selectedDepartment"
+            [dataSource]="Department"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Catgeory"
-    labelMode="floating"
-    [(value)]="selectedCategory"
-    [dataSource]="Category"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="Catgeory"
+            labelMode="floating"
+            [(value)]="selectedCategory"
+            [dataSource]="Category"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="SubCategory"
-    labelMode="floating"
-    [(value)]="selectedSubcategory"
-    [dataSource]="Subcategory"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="SubCategory"
+            labelMode="floating"
+            [(value)]="selectedSubcategory"
+            [dataSource]="Subcategory"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
-<!-- Empty space -->
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Brand"
-    labelMode="floating"
-    [(value)]="selectedBrand"
-    [dataSource]="Brand"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
+        <!-- Empty space -->
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="Brand"
+            labelMode="floating"
+            [(value)]="selectedBrand"
+            [dataSource]="Brand"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="ItemProperty1"
-    labelMode="floating"
-    [(value)]="selectedItemProperty1"
-    [dataSource]="itemProperty1"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="ItemProperty1"
+            labelMode="floating"
+            [(value)]="selectedItemProperty1"
+            [dataSource]="itemProperty1"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="ItemProperty2"
-    labelMode="floating"
-    [(value)]="selectedItemProperty2"
-    [dataSource]="itemProperty2"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="ItemProperty2"
+            labelMode="floating"
+            [(value)]="selectedItemProperty2"
+            [dataSource]="itemProperty2"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
+        <dxi-item [colSpan]="1">
+          <dx-select-box
+            label="Salesman"
+            labelMode="floating"
+            [(value)]="selectedSalesman"
+            [dataSource]="Salesman"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
 
+        <dxi-item [colSpan]="3"></dxi-item>
 
-<dxi-item [colSpan]="1">
-  <dx-select-box
-    label="Salesman"
-    labelMode="floating"
-    [(value)]="selectedSalesman"
-    [dataSource]="Salesman"
-    displayExpr="DESCRIPTION"
-    valueExpr="ID"
-    [searchEnabled]="true">
-  </dx-select-box>
-</dxi-item>
-
-<dxi-item [colSpan]="3"></dxi-item>
-
-<!-- Apply button -->
-<dxi-item [colSpan]="1" cssClass="apply-btn-right">
-  <dx-button
-    text="Apply"
-    type="default"
-    stylingMode="contained"
-    (onClick)="load_JournalBook_data()">
-  </dx-button>
-</dxi-item>
-
+        <!-- Apply button -->
+        <dxi-item [colSpan]="1" cssClass="apply-btn-right">
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="load_JournalBook_data()"
+          >
+          </dx-button>
+        </dxi-item>
       </dxi-item>
     </dx-form>
   </div>
@@ -214,7 +224,8 @@
       type="normal"
       [icon]="isFilterVisible ? 'chevronup' : 'chevrondown'"
       (onClick)="toggleFiltersPanel()"
-      [hint]="isFilterVisible ? 'Hide Filters' : 'Show Filters'">
+      [hint]="isFilterVisible ? 'Hide Filters' : 'Show Filters'"
+    >
     </dx-button>
   </div>
 
@@ -233,26 +244,18 @@
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
     >
-
       <!-- ================= TOOLBAR ================= -->
       <dxo-toolbar>
-
         <dxi-item location="before">
           <div class="grid-header">Itemwise Sales</div>
         </dxi-item>
 
-        <dxi-item
-          widget="dxButton"
-          [options]="searchButtonOptions">
-        </dxi-item>
+        <dxi-item widget="dxButton" [options]="searchButtonOptions"> </dxi-item>
 
-        <dxi-item
-          widget="dxButton"
-          [options]="refreshButtonOptions">
+        <dxi-item widget="dxButton" [options]="refreshButtonOptions">
         </dxi-item>
 
         <dxi-item name="exportButton"></dxi-item>
-
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
@@ -260,30 +263,30 @@
         dataField="SALE_DATE"
         caption="Date"
         dataType="date"
-        [format]="{ type: 'custom', formatter: formatDates }">
+        [format]="{ type: 'custom', formatter: formatDates }"
+      >
       </dxi-column>
 
-      <dxi-column dataField="INVOICE_NO" caption="Invoice No"></dxi-column>
-     
+      <dxi-column dataField="SALE_NO" caption="Invoice No"></dxi-column>
 
       <dxi-column
         dataField="NET_AMOUNT"
         caption="Net Amount"
         alignment="right"
-        [format]="{ type: 'fixedPoint', precision: 2 }">
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      >
       </dxi-column>
 
       <dxi-column *ngIf="journalBookCount > 0" type="buttons" [width]="100">
         <dxi-button
           icon="eyeopen"
           text="View"
-          [onClick]="onViewClick.bind(this)">
+          [onClick]="onViewClick.bind(this)"
+        >
         </dxi-button>
       </dxi-column>
-
     </dx-data-grid>
   </div>
-
 </div>
 
 <!-- ================= POPUP ================= -->
@@ -303,5 +306,3 @@
   ></app-add-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>
-
-
