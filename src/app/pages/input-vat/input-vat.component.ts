@@ -92,7 +92,7 @@ export class InputVatComponent {
   isReadOnlyPayment: boolean = true;
   financialYeaDate: string;
   Store: any;
-  selectedStoreid: any;
+ selectedStoreid: number[] = [1];
 
   constructor(
     private dataservice: DataService,
@@ -183,6 +183,13 @@ export class InputVatComponent {
       }
       this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
         this.Store = res;
+        const hoStore = this.Store.find(
+    (x: any) => x.DESCRIPTION === 'HO_STORE'
+  );
+
+  if (hoStore) {
+    this.selectedStoreid = [hoStore.ID];
+  }
       });
     }
 
@@ -300,7 +307,7 @@ export class InputVatComponent {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
-      STORE_ID: this.selectedStoreid?.join(',') || '',
+      STORE_ID: this.selectedStoreid?.join(','),
       //  SUPP_ID: this.selectedSupplierId || 0
     };
 
