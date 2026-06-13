@@ -197,7 +197,8 @@ export class OutputVatComponent {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
-      STORE_ID: this.selectedStoreid.join(',')
+      STORE_ID: this.selectedStoreid?.join(',') || '',
+      FIN_ID : this.selected_fin_id
     };
 
     this.dataService.Output_VAT_Report_Api(payload).subscribe({
