@@ -41,6 +41,10 @@ import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AddSalesInvoiceRetailModule } from '../../OPERATIONS/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-vat-return',
@@ -48,6 +52,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styleUrls: ['./vat-return.component.scss'],
 })
 export class VatReturnComponent {
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
   selected_Company_id: any;
   selected_fin_id: any;
   gridData: any;
@@ -62,6 +68,25 @@ export class VatReturnComponent {
   pdfSrc: SafeResourceUrl | null = null;
   selected_Company_name: any;
   defaultDate: Date = new Date();
+  VATreturn:any[]=[];
+    salesVatTotal = 0;
+expenseVatTotal = 0;
+netVatDue = 0;
+isOutputVatPopup = false;
+isStoreVatPopup = false;
+outputVatPopupData: any[] = [];
+storeVatPopupData:any[] =[];
+isViewInvoice: boolean = false;
+isReadOnlyInvoice:boolean = true;
+selectedInvoice:any;
+isEditInvoiceReadOnly :boolean= true;
+isVerifyInvoice: boolean = false;
+statusFinder: any;
+ buttonText: any;
+ canApprove:boolean = false;
+ isEditInvoice:boolean = false;
+ vatReturnDataSource:any[]=[];
+
   constructor(
     private dataservice: DataService,
     private sanitizer: DomSanitizer,
@@ -83,343 +108,16 @@ export class VatReturnComponent {
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
   }
 
-  // get_pdf(){
+  calculateNetVat() {
+    this.salesVatTotal = this.VATreturn.filter(
+      (x: any) => x.GROUP_NAME === 'VAT On Sale and Other Outputs',
+    ).reduce((sum: number, x: any) => sum + Number(x.VAT || 0), 0);
 
-  get_pdf(data: any): SafeResourceUrl {
-    console.log(
-      this.selected_Company_name,
-      '=========================company name=============',
-    );
-    console.log(data, '=======data=======================');
-    const Data = data.Data;
-    const companyInfo = {
-      TRN: Data[0].TRN || '',
-      ID: Data[0].ID || '',
-      ARABIC_NAME: Data[0].ARABIC_NAME || '',
-      COMPANY_NAME: Data[0].COMPANY_NAME || '',
-      ADDRESS: Data[0].ADDRESS || '',
-      VAT: Data[0].VAT || '',
-      AMOUNT: Data[0].AMOUNT || '',
-      ADJUSTMENT: Data[0].ADJUSTMENT || '',
-    };
-    const Company_name = companyInfo.COMPANY_NAME;
+    this.expenseVatTotal = this.VATreturn.filter(
+      (x: any) => x.GROUP_NAME === 'VAT On Expense and Other Outputs',
+    ).reduce((sum: number, x: any) => sum + Number(x.VAT || 0), 0);
 
-    const ZeroRated = {
-      TRN: Data[1].TRN || '',
-      ID: Data[1].ID || '',
-      AMOUNT: Data[1].AMOUNT || '',
-      COMPANY_NAME: Data[1].COMPANY_NAME || '',
-      ADDRESS: Data[1].ADDRESS || '',
-      VAT: Data[1].VAT || '',
-    };
-    const puchId = {
-      TRN: Data[2].TRN || '',
-      ID: Data[2].ID || '',
-      AMOUNT: Data[2].AMOUNT || '',
-      VAT: Data[2].VAT || '',
-      ADJUSTMENT: Data[2].ADJUSTMENT || '',
-    };
-
-    console.log(companyInfo);
-    console.log(ZeroRated, '====================Zero========');
-    console.log(puchId, '===================Puch id===============');
-    const Id_value_Emirites = companyInfo.ID;
-    console.log(
-      Id_value_Emirites,
-      '=============Id_value_Emirites==============',
-    );
-
-    const Total_Amount_first_table = companyInfo.AMOUNT + ZeroRated.AMOUNT;
-    const Total_Vat_Amount = companyInfo.VAT + ZeroRated.VAT;
-    const total_Amount_second = puchId.AMOUNT;
-
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.width;
-    const marginLeft = 10;
-    let y = 20;
-
-    // Title
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('VALUE ADDED TAX RETURN', pageWidth / 2, y, { align: 'center' });
-    y += 10;
-
-    // Taxable Person Details Section
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setFillColor(200, 220, 255);
-    doc.rect(marginLeft, y, pageWidth - 20, 8, 'F');
-    doc.setTextColor(0, 0, 0);
-    doc.text('Taxable Person details', marginLeft + 2, y + 6);
-    y += 14;
-
-    doc.setFont('helvetica', 'normal');
-    const taxableDetails = [
-      ['TRN', companyInfo.TRN || ''],
-      [
-        'Taxable Person Name (English)',
-        companyInfo.COMPANY_NAME || this.selected_Company_name,
-      ],
-      ['Taxable Person Name (Arabic)', companyInfo.ARABIC_NAME || ''],
-      ['Taxable Person Address', companyInfo.ADDRESS || ''],
-      ['Tax Agency Name', data.tax_agency || ''],
-      ['TAN', data.tan || ''],
-      ['Tax Agent Name', data.agent_name || ''],
-      ['TAAN', data.taan || ''],
-    ];
-
-    taxableDetails.forEach(([label, value]) => {
-      doc.text(label, marginLeft, y);
-      doc.text(':', marginLeft + 70, y);
-      doc.text(value, marginLeft + 75, y);
-      y += 8;
-    });
-
-    // VAT Return Period
-    y += 6;
-    doc.setFont('helvetica', 'bold');
-    doc.text('VAT Return Period', marginLeft, y);
-    y += 10;
-    doc.setFont('helvetica', 'normal');
-    const fromDate = this.formatted_from_date;
-
-    // Convert to Date object
-    const dateObj = new Date(fromDate);
-
-    // Format as dd/mm/yyyy
-    const formattedDateFrom = dateObj.toLocaleDateString('en-GB'); // dd/mm/yyyy format
-    console.log(formattedDateFrom); // "01/01/2025"
-    const formattedDateTo = new Date(this.formatted_To_date).toLocaleDateString(
-      'en-GB',
-    );
-    console.log(formattedDateTo);
-    const vatDetails = [
-      ['VAT Return Period', `${formattedDateFrom} - ${formattedDateTo}`],
-      ['Tax Year', data.tax_year || '2025'],
-      ['VAT Return Period Ref. Number', data.vat_ref || ''],
-    ];
-
-    vatDetails.forEach(([label, value]) => {
-      doc.text(label, marginLeft, y);
-      doc.text(':', marginLeft + 70, y);
-      doc.text(value, marginLeft + 75, y);
-      y += 8;
-    });
-
-    // **New Section: VAT On Sale and other Outputs**
-    y += 10;
-    doc.setFont('helvetica', 'bold');
-    doc.text('VAT On Sale and other Outputs', marginLeft, y);
-    y += 5;
-
-    const emirateList = [
-      { id: '1.a.', name: 'Abu Dhabi' },
-      { id: '1.b.', name: 'Dubai' },
-      { id: '1.c.', name: 'Sharjah' },
-      { id: '1.d.', name: 'Ajman' },
-      { id: '1.e.', name: 'Umm Al Quwain' },
-      { id: '1.f.', name: 'Ras Al Khaimah' },
-      { id: '1.g.', name: 'Fujairah' },
-    ];
-
-    // ✅ Find matching ID
-    let matchedId: string | null = null;
-    if (Id_value_Emirites) {
-      const match = emirateList.find((e) => e.name === Id_value_Emirites);
-      if (match) {
-        matchedId = match.id;
-      }
-    }
-    console.log('Matched ID:', matchedId);
-
-    const tableData = [
-      ['1.a.', 'Standard rated supplies in Abu Dhabi', '', '', ''],
-      ['1.b.', 'Standard rated supplies in Dubai', '', '', ''],
-      ['1.c.', 'Standard rated supplies in Sharjah', '', '', ''],
-      ['1.d.', 'Standard rated supplies in Ajman', '', '', ''],
-      ['1.e.', 'Standard rated supplies in Umm Al Quwain', '', '', ''],
-      ['1.f.', 'Standard rated supplies in Ras Al Khaimah', '', '', ''],
-      ['1.g.', 'Standard rated supplies in Fujairah', '', '', ''],
-      ['2.', 'Supplies subject to the reverse charge provisions', '', '', ''],
-      [
-        '3.',
-        'Zero rated supplies',
-        this.formatAmount(ZeroRated.AMOUNT),
-        '',
-        '',
-      ],
-      [
-        '4.',
-        'Supplies of goods and services to registered customers in other GCC implementing states',
-        '',
-        '',
-        '',
-      ],
-      ['5.', 'Exempt supplies', '', '', ''],
-      ['6.', 'Import VAT accounted through UAE customs', '', '', ''],
-      ['7.', 'Amendments or corrections to Output figures', '', '', ''],
-      [
-        '8.',
-        'Totals',
-        this.formatAmount(Total_Amount_first_table),
-        this.formatAmount(Total_Vat_Amount),
-        '',
-      ],
-    ];
-
-    // ✅ Bind value based on matchedId
-    if (matchedId) {
-      tableData.forEach((row) => {
-        if (row[0] === matchedId) {
-          row[2] = this.formatAmount(companyInfo.AMOUNT); // <-- Replace with dynamic value from API or calculation
-          row[3] = this.formatAmount(companyInfo.VAT);
-          row[4] = this.formatAmount(companyInfo.ADJUSTMENT);
-        }
-      });
-    }
-
-    autoTable(doc, {
-      startY: y + 5,
-      head: [['', '', 'Amount (AED)', 'VAT Amount (AED)', 'Adjustment (AED)']],
-      body: tableData,
-      theme: 'grid',
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-        textColor: [0, 0, 0],
-      },
-      // doc.setFillColor(200, 220, 255);
-      headStyles: {
-        fillColor: [200, 220, 255],
-        textColor: [0, 0, 0],
-        halign: 'center',
-      },
-      columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 80 },
-        2: { halign: 'right' },
-        3: { halign: 'right' },
-        4: { halign: 'right' },
-      },
-      didParseCell: function (data) {
-        if (data.row.raw[0] === '8.') {
-          // ✅ Match the "Totals" row
-          data.cell.styles.fontStyle = 'bold';
-        }
-      },
-    });
-
-    // =====================
-    // TABLE 2: VAT On Sale and other Outputs
-    // =====================
-    y = (doc as any).lastAutoTable.finalY + 10;
-    doc.setFont('helvetica', 'bold');
-    doc.text('VAT On Sale and other Outputs', marginLeft, y);
-    y += 5;
-
-    const tableData2 = [
-      [
-        '9.',
-        'Standard rated expenses',
-        this.formatAmount(puchId.AMOUNT),
-        this.formatAmount(puchId.VAT),
-        this.formatAmount(puchId.ADJUSTMENT),
-      ],
-      ['10.', 'Supplies subject to the reverse charge provisions', '', '', ''],
-      ['11.', 'Amendments or corrections to Input figures', '', '', ''],
-      [
-        '12.',
-        'Totals',
-        this.formatAmount(puchId.AMOUNT),
-        this.formatAmount(puchId.VAT),
-        '',
-      ],
-    ];
-
-    autoTable(doc, {
-      startY: y + 5,
-      head: [
-        [
-          '',
-          '',
-          'Amount (AED)',
-          'Recoverable VAT Amount (AED)',
-          'Adjustment (AED)',
-        ],
-      ],
-      body: tableData2,
-      theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 3, textColor: [0, 0, 0] },
-      headStyles: {
-        fillColor: [200, 220, 255],
-        textColor: [0, 0, 0],
-        halign: 'center',
-      },
-      columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 80 },
-        2: { halign: 'right' },
-        3: { halign: 'right' },
-        4: { halign: 'right' },
-      },
-      didParseCell: function (data) {
-        if (data.row.raw[0] === '12.') {
-          // ✅ Match the "Totals" row
-          data.cell.styles.fontStyle = 'bold';
-        }
-      },
-    });
-
-    // =====================
-    // TABLE 3: Net VAT Due
-    // =====================
-    y = (doc as any).lastAutoTable.finalY + 10;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Net VAT Due', marginLeft, y);
-    y += 5;
-    const allTotal = Number(Total_Vat_Amount) + Number(puchId.VAT);
-
-    const tableData3 = [
-      [
-        '13.',
-        'Total value of due tax for the period',
-        this.formatAmount(Total_Vat_Amount),
-      ],
-      [
-        '14.',
-        'Total value of recoverable tax for the period',
-        this.formatAmount(puchId.VAT),
-      ],
-      ['15.', 'Net VAT due (or reclaimed) for the period', allTotal],
-    ];
-
-    autoTable(doc, {
-      startY: y + 5,
-      head: [['', '', '']],
-      body: tableData3,
-      theme: 'grid',
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-        textColor: [0, 0, 0],
-        fontStyle: 'bold',
-      },
-      headStyles: {
-        fillColor: [255, 255, 255],
-        textColor: [0, 0, 0],
-        fontStyle: 'bold',
-      },
-      columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 100 },
-        2: { cellWidth: 40, halign: 'right' },
-        3: { halign: 'right' },
-      },
-    });
-
-    const pdfBlob = doc.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+    this.netVatDue = this.salesVatTotal - this.expenseVatTotal;
   }
 
   formatAmount(value: any): string {
@@ -432,6 +130,156 @@ export class VatReturnComponent {
     });
   }
 
+onCellClick(e: any) {
+
+  const clickableColumns = ['AMOUNT', 'VAT', 'ADJUSTMENT'];
+
+  if (!clickableColumns.includes(e.column.dataField)) {
+    return;
+  }
+
+  // Skip total rows
+  if (e.data?.IS_TOTAL_ROW) {
+    return;
+  }
+
+  // TYPE = 2 → Direct drilldown
+  // if (e.data.TYPE === 2) {
+
+  //   const transId = e.data.TRANS_ID;
+
+  //   this.dataservice.selectPurchaseInvoice(transId)
+  //     .subscribe((res: any) => {
+
+  //       this.selectedInvoice = res.Data;
+
+  //       if (this.selectedInvoice.STATUS === 'Approved') {
+  //         this.buttonText = 'View Purchase Invoice';
+  //       } else if (this.selectedInvoice.STATUS === 'Open') {
+  //         this.buttonText = 'Verify Purchase Invoice';
+  //       } else if (this.selectedInvoice.STATUS === 'Verified') {
+  //         this.buttonText = 'Approve Purchase Invoice';
+  //       }
+
+  //       this.isVerifyInvoice = true;
+  //     });
+
+  //   return;
+  // }
+
+  // TYPE = 1 → Existing popup logic
+   if (e.data.TYPE === 1) {
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+      KEY: e.data.KEY,
+    };
+
+    this.dataservice.Output_Vat_Summary(payload).subscribe({
+      next: (res: any) => {
+        this.outputVatPopupData = res.Details || [];
+        this.isOutputVatPopup = true;
+      }
+    });
+
+    return;
+  }
+
+
+  if (e.data.TYPE === 2) {
+
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+    STORE_ID: 1,
+  };
+
+  this.dataservice.Storewise_Vat_Summary(payload).subscribe({
+    next: (res: any) => {
+      this.storeVatPopupData = res.Details || [];
+      this.isStoreVatPopup = true;
+    },
+    error: (err) => {
+      console.error(err);
+    }
+  });
+
+  return;
+}
+}
+
+  onRowStoreClick(e: any) {
+    // this.isLoading = true;
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+      STORE_ID: e.data.STORE_ID,
+    };
+
+    this.dataservice.Storewise_Vat_Summary(payload).subscribe({
+      next: (res: any) => {
+        this.storeVatPopupData = res.Details || [];
+
+        this.isStoreVatPopup = true;
+        // this.isLoading = false;
+      },
+      error: () => {
+        // this.isLoading = false;
+      },
+    });
+    
+  }
+
+onInvoiceRowClick(e: any) {
+  console.log(e,'event------------')
+  const trans_type = e.data.TRANS_TYPE
+  const trans_id = e.data.TRANS_ID;
+
+  if(trans_type === "25"){
+  this.dataservice
+      .selectInvoiceRetail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+          this.isViewInvoice = true;
+        
+      }); // Selected row data
+  this.isViewInvoice = true; 
+    }
+    else if (trans_type === "19"){
+     this.dataservice.selectPurchaseInvoice(trans_id).subscribe((res: any) => {
+      console.log(res);
+      this.selectedInvoice = res.Data;
+      console.log(this.selectedInvoice, '==============select data====verify');
+      if (this.selectedInvoice.STATUS == "Approved") {
+        this.buttonText = 'View Purchase  Invoice'
+      } else if (this.selectedInvoice.STATUS == "Open") {
+        this.buttonText = 'Verify Purchase  Invoice'
+      } else if (this.selectedInvoice.STATUS == "Verified") {
+        this.buttonText = 'Approve Purchase  Invoice'
+
+      } else {
+        this.buttonText = 'Purchase Invoice'
+
+      }
+      // this.isEditInvoiceReadOnly = transStatus === 'Approved';
+      this.isVerifyInvoice = true;
+});
+    }
+  // Open Invoice popup
+}
+
+onRowPrepared(e: any) {
+  if (e.rowType === 'data' && e.data?.IS_TOTAL_ROW) {
+    e.rowElement.style.fontWeight = 'bold';
+    e.rowElement.style.backgroundColor = '#f2f2f2';
+  }
+}
+
   Vat_Return_Data() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -440,11 +288,273 @@ export class VatReturnComponent {
     };
 
     this.dataservice.VAT_Return_Report_Api(payload).subscribe((res: any) => {
+      this.vatReturnDataSource = res
+      this.VATreturn = res.Details;
+      this.VATreturn = res.Details.map((item: any) => ({
+        ...item,
+
+        GROUP_NAME:
+          item.TYPE === 1
+      ? 'VAT On Sale and Other Outputs'
+      : item.TYPE === 2
+      ? 'VAT On Expense and Other Outputs'
+      : 'Net VAT Due',
+      GROUP_ORDER:
+    item.TYPE === 1 ? 1 : 2
+      }));
+      const groupVat = this.VATreturn.reduce((acc: any, item: any) => {
+        const group = item.GROUP_NAME;
+
+        if (!acc[group]) {
+          acc[group] = 0;
+        }
+
+        acc[group] += Number(item.VAT || 0);
+
+        return acc;
+      }, {});
+
+      console.log(groupVat);
+      const difference =
+        groupVat['VAT On Sale and Other Outputs'] -
+        groupVat['VAT On Expense and Other Outputs'];
+      this.netVatDue = Number(difference.toFixed(2));
+      console.log('Difference:', this.netVatDue);
+      this.calculateNetVat();
+
+
+      const dueTax =
+  groupVat['VAT On Sale and Other Outputs'] || 0;
+
+const recoverableTax =
+  groupVat['VAT On Expense and Other Outputs'] || 0;
+
+this.VATreturn.push(
+  {
+    GROUP_NAME: 'Net VAT Due',
+    GROUP_ORDER: 3,
+    DESCRIPTION: 'Total value of due tax for the period',
+    AMOUNT: null,
+    VAT: dueTax,
+    ADJUSTMENT: null,
+    IS_TOTAL_ROW: true
+  },
+  {
+    GROUP_NAME: 'Net VAT Due',
+    GROUP_ORDER: 3,
+    DESCRIPTION: 'Total value of recoverable tax for the period',
+    AMOUNT: null,
+    VAT: recoverableTax,
+    ADJUSTMENT: null,
+    IS_TOTAL_ROW: true
+  },
+  {
+    GROUP_NAME: 'Net VAT Due',
+    GROUP_ORDER: 3,
+    DESCRIPTION: 'Net VAT due(or reclaimed) for the period',
+    AMOUNT: null,
+    VAT: this.netVatDue,
+    ADJUSTMENT: null,
+    IS_TOTAL_ROW: true
+  }
+);
       if (res) {
-        this.pdfSrc = this.get_pdf(res); // Update iframe source
+        // this.get_pdf(res); // Update iframe source
       }
     });
   }
+
+  downloadPdf() {
+
+   if (!this.VATreturn || this.VATreturn.length === 0) {
+    notify('No data found', 'warning', 2000);
+    return;
+  }
+
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+  };
+
+  this.dataservice.VAT_Return_Report_Api(payload).subscribe((res: any) => {
+    if (res?.Details?.length > 0) {
+      this.get_pdf(res);
+    } else {
+      notify('No data found', 'warning', 2000);
+    }
+  });
+
+}
+  
+get_pdf(response: any) {
+  const header = response.Header;
+  const details = response.Details || [];
+
+  // Sales (TYPE = 1)
+  const salesRows = details.filter((x: any) => x.TYPE === 1);
+
+  // Expenses (TYPE = 2)
+  const purchaseRows = details.filter((x: any) => x.TYPE === 2);
+
+  const totalSalesAmount = salesRows.reduce(
+    (sum: number, item: any) => sum + Number(item.AMOUNT || 0),
+    0
+  );
+
+  const totalSalesVat = salesRows.reduce(
+    (sum: number, item: any) => sum + Number(item.VAT || 0),
+    0
+  );
+
+  const totalPurchaseAmount = purchaseRows.reduce(
+    (sum: number, item: any) => sum + Number(item.AMOUNT || 0),
+    0
+  );
+
+  const totalPurchaseVat = purchaseRows.reduce(
+    (sum: number, item: any) => sum + Number(item.VAT || 0),
+    0
+  );
+
+  const netVat = totalSalesVat - totalPurchaseVat;
+
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.width;
+
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('VALUE ADDED TAX RETURN', pageWidth / 2, 15, {
+    align: 'center',
+  });
+
+  doc.setFontSize(11);
+  doc.text('Taxable Person Details', 14, 30);
+
+  autoTable(doc, {
+    startY: 35,
+    theme: 'plain',
+    body: [
+      ['TRN', header?.TRN || ''],
+      ['Company Name', header?.COMPANY_NAME || ''],
+      ['Arabic Name', header?.ARABIC_NAME || ''],
+      ['Address', header?.ADDRESS || ''],
+    ],
+  });
+
+  // ===============================
+  // VAT ON SALES
+  // ===============================
+
+  const y1 = (doc as any).lastAutoTable.finalY + 10;
+
+  doc.setFontSize(11);
+  doc.text('VAT On Sale and Other Outputs', 14, y1);
+
+  const salesTableRows = salesRows.map((item: any) => [
+    item.ID,
+    item.DESCRIPTION,
+    Number(item.AMOUNT || 0).toFixed(2),
+    Number(item.VAT || 0).toFixed(2),
+    Number(item.ADJUSTMENT || 0).toFixed(2),
+  ]);
+
+  autoTable(doc, {
+    startY: y1 + 5,
+    theme: 'grid',
+    head: [
+      [
+        'Code',
+        'Description',
+        'Amount (AED)',
+        'VAT Amount (AED)',
+        'Adjustment',
+      ],
+    ],
+    body: [
+      ...salesTableRows,
+      [
+        '',
+        'TOTAL',
+        totalSalesAmount.toFixed(2),
+        totalSalesVat.toFixed(2),
+        '',
+      ],
+    ],
+  });
+
+  // ===============================
+  // VAT ON EXPENSES
+  // ===============================
+
+  const y2 = (doc as any).lastAutoTable.finalY + 10;
+
+  doc.text('VAT On Expense and Other Outputs', 14, y2);
+
+  const purchaseTableRows = purchaseRows.map((item: any) => [
+    item.ID,
+    item.DESCRIPTION,
+    Number(item.AMOUNT || 0).toFixed(2),
+    Number(item.VAT || 0).toFixed(2),
+    Number(item.ADJUSTMENT || 0).toFixed(2),
+  ]);
+
+  autoTable(doc, {
+    startY: y2 + 5,
+    theme: 'grid',
+    head: [
+      [
+        'Code',
+        'Description',
+        'Amount (AED)',
+        'Recoverable VAT',
+        'Adjustment',
+      ],
+    ],
+    body: [
+      ...purchaseTableRows,
+      [
+        '',
+        'TOTAL',
+        totalPurchaseAmount.toFixed(2),
+        totalPurchaseVat.toFixed(2),
+        '',
+      ],
+    ],
+  });
+
+  // ===============================
+  // NET VAT DUE
+  // ===============================
+
+  const y3 = (doc as any).lastAutoTable.finalY + 10;
+
+  doc.text('Net VAT Due', 14, y3);
+
+  autoTable(doc, {
+    startY: y3 + 5,
+    theme: 'grid',
+    body: [
+      [
+        'Total value of due tax for the period',
+        totalSalesVat.toFixed(2),
+      ],
+      [
+        'Total value of recoverable tax for the period',
+        totalPurchaseVat.toFixed(2),
+      ],
+      [
+        'Net VAT due(or reclaimed) for the period',
+        netVat.toFixed(2),
+      ],
+    ],
+    styles: {
+      fontStyle: 'bold',
+    },
+  });
+
+  doc.output('dataurlnewwindow');
+}
 
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
@@ -476,6 +586,16 @@ export class VatReturnComponent {
     const year = date.getFullYear();
 
     return `${day}-${month}-${year}`;
+  }
+
+handleClose(){
+  this.isVerifyInvoice = false;
+  this.isViewInvoice = false;
+}
+
+    onExporting(event: any) {
+    const fileName = 'VAT Return';
+    this.dataservice.exportDataGridReport(event, fileName);
   }
 }
 
@@ -509,6 +629,8 @@ export class VatReturnComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
+    AddInvoiceRetailModule,
+    EditPurchaseInvoiceModule,
   ],
   providers: [],
   declarations: [VatReturnComponent],

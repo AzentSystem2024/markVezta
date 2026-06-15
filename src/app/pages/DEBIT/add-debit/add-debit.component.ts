@@ -127,7 +127,7 @@ export class AddDebitComponent {
   netAmountDisplay: any;
   supplierList: any;
   selectedSupplierId: any;
-  invoicePopupVisible: boolean;
+  invoicePopupVisible: boolean = false;
   pendingInvoices: any;
   pendingInvoicelist: any;
   selectedSupplier: any;
@@ -151,23 +151,23 @@ export class AddDebitComponent {
   subTypeList: any;
   selectedSubTypeId: any;
   vatTitle: any;
-  showSubType: boolean;
+  showSubType: boolean = false;
   VatClass: any;
 
   get actionButtonText(): string {
-  switch (this.mode) {
-    case 'verify':
-      return 'Verify';
-    case 'approve':
-      return 'Approve';
-    case 'view':
-      return 'View';
-    case 'edit':
-      return 'Update';
-    default:
-      return 'Save';
+    switch (this.mode) {
+      case 'verify':
+        return 'Verify';
+      case 'approve':
+        return 'Approve';
+      case 'view':
+        return 'View';
+      case 'edit':
+        return 'Update';
+      default:
+        return 'Save';
+    }
   }
-}
 
   constructor(private dataService: DataService) {
     this.sessionData_tax();
@@ -565,16 +565,16 @@ export class AddDebitComponent {
     const rowIndex = e.row?.rowIndex;
 
     if (e.dataField === 'ledgerCode') {
-      // ✅ Open dropdown on focus
+      //  Open dropdown on focus
       e.editorOptions.onFocusIn = (args: any) => {
         setTimeout(() => {
           args.component.open();
         }, 0);
       };
 
-      // ❌ REMOVE your existing onKeyDown completely
+      //  REMOVE your existing onKeyDown completely
 
-      // ✅ Move on value selection
+      //  Move on value selection
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_CODE === args.value,
@@ -590,7 +590,7 @@ export class AddDebitComponent {
             selectedLedger.HEAD_NAME,
           );
 
-          // 🔥 MOVE FOCUS HERE (THIS IS THE FIX)
+          //  MOVE FOCUS HERE (THIS IS THE FIX)
           setTimeout(() => {
             const grid = this.itemsGridRef?.instance;
             grid.editCell(rowIndex, 'ledgerName');
@@ -599,7 +599,7 @@ export class AddDebitComponent {
       };
     }
 
-    // ➤ ledgerName: move to particulars on Enter
+    //  ledgerName: move to particulars on Enter
     if (e.dataField === 'ledgerName') {
       // open dropdown on focus
       e.editorOptions.onFocusIn = (args: any) => {
@@ -608,7 +608,7 @@ export class AddDebitComponent {
         }, 0);
       };
 
-      // 🔥 MAIN FIX: move on selection
+      //  MAIN FIX: move on selection
       e.editorOptions.onValueChanged = (args: any) => {
         const selectedLedger = this.ledgerList.find(
           (item: any) => item.HEAD_NAME === args.value,
@@ -625,7 +625,7 @@ export class AddDebitComponent {
           );
         }
 
-        // 🔥 MOVE TO PARTICULARS HERE
+        //  MOVE TO PARTICULARS HERE
         setTimeout(() => {
           const grid = this.itemsGridRef?.instance;
           grid.editCell(rowIndex, 'particulars');
@@ -712,14 +712,14 @@ export class AddDebitComponent {
         e.row.data.SGST = 0;
       };
 
-      // ✅ auto open dropdown
+      //  auto open dropdown
       e.editorOptions.onFocusIn = (args: any) => {
         setTimeout(() => {
           args.component.open();
         }, 50);
       };
 
-      // ✅ ENTER → add row
+      // ENTER → add row
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           event.event.preventDefault();

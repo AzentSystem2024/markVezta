@@ -88,6 +88,7 @@ export class SupplierStatementDetailsComponent {
   editPrePaymentPopupOpened: boolean = false;
   loadingInvoice = false;
   popupReady = false;
+  supplierDescription: any;
 
   constructor(
     private dataService: DataService,
@@ -97,6 +98,7 @@ export class SupplierStatementDetailsComponent {
     this.get_sessionstorage_data();
     this.get_fin_id();
     this.sesstion_Details();
+    this.supplier_dropdown();
 
     // Detect when component is revisited
     this.router.events
@@ -118,9 +120,13 @@ export class SupplierStatementDetailsComponent {
     //     this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
     //     console.log(this.HEAD_ID_LIST);
     //   });
-    const payload = {
+    this.supplier_dropdown();
+  }
+
+  supplier_dropdown(){
+     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: ' SUPPLIER',
+      NAME: 'SUPPLIER',
     };
     this.dataService.Supplier_Dropdown(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
@@ -153,11 +159,20 @@ export class SupplierStatementDetailsComponent {
     this.isEditInvoice = false;
     this.isEditReceipt = false;
     this.editPrePaymentPopupOpened = false;
+
+    this.selectedInvoice = null;
+    this.selectedReceipt = null;
+    this.selectedPrePayment = null;
   }
 
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
-    return data ? JSON.parse(data) : null;
+
+    try {
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return data;
+    }
   }
 
   get_sessionstorage_data() {
@@ -213,65 +228,76 @@ export class SupplierStatementDetailsComponent {
     return `${day}-${month}-${year}`;
   }
 
-  async loadLedgerData() {
-    // this.ledgerSummaryData=this.Ledger_statement_datasource
+  loadLedgerData() {
+    console.log('loadLedgerData triggered');
+
     const sessiondata = this.getSessionData('supplierViewClick');
-    const suppid = this.getSessionData('SUPPID');
-    const purchid = this.getSessionData('PURCHID');
-    console.log(suppid, '========suppid=========');
-    console.log(purchid, '========purchid=========');
+
+    const suppid = sessionStorage.getItem('SUPPID');
+
+    const purchid = sessionStorage.getItem('PURCHID');
 
     console.log(sessiondata);
+    console.log(suppid);
+    console.log(purchid);
 
-    // if (!sessiondata) {
-    //   console.log('No session data found!');
-    //   return;
-    // }
+    if (!sessiondata) {
+      console.log('supplierViewClick missing');
+      return;
+    }
+    this.selected_from_date = sessiondata.DATE_FROM
+    this.selected_To_date = sessiondata.DATE_TO
+    this.selectedSupplierId = suppid
 
     const payload = {
       COMPANY_ID: Number(sessiondata.COMPANY_ID),
-      SUPP_ID: suppid,
-      PURCH_ID: purchid,
+      SUPP_ID: Number(suppid),
+      PURCH_ID: Number(purchid),
       DATE_FROM: sessiondata.DATE_FROM,
       DATE_TO: sessiondata.DATE_TO,
     };
 
-    console.log(payload, '=========payload=========');
-
-    this.selectedCompanyId = payload.COMPANY_ID;
-    this.selectedSupplierId = payload.SUPP_ID;
-    this.selected_from_date = payload.DATE_FROM;
-    this.selected_To_date = payload.DATE_TO;
-
-    await this.dataService
-      .SupplierDetails_Report_Api(payload)
-      .subscribe((res: any) => {
-        console.log(res, '========Supplier Statement Details Data=========');
-        this.SupplierStatementDetailsDataSource = res.data || [];
-        this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
-        this.cdr.detectChanges();
-      });
-  }
-
-  load_Ledgre_data() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-
-      // PURCH_ID: purchid || 0,
-      SUPP_ID: this.selectedSupplierId,
-      DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-    };
-
-    console.log(payload, '==========manual payload===========');
+    console.log(payload);
 
     this.dataService
       .SupplierDetails_Report_Api(payload)
       .subscribe((res: any) => {
+        console.log('API HIT');
+
         this.SupplierStatementDetailsDataSource = res.data || [];
+
         this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
+
+        if (this.SupplierStatementDetailsDataSource.length > 0) {
+      this.supplierDescription =
+        this.SupplierStatementDetailsDataSource[0].DESCRIPTION;
+    }
+    console.log(this.supplierDescription)
+
+        this.cdr.detectChanges();
       });
   }
+
+  // load_Ledgre_data() {
+  //   console.log('==================================');
+  //   const payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+
+  //     // PURCH_ID: purchid || 0,
+  //     SUPP_ID: this.selectedSupplierId,
+  //     DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
+  //     DATE_TO: this.formatted_To_date ?? this.selected_To_date,
+  //   };
+
+  //   console.log(payload, '==========manual payload===========');
+
+  //   this.dataService
+  //     .SupplierDetails_Report_Api(payload)
+  //     .subscribe((res: any) => {
+  //       this.SupplierStatementDetailsDataSource = res.data || [];
+  //       this.ledgerSummaryData = this.SupplierStatementDetailsDataSource;
+  //     });
+  // }
 
   onViewClick(e: any) {
     const trans_id = e.row.data.TRANS_ID;

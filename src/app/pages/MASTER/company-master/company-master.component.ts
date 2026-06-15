@@ -195,8 +195,8 @@ export class CompanyMasterComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/company');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/company');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -209,6 +209,18 @@ export class CompanyMasterComponent {
     this.sesstion_Details();
     this.getCompanyList();
   }
+
+  validateEmail = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    // Empty → valid (not mandatory)
+    if (!value) return true;
+
+    // Validate only if user entered something
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailRegex.test(value);
+  };
 
   onAddPopupClose() {
     this.selectedCompanyType = null;
@@ -419,11 +431,11 @@ export class CompanyMasterComponent {
       this.dataservice.Select_CompanyList_Api(ID).subscribe((response: any) => {
         const data = response.Data;
         this.selectedData = response;
-
+        this.editingRowData = { ...data };
         // 🔹 PHONE split
         if (data.PHONE) {
           const phoneParts = data.PHONE.split('-');
-          this.countryCodephone = phoneParts[0];   // +971
+          this.countryCodephone = phoneParts[0]; // +971
           this.editingRowData.PHONE = phoneParts[1]; // 578674589
         }
 
@@ -659,4 +671,4 @@ export class CompanyMasterComponent {
   exports: [],
   declarations: [CompanyMasterComponent],
 })
-export class CompanyMasterModule { }
+export class CompanyMasterModule {}

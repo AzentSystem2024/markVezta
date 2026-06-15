@@ -333,6 +333,7 @@
             ></dx-text-box>
           </div>
           <dx-check-box
+            *ngIf="!isVerifyCreditNote && !isApproveMode"
             [(value)]="creditFormData.IS_APPROVED"
             text="Approve"
             (onValueChanged)="onApprovedChanged($event)"

@@ -174,32 +174,32 @@
             caption="Description"
             [allowEditing]="!isReadOnlyMode"
           ></dxi-column>
-           <dxi-column
-  dataField="STORE_ID"
-  caption="Store"
-  [width]="200"
-  [editorType]="'dxSelectBox'"
-  [lookup]="{
-    dataSource: Store,
-    valueExpr: 'ID',
-    displayExpr: 'DESCRIPTION',
-    searchEnabled: true
-  }"
-  [allowEditing]="!isReadOnlyMode"
-></dxi-column>
-        <dxi-column
-  dataField="DEPT_ID"
-  caption="Department"
-  [width]="200"
-  [editorType]="'dxSelectBox'"
-  [lookup]="{
-    dataSource: Department,
-    valueExpr: 'ID',
-    displayExpr: 'DESCRIPTION',
-    searchEnabled: true
-  }"
-  [allowEditing]="!isReadOnlyMode"
-></dxi-column>
+          <dxi-column
+            dataField="STORE_ID"
+            caption="Store"
+            [width]="200"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: Store,
+              valueExpr: 'ID',
+              displayExpr: 'DESCRIPTION',
+              searchEnabled: true,
+            }"
+            [allowEditing]="!isReadOnlyMode"
+          ></dxi-column>
+          <dxi-column
+            dataField="DEPT_ID"
+            caption="Department"
+            [width]="200"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: Department,
+              valueExpr: 'ID',
+              displayExpr: 'DESCRIPTION',
+              searchEnabled: true,
+            }"
+            [allowEditing]="!isReadOnlyMode"
+          ></dxi-column>
           <dxi-column
             dataField="AMOUNT"
             caption="Amount"

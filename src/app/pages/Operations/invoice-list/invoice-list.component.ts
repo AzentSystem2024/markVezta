@@ -130,7 +130,7 @@ export class InvoiceListComponent {
   invoiceCount = 0;
   isEditInvoice: boolean = false;
   selectedInvoice: any;
-  isViewInvoice: boolean=false;
+  isViewInvoice: boolean = false;
 
   sessionData: any;
   selected_Company_id: any;
@@ -147,6 +147,10 @@ export class InvoiceListComponent {
   canPrint = false;
   companyID: any;
   vatTitle: any;
+  canVerify: any;
+  isApproveInvoice: boolean;
+  isVerifyInvoice: boolean;
+  isReadOnlyInvoice: boolean;
 
   constructor(
     private dataService: DataService,
@@ -163,7 +167,7 @@ export class InvoiceListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    const userDataString = localStorage.getItem('userData')||'{}';
+    const userDataString = localStorage.getItem('userData') || '{}';
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
@@ -180,6 +184,7 @@ export class InvoiceListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
     }
 
     //
@@ -364,7 +369,9 @@ export class InvoiceListComponent {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -509,14 +516,20 @@ export class InvoiceListComponent {
   }
 
   //status flag color
+
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = cellInfo.data.TRANS_STATUS;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -524,6 +537,21 @@ export class InvoiceListComponent {
 
     cellElement.appendChild(icon);
   }
+  // statusCellRender(cellElement: any, cellInfo: any) {
+  //   const status = cellInfo.data.TRANS_STATUS;
+
+  //   const icon = document.createElement('i');
+  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
+  //   icon.style.fontSize = '18px';
+  //   icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
+  //   icon.title = status === 5 ? 'Approved' : 'Open';
+
+  //   icon.style.display = 'flex';
+  //   icon.style.justifyContent = 'center';
+  //   icon.style.alignItems = 'center';
+
+  //   cellElement.appendChild(icon);
+  // }
 
   getStatusFilterData = [
     {
@@ -560,6 +588,34 @@ export class InvoiceListComponent {
       } else {
         // Open edit popup
         this.isEditInvoice = true;
+      }
+    });
+  }
+
+  onVerifyInvoice(e: any) {
+    const rowData = e.row.data;
+
+    const invoiceId = rowData.TRANS_ID;
+    const transStatus = rowData.TRANS_STATUS;
+
+    this.isReadOnlyInvoice = transStatus === 5;
+
+    this.dataService.selectInvoice(invoiceId).subscribe((response: any) => {
+      this.selectedInvoice = response.Data;
+
+      // APPROVED -> OPEN VIEW PAGE
+      if (transStatus === 5) {
+        this.isViewInvoice = true;
+      }
+
+      // VERIFIED -> OPEN APPROVE PAGE
+      else if (transStatus === 2) {
+        this.isApproveInvoice = true;
+      }
+
+      // OPEN VERIFY PAGE
+      else {
+        this.isVerifyInvoice = true;
       }
     });
   }
@@ -617,6 +673,8 @@ export class InvoiceListComponent {
     this.isAddInvoice = false;
     this.isEditInvoice = false;
     this.isViewInvoice = false;
+    this.isVerifyInvoice = false;
+    this.isApproveInvoice = false;
     this.getInvoiceList();
     if (this.addInvoiceComp) {
       this.addInvoiceComp.resetInvoiceForm();
@@ -671,4 +729,4 @@ export class InvoiceListComponent {
   exports: [InvoiceListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceListModule { }
+export class InvoiceListModule {}

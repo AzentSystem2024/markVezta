@@ -12,17 +12,17 @@
               type="required"
               message="Code is required"
             ></dxi-validation-rule>
-          <dxi-validation-rule
-            type="pattern"
-            [pattern]="'^[a-zA-Z0-9]+$'"
-            message="Code should be alphanumeric only"
-          ></dxi-validation-rule>
+            <dxi-validation-rule
+              type="pattern"
+              [pattern]="'^[a-zA-Z0-9]+$'"
+              message="Code should be alphanumeric only"
+            ></dxi-validation-rule>
 
-          <dxi-validation-rule
-            type="custom"
-            [validationCallback]="validateStoreCode"
-            message="Code already exists"
-          ></dxi-validation-rule>
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateStoreCode"
+              message="Code already exists"
+            ></dxi-validation-rule>
           </dx-validator>
         </dx-text-box>
       </div>
@@ -41,11 +41,11 @@
               message="This Field is required"
             ></dxi-validation-rule>
 
-             <dxi-validation-rule
-            type="custom"
-            [validationCallback]="validateStoreName"
-            message="Storename already exists"
-          ></dxi-validation-rule>
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateStoreName"
+              message="Storename already exists"
+            ></dxi-validation-rule>
           </dx-validator>
         </dx-text-box>
       </div>
@@ -257,5 +257,9 @@
         ></dx-text-box>
       </div>
     </dxi-item>
+  </dxi-item>
+
+  <dxi-item itemType="group" [colCount]="2">
+    <dx-check-box text="Active" [(value)]="newStores.IS_ACTIVE"> </dx-check-box>
   </dxi-item>
 </dx-form>

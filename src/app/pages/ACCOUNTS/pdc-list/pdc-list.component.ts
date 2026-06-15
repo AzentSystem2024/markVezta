@@ -43,29 +43,29 @@ export class PdcListComponent {
   dataGrid: DxDataGridComponent;
   isEditReadOnly: boolean = false;
   popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
-popupTitle = 'New PDC';
+  popupTitle = 'New PDC';
 
-setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
-  this.popupMode = mode;
+  setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
+    this.popupMode = mode;
 
-  switch (mode) {
-    case 'new':
-      this.popupTitle = 'New PDC';
-      break;
-    case 'edit':
-      this.popupTitle = 'Edit PDC';
-      break;
-    case 'verify':
-      this.popupTitle = 'Verify PDC';
-      break;
-    case 'approve':
-      this.popupTitle = 'Approve PDC';
-      break;
-    case 'view':
-      this.popupTitle = 'View PDC';
-      break;
+    switch (mode) {
+      case 'new':
+        this.popupTitle = 'New PDC';
+        break;
+      case 'edit':
+        this.popupTitle = 'Edit PDC';
+        break;
+      case 'verify':
+        this.popupTitle = 'Verify PDC';
+        break;
+      case 'approve':
+        this.popupTitle = 'Approve PDC';
+        break;
+      case 'view':
+        this.popupTitle = 'View PDC';
+        break;
+    }
   }
-}
 
   PDCListDataSource: any[] = [];
   fullPDCList: any[] = [];
@@ -75,7 +75,7 @@ setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
   showPageSizeSelector = true;
   addPDCPopupOpened: boolean = false;
   editPDCPopupOpened: boolean = false;
-  VerifyPDCPopupOpened : boolean = false;
+  VerifyPDCPopupOpened: boolean = false;
   selectedEmployee: any;
   selectedDateRange: any = 'today';
   selectedEntryDateRange: any = 'today';
@@ -431,15 +431,21 @@ setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
     icon.style.color =
-    status === 'Closed'
-      ? '#EF4444' 
-      :status === 'Approved'
-        ? '#10B981' // Approved
-        : status === 'Verified'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'Closed'
-      ? 'Closed' : status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
+      status === 'Closed'
+        ? '#EF4444'
+        : status === 'Approved'
+          ? '#10B981' // Approved
+          : status === 'Verified'
+            ? '#0073D8' // Verified
+            : '#FFA500'; // Open
+    icon.title =
+      status === 'Closed'
+        ? 'Closed'
+        : status === 'Approved'
+          ? 'Approved'
+          : status === 'Verified'
+            ? 'Verified'
+            : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -640,7 +646,7 @@ setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
     },
   ];
 
-   getStatusFilterData = [
+  getStatusFilterData = [
     {
       text: 'Approved',
       value: 'Approved',
@@ -651,19 +657,19 @@ setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
     },
   ];
 
-  onVerifyInvoice(e:any){
+  onVerifyInvoice(e: any) {
     e.cancel = true;
     const status = e.row.data?.ENTRY_STATUS?.trim();
-   if (status === 'Verified') {
-    this.setPopupMode('approve');
-    this.isEditReadOnly = false;
-  } else if (status === 'Approved' || status === 'Closed') {
-    this.setPopupMode('view');
-    this.isEditReadOnly = true;
-  } else {
-    this.setPopupMode('verify');
-    this.isEditReadOnly = false;
-  }
+    if (status === 'Verified') {
+      this.setPopupMode('approve');
+      this.isEditReadOnly = false;
+    } else if (status === 'Approved' || status === 'Closed') {
+      this.setPopupMode('view');
+      this.isEditReadOnly = true;
+    } else {
+      this.setPopupMode('verify');
+      this.isEditReadOnly = false;
+    }
     //  this.isEditReadOnly =
     // status === 'Approved' || status === 'Closed';
     this.VerifyPDCPopupOpened = true;
@@ -674,53 +680,53 @@ setPopupMode(mode: 'new' | 'edit' | 'verify' | 'approve' | 'view') {
     event.cancel = true;
     const status = event.data?.ENTRY_STATUS?.trim();
     if (status === 'Approved' || status === 'Closed') {
-    this.setPopupMode('view');
-    this.isEditReadOnly = true;
-  } else {
-    this.setPopupMode('edit');
-    this.isEditReadOnly = false;
-  }
+      this.setPopupMode('view');
+      this.isEditReadOnly = true;
+    } else {
+      this.setPopupMode('edit');
+      this.isEditReadOnly = false;
+    }
     //  this.isEditReadOnly =
     // status === 'Approved' || status === 'Closed';
     this.editPDCPopupOpened = true;
     this.selected_PDC(event);
   }
 
-   selectedVerify_PDC(event: any) {
-  const id = event.row.data.ID;
-  this.PDCid = id;
-  this.selectPDC = id;
+  selectedVerify_PDC(event: any) {
+    const id = event.row.data.ID;
+    this.PDCid = id;
+    this.selectPDC = id;
 
-  this.dataservice.Select_PDC(id).subscribe((res: any) => {
-    this.selectedPDC = {
-      ...res.Data[0],
-      ENTRY_STATUS: (res.Data[0].ENTRY_STATUS || '').trim()
-    };
+    this.dataservice.Select_PDC(id).subscribe((res: any) => {
+      this.selectedPDC = {
+        ...res.Data[0],
+        ENTRY_STATUS: (res.Data[0].ENTRY_STATUS || '').trim(),
+      };
 
-    this.selectedPDC.BENEFICIARY_TYPE =
-      this.selectedPDC.BENEFICIARY_TYPE?.id ||
-      this.selectedPDC.BENEFICIARY_TYPE ||
-      null;
-  });
-}
+      this.selectedPDC.BENEFICIARY_TYPE =
+        this.selectedPDC.BENEFICIARY_TYPE?.id ||
+        this.selectedPDC.BENEFICIARY_TYPE ||
+        null;
+    });
+  }
 
-selected_PDC(event: any) {
-  const id = event.data.ID;
-  this.PDCid = id;
-  this.selectPDC = id;
+  selected_PDC(event: any) {
+    const id = event.data.ID;
+    this.PDCid = id;
+    this.selectPDC = id;
 
-  this.dataservice.Select_PDC(id).subscribe((res: any) => {
-    this.selectedPDC = {
-      ...res.Data[0],
-      ENTRY_STATUS: (res.Data[0].ENTRY_STATUS || '').trim()
-    };
+    this.dataservice.Select_PDC(id).subscribe((res: any) => {
+      this.selectedPDC = {
+        ...res.Data[0],
+        ENTRY_STATUS: (res.Data[0].ENTRY_STATUS || '').trim(),
+      };
 
-    this.selectedPDC.BENEFICIARY_TYPE =
-      this.selectedPDC.BENEFICIARY_TYPE?.id ||
-      this.selectedPDC.BENEFICIARY_TYPE ||
-      null;
-  });
-}
+      this.selectedPDC.BENEFICIARY_TYPE =
+        this.selectedPDC.BENEFICIARY_TYPE?.id ||
+        this.selectedPDC.BENEFICIARY_TYPE ||
+        null;
+    });
+  }
 
   DeletePDC(event: any) {
     const id = event.data.ID;
@@ -845,4 +851,4 @@ selected_PDC(event: any) {
   exports: [PdcListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PdcListModule { }
+export class PdcListModule {}

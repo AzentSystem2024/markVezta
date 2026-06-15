@@ -25,10 +25,10 @@
                   </dxi-validation-rule>
 
                   <dxi-validation-rule
-            type="custom"
-            [validationCallback]="validateCustomerCode"
-            message="Code already exists"
-          ></dxi-validation-rule>
+                    type="custom"
+                    [validationCallback]="validateCustomerCode"
+                    message="Code already exists"
+                  ></dxi-validation-rule>
 
                   <dxi-validation-rule
                     type="pattern"
@@ -93,11 +93,10 @@
                   </dxi-validation-rule>
 
                   <dxi-validation-rule
-            type="custom"
-            [validationCallback]="validateCustomername"
-            message="Contactname already exists"
-          ></dxi-validation-rule>
-
+                    type="custom"
+                    [validationCallback]="validateCustomername"
+                    message="Contactname already exists"
+                  ></dxi-validation-rule>
                 </dx-validator>
               </dx-text-box>
             </div>
@@ -369,18 +368,14 @@
                 [(value)]="formCustomerData.EMAIL"
                 labelMode="floating"
               >
-                <!-- <dx-validator>
+                <dx-validator>
                   <dxi-validation-rule
-                    type="required"
-                    message="Email is required"
+                    type="custom"
+                    [validationCallback]="validateEmail"
+                    message="Enter a valid email address"
                   >
                   </dxi-validation-rule>
-
-                  <dxi-validation-rule
-                    type="email"
-                    message="Enter a valid email address"
-                  ></dxi-validation-rule>
-                </dx-validator> -->
+                </dx-validator>
               </dx-text-box>
             </div>
           </dxi-item>

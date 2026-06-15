@@ -208,6 +208,7 @@ import { PurchaseInvoiceListComponent } from './pages/OPERATIONS/purchase-invoic
 import { ARManualMatchingComponent } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
 import { TrialBalanceDimensionAdvanceComponent } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
 import { LedgerStatementDimensionComponent } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
+import { BarcodePrintComponent } from './pages/barcode-print/barcode-print.component';
 
 const routes: Routes = [
   {
@@ -1281,6 +1282,11 @@ const routes: Routes = [
         component: LedgerStatementDimensionComponent,
         canActivate: [AuthGuardService],
       },
+      {
+        path: 'barcode',
+        component: BarcodePrintComponent,
+        canActivate: [AuthGuardService],
+      },
 
       {
         path: '**',
@@ -1298,4 +1304,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

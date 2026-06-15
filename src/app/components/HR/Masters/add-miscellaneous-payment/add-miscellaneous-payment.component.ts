@@ -165,90 +165,90 @@ export class AddMiscellaneousPaymentComponent {
   isSaving: boolean;
   selected_Company_id: any;
   Store: any;
- @Input() verifyMiscPopupOpened: boolean = false;
+  @Input() verifyMiscPopupOpened: boolean = false;
   BankID: any;
   settings: any;
   CashID: any;
 
- get popupTitle(): string {
-  switch (this.mode) {
-    case 'new':
-      return 'New Miscellaneous Payment';
-
-    case 'edit':
-      return 'Edit Miscellaneous Payment';
-
-    case 'verify':
-      return 'Verify Miscellaneous Payment';
-
-    case 'approve':
-      return 'Approve Miscellaneous Payment';
-
-    case 'view':
-      return 'View Miscellaneous Payment';
-
-    default:
-      return 'Miscellaneous Payment';
-  }
-} 
-
-get actionButtonText(): string {
-  if (this.isSaving) {
+  get popupTitle(): string {
     switch (this.mode) {
       case 'new':
-        return 'Saving...';
+        return 'New Miscellaneous Payment';
 
       case 'edit':
-        return 'Updating...';
+        return 'Edit Miscellaneous Payment';
 
       case 'verify':
-        return 'Verifying...';
+        return 'Verify Miscellaneous Payment';
 
       case 'approve':
-        return 'Approving...';
+        return 'Approve Miscellaneous Payment';
+
+      case 'view':
+        return 'View Miscellaneous Payment';
 
       default:
-        return 'Processing...';
+        return 'Miscellaneous Payment';
     }
   }
 
-  switch (this.mode) {
-    case 'new':
-      return 'Save';
+  get actionButtonText(): string {
+    if (this.isSaving) {
+      switch (this.mode) {
+        case 'new':
+          return 'Saving...';
 
-    case 'edit':
-      return 'Update';
+        case 'edit':
+          return 'Updating...';
 
-    case 'verify':
-      return 'Verify';
+        case 'verify':
+          return 'Verifying...';
 
-    case 'approve':
-      return 'Approve';
+        case 'approve':
+          return 'Approving...';
 
-    default:
-      return '';
+        default:
+          return 'Processing...';
+      }
+    }
+
+    switch (this.mode) {
+      case 'new':
+        return 'Save';
+
+      case 'edit':
+        return 'Update';
+
+      case 'verify':
+        return 'Verify';
+
+      case 'approve':
+        return 'Approve';
+
+      default:
+        return '';
+    }
   }
-}
 
-onActionClick() {
-  switch (this.mode) {
-    case 'new':
-      this.onSave();
-      break;
+  onActionClick() {
+    switch (this.mode) {
+      case 'new':
+        this.onSave();
+        break;
 
-    case 'edit':
-      this.onUpdateMiscReceipt();
-      break;
+      case 'edit':
+        this.onUpdateMiscReceipt();
+        break;
 
-    case 'verify':
-      this.onUpdateMiscReceipt();
-      break;
+      case 'verify':
+        this.onUpdateMiscReceipt();
+        break;
 
-    case 'approve':
-      this.onUpdateMiscReceipt();
-      break;
+      case 'approve':
+        this.onUpdateMiscReceipt();
+        break;
+    }
   }
-}
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
@@ -302,18 +302,18 @@ onActionClick() {
     }, 500); // allow grid/toolbar to fully render
   }
 
-      AC_Default(){
-   const payload = {
-    CompanyID : this.selected_Company_id
-   }
-    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-      this.settings = res.Data
-      this.CashID = this.settings.GP_CASH_ID;  
-      console.log(this.CashID) 
+  AC_Default() {
+    const payload = {
+      CompanyID: this.selected_Company_id,
+    };
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res: any) => {
+      console.log(res);
+      this.settings = res.Data;
+      this.CashID = this.settings.GP_CASH_ID;
+      console.log(this.CashID);
       this.BankID = this.settings.GP_BANK_ID;
-      console.log(this.BankID)
-    })
+      console.log(this.BankID);
+    });
   }
 
   getPendingNo() {
@@ -365,18 +365,17 @@ onActionClick() {
     this.miscFormData.COMPANY_ID = data.COMPANY_ID || '';
     this.miscFormData.FIN_ID = data.FIN_ID || '';
     this.miscFormData.VAT_REGN = data.VAT_REGN || '';
-    
 
     this.miscFormData.DEPT_ID = data.DEPT_ID ? Number(data.DEPT_ID) : null;
     // Populate pendingInvoicelist from DetailList
     if (Array.isArray(data.DetailList) && data.DetailList.length > 0) {
       this.pendingInvoicelist = data.DetailList.map((item: any) => ({
         ledgerCode: item.LEDGER_CODE || '',
-      ledgerName: item.LEDGER_NAME || '',
+        ledgerName: item.LEDGER_NAME || '',
         DESCRIPTION: item.REMARKS ?? '',
         AMOUNT: item.AMOUNT ?? null,
-        STORE_ID : item.STORE_ID ?? null,
-        DEPT_ID : item.DEPT_ID ?? null,
+        STORE_ID: item.STORE_ID ?? null,
+        DEPT_ID: item.DEPT_ID ?? null,
         TAX: item.VAT_PERCENT ?? null,
         TAX_AMOUNT: item.VAT_AMOUNT ?? null,
         HSN_CODE: this.HSNCODE,
@@ -388,8 +387,8 @@ onActionClick() {
           ledgerCode: '',
           ledgerName: '',
           DESCRIPTION: '',
-          DEPT_ID :'',
-          STORE_ID : '',
+          DEPT_ID: '',
+          STORE_ID: '',
           AMOUNT: null,
           TAX: null,
           TAX_AMOUNT: null,
@@ -423,7 +422,9 @@ onActionClick() {
       e.dataField === 'DESCRIPTION' ||
       e.dataField === 'AMOUNT' ||
       e.dataField === 'TAX' ||
-      e.dataField === 'TAX_AMOUNT'
+      e.dataField === 'TAX_AMOUNT' ||
+      e.dataField === 'STORE_ID' ||
+      e.dataField === 'DEPT_ID'
     ) {
       e.editorOptions = e.editorOptions || {};
 
@@ -578,13 +579,91 @@ onActionClick() {
     if (e.dataField === 'DESCRIPTION') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
           const grid = e.component;
           const rowIndex = e.row.rowIndex;
-          // Move focus to the "ledgerCode" column in the same row
+
+          // Commit DESCRIPTION value
+          const editorElement = event.event.target as HTMLElement;
+          editorElement.blur();
+
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'Amount'));
-          });
+            grid.saveEditData();
+
+            // Move to Store
+            grid.editCell(rowIndex, 'STORE_ID');
+          }, 50);
         }
+      };
+    }
+
+    if (e.dataField === 'STORE_ID') {
+      let dropdownOpened = false;
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
+          const grid = e.component;
+
+          // First Enter → open dropdown
+          if (!dropdownOpened) {
+            dropdownOpened = true;
+
+            setTimeout(() => {
+              event.component.open();
+            }, 50);
+
+            return;
+          }
+
+          // Second Enter (after selection) → move next field
+          setTimeout(() => {
+            dropdownOpened = false;
+
+            grid.editCell(e.row.rowIndex, 'DEPT_ID');
+          }, 50);
+        }
+      };
+
+      // Reset after selecting value
+      e.editorOptions.onValueChanged = (args: any) => {
+        e.setValue(args.value);
+      };
+    }
+
+    if (e.dataField === 'DEPT_ID') {
+      let deptDropdownOpened = false;
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          event.event.preventDefault();
+
+          const grid = e.component;
+
+          // First Enter → open Department dropdown
+          if (!deptDropdownOpened) {
+            deptDropdownOpened = true;
+
+            setTimeout(() => {
+              event.component.open();
+            }, 50);
+
+            return;
+          }
+
+          // Second Enter → move to next field
+          setTimeout(() => {
+            deptDropdownOpened = false;
+
+            grid.editCell(e.row.rowIndex, 'AMOUNT');
+          }, 50);
+        }
+      };
+
+      e.editorOptions.onValueChanged = (args: any) => {
+        e.setValue(args.value);
       };
     }
     if (e.dataField === 'AMOUNT') {
@@ -701,42 +780,45 @@ onActionClick() {
     setTimeout(() => {
       const grid = e.component;
 
-      // Ensure pendingInvoicelist exists
-      if (!this.pendingInvoicelist || this.pendingInvoicelist.length === 0) {
-        // Create a new blank row
+      // Check actual grid rows after deletion
+      if (grid.getVisibleRows().length === 0) {
         const newRow = {
           ledgerCode: '',
           ledgerName: '',
           DESCRIPTION: '',
+          STORE_ID: null,
+          DEPT_ID: null,
           AMOUNT: '',
           TAX: '',
           TAX_AMOUNT: '',
         };
 
-        // Reset the data source with one new row
         this.pendingInvoicelist = [newRow];
+
         grid.option('dataSource', [...this.pendingInvoicelist]);
 
-        // Focus the first cell of the new row
         setTimeout(() => {
-          grid.focus(
-            grid.getCellElement(0, grid.columnOption('HEAD_ID', 'index')),
-          );
-          grid.editCell(0, 'HEAD_ID'); // Or whichever field should be focused first
+          grid.editCell(0, 'ledgerCode');
         }, 50);
       }
-    }, 50); // small delay ensures deletion completes
+    }, 50);
   }
 
   // TS: Add this method in your component
   onGridClick(e: any) {
-    // Check if there is already a blank row
+    // Ignore delete button click
+    if (
+      e.event?.target?.closest('.dx-link-delete') ||
+      e.event?.target?.closest('.dx-command-edit')
+    ) {
+      return;
+    }
+
     const hasEmptyRow = this.pendingInvoicelist.some(
       (row: any) =>
-        !row.HEAD_ID &&
+        !row.ledgerCode &&
         !row.DESCRIPTION &&
-        (!row.AMOUNT || row.AMOUNT === 0) &&
-        (!row.TAX || row.TAX === 0),
+        (!row.AMOUNT || row.AMOUNT === 0),
     );
 
     if (!hasEmptyRow) {
@@ -744,26 +826,22 @@ onActionClick() {
         ledgerCode: '',
         ledgerName: '',
         DESCRIPTION: '',
+        STORE_ID: null,
+        DEPT_ID: null,
         AMOUNT: '',
         TAX: '',
         TAX_AMOUNT: '',
       };
 
-      this.pendingInvoicelist.push(newRow);
+      this.pendingInvoicelist = [...this.pendingInvoicelist, newRow];
 
       const grid = this.itemsGridRef?.instance;
-      if (grid) {
-        grid.option('dataSource', [...this.pendingInvoicelist]);
 
-        // Optional: focus first cell of new row
-        setTimeout(() => {
-          const rowIndex = this.pendingInvoicelist.length - 1;
-          grid.editCell(rowIndex, 'HEAD_ID');
-        }, 50);
-      }
+      setTimeout(() => {
+        grid?.editCell(this.pendingInvoicelist.length - 1, 'ledgerCode');
+      }, 50);
     }
   }
-
   getLedgerCodeDropdown() {
     this.dataService.getActiveLedger().subscribe({
       next: (response: any) => {
@@ -802,7 +880,8 @@ onActionClick() {
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== this.CashID && item.GROUP_ID !== this.BankID,
+        (item: any) =>
+          item.GROUP_ID !== this.CashID && item.GROUP_ID !== this.BankID,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
@@ -936,7 +1015,7 @@ onActionClick() {
           VAT_REGN: this.miscFormData.VAT_REGN || 0,
           VAT_PERCENT: tax,
           DEPT_ID: item.DEPT_ID,
-          STORE_ID: item.STORE_ID, 
+          STORE_ID: item.STORE_ID,
         };
       }),
     };
@@ -1032,8 +1111,8 @@ onActionClick() {
           SL_NO: index + 1,
           HEAD_ID: matchedLedger?.HEAD_ID || '', // Use actual HEAD_ID
           REMARKS: item.DESCRIPTION || '',
-          STORE_ID :item.STORE_ID,
-          DEPT_ID:item.DEPT_ID,
+          STORE_ID: item.STORE_ID,
+          DEPT_ID: item.DEPT_ID,
           AMOUNT: amount,
           VAT_AMOUNT: taxAmount,
           VAT_REGN: this.miscFormData.VAT_REGN || 0,
@@ -1047,149 +1126,99 @@ onActionClick() {
 
     let apiCall;
 
-if (
-  this.status === 'Open' &&
-  this.verifyMiscPopupOpened === true
-) {
+    if (this.status === 'Open' && this.verifyMiscPopupOpened === true) {
+      apiCall = this.dataService.verifyMiscPayment(payload);
+    } else if (this.status === 'Verify') {
+      apiCall = this.dataService.approveMiscPayment(payload);
+    } else {
+      apiCall = this.dataService.updateMiscPayment(payload);
+    }
 
-  apiCall = this.dataService.verifyMiscPayment(payload);
+    let confirmMessage = '';
+    let successMessage = '';
 
-} else if (
-  this.status === 'Verify'
-) {
+    if (this.status === 'Open' && this.verifyMiscPopupOpened === true) {
+      confirmMessage =
+        'Are you sure you want to verify this Miscellaneous Payment?';
 
-  apiCall = this.dataService.approveMiscPayment(payload);
+      successMessage = 'Miscellaneous Payment Verified Successfully';
+    } else if (this.status === 'Verify') {
+      confirmMessage =
+        'Are you sure you want to approve this Miscellaneous Payment?';
 
-} else {
+      successMessage = 'Miscellaneous Payment Approved Successfully';
+    } else {
+      successMessage = 'Miscellaneous Payment Updated Successfully';
+    }
 
-  apiCall = this.dataService.updateMiscPayment(payload);
+    const executeApi = () => {
+      this.isSaving = true;
 
-}
+      apiCall.subscribe({
+        next: (response: any) => {
+          this.isSaving = false;
 
-let confirmMessage = '';
-let successMessage = '';
+          if (response?.flag == 1) {
+            notify(
+              {
+                message: successMessage,
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              },
+              'success',
+            );
 
-if (
-  this.status === 'Open' &&
-  this.verifyMiscPopupOpened === true
-) {
-
-  confirmMessage =
-    'Are you sure you want to verify this Miscellaneous Payment?';
-
-  successMessage =
-    'Miscellaneous Payment Verified Successfully';
-
-} else if (
-  this.status === 'Verify'
-) {
-
-  confirmMessage =
-    'Are you sure you want to approve this Miscellaneous Payment?';
-
-  successMessage =
-    'Miscellaneous Payment Approved Successfully';
-
-} else {
-
-  successMessage =
-    'Miscellaneous Payment Updated Successfully';
-
-}
-
-const executeApi = () => {
-
-  this.isSaving = true;
-
-  apiCall.subscribe({
-    next: (response: any) => {
-
-      this.isSaving = false;
-
-      if (response?.flag == 1) {
-
-        notify(
-          {
-            message: successMessage,
-            position: {
-              at: 'top center',
-              my: 'top center',
-            },
-          },
-          'success',
-        );
-
-        this.popupClosed.emit();
-
-      } else {
-
-        notify(
-          {
-            message:
-              response?.Message || 'Operation failed.',
-            position: {
-              at: 'top center',
-              my: 'top center',
-            },
-          },
-          'error',
-        );
-      }
-    },
-
-    error: (err) => {
-
-      this.isSaving = false;
-
-      console.error('API Error:', err);
-
-      notify(
-        {
-          message:
-            'Something went wrong.',
-          position: {
-            at: 'top center',
-            my: 'top center',
-          },
+            this.popupClosed.emit();
+          } else {
+            notify(
+              {
+                message: response?.Message || 'Operation failed.',
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              },
+              'error',
+            );
+          }
         },
-        'error',
-      );
-    },
-  });
-};
 
-if (
-  this.status === 'Open' &&
-  this.verifyMiscPopupOpened === true
-) {
+        error: (err) => {
+          this.isSaving = false;
 
-  confirm(confirmMessage, 'Confirm Verify')
-    .then((dialogResult) => {
+          console.error('API Error:', err);
 
-      if (dialogResult) {
-        executeApi();
-      }
+          notify(
+            {
+              message: 'Something went wrong.',
+              position: {
+                at: 'top center',
+                my: 'top center',
+              },
+            },
+            'error',
+          );
+        },
+      });
+    };
 
-    });
-
-} else if (
-  this.status === 'Verify'
-) {
-
-  confirm(confirmMessage, 'Confirm Approval')
-    .then((dialogResult) => {
-
-      if (dialogResult) {
-        executeApi();
-      }
-
-    });
-
-} else {
-
-  executeApi();
-
-}
+    if (this.status === 'Open' && this.verifyMiscPopupOpened === true) {
+      confirm(confirmMessage, 'Confirm Verify').then((dialogResult) => {
+        if (dialogResult) {
+          executeApi();
+        }
+      });
+    } else if (this.status === 'Verify') {
+      confirm(confirmMessage, 'Confirm Approval').then((dialogResult) => {
+        if (dialogResult) {
+          executeApi();
+        }
+      });
+    } else {
+      executeApi();
+    }
     // if (this.isApproved) {
     //   confirm(
     //     'Are you sure you want to approve this Miscellaneous Payment?',
@@ -1286,11 +1315,11 @@ if (
     });
   }
 
-      store_dropdown(){
+  store_dropdown() {
     const payload = {
-      NAME :'STORE',
-      COMPANY_ID : this.selected_Company_id
-    }
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });

@@ -308,13 +308,13 @@
                 [(value)]="newCustomer.FAX_NO"
                 labelMode="floating"
               >
-                <dx-validator>
+                <!-- <dx-validator>
                   <dxi-validation-rule
                     type="required"
                     message="FAX number is required"
                   >
                   </dxi-validation-rule>
-                </dx-validator>
+                </dx-validator> -->
               </dx-text-box>
             </div>
           </dxi-item>
@@ -325,13 +325,14 @@
                 [(value)]="newCustomer.EMAIL"
                 labelMode="floating"
               >
-                <!-- <dx-validator>
+                <dx-validator>
                   <dxi-validation-rule
-                    type="required"
-                    message="Email is required"
+                    type="custom"
+                    [validationCallback]="validateEmail"
+                    message="Enter a valid email address"
                   >
                   </dxi-validation-rule>
-                </dx-validator> -->
+                </dx-validator>
               </dx-text-box>
             </div>
           </dxi-item>
@@ -458,10 +459,13 @@
         <dxi-item itemType="group" [colCount]="2">
           <dxi-item>
             <div *dxTemplate>
-              <dx-text-box
-                label="Credit Limit *"
+              <dx-number-box
+                label="Credit Limit"
                 labelMode="floating"
                 [(value)]="newCustomer.CREDIT_LIMIT"
+                [min]="0"
+                [showSpinButtons]="true"
+                format="#0.00"
               >
                 <!-- <dx-validator>
                   <dxi-validation-rule
@@ -470,24 +474,19 @@
                   >
                   </dxi-validation-rule>
                 </dx-validator> -->
-              </dx-text-box>
+              </dx-number-box>
             </div>
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
-              <dx-text-box
-                label="Current Credit *"
+              <dx-number-box
+                label="Current Credit"
                 [(value)]="newCustomer.CURRENT_CREDIT"
                 labelMode="floating"
+                [readOnly]="true"
+                format="#0.00"
               >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Current credit is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator>
-              </dx-text-box>
+              </dx-number-box>
             </div>
           </dxi-item>
         </dxi-item>
@@ -496,7 +495,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
-                label="Payment Terms *"
+                label="Payment Terms"
                 [items]="PaymentTermsDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
@@ -529,7 +528,7 @@
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
-                label="Default Price Level *"
+                label="Default Price Level"
                 [items]="PriceLevelDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
@@ -549,10 +548,15 @@
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
-              <dx-text-box
-                label="Discount % *"
+              <dx-number-box
+                label="Discount %"
                 labelMode="floating"
                 [(value)]="newCustomer.DISCOUNT_PERCENT"
+                [min]="0"
+                [max]="100"
+                [step]="0.01"
+                format="#0.00"
+                [showSpinButtons]="true"
               >
                 <!-- <dx-validator>
                   <dxi-validation-rule
@@ -561,7 +565,7 @@
                   >
                   </dxi-validation-rule>
                 </dx-validator> -->
-              </dx-text-box>
+              </dx-number-box>
             </div>
           </dxi-item>
         </dxi-item>
@@ -597,8 +601,8 @@
                 [label]="
                   selected_vat_id == sessionData.VAT_ID &&
                   sessionData.VAT_ID == 2
-                    ? '  VAT Registration Number *'
-                    : ' GST Registration Number *'
+                    ? '  VAT Registration Number'
+                    : ' GST Registration Number'
                 "
                 [(value)]="newCustomer.VAT_REGNO"
                 labelMode="floating"
