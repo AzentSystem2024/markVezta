@@ -1354,7 +1354,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SupplierPayment/commit`, data);
   }
 
-
   deleteSupplierPayment(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}SupplierPayment/delete/` + id,
@@ -7050,7 +7049,7 @@ The result can be exported to HTML or Markdown.`;
   makeColumnVisible(dataGrid: DxDataGridComponent, columnName: string) {
     const columns = dataGrid.instance.getVisibleColumns();
     const columnIndex = columns.findIndex(
-      (column: any) => column.caption === columnName
+      (column: any) => column.caption === columnName,
     );
     if (columnIndex !== -1) {
       const columnWidth = 150;
@@ -7063,7 +7062,7 @@ The result can be exported to HTML or Markdown.`;
       dataGrid.instance.columnOption(
         columnName,
         'cssClass',
-        'highlighted-column'
+        'highlighted-column',
       );
       setTimeout(() => {
         dataGrid.instance.columnOption(columnName, 'cssClass', null);
@@ -7074,9 +7073,8 @@ The result can be exported to HTML or Markdown.`;
   //-----------------dashbooaed data===================================
 
   Dashboard_Data_api(item: any) {
-    const payload = item
-    return this.http.post(`${this.apiUrl}Dashboard/dashboard`, payload)
-
+    const payload = item;
+    return this.http.post(`${this.apiUrl}Dashboard/dashboard`, payload);
   }
 
   LedgerStatement_Dimension(payload: any) {
@@ -7090,14 +7088,22 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // ===============VAT RETURN DRILLDOWN API=============================
-  Output_Vat_Summary(payload: any){
+  Output_Vat_Summary(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/GetStoresByVatReturnKey';
     return this.http.post(getEndpoint, payload);
   }
 
-   Storewise_Vat_Summary(payload: any){
+  Storewise_Vat_Summary(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/GetTransactionsByStore';
     return this.http.post(getEndpoint, payload);
   }
-  
+
+  //-------------------------------BARCODE PRINTER---------------------------------------------------//
+  getItemsforBarcode(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Items/Itemslist`, {});
+  }
+
+  getGRNforBarcode(): Observable<any> {
+    return this.http.post(`${this.apiUrl}GRN/GetAllGRNs`, {});
+  }
 }
