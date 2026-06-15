@@ -197,6 +197,7 @@ export class SupplierFinFormComponent {
     this.newSupplier.NOTES = '';
     this.newSupplier.PHONE = '';
     this.newSupplier.SUPP_CAT_ID = 0;
+    this.newSupplier.FAX_NO = '';
     // Clear Supplier_cost
     this.formSupplierData.Supplier_cost = [];
 
@@ -457,4 +458,4 @@ export class SupplierFinFormComponent {
   exports: [SupplierFinFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierFinFormModule {}
+export class SupplierFinFormModule { }

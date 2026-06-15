@@ -53,6 +53,7 @@
             Account Summary
           </div>
         </dxi-item>
+        <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
 
         <dxi-item>
           <dx-date-box
@@ -80,6 +81,25 @@
 
         <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
+      <div
+        *dxTemplate="let data of 'StoreFilterTemplate'"
+        style="margin-bottom: 5px"
+      >
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Stores_List"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [width]="200"
+          (onValueChanged)="onStoreChanged($event)"
+        ></dx-tag-box>
+      </div>
 
       <dxo-grouping
         [autoExpandAll]="false"
@@ -111,19 +131,19 @@
       <dxi-column
         dataField="LedgerCode"
         caption="Ledger Code"
-        width="200"
+        width="100"
       ></dxi-column>
       <dxi-column
         dataField="LedgerName"
         caption="Ledger Name"
-        width="200"
+        width="300"
       ></dxi-column>
       <dxi-column
         dataField="HeadID"
         caption="Head ID"
         [visible]="false"
       ></dxi-column>
-      <dxi-column caption="Debit">
+      <dxi-column caption="Debit" alignment="center">
         <dxi-column
           *ngFor="let store of storesDebit"
           [dataField]="'Debit_' + store"
@@ -137,7 +157,7 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Credit">
+      <dxi-column caption="Credit" alignment="center">
         <dxi-column
           *ngFor="let store of storesCredit"
           [dataField]="'Credit_' + store"
@@ -154,7 +174,7 @@
       <dxi-column
         *ngIf="TrialBalanceReport.length > 0"
         type="buttons"
-        [width]="100"
+        [width]="50"
       >
         <dxi-button
           hint="View"
@@ -177,6 +197,7 @@
           [summaryType]="item.summaryType"
           [showInColumn]="item.showInColumn"
           [valueFormat]="item.valueFormat"
+          displayFormat="{0}"
         >
         </dxi-total-item>
       </dxo-summary>
