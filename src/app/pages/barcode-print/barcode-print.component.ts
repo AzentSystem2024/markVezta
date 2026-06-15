@@ -128,6 +128,7 @@ export class BarcodePrintComponent {
 
   getGRNDropdown() {
     this.dataService.getGRNforBarcode().subscribe((response: any) => {
+      this.grnList = response;
       console.log(response, 'GRN');
     });
   }

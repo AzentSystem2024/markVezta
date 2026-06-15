@@ -7106,4 +7106,7 @@ The result can be exported to HTML or Markdown.`;
   getGRNforBarcode(): Observable<any> {
     return this.http.post(`${this.apiUrl}GRN/GetAllGRNs`, {});
   }
+  getItemsOfGRN(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Invoice/list`, payload);
+  }
 }
