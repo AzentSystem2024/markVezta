@@ -240,6 +240,7 @@
   (onHiding)="handleClose()"
 >
   <app-view-credit-note
+    *ngIf="editMiscPopupOpened"
     [creditFormData]="selectedCreditNote"
     (popupClosed)="handleClose()"
   ></app-view-credit-note>
@@ -272,6 +273,7 @@
   (onHiding)="handleClose()"
 >
   <app-view-customer-receipt
+    *ngIf="isViewReceipt"
     [receiprtFormData]="selectedReceipt"
     (popupClosed)="handleClose()"
   ></app-view-customer-receipt>
@@ -305,6 +307,7 @@
   (onHiding)="handleClose()"
 >
   <app-depreciation-edit
+    *ngIf="EditDepreciationPopupVisible"
     [SelectDepreciationData]="Selected_Depreciation_data"
     (popupClosed)="handleClose()"
   ></app-depreciation-edit>
@@ -320,6 +323,7 @@
   (onHiding)="handleClose()"
 >
   <app-pre-payment-edit
+    *ngIf="editPrePaymentPopupOpened"
     [selectedPrePayment]="selectedPrePayment"
     [isOpen]="editPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"
@@ -338,6 +342,7 @@
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-edit-supplier-payment
+    *ngIf="isEditReceipt"
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"
@@ -379,5 +384,3 @@
     (popupClosed)="handleClose()"
   ></app-add-misc-receipt>
 </dx-popup>
-
-app-advance
