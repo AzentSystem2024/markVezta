@@ -115,17 +115,18 @@ export class BarcodePrintComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     const userDataString = localStorage.getItem('userData');
+    if (!userDataString) {
+      return;
+    }
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
     const configStore = userData.Configuration?.[0];
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
       .find((menu: any) => menu.Path === 'barcode');
-    console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -135,7 +136,6 @@ export class BarcodePrintComponent {
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
     }
-    console.log(this.canEdit, 'CANEDIT');
     this.getItems();
     this.getGRNDropdown();
   }
