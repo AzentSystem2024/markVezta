@@ -142,7 +142,7 @@
     <dx-data-grid
       #dataGrid
       class="grid theme-dependent"
-      [dataSource]="JournalBookDataSource"
+      [dataSource]="SaleSummaryDataSource"
       height="79vh"
       [showBorders]="true"
       [showRowLines]="true"
@@ -163,6 +163,10 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
+     <dxo-group-panel [visible]="true"></dxo-group-panel>
+     <dxo-grouping
+    [autoExpandAll]="false">
+  </dxo-grouping>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -189,6 +193,7 @@
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
+       <dxi-column dataField="Store" caption="Store" [groupIndex]="0"></dxi-column>
       <dxi-column
         dataField="Date"
         caption="Date"
@@ -199,9 +204,9 @@
 
       <dxi-column dataField="Invoice No" caption="Invoice No"></dxi-column>
       <dxi-column dataField="Customer" caption="Customer"></dxi-column>
-      <dxi-column dataField="Store" caption="Store"></dxi-column>
       <dxi-column dataField="Invoice Type" caption="Invoice Type"></dxi-column>
       <dxi-column dataField="Discount" caption="Discount"></dxi-column>
+      <dxi-column dataField="Exempted" caption="Exempted"></dxi-column>
       <dxi-column
         caption="Ex. VAT Total"
         name="ExVATtotal"

@@ -142,8 +142,12 @@
       dataField="STORE_NAME"
       caption="Store Name"
       dataType="string"
-
+      [groupIndex]="0"
+     groupCellTemplate="groupTemplate"
     ></dxi-column>
+    <div *dxTemplate="let data of 'groupTemplate'">
+  Store Name: {{ data.value }}
+</div>
 
     <dxi-column
       dataField="DOC_NO"
