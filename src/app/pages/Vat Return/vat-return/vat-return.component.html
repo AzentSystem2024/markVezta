@@ -24,7 +24,11 @@
       texts: { fix: 'Freeze', unfix: 'Unfreeze' },
     }"
     (onExporting)="onExporting($event)"
-    [loadPanel]="{ enabled: false, text: 'Loading...' }"
+    [loadPanel]="{
+  enabled: true,
+  text: 'Loading...'
+}"
+[loading]="isLoading"
     (onCellClick)="onCellClick($event)"
      (onRowPrepared)="onRowPrepared($event)"
   >
@@ -421,3 +425,11 @@
     ></app-edit-purchase-invoice>
   </ng-container>
 </dx-popup>
+
+<dx-load-panel
+  [visible]="isLoading"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  message="Loading...">
+</dx-load-panel>

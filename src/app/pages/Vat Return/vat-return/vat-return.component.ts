@@ -86,6 +86,7 @@ statusFinder: any;
  canApprove:boolean = false;
  isEditInvoice:boolean = false;
  vatReturnDataSource:any[]=[];
+ isLoading = false;
 
   constructor(
     private dataservice: DataService,
@@ -142,30 +143,6 @@ onCellClick(e: any) {
   if (e.data?.IS_TOTAL_ROW) {
     return;
   }
-
-  // TYPE = 2 → Direct drilldown
-  // if (e.data.TYPE === 2) {
-
-  //   const transId = e.data.TRANS_ID;
-
-  //   this.dataservice.selectPurchaseInvoice(transId)
-  //     .subscribe((res: any) => {
-
-  //       this.selectedInvoice = res.Data;
-
-  //       if (this.selectedInvoice.STATUS === 'Approved') {
-  //         this.buttonText = 'View Purchase Invoice';
-  //       } else if (this.selectedInvoice.STATUS === 'Open') {
-  //         this.buttonText = 'Verify Purchase Invoice';
-  //       } else if (this.selectedInvoice.STATUS === 'Verified') {
-  //         this.buttonText = 'Approve Purchase Invoice';
-  //       }
-
-  //       this.isVerifyInvoice = true;
-  //     });
-
-  //   return;
-  // }
 
   // TYPE = 1 → Existing popup logic
    if (e.data.TYPE === 1) {
@@ -281,6 +258,7 @@ onRowPrepared(e: any) {
 }
 
   Vat_Return_Data() {
+     this.isLoading = true;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
@@ -288,6 +266,7 @@ onRowPrepared(e: any) {
     };
 
     this.dataservice.VAT_Return_Report_Api(payload).subscribe((res: any) => {
+       this.isLoading = false;
       this.vatReturnDataSource = res
       this.VATreturn = res.Details;
       this.VATreturn = res.Details.map((item: any) => ({

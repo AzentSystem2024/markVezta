@@ -62,7 +62,7 @@ import { AddSalesInvoiceRetailModule } from '../../OPERATIONS/add-sales-invoice-
 export class SalesSummaryComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
-  JournalBookDataSource: DataSource; // ONLY for dx-data-grid
+  SaleSummaryDataSource: DataSource; // ONLY for dx-data-grid
   journalBookArray: any[] = []; // ONLY for logic / checks
   journalBookCount = 0;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -420,7 +420,7 @@ export class SalesSummaryComponent {
       INCLUDE_SUMMARY: 0,
     };
 
-    this.JournalBookDataSource = new DataSource({
+    this.SaleSummaryDataSource = new DataSource({
       load: () =>
         new Promise((resolve) => {
           this.dataService.SalesSummaryReport(payload).subscribe({
@@ -477,11 +477,28 @@ export class SalesSummaryComponent {
   };
 
   summaryColumnsData = {
+    
     totalItems: [
+      {
+        column: 'Discount',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'Discount',
+        alignment: 'right',
+      },
+      {
+        column: 'Exempted',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'Exempted',
+        alignment: 'right',
+      },
       {
         column: 'ExVATtotal',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'ExVATtotal',
         alignment: 'right',
@@ -489,7 +506,7 @@ export class SalesSummaryComponent {
       {
         column: 'VAT Amount',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'VAT Amount',
         alignment: 'right',
@@ -497,7 +514,7 @@ export class SalesSummaryComponent {
       {
         column: 'netAmount',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'netAmount',
         alignment: 'right',
@@ -505,7 +522,7 @@ export class SalesSummaryComponent {
       {
         column: 'CASH',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'CASH',
         alignment: 'right',
@@ -513,7 +530,7 @@ export class SalesSummaryComponent {
       {
         column: 'BANK CARD',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'BANK CARD',
         alignment: 'right',
@@ -521,7 +538,7 @@ export class SalesSummaryComponent {
       {
         column: 'FAB POS CARD',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'FAB POS CARD',
         alignment: 'right',
@@ -529,13 +546,27 @@ export class SalesSummaryComponent {
       {
         column: 'ROOM CHARGE',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'ROOM CHARGE',
         alignment: 'right',
       },
     ],
     groupItems: [
+      {
+        column: 'Discount',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'Exempted',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
       {
         column: 'ExVATtotal',
         summaryType: 'sum',
@@ -675,7 +706,7 @@ export class SalesSummaryComponent {
   }
 
   onExporting(event: any) {
-    const fileName = 'Journal_Book';
+    const fileName = 'Sales Summary';
     this.dataService.exportDataGridReport(event, fileName);
   }
 }
