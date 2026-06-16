@@ -31,11 +31,13 @@
         [rowAlternationEnabled]="true"
         [allowColumnReordering]="true"
         [showColumnHeaders]="true"
-        [columnAutoWidth]="true"
         [allowColumnResizing]="true"
         [columnResizingMode]="'nextColumn'"
         [filterRow]="{ visible: false }"
-        [headerFilter]="{ visible: false }"
+        [headerFilter]="{
+          visible: true,
+          allowSearch: true,
+        }"
         [scrolling]="{ mode: 'virtual' }"
         rowAlternationInterval="2"
         [selection]="{
@@ -43,7 +45,6 @@
           showCheckBoxesMode: 'always',
         }"
         focusStateEnabled="false"
-        [scrolling]="{ mode: 'virtual' }"
         (onSelectionChanged)="onSelectionChanged($event)"
         (onEditorPreparing)="onEditorPreparing($event)"
         (onEditingStart)="onEditingStart($event)"
@@ -74,12 +75,15 @@
           [visible]="isFilterRowVisible"
           [applyFilter]="auto"
         ></dxo-filter-row>
-        <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-header-filter [visible]="true">
           <dxo-search [enabled]="true"></dxo-search>
         </dxo-header-filter>
-        <dxo-header-filter [visible]="isFilterOpened">
+        <!-- <dxo-header-filter [visible]="isFilterOpened">
           <dxo-search [enabled]="true"></dxo-search>
-        </dxo-header-filter>
+        </dxo-header-filter> -->
+        <!-- <dxo-header-filter [visible]="isFilterOpened">
+          <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter> -->
         <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
         <dxo-filter-builder [allowHierarchicalFields]="true">
         </dxo-filter-builder>
@@ -101,7 +105,19 @@
             >
             </dx-radio-group>
           </dxi-item>
+          <!-- <dxi-item
+            location="after"
+            locateInMenu="auto"
+            widget="dxButton"
+            [options]="searchButtonOptions"
+          ></dxi-item> -->
 
+          <dxi-item
+            location="after"
+            locateInMenu="auto"
+            widget="dxButton"
+            [options]="refreshButtonOptions"
+          ></dxi-item>
           <!-- GRN Dropdown -->
           <dxi-item location="after">
             <dx-drop-down-box

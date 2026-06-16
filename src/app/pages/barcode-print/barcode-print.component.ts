@@ -86,6 +86,21 @@ export class BarcodePrintComponent {
   barcodeHtml = '';
   selectedGRNKeys: any[] = [];
   grnDropdownOpened = false;
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
 
   constructor(
     private dataService: DataService,
@@ -125,16 +140,45 @@ export class BarcodePrintComponent {
     this.getGRNDropdown();
   }
 
-  getItems() {
-    const grid = this.dataGrid?.instance;
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
 
-    grid?.beginCustomLoading('Loading...');
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.dataGrid?.instance?.updateDimensions();
+    });
+  }
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+    }
+
+    if (this.selectedType === 'Items') {
+      this.getItems();
+    } else {
+      if (this.selectedGRN) {
+        this.onGRNChanged({
+          value: this.selectedGRN,
+        });
+      }
+    }
+  }
+
+  getItems() {
+    this.itemsList = [];
+
+    setTimeout(() => {
+      this.dataGrid?.instance?.beginCustomLoading('Loading...');
+    });
 
     this.dataService.getItemsforBarcode().subscribe({
       next: (response: any) => {
         this.itemsList = response;
 
-        console.log(response, 'ITEMSLISTTTTTTTTTTTT');
+        // force grid render
+        this.cdr.detectChanges();
       },
 
       error: () => {
@@ -151,7 +195,7 @@ export class BarcodePrintComponent {
       },
 
       complete: () => {
-        grid?.endCustomLoading();
+        this.dataGrid?.instance?.endCustomLoading();
       },
     });
   }
@@ -248,6 +292,19 @@ export class BarcodePrintComponent {
   onEditorPreparing(e: any) {
     if (e.dataField === 'BARCODE_QTY') {
       e.editorOptions = e.editorOptions || {};
+      e.editorName = 'dxNumberBox';
+
+      e.editorOptions.min = 0;
+      e.editorOptions.step = 1;
+      e.editorOptions.showSpinButtons = true;
+
+      e.editorOptions.onKeyPress = (args: any) => {
+        const allowed = /^[0-9]$/;
+
+        if (!allowed.test(args.event.key)) {
+          args.event.preventDefault();
+        }
+      };
 
       // Added only this block
       if (e.parentType === 'dataRow') {
@@ -426,7 +483,7 @@ export class BarcodePrintComponent {
             </div>
 
             <div style="font-weight:bold">
-              Price : ${item.PRICE}
+              Price : AED ${Number(item.PRICE).toFixed(2)}
             </div>
           `;
 
@@ -452,7 +509,7 @@ export class BarcodePrintComponent {
               "
             >
               <span>${item.ITEM_CODE}</span>
-              <span>${item.PRICE}</span>
+              <span>AED ${Number(item.PRICE).toFixed(2)}</span>
             </div>
 
             <div style="font-size:10px">
