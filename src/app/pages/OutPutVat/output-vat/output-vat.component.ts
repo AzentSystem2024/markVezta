@@ -390,11 +390,11 @@ export class OutputVatComponent {
         alignment: 'right',
       },
       {
-        column: 'ZERO',
+        column: 'ZERO_RATE',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'ZERO',
+        showInColumn: 'ZERO_RATE',
         alignment: 'right',
       },
       {
@@ -439,7 +439,7 @@ export class OutputVatComponent {
         alignByColumn: true,
       },
       {
-        column: 'ZERO',
+        column: 'ZERO_RATE',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },

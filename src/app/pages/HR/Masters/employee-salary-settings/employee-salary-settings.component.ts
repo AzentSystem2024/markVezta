@@ -74,28 +74,7 @@ export class EmployeeSalarySettingsComponent {
   canPrint = false;
   selected_Company_id: any;
 
-  addButtonOptions = {
-    type: 'default',
-    stylingMode: 'contained',
-    hint: 'Add new entry',
-    onClick: () => {
-      this.ngZone.run(() => this.addEmployee());
-    },
-    elementAttr: { class: 'add-button' },
-
-    template: () => {
-      return `
-       <div class="add-btn-content">
-         <span class="iconify"
-               data-icon="formkit:add"
-               data-width="20"
-               data-height="20"></span>
-         <span class="add-text">New</span>
-       </div>
-     `;
-    },
-  };
-
+ 
   filterSelectBoxOptions = {
     items: this.filterOptions,
     displayExpr: 'text',
@@ -134,8 +113,16 @@ export class EmployeeSalarySettingsComponent {
     this.dataservice.exportDataGrid(event, fileName);
   }
 
+  constructor(
+    private dataservice: DataService,
+    private ngZone: NgZone,
+    private router: Router,
+  ) { }
+
+
+  
   ngOnInit() {
-    const currentUrl = this.router.url;
+   const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -143,7 +130,7 @@ export class EmployeeSalarySettingsComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/employee-salary-settings');
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -153,16 +140,32 @@ export class EmployeeSalarySettingsComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
-
     this.sesstion_Details();
     this.getEmployeeSalarySettingsList(); // call API on load with default filter
   }
 
-  constructor(
-    private dataservice: DataService,
-    private ngZone: NgZone,
-    private router: Router,
-  ) { }
+   addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.addEmployee());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+       <div class="add-btn-content">
+         <span class="iconify"
+               data-icon="formkit:add"
+               data-width="20"
+               data-height="20"></span>
+         <span class="add-text">New</span>
+       </div>
+     `;
+    },
+  };
+
 
   formatMonthYear = (date: Date) => {
     if (!date) return '';

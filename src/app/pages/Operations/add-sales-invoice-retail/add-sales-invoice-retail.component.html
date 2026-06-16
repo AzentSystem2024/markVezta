@@ -87,7 +87,7 @@
           [columnResizingMode]="'nextColumn'"
           [filterRow]="{ visible: false }"
           [headerFilter]="{ visible: true }"
-          height="85%"
+          height="100%"
         >
           <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
           <dxi-column
@@ -97,7 +97,7 @@
           <dxi-column dataField="QUANTITY" caption="Qty"></dxi-column>
           <dxi-column
             dataField="PRICE"
-            caption="Price"
+            caption="Price(AED)"
             dataType="number"
             format="#,##0.00"
           ></dxi-column>
@@ -109,7 +109,7 @@
           ></dxi-column>
           <dxi-column
             dataField="AMOUNT_INCL_VAT"
-            caption="Amount(Incl.VAT)"
+            caption="Amount(Incl.VAT)AED"
             dataType="number"
             format="#,##0.00"
           >
@@ -117,11 +117,72 @@
           <dxi-column dataField="TAX_PERC" caption="VAT %"></dxi-column>
           <dxi-column
             dataField="TAX_AMOUNT"
-            caption="VAT Amt"
+            caption="VAT Amt(AED)"
             dataType="number"
             format="#,##0.00"
           >
           </dxi-column>
+
+          <dxi-column
+           dataField="AMOUNT_EXCL_VAT"
+            caption="Amount(Excl.VAT)AED"
+            dataType="number"
+            format="#,##0.00"
+          >
+          </dxi-column>
+
+           <dxo-summary>
+    <dxi-total-item
+      column="QUANTITY"
+      summaryType="sum"
+      displayFormat="{0}">
+    </dxi-total-item>
+
+    <dxi-total-item
+      column="AMOUNT_INCL_VAT"
+      summaryType="sum"
+      valueFormat="#,##0.00"
+      displayFormat="{0}">
+    </dxi-total-item>
+
+    <dxi-total-item
+      column="TAX_PERC"
+      summaryType="sum"
+      valueFormat="#,##0.00"
+      displayFormat="{0}">
+    </dxi-total-item>
+
+    <dxi-total-item
+      column="TAX_AMOUNT"
+      summaryType="sum"
+      valueFormat="#,##0.00"
+      displayFormat="{0}">
+    </dxi-total-item>
+
+     <dxi-total-item
+      column="AMOUNT_EXCL_VAT"
+      summaryType="sum"
+      valueFormat="#,##0.00"
+      displayFormat="{0}">
+    </dxi-total-item>
+  </dxo-summary>
+
+<!-- 
+          <dx-data-grid
+  [dataSource]="invoiceFormData.Details"
+  [showBorders]="true">
+
+  <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
+  <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+  <dxi-column dataField="QUANTITY" caption="Qty"></dxi-column>
+  <dxi-column dataField="PRICE" caption="Price"></dxi-column>
+  <dxi-column dataField="DISC_PERC" caption="Discount"></dxi-column>
+  <dxi-column dataField="AMOUNT_INCL_VAT" caption="Amount(Incl.VAT)"></dxi-column>
+  <dxi-column dataField="TAX_PERC" caption="VAT %"></dxi-column>
+  <dxi-column dataField="TAX_AMOUNT" caption="VAT Amt"></dxi-column>
+
+ 
+</dx-data-grid> -->
         </dx-data-grid>
       </div>
 
@@ -142,7 +203,7 @@
           [columnResizingMode]="'nextColumn'"
           [filterRow]="{ visible: false }"
           [headerFilter]="{ visible: true }"
-          height="85%"
+          height="100%"
         >
           <dxi-column dataField="TYPE" caption="Tender"></dxi-column>
           <dxi-column
@@ -151,45 +212,17 @@
             dataType="number"
             format="#,##0.00"
           ></dxi-column>
+
+          <dxo-summary>
+<dxi-total-item
+             column="AMOUNT"
+      summaryType="sum"
+      valueFormat="#,##0.00"
+      displayFormat="{0}">
+    ></dxi-total-item>
+  </dxo-summary>
         </dx-data-grid>
       </div>
-    </div>
-
-    <!-- 🔹 TOTALS -->
-    <div class="totals-section">
-      <dx-number-box
-        [(value)]="totalQty"
-        label="TotalQty"
-        labelMode="floating"
-      ></dx-number-box>
-      <dx-number-box
-        [(value)]="totalExclVAT"
-        label="Total Excl VAT"
-        labelMode="floating"
-        dataType="number"
-        format="#,##0.00"
-      ></dx-number-box>
-      <dx-number-box
-        [(value)]="vatAmount"
-        label="VAT Amount"
-        labelMode="floating"
-        dataType="number"
-        format="#,##0.00"
-      ></dx-number-box>
-      <dx-number-box
-        [(value)]="totalInclVAT"
-        label="Total Incl.VAT"
-        labelMode="floating"
-        dataType="number"
-        format="#,##0.00"
-      ></dx-number-box>
-      <dx-number-box
-        [(value)]="totalTender"
-        label="Total Tender"
-        labelMode="floating"
-        dataType="number"
-        format="#,##0.00"
-      ></dx-number-box>
     </div>
   </div>
 </dx-validation-group>
