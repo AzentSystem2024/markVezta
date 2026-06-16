@@ -392,12 +392,19 @@ import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/
 import { ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
-import { ARManualMatchingComponent, ARManualMatchingModule } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
+import {
+  ARManualMatchingComponent,
+  ARManualMatchingModule,
+} from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
 import { LedgerStatementDimensionModule } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
 import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
+import {
+  BarcodePrintComponent,
+  BarcodePrintModule,
+} from './pages/barcode-print/barcode-print.component';
 
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -806,6 +813,7 @@ import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance
     ARManualMatchingModule,
     TrialBalanceDimensionAdvanceModule,
     LedgerStatementDimensionModule,
+    BarcodePrintModule,
   ],
 
   providers: [
@@ -820,4 +828,4 @@ import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

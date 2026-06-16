@@ -462,7 +462,11 @@ export class ItemStorePropertiesLogComponent implements OnInit {
         this.StatusType = 'VerificationScreen'
 
 
-      } else {
+      } else if (this.selectedData.Status == '5') {
+        this.StatusType = 'ViewScreen'
+
+      }
+      else {
         this.StatusType = 'ViewScreen'
 
       }

@@ -364,10 +364,12 @@ export class LedgerStatementComponent {
     });
   }
 
+
+  //-----------------data loading based on session storage value when navigate back to this page-----------------
   loadLedgerData() {
     const sessiondata = this.getSessionData('viewclickvalue');
     const headid = this.getSessionData('HEADID');
-
+    this.selectedStoreid = sessiondata.selectedStoreid
     const payload = {
       COMPANY_ID: Number(sessiondata.companyId),
       FIN_ID: Number(sessiondata.finId),
@@ -385,7 +387,11 @@ export class LedgerStatementComponent {
     this.selected_Head_Id = payload.HEAD_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
-    this.selectedStoreid = payload.STORE_ID;
+    this.selectedStoreid = sessiondata.selectedStoreid || [];
+
+
+
+    this
 
     // use your existing datasource creator
     this.createLedgerDataSource(payload);
@@ -463,6 +469,7 @@ export class LedgerStatementComponent {
         ? this.selectedStoreid.join(',') // ✅ FINAL FIX
         : ''
     };
+
 
     this.createLedgerDataSource(payload);
   }

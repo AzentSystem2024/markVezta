@@ -57,7 +57,7 @@ export class TrialBalanceDimensionAdvanceComponent {
   selectedmonth: any = '';
   selected_from_date: any;
   Store: any;
-  selectedStoreid: any;
+  selectedStoreid: any = [];
   Diamensions: any[] = [];
   storeHint: string = '';
   selectedDiamensions: number[] = [2];
@@ -66,6 +66,7 @@ export class TrialBalanceDimensionAdvanceComponent {
   dimensionPopupVisible: boolean = false;
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
+  Stores_List: any = [];
   summaryColumnsData: any = {
     totalItems: [],
     groupItems: []
@@ -166,6 +167,7 @@ export class TrialBalanceDimensionAdvanceComponent {
     this.formatted_To_date = SystemDate;
     this.Diamension_dropdown();
     this.get_DataSource();
+    this.getStoreDropdown()
   }
   customizeTotalText = () => {
     return 'Total';
@@ -221,7 +223,7 @@ export class TrialBalanceDimensionAdvanceComponent {
   };
 
   onExporting(event: any) {
-    const fileName = 'TrialBalanceReport';
+    const fileName = 'Account_Summary_Report.xlsx';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
@@ -254,8 +256,12 @@ export class TrialBalanceDimensionAdvanceComponent {
 
   get_DataSource() {
     console.log('call this function')
+    console.log('selected store ids before API call', this.selectedStoreid);
+    const storeIds = this.selectedStoreid?.length
+      ? this.selectedStoreid.join(',')
+      : "";
     const payload = {
-
+      storeIds: storeIds,
       companyId: this.selected_Company_id,
       finId: this.selected_fin_id,
       dateTo: this.formatted_To_date,
@@ -263,6 +269,7 @@ export class TrialBalanceDimensionAdvanceComponent {
     //session stora payload
 
     const payloadForSession = {
+      selectedStoreid: this.selectedStoreid,
       dateFrom: this.date_from,
       companyId: this.selected_Company_id,
       finId: this.selected_fin_id,
@@ -276,10 +283,6 @@ export class TrialBalanceDimensionAdvanceComponent {
     this.dataservice
       .account_Summary_Api(payload)
       .subscribe((res: any) => {
-        // this.isEmptyDatagrid = false;
-
-        // this.TrialBalanceReport = res.data;
-
         console.log(this.TrialBalanceReport);
         this.TrialBalanceReport = res.data.map((row: any) => {
 
@@ -305,9 +308,7 @@ export class TrialBalanceDimensionAdvanceComponent {
         this.storesDebit = Object.keys(res.data[0].Debit || {});
         this.storesCredit = Object.keys(res.data[0].Credit || {});
         this.generateSummary();
-
         console.log(this.summaryColumnsData);
-
       });
   }
   getDebitValue(store: string) {
@@ -445,6 +446,23 @@ export class TrialBalanceDimensionAdvanceComponent {
 
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
+  }
+
+
+  getStoreDropdown() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'STORE',
+    };
+    this.dataservice.getDropdownData(payload).subscribe((response: any) => {
+      this.Stores_List = response;
+    });
+  }
+
+  onStoreChanged(e: any) {
+
+    console.log('Selected store IDs:', this.selectedStoreid);
+
   }
 
 }

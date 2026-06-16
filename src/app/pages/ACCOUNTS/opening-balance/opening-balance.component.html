@@ -33,10 +33,9 @@
       (onRowValidating)="onRowValidating($event)"
       (onExporting)="onExporting($event)"
     >
-
-    <dxo-editing
-       [allowUpdating]="canEdit"
-       [allowDeleting]="canDelete"
+      <dxo-editing
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
 
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -54,8 +53,18 @@
         [formats]="['xlsx']"
       >
       </dxo-export>
+      <!-- <dxo-column-chooser [enabled]="true"></dxo-column-chooser> -->
+      <dxo-column-chooser
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
+      <dxo-data-grid-header-filter
+        [visible]="showHeaderFilter"
+      ></dxo-data-grid-header-filter>
       <!-- <dxo-filter-row
             [visible]="isFilterRowVisible"
             [applyFilter]="auto"
@@ -82,9 +91,10 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
 
         <dxi-item
-        *ngIf="canAdd"
+          *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
@@ -111,7 +121,6 @@
           displayExpr: 'HEAD_CODE',
           searchEnabled: true,
         }"
-
       ></dxi-column>
 
       <dxi-column
@@ -160,7 +169,7 @@
         dataField="debitAmount"
         caption="Debit Amount"
         dataType="number"
-        [width]="150"
+        [width]="200"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         [allowEditing]="!isReadOnly"
       >
@@ -170,27 +179,27 @@
         dataField="creditAmount"
         caption="Credit Amount"
         dataType="number"
-        [width]="150"
+        [width]="200"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         [allowEditing]="!isReadOnly"
       >
       </dxi-column>
 
       <dxo-summary>
-  <dxi-total-item
-    column="debitAmount"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Total: {0}"
-  ></dxi-total-item>
+        <dxi-total-item
+          column="debitAmount"
+          summaryType="sum"
+          valueFormat="#,##0.00"
+          displayFormat="Total: {0}"
+        ></dxi-total-item>
 
-  <dxi-total-item
-    column="creditAmount"
-    summaryType="sum"
-    valueFormat="#,##0.00"
-    displayFormat="Total: {0}"
-  ></dxi-total-item>
-</dxo-summary>
+        <dxi-total-item
+          column="creditAmount"
+          summaryType="sum"
+          valueFormat="#,##0.00"
+          displayFormat="Total: {0}"
+        ></dxi-total-item>
+      </dxo-summary>
     </dx-data-grid>
   </div>
 </div>
@@ -227,7 +236,7 @@
       type="normal"
     ></dx-button>
     <dx-button
-    *ngIf="canAdd"
+      *ngIf="canAdd"
       #saveBtnRef
       id="saveBtn"
       [text]="isApproved ? 'Commit' : 'Save'"
