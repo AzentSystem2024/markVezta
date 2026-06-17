@@ -16,6 +16,7 @@ import { UserPanelModule } from '../user-panel/user-panel.component';
 import { AuthService, DataService, IUser, ThemeService } from 'src/app/services';
 import { ThemeSwitcherModule } from 'src/app/components/library/theme-switcher/theme-switcher.component';
 import { Router } from '@angular/router';
+import { DxPopupModule } from 'devextreme-angular';
 
 @Component({
   selector: 'app-header',
@@ -34,6 +35,7 @@ export class AppHeaderComponent implements OnInit {
   customerInfo: any;
   user: IUser | null = { email: 'rererer' };
   UserName: any;
+  popupVisible: boolean = false
 
   userMenuItems = [
     {
@@ -63,7 +65,7 @@ export class AppHeaderComponent implements OnInit {
     private router: Router,
     private dataservice: DataService,
     public themeService: ThemeService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.authService.getUser().then((e) => (this.user = e.data));
@@ -71,10 +73,10 @@ export class AppHeaderComponent implements OnInit {
     this.version = this.dataservice.get_version();
 
     this.themeService.isDark.subscribe((isDark) => {
-    this.logoPath = isDark
-      ? 'assets/images/Vezta-logo-dark.svg'
-      : 'assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png';
-  });
+      this.logoPath = isDark
+        ? 'assets/images/Vezta-logo-dark.svg'
+        : 'assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png';
+    });
   }
 
   private getInitials(name: string): string {
@@ -113,6 +115,9 @@ export class AppHeaderComponent implements OnInit {
   toggleMenu = () => {
     this.menuToggle.emit();
   };
+
+
+
 }
 
 @NgModule({
@@ -122,8 +127,9 @@ export class AppHeaderComponent implements OnInit {
     DxToolbarModule,
     ThemeSwitcherModule,
     UserPanelModule,
+    DxPopupModule
   ],
   declarations: [AppHeaderComponent],
   exports: [AppHeaderComponent],
 })
-export class AppHeaderModule {}
+export class AppHeaderModule { }
