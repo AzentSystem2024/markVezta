@@ -514,18 +514,49 @@ export class ItemwisesalesComponent {
 
   summaryColumnsData = {
     totalItems: [
-      // 1. Total Debitṅ
+       {
+        name: 'totalDr',
+        column: 'GROSS_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'GROSS_AMOUNT',
+        alignment: 'right',
+      },
+       {
+        name: 'totalDr',
+        column: 'VAT_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'VAT_AMOUNT',
+        alignment: 'right',
+      },
       {
         name: 'totalDr',
         column: 'NET_AMOUNT',
         summaryType: 'sum',
-        displayFormat: 'Total {0}',
+        displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         showInColumn: 'NET_AMOUNT',
         alignment: 'right',
       },
     ],
     groupItems: [
+      {
+        column: 'GROSS_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'VAT_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
       {
         column: 'NET_AMOUNT',
         summaryType: 'sum',

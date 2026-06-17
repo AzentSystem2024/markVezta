@@ -268,6 +268,13 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
+
+    <dxo-group-panel [visible]="true"></dxo-group-panel>
+      <dxo-grouping
+    [contextMenuEnabled]="true"
+    [autoExpandAll]="false">
+  </dxo-grouping>
+
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -294,6 +301,8 @@
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
+       <dxi-column dataField="SALE_NO" caption="Sale no."  [groupIndex]="0"></dxi-column>
+        <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column
         dataField="SALE_DATE"
         caption="Sale Date"
@@ -301,8 +310,6 @@
         [format]="{ type: 'custom', formatter: formatDates }"
       >
       </dxi-column>
-      <dxi-column dataField="SALE_NO" caption="Sale no."></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column dataField="SALE_TYPE_NAME" caption="Sale type"></dxi-column>
       <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
       <dxi-column dataField="ITEM_CODE" caption="ItemCode"></dxi-column>
@@ -310,7 +317,7 @@
       <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
       <dxi-column
         dataField="PRICE"
-        caption="Price"
+        caption="Price(AED)"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
         ></dxi-column
@@ -320,19 +327,19 @@
       <dxi-column dataField="SUBCAT_NAME" caption="SubCategory"></dxi-column>
       <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
       <dxi-column
-        dataField="ITEMCATEGORY1_NAME"
+        dataField="CUSTOM1_NAME"
         caption="ItemProperty1"
       ></dxi-column>
       <dxi-column
-        dataField="ITEMCATEGORY2_NAME"
+        dataField="CUSTOM2_NAME"
         caption="ItemProperty2"
       ></dxi-column>
-      <dxi-column dataField="DISCOUNT" caption="Discount"></dxi-column>
+      <dxi-column dataField="DISCOUNT" caption="Discount(AED)"></dxi-column>
       <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
       <dxi-column dataField="DISC_REASON" caption="Reason"></dxi-column>
       <dxi-column
         dataField="GROSS_AMOUNT"
-        caption="Gross Amount"
+        caption="Excl.VAT Amount(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
@@ -346,14 +353,14 @@
       </dxi-column>
       <dxi-column
         dataField="VAT_AMOUNT"
-        caption="VAT Amount"
+        caption="VAT Amount(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
       <dxi-column
         dataField="NET_AMOUNT"
-        caption="Net Amount"
+        caption="Net Amount(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
