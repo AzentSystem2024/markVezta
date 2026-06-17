@@ -104,6 +104,7 @@ export class StorewiseStockViewComponent {
     this.sesstion_Details();
     this.store_dropdown();
     this.item_dropdown();
+    this.get_DataSource();
 
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
