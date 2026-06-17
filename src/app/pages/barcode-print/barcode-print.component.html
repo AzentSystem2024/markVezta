@@ -91,7 +91,7 @@
           <!-- Heading -->
           <dxi-item location="before">
             <div style="font-size: 18px; font-weight: 600; margin-right: 20px">
-              Barcode Printer
+              Print Barcode
             </div>
           </dxi-item>
 
@@ -105,12 +105,12 @@
             >
             </dx-radio-group>
           </dxi-item>
-          <dxi-item
+          <!-- <dxi-item
             location="after"
             locateInMenu="auto"
             widget="dxButton"
             [options]="searchButtonOptions"
-          ></dxi-item>
+          ></dxi-item> -->
 
           <dxi-item
             location="after"
@@ -140,9 +140,6 @@
                   [height]="350"
                   [selection]="{
                     mode: 'single',
-                  }"
-                  [searchPanel]="{
-                    visible: true,
                   }"
                   [filterRow]="{
                     visible: true,
@@ -226,6 +223,8 @@
         <dxi-column
           dataField="PRICE"
           caption="Price"
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
           [allowEditing]="false"
         ></dxi-column>
         <dxi-column
