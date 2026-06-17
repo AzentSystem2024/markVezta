@@ -231,7 +231,7 @@
     <dxi-column caption="VAT Category" alignment="center">
       <dxi-column
         dataField="EXEMPTED"
-        caption="Exempted"
+        caption="Exempted(AED)"
         dataType="number"
         format="#,##0.00"
         alignment="right"
@@ -240,7 +240,7 @@
 
       <dxi-column
         dataField="ZERO_RATE"
-        caption="Zero"
+        caption="Zero(AED)"
         dataType="number"
         format="#,##0.00"
         alignment="right"
@@ -249,7 +249,7 @@
 
       <dxi-column
         dataField="STANDARD_RATE"
-        caption="Standard Rate"
+        caption="Standard Rate(AED)"
         dataType="number"
         format="#,##0.00"
         alignment="right"
@@ -259,14 +259,14 @@
 
     <dxi-column
       dataField="TAX_AMOUNT"
-      caption="Tax Amount"
+      caption="Tax Amount(AED)"
       dataType="number"
       format="#,##0.00"
       alignment="right"
     ></dxi-column>
     <dxi-column
       dataField="TOTAL"
-      caption="Total"
+      caption="Total(AED)"
       dataType="number"
       format="#,##0.00"
       alignment="right"
@@ -274,6 +274,8 @@
 
     <dxo-summary>
       <!-- Grand Totals -->
+        <dxi-total-item column="EXEMPTED" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
 
       <dxi-total-item column="STANDARD_RATE" summaryType="sum" valueFormat="#,##0.00">
       </dxi-total-item>
@@ -320,7 +322,7 @@
     <dxi-column caption="VAT Category" alignment="center">
       <dxi-column
         dataField="EXEMPTED"
-        caption="VAT Exempt Sale"
+        caption="VAT Exempt Sale(AED)"
         dataType="number"
         format="#,##0.00"
         alignment="right"
@@ -329,7 +331,7 @@
 
       <dxi-column
         dataField="ZERO_RATE"
-        caption="Zero VAT Sale"
+        caption="Zero VAT Sale(AED)"
         dataType="number"
         format="#,##0.00"
         alignment="right"
@@ -338,7 +340,7 @@
 
       <dxi-column
         dataField="STANDARD_RATE"
-        caption="Standard VAT Sale"
+        caption="Standard VAT Sale(AED)"
         dataType="number"
         format="#,##0.00"
         alignment="right"
@@ -348,14 +350,14 @@
 
     <dxi-column
       dataField="TAX_AMOUNT"
-      caption="VAT Amount"
+      caption="VAT Amount(AED)"
       dataType="number"
       format="#,##0.00"
       alignment="right"
     ></dxi-column>
     <dxi-column
       dataField="TOTAL"
-      caption="Total"
+      caption="Total(AED)"
       dataType="number"
       format="#,##0.00"
       alignment="right"
@@ -365,6 +367,9 @@
 
 
       <!-- Grand Totals -->
+       <dxi-total-item column="EXEMPTED" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
+
 
       <dxi-total-item column="STANDARD_RATE" summaryType="sum" valueFormat="#,##0.00">
       </dxi-total-item>

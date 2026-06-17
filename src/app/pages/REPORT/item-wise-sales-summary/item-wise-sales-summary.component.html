@@ -259,7 +259,10 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
-
+    <dxo-group-panel [visible]="true"></dxo-group-panel>
+     <dxo-grouping
+    [autoExpandAll]="false">
+  </dxo-grouping>
      <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -294,10 +297,10 @@
 
       <!-- ================= COLUMNS ================= -->
 
+       <dxi-column dataField="STORE_NAME" caption="Store" [groupIndex]="0"></dxi-column>
       <dxi-column dataField="ITEM_CODE" caption="Item"></dxi-column>
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
       <dxi-column dataField="DISCOUNT" caption="Discount"></dxi-column>
-       <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column dataField="SALE_TYPE_NAME" caption="Sale Type"></dxi-column>
       <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
        <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
@@ -311,19 +314,19 @@
 
       <dxi-column
         dataField="GROSS_AMOUNT"
-        caption="Gross Amount"
+        caption="Excl.VAT Amount(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
       <dxi-column
         dataField="VAT_AMOUNT"
-        caption="VAT Amount"
+        caption="VAT Amount(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
       <dxi-column
         dataField="NET_AMOUNT"
-        caption="Net Amount"
+        caption="Net Amount(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
