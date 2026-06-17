@@ -101,6 +101,7 @@ export class BarcodePrintComponent {
     },
     text: '',
   };
+  selectedRowKeys: any;
 
   constructor(
     private dataService: DataService,
@@ -115,17 +116,18 @@ export class BarcodePrintComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     const userDataString = localStorage.getItem('userData');
+    if (!userDataString) {
+      return;
+    }
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
     const configStore = userData.Configuration?.[0];
     const menuGroups = menuResponse.MenuGroups || [];
-    console.log(menuGroups, 'MENUGROUPSSSSSSSSSSS');
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
       .find((menu: any) => menu.Path === 'barcode');
-    console.log(packingRights, 'PACKINGRIGHTSSSSSSSS');
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -135,7 +137,6 @@ export class BarcodePrintComponent {
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
     }
-    console.log(this.canEdit, 'CANEDIT');
     this.getItems();
     this.getGRNDropdown();
   }
@@ -269,7 +270,8 @@ export class BarcodePrintComponent {
     });
   }
   onSelectionChanged(e: any) {
-    this.selectedItems = e.component.getSelectedRowsData();
+    this.selectedRowKeys = e.selectedRowKeys;
+    this.selectedItems = e.selectedRowsData;
   }
 
   isBarcodeQtyEditable = (rowInfo: any) => {
@@ -483,7 +485,10 @@ export class BarcodePrintComponent {
             </div>
 
             <div style="font-weight:bold">
-              Price : AED ${Number(item.PRICE).toFixed(2)}
+              Price : AED ${Number(item.PRICE).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </div>
           `;
 
@@ -509,7 +514,12 @@ export class BarcodePrintComponent {
               "
             >
               <span>${item.ITEM_CODE}</span>
-              <span>AED ${Number(item.PRICE).toFixed(2)}</span>
+                <span>
+    AED ${Number(item.PRICE).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}
+  </span>
             </div>
 
             <div style="font-size:10px">
