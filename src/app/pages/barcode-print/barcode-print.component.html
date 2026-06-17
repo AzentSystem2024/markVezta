@@ -45,6 +45,7 @@
           showCheckBoxesMode: 'always',
         }"
         focusStateEnabled="false"
+        [(selectedRowKeys)]="selectedRowKeys"
         (onSelectionChanged)="onSelectionChanged($event)"
         (onEditorPreparing)="onEditorPreparing($event)"
         (onEditingStart)="onEditingStart($event)"
