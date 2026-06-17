@@ -27,8 +27,8 @@
       style="border: none; background: none"
       [title]="
         notificationCount > 0
-          ? 'You have new notifications'
-          : 'No notifications'
+          ? 'Store data is not up to date'
+          : ' All stote data is up to date'
       "
       (click)="showPopup()"
     >
@@ -54,9 +54,10 @@
   [(visible)]="popupVisible"
   width="700"
   height="auto"
-  title="Notifications"
+  title="Store Synchronization Status"
   [showTitle]="true"
   [dragEnabled]="false"
+  [hideOnOutsideClick]="true"
 >
   <dx-data-grid
     class="grid theme-dependent"

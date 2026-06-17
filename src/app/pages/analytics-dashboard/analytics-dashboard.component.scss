@@ -80,3 +80,12 @@ dx-chart {
   padding-left: 16px;
   padding-bottom: -5px;
 }
+
+::ng-deep .popup-title-text {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  font-size: 20px;
+  font-weight: 600;
+  word-break: break-word;
+}

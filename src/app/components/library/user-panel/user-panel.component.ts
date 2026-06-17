@@ -23,7 +23,7 @@ export class UserPanelComponent {
   user!: IUser | null;
 
   @ViewChild(UserMenuSectionComponent) userMenuSection: UserMenuSectionComponent;
-  notificationCount: any = 2
+  notificationCount: any
   popupVisible: boolean = false
   listSyncData: any
 
@@ -35,6 +35,8 @@ export class UserPanelComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
     console.log(sessionData)
     this.synch_pending_intervel = sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL
+
+    this.Get_SyncData()
 
 
   }
@@ -62,7 +64,17 @@ export class UserPanelComponent {
           SL_NO: index + 1
 
         }))
+        this.notificationCount = this.listSyncData.filter((item: any) => {
 
+          const lastSyncTime = new Date(item.LAST_SYNCH_TIME);
+          const currentTime = new Date();
+
+          const diffMinutes =
+            (currentTime.getTime() - lastSyncTime.getTime()) / (1000 * 60);
+
+          return diffMinutes > this.synch_pending_intervel;
+
+        }).length;
 
       },
       error: (err) => {
