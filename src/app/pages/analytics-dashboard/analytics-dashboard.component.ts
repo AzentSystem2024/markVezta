@@ -35,6 +35,7 @@ import {
 import { ApplyPipeModule } from 'src/app/pipes/apply.pipe';
 import {
   DxDateBoxModule,
+  DxPopupModule,
   DxSelectBoxModule,
   DxValidationGroupModule,
   DxValidatorModule,
@@ -126,7 +127,26 @@ export class AnalyticsDashboardComponent implements OnInit {
   startDate_of_Financial_year: any;
   customDateRangeText: any;
   customDateLabel = '';
-  constructor(private service: DataService) {}
+  listSyncData: any[] = []
+  synch_pending_intervel: any
+  notificationCount: any
+  show_sync_reminder: boolean = false
+  popupVisible: boolean = false
+  constructor(private service: DataService) {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
+    console.log(sessionData)
+    this.synch_pending_intervel = sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL
+    this.show_sync_reminder = sessionData.GeneralSettings.SHOW_SYNCH_REMINDER
+
+    this.Get_SyncData()
+    if (this.show_sync_reminder) {
+      this.popupVisible = true
+    }
+    else {
+      this.popupVisible = false
+    }
+
+  }
 
   selectionChange(dates: Dates) {
     this.loadData(dates.startDate, dates.endDate);
@@ -190,8 +210,6 @@ export class AnalyticsDashboardComponent implements OnInit {
     );
 
     const sessionYear = sessionData.FINANCIAL_YEARS;
-    //  this.financialYeaDate=sessionYear[0].DATE_FROM
-    // this.formatted_from_date=this.financialYeaDate
   }
   //--------------------date range selection----------------------------
 
@@ -367,9 +385,9 @@ export class AnalyticsDashboardComponent implements OnInit {
     `,
     };
   }
-  barChartcustomizeTooltip() {}
-  MillioncustomizeLabel() {}
-  onChartInitialized(e: any) {}
+  barChartcustomizeTooltip() { }
+  MillioncustomizeLabel() { }
+  onChartInitialized(e: any) { }
   customizeFunnelLabel = (arg: any) => {
     return `${arg.item.STORE_NAME}
 ${this.formatAmount(arg.value)}`;
@@ -436,41 +454,6 @@ ${this.formatAmount(arg.value)}`;
     this.getDashboardData();
   }
 
-  // applyDateFilter() {
-
-  //   if (this.selectedDateRange === 'all') {
-  //     return;
-  //   }
-  //   const today = new Date();
-  //   let startDate: Date;
-  //   const endDate = new Date(); // today
-
-  //   switch (this.selectedDateRange) {
-  //     case 'today':
-  //       startDate = new Date();
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     case 'last7':
-  //       startDate = new Date();
-  //       startDate.setDate(today.getDate() - 6);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     case 'last15':
-  //       startDate = new Date();
-  //       startDate.setDate(today.getDate() - 14);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     case 'last30':
-  //       startDate = new Date();
-  //       startDate.setDate(today.getDate() - 29);
-  //       startDate.setHours(0, 0, 0, 0);
-  //       break;
-  //     default:
-  //       // this.filteredPurchaseInvoices = this.purchaseInvoiceList;
-  //       return;
-  //   }
-
-  // }
   applyDateFilter() {
     const today = new Date();
 
@@ -616,6 +599,51 @@ ${this.formatAmount(arg.value)}`;
       }
     }, 0);
   }
+
+  //===================Show synch reminder===============
+
+
+
+  Get_SyncData() {
+    this.service.get_sync_Data_api().subscribe({
+      next: (res: any) => {
+
+        const currentTime = new Date();
+
+        const pendingData = res.filter((item: any) => {
+          const lastSyncTime = new Date(item.LAST_SYNCH_TIME);
+
+          const diffMinutes =
+            (currentTime.getTime() - lastSyncTime.getTime()) / (1000 * 60);
+
+          return diffMinutes > this.synch_pending_intervel;
+        });
+
+        this.listSyncData = pendingData.map((item: any, index: number) => ({
+          ...item,
+          SL_NO: index + 1,
+          IsPending: true
+
+        }));
+
+        this.notificationCount = this.listSyncData.length;
+
+        console.log('Pending Sync Data:', this.listSyncData);
+        console.log('Notification Count:', this.notificationCount);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
+  }
+  onRowPrepared(e: any) {
+    if (e.rowType !== 'data') return;
+
+    if (e.data.IsPending) {
+      e.rowElement.style.color = 'red';
+      e.rowElement.style.fontWeight = 'bold';
+    }
+  }
 }
 
 @NgModule({
@@ -645,10 +673,11 @@ ${this.formatAmount(arg.value)}`;
     DxDateBoxModule,
     DxLoadPanelModule,
     CustomDatePopupModule,
+    DxPopupModule
   ],
   providers: [],
   exports: [],
   declarations: [AnalyticsDashboardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AnalyticsDashboardModule {}
+export class AnalyticsDashboardModule { }

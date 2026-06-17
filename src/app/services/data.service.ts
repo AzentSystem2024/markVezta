@@ -7109,4 +7109,9 @@ The result can be exported to HTML or Markdown.`;
   getItemsOfGRN(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}GRN/GetItemsByGRN`, payload);
   }
+
+  //==================synching data Api=======================
+  get_sync_Data_api() {
+    return this.http.post(`${this.apiUrl}Synch/PendingStores`, {})
+  }
 }

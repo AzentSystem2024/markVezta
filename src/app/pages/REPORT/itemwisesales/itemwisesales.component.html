@@ -311,6 +311,49 @@
       <dxi-column dataField="CUSTOM2_NAME" caption="ItemProperty2"></dxi-column>
       <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
 
+      <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
+      <dxi-column dataField="SALE_TYPE_NAME" caption="Sale Type"></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+      <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+      <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+      <dxi-column dataField="CAT_NAME" caption="Category"></dxi-column>
+      <dxi-column dataField="SUBCAT_NAME" caption="Subcategory"></dxi-column>
+      <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
+      <dxi-column dataField="CUSTOM1_NAME" caption="ItemProperty1"></dxi-column>
+      <dxi-column dataField="CUSTOM2_NAME" caption="ItemProperty2"></dxi-column>
+
+      <dxi-column
+        dataField="PRICE"
+        caption="Price"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      >
+      </dxi-column>
+      <dxi-column
+        dataField="DISCOUNT"
+        caption="Discount"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      >
+      </dxi-column>
+      <dxi-column dataField="DISC_REASON" caption="Reason"></dxi-column>
+      <dxi-column
+        dataField="GROSS_AMOUNT"
+        caption="Gross Amount"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      >
+      </dxi-column>
+      <dxi-column dataField="VAT_PERCENT" caption="VAT %"></dxi-column>
+      <dxi-column
+        dataField="VAT_AMOUNT"
+        caption="VAT Amount"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      >
+      </dxi-column>
       <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Excl.VAT Amount(AED)"
@@ -332,6 +375,8 @@
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
+      <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
+      <dxi-column dataField="COMMISSION" caption="Commission"></dxi-column>
 
       <dxi-column *ngIf="journalBookCount > 0" type="buttons" [width]="100">
         <dxi-button
@@ -362,3 +407,8 @@
   ></app-add-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>
+COMMENT : "" COMMISSION : 0 CUST_NAME : "" DESCRIPTION : "FC MAGIC VELVET"
+DISCOUNT : 0 DISC_REASON : "" GROSS_AMOUNT : 169 ID : 42256 ITEM_CODE :
+"000772053945" NET_AMOUNT : 169 PRICE : 169 QUANTITY : 1 SALESMAN : "" SALE_DATE
+: "2026-02-22T00:00:00" SALE_NO : "42103" SALE_TYPE_NAME : "Sales" STORE_NAME :
+"JAPTC" TRANS_ID : 10534424 VAT_AMOUNT : 0

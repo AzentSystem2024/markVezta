@@ -179,3 +179,33 @@
   [hideOnOutsideClick]="false"
 >
 </dx-load-panel>
+
+<dx-popup
+  [(visible)]="popupVisible"
+  width="700"
+  height="auto"
+  title="Notifications"
+  [showTitle]="true"
+  [dragEnabled]="false"
+  [hideOnOutsideClick]="true"
+>
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="listSyncData"
+    height="auto"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [rowAlternationEnabled]="true"
+    [scrolling]="{ mode: 'virtual' }"
+    (onRowPrepared)="onRowPrepared($event)"
+  >
+    <dxi-column dataField="SL_NO" caption="SL.No"></dxi-column>
+    <dxi-column dataField="CODE" caption="Store Code"></dxi-column>
+
+    <dxi-column dataField="STORE_NAME" caption="Store Name"></dxi-column>
+    <dxi-column dataField="ADDRESS1" caption="Address"></dxi-column>
+    <dxi-column
+      dataField="LAST_SYNCH_TIME"
+      caption="Last Synch.Time"
+    ></dxi-column> </dx-data-grid
+></dx-popup>
