@@ -87,6 +87,7 @@
             >
               <dxo-label
                 [visible]="true"
+                position="inside"
                 [customizeText]="customizeCommonLabel"
               ></dxo-label>
             </dxo-common-series-settings>
@@ -207,7 +208,7 @@
     [showBorders]="true"
     (onRowPrepared)="onRowPrepared($event)"
   >
-    <dxi-column dataField="SL_NO" caption="SL.No"></dxi-column>
+    <dxi-column dataField="SL_NO" caption="SL.No" alignment="left"></dxi-column>
     <dxi-column dataField="CODE" caption="Store Code"></dxi-column>
 
     <dxi-column dataField="STORE_NAME" caption="Store Name"></dxi-column>
