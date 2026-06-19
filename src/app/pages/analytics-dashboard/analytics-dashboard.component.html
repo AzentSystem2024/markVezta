@@ -87,6 +87,7 @@
             >
               <dxo-label
                 [visible]="true"
+                position="inside"
                 [customizeText]="customizeCommonLabel"
               ></dxo-label>
             </dxo-common-series-settings>
@@ -182,13 +183,19 @@
 
 <dx-popup
   [(visible)]="popupVisible"
-  width="700"
-  height="auto"
-  title="Notifications"
+  width="1000"
+  height="500"
   [showTitle]="true"
+  [title]="buttonText"
   [dragEnabled]="false"
   [hideOnOutsideClick]="true"
+  titleTemplate="popupTitle"
 >
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
   <dx-data-grid
     class="grid theme-dependent"
     [dataSource]="listSyncData"
@@ -197,9 +204,11 @@
     [columnAutoWidth]="true"
     [rowAlternationEnabled]="true"
     [scrolling]="{ mode: 'virtual' }"
+    [showColumnLines]="true"
+    [showBorders]="true"
     (onRowPrepared)="onRowPrepared($event)"
   >
-    <dxi-column dataField="SL_NO" caption="SL.No"></dxi-column>
+    <dxi-column dataField="SL_NO" caption="SL.No" alignment="left"></dxi-column>
     <dxi-column dataField="CODE" caption="Store Code"></dxi-column>
 
     <dxi-column dataField="STORE_NAME" caption="Store Name"></dxi-column>

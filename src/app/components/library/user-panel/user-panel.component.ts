@@ -6,6 +6,7 @@ import { UserMenuSectionModule, UserMenuSectionComponent } from '../user-menu-se
 import { IUser } from '../../../services/auth.service';
 import { DataService } from 'src/app/services';
 import { DxDataGridModule, DxPopupModule } from 'devextreme-angular';
+import { timer } from 'rxjs';
 @Component({
   selector: 'user-panel',
   templateUrl: 'user-panel.component.html',
@@ -23,7 +24,7 @@ export class UserPanelComponent {
   user!: IUser | null;
 
   @ViewChild(UserMenuSectionComponent) userMenuSection: UserMenuSectionComponent;
-  notificationCount: any = 2
+  notificationCount: any
   popupVisible: boolean = false
   listSyncData: any
 
@@ -36,9 +37,16 @@ export class UserPanelComponent {
     console.log(sessionData)
     this.synch_pending_intervel = sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL
 
+    // this.Get_SyncData()
+
 
   }
 
+  ngOnInit() {
+    timer(0, 60000).subscribe(() => {
+      this.Get_SyncData()
+    })
+  }
   handleDropDownButtonContentReady({ component }) {
     component.registerKeyHandler('downArrow', () => {
       this.userMenuSection.userInfoList.nativeElement.focus();
@@ -62,7 +70,17 @@ export class UserPanelComponent {
           SL_NO: index + 1
 
         }))
+        this.notificationCount = this.listSyncData.filter((item: any) => {
 
+          const lastSyncTime = new Date(item.LAST_SYNCH_TIME);
+          const currentTime = new Date();
+
+          const diffMinutes =
+            (currentTime.getTime() - lastSyncTime.getTime()) / (1000 * 60);
+
+          return diffMinutes > this.synch_pending_intervel;
+
+        }).length;
 
       },
       error: (err) => {
@@ -83,8 +101,19 @@ export class UserPanelComponent {
     console.log("synch time", this.synch_pending_intervel)
     if (diffMinutes > this.synch_pending_intervel) {
       e.rowElement.style.color = 'red';
-      e.rowElement.style.fontWeight = 'bold';
+      // e.rowElement.style.fontWeight = 'bold';
     }
+  }
+  formatTime(rowData: any) {
+    if (!rowData.LAST_SYNCH_TIME) return '';
+
+    const date = new Date(rowData.LAST_SYNCH_TIME);
+
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
   }
 }
 
