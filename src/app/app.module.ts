@@ -402,6 +402,7 @@ import {
   BarcodePrintComponent,
   BarcodePrintModule,
 } from './pages/barcode-print/barcode-print.component';
+import { TrialBalanceBranchWiseModule } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -814,6 +815,7 @@ import {
     TrialBalanceDimensionAdvanceModule,
     LedgerStatementDimensionModule,
     BarcodePrintModule,
+    TrialBalanceBranchWiseModule
   ],
 
   providers: [
@@ -828,4 +830,4 @@ import {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

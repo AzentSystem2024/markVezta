@@ -299,6 +299,7 @@
   (onHiding)="handleClose()"
 >
   <app-pre-payment-edit
+    *ngIf="editPrePaymentPopupOpened"
     [selectedPrePayment]="selectedPrePayment"
     [isOpen]="editPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"
@@ -316,6 +317,7 @@
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-edit-supplier-payment
+    *ngIf="isEditReceipt"
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"
