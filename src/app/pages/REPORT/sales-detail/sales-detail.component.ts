@@ -531,6 +531,15 @@ export class SalesDetailComponent {
       },
       {
         name: 'totalDr',
+        column: 'DISCOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'DISCOUNT',
+        alignment: 'right',
+      },
+      {
+        name: 'totalDr',
         column: 'GROSS_AMOUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
@@ -567,6 +576,13 @@ export class SalesDetailComponent {
       },
       {
         column: 'PRICE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+       {
+        column: 'DISCOUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },

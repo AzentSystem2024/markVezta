@@ -72,20 +72,25 @@
           </div>
         </dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto">
-          <dx-select-box
-            [width]="200"
-            label="Type"
+       <dxi-item>
+          <dx-tag-box
+            label="Store"
             labelMode="floating"
-            [items]="ItemList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
-            [(value)]="selected_item_Id"
-            (onValueChanged)="onItemIdChange($event)"
+            [items]="Store"
             [searchEnabled]="true"
-          >
-          </dx-select-box>
+            [(value)]="selectedStoreid"
+            [showSelectionControls]="true"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [hint]="storeHint"
+            [width]="200"
+            (onValueChanged)="updateStoreHint()"
+          ></dx-tag-box>
         </dxi-item>
+
 
         <dxi-item>
           <dx-select-box
@@ -225,12 +230,14 @@
         dataType="number"
         alignment="right"
         caption="Production"
+        [visible]="false"
       ></dxi-column>
       <dxi-column
         dataField="CONSUMPTION_QTY"
         dataType="number"
         alignment="right"
         caption="Consumption"
+        [visible]="false"
       ></dxi-column>
       <!-- <dxi-column
         dataField="TRANSFEROUT_QTY"
@@ -250,6 +257,7 @@
         dataField="DELIVERY_QTY"
         dataType="number"
         alignment="right"
+        [visible]="false"
         caption="Delivery Out"
       ></dxi-column>
       <dxi-column
@@ -257,6 +265,7 @@
         dataType="number"
         alignment="right"
         caption="Delivery Return"
+        [visible]="false"
       ></dxi-column>
       <dxi-column
         dataField="SALE_QTY"
