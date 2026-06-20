@@ -43,7 +43,8 @@ import { AddInvoiceRetailModule } from '../INVOICE/add-invoice-retail/add-invoic
 import { InvoiceRetailComponent } from '../OPERATIONS/invoice-retail/invoice-retail.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
-import JsBarcode from 'jsbarcode';
+import 'jsbarcode';
+declare var JsBarcode: any;
 import notify from 'devextreme/ui/notify';
 
 @Component({

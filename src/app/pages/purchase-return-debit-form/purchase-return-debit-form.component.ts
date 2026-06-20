@@ -250,9 +250,9 @@ export class PurchaseReturnDebitFormComponent {
     // IMPORTANT: Reset grid before binding
     this.mainGridData = [];
     this.cdr.detectChanges();
-
+    this.purchaseReturnFormData.IS_APPROVED = false;
     // Map grid rows
-    this.mainGridData = (data.PurchDetail || []).map((item) => {
+    this.mainGridData = (data.PurchDetail || []).map((item: any) => {
       // COMBINE GST FOR UI (EDIT MODE)
       let vatPerc = 0;
 
