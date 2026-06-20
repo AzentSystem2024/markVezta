@@ -1,0 +1,280 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="TrialBalanceReport"
+      width="100%"
+      height="82vh"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [allowColumnResizing]="false"
+      [showColumnLines]="true"
+      [summary]="summaryColumnsData"
+      [columnAutoWidth]="true"
+      [groupPanel]="{ visible: true }"
+      [grouping]="{ autoExpandAll: false }"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
+      [headerFilter]="{ visible: false }"
+      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Trial Balance
+          </div>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-select-box
+            labelMode="floating"
+            labelLocation="left"
+            label="Year"
+            [width]="100"
+            [(value)]="selectedYear"
+            [dataSource]="years"
+            (onValueChanged)="onYearChanged($event)"
+            placeholder="Year"
+          ></dx-select-box>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-select-box
+            labelMode="floating"
+            labelLocation="left"
+            label="month"
+            [dataSource]="monthDataSource"
+            displayExpr="name"
+            valueExpr="value"
+            [(value)]="selectedmonth"
+            (onValueChanged)="onMonthValueChanged($event)"
+            [dropDownOptions]="{ width: 'auto' }"
+          >
+          </dx-select-box>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-date-box
+            [width]="150"
+            label="Date From"
+            labelMode="floating"
+            [displayFormat]="'dd-MM-yyyy'"
+            [value]="formatted_from_date"
+            (onValueChanged)="onFromDateChange($event)"
+          ></dx-date-box>
+        </dxi-item>
+        <dxi-item>
+          <dx-date-box
+            [width]="150"
+            label="Date To"
+            labelMode="floating"
+            [displayFormat]="'dd-MM-yyyy'"
+            [value]="formatted_To_date"
+            (onValueChanged)="onToDateChange($event)"
+          >
+          </dx-date-box>
+        </dxi-item>
+        <!-- <dxi-item location="after" template="StoreFilterTemplate"></dxi-item> -->
+
+        <!-- <dxi-item>
+      <dx-tag-box
+  label="Store"
+  labelMode="floating"
+  displayExpr="DESCRIPTION" 
+  valueExpr="ID"
+  [items]="Store"
+  [searchEnabled]="true"
+  [(value)]="selectedStoreid"
+  [showSelectionControls]="true"
+  [maxDisplayedTags]="100"
+  [showMultiTagOnly]="true"
+  [multiline]="false"
+  [hint]="storeHint"
+  [width]="150"
+  (onValueChanged)="updateStoreHint()"
+></dx-tag-box>
+    </dxi-item> -->
+        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-button
+            text="Apply"
+            type="default"
+            icon="todo"
+            stylingMode="contained"
+            (onClick)="get_DataSource()"
+          >
+          </dx-button>
+        </dxi-item>
+
+        <dxi-item name="exportButton"></dxi-item>
+      </dxo-toolbar>
+      <div
+        *dxTemplate="let data of 'StoreFilterTemplate'"
+        style="margin-bottom: 5px"
+      >
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Stores_List"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [width]="200"
+          (onValueChanged)="onStoreChanged($event)"
+        ></dx-tag-box>
+      </div>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <!-- <dxi-column dataField="DEPARTMENT_NAME" caption="Department Name" dataType="string"></dxi-column> -->
+      <dxi-column
+        dataField="MAIN_GROUP_NAME"
+        caption="Main Group"
+        dataType="string"
+      ></dxi-column>
+      <dxi-column
+        dataField="SUB_GROUP_NAME"
+        caption="Sub Group"
+        alignment="left"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column dataField="CATEGORY_NAME" caption="Category"></dxi-column>
+      <dxi-column dataField="HEAD_CODE" caption="Ledger Code"></dxi-column>
+      <dxi-column dataField="HEAD_NAME" caption="Ledger Name"></dxi-column>
+      <!-- <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column> -->
+      <!-- <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column> -->
+      <!-- Opening band -->
+      <dxi-column
+        caption="Opening Balance"
+        alignment="center"
+        cssClass="opening-header"
+      >
+        <dxi-column
+          *ngFor="let col of openingColumns"
+          [dataField]="col"
+          [caption]="col.replace('Opening - ', '')"
+          dataType="string"
+          alignment="right"
+          cssClass="opening-sub-header"
+          [customizeText]="formatAmount"
+        ></dxi-column>
+        <dxi-column
+          dataField="Opening TOTAL"
+          caption="TOTAL"
+          dataType="string"
+          cssClass="opening-sub-header"
+          alignment="right"
+          [customizeText]="formatAmount"
+        ></dxi-column>
+      </dxi-column>
+
+      <!-- During Period band -->
+      <dxi-column
+        caption="During Period"
+        alignment="center"
+        cssClass="DuringPeriod-header"
+      >
+        <dxi-column
+          *ngFor="let col of duringPeriodColumns"
+          [dataField]="col"
+          [caption]="col.replace('During_Period - ', '')"
+          dataType="string"
+          alignment="right"
+          [customizeText]="formatAmount"
+          cssClass="DuringPeriod-sub-header"
+        ></dxi-column>
+        <dxi-column
+          dataField="During_period TOTAL"
+          caption="TOTAL"
+          dataType="string"
+          alignment="right"
+          [customizeText]="formatAmount"
+          cssClass="DuringPeriod-sub-header"
+        ></dxi-column>
+      </dxi-column>
+
+      <!-- Closing band -->
+      <dxi-column
+        caption="Closing Balance"
+        alignment="center"
+        cssClass="closing-header"
+      >
+        <dxi-column
+          *ngFor="let col of closingColumns"
+          [dataField]="col"
+          [caption]="col.replace('Closing - ', '')"
+          dataType="string"
+          alignment="right"
+          [customizeText]="formatAmount"
+          cssClass="closing-sub-header"
+        ></dxi-column>
+        <dxi-column
+          dataField="Closing TOTAL"
+          caption="TOTAL"
+          dataType="string"
+          alignment="right"
+          cssClass="closing-sub-header"
+          [customizeText]="formatAmount"
+        ></dxi-column>
+      </dxi-column>
+
+      <!-- <dxi-column
+        *ngIf="TrialBalanceReport.length > 0"
+        type="buttons"
+        [width]="100"
+      >
+        <dxi-button
+          hint="View"
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)"
+        ></dxi-button>
+      </dxi-column> -->
+    </dx-data-grid>
+  </div>
+</div>

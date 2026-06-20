@@ -209,6 +209,7 @@ import { ARManualMatchingComponent } from './pages/ERP-INTEGRATION/ar-manual-mat
 import { TrialBalanceDimensionAdvanceComponent } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
 import { LedgerStatementDimensionComponent } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
 import { BarcodePrintComponent } from './pages/barcode-print/barcode-print.component';
+import { TrialBalanceBranchWiseComponent } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
 
 const routes: Routes = [
   {
@@ -1287,7 +1288,11 @@ const routes: Routes = [
         component: BarcodePrintComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'trial-balance-branch',
+        component: TrialBalanceBranchWiseComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'login',
@@ -1304,4 +1309,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

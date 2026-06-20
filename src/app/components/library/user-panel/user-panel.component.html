@@ -34,10 +34,15 @@
     >
       <div class="d-flex">
         <i
-          class="bi bi-bell"
-          style="font-size: 22px; color: var(--base-text-color)"
+          class="bi bi-bell bell-icon"
+          [ngClass]="notificationCount > 0 ? 'text-danger' : 'text-success'"
         ></i>
-        <div style="color: var(--base-text-color)">{{ notificationCount }}</div>
+        <div
+          style="color: var(--base-text-color)"
+          [ngClass]="notificationCount > 0 ? 'text-danger' : 'text-success'"
+        >
+          {{ notificationCount }}
+        </div>
       </div>
     </button>
   </div>
@@ -67,15 +72,17 @@
     [columnAutoWidth]="true"
     [rowAlternationEnabled]="true"
     [scrolling]="{ mode: 'virtual' }"
+    [showColumnLines]="true"
+    [showBorders]="true"
     (onRowPrepared)="onRowPrepared($event)"
   >
-    <dxi-column dataField="SL_NO" caption="SL.No"></dxi-column>
+    <dxi-column dataField="SL_NO" caption="SL.No" alignment="left"></dxi-column>
     <dxi-column dataField="CODE" caption="Store Code"></dxi-column>
 
     <dxi-column dataField="STORE_NAME" caption="Store Name"></dxi-column>
-    <dxi-column dataField="ADDRESS1" caption="Address"></dxi-column>
     <dxi-column
       dataField="LAST_SYNCH_TIME"
       caption="Last Synch.Time"
+      [calculateCellValue]="formatTime"
     ></dxi-column> </dx-data-grid
 ></dx-popup>

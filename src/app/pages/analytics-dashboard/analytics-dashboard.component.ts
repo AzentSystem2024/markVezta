@@ -138,7 +138,10 @@ export class AnalyticsDashboardComponent implements OnInit {
     console.log(sessionData)
     this.synch_pending_intervel = sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL
     this.show_sync_reminder = sessionData.GeneralSettings.SHOW_SYNCH_REMINDER
-    this.buttonText = "List of stores not synchronized in last 4 hours"
+    const hours =
+      Number(sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL) / 60;
+
+    this.buttonText = `List of stores not synchronized in last ${hours}  hours`
 
     this.Get_SyncData()
     if (this.show_sync_reminder) {
@@ -643,7 +646,7 @@ ${this.formatAmount(arg.value)}`;
 
     if (e.data.IsPending) {
       e.rowElement.style.color = 'red';
-      e.rowElement.style.fontWeight = 'bold';
+      // e.rowElement.style.fontWeight = 'bold';
     }
   }
 }

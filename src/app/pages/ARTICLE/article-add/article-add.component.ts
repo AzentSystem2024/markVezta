@@ -118,6 +118,7 @@ export class ArticleAddComponent {
     STANDARD_PACKING: '',
     GST_PERC: 0,
     HSN_CODE: '',
+    CREATE_PACKING: false,
   };
 
   articleList: any;
@@ -144,7 +145,7 @@ export class ArticleAddComponent {
   selectedItem: any;
   selectedItems: any[] = [];
   ComponentpopupVisible: boolean = false;
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) { }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -592,7 +593,7 @@ export class ArticleAddComponent {
       this.colorList = response;
     });
   }
-  onColorChanged(event: any) {}
+  onColorChanged(event: any) { }
   assignOrderNumbersToSizes() {
     const last = Number(this.lastOrderNo ?? 0);
     let nextOrderNo = last + 1;
@@ -1069,7 +1070,7 @@ export class ArticleAddComponent {
           CREATED_DATE: formatDate(this.articleData.CREATED_DATE),
           CATEGORY_ID: this.selectedCategoryId,
           ARTICLE_TYPE: this.selectedTypeId,
-          BRAND_ID: this.selectedBrandId,
+          BRAND_ID: this.selectedBrandId || 0,
           // COMPANY_ID: this.selected_Company_id,
           // UNIT_ID: this.selectedProductionUnitId,
           // COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
@@ -1290,7 +1291,7 @@ export class ArticleAddComponent {
     popupGrid.selectRows(selectedKeys, false);
   }
 
- 
+
 
   // saveSelectedItems() {
   //   const popupGrid = this.bomGridRef.instance;
@@ -1345,60 +1346,60 @@ export class ArticleAddComponent {
   //   this.ItempopupVisible = false;
   // }
 
-    saveSelectedItems() {
+  saveSelectedItems() {
 
-  const grid = this.itemsGridRef?.instance;
-  const popupGrid = this.bomGridRef.instance;
+    const grid = this.itemsGridRef?.instance;
+    const popupGrid = this.bomGridRef.instance;
 
-  //  VERY IMPORTANT: commit editing row
-  if (grid) {
-    grid.saveEditData();
-  }
-
-  const selectedRows = popupGrid.getSelectedRowsData();
-
-  //  Always get latest grid data
-  let currentRows =
-    grid.getVisibleRows().map((r: any) => r.data) || [];
-
-  //  STEP 1: Remove ONLY empty rows
-  const isEmptyRow = (r: any) =>
-    !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY;
-
-  currentRows = currentRows.filter(r => !isEmptyRow(r));
-
-  //  STEP 2: ADD new items (NO removal logic at all)
-  selectedRows.forEach((item: any) => {
-
-    const exists = currentRows.some(
-      (x) => x.ITEM_ID === item.ID
-    );
-
-    if (!exists) {
-      currentRows.push({
-        ITEM: item.ITEM_CODE,
-        DESCRIPTION: item.DESCRIPTION,
-        UOM: item.UOM,
-        QUANTITY: null,
-        ITEM_ID: item.ID,
-      });
+    //  VERY IMPORTANT: commit editing row
+    if (grid) {
+      grid.saveEditData();
     }
 
-  });
+    const selectedRows = popupGrid.getSelectedRowsData();
 
-  //  STEP 3: Always add ONE empty row at end
-  currentRows.push({
-    ITEM: null,
-    DESCRIPTION: '',
-    UOM: '',
-    QUANTITY: null,
-  });
+    //  Always get latest grid data
+    let currentRows =
+      grid.getVisibleRows().map((r: any) => r.data) || [];
 
-  //  update grid
-  this.items = [...currentRows];
+    //  STEP 1: Remove ONLY empty rows
+    const isEmptyRow = (r: any) =>
+      !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY;
 
-  this.ItempopupVisible = false;
-}
+    currentRows = currentRows.filter(r => !isEmptyRow(r));
+
+    //  STEP 2: ADD new items (NO removal logic at all)
+    selectedRows.forEach((item: any) => {
+
+      const exists = currentRows.some(
+        (x) => x.ITEM_ID === item.ID
+      );
+
+      if (!exists) {
+        currentRows.push({
+          ITEM: item.ITEM_CODE,
+          DESCRIPTION: item.DESCRIPTION,
+          UOM: item.UOM,
+          QUANTITY: null,
+          ITEM_ID: item.ID,
+        });
+      }
+
+    });
+
+    //  STEP 3: Always add ONE empty row at end
+    currentRows.push({
+      ITEM: null,
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: null,
+    });
+
+    //  update grid
+    this.items = [...currentRows];
+
+    this.ItempopupVisible = false;
+  }
 }
 
 @NgModule({
@@ -1442,4 +1443,4 @@ export class ArticleAddComponent {
   exports: [ArticleAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ArticleAddModule {}
+export class ArticleAddModule { }
