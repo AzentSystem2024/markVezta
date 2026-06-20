@@ -188,7 +188,7 @@
       >
       </dxi-column>
 
-      <dxi-column dataField="BILL_ID" caption="Bill No" dataType="string">
+      <dxi-column dataField="DOC_NO" caption="Bill No" dataType="string">
       </dxi-column>
 
       <!-- Age 0-30 -->
@@ -286,6 +286,7 @@
 <!-- =============================drildown========================= -->
 
 <dx-popup
+*ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'90vw'"
   [height]="'85vh'"

@@ -35,7 +35,12 @@
         [allowUpdating]="true"
       ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export
+        [enabled]="true"
+        [formats]="['xlsx', 'pdf']"
+        style="padding-right: 15px"
+      >
+      </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -294,6 +299,7 @@
   (onHiding)="handleClose()"
 >
   <app-pre-payment-edit
+    *ngIf="editPrePaymentPopupOpened"
     [selectedPrePayment]="selectedPrePayment"
     [isOpen]="editPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"
@@ -311,6 +317,7 @@
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-edit-supplier-payment
+    *ngIf="isEditReceipt"
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"

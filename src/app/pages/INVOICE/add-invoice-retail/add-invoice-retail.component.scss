@@ -188,3 +188,31 @@
 ::ng-deep .invalid-row > td {
   background-color: #ffe6e6 !important;
 }
+.invoice-summary {
+  width: 520px;
+  margin-left: auto;
+  margin-top: 8px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 30px;
+  margin-bottom: 8px;
+}
+
+.summary-item,
+.summary-total {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.summary-total {
+  justify-content: flex-end;
+}
+
+.summary-item span,
+.summary-total span {
+  font-weight: 600;
+}

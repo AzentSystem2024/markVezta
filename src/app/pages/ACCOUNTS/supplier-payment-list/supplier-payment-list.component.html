@@ -211,7 +211,8 @@
         <span
           *ngIf="
             (cellData.data.TRANS_STATUS === 2 && canApprove) ||
-            (cellData.data.TRANS_STATUS !== 2 && canVerify)
+            (cellData.data.TRANS_STATUS !== 2 && canVerify) ||
+            cellData.data.TRANS_STATUS >= 5
           "
           style="
             position: relative;

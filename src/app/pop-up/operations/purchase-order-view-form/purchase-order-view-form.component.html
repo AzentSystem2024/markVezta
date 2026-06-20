@@ -277,14 +277,26 @@
     >
     </dx-text-box>
     <div>
-      <dx-text-box
+      <dx-select-box
+        label="Issued by"
+        labelMode="floating"
+        placeholder="Issued by"
+        [width]="465"
+        [items]="employeeList"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="newPoData.ISSUED_EMP_ID"
+        [readOnly]="true"
+      >
+      </dx-select-box>
+      <!-- <dx-text-box
         label="Issued by"
         labelMode="floating"
         placeholder="Issued by"
         [width]="465"
         [(value)]="newPoData.ISSUED_EMP_ID"
       >
-      </dx-text-box>
+      </dx-text-box> -->
     </div>
   </div>
 </div>
@@ -357,7 +369,13 @@
     ></dxi-column> -->
     <!-- Conditionally add local currency column -->
     <dxi-column
-      [caption]="'Price (' + SupplierCurrencySymbol + ')'"
+      [caption]="
+        !SupplierCurrencySymbol ||
+        SupplierCurrencySymbol === '0' ||
+        SupplierCurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Price'
+          : 'Price (' + SupplierCurrencySymbol + ')'
+      "
       dataField="SUPP_PRICE"
       width="100"
       [allowEditing]="false"
@@ -387,7 +405,13 @@
       }"
     ></dxi-column>
     <dxi-column
-      [caption]="'Amount (' + SupplierCurrencySymbol + ')'"
+      [caption]="
+        !SupplierCurrencySymbol ||
+        SupplierCurrencySymbol === '0' ||
+        SupplierCurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Amount'
+          : 'Amount (' + SupplierCurrencySymbol + ')'
+      "
       [visible]="false"
       dataField="Amount"
       width="auto"
@@ -403,7 +427,13 @@
       [editorOptions]="{ format: '#0', mode: 'number' }"
     ></dxi-column>
     <dxi-column
-      [caption]="'Disc Amount (' + SupplierCurrencySymbol + ')'"
+      [caption]="
+        !SupplierCurrencySymbol ||
+        SupplierCurrencySymbol === '0' ||
+        SupplierCurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Disc Amt'
+          : 'Disc Amt (' + SupplierCurrencySymbol + ')'
+      "
       [visible]="false"
       dataField="discountAmount"
       width="auto"
@@ -420,7 +450,13 @@
     >
     </dxi-column> -->
     <dxi-column
-      [caption]="'Taxable (' + SupplierCurrencySymbol + ')'"
+      [caption]="
+        !SupplierCurrencySymbol ||
+        SupplierCurrencySymbol === '0' ||
+        SupplierCurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Taxable'
+          : 'Taxable (' + SupplierCurrencySymbol + ')'
+      "
       dataField="taxable"
       width="100"
       [allowEditing]="false"
@@ -486,6 +522,20 @@
       [allowEditing]="false"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column> -->
+    <dxi-column
+      [caption]="
+        !SupplierCurrencySymbol ||
+        SupplierCurrencySymbol === '0' ||
+        SupplierCurrencySymbol === menuResponse?.GeneralSettings?.SYMBOL
+          ? 'Tax Amt'
+          : 'Tax Amt (' + SupplierCurrencySymbol + ')'
+      "
+      alignment="right"
+      dataField="vatAmount"
+      width="100"
+      [allowEditing]="false"
+      [format]="{ type: 'fixedPoint', precision: 2 }"
+    ></dxi-column>
     <dxi-column
       caption="Total"
       dataField="total"

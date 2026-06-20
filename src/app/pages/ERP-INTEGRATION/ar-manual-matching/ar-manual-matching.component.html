@@ -1,0 +1,170 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #detailGrid
+      class="grid theme-dependent"
+      [dataSource]="importDataList"
+      [showBorders]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [columnAutoWidth]="true"
+      noDataText=" "
+      keyExpr="HeaderID"
+      [height]="'100%'"
+      (onRowCollapsing)="onRowCollapsing($event)"
+      (onCellClick)="onCellClick($event)"
+    >
+      <dxo-selection mode="multiple" showCheckBoxesMode="always">
+      </dxo-selection>
+      <dxi-column type="selection" [allowSelectAll]="true"> </dxi-column>
+      <dxi-column
+        *ngFor="let col of detailViewColumns"
+        [dataField]="col"
+        [caption]="col"
+        [visible]="col !== 'HeaderID'"
+        [width]="col === 'Status' ? 'auto' : 150"
+        [fixed]="col === 'FailureReason' || col === 'Status'"
+        [fixedPosition]="'right'"
+        [alignment]="
+          col === 'Status'
+            ? 'center'
+            : col === 'TransactionID'
+              ? 'left'
+              : 'left'
+        "
+      >
+      </dxi-column>
+
+      <!-- ================= Filter ================= -->
+      <dxo-filter-row
+        [visible]="showFilterRow"
+        [applyFilter]="currentFilter"
+      ></dxo-filter-row>
+
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <!-- ================= Paging ================= -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-pager
+        [visible]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+        [showPageSizeSelector]="true"
+        [allowedPageSizes]="[10, 20, 30, 40]"
+      >
+      </dxo-pager>
+      <!-- <dxo-scrolling
+        mode="stan"
+        rowRenderingMode="virtual"
+        columnRenderingMode="virtual"
+        showScrollbar="always"
+        preloadEnabled="true"
+        useNative="false"
+      >
+      </dxo-scrolling> -->
+
+      <dxo-load-panel [enabled]="true" [showPane]="true" [showIndicator]="true">
+      </dxo-load-panel>
+
+      <!-- ================= Toolbar ================= -->
+      <dxo-toolbar>
+        <dxi-item location="before" locateInMenu="never">
+          <div class="grid-header">Invoice List</div>
+        </dxi-item>
+
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        >
+        </dxi-item>
+
+        <!-- Divider -->
+
+        <dxi-item name="exportButton" location="after" cssClass="export-btn">
+        </dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="ReProcessButtonOptions"
+        >
+        </dxi-item>
+      </dxo-toolbar>
+      <!-- ---- custom daterange select box template ---- -->
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
+        >
+          <!-- This controls the dropdown list rendering -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
+    </dx-data-grid>
+  </div>
+  <div class="grid-section">
+    <dx-data-grid
+      #raGrid
+      [dataSource]="RAGridData"
+      [columns]="RAProcessPopUpColumns"
+      [showBorders]="true"
+      class="mb-1"
+      [keyExpr]="'ID'"
+      [rowAlternationEnabled]="true"
+      [paging]="{ enabled: false }"
+      [selection]="{
+        mode: 'multiple',
+        showCheckBoxesMode: 'always',
+      }"
+      [focusedRowEnabled]="false"
+      [scrolling]="{ mode: 'virtual' }"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [height]="'40%'"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      (onSelectionChanged)="onRADataRowSelected($event)"
+    >
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header h5 fw-bold border-bottom">Receipt Data</div>
+        </dxi-item>
+
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-sorting mode="single"></dxo-sorting>
+      <dxo-filter-row [visible]="true"></dxo-filter-row>
+      <dxo-header-filter [visible]="true"></dxo-header-filter>
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
+    </dx-data-grid>
+  </div>
+</div>

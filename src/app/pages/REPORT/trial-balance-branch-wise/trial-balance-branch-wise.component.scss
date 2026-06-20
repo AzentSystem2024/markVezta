@@ -1,0 +1,133 @@
+/* TOP HEADER (Opening Balance) */
+::ng-deep .dx-datagrid-headers .opening-header {
+  background-color: #1d70c1 !important;
+  color: white !important;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* SUB HEADERS (Debit / Credit) */
+::ng-deep .dx-datagrid-headers .opening-sub-header {
+  background-color: #1d70c1 !important;
+  color: white !important;
+  text-align: center;
+}
+
+/* CENTER TEXT PROPERLY */
+::ng-deep .dx-datagrid-text-content {
+  width: 100%;
+  text-align: center;
+}
+
+/* TOP HEADER (During period) */
+::ng-deep .dx-datagrid-headers .DuringPeriod-header {
+  background-color: #00a3da !important;
+  color: white !important;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* SUB HEADERS (Debit / Credit) */
+::ng-deep .dx-datagrid-headers .DuringPeriod-sub-header {
+  background-color: #00a3da !important;
+  color: white !important;
+  text-align: center;
+}
+
+/* CENTER TEXT PROPERLY */
+::ng-deep .dx-datagrid-text-content {
+  width: 100%;
+  text-align: center;
+}
+
+/* TOP HEADER (closing Balance) */
+::ng-deep .dx-datagrid-headers .closing-header {
+  background-color: #00c4cc !important;
+  color: white !important;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* SUB HEADERS (Debit / Credit) */
+::ng-deep .dx-datagrid-headers .closing-sub-header {
+  background-color: #00c4cc !important;
+  color: white !important;
+  text-align: center;
+}
+
+/* CENTER TEXT PROPERLY */
+::ng-deep .dx-datagrid-text-content {
+  width: 100%;
+  text-align: center;
+}
+
+/* Filter icon (funnel) color */
+/* Filter icon ONLY inside this header */
+/* Only inside your custom header */
+::ng-deep .opening-header .dx-header-filter,
+::ng-deep .opening-sub-header .dx-header-filter {
+  color: white !important;
+}
+::ng-deep .DuringPeriod-header .dx-header-filter,
+::ng-deep .DuringPeriod-sub-header .dx-header-filter {
+  color: white !important;
+}
+::ng-deep .closing-header .dx-header-filter,
+::ng-deep .closing-sub-header .dx-header-filter {
+  color: white !important;
+}
+::ng-deep .dx-datagrid-headers .opening-header:hover {
+  background-color: #1d70c1 !important;
+  color: white !important;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* SUB HEADERS (Debit / Credit) */
+::ng-deep .dx-datagrid-headers .opening-sub-header :hover {
+  background-color: #1d70c1 !important;
+  color: white !important;
+  text-align: center;
+}
+
+/* CENTER TEXT PROPERLY */
+::ng-deep .dx-datagrid-text-content {
+  width: 100%;
+  text-align: center;
+}
+
+/* TOP HEADER (During period) */
+::ng-deep .dx-datagrid-headers .DuringPeriod-header :hover {
+  background-color: #00a3da !important;
+  color: white !important;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* SUB HEADERS (Debit / Credit) */
+::ng-deep .dx-datagrid-headers .DuringPeriod-sub-header :hover {
+  background-color: #00a3da !important;
+  color: white !important;
+  text-align: center;
+}
+
+/* CENTER TEXT PROPERLY */
+::ng-deep .dx-datagrid-text-content {
+  width: 100%;
+  text-align: center;
+}
+
+/* TOP HEADER (closing Balance) */
+::ng-deep .dx-datagrid-headers .closing-header :hover {
+  background-color: #00c4cc !important;
+  color: white !important;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* SUB HEADERS (Debit / Credit) */
+::ng-deep .dx-datagrid-headers .closing-sub-header:hover {
+  background-color: #00c4cc !important;
+  color: white !important;
+  text-align: center;
+}

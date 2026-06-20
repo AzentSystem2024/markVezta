@@ -101,7 +101,7 @@ export class CreditNoteListComponent {
     onClick: () => this.toggleFilters(),
   };
   vatTitle: any;
-  isApproveCreditNote: boolean;
+  isApproveCreditNote: boolean = false;
 
   //========================Export data ==========================
   onExporting(event: any) {

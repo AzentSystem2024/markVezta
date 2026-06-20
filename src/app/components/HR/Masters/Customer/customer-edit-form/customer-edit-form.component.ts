@@ -213,6 +213,18 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.formCustomerData.PHONE = phonenumber;
   }
 
+  validateEmail = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    // Empty → valid (not mandatory)
+    if (!value) return true;
+
+    // Validate only if user entered something
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailRegex.test(value);
+  };
+
   onCountrycodeChange(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,

@@ -159,7 +159,7 @@ export class AddMiscReceiptComponent {
   }
   ngOnInit() {
     this.sessionDetails();
-    
+
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -205,18 +205,18 @@ export class AddMiscReceiptComponent {
     }, 500); // allow grid/toolbar to fully render
   }
 
-        AC_Default(){
-   const payload = {
-    CompanyID : this.companyId
-   }
-    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-      this.settings = res.Data
-      this.CashID = this.settings.GP_CASH_ID;  
-      console.log(this.CashID) 
+  AC_Default() {
+    const payload = {
+      CompanyID: this.companyId,
+    };
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res: any) => {
+      console.log(res);
+      this.settings = res.Data;
+      this.CashID = this.settings.GP_CASH_ID;
+      console.log(this.CashID);
       this.BankID = this.settings.GP_BANK_ID;
-      console.log(this.BankID)
-    })
+      console.log(this.BankID);
+    });
   }
 
   getVoucherNo() {
@@ -306,11 +306,19 @@ export class AddMiscReceiptComponent {
   onCellClick(e: any) {
     const grid = this.itemsGridRef?.instance;
     if (!grid) return;
-    if (this.hasEmptyRow()) return;
-    const dataSource = this.pendingInvoicelist || [];
-    const lastRow = dataSource[dataSource.length - 1];
 
-    // Check if last row is empty (all fields empty)
+    // Ignore delete button click
+    if (
+      e.event?.target?.closest('.dx-link-delete') ||
+      e.column?.command === 'edit'
+    ) {
+      return;
+    }
+
+    if (this.hasEmptyRow()) return;
+
+    const lastRow = this.pendingInvoicelist[this.pendingInvoicelist.length - 1];
+
     const isEmptyRow =
       lastRow &&
       !lastRow.ledgerCode &&
@@ -319,22 +327,19 @@ export class AddMiscReceiptComponent {
       (lastRow.AMOUNT === null || lastRow.AMOUNT === '');
 
     if (!isEmptyRow) {
-      // Add new row
       const newRow = {
         ledgerCode: '',
         ledgerName: '',
         REMARKS: '',
         AMOUNT: null,
       };
-      this.pendingInvoicelist.push(newRow);
 
-      // Refresh grid datasource
-      grid.option('dataSource', [...this.pendingInvoicelist]);
+      this.pendingInvoicelist = [...this.pendingInvoicelist, newRow];
 
-      // Focus the new row ledgerCode
-      const newRowIndex = this.pendingInvoicelist.length - 1;
+      grid.option('dataSource', this.pendingInvoicelist);
+
       setTimeout(() => {
-        grid.editCell(newRowIndex, 'ledgerCode');
+        grid.editCell(this.pendingInvoicelist.length - 1, 'ledgerCode');
       }, 50);
     }
   }
@@ -573,19 +578,26 @@ export class AddMiscReceiptComponent {
   }
 
   onRowRemoved(e: any) {
-    if (e.rowIndex == null || e.rowIndex < 0) return;
+    setTimeout(() => {
+      const grid = e.component;
 
-    this.pendingInvoicelist.splice(e.rowIndex, 1);
+      if (grid.getVisibleRows().length === 0) {
+        this.pendingInvoicelist = [
+          {
+            ledgerCode: '',
+            ledgerName: '',
+            REMARKS: '',
+            AMOUNT: null,
+          },
+        ];
 
-    // Optional: ensure at least one empty row exists
-    if (this.pendingInvoicelist.length === 0) {
-      this.pendingInvoicelist.push({
-        ledgerCode: '',
-        ledgerName: '',
-        REMARKS: '',
-        AMOUNT: null,
-      });
-    }
+        grid.option('dataSource', this.pendingInvoicelist);
+
+        setTimeout(() => {
+          grid.editCell(0, 'ledgerCode');
+        }, 50);
+      }
+    }, 50);
   }
 
   getLedgerCodeDropdown() {
@@ -617,7 +629,8 @@ export class AddMiscReceiptComponent {
       );
     } else if (this.receiptMode === 'Adjustments') {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item: any) => item.GROUP_ID !== this.CashID && item.GROUP_ID !== this.BankID,
+        (item: any) =>
+          item.GROUP_ID !== this.CashID && item.GROUP_ID !== this.BankID,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others

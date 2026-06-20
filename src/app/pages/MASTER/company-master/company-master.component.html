@@ -435,7 +435,16 @@
                 class="form-control mt-1"
                 label="Email"
                 labelMode="floating"
-              ></dx-text-box>
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="custom"
+                    [validationCallback]="validateEmail"
+                    message="Enter a valid email address"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-text-box>
             </dxi-item>
           </dxi-item>
 
@@ -788,7 +797,16 @@
                 class="form-control mt-1"
                 label="Email"
                 labelMode="floating"
-              ></dx-text-box>
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="custom"
+                    [validationCallback]="validateEmail"
+                    message="Enter a valid email address"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-text-box>
             </dxi-item>
           </dxi-item>
 

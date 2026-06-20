@@ -164,7 +164,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     SUPP_GROSS_AMOUNT: '',
     SUPP_NET_AMOUNT: '',
     EXCHANGE_RATE: '',
-    ISSUED_EMP_ID: '',
+    ISSUED_EMP_ID: null,
     PoDetails: [],
   };
   newPoData = this.poData;

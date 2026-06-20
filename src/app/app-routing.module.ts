@@ -205,6 +205,11 @@ import { InvoiceListComponent } from './pages/OPERATIONS/invoice-list/invoice-li
 import { CustomerReceiptsComponent } from './pages/OPERATIONS/customer-receipts/customer-receipts.component';
 import { InvoiceTrOutComponent } from './pages/OPERATIONS/invoice-tr-out/invoice-tr-out.component';
 import { PurchaseInvoiceListComponent } from './pages/OPERATIONS/purchase-invoice-list/purchase-invoice-list.component';
+import { ARManualMatchingComponent } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
+import { TrialBalanceDimensionAdvanceComponent } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
+import { LedgerStatementDimensionComponent } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
+import { BarcodePrintComponent } from './pages/barcode-print/barcode-print.component';
+import { TrialBalanceBranchWiseComponent } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
 
 const routes: Routes = [
   {
@@ -1263,7 +1268,31 @@ const routes: Routes = [
         component: BalanceSheetDimensionComponent,
         canActivate: [AuthGuardService],
       },
-
+      {
+        path: 'ar-manual-matching',
+        component: ARManualMatchingComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'TrialBalance-Dimension-advance',
+        component: TrialBalanceDimensionAdvanceComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'ledger-statement-Dimension',
+        component: LedgerStatementDimensionComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'barcode',
+        component: BarcodePrintComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'trial-balance-branch',
+        component: TrialBalanceBranchWiseComponent,
+        canActivate: [AuthGuardService],
+      },
       {
         path: '**',
         redirectTo: 'login',
@@ -1280,4 +1309,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

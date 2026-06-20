@@ -84,6 +84,8 @@ export class PDCReportComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+    canApprove = false;
+
   customer_details: any = {
     CUSTOMER_ID: 0,
     SALE_ID: 0,

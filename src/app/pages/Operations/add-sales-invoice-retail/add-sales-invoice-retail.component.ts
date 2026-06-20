@@ -89,7 +89,9 @@ ngOnChanges(changes: SimpleChanges) {
       AMOUNT_INCL_VAT: d.AMOUNT_INCL_VAT || 0,
       TAX_PERC: d.VAT_PERCENT || 0,
       TAX_AMOUNT: d.VAT_AMOUNT || 0,
-      TOTAL_AMOUNT: d.AMOUNT_INCL_VAT || 0
+      TOTAL_AMOUNT: d.AMOUNT_INCL_VAT || 0,
+      AMOUNT_EXCL_VAT:
+    (d.AMOUNT_INCL_VAT || 0) - (d.VAT_AMOUNT || 0)
     }));
 
     // 🔹 TENDER GRID
@@ -103,11 +105,7 @@ ngOnChanges(changes: SimpleChanges) {
       (sum: number, x: any) => sum + (x.QUANTITY || 0), 0
     );
 
-    this.totalExclVAT = this.invoiceFormData.Details.reduce(
-      (sum: number, x: any) => sum + ((x.GROSS_AMOUNT || 0)), 0
-    );
-
-    this.vatAmount = this.invoiceFormData.Details.reduce(
+     this.vatAmount = this.invoiceFormData.Details.reduce(
   (sum: number, x: any) => sum + (x.TAX_AMOUNT || 0),
   0
 );
@@ -115,6 +113,11 @@ ngOnChanges(changes: SimpleChanges) {
   (sum: number, x: any) => sum + (x.AMOUNT_INCL_VAT || 0),
   0
 );
+
+   this.totalExclVAT =
+  this.totalInclVAT - this.vatAmount;
+
+   
 
 this.totalTender = this.tenderList.reduce(
   (sum: number, t: any) => sum + (t.AMOUNT || 0),

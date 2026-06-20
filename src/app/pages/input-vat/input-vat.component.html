@@ -27,6 +27,13 @@
     (onExporting)="onExporting($event)"
     [loadPanel]="{ enabled: false, text: 'Loading...' }"
   >
+
+    <dxo-scrolling
+      mode="virtual"
+      rowRenderingMode="virtual"
+      columnRenderingMode="virtual">
+    </dxo-scrolling>
+
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
     <dxo-pager
@@ -50,11 +57,7 @@
             margin-right: 3px;
           "
         >
-          {{
-            selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-              ? "Input VAT"
-              : " INPUT GST"
-          }}
+         Input VAT
         </div>
       </dxi-item>
 
@@ -81,19 +84,24 @@
       </dxi-item>
       <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
 
-      <!-- <dxi-item>
-        <dx-select-box
-      label="Supplier"
-      labelMode="floating"
-      stylingMode="outlined"
-      [valueExpr]="'ID'"
-      [displayExpr]="'DESCRIPTION'"
-      [items]="Supplier"
-      [searchEnabled]="true"
-      [(value)]=" selectedSupplierId"
-      (onValueChanged)="onSupplierChanged($event)"
-    ></dx-select-box>
-      </dxi-item> -->
+      <!-- Store -->
+        <dxi-item>
+          <dx-tag-box
+            label="Store"
+            labelMode="floating"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [items]="Store"
+            [searchEnabled]="true"
+            [(value)]="selectedStoreid"
+            [showSelectionControls]="true"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [hint]="storeHint"
+            (onValueChanged)="updateStoreHint()"
+          ></dx-tag-box>
+        </dxi-item>
 
       <dxi-item>
         <dx-button
@@ -123,20 +131,16 @@
       [applyFilter]="auto"
     ></dxo-filter-row>
 
-    <dxi-column
-      dataField="SUPP_NAME"
-      caption="Supplier Name"
-      dataType="string"
-    ></dxi-column>
+ 
 
-    <dxi-column
+ <dxi-column
       dataField="DOC_NO"
       caption="Document No."
       dataType="number"
       alignment="left"
     ></dxi-column>
 
-    <dxi-column
+<dxi-column
       dataField="PURCH_DATE"
       caption="Purchase Date"
       dataType="date"
@@ -144,26 +148,27 @@
       format="dd/MM/yyyy"
     ></dxi-column>
 
-    <dxi-column
-      dataField="NARRATION"
-      caption="Narration"
+<dxi-column
+      dataField="VAT_REG_NO"
+      caption="Supplier's TRN"
       dataType="number"
-      alignment="left"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="SUPP_NAME"
+      caption="Supplier Name"
+      dataType="string"
     ></dxi-column>
 
     <dxi-column
       dataField="TAXABLE_AMOUNT"
-      caption="Gross Amount"
+      caption="Taxable Amount"
       [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       dataType="number"
     ></dxi-column>
     <dxi-column
       dataField="TAX_AMOUNT"
-      [caption]="
-        selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2
-          ? 'VAT Amount'
-          : ' GST Amount'
-      "
+      caption="Tax Amount"
       [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       dataType="number"
     >

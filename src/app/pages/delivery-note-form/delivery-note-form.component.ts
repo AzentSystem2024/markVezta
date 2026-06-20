@@ -152,7 +152,7 @@ export class DeliveryNoteFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.sessionData_tax();
@@ -171,8 +171,8 @@ export class DeliveryNoteFormComponent {
     const menuGroups = menuResponse.MenuGroups || [];
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/transfer-out-inventory');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/transfer-out-inventory');
     this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -253,7 +253,7 @@ export class DeliveryNoteFormComponent {
     this.updateTotalQty();
   }
 
-  reindexDetails() { }
+  reindexDetails() {}
 
   onInitNewRow(e: any) {
     // Prevent auto-adding empty row
@@ -464,7 +464,7 @@ export class DeliveryNoteFormComponent {
     }
   }
 
-  onAddItems() { }
+  onAddItems() {}
 
   validateQtyReceived = (e: any) => {
     const issued = e.data?.QUANTITY_ISSUED || 0;
@@ -503,7 +503,7 @@ export class DeliveryNoteFormComponent {
     );
   }
 
-  handleClose() { }
+  handleClose() {}
 
   cancel() {
     this.popupClosed.emit();
@@ -536,8 +536,10 @@ export class DeliveryNoteFormComponent {
       }
       if (item.DELIVERED_QUANTITY > item.QUANTITY) {
         notify(
-          `Row ${index + 1
-          }: Delivered Quantity cannot exceed Ordered Quantity (${item.QUANTITY
+          `Row ${
+            index + 1
+          }: Delivered Quantity cannot exceed Ordered Quantity (${
+            item.QUANTITY
           }).`,
         );
         isValid = false;
@@ -1067,4 +1069,4 @@ function numberToWordsIndianNumber(num: number) {
   exports: [DeliveryNoteFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFormModule { }
+export class DeliveryNoteFormModule {}

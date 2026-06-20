@@ -1,26 +1,51 @@
 <div class="user-panel">
-  <dx-drop-down-button
-    *ngIf="menuMode === 'context'"
-    stylingMode="text"
-    dropDownContentTemplate="dropDownTemplate"
-    [text]="user?.initials"
-    [showArrowIcon]="false"
-    [elementAttr]="{
-      class: 'user-button',
-    }"
-    [dropDownOptions]="{
-      width: 'auto',
-    }"
-    (onContentReady)="handleDropDownButtonContentReady($event)"
-  >
-    <div *dxTemplate="let data of 'dropDownTemplate'">
-      <user-menu-section
-        [menuItems]="menuItems"
-        [showAvatar]="false"
-        [user]="user"
-      ></user-menu-section>
-    </div>
-  </dx-drop-down-button>
+  <div class="d-flex">
+    <dx-drop-down-button
+      *ngIf="menuMode === 'context'"
+      stylingMode="text"
+      dropDownContentTemplate="dropDownTemplate"
+      [text]="user?.initials"
+      [showArrowIcon]="false"
+      [elementAttr]="{
+        class: 'user-button',
+      }"
+      [dropDownOptions]="{
+        width: 'auto',
+      }"
+      (onContentReady)="handleDropDownButtonContentReady($event)"
+    >
+      <div *dxTemplate="let data of 'dropDownTemplate'">
+        <user-menu-section
+          [menuItems]="menuItems"
+          [showAvatar]="false"
+          [user]="user"
+        ></user-menu-section>
+      </div>
+    </dx-drop-down-button>
+
+    <button
+      style="border: none; background: none"
+      [title]="
+        notificationCount > 0
+          ? 'Store data is not up to date'
+          : ' All stote data is up to date'
+      "
+      (click)="showPopup()"
+    >
+      <div class="d-flex">
+        <i
+          class="bi bi-bell bell-icon"
+          [ngClass]="notificationCount > 0 ? 'text-danger' : 'text-success'"
+        ></i>
+        <div
+          style="color: var(--base-text-color)"
+          [ngClass]="notificationCount > 0 ? 'text-danger' : 'text-success'"
+        >
+          {{ notificationCount }}
+        </div>
+      </div>
+    </button>
+  </div>
   <div *ngIf="menuMode === 'list'">
     <user-menu-section
       [menuItems]="menuItems"
@@ -29,3 +54,35 @@
     ></user-menu-section>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="popupVisible"
+  width="700"
+  height="auto"
+  title="Store Synchronization Status"
+  [showTitle]="true"
+  [dragEnabled]="false"
+  [hideOnOutsideClick]="true"
+>
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="listSyncData"
+    height="auto"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [rowAlternationEnabled]="true"
+    [scrolling]="{ mode: 'virtual' }"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    (onRowPrepared)="onRowPrepared($event)"
+  >
+    <dxi-column dataField="SL_NO" caption="SL.No" alignment="left"></dxi-column>
+    <dxi-column dataField="CODE" caption="Store Code"></dxi-column>
+
+    <dxi-column dataField="STORE_NAME" caption="Store Name"></dxi-column>
+    <dxi-column
+      dataField="LAST_SYNCH_TIME"
+      caption="Last Synch.Time"
+      [calculateCellValue]="formatTime"
+    ></dxi-column> </dx-data-grid
+></dx-popup>

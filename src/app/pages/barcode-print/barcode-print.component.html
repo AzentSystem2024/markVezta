@@ -1,0 +1,262 @@
+<div
+  class="invoice-wrapper"
+  style="
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+  "
+>
+  <div class="salary-grid-wrapper" style="padding: 0 20px">
+    <div class="grid-container">
+      <dx-data-grid
+        #dataGrid
+        noDataText="No data available"
+        [width]="'100%'"
+        [height]="'75vh'"
+        [loadPanel]="{
+          enabled: true,
+          text: 'Loading...',
+          showIndicator: true,
+          showPane: true,
+        }"
+        class="grid theme-dependent"
+        [dataSource]="itemsList"
+        [showBorders]="true"
+        [showRowLines]="true"
+        [showColumnLines]="true"
+        [columnAutoWidth]="false"
+        [wordWrapEnabled]="false"
+        [rowAlternationEnabled]="true"
+        [allowColumnReordering]="true"
+        [showColumnHeaders]="true"
+        [allowColumnResizing]="true"
+        [columnResizingMode]="'nextColumn'"
+        [filterRow]="{ visible: false }"
+        [headerFilter]="{
+          visible: true,
+          allowSearch: true,
+        }"
+        [scrolling]="{ mode: 'virtual' }"
+        rowAlternationInterval="2"
+        [selection]="{
+          mode: 'multiple',
+          showCheckBoxesMode: 'always',
+        }"
+        focusStateEnabled="false"
+        [(selectedRowKeys)]="selectedRowKeys"
+        (onSelectionChanged)="onSelectionChanged($event)"
+        (onEditorPreparing)="onEditorPreparing($event)"
+        (onEditingStart)="onEditingStart($event)"
+      >
+        <dxo-editing
+          mode="cell"
+          [allowUpdating]="canEdit"
+          [allowDeleting]="false"
+        ></dxo-editing>
+        <!-- <dxo-export
+          [enabled]="true"
+          [allowExportSelectedData]="false"
+          [formats]="['xlsx']"
+        >
+        </dxo-export> -->
+        <dxo-paging [pageSize]="10"></dxo-paging>
+        <dxo-pager
+          [visible]="true"
+          [allowedPageSizes]="allowedPageSizes"
+          [displayMode]="displayMode"
+          [showPageSizeSelector]="showPageSizeSelector"
+          [showInfo]="true"
+          [showNavigationButtons]="true"
+        ></dxo-pager>
+        <dxo-load-panel [showPane]="false"></dxo-load-panel>
+        <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
+        <dxo-filter-row
+          [visible]="isFilterRowVisible"
+          [applyFilter]="auto"
+        ></dxo-filter-row>
+        <dxo-header-filter [visible]="true">
+          <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter>
+        <!-- <dxo-header-filter [visible]="isFilterOpened">
+          <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter> -->
+        <!-- <dxo-header-filter [visible]="isFilterOpened">
+          <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter> -->
+        <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+        <dxo-filter-builder [allowHierarchicalFields]="true">
+        </dxo-filter-builder>
+        <dxo-toolbar>
+          <!-- Heading -->
+          <dxi-item location="before">
+            <div style="font-size: 18px; font-weight: 600; margin-right: 20px">
+              Print Barcode
+            </div>
+          </dxi-item>
+
+          <!-- Radio -->
+          <dxi-item location="before">
+            <dx-radio-group
+              [items]="radioOptions"
+              [(value)]="selectedType"
+              layout="horizontal"
+              (onValueChanged)="onTypeChange($event)"
+            >
+            </dx-radio-group>
+          </dxi-item>
+          <!-- <dxi-item
+            location="after"
+            locateInMenu="auto"
+            widget="dxButton"
+            [options]="searchButtonOptions"
+          ></dxi-item> -->
+
+          <dxi-item
+            location="after"
+            locateInMenu="auto"
+            widget="dxButton"
+            [options]="refreshButtonOptions"
+          ></dxi-item>
+          <!-- GRN Dropdown -->
+          <dxi-item location="after">
+            <dx-drop-down-box
+              [visible]="selectedType === 'GRN'"
+              [dataSource]="grnList"
+              [(value)]="selectedGRN"
+              valueExpr="GRN_ID"
+              [displayExpr]="displayGRN"
+              [searchEnabled]="true"
+              [(opened)]="grnDropdownOpened"
+              (onValueChanged)="onGRNChanged($event)"
+              placeholder="Select GRN"
+              [width]="500"
+            >
+              <div *dxTemplate="let data of 'content'">
+                <dx-data-grid
+                  [dataSource]="grnList"
+                  keyExpr="GRN_ID"
+                  [hoverStateEnabled]="true"
+                  [height]="350"
+                  [selection]="{
+                    mode: 'single',
+                  }"
+                  [filterRow]="{
+                    visible: true,
+                  }"
+                  [(selectedRowKeys)]="selectedGRNKeys"
+                  (onSelectionChanged)="
+                    selectedGRNKeys = $event.selectedRowKeys;
+                    selectedGRN = $event.selectedRowKeys[0];
+                    grnDropdownOpened = false
+                  "
+                >
+                  <dxi-column dataField="GRN_NO" caption="GRN No"></dxi-column>
+
+                  <dxi-column
+                    dataField="GRN_DATE"
+                    caption="GRN Date"
+                    dataType="date"
+                    format="dd/MM/yyyy"
+                  ></dxi-column>
+
+                  <dxi-column
+                    dataField="SUPP_NAME"
+                    caption="Supplier"
+                  ></dxi-column>
+                </dx-data-grid>
+              </div>
+            </dx-drop-down-box>
+          </dxi-item>
+          <dxi-item location="after">
+            <dx-select-box
+              [dataSource]="barcodeFormats"
+              [(value)]="selectedBarcodeFormat"
+              placeholder="Barcode Format"
+              [width]="180"
+            >
+            </dx-select-box>
+          </dxi-item>
+          <!-- Print -->
+          <dxi-item location="after">
+            <dx-button
+              text="Print"
+              icon="print"
+              type="default"
+              stylingMode="contained"
+              (onClick)="onPrint()"
+            >
+            </dx-button>
+          </dxi-item>
+        </dxo-toolbar>
+        <dxi-column
+          dataField="ITEM_ID"
+          caption="Item ID"
+          [allowEditing]="false"
+          [visible]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="ITEM_CODE"
+          caption="Item Code"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="BARCODE"
+          caption="Barcode"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="DESCRIPTION"
+          caption="Description"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="DEPARTMENT"
+          caption="Department"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="CATEGORY"
+          caption="Category"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="PRICE"
+          caption="Price"
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="QTY"
+          caption="Quantity"
+          [allowEditing]="false"
+        ></dxi-column>
+        <dxi-column
+          dataField="BARCODE_QTY"
+          caption="Barcode Count"
+          [allowEditing]="true"
+          alignment="right"
+        ></dxi-column>
+      </dx-data-grid>
+    </div>
+  </div>
+</div>
+<dx-popup
+  [(visible)]="showBarcodePreview"
+  [width]="900"
+  [height]="700"
+  title="Barcode Preview"
+  [showCloseButton]="true"
+>
+  <div
+    id="barcodePreview"
+    style="padding: 20px; display: flex; flex-wrap: wrap; gap: 10px"
+  ></div>
+
+  <div style="text-align: right; margin-top: 15px">
+    <dx-button text="Print" icon="print" (onClick)="printPreview()">
+    </dx-button>
+  </div>
+</dx-popup>

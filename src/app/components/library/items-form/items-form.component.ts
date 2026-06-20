@@ -596,7 +596,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       (option) => option.ID !== this.selectedUom,
     );
   }
-  onSelectPackAdd(event: any) {}
+  onSelectPackAdd(event: any) { }
 
   onUOMChange(event: any) {
     this.selectedUom = this.newItems.UNIT_ID;
@@ -604,7 +604,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
     this.filterDropdownOptions(); // Filter the options when the selection changes
   }
-  onPriorityChange(event: any) {}
+  onPriorityChange(event: any) { }
 
   // onParentItemChanged(e: any) {
   //   if (e.selectedRowKeys.length > 0) {
@@ -789,11 +789,11 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
         row.SALE_PRICE4 = '';
         row.SALE_PRICE5 = '';
         row.COST = '';
-        row.IS_INACTIVE = '';
-        row.IS_NOT_SALE_ITEM = '';
-        row.IS_NOT_SALE_RETURN = '';
-        row.IS_PRICE_REQUIRED = '';
-        row.IS_NOT_DISCOUNTABLE = '';
+        row.IS_INACTIVE = false;
+        row.IS_NOT_SALE_ITEM = false;
+        row.IS_NOT_SALE_RETURN = false;
+        row.IS_PRICE_REQUIRED = false;
+        row.IS_NOT_DISCOUNTABLE = false;
       });
     }
   }
@@ -913,7 +913,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       };
     }
   }
-  onRowClick(e: any) {}
+  onRowClick(e: any) { }
 
   onRowInserted(event: any) {
     // const newRecordIsPrimary = event.data.IS_PRIMARY === true;
@@ -955,7 +955,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   // this.formItemsData.ITEM_ALIAS.push({ ALIAS: event.data.ALIAS, ALIAS_TYPE_ID: this.selectedPriority   });
 
   // }
-  onClickSaveSupplier() {}
+  onClickSaveSupplier() { }
 
   onRowUpdatedAlias(event: any) {
     // Find the index of the alias being updated
@@ -1138,4 +1138,4 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   exports: [ItemsFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsFormModule {}
+export class ItemsFormModule { }

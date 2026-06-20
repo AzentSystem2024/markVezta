@@ -216,7 +216,12 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    console.log(
+      this.menuResponse.GeneralSettings.SYMBOL,
+      'GENERALSETTINGSSSSSSSSS',
+    );
     this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
+    console.log(this.vatTitle, 'VATTITLEEEEEEEEEEEEEE');
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     this.storeID = this.menuResponse.Configuration[0].STORE_ID;
     const menuGroups = this.menuResponse.MenuGroups || [];
@@ -437,11 +442,13 @@ export class PurchaseOrderNewFormComponent implements OnInit {
       this.newPoData.SUPP_MOBILE = this.supplierItems[0].PHONE;
       this.showLocalCurrencyColumn =
         this.localCurrencyId !== this.newPoData.CURRENCY_ID;
-      // this.newPoData.SHIP_TO = this.supplierItems[0].COMPANY_ADDRESS;
-      // this.newPoData.CONTACT_NAME = this.supplierItems[0].COMPANY_CONTACT;
-      // this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
+      if (this.vatTitle === 'GST') {
+        this.newPoData.SHIP_TO = this.supplierItems[0].COMPANY_ADDRESS;
+        this.newPoData.CONTACT_NAME = this.supplierItems[0].COMPANY_CONTACT;
+        this.newPoData.CONTACT_MOBILE = this.supplierItems[0].COMPANY_MOBILE;
+      }
       const suppMobile = this.supplierItems[0].PHONE;
-
+      console.log(this.SupplierCurrencySymbol, 'SUPPLIERCURRENCYSYMBOL');
       if (!suppMobile) return;
 
       // Extract country code and number
@@ -480,13 +487,25 @@ export class PurchaseOrderNewFormComponent implements OnInit {
   };
 
   formatTotalAmount = (data: any) => {
-    return `${this.SupplierCurrencySymbol} ${Number(
-      data.value || 0,
-    ).toLocaleString('en-IN', {
+    const formattedValue = Number(data.value || 0).toLocaleString('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    })}`;
+    });
+
+    return this.SupplierCurrencySymbol ===
+      this.menuResponse?.GeneralSettings?.SYMBOL
+      ? formattedValue
+      : `${this.SupplierCurrencySymbol} ${formattedValue}`;
   };
+
+  // formatTotalAmount = (data: any) => {
+  //   return `${this.SupplierCurrencySymbol} ${Number(
+  //     data.value || 0,
+  //   ).toLocaleString('en-IN', {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   })}`;
+  // };
   getStoreOrCompanyByid() {
     const payload = {
       // SUPP_ID: this.newPoData.SUPP_ID,

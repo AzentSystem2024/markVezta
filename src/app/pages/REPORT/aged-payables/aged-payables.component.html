@@ -122,13 +122,12 @@
             (onValueChanged)="onSupplierChanged($event)"
           ></dx-select-box>
         </dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+
         <dxi-item>
           <dx-button
             text="Apply"
             type="default"
+            icon="todo"
             stylingMode="contained"
             class="mt-2"
             (onClick)="get_DataSource()"
@@ -159,7 +158,7 @@
       ></dxi-column>
 
       <dxi-column
-        dataField="PURCH_ID"
+        dataField="DOC_NO"
         caption="Invoice No"
         dataType="number"
         alignment="left"
@@ -169,6 +168,7 @@
         dataField="PURCH_DATE"
         caption="Invoice Date"
         dataType="date"
+        format="dd/MM/yyyy"
       ></dxi-column>
 
       <dxi-column

@@ -161,6 +161,11 @@
       (onExporting)="onExporting($event)"
     >
 
+<dxo-group-panel [visible]="true"></dxo-group-panel>
+     <dxo-grouping
+      [contextMenuEnabled]="true"
+    [autoExpandAll]="false">
+  </dxo-grouping>
      <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -194,6 +199,7 @@
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
+       <dxi-column dataField="STORE" caption="Store" [groupIndex]="0"></dxi-column>
        <dxi-column
         dataField="DATE"
         caption="Date"
@@ -201,25 +207,24 @@
         [format]="{ type: 'custom', formatter: formatDates }">
       </dxi-column>
       <dxi-column dataField="INVOICE NO" caption="Invoice No."></dxi-column>
-      <dxi-column dataField="STORE" caption="Store"></dxi-column>
       <dxi-column dataField="INVOICE TYPE" caption="Invoice Type"></dxi-column>
       <dxi-column dataField="CUSTOMER_NAME" caption="Customer"></dxi-column>
 
       <dxi-column
         dataField="CASH"
-        caption="Cash"
+        caption="Cash(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
       <dxi-column
         dataField="FAB POS CARD"
-        caption="Fab Pos card"
+        caption="Fab Pos card(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>
       <dxi-column
         dataField="TOTAL"
-        caption="Total"
+        caption="Total(AED)"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }">
       </dxi-column>

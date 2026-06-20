@@ -26,6 +26,7 @@ import { ExportService } from 'src/app/services/export.service';
 import { VatClassEditModule } from '../../vat-class-edit/vat-class-edit.component';
 import { CommonModule } from '@angular/common';
 import DataSource from 'devextreme/data/data_source';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vat-class-list',
@@ -100,7 +101,7 @@ export class VatClassListComponent {
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
     onClick: () => this.toggleFilters(),
   };
-  router: any;
+  // router: any;
   canAdd: any;
   canEdit: any;
   canDelete: any;
@@ -117,7 +118,8 @@ export class VatClassListComponent {
     private exportService: ExportService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-  ) { }
+    private router: Router,
+  ) {}
   onExporting(event: any) {
     this.exportService.onExporting(event, 'VAT_class-list');
   }
@@ -237,7 +239,7 @@ export class VatClassListComponent {
               this.vatClassArray = list; // 🔑 cache for logic
               this.vatClassCount = list.length;
 
-              resolve(list); // 🔑 stops grid loader
+              resolve(list); //  stops grid loader
             },
             error: () => {
               this.vatClassArray = [];
@@ -345,4 +347,4 @@ export class VatClassListComponent {
   exports: [],
   declarations: [VatClassListComponent],
 })
-export class VatClassListModule { }
+export class VatClassListModule {}

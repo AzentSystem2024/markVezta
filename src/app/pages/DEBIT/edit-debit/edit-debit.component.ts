@@ -97,23 +97,23 @@ export class EditDebitComponent {
   @Input() mode: string = 'new';
 
   get actionButtonText(): string {
-  switch (this.mode) {
-    case 'verify':
-      return 'Verify';
+    switch (this.mode) {
+      case 'verify':
+        return 'Verify';
 
-    case 'approve':
-      return 'Approve';
+      case 'approve':
+        return 'Approve';
 
-    case 'edit':
-      return 'Update';
+      case 'edit':
+        return 'Update';
 
-    case 'view':
-      return 'View';
+      case 'view':
+        return 'View';
 
-    default:
-      return 'Save';
+      default:
+        return 'Save';
+    }
   }
-}
 
   netAmountDisplay: any;
   formattedTransDate: string;
@@ -223,7 +223,7 @@ export class EditDebitComponent {
       this.netAmountDisplay = parseFloat(data.NET_AMOUNT) || 0;
       this.transDate = new Date(data.TRANS_DATE);
       this.formattedTransDate = this.formatAsDDMMYYYY(this.transDate);
-
+      this.debitFormData.IS_APPROVED = false;
       // -----------------------------
       //  STEP 1: GET CUSTOMER STATE
       // -----------------------------

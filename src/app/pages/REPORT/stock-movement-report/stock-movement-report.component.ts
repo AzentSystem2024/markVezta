@@ -154,6 +154,9 @@ export class StockMovementReportComponent {
   isViewInvoice: boolean = false;
   fin_id: any;
   finID: any;
+  selectedStoreid: any[] = [];
+  storeHint: string = '';
+  Store: any;
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -166,6 +169,7 @@ export class StockMovementReportComponent {
     private zone: NgZone,
   ) {
     this.sesstion_Details();
+    this.store_dropdown();
     this.get_Item_Dropdown();
 
     //============Year field dataSource===============
@@ -181,6 +185,7 @@ export class StockMovementReportComponent {
   ngOnInit() {
     this.sesstion_Details();
     this.get_Item_Dropdown();
+    this.store_dropdown();
 
     //  SET TODAY AS DEFAULT
     const today = new Date();
@@ -286,6 +291,38 @@ export class StockMovementReportComponent {
     grid.endUpdate();
   }
 
+   store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
+
+    updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store
+      .filter(x => this.selectedStoreid.includes(x.ID))
+      .map(x => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
+    this.getStockMovement();
+  }
+
+  //   refreshButtonOptions = {
+  //   icon: 'refresh',
+  //   hint: 'Refresh',
+  //   elementAttr: { class: 'toolbar-icon-btn' },
+  //   onClick: () => this.refreshGrid(),
+  //   text: '',
+  // };
+
   onItemIdChange(event: any) {
     this.selected_item_Id = event.value;
     this.triggerStockReload();
@@ -338,6 +375,7 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
+      STORE_ID:this.selectedStoreid.join(','),
       FIN_ID: this.finID,
     };
     this.dataService.StockMovement_Api(payload).subscribe({

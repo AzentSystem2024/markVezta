@@ -134,13 +134,13 @@ export class StoresListComponent implements OnInit {
   }
 
   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
+    const status = cellInfo.data.IS_ACTIVE;
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag';
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'Approved' : 'Open';
+    icon.style.color = status === true ? '#10B981' : '#FFA500';
+    icon.title = status === true ? 'Active' : 'Inactive';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -151,12 +151,12 @@ export class StoresListComponent implements OnInit {
 
   getStatusFilterData = [
     {
-      text: 'Approved',
-      value: 'Approved',
+      text: 'Active',
+      value: 'true',
     },
     {
-      text: 'Open',
-      value: 'Open',
+      text: 'Inactive',
+      value: 'false',
     },
   ];
 

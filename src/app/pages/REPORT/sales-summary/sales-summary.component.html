@@ -142,7 +142,7 @@
     <dx-data-grid
       #dataGrid
       class="grid theme-dependent"
-      [dataSource]="JournalBookDataSource"
+      [dataSource]="SaleSummaryDataSource"
       height="79vh"
       [showBorders]="true"
       [showRowLines]="true"
@@ -163,6 +163,11 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
+     <dxo-group-panel [visible]="true"></dxo-group-panel>
+     <dxo-grouping
+      [contextMenuEnabled]="true"
+    [autoExpandAll]="false">
+  </dxo-grouping>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -189,6 +194,7 @@
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
+       <dxi-column dataField="Store" caption="Store" [groupIndex]="0"></dxi-column>
       <dxi-column
         dataField="Date"
         caption="Date"
@@ -199,11 +205,11 @@
 
       <dxi-column dataField="Invoice No" caption="Invoice No"></dxi-column>
       <dxi-column dataField="Customer" caption="Customer"></dxi-column>
-      <dxi-column dataField="Store" caption="Store"></dxi-column>
       <dxi-column dataField="Invoice Type" caption="Invoice Type"></dxi-column>
-      <dxi-column dataField="Discount" caption="Discount"></dxi-column>
+      <dxi-column dataField="Discount" caption="Discount" [visible]="false"></dxi-column>
+      <dxi-column dataField="Exempted" caption="Exempted(AED)"></dxi-column>
       <dxi-column
-        caption="Ex. VAT Total"
+        caption="Excl.VAT Total(AED)"
         name="ExVATtotal"
         [calculateCellValue]="getExVATtotal"
         alignment="right"
@@ -212,7 +218,7 @@
       >
       </dxi-column>
       <dxi-column
-        caption="VAT Amount"
+        caption="VAT Amount(AED)"
         alignment="right"
         dataField="VAT Amount"
         [format]="{ type: 'fixedPoint', precision: 2 }"
@@ -221,35 +227,35 @@
       <dxi-column
         name="netAmount"
         [calculateCellValue]="getNetAmount"
-        caption="Inc.VAT Total"
+        caption="Inc.VAT Total(AED)"
         alignment="right"
         [allowHeaderFiltering]="true"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
       <dxi-column
-        caption="CASH"
+        caption="CASH(AED)"
         dataField="CASH"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
       <dxi-column
-        caption="Bank Card"
+        caption="Bank Card(AED)"
         alignment="right"
         dataField="BANK CARD"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
       <dxi-column
-        caption="Fab Pos Card"
+        caption="Fab Pos Card(AED)"
         alignment="right"
         dataField="FAB POS CARD"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
       <dxi-column
-        caption="Room Charge"
+        caption="Room Charge(AED)"
         dataField="ROOM CHARGE"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }"

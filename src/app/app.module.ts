@@ -142,7 +142,7 @@ import { EmployeeAddFormModule } from './components/HR/Masters/employee-add-form
 import { EmployeeEditFormFormModule } from './components/HR/Masters/employee-edit-form/employee-edit-form.component';
 import { SalaryHeadsModule } from './components/HR/Masters/salary-heads/salary-heads.component';
 import { AdvanceTypesModule } from './components/HR/Masters/advance-types/advance-types.component';
-import { PayRevisionModule } from './components/HR/Masters/pay-revision/pay-revision.component';  
+import { PayRevisionModule } from './components/HR/Masters/pay-revision/pay-revision.component';
 import { PayRevisionEditModule } from './components/HR/Masters/pay-revision-edit/pay-revision-edit.component';
 import { PayRevisionAddModule } from './components/HR/Masters/pay-revision-add/pay-revision-add.component';
 import { PayRevisionVerifyModule } from './components/HR/Masters/pay-revision-verify/pay-revision-verify.component';
@@ -392,6 +392,17 @@ import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/
 import { ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
+import {
+  ARManualMatchingComponent,
+  ARManualMatchingModule,
+} from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
+import { LedgerStatementDimensionModule } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
+import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
+import {
+  BarcodePrintComponent,
+  BarcodePrintModule,
+} from './pages/barcode-print/barcode-print.component';
+import { TrialBalanceBranchWiseModule } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -800,6 +811,11 @@ import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-re
     ProfitAndLossDimensionModule,
     BalanceSheetDimensionModule,
     ARReportPageModule,
+    ARManualMatchingModule,
+    TrialBalanceDimensionAdvanceModule,
+    LedgerStatementDimensionModule,
+    BarcodePrintModule,
+    TrialBalanceBranchWiseModule
   ],
 
   providers: [
@@ -814,4 +830,4 @@ import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-re
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

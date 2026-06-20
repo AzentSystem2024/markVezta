@@ -91,6 +91,8 @@ export class InputVatComponent {
   editMiscPopupOpened: boolean = false;
   isReadOnlyPayment: boolean = true;
   financialYeaDate: string;
+  Store: any;
+ selectedStoreid: number[] = [1];
 
   constructor(
     private dataservice: DataService,
@@ -101,6 +103,7 @@ export class InputVatComponent {
     this.get_sessionstorage_data();
     this.sesstion_Details();
     this.get_Supplier_dropdown();
+    this.store_dropdown();
   }
 
   ngOnInit() {
@@ -157,6 +160,38 @@ export class InputVatComponent {
 
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
+
+    storeHint: string = '';
+  
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+  
+    const selectedNames = this.Store
+      .filter(x => this.selectedStoreid.includes(x.ID))
+      .map(x => x.DESCRIPTION);
+  
+    this.storeHint = selectedNames.join(', ');
+  }
+  
+    store_dropdown(){
+      const payload = {
+        NAME :'STORE',
+        COMPANY_ID : this.selected_Company_id
+      }
+      this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
+        this.Store = res;
+        const hoStore = this.Store.find(
+    (x: any) => x.DESCRIPTION === 'HO_STORE'
+  );
+
+  if (hoStore) {
+    this.selectedStoreid = [hoStore.ID];
+  }
+      });
+    }
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
@@ -272,6 +307,7 @@ export class InputVatComponent {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
+      STORE_ID: this.selectedStoreid?.join(','),
       //  SUPP_ID: this.selectedSupplierId || 0
     };
 

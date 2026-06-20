@@ -1,0 +1,227 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="TrialBalanceReport"
+      width="100%"
+      height="82vh"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [allowColumnResizing]="false"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [groupPanel]="{ visible: true }"
+      [grouping]="{ autoExpandAll: false }"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [summary]="summaryColumnsData"
+      [allowColumnReordering]="true"
+      id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
+      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+      (onCellClick)="onCellClick($event)"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Account Summary
+          </div>
+        </dxi-item>
+        <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
+
+        <dxi-item>
+          <dx-date-box
+            [width]="120"
+            label="As On Date"
+            labelMode="floating"
+            [displayFormat]="'dd-MM-yyyy'"
+            [value]="formatted_To_date"
+            (onValueChanged)="onToDateChange($event)"
+          >
+          </dx-date-box>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-button
+            class="mt-2"
+            text="Apply"
+            type="default"
+            icon="todo"
+            stylingMode="contained"
+            (onClick)="get_DataSource()"
+          >
+          </dx-button>
+        </dxi-item>
+
+        <dxi-item name="exportButton"></dxi-item>
+      </dxo-toolbar>
+      <div
+        *dxTemplate="let data of 'StoreFilterTemplate'"
+        style="margin-bottom: 5px"
+      >
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Stores_List"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [width]="200"
+          (onValueChanged)="onStoreChanged($event)"
+        ></dx-tag-box>
+      </div>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+        [allowSelectAll]="true"
+        [search]="{ enabled: true, mode: 'contains' }"
+      >
+      </dxo-header-filter>
+
+      <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+      <dxi-column
+        dataField="MainGroup"
+        caption="Main Group"
+        dataType="string"
+      ></dxi-column>
+      <dxi-column
+        dataField="SubGroup"
+        caption="Sub Group"
+        alignment="left"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column dataField="Category" caption="Category"></dxi-column>
+      <dxi-column
+        dataField="LedgerCode"
+        caption="Ledger Code"
+        width="100"
+      ></dxi-column>
+      <dxi-column
+        dataField="LedgerName"
+        caption="Ledger Name"
+        width="300"
+      ></dxi-column>
+      <dxi-column
+        dataField="HeadID"
+        caption="Head ID"
+        [visible]="false"
+      ></dxi-column>
+      <dxi-column caption="Debit" alignment="center">
+        <dxi-column
+          *ngFor="let store of storesDebit"
+          [dataField]="'Debit_' + store"
+          [caption]="store"
+          [format]="{
+            type: 'fixedPoint',
+            precision: 2,
+            useGrouping: true,
+          }"
+        >
+        </dxi-column>
+      </dxi-column>
+
+      <dxi-column caption="Credit" alignment="center">
+        <dxi-column
+          *ngFor="let store of storesCredit"
+          [dataField]="'Credit_' + store"
+          [caption]="store"
+          [format]="{
+            type: 'fixedPoint',
+            precision: 2,
+            useGrouping: true,
+          }"
+        >
+        </dxi-column>
+      </dxi-column>
+
+      <dxi-column
+        *ngIf="TrialBalanceReport.length > 0"
+        type="buttons"
+        [width]="50"
+      >
+        <dxi-button
+          hint="View"
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)"
+        ></dxi-button>
+      </dxi-column>
+
+      <dxo-summary>
+        <dxi-total-item
+          column="LedgerName"
+          summaryType="count"
+          [customizeText]="customizeTotalText"
+        >
+        </dxi-total-item>
+        <dxi-total-item
+          *ngFor="let item of summaryColumnsData.totalItems"
+          [column]="item.column"
+          [summaryType]="item.summaryType"
+          [showInColumn]="item.showInColumn"
+          [valueFormat]="item.valueFormat"
+          displayFormat="{0}"
+        >
+        </dxi-total-item>
+      </dxo-summary>
+    </dx-data-grid>
+  </div>
+
+  <dx-popup
+    [(visible)]="dimensionPopupVisible"
+    [width]="700"
+    [height]="500"
+    title="Financial Dimension Details"
+    [showCloseButton]="true"
+    [dragEnabled]="true"
+    [hideOnOutsideClick]="true"
+  >
+    <dx-data-grid
+      [dataSource]="dimensionPopupData"
+      [showBorders]="true"
+      [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+    >
+      <dxi-column dataField="Dimension" caption="Dimension"></dxi-column>
+      <dxi-column dataField="Code" caption="Code"></dxi-column>
+      <dxi-column dataField="Description" caption="Description"></dxi-column>
+    </dx-data-grid>
+  </dx-popup>
+</div>

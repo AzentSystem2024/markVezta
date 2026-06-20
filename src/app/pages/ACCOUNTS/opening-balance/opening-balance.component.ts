@@ -104,6 +104,7 @@ export class OpeningBalanceComponent {
   selected_Company_id: any;
   Departments: any = [];
   Stores_List: any = [];
+  selected_Financial_Year_id: any;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -136,6 +137,7 @@ export class OpeningBalanceComponent {
       const selectedCompany = userData?.SELECTED_COMPANY;
       const companyId = selectedCompany?.COMPANY_ID;
       const finId = userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
+      this.selected_Financial_Year_id = finId;
       console.log(
         companyId,
         finId,
@@ -224,6 +226,8 @@ export class OpeningBalanceComponent {
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
+      this.loadOpeningBalance(this.selected_Company_id, this.selected_Financial_Year_id);
+
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
   }

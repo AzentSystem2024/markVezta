@@ -306,7 +306,9 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData')||'{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
 
@@ -448,7 +450,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
         new Promise((resolve) => {
           this.dataservice.getItemsData().subscribe({
             next: (response: any) => {
-              const data = (response?.data || []).reverse();
+              const data = response?.data || [];
 
               this.itemsArray = data; // local cache
               this.itemsCount = data.length;
@@ -476,11 +478,11 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     if (items.ITEM_ALIAS && items.ITEM_ALIAS.length > 0) {
       // First filter out objects with empty ALIAS
       items.ITEM_ALIAS = items.ITEM_ALIAS.filter(
-        (item:any) => item.ALIAS && item.ALIAS.trim() !== '',
+        (item: any) => item.ALIAS && item.ALIAS.trim() !== '',
       );
 
       // Then set ALIAS_TYPE_ID: 1 for remaining objects
-      items.ITEM_ALIAS.forEach((item:any) => {
+      items.ITEM_ALIAS.forEach((item: any) => {
         item.ALIAS_TYPE_ID = 1;
       });
     } else {

@@ -82,7 +82,7 @@ export class SupplierFormComponent implements OnInit {
     CURRENCY_ID: '',
     PAY_TERM_ID: '',
     VAT_RULE_ID: '',
-    SUPP_CAT_ID: '',
+    SUPP_CAT_ID: 0,
     PURCH_TYPE: 0,
     IS_COMPANY_BRANCH: false,
     // Supplier_cost:''
@@ -128,10 +128,19 @@ export class SupplierFormComponent implements OnInit {
     ...this.newSupplier,
     MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
     PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
+    IS_DEFAULT_CURRENCY: this.isCurrencyAccepted,
   });
 
   toggleCurrencyDropdown(checked: boolean) {
     this.isCurrencyAccepted = checked;
+    if (checked) {
+      // Clear selection when disabled
+      this.formSupplierData.Supplier_cost = [];
+
+      if (this.landedCostGrid) {
+        this.landedCostGrid.instance.clearSelection();
+      }
+    }
   }
 
   private loadDropdownData(): void {
@@ -153,8 +162,8 @@ export class SupplierFormComponent implements OnInit {
       NOTES: '',
       PHONE: '',
       FAX_NO: '',
-      VAT_RULE_ID: '',
-      SUPP_CAT_ID: '',
+      VAT_RULE_ID: this.newSupplier.VAT_RULE_ID,
+      SUPP_CAT_ID: 0,
     };
 
     this.newSupplier.ADDRESS2 = '';
@@ -217,6 +226,15 @@ export class SupplierFormComponent implements OnInit {
 
     this.service.getDropdownData(payload).subscribe((data: any) => {
       this.VATRuleDropdownData = data;
+      if (!this.newSupplier.VAT_RULE_ID) {
+        const defaultValue = data.find(
+          (x: any) => x.DESCRIPTION === 'TAX Applicable',
+        );
+
+        if (defaultValue) {
+          this.newSupplier.VAT_RULE_ID = defaultValue.ID;
+        }
+      }
     });
   }
 
@@ -266,7 +284,7 @@ export class SupplierFormComponent implements OnInit {
     if (selectedCountry) {
       this.countryCode = selectedCountry.CODE; // e.g., '+971'
       this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
-
+      this.countryCodePhone = selectedCountry.CODE;
     } else {
       // 5️ Fallback if no country found
       this.countryCode = '';
@@ -296,8 +314,11 @@ export class SupplierFormComponent implements OnInit {
     this.getCurrency();
     this.getCurrency_Dropdown();
 
-    this.newSupplier.VAT_RULE_ID = "1"
-    console.log(this.newSupplier.VAT_RULE_ID, '===========vat rule id============')
+    // this.newSupplier.VAT_RULE_ID = '1';
+    console.log(
+      this.newSupplier.VAT_RULE_ID,
+      '===========vat rule id============',
+    );
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
@@ -391,4 +412,4 @@ export class SupplierFormComponent implements OnInit {
   exports: [SupplierFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierFormModule { }
+export class SupplierFormModule {}

@@ -113,7 +113,7 @@ export class ARImportedListComponent {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
-  
+
   selectedDateRange: any = 'last7';
   customStartDate: any = null;
   customEndDate: any = null;
@@ -124,11 +124,12 @@ export class ARImportedListComponent {
     private srvce: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.fetch_Full_import_list();
   }
+
 
   displayExpr = (item: any) => {
     if (!item) return '';
@@ -615,4 +616,4 @@ export class ARImportedListComponent {
   exports: [ARImportedListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ARImportedListModule {}
+export class ARImportedListModule { }

@@ -171,10 +171,7 @@ export class AddSupplierPaymentComponent {
     this.sesstion_Details();
     this.getDocNo();
     this.AC_Default();
-   
   }
-
-
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -182,18 +179,18 @@ export class AddSupplierPaymentComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
-    AC_Default(){
-   const payload = {
-    CompanyID : this.selected_Company_id
-   }
-    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-      this.settings = res.Data
-      this.CashID = this.settings.GP_CASH_ID;  
-      console.log(this.CashID) 
+  AC_Default() {
+    const payload = {
+      CompanyID: this.selected_Company_id,
+    };
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res: any) => {
+      console.log(res);
+      this.settings = res.Data;
+      this.CashID = this.settings.GP_CASH_ID;
+      console.log(this.CashID);
       this.BankID = this.settings.GP_BANK_ID;
-      console.log(this.BankID)
-    })
+      console.log(this.BankID);
+    });
   }
 
   getDocNo() {
@@ -299,70 +296,70 @@ export class AddSupplierPaymentComponent {
   //   }
   // }
 
-selectAllRows() {
-  if (!this.itemsGridRef?.instance || !this.pendingInvoicelist?.length) {
-    return;
+  selectAllRows() {
+    if (!this.itemsGridRef?.instance || !this.pendingInvoicelist?.length) {
+      return;
+    }
+
+    const allKeys = this.pendingInvoicelist.map((item: any) => item.BILL_ID);
+
+    this.itemsGridRef.instance.selectRows(allKeys, false);
   }
 
-  const allKeys = this.pendingInvoicelist.map((item: any) => item.BILL_ID);
+  clearSelection() {
+    this.itemsGridRef?.instance.clearSelection();
+  }
 
-  this.itemsGridRef.instance.selectRows(allKeys, false);
-}
+  onEditorPreparing(e: any) {
+    if (e.parentType === 'dataRow' && e.dataField === 'RECEIVED_AMOUNT') {
+      const grid = this.itemsGridRef?.instance;
 
-clearSelection() {
-  this.itemsGridRef?.instance.clearSelection();
-}
+      if (!grid) return;
 
- onEditorPreparing(e: any) {
-  if (e.parentType === 'dataRow' && e.dataField === 'RECEIVED_AMOUNT') {
-    const grid = this.itemsGridRef?.instance;
+      const selectedKeys = grid.getSelectedRowKeys();
+      const isSelected = selectedKeys.includes(e.row.key);
 
-    if (!grid) return;
+      e.editorOptions = e.editorOptions || {};
 
-    const selectedKeys = grid.getSelectedRowKeys();
-    const isSelected = selectedKeys.includes(e.row.key);
+      // disable editing for unselected rows
+      e.editorOptions.readOnly = !isSelected;
 
-    e.editorOptions = e.editorOptions || {};
-
-    // disable editing for unselected rows
-    e.editorOptions.readOnly = !isSelected;
-
-    e.editorOptions.elementAttr = {
-      style: `
+      e.editorOptions.elementAttr = {
+        style: `
         height: 100%;
         margin: 0;
         padding: 0;
         display: flex;
         align-items: center;
       `,
-    };
+      };
 
-    e.editorOptions.inputAttr = {
-      style: `
+      e.editorOptions.inputAttr = {
+        style: `
         height: 100%;
         padding: 0 4px;
         box-sizing: border-box;
       `,
-    };
+      };
 
-    if (e.editorName === 'dxNumberBox') {
-      e.editorOptions.showSpinButtons = false;
-    }
-
-    e.editorOptions.onKeyDown = (event: any) => {
-      if (event.event.key === 'Enter') {
-        const visibleRows = grid.getVisibleRows();
-        const rowIndex = visibleRows.findIndex(
-          (r) => r?.data === e.row?.data
-        );
-
-        setTimeout(() => {
-          grid.focus(grid.getCellElement(rowIndex + 1, 'RECEIVED_AMOUNT'));
-        }, 50);
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
       }
-    };
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const visibleRows = grid.getVisibleRows();
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data,
+          );
+
+          setTimeout(() => {
+            grid.focus(grid.getCellElement(rowIndex + 1, 'RECEIVED_AMOUNT'));
+          }, 50);
+        }
+      };
+    }
   }
-}
 
   onGridContentReady(e: any) {
     if (e.component) {
@@ -532,39 +529,32 @@ clearSelection() {
     this.pdcPopupVisible = false;
   }
 
-onSelectionChanged(e: any) {
-  this.selectedRowsCount = e.selectedRowsData.length;
+  onSelectionChanged(e: any) {
+    this.selectedRowsCount = e.selectedRowsData.length;
 
-  const selectedKeys = e.selectedRowKeys || [];
+    const selectedKeys = e.selectedRowKeys || [];
 
-  // selected rows total
-  this.totalPending = e.selectedRowsData.reduce(
-    (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-    0,
-  );
+    // update textbox value
+    this.totalPending = e.selectedRowsData.reduce(
+      (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
+      0,
+    );
 
-  // clear received amount for unselected rows
-  this.pendingInvoicelist.forEach((row: any) => {
-    if (!selectedKeys.includes(row.BILL_ID)) {
-      row.RECEIVED_AMOUNT = 0;
-    }
-  });
+    this.pendingInvoicelist.forEach((row: any) => {
+      if (!selectedKeys.includes(row.BILL_ID)) {
+        row.RECEIVED_AMOUNT = 0;
+      }
+    });
 
-  // refresh grid + summary
-  this.pendingInvoicelist = [...this.pendingInvoicelist];
-  this.itemsGridRef.instance.refresh();
-}
-  // onSelectionChanged(e: any) {
-  //   this.selectedRowsCount = e.selectedRowsData.length;
+    e.component.refresh(true);
+  }
 
-  //   // Calculate selected total balance
-  //   this.totalPending = e.selectedRowsData.reduce(
-  //     (sum: number, row: any) => sum + (Number(row.PENDING_AMOUNT) || 0),
-  //     0,
-  //   );
-
-  //   console.log('Selected Balance Total:', this.totalPending.toFixed(2));
-  // }
+  formatPending = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value || 0);
+  };
 
   onFillAmountClick() {
     if (this.selectedRowsCount === 0) {
@@ -579,60 +569,59 @@ onSelectionChanged(e: any) {
     // ✅ only show popup, no auto-fill into field1
     this.showFillAmountPopup = true;
   }
-autoFillReceivedAmounts() {
-  const fillAmount = Number(this.fillAmountData.field1);
+  autoFillReceivedAmounts() {
+    const fillAmount = Number(this.fillAmountData.field1);
 
-  if (isNaN(fillAmount) || fillAmount <= 0) {
-    notify('Please enter a valid fill amount first.', 'warning', 3000);
-    return;
+    if (isNaN(fillAmount) || fillAmount <= 0) {
+      notify('Please enter a valid fill amount first.', 'warning', 3000);
+      return;
+    }
+
+    let remaining = fillAmount;
+
+    const selectedKeys =
+      this.itemsGridRef?.instance?.getSelectedRowKeys() || [];
+
+    if (selectedKeys.length === 0) {
+      notify('Please select at least one row', 'warning', 3000);
+      return;
+    }
+
+    const EPSILON = 0.01;
+
+    // loop through full invoice list in display order
+    this.pendingInvoicelist.forEach((row: any) => {
+      // only process selected rows
+      if (selectedKeys.includes(row.BILL_ID)) {
+        const pending = Number(row.PENDING_AMOUNT) || 0;
+
+        if (remaining > EPSILON) {
+          row.RECEIVED_AMOUNT = Math.min(pending, remaining);
+          remaining -= row.RECEIVED_AMOUNT;
+        } else {
+          row.RECEIVED_AMOUNT = 0;
+        }
+      }
+    });
+
+    this.pendingInvoicelist = [...this.pendingInvoicelist];
   }
 
-  let remaining = fillAmount;
+  calculateSelectedPendingSummary = (options: any) => {
+    if (options.name === 'selectedPendingTotal') {
+      switch (options.summaryProcess) {
+        case 'start':
+          options.totalValue = 0;
+          break;
 
-  const selectedKeys =
-    this.itemsGridRef?.instance?.getSelectedRowKeys() || [];
-
-  if (selectedKeys.length === 0) {
-    notify('Please select at least one row', 'warning', 3000);
-    return;
-  }
-
-  const EPSILON = 0.01;
-
-  // loop through full invoice list in display order
-  this.pendingInvoicelist.forEach((row: any) => {
-    // only process selected rows
-    if (selectedKeys.includes(row.BILL_ID)) {
-      const pending = Number(row.PENDING_AMOUNT) || 0;
-
-      if (remaining > EPSILON) {
-        row.RECEIVED_AMOUNT = Math.min(pending, remaining);
-        remaining -= row.RECEIVED_AMOUNT;
-      } else {
-        row.RECEIVED_AMOUNT = 0;
+        case 'calculate':
+          if (options.component.isRowSelected(options.value.BILL_ID)) {
+            options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
+          }
+          break;
       }
     }
-  });
-
-  this.pendingInvoicelist = [...this.pendingInvoicelist];
-}
-
-calculateSelectedPendingSummary = (options: any) => {
-  if (options.name === 'selectedPendingTotal') {
-    if (options.summaryProcess === 'start') {
-      options.totalValue = 0;
-    }
-
-    if (options.summaryProcess === 'calculate') {
-      const selectedKeys =
-        this.itemsGridRef?.instance?.getSelectedRowKeys() || [];
-
-      if (selectedKeys.includes(options.value.BILL_ID)) {
-        options.totalValue += Number(options.value.PENDING_AMOUNT) || 0;
-      }
-    }
-  }
-};
+  };
 
   handleCancel() {
     this.popupClosed.emit();
@@ -666,35 +655,43 @@ calculateSelectedPendingSummary = (options: any) => {
     this.isFillAmountValid = true;
   }
 
-submitAmountPopup() {
-  const enteredAmount = Number(this.fillAmountData.field1);
+  Cancel() {
+    //  this.autoFillReceivedAmounts();
 
-  if (isNaN(enteredAmount) || enteredAmount <= 0) {
-    notify('Please enter a valid amount', 'warning', 3000);
-    return;
+    // this.amountError = '';
+    this.resetFillAmountForm();
+    this.showFillAmountPopup = false;
   }
 
-  if (this.selectedRowsCount === 0) {
-    notify('Please select at least one row', 'warning', 3000);
-    return;
+  submitAmountPopup() {
+    const enteredAmount = Number(this.fillAmountData.field1);
+
+    if (isNaN(enteredAmount) || enteredAmount <= 0) {
+      notify('Please enter a valid amount', 'warning', 3000);
+      return;
+    }
+
+    if (this.selectedRowsCount === 0) {
+      notify('Please select at least one row', 'warning', 3000);
+      return;
+    }
+
+    // check against selected rows pending total
+    if (enteredAmount > this.totalPending) {
+      notify(
+        'The amount cannot be greater than the selected rows pending amount',
+        'error',
+        3000,
+      );
+      return;
+    }
+
+    this.autoFillReceivedAmounts();
+
+    this.amountError = '';
+    this.resetFillAmountForm();
+    this.showFillAmountPopup = false;
   }
-
-  // check against selected rows pending total
-  if (enteredAmount > this.totalPending) {
-    notify(
-      'The amount cannot be greater than the selected rows pending amount',
-      'error',
-      3000,
-    );
-    return;
-  }
-
-  this.autoFillReceivedAmounts();
-
-  this.amountError = '';
-  this.resetFillAmountForm();
-  this.showFillAmountPopup = false;
-}
 
   getReceiptNo() {
     const payload = {
@@ -762,15 +759,15 @@ submitAmountPopup() {
     this.paymentFormData.SUPP_DETAIL = validDetails;
 
     if (this.paymentFormData.CHEQUE_DATE) {
-  const d = new Date(this.paymentFormData.CHEQUE_DATE);
+      const d = new Date(this.paymentFormData.CHEQUE_DATE);
 
-  this.paymentFormData.CHEQUE_DATE =
-    d.getFullYear() +
-    '-' +
-    String(d.getMonth() + 1).padStart(2, '0') +
-    '-' +
-    String(d.getDate()).padStart(2, '0');
-}
+      this.paymentFormData.CHEQUE_DATE =
+        d.getFullYear() +
+        '-' +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(d.getDate()).padStart(2, '0');
+    }
     // Set PAY_TYPE_ID based on receiptMode
     const payTypeMapping: any = {
       Cash: 1,

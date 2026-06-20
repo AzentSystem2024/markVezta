@@ -132,6 +132,7 @@ export class GrnComponent implements OnInit {
   isViewOpened: boolean;
   isApproveOpened: boolean;
   isVerifyOpened: boolean;
+  finID: any;
 
   statusCellRender(cellElement: any, cellInfo: any) {
     const status = (cellInfo.data.STATUS || '').trim();
@@ -315,7 +316,7 @@ export class GrnComponent implements OnInit {
 
     const data = this.grnNewForm.getNewGrnData();
     data.IS_APPROVED = this.isApproved;
-
+    data.FIN_ID = this.finID;
     // ✅ Confirmation for Verify / Approve
     const actionMessage = this.isVerifyMode
       ? 'Are you sure you want to verify this GRN?'
@@ -415,7 +416,7 @@ export class GrnComponent implements OnInit {
   async editGrnData() {
     const data = this.grnVerifyForm.getNewGrnData();
     console.log(data, 'grn verified data');
-
+    data.FIN_ID = this.finID;
     //  Confirmation only for Approve
     if (this.isApproved === true) {
       const confirmed = await confirm(
@@ -499,7 +500,7 @@ export class GrnComponent implements OnInit {
 
       const data = this.grnVerifyForm.getNewGrnData();
       console.log(data, 'grn verified data');
-
+      data.FIN_ID = this.finID;
       this.service.verifyGrnData(data).subscribe((res) => {
         console.log('data verified', res);
 
@@ -778,7 +779,8 @@ export class GrnComponent implements OnInit {
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
-
+    console.log(menuResponse.FINANCIAL_YEARS[0].FIN_ID, 'MENURESPONSEINGRN');
+    this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
       .find((menu: any) => menu.Path === currentUrl);
@@ -877,9 +879,49 @@ export class GrnComponent implements OnInit {
     });
   };
 
-  deleteGrnData(event: any) {
+  // deleteGrnData(event: any) {
+  //   const ID = event.data.ID;
+  //   this.service.deleteGrnData(ID).subscribe((response: any) => {});
+  // }
+  async deleteGrnData(event: any) {
+    const confirmed = await confirm(
+      'Are you sure you want to delete this GRN?',
+      'Confirmation',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     const ID = event.data.ID;
-    this.service.deleteGrnData(ID).subscribe((response: any) => {});
+
+    this.service.deleteGrnData(ID).subscribe(
+      (response: any) => {
+        if (response) {
+          notify(
+            {
+              message: 'GRN Deleted Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
+          this.getGrnLogData();
+          // this.dataGrid.instance.refresh();
+        } else {
+          notify(
+            {
+              message: 'Your Data Not deleted',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+        // or whatever method you use to refresh `employeeList`
+      },
+      (error) => {
+        console.error('Error deleting GRN :', error);
+      },
+    );
   }
 
   formatGrnDate(rowData: any): string {

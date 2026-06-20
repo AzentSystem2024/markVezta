@@ -1354,8 +1354,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SupplierPayment/commit`, data);
   }
 
-
-    deleteSupplierPayment(id: number) {
+  deleteSupplierPayment(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}SupplierPayment/delete/` + id,
       {},
@@ -7028,29 +7027,29 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}DenialMaster/delete/${id}`, {});
   }
 
-    //=================PROFIT & LOSS DIMENSION===================
+  //=================PROFIT & LOSS DIMENSION===================
   Profit_Loss_Dimension_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/profitlossdimension';
     return this.http.post(getEndpoint, payload);
   }
 
-   //===========Balance sheet Dimension======================
+  //===========Balance sheet Dimension======================
   Balance_Sheet_Dimension_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheetDimension';
     return this.http.post(getEndpoint, payload);
   }
 
-   //===========AC_Default_Settings=====================
+  //===========AC_Default_Settings=====================
   AC_Default_Settings_Api(payload: any) {
     const getEndpoint = this.apiUrl + 'ACDefaults/settings';
     return this.http.post(getEndpoint, payload);
   }
 
-    //================Column location finding==================
+  //================Column location finding==================
   makeColumnVisible(dataGrid: DxDataGridComponent, columnName: string) {
     const columns = dataGrid.instance.getVisibleColumns();
     const columnIndex = columns.findIndex(
-      (column:any) => column.caption === columnName
+      (column: any) => column.caption === columnName,
     );
     if (columnIndex !== -1) {
       const columnWidth = 150;
@@ -7063,11 +7062,62 @@ The result can be exported to HTML or Markdown.`;
       dataGrid.instance.columnOption(
         columnName,
         'cssClass',
-        'highlighted-column'
+        'highlighted-column',
       );
       setTimeout(() => {
         dataGrid.instance.columnOption(columnName, 'cssClass', null);
       }, 3000);
     }
+  }
+
+  //-----------------dashbooaed data===================================
+
+  Dashboard_Data_api(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}Dashboard/dashboard`, payload);
+  }
+
+  LedgerStatement_Dimension(payload: any) {
+    const getEndpoint = this.apiUrl + 'AC_Report/ledgerwithdimension';
+    return this.http.post(getEndpoint, payload);
+  }
+  // Account Summary data loading ============
+  account_Summary_Api(payload: any) {
+    const getEndpoint = this.apiUrl + 'AcReports/TrialBalance/AsOnDate';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  // ===============VAT RETURN DRILLDOWN API=============================
+  Output_Vat_Summary(payload: any) {
+    const getEndpoint = this.apiUrl + 'AC_Report/GetStoresByVatReturnKey';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  Storewise_Vat_Summary(payload: any) {
+    const getEndpoint = this.apiUrl + 'AC_Report/GetTransactionsByStore';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //-------------------------------BARCODE PRINTER---------------------------------------------------//
+  getItemsforBarcode(): Observable<any> {
+    return this.http.post(`${this.apiUrl}Items/Itemslist`, {});
+  }
+
+  getGRNforBarcode(): Observable<any> {
+    return this.http.post(`${this.apiUrl}GRN/GetAllGRNs`, {});
+  }
+  getItemsOfGRN(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}GRN/GetItemsByGRN`, payload);
+  }
+
+  //==================synching data Api=======================
+  get_sync_Data_api() {
+    return this.http.post(`${this.apiUrl}Synch/PendingStores`, {})
+  }
+
+  //==================trial balance with branch wise for Advance  data Api=======================
+  get_Trial_balance_api(item: any) {
+
+    return this.http.post(`${this.apiUrl}AcReports/TrialBalance/StoreWise`, item)
   }
 }

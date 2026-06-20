@@ -229,7 +229,8 @@
         <span
           *ngIf="
             (cellData.data.TRANS_STATUS === 2 && canApprove) ||
-            (cellData.data.TRANS_STATUS !== 2 && canVerify)
+            (cellData.data.TRANS_STATUS !== 2 && canVerify) ||
+            cellData.data.TRANS_STATUS >= 5
           "
           style="
             position: relative;
@@ -298,16 +299,15 @@
   [(visible)]="isEditDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  [title]="popupTitle"
+  title="Edit Debit Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditDebitNote">
     <app-edit-debit
-    [mode]="'edit'"
+      [mode]="'edit'"
       [debitFormData]="selectedDebitNote"
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
-      
     ></app-edit-debit>
   </ng-container>
 </dx-popup>
@@ -316,7 +316,7 @@
   [(visible)]="isVerifyDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  [title]="popupTitle"
+  title="Verify Debit Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isVerifyDebitNote">
@@ -334,7 +334,7 @@
   [(visible)]="isApproveDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  [title]="popupTitle"
+  title="Approve Journal Book"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isApproveDebitNote">

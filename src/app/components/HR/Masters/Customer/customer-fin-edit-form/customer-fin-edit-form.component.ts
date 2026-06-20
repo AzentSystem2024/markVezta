@@ -65,8 +65,7 @@ export class CustomerFinEditFormComponent {
   locationValue: any;
   phoneValue: any;
   editingIndex: number | null = null;
-   @Input() customersArray: any[] = [];
-
+  @Input() customersArray: any[] = [];
 
   formCustomerData: any = {
     WAREHOUSE_ID: '',
@@ -135,7 +134,7 @@ export class CustomerFinEditFormComponent {
   Phone_limit: number | undefined;
   mobile_limit_Delivery_Address: number = 0;
   savedAddresses: any[] = [];
-  Customer_type_list: any = []
+  Customer_type_list: any = [];
   constructor(private service: DataService) {
     this.getStateDropDown();
     this.showCountry();
@@ -145,7 +144,7 @@ export class CustomerFinEditFormComponent {
     service.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
     });
-    this.customer_Type_Dropdown()
+    this.customer_Type_Dropdown();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -221,6 +220,18 @@ export class CustomerFinEditFormComponent {
     this.PhonenumberCode = countryCodephone;
     this.formCustomerData.PHONE = phonenumber;
   }
+
+  validateEmail = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    // Empty → valid (not mandatory)
+    if (!value) return true;
+
+    // Validate only if user entered something
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailRegex.test(value);
+  };
 
   onCountrycodeChange(e: any) {
     const payload = {
@@ -368,7 +379,7 @@ export class CustomerFinEditFormComponent {
     });
   }
 
-  onStateSelectionChanged(event: any) { }
+  onStateSelectionChanged(event: any) {}
 
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
@@ -462,7 +473,7 @@ export class CustomerFinEditFormComponent {
     };
   }
 
-  closePopup() { }
+  closePopup() {}
 
   saveDeliveryAddress() {
     // Validate that at least one field is filled
@@ -596,41 +607,41 @@ export class CustomerFinEditFormComponent {
 
   customer_Type_Dropdown() {
     const payload = {
-      NAME: 'CUSTOMER_TYPE'
-    }
+      NAME: 'CUSTOMER_TYPE',
+    };
     this.service.customer_type_drp(payload).subscribe((res: any) => {
-      console.log(res)
-      this.Customer_type_list = res
-    })
+      console.log(res);
+      this.Customer_type_list = res;
+    });
   }
 
   validateCustomerCode = (e: any): boolean => {
-  const value = (e.value || '').trim().toLowerCase();
+    const value = (e.value || '').trim().toLowerCase();
 
-  if (!value || !this.customersArray?.length) return true;
+    if (!value || !this.customersArray?.length) return true;
 
-  const currentId = this.formCustomerData?.ID || 0;
+    const currentId = this.formCustomerData?.ID || 0;
 
-  return !this.customersArray.some((item: any) => {
-    const code = (item.CUST_CODE || '').trim().toLowerCase();
+    return !this.customersArray.some((item: any) => {
+      const code = (item.CUST_CODE || '').trim().toLowerCase();
 
-    return code === value && item.ID !== currentId;
-  });
-};
+      return code === value && item.ID !== currentId;
+    });
+  };
 
-validateCustomername = (e: any): boolean => {
-  const value = (e.value || '').trim().toLowerCase();
+  validateCustomername = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
 
-  if (!value || !this.customersArray?.length) return true;
+    if (!value || !this.customersArray?.length) return true;
 
-  const currentId = this.formCustomerData?.ID || 0;
+    const currentId = this.formCustomerData?.ID || 0;
 
-  return !this.customersArray.some((item: any) => {
-    const code = (item.CONTACT_NAME || '').trim().toLowerCase();
+    return !this.customersArray.some((item: any) => {
+      const code = (item.CONTACT_NAME || '').trim().toLowerCase();
 
-    return code === value && item.ID !== currentId;
-  });
-};
+      return code === value && item.ID !== currentId;
+    });
+  };
 }
 
 @NgModule({
@@ -654,4 +665,4 @@ validateCustomername = (e: any): boolean => {
   declarations: [CustomerFinEditFormComponent],
   exports: [CustomerFinEditFormComponent],
 })
-export class CustomerFinEditFormModule { }
+export class CustomerFinEditFormModule {}
