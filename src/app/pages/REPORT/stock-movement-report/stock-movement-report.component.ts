@@ -41,8 +41,6 @@ import {
   DxoLookupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { BoxproductionJvAddModule } from 'src/app/boxproduction-jv-add/boxproduction-jv-add.component';
 import { DeliveryNoteFormModule } from 'src/app/pages/delivery-note-form/delivery-note-form.component';
 import { ViewInvoiceModule } from 'src/app/pages/INVOICE/view-invoice/view-invoice.component';
@@ -61,26 +59,26 @@ import { ExportService } from 'src/app/services/export.service';
 })
 export class StockMovementReportComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
 
   StockMovementDatasource: any[] = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   auto: string = 'auto';
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
   months: any[] = [];
-  selectedMonth: string;
-  payloadDate: string;
+  selectedMonth!: string;
+  payloadDate!: string;
   pdfData: any;
   ItemList: any;
 
-  formatted_To_date: string;
-  formatted_from_date: string;
+  formatted_To_date!: string;
+  formatted_from_date!: string;
   defaultDate: Date = new Date();
   selected_Company_id: any;
   selected_Company_name: any;
@@ -88,10 +86,10 @@ export class StockMovementReportComponent {
   selected_fin_id: any;
   selectedstoreId: any;
   selected_item_Id: any;
-  selectedYear: number | null = null;
+  selectedYear!: any | null;
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
-  selectedmonth: any = '';
+  selectedmonth!: any;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -108,10 +106,10 @@ export class StockMovementReportComponent {
     },
     text: '',
   };
-  fromDate: Date | string | number;
-  toDate: Date | string | number;
-  selected_To_date: any;
-  selected_from_date: any;
+  fromDate!: Date | string | number;
+  toDate!: Date | string | number;
+  selected_To_date!: any;
+  selected_from_date!: any;
   isProductionPopupVisible: boolean = false;
   selectedRowData: any = null;
   selectedItemId: any;
@@ -138,12 +136,12 @@ export class StockMovementReportComponent {
   adjustedDetails: any[] = [];
   isEditProductionPopupVisible: boolean = false;
   selectedProduction: any;
-  isReadOnlyInvoice: boolean = false;;
+  isReadOnlyInvoice: boolean = false;
   selectedProductionType: any;
   selectedGrnId: any;
-  isViewGrnPopupOpened: boolean = false;;
+  isViewGrnPopupOpened: boolean = false;
   selectedPurchaseReturnId: any;
-  isEditPurchaseReturn: boolean = false;;
+  isEditPurchaseReturn: boolean = false;
   selectedPurchaseReturn: any;
   selectedDelivery: any;
   isReadOnlyPurchaseReturn: boolean = false;
@@ -153,7 +151,7 @@ export class StockMovementReportComponent {
   isReadOnlySaleReturn = true;
   isReadOnlyDelivery = true;
   selectedInvoice: any;
-  isViewInvoice: boolean = false;;
+  isViewInvoice: boolean = false;
   fin_id: any;
   finID: any;
 
@@ -194,7 +192,7 @@ export class StockMovementReportComponent {
       String(today.getDate()).padStart(2, '0');
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
-    this.getStockMovement;
+    this.getStockMovement();
 
     // this.formatted_To_date = this.formatDate(today);
   }
@@ -246,7 +244,9 @@ export class StockMovementReportComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.fin_id = sessionData.FINANCIAL_YEARS;
     if (this.fin_id.length) {
       this.finID = this.fin_id[0].FIN_ID;
@@ -271,6 +271,7 @@ export class StockMovementReportComponent {
     }
     this.getStockMovement();
   }
+
   toggleFilters() {
     const grid = this.dataGrid?.instance;
     if (!grid) return;
@@ -284,14 +285,6 @@ export class StockMovementReportComponent {
     });
     grid.endUpdate();
   }
-
-  //   refreshButtonOptions = {
-  //   icon: 'refresh',
-  //   hint: 'Refresh',
-  //   elementAttr: { class: 'toolbar-icon-btn' },
-  //   onClick: () => this.refreshGrid(),
-  //   text: '',
-  // };
 
   onItemIdChange(event: any) {
     this.selected_item_Id = event.value;
@@ -327,12 +320,14 @@ export class StockMovementReportComponent {
     const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
+
   private triggerStockReload() {
     // Optional guard – prevents API call before grid is ready
     if (!this.dataGrid?.instance) return;
 
     this.getStockMovement();
   }
+
   getStockMovement() {
     const grid = this.dataGrid?.instance;
 
@@ -344,7 +339,6 @@ export class StockMovementReportComponent {
       DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
       FIN_ID: this.finID,
-
     };
     this.dataService.StockMovement_Api(payload).subscribe({
       next: (res: any) => {
@@ -361,21 +355,6 @@ export class StockMovementReportComponent {
       },
     });
   }
-
-  // getStockMovement() {
-  //   const payload = {
-  //     COMPANY_ID: this.selected_Company_id,
-  //     DATE_FROM: this.formatted_from_date,
-  //     DATE_TO: this.formatted_To_date,
-  //     // STORE_ID: this.selectedstoreId,
-  //     ITEM_TYPE: this.selected_item_Id || 0,
-  //   };
-  //   this.dataService.StockMovement_Api(payload).subscribe((res: any) => {
-  //
-  //     this.StockMovementDatasource = res.data;
-
-  //   });
-  // }
 
   summaryColumnsData = {
     totalItems: [
@@ -577,7 +556,7 @@ export class StockMovementReportComponent {
         alignByColumn: true,
       },
     ],
-    calculateCustomSummary: (options) => {
+    calculateCustomSummary: (options: any) => {
       if (options.name === 'summaryRow') {
         // Custom logic if needed
       }
@@ -642,6 +621,7 @@ export class StockMovementReportComponent {
       this.isPopupVisible = true;
     }
   }
+
   loadProductionDetails(itemId: number) {
     const payload = {
       ITEM_ID: itemId,
@@ -669,6 +649,7 @@ export class StockMovementReportComponent {
       this.consumptionDetails = res.data || [];
     });
   }
+
   loadDeliveryDetails(itemId: number) {
     const payload = {
       ITEM_ID: itemId,
@@ -728,6 +709,7 @@ export class StockMovementReportComponent {
       this.PurchReturnDetails = res.data || [];
     });
   }
+
   loadSaleReturnDetails(itemId: number) {
     const payload = {
       ITEM_ID: itemId,
@@ -807,7 +789,7 @@ export class StockMovementReportComponent {
 
     this.isEditProductionPopupVisible = false;
 
-    let api$;
+    let api$: any | undefined;
     const productionId = row.TRANS_ID;
     switch (type) {
       // SAME logic for Production & Consumption
@@ -1010,4 +992,4 @@ export class StockMovementReportComponent {
   exports: [StockMovementReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockMovementReportModule { }
+export class StockMovementReportModule {}
