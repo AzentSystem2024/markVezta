@@ -21,7 +21,7 @@ import { DataService } from 'src/app/services';
 @Component({
   selector: 'app-trial-balance-branch-wise',
   templateUrl: './trial-balance-branch-wise.component.html',
-  styleUrls: ['./trial-balance-branch-wise.component.scss']
+  styleUrls: ['./trial-balance-branch-wise.component.scss'],
 })
 export class TrialBalanceBranchWiseComponent {
   isFilterRowVisible: boolean = false;
@@ -53,7 +53,7 @@ export class TrialBalanceBranchWiseComponent {
   selected_from_date: any;
   Store: any;
   selectedStoreid: any;
-  Stores_List: any[] = []
+  Stores_List: any[] = [];
   openingColumns: any[] = [];
   duringPeriodColumns: any[] = [];
   closingColumns: any[] = [];
@@ -67,7 +67,7 @@ export class TrialBalanceBranchWiseComponent {
     this.get_sessionstorage_data();
     this.get_fin_id();
     this.sesstion_Details();
-    this.store_dropdown()
+    this.store_dropdown();
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
@@ -91,7 +91,7 @@ export class TrialBalanceBranchWiseComponent {
     this.formatted_To_date = SystemDate;
     this.get_DataSource();
     this.store_dropdown();
-    this.getStoreDropdown()
+    this.getStoreDropdown();
   }
 
   //================ Year value change ===================
@@ -143,14 +143,15 @@ export class TrialBalanceBranchWiseComponent {
     this.cdr.detectChanges();
   };
 
-
   onExporting(event: any) {
     const fileName = 'TrialBalanceReport';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
   get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.savedUserData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     this.company_list = this.savedUserData.Companies;
   }
 
@@ -200,7 +201,6 @@ export class TrialBalanceBranchWiseComponent {
 
   //   sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
 
-
   //   this.dataservice.get_Trial_balance_api(payload).subscribe((res: any) => {
   //     this.isEmptyDatagrid = false;
 
@@ -222,7 +222,9 @@ export class TrialBalanceBranchWiseComponent {
   //   });
   // }
   get_DataSource() {
-    const storeIds = this.selectedStoreid?.length ? this.selectedStoreid.join(',') : '';
+    const storeIds = this.selectedStoreid?.length
+      ? this.selectedStoreid.join(',')
+      : '';
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
@@ -233,18 +235,24 @@ export class TrialBalanceBranchWiseComponent {
     sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
 
     this.dataservice.get_Trial_balance_api(payload).subscribe((res: any) => {
-      const rows: any[] = res?.data ?? [];      // ✅ use res.data
+      const rows: any[] = res?.data ?? []; // ✅ use res.data
       this.isEmptyDatagrid = rows.length === 0;
 
       if (rows.length > 0) {
-        const firstRow = rows[0];               // ✅ rows[0]
-        this.openingColumns = Object.keys(firstRow).filter(k => k.startsWith('Opening - '));
-        this.duringPeriodColumns = Object.keys(firstRow).filter(k => k.startsWith('During_Period - '));
-        this.closingColumns = Object.keys(firstRow).filter(k => k.startsWith('Closing - '));
+        const firstRow = rows[0]; // ✅ rows[0]
+        this.openingColumns = Object.keys(firstRow).filter((k) =>
+          k.startsWith('Opening - '),
+        );
+        this.duringPeriodColumns = Object.keys(firstRow).filter((k) =>
+          k.startsWith('During_Period - '),
+        );
+        this.closingColumns = Object.keys(firstRow).filter((k) =>
+          k.startsWith('Closing - '),
+        );
       }
 
       this.TrialBalanceReport = rows;
-      this.createSummary()
+      this.createSummary();
       // ✅ show data as-is, no conversion
     });
   }
@@ -257,9 +265,9 @@ export class TrialBalanceBranchWiseComponent {
       return;
     }
 
-    const selectedNames = this.Store
-      .filter(x => this.selectedStoreid.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
 
     this.storeHint = selectedNames.join(', ');
   }
@@ -267,8 +275,8 @@ export class TrialBalanceBranchWiseComponent {
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
@@ -295,13 +303,11 @@ export class TrialBalanceBranchWiseComponent {
   }
 
   onStoreChanged(e: any) {
-
     console.log('Selected store IDs:', this.selectedStoreid);
-
   }
   summaryColumnsData = {
     totalItems: [
-      ...this.openingColumns.map(col => ({
+      ...this.openingColumns.map((col) => ({
         column: col,
         summaryType: 'sum',
         showInColumn: col,
@@ -309,11 +315,11 @@ export class TrialBalanceBranchWiseComponent {
         valueFormat: {
           type: 'fixedPoint',
           precision: 2,
-          useGrouping: true
-        }
+          useGrouping: true,
+        },
       })),
 
-      ...this.duringPeriodColumns.map(col => ({
+      ...this.duringPeriodColumns.map((col) => ({
         column: col,
         summaryType: 'sum',
         showInColumn: col,
@@ -321,11 +327,11 @@ export class TrialBalanceBranchWiseComponent {
         valueFormat: {
           type: 'fixedPoint',
           precision: 2,
-          useGrouping: true
-        }
+          useGrouping: true,
+        },
       })),
 
-      ...this.closingColumns.map(col => ({
+      ...this.closingColumns.map((col) => ({
         column: col,
         summaryType: 'sum',
         showInColumn: col,
@@ -333,8 +339,8 @@ export class TrialBalanceBranchWiseComponent {
         valueFormat: {
           type: 'fixedPoint',
           precision: 2,
-          useGrouping: true
-        }
+          useGrouping: true,
+        },
       })),
 
       {
@@ -344,8 +350,8 @@ export class TrialBalanceBranchWiseComponent {
         valueFormat: {
           type: 'fixedPoint',
           precision: 2,
-          useGrouping: true
-        }
+          useGrouping: true,
+        },
       },
 
       {
@@ -355,8 +361,8 @@ export class TrialBalanceBranchWiseComponent {
         valueFormat: {
           type: 'fixedPoint',
           precision: 2,
-          useGrouping: true
-        }
+          useGrouping: true,
+        },
       },
 
       {
@@ -366,22 +372,19 @@ export class TrialBalanceBranchWiseComponent {
         valueFormat: {
           type: 'fixedPoint',
           precision: 2,
-          useGrouping: true
-        }
-      }
-    ]
+          useGrouping: true,
+        },
+      },
+    ],
   };
   calculateCustomSummary(options: any) {
-
     if (options.summaryProcess === 'start') {
       options.totalValue = 0;
     }
 
     if (options.summaryProcess === 'calculate') {
-
       const value = Number(
-        String(options.value[options.name] || '0')
-          .replace(/,/g, '')
+        String(options.value[options.name] || '0').replace(/,/g, ''),
       );
 
       options.totalValue += value;
@@ -390,98 +393,101 @@ export class TrialBalanceBranchWiseComponent {
     if (options.summaryProcess === 'finalize') {
       options.totalValue = options.totalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        maximumFractionDigits: 2,
       });
     }
   }
   formatAmount = (cellInfo: any) => {
-
     if (!cellInfo.value) {
       return '0.00';
     }
 
-    return Number(
-      String(cellInfo.value).replace(/,/g, '')
-    ).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+    return Number(String(cellInfo.value).replace(/,/g, '')).toLocaleString(
+      'en-US',
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      },
+    );
   };
   createSummary() {
     this.summaryColumnsData = {
       totalItems: [
-
-        ...this.openingColumns.map(col => ({
+        ...this.openingColumns.map((col) => ({
           column: col,
           summaryType: 'sum',
           showInColumn: col,
+          displayFormat: '{0}',
           valueFormat: {
             type: 'fixedPoint',
             precision: 2,
-            useGrouping: true
-          }
+            useGrouping: true,
+          },
         })),
 
-        ...this.duringPeriodColumns.map(col => ({
+        ...this.duringPeriodColumns.map((col) => ({
           column: col,
           summaryType: 'sum',
           showInColumn: col,
+          displayFormat: '{0}',
           valueFormat: {
             type: 'fixedPoint',
             precision: 2,
-            useGrouping: true
-          }
+            useGrouping: true,
+          },
         })),
 
-        ...this.closingColumns.map(col => ({
+        ...this.closingColumns.map((col) => ({
           column: col,
           summaryType: 'sum',
           showInColumn: col,
+          displayFormat: '{0}',
           valueFormat: {
             type: 'fixedPoint',
             precision: 2,
-            useGrouping: true
-          }
+            useGrouping: true,
+          },
         })),
 
         {
           column: 'Opening TOTAL',
           summaryType: 'sum',
           showInColumn: 'Opening TOTAL',
+          displayFormat: '{0}',
           valueFormat: {
             type: 'fixedPoint',
             precision: 2,
-            useGrouping: true
-          }
+            useGrouping: true,
+          },
         },
 
         {
           column: 'During_period TOTAL',
           summaryType: 'sum',
           showInColumn: 'During_period TOTAL',
+          displayFormat: '{0}',
           valueFormat: {
             type: 'fixedPoint',
             precision: 2,
-            useGrouping: true
-          }
+            useGrouping: true,
+          },
         },
 
         {
           column: 'Closing TOTAL',
           summaryType: 'sum',
           showInColumn: 'Closing TOTAL',
+          displayFormat: '{0}',
           valueFormat: {
             type: 'fixedPoint',
             precision: 2,
-            useGrouping: true
-          }
-        }
-      ]
+            useGrouping: true,
+          },
+        },
+      ],
     };
   }
-};
-
-
+}
 
 @NgModule({
   imports: [
@@ -505,5 +511,4 @@ export class TrialBalanceBranchWiseComponent {
   exports: [],
   declarations: [TrialBalanceBranchWiseComponent],
 })
-export class TrialBalanceBranchWiseModule { }
-
+export class TrialBalanceBranchWiseModule {}
