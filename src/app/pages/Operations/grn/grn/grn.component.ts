@@ -547,6 +547,7 @@ export class GrnComponent implements OnInit {
     result.then((dialogResult: boolean) => {
       if (dialogResult) {
         const data = this.grnVerifyForm.getNewGrnData();
+        data.FIN_ID = this.finID;
         this.service.approveGrnData(data).subscribe((res) => {
           console.log('data approved', res);
           if ((res.Message = 'Success')) {
