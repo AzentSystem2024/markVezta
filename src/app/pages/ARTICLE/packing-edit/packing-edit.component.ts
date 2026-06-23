@@ -179,7 +179,7 @@ export class PackingEditComponent {
   }
   getItems() {
     const payload = {
-      NAME: 'GETITEM',
+      NAME: 'GETPACKINGITEM',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       console.log(response);

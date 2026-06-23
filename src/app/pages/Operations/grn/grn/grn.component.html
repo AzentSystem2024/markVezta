@@ -268,6 +268,7 @@
   [(visible)]="isVerifyOpened"
   titleText="Verify Goods Receipt Note"
   [height]="'100vh'"
+  [showApprove]="false"
   [width]="width"
   (save)="verifyGrnData()"
 >
@@ -282,6 +283,7 @@
   titleText="Approve Goods Receipt Note"
   [height]="'100vh'"
   [width]="width"
+  [showApprove]="false"
   (save)="approveGrnData()"
 >
   <app-grn-verify-form

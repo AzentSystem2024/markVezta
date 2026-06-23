@@ -180,6 +180,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
       PO_DETAIL_ID: item.PO_DETAIL_ID,
       GRN_ID: this.newGrnData.ID || 0,
       ITEM_ID: item.ITEM_ID,
+      FIN_ID:this.selected_fin_id,
       QUANTITY: Number(item.PO_QUANTITY),
       RATE: Number(item.RATE),
       AMOUNT: Number(item.AMOUNT || 0),
@@ -220,6 +221,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
 
     return {
       ...prepared,
+      FIN_ID:this.selected_fin_id,
       GRNDetails: mergedDetails, //  full list with edits merged
       GRN_DATE: new Date(), //  override with current date
     };
@@ -244,6 +246,7 @@ export class GrnApproveFormComponent implements OnInit, OnChanges {
 
     const sessionYear = this.sessionData.FINANCIAL_YEARS;
     this.financialYeaDate = sessionYear[0].DATE_FROM;
+    this.newGrnData.FIN_ID = this.selected_fin_id; // <-- Add this
 
     this.formatted_from_date = this.financialYeaDate;
 

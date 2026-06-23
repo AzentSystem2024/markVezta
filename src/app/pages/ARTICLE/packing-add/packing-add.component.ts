@@ -272,7 +272,7 @@ export class PackingAddComponent {
 
   getItems() {
     const payload = {
-      NAME: 'GETITEM',
+      NAME: 'GETPACKINGITEM',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.itemsList = response;
