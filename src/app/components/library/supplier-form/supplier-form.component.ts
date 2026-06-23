@@ -82,7 +82,7 @@ export class SupplierFormComponent implements OnInit {
     CURRENCY_ID: '',
     PAY_TERM_ID: '',
     VAT_RULE_ID: '',
-    SUPP_CAT_ID: '',
+    SUPP_CAT_ID: 0,
     PURCH_TYPE: 0,
     IS_COMPANY_BRANCH: false,
     // Supplier_cost:''
@@ -163,7 +163,7 @@ export class SupplierFormComponent implements OnInit {
       PHONE: '',
       FAX_NO: '',
       VAT_RULE_ID: this.newSupplier.VAT_RULE_ID,
-      SUPP_CAT_ID: '',
+      SUPP_CAT_ID: 0,
     };
 
     this.newSupplier.ADDRESS2 = '';

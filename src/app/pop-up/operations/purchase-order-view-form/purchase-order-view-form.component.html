@@ -277,14 +277,26 @@
     >
     </dx-text-box>
     <div>
-      <dx-text-box
+      <dx-select-box
+        label="Issued by"
+        labelMode="floating"
+        placeholder="Issued by"
+        [width]="465"
+        [items]="employeeList"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="newPoData.ISSUED_EMP_ID"
+        [readOnly]="true"
+      >
+      </dx-select-box>
+      <!-- <dx-text-box
         label="Issued by"
         labelMode="floating"
         placeholder="Issued by"
         [width]="465"
         [(value)]="newPoData.ISSUED_EMP_ID"
       >
-      </dx-text-box>
+      </dx-text-box> -->
     </div>
   </div>
 </div>

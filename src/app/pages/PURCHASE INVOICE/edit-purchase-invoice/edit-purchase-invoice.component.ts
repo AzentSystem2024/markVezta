@@ -806,7 +806,7 @@ export class EditPurchaseInvoiceComponent {
     if (!isValid) return;
 
     if (!isValid) {
-      return; // 🚫 STOP saving
+      return; //  STOP saving
     }
     let grossAmount = 0;
     let vatAmount = 0;
@@ -949,7 +949,7 @@ export class EditPurchaseInvoiceComponent {
     }
 
     // APPROVE CONFIRMATION
-    else if (this.isApproveMode) {
+    else if (this.isApproveMode || this.isApproved) {
       confirm(
         'Are you sure you want to approve this invoice?',
         'Confirm Approval',
