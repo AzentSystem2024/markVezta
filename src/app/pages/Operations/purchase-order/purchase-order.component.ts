@@ -131,7 +131,7 @@ export class PurchaseOrderComponent {
   // host = 'http://localhost:49834/';
   showReportDesigner: boolean = false;
 
-  showHeaderFilter:boolean = true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   filterRowVisible: boolean = false;
   isFilterRowVisible: boolean = false;
@@ -209,6 +209,7 @@ export class PurchaseOrderComponent {
   isVerifyMode: boolean = false;
   isApproveMode: boolean = false;
   popupTitle: string = 'Edit Purchase Order';
+  finId: any;
 
   constructor(
     private service: DataService,
@@ -216,7 +217,9 @@ export class PurchaseOrderComponent {
     private router: Router,
   ) {}
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -229,6 +232,8 @@ export class PurchaseOrderComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    console.log(menuResponse.FINANCIAL_YEARS[0].FIN_ID, 'MENURESPONSEINPO');
+    this.finId = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
 
@@ -258,7 +263,9 @@ export class PurchaseOrderComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -895,7 +902,7 @@ export class PurchaseOrderComponent {
       data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
     }
     data.IS_APPROVED = this.isApproved;
-
+    data.FIN_ID = this.finId;
     // ✅ VALIDATIONS (ONLY FIX: added isSaving reset)
     if (!data.STORE_ID) {
       notify(
@@ -1044,6 +1051,7 @@ export class PurchaseOrderComponent {
     if (this.isSaving) return; // prevent double click
     this.isSaving = true;
     const data = this.poEditForm.getNewPoData();
+    data.FIN_ID = this.finId;
     // Combine country code + mobile (EDIT)
     // convert mobile before API
     this.poEditForm.preparePoDetailsForSubmit();
@@ -1176,7 +1184,7 @@ export class PurchaseOrderComponent {
     result.then((dialogResult) => {
       if (dialogResult) {
         const data = this.poEditForm.getNewPoData();
-
+        data.FIN_ID = this.finId;
         // Combine country code + mobile
         // convert mobile before API
         this.poEditForm.preparePoDetailsForSubmit();
@@ -1262,7 +1270,7 @@ export class PurchaseOrderComponent {
     result.then((dialogResult) => {
       if (dialogResult) {
         const data = this.poEditForm.getNewPoData();
-
+        data.FIN_ID = this.finId;
         // convert mobile before API
         this.poEditForm.preparePoDetailsForSubmit();
 
