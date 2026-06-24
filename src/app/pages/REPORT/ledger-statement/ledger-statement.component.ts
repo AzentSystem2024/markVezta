@@ -69,6 +69,8 @@ import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
 import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
+import { AddSalesInvoiceRetailModule } from '../../OPERATIONS/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 
 // import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 // import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
@@ -104,11 +106,13 @@ export class LedgerStatementComponent {
   isViewCreditNote: boolean = false;
   selectedCreditNote: any;
   isViewInvoice: boolean = false;
+  isRetailInvoice:boolean = false;
   selectedInvoice: any;
   isViewReceipt: boolean = false;
   selectedReceipt: any;
   selected_Company_id: any;
   isReadOnlyReceipt: boolean = true;
+   isReadOnlyInvoice: boolean = true;
   isEditReceipt: boolean = false;
   isReadOnlyPayment: boolean = true;
   selectedmiscellaneousData: any;
@@ -154,6 +158,7 @@ export class LedgerStatementComponent {
   selectedPayroll: any;
   Store: any;
   selectedStoreid: any;
+  vat_title: any;
 
   constructor(
     private dataService: DataService,
@@ -451,6 +456,7 @@ export class LedgerStatementComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.vat_title = sessionData?.GeneralSettings.VAT_TITLE
   }
 
   load_Ledgre_data() {
@@ -492,6 +498,7 @@ export class LedgerStatementComponent {
     this.isViewDebitNote = false;
     this.isViewCreditNote = false;
     this.isViewInvoice = false;
+    this.isRetailInvoice = false;
     this.isViewReceipt = false;
     this.isViewProduction = false;
   }
@@ -504,7 +511,7 @@ export class LedgerStatementComponent {
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-    //  this.isViewInvoice= true;
+    
 
     if (TRANS_TYPE_ID == 4) {
       this.dataService
@@ -529,16 +536,33 @@ export class LedgerStatementComponent {
         this.cdr.detectChanges();
       });
     } else if (TRANS_TYPE_ID === 25) {
-      this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
-        this.loadingInvoice = false;
 
-        // this.isEditInvoice = true;
+  if (this.vat_title === 'GST') {
+
+    this.dataService.selectInvoice(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
 
         this.isViewInvoice = true;
+        this.isRetailInvoice = false;
+
         this.cdr.detectChanges();
       });
-    } else if (TRANS_TYPE_ID == 19) {
+
+  } else {
+
+    this.dataService.selectInvoiceRetail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+
+        this.isRetailInvoice = true;
+        this.isViewInvoice = false;
+
+        this.cdr.detectChanges();
+      });
+
+  }
+}else if (TRANS_TYPE_ID == 19) {
       this.dataService
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
@@ -950,6 +974,7 @@ export class LedgerStatementComponent {
     SaleReturnFormModule,
     ProductionJvViewModule,
     MiscSalesInvoiceFormModule,
+    AddInvoiceRetailModule,
 
   ],
   providers: [],

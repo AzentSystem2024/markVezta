@@ -84,6 +84,7 @@ export class JournalBookComponent {
   isViewDebitNote: boolean = false;
   isViewCreditNote: boolean = false;
   isViewInvoice: boolean = false;
+  isRetailInvoice :boolean= false;
   isViewReceipt: boolean = false;
   editMiscPopup: boolean = false;
   selectedJournalVoucher: any;
@@ -146,6 +147,7 @@ export class JournalBookComponent {
   selectedPayroll: any;
   Store: any;
   selectedStoreid: any;
+  vat_title: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -154,7 +156,7 @@ export class JournalBookComponent {
   ) {
     // this.get_sessionstorage_data();
     // this.get_fin_id();
-    // this.sesstion_Details();
+    this.sesstion_Details();
 
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
@@ -278,6 +280,7 @@ export class JournalBookComponent {
     this.isViewDebitNote = false;
     this.isViewCreditNote = false;
     this.isViewInvoice = false;
+    this.isRetailInvoice = false;
     this.isEditInvoice = false;
     this.isEditCustomerReceipt = false;
     this.editMiscPopup = false;
@@ -309,6 +312,8 @@ export class JournalBookComponent {
       sessionData?.SELECTED_COMPANY?.COMPANY_ID ?? null;
 
     this.selected_fin_id = sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? null;
+    this.vat_title = sessionData?.GeneralSettings.VAT_TITLE
+    console.log(this.vat_title)
   }
 
   get_sessionstorage_data() {
@@ -434,14 +439,36 @@ export class JournalBookComponent {
           'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
         );
       });
-    } else if (TransType === 25) {
-      this.dataService
-        .selectInvoiceRetail(trans_id)
-        .subscribe((response: any) => {
-          this.selectedInvoice = response.Data;
-          this.isViewInvoice = true;
-        });
-    } else if (TransType === 19) {
+    }  
+    else if (TransType === 25) {
+
+  if (this.vat_title === 'GST') {
+
+    this.dataService.selectInvoice(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+
+        this.isViewInvoice = true;
+        this.isRetailInvoice = false;
+
+        this.cdr.detectChanges();
+      });
+
+  } else {
+
+    this.dataService.selectInvoiceRetail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+
+        this.isRetailInvoice = true;
+        this.isViewInvoice = false;
+
+        this.cdr.detectChanges();
+      });
+
+  }
+}
+    else if (TransType === 19) {
       console.log('PURCHINVVVVVVVVVVVVVVVVVVVVVVVVVVV');
       this.dataService
         .selectPurchaseInvoice(trans_id)
@@ -664,6 +691,7 @@ export class JournalBookComponent {
     this.isViewDebitNote = false;
     this.isViewCreditNote = false;
     this.isViewInvoice = false;
+    this.isRetailInvoice = false;
     this.isViewReceipt = false;
     this.isEditInvoice = false;
     this.editMiscPopup = false;
