@@ -317,6 +317,22 @@
   </ng-container>
 </dx-popup>
 
+<dx-popup
+  *ngIf="isRetailInvoice"
+  [(visible)]="isRetailInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Invoice"
+  (onHiding)="handleClose()"
+>
+  <app-add-invoice-retail
+    [isEditing]="true"
+    [isReadOnlyMode]="isReadOnlyInvoice"
+    [EditingResponseData]="selectedInvoice"
+    (popupClosed)="handleClose()">
+  </app-add-invoice-retail>
+</dx-popup>
+
 <!-- //======================= coustom receipt=================== -->
 
 <dx-popup
