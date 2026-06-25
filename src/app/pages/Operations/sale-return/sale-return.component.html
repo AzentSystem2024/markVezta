@@ -302,11 +302,7 @@
   [(visible)]="isVerifySalesReturn"
   [width]="'95vw'"
   [height]="'100vh'"
-  [title]="
-    selectedSaleReturn?.TRANS_STATUS === 2
-      ? 'Approve Sales Return'
-      : 'Verify Sales Return'
-  "
+  title="Verify Sales Return"
   (popupClosed)="handleClose()"
 >
   <app-sale-return-form
@@ -344,7 +340,7 @@
   [(visible)]="isViewSalesReturn"
   [width]="'95vw'"
   [height]="'100vh'"
-  title="Invoice"
+  title="Sales Return"
   (onHiding)="handleClose()"
 >
   <!-- <ng-container *ngIf="isAddInvoice"> -->

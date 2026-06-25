@@ -623,7 +623,7 @@ export class SaleReturnComponent {
   handleClose() {
     this.isAddSaleReturn = false;
     this.isEditSaleReturn = false;
-    this.isViewSaleReturn = false;
+    this.isViewSalesReturn = false;
     this.isVerifySalesReturn = false;
     this.isApproveSalesReturn = false;
     if (this.SaleReturnFormComponent) {

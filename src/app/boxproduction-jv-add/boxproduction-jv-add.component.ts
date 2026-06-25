@@ -472,24 +472,24 @@ export class BoxproductionJvAddComponent {
     }
 
     //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
-    // const invalidRow = this.gridData.find((item: any) => {
-    //   const usedQty = Number(item.USED_QTY) || 0;
-    //   const availableQty = Number(item.QTY_AVAILABLE) || 0; //  adjust field name if needed
+    const invalidRow = this.gridData.find((item: any) => {
+      const usedQty = Number(item.USED_QTY) || 0;
+      const availableQty = Number(item.QTY_AVAILABLE) || 0; //  adjust field name if needed
 
-    //   return usedQty > availableQty;
-    // });
+      return usedQty > availableQty;
+    });
 
-    // if (invalidRow) {
-    //   notify(
-    //     {
-    //       message: 'Used Quantity cannot be greater than Available Quantity',
-    //       position: { at: 'top right', my: 'top right' },
-    //     },
-    //     'error',
-    //     4000
-    //   );
-    //   return; //  STOP SAVE
-    // }
+    if (invalidRow) {
+      notify(
+        {
+          message: 'Used Quantity cannot be greater than Available Quantity',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        4000,
+      );
+      return; //  STOP SAVE
+    }
 
     const payload = {
       ID: this.isEditing ? this.productionJVFormData.ID : 0,
