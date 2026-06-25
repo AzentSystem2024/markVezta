@@ -79,6 +79,7 @@ export class CustomerStatementDetailsComponent {
   selectedDebitNote: any;
   isViewCreditNote: boolean = false;
   selectedCreditNote: any;
+  isRetailInvoice :boolean= false;
   isViewInvoice: boolean = false;
   selectedInvoice: any;
   isViewReceipt: boolean = false;
@@ -95,6 +96,7 @@ export class CustomerStatementDetailsComponent {
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
   isReadOnlyInvoice : boolean = true;
+  vat_title: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -275,6 +277,7 @@ export class CustomerStatementDetailsComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.vat_title = sessionData?.GeneralSettings.VAT_TITLE
   }
 
   formatDates(cellData: any): string {
@@ -295,6 +298,7 @@ export class CustomerStatementDetailsComponent {
     this.isViewDebitNote = false;
     this.isViewCreditNote = false;
     this.isViewInvoice = false;
+    this.isRetailInvoice = false;
     this.isViewReceipt = false;
     this.isViewCreditNote = false;
   }
@@ -303,7 +307,7 @@ export class CustomerStatementDetailsComponent {
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-    //  this.isViewInvoice= true;
+   
 
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE;
     const trans_id = e.row.data.TRANS_ID;
@@ -329,14 +333,34 @@ export class CustomerStatementDetailsComponent {
         this.isViewCreditNote = true;
         this.cdr.detectChanges();
       });
-    } else if (TRANS_TYPE_ID === 25) {
-      this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
+    }  else if (TRANS_TYPE_ID === 25) {
+
+  if (this.vat_title === 'GST') {
+
+    this.dataService.selectInvoice(trans_id)
+      .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
-        this.loadingInvoice = false;
+
         this.isViewInvoice = true;
+        this.isRetailInvoice = false;
+
         this.cdr.detectChanges();
       });
-    } else if (TRANS_TYPE_ID === 27) {
+
+  } else {
+
+    this.dataService.selectInvoiceRetail(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
+
+        this.isRetailInvoice = true;
+        this.isViewInvoice = false;
+
+        this.cdr.detectChanges();
+      });
+
+  }
+}else if (TRANS_TYPE_ID === 27) {
       this.dataService
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
@@ -510,7 +534,6 @@ export class CustomerStatementDetailsComponent {
     DxDateBoxModule,
     DxFormModule,
     DxTextBoxModule,
-
     DxCheckBoxModule,
     DxRadioGroupModule,
     DxFileUploaderModule,

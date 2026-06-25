@@ -202,22 +202,36 @@
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
   [height]="'100vh'"
+  title="View Invoice"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isViewInvoice">
+    <app-view-invoice
+      [isEditing]="true"
+      [isReadOnlyMode]="isReadOnlyInvoice"
+      [invoiceFormData]="selectedInvoice"
+      (popupClosed)="handleClose()"
+    ></app-view-invoice>
+  </ng-container>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isRetailInvoice"
+  [(visible)]="isRetailInvoice"
+  [width]="'95vw'"
+  [height]="'100vh'"
   title="Invoice"
   (onHiding)="handleClose()"
 >
-  <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-add-invoice-retail
     [isEditing]="true"
     [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
-    (popupClosed)="handleClose()"
-  ></app-add-invoice-retail>
-  <!-- </ng-container> -->
+    (popupClosed)="handleClose()">
+  </app-add-invoice-retail>
 </dx-popup>
 
-<!-- =====================invoice view screen=========================== -->
-
-<!-- <dx-popup
+<dx-popup
   [(visible)]="isViewInvoice"
   [width]="'90vw'"
   [height]="'100vh'"
@@ -231,7 +245,7 @@
       (popupClosed)="handleClose()"
     ></app-view-invoice>
   </ng-container>
-</dx-popup> -->
+</dx-popup> 
 
 <!-- //======================= coustom receipt=================== -->
 
