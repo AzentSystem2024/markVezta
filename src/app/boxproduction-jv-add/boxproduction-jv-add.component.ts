@@ -471,25 +471,42 @@ export class BoxproductionJvAddComponent {
       return;
     }
 
-    //  VALIDATION: USED_QTY must be <= AVAILABLE_QTY
-    const invalidRow = this.gridData.find((item: any) => {
-      const usedQty = Number(item.USED_QTY) || 0;
-      const availableQty = Number(item.QTY_AVAILABLE) || 0; //  adjust field name if needed
+   // =====================================================
+// VALIDATION: REQUIRED_QTY & USED_QTY must be <= AVAILABLE_QTY
+// =====================================================
+for (const item of this.gridData) {
+  const requiredQty = Number(item.REQUIRED_QTY) || 0;
+  const usedQty = Number(item.USED_QTY) || 0;
+  const availableQty = Number(item.QTY_AVAILABLE) || 0;
 
-      return usedQty > availableQty;
-    });
+  
 
-    if (invalidRow) {
-      notify(
-        {
-          message: 'Used Quantity cannot be greater than Available Quantity',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'error',
-        4000,
-      );
-      return; //  STOP SAVE
-    }
+  // Used Qty Validation
+  if (usedQty > availableQty) {
+    notify(
+      {
+        message: `Used Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
+        position: { at: 'top right', my: 'top right' },
+      },
+      'error',
+      4000
+    );
+    return;
+  }
+
+  // Required Qty Validation
+  if (requiredQty > availableQty) {
+    notify(
+      {
+        message: `Required Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
+        position: { at: 'top right', my: 'top right' },
+      },
+      'error',
+      4000
+    );
+    return;
+  }
+}
 
     const payload = {
       ID: this.isEditing ? this.productionJVFormData.ID : 0,
