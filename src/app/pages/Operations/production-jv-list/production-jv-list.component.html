@@ -262,6 +262,7 @@
       [EditingResponseData]="selectedProduction"
       [productionType]="selectedProductionType"
       [isReadOnlyMode]="isReadOnlyInvoice"
+      (popupClosed)="isViewProduction = false"
       (popupClosed)="handleClose()"
     ></app-production-jv-view>
   </ng-container>
