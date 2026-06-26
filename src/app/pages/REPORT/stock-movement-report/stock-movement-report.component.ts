@@ -63,6 +63,7 @@ export class StockMovementReportComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
 
   StockMovementDatasource: any[] = [];
+  allStockMovementData: any[] = [];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   auto: string = 'auto';
@@ -157,6 +158,7 @@ export class StockMovementReportComponent {
   selectedStoreid: any[] = [];
   storeHint: string = '';
   Store: any;
+  showZeroStock: boolean = false;
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -180,6 +182,12 @@ export class StockMovementReportComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
+    this.monthDataSource.unshift({
+  name: 'All',
+  value: ''
+});
+
+this.selectedmonth = '';
   }
 
   ngOnInit() {
@@ -230,7 +238,7 @@ export class StockMovementReportComponent {
   //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
-    if (this.selectedmonth === '') {
+    if (this.selectedmonth === ''|| this.selectedmonth === null) {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
@@ -380,7 +388,15 @@ export class StockMovementReportComponent {
     };
     this.dataService.StockMovement_Api(payload).subscribe({
       next: (res: any) => {
-        this.StockMovementDatasource = res.data || [];
+        // this.StockMovementDatasource = res.data || [];
+        this.allStockMovementData = res.data || [];
+
+this.StockMovementDatasource = [...this.allStockMovementData];
+
+// Apply checkbox filter if already checked
+if (this.showZeroStock) {
+  this.filterZeroStock();
+}
 
         //  FORCE GRID REFRESH
         grid?.refresh();
@@ -946,6 +962,35 @@ export class StockMovementReportComponent {
       this.isEditProductionPopupVisible = true;
     });
   }
+
+  filterZeroStock() {
+  this.StockMovementDatasource = this.allStockMovementData.filter(item =>
+
+    (Number(item.GRN_QTY) || 0) !== 0 ||
+    (Number(item.PURCHASE_RETURN_QTY) || 0) !== 0 ||
+    (Number(item.PRODUCTION_QTY) || 0) !== 0 ||
+    (Number(item.CONSUMPTION_QTY) || 0) !== 0 ||
+    (Number(item.DELIVERY_QTY) || 0) !== 0 ||
+    (Number(item.DELIVERY_RETURN_QTY) || 0) !== 0 ||
+    (Number(item.SALE_QTY) || 0) !== 0 ||
+    (Number(item.SALE_RETURN_QTY) || 0) !== 0 ||
+    (Number(item.ADJUSTED) || 0) !== 0 ||
+    (Number(item.TRANSFER_OUT_QTY) || 0) !== 0 ||
+    (Number(item.TRANSFER_IN_QTY) || 0) !== 0
+
+    // Don't include OPENING_QTY and BALANCE_STOCK
+  );
+}
+
+onShowZeroStockChanged(e: any) {
+  this.showZeroStock = e.value;
+
+  if (this.showZeroStock) {
+    this.filterZeroStock();
+  } else {
+    this.StockMovementDatasource = [...this.allStockMovementData];
+  }
+}
 
   handleClose() {
     //  Close main details popup
