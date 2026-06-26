@@ -382,7 +382,7 @@ export class BoxproductionJvAddComponent {
       // TOTAL_COST: Number(item.TOTAL_COST) || 0,
 
       // derived / editable fields
-      QUANTITY: Number(item.USED_QTY) || 0,
+      QUANTITY: Number(item.QUANTITY) || 0,
       COST: Number(item.UNIT_COST) || 0,
       AMOUNT: (Number(item.USED_QTY) || 0) * (Number(item.UNIT_COST) || 0),
     }));
@@ -471,42 +471,40 @@ export class BoxproductionJvAddComponent {
       return;
     }
 
-   // =====================================================
-// VALIDATION: REQUIRED_QTY & USED_QTY must be <= AVAILABLE_QTY
-// =====================================================
-for (const item of this.gridData) {
-  const requiredQty = Number(item.REQUIRED_QTY) || 0;
-  const usedQty = Number(item.USED_QTY) || 0;
-  const availableQty = Number(item.QTY_AVAILABLE) || 0;
+    // =====================================================
+    // VALIDATION: REQUIRED_QTY & USED_QTY must be <= AVAILABLE_QTY
+    // =====================================================
+    for (const item of this.gridData) {
+      const requiredQty = Number(item.REQUIRED_QTY) || 0;
+      const usedQty = Number(item.USED_QTY) || 0;
+      const availableQty = Number(item.QTY_AVAILABLE) || 0;
 
-  
+      // Used Qty Validation
+      if (usedQty > availableQty) {
+        notify(
+          {
+            message: `Used Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+          4000,
+        );
+        return;
+      }
 
-  // Used Qty Validation
-  if (usedQty > availableQty) {
-    notify(
-      {
-        message: `Used Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
-        position: { at: 'top right', my: 'top right' },
-      },
-      'error',
-      4000
-    );
-    return;
-  }
-
-  // Required Qty Validation
-  if (requiredQty > availableQty) {
-    notify(
-      {
-        message: `Required Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
-        position: { at: 'top right', my: 'top right' },
-      },
-      'error',
-      4000
-    );
-    return;
-  }
-}
+      // Required Qty Validation
+      if (requiredQty > availableQty) {
+        notify(
+          {
+            message: `Required Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+          4000,
+        );
+        return;
+      }
+    }
 
     const payload = {
       ID: this.isEditing ? this.productionJVFormData.ID : 0,
