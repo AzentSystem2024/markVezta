@@ -105,15 +105,13 @@ export class DeliveryNoteFormComponent {
     TOTAL_QTY: 0,
     USER_ID: 0,
     NARRATION: '',
-    DN_TYPE: 0,
-    DETAILS: [
-      // {
-      //   SO_DETAIL_ID: 0,
-      //   ITEM_ID: 0,
-      //   REMARKS: '',
-      //   UOM: '',
-      //   QUANTITY: 0,
-      // },
+    IS_APPROVED: false,
+    Details: [
+      {
+        ITEM_ID: 0,
+        UOM: '',
+        QUANTITY: 0,
+      },
     ],
   };
 
@@ -146,6 +144,16 @@ export class DeliveryNoteFormComponent {
   insideCustomers: any;
   outsideCustomers: any;
   customerList: any;
+  itemsList: any;
+  itemsDescriptionList: {
+    store: { type: string; data: any; key: string };
+    paginate: boolean;
+    pageSize: number;
+  };
+  selectedCompany: any;
+  vatTitle: any;
+  selectedCompanyId: any;
+  distributorList: any;
 
   constructor(
     private dataService: DataService,
@@ -155,25 +163,43 @@ export class DeliveryNoteFormComponent {
   ) {}
 
   ngOnInit() {
-    this.sessionData_tax();
-    this.getSalesmanDropdown();
-    this.getCustomerDropdown();
-    this.getDeliveryNo();
-    this.isEditDataAvailable();
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
+
     const menuGroups = menuResponse.MenuGroups || [];
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      this.selectedCompany = userData?.SELECTED_COMPANY;
+      this.vatTitle = userData.GeneralSettings.VAT_TITLE;
+      if (this.selectedCompany?.COMPANY_ID) {
+        this.selectedCompanyId = this.selectedCompany.COMPANY_ID;
+        this.deliveryFormData.COMPANY_ID = this.selectedCompanyId;
+      }
+
+      if (userData.USER_ID) {
+        this.deliveryFormData.USER_ID = userData.USER_ID;
+      }
+
+      const firstFinYear = userData.FINANCIAL_YEARS?.[0];
+      if (firstFinYear?.FIN_ID) {
+        this.deliveryFormData.FIN_ID = firstFinYear.FIN_ID;
+      }
+    }
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/transfer-out-inventory');
+      .find((menu: any) => menu.Path === currentUrl);
+
     this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
+
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -182,20 +208,87 @@ export class DeliveryNoteFormComponent {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
-    if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
-      // this.getItemsList();
-    } else {
-      // this.getItemsList();
-    }
+
     this.getStoreDropdown();
 
+    this.sessionData_tax();
+    this.getSalesmanDropdown();
+    this.getCustomerDropdown();
+    this.getDeliveryNo();
+    this.getItemsofDelivery();
+    this.getItemsDescription();
+    this.getOutsideCustomerList();
+    this.getCustomerOrUnitLst();
+    // Load edit data first
+    // this.isEditDataAvailable();
+
+    // ADD MODE → show one empty row
+    if (
+      !this.isEditing &&
+      (!this.deliveryFormData.Details ||
+        this.deliveryFormData.Details.length === 0)
+    ) {
+      this.addEmptyRow();
+    }
+
     const imagePath = 'assets/markLogo.jpg';
+
     this.convertToBase64(imagePath).then((base64) => {
       this.logoBase64 = base64;
     });
-    // this.items = [];
-    // this.addEmptyRow();
   }
+
+  // ngOnInit() {
+  //   const currentUrl = this.router.url;
+
+  //   const menuResponse = JSON.parse(
+  //     sessionStorage.getItem('savedUserData') || '{}',
+  //   );
+  //   this.userID = menuResponse.USER_ID;
+  //   this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
+  //   this.companyID = menuResponse.Companies[0].COMPANY_ID;
+  //   const menuGroups = menuResponse.MenuGroups || [];
+  //   this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+  //   const packingRights = menuGroups
+  //     .flatMap((group: any) => group.Menus)
+  //     .find((menu: any) => menu.Path === currentUrl);
+  //   this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
+  //   if (packingRights) {
+  //     this.canAdd = packingRights.CanAdd;
+  //     this.canEdit = packingRights.CanEdit;
+  //     this.canDelete = packingRights.CanDelete;
+  //     this.canPrint = packingRights.CanPrint;
+  //     this.canView = packingRights.canView;
+  //     this.canApprove = packingRights.CanApprove;
+  //   }
+  //   if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
+  //     // this.getItemsList();
+  //   } else {
+  //     // this.getItemsList();
+  //   }
+  //   this.getStoreDropdown();
+  //   if (!this.isEditing && this.deliveryFormData.Details.length === 0) {
+  //     this.addEmptyRow();
+  //   }
+  //   this.sessionData_tax();
+  //   this.getSalesmanDropdown();
+  //   this.getCustomerDropdown();
+  //   this.getDeliveryNo();
+  //   this.isEditDataAvailable();
+  //   if (
+  //     !this.isEditing &&
+  //     (!this.deliveryFormData.Details ||
+  //       this.deliveryFormData.Details.length === 0)
+  //   ) {
+  //     this.deliveryFormData.Details = [{}];
+  //   }
+  //   const imagePath = 'assets/markLogo.jpg';
+  //   this.convertToBase64(imagePath).then((base64) => {
+  //     this.logoBase64 = base64;
+  //   });
+  //   // this.items = [];
+  //   // this.addEmptyRow();
+  // }
 
   private async convertToBase64(path: string): Promise<string> {
     const response = await fetch(path);
@@ -226,7 +319,7 @@ export class DeliveryNoteFormComponent {
       STORE_ID: data.STORE_ID || this.selectedStoreId,
       DN_DATE: data.DN_DATE ? new Date(data.DN_DATE) : new Date(),
       REF_NO: data.REF_NO || '',
-      CUST_ID: data.CUST_ID || 0,
+      DISTRIBUTOR_ID: data.CUST_ID || 0,
       CONTACT_NAME: data.CONTACT_NAME || '',
       CONTACT_PHONE: data.CONTACT_PHONE || '',
       CONTACT_FAX: data.CONTACT_FAX || '',
@@ -241,11 +334,17 @@ export class DeliveryNoteFormComponent {
       COMPANY_NAME: data.COMPANY_NAME,
 
       // ✅ GRID DATA BINDING
-      Details: (data.Details || []).map((row: any) => ({
-        ...row,
-        DELIVERED_QUANTITY: row.DELIVERED_QUANTITY ?? row.QUANTITY ?? 0,
-        SO_DETAIL_ID: row.SO_DETAIL_ID ?? 0,
-      })),
+      Details: (data.Details || []).map((row: any) => {
+        const item = this.itemsList.store.data.find(
+          (x: any) => x.DESCRIPTION === row.ITEM_CODE,
+        );
+
+        return {
+          ...row,
+          ITEM_ID: item?.ID,
+          ITEM_CODE: item?.ID,
+        };
+      }),
     };
 
     this.selectedCustomerId = this.deliveryFormData.CUST_ID;
@@ -253,11 +352,61 @@ export class DeliveryNoteFormComponent {
     this.updateTotalQty();
   }
 
+  addNewRow() {
+    this.deliveryFormData.Details.push({
+      ITEM_ID: 0,
+      ITEM_CODE: '',
+      DESCRIPTION: '',
+      UOM: '',
+      QTY_STOCK: 0,
+      QUANTITY: 0,
+    });
+
+    const grid = this.itemsGridRef.instance;
+
+    grid.refresh();
+
+    setTimeout(() => {
+      const rowIndex = this.deliveryFormData.Details.length - 1;
+
+      grid.editCell(rowIndex, 'ITEM_CODE');
+
+      setTimeout(() => {
+        const cell = grid.getCellElement(rowIndex, 'ITEM_CODE');
+        const input = cell?.querySelector('input') as HTMLInputElement;
+
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 50);
+    }, 100);
+  }
+
+  addEmptyRow() {
+    this.deliveryFormData.Details = [
+      {
+        ITEM_ID: 0,
+        ITEM_CODE: '',
+        DESCRIPTION: '',
+        UOM: '',
+        QTY_STOCK: 0,
+        QUANTITY: 0,
+      },
+    ];
+  }
+
   reindexDetails() {}
 
   onInitNewRow(e: any) {
-    // Prevent auto-adding empty row
-    e.cancel = true;
+    if (this.isEditing) return;
+
+    e.data = {
+      ITEM_CODE: '',
+      DESCRIPTION: '',
+      UOM: '',
+      QUANTITY: 0,
+    };
   }
 
   getSalesmanDropdown() {
@@ -270,6 +419,17 @@ export class DeliveryNoteFormComponent {
     this.dataService.getDropdownData('CUSTOMER').subscribe((response: any) => {
       this.customer = response;
     });
+  }
+
+  getCustomerOrUnitLst() {
+    const payload = {
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService
+      .getOutsideCustomerWithState(payload)
+      .subscribe((response: any) => {
+        this.distributorList = response;
+      });
   }
 
   typeChanged(e: any) {
@@ -295,6 +455,104 @@ export class DeliveryNoteFormComponent {
       .getDropdownData('INSIDE_CUSTOMER')
       .subscribe((response: any) => {
         this.customerList = response;
+      });
+  }
+
+  // getItemsofDelivery() {
+  //   const payload = {
+  //     NAME: 'ITEMS',
+  //   };
+  //   this.dataService.getDropdownData(payload).subscribe((response: any) => {
+  //     this.itemsList = response;
+  //   });
+  // }
+  getItemsofDelivery() {
+    const payload = {
+      name: 'ITEMS',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      // this.itemsList = response;
+      this.itemsList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
+      if (this.isEditing) {
+        this.isEditDataAvailable();
+      }
+    });
+  }
+
+  getItemsDescription() {
+    const payload = {
+      name: 'GetItemDesc',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.itemsDescriptionList = {
+        store: {
+          type: 'array',
+          data: response,
+          key: 'ID',
+        },
+        paginate: true,
+        pageSize: 50,
+      };
+    });
+  }
+
+  getItemsData(itemId: any, rowData: any) {
+    const payload = {
+      ITEM_ID: itemId,
+      COMPANY_ID: this.selectedCompanyId,
+      // CUSTOMER_ID: this.deliveryFormData.CUSTOMER_ID,
+    };
+
+    this.dataService
+      .getItemsDataofDeliveryNote(payload)
+      .subscribe((response: any) => {
+        const data = response?.Data?.[0];
+        console.log(data, 'deliverynoteeeeeeeeeeeeeee');
+        if (!data) return;
+
+        const grid = this.itemsGridRef.instance;
+
+        const visibleRows = grid.getVisibleRows();
+        const rowIndex = visibleRows.findIndex((r: any) => r.data === rowData);
+
+        if (rowIndex === -1) return;
+
+        //  UPDATE VALUES
+        grid.cellValue(rowIndex, 'ITEM_ID', data.ITEM_ID);
+        grid.cellValue(rowIndex, 'ITEM_CODE', data.ITEM_ID);
+        grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
+        grid.cellValue(rowIndex, 'UOM', data.UOM);
+        grid.cellValue(rowIndex, 'QTY_STOCK', data.QTY_STOCK);
+        grid.cellValue(rowIndex, 'QUANTITY', data.QUANTITY);
+
+        //  FORCE UI UPDATE
+        setTimeout(() => {
+          grid.repaintRows([rowIndex]);
+
+          // NOW MOVE TO QUANTITY (AFTER DATA IS READY)
+          setTimeout(() => {
+            grid.editCell(rowIndex, 'QUANTITY');
+
+            //  focus input
+            setTimeout(() => {
+              const cell = grid.getCellElement(rowIndex, 'QUANTITY');
+              const input = cell?.querySelector('input');
+
+              if (input) {
+                input.focus();
+                input.select();
+              }
+            }, 50);
+          }, 50);
+        }, 50);
       });
   }
 
@@ -421,10 +679,15 @@ export class DeliveryNoteFormComponent {
   }
 
   onEditorPreparing(e: any) {
-    if (e.dataField === 'DELIVERED_QUANTITY') {
+    if (
+      e.dataField === 'ITEM_CODE' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'UOM' ||
+      e.dataField === 'QTY_STOCK' ||
+      e.dataField === 'QUANTITY'
+    ) {
       e.editorOptions = e.editorOptions || {};
 
-      // Let the editor inherit row height naturally (no fixed height)
       e.editorOptions.elementAttr = {
         style: `
         height: 100%;
@@ -435,7 +698,6 @@ export class DeliveryNoteFormComponent {
       `,
       };
 
-      // Make sure the input fits snugly inside
       e.editorOptions.inputAttr = {
         style: `
         height: 100%;
@@ -444,10 +706,10 @@ export class DeliveryNoteFormComponent {
       `,
       };
 
-      // Remove spin buttons to prevent layout changes
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
+
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {
           const grid = this.itemsGridRef?.instance;
@@ -456,9 +718,202 @@ export class DeliveryNoteFormComponent {
           const rowIndex = visibleRows.findIndex(
             (r) => r?.data === e.row?.data,
           );
+
           setTimeout(() => {
-            grid.focus(grid.getCellElement(rowIndex, 'GST'));
+            // existing logic untouched
           }, 50);
+        }
+      };
+    }
+
+    if (
+      e.dataField === 'ITEM_CODE' ||
+      e.dataField === 'DESCRIPTION' ||
+      e.dataField === 'QUANTITY' ||
+      e.dataField === 'DISC_PERC'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      const grid = this.itemsGridRef?.instance;
+
+      // ============================
+      // DROPDOWN
+      // ============================
+      if (e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION') {
+        e.editorName = 'dxSelectBox';
+
+        e.editorOptions.dataSource =
+          e.dataField === 'ITEM_CODE'
+            ? this.itemsList
+            : this.itemsDescriptionList;
+
+        e.editorOptions.displayExpr = 'DESCRIPTION';
+
+        e.editorOptions.valueExpr =
+          e.dataField === 'ITEM_CODE' ? 'ID' : 'DESCRIPTION';
+
+        e.editorOptions.searchEnabled = true;
+
+        e.editorOptions.onValueChanged = (args: any) => {
+          console.log('Selected Value :', args.value);
+
+          if (!args.value) {
+            return;
+          }
+
+          if (e.dataField === 'ITEM_CODE') {
+            // args.value is ID
+            this.getItemsData(args.value, e.row.data);
+          } else {
+            // Find ID from description
+            const item = this.itemsDescriptionList.store.data.find(
+              (x: any) => x.DESCRIPTION === args.value,
+            );
+
+            if (item) {
+              this.getItemsData(item.ID, e.row.data);
+            }
+          }
+        };
+      }
+
+      // ============================
+      // MAIN KEY HANDLING
+      // ============================
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key !== 'Enter') return;
+
+        const visibleRows = grid.getVisibleRows();
+        const rowIndex = visibleRows.findIndex(
+          (r: any) => r.data === e.row.data,
+        );
+
+        const editor = event.component;
+
+        // DROPDOWN
+        if (e.editorName === 'dxSelectBox') {
+          event.event.preventDefault();
+
+          if (!editor.option('opened')) {
+            editor.open();
+          } else {
+            const selectedItem = editor.option('selectedItem');
+
+            if (selectedItem) {
+              editor.option('value', selectedItem.ID);
+
+              // Call API immediately
+              this.getItemsData(selectedItem.ID, e.row.data);
+            }
+
+            setTimeout(() => {
+              editor.close();
+
+              if (e.dataField === 'ITEM_CODE') {
+                grid.editCell(rowIndex, 'QUANTITY');
+              }
+            }, 100);
+          }
+
+          return;
+        }
+
+        // ============================
+        // QUANTITY (UNCHANGED - YOUR WORKING CODE)
+        // ============================
+        if (e.dataField === 'QUANTITY') {
+          event.event.preventDefault();
+
+          const input = event.event.target as HTMLInputElement;
+          const value = Number(input.value);
+
+          e.setValue(value);
+
+          grid.saveEditData();
+
+          setTimeout(() => {
+            const visibleRows = grid.getVisibleRows();
+            const rowIndex = e.row.rowIndex;
+            const isLastRow = rowIndex === visibleRows.length - 1;
+
+            if (isLastRow) {
+              // Add new row
+              this.deliveryFormData.Details.push({
+                ITEM_ID: 0,
+                ITEM_CODE: '',
+                DESCRIPTION: '',
+                UOM: '',
+                QTY_STOCK: 0,
+                QUANTITY: 0,
+              });
+
+              grid.refresh();
+
+              setTimeout(() => {
+                const newRowIndex = this.deliveryFormData.Details.length - 1;
+
+                grid.editCell(newRowIndex, 'ITEM_CODE');
+
+                setTimeout(() => {
+                  const cell = grid.getCellElement(newRowIndex, 'ITEM_CODE');
+                  const input = cell?.querySelector('input');
+
+                  input?.focus();
+                  input?.select();
+                }, 50);
+              }, 100);
+            } else {
+              grid.editCell(rowIndex + 1, 'ITEM_CODE');
+            }
+          }, 50);
+
+          return;
+        }
+
+        // ============================
+        // ✅ DISC_PERC (ONLY NEW ADDITION)
+        // ============================
+        if (e.dataField === 'DISC_PERC') {
+          event.event.preventDefault();
+
+          const grid = this.itemsGridRef.instance;
+          const rowIndex = e.row.rowIndex;
+
+          const input = event.event.target as HTMLInputElement;
+          const value = Number(input.value);
+
+          e.setValue(value);
+
+          grid.saveEditData();
+
+          setTimeout(() => {
+            const visibleRows = grid.getVisibleRows();
+            const isLastRow = rowIndex === visibleRows.length - 1;
+
+            if (isLastRow) {
+              // ✅ call your function
+              // this.onAddRow();
+
+              // 🔥 FORCE FOCUS (IMPORTANT)
+              setTimeout(() => {
+                const newRowIndex = this.deliveryFormData.Details.length - 1;
+
+                grid.editCell(newRowIndex, 'ITEM_CODE');
+
+                // optional: focus input
+                setTimeout(() => {
+                  const cell = grid.getCellElement(newRowIndex, 'ITEM_CODE');
+                  const input = cell?.querySelector('input');
+                  input?.focus();
+                  input?.select();
+                }, 50);
+              }, 100); // ⬅️ must be slightly higher
+            } else {
+              grid.editCell(rowIndex + 1, 'ITEM_CODE');
+            }
+          }, 50);
+
+          return;
         }
       };
     }
@@ -490,8 +945,25 @@ export class DeliveryNoteFormComponent {
   };
 
   onCellValueChanged(e: any) {
+    console.log('Cell Changed', e);
+    if (e.dataField === 'ITEM_CODE') {
+      this.getItemsData(e.value, e.data);
+      return;
+    }
+
+    if (e.dataField === 'DESCRIPTION') {
+      const item = this.itemsDescriptionList.store.data.find(
+        (x: any) => x.DESCRIPTION === e.value,
+      );
+
+      if (item) {
+        this.getItemsData(item.ID, e.data);
+      }
+      return;
+    }
+
     if (e.column.dataField === 'DELIVERED_QUANTITY') {
-      e.component.validate(); // forces inline validation
+      e.component.validate();
       this.updateTotalQty();
     }
   }
@@ -509,14 +981,27 @@ export class DeliveryNoteFormComponent {
     this.popupClosed.emit();
   }
 
+  validateQuantity = (e: any): boolean => {
+    const quantity = Number(e.value || 0);
+    const stockQty = Number(e.data?.QTY_STOCK || 0);
+
+    return quantity <= stockQty;
+  };
+
   saveDeliveryNote() {
-    // Basic Validations
-    if (!this.selectedCustomerId || this.selectedCustomerId === 0) {
+    // Map Distributor to Customer
+    this.deliveryFormData.CUST_ID = this.deliveryFormData.DISTRIBUTOR_ID;
+    // Customer validation
+    if (!this.deliveryFormData.CUST_ID || this.deliveryFormData.CUST_ID === 0) {
       notify('Please select a customer.', 'warning', 3000);
       return;
     }
 
-    if (!this.deliveryFormData.Details.length) {
+    // Item validation
+    if (
+      !this.deliveryFormData.Details ||
+      this.deliveryFormData.Details.length === 0
+    ) {
       notify('Please add at least one item.', 'warning', 3000);
       return;
     }
@@ -524,128 +1009,142 @@ export class DeliveryNoteFormComponent {
     let isValid = true;
 
     this.deliveryFormData.Details.forEach((item: any, index: number) => {
-      if (!item.SO_DETAIL_ID) {
-        notify(`Row ${index + 1}: Item is required.`, 'warning', 3000);
+      if (!item.ITEM_ID || item.ITEM_ID === 0) {
+        notify(`Row ${index + 1}: Please select an item.`, 'warning', 3000);
         isValid = false;
         return;
       }
-      if (!item.DELIVERED_QUANTITY || item.DELIVERED_QUANTITY <= 0) {
-        notify(`Row ${index + 1}: Delivered Quantity must be greater than 0.`);
-        isValid = false;
-        return;
-      }
-      if (item.DELIVERED_QUANTITY > item.QUANTITY) {
+
+      if (!item.QUANTITY || Number(item.QUANTITY) <= 0) {
         notify(
-          `Row ${
-            index + 1
-          }: Delivered Quantity cannot exceed Ordered Quantity (${
-            item.QUANTITY
-          }).`,
+          `Row ${index + 1}: Quantity should be greater than zero.`,
+          'warning',
+          3000,
         );
         isValid = false;
         return;
       }
     });
 
-    if (!isValid) return;
+    if (!isValid) {
+      return;
+    }
+
+    // if (
+    //   !this.deliveryFormData.QUANTITY ||
+    //   this.deliveryFormData.QUANTITY === 0
+    // ) {
+    //   notify('Please enter a quantity.', 'warning', 3000);
+    //   return;
+    // }
+
     const formatDate = (date: any): string => {
       if (!date) return '';
+
       const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
+
       const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+
       return `${year}-${month}-${day}`;
     };
-    // Prepare Payload
-    const payload = {
-      ...this.deliveryFormData,
-      COMPANY_ID: this.companyID,
+    this.deliveryFormData.TOTAL_QTY = this.deliveryFormData.Details.reduce(
+      (total: number, item: any) => total + (Number(item.QUANTITY) || 0),
+      0,
+    );
+    const payload: any = {
+      COMPANY_ID: this.selectedCompanyId,
       STORE_ID: this.storeFromSession,
-      FIN_ID: this.finID,
-      USER_ID: this.userID,
       DN_DATE: formatDate(this.deliveryFormData.DN_DATE),
-      Details: (this.deliveryFormData.Details || []).map((item: any) => ({
-        // ITEM_ID: item.ITEM_ID,
-        BRAND: item.BRAND,
-        ART_NO: item.ART_NO,
-        PACKING: item.PACKING,
-        ARTICLE_TYPE: item.ARTICLE_TYPE,
-        REMARKS: item.REMARKS,
-        COLOR: item.COLOR,
-        CATEGORY: item.CATEGORY,
-        QUANTITY: item.QUANTITY || 0,
-        DELIVERED_QUANTITY: item.DELIVERED_QUANTITY,
-        SO_DETAIL_ID: item.SO_DETAIL_ID || 0,
-        PACKING_ID: item.PACKING_ID || 0,
+      REF_NO: this.deliveryFormData.REF_NO,
+      CUST_ID: this.deliveryFormData.CUST_ID,
+      CONTACT_NAME: this.deliveryFormData.CONTACT_NAME,
+      CONTACT_PHONE: this.deliveryFormData.CONTACT_PHONE,
+      CONTACT_FAX: this.deliveryFormData.CONTACT_FAX,
+      CONTACT_MOBILE: this.deliveryFormData.CONTACT_MOBILE,
+      SALESMAN_ID: this.deliveryFormData.SALESMAN_ID,
+      FIN_ID: this.finID,
+      TOTAL_QTY: this.deliveryFormData.TOTAL_QTY,
+      USER_ID: this.userID,
+      NARRATION: this.deliveryFormData.NARRATION,
+      IS_APPROVED: this.deliveryFormData.IS_APPROVED,
+
+      Details: this.deliveryFormData.Details.map((item: any) => ({
+        ITEM_ID: item.ITEM_ID,
+        UOM: item.UOM,
+        QUANTITY: Number(item.QUANTITY) || 0,
       })),
     };
 
     if (this.isEditing && this.deliveryFormData.ID) {
       payload.ID = this.deliveryFormData.ID;
     }
-    // Decide API call based on mode
-    // Decide API call logic
+
+    // EDIT
     if (this.isEditing) {
-      // EDIT MODE
       if (this.deliveryFormData.IS_APPROVED) {
-        // ✔️ APPROVE existing DN
-        const result = confirm(
+        confirm(
           'Are you sure you want to approve this Delivery Note?',
           'Confirm Approval',
-        );
+        ).then((dialogResult: boolean) => {
+          if (!dialogResult) return;
 
-        result.then((dialogResult: boolean) => {
-          if (dialogResult) {
-            this.dataService.approveDeliveryNote(payload).subscribe({
-              next: () => {
-                notify('Delivery Note Approved!', 'success', 2000);
-                this.popupClosed.emit();
-              },
-              error: () => notify('Approval failed!', 'error', 3000),
-            });
-          }
+          this.dataService.approveDeliveryNote(payload).subscribe({
+            next: () => {
+              notify('Delivery Note Approved!', 'success', 2000);
+              this.popupClosed.emit();
+            },
+            error: () => {
+              notify('Approval failed!', 'error', 3000);
+            },
+          });
         });
       } else {
-        // ✔️ UPDATE existing DN
         this.dataService.updateDeliveryNote(payload).subscribe({
           next: () => {
             notify('Delivery Note Updated!', 'success', 2000);
             this.popupClosed.emit();
           },
-          error: () => notify('Update failed!', 'error', 3000),
+          error: () => {
+            notify('Update failed!', 'error', 3000);
+          },
         });
       }
-    } else {
-      // ADD MODE
+    }
+
+    // ADD
+    else {
+      const saveData = () => {
+        this.dataService.saveDeliveryNote(payload).subscribe({
+          next: () => {
+            notify(
+              this.deliveryFormData.IS_APPROVED
+                ? 'Delivery Note Saved & Approved!'
+                : 'Delivery Note Saved!',
+              'success',
+              2000,
+            );
+
+            this.popupClosed.emit();
+          },
+          error: () => {
+            notify('Save failed!', 'error', 3000);
+          },
+        });
+      };
+
       if (this.deliveryFormData.IS_APPROVED) {
-        // ✔️ Confirm before saving as Approved
-        const result = confirm(
+        confirm(
           'Are you sure you want to save this Delivery Note as Approved?',
           'Confirm Save',
-        );
-
-        result.then((dialogResult: boolean) => {
+        ).then((dialogResult: boolean) => {
           if (dialogResult) {
-            this.dataService.saveDeliveryNote(payload).subscribe({
-              next: () => {
-                notify('Delivery Note Saved & Approved!', 'success', 2000);
-                this.ngZone.run(() => {
-                  this.popupClosed.emit();
-                });
-              },
-              error: () => notify('Save failed!', 'error', 3000),
-            });
+            saveData();
           }
         });
       } else {
-        // ✔️ Save normally without approval
-        this.dataService.saveDeliveryNote(payload).subscribe({
-          next: () => {
-            notify('Delivery Note Saved!', 'success', 2000);
-            this.popupClosed.emit();
-          },
-          error: () => notify('Save failed!', 'error', 3000),
-        });
+        saveData();
       }
     }
   }

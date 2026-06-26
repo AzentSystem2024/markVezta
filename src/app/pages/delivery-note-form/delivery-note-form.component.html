@@ -18,9 +18,9 @@
           [selection]="{ mode: 'single' }"
           [editing]="{
             mode: 'cell',
-            allowAdding: true,
-            allowUpdating: true,
+            allowUpdating: !isReadOnlyMode,
             allowDeleting: !isReadOnlyMode,
+            allowAdding: false,
           }"
           (onInitNewRow)="onInitNewRow($event)"
           (onRowUpdated)="onRowUpdated($event)"
@@ -79,38 +79,65 @@
 
                 <!-- Row 2 : Company (aligned with DN / Ref No) -->
                 <div style="display: flex; align-items: center">
-                  <dx-select-box
+                  <!-- <dx-text-box
                     [(value)]="deliveryFormData.COMPANY_NAME"
                     label="Company"
                     labelMode="floating"
                     [width]="400"
                     [readOnly]="isReadOnlyMode"
-                  ></dx-select-box>
+                  ></dx-text-box> -->
+                  <dx-select-box
+                    [(value)]="deliveryFormData.DISTRIBUTOR_ID"
+                    [dataSource]="distributorList"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="375"
+                    label="Customer *"
+                    labelMode="floating"
+                    [searchEnabled]="true"
+                    [readOnly]="isReadOnlyMode"
+                  >
+                  </dx-select-box>
+                  <dx-button
+                    text="Add Row"
+                    icon="plus"
+                    type="default"
+                    stylingMode="contained"
+                    [disabled]="isReadOnlyMode"
+                    (onClick)="addNewRow()"
+                  >
+                  </dx-button>
                 </div>
               </div>
             </dxi-item>
           </dxo-toolbar>
 
           <!-- <dxi-column caption="Sl No" [allowEditing]="false"> </dxi-column> -->
-          <dxi-column
-            dataField="SO_DETAIL_ID"
-            caption="SODETAILID"
-            [visible]="false"
-          >
-          </dxi-column>
+          <dxi-column dataField="ITEM_ID" [visible]="false"> </dxi-column>
           <!-- <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column> -->
           <dxi-column
             dataField="ITEM_CODE"
             caption="Item Code"
-            [width]="250"
-            [allowEditing]="false"
-          >
-          </dxi-column>
+            [allowEditing]="!isReadOnlyMode"
+            [editorType]="'dxSelectBox'"
+            [lookup]="{
+              dataSource: itemsList,
+              valueExpr: 'ID',
+              displayExpr: 'DESCRIPTION',
+              searchEnabled: true,
+              searchMode: 'contains',
+              minSearchLength: 2,
+              showDataBeforeSearch: false,
+              paginate: true,
+              pageSize: 50,
+            }"
+          ></dxi-column>
           <dxi-column
             dataField="DESCRIPTION"
             caption="Description"
             [allowEditing]="false"
-          ></dxi-column>
+          >
+          </dxi-column>
           <!-- <dxi-column
             dataField="MATRIX_CODE"
             caption="Matrix Code"
@@ -122,16 +149,27 @@
             caption="UOM"
             [allowEditing]="false"
           ></dxi-column>
-          <!-- <dxi-column
-            dataField="UOM"
-            caption="UOM"
+          <dxi-column
+            dataField="QTY_STOCK"
+            caption="Stock Qty"
             [allowEditing]="false"
-          ></dxi-column> -->
+          ></dxi-column>
           <dxi-column
             dataField="QUANTITY"
             caption="Quantity"
-            [allowEditing]="false"
-          ></dxi-column>
+            [allowEditing]="true"
+          >
+            <!-- <dxi-validation-rule
+              type="required"
+              message="Quantity is required"
+            ></dxi-validation-rule> -->
+
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateQuantity"
+              message="Quantity cannot be greater than Stock Qty"
+            ></dxi-validation-rule>
+          </dxi-column>
           <!-- <dxi-column
             dataField="DELIVERED_QUANTITY"
             caption="Delivered Quantity"
@@ -218,7 +256,7 @@
             </div>
 
             <!-- Approve Checkbox -->
-            <!-- <dx-check-box
+            <dx-check-box
               [value]="isReadOnlyMode ? true : deliveryFormData.IS_APPROVED"
               (valueChange)="
                 !isReadOnlyMode ? (deliveryFormData.IS_APPROVED = $event) : null
@@ -227,7 +265,7 @@
               [readOnly]="isReadOnlyMode"
               class="approve-checkbox"
               style="margin-top: 15px"
-            ></dx-check-box> -->
+            ></dx-check-box>
 
             <!-- Buttons -->
             <div class="footer-actions" style="margin-top: 15px">

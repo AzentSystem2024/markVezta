@@ -1095,10 +1095,12 @@ export class DataService {
   getCustomerDetailDeliveryNote(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Delivery_Note/getcust`, data);
   }
-
+  getItemsDataofDeliveryNote(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Delivery_note/getitem`, data);
+  }
   saveDeliveryNote(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}Delivery_Note/insert`, data);
+    return this.http.post(`${this.apiUrl}Delivery_Note/Save`, data);
   }
   selectDeliveryNote(id: number) {
     return this.http.post<any>(`${this.apiUrl}Sync/dnselect/` + id, {});
@@ -1109,11 +1111,11 @@ export class DataService {
   }
   updateDeliveryNote(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}Delivery_Note/update`, data);
+    return this.http.post(`${this.apiUrl}Delivery_Note/Edit`, data);
   }
   approveDeliveryNote(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}Delivery_Note/approve`, data);
+    return this.http.post(`${this.apiUrl}Delivery_Note/Commit`, data);
   }
   deleteDeliveryNote(id: number) {
     return this.http.post<any>(`${this.apiUrl}Delivery_Note/delete/` + id, {});
@@ -7112,12 +7114,14 @@ The result can be exported to HTML or Markdown.`;
 
   //==================synching data Api=======================
   get_sync_Data_api() {
-    return this.http.post(`${this.apiUrl}Synch/PendingStores`, {})
+    return this.http.post(`${this.apiUrl}Synch/PendingStores`, {});
   }
 
   //==================trial balance with branch wise for Advance  data Api=======================
   get_Trial_balance_api(item: any) {
-
-    return this.http.post(`${this.apiUrl}AcReports/TrialBalance/StoreWise`, item)
+    return this.http.post(
+      `${this.apiUrl}AcReports/TrialBalance/StoreWise`,
+      item,
+    );
   }
 }
