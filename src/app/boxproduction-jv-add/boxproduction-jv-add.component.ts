@@ -653,6 +653,8 @@ for (const item of this.gridData) {
       this.itemsGrid.instance.cancelEditData();
       this.itemsGrid.instance.refresh();
     }
+    this.getPendingNo();
+this.productionJVFormData.PRODUCTION_DATE = new Date();
   }
 }
 @NgModule({
