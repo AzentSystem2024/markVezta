@@ -39,6 +39,7 @@ import { DataService } from 'src/app/services';
 export class GrnVerifyFormComponent implements OnInit, OnChanges {
   @Input() formdata: any;
   @Input() isReadOnly: boolean = false;
+  @Input() isViewMode: boolean = false;
   financialYeaDate: string;
   selected_vat_id: any;
   sessionData: any;
@@ -1292,7 +1293,10 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       this.poDetails = this.newGrnData.GRNDetails.map((item, index) => ({
         ...item,
         SL_NO: index + 1, // Add SL_NO starting from 1
-        QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QUANTITY,
+        // QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QUANTITY,
+        QTY_TO_RECEIVE: this.isViewMode
+  ? item.BALANCE_QTY
+  : item.PO_QUANTITY - item.GRN_QUANTITY,
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
         QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
         DESCRIPTION: item.ITEM_NAME,
