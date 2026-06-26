@@ -91,13 +91,13 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
-        <!-- <dxi-item
+        <dxi-item
           *ngIf="canAdd"
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
-        ></dxi-item> -->
+        ></dxi-item>
       </dxo-toolbar>
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
@@ -189,8 +189,12 @@
 >
   <ng-container *ngIf="isAddDelivery">
     <app-delivery-note-form
+      [isEditing]="false"
+      [EditingResponseData]="null"
+      [isReadOnlyMode]="false"
       (popupClosed)="handleClose()"
-    ></app-delivery-note-form>
+    >
+    </app-delivery-note-form>
   </ng-container>
 </dx-popup>
 

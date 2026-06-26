@@ -592,6 +592,9 @@ export class DeliveryNoteComponent {
   }
 
   addDeliveryNote() {
+    this.selectedDelivery = null;
+    this.isReadOnlyDelivery = false;
+    this.isEditDelivery = false;
     this.isAddDelivery = true;
   }
 
