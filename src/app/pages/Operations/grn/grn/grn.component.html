@@ -275,6 +275,7 @@
   <app-grn-verify-form
     #verifyForm
     [formdata]="selectedRowData"
+    [isViewMode]="false"
   ></app-grn-verify-form>
 </form-popup>
 <form-popup
@@ -303,6 +304,7 @@
     [formdata]="selectedRowData"
     [isReadOnly]="true"
     (closePopup)="isViewPopupOpened = false"
+    [isViewMode]="true"
   ></app-grn-verify-form>
 </dx-popup>
 <!-- <dx-popup

@@ -162,6 +162,15 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+
+        <dxi-item location="after">
+  <dx-check-box
+    text="Show Non Zero Stock"
+    [(value)]="showZeroStock"
+    (onValueChanged)="onShowZeroStockChanged($event)"
+  >
+  </dx-check-box>
+</dxi-item>
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <!-- <dxi-item
           location="after"
