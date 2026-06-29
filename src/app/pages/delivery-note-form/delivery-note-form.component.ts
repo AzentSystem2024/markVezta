@@ -219,6 +219,7 @@ export class DeliveryNoteFormComponent {
     this.getItemsDescription();
     this.getOutsideCustomerList();
     this.getCustomerOrUnitLst();
+    this.getPendingNo();
     // Load edit data first
     // this.isEditDataAvailable();
 
@@ -298,6 +299,18 @@ export class DeliveryNoteFormComponent {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
       reader.readAsDataURL(blob);
+    });
+  }
+
+
+    getPendingNo() {
+    const payload = {
+      TRANS_TYPE: 23,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.dataService.getDocNo(payload).subscribe((response: any) => {
+      // this.pendingNo = response.PAYMENT_NO;
+      this.deliveryFormData.DN_NO = response.DOC_NO;
     });
   }
 

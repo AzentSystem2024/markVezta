@@ -244,7 +244,7 @@
     <dxi-column
       dataField="QUANTITY"
       caption="QTY RECEIVED"
-      [allowEditing]="true"
+      [allowEditing]="newGrnData?.STATUS !== 'Approved'"
       [editorOptions]="{
         showSpinButtons: true,
         min: 0,

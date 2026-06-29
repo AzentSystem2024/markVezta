@@ -105,7 +105,7 @@ export class StockViewComponent {
     if (this.fin_id.length) {
       this.finID = this.fin_id[0].FIN_ID;
     }
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
 
@@ -129,6 +129,8 @@ export class StockViewComponent {
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.companyID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    console.log(this.companyID)
   }
   refreshGrid() {
     // if (this.dataGrid?.instance) {
@@ -152,6 +154,7 @@ export class StockViewComponent {
   getStockViewList() {
     const payload = {
       FIN_ID: this.finID,
+      COMPANY_ID : this.companyID
     };
     this.dataService.getStockViewList(payload).subscribe((response: any) => {
       this.stockViewList = response.Data;
