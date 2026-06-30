@@ -403,6 +403,18 @@ import {
   BarcodePrintModule,
 } from './pages/barcode-print/barcode-print.component';
 import { TrialBalanceBranchWiseModule } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
+import {
+  DistrictComponent,
+  DistrictModule,
+} from './pages/district/district.component';
+import {
+  DistrictFormComponent,
+  DistrictFormModule,
+} from './pages/district-form/district-form.component';
+import {
+  DashboardMarkComponent,
+  DashboardMarkModule,
+} from './pages/dashboard-mark/dashboard-mark.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -815,7 +827,10 @@ import { TrialBalanceBranchWiseModule } from './pages/REPORT/trial-balance-branc
     TrialBalanceDimensionAdvanceModule,
     LedgerStatementDimensionModule,
     BarcodePrintModule,
-    TrialBalanceBranchWiseModule
+    TrialBalanceBranchWiseModule,
+    DistrictModule,
+    DistrictFormModule,
+    DashboardMarkModule,
   ],
 
   providers: [
@@ -830,4 +845,4 @@ import { TrialBalanceBranchWiseModule } from './pages/REPORT/trial-balance-branc
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,0 +1,64 @@
+<dx-form [(formData)]="districtFormData" [colCount]="1" labelLocation="top">
+  <!-- District Name -->
+  <dxi-item
+    dataField="DISTRICT_NAME"
+    editorType="dxTextBox"
+    [label]="{ text: 'District Name' }"
+  >
+    <dxi-validation-rule
+      type="required"
+      message="District Name is required"
+    ></dxi-validation-rule>
+  </dxi-item>
+
+  <!-- Country -->
+  <dxi-item [label]="{ text: 'Country' }">
+    <div *dxTemplate>
+      <dx-select-box
+        [searchEnabled]="true"
+        [acceptCustomValue]="false"
+        [(value)]="districtFormData.COUNTRY_ID"
+        [items]="countryCodes"
+        valueExpr="ID"
+        [displayExpr]="countryDisplay"
+        (onValueChanged)="onCountryChanged($event)"
+      >
+        <div *dxTemplate="let data of 'item'">
+          <img [src]="data.FLAG_URL" width="20" style="margin-right: 8px" />
+          {{ data.CODE }} {{ data.COUNTRY_NAME }}
+        </div>
+      </dx-select-box>
+    </div>
+  </dxi-item>
+  <!-- State -->
+  <dxi-item
+    dataField="STATE_ID"
+    editorType="dxSelectBox"
+    [label]="{ text: 'State' }"
+    [editorOptions]="{
+      dataSource: filteredStates,
+      displayExpr: 'DESCRIPTION',
+      valueExpr: 'ID',
+      searchEnabled: true,
+    }"
+  >
+    <dxi-validation-rule
+      type="required"
+      message="State is required"
+    ></dxi-validation-rule>
+  </dxi-item>
+</dx-form>
+
+<div class="d-flex justify-content-end mt-4">
+  <dx-button
+    text="Cancel"
+    type="normal"
+    stylingMode="outlined"
+    class="me-2"
+    (onClick)="cancel()"
+  >
+  </dx-button>
+
+  <dx-button text="Save" type="default" icon="save" (onClick)="saveDistrict()">
+  </dx-button>
+</div>

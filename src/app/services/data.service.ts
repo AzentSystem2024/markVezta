@@ -7124,4 +7124,30 @@ The result can be exported to HTML or Markdown.`;
       item,
     );
   }
+
+  //===================================DISTRICT======================================================//
+  getDistricts(): Observable<any> {
+    return this.http.post(`${this.apiUrl}District/list`, {});
+  }
+
+  insertDistrict(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}District/insert`, data);
+  }
+  selectDistrict(id: number) {
+    return this.http.post<any>(`${this.apiUrl}District/select/` + id, {});
+  }
+  updateDistrict(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}District/update`, data);
+  }
+  deleteDistrict(id: number) {
+    return this.http.post<any>(`${this.apiUrl}District/delete/` + id, {});
+  }
+
+  //============================DASHBOARD-MARK=================================================//
+  dashboardMarkData(item: any) {
+    const payload = item;
+    return this.http.post(`${this.apiUrl}Dashboard/getdashboard`, payload);
+  }
 }

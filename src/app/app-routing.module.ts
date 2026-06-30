@@ -210,6 +210,8 @@ import { TrialBalanceDimensionAdvanceComponent } from './pages/REPORT/trial-bala
 import { LedgerStatementDimensionComponent } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
 import { BarcodePrintComponent } from './pages/barcode-print/barcode-print.component';
 import { TrialBalanceBranchWiseComponent } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
+import { DistrictComponent } from './pages/district/district.component';
+import { DashboardMarkComponent } from './pages/dashboard-mark/dashboard-mark.component';
 
 const routes: Routes = [
   {
@@ -1294,6 +1296,16 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'district',
+        component: DistrictComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'mark-dashboard',
+        component: DashboardMarkComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: '**',
         redirectTo: 'login',
         pathMatch: 'full',
@@ -1309,4 +1321,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
