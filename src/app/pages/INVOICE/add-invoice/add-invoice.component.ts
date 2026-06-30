@@ -146,6 +146,7 @@ export class AddInvoiceComponent {
   isSaving: boolean;
   isTransfersLoading: boolean;
   vatTitle: any;
+  salesmanName: any;
 
   constructor(
     private dataService: DataService,
@@ -242,6 +243,8 @@ export class AddInvoiceComponent {
     this.selectedCustomer = selectedCustomer;
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
 
+    this.getSalesman(selectedCustomer.ID);
+
     // ONLY CHANGE
     // this.applyGstMode();
 
@@ -251,6 +254,26 @@ export class AddInvoiceComponent {
     this.isTransfersLoading = true;
     this.getInvoiceListForGrid();
   }
+
+  getSalesman(customerId: number) {
+  const payload = {
+    CUSTOMER_ID: customerId
+  };
+
+  this.dataService.getInvoiceSalesman(payload).subscribe(
+    (response: any) => {
+      this.salesmanName = response?.length
+        ? response[0].EMP_NAME
+        : '';
+
+      console.log(this.salesmanName);
+    },
+    (error) => {
+      console.error(error);
+      this.salesmanName = '';
+    }
+  );
+}
 
   onUnitChanged(e: any) {
     if (e.value) {

@@ -98,6 +98,8 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     DELIVERY_ADDRESS: [],
     DEALER_TYPE: 0,
     DEALER_ID: 0,
+    DISTRICT_ID:0,
+    SALESMAN_ID:0,
     DeliveryAddresses: [],
   };
 
@@ -129,6 +131,9 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   Phone_limit: number;
   mobile_limit_Delivery_Address: number = 0;
   savedAddresses: any[] = [];
+  districtData: any;
+  Salesman: any;
+  selected_stateId: any;
 
   constructor(private service: DataService) {
     this.getStateDropDown();
@@ -368,7 +373,31 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     });
   }
 
-  onStateSelectionChanged(event: any) {}
+    getDistrictDropDown() {
+    const id = this.selected_stateId;
+    const payload = {
+      NAME: 'DISTRICT_NAME',
+      STATE_ID: this.selected_stateId,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.districtData = data;
+    });
+  }
+
+    getSalesmanDropDown() {
+    const payload = {
+      NAME: 'SALESMAN',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.Salesman = data;
+    });
+  }
+  
+    onStateSelectionChanged(event: any) {
+    this.selected_stateId = event.value;
+    this.getDistrictDropDown();
+  }
 
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
@@ -393,14 +422,16 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.sesstion_Details();
     this.getPaymentTerms();
 
     this.getVATRuleDropDown();
     this.getStateDropDown();
+    this.getSalesmanDropDown();
     this.getPriceLevelDropDown();
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
-    this.sesstion_Details();
+    
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;

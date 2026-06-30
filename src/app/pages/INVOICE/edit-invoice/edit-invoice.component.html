@@ -116,35 +116,44 @@
                   >
                   </dx-select-box>
                 </div>
-                <div
-                  style="
+                     
+              <div
+  style="
+    margin-top: 4px;
                     display: flex;
-                    gap: 2px;
-                    margin-bottom: 0;
-                    justify-content: end;
-                  "
-                >
-                  <dx-button
-                    (onClick)="openTrOutSelector()"
-                    stylingMode="outlined"
-                    class="blue-outline-btn"
-                  >
-                    <div
-                      *dxTemplate="let data of 'content'"
-                      style="display: flex; align-items: center; gap: 6px"
-                    >
-                      <span
-                        class="iconify"
-                        data-icon="mingcute:time-line"
-                        data-width="18"
-                        data-height="18"
-                      >
-                      </span>
+                    align-items: flex-end;
+                    gap: 16px;
+                    margin-bottom: 24px;
+  "
+>
+  <!-- Text Box -->
+ <dx-text-box
+  label="Salesman"
+  labelMode="floating"
+  [width]="170"
+  [(value)]="salesmanName"
+  [readOnly]="true">
+</dx-text-box>
 
-                      <span>Fill Pending Deliveries</span>
-                    </div>
-                  </dx-button>
-                </div>
+  <!-- Fill Pending Deliveries Button -->
+  <dx-button
+    stylingMode="contained"
+    class="blue-outline-btn"
+    (onClick)="openTrOutSelector()"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <div style="display: flex; align-items: center; gap: 6px">
+        <span
+          class="iconify"
+          data-icon="mingcute:time-line"
+          data-width="20"
+          data-height="20"
+        ></span>
+        <span>Fill Pending Deliveries</span>
+      </div>
+    </div>
+  </dx-button>
+</div>
               </div>
             </dxi-item>
           </dxo-toolbar>
