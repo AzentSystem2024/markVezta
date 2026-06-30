@@ -944,6 +944,7 @@ export class GrnComponent implements OnInit {
     }
 
     this.isGRNPopupVisible = false;
+     this.isApproved = false;
 
     // Reset arrays only
     this.grnNewForm.newGrnData.GRNDetails = [];

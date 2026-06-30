@@ -213,7 +213,7 @@
               label="Contact Name"
               labelMode="floating"
               [width]="410"
-              [readOnly]="true"
+              [readOnly]="isReadOnlyMode"
               style="margin-top: 10px"
             ></dx-text-box>
             <!-- <div style="flex: 1">
@@ -250,7 +250,7 @@
                 [(value)]="deliveryFormData.CONTACT_MOBILE"
                 label="Mobile"
                 labelMode="floating"
-                [readOnly]="true"
+                [readOnly]="isReadOnlyMode"
               >
               </dx-text-box>
             </div>
