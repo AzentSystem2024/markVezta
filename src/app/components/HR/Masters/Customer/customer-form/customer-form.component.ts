@@ -93,6 +93,8 @@ export class CustomerFormComponent {
     CUST_TYPE: 0,
     DEALER_TYPE: 0,
     DEALER_ID: 0,
+    DISTRICT_ID:0,
+    SALESMAN_ID:0,
     DeliveryAddresses: [] as any[],
   };
 
@@ -122,6 +124,9 @@ export class CustomerFormComponent {
   countryCodeDeliveryaddress: any;
   Phone_limit: number | undefined;
   mobile_limit_Delivery_Address: number | undefined;
+  Salesman: any;
+  selected_stateId: any;
+  districtData: any;
 
   constructor(
     private service: DataService,
@@ -136,6 +141,22 @@ export class CustomerFormComponent {
 
     this.getStateDropDown();
   }
+
+
+    ngOnInit(): void {
+    this.get_Country_Dropdown_List();
+    this.getDealerDropDown();
+    this.getPaymentTerms();
+    this.showCountry();
+    this.getVATRuleDropDown();
+    this.getStateDropDown();
+    this.getSalesmanDropDown();
+    this.getPriceLevelDropDown();
+    this.get_Warehouse_Dropdown_List();
+    this.get_DeliveryAddress_Dropdown_List();
+    this.sesstion_Details();
+  }
+
   onCountrycodeChange(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
@@ -307,6 +328,28 @@ export class CustomerFormComponent {
       this.StateDropdownData = data;
     });
   }
+
+    getDistrictDropDown() {
+    const id = this.selected_stateId;
+    const payload = {
+      NAME: 'DISTRICT_NAME',
+      STATE_ID: this.selected_stateId,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.districtData = data;
+    });
+  }
+
+    getSalesmanDropDown() {
+    const payload = {
+      NAME: 'SALESMAN',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.Salesman = data;
+    });
+  }
+
   get_Country_Dropdown_List() {
     this.service.getCountryWithFlags().subscribe((response: any) => {
       this.CountryDropdownData = response;
@@ -320,19 +363,11 @@ export class CustomerFormComponent {
     );
   }
 
-  onStateSelectionChanged(event: any) {}
-  ngOnInit(): void {
-    this.get_Country_Dropdown_List();
-    this.getDealerDropDown();
-    this.getPaymentTerms();
-    this.showCountry();
-    this.getVATRuleDropDown();
-    this.getStateDropDown();
-    this.getPriceLevelDropDown();
-    this.get_Warehouse_Dropdown_List();
-    this.get_DeliveryAddress_Dropdown_List();
-    this.sesstion_Details();
+  onStateSelectionChanged(event: any) {
+    this.selected_stateId = event.value;
+    this.getDistrictDropDown();
   }
+
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
     var inputElement = event.target as HTMLInputElement;

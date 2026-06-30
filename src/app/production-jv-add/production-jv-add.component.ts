@@ -475,7 +475,7 @@ export class ProductionJvAddComponent {
       // TOTAL_COST: Number(item.TOTAL_COST) || 0,
       QTY_AVAILABLE: Number(item.QTY_AVAILABLE) || 0,
       // derived / editable fields
-      QUANTITY: Number(item.BOM_QTY) || 0,
+      QUANTITY: Number(item.QUANTITY) || 0,
       COST: Number(item.UNIT_COST) || 0,
       AMOUNT: (Number(item.USED_QTY) || 0) * (Number(item.UNIT_COST) || 0),
     }));

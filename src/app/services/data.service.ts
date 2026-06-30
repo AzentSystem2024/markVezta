@@ -595,6 +595,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Invoice/getlist`, data);
   }
 
+  getInvoiceSalesman(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Invoice/getemployee`, data);
+  }
+
   getCustomerOrUnit(): Observable<any> {
     return this.http.post(`${this.apiUrl}CustTypeDrop`, {});
   }

@@ -111,6 +111,7 @@ export class EditInvoiceComponent {
   selectedCustomerType: any;
   isUpdating = false;
   vatTitle: any;
+  salesmanName: any;
 
   constructor(
     private dataService: DataService,
@@ -212,6 +213,8 @@ export class EditInvoiceComponent {
       // this.getCompanyListDropdown();
       this.getCustomerOrUnitLst();
     }
+
+    this.salesmanName =  this.invoiceFormData.EMP_NAME
   }
 
   onDistributorChanged(e: any) {
@@ -251,12 +254,34 @@ export class EditInvoiceComponent {
     this.selectedCustomer = selectedCustomer;
     this.invoiceFormData.DISTRIBUTOR_ID = selectedCustomer.ID;
 
+    this.getSalesman(selectedCustomer.ID);
+
     if (this.selectedCustomerType) {
       this.invoiceFormData.CUST_TYPE = this.selectedCustomerType.CUST_TYPE;
     }
 
     this.getInvoiceListForGrid();
   }
+
+   getSalesman(customerId: number) {
+  const payload = {
+    CUSTOMER_ID: customerId
+  };
+
+  this.dataService.getInvoiceSalesman(payload).subscribe(
+    (response: any) => {
+      this.salesmanName = response?.length
+        ? response[0].EMP_NAME
+        : '';
+
+      console.log(this.salesmanName);
+    },
+    (error) => {
+      console.error(error);
+      this.salesmanName = '';
+    }
+  );
+}
 
   getInvoiceListForGrid() {
     const payload = {
