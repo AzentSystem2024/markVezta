@@ -1,0 +1,139 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'82vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true,
+      }"
+      class="grid theme-dependent"
+      [dataSource]="districtList"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      [scrolling]="{ mode: 'virtual' }"
+      (onEditingStart)="onEditDistrict($event)"
+      (onRowRemoving)="onDeleteDistrict($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">District</div>
+        </dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+      <dxi-column dataField="DISTRICT_NAME" caption="District"></dxi-column>
+      <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
+      <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column>
+    </dx-data-grid>
+  </div>
+</div>
+<dx-popup
+  *ngIf="isAddDistrict"
+  [(visible)]="isAddDistrict"
+  [width]="'50vw'"
+  [height]="'55vh'"
+  title="New District"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-district-form
+    [districtList]="districtList"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  ></app-district-form>
+  <!-- </ng-container> -->
+</dx-popup>
+<dx-popup
+  *ngIf="isEditDistrict"
+  [(visible)]="isEditDistrict"
+  [width]="'50vw'"
+  [height]="'55vh'"
+  title="Edit District"
+  (onHiding)="handleClose()"
+>
+  <!-- <ng-container *ngIf="isAddInvoice"> -->
+  <app-district-form
+    [isEditing]="true"
+    [EditingResponseData]="selectedDistrict"
+    (popupClosed)="handleClose()"
+  ></app-district-form>
+  <!-- </ng-container> -->
+</dx-popup>

@@ -1,0 +1,243 @@
+<div class="d-flex filter-container mt-2">
+  <dx-select-box
+    label="Date Range"
+    labelMode="floating"
+    valueExpr="value"
+    [displayExpr]="displayExpr"
+    [dataSource]="dateRanges"
+    [searchEnabled]="true"
+    [(value)]="selectedDateRange"
+    (onValueChanged)="onDateRangeChange($event)"
+    (onOpened)="attachItemClickHandler($event)"
+  >
+  </dx-select-box>
+
+  <!-- <dx-date-box
+    label="From Date"
+    labelMode="floating"
+    type="date"
+    displayFormat="dd-MM-yyyy"
+    [(value)]="fromDate"
+    (onValueChanged)="dateChanged()"
+  >
+  </dx-date-box> -->
+
+  <!-- <dx-date-box
+    label="To Date"
+    labelMode="floating"
+    type="date"
+    [(value)]="toDate"
+    (onValueChanged)="dateChanged()"
+    displayFormat="dd-MM-yyyy"
+  >
+  </dx-date-box> -->
+</div>
+<div class="view-wrapper">
+  <div class="dashboard-wrapper">
+    <!-- Row 1 -->
+    <div class="dashboard-row">
+      <!-- Funnel -->
+      <div class="dashboard-card">
+        <h6 class="card-title mt-2 mb-2">Last Month Sales</h6>
+
+        <!-- <dx-scroll-view direction="both" showScrollbar="always" [height]="450"> -->
+        <dx-funnel
+          [dataSource]="lastMonthSalesList"
+          argumentField="ITEM_NAME"
+          valueField="NET_AMOUNT"
+          [palette]="customPalette"
+        >
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeCommonTooltip"
+          >
+          </dxo-tooltip>
+
+          <dxo-label
+            [visible]="true"
+            position="inside"
+            [customizeText]="customizeCommonLabel"
+          >
+          </dxo-label>
+
+          <dxo-legend
+            [visible]="true"
+            verticalAlignment="bottom"
+            horizontalAlignment="center"
+          >
+          </dxo-legend>
+
+          <dxo-item [borderWidth]="2" borderColor="#ffffff"> </dxo-item>
+        </dx-funnel>
+        <!-- </dx-scroll-view> -->
+      </div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Top Moving Articles</h6>
+
+        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
+          <dx-chart [dataSource]="TopMovingArticles_list" palette="soft">
+            <dxo-common-series-settings
+              argumentField="ARTICLE_NAME"
+              valueField="TOTAL_QTY"
+              type="bar"
+              [ignoreEmptyPoints]="true"
+            >
+              <dxo-label
+                [visible]="true"
+                position="inside"
+                [customizeText]="customizeCommonLabel"
+              ></dxo-label>
+            </dxo-common-series-settings>
+
+            <dxo-series-template nameField="ART_NO"> </dxo-series-template>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeChartTooltip"
+            >
+            </dxo-tooltip>
+
+            <dxo-legend [visible]="false"></dxo-legend>
+
+            <dxo-size [height]="400" [width]="1200"> </dxo-size>
+          </dx-chart>
+        </dx-scroll-view>
+      </div>
+    </div>
+
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Region Wise Sales</h6>
+
+        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
+          <dx-chart [dataSource]="regionWiseSalesList" palette="Soft Pastel">
+            <dxo-common-series-settings
+              argumentField="STATE_NAME"
+              type="stackedBar"
+            >
+              <dxo-label [visible]="false" position="outside"> </dxo-label>
+            </dxo-common-series-settings>
+
+            <dxi-series valueField="GROSS_AMOUNT" name="Gross Amount">
+            </dxi-series>
+
+            <dxi-series valueField="TAX_AMOUNT" name="Tax Amount"> </dxi-series>
+
+            <dxi-series valueField="TOTAL_SALES" name="Total Sales">
+            </dxi-series>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeRegionTooltip"
+            >
+            </dxo-tooltip>
+
+            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
+            </dxo-legend>
+
+            <dxo-size [height]="400" [width]="900"> </dxo-size>
+          </dx-chart>
+        </dx-scroll-view>
+      </div>
+    </div>
+
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Salesman Wise Sales</h6>
+
+        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
+          <dx-chart [dataSource]="salesmanWiseSalesList" palette="Soft Pastel">
+            <dxo-common-series-settings
+              argumentField="SALESMAN_NAME"
+              type="bar"
+            >
+              <dxo-label
+                [visible]="true"
+                position="outside"
+                [customizeText]="customizeCommonLabel"
+              >
+              </dxo-label>
+            </dxo-common-series-settings>
+
+            <dxi-series valueField="TOTAL_SALES" name="Total Sales">
+            </dxi-series>
+
+            <dxo-rotated [value]="true"></dxo-rotated>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeSalesmanTooltip"
+            >
+            </dxo-tooltip>
+
+            <dxo-legend [visible]="false"></dxo-legend>
+          </dx-chart>
+        </dx-scroll-view>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- //=============Custome popup=============== -->
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
+
+<dx-load-panel
+  *ngIf="loadingVisible"
+  #loadPanel
+  shadingColor="rgba(0,0,0,0.4)"
+  [position]="{ of: '#fullpageDiv' }"
+  [(visible)]="loadingVisible"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  [hideOnOutsideClick]="false"
+>
+</dx-load-panel>
+
+<dx-popup
+  [(visible)]="popupVisible"
+  width="1000"
+  height="500"
+  [showTitle]="true"
+  [title]="buttonText"
+  [dragEnabled]="false"
+  [hideOnOutsideClick]="true"
+  titleTemplate="popupTitle"
+>
+  <div *dxTemplate="let data of 'popupTitle'">
+    <div class="popup-title-text">
+      {{ buttonText }}
+    </div>
+  </div>
+  <dx-data-grid
+    class="grid theme-dependent"
+    [dataSource]="listSyncData"
+    height="auto"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [rowAlternationEnabled]="true"
+    [scrolling]="{ mode: 'virtual' }"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    (onRowPrepared)="onRowPrepared($event)"
+  >
+    <dxi-column dataField="SL_NO" caption="SL.No" alignment="left"></dxi-column>
+    <dxi-column dataField="CODE" caption="Store Code"></dxi-column>
+
+    <dxi-column dataField="STORE_NAME" caption="Store Name"></dxi-column>
+    <dxi-column dataField="ADDRESS1" caption="Address"></dxi-column>
+    <dxi-column
+      dataField="LAST_SYNCH_TIME"
+      caption="Last Synch.Time"
+    ></dxi-column> </dx-data-grid
+></dx-popup>
