@@ -74,6 +74,7 @@ export class LoginFormComponent implements OnInit {
     ],
   };
   datasource: any;
+  userDataResponse: any;
 
   constructor(
     private authService: AuthService,
@@ -246,7 +247,18 @@ export class LoginFormComponent implements OnInit {
           sessionStorage.setItem('savedUserData', JSON.stringify(res));
           localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
           sessionStorage.setItem('authToken', res.Token);
-          this.router.navigate(['/analytics-dashboard']);
+          this.userDataResponse = JSON.parse(
+            sessionStorage.getItem('savedUserData') || '{}',
+          );
+          console.log(
+            'Saved User Data:',
+            this.userDataResponse.GeneralSettings.VAT_TITLE,
+          );
+          if (this.userDataResponse.GeneralSettings.VAT_TITLE === 'GST') {
+            this.router.navigate(['mark-dashboard']);
+          } else {
+            this.router.navigate(['/analytics-dashboard']);
+          }
 
           notify({
             message: 'Login successful!',
@@ -283,8 +295,6 @@ export class LoginFormComponent implements OnInit {
       },
     });
   }
-
-
 }
 
 @NgModule({
