@@ -144,6 +144,41 @@
         </dx-scroll-view>
       </div>
     </div>
+
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Salesman Wise Sales</h6>
+
+        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
+          <dx-chart [dataSource]="salesmanWiseSalesList" palette="Soft Pastel">
+            <dxo-common-series-settings
+              argumentField="SALESMAN_NAME"
+              type="bar"
+            >
+              <dxo-label
+                [visible]="true"
+                position="outside"
+                [customizeText]="customizeCommonLabel"
+              >
+              </dxo-label>
+            </dxo-common-series-settings>
+
+            <dxi-series valueField="TOTAL_SALES" name="Total Sales">
+            </dxi-series>
+
+            <dxo-rotated [value]="true"></dxo-rotated>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeSalesmanTooltip"
+            >
+            </dxo-tooltip>
+
+            <dxo-legend [visible]="false"></dxo-legend>
+          </dx-chart>
+        </dx-scroll-view>
+      </div>
+    </div>
   </div>
 </div>
 

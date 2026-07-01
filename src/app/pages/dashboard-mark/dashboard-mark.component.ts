@@ -133,6 +133,7 @@ export class DashboardMarkComponent {
   buttonText: any;
   lastMonthSalesList: any;
   regionWiseSalesList: unknown[];
+  salesmanWiseSalesList: any;
   constructor(private service: DataService) {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '',
@@ -329,6 +330,14 @@ export class DashboardMarkComponent {
         );
 
         this.regionWiseSalesList = groupedRegions;
+
+        this.salesmanWiseSalesList = res.data.SalesmanWiseSales.map(
+          (item: any) => ({
+            SALESMAN_NAME: item.SALESMAN_NAME,
+            TOTAL_INVOICES: item.TOTAL_INVOICES,
+            TOTAL_SALES: item.TOTAL_SALES,
+          }),
+        );
         this.TenderSummary_list = res.data.TenderSummary;
 
         this.chartData = this.TenderSummary_list.map((store: any) => {
@@ -362,6 +371,20 @@ export class DashboardMarkComponent {
       option.value === 'custom' ? { ...option, label: 'Custom' } : option,
     );
   }
+
+  customizeSalesmanTooltip = (arg: any) => {
+    const data = arg.point.data;
+
+    return {
+      text:
+        'Salesman : ' +
+        data.SALESMAN_NAME +
+        '\nTotal Sales : ' +
+        this.formatNumber(data.TOTAL_SALES) +
+        '\nInvoices : ' +
+        data.TOTAL_INVOICES,
+    };
+  };
 
   customizeRegionTooltip = (arg: any) => {
     const data = arg.point.data || arg.point.tag || {};
