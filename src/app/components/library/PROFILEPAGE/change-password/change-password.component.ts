@@ -184,7 +184,7 @@ export class ChangePasswordComponent {
     const vatTitle = sessionData?.GeneralSettings?.VAT_TITLE;
 
     if (vatTitle === 'GST') {
-      this.route.navigate(['/dashboard-mark']);
+      this.route.navigate(['/mark-dashboard']);
     } else {
       this.route.navigate(['/analytics-dashboard']);
     }
@@ -245,7 +245,7 @@ export class ChangePasswordComponent {
             );
 
             if (sessionData?.GeneralSettings?.VAT_TITLE === 'GST') {
-              this.route.navigate(['/dashboard-mark']);
+              this.route.navigate(['/mark-dashboard']);
             } else {
               this.route.navigate(['/analytics-dashboard']);
             }

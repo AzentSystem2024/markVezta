@@ -93,7 +93,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     const isGST = sessionData?.GeneralSettings?.VAT_TITLE === 'GST';
-    const path = isGST ? 'dashboard-mark' : 'analytics-dashboard';
+    const path = isGST ? 'mark-dashboard' : 'analytics-dashboard';
     const title = 'Home';
     // let path = 'analytics-dashboard';
     // let title = 'Home';
@@ -202,7 +202,7 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     );
     const homePath =
       sessionData?.GeneralSettings?.VAT_TITLE === 'GST'
-        ? 'dashboard-mark'
+        ? 'mark-dashboard'
         : 'analytics-dashboard';
     // Prevent closing "analytics-dashboard"
     if (tab.path === 'analytics-dashboard') {

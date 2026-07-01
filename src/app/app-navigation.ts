@@ -1,9 +1,8 @@
-
 export const navigation = [
   {
     text: 'Dashboard',
     icon: 'chart',
-    path: '/analytics-dashboard',
+    path: '/mark-dashboard',
   },
   {
     text: 'Home',
@@ -191,8 +190,6 @@ export const navigation = [
         text: 'Print Barcode',
         path: '',
       },
-
-
     ],
   },
   {
@@ -220,7 +217,6 @@ export const navigation = [
       //   text: 'dept',
       //   path: '',
       // },
-     
     ],
   },
   {
