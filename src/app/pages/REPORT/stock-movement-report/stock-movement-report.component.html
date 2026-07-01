@@ -340,8 +340,15 @@
     {{ popupTitle }}
   </div> -->
   <div *dxTemplate="let data of 'title'">
-    <div class="custom-popup-title">
-      {{ popupTitle }}
+    <div class="custom-popup-header">
+      <span>{{ popupTitle }}</span>
+
+      <dx-button
+        icon="close"
+        stylingMode="text"
+        (onClick)="isPopupVisible = false"
+      >
+      </dx-button>
     </div>
   </div>
 
