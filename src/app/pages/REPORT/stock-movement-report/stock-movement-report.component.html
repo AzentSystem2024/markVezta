@@ -71,7 +71,15 @@
             Stock Movement
           </div>
         </dxi-item>
-
+        <dxi-item location="after">
+          <dx-check-box
+            hint="Show Non Zero Stock"
+            text="non zero stock"
+            [(value)]="showZeroStock"
+            (onValueChanged)="onShowZeroStockChanged($event)"
+          >
+          </dx-check-box>
+        </dxi-item>
         <dxi-item>
           <dx-tag-box
             label="Store"
@@ -163,14 +171,14 @@
           cssClass="export-btn"
         ></dxi-item>
 
-        <dxi-item location="after">
-  <dx-check-box
-    text="Show Non Zero Stock"
-    [(value)]="showZeroStock"
-    (onValueChanged)="onShowZeroStockChanged($event)"
-  >
-  </dx-check-box>
-</dxi-item>
+        <!-- <dxi-item location="after">
+          <dx-check-box
+            hint="Show Non Zero Stock"
+            [(value)]="showZeroStock"
+            (onValueChanged)="onShowZeroStockChanged($event)"
+          >
+          </dx-check-box>
+        </dxi-item> -->
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <!-- <dxi-item
           location="after"
@@ -275,12 +283,12 @@
         caption="Delivery Return"
         [visible]="false"
       ></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         dataField="SALE_QTY"
         dataType="number"
         alignment="right"
         caption="Sale Qty"
-      ></dxi-column>
+      ></dxi-column> -->
       <dxi-column
         dataField="SALE_RETURN_QTY"
         dataType="number"

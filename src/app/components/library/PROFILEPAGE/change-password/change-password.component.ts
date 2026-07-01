@@ -177,8 +177,22 @@ export class ChangePasswordComponent {
   }
 
   closeChangePassword() {
-    this.route.navigateByUrl('/analytics-dashboard');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const vatTitle = sessionData?.GeneralSettings?.VAT_TITLE;
+
+    if (vatTitle === 'GST') {
+      this.route.navigate(['/dashboard-mark']);
+    } else {
+      this.route.navigate(['/analytics-dashboard']);
+    }
   }
+
+  // closeChangePassword() {
+  //   this.route.navigateByUrl('/analytics-dashboard');
+  // }
 
   saveNewPassword() {
     // this.isSaving = true;
@@ -225,6 +239,18 @@ export class ChangePasswordComponent {
             },
             'success',
           );
+          setTimeout(() => {
+            const sessionData = JSON.parse(
+              sessionStorage.getItem('savedUserData') || '{}',
+            );
+
+            if (sessionData?.GeneralSettings?.VAT_TITLE === 'GST') {
+              this.route.navigate(['/dashboard-mark']);
+            } else {
+              this.route.navigate(['/analytics-dashboard']);
+            }
+          }, 500);
+
           // Navigate to login page after notification
           // setTimeout(() => {
           //   this.authService.logOut();

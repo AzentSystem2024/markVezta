@@ -113,7 +113,7 @@
       <div class="dashboard-card full-width">
         <h6 class="card-title mt-2 mb-2">Region Wise Sales</h6>
 
-        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
+        <dx-scroll-view direction="both" showScrollbar="always" [height]="300">
           <dx-chart [dataSource]="regionWiseSalesList" palette="Soft Pastel">
             <dxo-common-series-settings
               argumentField="STATE_NAME"
@@ -127,8 +127,13 @@
 
             <dxi-series valueField="TAX_AMOUNT" name="Tax Amount"> </dxi-series>
 
-            <dxi-series valueField="TOTAL_SALES" name="Total Sales">
+            <dxi-series
+              valueField="TOTAL_SALES"
+              name="Total Sales"
+              [barPadding]="0.6"
+            >
             </dxi-series>
+            <!-- </dxi-series> -->
 
             <dxo-tooltip
               [enabled]="true"
@@ -149,34 +154,26 @@
       <div class="dashboard-card full-width">
         <h6 class="card-title mt-2 mb-2">Salesman Wise Sales</h6>
 
-        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
-          <dx-chart [dataSource]="salesmanWiseSalesList" palette="Soft Pastel">
-            <dxo-common-series-settings
-              argumentField="SALESMAN_NAME"
-              type="bar"
-            >
-              <dxo-label
-                [visible]="true"
-                position="outside"
-                [customizeText]="customizeCommonLabel"
-              >
-              </dxo-label>
-            </dxo-common-series-settings>
+        <!-- <dx-scroll-view direction="both" showScrollbar="always" [height]="450"> -->
+        <!-- <pre>{{ salesmanWiseSalesList | json }}</pre> -->
+        <dx-chart [dataSource]="salesmanWiseSalesList" palette="Soft Pastel">
+          <dxo-common-series-settings argumentField="SALESMAN_NAME" type="bar">
+          </dxo-common-series-settings>
 
-            <dxi-series valueField="TOTAL_SALES" name="Total Sales">
-            </dxi-series>
+          <dxi-series valueField="TOTAL_SALES" name="Total Sales"> </dxi-series>
 
-            <dxo-rotated [value]="true"></dxo-rotated>
+          <dxo-argument-axis>
+            <dxo-label [rotationAngle]="-45" overlappingBehavior="rotate">
+            </dxo-label>
+          </dxo-argument-axis>
 
-            <dxo-tooltip
-              [enabled]="true"
-              [customizeTooltip]="customizeSalesmanTooltip"
-            >
-            </dxo-tooltip>
-
-            <dxo-legend [visible]="false"></dxo-legend>
-          </dx-chart>
-        </dx-scroll-view>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeSalesmanTooltip"
+          >
+          </dxo-tooltip>
+        </dx-chart>
+        <!-- </dx-scroll-view> -->
       </div>
     </div>
   </div>

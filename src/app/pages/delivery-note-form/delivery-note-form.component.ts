@@ -302,8 +302,7 @@ export class DeliveryNoteFormComponent {
     });
   }
 
-
-    getPendingNo() {
+  getPendingNo() {
     const payload = {
       TRANS_TYPE: 23,
       COMPANY_ID: this.selectedCompanyId,

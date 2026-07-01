@@ -334,6 +334,10 @@ export class DashboardMarkComponent {
         this.salesmanWiseSalesList = res.data.SalesmanWiseSales.map(
           (item: any) => ({
             SALESMAN_NAME: item.SALESMAN_NAME,
+            SHORT_NAME:
+              item.SALESMAN_NAME.length > 20
+                ? item.SALESMAN_NAME.substring(0, 20) + '...'
+                : item.SALESMAN_NAME,
             TOTAL_INVOICES: item.TOTAL_INVOICES,
             TOTAL_SALES: item.TOTAL_SALES,
           }),

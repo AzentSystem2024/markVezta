@@ -89,8 +89,14 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    let path = 'analytics-dashboard';
-    let title = 'Home';
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const isGST = sessionData?.GeneralSettings?.VAT_TITLE === 'GST';
+    const path = isGST ? 'dashboard-mark' : 'analytics-dashboard';
+    const title = 'Home';
+    // let path = 'analytics-dashboard';
+    // let title = 'Home';
     this.tabs.push({
       title: title,
       path: path,
@@ -184,13 +190,20 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     e.itemData = e.fromData[e.fromIndex];
   }
 
-  onTabDrop(event:any) {}
+  onTabDrop(event: any) {}
 
   showCloseButton() {
     return true;
   }
 
   closeButtonHandler(tab: any) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const homePath =
+      sessionData?.GeneralSettings?.VAT_TITLE === 'GST'
+        ? 'dashboard-mark'
+        : 'analytics-dashboard';
     // Prevent closing "analytics-dashboard"
     if (tab.path === 'analytics-dashboard') {
       return;
@@ -223,8 +236,6 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
       );
     }
   }
-
- 
 }
 
 @NgModule({
