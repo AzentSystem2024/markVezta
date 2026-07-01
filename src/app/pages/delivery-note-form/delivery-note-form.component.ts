@@ -325,7 +325,7 @@ export class DeliveryNoteFormComponent {
 
     // ✅ EditingResponseData IS ALREADY DATA
     const data = this.EditingResponseData;
-
+console.log(data.Details)
     this.deliveryFormData = {
       ID: data.ID,
       COMPANY_ID: data.COMPANY_ID || this.companyID,
@@ -347,17 +347,11 @@ export class DeliveryNoteFormComponent {
       COMPANY_NAME: data.COMPANY_NAME,
 
       // ✅ GRID DATA BINDING
-      Details: (data.Details || []).map((row: any) => {
-        const item = this.itemsList.store.data.find(
-          (x: any) => x.DESCRIPTION === row.ITEM_CODE,
-        );
-
-        return {
-          ...row,
-          ITEM_ID: item?.ID,
-          ITEM_CODE: item?.ID,
-        };
-      }),
+     Details: (data.Details || []).map((row: any) => ({
+  ...row,
+  ITEM_ID: row.ITEM_ID,
+  ITEM_CODE: row.ITEM_ID
+})),
     };
 
     this.selectedCustomerId = this.deliveryFormData.CUST_ID;
@@ -481,7 +475,7 @@ export class DeliveryNoteFormComponent {
   // }
   getItemsofDelivery() {
     const payload = {
-      name: 'ITEMS',
+      name: 'GetFG',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       // this.itemsList = response;
