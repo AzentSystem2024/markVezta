@@ -43,3 +43,13 @@
   font-size: 18px;
   font-weight: 600;
 }
+.custom-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.custom-popup-header .dx-button {
+  margin-right: -8px;
+}
