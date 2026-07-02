@@ -307,17 +307,19 @@
         dataType="number"
         alignment="right"
         caption="Transfer Out"
+        [visible]="false"
       ></dxi-column>
       <dxi-column
         dataField="TRANSFER_IN_QTY"
         dataType="number"
         alignment="right"
         caption="Transfer In"
+        [visible]="false"
       ></dxi-column>
       <dxi-column
         dataField="BALANCE_STOCK"
         dataType="number"
-        alignment="right"
+        alignment="right" 
         caption="Closing"
       ></dxi-column>
       <!-- <dxi-column dataField="SIZE" caption="Size"></dxi-column>
@@ -339,18 +341,23 @@
   <!-- <div class="custom-popup-header">
     {{ popupTitle }}
   </div> -->
-  <div *dxTemplate="let data of 'title'">
-    <div class="custom-popup-header">
-      <span>{{ popupTitle }}</span>
-
-      <dx-button
-        icon="close"
-        stylingMode="text"
-        (onClick)="isPopupVisible = false"
-      >
-      </dx-button>
+  <!-- <div *dxTemplate="let data of 'title'">
+    <div class="custom-popup-title">
+      {{ popupTitle }}
     </div>
+  </div> -->
+
+  <div *dxTemplate="let data of 'title'">
+  <div class="custom-popup-title">
+    <span>{{ popupTitle }}</span>
+
+    <i
+      class="dx-icon dx-icon-close"
+      style="cursor:pointer; float:right;"
+      (click)="isPopupVisible = false">
+    </i>
   </div>
+</div>
 
   <!-- GRN grid -->
   <dx-data-grid
@@ -398,7 +405,7 @@
     <dxi-column dataField="DOC_NO" caption="Doc No."></dxi-column>
     <dxi-column dataField="TRANS_TYPE" caption="Type"></dxi-column>
 
-    <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+    <dxi-column dataField="NAME" caption="Supplier"></dxi-column>
 
     <dxi-column
       dataField="DOC_DATE"
