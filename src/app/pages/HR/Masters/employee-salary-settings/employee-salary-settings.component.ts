@@ -66,15 +66,15 @@ export class EmployeeSalarySettingsComponent {
   SalaryDetails: any[] = [];
   effectFromRaw: any;
   previousEffectFrom: any;
-  canAdd = false;
-  canEdit = false;
-  canView = false;
-  canDelete = false;
-  canApprove = false;
-  canPrint = false;
+  canAdd: boolean = false;
+  canEdit: boolean = false;
+  canView: boolean = false;
+  canDelete: boolean = false;
+  canApprove: boolean = false;
+  canPrint: boolean = false;
   selected_Company_id: any;
 
- 
+
   filterSelectBoxOptions = {
     items: this.filterOptions,
     displayExpr: 'text',
@@ -120,9 +120,9 @@ export class EmployeeSalarySettingsComponent {
   ) { }
 
 
-  
+
   ngOnInit() {
-   const currentUrl = this.router.url;
+    const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -134,6 +134,7 @@ export class EmployeeSalarySettingsComponent {
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
+      console.log('Packing Add button:', this.canAdd);
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
@@ -144,9 +145,10 @@ export class EmployeeSalarySettingsComponent {
     this.getEmployeeSalarySettingsList(); // call API on load with default filter
   }
 
-   addButtonOptions = {
+  addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
+    visible: !this.canAdd,
     hint: 'Add new entry',
     onClick: () => {
       this.ngZone.run(() => this.addEmployee());

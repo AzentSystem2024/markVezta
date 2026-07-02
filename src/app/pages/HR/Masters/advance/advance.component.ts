@@ -561,13 +561,14 @@ export class AdvanceComponent {
   //===================On Edit Start=========================
 
   onEditStart(e: any) {
-    e.cancel = true;
+    // e.cancel = true;
     this.buttonText = 'Update';
 
-    const statusValue = e.row.data.STATUS;
-    const id = e.row.data.TRANS_ID;
+    const id = e.data.TRANS_ID;
     this.isEditPopUp = true;
-    const status = e.row.data?.STATUS?.trim();
+    const statusValue = e.data.STATUS;
+
+    const status = e.data?.STATUS?.trim();
     this.select_api_Advance(e);
     this.isEditReadOnly = false;
 
@@ -754,7 +755,8 @@ export class AdvanceComponent {
   }
 
   select_api_Advance(event: any) {
-    const id = event.row.data.TRANS_ID;
+    console.log(" call this functin", event)
+    const id = event.data.TRANS_ID;
     this.dataService.select_Advance(id).subscribe((res: any) => {
       this.selected_Data = res;
 

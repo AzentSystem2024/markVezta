@@ -162,13 +162,13 @@
 >
   <dx-form class="plain-styled-form" [formGroup]="formsource">
     <dxi-item>
-      <dx-text-box label="Code" formControlName="CODE" labelMode="floating">
+      <dx-text-box label="Code *" formControlName="CODE" labelMode="floating">
       </dx-text-box>
     </dxi-item>
 
     <dxi-item>
       <dx-text-box
-        label="EOS Reason"
+        label="EOS Reason *"
         formControlName="DESCRIPTION"
         labelMode="floating"
       ></dx-text-box>
@@ -189,7 +189,7 @@
 
     <dxi-item>
       <dx-text-box
-        label="EOS Reason"
+        label="EOS Reason *"
         [(value)]="editingRowData.DESCRIPTION"
         labelMode="floating"
       ></dx-text-box>

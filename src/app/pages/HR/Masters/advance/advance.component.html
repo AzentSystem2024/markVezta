@@ -303,7 +303,7 @@
           [items]="EMPLOYEE_VALUE"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          label="Employee"
+          label="Employee *"
           [labelMode]="'floating'"
           [searchEnabled]="true"
           placeholder="Select.."
@@ -322,7 +322,7 @@
       <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
         <dxi-item>
           <dx-number-box
-            label="Amount"
+            label="Amount *"
             [labelMode]="'floating'"
             formControlName="Amount"
             valueChangeEvent="input"
@@ -345,7 +345,7 @@
             displayExpr="DESCRIPTION"
             valueExpr="ID"
             [labelMode]="'floating'"
-            label="Advance Type"
+            label="Advance Type *"
             formControlName="Advance_types_ID"
             [searchEnabled]="true"
             placeholder="Select.."
@@ -481,7 +481,7 @@
         [readOnly]="isEditReadOnly"
         placeholder="Select.."
         dataField="employee_name"
-        label="Employee"
+        label="Employee *"
         (onValueChanged)="onEmployee_Change($event)"
         [labelMode]="'floating'"
       ></dx-select-box>
@@ -498,7 +498,7 @@
           [searchEnabled]="true"
           [displayCustomValue]="true"
           placeholder="Select.."
-          label="Advance Types"
+          label="Advance Types *"
           (onValueChanged)="onAdvance_type_Change($event)"
           [labelMode]="'floating'"
         >
@@ -510,7 +510,7 @@
 
       <dxi-item>
         <dx-number-box
-          label="Amount"
+          label="Amount *"
           format="#,##0.00"
           valueChangeEvent="input"
           [readOnly]="isEditReadOnly"
