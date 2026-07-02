@@ -377,6 +377,8 @@ Details: (data.Details || []).map((row: any) => ({
       DESCRIPTION: '',
       UOM: '',
       QTY_STOCK: 0,
+      PAIR_QTY: 0,
+  TOTAL_PAIR_QTY: 0,
       QUANTITY: 0,
     });
 
@@ -409,6 +411,8 @@ Details: (data.Details || []).map((row: any) => ({
         DESCRIPTION: '',
         UOM: '',
         QTY_STOCK: 0,
+        PAIR_QTY: 0,
+  TOTAL_PAIR_QTY: 0,
         QUANTITY: 0,
       },
     ];
@@ -549,6 +553,9 @@ Details: (data.Details || []).map((row: any) => ({
         grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
         grid.cellValue(rowIndex, 'UOM', data.UOM);
         grid.cellValue(rowIndex, 'QTY_STOCK', data.QTY_STOCK);
+        grid.cellValue(rowIndex, 'PAIR_QTY', data.PAIR_QTY);
+grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
+
         grid.cellValue(rowIndex, 'QUANTITY', data.QUANTITY);
 
         //  FORCE UI UPDATE

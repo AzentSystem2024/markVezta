@@ -661,17 +661,17 @@ export class AddPurchaseInvoiceComponent {
       );
       return; // stop execution here
     }
-    if (!this.purchaseInvoiceFormData.SUPP_INV_NO) {
-      notify(
-        {
-          message: 'Please Enter a Refferce No before saving the invoice.',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-        3000,
-      );
-      return; // stop execution here
-    }
+    // if (!this.purchaseInvoiceFormData.SUPP_INV_NO) {
+    //   notify(
+    //     {
+    //       message: 'Please Enter a Refferce No before saving the invoice.',
+    //       position: { at: 'top right', my: 'top right' },
+    //     },
+    //     'warning',
+    //     3000,
+    //   );
+    //   return; // stop execution here
+    // }
 
     // 1. Get updated summary values from the grid
     if (this.itemsGridRef?.instance) {

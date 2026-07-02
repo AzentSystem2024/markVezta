@@ -135,11 +135,12 @@
             dataField="QUANTITY"
             caption="BoM Qty"
             dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
 
  <dxi-column
             dataField="BALANCE_QTY"
-            caption="Balance Qty"
+            caption="Available Qty"
             dataType="number"
           ></dxi-column>
 
@@ -150,7 +151,7 @@
           ></dxi-column>
           <dxi-column
             dataField="QTY_AVAILABLE"
-            caption="Qty Available"
+            caption="Balance Qty"
             dataType="number"
           ></dxi-column>
 
