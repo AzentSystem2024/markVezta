@@ -206,6 +206,8 @@ export class ItemwisesalesComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -391,11 +393,11 @@ export class ItemwisesalesComponent {
     const rawDate: Date = new Date(event.value);
     const today = new Date();
 
-    if (rawDate > today) {
-      notify('To Date cannot be greater than today', 'error', 2000);
-      this.selected_To_date = today;
-      return;
-    }
+    // if (rawDate > today) {
+    //   notify('To Date cannot be greater than today', 'error', 2000);
+    //   this.selected_To_date = today;
+    //   return;
+    // }
     this.formatted_from_date = this.formatDate(rawDate);
     // this.reloadJournalBook();
   }
@@ -404,11 +406,11 @@ export class ItemwisesalesComponent {
     const rawDate: Date = new Date(event.value);
     const today = new Date();
 
-    if (rawDate > today) {
-      notify('To Date cannot be greater than today', 'error', 2000);
-      this.selected_To_date = today;
-      return;
-    }
+    // if (rawDate > today) {
+    //   notify('To Date cannot be greater than today', 'error', 2000);
+    //   this.selected_To_date = today;
+    //   return;
+    // }
     this.formatted_To_date = this.formatDate(rawDate);
     // this.reloadJournalBook();
   }
