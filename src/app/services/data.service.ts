@@ -7155,4 +7155,16 @@ The result can be exported to HTML or Markdown.`;
     const payload = item;
     return this.http.post(`${this.apiUrl}Dashboard/getdashboard`, payload);
   }
+
+    //-----------------------sales summary report-------------------------
+PurchaseReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'PurchaseReport/PurchaseSummary';
+    return this.http.post(getEndpoint, payload);
+  }
+
+      //-----------------------sales summary report-------------------------
+ ItemwisePurchaseReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'PurchaseReport/itemwisepurchase';
+    return this.http.post(getEndpoint, payload);
+  }
 }
