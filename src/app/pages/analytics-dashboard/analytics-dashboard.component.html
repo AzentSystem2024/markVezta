@@ -41,6 +41,32 @@
         <h6 class="card-title mt-2 mb-2">Gross Sales</h6>
 
         <!-- <dx-scroll-view direction="both" showScrollbar="always" [height]="450"> -->
+        <!-- <dx-funnel
+          id="funnel"
+          [dataSource]="gross_Sales_list"
+          argumentField="STORE_NAME"
+          valueField="AMOUNT"
+          [palette]="customPalette"
+        >
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeGrossSalesTooltip"
+          ></dxo-tooltip>
+
+          <dxo-label
+            [visible]="true"
+            position="inside"
+            [customizeText]="customizeGrossSalesLabel"
+          >
+          </dxo-label>
+          <dxo-legend
+            [visible]="true"
+            verticalAlignment="bottom"
+            horizontalAlignment="center"
+          >
+          </dxo-legend>
+          <dxo-item [borderWidth]="2" borderColor="#ffffff"> </dxo-item>
+        </dx-funnel> -->
         <dx-funnel
           id="funnel"
           [dataSource]="gross_Sales_list"
@@ -50,23 +76,29 @@
         >
           <dxo-tooltip
             [enabled]="true"
-            [customizeTooltip]="customizeCommonTooltip"
+            [customizeTooltip]="customizeGrossSalesTooltip"
           ></dxo-tooltip>
 
           <dxo-label
             [visible]="true"
             position="inside"
-            [customizeText]="customizeCommonLabel"
+            [customizeText]="customizeGrossSalesLabel"
           >
           </dxo-label>
-          <!-- <dxo-funnel-legend [visible]="true"></dxo-funnel-legend> -->
+
           <dxo-legend
             [visible]="true"
             verticalAlignment="bottom"
             horizontalAlignment="center"
           >
           </dxo-legend>
-          <dxo-item [borderWidth]="2" borderColor="#ffffff"> </dxo-item>
+          <dxo-item>
+            <dxo-border
+              [visible]="true"
+              [width]="3"
+              color="#ffffff"
+            ></dxo-border>
+          </dxo-item>
         </dx-funnel>
         <!-- </dx-scroll-view> -->
       </div>
@@ -110,7 +142,7 @@
 
     <div class="dashboard-row">
       <div class="dashboard-card-Tender">
-        <h6 class="card-title mt-2 mb-2">Tender Summary</h6>
+        <h6 class="card-title mt-2 mb-2">Revenue / Expenses</h6>
 
         <!-- <dx-scroll-view direction="both" showScrollbar="always"> -->
         <div class="chart-wrapper">
@@ -124,14 +156,20 @@
             <dxo-common-series-settings
               argumentField="STORE_NAME"
               type="bar"
-              [barPadding]="0.3"
+              [barPadding]="0"
+              [barGroupPadding]="0.3"
             >
               <dxo-label
                 [visible]="true"
                 position="outside"
-                [customizeText]="customizeCommonLabel"
+                [customizeText]="customizeCommonLabelTender"
               >
               </dxo-label>
+              <dxo-value-axis>
+                <dxo-label
+                  [customizeText]="customizeTenderAxisLabel"
+                ></dxo-label>
+              </dxo-value-axis>
             </dxo-common-series-settings>
 
             <dxi-series
@@ -154,6 +192,72 @@
           </dx-chart>
         </div>
         <!-- </dx-scroll-view> -->
+      </div>
+    </div>
+    <div class="dashboard-row">
+      <div class="dashboard-card-Tender">
+        <h6 class="card-title mt-2 mb-2">Tender Summary</h6>
+
+        <!-- <dx-scroll-view direction="both" showScrollbar="always"> -->
+        <div class="chart-wrapper">
+          <!-- <dx-chart id="chart" [dataSource]="storeinfo">
+            <dxi-series
+              *ngFor="let s of seriesList"
+              [valueField]="s.valueField"
+              [name]="s.name"
+              [color]="s.color"
+            >
+            </dxi-series>
+
+            <dxo-common-series-settings
+              argumentField="store"
+              type="fullStackedBar"
+            >
+            </dxo-common-series-settings>
+
+            <dxo-legend
+              verticalAlignment="top"
+              horizontalAlignment="center"
+              itemTextPosition="right"
+            >
+            </dxo-legend>
+            <dxo-tooltip [enabled]="true" [customizeTooltip]="customizeTooltip">
+            </dxo-tooltip>
+          </dx-chart> -->
+          <dx-chart id="chart" [dataSource]="storeinfo">
+            <dxi-series
+              *ngFor="let s of seriesList"
+              [valueField]="s.valueField"
+              [name]="s.name"
+              [color]="s.color"
+            >
+            </dxi-series>
+
+            <dxo-common-series-settings
+              argumentField="store"
+              type="fullStackedBar"
+            >
+              <dxo-label
+                [visible]="true"
+                [customizeText]="customizeLabelTender"
+              >
+              </dxo-label>
+            </dxo-common-series-settings>
+
+            <dxo-legend
+              verticalAlignment="top"
+              horizontalAlignment="center"
+              itemTextPosition="right"
+            >
+            </dxo-legend>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeTooltipTender"
+            >
+            </dxo-tooltip>
+          </dx-chart>
+        </div>
       </div>
     </div>
   </div>
@@ -190,10 +294,18 @@
   [dragEnabled]="false"
   [hideOnOutsideClick]="true"
   titleTemplate="popupTitle"
+  [showCloseButton]="true"
 >
   <div *dxTemplate="let data of 'popupTitle'">
     <div class="popup-title-text">
-      {{ buttonText }}
+      <!-- {{ buttonText }} -->
+      <span>{{ buttonText }}</span>
+      <i
+        class="dx-icon dx-icon-close"
+        style="cursor: pointer; font-size: 18px; margin-left: 530px"
+        (click)="popupVisible = false"
+      >
+      </i>
     </div>
   </div>
   <dx-data-grid
@@ -216,5 +328,6 @@
     <dxi-column
       dataField="LAST_SYNCH_TIME"
       caption="Last Synch.Time"
+      [customizeText]="formatLastSyncTime"
     ></dxi-column> </dx-data-grid
 ></dx-popup>

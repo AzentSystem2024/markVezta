@@ -80,7 +80,18 @@ export class CustomDatePopupComponent {
   }
 
   ngOnInit() {
+    // const today = new Date();
+    // const SystemDate =
+    //   today.getFullYear() +
+    //   '-' +
+    //   String(today.getMonth() + 1).padStart(2, '0') +
+    //   '-' +
+    //   String(today.getDate()).padStart(2, '0');
+
+    // this.selected_from_date = SystemDate;
+    // this.selected_To_date = SystemDate;
     const today = new Date();
+
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -88,8 +99,10 @@ export class CustomDatePopupComponent {
       '-' +
       String(today.getDate()).padStart(2, '0');
 
-    this.selected_from_date = SystemDate;
-    this.selected_To_date = SystemDate;
+    const YearStartDate = today.getFullYear() + '-01-01';
+
+    this.selected_from_date = YearStartDate; // e.g. 2026-01-01
+    this.selected_To_date = SystemDate;      // e.g. 2026-07-03
   }
   apply() {
     if (!this.selected_from_date || !this.selected_To_date) return;
@@ -191,4 +204,4 @@ export class CustomDatePopupComponent {
   exports: [CustomDatePopupComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomDatePopupModule {}
+export class CustomDatePopupModule { }
