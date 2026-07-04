@@ -338,6 +338,8 @@ export class DashboardMarkComponent {
               item.SALESMAN_NAME.length > 20
                 ? item.SALESMAN_NAME.substring(0, 20) + '...'
                 : item.SALESMAN_NAME,
+            SALE_NO: item.SALE_NO,
+            SALE_DATE: item.SALE_DATE,
             TOTAL_INVOICES: item.TOTAL_INVOICES,
             TOTAL_SALES: item.TOTAL_SALES,
           }),
@@ -383,6 +385,10 @@ export class DashboardMarkComponent {
       text:
         'Salesman : ' +
         data.SALESMAN_NAME +
+        '\nSale No : ' +
+        data.SALE_NO +
+        '\nSale Date : ' +
+        new Date(data.SALE_DATE).toLocaleDateString('en-GB') +
         '\nTotal Sales : ' +
         this.formatNumber(data.TOTAL_SALES) +
         '\nInvoices : ' +

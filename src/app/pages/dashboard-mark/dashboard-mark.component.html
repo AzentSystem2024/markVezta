@@ -78,34 +78,32 @@
       <div class="dashboard-card full-width">
         <h6 class="card-title mt-2 mb-2">Top Moving Articles</h6>
 
-        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
-          <dx-chart [dataSource]="TopMovingArticles_list" palette="soft">
-            <dxo-common-series-settings
-              argumentField="ARTICLE_NAME"
-              valueField="TOTAL_QTY"
-              type="bar"
-              [ignoreEmptyPoints]="true"
-            >
-              <dxo-label
-                [visible]="true"
-                position="inside"
-                [customizeText]="customizeCommonLabel"
-              ></dxo-label>
-            </dxo-common-series-settings>
+        <dx-chart [dataSource]="TopMovingArticles_list" palette="soft">
+          <dxo-common-series-settings
+            argumentField="ARTICLE_NAME"
+            valueField="TOTAL_QTY"
+            type="bar"
+            [ignoreEmptyPoints]="true"
+          >
+            <dxo-label
+              [visible]="true"
+              position="inside"
+              [customizeText]="customizeCommonLabel"
+            ></dxo-label>
+          </dxo-common-series-settings>
 
-            <dxo-series-template nameField="ART_NO"> </dxo-series-template>
+          <dxo-series-template nameField="ART_NO"> </dxo-series-template>
 
-            <dxo-tooltip
-              [enabled]="true"
-              [customizeTooltip]="customizeChartTooltip"
-            >
-            </dxo-tooltip>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeChartTooltip"
+          >
+          </dxo-tooltip>
 
-            <dxo-legend [visible]="false"></dxo-legend>
+          <dxo-legend [visible]="false"></dxo-legend>
 
-            <dxo-size [height]="400" [width]="1200"> </dxo-size>
-          </dx-chart>
-        </dx-scroll-view>
+          <dxo-size [height]="400" [width]="1200"> </dxo-size>
+        </dx-chart>
       </div>
     </div>
 
@@ -113,40 +111,38 @@
       <div class="dashboard-card full-width">
         <h6 class="card-title mt-2 mb-2">Region Wise Sales</h6>
 
-        <dx-scroll-view direction="both" showScrollbar="always" [height]="300">
-          <dx-chart [dataSource]="regionWiseSalesList" palette="Soft Pastel">
-            <dxo-common-series-settings
-              argumentField="STATE_NAME"
-              type="stackedBar"
-            >
-              <dxo-label [visible]="false" position="outside"> </dxo-label>
-            </dxo-common-series-settings>
+        <dx-chart [dataSource]="regionWiseSalesList" palette="Soft Pastel">
+          <dxo-common-series-settings
+            argumentField="STATE_NAME"
+            type="stackedBar"
+          >
+            <dxo-label [visible]="false" position="outside"> </dxo-label>
+          </dxo-common-series-settings>
 
-            <dxi-series valueField="GROSS_AMOUNT" name="Gross Amount">
-            </dxi-series>
+          <dxi-series valueField="GROSS_AMOUNT" name="Gross Amount">
+          </dxi-series>
 
-            <dxi-series valueField="TAX_AMOUNT" name="Tax Amount"> </dxi-series>
+          <dxi-series valueField="TAX_AMOUNT" name="Tax Amount"> </dxi-series>
 
-            <dxi-series
-              valueField="TOTAL_SALES"
-              name="Total Sales"
-              [barPadding]="0.6"
-            >
-            </dxi-series>
-            <!-- </dxi-series> -->
+          <dxi-series
+            valueField="TOTAL_SALES"
+            name="Total Sales"
+            [barPadding]="0.6"
+          >
+          </dxi-series>
+          <!-- </dxi-series> -->
 
-            <dxo-tooltip
-              [enabled]="true"
-              [customizeTooltip]="customizeRegionTooltip"
-            >
-            </dxo-tooltip>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeRegionTooltip"
+          >
+          </dxo-tooltip>
 
-            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
-            </dxo-legend>
+          <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
+          </dxo-legend>
 
-            <dxo-size [height]="400" [width]="900"> </dxo-size>
-          </dx-chart>
-        </dx-scroll-view>
+          <dxo-size [height]="350"> </dxo-size>
+        </dx-chart>
       </div>
     </div>
 
@@ -154,16 +150,19 @@
       <div class="dashboard-card full-width">
         <h6 class="card-title mt-2 mb-2">Salesman Wise Sales</h6>
 
-        <!-- <dx-scroll-view direction="both" showScrollbar="always" [height]="450"> -->
-        <!-- <pre>{{ salesmanWiseSalesList | json }}</pre> -->
         <dx-chart [dataSource]="salesmanWiseSalesList" palette="Soft Pastel">
-          <dxo-common-series-settings argumentField="SALESMAN_NAME" type="bar">
+          <dxo-margin [bottom]="110" [left]="40" [right]="20"> </dxo-margin>
+          <dxo-common-series-settings argumentField="SHORT_NAME" type="bar">
           </dxo-common-series-settings>
 
           <dxi-series valueField="TOTAL_SALES" name="Total Sales"> </dxi-series>
 
           <dxo-argument-axis>
-            <dxo-label [rotationAngle]="-45" overlappingBehavior="rotate">
+            <dxo-label
+              [visible]="true"
+              [rotationAngle]="-45"
+              overlappingBehavior="rotate"
+            >
             </dxo-label>
           </dxo-argument-axis>
 
@@ -173,7 +172,6 @@
           >
           </dxo-tooltip>
         </dx-chart>
-        <!-- </dx-scroll-view> -->
       </div>
     </div>
   </div>

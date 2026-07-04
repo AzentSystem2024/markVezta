@@ -6,3 +6,4 @@ export const environment = {
   apiUrl: 'https://dmgtapi.veztaonline.com/api/',
   // apiUrl: 'http://financeapi.advanceworldgroup.net/api/'
 };
+

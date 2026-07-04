@@ -185,6 +185,8 @@ export class LedgerStatementComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {

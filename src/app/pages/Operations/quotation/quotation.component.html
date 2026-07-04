@@ -177,8 +177,8 @@
         ></i>
         <span
           *ngIf="
-            (cellData.data.TRANS_STATUS === 'Verified' && canApprove) ||
-            (cellData.data.TRANS_STATUS !== 'Verified' && canVerify)
+            (cellData.data.TRANS_STATUS === 2 && canApprove) ||
+            (cellData.data.TRANS_STATUS !== 2 && canVerify)
           "
           style="
             position: relative;
