@@ -58,8 +58,10 @@ type DataLoader = (startDate: string, endDate: string) => Observable<Object>;
 })
 export class AnalyticsDashboardComponent implements OnInit {
   dateRanges = [
-    { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
+    { label: 'Current Year', value: 'currentYear' },
+    { label: 'Current Month', value: 'currentMonth' },
+    { label: 'Today', value: 'today' },
     { label: 'Last 7 Days', value: 'last7' },
     { label: 'Last 15 Days', value: 'last15' },
     { label: 'Last 30 Days', value: 'last30' },
@@ -96,21 +98,18 @@ export class AnalyticsDashboardComponent implements OnInit {
   customStartDate: any = null;
   isLoading: boolean = true;
   customPalette = [
-    '#BAE6FD', // Transactions
-    '#7DD3FC', // Sales
-    '#0EA5E9', // Net Sales
-    '#0284C7', // Completed
+    '#F59E0B', '#EC4899', '#0EA5E9',
+    '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
+    '#F97316', '#3B82F6', '#22C55E', '#D946EF', '#06B6D4',
   ];
   colors: string[] = [
     '#1E3A8A',
     '#2563EB',
-    '#3B82F6',
-    '#0EA5E9',
     '#22D3EE',
     '#0D9488',
-    '#14B8A6',
+    '#7DD3FC',
     '#475569',
-    '#64748B',
+
     '#94A3B8',
   ];
 
@@ -133,6 +132,7 @@ export class AnalyticsDashboardComponent implements OnInit {
   show_sync_reminder: boolean = false
   popupVisible: boolean = false
   buttonText: any
+  storeinfo: any = [];
   constructor(private service: DataService) {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
     console.log(sessionData)
@@ -244,6 +244,27 @@ export class AnalyticsDashboardComponent implements OnInit {
         this.fromDate.setDate(today.getDate() - 29);
         this.toDate = new Date(today);
         break;
+      case 'currentMonth':
+        // First day of the current month
+        this.fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        // Today's date
+        this.toDate = new Date(today);
+        this.toDate.setHours(0, 0, 0, 0);
+        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        break;
+
+      case 'currentYear':
+        // January 1 of the current year
+        this.fromDate = new Date(today.getFullYear(), 0, 1);
+        this.fromDate.setHours(0, 0, 0, 0);
+
+        // Today's date
+        this.toDate = new Date(today);
+        this.toDate.setHours(0, 0, 0, 0);
+        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+
+        break;
+
 
       case 'all':
         this.fromDate = new Date(this.startDate_of_Financial_year); // or your minimum date
@@ -262,15 +283,108 @@ export class AnalyticsDashboardComponent implements OnInit {
     this.getDashboardData();
   }
 
+  // getDashboardData() {
+  //   console.log('call this function');
+  //   console.log('From Date:', this.fromDate);
+  //   console.log('To Date:', this.toDate);
+  //   this.loadingVisible = true;
+  //   const timeoutId = setTimeout(() => {
+  //     this.loadingVisible = false;
+  //     alert('Request timeout. Please try again.');
+  //   }, 50000); // 50   seconds
+
+  //   this.sesstion_Details();
+
+  //   const payload = {
+  //     DATE_FROM: this.formatDate(this.fromDate),
+  //     DATE_TO: this.formatDate(this.toDate),
+  //     COMPANY_ID: this.selected_Company_id,
+  //     FIN_ID: this.selected_fin_id,
+  //   };
+
+  //   console.log(payload);
+  //   this.service.Dashboard_Data_api(payload).subscribe(
+  //     (res: any) => {
+  //       clearTimeout(timeoutId); // stop timeout
+
+  //       this.loadingVisible = false;
+  //       this.gross_Sales_list = res.data.GrossSale;
+  //       // this.TopMovingItems_list = res.data.
+  //       const item_list = res.data.TopMovingItems;
+  //       console.log(item_list, '==========item_list===========');
+  //       const maxQty = item_list.reduce((max: number, item: any) => {
+  //         return item.QTY_SOLD > max ? item.QTY_SOLD : max;
+  //       }, 0);
+  //       console.log(maxQty, '==========maxQty===========');
+
+  //       this.TopMovingItems_list = res.data.TopMovingItems.map((item: any) => ({
+  //         ITEM_CODE: item.ITEM_CODE,
+  //         QTY_SOLD: item.QTY_SOLD,
+  //         DESCRIPTION: item.DESCRIPTION,
+  //       }));
+  //       this.TenderSummary_list = res.data.TenderSummary;
+
+  //       this.chartData = this.TenderSummary_list.map((store: any) => {
+  //         const obj: any = {
+  //           STORE_NAME: store.STORE_NAME,
+  //         };
+
+  //         store.TenderTypes.forEach((t: any) => {
+  //           obj[t.TENDER] = t.AMOUNT;
+  //         });
+  //         this.generateSeries();
+
+  //         return obj;
+  //       });
+
+  //       console.log(
+  //         this.gross_Sales_list,
+  //         this.TopMovingItems_list,
+  //         this.TenderSummary_list,
+  //       );
+  //     },
+  //     (error) => {
+  //       clearTimeout(timeoutId); // stop timeout
+  //       this.loadingVisible = false;
+
+  //       // alert('Error occurred while loading data.');
+  //       notify('Error occurred while loading data.', 'error', 3000);
+  //     },
+  //   );
+  //   this.dateRanges = this.dateRanges.map((option) =>
+  //     option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+  //   );
+  // }
+  // generateSeries() {
+  //   const tenders = new Set<string>();
+
+  //   this.TenderSummary_list.forEach((store: any) => {
+  //     store.TenderTypes.forEach((t: any) => {
+  //       tenders.add(t.TENDER);
+  //     });
+  //   });
+
+  //   // A large enough palette that visually distinct colors cycle predictably
+  //   const palette = [
+  //     '#10B981', '#4F46E5', '#F59E0B', '#EC4899', '#0EA5E9',
+  //     '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
+  //     '#F97316', '#3B82F6', '#22C55E', '#D946EF', '#06B6D4',
+  //   ];
+
+  //   this.seriesList = Array.from(tenders).map((tender, index) => ({
+  //     valueField: tender,
+  //     name: tender,
+  //     type: 'bar',
+  //     color: palette[index % palette.length],
+  //   }));
+  // }
+
   getDashboardData() {
-    console.log('call this function');
-    console.log('From Date:', this.fromDate);
-    console.log('To Date:', this.toDate);
     this.loadingVisible = true;
     const timeoutId = setTimeout(() => {
       this.loadingVisible = false;
       alert('Request timeout. Please try again.');
-    }, 50000); // 50   seconds
+    }, 50000);
 
     this.sesstion_Details();
 
@@ -281,60 +395,59 @@ export class AnalyticsDashboardComponent implements OnInit {
       FIN_ID: this.selected_fin_id,
     };
 
-    console.log(payload);
     this.service.Dashboard_Data_api(payload).subscribe(
       (res: any) => {
-        clearTimeout(timeoutId); // stop timeout
-
+        clearTimeout(timeoutId);
         this.loadingVisible = false;
+
         this.gross_Sales_list = res.data.GrossSale;
-        // this.TopMovingItems_list = res.data.
-        const item_list = res.data.TopMovingItems;
-        console.log(item_list, '==========item_list===========');
-        const maxQty = item_list.reduce((max: number, item: any) => {
-          return item.QTY_SOLD > max ? item.QTY_SOLD : max;
-        }, 0);
-        console.log(maxQty, '==========maxQty===========');
 
         this.TopMovingItems_list = res.data.TopMovingItems.map((item: any) => ({
           ITEM_CODE: item.ITEM_CODE,
           QTY_SOLD: item.QTY_SOLD,
           DESCRIPTION: item.DESCRIPTION,
         }));
+
         this.TenderSummary_list = res.data.TenderSummary;
 
-        this.chartData = this.TenderSummary_list.map((store: any) => {
+        // build series list ONCE, before building chart data
+        this.generateTenderSeries();
+
+        const allTenderKeys = this.seriesList.map((s: any) => s.valueField);
+
+        // storeinfo-equivalent: flatten nested TenderTypes into flat columns
+        this.storeinfo = this.TenderSummary_list.map((store: any) => {
           const obj: any = {
-            STORE_NAME: store.STORE_NAME,
+            store: store.STORE_NAME,
+            Total: 0
           };
+
+          allTenderKeys.forEach((key: string) => (obj[key] = 0));
 
           store.TenderTypes.forEach((t: any) => {
             obj[t.TENDER] = t.AMOUNT;
+            obj.Total += t.AMOUNT;
           });
-          this.generateSeries();
 
           return obj;
         });
 
-        console.log(
-          this.gross_Sales_list,
-          this.TopMovingItems_list,
-          this.TenderSummary_list,
-        );
+        console.log(this.storeinfo, '==========chart-ready data===========');
       },
       (error) => {
-        clearTimeout(timeoutId); // stop timeout
+        clearTimeout(timeoutId);
         this.loadingVisible = false;
-
-        // alert('Error occurred while loading data.');
         notify('Error occurred while loading data.', 'error', 3000);
       },
     );
+
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom' ? { ...option, label: 'Custom' } : option,
     );
   }
-  generateSeries() {
+
+  // dynamically discovers tender types from the API response
+  generateTenderSeries() {
     const tenders = new Set<string>();
 
     this.TenderSummary_list.forEach((store: any) => {
@@ -343,19 +456,15 @@ export class AnalyticsDashboardComponent implements OnInit {
       });
     });
 
-    const tenderColors: any = {
-      Cash: '#10B981',
-      Check: '#34D399',
-      'Credit Card': '#4F46E5',
-      'Debit Card': '#0EA5E9',
-      Voucher: '#F59E0B',
-      'On Account': '#64748B',
-    };
-    this.seriesList = Array.from(tenders).map((tender) => ({
+    const palette = [
+      '#10B981', '#4F46E5', '#F59E0B', '#EC4899', '#0EA5E9',
+      '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
+    ];
+
+    this.seriesList = Array.from(tenders).map((tender, index) => ({
       valueField: tender,
       name: tender,
-      type: 'bar',
-      color: tenderColors[tender] || '#999999',
+      color: palette[index % palette.length],
     }));
   }
 
@@ -484,6 +593,26 @@ ${this.formatAmount(arg.value)}`;
         this.fromDate = new Date(today);
         this.fromDate.setDate(today.getDate() - 29);
         this.toDate = new Date(today);
+        break;
+      case 'currentMonth':
+        // First day of the current month
+        this.fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        // Today's date
+        this.toDate = new Date(today);
+        this.toDate.setHours(0, 0, 0, 0);
+        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        break;
+
+      case 'currentYear':
+        // January 1 of the current year
+        this.fromDate = new Date(today.getFullYear(), 0, 1);
+        this.fromDate.setHours(0, 0, 0, 0);
+
+        // Today's date
+        this.toDate = new Date(today);
+        this.toDate.setHours(0, 0, 0, 0);
+        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+
         break;
 
       case 'all':
@@ -649,6 +778,125 @@ ${this.formatAmount(arg.value)}`;
       // e.rowElement.style.fontWeight = 'bold';
     }
   }
+
+  // sync time format===================
+  formatLastSyncTime = (cellInfo: any) => {
+    if (!cellInfo.value) {
+      return '';
+    }
+
+    const date = new Date(cellInfo.value);
+
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }).format(date);
+  };
+
+  // Tender amount formatting for chart labels and tooltips
+  formatTenderAmount(value: number): string {
+    const absValue = Math.abs(value);
+
+    if (absValue >= 1_000_000_000) {
+      return (value / 1_000_000_000).toFixed(2) + ' B';
+    } else if (absValue >= 1_000_000) {
+      return (value / 1_000_000).toFixed(2) + ' M';
+    } else if (absValue >= 1_000) {
+      return (value / 1_000).toFixed(2) + ' K';
+    } else {
+      return value.toFixed(2);
+    }
+  }
+
+  // Bar label customization — uses the new formatter
+  customizeCommonLabelTender = (arg: any) => {
+    return {
+      text: this.formatTenderAmount(arg.value),
+    };
+  };
+
+  // Y-axis label customization — uses the same formatter for consistency
+  customizeTenderAxisLabel = (arg: any) => {
+    return this.formatTenderAmount(arg.value);
+  };
+
+  // Tooltip customization — uses the same formatter
+  customizeCommonTooltipTender = (arg: any) => {
+    return {
+      text: `${arg.seriesName}: ${this.formatTenderAmount(arg.value)}`,
+    };
+
+  };
+
+  //===================gross claimed tender summary chart========================
+  formatGrossSalesAmount(value: number): string {
+    const absValue = Math.abs(value);
+
+    if (absValue >= 1_000_000_000) {
+      return (value / 1_000_000_000).toFixed(2) + ' B';
+    } else if (absValue >= 1_000_000) {
+      return (value / 1_000_000).toFixed(2) + ' M';
+    } else if (absValue >= 1_000) {
+      return (value / 1_000).toFixed(2) + ' K';
+    } else {
+      return value.toFixed(2);
+    }
+  }
+  // customizeText for dxo-label must return a STRING directly
+  customizeGrossSalesLabel = (arg: any) => {
+    return this.formatGrossSalesAmount(arg.value);
+  };
+
+  // customizeTooltip for dxo-tooltip correctly returns an OBJECT
+  customizeGrossSalesTooltip = (arg: any) => {
+    return {
+      text: `${arg.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
+    };
+  };
+
+  formatAmountTender(value: number): string {
+    const absValue = Math.abs(value);
+    if (absValue >= 1_000_000_000) {
+      return (value / 1_000_000_000).toFixed(2) + 'B';
+    } else if (absValue >= 1_000_000) {
+      return (value / 1_000_000).toFixed(2) + 'M';
+    } else if (absValue >= 1_000) {
+      return (value / 1_000).toFixed(2) + 'K';
+    }
+    return value.toFixed(2);
+  }
+
+  // Tooltip - shows exact value only
+  customizeTooltipTender = (pointInfo: any) => {
+    return {
+      text: `${pointInfo.seriesName}: ${this.formatAmountTender(pointInfo.value)}`,
+    };
+  };
+
+  // Data labels on bars - shows exact value only
+  customizeLabelTender = (pointInfo: any) => {
+    return this.formatAmountTender(pointInfo.value);
+  };
+
+
+  //=================
+  customizeTotalLabel = (arg: any) => {
+    const value = arg.value;
+
+    if (value >= 1_000_000_000) {
+      return (value / 1_000_000_000).toFixed(2) + ' B';
+    } else if (value >= 1_000_000) {
+      return (value / 1_000_000).toFixed(2) + ' M';
+    } else if (value >= 1_000) {
+      return (value / 1_000).toFixed(2) + ' K';
+    }
+
+    return value.toString();
+  };
 }
 
 @NgModule({
@@ -678,7 +926,8 @@ ${this.formatAmount(arg.value)}`;
     DxDateBoxModule,
     DxLoadPanelModule,
     CustomDatePopupModule,
-    DxPopupModule
+    DxPopupModule,
+
   ],
   providers: [],
   exports: [],
