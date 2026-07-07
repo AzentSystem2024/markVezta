@@ -338,7 +338,7 @@ export class GrnComponent implements OnInit {
       .saveGrnData(data)
       .pipe(
         finalize(() => {
-          this.isSaving = false; // 🔥 ALWAYS executes (success/error/cancel)
+          this.isSaving = false; //  ALWAYS executes (success/error/cancel)
         }),
       )
       .subscribe({
@@ -944,7 +944,7 @@ export class GrnComponent implements OnInit {
     }
 
     this.isGRNPopupVisible = false;
-     this.isApproved = false;
+    this.isApproved = false;
 
     // Reset arrays only
     this.grnNewForm.newGrnData.GRNDetails = [];
