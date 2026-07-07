@@ -690,6 +690,31 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
 
   return; // <-- IMPORTANT
 }
+
+// ================= APPROVE =================
+  if (this.isApproveMode) {
+    const result = confirm(
+      'Are you sure you want to approve this Delivery Note?',
+      'Confirm Approval'
+    );
+
+    result.then((dialogResult: boolean) => {
+      if (dialogResult) {
+        this.dataService.approveDeliveryNoteFin(payload).subscribe({
+          next: () => {
+            notify('Delivery Note Approved!', 'success', 2000);
+            this.popupClosed.emit();
+          },
+          error: () => {
+            notify('Approval failed!', 'error', 3000);
+          },
+        });
+      }
+    });
+
+    return;
+  }
+  
     // Decide API call based on mode
     // Decide API call logic
     if (this.isEditing) {
