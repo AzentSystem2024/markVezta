@@ -409,12 +409,12 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   }
 
   highlightEditableColumns(event: any) {
-    if (event.rowType === 'data' && event.column.allowEditing) {
-      // Apply a custom style for editable cells
-      event.cellElement.style.backgroundColor = '#FFFFFF'; // Soft yellow background
-      event.cellElement.style.color = '#000000ff'; // Dark yellow text
-      // event.cellElement.style.fontWeight = 'bold';
-    }
+    // if (event.rowType === 'data' && event.column.allowEditing) {
+    //   // Apply a custom style for editable cells
+    //   event.cellElement.style.backgroundColor = '#FFFFFF'; // Soft yellow background
+    //   event.cellElement.style.color = '#000000ff'; // Dark yellow text
+    //   // event.cellElement.style.fontWeight = 'bold';
+    // }
   }
 
   preparePoDetailsForSubmit() {

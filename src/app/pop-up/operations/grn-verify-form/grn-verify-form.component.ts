@@ -189,12 +189,12 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   }
 
   highlightEditableColumns(event: any) {
-    if (event.rowType === 'data' && event.column.allowEditing) {
-      // Apply a custom style for editable cells
-      event.cellElement.style.backgroundColor = '##FFFFFF'; // Soft yellow background
-      event.cellElement.style.color = 'rgb(12, 12, 11)'; // Dark yellow text
-      event.cellElement.style.fontWeight = 'bold';
-    }
+    // if (event.rowType === 'data' && event.column.allowEditing) {
+    //   // Apply a custom style for editable cells
+    //   event.cellElement.style.backgroundColor = '##FFFFFF'; // Soft yellow background
+    //   event.cellElement.style.color = 'rgb(12, 12, 11)'; // Dark yellow text
+    //   event.cellElement.style.fontWeight = 'bold';
+    // }
   }
 
   selectedPONo: any;
@@ -1295,8 +1295,8 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         SL_NO: index + 1, // Add SL_NO starting from 1
         // QTY_TO_RECEIVE: item.PO_QUANTITY - item.GRN_QUANTITY,
         QTY_TO_RECEIVE: this.isViewMode
-  ? item.BALANCE_QTY
-  : item.PO_QUANTITY - item.GRN_QUANTITY,
+          ? item.BALANCE_QTY
+          : item.PO_QUANTITY - item.GRN_QUANTITY,
         SUPP_PRICE: item.SUPP_PRICE.toFixed(2),
         QTY_BASE_UNIT: `${item.QUANTITY / item.UOM_MULTIPLE} ${item.UOM}`,
         DESCRIPTION: item.ITEM_NAME,

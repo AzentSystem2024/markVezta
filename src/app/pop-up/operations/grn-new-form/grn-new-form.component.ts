@@ -303,12 +303,12 @@ export class GrnNewFormComponent implements OnInit {
   }
 
   highlightEditableColumns(event: any) {
-    if (event.rowType === 'data' && event.column.allowEditing) {
-      // Apply a custom style for editable cells
-      event.cellElement.style.backgroundColor = '#ffffffff'; // Soft yellow background
-      event.cellElement.style.color = '#000000'; // Dark yellow text
-      event.cellElement.style.fontWeight = 'bold';
-    }
+    // if (event.rowType === 'data' && event.column.allowEditing) {
+    //   // Apply a custom style for editable cells
+    //   event.cellElement.style.backgroundColor = '#ffffffff'; // Soft yellow background
+    //   event.cellElement.style.color = '#000000'; // Dark yellow text
+    //   event.cellElement.style.fontWeight = 'bold';
+    // }
   }
   onEditorPreparing(e: any) {
     if (e.dataField === 'RECEIVED_QTY') {
