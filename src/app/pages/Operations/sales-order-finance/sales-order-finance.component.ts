@@ -275,21 +275,31 @@ export class SalesOrderFinanceComponent {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
+statusCellRender(cellElement: any, cellInfo: any) {
+  const status = cellInfo.data.TRANS_STATUS;
 
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'APPROVED' : 'OPEN';
+  const icon = document.createElement('i');
+  icon.className = 'fas fa-flag';
+  icon.style.fontSize = '18px';
 
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
+  // Same colors as the badge
+  if (status === 5) {
+    icon.style.color = '#10B981'; // Green
+    icon.title = 'APPROVED';
+  } else if (status === 2) {
+    icon.style.color = '#0073D8'; // Blue
+    icon.title = 'VERIFIED';
+  } else {
+    icon.style.color = '#FFA500'; // Orange
+    icon.title = 'OPEN';
   }
+
+  icon.style.display = 'flex';
+  icon.style.justifyContent = 'center';
+  icon.style.alignItems = 'center';
+
+  cellElement.appendChild(icon);
+}
 
   getStatusFilterData = [
     {
