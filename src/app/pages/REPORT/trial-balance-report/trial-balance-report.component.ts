@@ -54,6 +54,7 @@ export class TrialBalanceReportComponent {
   selected_from_date: string;
   Store: any;
   selectedStoreid: any;
+  storeid: any;
 
   constructor(
     private dataservice: DataService,
@@ -72,6 +73,8 @@ export class TrialBalanceReportComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+  this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -287,7 +290,8 @@ export class TrialBalanceReportComponent {
       companyId: this.selected_Company_id,
       finId: this.selected_fin_id,
       dateFrom: this.formatted_from_date,
-      dateTo: this.formatted_To_date
+      dateTo: this.formatted_To_date,
+      selectedStoreid: this.selectedStoreid || []
     };
 
     sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
@@ -329,11 +333,15 @@ export class TrialBalanceReportComponent {
 
   onViewClick(e: any) {
     this.HeadId = e.row.data.HeadID;
+    this.storeid = e.row.data.STORE_ID;
+    console.log(this.storeid)
     console.log(this.HeadId);
 
     sessionStorage.setItem('HEADID', this.HeadId);
     console.log(sessionStorage.getItem('HEADID'));
 
+    sessionStorage.setItem('STOREID', this.storeid);
+        
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
   }

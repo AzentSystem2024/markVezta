@@ -186,27 +186,31 @@
       <dxi-column
         dataField="TRANS_DATE"
         caption="Date"
+        width="120"
         dataType="date"
         [format]="{ type: 'custom', formatter: formatDates }"
       ></dxi-column>
       <dxi-column
         dataField="TRANS_TYPE_NAME"
         caption="Document Type"
+         width="170"
       ></dxi-column>
-      <dxi-column dataField="VOUCHER_NO" caption="Voucher No"></dxi-column>
-      <dxi-column dataField="PARTICULARS" caption="Particulars"></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
-      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+      <dxi-column dataField="VOUCHER_NO" caption="Voucher No"  width="120"></dxi-column>
+      <dxi-column dataField="PARTICULARS" caption="Particulars"  width="180"></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store/Branch"  width="250"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"  width="120"></dxi-column>
       <dxi-column
         dataField="DR_AMOUNT"
         caption="Debit Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+         width="120"
       >
       </dxi-column>
 
       <dxi-column
         dataField="CR_AMOUNT"
+         width="120"
         caption="Credit Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
@@ -216,6 +220,7 @@
       <dxi-column
         dataField="BALANCE"
         caption="Balance"
+         width="120"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
       >

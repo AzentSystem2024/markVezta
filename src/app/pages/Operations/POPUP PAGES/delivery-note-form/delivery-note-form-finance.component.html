@@ -70,6 +70,7 @@
                       [width]="410"
                       label="Salesman"
                       labelMode="floating"
+                      [readOnly]="isReadOnlyMode"
                     >
                     </dx-select-box>
 
@@ -212,7 +213,7 @@
               label="Contact Name"
               labelMode="floating"
               [width]="410"
-              [readOnly]="false"
+              [readOnly]="isReadOnlyMode"
               style="margin-top: 10px"
             ></dx-text-box>
             <div style="flex: 1">
@@ -221,7 +222,7 @@
                 label="Fax"
                 labelMode="floating"
                 [width]="410"
-                [readOnly]="false"
+                [readOnly]="isReadOnlyMode"
               ></dx-text-box>
             </div>
           </div>
@@ -242,14 +243,14 @@
                 [(value)]="deliveryFormData.CONTACT_PHONE"
                 label="Phone"
                 labelMode="floating"
-                [readOnly]="false"
+                [readOnly]="isReadOnlyMode"
               ></dx-text-box>
 
               <dx-text-box
                 [(value)]="deliveryFormData.CONTACT_MOBILE"
                 label="Mobile"
                 labelMode="floating"
-                [readOnly]="false"
+               [readOnly]="isReadOnlyMode"
               >
               </dx-text-box>
             </div>

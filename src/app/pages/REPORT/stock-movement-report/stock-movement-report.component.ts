@@ -182,12 +182,8 @@ export class StockMovementReportComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
-    this.monthDataSource.unshift({
-  name: 'All',
-  value: ''
-});
-
-this.selectedmonth = '';
+     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+  this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {

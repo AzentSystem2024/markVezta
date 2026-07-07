@@ -19,6 +19,8 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
+import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-supplier-report',
@@ -26,7 +28,7 @@ import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-
   styleUrls: ['./supplier-report.component.scss'],
 })
 export class SupplierReportComponent {
-  SupplierReport: any[] = [];
+  SupplierReport: any;
   isFilterRowVisible: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -53,6 +55,7 @@ export class SupplierReportComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+  isLoading = false;
 
   constructor(
     private dataservice: DataService,
@@ -72,6 +75,8 @@ export class SupplierReportComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -257,23 +262,44 @@ export class SupplierReportComponent {
     });
   }
 
-  get_DataSource() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
-      SUPP_ID: this.selectedSupplierId || 0,
-    };
+get_DataSource() {
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+    SUPP_ID: this.selectedSupplierId || 0,
+  };
 
-    sessionStorage.setItem('supplierViewClick', JSON.stringify(payload));
+  sessionStorage.setItem('supplierViewClick', JSON.stringify(payload));
 
-    console.log(JSON.parse(sessionStorage.getItem('supplierViewClick')));
+  this.SupplierReport = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.Supplier_Report_Api(payload).subscribe({
+          next: (res: any) => {
+            const list = res.data || [];
 
-    this.dataservice.Supplier_Report_Api(payload).subscribe((res: any) => {
-      this.SupplierReport = res.data;
-      console.log(this.SupplierReport, '========SupplierReport=========');
-    });
-  }
+            if (list.length === 0) {
+              notify({
+                message: 'No data available',
+                type: 'warning',
+                displayTime: 2000,
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              });
+            }
+
+            resolve(list);
+          },
+          error: () => {
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
 
   summaryColumnsData = {
     totalItems: [

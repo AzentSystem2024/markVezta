@@ -289,6 +289,19 @@ export class TrialBalanceBranchWiseComponent {
     sessionStorage.setItem('HEADID', this.HeadId);
     console.log(sessionStorage.getItem('HEADID'));
 
+    // Update session storage with latest selected store ID
+    const sessiondata = sessionStorage.getItem('viewclickvalue');
+    if (sessiondata) {
+      try {
+        const payload = JSON.parse(sessiondata);
+        payload.selectedStoreid = this.selectedStoreid;
+        payload.STORE_ID = this.selectedStoreid?.length ? this.selectedStoreid.join(',') : '';
+        sessionStorage.setItem('viewclickvalue', JSON.stringify(payload));
+      } catch (err) {
+        console.error('Error updating viewclickvalue in onViewClick', err);
+      }
+    }
+
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
   }

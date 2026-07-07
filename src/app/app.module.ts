@@ -415,9 +415,11 @@ import {
   DashboardMarkComponent,
   DashboardMarkModule,
 } from './pages/dashboard-mark/dashboard-mark.component';
+import { PurchaseReportComponent, PurchaseReportModule } from './pages/REPORT/purchase-report/purchase-report.component';
+import { ItemwisePurchaseReportComponent, ItemwisePurchaseReportModule } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,],
   imports: [
     DxTemplateModule,
     TaskListModule,
@@ -831,6 +833,8 @@ import {
     DistrictModule,
     DistrictFormModule,
     DashboardMarkModule,
+    PurchaseReportModule,
+    ItemwisePurchaseReportModule,
   ],
 
   providers: [

@@ -32,6 +32,7 @@
       (onEditingStart)="onEditInvoice($event)"
       (onRowRemoving)="onDeleteInvoice($event)"
       (onCellPrepared)="onCellPrepared($event)"
+      [summary]="summaryColumnsData"
     >
       <dxo-editing
         mode="popup"

@@ -89,3 +89,9 @@ dx-chart {
   font-weight: 600;
   word-break: break-word;
 }
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}

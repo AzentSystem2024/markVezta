@@ -624,6 +624,25 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
+      summaryColumnsData = {
+      
+      totalItems: [
+        {
+          column: 'NET_AMOUNT',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'NET_AMOUNT',
+          alignment: 'right',
+        },
+      ],
+      calculateCustomSummary: (options) => {
+        if (options.name === 'summaryRow') {
+          // Custom logic if needed
+        }
+      },
+    };
+
   // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
     console.log(e, 'event--------------');

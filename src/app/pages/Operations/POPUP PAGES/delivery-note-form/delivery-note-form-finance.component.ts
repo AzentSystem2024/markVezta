@@ -58,6 +58,8 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+@Input() isApproveMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
@@ -107,7 +109,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     USER_ID: 0,
     NARRATION: '',
     DN_TYPE: 0,
-    DETAILS: [],
+    Details: [],
   };
 
   userID: any;
@@ -455,7 +457,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       .filter((row: any) => {
         return !this.deliveryFormData.Details.some(
           (item: any) =>
-            item.SO_DETAIL_ID === row.ID ||
+            // item.SO_DETAIL_ID === row.ID ||
             item.SO_DETAIL_ID === row.SO_DETAIL_ID,
         );
       })
@@ -665,6 +667,29 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     if (this.isEditing && this.deliveryFormData.ID) {
       payload.ID = this.deliveryFormData.ID;
     }
+
+    if (this.isVerifyMode) {
+  const result = confirm(
+    'Are you sure you want to verify this Delivery Note?',
+    'Confirm Verify'
+  );
+
+  result.then((dialogResult: boolean) => {
+    if (dialogResult) {
+      this.dataService.verifyDeliveryNoteFin(payload).subscribe({
+        next: () => {
+          notify('Delivery Note Verified!', 'success', 2000);
+          this.popupClosed.emit();
+        },
+        error: () => {
+          notify('Verification failed!', 'error', 3000);
+        },
+      });
+    }
+  });
+
+  return; // <-- IMPORTANT
+}
     // Decide API call based on mode
     // Decide API call logic
     if (this.isEditing) {
@@ -678,7 +703,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
 
         result.then((dialogResult: boolean) => {
           if (dialogResult) {
-            this.dataService.approveDeliveryNote(payload).subscribe({
+            this.dataService.approveDeliveryNoteFin(payload).subscribe({
               next: () => {
                 notify('Delivery Note Approved!', 'success', 2000);
                 this.popupClosed.emit();
@@ -689,7 +714,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         });
       } else {
         // ✔️ UPDATE existing DN
-        this.dataService.updateDeliveryNote(payload).subscribe({
+        this.dataService.updateDeliveryNoteFin(payload).subscribe({
           next: () => {
             notify('Delivery Note Updated!', 'success', 2000);
             this.popupClosed.emit();
@@ -708,7 +733,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
 
         result.then((dialogResult: boolean) => {
           if (dialogResult) {
-            this.dataService.saveDeliveryNote(payload).subscribe({
+            this.dataService.saveDeliveryNoteFin(payload).subscribe({
               next: () => {
                 notify('Delivery Note Saved & Approved!', 'success', 2000);
                 this.ngZone.run(() => {
@@ -721,7 +746,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         });
       } else {
         // ✔️ Save normally without approval
-        this.dataService.saveDeliveryNote(payload).subscribe({
+        this.dataService.saveDeliveryNoteFin(payload).subscribe({
           next: () => {
             notify('Delivery Note Saved!', 'success', 2000);
             this.popupClosed.emit();
@@ -739,7 +764,8 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
 
     const alreadySelected = this.deliveryFormData.Details.some(
       (item: any) =>
-        item.SO_DETAIL_ID === row.ID || item.SO_DETAIL_ID === row.SO_DETAIL_ID,
+        // item.SO_DETAIL_ID === row.ID || 
+      item.SO_DETAIL_ID === row.SO_DETAIL_ID,
     );
 
     if (alreadySelected) {
@@ -771,7 +797,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       NARRATION: '',
       DN_TYPE: 0,
       IS_APPROVED: false,
-      DETAILS: [],
+      Details: [],
     };
 
     // Reset extra fields

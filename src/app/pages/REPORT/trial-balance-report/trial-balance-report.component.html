@@ -183,23 +183,26 @@
         dataField="MainGroup"
         caption="Main Group"
         dataType="string"
+        width="120"
       ></dxi-column>
       <dxi-column
         dataField="SubGroup"
         caption="Sub Group"
         alignment="left"
+         width="150"
         dataType="number"
       ></dxi-column>
-      <dxi-column dataField="Category" caption="Category"></dxi-column>
-      <dxi-column dataField="LedgerCode" caption="Ledger Code"></dxi-column>
-      <dxi-column dataField="LedgerName" caption="Ledger Name"></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
-      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
-      <dxi-column caption="Opening Balance" cssClass="opening-header">
+      <dxi-column dataField="Category" caption="Category"  width="150"></dxi-column>
+      <dxi-column dataField="LedgerCode" caption="Ledger Code"  width="120"></dxi-column>
+      <dxi-column dataField="LedgerName" caption="Ledger Name"  width="250"></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store/Branch"  width="120"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"  width="120"></dxi-column>
+      <dxi-column caption="Opening Balance" cssClass="opening-header"  width="130">
         <dxi-column
           dataField="OpeningBalanceDebit"
           caption="Debit"
           cssClass="opening-sub-header"
+           width="130"
           [allowEditing]="false"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
@@ -208,6 +211,7 @@
         <dxi-column
           dataField="OpeningBalanceCredit"
           caption="Credit"
+           width="130"
           cssClass="opening-sub-header"
           alignment="center"
           alignment="right"
@@ -217,12 +221,13 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="During the Period" cssClass="DuringPeriod-header">
+      <dxi-column caption="During the Period" cssClass="DuringPeriod-header"  width="130">
         <dxi-column
           dataField="DuringThePeriodDebit"
           caption="Debit"
           alignment="right"
           cssClass="DuringPeriod-sub-header"
+           width="130"
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
@@ -233,13 +238,14 @@
           alignment="center"
           cssClass="DuringPeriod-sub-header"
           alignment="right"
+           width="130"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Closing Balance" cssClass="closing-header">
+      <dxi-column caption="Closing Balance" cssClass="closing-header"  width="130">
         <dxi-column
           dataField="ClosingBalanceDebit"
           caption="Debit"
@@ -255,6 +261,7 @@
           caption="Credit"
           cssClass="closing-sub-header"
           alignment="right"
+           width="130"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
         >

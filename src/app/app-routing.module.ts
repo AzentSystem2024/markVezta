@@ -212,6 +212,8 @@ import { BarcodePrintComponent } from './pages/barcode-print/barcode-print.compo
 import { TrialBalanceBranchWiseComponent } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
 import { DistrictComponent } from './pages/district/district.component';
 import { DashboardMarkComponent } from './pages/dashboard-mark/dashboard-mark.component';
+import { PurchaseReportComponent } from './pages/REPORT/purchase-report/purchase-report.component';
+import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
 
 const routes: Routes = [
   {
@@ -1303,6 +1305,16 @@ const routes: Routes = [
       {
         path: 'mark-dashboard',
         component: DashboardMarkComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'purchase-report',
+        component: PurchaseReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'itemwise-purchase-report',
+        component: ItemwisePurchaseReportComponent,
         canActivate: [AuthGuardService],
       },
       {
