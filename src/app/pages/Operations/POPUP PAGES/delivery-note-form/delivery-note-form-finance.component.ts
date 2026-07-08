@@ -199,6 +199,11 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       this.getDocNo(); // ONLY here
     }
 
+    console.log('EditingResponseData', this.EditingResponseData);
+console.log('Status', this.EditingResponseData?.STATUS);
+console.log('Approve Mode', this.isApproveMode);
+console.log('Verify Mode', this.isVerifyMode);
+
     // this.getCustomerOrUnitLst();
     this.getStoreDropdown();
     console.log('packingRights', packingRights);
