@@ -301,7 +301,7 @@
   [(visible)]="isAddDelivery"
   [width]="'80vw'"
   [height]="'95vh'"
-  title="Delivery Note"
+  title="Add Delivery Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddDelivery">
@@ -316,7 +316,7 @@
   [(visible)]="isEditDelivery"
   [width]="'80vw'"
   [height]="'90vh'"
-  title="Delivery Note"
+  title="Edit Delivery Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditDelivery">
@@ -334,11 +334,27 @@
   [(visible)]="isVerifyDelivery"
   [width]="'95vw'"
   [height]="'100vh'"
-  [title]="
-    selectedDelivery?.STATUS === 'VERIFIED'
-      ? 'Approve Invoice'
-      : 'Verify Invoice'
-  "
+  title="Verify Delivery Note"
+  (popupClosed)="handleClose()"
+>
+  <app-delivery-note-form-finance
+    [isEditing]="true"
+    [EditingResponseData]="selectedDelivery"
+    [isVerifyMode]="selectedDelivery?.STATUS !== 'VERIFIED'"
+    [isApproveMode]="selectedDelivery?.STATUS === 'VERIFIED'"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-delivery-note-form-finance>
+</dx-popup>
+
+
+<dx-popup
+  *ngIf="isApproveDelivery"
+  [(visible)]="isApproveDelivery"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Delivery note"
   (popupClosed)="handleClose()"
 >
   <app-delivery-note-form-finance
