@@ -188,12 +188,14 @@
           *ngIf="canEdit"
           class="dx-icon dx-icon-edit"
           [style.opacity]="
-            cellData.data.STATUS === 'VERIFIED' || cellData.data.STATUS === 'APPROVED'
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.STATUS === 'VERIFIED' || cellData.data.STATUS === 'APPROVED'
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? 'none'
               : 'auto'
           "
@@ -207,12 +209,14 @@
           *ngIf="canDelete"
           class="dx-icon dx-icon-trash"
           [style.opacity]="
-            cellData.data.STATUS === 'VERIFIED' || cellData.data.STATUS === 'APPROVED'
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.STATUS === 'VERIFIED' || cellData.data.STATUS === 'APPROVED'
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? 'none'
               : 'auto'
           "
@@ -331,8 +335,29 @@
   [width]="'95vw'"
   [height]="'100vh'"
   [title]="
-    selectedDelivery?.STATUS === 'VERIFIED' ? 'Approve Invoice' : 'Verify Invoice'
+    selectedDelivery?.STATUS === 'VERIFIED'
+      ? 'Approve Invoice'
+      : 'Verify Invoice'
   "
+  (popupClosed)="handleClose()"
+>
+  <app-delivery-note-form-finance
+    [isEditing]="true"
+    [EditingResponseData]="selectedDelivery"
+    [isVerifyMode]="selectedDelivery?.STATUS !== 'VERIFIED'"
+    [isApproveMode]="selectedDelivery?.STATUS === 'VERIFIED'"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-delivery-note-form-finance>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isApproveDelivery"
+  [(visible)]="isApproveDelivery"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Delivery Note"
   (popupClosed)="handleClose()"
 >
   <app-delivery-note-form-finance

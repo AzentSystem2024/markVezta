@@ -289,15 +289,14 @@
   [(visible)]="isEditInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
-  [title]="buttonText"
   (onHiding)="handleClose()"
-  titleTemplate="popupTitle"
+  title="Update Invoice"
 >
-  <div *dxTemplate="let data of 'popupTitle'">
+  <!-- <div *dxTemplate="let data of 'popupTitle'">
     <div class="popup-title-text">
       {{ buttonText }}
     </div>
-  </div>
+  </div> -->
   <ng-container *ngIf="isEditInvoice">
     <app-edit-purchase-invoice
       [invoiceFormData]="selectedInvoice"

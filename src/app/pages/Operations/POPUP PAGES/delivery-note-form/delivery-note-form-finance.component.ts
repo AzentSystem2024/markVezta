@@ -59,7 +59,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Input() isVerifyMode: boolean = false;
-@Input() isApproveMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
@@ -150,6 +150,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log(this.isApproveMode, 'isapprovemodeeeeeeeeeeee');
     const currentUrl = this.router.url;
     console.log('Current URL:', currentUrl);
     const menuResponse = JSON.parse(
@@ -669,27 +670,27 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     }
 
     if (this.isVerifyMode) {
-  const result = confirm(
-    'Are you sure you want to verify this Delivery Note?',
-    'Confirm Verify'
-  );
+      const result = confirm(
+        'Are you sure you want to verify this Delivery Note?',
+        'Confirm Verify',
+      );
 
-  result.then((dialogResult: boolean) => {
-    if (dialogResult) {
-      this.dataService.verifyDeliveryNoteFin(payload).subscribe({
-        next: () => {
-          notify('Delivery Note Verified!', 'success', 2000);
-          this.popupClosed.emit();
-        },
-        error: () => {
-          notify('Verification failed!', 'error', 3000);
-        },
+      result.then((dialogResult: boolean) => {
+        if (dialogResult) {
+          this.dataService.verifyDeliveryNoteFin(payload).subscribe({
+            next: () => {
+              notify('Delivery Note Verified!', 'success', 2000);
+              this.popupClosed.emit();
+            },
+            error: () => {
+              notify('Verification failed!', 'error', 3000);
+            },
+          });
+        }
       });
-    }
-  });
 
-  return; // <-- IMPORTANT
-}
+      return; // <-- IMPORTANT
+    }
     // Decide API call based on mode
     // Decide API call logic
     if (this.isEditing) {
@@ -764,8 +765,8 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
 
     const alreadySelected = this.deliveryFormData.Details.some(
       (item: any) =>
-        // item.SO_DETAIL_ID === row.ID || 
-      item.SO_DETAIL_ID === row.SO_DETAIL_ID,
+        // item.SO_DETAIL_ID === row.ID ||
+        item.SO_DETAIL_ID === row.SO_DETAIL_ID,
     );
 
     if (alreadySelected) {
