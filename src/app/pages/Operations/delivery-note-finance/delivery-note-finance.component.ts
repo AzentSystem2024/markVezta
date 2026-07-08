@@ -514,9 +514,9 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   }
 
   onVerifyDeliveryNote(event: any) {
-    console.log(event, 'event');
+    console.log(event, 'event=========================');
     const rowData = event.row.data;
-
+    console.log(rowData.STATUS, 'ROWDATAAAAAAAAAAA');
     const invoiceId = rowData.ID;
     const transStatus = rowData.STATUS;
 
