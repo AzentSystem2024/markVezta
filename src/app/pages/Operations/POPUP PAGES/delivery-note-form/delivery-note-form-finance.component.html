@@ -98,6 +98,7 @@
                     [width]="375"
                     label="Customer *"
                     labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
                     (onValueChanged)="customerChanged($event)"
                   >
                   </dx-select-box>
@@ -110,6 +111,7 @@
                     icon="event"
                     stylingMode="outlined"
                     class="blue-outline-btn"
+                    [disabled]="isReadOnlyMode"
                     (onClick)="addSalesOrder()"
                     [width]="375"
                   ></dx-button>
@@ -167,7 +169,7 @@
           <dxi-column
             dataField="DELIVERED_QUANTITY"
             caption="Delivered Quantity"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
             alignment="right"
             [validationRules]="[
               { type: 'required', message: 'Quantity is required' },

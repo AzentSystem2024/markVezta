@@ -363,3 +363,21 @@
   >
   </app-delivery-note-form-finance>
 </dx-popup>
+
+<dx-popup
+  *ngIf="isViewDelivery"
+  [(visible)]="isViewDelivery"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="View Delivery Note"
+  (onHiding)="handleClose()"
+>
+  <app-delivery-note-form-finance
+    [isEditing]="true"
+    [EditingResponseData]="selectedDelivery"
+    [isReadOnlyMode]="true"
+    [canApprove]="canApprove"
+    (popupClosed)="handleClose()"
+  >
+  </app-delivery-note-form-finance>
+</dx-popup>
