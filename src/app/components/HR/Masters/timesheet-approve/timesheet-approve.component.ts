@@ -125,6 +125,7 @@ export class TimesheetApproveComponent {
   }
 
   ngOnInit() {
+    console.log('APPROVEEEE');
     this.sesstion_Details();
     this.loadStores();
     // this.getSalaryHead();

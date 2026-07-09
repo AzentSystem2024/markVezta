@@ -174,7 +174,7 @@
           ></dx-number-box>
           <!-- <span    style="margin-top: 10px; " [ngStyle]="{ color: head_percent ? '#aaa' : 'inherit' }">% of selected Heads</span> -->
           <span
-            style="margin-top: 10px"
+            style="margin-top: 5px"
             [ngStyle]="{
               color: !isEnabled || head_percent ? '#aaa' : 'inherit',
             }"
@@ -187,12 +187,14 @@
             [disabled]="!isEnabled || ApplicableWithBasicRange"
             [(value)]="SalaryHeadData.RANGE_EXISTS"
             text="Applicable within the basic  range from"
+            class="mb-1"
           ></dx-check-box>
           <dx-number-box
             [disabled]="!isEnabled || head_From"
             [width]="50"
             [height]="30"
             [(value)]="SalaryHeadData.RANGE_FROM"
+            class="mt-1"
           ></dx-number-box>
           <span
             style="margin-top: 10px"
@@ -206,6 +208,7 @@
             [width]="100"
             [height]="30"
             [(value)]="SalaryHeadData.RANGE_TO"
+            class="mt-1"
           ></dx-number-box>
         </div>
         <dx-radio-group

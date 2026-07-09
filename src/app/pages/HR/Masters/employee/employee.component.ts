@@ -117,7 +117,9 @@ export class EmployeeComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) { }
+  ) {
+    this.isLoading = false
+  }
 
   onExporting(event: any) {
     const fileName = 'Credit_Note';
@@ -142,6 +144,7 @@ export class EmployeeComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.isLoading = false
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',

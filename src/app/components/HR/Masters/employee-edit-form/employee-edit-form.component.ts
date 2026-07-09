@@ -158,12 +158,17 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   COMPANY_ID: any;
   selected_Company_id: any;
   SubDepartmentDataSource: any = null;
+  countryCode: any;
+  CountryId: any;
+  mobile_limit: any;
+  countryCodes: any[] = []
   constructor(
     public dataservice: DataService,
     private sanitizer: DomSanitizer,
   ) {
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
+      this.countryCodes = data;
     });
 
     const payload = {
@@ -215,8 +220,19 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['employeeData'] && changes['employeeData'].currentValue) {
       this.employeeFormData = this.employeeData;
+      this.CountryId = this.employeeFormData.COUNTRY_ID; // Set CountryId from employeeData  
 
-      if (this.employeeFormData.IMAGE_NAME) {
+      const selectedCountry = this.countries.find(
+        (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+      );
+      // 4️ If found, set code & name
+      if (selectedCountry) {
+        this.countryCode = selectedCountry.CODE; // e.g., '+971'
+      } else {
+        // 5️ Fallback if no country found
+        this.countryCode = '';
+        console.warn(' No matching country found for ID:', this.employeeFormData.COUNTRY_ID);
+      } if (this.employeeFormData.IMAGE_NAME) {
         this.imageUrl = `${this.employeeFormData.IMAGE_NAME}`;
       } else {
         this.imageUrl = null;
@@ -251,7 +267,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     this.salaryHead = [...updatedSalaryHead]; // New reference for DevExtreme
   }
 
-  logGridData(e: any) {}
+  logGridData(e: any) { }
 
   triggerFileUpload() {
     if (this.fileInput) {
@@ -367,21 +383,17 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   }
 
   viewAttachment(file: any) {
-    const fileName = file.FILE_NAME || file.fileName;
+    const fileName = file.fileName;
+    const base64 = file.base64;
 
-    const actualFile = this.employeeFormData.Attachment.find(
-      (f: any) => f.FILE_NAME === fileName,
-    );
-
-    if (!actualFile || !actualFile.FILE_DATA) {
-      console.error('File data not found in employeeFormData.Attachment.');
+    if (!base64) {
+      notify('File data not found.', 'error', 2000);
       return;
     }
 
-    const base64 = actualFile.FILE_DATA;
-    const fileType = this.getFileType(actualFile.FILE_NAME);
+    const fileType = this.getFileType(fileName);
 
-    this.downloadFileName = actualFile.FILE_NAME;
+    this.downloadFileName = fileName;
 
     if (fileType.startsWith('image/')) {
       this.previewUrl = `data:${fileType};base64,${base64}`;
@@ -390,16 +402,52 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
       const byteArray = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
       const blob = new Blob([byteArray], { type: 'application/pdf' });
       const blobUrl = URL.createObjectURL(blob);
+
       this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+
       this.previewType = 'pdf';
     } else {
-      console.warn('Unsupported file type:', fileType);
       this.previewUrl = '';
       this.previewType = 'unsupported';
     }
 
     this.isPreviewVisible = true;
   }
+
+  // viewAttachment(file: any) {
+  //   const fileName = file.FILE_NAME || file.fileName;
+
+  //   const actualFile = this.employeeFormData.Attachment.find(
+  //     (f: any) => f.FILE_NAME === fileName,
+  //   );
+
+  //   if (!actualFile || !actualFile.FILE_DATA) {
+  //     console.error('File data not found in employeeFormData.Attachment.');
+  //     return;
+  //   }
+
+  //   const base64 = actualFile.FILE_DATA;
+  //   const fileType = this.getFileType(actualFile.FILE_NAME);
+
+  //   this.downloadFileName = actualFile.FILE_NAME;
+
+  //   if (fileType.startsWith('image/')) {
+  //     this.previewUrl = `data:${fileType};base64,${base64}`;
+  //     this.previewType = 'image';
+  //   } else if (fileType === 'application/pdf') {
+  //     const byteArray = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  //     const blob = new Blob([byteArray], { type: 'application/pdf' });
+  //     const blobUrl = URL.createObjectURL(blob);
+  //     this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+  //     this.previewType = 'pdf';
+  //   } else {
+  //     console.warn('Unsupported file type:', fileType);
+  //     this.previewUrl = '';
+  //     this.previewType = 'unsupported';
+  //   }
+
+  //   this.isPreviewVisible = true;
+  // }
 
   getFileType(fileName: string): string {
     const ext = fileName.split('.').pop()?.toLowerCase();
@@ -606,6 +654,35 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     const selected = this.states.find((d: any) => d.ID === e.value);
     this.employeeFormData.STATE_NAME = selected ? selected.DESCRIPTION : '';
   }
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+
+  onCountrySelectionChanged(event: any) {
+    this.CountryId = event.value;
+
+    const selectedCountry = this.countries.find(
+      (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+    );
+    // 4️ If found, set code & name
+    if (selectedCountry) {
+      this.countryCode = selectedCountry.CODE; // e.g., '+971'
+    } else {
+      // 5️ Fallback if no country found
+      this.countryCode = '';
+      console.warn(' No matching country found for ID:', this.employeeFormData.COUNTRY_ID);
+    }
+  }
 }
 
 @NgModule({
@@ -644,4 +721,4 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   exports: [EmployeeEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeEditFormFormModule {}
+export class EmployeeEditFormFormModule { }

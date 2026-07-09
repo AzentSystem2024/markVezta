@@ -240,7 +240,11 @@
           style="margin-left: 10px; cursor: default"
         ></i>
       </div> -->
-      <dxi-column dataField="STATUS" cellTemplate="statusCellRender">
+      <dxi-column
+        dataField="STATUS"
+        caption="Status"
+        cellTemplate="statusCellRender"
+      >
       </dxi-column>
 
       <div *dxTemplate="let data of 'statusCellRender'">
@@ -324,7 +328,7 @@
                 ? 'Approve'
                 : 'Verify'
           "
-          (click)="onEditingStart({ data: cellData.data, cancel: false })"
+          (click)="onVerifyAction(cellData.data)"
         >
           <!-- Blue badge -->
           <i
@@ -360,7 +364,7 @@
 <dx-popup
   [(visible)]="addTimesheetPopupOpened"
   [width]="'95vw'"
-  [height]="'95vh'"
+  [height]="'100vh'"
   title="New Timesheet"
   (onHiding)="handleClose()"
 >
@@ -374,58 +378,75 @@
 
 <dx-popup
   [(visible)]="editTimesheetPopupOpened"
-  [width]="'95vw'"
-  [height]="'95vh'"
   title="Edit Timesheet"
+  [width]="'95vw'"
+  [height]="'100vh'"
   (onHiding)="handleClose()"
 >
   <app-timesheet-edit
     *ngIf="editTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
     [existingTimesheets]="timesheetList"
+    [isReadOnlyMode]="false"
+    [isVerifyMode]="false"
+    [isApproveMode]="false"
     (popupClosed)="handleClose()"
-  ></app-timesheet-edit>
+  >
+  </app-timesheet-edit>
 </dx-popup>
 
 <dx-popup
   [(visible)]="verifyTimesheetPopupOpened"
-  [width]="'95vw'"
-  [height]="'95vh'"
   title="Verify Timesheet"
+  [width]="'95vw'"
+  [height]="'100vh'"
   (onHiding)="handleClose()"
 >
-  <app-timesheet-verify
+  <app-timesheet-edit
     *ngIf="verifyTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
     [existingTimesheets]="timesheetList"
+    [isVerifyMode]="true"
+    [isApproveMode]="false"
+    [isReadOnlyMode]="true"
     (popupClosed)="handleClose()"
-  ></app-timesheet-verify>
+  >
+  </app-timesheet-edit>
 </dx-popup>
-
 <dx-popup
   [(visible)]="approveTimesheetPopupOpened"
   [width]="'95vw'"
-  [height]="'95vh'"
+  [height]="'100vh'"
   title="Approve Timesheet"
   (onHiding)="handleClose()"
 >
-  <app-timesheet-approve
+  <app-timesheet-edit
     *ngIf="approveTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
+    [existingTimesheets]="timesheetList"
+    [isVerifyMode]="false"
+    [isApproveMode]="true"
+    [isReadOnlyMode]="true"
     (popupClosed)="handleClose()"
-  ></app-timesheet-approve>
+  >
+  </app-timesheet-edit>
 </dx-popup>
 
 <dx-popup
   [(visible)]="viewTimesheetPopupOpened"
-  [width]="'95vw'"
-  [height]="'95vh'"
   title="View Timesheet"
+  [width]="'95vw'"
+  [height]="'100vh'"
   (onHiding)="handleClose()"
 >
-  <app-timesheet-view
+  <app-timesheet-edit
     *ngIf="viewTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
+    [existingTimesheets]="timesheetList"
+    [isReadOnlyMode]="true"
+    [isVerifyMode]="false"
+    [isApproveMode]="false"
     (popupClosed)="handleClose()"
-  ></app-timesheet-view>
+  >
+  </app-timesheet-edit>
 </dx-popup>

@@ -6,12 +6,6 @@
       [width]="'100%'"
       [height]="'82vh'"
       [showColumnLines]="true"
-      [loadPanel]="{
-        enabled: true,
-        text: 'Loading...',
-        showIndicator: true,
-        showPane: true,
-      }"
       class="grid theme-dependent"
       [dataSource]="employeeList"
       [showBorders]="true"
@@ -87,9 +81,7 @@
         <dxi-item location="before">
           <div class="grid-header">Employee</div>
         </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-         
-        </dxi-item>
+        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
         <dxi-item
           location="after"
@@ -124,9 +116,8 @@
       <dxi-column dataField="CITY" caption="City"></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column dataField="DESG_NAME" caption="Designation"></dxi-column>
-     
+
       <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
-    
 
       <dxi-column
         dataField="DAMAN_CATEGORY"
@@ -211,14 +202,3 @@
     (formClosed)="handleEditClose()"
   ></app-employee-edit-form>
 </dx-popup>
-<dx-load-panel
-  [visible]="isLoading"
-  [showPane]="true"
-  [showIndicator]="true"
-  shadingColor="rgba(0,0,0,0.4)"
-  [closeOnOutsideClick]="false"
-  message="Loading ..."
-  [width]="250"
-  [height]="90"
->
-</dx-load-panel>

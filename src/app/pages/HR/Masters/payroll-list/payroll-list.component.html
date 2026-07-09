@@ -220,7 +220,11 @@
         }"
       >
       </dxi-column> -->
-      <dxi-column dataField="STATUS" cellTemplate="statusCellRender">
+      <dxi-column
+        dataField="STATUS"
+        caption="Status"
+        cellTemplate="statusCellRender"
+      >
       </dxi-column>
 
       <div *dxTemplate="let data of 'statusCellRender'">

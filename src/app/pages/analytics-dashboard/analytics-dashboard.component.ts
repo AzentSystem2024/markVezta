@@ -133,6 +133,8 @@ export class AnalyticsDashboardComponent implements OnInit {
   popupVisible: boolean = false
   buttonText: any
   storeinfo: any = [];
+  profitAndLoss_List: any = {}
+  seriesList_profitAndLoss: any[] = [];
   constructor(private service: DataService) {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
     console.log(sessionData)
@@ -432,7 +434,48 @@ export class AnalyticsDashboardComponent implements OnInit {
           return obj;
         });
 
-        console.log(this.storeinfo, '==========chart-ready data===========');
+        const revenue = res.data.ProfitLoss.Revenue || [];
+        const expense = res.data.ProfitLoss.Expense || [];
+
+        // Create two rows: Revenue and Expense
+        const revenueRow: any = {
+          TYPE: 'Revenue'
+        };
+
+        const expenseRow: any = {
+          TYPE: 'Expense'
+        };
+
+        // Fill Revenue
+        revenue.forEach((item: any) => {
+          revenueRow[item.STORE] = Number(item.REVENUE) || 0;
+        });
+
+        // Fill Expense
+        expense.forEach((item: any) => {
+          expenseRow[item.STORE] = Number(item.EXPENSE) || 0;
+        });
+
+        // Chart data
+        this.chartData = [revenueRow, expenseRow];
+
+        // Series (one per store)
+        const stores = new Set<string>();
+
+        revenue.forEach((x: any) => stores.add(x.STORE));
+        expense.forEach((x: any) => stores.add(x.STORE));
+
+        this.seriesList_profitAndLoss = Array.from(stores).map(store => ({
+          valueField: store,
+          name: store,
+          type: 'bar'
+        }));
+
+        console.log(this.chartData);
+        console.log(this.seriesList_profitAndLoss);
+
+        console.log(this.chartData);
+        console.log(this.storeinfo, '');
       },
       (error) => {
         clearTimeout(timeoutId);
@@ -848,90 +891,120 @@ ${this.formatAmount(arg.value)}`;
   }
   // customizeText for dxo-label must return a STRING directly
   customizeGrossSalesLabel = (arg: any) => {
-    return this.formatGrossSalesAmount(arg.value);
-  };
-
-  // customizeTooltip for dxo-tooltip correctly returns an OBJECT
-  customizeGrossSalesTooltip = (arg: any) => {
+    console.log(arg,'=================')
     return {
-      text: `${arg.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
-    };
-  };
+      text: `${arg.items.argument}: ${this.formatGrossSalesAmount(arg.value)}`
 
-  formatAmountTender(value: number): string {
-    const absValue = Math.abs(value);
-    if (absValue >= 1_000_000_000) {
-      return (value / 1_000_000_000).toFixed(2) + 'B';
-    } else if (absValue >= 1_000_000) {
-      return (value / 1_000_000).toFixed(2) + 'M';
-    } else if (absValue >= 1_000) {
-      return (value / 1_000).toFixed(2) + 'K';
-    }
-    return value.toFixed(2);
+    };
   }
 
-  // Tooltip - shows exact value only
-  customizeTooltipTender = (pointInfo: any) => {
-    return {
-      text: `${pointInfo.seriesName}: ${this.formatAmountTender(pointInfo.value)}`,
+    // customizeTooltip for dxo-tooltip correctly returns an OBJECT
+    customizeGrossSalesTooltip = (arg: any) => {
+          console.log(arg,'=================')
+
+      return {
+        text: `${arg.items.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
+      };
     };
-  };
 
-  // Data labels on bars - shows exact value only
-  customizeLabelTender = (pointInfo: any) => {
-    return this.formatAmountTender(pointInfo.value);
-  };
-
-
-  //=================
-  customizeTotalLabel = (arg: any) => {
-    const value = arg.value;
-
-    if (value >= 1_000_000_000) {
-      return (value / 1_000_000_000).toFixed(2) + ' B';
-    } else if (value >= 1_000_000) {
-      return (value / 1_000_000).toFixed(2) + ' M';
-    } else if (value >= 1_000) {
-      return (value / 1_000).toFixed(2) + ' K';
+    formatAmountTender(value: number): string {
+      const absValue = Math.abs(value);
+      if (absValue >= 1_000_000_000) {
+        return (value / 1_000_000_000).toFixed(2) + 'B';
+      } else if (absValue >= 1_000_000) {
+        return (value / 1_000_000).toFixed(2) + 'M';
+      } else if (absValue >= 1_000) {
+        return (value / 1_000).toFixed(2) + 'K';
+      }
+      return value.toFixed(2);
     }
 
-    return value.toString();
-  };
-}
+    // Tooltip - shows exact value only
+    customizeTooltipTender = (pointInfo: any) => {
+      return {
+        text: `${pointInfo.seriesName}: ${this.formatAmountTender(pointInfo.value)}`,
+      };
+    };
 
-@NgModule({
-  imports: [
-    DxScrollViewModule,
-    DxDataGridModule,
-    DxBulletModule,
-    DxFunnelModule,
-    DxPieChartModule,
-    DxChartModule,
-    CardAnalyticsModule,
-    ToolbarAnalyticsModule,
-    DxLoadPanelModule,
-    ApplyPipeModule,
-    ConversionCardModule,
-    RevenueAnalysisCardModule,
-    RevenueCardModule,
-    RevenueSnapshotCardModule,
-    OpportunitiesTickerModule,
-    RevenueTotalTickerModule,
-    ConversionTickerModule,
-    LeadsTickerModule,
-    CommonModule,
-    DxSelectBoxModule,
-    DxValidationGroupModule,
-    DxValidatorModule,
-    DxDateBoxModule,
-    DxLoadPanelModule,
-    CustomDatePopupModule,
-    DxPopupModule,
+    // Data labels on bars - shows exact value only
+    customizeLabelTender = (pointInfo: any) => {
+      return this.formatAmountTender(pointInfo.value);
+    };
 
-  ],
-  providers: [],
-  exports: [],
-  declarations: [AnalyticsDashboardComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-})
-export class AnalyticsDashboardModule { }
+
+    //=================
+    customizeTotalLabel = (arg: any) => {
+      const value = arg.value;
+
+      if (value >= 1_000_000_000) {
+        return (value / 1_000_000_000).toFixed(2) + ' B';
+      } else if (value >= 1_000_000) {
+        return (value / 1_000_000).toFixed(2) + ' M';
+      } else if (value >= 1_000) {
+        return (value / 1_000).toFixed(2) + ' K';
+      }
+
+      return value.toString();
+    };
+
+    customizeCommonLabelProfitandLoss = (arg: any) => {
+      return new Intl.NumberFormat('en', {
+        notation: 'compact',
+        maximumFractionDigits: 1
+      }).format(arg.value);
+    };
+    customizeProfitandLoss = (arg: any) => {
+      return new Intl.NumberFormat('en-IN', {
+        notation: 'compact',
+        maximumFractionDigits: 1
+      }).format(arg.value);
+    };
+    customizeProfitAndLossTooltip = (arg: any) => {
+      return {
+        text: `${arg.seriesName}\n${arg.argumentText}\n${new Intl.NumberFormat(
+          'en-IN',
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }
+        ).format(arg.value)}`
+      };
+    };
+  }
+
+  @NgModule({
+    imports: [
+      DxScrollViewModule,
+      DxDataGridModule,
+      DxBulletModule,
+      DxFunnelModule,
+      DxPieChartModule,
+      DxChartModule,
+      CardAnalyticsModule,
+      ToolbarAnalyticsModule,
+      DxLoadPanelModule,
+      ApplyPipeModule,
+      ConversionCardModule,
+      RevenueAnalysisCardModule,
+      RevenueCardModule,
+      RevenueSnapshotCardModule,
+      OpportunitiesTickerModule,
+      RevenueTotalTickerModule,
+      ConversionTickerModule,
+      LeadsTickerModule,
+      CommonModule,
+      DxSelectBoxModule,
+      DxValidationGroupModule,
+      DxValidatorModule,
+      DxDateBoxModule,
+      DxLoadPanelModule,
+      CustomDatePopupModule,
+      DxPopupModule,
+
+    ],
+    providers: [],
+    exports: [],
+    declarations: [AnalyticsDashboardComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  })
+  export class AnalyticsDashboardModule { }
