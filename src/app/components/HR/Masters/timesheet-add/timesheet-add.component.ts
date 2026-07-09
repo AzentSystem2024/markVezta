@@ -247,58 +247,133 @@ export class TimesheetAddComponent {
   }
   onEditorPreparingTImesheetdetails(e: any) {
     if (
-      e.dataField === 'DEPT_ID' ||
-      e.dataField === 'DAYS' ||
-      e.dataField === 'NORMAL_OT' ||
-      e.dataField === 'HOLIDAY_OT' ||
-      e.dataField === 'STORE_ID'
+      e.parentType !== 'dataRow' ||
+      !['STORE_ID', 'DEPT_ID', 'DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(
+        e.dataField,
+      )
     ) {
-      e.editorOptions = e.editorOptions || {};
+      return;
+    }
 
-      e.editorOptions.elementAttr = {
-        style: `
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
-      `,
-      };
+    e.editorOptions = e.editorOptions || {};
 
-      e.editorOptions.inputAttr = {
-        style: `
-        height: 100%;
-        padding: 0 4px;
-        box-sizing: border-box;
-      `,
-      };
+    e.editorOptions.elementAttr = {
+      style: `
+      height:100%;
+      margin:0;
+      padding:0;
+      display:flex;
+      align-items:center;
+    `,
+    };
 
-      if (e.editorName === 'dxNumberBox') {
-        e.editorOptions.showSpinButtons = false;
+    e.editorOptions.inputAttr = {
+      style: `
+      height:100%;
+      padding:0 4px;
+      box-sizing:border-box;
+    `,
+    };
+
+    if (e.editorName === 'dxNumberBox') {
+      e.editorOptions.showSpinButtons = false;
+    }
+
+    if (e.editorName === 'dxSelectBox') {
+      e.editorOptions.openOnFieldClick = true;
+    }
+
+    e.editorOptions.onKeyDown = (args: any) => {
+      if (args.event.key !== 'Enter') {
+        return;
       }
 
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.dataGrid?.instance;
-          const visibleRows = grid.getVisibleRows();
+      args.event.preventDefault();
 
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
+      const grid = this.dataGrid.instance;
+      const rowIndex = e.row.rowIndex;
 
-          setTimeout(() => {
-            // existing logic untouched
-          }, 50);
-        }
-      };
-    }
-    if (e.parentType === 'dataRow') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter' && e.dataField === 'HOLIDAY_OT') {
-          this.addNewRow();
-        }
-      };
-    }
+      switch (e.dataField) {
+        //================ STORE =================
+        case 'STORE_ID':
+          if (!args.component.option('opened')) {
+            args.component.open();
+            return;
+          }
+
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'DEPT_ID');
+            }, 50);
+          });
+
+          break;
+
+        //================ DEPARTMENT =================
+        case 'DEPT_ID':
+          if (!args.component.option('opened')) {
+            args.component.open();
+            return;
+          }
+
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'DAYS');
+            }, 50);
+          });
+
+          break;
+
+        //================ WORKED DAYS =================
+        case 'DAYS':
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'NORMAL_OT');
+            }, 50);
+          });
+
+          break;
+
+        //================ OT HOURS =================
+        case 'NORMAL_OT':
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'HOLIDAY_OT');
+            }, 50);
+          });
+
+          break;
+
+        //================ HOLIDAY OT =================
+        case 'HOLIDAY_OT':
+          grid.saveEditData().then(() => {
+            const row = this.timesheetDetails[rowIndex];
+
+            if (!row.STORE_ID || !row.DEPT_ID || !row.DAYS) {
+              notify(
+                {
+                  message: 'Store, Department and Worked Days are mandatory.',
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                },
+                'warning',
+              );
+              return;
+            }
+
+            this.addNewRow();
+
+            setTimeout(() => {
+              const newRowIndex = this.timesheetDetails.length - 1;
+              grid.editCell(newRowIndex, 'STORE_ID');
+            }, 100);
+          });
+
+          break;
+      }
+    };
   }
   addNewRow() {
     this.timesheetDetails.push({
