@@ -209,6 +209,10 @@ export class EmployeeSalarySettingsEditComponent {
 
       this.SalaryDetails = this.salaryGridData.Details || [];
       this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
+    //    this.employeeFormData.PREVIOUS_EFFECT_FROM =
+    // this.salaryGridData.EFFECT_FROM
+    //   ? new Date(this.salaryGridData.EFFECT_FROM)
+    //   : null;
       this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || null;
     });
   }
@@ -273,13 +277,27 @@ export class EmployeeSalarySettingsEditComponent {
   isValid() {
     return this.SalaryHeadValidation?.instance.validate().isValid;
   }
+  stripToDateOnly(date: Date | null): string | null {
+    if (!(date instanceof Date) || isNaN(date.getTime())) return null;
+    const yyyy = date.getFullYear();
+    const mm = date.getMonth() + 1;
+    const dd = date.getDate();
+    return `${yyyy}-${mm.toString().padStart(2, '0')}-${dd.toString().padStart(2, '0')}`;
+  }
 
   saveEmployee() {
     if (!this.isValid()) return;
     const effectFrom = new Date(this.employeeFormData.EFFECT_FROM);
     const previousRevision = new Date(this.PreviousRevision);
 
-    if (effectFrom <= previousRevision) {
+     const effectStr: any = this.stripToDateOnly(effectFrom);
+    const prevStr = this.stripToDateOnly(previousRevision);
+    console.log(effectFrom)
+    console.log(previousRevision)
+    console.log(effectStr)
+    console.log(prevStr)
+
+    if (prevStr && effectStr < prevStr) {
       notify(
         {
           message:
