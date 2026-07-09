@@ -158,12 +158,17 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   COMPANY_ID: any;
   selected_Company_id: any;
   SubDepartmentDataSource: any = null;
+  countryCode: any;
+  CountryId: any;
+  mobile_limit: any;
+  countryCodes: any[] = []
   constructor(
     public dataservice: DataService,
     private sanitizer: DomSanitizer,
   ) {
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
+      this.countryCodes = data;
     });
 
     const payload = {
@@ -215,8 +220,19 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['employeeData'] && changes['employeeData'].currentValue) {
       this.employeeFormData = this.employeeData;
+      this.CountryId = this.employeeFormData.COUNTRY_ID; // Set CountryId from employeeData  
 
-      if (this.employeeFormData.IMAGE_NAME) {
+      const selectedCountry = this.countries.find(
+        (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+      );
+      // 4️ If found, set code & name
+      if (selectedCountry) {
+        this.countryCode = selectedCountry.CODE; // e.g., '+971'
+      } else {
+        // 5️ Fallback if no country found
+        this.countryCode = '';
+        console.warn(' No matching country found for ID:', this.employeeFormData.COUNTRY_ID);
+      } if (this.employeeFormData.IMAGE_NAME) {
         this.imageUrl = `${this.employeeFormData.IMAGE_NAME}`;
       } else {
         this.imageUrl = null;
@@ -251,7 +267,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     this.salaryHead = [...updatedSalaryHead]; // New reference for DevExtreme
   }
 
-  logGridData(e: any) {}
+  logGridData(e: any) { }
 
   triggerFileUpload() {
     if (this.fileInput) {
@@ -638,6 +654,35 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     const selected = this.states.find((d: any) => d.ID === e.value);
     this.employeeFormData.STATE_NAME = selected ? selected.DESCRIPTION : '';
   }
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+
+  onCountrySelectionChanged(event: any) {
+    this.CountryId = event.value;
+
+    const selectedCountry = this.countries.find(
+      (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+    );
+    // 4️ If found, set code & name
+    if (selectedCountry) {
+      this.countryCode = selectedCountry.CODE; // e.g., '+971'
+    } else {
+      // 5️ Fallback if no country found
+      this.countryCode = '';
+      console.warn(' No matching country found for ID:', this.employeeFormData.COUNTRY_ID);
+    }
+  }
 }
 
 @NgModule({
@@ -676,4 +721,4 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   exports: [EmployeeEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeEditFormFormModule {}
+export class EmployeeEditFormFormModule { }

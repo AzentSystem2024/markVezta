@@ -133,6 +133,7 @@
                   [searchEnabled]="true"
                   [(value)]="employeeFormData.COUNTRY_ID"
                   placeholder="Select Country"
+                  (onValueChanged)="onCountrySelectionChanged($event)"
                 >
                   <!-- Selected field display -->
                   <div *dxTemplate="let data of 'field'">
@@ -278,13 +279,44 @@
         </div>
 
         <div>
-          <dx-text-box
-            [(value)]="employeeFormData.MOBILE"
-            [placeholder]="'Enter Mobile'"
-            label="Mobile"
-            [labelMode]="'floating'"
-            (input)="validateMobile($event)"
-          ></dx-text-box>
+          <div style="display: flex">
+            <dx-select-box
+              label="Country code *"
+              [searchEnabled]="true"
+              labelMode="floating"
+              [(value)]="countryCode"
+              [items]="countryCodes"
+              valueExpr="CODE"
+              [displayExpr]="countryDisplay"
+              placeholder="+1"
+              [dropDownOptions]="{ width: '370px' }"
+              hint="Country Code"
+              (onValueChanged)="onCountrycodeChange($event)"
+              style="width: 100px"
+            >
+              <div *dxTemplate="let data of 'item'">
+                <img
+                  [src]="data.FLAG_URL"
+                  width="20"
+                  style="margin-right: 8px"
+                />
+                {{ data.CODE }} {{ data.COUNTRY_NAME }}
+              </div>
+              <!-- <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Country code is required"
+                ></dxi-validation-rule>
+              </dx-validator> -->
+            </dx-select-box>
+            <dx-text-box
+              [(value)]="employeeFormData.MOBILE"
+              [placeholder]="'Enter Mobile'"
+              label="Mobile"
+              [labelMode]="'floating'"
+              (input)="validateMobile($event)"
+            ></dx-text-box>
+          </div>
           <div *ngIf="mobileError" class="error-message">{{ mobileError }}</div>
         </div>
 
