@@ -148,10 +148,7 @@
         <div class="chart-wrapper">
           <dx-chart
             [dataSource]="chartData"
-            palette="Soft Pastel"
-            [size]="{
-              height: 400,
-            }"
+            [series]="seriesList_profitAndLoss"
           >
             <dxo-common-series-settings
               argumentField="STORE_NAME"
@@ -161,34 +158,29 @@
             >
               <dxo-label
                 [visible]="true"
-                position="outside"
-                [customizeText]="customizeCommonLabelTender"
+                position="inside"
+                [customizeText]="customizeCommonLabelProfitandLoss"
               >
               </dxo-label>
-              <dxo-value-axis>
-                <dxo-label
-                  [customizeText]="customizeTenderAxisLabel"
-                ></dxo-label>
-              </dxo-value-axis>
+            </dxo-common-series-settings>
+            <dxo-common-series-settings argumentField="TYPE" type="bar">
             </dxo-common-series-settings>
 
-            <dxi-series
-              *ngFor="let s of seriesList"
-              [valueField]="s.valueField"
-              [name]="s.name"
-              [type]="s.type"
-              [color]="s.color"
-            >
-            </dxi-series>
-
-            <dxo-legend verticalAlignment="bottom" horizontalAlignment="center">
-            </dxo-legend>
+            <dxo-value-axis>
+              <dxo-label [customizeText]="customizeProfitandLoss"> </dxo-label>
+            </dxo-value-axis>
 
             <dxo-tooltip
               [enabled]="true"
-              [customizeTooltip]="customizeCommonTooltip"
+              [customizeTooltip]="customizeProfitAndLossTooltip"
             >
             </dxo-tooltip>
+            <dxo-legend
+              verticalAlignment="top"
+              horizontalAlignment="center"
+              itemTextPosition="right"
+            >
+            </dxo-legend>
           </dx-chart>
         </div>
         <!-- </dx-scroll-view> -->
@@ -200,30 +192,6 @@
 
         <!-- <dx-scroll-view direction="both" showScrollbar="always"> -->
         <div class="chart-wrapper">
-          <!-- <dx-chart id="chart" [dataSource]="storeinfo">
-            <dxi-series
-              *ngFor="let s of seriesList"
-              [valueField]="s.valueField"
-              [name]="s.name"
-              [color]="s.color"
-            >
-            </dxi-series>
-
-            <dxo-common-series-settings
-              argumentField="store"
-              type="fullStackedBar"
-            >
-            </dxo-common-series-settings>
-
-            <dxo-legend
-              verticalAlignment="top"
-              horizontalAlignment="center"
-              itemTextPosition="right"
-            >
-            </dxo-legend>
-            <dxo-tooltip [enabled]="true" [customizeTooltip]="customizeTooltip">
-            </dxo-tooltip>
-          </dx-chart> -->
           <dx-chart id="chart" [dataSource]="storeinfo">
             <dxi-series
               *ngFor="let s of seriesList"

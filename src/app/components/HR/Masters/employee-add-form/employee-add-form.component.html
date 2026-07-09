@@ -140,6 +140,7 @@
                   [searchEnabled]="true"
                   [(value)]="employeeFormData.COUNTRY_ID"
                   placeholder="Select Country"
+                  (onValueChanged)="onCountrySelectionChanged($event)"
                 >
                   <!-- Selected field display -->
                   <div *dxTemplate="let data of 'field'">
@@ -287,15 +288,46 @@
         </div>
 
         <div>
-          <dx-text-box
-            [(value)]="employeeFormData.MOBILE"
-            [placeholder]="'Enter Mobile'"
-            label="Mobile"
-            [labelMode]="'floating'"
-            (input)="validateMobile($event)"
-          ></dx-text-box>
-          <div *ngIf="mobileError" class="error-message">
-            {{ mobileError }}
+          <div style="display: flex">
+            <dx-select-box
+              label="Country code *"
+              [searchEnabled]="true"
+              labelMode="floating"
+              [(value)]="countryCode"
+              [items]="countryCodes"
+              valueExpr="CODE"
+              [displayExpr]="countryDisplay"
+              placeholder="+1"
+              [dropDownOptions]="{ width: '370px' }"
+              hint="Country Code"
+              (onValueChanged)="onCountrycodeChange($event)"
+            >
+              <div *dxTemplate="let data of 'item'">
+                <img
+                  [src]="data.FLAG_URL"
+                  width="20"
+                  style="margin-right: 8px"
+                />
+                {{ data.CODE }} {{ data.COUNTRY_NAME }}
+              </div>
+              <!-- <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Country code is required"
+                ></dxi-validation-rule>
+              </dx-validator> -->
+            </dx-select-box>
+            <dx-text-box
+              [(value)]="employeeFormData.MOBILE"
+              [placeholder]="'Enter Mobile'"
+              label="Mobile"
+              [labelMode]="'floating'"
+              (input)="validateMobile($event)"
+            ></dx-text-box>
+
+            <div *ngIf="mobileError" class="error-message">
+              {{ mobileError }}
+            </div>
           </div>
         </div>
 
@@ -311,118 +343,120 @@
         </div>
       </div>
 
-      <div class="dx-card custom-card-passport">
-        <span>-- Visa Details --</span>
-        <div>
-          <div>
-            <dx-text-box
-              [(value)]="employeeFormData.PP_NO"
-              [placeholder]="'Passport No.'"
-              label="Passport No."
-              labelMode="floating"
-            >
-            </dx-text-box>
+      <div class="container custom-card-bank-details">
+        <div class="left-column">
+          <span class="card-label">-- Visa Details --</span>
+          <div class="four-column-layout">
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.PP_NO"
+                [placeholder]="'Passport No.'"
+                label="Passport No."
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.PP_EXPIRY"
+                [placeholder]="'Passport Expiry'"
+                label="Passport Expiry"
+                labelMode="floating"
+                displayFormat="dd/MM/yyyy"
+              >
+              </dx-date-box>
+            </div>
+
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.VISA_NO"
+                [placeholder]="'Visa No.'"
+                label="Visa No."
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.VISA_EXPIRY"
+                [placeholder]="'Visa Expiry'"
+                label="Visa Expiry"
+                labelMode="floating"
+                displayFormat="dd/MM/yyyy"
+              >
+              </dx-date-box>
+            </div>
           </div>
-          <div>
-            <dx-date-box
-              [(value)]="employeeFormData.PP_EXPIRY"
-              [placeholder]="'Passport Expiry'"
-              label="Passport Expiry"
-              labelMode="floating"
-              displayFormat="dd/MM/yyyy"
-            >
-            </dx-date-box>
+          <div class="four-column-layout">
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.WORK_PERMIT_NO"
+                [placeholder]="'Work Permit ID'"
+                label="Work Permit ID"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.WORK_PERMIT_EXPIRY"
+                [placeholder]="'Work Permit Expiry'"
+                label="Work Permit Expiry"
+                labelMode="floating"
+                displayFormat="dd/MM/yyyy"
+              >
+              </dx-date-box>
+            </div>
+
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.LICENSE_NO"
+                [placeholder]="'Driving License'"
+                label="Driving License"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-date-box
+                [(value)]="employeeFormData.LICENSE_EXPIRY"
+                [placeholder]="'Driving License Expiry'"
+                label="Driving License Expiry"
+                labelMode="floating"
+                displayFormat="dd/MM/yyyy"
+              >
+              </dx-date-box>
+            </div>
           </div>
 
-          <div>
-            <dx-text-box
-              [(value)]="employeeFormData.VISA_NO"
-              [placeholder]="'Visa No.'"
-              label="Visa No."
-              labelMode="floating"
-            >
-            </dx-text-box>
-          </div>
-          <div>
-            <dx-date-box
-              [(value)]="employeeFormData.VISA_EXPIRY"
-              [placeholder]="'Visa Expiry'"
-              label="Visa Expiry"
-              labelMode="floating"
-              displayFormat="dd/MM/yyyy"
-            >
-            </dx-date-box>
-          </div>
-        </div>
-        <div class="four-column-layout">
-          <div>
-            <dx-text-box
-              [(value)]="employeeFormData.WORK_PERMIT_NO"
-              [placeholder]="'Work Permit ID'"
-              label="Work Permit ID"
-              labelMode="floating"
-            >
-            </dx-text-box>
-          </div>
-          <div>
-            <dx-date-box
-              [(value)]="employeeFormData.WORK_PERMIT_EXPIRY"
-              [placeholder]="'Work Permit Expiry'"
-              label="Work Permit Expiry"
-              labelMode="floating"
-              displayFormat="dd/MM/yyyy"
-            >
-            </dx-date-box>
-          </div>
-
-          <div>
-            <dx-text-box
-              [(value)]="employeeFormData.LICENSE_NO"
-              [placeholder]="'Driving License'"
-              label="Driving License"
-              labelMode="floating"
-            >
-            </dx-text-box>
-          </div>
-          <div>
-            <dx-date-box
-              [(value)]="employeeFormData.LICENSE_EXPIRY"
-              [placeholder]="'Driving License Expiry'"
-              label="Driving License Expiry"
-              labelMode="floating"
-              displayFormat="dd/MM/yyyy"
-            >
-            </dx-date-box>
-          </div>
-        </div>
-
-        <div class="four-column-layout">
-          <div>
-            <dx-text-box
-              [(value)]="employeeFormData.DAMAN_NO"
-              [placeholder]="'Daman Card No'"
-              label="Daman Card No"
-              labelMode="floating"
-            >
-            </dx-text-box>
-          </div>
-          <div>
-            <dx-text-box
-              [(value)]="employeeFormData.DAMAN_CATEGORY"
-              [placeholder]="'Category'"
-              label="Category"
-              labelMode="floating"
-            >
-            </dx-text-box>
-          </div>
-          <div>
-            <dx-text-box
-              [(value)]="employeeFormData.MOL_NUMBER"
-              [placeholder]="'MOL Number'"
-              label="MOL Number"
-              labelMode="floating"
-            >
-            </dx-text-box>
+          <div class="four-column-layout">
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.DAMAN_NO"
+                [placeholder]="'Daman Card No'"
+                label="Daman Card No"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.DAMAN_CATEGORY"
+                [placeholder]="'Category'"
+                label="Category"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
+            <div>
+              <dx-text-box
+                [(value)]="employeeFormData.MOL_NUMBER"
+                [placeholder]="'MOL Number'"
+                label="MOL Number"
+                labelMode="floating"
+              >
+              </dx-text-box>
+            </div>
           </div>
         </div>
       </div>

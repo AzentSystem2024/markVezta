@@ -136,8 +136,8 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   IsAttachmentPopupVisible: boolean = false;
-  showPopup: boolean = false; 
-  uploadedFileName: string = ''; 
+  showPopup: boolean = false;
+  uploadedFileName: string = '';
   fileDetails: { file: File | null; remarks: string } = {
     file: null,
     remarks: '',
@@ -155,6 +155,10 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   COMPANY_ID: any;
   selected_Company_id: any;
   SubDepartmentDataSource: any = null;
+  mobile_limit: any;
+  countryCodes: any = []
+  countryCode: any
+  CountryId: any;
 
   constructor(public dataservice: DataService) {
     const savedUserData = sessionStorage.getItem('savedUserData');
@@ -166,6 +170,8 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
 
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
+      this.countryCodes = data;
+
     });
     const dept_payload = {
       NAME: 'DEPT',
@@ -356,7 +362,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   onDepartmentChange(e: any) {
-    const selectedDept = this.departments.find((dept:any) => dept.ID === e.value);
+    const selectedDept = this.departments.find((dept: any) => dept.ID === e.value);
     this.employeeFormData.DEPT_NAME = selectedDept
       ? selectedDept.DESCRIPTION
       : '';
@@ -370,12 +376,12 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   onDesignationChange(e: any) {
-    const selected = this.designations.find((d:any) => d.ID === e.value);
+    const selected = this.designations.find((d: any) => d.ID === e.value);
     this.employeeFormData.DESG_NAME = selected ? selected.DESCRIPTION : '';
   }
 
   onStateChange(e: any) {
-    const selected = this.states.find((d:any) => d.ID === e.value);
+    const selected = this.states.find((d: any) => d.ID === e.value);
     this.employeeFormData.STATE_NAME = selected ? selected.DESCRIPTION : '';
   }
 
@@ -386,7 +392,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
 
     if (headId !== undefined && amount !== undefined) {
       const existingIndex = this.employeeFormData.EmployeeSalary.findIndex(
-        (item:any) => item.HEAD_ID === headId,
+        (item: any) => item.HEAD_ID === headId,
       );
 
       if (existingIndex > -1) {
@@ -415,7 +421,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     const enteredEmpCode = this.employeeFormData.EMP_CODE?.trim().toUpperCase();
 
     const isDuplicate = this.employeeList.some(
-      (emp:any) =>
+      (emp: any) =>
         emp.EMP_CODE?.trim().toUpperCase() === enteredEmpCode &&
         (!this.employeeFormData.EMP_ID ||
           emp.EMP_ID !== this.employeeFormData.EMP_ID),
@@ -476,6 +482,41 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   cancel() {
     this.formClosed.emit(true);
   }
+
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+
+  onCountrySelectionChanged(event: any) {
+    this.CountryId = event.value;
+    // const selectedCountry = this.CountryDropdownData.find(country => country.ID === event.value);
+    // if (selectedCountry) {
+    //   this.countryCode = selectedCountry.CODE;
+    // }
+    // this.get_Country_Dropdown_List();
+
+    const selectedCountry = this.countries.find(
+      (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+    );
+    // 4️ If found, set code & name
+    if (selectedCountry) {
+      this.countryCode = selectedCountry.CODE; // e.g., '+971'
+    } else {
+      // 5️ Fallback if no country found
+      this.countryCode = '';
+      console.warn(' No matching country found for ID:', this.employeeFormData.COUNTRY_ID);
+    }
+  }
 }
 
 @NgModule({
@@ -515,4 +556,4 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   exports: [EmployeeAddFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeAddFormModule {}
+export class EmployeeAddFormModule { }

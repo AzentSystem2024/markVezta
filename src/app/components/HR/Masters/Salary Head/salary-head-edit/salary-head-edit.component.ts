@@ -169,7 +169,17 @@ export class SalaryHeadEditComponent {
     // If "Advance" is selected
     if (this.selectedPriority?.id === 3 || this.selectedPriority === 3) {
       this.selectedType = 'others'; // auto select "Others"
+      this.SalaryHeadData.FIXED_AMOUNT = 0
+      this.SalaryHeadData.RANGE_EXISTS = false;
+      this.SalaryHeadData.RANGE_TO = 0;
+      this.SalaryHeadData.RANGE_FROM = 0;
+      this.SalaryHeadData.AFFECT_LEAVE = false
+      this.selectedRows = []
+      this.SalaryHeadData.HEAD_PERCENT = 0
       this.onTypeChange(); // trigger your type change logic
+    } else if (this.HeadType_value == 1 || this.HeadType_value == 2) {
+      this.SalaryHeadData.INSTALLMENT_RECOVERY = false;
+
     }
   }
 
@@ -195,6 +205,10 @@ export class SalaryHeadEditComponent {
       this.head_To = true;
       this.ApplicableWithBasicRange = true;
       this.ApplicableWorkingDay = false;
+      this.SalaryHeadData.RANGE_EXISTS = false;
+      this.SalaryHeadData.RANGE_TO = 0;
+      this.SalaryHeadData.RANGE_FROM = 0;
+      this.selectedRows = []
     } else if (this.selectedNatureId === 2) {
       this.selecteNatureTypeTwo = true;
       this.head_percent = false;
@@ -203,6 +217,8 @@ export class SalaryHeadEditComponent {
       this.ApplicableWorkingDay = true;
       this.selecteNatureTypeone = true;
       this.ApplicableWithBasicRange = false;
+      this.SalaryHeadData.FIXED_AMOUNT = 0
+      this.SalaryHeadData.AFFECT_LEAVE = false
     } else if (this.selectedNatureId === 3) {
       this.head_percent = true;
       this.head_From = true;
@@ -211,6 +227,12 @@ export class SalaryHeadEditComponent {
       this.ApplicableWorkingDay = true;
       this.selecteNatureTypeone = true;
       this.selecteNatureTypeTwo = true;
+      this.SalaryHeadData.FIXED_AMOUNT = 0
+      this.SalaryHeadData.RANGE_EXISTS = false;
+      this.SalaryHeadData.RANGE_TO = 0;
+      this.SalaryHeadData.RANGE_FROM = 0;
+      this.SalaryHeadData.AFFECT_LEAVE = false
+      this.selectedRows = []
     }
 
     // if(this.selectedNatureId==1){
@@ -270,7 +292,7 @@ export class SalaryHeadEditComponent {
       const isDuplicate = this.salaryHeadList.some(
         (head: any) =>
           head.HEAD_NAME.trim().toLowerCase() ===
-            this.SalaryHeadData.HEAD_NAME.trim().toLowerCase() &&
+          this.SalaryHeadData.HEAD_NAME.trim().toLowerCase() &&
           head.ID !== this.SalaryHeadData.ID,
       );
 
@@ -314,7 +336,7 @@ export class SalaryHeadEditComponent {
 
     this.is_time_entry = e.value === 2;
   }
-  onChangeAc_head(e: any) {}
+  onChangeAc_head(e: any) { }
 }
 
 @NgModule({
@@ -352,4 +374,4 @@ export class SalaryHeadEditComponent {
   exports: [SalaryHeadEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalaryHeadEditModule {}
+export class SalaryHeadEditModule { }

@@ -98,9 +98,8 @@
         style="margin-left: 27px"
       ></dx-check-box>
     </div>
-    <div>
+    <div *ngIf="!isEnabled">
       <dx-check-box
-        [disabled]="isEnabled"
         [(value)]="SalaryHeadData.INSTALLMENT_RECOVERY"
         text="Recovery will be in installments (will not allow more than one active advance at a time) "
       ></dx-check-box>
@@ -148,6 +147,10 @@
             [(value)]="SalaryHeadData.FIXED_AMOUNT"
             [width]="150"
             [inputAttr]="{ style: 'text-align: right' }"
+            [format]="{
+              type: 'fixedPoint',
+              precision: 2,
+            }"
           ></dx-number-box>
           <!-- [format]="{
     type: 'fixedPoint',
