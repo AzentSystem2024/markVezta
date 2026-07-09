@@ -154,7 +154,7 @@
           [autoNavigateToFocusedRow]="false"
           [editing]="{
             mode: 'cell',
-            allowUpdating: timesheetFormData.STATUS !== 'Approved',
+            allowUpdating: !is_approve,
           }"
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
           (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
@@ -270,7 +270,7 @@
           [autoNavigateToFocusedRow]="false"
           [editing]="{
             mode: 'cell',
-            allowUpdating: timesheetFormData.STATUS !== 'Approved',
+            allowUpdating: !is_approve,
           }"
           (onRowUpdated)="onSalaryHeadUpdated($event)"
         >
@@ -336,9 +336,28 @@
 <div class="fixed-footer">
   <dx-button text="Cancel" (onClick)="handleClose()" class="ml-2"></dx-button>
   <dx-button
+    text="Verify"
+    type="default"
+    (onClick)="verifyTimesheet()"
+    [visible]="is_verify"
+  ></dx-button>
+
+  <dx-button
+    text="Update"
+    type="default"
+    (onClick)="updateTimesheet()"
+    [visible]="!is_verify && !is_approved"
+  ></dx-button>
+  <dx-button
+    text="Approve"
+    type="default"
+    (onClick)="approveTimesheet()"
+    [visible]="is_approved"
+  ></dx-button>
+  <!-- <dx-button
     text="Update"
     type="default"
     (onClick)="updateTimesheet()"
     [visible]="!is_approve"
-  ></dx-button>
+  ></dx-button> -->
 </div>

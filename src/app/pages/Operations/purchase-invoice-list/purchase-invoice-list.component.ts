@@ -83,7 +83,7 @@ export class PurchaseInvoiceListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  buttonText: any
+  buttonText: any;
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -148,7 +148,7 @@ export class PurchaseInvoiceListComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -624,6 +624,24 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
+  summaryColumnsData = {
+    totalItems: [
+      {
+        column: 'NET_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'NET_AMOUNT',
+        alignment: 'right',
+      },
+    ],
+    calculateCustomSummary: (options) => {
+      if (options.name === 'summaryRow') {
+        // Custom logic if needed
+      }
+    },
+  };
+
   // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
     console.log(e, 'event--------------');
@@ -638,23 +656,18 @@ export class PurchaseInvoiceListComponent {
       console.log(res);
       this.selectedInvoice = res.Data;
       console.log(this.selectedInvoice, '==============select data====verify');
-      if (this.selectedInvoice.STATUS == "Approved") {
-        this.buttonText = 'View Purchase  Invoice'
-      } else if (this.selectedInvoice.STATUS == "Open") {
-        this.buttonText = 'Verify Purchase  Invoice'
-      } else if (this.selectedInvoice.STATUS == "Verified") {
-        this.buttonText = 'Approve Purchase  Invoice'
-
+      if (this.selectedInvoice.STATUS == 'Approved') {
+        this.buttonText = 'View Purchase  Invoice';
+      } else if (this.selectedInvoice.STATUS == 'Open') {
+        this.buttonText = 'Verify Purchase  Invoice';
+      } else if (this.selectedInvoice.STATUS == 'Verified') {
+        this.buttonText = 'Approve Purchase  Invoice';
       } else {
-        this.buttonText = 'Purchase Invoice'
-
+        this.buttonText = 'Purchase Invoice';
       }
       // this.get_employes_details_value_select();
       this.isEditInvoiceReadOnly = transStatus === 'Approved';
       this.isVerifyInvoice = true;
-
-
-
     });
   }
 
@@ -801,4 +814,4 @@ export class PurchaseInvoiceListComponent {
   exports: [PurchaseInvoiceListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseInvoiceListModule { }
+export class PurchaseInvoiceListModule {}

@@ -70,6 +70,7 @@
                       [width]="410"
                       label="Salesman"
                       labelMode="floating"
+                      [readOnly]="isReadOnlyMode"
                     >
                     </dx-select-box>
 
@@ -97,6 +98,7 @@
                     [width]="375"
                     label="Customer *"
                     labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
                     (onValueChanged)="customerChanged($event)"
                   >
                   </dx-select-box>
@@ -109,6 +111,7 @@
                     icon="event"
                     stylingMode="outlined"
                     class="blue-outline-btn"
+                    [disabled]="isReadOnlyMode"
                     (onClick)="addSalesOrder()"
                     [width]="375"
                   ></dx-button>
@@ -166,7 +169,7 @@
           <dxi-column
             dataField="DELIVERED_QUANTITY"
             caption="Delivered Quantity"
-            [allowEditing]="true"
+            [allowEditing]="!isReadOnlyMode"
             alignment="right"
             [validationRules]="[
               { type: 'required', message: 'Quantity is required' },
@@ -212,7 +215,7 @@
               label="Contact Name"
               labelMode="floating"
               [width]="410"
-              [readOnly]="false"
+              [readOnly]="isReadOnlyMode"
               style="margin-top: 10px"
             ></dx-text-box>
             <div style="flex: 1">
@@ -221,7 +224,7 @@
                 label="Fax"
                 labelMode="floating"
                 [width]="410"
-                [readOnly]="false"
+                [readOnly]="isReadOnlyMode"
               ></dx-text-box>
             </div>
           </div>
@@ -242,14 +245,14 @@
                 [(value)]="deliveryFormData.CONTACT_PHONE"
                 label="Phone"
                 labelMode="floating"
-                [readOnly]="false"
+                [readOnly]="isReadOnlyMode"
               ></dx-text-box>
 
               <dx-text-box
                 [(value)]="deliveryFormData.CONTACT_MOBILE"
                 label="Mobile"
                 labelMode="floating"
-                [readOnly]="false"
+                [readOnly]="isReadOnlyMode"
               >
               </dx-text-box>
             </div>

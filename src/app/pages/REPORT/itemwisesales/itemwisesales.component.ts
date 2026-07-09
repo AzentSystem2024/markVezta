@@ -516,6 +516,15 @@ this.selectedmonth = currentMonth;
 
   summaryColumnsData = {
     totalItems: [
+      {
+        name: 'totalDr',
+        column: 'QUANTITY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'QUANTITY',
+        alignment: 'right',
+      },
        {
         name: 'totalDr',
         column: 'GROSS_AMOUNT',
@@ -545,6 +554,13 @@ this.selectedmonth = currentMonth;
       },
     ],
     groupItems: [
+      {
+        column: 'QUANTITY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
       {
         column: 'GROSS_AMOUNT',
         summaryType: 'sum',

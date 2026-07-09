@@ -1107,6 +1107,11 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/Save`, data);
   }
+
+    saveDeliveryNoteFin(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Delivery_Note/Insert`, data);
+  }
   selectDeliveryNote(id: number) {
     return this.http.post<any>(`${this.apiUrl}Sync/dnselect/` + id, {});
   }
@@ -1118,9 +1123,21 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/Edit`, data);
   }
+    updateDeliveryNoteFin(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Delivery_Note/Update`, data);
+  }
+   verifyDeliveryNoteFin(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Delivery_Note/DNVerify`, data);
+  }
   approveDeliveryNote(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/Commit`, data);
+  }
+   approveDeliveryNoteFin(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Delivery_Note/approve`, data);
   }
   deleteDeliveryNote(id: number) {
     return this.http.post<any>(`${this.apiUrl}Delivery_Note/delete/` + id, {});
@@ -7154,5 +7171,17 @@ The result can be exported to HTML or Markdown.`;
   dashboardMarkData(item: any) {
     const payload = item;
     return this.http.post(`${this.apiUrl}Dashboard/getdashboard`, payload);
+  }
+
+    //-----------------------sales summary report-------------------------
+PurchaseReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'PurchaseReport/PurchaseSummary';
+    return this.http.post(getEndpoint, payload);
+  }
+
+      //-----------------------sales summary report-------------------------
+ ItemwisePurchaseReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'PurchaseReport/itemwisepurchase';
+    return this.http.post(getEndpoint, payload);
   }
 }

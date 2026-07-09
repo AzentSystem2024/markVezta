@@ -56,6 +56,7 @@ export class AppHeaderComponent implements OnInit {
   ];
   company: any;
   version: any;
+  finId: any;
   userInitials = '';
   logoPath: string = '';
 
@@ -93,8 +94,9 @@ export class AppHeaderComponent implements OnInit {
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
-    this.UserName = sessionData.USER_NAME;
-    this.company = sessionData.SELECTED_COMPANY.COMPANY_NAME;
+    this.UserName = sessionData?.USER_NAME;
+    this.company = sessionData?.SELECTED_COMPANY?.COMPANY_NAME;
+    this.finId = sessionData?.FINANCIAL_YEARS?.[0]?.FIN_CODE || '2026';
 
     const initials = this.UserName?.trim()
       .split(/\s+/)

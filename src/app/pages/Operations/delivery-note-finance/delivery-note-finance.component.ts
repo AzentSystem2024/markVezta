@@ -287,7 +287,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     icon.style.color =
       status === 'APPROVED'
         ? '#10B981' // Approved
-        : status === 2
+        : status === 'VERIFIED'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
     icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
@@ -514,13 +514,13 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   }
 
   onVerifyDeliveryNote(event: any) {
-    console.log(event, 'event');
+    console.log(event, 'event=========================');
     const rowData = event.row.data;
-
+    console.log(rowData.STATUS, 'ROWDATAAAAAAAAAAA');
     const invoiceId = rowData.ID;
     const transStatus = rowData.STATUS;
 
-    this.isReadOnlyDelivery = transStatus === 5;
+    this.isReadOnlyDelivery = transStatus === 'APPROVED';
 
     this.dataService
       .selectDeliveryNoteFinance(invoiceId)
@@ -528,12 +528,12 @@ export class DeliveryNoteFinanceComponent implements OnInit {
         this.selectedDelivery = response.Data;
 
         // APPROVED -> OPEN VIEW PAGE
-        if (transStatus === 5) {
+        if (transStatus === 'APPROVED') {
           this.isViewDelivery = true;
         }
 
         // VERIFIED -> OPEN APPROVE PAGE
-        else if (transStatus === 2) {
+        else if (transStatus === 'VERIFIED') {
           this.isApproveDelivery = true;
         }
 

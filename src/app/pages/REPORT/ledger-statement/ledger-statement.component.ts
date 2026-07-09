@@ -185,8 +185,8 @@ export class LedgerStatementComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
-    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+  this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -376,16 +376,19 @@ this.selectedmonth = currentMonth;
   loadLedgerData() {
     const sessiondata = this.getSessionData('viewclickvalue');
     const headid = this.getSessionData('HEADID');
-    this.selectedStoreid = sessiondata.selectedStoreid
+    const storeid = this.getSessionData('STOREID')
+    this.selectedStoreid = storeid ? [storeid] : [];
+    // this.selectedStoreid = sessiondata.selectedStoreid
     const payload = {
       COMPANY_ID: Number(sessiondata.companyId),
       FIN_ID: Number(sessiondata.finId),
       HEAD_ID: headid,
       DATE_FROM: sessiondata.dateFrom,
       DATE_TO: sessiondata.dateTo,
-      STORE_ID: this.selectedStoreid?.length
-        ? this.selectedStoreid.join(',') // FINAL FIX
-        : ''
+      // STORE_ID: this.selectedStoreid?.length
+      //   ? this.selectedStoreid.join(',') // FINAL FIX
+      //   : storeid
+       STORE_ID: String(storeid)
     };
 
     console.log(payload, '=========payload=========');
@@ -394,7 +397,11 @@ this.selectedmonth = currentMonth;
     this.selected_Head_Id = payload.HEAD_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
-    this.selectedStoreid = sessiondata.selectedStoreid || [];
+    
+
+this.selectedStoreid = storeid ? [storeid] : [];
+this.updateStoreHint();
+    // this.selectedStoreid = sessiondata.selectedStoreid || [];
 
 
 
@@ -776,9 +783,15 @@ this.selectedmonth = currentMonth;
       NAME: 'STORE',
       COMPANY_ID: this.selected_Company_id
     }
-    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-      this.Store = res;
-    });
+   this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+  this.Store = res;
+
+   const storeid = Number(sessionStorage.getItem('STOREID'));
+  // this.selectedStoreid = [storeid];
+  this.selectedStoreid = storeid ? [storeid] : [];
+
+  this.updateStoreHint();
+});
   }
 
   // POPUP shown → allow child to render

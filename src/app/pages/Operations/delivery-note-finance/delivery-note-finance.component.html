@@ -188,12 +188,14 @@
           *ngIf="canEdit"
           class="dx-icon dx-icon-edit"
           [style.opacity]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? 'none'
               : 'auto'
           "
@@ -207,12 +209,14 @@
           *ngIf="canDelete"
           class="dx-icon dx-icon-trash"
           [style.opacity]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
+            cellData.data.STATUS === 'VERIFIED' ||
+            cellData.data.STATUS === 'APPROVED'
               ? 'none'
               : 'auto'
           "
@@ -224,8 +228,8 @@
         <!-- Verify -->
         <span
           *ngIf="
-            (cellData.data.TRANS_STATUS === 2 && canApprove) ||
-            (cellData.data.TRANS_STATUS !== 2 && canVerify)
+            (cellData.data.STATUS === 'VERIFIED' && canApprove) ||
+            (cellData.data.STATUS !== 'VERIFIED' && canVerify)
           "
           style="
             position: relative;
@@ -237,9 +241,9 @@
             vertical-align: middle;
           "
           [title]="
-            cellData.data.TRANS_STATUS === 5
+            cellData.data.STATUS === 'APPROVED'
               ? 'Approved'
-              : cellData.data.TRANS_STATUS === 2
+              : cellData.data.STATUS === 'VERIFIED'
                 ? 'Approve'
                 : 'Verify'
           "
@@ -249,9 +253,9 @@
           <i
             class="fas fa-certificate"
             [style.color]="
-              cellData.data.TRANS_STATUS === 5
+              cellData.data.STATUS === 'APPROVED'
                 ? '#10B981'
-                : cellData.data.TRANS_STATUS === 2
+                : cellData.data.STATUS === 'VERIFIED'
                   ? '#0073D8'
                   : '#FFA500'
             "
@@ -297,7 +301,7 @@
   [(visible)]="isAddDelivery"
   [width]="'80vw'"
   [height]="'95vh'"
-  title="Delivery Note"
+  title="Add Delivery Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddDelivery">
@@ -312,7 +316,7 @@
   [(visible)]="isEditDelivery"
   [width]="'80vw'"
   [height]="'90vh'"
-  title="Delivery Note"
+  title="Edit Delivery Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isEditDelivery">
@@ -330,16 +334,56 @@
   [(visible)]="isVerifyDelivery"
   [width]="'95vw'"
   [height]="'100vh'"
-  [title]="
-    selectedDelivery?.TRANS_STATUS === 2 ? 'Approve Invoice' : 'Verify Invoice'
-  "
+  title="Verify Delivery Note"
   (popupClosed)="handleClose()"
 >
   <app-delivery-note-form-finance
     [isEditing]="true"
     [EditingResponseData]="selectedDelivery"
-    [isVerifyMode]="selectedDelivery?.TRANS_STATUS !== 2"
-    [isApproveMode]="selectedDelivery?.TRANS_STATUS === 2"
+    [isVerifyMode]="selectedDelivery?.STATUS !== 'VERIFIED'"
+    [isApproveMode]="selectedDelivery?.STATUS === 'VERIFIED'"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-delivery-note-form-finance>
+</dx-popup>
+
+
+<dx-popup
+  *ngIf="isApproveDelivery"
+  [(visible)]="isApproveDelivery"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="Approve Delivery note"
+  (popupClosed)="handleClose()"
+>
+  <app-delivery-note-form-finance
+    [isEditing]="true"
+    [EditingResponseData]="selectedDelivery"
+    [isVerifyMode]="selectedDelivery?.STATUS !== 'VERIFIED'"
+    [isApproveMode]="selectedDelivery?.STATUS === 'VERIFIED'"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  >
+  </app-delivery-note-form-finance>
+</dx-popup>
+
+<dx-popup
+  *ngIf="isViewDelivery"
+  [(visible)]="isViewDelivery"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  title="View Delivery Note"
+  (onHiding)="handleClose()"
+>
+  <app-delivery-note-form-finance
+    [isEditing]="true"
+    [EditingResponseData]="selectedDelivery"
+    [isReadOnlyMode]="true"
+    [canApprove]="canApprove"
+    (popupClosed)="handleClose()"
+    [isVerifyMode]="selectedDelivery?.STATUS !== 'VERIFIED'"
+    [isApproveMode]="selectedDelivery?.STATUS === 'VERIFIED'"
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
   >

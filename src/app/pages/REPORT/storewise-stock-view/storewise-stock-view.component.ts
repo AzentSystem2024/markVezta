@@ -128,6 +128,10 @@ export class StorewiseStockViewComponent {
     // this.get_DataSource();
   }
 
+  ngOnInit(){
+    this.get_DataSource();
+  }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed

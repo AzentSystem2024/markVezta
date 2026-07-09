@@ -301,11 +301,15 @@ export class AddJournalVoucharComponent {
   }
 
   onRowRemoved(e: any) {
-    const details = this.journalVoucherFormData.DETAILS;
-    if (details.length === 0) {
-      this.onAddRow(); // Auto add a new row
-    }
+    this.journalVoucherFormData.DETAILS =
+      this.itemsGridRef.instance.option('dataSource');
   }
+  // onRowRemoved(e: any) {
+  //   const details = this.journalVoucherFormData.DETAILS;
+  //   if (details.length === 0) {
+  //     this.onAddRow(); // Auto add a new row
+  //   }
+  // }
 
   onAddRow(): void {
     const nextBillNo = this.journalVoucherFormData.DETAILS.length + 1;
@@ -937,7 +941,11 @@ export class AddJournalVoucharComponent {
 
       return;
     }
-
+    console.log(
+      'Grid datasource',
+      this.itemsGridRef.instance.option('dataSource'),
+    );
+    console.log('DETAILS', this.journalVoucherFormData.DETAILS);
     // 🔹 Step 1: Filter out completely empty rows (ignore billNo-only rows)
     const cleanedDetails = this.journalVoucherFormData.DETAILS.filter(
       (item) => {

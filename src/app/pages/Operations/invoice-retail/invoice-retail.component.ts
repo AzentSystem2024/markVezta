@@ -164,6 +164,7 @@ export class InvoiceRetailComponent {
   ) {}
 
   ngOnInit() {
+    console.log('******************');
     const currentUrl = this.router.url;
     //
     const menuResponse = JSON.parse(
@@ -577,6 +578,78 @@ export class InvoiceRetailComponent {
       }
     }
   }
+
+  summaryColumnsData = {
+    totalItems: [
+      {
+        column: 'GROSS_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'GROSS_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        column: 'DISCOUNT_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'DISCOUNT_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        column: 'GST_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'GST_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        column: 'NET_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'NET_AMOUNT',
+        alignment: 'right',
+      },
+    ],
+    groupItems: [
+      {
+        column: 'GROSS_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'DISCOUNT_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'GST_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'NET_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+    ],
+    calculateCustomSummary: (options) => {
+      if (options.name === 'summaryRow') {
+        // Custom logic if needed
+      }
+    },
+  };
 
   onEditInvoice(event: any) {
     event.cancel = true;
