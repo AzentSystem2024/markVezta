@@ -51,6 +51,8 @@ import { Router } from '@angular/router';
 })
 export class TimesheetAddComponent {
   @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+  @ViewChild('salaryGrid')
+  salaryGrid: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() selectedMonth: string;
   @Input() existingTimesheets: any[] = [];
