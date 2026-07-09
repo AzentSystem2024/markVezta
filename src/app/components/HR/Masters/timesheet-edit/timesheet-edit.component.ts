@@ -6,6 +6,7 @@ import {
   NgModule,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -28,6 +29,7 @@ import {
   DxTabPanelModule,
   DxTabsModule,
   DxNumberBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -40,6 +42,7 @@ import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-te
 import { TimesheetAddComponent } from '../timesheet-add/timesheet-add.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-timesheet-edit',
@@ -47,6 +50,7 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./timesheet-edit.component.scss'],
 })
 export class TimesheetEditComponent {
+  @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() timesheet: any;
   @Input() existingTimesheets: any[] = [];
@@ -341,6 +345,41 @@ export class TimesheetEditComponent {
         (item) => item.SALARY_HEAD_ID !== '' && item.AMOUNT !== '',
       );
   }
+
+  buildTimesheetPayload() {
+    const totalworkdays = this.timesheetDetails.reduce(
+      (sum, item) => sum + (Number(item.DAYS) || 0),
+      0,
+    );
+
+    let actualEmpName = '';
+    let actualEmpCode = '';
+
+    const empIdValue = this.timesheetFormData.EMP_ID || this.employeeid;
+
+    const emp = this.employee.find((e: any) => e.ID == empIdValue);
+
+    if (emp) {
+      actualEmpName = emp.DESCRIPTION;
+      actualEmpCode = emp.EMP_NO || '';
+    }
+
+    const formattedDetails = this.timesheetDetails.map((item: any) => ({
+      ...item,
+      ID: item.ID || 0,
+      TS_ID: item.TS_ID || 0,
+    }));
+
+    return {
+      ...this.timesheetFormData,
+      TIMESHEET_DETAIL: formattedDetails,
+      WORKED_DAYS: totalworkdays,
+      COMPANY_ID: this.selected_Company_id,
+      EMP_ID: empIdValue,
+      EMP_CODE: actualEmpCode,
+      EMP_NAME: actualEmpName,
+    };
+  }
   updateTimesheet() {
     if (
       !this.timesheetFormData.TIMESHEET_SALARY ||
@@ -378,23 +417,33 @@ export class TimesheetEditComponent {
     console.log(totalworkdays, '=======totalworkdays===========');
 
     if (Number(this.timesheetFormData.DAYS) == totalworkdays) {
-      const payload = {
-        ...this.timesheetFormData,
-        TIMESHEET_DETAIL: this.timesheetDetails,
-        WORKED_DAYS: totalworkdays,
-        COMPANY_ID: this.selected_Company_id,
-        EMP_ID: this.timesheetFormData.EMP_ID,
-        EMP_CODE: this.timesheetFormData.EMP_CODE,
-        EMP_NAME: this.timesheetFormData.EMP_NAME,
-      };
+      let actualEmpName = '';
+      let actualEmpCode = '';
+      const empIdValue = this.timesheetFormData.EMP_ID || this.employeeid;
+      if (this.employee && this.employee.length) {
+        const emp = this.employee.find((e: any) => e.ID == empIdValue);
+        if (emp) {
+          actualEmpName = emp.DESCRIPTION;
+          actualEmpCode = emp.EMP_NO || '';
+        }
+      }
+
+      const formattedDetails = this.timesheetDetails.map((item: any) => ({
+        ...item,
+        ID: item.ID || 0,
+        TS_ID: item.TS_ID || 0,
+      }));
+
       // const payload = {
       //   ...this.timesheetFormData,
-      //   TIMESHEET_DETAIL: this.timesheetDetails,
+      //   TIMESHEET_DETAIL: formattedDetails,
       //   WORKED_DAYS: totalworkdays,
       //   COMPANY_ID: this.selected_Company_id,
-      //   EMP_ID: this.employeeid,
-      //   EMP_NAME: '',
+      //   EMP_ID: empIdValue,
+      //   EMP_CODE: actualEmpCode,
+      //   EMP_NAME: actualEmpName,
       // };
+      const payload = this.buildTimesheetPayload();
       console.log(this.timesheetList, '=======timesheetList===========');
       console.log(this.employeeid, '=======employeeid===========');
 
@@ -462,20 +511,58 @@ export class TimesheetEditComponent {
   }
 
   verifyTimesheet() {
-    const payload = {
-      IDs: [this.timesheetFormData.ID],
-    };
+    confirm(
+      'Are you sure you want to verify this timesheet?',
+      'Confirm Verification',
+    ).then((result) => {
+      if (!result) {
+        return;
+      }
 
-    this.dataService.verifyTimesheet(payload).subscribe((response: any) => {
-      notify(
-        {
-          message: 'Timesheet Verified Successfully',
-          position: { at: 'top center', my: 'top center' },
-        },
-        'success',
-      );
+      const payload = {
+        IDs: [this.timesheetFormData.ID],
+      };
 
-      this.popupClosed.emit();
+      this.dataService.verifyTimesheet(payload).subscribe((response: any) => {
+        notify(
+          {
+            message: 'Timesheet Verified Successfully',
+            position: { at: 'top center', my: 'top center' },
+          },
+          'success',
+        );
+
+        this.popupClosed.emit();
+      });
+    });
+  }
+
+  approveTimesheet() {
+    confirm(
+      'Are you sure you want to approve this timesheet?',
+      'Confirm Approval',
+    ).then((result) => {
+      if (!result) {
+        return;
+      }
+
+      const payload = {
+        IDs: [this.timesheetFormData.ID],
+      };
+
+      this.dataService
+        .Timesheet_Approval_Api(payload)
+        .subscribe((response: any) => {
+          notify(
+            {
+              message: 'Timesheet Approved Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
+
+          this.popupClosed.emit();
+        });
     });
   }
 
@@ -489,6 +576,52 @@ export class TimesheetEditComponent {
     return enteredDays <= maxDays;
   };
   onEditorPreparingTImesheetdetails(e: any) {
+    if (
+      e.dataField === 'DEPT_ID' ||
+      e.dataField === 'DAYS' ||
+      e.dataField === 'NORMAL_OT' ||
+      e.dataField === 'HOLIDAY_OT' ||
+      e.dataField === 'STORE_ID'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+
+      e.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.dataGrid?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === e.row?.data,
+          );
+
+          setTimeout(() => {
+            // existing logic untouched
+          }, 50);
+        }
+      };
+    }
     if (e.parentType === 'dataRow') {
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key === 'Enter') {

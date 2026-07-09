@@ -364,7 +364,7 @@
 <dx-popup
   [(visible)]="addTimesheetPopupOpened"
   [width]="'95vw'"
-  [height]="'95vh'"
+  [height]="'100vh'"
   title="New Timesheet"
   (onHiding)="handleClose()"
 >
@@ -376,7 +376,13 @@
   ></app-timesheet-add>
 </dx-popup>
 
-<dx-popup [(visible)]="editTimesheetPopupOpened" title="Edit Timesheet">
+<dx-popup
+  [(visible)]="editTimesheetPopupOpened"
+  title="Edit Timesheet"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  (onHiding)="handleClose()"
+>
   <app-timesheet-edit
     *ngIf="editTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
@@ -389,7 +395,13 @@
   </app-timesheet-edit>
 </dx-popup>
 
-<dx-popup [(visible)]="verifyTimesheetPopupOpened" title="Verify Timesheet">
+<dx-popup
+  [(visible)]="verifyTimesheetPopupOpened"
+  title="Verify Timesheet"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  (onHiding)="handleClose()"
+>
   <app-timesheet-edit
     *ngIf="verifyTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
@@ -404,18 +416,29 @@
 <dx-popup
   [(visible)]="approveTimesheetPopupOpened"
   [width]="'95vw'"
-  [height]="'95vh'"
+  [height]="'100vh'"
   title="Approve Timesheet"
   (onHiding)="handleClose()"
 >
-  <app-timesheet-approve
+  <app-timesheet-edit
     *ngIf="approveTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
+    [existingTimesheets]="timesheetList"
+    [isVerifyMode]="false"
+    [isApproveMode]="true"
+    [isReadOnlyMode]="true"
     (popupClosed)="handleClose()"
-  ></app-timesheet-approve>
+  >
+  </app-timesheet-edit>
 </dx-popup>
 
-<dx-popup [(visible)]="viewTimesheetPopupOpened" title="View Timesheet">
+<dx-popup
+  [(visible)]="viewTimesheetPopupOpened"
+  title="View Timesheet"
+  [width]="'95vw'"
+  [height]="'100vh'"
+  (onHiding)="handleClose()"
+>
   <app-timesheet-edit
     *ngIf="viewTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"

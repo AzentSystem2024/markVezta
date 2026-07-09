@@ -294,7 +294,7 @@ export class TimesheetAddComponent {
     }
     if (e.parentType === 'dataRow') {
       e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
+        if (event.event.key === 'Enter' && e.dataField === 'HOLIDAY_OT') {
           this.addNewRow();
         }
       };
