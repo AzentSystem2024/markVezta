@@ -99,6 +99,9 @@ export class TimesheetEditComponent {
   Stores_List: any = [];
   is_verify = false;
   is_approved = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
+  @Input() isReadOnlyMode: boolean = false;
   constructor(private dataService: DataService) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -114,13 +117,10 @@ export class TimesheetEditComponent {
       this.getSalaryHead(existingSalary);
       console.log(this.timesheetFormData);
       // this.is_approve = this.timesheetFormData.STATUS === 'Approved';
-      this.is_verify = this.timesheetFormData.STATUS === 'Open';
-      this.is_approved = this.timesheetFormData.STATUS === 'Approved';
-
-      // Readonly for Verify and Approved
-      this.is_approve =
-        this.timesheetFormData.STATUS === 'Open' ||
-        this.timesheetFormData.STATUS === 'Approved';
+      // this.is_verify = this.timesheetFormData.STATUS === 'Open';
+      this.is_verify = this.isVerifyMode;
+      this.is_approved = this.isApproveMode;
+      this.is_approve = this.isReadOnlyMode || this.isVerifyMode;
       this.timesheetDetails = (
         this.timesheetFormData.TIMESHEET_DETAIL || []
       ).map((detail) => ({
@@ -383,9 +383,18 @@ export class TimesheetEditComponent {
         TIMESHEET_DETAIL: this.timesheetDetails,
         WORKED_DAYS: totalworkdays,
         COMPANY_ID: this.selected_Company_id,
-        EMP_ID: this.employeeid,
-        EMP_NAME: '',
+        EMP_ID: this.timesheetFormData.EMP_ID,
+        EMP_CODE: this.timesheetFormData.EMP_CODE,
+        EMP_NAME: this.timesheetFormData.EMP_NAME,
       };
+      // const payload = {
+      //   ...this.timesheetFormData,
+      //   TIMESHEET_DETAIL: this.timesheetDetails,
+      //   WORKED_DAYS: totalworkdays,
+      //   COMPANY_ID: this.selected_Company_id,
+      //   EMP_ID: this.employeeid,
+      //   EMP_NAME: '',
+      // };
       console.log(this.timesheetList, '=======timesheetList===========');
       console.log(this.employeeid, '=======employeeid===========');
 

@@ -455,19 +455,19 @@ export class TimesheetListComponent {
 
   onEditingStart(e: any) {
     e.cancel = true;
-    console.log(
-      e,
-      '============mingcute:certificate-fill=====================',
-    );
 
-    this.editTimesheetPopupOpened = true;
-
-    // this.editTimesheetPopupOpened = true;
     const timesheetId = e.data.ID;
-    const status = e.data.STATUS;
 
     this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
       this.selectedTimesheet = response;
+
+      // Close other popups
+      this.verifyTimesheetPopupOpened = false;
+      this.approveTimesheetPopupOpened = false;
+      this.viewTimesheetPopupOpened = false;
+
+      // Always open Edit popup
+      this.editTimesheetPopupOpened = true;
     });
   }
 
