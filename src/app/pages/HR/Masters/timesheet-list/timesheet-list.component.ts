@@ -196,7 +196,7 @@ export class TimesheetListComponent {
     private dataService: DataService,
     private zone: NgZone,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -218,7 +218,6 @@ export class TimesheetListComponent {
       this.SessioncanApprove = packingRights.CanApprove;
 
       this.SessioncanVerify = packingRights.CanVerify;
-
     }
     const today = new Date();
     this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
@@ -385,7 +384,7 @@ export class TimesheetListComponent {
   getPayTimeEntries() {
     this.dataService
       .getDropdownData('PAYTIME_ENTRY')
-      .subscribe((res: any) => { });
+      .subscribe((res: any) => {});
   }
 
   goToPreviousMonth() {
@@ -456,7 +455,10 @@ export class TimesheetListComponent {
 
   onEditingStart(e: any) {
     e.cancel = true;
-    console.log(e, '============mingcute:certificate-fill=====================')
+    console.log(
+      e,
+      '============mingcute:certificate-fill=====================',
+    );
 
     this.editTimesheetPopupOpened = true;
 
@@ -468,17 +470,32 @@ export class TimesheetListComponent {
       this.selectedTimesheet = response;
     });
   }
+
+  onVerifyAction(data: any) {
+    const timesheetId = data.ID;
+
+    this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
+      this.selectedTimesheet = response;
+
+      if (data.STATUS === 'Open') {
+        this.verifyTimesheetPopupOpened = true;
+      } else if (data.STATUS === 'Verified') {
+        this.approveTimesheetPopupOpened = true;
+      } else if (data.STATUS === 'Approved') {
+        this.viewTimesheetPopupOpened = true;
+      }
+    });
+  }
   onEditingStartVerify(e: any) {
-    console.log("call this function")
+    console.log('call this function');
     e.cancel = true;
 
     if (e.row?.data?.STATUS == 'Approved') {
-      this.PopupTitle = 'View Timesheet'
+      this.PopupTitle = 'View Timesheet';
       this.viewTimesheetPopupOpened = true;
     } else {
       this.editTimesheetPopupOpened = true;
-      this.PopupTitle = 'Edit Timesheet'
-
+      this.PopupTitle = 'Edit Timesheet';
     }
     // this.editTimesheetPopupOpened = true;
     const timesheetId = e.data.ID;
@@ -563,7 +580,6 @@ export class TimesheetListComponent {
     this.fetchTimesheetList();
   }
 
-
   // onSelectionChanged(e: any) {
 
   //   const selectedRows = e.selectedRowsData;
@@ -619,7 +635,6 @@ export class TimesheetListComponent {
   // }
 
   onSelectionChanged(e: any) {
-
     const selectedRows = e.selectedRowsData;
 
     if (!selectedRows || selectedRows.length === 0) {
@@ -634,20 +649,14 @@ export class TimesheetListComponent {
 
     // Allow only same status rows
     const validRows = selectedRows.filter(
-      (row: any) => row.STATUS === firstStatus
+      (row: any) => row.STATUS === firstStatus,
     );
 
     // Remove mixed status selection
     if (validRows.length !== selectedRows.length) {
+      this.selectedRowKeys = validRows.map((row: any) => row.ID);
 
-      this.selectedRowKeys = validRows.map(
-        (row: any) => row.ID
-      );
-
-      this.dataGrid.instance.selectRows(
-        this.selectedRowKeys,
-        false
-      );
+      this.dataGrid.instance.selectRows(this.selectedRowKeys, false);
     }
 
     // Reset buttons
@@ -655,26 +664,16 @@ export class TimesheetListComponent {
     this.canVerify = false;
 
     // Open -> Verify button only if session verify permission exists
-    if (
-      firstStatus === 'Open' &&
-      this.SessioncanVerify
-    ) {
-
+    if (firstStatus === 'Open' && this.SessioncanVerify) {
       this.canVerify = true;
     }
 
     // Verified -> Approve button only if session approve permission exists
-    if (
-      firstStatus === 'Verified' &&
-      this.SessioncanApprove
-    ) {
-
+    if (firstStatus === 'Verified' && this.SessioncanApprove) {
       this.canApprove = true;
     }
 
-    this.selectedRowKeys = validRows.map(
-      (row: any) => row.ID
-    );
+    this.selectedRowKeys = validRows.map((row: any) => row.ID);
   }
 
   onCellPrepared(e: any) {
@@ -691,7 +690,7 @@ export class TimesheetListComponent {
     }
   }
   statusCellRender(cellElement: any, cellInfo: any) {
-    console.log(cellInfo, '==========cellInfo==============')
+    console.log(cellInfo, '==========cellInfo==============');
     const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
@@ -703,7 +702,12 @@ export class TimesheetListComponent {
         : status === 'Verified'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
+    icon.title =
+      status === 'Approved'
+        ? 'Approved'
+        : status === 'Verified'
+          ? 'Verified'
+          : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -817,20 +821,18 @@ export class TimesheetListComponent {
       IDs: this.selectedRowKeys,
     };
 
-    this.dataService
-      .verifyTimesheet(payload)
-      .subscribe((response: any) => {
-        // this.timesheetList = response;
-        this.selectedRowKeys = []; // Clear selection after success
-        notify(
-          {
-            message: `Verified Successfully`,
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.fetchTimesheetList();
-      });
+    this.dataService.verifyTimesheet(payload).subscribe((response: any) => {
+      // this.timesheetList = response;
+      this.selectedRowKeys = []; // Clear selection after success
+      notify(
+        {
+          message: `Verified Successfully`,
+          position: { at: 'top right', my: 'top right' },
+        },
+        'success',
+      );
+      this.fetchTimesheetList();
+    });
   }
   refreshButtonOptions = {
     icon: 'refresh',
@@ -884,4 +886,4 @@ export class TimesheetListComponent {
   exports: [TimesheetListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetListModule { }
+export class TimesheetListModule {}

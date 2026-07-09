@@ -240,7 +240,11 @@
           style="margin-left: 10px; cursor: default"
         ></i>
       </div> -->
-      <dxi-column dataField="STATUS" cellTemplate="statusCellRender">
+      <dxi-column
+        dataField="STATUS"
+        caption="Status"
+        cellTemplate="statusCellRender"
+      >
       </dxi-column>
 
       <div *dxTemplate="let data of 'statusCellRender'">
@@ -324,7 +328,7 @@
                 ? 'Approve'
                 : 'Verify'
           "
-          (click)="onEditingStart({ data: cellData.data, cancel: false })"
+          (click)="onVerifyAction(cellData.data)"
         >
           <!-- Blue badge -->
           <i
@@ -394,12 +398,12 @@
   title="Verify Timesheet"
   (onHiding)="handleClose()"
 >
-  <app-timesheet-verify
+  <app-timesheet-edit
     *ngIf="verifyTimesheetPopupOpened"
     [timesheet]="selectedTimesheet"
     [existingTimesheets]="timesheetList"
     (popupClosed)="handleClose()"
-  ></app-timesheet-verify>
+  ></app-timesheet-edit>
 </dx-popup>
 
 <dx-popup

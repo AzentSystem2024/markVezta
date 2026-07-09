@@ -50,6 +50,7 @@ import notify from 'devextreme/ui/notify';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-journal-voucher-list',
@@ -65,7 +66,7 @@ export class JournalVoucherListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter:boolean= true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -84,8 +85,8 @@ export class JournalVoucherListComponent {
   canApprove = false;
   canPrint = false;
 
-  startDate: Date= new Date();
-  endDate: Date= new Date();
+  startDate: Date = new Date();
+  endDate: Date = new Date();
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -208,7 +209,9 @@ export class JournalVoucherListComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -403,8 +406,6 @@ export class JournalVoucherListComponent {
 
     cellElement.appendChild(icon);
   }
-
-  
 
   handlePopupShown() {
     setTimeout(() => {
@@ -631,38 +632,86 @@ export class JournalVoucherListComponent {
       notify('This journal voucher cannot be deleted.', 'error', 2000);
       return;
     }
-    const JVId = event.data.TRANS_ID;
+
     event.cancel = true;
 
-    // Call your delete API
-    this.dataService.deleteJournalVoucher(JVId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Journal Voucher Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.getJournalVouchers();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
-    );
+    confirm(
+      'Are you sure you want to delete this journal voucher?',
+      'Confirm Delete',
+    ).then((result) => {
+      if (!result) {
+        return;
+      }
+
+      const JVId = event.data.TRANS_ID;
+
+      this.dataService.deleteJournalVoucher(JVId).subscribe(
+        (response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Journal Voucher Deleted Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.getJournalVouchers();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not deleted',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        },
+        (error) => {
+          console.error('Error deleting journal voucher:', error);
+        },
+      );
+    });
   }
+
+  // onDeleteJournalVoucher(event: any) {
+  //   if (event.data.TRANS_STATUS === 5) {
+  //     event.cancel = true;
+  //     notify('This journal voucher cannot be deleted.', 'error', 2000);
+  //     return;
+  //   }
+  //   const JVId = event.data.TRANS_ID;
+  //   event.cancel = true;
+
+  //   // Call your delete API
+  //   this.dataService.deleteJournalVoucher(JVId).subscribe(
+  //     (response: any) => {
+  //       if (response) {
+  //         notify(
+  //           {
+  //             message: 'Journal Voucher Deleted Successfully',
+  //             position: { at: 'top center', my: 'top center' },
+  //           },
+  //           'success',
+  //         );
+  //         this.getJournalVouchers();
+  //         // this.dataGrid.instance.refresh();
+  //       } else {
+  //         notify(
+  //           {
+  //             message: 'Your Data Not deleted',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'error',
+  //         );
+  //       }
+  //       // or whatever method you use to refresh `employeeList`
+  //     },
+  //     (error) => {
+  //       console.error('Error deleting employee:', error);
+  //     },
+  //   );
+  // }
 
   handleClose() {
     this.isAddJournalVoucher = false;

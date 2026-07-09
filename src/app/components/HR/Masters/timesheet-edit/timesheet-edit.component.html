@@ -336,9 +336,22 @@
 <div class="fixed-footer">
   <dx-button text="Cancel" (onClick)="handleClose()" class="ml-2"></dx-button>
   <dx-button
+    text="Verify"
+    type="default"
+    (onClick)="verifyTimesheet()"
+    [visible]="is_verify"
+  ></dx-button>
+
+  <dx-button
+    text="Update"
+    type="default"
+    (onClick)="updateTimesheet()"
+    [visible]="!is_verify && !is_approved"
+  ></dx-button>
+  <!-- <dx-button
     text="Update"
     type="default"
     (onClick)="updateTimesheet()"
     [visible]="!is_approve"
-  ></dx-button>
+  ></dx-button> -->
 </div>

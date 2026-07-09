@@ -367,21 +367,17 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   }
 
   viewAttachment(file: any) {
-    const fileName = file.FILE_NAME || file.fileName;
+    const fileName = file.fileName;
+    const base64 = file.base64;
 
-    const actualFile = this.employeeFormData.Attachment.find(
-      (f: any) => f.FILE_NAME === fileName,
-    );
-
-    if (!actualFile || !actualFile.FILE_DATA) {
-      console.error('File data not found in employeeFormData.Attachment.');
+    if (!base64) {
+      notify('File data not found.', 'error', 2000);
       return;
     }
 
-    const base64 = actualFile.FILE_DATA;
-    const fileType = this.getFileType(actualFile.FILE_NAME);
+    const fileType = this.getFileType(fileName);
 
-    this.downloadFileName = actualFile.FILE_NAME;
+    this.downloadFileName = fileName;
 
     if (fileType.startsWith('image/')) {
       this.previewUrl = `data:${fileType};base64,${base64}`;
@@ -390,16 +386,52 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
       const byteArray = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
       const blob = new Blob([byteArray], { type: 'application/pdf' });
       const blobUrl = URL.createObjectURL(blob);
+
       this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+
       this.previewType = 'pdf';
     } else {
-      console.warn('Unsupported file type:', fileType);
       this.previewUrl = '';
       this.previewType = 'unsupported';
     }
 
     this.isPreviewVisible = true;
   }
+
+  // viewAttachment(file: any) {
+  //   const fileName = file.FILE_NAME || file.fileName;
+
+  //   const actualFile = this.employeeFormData.Attachment.find(
+  //     (f: any) => f.FILE_NAME === fileName,
+  //   );
+
+  //   if (!actualFile || !actualFile.FILE_DATA) {
+  //     console.error('File data not found in employeeFormData.Attachment.');
+  //     return;
+  //   }
+
+  //   const base64 = actualFile.FILE_DATA;
+  //   const fileType = this.getFileType(actualFile.FILE_NAME);
+
+  //   this.downloadFileName = actualFile.FILE_NAME;
+
+  //   if (fileType.startsWith('image/')) {
+  //     this.previewUrl = `data:${fileType};base64,${base64}`;
+  //     this.previewType = 'image';
+  //   } else if (fileType === 'application/pdf') {
+  //     const byteArray = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  //     const blob = new Blob([byteArray], { type: 'application/pdf' });
+  //     const blobUrl = URL.createObjectURL(blob);
+  //     this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+  //     this.previewType = 'pdf';
+  //   } else {
+  //     console.warn('Unsupported file type:', fileType);
+  //     this.previewUrl = '';
+  //     this.previewType = 'unsupported';
+  //   }
+
+  //   this.isPreviewVisible = true;
+  // }
 
   getFileType(fileName: string): string {
     const ext = fileName.split('.').pop()?.toLowerCase();

@@ -47,7 +47,6 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./timesheet-edit.component.scss'],
 })
 export class TimesheetEditComponent {
-
   @Output() popupClosed = new EventEmitter<void>();
   @Input() timesheet: any;
   @Input() existingTimesheets: any[] = [];
@@ -98,9 +97,12 @@ export class TimesheetEditComponent {
   timesheetList: any = [];
   is_approve: boolean = false;
   Stores_List: any = [];
-  constructor(private dataService: DataService) { }
+  is_verify = false;
+  is_approved = false;
+  constructor(private dataService: DataService) {}
 
   ngOnChanges(changes: SimpleChanges) {
+    console.log('VERIFY');
     if (changes['timesheet'] && changes['timesheet'].currentValue) {
       // Deep copy to avoid reference issues
       this.timesheetFormData = {
@@ -110,8 +112,15 @@ export class TimesheetEditComponent {
 
       const existingSalary = this.timesheetFormData.TIMESHEET_SALARY || [];
       this.getSalaryHead(existingSalary);
-      console.log(this.timesheetFormData)
-      this.is_approve = this.timesheetFormData.STATUS === 'Approved';
+      console.log(this.timesheetFormData);
+      // this.is_approve = this.timesheetFormData.STATUS === 'Approved';
+      this.is_verify = this.timesheetFormData.STATUS === 'Open';
+      this.is_approved = this.timesheetFormData.STATUS === 'Approved';
+
+      // Readonly for Verify and Approved
+      this.is_approve =
+        this.timesheetFormData.STATUS === 'Open' ||
+        this.timesheetFormData.STATUS === 'Approved';
       this.timesheetDetails = (
         this.timesheetFormData.TIMESHEET_DETAIL || []
       ).map((detail) => ({
@@ -443,6 +452,24 @@ export class TimesheetEditComponent {
     }
   }
 
+  verifyTimesheet() {
+    const payload = {
+      IDs: [this.timesheetFormData.ID],
+    };
+
+    this.dataService.verifyTimesheet(payload).subscribe((response: any) => {
+      notify(
+        {
+          message: 'Timesheet Verified Successfully',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'success',
+      );
+
+      this.popupClosed.emit();
+    });
+  }
+
   handleClose() {
     this.popupClosed.emit();
   }
@@ -599,4 +626,4 @@ export class TimesheetEditComponent {
   exports: [TimesheetEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetEditModule { }
+export class TimesheetEditModule {}
