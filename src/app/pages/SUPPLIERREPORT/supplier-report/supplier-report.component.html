@@ -216,8 +216,9 @@
         dataType="number"
       ></dxi-column>
 
-      <dxi-column
-        *ngIf="SupplierReport.length > 0"
+      <!-- <dxi-column
+        /* *ngIf="SupplierReport.length > 0" */
+        *ngIf="hasData"
         type="buttons"
         [width]="100"
       >
@@ -227,7 +228,16 @@
           text="View"
           [onClick]="onViewClick.bind(this)"
         ></dxi-button>
-      </dxi-column>
+      </dxi-column> -->
+
+      <dxi-column type="buttons" [width]="100" *ngIf="hasData">
+  <dxi-button
+    hint="View"
+    icon="eyeopen"
+    text="View"
+    [onClick]="onViewClick.bind(this)">
+  </dxi-button>
+</dxi-column>
     </dx-data-grid>
   </div>
 </div>
