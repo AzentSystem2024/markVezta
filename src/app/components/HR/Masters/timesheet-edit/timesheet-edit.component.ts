@@ -116,7 +116,10 @@ export class TimesheetEditComponent {
         ...this.timesheetFormData,
         ...changes['timesheet'].currentValue,
       };
-
+      console.log(
+        'TIMESHEET_SALARY from select',
+        this.timesheetFormData.TIMESHEET_SALARY,
+      );
       const existingSalary = this.timesheetFormData.TIMESHEET_SALARY || [];
       this.getSalaryHead(existingSalary);
       console.log(this.timesheetFormData);
@@ -254,7 +257,6 @@ export class TimesheetEditComponent {
       }
     });
   }
-  ssss;
 
   getSalaryHead(existingData = []) {
     const payload = {
@@ -264,17 +266,36 @@ export class TimesheetEditComponent {
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.salaryHead = response.data || response;
 
-      // 🔥 merge existing values
-      this.salaryDataSource = this.salaryHead.map((item) => {
-        const existing = existingData.find((x) => x.SALARY_HEAD_ID === item.ID);
+      // ===== DEBUG =====
+      console.log('existingData', existingData);
+      console.log('salaryHead', this.salaryHead);
+
+      this.salaryDataSource = this.salaryHead.map((item: any) => {
+        const existing = existingData.find(
+          (x: any) => Number(x.SALARY_HEAD_ID) === Number(item.ID),
+        );
+
+        console.log(
+          'Matching:',
+          'SalaryHead ID =',
+          item.ID,
+          'Matched =',
+          existing,
+        );
 
         return {
           SALARY_HEAD_ID: item.ID,
-          AMOUNT: existing ? existing.AMOUNT : null, // ✅ preserve amount
+          AMOUNT: existing ? existing.AMOUNT : null,
         };
       });
 
+      console.log('salaryDataSource', this.salaryDataSource);
+
       this.salaryDataSource = [...this.salaryDataSource];
+      setTimeout(() => {
+        this.dataGrid?.instance?.refresh();
+      });
+      console.log('FINAL salaryDataSource', this.salaryDataSource);
     });
   }
   onMonthChanged(event: any) {
@@ -283,6 +304,170 @@ export class TimesheetEditComponent {
     const month = String(this.tsMonthDate.getMonth() + 1).padStart(2, '0');
     this.timesheetFormData.TS_MONTH = `${year}-${month}`;
   }
+
+  onEditorPreparingTImesheetdetails(e: any) {
+    if (
+      e.parentType !== 'dataRow' ||
+      !['STORE_ID', 'DEPT_ID', 'DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(
+        e.dataField,
+      )
+    ) {
+      return;
+    }
+
+    e.editorOptions = e.editorOptions || {};
+
+    e.editorOptions.elementAttr = {
+      style: `
+      height:100%;
+      margin:0;
+      padding:0;
+      display:flex;
+      align-items:center;
+    `,
+    };
+
+    e.editorOptions.inputAttr = {
+      style: `
+      height:100%;
+      padding:0 4px;
+      box-sizing:border-box;
+    `,
+    };
+
+    if (e.editorName === 'dxNumberBox') {
+      e.editorOptions.showSpinButtons = false;
+    }
+
+    if (e.editorName === 'dxSelectBox') {
+      e.editorOptions.openOnFieldClick = true;
+    }
+
+    e.editorOptions.onKeyDown = (args: any) => {
+      if (args.event.key !== 'Enter') {
+        return;
+      }
+
+      args.event.preventDefault();
+
+      // Ensure the newly typed value is committed to the grid cell before moving focus.
+      // Use the raw DOM input value for numeric fields because the DevExtreme component's
+      // internal value state is stale during the 'keydown' event if default is prevented.
+      if (typeof e.setValue === 'function') {
+        if (
+          ['DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(e.dataField) &&
+          args.event &&
+          args.event.target
+        ) {
+          let typedValue = args.event.target.value;
+          if (typedValue !== undefined && typedValue !== '') {
+            e.setValue(Number(typedValue));
+          }
+        } else {
+          // For lookup columns (STORE_ID, DEPT_ID), the component value is correct
+          // and we MUST NOT use the raw input text because it's just the display string.
+          e.setValue(args.component.option('value'));
+        }
+      }
+
+      const grid = this.dataGrid.instance;
+      const rowIndex = e.row.rowIndex;
+
+      switch (e.dataField) {
+        //================ STORE =================
+        case 'STORE_ID':
+          if (!args.component.option('opened')) {
+            args.component.open();
+            return;
+          }
+
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'DEPT_ID');
+            }, 50);
+          });
+
+          break;
+
+        //================ DEPARTMENT =================
+        case 'DEPT_ID':
+          if (!args.component.option('opened')) {
+            args.component.open();
+            return;
+          }
+
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'DAYS');
+            }, 50);
+          });
+
+          break;
+
+        //================ WORKED DAYS =================
+        case 'DAYS':
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'NORMAL_OT');
+            }, 50);
+          });
+
+          break;
+
+        //================ OT HOURS =================
+        case 'NORMAL_OT':
+          grid.saveEditData().then(() => {
+            setTimeout(() => {
+              grid.editCell(rowIndex, 'HOLIDAY_OT');
+            }, 50);
+          });
+
+          break;
+
+        //================ HOLIDAY OT =================
+        case 'HOLIDAY_OT':
+          grid.saveEditData().then(() => {
+            const row = this.timesheetDetails[rowIndex];
+
+            if (!row.STORE_ID || !row.DEPT_ID || !row.DAYS) {
+              notify(
+                {
+                  message: 'Store, Department and Worked Days are mandatory.',
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                },
+                'warning',
+              );
+              return;
+            }
+
+            this.addNewRow();
+
+            setTimeout(() => {
+              const newRowIndex = this.timesheetDetails.length - 1;
+              grid.editCell(newRowIndex, 'STORE_ID');
+            }, 100);
+          });
+
+          break;
+      }
+    };
+  }
+
+  // addNewRow() {
+  //   this.timesheetDetails.push({
+  //     DEPT_ID: null,
+  //     DAYS: 0,
+  //     NORMAL_OT: 0,
+  //     HOLIDAY_OT: 0,
+  //     STORE_ID: 0,
+  //   });
+
+  //   // refresh grid if needed
+  //   this.timesheetDetails = [...this.timesheetDetails];
+  // }
 
   onTimesheetDetailsUpdated(e: any) {
     // this.calculateTotalWorkedDays()
@@ -575,61 +760,61 @@ export class TimesheetEditComponent {
 
     return enteredDays <= maxDays;
   };
-  onEditorPreparingTImesheetdetails(e: any) {
-    if (
-      e.dataField === 'DEPT_ID' ||
-      e.dataField === 'DAYS' ||
-      e.dataField === 'NORMAL_OT' ||
-      e.dataField === 'HOLIDAY_OT' ||
-      e.dataField === 'STORE_ID'
-    ) {
-      e.editorOptions = e.editorOptions || {};
+  // onEditorPreparingTImesheetdetails(e: any) {
+  //   if (
+  //     e.dataField === 'DEPT_ID' ||
+  //     e.dataField === 'DAYS' ||
+  //     e.dataField === 'NORMAL_OT' ||
+  //     e.dataField === 'HOLIDAY_OT' ||
+  //     e.dataField === 'STORE_ID'
+  //   ) {
+  //     e.editorOptions = e.editorOptions || {};
 
-      e.editorOptions.elementAttr = {
-        style: `
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
-      `,
-      };
+  //     e.editorOptions.elementAttr = {
+  //       style: `
+  //       height: 100%;
+  //       margin: 0;
+  //       padding: 0;
+  //       display: flex;
+  //       align-items: center;
+  //     `,
+  //     };
 
-      e.editorOptions.inputAttr = {
-        style: `
-        height: 100%;
-        padding: 0 4px;
-        box-sizing: border-box;
-      `,
-      };
+  //     e.editorOptions.inputAttr = {
+  //       style: `
+  //       height: 100%;
+  //       padding: 0 4px;
+  //       box-sizing: border-box;
+  //     `,
+  //     };
 
-      if (e.editorName === 'dxNumberBox') {
-        e.editorOptions.showSpinButtons = false;
-      }
+  //     if (e.editorName === 'dxNumberBox') {
+  //       e.editorOptions.showSpinButtons = false;
+  //     }
 
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.dataGrid?.instance;
-          const visibleRows = grid.getVisibleRows();
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = this.dataGrid?.instance;
+  //         const visibleRows = grid.getVisibleRows();
 
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
-          );
+  //         const rowIndex = visibleRows.findIndex(
+  //           (r) => r?.data === e.row?.data,
+  //         );
 
-          setTimeout(() => {
-            // existing logic untouched
-          }, 50);
-        }
-      };
-    }
-    if (e.parentType === 'dataRow') {
-      e.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          this.addNewRow();
-        }
-      };
-    }
-  }
+  //         setTimeout(() => {
+  //           // existing logic untouched
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+  //   if (e.parentType === 'dataRow') {
+  //     e.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         this.addNewRow();
+  //       }
+  //     };
+  //   }
+  // }
   addNewRow() {
     this.timesheetDetails.push({
       DEPT_ID: null,
