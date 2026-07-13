@@ -213,39 +213,39 @@ get actionButtonText(): string {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
-  //    convertToISO(dateStr: string): string {
-  //   // dateStr is in "DD/MM/YYYY"
-  //   const [day, month, year] = dateStr.split("/").map(Number);
+     convertToISO(dateStr: string): string {
+    // dateStr is in "DD/MM/YYYY"
+    const [day, month, year] = dateStr.split("/").map(Number);
 
-  //   // Create JS Date (note: month is 0-based)
-  //   const date = new Date(year, month - 1, day +1);
+    // Create JS Date (note: month is 0-based)
+    const date = new Date(year, month - 1, day +1);
 
-  //   return date.toISOString();  // Converts to ISO string
-  // }
-  convertToISO(dateStr: any): string {
-    if (!dateStr) return ''; //  Return empty if missing
-
-    //  If it's already a Date object
-    if (dateStr instanceof Date) {
-      return dateStr.toISOString();
-    }
-
-    //  If it's a string like "DD/MM/YYYY"
-    if (typeof dateStr === 'string' && dateStr.includes('/')) {
-      const [day, month, year] = dateStr.split('/').map(Number);
-      const date = new Date(year, month - 1, day);
-      return date.toISOString();
-    }
-
-    //  If it’s already in ISO or unexpected format, try to parse
-    const parsed = new Date(dateStr);
-    if (!isNaN(parsed.getTime())) {
-      return parsed.toISOString();
-    }
-
-    console.warn(' Unrecognized date format:', dateStr);
-    return '';
+    return date.toISOString();  // Converts to ISO string
   }
+  // convertToISO(dateStr: any): string {
+  //   if (!dateStr) return ''; //  Return empty if missing
+
+  //   //  If it's already a Date object
+  //   if (dateStr instanceof Date) {
+  //     return dateStr.toISOString();
+  //   }
+
+  //   //  If it's a string like "DD/MM/YYYY"
+  //   if (typeof dateStr === 'string' && dateStr.includes('/')) {
+  //     const [day, month, year] = dateStr.split('/').map(Number);
+  //     const date = new Date(year, month - 1, day);
+  //     return date.toISOString();
+  //   }
+
+  //   //  If it’s already in ISO or unexpected format, try to parse
+  //   const parsed = new Date(dateStr);
+  //   if (!isNaN(parsed.getTime())) {
+  //     return parsed.toISOString();
+  //   }
+
+  //   console.warn(' Unrecognized date format:', dateStr);
+  //   return '';
+  // }
 
   updatePeriodTo() {
     if (this.PrePaymentFormData.DATE_FROM) {
@@ -278,7 +278,9 @@ get actionButtonText(): string {
   onCalendarClick() {
     this.showGrid = true;
     this.generateSchedule();
-    this.totalExpense = this.PrePaymentFormData.EXPENSE_AMOUNT || 0; // Copy Amount to Total Expense
+    // this.totalExpense = this.PrePaymentFormData.EXPENSE_AMOUNT || 0; // Copy Amount to Total Expense
+      this.calculateTotalExpense();
+
   }
 
   generateSchedule() {
@@ -300,7 +302,10 @@ get actionButtonText(): string {
       );
     }
     const totalDays = this.daysBetween(startDate, endDateFinal);
+    console.log(totalDays)
+    console.log(this.PrePaymentFormData.EXPENSE_AMOUNT)
     const perDayAmount = this.PrePaymentFormData.EXPENSE_AMOUNT / totalDays;
+    console.log(perDayAmount)
 
     let schedule: any[] = [];
     let current = new Date(startDate);
@@ -329,11 +334,14 @@ get actionButtonText(): string {
       }
 
       const daysInPeriod = this.daysBetween(periodStart, periodEnd);
+      console.log(daysInPeriod)
       const rowAmount = +(perDayAmount * daysInPeriod).toFixed(2);
+      console.log(rowAmount)
 
       schedule.push({
         HEAD_ID: schedule.length + 1,
-        DUE_DATE: periodEnd.toLocaleDateString('en-GB'), // gives dd/MM/yyyy
+        // DUE_DATE: periodEnd.toLocaleDateString('en-GB'), // gives dd/MM/yyyy
+        DUE_DATE: new Date(periodEnd),
         DUE_AMOUNT: rowAmount,
         HEAD_PERCENT: null,
       });
@@ -344,6 +352,8 @@ get actionButtonText(): string {
     }
 
     this.ExpenseAmountDetails = schedule;
+      this.calculateTotalExpense();
+
     this.showGrid = true;
     this.scheduleGenerated = true;
     this.fieldChanged = false;
@@ -364,6 +374,7 @@ get actionButtonText(): string {
     if (column.dataField === 'HEAD_PERCENT') {
       data.HEAD_PERCENT = value;
     }
+     this.calculateTotalExpense();
   }
 
   onSelectionChanged(e: any) {
@@ -495,6 +506,13 @@ get actionButtonText(): string {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
   }
 
+  calculateTotalExpense() {
+  this.totalExpense = (this.ExpenseAmountDetails || []).reduce(
+    (sum: number, item: any) => sum + (Number(item.DUE_AMOUNT) || 0),
+    0
+  );
+}
+
   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes['selectedPrePayment'] &&
@@ -513,7 +531,7 @@ get actionButtonText(): string {
         ...item,
         DUE_DATE: new Date(item.DUE_DATE), // Ensure it's a Date object
       }));
-
+this.calculateTotalExpense();
       this.showGrid = true; // Ensure grid is shown
     }
     console.log(
@@ -523,6 +541,21 @@ get actionButtonText(): string {
   }
 
   savePrePayment() {
+
+    const expenseAmount = Number(this.PrePaymentFormData.EXPENSE_AMOUNT);
+    const totalExpense = Number(this.totalExpense);
+
+     if (expenseAmount !== totalExpense) {
+      notify({
+        message: 'Amount and Total Expense must be the same.',
+        type: 'error',
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 1500,
+      });
+      return;
+    }
+
+
     this.isSaving = true;
     const result = (this.ExpenseAmountDetails || []).map((item) => ({
       DUE_DATE: this.convertToISO(item.DUE_DATE),

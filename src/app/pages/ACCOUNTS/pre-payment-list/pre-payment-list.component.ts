@@ -26,7 +26,7 @@ import {
 import { DxoItemModule } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
-import { PrePaymentAddModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-add/pre-payment-add.component';
+import { PrePaymentAddComponent, PrePaymentAddModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-add/pre-payment-add.component';
 import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
@@ -41,6 +41,8 @@ import { confirm } from 'devextreme/ui/dialog';
 export class PrePaymentListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+  @ViewChild('prePaymentAdd')
+prePaymentAdd!: PrePaymentAddComponent;
 
   PrePaymentListDataSource: any[] = [];
   readonly allowedPageSizes: any = [10, 20, 'all'];
@@ -178,6 +180,7 @@ export class PrePaymentListComponent {
   }
 
   handleClose() {
+    this.prePaymentAdd?.resetPopupForm();
     this.addPrepaymentPopupOpened = false;
     this.editPrePaymentPopupOpened = false;
     this.verifyPrePaymentPopupOpened = false;

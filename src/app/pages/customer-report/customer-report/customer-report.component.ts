@@ -41,6 +41,8 @@ import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
 import { CustomerStatementDetailsModule } from '../../REPORT/customer-statement-details/customer-statement-details.component';
+import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-customer-report',
@@ -48,7 +50,7 @@ import { CustomerStatementDetailsModule } from '../../REPORT/customer-statement-
   styleUrls: ['./customer-report.component.scss'],
 })
 export class CustomerReportComponent {
-  CustomerListDataSource: any[] = [];
+  CustomerListDataSource: any;
   isFilterRowVisible: boolean = false;
   isViewInvoice: boolean = false;
   BalanceSheetReport: any = [];
@@ -231,18 +233,56 @@ this.selectedmonth = currentMonth;
     return `${year}-${month}-${day}`;
   }
 
-  GET_CUSTOMER_LIST() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      CUSTOMER_ID: this.select_customer_id || 0,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
-    };
+  // GET_CUSTOMER_LIST() {
+  //   const payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //     CUSTOMER_ID: this.select_customer_id || 0,
+  //     DATE_FROM: this.formatted_from_date,
+  //     DATE_TO: this.formatted_To_date,
+  //   };
 
-    this.dataservice.customer_report_Api(payload).subscribe((res: any) => {
-      this.CustomerListDataSource = res.Data;
-    });
-  }
+  //   this.dataservice.customer_report_Api(payload).subscribe((res: any) => {
+  //     this.CustomerListDataSource = res.Data;
+  //   });
+  // }
+
+
+  GET_CUSTOMER_LIST() {
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    CUSTOMER_ID: this.select_customer_id || 0,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+  };
+
+  this.CustomerListDataSource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.customer_report_Api(payload).subscribe({
+          next: (res: any) => {
+            const list = res.Data || [];
+
+            resolve(list);
+
+            if (list.length === 0) {
+              notify({
+                message: 'No data available',
+                type: 'warning',
+                displayTime: 2000,
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              });
+            }
+          },
+          error: () => {
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
   onViewClick(e: any) {
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
     const trans_id = e.row.data.TRANS_ID;

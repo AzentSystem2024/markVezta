@@ -388,7 +388,9 @@ export class ListMiscReceiptComponent {
           this.PopupTitle = 'Verify Miscellaneous Receipt'
         }
         // open popup AFTER data arrives
-        this.verifypopup = true;
+       setTimeout(() => {
+  this.verifypopup = true;
+});
 
       },
       error: (err) => {

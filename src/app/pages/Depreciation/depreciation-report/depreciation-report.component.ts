@@ -320,7 +320,7 @@ this.selectedmonth = currentMonth;
   Depreciation_Report() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      DEPARTMENT_ID: this.select_department_id || 0,
+      DEPARTMENT_ID: String(this.select_department_id || 0),
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
     };
