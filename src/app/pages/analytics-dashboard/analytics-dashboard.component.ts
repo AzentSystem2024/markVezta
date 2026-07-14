@@ -98,9 +98,19 @@ export class AnalyticsDashboardComponent implements OnInit {
   customStartDate: any = null;
   isLoading: boolean = true;
   customPalette = [
-    '#F59E0B', '#EC4899', '#0EA5E9',
-    '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
-    '#F97316', '#3B82F6', '#22C55E', '#D946EF', '#06B6D4',
+    '#F59E0B',
+    '#EC4899',
+    '#0EA5E9',
+    '#8B5CF6',
+    '#EF4444',
+    '#14B8A6',
+    '#EAB308',
+    '#64748B',
+    '#F97316',
+    '#3B82F6',
+    '#22C55E',
+    '#D946EF',
+    '#06B6D4',
   ];
   colors: string[] = [
     '#1E3A8A',
@@ -126,33 +136,34 @@ export class AnalyticsDashboardComponent implements OnInit {
   startDate_of_Financial_year: any;
   customDateRangeText: any;
   customDateLabel = '';
-  listSyncData: any[] = []
-  synch_pending_intervel: any
-  notificationCount: any
-  show_sync_reminder: boolean = false
-  popupVisible: boolean = false
-  buttonText: any
+  listSyncData: any[] = [];
+  synch_pending_intervel: any;
+  notificationCount: any;
+  show_sync_reminder: boolean = false;
+  popupVisible: boolean = false;
+  buttonText: any;
   storeinfo: any = [];
-  profitAndLoss_List: any = {}
+  profitAndLoss_List: any = {};
   seriesList_profitAndLoss: any[] = [];
   constructor(private service: DataService) {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
-    console.log(sessionData)
-    this.synch_pending_intervel = sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL
-    this.show_sync_reminder = sessionData.GeneralSettings.SHOW_SYNCH_REMINDER
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
+    console.log(sessionData);
+    this.synch_pending_intervel =
+      sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL;
+    this.show_sync_reminder = sessionData.GeneralSettings.SHOW_SYNCH_REMINDER;
     const hours =
       Number(sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL) / 60;
 
-    this.buttonText = `List of stores not synchronized in last ${hours}  hours`
+    this.buttonText = `List of stores not synchronized in last ${hours}  hours`;
 
-    this.Get_SyncData()
+    this.Get_SyncData();
     if (this.show_sync_reminder) {
-      this.popupVisible = true
+      this.popupVisible = true;
+    } else {
+      this.popupVisible = false;
     }
-    else {
-      this.popupVisible = false
-    }
-
   }
 
   selectionChange(dates: Dates) {
@@ -252,7 +263,11 @@ export class AnalyticsDashboardComponent implements OnInit {
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
         break;
 
       case 'currentYear':
@@ -263,10 +278,13 @@ export class AnalyticsDashboardComponent implements OnInit {
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
 
         break;
-
 
       case 'all':
         this.fromDate = new Date(this.startDate_of_Financial_year); // or your minimum date
@@ -409,6 +427,7 @@ export class AnalyticsDashboardComponent implements OnInit {
           QTY_SOLD: item.QTY_SOLD,
           DESCRIPTION: item.DESCRIPTION,
         }));
+        console.table(this.TopMovingItems_list);
 
         this.TenderSummary_list = res.data.TenderSummary;
 
@@ -421,7 +440,7 @@ export class AnalyticsDashboardComponent implements OnInit {
         this.storeinfo = this.TenderSummary_list.map((store: any) => {
           const obj: any = {
             store: store.STORE_NAME,
-            Total: 0
+            Total: 0,
           };
 
           allTenderKeys.forEach((key: string) => (obj[key] = 0));
@@ -439,11 +458,11 @@ export class AnalyticsDashboardComponent implements OnInit {
 
         // Create two rows: Revenue and Expense
         const revenueRow: any = {
-          TYPE: 'Revenue'
+          TYPE: 'Revenue',
         };
 
         const expenseRow: any = {
-          TYPE: 'Expense'
+          TYPE: 'Expense',
         };
 
         // Fill Revenue
@@ -465,10 +484,10 @@ export class AnalyticsDashboardComponent implements OnInit {
         revenue.forEach((x: any) => stores.add(x.STORE));
         expense.forEach((x: any) => stores.add(x.STORE));
 
-        this.seriesList_profitAndLoss = Array.from(stores).map(store => ({
+        this.seriesList_profitAndLoss = Array.from(stores).map((store) => ({
           valueField: store,
           name: store,
-          type: 'bar'
+          type: 'bar',
         }));
 
         console.log(this.chartData);
@@ -488,7 +507,20 @@ export class AnalyticsDashboardComponent implements OnInit {
       option.value === 'custom' ? { ...option, label: 'Custom' } : option,
     );
   }
+  customizeAxisLabel = (arg: any) => {
+    const text = arg.valueText;
 
+    // Split into two lines near the middle
+    const words = text.split(' ');
+
+    if (words.length <= 1) {
+      return text;
+    }
+
+    const mid = Math.ceil(words.length / 2);
+
+    return words.slice(0, mid).join(' ') + '\n' + words.slice(mid).join(' ');
+  };
   // dynamically discovers tender types from the API response
   generateTenderSeries() {
     const tenders = new Set<string>();
@@ -500,8 +532,16 @@ export class AnalyticsDashboardComponent implements OnInit {
     });
 
     const palette = [
-      '#10B981', '#4F46E5', '#F59E0B', '#EC4899', '#0EA5E9',
-      '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
+      '#10B981',
+      '#4F46E5',
+      '#F59E0B',
+      '#EC4899',
+      '#0EA5E9',
+      '#8B5CF6',
+      '#EF4444',
+      '#14B8A6',
+      '#EAB308',
+      '#64748B',
     ];
 
     this.seriesList = Array.from(tenders).map((tender, index) => ({
@@ -542,9 +582,9 @@ export class AnalyticsDashboardComponent implements OnInit {
     `,
     };
   }
-  barChartcustomizeTooltip() { }
-  MillioncustomizeLabel() { }
-  onChartInitialized(e: any) { }
+  barChartcustomizeTooltip() {}
+  MillioncustomizeLabel() {}
+  onChartInitialized(e: any) {}
   customizeFunnelLabel = (arg: any) => {
     return `${arg.item.STORE_NAME}
 ${this.formatAmount(arg.value)}`;
@@ -646,7 +686,11 @@ ${this.formatAmount(arg.value)}`;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
         break;
 
       case 'currentYear':
@@ -657,7 +701,11 @@ ${this.formatAmount(arg.value)}`;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
 
         break;
 
@@ -782,21 +830,18 @@ ${this.formatAmount(arg.value)}`;
 
   //===================Show synch reminder===============
 
-
-
   Get_SyncData() {
     this.service.get_sync_Data_api().subscribe({
       next: (res: any) => {
-
         const pendingData = res.filter(
-          (item: any) => Number(item.TIME_DIFFERENCE) > this.synch_pending_intervel
+          (item: any) =>
+            Number(item.TIME_DIFFERENCE) > this.synch_pending_intervel,
         );
 
         this.listSyncData = pendingData.map((item: any, index: number) => ({
           ...item,
           SL_NO: index + 1,
-          IsPending: true
-
+          IsPending: true,
         }));
 
         this.notificationCount = this.listSyncData.length;
@@ -806,12 +851,11 @@ ${this.formatAmount(arg.value)}`;
       },
       error: (err) => {
         console.log(err);
-      }
+      },
     });
   }
   onRowPrepared(e: any) {
     if (e.rowType !== 'data') return;
-
 
     if (e.data.IsPending) {
       e.rowElement.style.color = 'red';
@@ -833,7 +877,7 @@ ${this.formatAmount(arg.value)}`;
       year: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
     }).format(date);
   };
 
@@ -869,7 +913,6 @@ ${this.formatAmount(arg.value)}`;
     return {
       text: `${arg.seriesName}: ${this.formatTenderAmount(arg.value)}`,
     };
-
   };
 
   //===================gross claimed tender summary chart========================
@@ -889,9 +932,9 @@ ${this.formatAmount(arg.value)}`;
   // customizeText for dxo-label must return a STRING directly
   customizeGrossSalesLabel = (arg: any) => {
     return {
-      text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`
+      text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
     };
-  }
+  };
 
   customizeGrossSalesTooltip = (arg: any) => {
     return {
@@ -923,7 +966,6 @@ ${this.formatAmount(arg.value)}`;
     return this.formatAmountTender(pointInfo.value);
   };
 
-
   //=================
   customizeTotalLabel = (arg: any) => {
     const value = arg.value;
@@ -942,13 +984,13 @@ ${this.formatAmount(arg.value)}`;
   customizeCommonLabelProfitandLoss = (arg: any) => {
     return new Intl.NumberFormat('en', {
       notation: 'compact',
-      maximumFractionDigits: 1
+      maximumFractionDigits: 1,
     }).format(arg.value);
   };
   customizeProfitandLoss = (arg: any) => {
     return new Intl.NumberFormat('en-IN', {
       notation: 'compact',
-      maximumFractionDigits: 1
+      maximumFractionDigits: 1,
     }).format(arg.value);
   };
   customizeProfitAndLossTooltip = (arg: any) => {
@@ -957,25 +999,23 @@ ${this.formatAmount(arg.value)}`;
         'en-IN',
         {
           minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }
-      ).format(arg.value)}`
+          maximumFractionDigits: 2,
+        },
+      ).format(arg.value)}`,
     };
   };
 
   customizeLabelTenderTotal = (pointInfo: any) => {
-
     const data = pointInfo.point.data;
 
     let total = 0;
 
-    this.seriesList.forEach(series => {
+    this.seriesList.forEach((series) => {
       total += Number(data[series.valueField] || 0);
     });
 
     return total.toLocaleString();
   };
-
 }
 
 @NgModule({
@@ -1006,11 +1046,10 @@ ${this.formatAmount(arg.value)}`;
     DxLoadPanelModule,
     CustomDatePopupModule,
     DxPopupModule,
-
   ],
   providers: [],
   exports: [],
   declarations: [AnalyticsDashboardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AnalyticsDashboardModule { }
+export class AnalyticsDashboardModule {}
