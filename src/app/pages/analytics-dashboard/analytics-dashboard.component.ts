@@ -417,11 +417,12 @@ export class AnalyticsDashboardComponent implements OnInit {
         const allTenderKeys = this.seriesList.map((s: any) => s.valueField);
 
         this.storeinfo = this.TenderSummary_list.map((store: any) => {
+          console.log(store, '----stores----')
           const obj: any = {
             store: store.STORE_NAME,
             Total: 0,
-            TOTAL: this.seriesList.reduce((sum, s) => {
-              return sum + Number(store[s.valueField] || 0);
+            TOTAL: store.TenderTypes.reduce((sum: number, tender: any) => {
+              return sum + Number(tender.AMOUNT || 0);
             }, 0)
           };
 
@@ -605,7 +606,7 @@ ${this.formatAmount(arg.value)}`;
   //   };
   // };
   customizeCommonLabel = (pointInfo: any) => {
-    return `${pointInfo.item.argument}\n${this.formatAmountTender(pointInfo.value)}`;
+    return `${this.formatAmountTender(pointInfo.value)}`;
   };
 
 
@@ -1016,6 +1017,12 @@ ${this.formatAmount(arg.value)}`;
 
     return words.slice(0, mid).join(' ') + '\n' + words.slice(mid).join(' ');
   };
+
+  customizeInsideLabel = (arg: any) => {
+    return arg.valueText;   // Shows 81, 13, etc.
+  };
+
+
 
 }
 

@@ -38,12 +38,12 @@
           >
           </dxo-label>
 
-          <!-- <dxo-legend
+          <dxo-legend
             [visible]="true"
             verticalAlignment="bottom"
             horizontalAlignment="center"
           >
-          </dxo-legend> -->
+          </dxo-legend>
           <dxo-item>
             <dxo-border
               [visible]="true"
@@ -109,7 +109,12 @@
             [dataSource]="chartData"
             [series]="seriesList_profitAndLoss"
           >
-            <dxo-common-series-settings argumentField="STORE_NAME" type="bar">
+            <dxo-common-series-settings
+              argumentField="STORE_NAME"
+              type="bar"
+              [barPadding]="0.05"
+              [barGroupPadding]="0.05"
+            >
               <dxo-label
                 [visible]="true"
                 position="inside"
@@ -142,14 +147,14 @@
         <!-- <dx-scroll-view direction="both" showScrollbar="always"> -->
         <div class="chart-wrapper">
           <dx-chart id="chart" [dataSource]="storeinfo">
-            <dxo-chart-label
-              [visible]="true"
-              [format]="{
-                type: 'fixedPoint',
-                precision: '0',
-              }"
-            >
-            </dxo-chart-label>
+            <dxo-argument-axis>
+              <dxo-label
+                [rotationAngle]="-45"
+                overlappingBehavior="rotate"
+                [customizeText]="customizeAxisLabel"
+              >
+              </dxo-label>
+            </dxo-argument-axis>
             <dxi-series
               *ngFor="let s of seriesList"
               [valueField]="s.valueField"
