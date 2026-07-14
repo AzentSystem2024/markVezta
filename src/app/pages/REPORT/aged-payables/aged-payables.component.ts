@@ -5,6 +5,8 @@ import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
+import notify from 'devextreme/ui/notify';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-aged-payables',
@@ -12,7 +14,7 @@ import { FormBuilder } from '@angular/forms';
   styleUrls: ['./aged-payables.component.scss']
 })
 export class AgedPayablesComponent {
-      AgedPayableReport: any[]=[];
+      AgedPayableReport: any;
       isFilterRowVisible:boolean=false
        readonly allowedPageSizes: any = [ 5,10, 'all'];
         displayMode: any = 'full';
@@ -217,25 +219,45 @@ console.log(financialYeaDate,'=========================date=[[[[[[[[[[[[[[[[[[[[
     
     }
 
-    get_DataSource(){
-       const payload = {
-        COMPANY_ID: this.selected_Company_id,
-        DATE_FROM: this.formatted_from_date,
-         DATE_TO: this.formatted_To_date,
-         SUPP_ID: this.selectedSupplierId || 0
-      }
+ get_DataSource() {
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+    SUPP_ID: this.selectedSupplierId || 0,
+  };
 
-       sessionStorage.removeItem('supplierViewClick')
-      sessionStorage.setItem('supplierViewClick', JSON.stringify(payload));
-     
-      console.log(JSON.parse(sessionStorage.getItem('supplierViewClick')));
-      console.log(payload,'==========payload================');
-      this.dataservice.AgedPayable_Report_Api(payload).subscribe((res: any) => {
-        console.log(res, '----------list --------------------------');
-        this.AgedPayableReport = res.data;
-        
-      })
-    }
+  sessionStorage.removeItem('supplierViewClick');
+  sessionStorage.setItem('supplierViewClick', JSON.stringify(payload));
+
+  this.AgedPayableReport = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.AgedPayable_Report_Api(payload).subscribe({
+          next: (res: any) => {
+            const list = res.data || [];
+
+            if (list.length === 0) {
+              notify({
+                message: 'No data available',
+                type: 'warning',
+                displayTime: 2000,
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              });
+            }
+
+            resolve(list);
+          },
+          error: () => {
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
 
     handleClose(){
        this.isEditInvoice = false;
