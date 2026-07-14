@@ -1550,43 +1550,52 @@ export class AddDebitComponent {
 
   onAddNewRow() {
     const grid = this.itemsGridRef.instance;
-    const rows = grid.getVisibleRows();
+
+    // Save the current editing row first
+    grid.saveEditData();
+
+    const rows = this.debitFormData.NOTE_DETAIL;
 
     const hasIncompleteRow = rows.some(
-      (r: any) => !r.data.ledgerName || !r.data.Amount,
+      (r: any) =>
+        !r.ledgerName ||
+        r.Amount === null ||
+        r.Amount === undefined ||
+        r.Amount === '',
     );
+
     if (hasIncompleteRow) {
       return;
     }
 
-    const nextSlNo = this.noteDetails.length + 1;
-
     const newRow: any = {
-      SL_NO: nextSlNo,
-      ledgerCode: null,
+      SL_NO: rows.length + 1,
+      ledgerCode: '',
       ledgerName: '',
       particulars: '',
       Amount: null,
       gstAmount: null,
       HSN_CODE: '',
+      GST_PERC: null,
+      GST_ID: null,
       CGST: 0,
       SGST: 0,
-      GST_PERC: null, // ✅ keep empty
     };
 
-    const baseRow = this.noteDetails[0];
-
-    if (baseRow) {
-      // ❌ removed GST copy
-      newRow.HSN_CODE = baseRow.HSN_CODE || ''; // ✅ keep this if needed
+    // Copy HSN from first row if required
+    if (rows.length > 0) {
+      newRow.HSN_CODE = rows[0].HSN_CODE || '';
     }
 
-    this.noteDetails.push(newRow);
+    rows.push(newRow);
 
+    // Refresh grid
+    grid.option('dataSource', [...rows]);
+    grid.refresh();
+
+    // Focus first cell of new row
     setTimeout(() => {
-      const gridInstance = this.itemsGridRef?.instance;
-      const newRowIndex = this.noteDetails.length - 1;
-      gridInstance?.editCell(newRowIndex, 'ledgerCode');
+      grid.editCell(rows.length - 1, 'ledgerCode');
     }, 100);
   }
 

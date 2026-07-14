@@ -21,9 +21,9 @@
       [selection]="{ mode: 'single' }"
       [editing]="{
         mode: 'cell',
-        allowAdding: true,
-        allowDeleting: true,
-        allowUpdating: true,
+        allowAdding: !is_approve,
+        allowDeleting: !is_approve,
+        allowUpdating: !is_approve,
         useIcons: true,
       }"
       (onEditorPreparing)="onEditorPreparing($event)"
@@ -84,6 +84,7 @@
               [width]="180"
               [min]="0"
               [max]="12"
+              [readOnly]="is_approve"
             ></dx-number-box>
           </div>
         </dxi-item>
@@ -106,6 +107,7 @@
                 [width]="140"
                 [min]="0"
                 [max]="12"
+                [readOnly]="is_approve"
               ></dx-number-box>
 
               <dx-button
@@ -115,6 +117,7 @@
                 [height]="31"
                 style="margin-top: 10px"
                 (onClick)="addNewRow()"
+                [disabled]="is_approve"
               ></dx-button>
             </div>
           </div>
@@ -224,10 +227,25 @@
       (onClick)="handleClose()"
     ></dx-button>
     <dx-button
+      text="Verify"
+      stylingMode="contained"
+      (onClick)="verify()"
+      type="default"
+      [visible]="is_verify || (payRollData?.STATUS === 'Open' && !is_approved)"
+    ></dx-button>
+    <dx-button
       text="Update"
       stylingMode="contained"
-      (onClick)="update()"
+      (onClick)="update(false)"
       type="default"
+      [visible]="!is_verify && !is_approved"
+    ></dx-button>
+    <dx-button
+      text="Approve"
+      stylingMode="contained"
+      (onClick)="approve()"
+      type="default"
+      [visible]="is_approved && !is_verify"
     ></dx-button>
   </div>
 </div>

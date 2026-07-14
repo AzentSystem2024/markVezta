@@ -127,7 +127,7 @@ export class PayrollListComponent {
   ];
   selectedMonth: Date = new Date();
   selectedMonthForAdd: any;
-  selectedRowKeys: any
+  selectedRowKeys: any;
   calendarVisible = false;
   months = Array.from({ length: 12 }, (_, i) => new Date(2022, i, 1));
   monthNames = [
@@ -149,9 +149,10 @@ export class PayrollListComponent {
   years: number[] = [];
   addPayrollPopupOpened: boolean = false;
   editPayrollPopupOpened: boolean = false;
-  verifyPayrollPopupOpened: boolean = false;
-  approvePayrollPopupOpened: boolean = false;
-  viewPayrollPopupOpened: boolean = false;
+  isVerifyMode: boolean = false;
+  isApproveMode: boolean = false;
+  isReadOnlyMode: boolean = false;
+  PopupTitle: string = 'Payroll';
   selectedPayroll: any;
   startYear = 2010;
 
@@ -200,7 +201,7 @@ export class PayrollListComponent {
     private zone: NgZone,
     private router: Router,
     private cdr: ChangeDetectorRef,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -240,7 +241,7 @@ export class PayrollListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
-      this.canVerify = packingRights.CanVerify
+      this.canVerify = packingRights.CanVerify;
     }
 
     this.getPayrollList();
@@ -271,7 +272,7 @@ export class PayrollListComponent {
       this.cdr.detectChanges();
     });
   }
-  onToolbarPreparing(e: any) { }
+  onToolbarPreparing(e: any) {}
   approveSelectedPayroll() {
     console.log('PAYROLLAPPROVE');
     const selectedRows = this.dataGrid.instance.getSelectedRowsData();
@@ -313,14 +314,15 @@ export class PayrollListComponent {
 
     this.approveDisabled = selectedRows.length === 0 || hasApproved;
     const firstStatus = selectedRows[0]?.STATUS;
-    const hasMixedStatus = selectedRows.some((row: any) => row.STATUS !== firstStatus);
+    const hasMixedStatus = selectedRows.some(
+      (row: any) => row.STATUS !== firstStatus,
+    );
 
     // only same-status selection allowed for approve action
     if (hasMixedStatus) return;
-
   }
   statusCellRender(cellElement: any, cellInfo: any) {
-    console.log(cellInfo, '==========cellInfo==============')
+    console.log(cellInfo, '==========cellInfo==============');
     const status = cellInfo.data.STATUS;
 
     const icon = document.createElement('i');
@@ -332,7 +334,12 @@ export class PayrollListComponent {
         : status === 'Verified'
           ? '#0073D8' // Verified
           : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'Verified' ? 'Verified' : 'Open';
+    icon.title =
+      status === 'Approved'
+        ? 'Approved'
+        : status === 'Verified'
+          ? 'Verified'
+          : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -501,13 +508,11 @@ export class PayrollListComponent {
     onClick: () => this.VerifyBulkRows(),
   };
 
-
   toggleFilterRow(): void {
     setTimeout(() => {
       this.filterRowVisible = !this.filterRowVisible;
     });
   }
-
 
   getStatusFilterData = [
     {
@@ -586,11 +591,18 @@ export class PayrollListComponent {
           actionButton.text = hintText;
         }
 
+        this.isVerifyMode = false;
+        this.isApproveMode = false;
+        this.isReadOnlyMode = false;
+
         if (this.selectedPayroll.STATUS === 'Approved') {
-          this.viewPayrollPopupOpened = true;
+          this.isReadOnlyMode = true;
+          this.isApproveMode = true;
+          this.PopupTitle = 'View Payroll';
         } else {
-          this.editPayrollPopupOpened = true;
+          this.PopupTitle = 'Edit Payroll';
         }
+        this.editPayrollPopupOpened = true;
       },
       error: (err) => {
         console.error('Failed to fetch salary revision:', err);
@@ -598,42 +610,36 @@ export class PayrollListComponent {
     });
   }
 
-  onVerifyClick(e: any): void {
+  onVerifyOrApproveIconClick(e: any): void {
     e.cancel = true;
-    const payrollId = e.row?.data?.ID;
+    const payrollId = e.data?.SALARY_BILL_NO;
+    const status = e.data?.STATUS;
 
     if (!payrollId) {
-      console.warn('No Employee ID found in row data');
+      console.warn('No Payroll ID found in row data');
       return;
     }
 
-    this.dataService.selectPayroll(payrollId).subscribe({
+    const payload = { PAYDETAIL_ID: payrollId };
+
+    this.dataService.viewSelectedPayroll(payload).subscribe({
       next: (response: any) => {
         this.selectedPayroll = response;
-        this.verifyPayrollPopupOpened = true;
+        if (status === 'Verified') {
+          this.isVerifyMode = false;
+          this.isApproveMode = true;
+          this.isReadOnlyMode = true;
+          this.PopupTitle = 'Approve Payroll';
+        } else {
+          this.isVerifyMode = true;
+          this.isApproveMode = false;
+          this.isReadOnlyMode = false;
+          this.PopupTitle = 'Verify Payroll';
+        }
+        this.editPayrollPopupOpened = true;
       },
       error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
-    });
-  }
-
-  onApproveClick(e: any): void {
-    e.cancel = true;
-    const payrollId = e.row?.data?.ID;
-
-    if (!payrollId) {
-      console.warn('No Employee ID found in row data');
-      return;
-    }
-
-    this.dataService.selectPayroll(payrollId).subscribe({
-      next: (response: any) => {
-        this.selectedPayroll = response;
-        this.approvePayrollPopupOpened = true;
-      },
-      error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
+        console.error('Failed to fetch payroll details:', err);
       },
     });
   }
@@ -680,9 +686,6 @@ export class PayrollListComponent {
     console.log('PARENT HANDLE CLOSE CALLED');
     this.addPayrollPopupOpened = false; // closes the popup
     this.editPayrollPopupOpened = false;
-    this.verifyPayrollPopupOpened = false;
-    this.approvePayrollPopupOpened = false;
-    this.viewPayrollPopupOpened = false;
     this.getPayrollList();
   }
   //===========================verify====================
@@ -759,4 +762,4 @@ export class PayrollListComponent {
   exports: [PayrollListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PayrollListModule { }
+export class PayrollListModule {}
