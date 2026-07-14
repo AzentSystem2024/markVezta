@@ -26,7 +26,10 @@
       [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
-      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+       [loadPanel]="{
+    enabled: true,
+    text: 'Loading...'
+  }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>

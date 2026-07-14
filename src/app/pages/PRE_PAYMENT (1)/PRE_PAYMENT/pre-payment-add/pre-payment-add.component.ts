@@ -203,6 +203,7 @@ export class PrePaymentAddComponent {
       this.ExpenseAmountDetails?.reduce((sum, item) => {
         return sum + (Number(item.DUE_AMOUNT) || 0);
       }, 0) || 0;
+      
   }
 
   generateSchedule() {
@@ -229,6 +230,7 @@ export class PrePaymentAddComponent {
     const totalDays = this.daysBetween(startDate, endDateFinal);
     console.log(totalDays, 'total days=========');
     const perDayAmount = this.PrePaymentFormData.EXPENSE_AMOUNT / totalDays;
+    console.log(perDayAmount)
 
     let schedule: any[] = [];
     let current = new Date(startDate);
@@ -334,6 +336,10 @@ export class PrePaymentAddComponent {
       this.PrePaymentLedger = res;
     });
   }
+
+  resetPopupForm() {
+  this.resetForm();
+}
 
   resetForm() {
     this.PrePaymentFormData = {
