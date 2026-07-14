@@ -61,7 +61,7 @@ export class DataService {
   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {
-    // this.sesstion_Details();
+    this.sesstion_Details();
   }
   getLeavesByEmployee(empId: number) {
     throw new Error('Method not implemented.');

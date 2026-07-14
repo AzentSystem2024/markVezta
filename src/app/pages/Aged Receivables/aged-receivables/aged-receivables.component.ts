@@ -41,13 +41,15 @@ import {
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
+import notify from 'devextreme/ui/notify';
+import DataSource from 'devextreme/data/data_source';
 @Component({
   selector: 'app-aged-receivables',
   templateUrl: './aged-receivables.component.html',
   styleUrls: ['./aged-receivables.component.scss'],
 })
 export class AgedReceivablesComponent {
-  AgedList_Datasource: any[] = [];
+  AgedList_Datasource: any;
   isFilterRowVisible: boolean = false;
   isViewInvoice: boolean = false;
   BalanceSheetReport: any = [];
@@ -226,20 +228,63 @@ this.selectedmonth = currentMonth;
     return `${year}-${month}-${day}`;
   }
 
-  GET_CUSTOMER_LIST() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      CUSTOMER_ID: this.select_customer_id || 0,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
-    };
+  // GET_CUSTOMER_LIST() {
+  //   const payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //     CUSTOMER_ID: this.select_customer_id || 0,
+  //     DATE_FROM: this.formatted_from_date,
+  //     DATE_TO: this.formatted_To_date,
+  //   };
 
-    this.dataservice
-      .Aged_receivable_report_Api(payload)
-      .subscribe((res: any) => {
-        this.AgedList_Datasource = res.Data;
-      });
-  }
+  //   this.dataservice
+  //     .Aged_receivable_report_Api(payload)
+  //     .subscribe((res: any) => {
+  //       this.AgedList_Datasource = res.Data;
+  //     });
+  // }
+
+  GET_CUSTOMER_LIST() {
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    CUSTOMER_ID: this.select_customer_id || 0,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+  };
+
+  this.AgedList_Datasource = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice
+          .Aged_receivable_report_Api(payload)
+          .subscribe({
+            next: (res: any) => {
+              const list = res.Data || [];
+
+              this.isEmptyDatagrid = list.length === 0;
+
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
+
+              resolve(list);
+            },
+            error: () => {
+              this.isEmptyDatagrid = true;
+              resolve([]);
+            },
+          });
+      }),
+  });
+}
+
   onViewClick(e: any) {
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
     const trans_id = e.row.data.TRANS_ID;

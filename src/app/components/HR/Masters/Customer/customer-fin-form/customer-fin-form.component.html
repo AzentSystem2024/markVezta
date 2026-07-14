@@ -386,10 +386,10 @@
         </dxi-item>
       </dxi-item>
 
-      <dxi-item itemType="group">
+      <dxi-item itemType="group" cssClass="mt-5">
         <dxi-item [colSpan]="2">
           <div *dxTemplate>
-            <dx-select-box
+            <!-- <dx-select-box
               label="Customer Type"
               [items]="Customer_type_list"
               displayExpr="DESCRIPTION"
@@ -398,7 +398,7 @@
               placeholder="Select customer type"
               labelMode="floating"
               (onValueChanged)="onDealerSelected($event)"
-            ></dx-select-box>
+            ></dx-select-box> -->
 
             <!-- <dx-check-box
               [(value)]="IS_COMPANY_BRANCH_VALUE"
@@ -610,7 +610,7 @@
         <dxi-item itemType="group" [colCount]="2"> </dxi-item>
       </dxi-item>
 
-      <!-- Conditional Dealer/Sub-Dealer Radio -->
+
     </dx-form>
   </dxi-item>
 

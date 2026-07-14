@@ -318,6 +318,32 @@ export class ARManualMatchingComponent implements AfterViewInit {
   }
 
   onInvoiceSelectionChanged(e: any) {
+    let hasChanges = false;
+
+    if (e.currentSelectedRowKeys && e.currentSelectedRowKeys.length > 0) {
+      e.currentSelectedRowKeys.forEach((key: any) => {
+        const rowData = typeof key === 'object' ? key : this.invoiceData.find(x => x.InvoiceID === key);
+        if (rowData) {
+          rowData.ReceivedAmount = rowData.Amount;
+          hasChanges = true;
+        }
+      });
+    }
+
+    if (e.currentDeselectedRowKeys && e.currentDeselectedRowKeys.length > 0) {
+      e.currentDeselectedRowKeys.forEach((key: any) => {
+        const rowData = typeof key === 'object' ? key : this.invoiceData.find(x => x.InvoiceID === key);
+        if (rowData) {
+          rowData.ReceivedAmount = null;
+          hasChanges = true;
+        }
+      });
+    }
+
+    if (hasChanges && this.invoiceGrid && this.invoiceGrid.instance) {
+      this.invoiceGrid.instance.refresh();
+    }
+
     this.calculateInvoiceTotals();
   }
 
