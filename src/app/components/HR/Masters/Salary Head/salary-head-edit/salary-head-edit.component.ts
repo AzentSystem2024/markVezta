@@ -208,7 +208,7 @@ export class SalaryHeadEditComponent {
       this.SalaryHeadData.RANGE_EXISTS = false;
       this.SalaryHeadData.RANGE_TO = 0;
       this.SalaryHeadData.RANGE_FROM = 0;
-      this.selectedRows = []
+      this.grid_value = []
     } else if (this.selectedNatureId === 2) {
       this.selecteNatureTypeTwo = true;
       this.head_percent = false;
@@ -232,7 +232,7 @@ export class SalaryHeadEditComponent {
       this.SalaryHeadData.RANGE_TO = 0;
       this.SalaryHeadData.RANGE_FROM = 0;
       this.SalaryHeadData.AFFECT_LEAVE = false
-      this.selectedRows = []
+      this.grid_value = []
     }
 
     // if(this.selectedNatureId==1){

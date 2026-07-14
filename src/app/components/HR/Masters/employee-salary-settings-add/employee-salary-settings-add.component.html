@@ -3,7 +3,7 @@
     <div>
       <dx-select-box
         [placeholder]="'Employee Code'"
-        label="Employee"
+        label="Employee *"
         [items]="EmployeeDropdown"
         valueExpr="ID"
         displayExpr="DESCRIPTION"
@@ -13,6 +13,17 @@
         [labelMode]="'floating'"
         (onValueChanged)="onEmployeeChanged($event)"
       >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="This field is required"
+          ></dxi-validation-rule>
+          <!-- <dxi-validation-rule
+              type="range"
+              [min]="1"
+              message="Basic Salary must be greater than 0"
+            ></dxi-validation-rule> -->
+        </dx-validator>
       </dx-select-box>
     </div>
 

@@ -36,6 +36,10 @@ export class UserPanelComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
     console.log(sessionData)
     this.synch_pending_intervel = sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL
+    const utcNow = new Date().toISOString();
+
+    console.log(utcNow);
+    // Example: 2026-07-14T05:15:30.123Z
 
     // this.Get_SyncData()
 
@@ -70,18 +74,11 @@ export class UserPanelComponent {
           SL_NO: index + 1
 
         }))
-        this.notificationCount = this.listSyncData.filter((item: any) => {
 
-          const lastSyncTime = new Date(item.LAST_SYNCH_TIME);
-          const currentTime = new Date();
 
-          const diffMinutes =
-            (currentTime.getTime() - lastSyncTime.getTime()) / (1000 * 60);
-
-          return diffMinutes > this.synch_pending_intervel;
-
-        }).length;
-
+        this.notificationCount = this.listSyncData.filter(
+          (item: any) => item.TIME_DIFFERENCE > this.synch_pending_intervel
+        ).length;
       },
       error: (err) => {
         console.log(err)
@@ -90,6 +87,7 @@ export class UserPanelComponent {
   }
   onRowPrepared(e: any) {
     if (e.rowType !== 'data') return;
+    console.log(e, '========')
 
     const lastSyncTime = new Date(e.data.LAST_SYNCH_TIME);
     console.log(lastSyncTime, "============last sync time============")
@@ -99,37 +97,37 @@ export class UserPanelComponent {
       (currentTime.getTime() - lastSyncTime.getTime()) / (1000 * 60);
     console.log(diffMinutes, '====differen mintus')
     console.log("synch time", this.synch_pending_intervel)
-    if (diffMinutes > this.synch_pending_intervel) {
+    if (e.data.TIME_DIFFERENCE > this.synch_pending_intervel) {
       e.rowElement.style.color = 'red';
       // e.rowElement.style.fontWeight = 'bold';
     }
   }
-  formatTime(rowData: any) {
+
+  // formatLastSyncTime = (rowData: any) => {
+  //   if (!rowData.LAST_SYNCH_TIME) return '';
+
+  //   const utcDate = new Date(
+  //     rowData.LAST_SYNCH_TIME.replace(' ', 'T') + 'Z'
+  //   );
+
+  //   // return utcDate.toLocaleString();
+  // };
+  formatLastSyncTime = (rowData: any) => {
     if (!rowData.LAST_SYNCH_TIME) return '';
 
-    const date = new Date(rowData.LAST_SYNCH_TIME);
+    const utcDate = new Date(
+      rowData.LAST_SYNCH_TIME.replace(' ', 'T') + 'Z'
+    );
 
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  }
-  formatLastSyncTime = (cellInfo: any) => {
-    if (!cellInfo.value) {
-      return '';
-    }
-
-    const date = new Date(cellInfo.value);
-
-    return new Intl.DateTimeFormat('en-GB', {
+    return utcDate.toLocaleString('en-GB', {
+      timeZone: 'Asia/Dubai',
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
-    }).format(date);
+    });
   };
 }
 

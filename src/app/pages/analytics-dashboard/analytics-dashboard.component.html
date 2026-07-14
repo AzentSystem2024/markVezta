@@ -11,26 +11,6 @@
     (onOpened)="attachItemClickHandler($event)"
   >
   </dx-select-box>
-
-  <!-- <dx-date-box
-    label="From Date"
-    labelMode="floating"
-    type="date"
-    displayFormat="dd-MM-yyyy"
-    [(value)]="fromDate"
-    (onValueChanged)="dateChanged()"
-  >
-  </dx-date-box> -->
-
-  <!-- <dx-date-box
-    label="To Date"
-    labelMode="floating"
-    type="date"
-    [(value)]="toDate"
-    (onValueChanged)="dateChanged()"
-    displayFormat="dd-MM-yyyy"
-  >
-  </dx-date-box> -->
 </div>
 <div class="view-wrapper">
   <div class="dashboard-wrapper">
@@ -38,60 +18,32 @@
     <div class="dashboard-row">
       <!-- Funnel -->
       <div class="dashboard-card">
-        <h6 class="card-title mt-2 mb-2">Gross Sales</h6>
+        <h6 class="card-title mt-2 mb-2">Net Sales</h6>
 
-        <!-- <dx-scroll-view direction="both" showScrollbar="always" [height]="450"> -->
-        <!-- <dx-funnel
-          id="funnel"
-          [dataSource]="gross_Sales_list"
-          argumentField="STORE_NAME"
-          valueField="AMOUNT"
-          [palette]="customPalette"
-        >
-          <dxo-tooltip
-            [enabled]="true"
-            [customizeTooltip]="customizeGrossSalesTooltip"
-          ></dxo-tooltip>
-
-          <dxo-label
-            [visible]="true"
-            position="inside"
-            [customizeText]="customizeGrossSalesLabel"
-          >
-          </dxo-label>
-          <dxo-legend
-            [visible]="true"
-            verticalAlignment="bottom"
-            horizontalAlignment="center"
-          >
-          </dxo-legend>
-          <dxo-item [borderWidth]="2" borderColor="#ffffff"> </dxo-item>
-        </dx-funnel> -->
         <dx-funnel
           id="funnel"
           [dataSource]="gross_Sales_list"
           argumentField="STORE_NAME"
           valueField="AMOUNT"
-          [palette]="customPalette"
         >
           <dxo-tooltip
             [enabled]="true"
-            [customizeTooltip]="customizeGrossSalesTooltip"
+            [customizeTooltip]="customizeCommonTooltip"
           ></dxo-tooltip>
 
           <dxo-label
             [visible]="true"
             position="inside"
-            [customizeText]="customizeGrossSalesLabel"
+            [customizeText]="customizeCommonLabel"
           >
           </dxo-label>
 
-          <dxo-legend
+          <!-- <dxo-legend
             [visible]="true"
             verticalAlignment="bottom"
             horizontalAlignment="center"
           >
-          </dxo-legend>
+          </dxo-legend> -->
           <dxo-item>
             <dxo-border
               [visible]="true"
@@ -100,17 +52,25 @@
             ></dxo-border>
           </dxo-item>
         </dx-funnel>
-        <!-- </dx-scroll-view> -->
       </div>
     </div>
 
-    <!-- Bar Chart -->
     <div class="dashboard-row">
       <div class="dashboard-card full-width">
         <h6 class="card-title mt-2 mb-2">Top Moving Items</h6>
 
         <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
           <dx-chart [dataSource]="TopMovingItems_list" palette="soft">
+            <!-- Add only this -->
+            <dxo-argument-axis>
+              <dxo-label
+                [rotationAngle]="-45"
+                overlappingBehavior="rotate"
+                [customizeText]="customizeAxisLabel"
+              >
+              </dxo-label>
+            </dxo-argument-axis>
+
             <dxo-common-series-settings
               argumentField="DESCRIPTION"
               valueField="QTY_SOLD"
@@ -120,11 +80,11 @@
               <dxo-label
                 [visible]="true"
                 position="inside"
-                [customizeText]="customizeCommonLabel"
+                [customizeText]="customizeCommonLabelFortopmovin"
               ></dxo-label>
             </dxo-common-series-settings>
 
-            <dxo-series-template nameField="ITEM_CODE"> </dxo-series-template>
+            <dxo-series-template nameField="ITEM_CODE"></dxo-series-template>
 
             <dxo-tooltip
               [enabled]="true"
@@ -134,12 +94,11 @@
 
             <dxo-legend [visible]="false"></dxo-legend>
 
-            <dxo-size [height]="400" [width]="1200"> </dxo-size>
+            <dxo-size [height]="400" [width]="1150"></dxo-size>
           </dx-chart>
         </dx-scroll-view>
       </div>
     </div>
-
     <div class="dashboard-row">
       <div class="dashboard-card-Tender">
         <h6 class="card-title mt-2 mb-2">Revenue / Expenses</h6>
@@ -150,20 +109,13 @@
             [dataSource]="chartData"
             [series]="seriesList_profitAndLoss"
           >
-            <dxo-common-series-settings
-              argumentField="STORE_NAME"
-              type="bar"
-              [barPadding]="0"
-              [barGroupPadding]="0.3"
-            >
+            <dxo-common-series-settings argumentField="STORE_NAME" type="bar">
               <dxo-label
                 [visible]="true"
                 position="inside"
                 [customizeText]="customizeCommonLabelProfitandLoss"
               >
               </dxo-label>
-            </dxo-common-series-settings>
-            <dxo-common-series-settings argumentField="TYPE" type="bar">
             </dxo-common-series-settings>
 
             <dxo-value-axis>
@@ -175,11 +127,8 @@
               [customizeTooltip]="customizeProfitAndLossTooltip"
             >
             </dxo-tooltip>
-            <dxo-legend
-              verticalAlignment="top"
-              horizontalAlignment="center"
-              itemTextPosition="right"
-            >
+
+            <dxo-legend verticalAlignment="top" horizontalAlignment="center">
             </dxo-legend>
           </dx-chart>
         </div>
@@ -193,6 +142,14 @@
         <!-- <dx-scroll-view direction="both" showScrollbar="always"> -->
         <div class="chart-wrapper">
           <dx-chart id="chart" [dataSource]="storeinfo">
+            <dxo-chart-label
+              [visible]="true"
+              [format]="{
+                type: 'fixedPoint',
+                precision: '0',
+              }"
+            >
+            </dxo-chart-label>
             <dxi-series
               *ngFor="let s of seriesList"
               [valueField]="s.valueField"
@@ -200,6 +157,12 @@
               [color]="s.color"
             >
             </dxi-series>
+            <dxo-label
+              [visible]="true"
+              position="outside"
+              [customizeText]="customizeLabelTenderTotal"
+            >
+            </dxo-label>
 
             <dxo-common-series-settings
               argumentField="store"
@@ -296,6 +259,5 @@
     <dxi-column
       dataField="LAST_SYNCH_TIME"
       caption="Last Synch.Time"
-      [customizeText]="formatLastSyncTime"
     ></dxi-column> </dx-data-grid
 ></dx-popup>

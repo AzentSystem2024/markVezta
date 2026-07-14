@@ -412,16 +412,17 @@ export class AnalyticsDashboardComponent implements OnInit {
 
         this.TenderSummary_list = res.data.TenderSummary;
 
-        // build series list ONCE, before building chart data
         this.generateTenderSeries();
 
         const allTenderKeys = this.seriesList.map((s: any) => s.valueField);
 
-        // storeinfo-equivalent: flatten nested TenderTypes into flat columns
         this.storeinfo = this.TenderSummary_list.map((store: any) => {
           const obj: any = {
             store: store.STORE_NAME,
-            Total: 0
+            Total: 0,
+            TOTAL: this.seriesList.reduce((sum, s) => {
+              return sum + Number(store[s.valueField] || 0);
+            }, 0)
           };
 
           allTenderKeys.forEach((key: string) => (obj[key] = 0));
@@ -433,43 +434,59 @@ export class AnalyticsDashboardComponent implements OnInit {
 
           return obj;
         });
+        // const revenue = res.data.ProfitLoss.Revenue || [];
+        // const expense = res.data.ProfitLoss.Expense || [];
 
+        const RevenuExpe = res.data.ProfitLoss
+        console.log(RevenuExpe, '----------------RevenuExpe------------')
+
+        // const data = {
+        //   ...revenue, ...expense
+        // }
         const revenue = res.data.ProfitLoss.Revenue || [];
         const expense = res.data.ProfitLoss.Expense || [];
 
-        // Create two rows: Revenue and Expense
-        const revenueRow: any = {
-          TYPE: 'Revenue'
-        };
+        const chartMap = new Map<string, any>();
 
-        const expenseRow: any = {
-          TYPE: 'Expense'
-        };
-
-        // Fill Revenue
+        // Revenue
         revenue.forEach((item: any) => {
-          revenueRow[item.STORE] = Number(item.REVENUE) || 0;
+          chartMap.set(item.STORE, {
+            STORE_NAME: item.STORE,
+            Revenue: Number(item.REVENUE) || 0,
+            Expense: 0
+          });
         });
 
-        // Fill Expense
+        // Expense
         expense.forEach((item: any) => {
-          expenseRow[item.STORE] = Number(item.EXPENSE) || 0;
+
+          if (chartMap.has(item.STORE)) {
+            chartMap.get(item.STORE).Expense = Number(item.EXPENSE) || 0;
+          } else {
+            chartMap.set(item.STORE, {
+              STORE_NAME: item.STORE,
+              Revenue: 0,
+              Expense: Number(item.EXPENSE) || 0
+            });
+          }
+
         });
 
-        // Chart data
-        this.chartData = [revenueRow, expenseRow];
+        this.chartData = Array.from(chartMap.values());
+        console.log(this.chartData, this.seriesList_profitAndLoss)
 
-        // Series (one per store)
-        const stores = new Set<string>();
+        this.seriesList_profitAndLoss = [
+          {
+            valueField: 'Revenue',
+            name: 'Revenue'
+          },
+          {
+            valueField: 'Expense',
+            name: 'Expense'
+          }
+        ];
 
-        revenue.forEach((x: any) => stores.add(x.STORE));
-        expense.forEach((x: any) => stores.add(x.STORE));
-
-        this.seriesList_profitAndLoss = Array.from(stores).map(store => ({
-          valueField: store,
-          name: store,
-          type: 'bar'
-        }));
+        // console.log(data, '=================full reven and expence')
 
         console.log(this.chartData);
         console.log(this.seriesList_profitAndLoss);
@@ -581,14 +598,27 @@ ${this.formatAmount(arg.value)}`;
     return new Intl.NumberFormat('en-IN').format(value);
   }
 
-  customizeCommonLabel = (arg: any) => {
-    return this.formatNumber(arg.value);
+  // customizeCommonLabel = (arg: any) => {
+  //   // return this.formatAmountTender(arg.value);
+  //   return {
+  //     text: `${arg.item.argument}${this.formatAmountTender(arg.value)}`,
+  //   };
+  // };
+  customizeCommonLabel = (pointInfo: any) => {
+    return `${pointInfo.item.argument}\n${this.formatAmountTender(pointInfo.value)}`;
   };
 
+
+
+
   customizeCommonTooltip = (arg: any) => {
+    console.log(arg)
     return {
-      text: `${this.formatNumber(arg.value)}`,
+      text: `${arg.item.argument}${this.formatNumber(arg.value)}`,
     };
+  };
+  customizeCommonLabelFortopmovin = (pointInfo: any): string => {
+    return `${pointInfo.value}`;
   };
 
   //====================date range selection for custom date===========================
@@ -785,16 +815,9 @@ ${this.formatAmount(arg.value)}`;
     this.service.get_sync_Data_api().subscribe({
       next: (res: any) => {
 
-        const currentTime = new Date();
-
-        const pendingData = res.filter((item: any) => {
-          const lastSyncTime = new Date(item.LAST_SYNCH_TIME);
-
-          const diffMinutes =
-            (currentTime.getTime() - lastSyncTime.getTime()) / (1000 * 60);
-
-          return diffMinutes > this.synch_pending_intervel;
-        });
+        const pendingData = res.filter(
+          (item: any) => Number(item.TIME_DIFFERENCE) > this.synch_pending_intervel
+        );
 
         this.listSyncData = pendingData.map((item: any, index: number) => ({
           ...item,
@@ -815,6 +838,7 @@ ${this.formatAmount(arg.value)}`;
   }
   onRowPrepared(e: any) {
     if (e.rowType !== 'data') return;
+
 
     if (e.data.IsPending) {
       e.rowElement.style.color = 'red';
@@ -891,120 +915,143 @@ ${this.formatAmount(arg.value)}`;
   }
   // customizeText for dxo-label must return a STRING directly
   customizeGrossSalesLabel = (arg: any) => {
-    console.log(arg,'=================')
     return {
-      text: `${arg.items.argument}: ${this.formatGrossSalesAmount(arg.value)}`
-
+      text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`
     };
   }
 
-    // customizeTooltip for dxo-tooltip correctly returns an OBJECT
-    customizeGrossSalesTooltip = (arg: any) => {
-          console.log(arg,'=================')
-
-      return {
-        text: `${arg.items.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
-      };
+  customizeGrossSalesTooltip = (arg: any) => {
+    return {
+      text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
     };
+  };
 
-    formatAmountTender(value: number): string {
-      const absValue = Math.abs(value);
-      if (absValue >= 1_000_000_000) {
-        return (value / 1_000_000_000).toFixed(2) + 'B';
-      } else if (absValue >= 1_000_000) {
-        return (value / 1_000_000).toFixed(2) + 'M';
-      } else if (absValue >= 1_000) {
-        return (value / 1_000).toFixed(2) + 'K';
-      }
-      return value.toFixed(2);
+  formatAmountTender(value: number): string {
+    const absValue = Math.abs(value);
+    if (absValue >= 1_000_000_000) {
+      return (value / 1_000_000_000).toFixed(2) + 'B';
+    } else if (absValue >= 1_000_000) {
+      return (value / 1_000_000).toFixed(2) + 'M';
+    } else if (absValue >= 1_000) {
+      return (value / 1_000).toFixed(2) + 'K';
+    }
+    return value.toFixed(2);
+  }
+
+  // Tooltip - shows exact value only
+  customizeTooltipTender = (pointInfo: any) => {
+    return {
+      text: `${pointInfo.seriesName}: ${this.formatAmountTender(pointInfo.value)}`,
+    };
+  };
+
+  // Data labels on bars - shows exact value only
+  customizeLabelTender = (pointInfo: any) => {
+    return this.formatAmountTender(pointInfo.value);
+  };
+
+
+  //=================
+  customizeTotalLabel = (arg: any) => {
+    const value = arg.value;
+
+    if (value >= 1_000_000_000) {
+      return (value / 1_000_000_000).toFixed(2) + ' B';
+    } else if (value >= 1_000_000) {
+      return (value / 1_000_000).toFixed(2) + ' M';
+    } else if (value >= 1_000) {
+      return (value / 1_000).toFixed(2) + ' K';
     }
 
-    // Tooltip - shows exact value only
-    customizeTooltipTender = (pointInfo: any) => {
-      return {
-        text: `${pointInfo.seriesName}: ${this.formatAmountTender(pointInfo.value)}`,
-      };
+    return value.toString();
+  };
+
+  customizeCommonLabelProfitandLoss = (arg: any) => {
+    return new Intl.NumberFormat('en', {
+      notation: 'compact',
+      maximumFractionDigits: 1
+    }).format(arg.value);
+  };
+  customizeProfitandLoss = (arg: any) => {
+    return new Intl.NumberFormat('en-IN', {
+      notation: 'compact',
+      maximumFractionDigits: 1
+    }).format(arg.value);
+  };
+  customizeProfitAndLossTooltip = (arg: any) => {
+    return {
+      text: `${arg.seriesName}\n${arg.argumentText}\n ${new Intl.NumberFormat(
+        'en-IN',
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      ).format(arg.value)} AED`
     };
+  };
 
-    // Data labels on bars - shows exact value only
-    customizeLabelTender = (pointInfo: any) => {
-      return this.formatAmountTender(pointInfo.value);
-    };
+  customizeLabelTenderTotal = (pointInfo: any) => {
 
+    const data = pointInfo.point.data;
 
-    //=================
-    customizeTotalLabel = (arg: any) => {
-      const value = arg.value;
+    let total = 0;
 
-      if (value >= 1_000_000_000) {
-        return (value / 1_000_000_000).toFixed(2) + ' B';
-      } else if (value >= 1_000_000) {
-        return (value / 1_000_000).toFixed(2) + ' M';
-      } else if (value >= 1_000) {
-        return (value / 1_000).toFixed(2) + ' K';
-      }
+    this.seriesList.forEach(series => {
+      total += Number(data[series.valueField] || 0);
+    });
 
-      return value.toString();
-    };
+    return total.toLocaleString();
+  };
+  customizeAxisLabel = (arg: any) => {
+    const text = arg.valueText;
 
-    customizeCommonLabelProfitandLoss = (arg: any) => {
-      return new Intl.NumberFormat('en', {
-        notation: 'compact',
-        maximumFractionDigits: 1
-      }).format(arg.value);
-    };
-    customizeProfitandLoss = (arg: any) => {
-      return new Intl.NumberFormat('en-IN', {
-        notation: 'compact',
-        maximumFractionDigits: 1
-      }).format(arg.value);
-    };
-    customizeProfitAndLossTooltip = (arg: any) => {
-      return {
-        text: `${arg.seriesName}\n${arg.argumentText}\n${new Intl.NumberFormat(
-          'en-IN',
-          {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }
-        ).format(arg.value)}`
-      };
-    };
-  }
+    // Split into two lines near the middle
+    const words = text.split(' ');
 
-  @NgModule({
-    imports: [
-      DxScrollViewModule,
-      DxDataGridModule,
-      DxBulletModule,
-      DxFunnelModule,
-      DxPieChartModule,
-      DxChartModule,
-      CardAnalyticsModule,
-      ToolbarAnalyticsModule,
-      DxLoadPanelModule,
-      ApplyPipeModule,
-      ConversionCardModule,
-      RevenueAnalysisCardModule,
-      RevenueCardModule,
-      RevenueSnapshotCardModule,
-      OpportunitiesTickerModule,
-      RevenueTotalTickerModule,
-      ConversionTickerModule,
-      LeadsTickerModule,
-      CommonModule,
-      DxSelectBoxModule,
-      DxValidationGroupModule,
-      DxValidatorModule,
-      DxDateBoxModule,
-      DxLoadPanelModule,
-      CustomDatePopupModule,
-      DxPopupModule,
+    if (words.length <= 1) {
+      return text;
+    }
 
-    ],
-    providers: [],
-    exports: [],
-    declarations: [AnalyticsDashboardComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  })
-  export class AnalyticsDashboardModule { }
+    const mid = Math.ceil(words.length / 2);
+
+    return words.slice(0, mid).join(' ') + '\n' + words.slice(mid).join(' ');
+  };
+
+}
+
+@NgModule({
+  imports: [
+    DxScrollViewModule,
+    DxDataGridModule,
+    DxBulletModule,
+    DxFunnelModule,
+    DxPieChartModule,
+    DxChartModule,
+    CardAnalyticsModule,
+    ToolbarAnalyticsModule,
+    DxLoadPanelModule,
+    ApplyPipeModule,
+    ConversionCardModule,
+    RevenueAnalysisCardModule,
+    RevenueCardModule,
+    RevenueSnapshotCardModule,
+    OpportunitiesTickerModule,
+    RevenueTotalTickerModule,
+    ConversionTickerModule,
+    LeadsTickerModule,
+    CommonModule,
+    DxSelectBoxModule,
+    DxValidationGroupModule,
+    DxValidatorModule,
+    DxDateBoxModule,
+    DxLoadPanelModule,
+    CustomDatePopupModule,
+    DxPopupModule,
+
+  ],
+  providers: [],
+  exports: [],
+  declarations: [AnalyticsDashboardComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class AnalyticsDashboardModule { }

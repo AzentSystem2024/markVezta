@@ -56,6 +56,14 @@ export class PayrollEditComponent {
   @Output() popupClosed = new EventEmitter<void>();
   @Input() payroll: any;
   @Input() readOnly: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
+  @Input() isReadOnlyMode: boolean = false;
+
+  is_verify: boolean = false;
+  is_approve: boolean = false;
+  is_approved: boolean = false;
+
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -72,6 +80,7 @@ export class PayrollEditComponent {
 
   salaryHeadList: any;
   selected_Company_id: any;
+  userId: any;
   incomingPayroll: any;
   incomingPayrollData: any;
   constructor(
@@ -87,6 +96,11 @@ export class PayrollEditComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['payroll'] && changes['payroll'].currentValue) {
+      this.is_verify = this.isVerifyMode;
+      this.is_approved = this.isApproveMode;
+      this.is_approve =
+        this.isReadOnlyMode || this.isVerifyMode || this.isApproveMode;
+
       this.incomingPayrollData = changes['payroll'].currentValue;
       console.log(this.incomingPayrollData, 'INCOMINGPAYROLLDATA');
       // Update the payRollData object with the incoming payroll
@@ -232,6 +246,11 @@ export class PayrollEditComponent {
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    const userDataString = localStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      this.userId = userData.USER_ID;
+    }
   }
 
   getHeadName = (rowData: any) => {
@@ -279,7 +298,7 @@ export class PayrollEditComponent {
         }
       });
   }
-  update() {
+  update(shouldVerify: boolean = false) {
     const details = this.payRollData?.PAY_DETAILS || [];
 
     if (details.length === 0) {
@@ -367,7 +386,11 @@ export class PayrollEditComponent {
           },
           'success',
         );
-        this.popupClosed.emit();
+        if (shouldVerify) {
+          this.executeVerify();
+        } else {
+          this.popupClosed.emit();
+        }
       } else {
         notify(
           {
@@ -382,6 +405,60 @@ export class PayrollEditComponent {
 
   handleClose() {
     this.popupClosed.emit();
+  }
+
+  verify() {
+    if (!this.isVerifyMode && !this.isReadOnlyMode) {
+      this.update(true);
+    } else {
+      this.executeVerify();
+    }
+  }
+
+  executeVerify() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId,
+      PAYDETAIL_ID: [
+        this.payRollData.PAYDETAIL_ID || this.payRollData.SALARY_BILL_NO,
+      ],
+    };
+
+    this.dataService.VerifyPayroll(payload).subscribe((response: any) => {
+      if (
+        response.flag == '1' ||
+        response.flag == 'true' ||
+        response.flag == 1
+      ) {
+        notify('Payroll verified successfully.', 'success', 3000);
+      } else {
+        notify('Verification failed.', 'error', 3000);
+      }
+      this.popupClosed.emit();
+    });
+  }
+
+  approve() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId,
+      PAYDETAIL_ID: [
+        this.payRollData.PAYDETAIL_ID || this.payRollData.SALARY_BILL_NO,
+      ],
+    };
+
+    this.dataService.approvePayroll(payload).subscribe((response: any) => {
+      if (
+        response.flag == '1' ||
+        response.flag == 'true' ||
+        response.flag == 1
+      ) {
+        notify('Payroll approved successfully.', 'success', 3000);
+      } else {
+        notify('Approval failed.', 'error', 3000);
+      }
+      this.popupClosed.emit();
+    });
   }
 
   onEditorPreparing(e: any) {
