@@ -256,6 +256,7 @@
       (onHiding)="handleClose()"
     >
       <app-pre-payment-add
+       #prePaymentAdd
       [mode]="popupMode"
         [isOpen]="addPrepaymentPopupOpened"
         (formClosed)="handleClose()"

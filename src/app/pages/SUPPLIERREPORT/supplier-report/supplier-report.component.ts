@@ -56,6 +56,7 @@ export class SupplierReportComponent {
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
   isLoading = false;
+  hasData = false;
 
   constructor(
     private dataservice: DataService,
@@ -279,6 +280,9 @@ get_DataSource() {
           next: (res: any) => {
             const list = res.data || [];
 
+            this.hasData = list.length > 0;
+            resolve(list);
+            
             if (list.length === 0) {
               notify({
                 message: 'No data available',

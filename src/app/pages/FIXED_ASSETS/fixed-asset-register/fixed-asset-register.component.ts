@@ -187,7 +187,7 @@ FixedAssetRegister: any[] = [];
   Fixed_Asset_register() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      DEPARTMENT_ID: this.select_department_id || 0,
+      DEPARTMENT_ID: String(this.select_department_id || 0),
     };
 
     this.dataservice.FixedAssetRegister_List(payload).subscribe((res: any) => {
