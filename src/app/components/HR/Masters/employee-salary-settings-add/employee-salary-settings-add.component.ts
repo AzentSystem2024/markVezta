@@ -194,8 +194,8 @@ export class EmployeeSalarySettingsAddComponent {
       this.SalaryDetails = this.salaryGridData.Details || [];
       // this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
       this.PreviousRevision = this.salaryGridData.EFFECT_FROM
-  ? new Date(this.salaryGridData.EFFECT_FROM)
-  : null;
+        ? new Date(this.salaryGridData.EFFECT_FROM)
+        : null;
 
       this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || 0;
       this.effectFromValidator?.instance?.validate(); // force revalidate
@@ -210,7 +210,7 @@ export class EmployeeSalarySettingsAddComponent {
     this.employeeFormData = {
       EMP_CODE: '',
       FIN_ID: '',
-      BASIC_SALARY: '',
+      BASIC_SALARY: null,
       PREV_REVISION: '',
       EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // always 1st of current month
     };
@@ -248,7 +248,7 @@ export class EmployeeSalarySettingsAddComponent {
       EMP_CODE: '',
       EMP_NAME: '',
       DESIGNATION: '',
-      BASIC_SALARY: '',
+      BASIC_SALARY: null,
       EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
       IS_INACTIVE: false,
     };
@@ -421,4 +421,4 @@ export class EmployeeSalarySettingsAddComponent {
   exports: [EmployeeSalarySettingsAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeSalarySettingsAddModule {}
+export class EmployeeSalarySettingsAddModule { }

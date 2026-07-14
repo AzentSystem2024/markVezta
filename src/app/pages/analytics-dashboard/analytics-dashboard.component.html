@@ -38,51 +38,23 @@
     <div class="dashboard-row">
       <!-- Funnel -->
       <div class="dashboard-card">
-        <h6 class="card-title mt-2 mb-2">Gross Sales</h6>
+        <h6 class="card-title mt-2 mb-2">Net Sales</h6>
 
-        <!-- <dx-scroll-view direction="both" showScrollbar="always" [height]="450"> -->
-        <!-- <dx-funnel
-          id="funnel"
-          [dataSource]="gross_Sales_list"
-          argumentField="STORE_NAME"
-          valueField="AMOUNT"
-          [palette]="customPalette"
-        >
-          <dxo-tooltip
-            [enabled]="true"
-            [customizeTooltip]="customizeGrossSalesTooltip"
-          ></dxo-tooltip>
-
-          <dxo-label
-            [visible]="true"
-            position="inside"
-            [customizeText]="customizeGrossSalesLabel"
-          >
-          </dxo-label>
-          <dxo-legend
-            [visible]="true"
-            verticalAlignment="bottom"
-            horizontalAlignment="center"
-          >
-          </dxo-legend>
-          <dxo-item [borderWidth]="2" borderColor="#ffffff"> </dxo-item>
-        </dx-funnel> -->
         <dx-funnel
           id="funnel"
           [dataSource]="gross_Sales_list"
           argumentField="STORE_NAME"
           valueField="AMOUNT"
-          [palette]="customPalette"
         >
           <dxo-tooltip
             [enabled]="true"
-            [customizeTooltip]="customizeGrossSalesTooltip"
+            [customizeTooltip]="customizeCommonTooltip"
           ></dxo-tooltip>
 
           <dxo-label
             [visible]="true"
             position="inside"
-            [customizeText]="customizeGrossSalesLabel"
+            [customizeText]="customizeCommonLabel"
           >
           </dxo-label>
 
@@ -100,12 +72,11 @@
             ></dxo-border>
           </dxo-item>
         </dx-funnel>
-        <!-- </dx-scroll-view> -->
       </div>
     </div>
 
     <!-- Bar Chart -->
-    <div class="dashboard-row">
+    <!-- <div class="dashboard-row">
       <div class="dashboard-card full-width">
         <h6 class="card-title mt-2 mb-2">Top Moving Items</h6>
 
@@ -138,8 +109,42 @@
           </dx-chart>
         </dx-scroll-view>
       </div>
-    </div>
+    </div> -->
 
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Top Moving Items</h6>
+
+        <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
+          <dx-chart [dataSource]="TopMovingItems_list" palette="soft">
+            <dxo-common-series-settings
+              argumentField="DESCRIPTION"
+              valueField="QTY_SOLD"
+              type="bar"
+              [ignoreEmptyPoints]="true"
+            >
+              <dxo-label
+                [visible]="true"
+                position="inside"
+                [customizeText]="customizeCommonLabelFortopmovin"
+              ></dxo-label>
+            </dxo-common-series-settings>
+
+            <dxo-series-template nameField="ITEM_CODE"> </dxo-series-template>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeChartTooltip"
+            >
+            </dxo-tooltip>
+
+            <dxo-legend [visible]="false"></dxo-legend>
+
+            <dxo-size [height]="400" [width]="1200"> </dxo-size>
+          </dx-chart>
+        </dx-scroll-view>
+      </div>
+    </div>
     <div class="dashboard-row">
       <div class="dashboard-card-Tender">
         <h6 class="card-title mt-2 mb-2">Revenue / Expenses</h6>
@@ -200,6 +205,12 @@
               [color]="s.color"
             >
             </dxi-series>
+            <dxo-label
+              [visible]="true"
+              position="outside"
+              [customizeText]="customizeLabelTenderTotal"
+            >
+            </dxo-label>
 
             <dxo-common-series-settings
               argumentField="store"
@@ -296,6 +307,5 @@
     <dxi-column
       dataField="LAST_SYNCH_TIME"
       caption="Last Synch.Time"
-      [customizeText]="formatLastSyncTime"
     ></dxi-column> </dx-data-grid
 ></dx-popup>
