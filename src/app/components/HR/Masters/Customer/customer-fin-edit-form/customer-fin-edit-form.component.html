@@ -382,8 +382,8 @@
         </dxi-item>
       </dxi-item>
 
-      <dxi-item itemType="group">
-        <dxi-item [colSpan]="2">
+      <dxi-item itemType="group" cssClass="mt-5">
+        <!-- <dxi-item [colSpan]="2">
           <div *dxTemplate>
             <dx-select-box
               label="Customer Type"
@@ -395,25 +395,9 @@
               labelMode="floating"
               (onValueChanged)="onDealerSelected($event)"
             ></dx-select-box>
-            <!-- <dx-check-box
-              [(value)]="IS_COMPANY_BRANCH_VALUE"
-              text="Company Branch"
-              stylingMode="outlined"
-              hint="Company Branch"
-              labelMode="floating"
-            ></dx-check-box> -->
-            <!-- <dx-radio-group
-              [(value)]="formCustomerData.CUST_TYPE"
-              [items]="dealerTypeOptions"
-              layout="horizontal"
-              displayExpr="text"
-              valueExpr="value"
-              label="Customer Category"
-              labelMode="floating"
-              (onValueChanged)="onDealerTypeChange($event)"
-            ></dx-radio-group> -->
+            
           </div>
-        </dxi-item>
+        </dxi-item> -->
 
         <dxi-item *ngIf="formCustomerData.CUST_TYPE === 2" [colSpan]="2">
           <div *dxTemplate>

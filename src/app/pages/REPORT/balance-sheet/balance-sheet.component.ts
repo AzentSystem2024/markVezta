@@ -15,6 +15,8 @@ import {
   DxValidationGroupModule,
   DxValidatorModule,
 } from 'devextreme-angular';
+import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
 import { DataService } from 'src/app/services';
 
 @Component({
@@ -25,7 +27,7 @@ import { DataService } from 'src/app/services';
 export class BalanceSheetComponent {
   isFilterRowVisible: boolean = false;
 
-  BalanceSheetReport: any = [];
+  BalanceSheetReport: any ;
   auto: string = 'auto';
   isEmptyDatagrid: boolean = true;
   expandedOnce = false;
@@ -182,33 +184,59 @@ this.selectedmonth = currentMonth;
     return `${year}-${month}-${day}`;
   }
 
-  get_DataSource() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.finID,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
-    };
+get_DataSource() {
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.finID,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+  };
 
-    const payloadData = {
-      companyId: payload.COMPANY_ID,
-      finId: payload.FIN_ID,
-      dateFrom: payload.DATE_FROM,
-      dateTo: payload.DATE_TO,
-    };
+  const payloadData = {
+    companyId: payload.COMPANY_ID,
+    finId: payload.FIN_ID,
+    dateFrom: payload.DATE_FROM,
+    dateTo: payload.DATE_TO,
+  };
 
-    sessionStorage.removeItem('viewclickvalue');
-    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
+  sessionStorage.removeItem('viewclickvalue');
+  sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-    this.dataservice.Balance_Sheet_Api(payload).subscribe((res: any) => {
-      this.isEmptyDatagrid = false;
+  this.BalanceSheetReport = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.Balance_Sheet_Api(payload).subscribe({
+          next: (res: any) => {
+            const list = res.data || [];
 
-      this.BalanceSheetReport = res.data;
+            this.isEmptyDatagrid = list.length === 0;
 
-      this.calculateCustomSummaries();
-      this.expandedOnce = false; // ✅ reset when new data is loaded
-    });
-  }
+           this.calculateCustomSummaries(list);
+            // this.expandedOnce = false;
+
+            if (list.length === 0) {
+              notify({
+                message: 'No data available',
+                type: 'warning',
+                displayTime: 2000,
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              });
+            }
+
+            resolve(list);
+            this.expandedOnce = false;
+          },
+          error: () => {
+            this.isEmptyDatagrid = true;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
 
   onViewClick(e: any) {
     this.HeadId = e.row.data.HEAD_ID;
@@ -226,10 +254,14 @@ this.selectedmonth = currentMonth;
     }
   }
 
-  calculateCustomSummaries() {
-    // no row insertion, just keep original data
-    this.BalanceSheetReport = [...this.BalanceSheetReport];
-  }
+  // calculateCustomSummaries() {
+  //   // no row insertion, just keep original data
+  //   this.BalanceSheetReport = [...this.BalanceSheetReport];
+  // }
+
+  calculateCustomSummaries(list: any[]) {
+  // calculate summaries here if needed
+}
 
   onContentReady(e) {
     if (!this.expandedOnce && e.component.getDataSource().isLoaded()) {

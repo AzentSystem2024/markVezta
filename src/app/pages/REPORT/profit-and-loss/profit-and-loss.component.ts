@@ -27,6 +27,8 @@ import {
   LedgerStatementComponent,
   LedgerStatementModule,
 } from '../ledger-statement/ledger-statement.component';
+import notify from 'devextreme/ui/notify';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-profit-and-loss',
@@ -113,7 +115,7 @@ this.selectedmonth = currentMonth;
 
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
-    this.get_DataSource();
+    // this.get_DataSource();
   }
 
   refreshGrid() {
@@ -218,47 +220,99 @@ this.selectedmonth = currentMonth;
     return `${year}-${month}-${day}`;
   }
 
+  // get_DataSource() {
+
+  //   let payload = {
+  //     COMPANY_ID: this.selected_Company_id,
+  //     FIN_ID: this.finID,
+  //     DATE_FROM: this.formatted_from_date,
+  //     DATE_TO: this.formatted_To_date,
+  //   };
+
+  //   const payloadData = {
+  //     companyId: payload.COMPANY_ID,
+  //     finId: payload.FIN_ID,
+  //     dateFrom: payload.DATE_FROM,
+  //     dateTo: payload.DATE_TO,
+  //   };
+
+  //   sessionStorage.removeItem('viewclickvalue');
+  //   sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
+
+  //   // console.log(JSON.parse(sessionStorage.getItem('viewclickvalue')));
+  //   // console.log(payload, '==========payload================');
+
+  //   this.dataservice.Profit_Loss_Api(payload).subscribe({
+  //     next: (res: any) => {
+  //       this.isEmptyDatagrid = false;
+  //       // console.log(res, '----------list --------------------------');
+
+  //       this.ProfitLossReport = res.data;
+
+  //       this.calculateNetProfit();
+
+  //       this.dataGrid.instance.refresh(); // force grid to recalc summaries
+  //     },
+  //     error: () => {},
+  //     complete: () => {
+  //       grid?.endCustomLoading();
+  //     },
+  //   });
+  // }
+
   get_DataSource() {
-    const grid = this.dataGrid?.instance;
-    grid?.beginCustomLoading('Loading...');
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    FIN_ID: this.finID,
+    DATE_FROM: this.formatted_from_date,
+    DATE_TO: this.formatted_To_date,
+  };
 
-    let payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.finID,
-      DATE_FROM: this.formatted_from_date,
-      DATE_TO: this.formatted_To_date,
-    };
+  const payloadData = {
+    companyId: payload.COMPANY_ID,
+    finId: payload.FIN_ID,
+    dateFrom: payload.DATE_FROM,
+    dateTo: payload.DATE_TO,
+  };
 
-    const payloadData = {
-      companyId: payload.COMPANY_ID,
-      finId: payload.FIN_ID,
-      dateFrom: payload.DATE_FROM,
-      dateTo: payload.DATE_TO,
-    };
+  sessionStorage.removeItem('viewclickvalue');
+  sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-    sessionStorage.removeItem('viewclickvalue');
-    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
+  this.ProfitLossReport = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataservice.Profit_Loss_Api(payload).subscribe({
+          next: (res: any) => {
+            const list = res.data || [];
 
-    // console.log(JSON.parse(sessionStorage.getItem('viewclickvalue')));
-    // console.log(payload, '==========payload================');
+            this.isEmptyDatagrid = list.length === 0;
 
-    this.dataservice.Profit_Loss_Api(payload).subscribe({
-      next: (res: any) => {
-        this.isEmptyDatagrid = false;
-        // console.log(res, '----------list --------------------------');
+            // Calculate net profit using the loaded data
+            this.calculateNetProfit(list);
 
-        this.ProfitLossReport = res.data;
+            if (list.length === 0) {
+              notify({
+                message: 'No data available',
+                type: 'warning',
+                displayTime: 2000,
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              });
+            }
 
-        this.calculateNetProfit();
+            resolve(list);
+          },
+          error: () => {
+            this.isEmptyDatagrid = true;
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
 
-        this.dataGrid.instance.refresh(); // force grid to recalc summaries
-      },
-      error: () => {},
-      complete: () => {
-        grid?.endCustomLoading();
-      },
-    });
-  }
   typeSorting = (a: string, b: string) => {
     const order = {
       REVENUES: 1,
@@ -288,18 +342,34 @@ this.selectedmonth = currentMonth;
     }
   }
 
-  calculateNetProfit() {
-    let revenue = 0,
-      expense = 0;
-    this.ProfitLossReport.forEach((row) => {
-      const type = (row.TYPE_NAME || '').trim().toUpperCase();
-      const amount = Number(row.AMOUNT || 0);
-      if (type === 'REVENUES') revenue += amount;
-      else if (type === 'EXPENSES') expense += amount;
-    });
-    this.netProfit = revenue - expense;
-  }
+  // calculateNetProfit() {
+  //   let revenue = 0,
+  //     expense = 0;
+  //   this.ProfitLossReport.forEach((row) => {
+  //     const type = (row.TYPE_NAME || '').trim().toUpperCase();
+  //     const amount = Number(row.AMOUNT || 0);
+  //     if (type === 'REVENUES') revenue += amount;
+  //     else if (type === 'EXPENSES') expense += amount;
+  //   });
+  //   this.netProfit = revenue - expense;
+  // }
+calculateNetProfit(data: any[]) {
+  let revenue = 0;
+  let expense = 0;
 
+  data.forEach((row) => {
+    const type = (row.TYPE_NAME || '').trim().toUpperCase();
+    const amount = Number(row.AMOUNT || 0);
+
+    if (type === 'REVENUES') {
+      revenue += amount;
+    } else if (type === 'EXPENSES') {
+      expense += amount;
+    }
+  });
+
+  this.netProfit = revenue - expense;
+}
   onCellPrepared(e: any) {
     if (
       e.rowType === 'totalFooter' &&
