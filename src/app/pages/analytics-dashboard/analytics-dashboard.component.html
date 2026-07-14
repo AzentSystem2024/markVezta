@@ -60,11 +60,17 @@
         <h6 class="card-title mt-2 mb-2">Top Moving Items</h6>
 
         <dx-scroll-view direction="both" showScrollbar="always" [height]="450">
-          <dx-chart
-            [dataSource]="TopMovingItems_list"
-            palette="soft"
-            with="90%"
-          >
+          <dx-chart [dataSource]="TopMovingItems_list" palette="soft">
+            <!-- Add only this -->
+            <dxo-argument-axis>
+              <dxo-label
+                [rotationAngle]="-45"
+                overlappingBehavior="rotate"
+                [customizeText]="customizeAxisLabel"
+              >
+              </dxo-label>
+            </dxo-argument-axis>
+
             <dxo-common-series-settings
               argumentField="DESCRIPTION"
               valueField="QTY_SOLD"
@@ -78,7 +84,7 @@
               ></dxo-label>
             </dxo-common-series-settings>
 
-            <dxo-series-template nameField="ITEM_CODE"> </dxo-series-template>
+            <dxo-series-template nameField="ITEM_CODE"></dxo-series-template>
 
             <dxo-tooltip
               [enabled]="true"
@@ -88,7 +94,7 @@
 
             <dxo-legend [visible]="false"></dxo-legend>
 
-            <dxo-size [height]="400" [width]="1200"> </dxo-size>
+            <dxo-size [height]="400" [width]="1150"></dxo-size>
           </dx-chart>
         </dx-scroll-view>
       </div>

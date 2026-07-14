@@ -986,7 +986,7 @@ ${this.formatAmount(arg.value)}`;
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         }
-      ).format(arg.value)}AED`
+      ).format(arg.value)} AED`
     };
   };
 
@@ -1001,6 +1001,20 @@ ${this.formatAmount(arg.value)}`;
     });
 
     return total.toLocaleString();
+  };
+  customizeAxisLabel = (arg: any) => {
+    const text = arg.valueText;
+
+    // Split into two lines near the middle
+    const words = text.split(' ');
+
+    if (words.length <= 1) {
+      return text;
+    }
+
+    const mid = Math.ceil(words.length / 2);
+
+    return words.slice(0, mid).join(' ') + '\n' + words.slice(mid).join(' ');
   };
 
 }

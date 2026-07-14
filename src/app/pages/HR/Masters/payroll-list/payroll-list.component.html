@@ -308,7 +308,9 @@
                 ? 'Approve'
                 : 'Verify'
           "
-          (click)="onEditorPreparing({ data: cellData.data, cancel: false })"
+          (click)="
+            onVerifyOrApproveIconClick({ data: cellData.data, cancel: false })
+          "
         >
           <!-- Blue badge -->
           <i
@@ -359,58 +361,16 @@
   [(visible)]="editPayrollPopupOpened"
   [width]="'70vw'"
   [height]="'85vh'"
-  title="Payroll"
+  title="{{ PopupTitle }}"
   (onHiding)="handleClose()"
 >
   <app-payroll-edit
     *ngIf="editPayrollPopupOpened"
     [selectedMonth]="selectedMonthForAdd"
     [payroll]="selectedPayroll"
+    [isVerifyMode]="isVerifyMode"
+    [isApproveMode]="isApproveMode"
+    [isReadOnlyMode]="isReadOnlyMode"
     (popupClosed)="handleClose()"
   ></app-payroll-edit>
-</dx-popup>
-
-<dx-popup
-  [(visible)]="verifyPayrollPopupOpened"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Payroll"
-  (onHiding)="handleClose()"
->
-  <app-payroll-verify
-    *ngIf="verifyPayrollPopupOpened"
-    [selectedMonth]="selectedMonthForAdd"
-    [payroll]="selectedPayroll"
-    (popupClosed)="handleClose()"
-  ></app-payroll-verify>
-</dx-popup>
-
-<dx-popup
-  [(visible)]="approvePayrollPopupOpened"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Payroll"
-  (onHiding)="handleClose()"
->
-  <app-payroll-approve
-    *ngIf="approvePayrollPopupOpened"
-    [selectedMonth]="selectedMonthForAdd"
-    [payroll]="selectedPayroll"
-    (popupClosed)="handleClose()"
-  ></app-payroll-approve>
-</dx-popup>
-
-<dx-popup
-  [(visible)]="viewPayrollPopupOpened"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Payroll"
-  (onHiding)="handleClose()"
->
-  <app-payroll-view
-    *ngIf="viewPayrollPopupOpened"
-    [selectedMonth]="selectedMonthForAdd"
-    [payroll]="selectedPayroll"
-    (popupClosed)="handleClose()"
-  ></app-payroll-view>
 </dx-popup>

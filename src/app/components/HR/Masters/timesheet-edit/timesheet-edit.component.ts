@@ -164,7 +164,7 @@ export class TimesheetEditComponent {
   ngOnInit() {
     this.sesstion_Details();
     this.loadDepartment();
-    this.getSalaryHead();
+    this.getSalaryHead(this.timesheetFormData.TIMESHEET_SALARY || []);
     this.getStoreDropdown();
     this.getEmployeeDropdown();
     this.Timesheetlistdata();

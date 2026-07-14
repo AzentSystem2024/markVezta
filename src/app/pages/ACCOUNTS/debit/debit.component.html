@@ -285,7 +285,7 @@
   [(visible)]="isAddDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  [title]="popupTitle"
+  title="New Debit Note"
   (onHiding)="handleClose()"
 >
   <app-add-debit
@@ -334,7 +334,7 @@
   [(visible)]="isApproveDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  title="Approve Journal Book"
+  title="Approve Debit Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isApproveDebitNote">
@@ -352,7 +352,7 @@
   [(visible)]="isViewDebitNote"
   [width]="'90vw'"
   [height]="'100vh'"
-  [title]="popupTitle"
+  title="Debit Note"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isViewDebitNote">
