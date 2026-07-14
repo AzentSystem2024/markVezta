@@ -135,6 +135,9 @@ export class AnalyticsDashboardComponent implements OnInit {
   storeinfo: any = [];
   profitAndLoss_List: any = {}
   seriesList_profitAndLoss: any[] = [];
+  totalCash = 0;
+totalFabPosCard = 0;
+
   constructor(private service: DataService) {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
     console.log(sessionData)
@@ -389,6 +392,7 @@ export class AnalyticsDashboardComponent implements OnInit {
     }, 50000);
 
     this.sesstion_Details();
+    
 
     const payload = {
       DATE_FROM: this.formatDate(this.fromDate),
@@ -430,11 +434,14 @@ export class AnalyticsDashboardComponent implements OnInit {
 
           store.TenderTypes.forEach((t: any) => {
             obj[t.TENDER] = t.AMOUNT;
-            obj.Total += t.AMOUNT;
+            obj.Total += Number(t.AMOUNT);
           });
-
+          // Total = Cash + FAB POS CARD
+obj.TOTAL = obj.Total;
+console.log(obj.TOTAL)
           return obj;
         });
+
         // const revenue = res.data.ProfitLoss.Revenue || [];
         // const expense = res.data.ProfitLoss.Expense || [];
 
@@ -940,11 +947,17 @@ ${this.formatAmount(arg.value)}`;
   }
 
   // Tooltip - shows exact value only
-  customizeTooltipTender = (pointInfo: any) => {
-    return {
-      text: `${pointInfo.seriesName}: ${this.formatAmountTender(pointInfo.value)}`,
-    };
+ customizeTooltipTender = (pointInfo: any) => {
+  const data = pointInfo.point.data;
+
+  return {
+    html: `
+      <b>${data.store}</b><br/>
+      ${pointInfo.seriesName}: ${pointInfo.valueText}<br/>
+      <b>Total: ${data.TOTAL.toLocaleString()}</b>
+    `,
   };
+};
 
   // Data labels on bars - shows exact value only
   customizeLabelTender = (pointInfo: any) => {
