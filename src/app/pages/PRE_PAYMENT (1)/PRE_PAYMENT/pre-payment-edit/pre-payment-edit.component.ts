@@ -356,7 +356,7 @@ get actionButtonText(): string {
 
     this.showGrid = true;
     this.scheduleGenerated = true;
-    this.fieldChanged = false;
+    this.fieldChanged = false; 
   }
 
   onFieldChange() {
