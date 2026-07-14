@@ -24,7 +24,7 @@
       *ngFor="let col of detailViewColumns"
       [dataField]="col"
       [caption]="col"
-      [visible]="col !== 'HeaderID'"
+      [visible]="col !== 'HeaderID' && col !== 'AcTranID' && col !== 'AcTransID'"
       [width]="col === 'Status' ? 'auto' : 150"
       [fixed]="col === 'FailureReason' || col === 'Status'"
       [fixedPosition]="'right'"

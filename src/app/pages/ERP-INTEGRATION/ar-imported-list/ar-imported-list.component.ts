@@ -124,12 +124,11 @@ export class ARImportedListComponent {
     private srvce: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.fetch_Full_import_list();
   }
-
 
   displayExpr = (item: any) => {
     if (!item) return '';
@@ -609,11 +608,11 @@ export class ARImportedListComponent {
     DxLoadPanelModule,
     ERPJVModule,
     CustomDatePopupModule,
-    DxSelectBoxModule
+    DxSelectBoxModule,
   ],
   providers: [],
   declarations: [ARImportedListComponent],
   exports: [ARImportedListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ARImportedListModule { }
+export class ARImportedListModule {}
