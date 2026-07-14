@@ -294,6 +294,7 @@ export class PayrollListComponent {
         const payload = {
           COMPANY_ID: this.selectedCompanyId,
           USER_ID: this.userId,
+          FIN_ID: this.finId,
           PAYDETAIL_ID: selectedRows.map((row: any) => row.SALARY_BILL_NO),
         };
 
