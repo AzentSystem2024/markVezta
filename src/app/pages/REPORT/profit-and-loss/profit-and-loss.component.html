@@ -29,7 +29,10 @@
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
       (onExporting)="onExporting($event)"
-      [loadPanel]="{ enabled: false, text: 'Loading...' }"
+        [loadPanel]="{
+    enabled: true,
+    text: 'Loading...'
+  }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
@@ -99,7 +102,7 @@
         <dxi-item>
           <dx-date-box
             [width]="150"
-            label="Date To"
+            label="As on Date"
             labelMode="floating"
             [value]="formatted_To_date"
             [displayFormat]="'dd-MM-yyyy'"
