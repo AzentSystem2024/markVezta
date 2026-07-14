@@ -7147,6 +7147,29 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+
+    //==================AR Manual Matching=======================
+  getARManualMatchingReceiptList(payload: any): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}ARManualMatching/receiptlist`,
+      payload,
+    );
+  }
+
+  getARManualMatchingInvoiceList(payload: any): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}ARManualMatching/invoicelist`,
+      payload,
+    );
+  }
+
+  processARManualMatching(payload: any): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}ARManualMatching/manualprocess`,
+      payload,
+    );
+  }
+
   //===================================DISTRICT======================================================//
   getDistricts(): Observable<any> {
     return this.http.post(`${this.apiUrl}District/list`, {});
