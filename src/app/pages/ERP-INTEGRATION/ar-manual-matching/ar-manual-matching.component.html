@@ -1,9 +1,144 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
+    <!-- Top Grid: Receipts -->
     <dx-data-grid
-      #detailGrid
+      #receiptGrid
+      [dataSource]="receiptData"
+      [showBorders]="true"
+      class="grid theme-dependent mb-1"
+      [rowAlternationEnabled]="true"
+      [selection]="{
+        mode: 'multiple',
+        showCheckBoxesMode: 'always',
+        allowSelectAll: false,
+      }"
+      [focusedRowEnabled]="false"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [height]="'40vh'"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      (onSelectionChanged)="onReceiptSelectionChanged($event)"
+    >
+      <dxi-column
+        *ngFor="let col of receiptColumns"
+        [dataField]="col.dataField"
+        [caption]="col.caption"
+        [dataType]="col.dataType"
+        [format]="col.format"
+      ></dxi-column>
+
+      <dxo-filter-row
+        [visible]="showFilterRow"
+        [applyFilter]="currentFilter"
+      ></dxo-filter-row>
+
+      <dxo-header-filter [visible]="isFilterOpened"
+        ><dxo-search [enabled]="true"></dxo-search
+      ></dxo-header-filter>
+
+      <dxo-paging [enabled]="false"></dxo-paging>
+
+      <dxo-pager
+        [visible]="false"
+        [showInfo]="true"
+        infoText="Total Rows: {2}"
+        [showNavigationButtons]="false"
+        [showPageSizeSelector]="false"
+      ></dxo-pager>
+
+      <dxo-scrolling
+        mode="virtual"
+        rowRenderingMode="virtual"
+        columnRenderingMode="virtual"
+        showScrollbar="always"
+        preloadEnabled="true"
+        useNative="false"
+      ></dxo-scrolling>
+
+      <dxo-toolbar>
+        <dxi-item
+          name="receiptListHeader"
+          location="before"
+          locateInMenu="never"
+        >
+          <div class="grid-header">Receipts</div>
+        </dxi-item>
+
+        <dxi-item
+          name="refreshButton"
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          name="searchButton"
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item name="divider1" location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <dxi-item
+          name="reProcessButton"
+          location="after"
+          widget="dxButton"
+          [options]="MatchingButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-summary>
+        <dxi-total-item
+          column="Amount"
+          summaryType="custom"
+          [displayFormat]="
+            'Total: ' +
+            ((selectedReceiptAmountTotal | number: '1.2-2') || '0.00')
+          "
+        ></dxi-total-item>
+        <dxi-total-item
+          column="RejectedAmount"
+          summaryType="custom"
+          [displayFormat]="
+            'Total: ' +
+            ((selectedReceiptRejectedTotal | number: '1.2-2') || '0.00')
+          "
+        ></dxi-total-item>
+      </dxo-summary>
+    </dx-data-grid>
+  </div>
+
+  <div
+    *ngIf="isMatchingLoading"
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+    "
+  >
+    <dx-load-indicator
+      [visible]="true"
+      height="24"
+      width="24"
+    ></dx-load-indicator>
+    <span style="margin-left: 10px; font-weight: 500; color: #1ca8dd"
+      >Processing Match...</span
+    >
+  </div>
+
+  <div class="grid-section">
+    <!-- Bottom Grid: Invoices -->
+    <dx-data-grid
+      #invoiceGrid
       class="grid theme-dependent"
-      [dataSource]="importDataList"
+      [dataSource]="invoiceData"
       [showBorders]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
@@ -11,160 +146,92 @@
       [allowColumnResizing]="true"
       [columnAutoWidth]="true"
       noDataText=" "
-      keyExpr="HeaderID"
-      [height]="'100%'"
-      (onRowCollapsing)="onRowCollapsing($event)"
-      (onCellClick)="onCellClick($event)"
+      [height]="'40vh'"
+      (onSelectionChanged)="onInvoiceSelectionChanged($event)"
+      (onEditorPreparing)="onInvoiceEditorPreparing($event)"
+      (onSaved)="onInvoiceSaved($event)"
     >
-      <dxo-selection mode="multiple" showCheckBoxesMode="always">
-      </dxo-selection>
-      <dxi-column type="selection" [allowSelectAll]="true"> </dxi-column>
-      <dxi-column
-        *ngFor="let col of detailViewColumns"
-        [dataField]="col"
-        [caption]="col"
-        [visible]="col !== 'HeaderID'"
-        [width]="col === 'Status' ? 'auto' : 150"
-        [fixed]="col === 'FailureReason' || col === 'Status'"
-        [fixedPosition]="'right'"
-        [alignment]="
-          col === 'Status'
-            ? 'center'
-            : col === 'TransactionID'
-              ? 'left'
-              : 'left'
-        "
-      >
-      </dxi-column>
+      <dxo-selection
+        mode="multiple"
+        showCheckBoxesMode="always"
+      ></dxo-selection>
 
-      <!-- ================= Filter ================= -->
+      <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
+
+      <dxi-column
+        *ngFor="let col of invoiceColumns"
+        [dataField]="col.dataField"
+        [caption]="col.caption"
+        [dataType]="col.dataType"
+        [format]="col.format"
+        [allowEditing]="col.allowEditing"
+        [validationRules]="col.validationRules"
+      ></dxi-column>
+
       <dxo-filter-row
         [visible]="showFilterRow"
         [applyFilter]="currentFilter"
       ></dxo-filter-row>
 
-      <dxo-header-filter [visible]="isFilterOpened">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
+      <dxo-header-filter [visible]="isFilterOpened"
+        ><dxo-search [enabled]="true"></dxo-search
+      ></dxo-header-filter>
 
-      <!-- ================= Paging ================= -->
-      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-paging [enabled]="false"></dxo-paging>
 
       <dxo-pager
-        [visible]="true"
+        [visible]="false"
         [showInfo]="true"
-        [showNavigationButtons]="true"
-        [showPageSizeSelector]="true"
-        [allowedPageSizes]="[10, 20, 30, 40]"
-      >
-      </dxo-pager>
-      <!-- <dxo-scrolling
-        mode="stan"
+        infoText="Total Rows: {2}"
+        [showNavigationButtons]="false"
+        [showPageSizeSelector]="false"
+      ></dxo-pager>
+
+      <dxo-scrolling
+        mode="virtual"
         rowRenderingMode="virtual"
         columnRenderingMode="virtual"
         showScrollbar="always"
         preloadEnabled="true"
         useNative="false"
-      >
-      </dxo-scrolling> -->
+      ></dxo-scrolling>
 
-      <dxo-load-panel [enabled]="true" [showPane]="true" [showIndicator]="true">
-      </dxo-load-panel>
-
-      <!-- ================= Toolbar ================= -->
       <dxo-toolbar>
-        <dxi-item location="before" locateInMenu="never">
-          <div class="grid-header">Invoice List</div>
-        </dxi-item>
-
-        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
-
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-
         <dxi-item
-          location="after"
-          widget="dxButton"
-          [options]="searchButtonOptions"
+          name="invoiceListHeader"
+          location="before"
+          locateInMenu="never"
         >
-        </dxi-item>
-
-        <!-- Divider -->
-
-        <dxi-item name="exportButton" location="after" cssClass="export-btn">
-        </dxi-item>
-
-        <dxi-item
-          location="after"
-          widget="dxButton"
-          [options]="ReProcessButtonOptions"
-        >
+          <div class="grid-header">Invoices</div>
         </dxi-item>
       </dxo-toolbar>
-      <!-- ---- custom daterange select box template ---- -->
-      <div *dxTemplate="let data of 'dateFilterTemplate'">
-        <dx-select-box
-          [dataSource]="dateRanges"
-          [displayExpr]="displayExpr"
-          valueExpr="value"
-          [(value)]="selectedDateRange"
-          (onValueChanged)="onDateRangeChanged($event)"
-          (onOpened)="attachItemClickHandler($event)"
-          width="220"
-        >
-          <!-- This controls the dropdown list rendering -->
-          <div *dxTemplate="let item of 'item'">
-            {{ item.value === "custom" ? "Custom" : item.label }}
-          </div>
-        </dx-select-box>
-      </div>
-    </dx-data-grid>
-  </div>
-  <div class="grid-section">
-    <dx-data-grid
-      #raGrid
-      [dataSource]="RAGridData"
-      [columns]="RAProcessPopUpColumns"
-      [showBorders]="true"
-      class="mb-1"
-      [keyExpr]="'ID'"
-      [rowAlternationEnabled]="true"
-      [paging]="{ enabled: false }"
-      [selection]="{
-        mode: 'multiple',
-        showCheckBoxesMode: 'always',
-      }"
-      [focusedRowEnabled]="false"
-      [scrolling]="{ mode: 'virtual' }"
-      [allowColumnReordering]="true"
-      [allowColumnResizing]="true"
-      [height]="'40%'"
-      [columnFixing]="{
-        enabled: true,
-        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
-      }"
-      (onSelectionChanged)="onRADataRowSelected($event)"
-    >
-      <dxo-toolbar>
-        <dxi-item location="before">
-          <div class="grid-header h5 fw-bold border-bottom">Receipt Data</div>
-        </dxi-item>
 
-        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
-      </dxo-toolbar>
-
-      <dxo-sorting mode="single"></dxo-sorting>
-      <dxo-filter-row [visible]="true"></dxo-filter-row>
-      <dxo-header-filter [visible]="true"></dxo-header-filter>
-      <dxo-column-chooser
-        [height]="500"
-        hideOnOutsideClick="true"
-        [enabled]="true"
-        mode="select"
-      >
-      </dxo-column-chooser>
+      <dxo-summary>
+        <dxi-total-item
+          column="Amount"
+          summaryType="custom"
+          [displayFormat]="
+            'Selected: ' +
+            ((selectedInvoiceAmountTotal | number: '1.2-2') || '0.00')
+          "
+        ></dxi-total-item>
+        <dxi-total-item
+          column="ReceivedAmount"
+          summaryType="custom"
+          [displayFormat]="
+            'Total: ' +
+            ((selectedInvoiceReceivedTotal | number: '1.2-2') || '0.00')
+          "
+        ></dxi-total-item>
+        <dxi-total-item
+          column="RejectedAmount"
+          summaryType="custom"
+          [displayFormat]="
+            'Total: ' +
+            ((selectedInvoiceRejectedTotal | number: '1.2-2') || '0.00')
+          "
+        ></dxi-total-item>
+      </dxo-summary>
     </dx-data-grid>
   </div>
 </div>

@@ -21,3 +21,45 @@
   height: 32px;
   // border: 2px solid var(--border-color);
 }
+::ng-deep .dx-editor-cell .dx-texteditor:not(.dx-tagbox) .dx-texteditor-input {
+  font-size: 14px;
+  height: 10px;
+  padding-right: 16px;
+  padding-left: 16px;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+}
+
+::ng-deep .total-amount-box .dx-texteditor-label .dx-label {
+  color: #28a745 !important;
+  font-weight: 500;
+}
+::ng-deep .total-rejected-box .dx-texteditor-label .dx-label {
+  color: #dc3545 !important;
+  font-weight: 500;
+}
+::ng-deep .total-invoice-box .dx-texteditor-label .dx-label {
+  color: #17a2b8 !important;
+  font-weight: 500;
+}
+
+::ng-deep
+  .dx-datagrid
+  .dx-datagrid-content
+  .dx-datagrid-table
+  .dx-row
+  > td.dx-datagrid-modified {
+  padding-right: 28px !important;
+}
+
+::ng-deep
+  .dx-datagrid
+  .dx-datagrid-content
+  .dx-datagrid-table
+  .dx-row
+  > td
+  .dx-revert-button {
+  left: auto !important;
+  right: 2px !important;
+}
