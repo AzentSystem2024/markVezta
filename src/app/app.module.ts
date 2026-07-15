@@ -417,6 +417,7 @@ import {
 } from './pages/dashboard-mark/dashboard-mark.component';
 import { PurchaseReportComponent, PurchaseReportModule } from './pages/REPORT/purchase-report/purchase-report.component';
 import { ItemwisePurchaseReportComponent, ItemwisePurchaseReportModule } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
+import { TimesheetReportComponent, TimesheetReportModule } from './pages/HR/timesheet-report/timesheet-report.component';
 
 @NgModule({
   declarations: [AppComponent,],
@@ -835,6 +836,7 @@ import { ItemwisePurchaseReportComponent, ItemwisePurchaseReportModule } from '.
     DashboardMarkModule,
     PurchaseReportModule,
     ItemwisePurchaseReportModule,
+    TimesheetReportModule,
   ],
 
   providers: [

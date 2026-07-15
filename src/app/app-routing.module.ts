@@ -214,6 +214,7 @@ import { DistrictComponent } from './pages/district/district.component';
 import { DashboardMarkComponent } from './pages/dashboard-mark/dashboard-mark.component';
 import { PurchaseReportComponent } from './pages/REPORT/purchase-report/purchase-report.component';
 import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
+import { TimesheetReportComponent } from './pages/HR/timesheet-report/timesheet-report.component';
 
 const routes: Routes = [
   {
@@ -1315,6 +1316,11 @@ const routes: Routes = [
       {
         path: 'itemwise-purchase-report',
         component: ItemwisePurchaseReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'timesheet-report',
+        component: TimesheetReportComponent,
         canActivate: [AuthGuardService],
       },
       {

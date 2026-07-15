@@ -1,0 +1,274 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="TimesheetReport"
+      width="100%"
+      noDataText=""
+      height="82vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <!-- <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="font-weight: 600; font-size: 20px; margin-left: 12px"
+          >
+            Trial Balance
+          </div>
+        </dxi-item>
+      </dxo-toolbar> -->
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Timesheet Report
+          </div>
+        </dxi-item>
+       
+         <!-- Buttons -->
+        <dxi-item location="after">
+          <ng-template dxTemplate>
+            <div
+              class="month-selector"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                position: relative;
+              "
+            >
+              <!-- Previous Month -->
+              <dx-button
+                icon="chevronleft"
+                [disabled]="false"
+                [focusStateEnabled]="false"
+                [activeStateEnabled]="true"
+                [hoverStateEnabled]="true"
+                (onClick)="goToPreviousMonth()"
+              >
+              </dx-button>
+
+              <!-- Month Label -->
+              <span class="month-label" (click)="toggleCalendar()">
+                {{ selectedMonth | date: "MMMM yyyy" }}
+              </span>
+
+              <!-- Next Month -->
+              <dx-button
+                icon="chevronright"
+                [disabled]="false"
+                [focusStateEnabled]="false"
+                [activeStateEnabled]="true"
+                [hoverStateEnabled]="true"
+                (onClick)="goToNextMonth()"
+              >
+              </dx-button>
+
+              <!-- Calendar Popup -->
+              <div *ngIf="calendarVisible" class="calendar-popup">
+                <div class="calendar-header">
+                  <button class="year-button" (click)="previousYear()">
+                    &lt;
+                  </button>
+
+                  <span class="year-clickable" (click)="toggleYearSelector()">
+                    {{ selectedYear }}
+                  </span>
+
+                  <button class="year-button" (click)="nextYear()">&gt;</button>
+                </div>
+
+                <!-- Year Selector -->
+                <div
+                  class="year-selector-popup"
+                  *ngIf="yearSelectorVisible"
+                  (click)="$event.stopPropagation()"
+                >
+                  <div class="year-grid">
+                    <div
+                      class="year-option"
+                      *ngFor="let year of years"
+                      (click)="selectYear(year, $event)"
+                    >
+                      {{ year }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="calendar-body"></div>
+              </div>
+            </div>
+          </ng-template>
+        </dxi-item>
+    
+        <dxi-item>
+          <dx-select-box
+            [width]="200"
+            label="Department"
+            labelMode="floating"
+            [items]="Department"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="select_department_id"
+            [searchEnabled]="true"
+          >
+          </dx-select-box>
+        </dxi-item>
+
+        <dxi-item location="after" style="margin-bottom: 3px">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <dxi-item>
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="Timesheet_Report()"
+          >
+          </dx-button>
+        </dxi-item>
+
+        <dxi-item name="exportButton"></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <!-- Customer Name -->
+      <dxi-column
+        dataField="CODE"
+        caption="Month"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- Age -->
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Emp.Code"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- Invoice No -->
+      <dxi-column
+        dataField="ASSET_TYPE"
+        caption="Name"
+        dataType="string"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="LOCATION"
+        caption="Department"
+        dataType="string"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="PURCH_DATE"
+        caption="Total Days"
+      ></dxi-column>
+
+      <!-- Narration -->
+      <dxi-column
+        dataField="ASSET_VALUE"
+        caption="Basic"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+      ></dxi-column>
+
+      <!-- Net Amount -->
+      <dxi-column
+        dataField="USEFUL_LIFE"
+        caption="Allowance"
+        dataType="number"
+      ></dxi-column>
+
+
+      <!-- Received Amount -->
+      <dxi-column
+        dataField="CURRENT_VALUE"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        caption="Normal OT Hours"
+        dataType="number"
+        format="currency"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="LOCATION"
+        caption="Holiday OT Hours"
+        dataType="string"
+      ></dxi-column>
+
+
+<dxi-column
+        dataField="LOCATION"
+        caption="Additions"
+        dataType="string"
+      ></dxi-column>
+
+
+<dxi-column
+        dataField="LOCATION"
+        caption="Deductions"
+        dataType="string"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="LOCATION"
+        caption="Absenti Days"
+        dataType="string"
+      ></dxi-column>
+
+    </dx-data-grid>
+  </div>
+</div>
+

@@ -7207,4 +7207,9 @@ PurchaseReport(payload: any) {
     const getEndpoint = this.apiUrl + 'PurchaseReport/itemwisepurchase';
     return this.http.post(getEndpoint, payload);
   }
+
+  TimesheetReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'PurchaseReport/itemwisepurchase';
+    return this.http.post(getEndpoint, payload);
+  }
 }
