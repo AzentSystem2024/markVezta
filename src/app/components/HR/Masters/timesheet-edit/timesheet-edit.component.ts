@@ -236,7 +236,7 @@ export class TimesheetEditComponent {
   loadDepartment() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: 'DEPARTMENT',
+      NAME: 'DEPT',
     };
 
     this.dataService.getDropdownData(payload).subscribe((response) => {
