@@ -531,7 +531,7 @@ export class StaffEOSComponent {
     const days_worked = this.formSource.value.days_Worked;
     const reason_id = this.formSource.value.reason_ID;
     const remarks = this.formSource.value.Remarks;
-    const relieving_date = this.formSource.value.RELIEVING_DATE;
+    const relieving_date = this.selected_data.RELIEVING_DATE;
     const days = this.all_workingdays.toString() || '';
     console.log(relieving_date, '========relvieing data s payload');
 
