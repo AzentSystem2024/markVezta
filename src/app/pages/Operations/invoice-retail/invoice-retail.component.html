@@ -142,7 +142,7 @@
         caption="Sale No"
         alignment="left"
       ></dxi-column>
-      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+
       <dxi-column
         dataField="TRANS_DATE"
         caption="Date"
@@ -150,6 +150,8 @@
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Gross Amount"
@@ -177,7 +179,7 @@
 
       <dxi-column
         caption="Status"
-        dataField="STATUS"
+        dataField="TRANS_STATUS"
         [width]="80"
         [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
