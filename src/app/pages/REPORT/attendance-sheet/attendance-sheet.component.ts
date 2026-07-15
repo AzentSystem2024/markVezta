@@ -133,18 +133,18 @@ export class AttendanceSheetComponent {
 
     // --- Report Title ---
     doc.setFontSize(14);
-    const reportTitle = 'Reports - MMark Payroll';
+    const reportTitle = 'Reports - Payroll';
     const textWidth = doc.getTextWidth(reportTitle);
     doc.text(reportTitle, (pageWidth - textWidth) / 2, 30);
 
-    //   this.dataService.getAttendance(payload).subscribe((response: any) => {
-    // if (!response?.AttendanceDetails || response.AttendanceDetails.length === 0) {
-    //   return;
-    // }
+      this.dataService.getAttendanceSheet(payload).subscribe((response: any) => {
+    if (!response?.AttendanceDetails || response.AttendanceDetails.length === 0) {
+      return;
+    }
 
-    //  const data = response.AttendanceDetails;
+     const data = response.AttendanceDetails;
 
-    const data = [];
+    // const data = [];
 
     //  Parse year & month
     const [year, month] = monthToUse.split('-').map(Number);
@@ -192,7 +192,7 @@ export class AttendanceSheetComponent {
     const blob = doc.output('blob');
     const url = URL.createObjectURL(blob);
     this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    // });
+    });
   }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));

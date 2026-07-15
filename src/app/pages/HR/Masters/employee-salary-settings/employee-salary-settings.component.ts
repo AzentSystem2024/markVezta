@@ -43,6 +43,9 @@ export class EmployeeSalarySettingsComponent {
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup: DxValidationGroupComponent | undefined;
 
+  @ViewChild('salarySettings')
+salarySettings!: EmployeeSalarySettingsAddComponent;
+
   @ViewChild(DxDataGridComponent, { static: true })
   EmployeeSalarySettingsDatasource: any[] = [];
   displayMode: any = 'full';
@@ -263,6 +266,7 @@ export class EmployeeSalarySettingsComponent {
     this.salaryGridData = [];
 
     this.SalaryDetails = [];
+     this.salarySettings?.resetForm();
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });
@@ -274,6 +278,8 @@ export class EmployeeSalarySettingsComponent {
     if (this.EmployeeSalarySettingsAddComponent) {
       this.EmployeeSalarySettingsAddComponent.resetForm();
     }
+
+   this.salarySettings?.resetForm(); 
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });

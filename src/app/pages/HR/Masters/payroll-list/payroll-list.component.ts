@@ -626,18 +626,26 @@ export class PayrollListComponent {
     this.dataService.viewSelectedPayroll(payload).subscribe({
       next: (response: any) => {
         this.selectedPayroll = response;
-        if (status === 'Verified') {
-          this.isVerifyMode = false;
-          this.isApproveMode = true;
-          this.isReadOnlyMode = true;
-          this.PopupTitle = 'Approve Payroll';
-        } else {
-          this.isVerifyMode = true;
-          this.isApproveMode = false;
-          this.isReadOnlyMode = false;
-          this.PopupTitle = 'Verify Payroll';
-        }
-        this.editPayrollPopupOpened = true;
+        if (status === 'Pending') {
+  this.isVerifyMode = true;
+  this.isApproveMode = false;
+  this.isReadOnlyMode = false;
+  this.PopupTitle = 'Verify Payroll';
+}
+else if (status === 'Verified') {
+  this.isVerifyMode = false;
+  this.isApproveMode = true;
+  this.isReadOnlyMode = true;
+  this.PopupTitle = 'Approve Payroll';
+}
+else if (status === 'Approved') {
+  this.isVerifyMode = false;
+  this.isApproveMode = false;
+  this.isReadOnlyMode = true;
+  this.PopupTitle = 'View Payroll';
+}
+
+this.editPayrollPopupOpened = true;
       },
       error: (err) => {
         console.error('Failed to fetch payroll details:', err);

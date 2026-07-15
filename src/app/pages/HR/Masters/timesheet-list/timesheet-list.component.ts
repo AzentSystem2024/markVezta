@@ -576,6 +576,7 @@ export class TimesheetListComponent {
     this.editTimesheetPopupOpened = false;
     this.verifyTimesheetPopupOpened = false;
     this.approveTimesheetPopupOpened = false;
+    this.viewTimesheetPopupOpened = false;
     this.getTimesheet();
     this.fetchTimesheetList();
   }

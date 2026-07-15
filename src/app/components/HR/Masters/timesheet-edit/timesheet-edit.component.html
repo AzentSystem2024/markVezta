@@ -346,7 +346,7 @@
     text="Update"
     type="default"
     (onClick)="updateTimesheet()"
-    [visible]="!is_verify && !is_approved"
+    [visible]="!is_verify && !is_approved  && !isReadOnlyMode"
   ></dx-button>
   <dx-button
     text="Approve"

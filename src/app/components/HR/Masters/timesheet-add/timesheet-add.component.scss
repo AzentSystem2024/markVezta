@@ -4,10 +4,10 @@ body, html {
   overflow: hidden; /* Prevent any additional scrolling */
 }
 .timesheet-form {
-    padding: 20px;
-    // max-height: calc(100vh - 60px);
-    overflow-y: hidden; 
-    gap: 8px;
+    padding: 12px;
+  height: 80vh;   // Adjust as needed
+  overflow: hidden;
+  gap: 8px;
     .button-group {
       margin-top: 20px;
   
