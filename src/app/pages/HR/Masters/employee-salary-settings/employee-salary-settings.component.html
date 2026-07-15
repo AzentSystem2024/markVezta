@@ -82,7 +82,7 @@
         <dxi-item
           name="exportButton"
           location="after"
-          cssClass="export-btn"
+          cssClass="export-btn" 
         ></dxi-item>
         <!-- ADD BUTTON -->
         <dxi-item
@@ -122,6 +122,7 @@
       (onHiding)="handleClose()"
     >
       <app-employee-salary-settings-add
+       #salarySettings
         [isOpen]="addEmployeePopupOpened"
         (formClosed)="handleClose()"
       ></app-employee-salary-settings-add>

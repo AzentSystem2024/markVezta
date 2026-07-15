@@ -223,7 +223,10 @@ export class EmployeeSalarySettingsAddComponent {
     this.SalaryDetails = [];
     this.formClosed.emit(true);
 
-    this.formValidationGroup.instance.reset(); // Works
+    this.effectFromValidator?.instance?.reset();
+
+  this.SalaryHeadValidation?.instance.reset();
+    // this.formValidationGroup.instance.reset(); // Works
   }
 
   onEditorPreparing(e: any) {
@@ -270,7 +273,10 @@ export class EmployeeSalarySettingsAddComponent {
       this.salaryGridRef.instance.refresh();
     }
     this.formValidationGroup.instance.reset(); // Works
-    this.formValidationGroup?.instance?.validate(); // Will pass since validator was reset
+    this.formValidationGroup?.instance?.validate();
+    this.effectFromValidator?.instance?.reset();
+
+  this.SalaryHeadValidation?.instance.reset(); // Will pass since validator was reset
     this.effectFromValidator?.instance?.reset();
   }
 
