@@ -141,11 +141,15 @@ export class InvoiceRetailComponent {
   getStatusFilterData = [
     {
       text: 'Approved',
-      value: 'Approved',
+      value: 5,
     },
     {
       text: 'Open',
-      value: 'Open',
+      value: 1,
+    },
+    {
+      text: 'Verified',
+      value: 2,
     },
   ];
   isReadOnlyInvoice: boolean = false;
@@ -191,7 +195,7 @@ export class InvoiceRetailComponent {
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
     }
-    this.getStoreData();
+    // this.getStoreData();
     // if (this.isHQApp && configStore) {
     //   this.filteredStoreList = [
     //     {
@@ -253,16 +257,75 @@ export class InvoiceRetailComponent {
         // }
       }
 
-      // 🔥 Load data AFTER store is ready
+      //  Load data AFTER store is ready
       this.getInvoiceList();
     });
   }
-  onStoreChanged(e: any) {
-    this.selectedStoreId = e.value;
+  // onStoreChanged(e: any) {
+  //   this.selectedStoreId = e.value;
 
-    // 🔥 Reload list with selected store
-    this.getInvoiceList();
-  }
+  //   // 🔥 Reload list with selected store
+  //   this.getInvoiceList();
+  // }
+  // getInvoiceList(dateRange: string = this.selectedDateRange) {
+  //   const datePayload = this.getDateRangePayload(dateRange);
+
+  //   const payload = {
+  //     COMPANY_ID: this.companyID,
+  //     DATE_FROM: datePayload.DATE_FROM,
+  //     DATE_TO: datePayload.DATE_TO,
+  //     STORE_ID: this.selectedStoreId || this.storeList?.[0]?.ID || 0,
+  //   };
+
+  //   this.InvoiceDataSource = new DataSource({
+  //     load: () =>
+  //       new Promise((resolve) => {
+  //         this.dataService.getSalesInvoiceRetailData(payload).subscribe({
+  //           next: (response: any) => {
+  //             const list = (response?.Data || [])
+  //               .map((item: any) => {
+  //                 let dateValue: Date;
+  //                 console.log('Rows:', list.length);
+
+  //                 if (
+  //                   typeof item.TRANS_DATE === 'string' &&
+  //                   item.TRANS_DATE.includes('-')
+  //                 ) {
+  //                   const [day, month, year] =
+  //                     item.TRANS_DATE.split('-').map(Number);
+  //                   dateValue = new Date(year, month - 1, day);
+  //                 } else {
+  //                   dateValue = new Date(item.TRANS_DATE);
+  //                 }
+
+  //                 return {
+  //                   ...item,
+  //                   TRANS_DATE: dateValue,
+  //                 };
+  //               })
+  //               .sort((a: any, b: any) => {
+  //                 const numA = Number(a.VOUCHER_NO.match(/\d+$/)?.[0] || 0);
+  //                 const numB = Number(b.VOUCHER_NO.match(/\d+$/)?.[0] || 0);
+  //                 return numB - numA; // descending
+  //               });
+
+  //             //  cache for logic
+  //             this.invoiceArray = list;
+  //             this.invoiceCount = list.length;
+
+  //             resolve(list); //  grid data
+  //           },
+  //           error: () => {
+  //             this.invoiceArray = [];
+  //             this.invoiceCount = 0;
+  //             resolve([]);
+  //           },
+  //         });
+  //       }),
+  //   });
+  //   console.log(this.InvoiceDataSource, 'INVOICEDATASOURCE');
+  // }
+
   getInvoiceList(dateRange: string = this.selectedDateRange) {
     const datePayload = this.getDateRangePayload(dateRange);
 
@@ -270,55 +333,57 @@ export class InvoiceRetailComponent {
       COMPANY_ID: this.companyID,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
-      STORE_ID: this.selectedStoreId || this.storeList?.[0]?.ID || 0,
+      STORE_ID: this.selectedStoreId || 0,
     };
 
     this.InvoiceDataSource = new DataSource({
-      load: () =>
-        new Promise((resolve) => {
-          this.dataService.getSalesInvoiceRetailData(payload).subscribe({
-            next: (response: any) => {
-              const list = (response?.Data || [])
-                .map((item: any) => {
-                  let dateValue: Date;
+      load: () => {
+        return this.dataService
+          .getSalesInvoiceRetailData(payload)
+          .toPromise()
+          .then((response: any) => {
+            const list = (response?.Data || []).map((item: any) => {
+              let dateValue: Date;
 
-                  if (
-                    typeof item.TRANS_DATE === 'string' &&
-                    item.TRANS_DATE.includes('-')
-                  ) {
-                    const [day, month, year] =
-                      item.TRANS_DATE.split('-').map(Number);
-                    dateValue = new Date(year, month - 1, day);
-                  } else {
-                    dateValue = new Date(item.TRANS_DATE);
-                  }
+              if (item.TRANS_DATE instanceof Date) {
+                dateValue = item.TRANS_DATE;
+              } else if (
+                typeof item.TRANS_DATE === 'string' &&
+                item.TRANS_DATE.includes('-')
+              ) {
+                const parts = item.TRANS_DATE.split('-');
 
-                  return {
-                    ...item,
-                    TRANS_DATE: dateValue,
-                  };
-                })
-                .sort((a: any, b: any) => {
-                  const numA = Number(a.VOUCHER_NO.match(/\d+$/)?.[0] || 0);
-                  const numB = Number(b.VOUCHER_NO.match(/\d+$/)?.[0] || 0);
-                  return numB - numA; // descending
-                });
+                if (parts.length === 3) {
+                  // Handles dd-MM-yyyy
+                  const [day, month, year] = parts.map(Number);
+                  dateValue = new Date(year, month - 1, day);
+                } else {
+                  dateValue = new Date(item.TRANS_DATE);
+                }
+              } else {
+                dateValue = new Date(item.TRANS_DATE);
+              }
 
-              //  cache for logic
-              this.invoiceArray = list;
-              this.invoiceCount = list.length;
+              return {
+                ...item,
+                TRANS_DATE: dateValue,
+              };
+            });
 
-              resolve(list); //  grid data
-            },
-            error: () => {
-              this.invoiceArray = [];
-              this.invoiceCount = 0;
-              resolve([]);
-            },
+            // Optional: keep if used elsewhere
+            this.invoiceArray = list;
+            this.invoiceCount = list.length;
+
+            return list;
+          })
+          .catch((err) => {
+            console.error(err);
+            this.invoiceArray = [];
+            this.invoiceCount = 0;
+            return [];
           });
-        }),
+      },
     });
-    console.log(this.InvoiceDataSource, 'INVOICEDATASOURCE');
   }
 
   private getDateRangePayload(range: string) {

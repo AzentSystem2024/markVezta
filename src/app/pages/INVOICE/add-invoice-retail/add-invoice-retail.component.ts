@@ -165,19 +165,25 @@ export class AddInvoiceRetailComponent {
       this.invoiceFormData.FIN_ID = firstFinYear.FIN_ID;
     }
     this.getStoreData();
-    if (this.isHQApp && configStore) {
-      this.filteredStoreList = [
-        {
-          ID: configStore.STORE_ID,
-          DESCRIPTION: configStore.STORE_NAME,
-        },
-      ];
+    // this.getStoreData();
 
-      // Auto select store
+    if (!this.isEditing && this.isHQApp && configStore) {
       this.invoiceFormData.STORE_ID = configStore.STORE_ID;
-    } else {
-      this.filteredStoreList = this.storeList;
     }
+    // if (this.isHQApp && configStore) {
+    //   this.filteredStoreList = [
+    //     {
+    //       ID: configStore.STORE_ID,
+    //       DESCRIPTION: configStore.STORE_NAME,
+    //     },
+    //   ];
+
+    //   if (!this.isEditing) {
+    //     this.invoiceFormData.STORE_ID = configStore.STORE_ID;
+    //   }
+    // } else {
+    //   this.filteredStoreList = this.storeList;
+    // }
     this.getItems();
     this.getItemsDescription();
     if (!this.isEditing) {
@@ -216,14 +222,47 @@ export class AddInvoiceRetailComponent {
       NAME: 'STORE',
       COMPANY_ID: this.selectedCompanyId,
     };
-    this.dataService.getDropdownData(payload).subscribe((res) => {
+
+    this.dataService.getDropdownData(payload).subscribe((res: any) => {
       this.storeList = res;
-      console.log(this.storeID, 'STORELISTTTTTTTTTTT');
-      if (!this.isHQApp) {
-        this.filteredStoreList = this.storeList; //update here
+
+      if (!this.isEditing && this.isHQApp) {
+        // ADD MODE + HQ APP
+        this.filteredStoreList = res.filter(
+          (x: any) => Number(x.ID) === Number(this.storeID),
+        );
+
+        this.invoiceFormData.STORE_ID = Number(this.storeID);
+      } else {
+        // EDIT / VERIFY / APPROVE / VIEW
+        this.filteredStoreList = res;
+
+        if (this.EditingResponseData) {
+          this.invoiceFormData.STORE_ID = Number(
+            this.EditingResponseData.STORE_ID,
+          );
+        }
       }
+
+      console.log('isEditing', this.isEditing);
+      console.log('isHQApp', this.isHQApp);
+      console.log('filteredStoreList', this.filteredStoreList);
     });
   }
+
+  // getStoreData() {
+  //   const payload = {
+  //     NAME: 'STORE',
+  //     COMPANY_ID: this.selectedCompanyId,
+  //   };
+  //   this.dataService.getDropdownData(payload).subscribe((res) => {
+  //     this.storeList = res;
+  //     console.log(this.storeID, 'STORELISTTTTTTTTTTT');
+  //     if (!this.isHQApp) {
+  //       this.filteredStoreList = this.storeList; //update here
+  //     }
+  //   });
+  // }
 
   getItems() {
     const payload = {
@@ -511,7 +550,7 @@ export class AddInvoiceRetailComponent {
 
     const data = this.EditingResponseData; //  full object
     const Details = data.Details || [];
-
+    console.log(Details, 'DETAILSSSSSSSSSSSSSSSSS');
     //  PATCH HEADER
     this.invoiceFormData = {
       ...this.invoiceFormData,
