@@ -215,6 +215,10 @@ import { DashboardMarkComponent } from './pages/dashboard-mark/dashboard-mark.co
 import { PurchaseReportComponent } from './pages/REPORT/purchase-report/purchase-report.component';
 import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
 import { TimesheetReportComponent } from './pages/HR/timesheet-report/timesheet-report.component';
+import { PayrollReportComponent } from './pages/REPORT/payroll-report/payroll-report.component';
+import { PayrollOtReportComponent } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
+import { LeavelistComponent, LeavelistModule } from './pages/REPORT/leavelist/leavelist.component';
+import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 
 const routes: Routes = [
   {
@@ -1321,6 +1325,26 @@ const routes: Routes = [
       {
         path: 'timesheet-report',
         component: TimesheetReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'payroll-report',
+        component: PayrollReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'payroll-ot-report',
+        component: PayrollOtReportComponent,
+        canActivate: [AuthGuardService],
+      },
+       {
+        path: 'leave-list',
+        component: LeavelistComponent,
+        canActivate: [AuthGuardService],
+      },
+       {
+        path: 'finalsettlement-report',
+        component: FinalSettlementReportComponent,
         canActivate: [AuthGuardService],
       },
       {

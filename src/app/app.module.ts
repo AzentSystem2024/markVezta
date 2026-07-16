@@ -418,6 +418,11 @@ import {
 import { PurchaseReportComponent, PurchaseReportModule } from './pages/REPORT/purchase-report/purchase-report.component';
 import { ItemwisePurchaseReportComponent, ItemwisePurchaseReportModule } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
 import { TimesheetReportComponent, TimesheetReportModule } from './pages/HR/timesheet-report/timesheet-report.component';
+import { PayrollReportComponent, PayrollReportModule } from './pages/REPORT/payroll-report/payroll-report.component';
+import { PayrollOtReportComponent, PayrollOtReportModule } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
+import { LeavelistComponent, LeavelistModule } from './pages/REPORT/leavelist/leavelist.component';
+import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
+
 
 @NgModule({
   declarations: [AppComponent,],
@@ -837,6 +842,10 @@ import { TimesheetReportComponent, TimesheetReportModule } from './pages/HR/time
     PurchaseReportModule,
     ItemwisePurchaseReportModule,
     TimesheetReportModule,
+    PayrollReportModule,
+    PayrollOtReportModule,
+    LeavelistModule,
+    FinalSettlementReportModule,
   ],
 
   providers: [

@@ -1,0 +1,226 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="reportData"
+      width="100%"
+      noDataText=""
+      height="78vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+    >
+      <!-- (onEditingStart)="onEditLedger($event)" -->
+      <!-- <dxo-editing
+        mode="popup"s
+        [allowUpdating]="true"
+      ></dxo-editing> -->
+      <dxo-paging [pageSize]="10"></dxo-paging>
+     
+      
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right:  3px;
+            "
+          >
+            Final Settlement Report
+          </div>
+        </dxi-item>
+
+        <dxi-item>
+             <dx-select-box
+                [placeholder]="'Employee'"
+        label="Employee"
+        [items]="EmployeeDropdown"
+        valueExpr="ID"
+        displayExpr="DESCRIPTION"
+        [(value)]="selectedEmployeeId"
+        [searchEnabled]="true"
+        [showClearButton]="true"
+        [labelMode]="'floating'"
+        width="200"
+              >
+              </dx-select-box>
+        </dxi-item>
+
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+        <dxi-item>
+          <dx-button
+            text="Apply"
+            stylingMode="contained"
+            type="default"
+            (onClick)="FinalSettlement_Report()"
+          >
+          </dx-button>
+        </dxi-item>
+        <dxi-item name="exportButton" class="export-btn"></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-filter-row visible="true"></dxo-filter-row>
+      <dxo-header-filter visible="true"></dxo-header-filter>
+      <dxo-paging page-size="10"></dxo-paging>
+      <dxo-pager
+        show-page-size-selector="true"
+        show-info="true"
+        show-navigator="true"
+      ></dxo-pager>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <!-- <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row> -->
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <!-- <dxi-column
+        dataField="DateOfJoining"
+        caption="Date of Joining"
+      ></dxi-column>
+      <dxi-column
+        dataField="LastWorkingDay"
+        caption="Last Working Days"
+      ></dxi-column>
+      <dxi-column dataField="BasicSalary" caption="Basic Salary"></dxi-column>
+      <dxi-column dataField="Allowance" caption="Allowance"></dxi-column>
+      <dxi-column dataField="UnPaidLeaveDays" caption="Unpaid Leaves"></dxi-column>
+      <dxi-column dataField="TotalServiceDays" caption="Leave Balance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
+      <dxi-column
+        dataField="IndemnityFirstFiveYears"
+        caption="Leave Start Date"
+       dataType="date"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="IndemnityAfterFiveYears"
+          dataType="date"
+        caption="Leave End Date"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="TotalIndemnityDays"
+        caption="Approved Days"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="EntitledLeaveDays"
+        caption="Approved Status"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="IndemnityAmount"
+        caption="Resumed Date"
+        dataType="date"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="LeaveSalary"
+        caption="Resumed Date"
+        dataType="date"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="HeadName"
+        caption="Resumed Date"
+        dataType="date"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="SalaryMonth"
+        caption="Resumed Date"
+        dataType="date"
+        alignment="right"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="Amount"
+        caption="Resumed Date"
+        dataType="date"
+        alignment="right"
+      >
+      </dxi-column>
+
+       <dxi-column
+        dataField="TotalAmount"
+        caption="Resumed Date"
+        dataType="date"
+        alignment="right"
+      >
+      </dxi-column> -->
+
+         <dxi-column
+        dataField="Description"
+        caption=""
+        width="70%">
+    </dxi-column>
+
+    <dxi-column
+        dataField="Value"
+        caption=""
+        alignment="right">
+    </dxi-column>
+
+    </dx-data-grid>
+  </div>
+</div>
+
+<!-- <dx-popup
+  [(visible)]="viewPayrollPopupOpened"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Payroll"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-view
+    *ngIf="viewPayrollPopupOpened"
+    [payroll]="selectedPayroll"
+    (popupClosed)="handleClose()"
+  ></app-payroll-view>
+</dx-popup> -->

@@ -185,41 +185,42 @@
         [applyFilter]="auto"
       ></dxo-filter-row>
 
-      <!-- Customer Name -->
+     
       <dxi-column
-        dataField="CODE"
+        dataField="TS_MONTH"
         caption="Month"
-        dataType="string"
+        dataType="date"
+        format="yyyy MMMM"
       ></dxi-column>
 
-      <!-- Age -->
+    
       <dxi-column
-        dataField="DESCRIPTION"
+        dataField="EMP_CODE"
         caption="Emp.Code"
         dataType="string"
       ></dxi-column>
 
       <!-- Invoice No -->
       <dxi-column
-        dataField="ASSET_TYPE"
+        dataField="EMP_NAME"
         caption="Name"
         dataType="string"
       ></dxi-column>
 
       <dxi-column
-        dataField="LOCATION"
+        dataField="DEPT_NAME"
         caption="Department"
         dataType="string"
       ></dxi-column>
 
       <dxi-column
-        dataField="PURCH_DATE"
+        dataField="TOTAL_DAYS"
         caption="Total Days"
       ></dxi-column>
 
       <!-- Narration -->
       <dxi-column
-        dataField="ASSET_VALUE"
+        dataField="BASIC"
         caption="Basic"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
@@ -227,7 +228,7 @@
 
       <!-- Net Amount -->
       <dxi-column
-        dataField="USEFUL_LIFE"
+        dataField="ALLOWANCE"
         caption="Allowance"
         dataType="number"
       ></dxi-column>
@@ -235,7 +236,7 @@
 
       <!-- Received Amount -->
       <dxi-column
-        dataField="CURRENT_VALUE"
+        dataField="NORMAL_OT"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         caption="Normal OT Hours"
         dataType="number"
@@ -243,27 +244,27 @@
       ></dxi-column>
 
       <dxi-column
-        dataField="LOCATION"
+        dataField="HOLIDAY_OT"
         caption="Holiday OT Hours"
         dataType="string"
       ></dxi-column>
 
 
 <dxi-column
-        dataField="LOCATION"
+        dataField="ADDITIONS"
         caption="Additions"
         dataType="string"
       ></dxi-column>
 
 
 <dxi-column
-        dataField="LOCATION"
+        dataField="DEDUCT_DAYS"
         caption="Deductions"
         dataType="string"
       ></dxi-column>
 
       <dxi-column
-        dataField="LOCATION"
+        dataField="ABSENTEES"
         caption="Absenti Days"
         dataType="string"
       ></dxi-column>
