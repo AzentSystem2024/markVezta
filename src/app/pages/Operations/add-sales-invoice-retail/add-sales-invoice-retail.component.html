@@ -88,6 +88,7 @@
           [filterRow]="{ visible: false }"
           [headerFilter]="{ visible: true }"
           height="100%"
+          [width]="'70vw'"
         >
           <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
           <dxi-column
@@ -124,50 +125,55 @@
           </dxi-column>
 
           <dxi-column
-           dataField="AMOUNT_EXCL_VAT"
+            dataField="AMOUNT_EXCL_VAT"
             caption="Amount(Excl.VAT)AED"
             dataType="number"
             format="#,##0.00"
           >
           </dxi-column>
 
-           <dxo-summary>
-    <dxi-total-item
-      column="QUANTITY"
-      summaryType="sum"
-      displayFormat="{0}">
-    </dxi-total-item>
+          <dxo-summary>
+            <dxi-total-item
+              column="QUANTITY"
+              summaryType="sum"
+              displayFormat="{0}"
+            >
+            </dxi-total-item>
 
-    <dxi-total-item
-      column="AMOUNT_INCL_VAT"
-      summaryType="sum"
-      valueFormat="#,##0.00"
-      displayFormat="{0}">
-    </dxi-total-item>
+            <dxi-total-item
+              column="AMOUNT_INCL_VAT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+            >
+            </dxi-total-item>
 
-    <dxi-total-item
-      column="TAX_PERC"
-      summaryType="sum"
-      valueFormat="#,##0.00"
-      displayFormat="{0}">
-    </dxi-total-item>
+            <dxi-total-item
+              column="TAX_PERC"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+            >
+            </dxi-total-item>
 
-    <dxi-total-item
-      column="TAX_AMOUNT"
-      summaryType="sum"
-      valueFormat="#,##0.00"
-      displayFormat="{0}">
-    </dxi-total-item>
+            <dxi-total-item
+              column="TAX_AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+            >
+            </dxi-total-item>
 
-     <dxi-total-item
-      column="AMOUNT_EXCL_VAT"
-      summaryType="sum"
-      valueFormat="#,##0.00"
-      displayFormat="{0}">
-    </dxi-total-item>
-  </dxo-summary>
+            <dxi-total-item
+              column="AMOUNT_EXCL_VAT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+            >
+            </dxi-total-item>
+          </dxo-summary>
 
-<!-- 
+          <!-- 
           <dx-data-grid
   [dataSource]="invoiceFormData.Details"
   [showBorders]="true">
@@ -214,13 +220,15 @@
           ></dxi-column>
 
           <dxo-summary>
-<dxi-total-item
-             column="AMOUNT"
-      summaryType="sum"
-      valueFormat="#,##0.00"
-      displayFormat="{0}">
-    ></dxi-total-item>
-  </dxo-summary>
+            <dxi-total-item
+              column="AMOUNT"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="{0}"
+            >
+              ></dxi-total-item
+            >
+          </dxo-summary>
         </dx-data-grid>
       </div>
     </div>
