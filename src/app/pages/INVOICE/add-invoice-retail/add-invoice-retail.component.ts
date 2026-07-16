@@ -137,6 +137,7 @@ export class AddInvoiceRetailComponent {
   ngOnInit() {
     console.log(this.EditingResponseData, 'EditingResponseData');
     const userDataString = localStorage.getItem('userData');
+    console.log('userData', userDataString);
     if (!userDataString) return;
 
     const userData = JSON.parse(userDataString);
@@ -207,6 +208,7 @@ export class AddInvoiceRetailComponent {
   }
 
   getDocNo() {
+    console.log('getDocNo called');
     const payload = {
       TRANS_TYPE: 25,
       COMPANY_ID: this.selectedCompanyId,
@@ -218,6 +220,7 @@ export class AddInvoiceRetailComponent {
   }
 
   getStoreData() {
+    console.log('getStoreData called');
     const payload = {
       NAME: 'STORE',
       COMPANY_ID: this.selectedCompanyId,
@@ -530,6 +533,7 @@ export class AddInvoiceRetailComponent {
   // };
 
   getCustomerOrUnitLst() {
+    console.log('getCustomer called');
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
     };
