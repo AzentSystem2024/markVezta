@@ -135,8 +135,10 @@
   [width]="'60vw'"
   [height]="'100vh'"
   title="Edit employee salary settings"
+  (onHiding)="editSalarySettings.cancel()"
 >
   <app-employee-salary-settings-edit
+    #editSalarySettings
     [employeeData]="selectedEmployee"
     [isOpen]="addEmployeePopupOpened"
     (formClosed)="handleEditClose($event)"

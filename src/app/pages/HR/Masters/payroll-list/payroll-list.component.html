@@ -36,6 +36,7 @@
       (onCellPrepared)="onCellPrepared($event)"
       (onEditorPreparing)="onEditorPreparing($event)"
       [selectedRowKeys]="selectedRowKeys"
+      keyExpr="SALARY_BILL_NO"
     >
       <dxo-editing
         mode="popup"
@@ -58,7 +59,6 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
@@ -207,19 +207,7 @@
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
-      <!-- 
-      <dxi-column
-        caption="Status"
-        dataField="STATUS"
-        [width]="80"
-        [cellTemplate]="statusCellRender"
-        [allowHeaderFiltering]="true"
-        [headerFilter]="{
-          dataSource: getStatusFilterData,
-          encodeHtml: false,
-        }"
-      >
-      </dxi-column> -->
+
       <dxi-column
         dataField="STATUS"
         caption="Status"
@@ -238,7 +226,7 @@
                 : '#FFA500'
           "
           [attr.title]="data.data.STATUS"
-    style="cursor: default"
+          style="cursor: default"
         ></i>
       </div>
       <dxi-column

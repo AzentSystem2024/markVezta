@@ -44,7 +44,7 @@ export class EmployeeSalarySettingsComponent {
   formValidationGroup: DxValidationGroupComponent | undefined;
 
   @ViewChild('salarySettings')
-salarySettings!: EmployeeSalarySettingsAddComponent;
+  salarySettings!: EmployeeSalarySettingsAddComponent;
 
   @ViewChild(DxDataGridComponent, { static: true })
   EmployeeSalarySettingsDatasource: any[] = [];
@@ -76,7 +76,6 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
   canApprove: boolean = false;
   canPrint: boolean = false;
   selected_Company_id: any;
-
 
   filterSelectBoxOptions = {
     items: this.filterOptions,
@@ -120,9 +119,7 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
     private dataservice: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) { }
-
-
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -137,7 +134,6 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
-      console.log('Packing Add button:', this.canAdd);
       this.canEdit = packingRights.CanEdit;
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
@@ -170,7 +166,6 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
      `;
     },
   };
-
 
   formatMonthYear = (date: Date) => {
     if (!date) return '';
@@ -266,7 +261,7 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
     this.salaryGridData = [];
 
     this.SalaryDetails = [];
-     this.salarySettings?.resetForm();
+    this.salarySettings?.resetForm();
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });
@@ -279,7 +274,7 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
       this.EmployeeSalarySettingsAddComponent.resetForm();
     }
 
-   this.salarySettings?.resetForm(); 
+    this.salarySettings?.resetForm();
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });
@@ -306,21 +301,11 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
 
   onPopupHiding() {
     this.addEmployeePopupOpened = false;
-
-    // Optionally reset child component if needed
-    // You can use @ViewChild to get the component reference:
-    // this.employeeSalaryAddComponentRef?.resetForm();
   }
 
   DeleteEmployeeSalarySettings(event: any) {
     const BatchId = event.data.BATCH_ID;
-    //   const id=event.data.ID
-    // const EffectFrom = event.data.EFFECT_FROM
-    // const formattedEffectFrom = formatDate(EffectFrom, 'yyyy-MM-dd', 'en-US');
-    //   const payload ={
-    //     EMP_ID : id,
-    //     EFFECT_FROM : formattedEffectFrom
-    //   }
+
     this.dataservice
       .Delete_EmployeeSalarySettings_Api(BatchId)
       .subscribe((res: any) => {
@@ -358,4 +343,4 @@ salarySettings!: EmployeeSalarySettingsAddComponent;
   exports: [EmployeeSalarySettingsComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeSalarySettingsModule { }
+export class EmployeeSalarySettingsModule {}
