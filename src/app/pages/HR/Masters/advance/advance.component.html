@@ -24,13 +24,10 @@
     <dxo-header-filter [visible]="isFilterOpened">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
-    <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxo-editing mode="popup" [allowUpdating]="true" [allowDeleting]="true">
     </dxo-editing>
-    <!-- <dxo-filter-row [visible]="true" [height]="10"></dxo-filter-row> -->
     <dxo-scrolling mode="standard"></dxo-scrolling>
-    <!-- <dxo-header-filter [visible]="true"></dxo-header-filter> -->
 
     <dxo-paging [pageSize]="10"></dxo-paging>
 
@@ -84,7 +81,6 @@
         widget="dxButton"
         [options]="addButtonOptions"
       ></dxi-item>
-      <!-- *ngIf="canAdd" -->
     </dxo-toolbar>
     <dxi-column
       dataField="serialNo"
@@ -657,15 +653,6 @@
         ></dx-date-box>
       </dxi-item>
     </dxi-item>
-    <!-- <dxi-item>
-      <dx-check-box
-        [(value)]="approveValue"
-        text="Approve"
-        [readOnly]="isEditReadOnly"
-        style="margin: 10px"
-      >
-      </dx-check-box
-    ></dxi-item> -->
     <dxi-item
       class="fixed-footer"
       itemType="group"
