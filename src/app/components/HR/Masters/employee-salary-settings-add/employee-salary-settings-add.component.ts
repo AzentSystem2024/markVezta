@@ -69,14 +69,12 @@ export class EmployeeSalarySettingsAddComponent {
     EFFECT_FROM: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // always 1st of current month
   };
 
-  constructor(private dataservice: DataService) {
-    this.EmployeeListDropDown();
-    this.get_SalaryHead_List();
-  }
+  constructor(private dataservice: DataService) {}
 
   ngOnInit() {
     this.sessionDetails();
     this.EmployeeListDropDown();
+    this.get_SalaryHead_List();
   }
 
   sessionDetails() {
@@ -225,7 +223,7 @@ export class EmployeeSalarySettingsAddComponent {
 
     this.effectFromValidator?.instance?.reset();
 
-  this.SalaryHeadValidation?.instance.reset();
+    this.SalaryHeadValidation?.instance.reset();
     // this.formValidationGroup.instance.reset(); // Works
   }
 
@@ -276,7 +274,7 @@ export class EmployeeSalarySettingsAddComponent {
     this.formValidationGroup?.instance?.validate();
     this.effectFromValidator?.instance?.reset();
 
-  this.SalaryHeadValidation?.instance.reset(); // Will pass since validator was reset
+    this.SalaryHeadValidation?.instance.reset(); // Will pass since validator was reset
     this.effectFromValidator?.instance?.reset();
   }
 
@@ -292,9 +290,6 @@ export class EmployeeSalarySettingsAddComponent {
     }
   }
 
-  // stripToDateOnly(date: Date): string {
-  //   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-  // }
   stripToDateOnly(date: Date | null): string | null {
     if (!(date instanceof Date) || isNaN(date.getTime())) return null;
     const yyyy = date.getFullYear();
@@ -302,6 +297,7 @@ export class EmployeeSalarySettingsAddComponent {
     const dd = date.getDate();
     return `${yyyy}-${mm.toString().padStart(2, '0')}-${dd.toString().padStart(2, '0')}`;
   }
+
   isValid() {
     return this.SalaryHeadValidation?.instance.validate().isValid;
   }
@@ -427,4 +423,4 @@ export class EmployeeSalarySettingsAddComponent {
   exports: [EmployeeSalarySettingsAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeSalarySettingsAddModule { }
+export class EmployeeSalarySettingsAddModule {}

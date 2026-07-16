@@ -150,3 +150,14 @@
     (onClick)="saveEmployee()"
   ></dx-button>
 </div>
+
+<dx-load-panel
+  [visible]="isLoading"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="true"
+  [hideOnOutsideClick]="false"
+  shadingColor="rgba(0,0,0,0.4)"
+  message="Loading..."
+>
+</dx-load-panel>

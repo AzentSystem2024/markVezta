@@ -34,10 +34,7 @@ import {
   DxiItemModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import {
-  EmployeeAddFormComponent,
-  EmployeeAddFormModule,
-} from '../../../../components/HR/Masters/employee-add-form/employee-add-form.component';
+import { EmployeeAddFormModule } from '../../../../components/HR/Masters/employee-add-form/employee-add-form.component';
 import { DataService } from 'src/app/services';
 import { EmployeeEditFormFormModule } from '../../../../components/HR/Masters/employee-edit-form/employee-edit-form.component';
 import notify from 'devextreme/ui/notify';
@@ -51,7 +48,7 @@ import { Router } from '@angular/router';
 export class EmployeeComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent | undefined;
-  readonly allowedPageSizes: any = [10, 15, 'all'];
+  readonly allowedPageSizes: any = [25, 50, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: boolean = true;
@@ -71,7 +68,6 @@ export class EmployeeComponent implements OnInit {
   canDelete = false;
   canApprove = false;
   canPrint = false;
-  //=================================refresh=============================
 
   addButtonOptions = {
     type: 'default',
@@ -118,7 +114,7 @@ export class EmployeeComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {
-    this.isLoading = false
+    // this.isLoading = false;
   }
 
   onExporting(event: any) {
@@ -144,7 +140,7 @@ export class EmployeeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isLoading = false
+    this.isLoading = true;
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -163,7 +159,7 @@ export class EmployeeComponent implements OnInit {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
-    // this.isLoading = true;
+    this.isLoading = false;
     this.sesstion_Details();
     this.getEmployeeList();
   }
@@ -218,7 +214,7 @@ export class EmployeeComponent implements OnInit {
     this.GridSource.filter();
   }
 
-  onAddClick() { }
+  onAddClick() {}
 
   addEmployee() {
     this.addEmployeePopupOpened = true;
@@ -290,6 +286,7 @@ export class EmployeeComponent implements OnInit {
       this.getEmployeeList();
     }
   }
+
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
@@ -336,4 +333,4 @@ export class EmployeeComponent implements OnInit {
   exports: [EmployeeComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeModule { }
+export class EmployeeModule {}
