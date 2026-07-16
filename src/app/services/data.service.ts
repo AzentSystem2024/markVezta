@@ -4759,11 +4759,6 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=============================employee dropdown============
-  // Dropdown_advance_employee(type: any) {
-  //   const reqbody = { NAME: 'EMPLOYEE' };
-  //   return this.http.post(`${this.apiUrl}DropDown`, reqbody);
-  // }
-
   Dropdown_advance_employee(type: any) {
     return this.http.post(`${this.apiUrl}DropDown`, type);
   }

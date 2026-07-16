@@ -115,29 +115,6 @@
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column>
-    <!-- <dxi-column
-      dataField="STATUS"
-      caption="Status"
-      alignment="center"
-      cellTemplate="statusCellTemplate"
-      fixedPosition="right"
-    >
-    </dxi-column>
-    <div *dxTemplate="let cellData of 'statusCellTemplate'">
-      <i
-        class="fas fa-flag"
-        [ngClass]="getStatusFlagClass(cellData.value)"
-        [attr.title]="cellData.value"
-        style="margin-left: 10px; cursor: default"
-      ></i>
-    </div>
-    <dxi-column
-      type="buttons"
-      [width]="200"
-      [buttons]="allButtons"
-    ></dxi-column> -->
-    <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
-    <!-- <dxi-column type="buttons" [buttons]="allActionButtons" fixed="true" fixedPosition="right"width="150"></dxi-column> -->
 
     <dxi-column
       caption="Status"
@@ -151,7 +128,7 @@
       }"
     >
     </dxi-column>
-    <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
+
     <dxi-column
       type="buttons"
       caption="Actions"
@@ -256,8 +233,7 @@
   </dx-data-grid>
 </div>
 
-<!-- ============================================Add form============================== -->
-
+<!-- =========== Add Form ============ -->
 <form-popup
   (onHiding)="closeButton()"
   [(visible)]="isAddPopUp"
@@ -272,16 +248,6 @@
   <dx-validation-group class="form-grid" #formValidationGroup>
     <dx-form id="form" [formGroup]="formSource">
       <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
-        <!-- Document No -->
-        <!-- <dxi-item>
-          <dx-text-box
-            label="Document No"
-            [labelMode]="'floating'"
-            [readOnly]="true"
-            [(value)]="docNo"
-          ></dx-text-box>
-        </dxi-item> -->
-
         <!-- Date Picker -->
         <dxi-item>
           <dx-date-box
@@ -446,8 +412,7 @@
   </dx-validation-group>
 </form-popup>
 
-<!-- ========================Edit Advance ==============================
-  -->
+<!-- =========== Edit Advance ================ -->
 <dx-popup
   (onHiding)="closeButton()"
   [(visible)]="isEditPopUp"
@@ -692,16 +657,15 @@
         ></dx-date-box>
       </dxi-item>
     </dxi-item>
-    <dxi-item>
+    <!-- <dxi-item>
       <dx-check-box
         [(value)]="approveValue"
         text="Approve"
         [readOnly]="isEditReadOnly"
-        (onValueChanged)="onApprovedChanged($event)"
         style="margin: 10px"
       >
       </dx-check-box
-    ></dxi-item>
+    ></dxi-item> -->
     <dxi-item
       class="fixed-footer"
       itemType="group"
@@ -709,11 +673,16 @@
       [colSpan]="2"
     >
       <div class="fixed-footer">
-        <dx-button text="Cancel" (onClick)="close()"></dx-button>
+        <dx-button
+          [stylingMode]="'outlined'"
+          text="Cancel"
+          (onClick)="close()"
+        ></dx-button>
         <dx-button
           [visible]="!isEditReadOnly"
           [text]="buttonText"
           stylingMode="contained"
+          [type]="'default'"
           (onClick)="Update_advance()"
         ></dx-button>
       </div>

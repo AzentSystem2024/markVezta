@@ -124,9 +124,7 @@ export class TimesheetListComponent {
     onClick: () => this.VerifyBulkRows(),
   };
 
-  // selectedMonth: string | number | Date = new Date();
   selectedMonth: Date = new Date();
-  // selectedRowKeys: any[] = [];
   timesheetData: any;
   timesheet: any;
   selectedMonthForAdd: any;
@@ -192,6 +190,7 @@ export class TimesheetListComponent {
   SessioncanApprove: boolean = false;
   SessioncanVerify: boolean = false;
   PopupTitle: string;
+
   constructor(
     private dataService: DataService,
     private zone: NgZone,
@@ -245,6 +244,7 @@ export class TimesheetListComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
   onExporting(event: any) {
     const fileName = 'Timesheet';
     this.dataService.exportDataGrid(event, fileName);
@@ -265,6 +265,7 @@ export class TimesheetListComponent {
   nextYear() {
     this.selectedYear++;
   }
+
   selectMonthByIndex(monthIndex: number) {
     this.selectedMonth = new Date(this.selectedYear, monthIndex, 1, 12); // Set the date to the 1st of the selected month
     this.onMonthChange({ value: this.selectedMonth }); // Pass the selected month to onMonthChange
@@ -292,6 +293,7 @@ export class TimesheetListComponent {
       );
     }
   }
+
   toggleCalendar() {
     this.calendarVisible = !this.calendarVisible;
 
@@ -486,6 +488,7 @@ export class TimesheetListComponent {
       }
     });
   }
+
   onEditingStartVerify(e: any) {
     console.log('call this function');
     e.cancel = true;
@@ -505,6 +508,7 @@ export class TimesheetListComponent {
       this.selectedTimesheet = response;
     });
   }
+
   onEditOrViewTimesheet(e: any) {
     e.cancel = true;
     const timesheetId = e.data.ID;
@@ -567,6 +571,7 @@ export class TimesheetListComponent {
       },
     );
   }
+
   isDeleteVisible = (e: any) => {
     return e.row?.data?.STATUS !== 'Approved';
   };
@@ -580,60 +585,6 @@ export class TimesheetListComponent {
     this.getTimesheet();
     this.fetchTimesheetList();
   }
-
-  // onSelectionChanged(e: any) {
-
-  //   const selectedRows = e.selectedRowsData;
-
-  //   if (!selectedRows || selectedRows.length === 0) {
-  //     this.canApprove = false;
-  //     this.canVerify = false;
-  //     this.selectedRowKeys = [];
-  //     return;
-  //   }
-
-  //   // Take first selected row status
-  //   const firstStatus = selectedRows[0].STATUS;
-
-  //   // Allow only same status rows
-  //   const validRows = selectedRows.filter(
-  //     (row: any) => row.STATUS === firstStatus
-  //   );
-
-  //   // If mixed status selected, remove invalid selections
-  //   if (validRows.length !== selectedRows.length) {
-
-  //     this.selectedRowKeys = validRows.map(
-  //       (row: any) => row.ID
-  //     );
-
-  //     this.dataGrid.instance.selectRows(
-  //       this.selectedRowKeys,
-  //       false
-  //     );
-  //   }
-
-  //   // Button visibility
-  //   if (firstStatus === 'Verified') {
-
-  //     this.canApprove = true;
-  //     this.canVerify = false;
-
-  //   } else if (firstStatus === 'Open') {
-
-  //     this.canApprove = false;
-  //     this.canVerify = true;
-
-  //   } else {
-
-  //     this.canApprove = false;
-  //     this.canVerify = false;
-  //   }
-
-  //   this.selectedRowKeys = validRows.map(
-  //     (row: any) => row.ID
-  //   );
-  // }
 
   onSelectionChanged(e: any) {
     const selectedRows = e.selectedRowsData;
@@ -690,6 +641,7 @@ export class TimesheetListComponent {
       e.cellElement.style.pointerEvents = 'none';
     }
   }
+
   statusCellRender(cellElement: any, cellInfo: any) {
     console.log(cellInfo, '==========cellInfo==============');
     const status = cellInfo.data.STATUS;
@@ -716,6 +668,7 @@ export class TimesheetListComponent {
 
     cellElement.appendChild(icon);
   }
+
   getStatusFilterData = [
     {
       text: 'Approved',
@@ -736,7 +689,7 @@ export class TimesheetListComponent {
   }
 
   fetchTimesheetList() {
-    this.timesheetList = [];
+    // this.timesheetList = [];
     const payload = {
       COMPANY_ID: this.CompanyID,
       MONTH: this.selectedMonth
@@ -805,6 +758,7 @@ export class TimesheetListComponent {
         this.fetchTimesheetList();
       });
   }
+
   VerifyBulkRows() {
     //  Check if nothing selected
     if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
