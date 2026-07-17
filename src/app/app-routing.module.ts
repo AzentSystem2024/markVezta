@@ -40,7 +40,7 @@ import { LeaveSalaryComponent } from './pages/HR/Masters/leave-salary/leave-sala
 import { EmployeeLeaveComponent } from './pages/HR/Masters/employee-leave/employee-leave.component';
 import { EmployeeComponent } from './pages/HR/Masters/employee/employee.component';
 import { TimesheetListComponent } from './pages/HR/Masters/timesheet-list/timesheet-list.component';
-import { StaffEOSComponent } from './components/HR/Masters/staff-eos/staff-eos.component';
+import { StaffEOSComponent } from './pages/HR/Masters/staff-eos/staff-eos.component';
 import { ListMiscellaneousPaymentsComponent } from './pages/ACCOUNTS/list-miscellaneous-payments/list-miscellaneous-payments.component';
 import { PayrollListComponent } from './pages/HR/Masters/payroll-list/payroll-list.component';
 import { AccountsListComponent } from './pages/ACCOUNTS/Chart of Account/accounts-list.component';

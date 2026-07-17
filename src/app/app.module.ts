@@ -151,7 +151,7 @@ import { PayRevisionViewModule } from './components/HR/Masters/pay-revision-view
 import { TimesheetListModule } from './pages/HR/Masters/timesheet-list/timesheet-list.component';
 import { TimesheetAddModule } from './components/HR/Masters/timesheet-add/timesheet-add.component';
 import { TimesheetEditModule } from './components/HR/Masters/timesheet-edit/timesheet-edit.component';
-import { StaffEOSModule } from './components/HR/Masters/staff-eos/staff-eos.component';
+import { StaffEOSModule } from './pages/HR/Masters/staff-eos/staff-eos.component';
 import { TimesheetVerifyModule } from './components/HR/Masters/timesheet-verify/timesheet-verify.component';
 import { TimesheetApproveModule } from './components/HR/Masters/timesheet-approve/timesheet-approve.component';
 import { TimesheetViewModule } from './components/HR/Masters/timesheet-view/timesheet-view.component';
@@ -415,12 +415,21 @@ import {
   DashboardMarkComponent,
   DashboardMarkModule,
 } from './pages/dashboard-mark/dashboard-mark.component';
-import { PurchaseReportComponent, PurchaseReportModule } from './pages/REPORT/purchase-report/purchase-report.component';
-import { ItemwisePurchaseReportComponent, ItemwisePurchaseReportModule } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
-import { TimesheetReportComponent, TimesheetReportModule } from './pages/HR/timesheet-report/timesheet-report.component';
+import {
+  PurchaseReportComponent,
+  PurchaseReportModule,
+} from './pages/REPORT/purchase-report/purchase-report.component';
+import {
+  ItemwisePurchaseReportComponent,
+  ItemwisePurchaseReportModule,
+} from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
+import {
+  TimesheetReportComponent,
+  TimesheetReportModule,
+} from './pages/HR/timesheet-report/timesheet-report.component';
 
 @NgModule({
-  declarations: [AppComponent,],
+  declarations: [AppComponent],
   imports: [
     DxTemplateModule,
     TaskListModule,

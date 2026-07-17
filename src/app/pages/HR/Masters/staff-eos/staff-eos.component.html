@@ -103,37 +103,11 @@
       caption="Remarks "
       [width]="150"
     ></dxi-column>
-    <!-- 
-    <dxi-column
-      dataField="STATUS"
-      caption="Status"
-      alignment="right"
-      fixedPosition="right"
-      cellTemplate="statusCellTemplate"
-      width="100"
-      fixedPosition="right"
-    >
-    </dxi-column>
-    <div *dxTemplate="let cellData of 'statusCellTemplate'">
-      <i
-        class="fas fa-flag"
-        [ngClass]="getStatusFlagClass(cellData.value)"
-        [attr.title]="cellData.value"
-        style="margin-left: 10px; cursor: default"
-      ></i>
-            
-    </div>
-    <dxi-column
-      type="buttons"
-      [buttons]="allActionButtons"
-      fixed="true"
-      fixedPosition="right"
-      width="150"
-    ></dxi-column> -->
 
     <dxi-column
       caption="Status"
       dataField="STATUS"
+      alignment="center"
       [width]="80"
       [cellTemplate]="statusCellRender"
       [allowHeaderFiltering]="true"
@@ -143,7 +117,7 @@
       }"
     >
     </dxi-column>
-    <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
+
     <dxi-column
       type="buttons"
       caption="Actions"
@@ -257,6 +231,7 @@
     [width]="600"
     [height]="550"
     [dragEnabled]="true"
+    [showApprove]="false"
     (save)="Add_EOS()"
     (cancel)="close()"
   >

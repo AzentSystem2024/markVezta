@@ -34,9 +34,6 @@ import {
   DxiItemModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { AddMiscReceiptModule } from '../../MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
-import { EditMiscReceiptModule } from '../../MISC-RECEIPT/edit-misc-receipt/edit-misc-receipt.component';
-import { ListSalaryPaymentComponent } from '../../../../../pages/HR/Masters/list-salary-payment/list-salary-payment.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 
@@ -50,7 +47,9 @@ export class AddSalaryPaymentComponent {
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
+
   @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
+
   ledgerList: any;
   filteredLedgerList: any;
   isApproved: boolean = false;
@@ -58,7 +57,6 @@ export class AddSalaryPaymentComponent {
   selectedMonth: Date = new Date();
   selectedMonthForAdd: string;
   calendarVisible = false;
-  months = Array.from({ length: 12 }, (_, i) => new Date(2022, i, 1));
   monthNames = [
     'January',
     'February',
@@ -113,7 +111,6 @@ export class AddSalaryPaymentComponent {
       },
     ],
   };
-  paymentNo: any;
   selectedIds: any[] = [];
   userId: any;
   companyId: any;
@@ -127,7 +124,6 @@ export class AddSalaryPaymentComponent {
 
   ngOnInit() {
     this.getLedgerCodeDropdown();
-    this.getVoucherNo();
     this.loadUserData();
     this.sessionDetails();
     this.getDocNo();
@@ -199,7 +195,7 @@ export class AddSalaryPaymentComponent {
       this.selectedYear = year;
     }
 
-    // ✅ Fix — access DetailList from the object, not the array
+    //  Fix — access DetailList from the object, not the array
     if (Array.isArray(data.DetailList) && data.DetailList.length > 0) {
       this.salaryPendingList = data.DetailList.map((item: any) => ({
         ID: item.ID,
@@ -229,12 +225,6 @@ export class AddSalaryPaymentComponent {
     this.selectedIds = e.selectedRowsData.map((row: any) => row.ID);
   }
 
-  getVoucherNo() {
-    this.dataService.getPaymentNo().subscribe((response: any) => {
-      this.paymentNo = response.VOUCHER_NO;
-    });
-  }
-
   getSalaryPendingList() {
     const payload = {
       COMPANY_ID: this.companyId,
@@ -254,6 +244,7 @@ export class AddSalaryPaymentComponent {
   previousYear() {
     this.selectedYear--;
   }
+
   nextYear() {
     this.selectedYear++;
   }
@@ -263,30 +254,6 @@ export class AddSalaryPaymentComponent {
     this.onMonthChange({ value: this.selectedMonth }); // Pass the selected month to onMonthChange
 
     this.calendarVisible = false;
-
-    // Hide calendar after selection (optional)
-  }
-
-  updateMonthLabel() {
-    // This is automatically updated with the selectedMonth binding in the template
-  }
-  onMonthandYearChanged(e: any) {
-    if (e.value) {
-      const updatedMonth = new Date(e.value);
-      this.selectedMonth = new Date(
-        updatedMonth.getFullYear(),
-        updatedMonth.getMonth() - 1,
-        1,
-      );
-      this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString(
-        'en-US',
-        { month: 'long', year: 'numeric' },
-      );
-    }
-  }
-
-  isDisabledYear(year: number): boolean {
-    return year < 2010 || year > 2019;
   }
 
   toggleCalendar() {
@@ -300,14 +267,17 @@ export class AddSalaryPaymentComponent {
       document.removeEventListener('click', this.outsideClickListener);
     }
   }
+  
   toggleYearSelector() {
     this.yearSelectorVisible = !this.yearSelectorVisible;
   }
+
   selectYear(year: number, event: MouseEvent) {
     event.stopPropagation(); // Prevent calendar from closing
     this.selectedYear = year;
     this.yearSelectorVisible = false;
   }
+
   outsideClickListener = (event: any) => {
     const calendarElement = document.querySelector('.calendar-popup');
     const labelElement = document.querySelector('.month-label');
@@ -322,9 +292,7 @@ export class AddSalaryPaymentComponent {
       document.removeEventListener('click', this.outsideClickListener);
     }
   };
-  onCalendarClose() {
-    this.calendarVisible = false;
-  }
+
   onMonthChange(event: any): void {
     const selectedDate = new Date(event.value);
 
@@ -374,12 +342,6 @@ export class AddSalaryPaymentComponent {
     const day = ('0' + date.getDate()).slice(-2);
     return `${day}-${month}-${year}`; // ✅ dd-MM-yyyy format
   }
-
-  focusGridFirstCell() {}
-
-  onEditorPreparing(event: any) {}
-
-  onRowRemoved(event: any) {}
 
   getLedgerCodeDropdown() {
     this.dataService.getAccountHeadList().subscribe({
@@ -583,8 +545,6 @@ export class AddSalaryPaymentComponent {
     DxToolbarModule,
     DxiItemModule,
     DxoItemModule,
-    AddMiscReceiptModule,
-    EditMiscReceiptModule,
   ],
   providers: [],
   declarations: [AddSalaryPaymentComponent],

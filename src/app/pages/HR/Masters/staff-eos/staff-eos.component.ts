@@ -439,11 +439,7 @@ export class StaffEOSComponent {
 
     this.select_Data_EOS(event);
   }
-  //   add_popup() {
-
-  //     this.isAddPopUp = true;
-
-  //   }
+ 
   add_popup() {
     // Also reset any additional variables if needed
     this.join_date_value = '';
@@ -454,6 +450,7 @@ export class StaffEOSComponent {
     this.selected_data.RELIEVING_DATE = new Date();
     this.get_employes_details_value();
   }
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -543,7 +540,7 @@ export class StaffEOSComponent {
     if (duplicate) {
       notify(
         {
-          message: 'This employee already .',
+          message: 'This employee already exists.....',
           position: { at: 'top right', my: 'top right' },
           displayTime: 500,
         },
@@ -609,12 +606,14 @@ export class StaffEOSComponent {
       this.payment_functionality();
     });
   }
+
   onEmployee_Change(event: any) {
     this.employee_ID = event.value; // assign selected value
     this.get_employes_details_value();
     this.employee_value = event.value;
     console.log(this.employee_value);
   }
+  
   onReason_Change(event: any) {
     this.reason_id_value = event.value;
     console.log(this.reason_id_value);
@@ -872,6 +871,7 @@ export class StaffEOSComponent {
       // this.get_employes_details_value_select();
     });
   }
+
   Approve_EOS() {
     console.log('Approve_EOS called');
     const id = this.selected_data.ID;
@@ -942,6 +942,7 @@ export class StaffEOSComponent {
       this.days_worked_value = 0;
     }
   }
+
   calculateWorkingDaysEdit(event: any) {
     console.log(event, '=================event value====================');
     const joinDate = this.parseApiDate(this.join_date_value); // Parse the join date value
