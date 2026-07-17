@@ -46,6 +46,9 @@ import DataSource from 'devextreme/data/data_source';
 import notify from 'devextreme/ui/notify';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import { confirm } from 'devextreme/ui/dialog';
+import { Workbook } from 'exceljs';
+import { exportDataGrid } from 'devextreme/excel_exporter';
+import saveAs from 'file-saver';
 
 @Component({
   selector: 'app-invoice-retail',
@@ -225,6 +228,27 @@ export class InvoiceRetailComponent {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
+  }
+
+  onExporting(e: any) {
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Invoice');
+
+    exportDataGrid({
+      component: e.component,
+      worksheet: worksheet,
+    }).then(() => {
+      workbook.xlsx.writeBuffer().then((buffer: any) => {
+        saveAs(
+          new Blob([buffer], {
+            type: 'application/octet-stream',
+          }),
+          'Invoice.xlsx',
+        );
+      });
+    });
+
+    e.cancel = true;
   }
   getStoreData() {
     const payload = {
