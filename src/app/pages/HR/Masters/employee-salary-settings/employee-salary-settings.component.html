@@ -123,7 +123,6 @@
     >
       <app-employee-salary-settings-add
        #salarySettings
-        [isOpen]="addEmployeePopupOpened"
         (formClosed)="handleClose()"
       ></app-employee-salary-settings-add>
     </dx-popup>
@@ -140,7 +139,6 @@
   <app-employee-salary-settings-edit
     #editSalarySettings
     [employeeData]="selectedEmployee"
-    [isOpen]="addEmployeePopupOpened"
     (formClosed)="handleEditClose($event)"
   ></app-employee-salary-settings-edit>
 </dx-popup>
