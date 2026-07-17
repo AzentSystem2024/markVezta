@@ -127,6 +127,12 @@
                   labelMode="floating"
                   displayFormat="dd/MM/yyyy"
                 >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
                 </dx-date-box>
               </div>
               <div>
@@ -475,7 +481,7 @@
                 [placeholder]="'Select Payment'"
                 label="Type of Payment"
                 [labelMode]="'floating'"
-                [readOnly]="true"
+                [readOnly]="false"
               >
               </dx-select-box>
 

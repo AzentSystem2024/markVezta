@@ -36,11 +36,11 @@ import { ItemStorePriceVerifyApproveComponent } from './pages/item-store-price-v
 import { ItemStorePriceViewComponent } from './pages/item-store-price-view/item-store-price-view.component';
 import { DepartmentComponent } from './pages/MASTER/department/department.component';
 import { EOSComponent } from './pages/HR/Masters/eos/eos.component';
-import { LeaveSalaryComponent } from './pages/HR/Masters/leave-salary/leave-salary.component';
+import { LeaveSalaryComponent } from './pages/HR/Masters/leave-type/leave-salary.component';
 import { EmployeeLeaveComponent } from './pages/HR/Masters/employee-leave/employee-leave.component';
 import { EmployeeComponent } from './pages/HR/Masters/employee/employee.component';
 import { TimesheetListComponent } from './pages/HR/Masters/timesheet-list/timesheet-list.component';
-import { StaffEOSComponent } from './components/HR/Masters/staff-eos/staff-eos.component';
+import { StaffEOSComponent } from './pages/HR/Masters/staff-eos/staff-eos.component';
 import { ListMiscellaneousPaymentsComponent } from './pages/ACCOUNTS/list-miscellaneous-payments/list-miscellaneous-payments.component';
 import { PayrollListComponent } from './pages/HR/Masters/payroll-list/payroll-list.component';
 import { AccountsListComponent } from './pages/ACCOUNTS/Chart of Account/accounts-list.component';
@@ -215,6 +215,13 @@ import { DashboardMarkComponent } from './pages/dashboard-mark/dashboard-mark.co
 import { PurchaseReportComponent } from './pages/REPORT/purchase-report/purchase-report.component';
 import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
 import { TimesheetReportComponent } from './pages/HR/timesheet-report/timesheet-report.component';
+import { PayrollReportComponent } from './pages/REPORT/payroll-report/payroll-report.component';
+import { PayrollOtReportComponent } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
+import {
+  LeavelistComponent,
+  LeavelistModule,
+} from './pages/REPORT/leavelist/leavelist.component';
+import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 
 const routes: Routes = [
   {
@@ -1321,6 +1328,26 @@ const routes: Routes = [
       {
         path: 'timesheet-report',
         component: TimesheetReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'payroll-report',
+        component: PayrollReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'payroll-ot-report',
+        component: PayrollOtReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'leave-list',
+        component: LeavelistComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'finalsettlement-report',
+        component: FinalSettlementReportComponent,
         canActivate: [AuthGuardService],
       },
       {

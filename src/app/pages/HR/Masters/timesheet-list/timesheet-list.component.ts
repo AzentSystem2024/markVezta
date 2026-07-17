@@ -6,6 +6,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -31,24 +32,22 @@ import {
   DxoLookupModule,
   DxiItemModule,
 } from 'devextreme-angular/ui/nested';
+import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
+
+// Custom Modules & Components
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { PayRevisionAddModule } from '../../../../components/HR/Masters/pay-revision-add/pay-revision-add.component';
 import { PayRevisionApproveModule } from '../../../../components/HR/Masters/pay-revision-approve/pay-revision-approve.component';
 import { PayRevisionEditModule } from '../../../../components/HR/Masters/pay-revision-edit/pay-revision-edit.component';
 import { PayRevisionVerifyModule } from '../../../../components/HR/Masters/pay-revision-verify/pay-revision-verify.component';
 import { PayRevisionViewModule } from '../../../../components/HR/Masters/pay-revision-view/pay-revision-view.component';
-import { PayRevisionComponent } from '../../../../components/HR/Masters/pay-revision/pay-revision.component';
-import { DataService } from 'src/app/services';
 import { TimesheetAddModule } from '../../../../components/HR/Masters/timesheet-add/timesheet-add.component';
 import { TimesheetEditModule } from '../../../../components/HR/Masters/timesheet-edit/timesheet-edit.component';
 import { TimesheetVerifyModule } from '../../../../components/HR/Masters/timesheet-verify/timesheet-verify.component';
 import { TimesheetApproveModule } from '../../../../components/HR/Masters/timesheet-approve/timesheet-approve.component';
-import notify from 'devextreme/ui/notify';
-import {
-  TimesheetViewComponent,
-  TimesheetViewModule,
-} from '../../../../components/HR/Masters/timesheet-view/timesheet-view.component';
-import { Router } from '@angular/router';
+import { TimesheetViewModule } from '../../../../components/HR/Masters/timesheet-view/timesheet-view.component';
+import { DataService } from 'src/app/services';
 
 @Component({
   selector: 'app-timesheet-list',
@@ -56,82 +55,41 @@ import { Router } from '@angular/router';
   styleUrls: ['./timesheet-list.component.scss'],
 })
 export class TimesheetListComponent {
+  // VIEW CHILD & UI COMPONENTS
+  // ==========================================
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
+
+  // STATE FLAGS & CONFIGURATIONS
+  // ==========================================
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter = true;
   showFilterRow = true;
   isFilterOpened = false;
-  filterRowVisible: boolean = false;
-  isFilterRowVisible: boolean = false;
-  auto: string = 'auto';
+  isFilterRowVisible = false;
+
+  addTimesheetPopupOpened = false;
+  editTimesheetPopupOpened = false;
+  verifyTimesheetPopupOpened = false;
+  approveTimesheetPopupOpened = false;
+  viewTimesheetPopupOpened = false;
+  calendarVisible = false;
+  yearSelectorVisible = false;
+
   CompanyID: any;
   selectedRowKeys: any[] = [];
-
-  GridSource: any;
-  isLoading: boolean = false;
-  addTimesheetPopupOpened: boolean = false;
-  editTimesheetPopupOpened: boolean = false;
-  verifyTimesheetPopupOpened: boolean = false;
-  approveTimesheetPopupOpened: boolean = false;
-  viewTimesheetPopupOpened: boolean = false;
   selectedTimesheet: any = null;
   timesheetList: any[] = [];
-  allActionButtons = [
-    {
-      name: 'edit',
-      hint: 'Edit',
-      icon: 'edit',
-      text: 'Edit',
-      visible: (e) => e.row.data.STATUS !== 'Approved',
-    },
-    {
-      name: 'delete',
-      hint: 'Delete',
-      icon: 'trash',
-      text: 'Delete',
-      // onClick: (e) => this.onDeleteTimesheet(e),
-      visible: (e) => e.row.data.STATUS !== 'Approved',
-    },
+  PopupTitle: string = '';
 
-    {
-      hint: 'Approve',
-      icon: 'check',
-      text: 'Approve',
-      onClick: (e) => {
-        setTimeout(() => this.onApproveClick(e));
-      },
-      visible: (e) => e.row.data.STATUS === 'Verified',
-    },
-  ];
-
-  approveButtonOptions: any = {
-    text: 'Approve',
-    type: 'default',
-    stylingMode: 'contained',
-    width: 100,
-    disabled: false,
-    onClick: () => this.ApproveBulkRows(),
-  };
-  VerifyButtonOptions: any = {
-    text: 'Verify',
-    type: 'default',
-    stylingMode: 'contained',
-    width: 100,
-    disabled: false,
-    onClick: () => this.VerifyBulkRows(),
-  };
-
-  // selectedMonth: string | number | Date = new Date();
+  // Month / Year Selection
   selectedMonth: Date = new Date();
-  // selectedRowKeys: any[] = [];
-  timesheetData: any;
-  timesheet: any;
   selectedMonthForAdd: any;
-  calendarVisible = false;
-  months = Array.from({ length: 12 }, (_, i) => new Date(2022, i, 1)); // Example for 2022
+  selectedYear: number = new Date().getFullYear();
+  years: number[] = [];
+  months = Array.from({ length: 12 }, (_, i) => new Date(2022, i, 1));
   monthNames = [
     'January',
     'February',
@@ -146,16 +104,64 @@ export class TimesheetListComponent {
     'November',
     'December',
   ];
-  selectedYear: number;
-  yearSelectorVisible = false;
-  years: number[] = [];
-  // CompanyID: any;
-  canAdd: boolean = false;
-  canEdit: boolean = false;
-  canDelete: boolean = false;
-  canPrint: boolean = false;
-  canView: boolean = false;
-  canApprove: boolean = false;
+
+  // PERMISSIONS
+  // ==========================================
+  canAdd = false;
+  canEdit = false;
+  canDelete = false;
+  canPrint = false;
+  canView = false;
+  canVerify = false;
+  canApprove = false;
+  SessioncanApprove = false;
+  SessioncanVerify = false;
+
+  // GRID CONFIGURATION
+  // ==========================================
+  allActionButtons = [
+    {
+      name: 'edit',
+      hint: 'Edit',
+      icon: 'edit',
+      text: 'Edit',
+      visible: (e: any) => e.row.data.STATUS !== 'Approved',
+    },
+    {
+      name: 'delete',
+      hint: 'Delete',
+      icon: 'trash',
+      text: 'Delete',
+      visible: (e: any) => e.row.data.STATUS !== 'Approved',
+    },
+    {
+      hint: 'Approve',
+      icon: 'check',
+      text: 'Approve',
+      onClick: (e: any) => {
+        setTimeout(() => this.onApproveClick(e));
+      },
+      visible: (e: any) => e.row.data.STATUS === 'Verified',
+    },
+  ];
+
+  approveButtonOptions: any = {
+    text: 'Approve',
+    type: 'default',
+    stylingMode: 'contained',
+    width: 100,
+    disabled: false,
+    onClick: () => this.ApproveBulkRows(),
+  };
+
+  VerifyButtonOptions: any = {
+    text: 'Verify',
+    type: 'default',
+    stylingMode: 'contained',
+    width: 100,
+    disabled: false,
+    onClick: () => this.VerifyBulkRows(),
+  };
 
   addButtonOptions = {
     type: 'default',
@@ -165,45 +171,56 @@ export class TimesheetListComponent {
       this.zone.run(() => this.addTimesheet());
     },
     elementAttr: { class: 'add-button' },
-
     template: () => {
       return `
       <div class="add-btn-content">
-        <span class="iconify"
-              data-icon="formkit:add"
-              data-width="20"
-              data-height="20"></span>
+        <span class="iconify" data-icon="formkit:add" data-width="20" data-height="20"></span>
         <span class="add-text">New</span>
-      </div>
-    `;
+      </div>`;
     },
   };
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' }, // global style
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
-  popupTitle: any;
-  isViewMode: boolean = false;
-  selectedStatus: any;
-  canVerify: boolean = false;
-  SessioncanApprove: boolean = false;
-  SessioncanVerify: boolean = false;
-  PopupTitle: string;
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  getStatusFilterData = [
+    { text: 'Approved', value: 'Approved' },
+    { text: 'Open', value: 'Open' },
+    { text: 'Verified', value: 'Verified' },
+  ];
+
+  // CONSTRUCTOR
+  // ==========================================
   constructor(
     private dataService: DataService,
     private zone: NgZone,
     private router: Router,
   ) {}
 
+  // LIFECYCLE HOOKS
+  // ==========================================
   ngOnInit() {
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.CompanyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    if (menuResponse && menuResponse.SELECTED_COMPANY) {
+      this.CompanyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    }
+
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -216,12 +233,11 @@ export class TimesheetListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.SessioncanApprove = packingRights.CanApprove;
-
       this.SessioncanVerify = packingRights.CanVerify;
     }
+
     const today = new Date();
     this.selectedMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); // Previous month
-
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric',
@@ -235,47 +251,96 @@ export class TimesheetListComponent {
     this.fetchTimesheetList();
   }
 
+  // UI & GRID UTILS
+  // ==========================================
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
+    const grid = this.dataGrid?.instance;
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+
   onExporting(event: any) {
     const fileName = 'Timesheet';
     this.dataService.exportDataGrid(event, fileName);
   }
 
+  refreshGrid() {
+    this.fetchTimesheetList();
+  }
+
+  statusCellRender = (cellElement: any, cellInfo: any) => {
+    const status = cellInfo.data.STATUS;
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-flag';
+    icon.style.fontSize = '18px';
+    icon.style.color =
+      status === 'Approved'
+        ? '#10B981'
+        : status === 'Verified'
+          ? '#0073D8'
+          : '#FFA500';
+
+    icon.title =
+      status === 'Approved'
+        ? 'Approved'
+        : status === 'Verified'
+          ? 'Verified'
+          : 'Open';
+
+    icon.style.display = 'flex';
+    icon.style.justifyContent = 'center';
+    icon.style.alignItems = 'center';
+    cellElement.appendChild(icon);
+  };
+
+  onCellPrepared(e: any) {
+    if (
+      e.rowType === 'data' &&
+      e.column.command === 'select' &&
+      e.data.STATUS === 'Approved'
+    ) {
+      e.cellElement.classList.add('dx-state-disabled');
+      e.cellElement.style.pointerEvents = 'none';
+    }
+  }
+
+  getStatusFlagClass(status: string): string {
+    switch (status) {
+      case 'Open':
+        return 'flag-orange';
+      case 'Verified':
+        return 'flag-verified'; // blue
+      case 'Approved':
+        return 'flag-approved'; // Green
+      default:
+        return '';
+    }
+  }
+
+  // CALENDAR & DATE SELECTION
+  // ==========================================
   generateYears() {
     const currentYear = new Date().getFullYear();
     this.years = [];
-
     for (let i = currentYear - 10; i <= currentYear + 1; i++) {
       this.years.push(i);
     }
   }
+
   previousYear() {
     this.selectedYear--;
   }
-
   nextYear() {
     this.selectedYear++;
   }
+
   selectMonthByIndex(monthIndex: number) {
-    this.selectedMonth = new Date(this.selectedYear, monthIndex, 1, 12); // Set the date to the 1st of the selected month
-    this.onMonthChange({ value: this.selectedMonth }); // Pass the selected month to onMonthChange
-
+    this.selectedMonth = new Date(this.selectedYear, monthIndex, 1, 12);
+    this.onMonthChange({ value: this.selectedMonth });
     this.calendarVisible = false;
-
-    // Hide calendar after selection (optional)
-  }
-
-  updateMonthLabel() {
-    // This is automatically updated with the selectedMonth binding in the template
   }
 
   onMonthandYearChanged(e: any) {
@@ -292,23 +357,16 @@ export class TimesheetListComponent {
       );
     }
   }
+
   toggleCalendar() {
     this.calendarVisible = !this.calendarVisible;
-
     if (this.calendarVisible) {
-      setTimeout(() => {
-        document.addEventListener('click', this.outsideClickListener);
-      });
+      setTimeout(() =>
+        document.addEventListener('click', this.outsideClickListener),
+      );
     } else {
       document.removeEventListener('click', this.outsideClickListener);
     }
-  }
-
-  refreshGrid() {
-    // if (this.dataGrid?.instance) {
-    //   this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    // }
-    this.fetchTimesheetList();
   }
 
   toggleYearSelector() {
@@ -316,7 +374,7 @@ export class TimesheetListComponent {
   }
 
   selectYear(year: number, event: MouseEvent) {
-    event.stopPropagation(); // Prevent calendar from closing
+    event.stopPropagation();
     this.selectedYear = year;
     this.yearSelectorVisible = false;
   }
@@ -324,7 +382,6 @@ export class TimesheetListComponent {
   outsideClickListener = (event: any) => {
     const calendarElement = document.querySelector('.calendar-popup');
     const labelElement = document.querySelector('.month-label');
-
     if (
       calendarElement &&
       !calendarElement.contains(event.target) &&
@@ -342,43 +399,50 @@ export class TimesheetListComponent {
 
   onMonthChange(event: any): void {
     const selectedDate = new Date(event.value);
-
     if (isNaN(selectedDate.getTime())) return;
-
-    // Ensure the date is normalized to the first of the month at noon
     this.selectedMonth = new Date(
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
       1,
       12,
     );
-
     this.selectedMonthForAdd = this.selectedMonth.toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric',
     });
-
     this.getTimesheet();
   }
 
+  goToPreviousMonth() {
+    const currentDate = new Date(this.selectedMonth);
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    this.selectedMonth = currentDate;
+    this.getTimesheet();
+    this.fetchTimesheetList();
+  }
+
+  goToNextMonth() {
+    const currentDate = new Date(this.selectedMonth);
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    this.selectedMonth = currentDate;
+    this.getTimesheet();
+    this.fetchTimesheetList();
+  }
+
+  updateMonthLabel() {}
+
+  // DATA FETCHING
+  // ==========================================
+  sesstion_Details() {
+    // Keep method as placeholder since original had it
+  }
+
   getTimesheet() {
+    // Keep placeholder from original
     const selectedMonthStr = this.selectedMonth.toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric',
-    }); // e.g. "Apr 2025"
-  }
-
-  getStatusFlagClass(status: string): string {
-    switch (status) {
-      case 'Open':
-        return 'flag-orange';
-      case 'Verified':
-        return 'flag-verified'; // blue
-      case 'Approved':
-        return 'flag-approved'; // Green
-      default:
-        return '';
-    }
+    });
   }
 
   getPayTimeEntries() {
@@ -387,124 +451,163 @@ export class TimesheetListComponent {
       .subscribe((res: any) => {});
   }
 
-  goToPreviousMonth() {
-    const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    this.selectedMonth = currentDate;
-    this.getTimesheet();
+  fetchTimesheetList() {
+    const payload = {
+      COMPANY_ID: this.CompanyID,
+      MONTH: this.selectedMonth
+        .toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+        .replace(/\s/g, ''),
+    };
 
-    this.fetchTimesheetList();
-  }
-
-  goToNextMonth() {
-    const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    this.selectedMonth = currentDate;
-    this.getTimesheet();
-    this.fetchTimesheetList();
-  }
-
-  onVerifyClick(e: any): void {
-    e.cancel = true;
-    const timesheetId = e.row?.data?.ID;
-
-    if (!timesheetId) {
-      console.warn('No Employee ID found in row data');
-      return;
-    }
-
-    this.dataService.selectTimesheet(timesheetId).subscribe({
-      next: (response: any) => {
-        this.selectedTimesheet = response;
-        this.verifyTimesheetPopupOpened = true;
-      },
-      error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
+    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+      this.timesheetList = response.data;
+      this.updateApproveButtonState();
     });
   }
 
-  onApproveClick(e: any): void {
-    e.cancel = true;
-    const employeeId = e.row?.data?.ID;
+  // ROW SELECTION & BULK ACTIONS
+  // ==========================================
+  onSelectionChanged(e: any) {
+    const selectedRows = e.selectedRowsData;
 
-    if (!employeeId) {
-      console.warn('No Employee ID found in row data');
+    if (!selectedRows || selectedRows.length === 0) {
+      this.canApprove = false;
+      this.canVerify = false;
+      this.selectedRowKeys = [];
       return;
     }
 
-    this.dataService.selectTimesheet(employeeId).subscribe({
-      next: (response: any) => {
-        this.selectedTimesheet = response;
-        this.approveTimesheetPopupOpened = true;
-      },
-      error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
+    const firstStatus = selectedRows[0].STATUS;
+    const validRows = selectedRows.filter(
+      (row: any) => row.STATUS === firstStatus,
+    );
+
+    if (validRows.length !== selectedRows.length) {
+      this.selectedRowKeys = validRows.map((row: any) => row.ID);
+      this.dataGrid.instance.selectRows(this.selectedRowKeys, false);
+    }
+
+    this.canApprove = false;
+    this.canVerify = false;
+
+    if (firstStatus === 'Open' && this.SessioncanVerify) {
+      this.canVerify = true;
+    }
+    if (firstStatus === 'Verified' && this.SessioncanApprove) {
+      this.canApprove = true;
+    }
+
+    this.selectedRowKeys = validRows.map((row: any) => row.ID);
+  }
+
+  updateApproveButtonState() {
+    if (!this.timesheetList || this.timesheetList.length === 0) {
+      this.setApproveDisabled(true);
+      return;
+    }
+    const allApproved = this.timesheetList.every(
+      (row: any) => row.STATUS === 'Approved',
+    );
+    this.setApproveDisabled(allApproved);
+  }
+
+  setApproveDisabled(state: boolean) {
+    this.approveButtonOptions = {
+      ...this.approveButtonOptions,
+      disabled: state,
+    };
+  }
+
+  ApproveBulkRows() {
+    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one row',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return;
+    }
+    const payload = { IDs: this.selectedRowKeys };
+    this.dataService.Timesheet_Approval_Api(payload).subscribe(() => {
+      this.selectedRowKeys = [];
+      notify(
+        {
+          message: `Approved Successfully`,
+          position: { at: 'top right', my: 'top right' },
+        },
+        'success',
+      );
+      this.fetchTimesheetList();
     });
   }
 
+  VerifyBulkRows() {
+    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one row',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
+      return;
+    }
+    const payload = { IDs: this.selectedRowKeys };
+    this.dataService.verifyTimesheet(payload).subscribe(() => {
+      this.selectedRowKeys = [];
+      notify(
+        {
+          message: `Verified Successfully`,
+          position: { at: 'top right', my: 'top right' },
+        },
+        'success',
+      );
+      this.fetchTimesheetList();
+    });
+  }
+
+  // POPUP OPENERS & ROW ACTIONS
+  // ==========================================
   addTimesheet() {
     const year = this.selectedMonth.getFullYear();
     const month = ('0' + (this.selectedMonth.getMonth() + 1)).slice(-2);
-
     this.selectedMonthForAdd = `${year}-${month}`;
-
     this.addTimesheetPopupOpened = true;
   }
 
   onEditingStart(e: any) {
     e.cancel = true;
-
     const timesheetId = e.data.ID;
-
     this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
       this.selectedTimesheet = response;
-
-      // Close other popups
       this.verifyTimesheetPopupOpened = false;
       this.approveTimesheetPopupOpened = false;
       this.viewTimesheetPopupOpened = false;
-
-      // Always open Edit popup
       this.editTimesheetPopupOpened = true;
     });
   }
 
-  onVerifyAction(data: any) {
-    const timesheetId = data.ID;
-
-    this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
-      this.selectedTimesheet = response;
-
-      if (data.STATUS === 'Open') {
-        this.verifyTimesheetPopupOpened = true;
-      } else if (data.STATUS === 'Verified') {
-        this.approveTimesheetPopupOpened = true;
-      } else if (data.STATUS === 'Approved') {
-        this.viewTimesheetPopupOpened = true;
-      }
-    });
-  }
   onEditingStartVerify(e: any) {
-    console.log('call this function');
     e.cancel = true;
+    const timesheetId = e.data.ID;
+    this.PopupTitle =
+      e.row?.data?.STATUS == 'Approved' ? 'View Timesheet' : 'Edit Timesheet';
 
     if (e.row?.data?.STATUS == 'Approved') {
-      this.PopupTitle = 'View Timesheet';
       this.viewTimesheetPopupOpened = true;
     } else {
       this.editTimesheetPopupOpened = true;
-      this.PopupTitle = 'Edit Timesheet';
     }
-    // this.editTimesheetPopupOpened = true;
-    const timesheetId = e.data.ID;
-    const status = e.data.STATUS;
 
     this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
       this.selectedTimesheet = response;
     });
   }
+
   onEditOrViewTimesheet(e: any) {
     e.cancel = true;
     const timesheetId = e.data.ID;
@@ -517,9 +620,8 @@ export class TimesheetListComponent {
           (btn) => btn.name === 'edit',
         );
         if (actionButton) {
-          actionButton.hint =
-            this.selectedTimesheet.STATUS === 'Approved' ? 'View' : 'Edit';
-          actionButton.text = actionButton.hint; // optional: update button text as well
+          actionButton.hint = status === 'Approved' ? 'View' : 'Edit';
+          actionButton.text = actionButton.hint;
         }
         if (status === 'Approved') {
           this.viewTimesheetPopupOpened = true;
@@ -527,52 +629,111 @@ export class TimesheetListComponent {
           this.editTimesheetPopupOpened = true;
         }
       },
-      error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
+      error: (err) => console.error('Failed to fetch timesheet:', err),
     });
   }
 
-  onDeleteTimesheet(e: any) {
-    const timesheetIdId = e.data.ID;
-    // Optionally prevent the default delete behavior
+  onVerifyClick(e: any): void {
     e.cancel = true;
+    const timesheetId = e.row?.data?.ID;
+    if (!timesheetId) return;
 
-    // Call your delete API
-    this.dataService.deleteTimesheet(timesheetIdId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Timesheet Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.fetchTimesheetList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
+    this.dataService.selectTimesheet(timesheetId).subscribe({
+      next: (response: any) => {
+        this.selectedTimesheet = response;
+        this.verifyTimesheetPopupOpened = true;
       },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
-    );
+      error: (err) => console.error('Failed to fetch timesheet:', err),
+    });
   }
+
+  onApproveClick(e: any): void {
+    e.cancel = true;
+    const employeeId = e.row?.data?.ID;
+    if (!employeeId) return;
+
+    this.dataService.selectTimesheet(employeeId).subscribe({
+      next: (response: any) => {
+        this.selectedTimesheet = response;
+        this.approveTimesheetPopupOpened = true;
+      },
+      error: (err) => console.error('Failed to fetch timesheet:', err),
+    });
+  }
+
+  onVerifyAction(data: any) {
+    const timesheetId = data.ID;
+    this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
+      this.selectedTimesheet = response;
+      if (data.STATUS === 'Open') {
+        this.verifyTimesheetPopupOpened = true;
+      } else if (data.STATUS === 'Verified') {
+        this.approveTimesheetPopupOpened = true;
+      } else if (data.STATUS === 'Approved') {
+        this.viewTimesheetPopupOpened = true;
+      }
+    });
+  }
+
   isDeleteVisible = (e: any) => {
     return e.row?.data?.STATUS !== 'Approved';
   };
 
+  onDeleteTimesheet(e: any) {
+    e.cancel = new Promise<void>((resolve, reject) => {
+      confirm(
+        'Are you sure you want to delete this Timesheet record?',
+        'Confirm Deletion',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          const timesheetIdId = e.data.ID;
+          this.dataService.deleteTimesheet(timesheetIdId).subscribe({
+            next: (response: any) => {
+              if (response) {
+                notify(
+                  {
+                    message: 'Timesheet Deleted Successfully',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 500,
+                  },
+                  'success',
+                );
+                this.fetchTimesheetList();
+                resolve();
+              } else {
+                notify(
+                  {
+                    message: 'Your Data Not deleted',
+                    position: { at: 'top right', my: 'top right' },
+                    displayTime: 2000,
+                  },
+                  'error',
+                );
+                reject();
+              }
+            },
+            error: (error) => {
+              notify(
+                {
+                  message: 'Error deleting timesheet',
+                  position: { at: 'top right', my: 'top right' },
+                  displayTime: 2000,
+                },
+                'error',
+              );
+              console.error('Error deleting timesheet:', error);
+              reject();
+            },
+          });
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
   handleClose() {
-    this.addTimesheetPopupOpened = false; // closes the popup
+    this.addTimesheetPopupOpened = false;
     this.editTimesheetPopupOpened = false;
     this.verifyTimesheetPopupOpened = false;
     this.approveTimesheetPopupOpened = false;
@@ -580,268 +741,6 @@ export class TimesheetListComponent {
     this.getTimesheet();
     this.fetchTimesheetList();
   }
-
-  // onSelectionChanged(e: any) {
-
-  //   const selectedRows = e.selectedRowsData;
-
-  //   if (!selectedRows || selectedRows.length === 0) {
-  //     this.canApprove = false;
-  //     this.canVerify = false;
-  //     this.selectedRowKeys = [];
-  //     return;
-  //   }
-
-  //   // Take first selected row status
-  //   const firstStatus = selectedRows[0].STATUS;
-
-  //   // Allow only same status rows
-  //   const validRows = selectedRows.filter(
-  //     (row: any) => row.STATUS === firstStatus
-  //   );
-
-  //   // If mixed status selected, remove invalid selections
-  //   if (validRows.length !== selectedRows.length) {
-
-  //     this.selectedRowKeys = validRows.map(
-  //       (row: any) => row.ID
-  //     );
-
-  //     this.dataGrid.instance.selectRows(
-  //       this.selectedRowKeys,
-  //       false
-  //     );
-  //   }
-
-  //   // Button visibility
-  //   if (firstStatus === 'Verified') {
-
-  //     this.canApprove = true;
-  //     this.canVerify = false;
-
-  //   } else if (firstStatus === 'Open') {
-
-  //     this.canApprove = false;
-  //     this.canVerify = true;
-
-  //   } else {
-
-  //     this.canApprove = false;
-  //     this.canVerify = false;
-  //   }
-
-  //   this.selectedRowKeys = validRows.map(
-  //     (row: any) => row.ID
-  //   );
-  // }
-
-  onSelectionChanged(e: any) {
-    const selectedRows = e.selectedRowsData;
-
-    if (!selectedRows || selectedRows.length === 0) {
-      this.canApprove = false;
-      this.canVerify = false;
-      this.selectedRowKeys = [];
-      return;
-    }
-
-    // First selected row status
-    const firstStatus = selectedRows[0].STATUS;
-
-    // Allow only same status rows
-    const validRows = selectedRows.filter(
-      (row: any) => row.STATUS === firstStatus,
-    );
-
-    // Remove mixed status selection
-    if (validRows.length !== selectedRows.length) {
-      this.selectedRowKeys = validRows.map((row: any) => row.ID);
-
-      this.dataGrid.instance.selectRows(this.selectedRowKeys, false);
-    }
-
-    // Reset buttons
-    this.canApprove = false;
-    this.canVerify = false;
-
-    // Open -> Verify button only if session verify permission exists
-    if (firstStatus === 'Open' && this.SessioncanVerify) {
-      this.canVerify = true;
-    }
-
-    // Verified -> Approve button only if session approve permission exists
-    if (firstStatus === 'Verified' && this.SessioncanApprove) {
-      this.canApprove = true;
-    }
-
-    this.selectedRowKeys = validRows.map((row: any) => row.ID);
-  }
-
-  onCellPrepared(e: any) {
-    if (
-      e.rowType === 'data' &&
-      e.column.command === 'select' &&
-      e.data.STATUS === 'Approved'
-    ) {
-      // Disable checkbox
-      e.cellElement.classList.add('dx-state-disabled');
-
-      // Prevent clicking
-      e.cellElement.style.pointerEvents = 'none';
-    }
-  }
-  statusCellRender(cellElement: any, cellInfo: any) {
-    console.log(cellInfo, '==========cellInfo==============');
-    const status = cellInfo.data.STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approved'
-        ? '#10B981' // Approved
-        : status === 'Verified'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title =
-      status === 'Approved'
-        ? 'Approved'
-        : status === 'Verified'
-          ? 'Verified'
-          : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 'Approved',
-    },
-    {
-      text: 'Open',
-      value: 'Open',
-    },
-    {
-      text: 'Verified',
-      value: 'Verified',
-    },
-  ];
-
-  sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-  }
-
-  fetchTimesheetList() {
-    this.timesheetList = [];
-    const payload = {
-      COMPANY_ID: this.CompanyID,
-      MONTH: this.selectedMonth
-        .toLocaleDateString('en-US', {
-          month: 'long',
-          year: 'numeric',
-        })
-        .replace(/\s/g, ''),
-    };
-
-    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-      this.timesheetList = response.data;
-      this.updateApproveButtonState();
-    });
-  }
-
-  updateApproveButtonState() {
-    if (!this.timesheetList || this.timesheetList.length === 0) {
-      this.setApproveDisabled(true);
-      return;
-    }
-
-    const allApproved = this.timesheetList.every(
-      (row: any) => row.STATUS === 'Approved',
-    );
-
-    this.setApproveDisabled(allApproved);
-  }
-
-  setApproveDisabled(state: boolean) {
-    this.approveButtonOptions = {
-      ...this.approveButtonOptions,
-      disabled: state,
-    };
-  }
-
-  ApproveBulkRows() {
-    //  Check if nothing selected
-    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
-      notify(
-        {
-          message: 'Please select at least one row',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-        3000,
-      );
-      return; // stop execution
-    }
-    const payload = {
-      IDs: this.selectedRowKeys,
-    };
-
-    this.dataService
-      .Timesheet_Approval_Api(payload)
-      .subscribe((response: any) => {
-        // this.timesheetList = response;
-        this.selectedRowKeys = []; // Clear selection after success
-        notify(
-          {
-            message: `Approved Successfully`,
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success',
-        );
-        this.fetchTimesheetList();
-      });
-  }
-  VerifyBulkRows() {
-    //  Check if nothing selected
-    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
-      notify(
-        {
-          message: 'Please select at least one row',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-        3000,
-      );
-      return; // stop execution
-    }
-    const payload = {
-      IDs: this.selectedRowKeys,
-    };
-
-    this.dataService.verifyTimesheet(payload).subscribe((response: any) => {
-      // this.timesheetList = response;
-      this.selectedRowKeys = []; // Clear selection after success
-      notify(
-        {
-          message: `Verified Successfully`,
-          position: { at: 'top right', my: 'top right' },
-        },
-        'success',
-      );
-      this.fetchTimesheetList();
-    });
-  }
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
-    text: '',
-  };
 }
 
 @NgModule({
@@ -865,16 +764,13 @@ export class TimesheetListComponent {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
-    DxoItemModule,
     PayRevisionEditModule,
     PayRevisionAddModule,
     PayRevisionVerifyModule,
     PayRevisionApproveModule,
     PayRevisionViewModule,
-    DxDateBoxModule,
     DxDateRangeBoxModule,
     TimesheetAddModule,
     TimesheetEditModule,

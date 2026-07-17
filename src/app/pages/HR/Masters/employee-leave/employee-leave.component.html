@@ -121,7 +121,7 @@
         fixedPosition="right"
       >
       </dxi-column>
-      
+
       <dxi-column
         type="buttons"
         caption="Actions"
@@ -130,29 +130,29 @@
       >
       </dxi-column>
 
-       <div *dxTemplate="let cellData of 'actionTemplate'">
+      <div *dxTemplate="let cellData of 'actionTemplate'">
         <!-- Edit -->
         <i
           *ngIf="canEdit"
           class="dx-icon dx-icon-edit"
           [style.opacity]="
-  cellData.data.STATUS === 'Verified' ||
-  cellData.data.STATUS === 'Approved' ||
-  cellData.data.STATUS === 'Travelled' ||
-  cellData.data.STATUS === 'Rejoined' ||
-  cellData.data.STATUS === 'Left Service'
-    ? '0.4'
-    : '1'
-"
-[style.pointer-events]="
-  cellData.data.STATUS === 'Verified' ||
-  cellData.data.STATUS === 'Approved' ||
-  cellData.data.STATUS === 'Travelled' ||
-  cellData.data.STATUS === 'Rejoined' ||
-  cellData.data.STATUS === 'Left Service'
-    ? 'none'
-    : 'auto'
-"
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Travelled' ||
+            cellData.data.STATUS === 'Rejoined' ||
+            cellData.data.STATUS === 'Left Service'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Travelled' ||
+            cellData.data.STATUS === 'Rejoined' ||
+            cellData.data.STATUS === 'Left Service'
+              ? 'none'
+              : 'auto'
+          "
           style="cursor: pointer; margin-right: 10px"
           title="Edit"
           (click)="onEditingStart({ data: cellData.data, cancel: false })"
@@ -163,23 +163,23 @@
           *ngIf="canDelete"
           class="dx-icon dx-icon-trash"
           [style.opacity]="
-  cellData.data.STATUS === 'Verified' ||
-  cellData.data.STATUS === 'Approved' ||
-  cellData.data.STATUS === 'Travelled' ||
-  cellData.data.STATUS === 'Rejoined' ||
-  cellData.data.STATUS === 'Left Service'
-    ? '0.4'
-    : '1'
-"
-[style.pointer-events]="
-  cellData.data.STATUS === 'Verified' ||
-  cellData.data.STATUS === 'Approved' ||
-  cellData.data.STATUS === 'Travelled' ||
-  cellData.data.STATUS === 'Rejoined' ||
-  cellData.data.STATUS === 'Left Service'
-    ? 'none'
-    : 'auto'
-"
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Travelled' ||
+            cellData.data.STATUS === 'Rejoined' ||
+            cellData.data.STATUS === 'Left Service'
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Travelled' ||
+            cellData.data.STATUS === 'Rejoined' ||
+            cellData.data.STATUS === 'Left Service'
+              ? 'none'
+              : 'auto'
+          "
           style="cursor: pointer; margin-right: 10px"
           title="Delete"
           (click)="Delete_Data({ data: cellData.data, cancel: false })"
@@ -188,16 +188,14 @@
         <!-- Verify -->
         <span
           *ngIf="
-  (cellData.data.STATUS === 'Verified' && canApprove) ||
-  (cellData.data.STATUS === 'Approved' && canApprove) ||
-  (cellData.data.STATUS === 'Travelled' && canApprove) ||
-  (
-    cellData.data.STATUS !== 'Verified' &&
-    cellData.data.STATUS !== 'Approved' &&
-    cellData.data.STATUS !== 'Travelled' &&
-    canVerify
-  )
-"
+            (cellData.data.STATUS === 'Verified' && canApprove) ||
+            (cellData.data.STATUS === 'Approved' && canApprove) ||
+            (cellData.data.STATUS === 'Travelled' && canApprove) ||
+            (cellData.data.STATUS !== 'Verified' &&
+              cellData.data.STATUS !== 'Approved' &&
+              cellData.data.STATUS !== 'Travelled' &&
+              canVerify)
+          "
           style="
             position: relative;
             display: inline-block;
@@ -207,47 +205,47 @@
             cursor: pointer;
             vertical-align: middle;
           "
-         [title]="
-  cellData.data.STATUS === 'Rejoined' ||
-  cellData.data.STATUS === 'Left Service'
-    ? 'View'
-    : cellData.data.STATUS === 'Travelled'
-      ? 'Rejoin / Left Service'
-      : cellData.data.STATUS === 'Approved'
-        ? 'Travel'
-        : cellData.data.STATUS === 'Verified'
-          ? 'Approve'
-          : 'Verify'
-"
-        (click)="
-  cellData.data.STATUS === 'Rejoined' ||
-  cellData.data.STATUS === 'Left Service'
-    ? onEditingStart({ data: cellData.data, cancel: false })
-    : cellData.data.STATUS === 'Travelled'
-      ? onRejoinClick({ row: { data: cellData.data } })
-      : cellData.data.STATUS === 'Approved'
-        ? onTravelClick({ row: { data: cellData.data } })
-        : cellData.data.STATUS === 'Verified'
-          ? onApproveClick({ row: { data: cellData.data } })
-          : onVerifyClick({ row: { data: cellData.data } })
-"
+          [title]="
+            cellData.data.STATUS === 'Rejoined' ||
+            cellData.data.STATUS === 'Left Service'
+              ? 'View'
+              : cellData.data.STATUS === 'Travelled'
+                ? 'Rejoin / Left Service'
+                : cellData.data.STATUS === 'Approved'
+                  ? 'Travel'
+                  : cellData.data.STATUS === 'Verified'
+                    ? 'Approve'
+                    : 'Verify'
+          "
+          (click)="
+            cellData.data.STATUS === 'Rejoined' ||
+            cellData.data.STATUS === 'Left Service'
+              ? onEditingStart({ data: cellData.data, cancel: false })
+              : cellData.data.STATUS === 'Travelled'
+                ? onRejoinClick({ row: { data: cellData.data } })
+                : cellData.data.STATUS === 'Approved'
+                  ? onTravelClick({ row: { data: cellData.data } })
+                  : cellData.data.STATUS === 'Verified'
+                    ? onApproveClick({ row: { data: cellData.data } })
+                    : onVerifyClick({ row: { data: cellData.data } })
+          "
         >
           <!-- Blue badge -->
           <i
             class="fas fa-certificate"
             [style.color]="
-  cellData.data.STATUS === 'Travelled'
-    ? '#FFD700'
-    : cellData.data.STATUS === 'Approved'
-      ? '#10B981'
-      : cellData.data.STATUS === 'Verified'
-        ? '#0073D8'
-        : cellData.data.STATUS === 'Rejoined'
-            ? '#8B4513'
-            : cellData.data.STATUS === 'Left Service'
-              ? '#DC2626'
-        : '#FFA500'
-"
+              cellData.data.STATUS === 'Travelled'
+                ? '#FFD700'
+                : cellData.data.STATUS === 'Approved'
+                  ? '#10B981'
+                  : cellData.data.STATUS === 'Verified'
+                    ? '#0073D8'
+                    : cellData.data.STATUS === 'Rejoined'
+                      ? '#8B4513'
+                      : cellData.data.STATUS === 'Left Service'
+                        ? '#DC2626'
+                        : '#FFA500'
+            "
             style="font-size: 18px; position: absolute; top: 0; left: 0"
           ></i>
 
@@ -331,7 +329,6 @@
           displayExpr="DESCRIPTION"
           valueExpr="ID"
           [items]="LeaveType"
-          [(value)]="Leave_type"
           placeholder="Select.."
           formControlName="Leave_type"
           [labelMode]="'floating'"
@@ -360,7 +357,7 @@
           [useMaskBehavior]="true"
           displayFormat="dd/MM/yyyy"
           type="date"
-          [min]="minSelectableDate"
+          [min]="today"
           [inputAttr]="{ 'aria-label': 'Dept_date' }"
           formControlName="Dept_date"
           ><dx-validator>
@@ -1257,7 +1254,7 @@
         <dx-check-box
           [readOnly]="true"
           text="Travelled"
-          [(value)]="Is_ticket"
+          [(value)]="selectedData.IS_TICKET"
         ></dx-check-box>
       </dxi-item>
 
@@ -1513,7 +1510,7 @@
       <dxi-item>
         <dx-check-box
           text="Travelled"
-          [(value)]="Is_ticket"
+          [(value)]="selectedData.IS_TICKET"
           [readOnly]="true"
         ></dx-check-box>
       </dxi-item>

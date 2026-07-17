@@ -1,4 +1,5 @@
 <div class="content-wrapper">
+  <dx-validation-group #employeeFormGroup>
   <dx-tab-panel
     class="form-tabs"
     [(selectedIndex)]="selectedTabIndex"
@@ -21,6 +22,12 @@
                   label="Employee No.*"
                   [labelMode]="'floating'"
                 >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
                 </dx-text-box>
               </div>
               <div>
@@ -30,6 +37,12 @@
                   label="Employee Name *"
                   [labelMode]="'floating'"
                 >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
                 </dx-text-box>
               </div>
             </div>
@@ -119,6 +132,12 @@
                   displayFormat="dd-MM-yyyy"
                   labelMode="floating"
                 >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="This field is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
                 </dx-date-box>
               </div>
 
@@ -570,6 +589,7 @@
       </div>
     </dxi-item>
   </dx-tab-panel>
+  </dx-validation-group>
 
   <div
     class="container mt-2"

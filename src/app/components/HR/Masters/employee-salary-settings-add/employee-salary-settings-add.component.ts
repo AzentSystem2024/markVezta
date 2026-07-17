@@ -129,6 +129,30 @@ export class EmployeeSalarySettingsAddComponent {
     return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
   }
 
+  parseDateSafe(dateString: any): Date | null {
+    if (!dateString) return null;
+    if (dateString instanceof Date) return dateString;
+
+    // Parse format like "3/1/2026 12:00:00 AM" (M/D/YYYY)
+    const datePart = dateString.split(' ')[0];
+    const parts = datePart.split(/[\/\-]/);
+
+    if (parts.length === 3) {
+      const month = parseInt(parts[0], 10) - 1;
+      const day = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+
+      // Set to noon to avoid timezone shift backward to previous day
+      return new Date(year, month, day, 12, 0, 0);
+    }
+
+    const parsed = new Date(dateString);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+    return null;
+  }
+
   onEmployeeChanged(event: any) {
     this.selectedEmployeeId = event.value;
 
@@ -190,9 +214,8 @@ export class EmployeeSalarySettingsAddComponent {
         .map((item: any) => item.HEAD_ID); // or your row's unique identifier
 
       this.SalaryDetails = this.salaryGridData.Details || [];
-      // this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
       this.PreviousRevision = this.salaryGridData.EFFECT_FROM
-        ? new Date(this.salaryGridData.EFFECT_FROM)
+        ? this.parseDateSafe(this.salaryGridData.EFFECT_FROM)
         : null;
 
       this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY || 0;
@@ -256,6 +279,7 @@ export class EmployeeSalarySettingsAddComponent {
 
     this.selectedEmployee = null;
     this.selectedEmployeeId = null;
+    this.PreviousRevision = null;
     this.selectedRows = [];
     this.salaryGridData = [];
     this.SalaryDetails = [];

@@ -131,7 +131,7 @@ export class ListSalaryPaymentComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -151,7 +151,7 @@ export class ListSalaryPaymentComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
-      this.canVerify = packingRights.CanVerify
+      this.canVerify = packingRights.CanVerify;
     }
     this.sessionData_tax();
     this.selectedDateRange = 'today';
@@ -250,7 +250,7 @@ export class ListSalaryPaymentComponent {
     e.cancel = true;
     const miscId = e.data.TRANS_ID;
     const status = e.data.TRANS_STATUS;
-    this.StatusType = 'Editscreen'
+    this.StatusType = 'Editscreen';
     this.dataService.selectSalaryPayment(miscId).subscribe({
       next: (response: any) => {
         this.selectedSalaryData = response.Data;
@@ -544,17 +544,27 @@ export class ListSalaryPaymentComponent {
 
   onverifyClick(e: any) {
     const miscId = e.row.data.TRANS_ID;
-    this.StatusType = 'verifyscreen'
+    this.StatusType = 'verifyscreen';
 
-    const status = e.data.TRANS_STATUS;
+    const status = e.row.data.TRANS_STATUS;
     this.dataService.selectSalaryPayment(miscId).subscribe({
       next: (response: any) => {
-        this.selectedSalaryData = response.Data;
-        this.editSalaryPopup = true;
-        this.isReadOnlyPayment = status === 5;
+        if (response && response.Data) {
+          this.selectedSalaryData = response.Data;
+          this.editSalaryPopup = true;
+          this.isReadOnlyPayment = status === 5;
+        } else {
+          const errorMessage =
+            response?.Message || 'Failed to fetch salary payment data.';
+          notify(errorMessage, 'error', 3000);
+        }
       },
       error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
+        notify(
+          'An error occurred while fetching salary payment details.',
+          'error',
+          3000,
+        );
       },
     });
   }
@@ -593,4 +603,4 @@ export class ListSalaryPaymentComponent {
   exports: [ListSalaryPaymentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ListSalaryPaymentModule { }
+export class ListSalaryPaymentModule {}

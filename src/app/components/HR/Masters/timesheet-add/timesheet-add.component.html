@@ -9,8 +9,6 @@
     margin-top: -20px;
   "
 >
-  <!-- Column 1: Month + Employee Fields -->
-  <!-- Column 2: Leave Period -->
   <div style="width: 100%; margin-bottom: 10px">
     <dx-text-box
       label="Month"
@@ -21,110 +19,107 @@
     >
     </dx-text-box>
   </div>
-  <div
-    class="timesheet-extra-container"
-    style="
-      flex: 1 1 48%;
-      border: 1px solid #858080;
-      padding: 16px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      row-gap: 8px;
-      min-width: 300px;
-      box-sizing: border-box;
-    "
-  >
-    <p style="margin: 0 0 0"><strong>Employee</strong></p>
-    <div style="display: flex; gap: 20px; flex-wrap: wrap">
-      <!-- Employee Field -->
-      <div style="flex: 1 1 45%; min-width: 200px">
-        <dx-select-box
-          label="Employee Name *"
-          [labelMode]="'floating'"
-          [dataSource]="employee"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="timesheetFormData.EMP_ID"
-          [searchEnabled]="true"
-          placeholder="Select Employee"
-          (onValueChanged)="onEmployeeSelected($event)"
-          width="100%"
-        >
-        </dx-select-box>
+
+  <div style="display: flex; gap: 8px; width: 100%">
+    <div
+      class="timesheet-extra-container"
+      style="
+        flex: 0 0 calc(55% - 4px);
+        width: calc(55% - 4px);
+        border: 1px solid #858080;
+        padding: 16px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        row-gap: 8px;
+        min-width: 300px;
+        box-sizing: border-box;
+      "
+    >
+      <p style="margin: 0 0 0"><strong>Employee</strong></p>
+      <div style="display: flex; gap: 20px; flex-wrap: wrap">
+        <!-- Employee Field -->
+        <div style="flex: 1 1 45%; min-width: 200px">
+          <dx-select-box
+            label="Employee Name *"
+            [labelMode]="'floating'"
+            [dataSource]="employee"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="timesheetFormData.EMP_ID"
+            [searchEnabled]="true"
+            placeholder="Select Employee"
+            (onValueChanged)="onEmployeeSelected($event)"
+            width="100%"
+          >
+          </dx-select-box>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div
-    class="timesheet-extra-container"
-    style="
-      flex: 1 1 48%;
-      border: 1px solid #858080;
-      padding: 16px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 300px;
-      box-sizing: border-box;
-    "
-  >
-    <p style="margin: 0 0 0"><strong>Leave Period</strong></p>
+    <div
+      class="timesheet-extra-container"
+      style="
+        flex: 0 0 calc(45% - 4px);
+        width: calc(45% - 4px);
+        border: 1px solid #858080;
+        padding: 16px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 300px;
+        box-sizing: border-box;
+      "
+    >
+      <p style="margin: 0 0 0"><strong>Leave Period</strong></p>
 
-    <!-- Single row for all 3 fields -->
-    <div style="display: flex; gap: 20px; flex-wrap: wrap">
-      <!-- From Date -->
-      <!-- <dx-text-box
-        [(value)]="timesheetFormData.LEAVE_FROM"
-        label="From"
-        [labelMode]="'floating'"
-        type="date"
-        placeholder="Select From Date"
-        style="flex: 1 1 30%"
-      ></dx-text-box> -->
-      <dx-date-box
-        [(value)]="timesheetFormData.LEAVE_FROM"
-        label="From"
-        [labelMode]="'floating'"
-        type="date"
-        displayFormat="dd-MM-yyyy"
-        placeholder="Select From Date"
-        style="flex: 1 1 30%"
-        [readOnly]="true"
-      ></dx-date-box>
+      <!-- Single row for all 3 fields -->
+      <div style="display: flex; gap: 20px; flex-wrap: wrap">
+        <!-- From Date -->
+        <dx-date-box
+          [(value)]="timesheetFormData.LEAVE_FROM"
+          label="From"
+          [labelMode]="'floating'"
+          type="date"
+          displayFormat="dd-MM-yyyy"
+          placeholder="Select From Date"
+          style="flex: 1 1 30%"
+          [readOnly]="true"
+        ></dx-date-box>
 
-      <!-- Total Days Worked -->
+        <!-- Total Days Worked -->
 
-      <!-- Upto Date -->
-      <dx-date-box
-        [(value)]="timesheetFormData.LEAVE_TO"
-        label="To "
-        [labelMode]="'floating'"
-        type="date"
-        displayFormat="dd-MM-yyyy"
-        placeholder="Select Upto Date"
-        style="flex: 1 1 30%"
-        [readOnly]="true"
-      ></dx-date-box>
-      <!-- <dx-text-box
-        [(value)]="timesheetFormData.LEAVE_TO"
-        label="To"
-        [labelMode]="'floating'"
-        type="date"
-        placeholder="Select Upto Date"
-        style="flex: 1 1 30%"
-      ></dx-text-box> -->
-      <dx-number-box
-        [(value)]="timesheetFormData.DAYS"
-        label="Total Days Worked"
-        [labelMode]="'floating'"
-        [min]="0"
-        placeholder="Enter Total Days"
-        style="flex: 1 1 30%"
-        [readOnly]="true"
-      ></dx-number-box>
+        <!-- Upto Date -->
+        <dx-date-box
+          [(value)]="timesheetFormData.LEAVE_TO"
+          label="To "
+          [labelMode]="'floating'"
+          type="date"
+          displayFormat="dd-MM-yyyy"
+          placeholder="Select Upto Date"
+          style="flex: 1 1 30%"
+          [readOnly]="true"
+        ></dx-date-box>
+        <!-- <dx-text-box
+          [(value)]="timesheetFormData.LEAVE_TO"
+          label="To"
+          [labelMode]="'floating'"
+          type="date"
+          placeholder="Select Upto Date"
+          style="flex: 1 1 30%"
+        ></dx-text-box> -->
+        <dx-number-box
+          [(value)]="timesheetFormData.DAYS"
+          label="Total Days Worked"
+          [labelMode]="'floating'"
+          [min]="0"
+          placeholder="Enter Total Days"
+          style="flex: 1 1 30%"
+          [readOnly]="true"
+        ></dx-number-box>
+      </div>
     </div>
   </div>
 
@@ -133,7 +128,8 @@
     <div
       class="timesheet-extra-container"
       style="
-        flex: 1 1 35%;
+        flex: 0 0 calc(55% - 4px);
+        width: calc(55% - 4px);
         border: 1px solid #858080;
         padding: 16px;
         border-radius: 8px;
@@ -257,7 +253,8 @@
     <div
       class="timesheet-extra-container"
       style="
-        flex: 1 1 35%;
+        flex: 0 0 calc(45% - 4px);
+        width: calc(45% - 4px);
         border: 1px solid #858080;
         padding: 16px;
         border-radius: 8px;

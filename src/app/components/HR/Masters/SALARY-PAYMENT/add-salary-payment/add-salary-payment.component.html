@@ -31,27 +31,18 @@
             [scrolling]="{ mode: 'virtual' }"
             rowAlternationInterval="2"
             [keyboardNavigation]="{ editOnKeyPress: true }"
-            [editing]="{
-              mode: 'cell',
-              allowUpdating: true,
-              allowDeleting: true,
-              allowAdding: true,
-              useIcons: true,
-            }"
             keyExpr="ID"
-            [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
-            (onEditorPreparing)="onEditorPreparing($event)"
-            (onRowRemoved)="onRowRemoved($event)"
+            [selection]="{
+              mode: isReadOnlyMode ? 'none' : 'multiple',
+              showCheckBoxesMode: isReadOnlyMode ? 'none' : 'always',
+            }"
+            [selectedRowKeys]="selectedIds"
             (onSelectionChanged)="onSelectionChanged($event)"
           >
             <dxo-load-panel [showPane]="false"></dxo-load-panel>
             <dxo-filter-builder [allowHierarchicalFields]="true">
             </dxo-filter-builder>
             <dxo-toolbar>
-              <div
-                class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 2px"
-              ></div>
               <dxi-item location="before" locateInMenu="auto">
                 <div
                   class="stacked-toolbar-group"
@@ -69,9 +60,6 @@
                 </div>
               </dxi-item>
 
-              <dxi-item location="after" locateInMenu="auto">
-                <div class="stacked-toolbar-group"></div>
-              </dxi-item>
               <dxi-item location="after" locateInMenu="auto">
                 <div
                   class="stacked-toolbar-group"
@@ -92,13 +80,15 @@
                         style="display: flex; align-items: center; gap: 8px"
                       >
                         <dx-button
+                          *ngIf="!isReadOnlyMode && !isEditing"
                           icon="chevronleft"
                           (onClick)="goToPreviousMonth()"
                         ></dx-button>
-                        <span class="month-label" (click)="toggleCalendar()">
+                        <span class="month-label" (click)="!isEditing && toggleCalendar()" [ngStyle]="{'cursor': isEditing ? 'default' : 'pointer'}">
                           {{ selectedMonth | date: "MMMM yyyy" }}
                         </span>
                         <dx-button
+                          *ngIf="!isReadOnlyMode && !isEditing"
                           icon="chevronright"
                           (onClick)="goToNextMonth()"
                         ></dx-button>
@@ -196,7 +186,7 @@
               [format]="{ type: 'fixedPoint', precision: 2 }"
             ></dxi-column>
 
-            <dxi-column type="buttons">
+            <dxi-column *ngIf="!isReadOnlyMode" type="buttons">
               <dxi-button name="edit"></dxi-button>
               <dxi-button name="delete"></dxi-button>
             </dxi-column>
@@ -213,10 +203,6 @@
             </dxo-summary>
           </dx-data-grid>
 
-          <!-- Fill Amount Button below grid -->
-          <div
-            style="display: flex; justify-content: flex-end; margin-top: 5px"
-          ></div>
           <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
           <div
             class="bordered-grid"

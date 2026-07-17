@@ -4759,11 +4759,6 @@ The result can be exported to HTML or Markdown.`;
   }
 
   //=============================employee dropdown============
-  // Dropdown_advance_employee(type: any) {
-  //   const reqbody = { NAME: 'EMPLOYEE' };
-  //   return this.http.post(`${this.apiUrl}DropDown`, reqbody);
-  // }
-
   Dropdown_advance_employee(type: any) {
     return this.http.post(`${this.apiUrl}DropDown`, type);
   }
@@ -7209,7 +7204,27 @@ PurchaseReport(payload: any) {
   }
 
   TimesheetReport(payload: any) {
-    const getEndpoint = this.apiUrl + 'PurchaseReport/itemwisepurchase';
+    const getEndpoint = this.apiUrl + 'Report/GetTimesheetReport';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  PayrollReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'Payroll/GetPayroll';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   PayrollOTReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'Payroll/GetPayrollOT';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   LeaveListReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'LeaveType/LeaveApplicationList';
+    return this.http.post(getEndpoint, payload);
+  }
+
+   FinalSettlementReport(payload: any) {
+    const getEndpoint = this.apiUrl + 'FinalSettlement/Settlement';
     return this.http.post(getEndpoint, payload);
   }
 }
