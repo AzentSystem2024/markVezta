@@ -37,6 +37,7 @@ import {
 import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import notify from 'devextreme/ui/notify';
 
 interface jsPDFWithAutoTable extends jsPDF {
   lastAutoTable?: { finalY: number };
@@ -80,7 +81,12 @@ export class PaySlipComponent {
   }
 
   getPaySlip(): void {
-    if (!this.selectedEmployee || this.selectedEmployee.length === 0) return;
+  if (!this.selectedEmployee || this.selectedEmployee.length === 0) {
+  notify('Please select at least one employee.', 'warning', 2000);
+  return;
+}
+
+
 
     const monthToUse =
       this.selectedMonth ||
@@ -103,7 +109,10 @@ export class PaySlipComponent {
     };
 
     this.dataService.getPaySlip(payload).subscribe((response: any) => {
-      if (!response?.PaySlipDetails?.length) return;
+     if (!response?.PaySlipDetails || response.PaySlipDetails.length === 0) {
+  notify('No data found.', 'warning', 2000);
+  return;
+}
 
       const doc = new jsPDF();
 

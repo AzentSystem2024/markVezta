@@ -24,7 +24,6 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-      [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
     >
       <!-- (onEditingStart)="onEditLedger($event)" -->
@@ -104,100 +103,11 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-      <!-- <dxi-column
-        dataField="DateOfJoining"
-        caption="Date of Joining"
-      ></dxi-column>
-      <dxi-column
-        dataField="LastWorkingDay"
-        caption="Last Working Days"
-      ></dxi-column>
-      <dxi-column dataField="BasicSalary" caption="Basic Salary"></dxi-column>
-      <dxi-column dataField="Allowance" caption="Allowance"></dxi-column>
-      <dxi-column dataField="UnPaidLeaveDays" caption="Unpaid Leaves"></dxi-column>
-      <dxi-column dataField="TotalServiceDays" caption="Leave Balance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
-      <dxi-column
-        dataField="IndemnityFirstFiveYears"
-        caption="Leave Start Date"
-       dataType="date"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="IndemnityAfterFiveYears"
-          dataType="date"
-        caption="Leave End Date"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="TotalIndemnityDays"
-        caption="Approved Days"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="EntitledLeaveDays"
-        caption="Approved Status"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="IndemnityAmount"
-        caption="Resumed Date"
-        dataType="date"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="LeaveSalary"
-        caption="Resumed Date"
-        dataType="date"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="HeadName"
-        caption="Resumed Date"
-        dataType="date"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="SalaryMonth"
-        caption="Resumed Date"
-        dataType="date"
-        alignment="right"
-      >
-      </dxi-column>
-
-      <dxi-column
-        dataField="Amount"
-        caption="Resumed Date"
-        dataType="date"
-        alignment="right"
-      >
-      </dxi-column>
-
-       <dxi-column
-        dataField="TotalAmount"
-        caption="Resumed Date"
-        dataType="date"
-        alignment="right"
-      >
-      </dxi-column> -->
+     
 
          <dxi-column
         dataField="Description"
-        caption=""
+       [caption]="headerCaption"
         width="70%">
     </dxi-column>
 
@@ -211,16 +121,3 @@
   </div>
 </div>
 
-<!-- <dx-popup
-  [(visible)]="viewPayrollPopupOpened"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Payroll"
-  (onHiding)="handleClose()"
->
-  <app-payroll-view
-    *ngIf="viewPayrollPopupOpened"
-    [payroll]="selectedPayroll"
-    (popupClosed)="handleClose()"
-  ></app-payroll-view>
-</dx-popup> -->

@@ -190,7 +190,6 @@
       <dxi-column
         dataField="NormalOT"
         caption="Normal OT"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
       >
       </dxi-column>
@@ -198,7 +197,6 @@
       <dxi-column
         dataField="HolidayOT"
         caption="Holiday OT"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
       >
       </dxi-column>
@@ -222,7 +220,6 @@
       <dxi-column
         dataField="TotalOT"
         caption="Total OT"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
       >
       </dxi-column>
@@ -248,16 +245,3 @@
   </div>
 </div>
 
-<!-- <dx-popup
-  [(visible)]="viewPayrollPopupOpened"
-  [width]="'75vw'"
-  [height]="'90vh'"
-  title="Payroll"
-  (onHiding)="handleClose()"
->
-  <app-payroll-view
-    *ngIf="viewPayrollPopupOpened"
-    [payroll]="selectedPayroll"
-    (popupClosed)="handleClose()"
-  ></app-payroll-view>
-</dx-popup> -->
