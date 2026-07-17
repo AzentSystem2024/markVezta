@@ -22,8 +22,8 @@
 
     <dxo-pager
       [visible]="true"
-      [displayMode]="displayMode"
-      [showPageSizeSelector]="showPageSizeSelector"
+      displayMode="full"
+      [showPageSizeSelector]="true"
       [showInfo]="true"
       [showNavigationButtons]="true"
     ></dxo-pager>
@@ -68,7 +68,6 @@
       </dxi-item>
     </dxo-toolbar>
 
-    <!-- <dxo-filter-row [visible]="isFilterVisible"></dxo-filter-row> -->
     <dxo-filter-row [visible]="true" *ngIf="isFilterVisible"></dxo-filter-row>
     <dxo-editing
       mode="popup"
