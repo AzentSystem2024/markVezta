@@ -31,19 +31,18 @@
             [scrolling]="{ mode: 'virtual' }"
             rowAlternationInterval="2"
             [keyboardNavigation]="{ editOnKeyPress: true }"
-           
             keyExpr="ID"
             [selection]="{
               mode: isReadOnlyMode ? 'none' : 'multiple',
               showCheckBoxesMode: isReadOnlyMode ? 'none' : 'always',
             }"
+            [selectedRowKeys]="selectedIds"
             (onSelectionChanged)="onSelectionChanged($event)"
           >
             <dxo-load-panel [showPane]="false"></dxo-load-panel>
             <dxo-filter-builder [allowHierarchicalFields]="true">
             </dxo-filter-builder>
             <dxo-toolbar>
-
               <dxi-item location="before" locateInMenu="auto">
                 <div
                   class="stacked-toolbar-group"
@@ -60,7 +59,6 @@
                   </div>
                 </div>
               </dxi-item>
-
 
               <dxi-item location="after" locateInMenu="auto">
                 <div
@@ -82,15 +80,15 @@
                         style="display: flex; align-items: center; gap: 8px"
                       >
                         <dx-button
-                          *ngIf="!isReadOnlyMode"
+                          *ngIf="!isReadOnlyMode && !isEditing"
                           icon="chevronleft"
                           (onClick)="goToPreviousMonth()"
                         ></dx-button>
-                        <span class="month-label" (click)="toggleCalendar()">
+                        <span class="month-label" (click)="!isEditing && toggleCalendar()" [ngStyle]="{'cursor': isEditing ? 'default' : 'pointer'}">
                           {{ selectedMonth | date: "MMMM yyyy" }}
                         </span>
                         <dx-button
-                          *ngIf="!isReadOnlyMode"
+                          *ngIf="!isReadOnlyMode && !isEditing"
                           icon="chevronright"
                           (onClick)="goToNextMonth()"
                         ></dx-button>
@@ -204,7 +202,6 @@
               </dxi-total-item>
             </dxo-summary>
           </dx-data-grid>
-
 
           <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
           <div

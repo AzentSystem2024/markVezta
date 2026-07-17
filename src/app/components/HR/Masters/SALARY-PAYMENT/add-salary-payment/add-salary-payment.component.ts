@@ -127,6 +127,9 @@ export class AddSalaryPaymentComponent {
     this.loadUserData();
     this.sessionDetails();
     this.getDocNo();
+    if (!this.isEditing) {
+      this.getSalaryPendingList();
+    }
   }
 
   getDocNo() {
@@ -195,19 +198,6 @@ export class AddSalaryPaymentComponent {
       this.selectedYear = year;
     }
 
-    //  Fix — access DetailList from the object, not the array
-    if (Array.isArray(data.DetailList) && data.DetailList.length > 0) {
-      this.salaryPendingList = data.DetailList.map((item: any) => ({
-        ID: item.ID,
-        EMP_ID: item.EMP_ID,
-        EMP_CODE: item.EMP_CODE ?? '',
-        EMP_NAME: item.EMP_NAME ?? '',
-        NET_AMOUNT: item.NET_AMOUNT ?? null,
-      }));
-    } else {
-      this.salaryPendingList = [];
-    }
-
     this.salaryPaymentData.CHEQUE_NO = data.CHEQUE_NO;
     this.salaryPaymentData.CHEQUE_DATE = data.CHEQUE_DATE;
     this.salaryPaymentData.BANK_NAME = data.BANK_NAME;
@@ -215,8 +205,7 @@ export class AddSalaryPaymentComponent {
     this.salaryPaymentData.TRANS_ID = data.TRANS_ID;
     this.salaryPaymentData.PAY_HEAD_ID = data.PAY_HEAD_ID;
 
-    // Optional — force grid refresh
-    this.salaryPendingList = [...this.salaryPendingList];
+    this.getSalaryPendingList();
   }
 
   onSelectionChanged(e: any) {
@@ -228,16 +217,37 @@ export class AddSalaryPaymentComponent {
   getSalaryPendingList() {
     const payload = {
       COMPANY_ID: this.companyId,
-      SAL_MONTH: `${this.selectedMonth.getFullYear()}-${(
-        this.selectedMonth.getMonth() + 1
-      )
+      SAL_MONTH: `${(this.selectedMonth.getMonth() + 1)
         .toString()
-        .padStart(2, '0')}`,
+        .padStart(2, '0')}-${this.selectedMonth.getFullYear()}`,
     };
     this.dataService
       .getPendingSalaryPayments(payload)
       .subscribe((response: any) => {
-        this.salaryPendingList = response.data;
+        let pendingList = response.data || [];
+        
+        if (this.isEditing && this.EditingResponseData) {
+            const data = Array.isArray(this.EditingResponseData)
+              ? this.EditingResponseData[0]
+              : this.EditingResponseData;
+              
+            const savedList = data.DetailList || [];
+            
+            // merge pendingList and savedList, avoiding duplicates by ID
+            const savedIds = new Set(savedList.map((item: any) => item.ID));
+            const mergedList = [...savedList];
+            
+            pendingList.forEach((item: any) => {
+               if (!savedIds.has(item.ID)) {
+                  mergedList.push(item);
+               }
+            });
+            this.salaryPendingList = mergedList;
+            this.selectedIds = Array.from(savedIds);
+        } else {
+            this.salaryPendingList = pendingList;
+            this.selectedIds = [];
+        }
       });
   }
 
@@ -267,7 +277,7 @@ export class AddSalaryPaymentComponent {
       document.removeEventListener('click', this.outsideClickListener);
     }
   }
-  
+
   toggleYearSelector() {
     this.yearSelectorVisible = !this.yearSelectorVisible;
   }
