@@ -135,7 +135,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
 import { DesignationModule } from './pages/HR/Masters/designation/designation.component';
 import { EOSModule } from './pages/HR/Masters/eos/eos.component';
 import { PaySettingsModule } from './pages/HR/Masters/pay-settings/pay-settings.component';
-import { LeaveSalaryModule } from './pages/HR/Masters/leave-salary/leave-salary.component';
+import { LeaveSalaryModule } from './pages/HR/Masters/leave-type/leave-salary.component';
 import { EmployeeLeaveModule } from './pages/HR/Masters/employee-leave/employee-leave.component';
 import { EmployeeModule } from './pages/HR/Masters/employee/employee.component';
 import { EmployeeAddFormModule } from './components/HR/Masters/employee-add-form/employee-add-form.component';
@@ -427,11 +427,19 @@ import {
   TimesheetReportComponent,
   TimesheetReportModule,
 } from './pages/HR/timesheet-report/timesheet-report.component';
-import { PayrollReportComponent, PayrollReportModule } from './pages/REPORT/payroll-report/payroll-report.component';
-import { PayrollOtReportComponent, PayrollOtReportModule } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
-import { LeavelistComponent, LeavelistModule } from './pages/REPORT/leavelist/leavelist.component';
+import {
+  PayrollReportComponent,
+  PayrollReportModule,
+} from './pages/REPORT/payroll-report/payroll-report.component';
+import {
+  PayrollOtReportComponent,
+  PayrollOtReportModule,
+} from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
+import {
+  LeavelistComponent,
+  LeavelistModule,
+} from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
-
 
 @NgModule({
   declarations: [AppComponent],

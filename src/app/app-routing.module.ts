@@ -36,7 +36,7 @@ import { ItemStorePriceVerifyApproveComponent } from './pages/item-store-price-v
 import { ItemStorePriceViewComponent } from './pages/item-store-price-view/item-store-price-view.component';
 import { DepartmentComponent } from './pages/MASTER/department/department.component';
 import { EOSComponent } from './pages/HR/Masters/eos/eos.component';
-import { LeaveSalaryComponent } from './pages/HR/Masters/leave-salary/leave-salary.component';
+import { LeaveSalaryComponent } from './pages/HR/Masters/leave-type/leave-salary.component';
 import { EmployeeLeaveComponent } from './pages/HR/Masters/employee-leave/employee-leave.component';
 import { EmployeeComponent } from './pages/HR/Masters/employee/employee.component';
 import { TimesheetListComponent } from './pages/HR/Masters/timesheet-list/timesheet-list.component';
@@ -217,7 +217,10 @@ import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchas
 import { TimesheetReportComponent } from './pages/HR/timesheet-report/timesheet-report.component';
 import { PayrollReportComponent } from './pages/REPORT/payroll-report/payroll-report.component';
 import { PayrollOtReportComponent } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
-import { LeavelistComponent, LeavelistModule } from './pages/REPORT/leavelist/leavelist.component';
+import {
+  LeavelistComponent,
+  LeavelistModule,
+} from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 
 const routes: Routes = [
@@ -1337,12 +1340,12 @@ const routes: Routes = [
         component: PayrollOtReportComponent,
         canActivate: [AuthGuardService],
       },
-       {
+      {
         path: 'leave-list',
         component: LeavelistComponent,
         canActivate: [AuthGuardService],
       },
-       {
+      {
         path: 'finalsettlement-report',
         component: FinalSettlementReportComponent,
         canActivate: [AuthGuardService],
