@@ -41,13 +41,18 @@ import { Router } from '@angular/router';
   styleUrls: ['./advance.component.scss'],
 })
 export class AdvanceComponent {
+  // ==========================================
+  // 1. VIEW CHILDS
+  // ==========================================
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup!: DxValidationGroupComponent;
 
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
 
-  // --- UI State & Toggles ---
+  // ==========================================
+  // 2. STATE & TOGGLES
+  // ==========================================
   isLoading: boolean = true;
   isAddPopUp: boolean = false;
   isEditPopUp: boolean = false;
@@ -59,7 +64,9 @@ export class AdvanceComponent {
   isFormSubmitted: boolean = false;
   approveValue: boolean = false;
 
-  // --- Permissions ---
+  // ==========================================
+  // 3. PERMISSIONS
+  // ==========================================
   canAdd: boolean = false;
   canEdit: boolean = false;
   canView: boolean = false;
@@ -68,63 +75,26 @@ export class AdvanceComponent {
   canVerify: boolean = false;
   canPrint: boolean = false;
 
-  // --- Grid Settings ---
+  // ==========================================
+  // 4. GLOBAL & SESSION INFO
+  // ==========================================
+  selected_Company_id: any;
+  selected_fin_id: any;
+  companyId: any;
+  docNo: any;
+
+  // ==========================================
+  // 5. GRID SETTINGS & DATA
+  // ==========================================
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector: boolean = true;
   buttonText: string = 'Update';
 
-  // --- Form & Data Variables ---
-  formSource!: FormGroup;
-  minDate!: Date;
-  minDateUpdate!: Date;
   Advance_Options: any[] = [];
-  EMPLOYEE_VALUE: any[] = [];
-  ADVANCETYPE_VALUE: any[] = [];
-  selected_Data: any = {};
-  payment_Detilas: any[] = [];
   filterddata: any[] = [];
+  selected_Data: any = {};
 
-  // Variables bound to Edit/Update Form
-  id: any;
-  emp_id: any;
-  employee_ID: any;
-  emp_name_value: any;
-  date_value: any;
-  adv_no_value: any;
-  adv_type_id_value: any;
-  adv_type_name: any;
-  Advance_Amount_value: any;
-  reco_Amount_value: any;
-  reco_install_Amount_value: any;
-  reco_inst_count_value: any;
-  reco_stat_month: any;
-  recoverd_Amt_value: any;
-  remark_value: any;
-  Payment_Head: any;
-  selectTransId: any;
-  trans_id: any;
-  selected_Cheque_No: any;
-  selected_Cheque_Date: any;
-
-  // Payment Modes
-  paymentModes = [
-    { value: '13', label: 'Cash' },
-    { value: '14', label: 'Bank' },
-  ];
-  selectedPaymentMode: string = '13';
-  selected_pay_type_id: any;
-  tempPaymentMode: any = 0;
-  selectedpayid: any;
-
-  // Session & Global Info
-  selected_Company_id: any;
-  selected_fin_id: any;
-  companyId: any;
-  docNo: any;
-  Recovery_Date: any;
-
-  // Date Filtering
   dateRanges = [
     { label: 'All', value: 'all' },
     { label: 'Today', value: 'today' },
@@ -143,7 +113,48 @@ export class AdvanceComponent {
     { text: 'Verified', value: 'Verified' },
   ];
 
-  // Action Buttons Configurations
+  // ==========================================
+  // 6. FORM & DROPDOWN VARIABLES
+  // ==========================================
+  formSource!: FormGroup;
+  minDate!: Date;
+  minDateUpdate!: Date;
+
+  EMPLOYEE_VALUE: any[] = [];
+  ADVANCETYPE_VALUE: any[] = [];
+  payment_Detilas: any[] = [];
+
+  paymentModes = [
+    { value: '13', label: 'Cash' },
+    { value: '14', label: 'Bank' },
+  ];
+  selectedPaymentMode: string = '13';
+  selected_pay_type_id: any;
+
+  // Variables bound to Edit/Update Form
+  id: any;
+  emp_id: any;
+  employee_ID: any;
+  date_value: any;
+  adv_no_value: any;
+  adv_type_id_value: any;
+  adv_type_name: any;
+  Advance_Amount_value: any;
+  reco_Amount_value: any;
+  reco_install_Amount_value: any;
+  reco_inst_count_value: any;
+  reco_stat_month: any;
+  recoverd_Amt_value: any;
+  remark_value: any;
+  Payment_Head: any;
+  selectTransId: any;
+  selected_Cheque_No: any;
+  selected_Cheque_Date: any;
+  Recovery_Date: any;
+
+  // ==========================================
+  // 7. GRID ACTION BUTTON CONFIGURATIONS
+  // ==========================================
   addButtonOptions = {
     text: 'New',
     type: 'default',
@@ -224,6 +235,9 @@ export class AdvanceComponent {
   ];
   Advance_types_ID: any;
 
+  // ==========================================
+  // 8. CONSTRUCTOR & LIFECYCLE HOOKS
+  // ==========================================
   constructor(
     private fb: FormBuilder,
     private dataService: DataService,
@@ -261,8 +275,6 @@ export class AdvanceComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyId = menuResponse?.SELECTED_COMPANY?.COMPANY_ID;
-    console.log('menu response', menuResponse);
-    console.log('company id', this.companyId);
     const menuGroups = menuResponse?.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -280,9 +292,11 @@ export class AdvanceComponent {
 
     this.get_Employee_dropdown();
     this.get_advance_list();
-    this.setPaymentMode();
   }
 
+  // ==========================================
+  // 9. DATA FETCHING METHODS
+  // ==========================================
   sesstion_Details() {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -291,7 +305,6 @@ export class AdvanceComponent {
     this.selected_fin_id = sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
   }
 
-  // ========= Data Fetching & Setup =========
   getDocNo() {
     const payload = {
       TRANS_TYPE: 28,
@@ -308,7 +321,6 @@ export class AdvanceComponent {
       .Dropdown_advance_employee(payload)
       .subscribe((res: any) => {
         this.EMPLOYEE_VALUE = res;
-        console.log("employee list :",this.EMPLOYEE_VALUE)
       });
   }
 
@@ -403,7 +415,44 @@ export class AdvanceComponent {
     });
   }
 
-  // ========= Event Handlers & Data Formatting =========
+  loadAdvanceDetails(id: any) {
+    this.dataService.select_Advance(id).subscribe((res: any) => {
+      this.selected_Data = res;
+
+      this.id = this.selected_Data.ID;
+      this.Advance_Amount_value = this.selected_Data.ADVANCE_AMOUNT;
+      this.adv_no_value = this.selected_Data.ADV_NO;
+      this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
+      this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
+      this.date_value = this.selected_Data.DATE;
+      this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
+      this.selectTransId = this.selected_Data.TRANS_ID;
+      this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
+      this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE;
+      this.selected_pay_type_id = this.selected_Data.PAY_TYPE_ID;
+
+      if (this.selected_pay_type_id === 0 || this.selected_pay_type_id === 1) {
+        this.selectedPaymentMode = '13'; // Cash
+      } else {
+        this.selectedPaymentMode = '14'; // Bank
+      }
+
+      this.emp_id = this.selected_Data.EMP_ID;
+      this.reco_Amount_value = this.selected_Data.REC_AMOUNT;
+      this.reco_install_Amount_value = this.selected_Data.REC_INSTALL_AMOUNT;
+      this.reco_inst_count_value = this.selected_Data.REC_INSTALL_COUNT;
+      this.reco_stat_month = this.selected_Data.REC_START_MONTH;
+      this.remark_value = this.selected_Data.REMARKS;
+      this.approveValue = this.selected_Data.STATUS === 'Approved';
+      this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
+
+      this.cdr.detectChanges();
+    });
+  }
+
+  // ==========================================
+  // 10. EVENT HANDLERS & ACTIONS
+  // ==========================================
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
@@ -419,19 +468,6 @@ export class AdvanceComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
-
-  parseApiDate(dateStr: string): Date | null {
-    try {
-      const parts = dateStr.split('/');
-      if (parts.length !== 3) return null;
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = 2000 + parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    } catch (e) {
-      return null;
-    }
-  }
 
   onDateRangeChange(event: any) {
     const selected = event.value;
@@ -459,14 +495,6 @@ export class AdvanceComponent {
     this.initialLoad = true;
     this.selectedRange = 'all';
     this.get_advance_list();
-  }
-
-  setPaymentMode() {
-    if (this.selected_pay_type_id === 0) {
-      this.tempPaymentMode = this.selectedPaymentMode;
-    } else {
-      this.tempPaymentMode = this.selected_pay_type_id;
-    }
   }
 
   onPaymentModeChanged(e: any) {
@@ -514,6 +542,22 @@ export class AdvanceComponent {
     }
   }
 
+  // ==========================================
+  // 11. GRID FORMATTING & HELPERS
+  // ==========================================
+  parseApiDate(dateStr: string): Date | null {
+    try {
+      const parts = dateStr.split('/');
+      if (parts.length !== 3) return null;
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = 2000 + parseInt(parts[2], 10);
+      return new Date(year, month, day);
+    } catch (e) {
+      return null;
+    }
+  }
+
   getAdvanceTypeName(id: any): string {
     const item = this.ADVANCETYPE_VALUE.find((x) => x.ID === id);
     return item ? item.DESCRIPTION : this.adv_type_name || 'Unknown Type';
@@ -550,7 +594,9 @@ export class AdvanceComponent {
     }
   }
 
-  // ========= Calculations =========
+  // ==========================================
+  // 12. CALCULATIONS
+  // ==========================================
   setupInstallmentCalculation() {
     this.formSource.get('Net_Amount_recoverd')?.valueChanges.subscribe(() => {
       this.calculateInstallmentAmount();
@@ -591,7 +637,9 @@ export class AdvanceComponent {
     }
   }
 
-  // ========= Popups & Grid Actions =========
+  // ==========================================
+  // 13. POPUP MODALS
+  // ==========================================
   add_pop() {
     this.isAddPopUp = true;
     setTimeout(() => {
@@ -622,46 +670,7 @@ export class AdvanceComponent {
     });
   }
 
-  loadAdvanceDetails(id: any) {
-    this.dataService.select_Advance(id).subscribe((res: any) => {
-      this.selected_Data = res;
-
-      this.id = this.selected_Data.ID;
-      this.Advance_Amount_value = this.selected_Data.ADVANCE_AMOUNT;
-      this.adv_no_value = this.selected_Data.ADV_NO;
-      this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
-      this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
-      this.date_value = this.selected_Data.DATE;
-      this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
-      this.selectTransId = this.selected_Data.TRANS_ID;
-      this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
-      this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE;
-      this.selected_pay_type_id = this.selected_Data.PAY_TYPE_ID;
-
-      if (this.selected_pay_type_id === 0 || this.selected_pay_type_id === 1) {
-        this.selectedPaymentMode = '13'; // Cash
-      } else {
-        this.selectedPaymentMode = '14'; // Bank
-      }
-
-      this.emp_id = this.selected_Data.EMP_ID;
-      this.emp_name_value = this.selected_Data.EMP_NAME;
-      this.reco_Amount_value = this.selected_Data.REC_AMOUNT;
-      this.reco_install_Amount_value = this.selected_Data.REC_INSTALL_AMOUNT;
-      this.reco_inst_count_value = this.selected_Data.REC_INSTALL_COUNT;
-      this.reco_stat_month = this.selected_Data.REC_START_MONTH;
-      this.remark_value = this.selected_Data.REMARKS;
-      this.trans_id = this.selected_Data.TRANS_ID;
-      this.selectedpayid = this.selected_Data.PAY_TYPE_ID;
-      this.approveValue = this.selected_Data.STATUS === 'Approved';
-      this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
-
-      this.cdr.detectChanges();
-    });
-  }
-
   onEditStart(e: any) {
-    // e.data contains the row data since this is triggered by onEditingStart
     this.buttonText = 'Update';
     this.isEditPopUp = true;
     this.isEditReadOnly = false;
@@ -702,7 +711,9 @@ export class AdvanceComponent {
     this.loadAdvanceDetails(e.row.data.TRANS_ID);
   };
 
-  // ========= CRUD Operations =========
+  // ==========================================
+  // 14. CRUD OPERATIONS
+  // ==========================================
   Add_Advace() {
     const formVals = this.formSource.value;
     const emp_id = formVals.employee_ID;
@@ -883,21 +894,30 @@ export class AdvanceComponent {
 
   deleteData(event: any) {
     const id = event.data.ID;
-    this.dataService.Api_Delete_advance(id).subscribe((res: any) => {
-      notify(
-        {
-          message: 'Advance Deleted successfully',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'success',
-      );
-      this.get_advance_list();
-      this.isLoading = false;
-    });
+    confirm('Are you sure you want to delete this record?', 'Confirm Delete').then(
+      (result) => {
+        if (result) {
+          this.dataService.Api_Delete_advance(id).subscribe((res: any) => {
+            notify(
+              {
+                message: 'Advance Deleted successfully',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 500,
+              },
+              'success',
+            );
+            this.get_advance_list();
+            this.isLoading = false;
+          });
+        }
+      }
+    );
   }
 }
 
+// ==========================================
+// MODULE DEFINITION
+// ==========================================
 @NgModule({
   imports: [
     DxDataGridModule,
