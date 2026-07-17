@@ -89,77 +89,107 @@ years: number[] = [];
   summaryColumnsData = {
     totalItems: [
       {
-        column: 'ASSET_VALUE',
+        column: 'BASIC',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'ASSET_VALUE',
+        showInColumn: 'BASIC',
         alignment: 'right',
       },
       {
-        column: 'OPENING_DEPR',
+        column: 'ALLOWANCE',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'OPENING_DEPR',
+        showInColumn: 'ALLOWANCE',
         alignment: 'right',
       },
       {
-        column: 'DURING_DEPR',
+        column: 'NORMAL_OT',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DURING_DEPR',
+        showInColumn: 'NORMAL_OT',
         alignment: 'right',
       },
       {
-        column: 'CLOSING_DEPR',
+        column: 'HOLIDAY_OT',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CLOSING_DEPR',
+        showInColumn: 'HOLIDAY_OT',
         alignment: 'right',
       },
       {
-        column: 'CURRENT_VALUE',
+        column: 'ADDITIONS',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CURRENT_VALUE',
+        showInColumn: 'ADDITIONS',
+        alignment: 'right',
+      },
+      {
+        column: 'DEDUCT_DAYS',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'DEDUCT_DAYS',
+        alignment: 'right',
+      },
+      {
+        column: 'ABSENTEES',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'ABSENTEES',
         alignment: 'right',
       },
     ],
     groupItems: [
       {
-        column: 'ASSET_VALUE',
+        column: 'BASIC',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
-        column: 'OPENING_DEPR',
+        column: 'ALLOWANCE',
         summaryType: 'sum',
         displayFormat: ' {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
-        column: 'DURING_DEPR',
+        column: 'NORMAL_OT',
         summaryType: 'sum',
         displayFormat: ' {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
-        column: 'CLOSING_DEPR',
+        column: 'HOLIDAY_OT',
         summaryType: 'sum',
         displayFormat: ' {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
       {
-        column: 'CURRENT_VALUE',
+        column: 'ADDITIONS',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+       {
+        column: 'DEDUCT_DAYS',
+        summaryType: 'sum',
+        displayFormat: ' {0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+       {
+        column: 'ABSENTEES',
         summaryType: 'sum',
         displayFormat: ' {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
@@ -323,16 +353,31 @@ goToNextMonth() {
     });
   }
 
-  Timesheet_Report() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      DEPARTMENT_ID: String(this.select_department_id || 0),
-    };
+Timesheet_Report() {
+  const firstDayOfMonth = new Date(
+    this.selectedMonth.getFullYear(),
+    this.selectedMonth.getMonth(),
+    1
+  );
 
-    this.dataservice.TimesheetReport(payload).subscribe((res: any) => {
-      this.TimesheetReport = res.DepreciationDetails;
-    });
-  }
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    DEPARTMENT_ID: String(this.select_department_id || ''),
+    TS_MONTH: this.formatDate(firstDayOfMonth),
+  };
+
+  this.dataservice.TimesheetReport(payload).subscribe((res: any) => {
+    this.TimesheetReport = res;
+  });
+}
+
+formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
 
   handleClose() {
     this.isViewInvoice = false;
