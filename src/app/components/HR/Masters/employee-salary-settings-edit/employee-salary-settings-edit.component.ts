@@ -137,11 +137,21 @@ export class EmployeeSalarySettingsEditComponent {
         EMP_CODE: this.selectedEmployee.EMP_CODE || '',
         EMP_NAME: this.selectedEmployee.EMP_NAME || '',
         DESIGNATION: this.selectedEmployee.DESG_NAME || '',
-        BASIC_SALARY: this.selectedEmployee.SALARY ? Number(this.selectedEmployee.SALARY) : undefined,
-        EFFECT_FROM: this.selectedEmployee.EFFECT_FROM,
-        PREVIOUS_EFFECT_FROM: this.selectedEmployee.PREVIOUS_EFFECT_FROM,
+        BASIC_SALARY: this.selectedEmployee.SALARY
+          ? Number(this.selectedEmployee.SALARY)
+          : undefined,
+        EFFECT_FROM: new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          1,
+        ),
+        PREVIOUS_EFFECT_FROM: this.selectedEmployee.PREVIOUS_EFFECT_FROM
+          ? this.parseDateSafe(this.selectedEmployee.PREVIOUS_EFFECT_FROM)
+          : null,
         IS_INACTIVE: this.selectedEmployee.IS_INACTIVE || false,
       };
+      console.log('selected employeesssss', this.selectedEmployee);
+      console.log('selected employee', this.employeeFormData);
     }
 
     const payload = {
@@ -162,9 +172,15 @@ export class EmployeeSalarySettingsEditComponent {
 
         this.SalaryDetails = this.salaryGridData.Details || [];
         this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
-        //   ? new Date(this.salaryGridData.EFFECT_FROM)
-        //   : null;
-        this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY ? Number(this.salaryGridData.SALARY) : undefined;
+        
+        // Ensure UI bindings are updated if switching employees via the dropdown
+        if (this.PreviousRevision) {
+          this.employeeFormData.PREVIOUS_EFFECT_FROM = this.parseDateSafe(this.PreviousRevision);
+        }
+
+        this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY
+          ? Number(this.salaryGridData.SALARY)
+          : undefined;
         this.isLoading = false;
       },
       error: (err: any) => {
@@ -175,6 +191,11 @@ export class EmployeeSalarySettingsEditComponent {
   }
 
   onEmployeeChanged(event: any) {
+    // Prevent double execution and overwriting of selectedEmployee on load
+    if (this.selectedEmployee && this.selectedEmployee.ID === event.value) {
+      return;
+    }
+
     this.selectedEmployeeId = event.value;
 
     const selectedEmp = this.EmployeeDropdown.find(
@@ -273,6 +294,30 @@ export class EmployeeSalarySettingsEditComponent {
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 1-based
     const day = '01'; // Always first day
     return `${year}-${month}-${day}`; // Format: YYYY-MM-DD
+  }
+
+  parseDateSafe(dateString: any): Date | null {
+    if (!dateString) return null;
+    if (dateString instanceof Date) return dateString;
+
+    // Parse format like "3/1/2026 12:00:00 AM" (M/D/YYYY)
+    const datePart = dateString.split(' ')[0];
+    const parts = datePart.split(/[\/\-]/);
+
+    if (parts.length === 3) {
+      const month = parseInt(parts[0], 10) - 1;
+      const day = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+
+      // Set to noon to avoid timezone shift backward to previous day
+      return new Date(year, month, day, 12, 0, 0);
+    }
+
+    const parsed = new Date(dateString);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+    return null;
   }
 
   isValid() {

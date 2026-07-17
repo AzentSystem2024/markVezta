@@ -3,33 +3,22 @@
     <dx-data-grid
       #dataGrid
       noDataText=" "
-      [width]="'100%'"
-      [height]="'82vh'"
-      [loadPanel]="{
-        enabled: true,
-        text: 'Loading...',
-        showIndicator: true,
-        showPane: true,
-      }"
+      width="100%"
+      height="82vh"
       class="grid theme-dependent"
       [dataSource]="timesheetList"
       [showBorders]="true"
       [showColumnLines]="true"
-      [columnAutoWidth]="false"
+      [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
-      [headerFilter]="{ visible: true }"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: true, applyFilter: 'auto' }"
-      [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
       [allowColumnResizing]="true"
-      [columnResizingMode]="'nextColumn'"
-      [headerFilter]="{ visible: true }"
+      columnResizingMode="nextColumn"
       [scrolling]="{ mode: 'virtual' }"
-      rowAlternationInterval="2"
+      [rowAlternationInterval]="2"
       keyExpr="ID"
-      focusStateEnabled="false"
+      [focusStateEnabled]="false"
       (onExporting)="onExporting($event)"
       (onRowRemoving)="onDeleteTimesheet($event)"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
@@ -38,24 +27,30 @@
       (onCellPrepared)="onCellPrepared($event)"
       (onEditingStart)="onEditingStart($event)"
     >
+      <dxo-load-panel
+        [enabled]="true"
+        text="Loading..."
+        [showIndicator]="true"
+        [showPane]="true"
+      ></dxo-load-panel>
+
       <dxo-column-chooser
         [height]="500"
-        hideOnOutsideClick="true"
+        [hideOnOutsideClick]="true"
         [enabled]="true"
         mode="select"
-      >
-      </dxo-column-chooser>
+      ></dxo-column-chooser>
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="false"
         [formats]="['xlsx']"
-      >
-      </dxo-export>
+      ></dxo-export>
       <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="isDeleteVisible || canDelete"
       ></dxo-editing>
+
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -65,23 +60,17 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="virtual"></dxo-scrolling>
+
       <dxo-filter-row
         [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
+        applyFilter="auto"
       ></dxo-filter-row>
       <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
       <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
-      <dxo-filter-builder [allowHierarchicalFields]="true">
-      </dxo-filter-builder>
+      <dxo-filter-builder [allowHierarchicalFields]="true"></dxo-filter-builder>
 
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -98,7 +87,7 @@
           </div>
         </dxi-item>
 
-        <!-- Buttons -->
+        <!-- Month & Year Selector -->
         <dxi-item location="after">
           <ng-template dxTemplate>
             <div
@@ -113,13 +102,11 @@
               <!-- Previous Month -->
               <dx-button
                 icon="chevronleft"
-                [disabled]="false"
                 [focusStateEnabled]="false"
                 [activeStateEnabled]="true"
                 [hoverStateEnabled]="true"
                 (onClick)="goToPreviousMonth()"
-              >
-              </dx-button>
+              ></dx-button>
 
               <!-- Month Label -->
               <span class="month-label" (click)="toggleCalendar()">
@@ -129,13 +116,11 @@
               <!-- Next Month -->
               <dx-button
                 icon="chevronright"
-                [disabled]="false"
                 [focusStateEnabled]="false"
                 [activeStateEnabled]="true"
                 [hoverStateEnabled]="true"
                 (onClick)="goToNextMonth()"
-              >
-              </dx-button>
+              ></dx-button>
 
               <!-- Calendar Popup -->
               <div *ngIf="calendarVisible" class="calendar-popup">
@@ -143,11 +128,9 @@
                   <button class="year-button" (click)="previousYear()">
                     &lt;
                   </button>
-
                   <span class="year-clickable" (click)="toggleYearSelector()">
                     {{ selectedYear }}
                   </span>
-
                   <button class="year-button" (click)="nextYear()">&gt;</button>
                 </div>
 
@@ -167,21 +150,18 @@
                     </div>
                   </div>
                 </div>
-
-                <div class="calendar-body"></div>
               </div>
             </div>
           </ng-template>
         </dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+
+        <!-- Action Buttons -->
         <dxi-item
           *ngIf="canAdd"
           location="after"
-          locateInMenu="auto"
-          [options]="addButtonOptions"
           widget="dxButton"
-        >
-        </dxi-item>
+          [options]="addButtonOptions"
+        ></dxi-item>
         <dxi-item
           *ngIf="canVerify"
           location="after"
@@ -194,23 +174,21 @@
           widget="dxButton"
           [options]="approveButtonOptions"
         ></dxi-item>
-
         <dxi-item
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="searchButtonOptions"
         ></dxi-item>
-
         <dxi-item
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
         <dxi-item location="after">
           <div class="toolbar-divider"></div>
         </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"
@@ -224,50 +202,20 @@
       <dxi-column dataField="OT_HOURS" caption="OT Hours"></dxi-column>
       <dxi-column dataField="LESS_HOURS" caption="Less Hours"></dxi-column>
 
-      <!-- <dxi-column
-        dataField="STATUS"
-        caption="Status"
-        cellTemplate="statusCellTemplate"
-        width="100  "
-        alignment="right"
-      >
-      </dxi-column>
-      <div *dxTemplate="let cellData of 'statusCellTemplate'">
-        <i
-          class="fas fa-flag"
-          [ngClass]="getStatusFlagClass(cellData.value)"
-          [attr.title]="cellData.value"
-          style="margin-left: 10px; cursor: default"
-        ></i>
-      </div> -->
+      <!-- Status Column mapped to TS function -->
       <dxi-column
         dataField="STATUS"
         caption="Status"
-        cellTemplate="statusCellRender"
-      >
-      </dxi-column>
+        [cellTemplate]="statusCellRender"
+      ></dxi-column>
 
-      <div *dxTemplate="let data of 'statusCellRender'">
-        <i
-          class="fas fa-flag"
-          [style.color]="
-            data.data.STATUS === 'Approved'
-              ? '#10B981'
-              : data.data.STATUS === 'Verified'
-                ? '#0073D8'
-                : '#FFA500'
-          "
-          [attr.title]="data.data.STATUS"
-    style="cursor: default"
-        ></i>
-      </div>
       <dxi-column
         type="buttons"
         caption="Actions"
         [width]="140"
         cellTemplate="actionTemplate"
-      >
-      </dxi-column>
+      ></dxi-column>
+
       <div *dxTemplate="let cellData of 'actionTemplate'">
         <!-- Edit -->
         <i
@@ -311,7 +259,7 @@
           (click)="onDeleteTimesheet({ data: cellData.data, cancel: false })"
         ></i>
 
-        <!-- Verify -->
+        <!-- Verify / Approve -->
         <span
           *ngIf="SessioncanVerify"
           style="
@@ -332,7 +280,6 @@
           "
           (click)="onVerifyAction(cellData.data)"
         >
-          <!-- Blue badge -->
           <i
             class="fas fa-certificate"
             [style.color]="
@@ -344,8 +291,6 @@
             "
             style="font-size: 18px; position: absolute; top: 0; left: 0"
           ></i>
-
-          <!-- White tick -->
           <i
             class="fas fa-check"
             style="
@@ -363,10 +308,11 @@
   </div>
 </div>
 
+<!-- Popups -->
 <dx-popup
   [(visible)]="addTimesheetPopupOpened"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  width="95vw"
+  height="100vh"
   title="New Timesheet"
   (onHiding)="handleClose()"
 >
@@ -381,8 +327,8 @@
 <dx-popup
   [(visible)]="editTimesheetPopupOpened"
   title="Edit Timesheet"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  width="95vw"
+  height="100vh"
   (onHiding)="handleClose()"
 >
   <app-timesheet-edit
@@ -393,15 +339,14 @@
     [isVerifyMode]="false"
     [isApproveMode]="false"
     (popupClosed)="handleClose()"
-  >
-  </app-timesheet-edit>
+  ></app-timesheet-edit>
 </dx-popup>
 
 <dx-popup
   [(visible)]="verifyTimesheetPopupOpened"
   title="Verify Timesheet"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  width="95vw"
+  height="100vh"
   (onHiding)="handleClose()"
 >
   <app-timesheet-edit
@@ -412,13 +357,13 @@
     [isApproveMode]="false"
     [isReadOnlyMode]="true"
     (popupClosed)="handleClose()"
-  >
-  </app-timesheet-edit>
+  ></app-timesheet-edit>
 </dx-popup>
+
 <dx-popup
   [(visible)]="approveTimesheetPopupOpened"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  width="95vw"
+  height="100vh"
   title="Approve Timesheet"
   (onHiding)="handleClose()"
 >
@@ -430,15 +375,14 @@
     [isApproveMode]="true"
     [isReadOnlyMode]="true"
     (popupClosed)="handleClose()"
-  >
-  </app-timesheet-edit>
+  ></app-timesheet-edit>
 </dx-popup>
 
 <dx-popup
   [(visible)]="viewTimesheetPopupOpened"
   title="View Timesheet"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  width="95vw"
+  height="100vh"
   (onHiding)="handleClose()"
 >
   <app-timesheet-edit
@@ -449,6 +393,5 @@
     [isVerifyMode]="false"
     [isApproveMode]="false"
     (popupClosed)="handleClose()"
-  >
-  </app-timesheet-edit>
+  ></app-timesheet-edit>
 </dx-popup>

@@ -36,6 +36,7 @@ import {
   DxTabsModule,
   DxDataGridComponent,
   DxNumberBoxModule,
+  DxValidationGroupComponent,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -60,6 +61,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   @ViewChild('salaryGrid', { static: false }) salaryGrid:
     | DxDataGridComponent
     | undefined;
+  @ViewChild('employeeFormGroup') employeeFormGroup!: DxValidationGroupComponent;
 
   @Input() employeeData: any;
   @Output() formClosed = new EventEmitter<boolean>();
@@ -568,7 +570,13 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     });
   }
 
+  isValid() {
+    return this.employeeFormGroup?.instance.validate().isValid;
+  }
+
   update() {
+    if (!this.isValid()) return;
+    
     const enteredEmpCode = this.employeeFormData.EMP_CODE?.trim().toUpperCase();
     const currentEmpId = this.employeeFormData.ID;
     const enteredEmpName = this.employeeFormData.EMP_NAME?.trim();
