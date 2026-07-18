@@ -18,11 +18,6 @@
             type="required"
             message="This field is required"
           ></dxi-validation-rule>
-          <!-- <dxi-validation-rule
-              type="range"
-              [min]="1"
-              message="Basic Salary must be greater than 0"
-            ></dxi-validation-rule> -->
         </dx-validator>
       </dx-select-box>
     </div>
@@ -40,17 +35,11 @@
               type="required"
               message="This field is required"
             ></dxi-validation-rule>
-            <!-- <dxi-validation-rule
-              type="range"
-              [min]="1"
-              message="Basic Salary must be greater than 0"
-            ></dxi-validation-rule> -->
           </dx-validator>
         </dx-number-box>
       </div>
 
       <div style="flex: 1">
-        <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
         <dx-date-box
           label="Previous Revision"
           [readOnly]="true"
@@ -58,20 +47,11 @@
           displayFormat="MMMM/yyyy"
           [labelMode]="'floating'"
         >
-          <!-- <dx-validator>
-      <dxi-validation-rule
-        type="custom"
-        [validationCallback]="validatePreviousRevision"
-        message="Previous Revision must be earlier than Effect From"
-      ></dxi-validation-rule>
-    </dx-validator> -->
         </dx-date-box>
-        <!-- </dx-validation-group> -->
       </div>
     </div>
 
     <div>
-      <!-- <dx-validation-group class="form-grid" #formValidationGroup> -->
       <dx-date-box
         label="Effect From"
         width="300px"
@@ -82,9 +62,8 @@
         pickerType="calendar"
         [calendarOptions]="{
           maxZoomLevel: 'year',
-          minZoomLevel: 'century',
+          minZoomLevel: 'century'
         }"
-        (onValueChanged)="onEffectFromChanged($event)"
       >
         <dx-validator #effectFromValidator>
           <dxi-validation-rule
@@ -94,7 +73,6 @@
           ></dxi-validation-rule>
         </dx-validator>
       </dx-date-box>
-      <!-- </dx-validation-group> -->
     </div>
   </dx-validation-group>
 </div>
@@ -113,7 +91,7 @@
   width="100%"
   [editing]="{
     mode: 'cell',
-    allowUpdating: true,
+    allowUpdating: true
   }"
 >
   <dxo-scrolling
@@ -128,7 +106,7 @@
   <dxi-column
     [width]="'200'"
     dataField="HEAD_NAME"
-    caption="Salary Head "
+    caption="Salary Head"
     [allowEditing]="false"
     [readOnly]="true"
   >
