@@ -198,7 +198,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     this.receiptMode = payTypeReverseMapping[data.PAY_TYPE_ID] || 'Cash';
 
     this.salaryPaymentData.VOUCHER_NO = data.VOUCHER_NO || '';
-    this.salaryPaymentData.TRANS_DATE = this.parseDateString(data.TRANS_DATE) || new Date();
+    this.salaryPaymentData.TRANS_DATE = this.parseDateString(data.TRANS_DATE);
     
     if (data.SAL_MONTH) {
       const [month, year] = data.SAL_MONTH.split('-').map(Number);
