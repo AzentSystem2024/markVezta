@@ -263,18 +263,31 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
         if (matched) this.countryCode = matched.CODE;
       }
     });
-    this.dataservice
-      .getDropdownData({ NAME: 'EMPLOYEE DEPARTMENT' })
-      .subscribe((data) => (this.departments = data));
-    this.dataservice
-      .getDropdownData({ NAME: 'DESIGNATION' })
-      .subscribe((data) => (this.designations = data));
-    this.dataservice
-      .getDropdownData({ NAME: 'SALARY PAYMENT TYPE' })
-      .subscribe((data) => (this.paymentType = data));
-    this.dataservice
-      .getDropdownData({ NAME: 'STATE' })
-      .subscribe((data) => (this.states = data));
+     const dept_payload = {
+       NAME: 'DEPT',
+       COMPANY_ID: this.COMPANY_ID || 1,
+     };
+     this.dataservice.getDropdownData(dept_payload).subscribe((data) => {
+       this.departments = data;
+     });
+     const payload = {
+       NAME: 'DESIGNATION',
+     };
+     this.dataservice.getDropdownData(payload).subscribe((data) => {
+       this.designations = data;
+     });
+     const paymentType_payload = {
+       NAME: 'SALARY PAYMENT TYPE',
+     };
+     this.dataservice.getDropdownData(paymentType_payload).subscribe((data) => {
+       this.paymentType = data;
+     });
+     const state_payload = {
+       NAME: 'STATE',
+     };
+     this.dataservice.getDropdownData(state_payload).subscribe((data) => {
+       this.states = data;
+     });
   }
 
   private loadSessionDetails() {
