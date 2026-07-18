@@ -170,20 +170,23 @@
       <dxi-column
         dataField="SalaryMonth"
         caption="Salary Month"
+        width="150"
       ></dxi-column>
       <dxi-column
         dataField="EmployeeNo"
         caption="Emp No"
+        width="120"
       ></dxi-column>
-      <dxi-column dataField="EmployeeName" caption="Name"></dxi-column>
-      <dxi-column dataField="Designation" caption="Designation"></dxi-column>
-      <dxi-column dataField="BasicPay" caption="BasicPay" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
-      <dxi-column dataField="Allowance" caption="Allowance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
+      <dxi-column dataField="EmployeeName" caption="Name" width="200"></dxi-column>
+      <dxi-column dataField="Designation" caption="Designation" width="180"></dxi-column>
+      <dxi-column dataField="BasicPay" caption="BasicPay" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" width="150"></dxi-column>
+      <dxi-column dataField="Allowance" caption="Allowance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" width="150"></dxi-column>
       <dxi-column
         dataField="TotalDue"
         caption="Total Due"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+        width="150"
       >
       </dxi-column>
 
@@ -192,6 +195,7 @@
         caption="OverTime"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+        width="150"
       >
       </dxi-column>
 
@@ -200,6 +204,7 @@
         caption="Advance"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+        width="150"
       >
       </dxi-column>
 
@@ -208,6 +213,7 @@
         caption="Deduction"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+        width="150"
       >
       </dxi-column>
 
@@ -216,6 +222,7 @@
         caption="Net Payable"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+        width="150"
       >
       </dxi-column>
 

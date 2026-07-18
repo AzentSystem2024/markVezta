@@ -39,6 +39,7 @@ import {
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-timesheet-report',
@@ -366,8 +367,37 @@ Timesheet_Report() {
     TS_MONTH: this.formatDate(firstDayOfMonth),
   };
 
-  this.dataservice.TimesheetReport(payload).subscribe((res: any) => {
-    this.TimesheetReport = res;
+  this.dataservice.TimesheetReport(payload).subscribe({
+    next: (res: any) => {
+      const list = res || []; // or res.Data || [] if your API returns Data
+
+      this.TimesheetReport = list;
+
+      if (list.length === 0) {
+        notify({
+          message: 'No data found',
+          type: 'warning',
+          displayTime: 2000,
+          position: {
+            at: 'top center',
+            my: 'top center',
+          },
+        });
+      }
+    },
+    error: () => {
+      this.TimesheetReport = [];
+
+      notify({
+        message: 'No data found',
+        type: 'warning',
+        displayTime: 2000,
+        position: {
+          at: 'top center',
+          my: 'top center',
+        },
+      });
+    },
   });
 }
 
