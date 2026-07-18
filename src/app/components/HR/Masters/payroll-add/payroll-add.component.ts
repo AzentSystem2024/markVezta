@@ -7,6 +7,8 @@ import {
   OnInit,
   Output,
   ViewChild,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -38,13 +40,8 @@ import {
   DxiItemModule,
   DxiGroupModule,
 } from 'devextreme-angular/ui/nested';
-import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { PayRevisionAddComponent } from '../pay-revision-add/pay-revision-add.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
-import { Router } from '@angular/router';
-import { OnChanges, SimpleChanges } from '@angular/core';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-payroll-add',
@@ -52,41 +49,33 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./payroll-add.component.scss'],
 })
 export class PayrollAddComponent implements OnInit, OnChanges {
-  @Output() popupClosed = new EventEmitter<void>();
+  // ================= Input & Output =================
   @Input() selectedMonth: string;
+  @Output() popupClosed = new EventEmitter<void>();
+
+  // ================= ViewChild =================
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
-  readonly allowedPageSizes: any = [5, 10, 'all'];
-  displayMode: any = 'full';
-  showPageSizeSelector = true;
-  showHeaderFilter: true;
-  showFilterRow = true;
-  isFilterOpened = false;
-  filterRowVisible: boolean = false;
-  timesheetList: any;
+  dataGrid!: DxDataGridComponent;
 
-  payRollData: {
-    COMPANY_ID: string;
-    TS_ID: string;
-    USER_ID: Number;
-  } = {
-      COMPANY_ID: '',
-      TS_ID: '',
-      USER_ID: 0,
-    };
+  // ================= State Properties =================
   companyID: any;
-  canAdd: any;
-  canEdit: any;
-  canDelete: any;
-  canPrint: any;
-  canView: any;
-  canApprove: any;
   userID: any;
+  timesheetList: any[] = [];
 
-  constructor(
-    private dataSerivice: DataService,
-    private router: Router,
-  ) { }
+  // ================= DataGrid Options =================
+  allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector: boolean = true;
+  filterRowVisible: boolean = false;
+
+  constructor(private dataService: DataService) {}
+
+  // ================= Lifecycle Hooks =================
+
+  ngOnInit() {
+    this.setSessionData();
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedMonth'] && this.selectedMonth) {
       this.setSessionData();
@@ -94,60 +83,11 @@ export class PayrollAddComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit() {
-    const currentUrl = this.router.url;
-    const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    this.userID = menuResponse.USER_ID;
-    const menuGroups = menuResponse.MenuGroups || [];
-    const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/credit-note');
-
-    if (packingRights) {
-      this.canAdd = packingRights.CanAdd;
-      this.canEdit = packingRights.CanEdit;
-      this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanPrint;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.CanApprove;
-    }
-    // this.payRollData.SAL_MONTH = this.selectedMonth;
-    // this.getTimesheetList();
-  }
-
-  setSessionData() {
-    const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    this.userID = menuResponse.USER_ID;
-
-    console.log(this.companyID, 'COMPANY ID SET');
-  }
-
-  getStatusFlagClass(status: string): string {
-    switch (status) {
-      case 'Open':
-        return 'flag-open'; // White or gray
-      case 'Verified':
-        return 'flag-verified'; // Orange
-      case 'Approved':
-        return 'flag-approved'; // Green
-      default:
-        return '';
-    }
-  }
+  // ================= Core Logic =================
 
   getTimesheetList() {
-    if (!this.selectedMonth) {
-      console.warn('No month selected.');
-      return;
-    }
-    console.log(this.companyID, '======COMPANYID====');
+    if (!this.selectedMonth || !this.companyID) return;
+
     const payload = {
       CompanyId: this.companyID,
       Month: new Date(this.selectedMonth)
@@ -157,10 +97,11 @@ export class PayrollAddComponent implements OnInit, OnChanges {
         })
         .replace(/\s/g, ''),
     };
-    this.dataSerivice
+
+    this.dataService
       .getTimesheetListForPayroll(payload)
       .subscribe((response: any) => {
-        this.timesheetList = response.data;
+        this.timesheetList = response.data || [];
       });
   }
 
@@ -178,21 +119,15 @@ export class PayrollAddComponent implements OnInit, OnChanges {
       return;
     }
 
-    // const userId = Number(sessionStorage.getItem('USER_ID'));
-
-    let successCount = 0;
-    let errorCount = 0;
-
-    selectedRows.forEach((row) => {
+    selectedRows.forEach((row: any) => {
       const payload = {
         COMPANY_ID: this.companyID,
         TS_ID: row.ID,
         USER_ID: this.userID,
       };
 
-      this.dataSerivice.generatePayroll(payload).subscribe({
+      this.dataService.generatePayroll(payload).subscribe({
         next: (response: any) => {
-          // console.log('API RESPONSE:', response);
           if (response.flag === 1) {
             notify(
               {
@@ -203,34 +138,34 @@ export class PayrollAddComponent implements OnInit, OnChanges {
               'success',
             );
             this.popupClosed.emit();
-
-            // successCount++;
           }
-          // else {
-          //   errorCount++;
-          // }
-
-          // Show message only after last API call
-          // if (successCount + errorCount === selectedRows.length) {
-          //   if (errorCount === 0) {
-
-          //   }
-          //   // else {
-          //   //   notify(
-          //   //     {
-          //   //       message: `Payroll generated for ${successCount} rows. Failed for ${errorCount} rows.`,
-          //   //       position: { at: 'top center', my: 'top center' },
-          //   //     },
-          //   //     'warning',
-          //   //   );
-          //   // }
-          // }
         },
         error: () => {
-          errorCount++;
+          // Silent catch for individual errors
         },
       });
     });
+  }
+
+  // ================= UI Helpers =================
+
+  getStatusColor(status: any): string {
+    const statusStr = String(status).toUpperCase();
+    if (status === 1 || statusStr === 'VERIFIED') return '#fd7e14'; // Orange
+    if (status === 2 || statusStr === 'APPROVED') return '#198754'; // Green
+    return '#6c757d'; // Gray for Open/Other
+  }
+
+  // ================= Helper Methods =================
+
+  private setSessionData() {
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    if (menuResponse?.SELECTED_COMPANY) {
+      this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+      this.userID = menuResponse.USER_ID;
+    }
   }
 }
 
@@ -242,7 +177,6 @@ export class PayrollAddComponent implements OnInit, OnChanges {
     DxDateBoxModule,
     DxFormModule,
     DxTextBoxModule,
-    FormTextboxModule,
     DxCheckBoxModule,
     DxRadioGroupModule,
     DxFileUploaderModule,
@@ -255,7 +189,6 @@ export class PayrollAddComponent implements OnInit, OnChanges {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
     DxoItemModule,
@@ -270,4 +203,4 @@ export class PayrollAddComponent implements OnInit, OnChanges {
   exports: [PayrollAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PayrollAddModule { }
+export class PayrollAddModule {}

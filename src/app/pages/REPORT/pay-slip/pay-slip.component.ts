@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   BrowserModule,
@@ -42,29 +42,23 @@ import notify from 'devextreme/ui/notify';
 interface jsPDFWithAutoTable extends jsPDF {
   lastAutoTable?: { finalY: number };
 }
+
 @Component({
   selector: 'app-pay-slip',
   templateUrl: './pay-slip.component.html',
   styleUrls: ['./pay-slip.component.scss'],
 })
-export class PaySlipComponent {
-  formatted_To_date: string | undefined;
-  formatted_from_date: string | undefined;
-  defaultDate: Date = new Date();
+export class PaySlipComponent implements OnInit {
+  // ================= State Properties =================
   selected_Company_id: any;
   selected_Company_name: any;
-  financialYeaDate: any;
-  selected_fin_id: any;
   months: any[] = [];
   selectedMonth: string | undefined;
   employeeList: any;
-  EmployeeID: any;
   selectedEmployee: number[] = [];
-
-  pdfSrc: SafeResourceUrl | null = null;
   payloadDate: string | undefined;
-  pdfData: any;
-  gridData: any;
+  pdfSrc: SafeResourceUrl | null = null;
+  gridData: any[] = [];
   allSelected = false;
 
   constructor(
@@ -74,29 +68,27 @@ export class PaySlipComponent {
     this.sesstion_Details();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const currentYear = new Date().getFullYear();
     this.generateMonths(currentYear);
     this.GetEmployeeList();
   }
 
+  // ================= Core Logic =================
+
   getPaySlip(): void {
-  if (!this.selectedEmployee || this.selectedEmployee.length === 0) {
-  notify('Please select at least one employee.', 'warning', 2000);
-  return;
-}
-
-
+    if (!this.selectedEmployee || this.selectedEmployee.length === 0) {
+      notify('Please select at least one employee.', 'warning', 2000);
+      return;
+    }
 
     const monthToUse =
       this.selectedMonth ||
       (() => {
         const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-          2,
-          '0',
-        )}`;
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       })();
+      
     // Determine the month to display in PDF
     const monthToDisplay = this.payloadDate
       ? new Date(this.payloadDate)
@@ -105,23 +97,21 @@ export class PaySlipComponent {
     const payload = {
       Month: this.payloadDate || `${monthToUse}-01T00:00:00.000Z`,
       EmployeeIDs: this.selectedEmployee,
-      COMPANY_ID : this.selected_Company_id
+      COMPANY_ID: this.selected_Company_id,
     };
 
     this.dataService.getPaySlip(payload).subscribe((response: any) => {
-     if (!response?.PaySlipDetails || response.PaySlipDetails.length === 0) {
-  notify('No data found.', 'warning', 2000);
-  return;
-}
+      if (!response?.PaySlipDetails || response.PaySlipDetails.length === 0) {
+        notify('No data found.', 'warning', 2000);
+        return;
+      }
 
       const doc = new jsPDF();
 
       response.PaySlipDetails.forEach((emp: any, index: number) => {
         // --- Header ---
         doc.setFontSize(16);
-        doc.text(this.selected_Company_name || 'Company Name', 105, 15, {
-          align: 'center',
-        });
+        doc.text(this.selected_Company_name || 'Company Name', 105, 15, { align: 'center' });
         doc.setFontSize(12);
         doc.text(
           `Salary for the month of ${monthToDisplay.toLocaleString('default', {
@@ -133,6 +123,7 @@ export class PaySlipComponent {
           { align: 'center' },
         );
         doc.line(10, 30, 200, 30);
+        
         // --- Employee Info ---
         doc.setFontSize(11);
         doc.text(`Name: ${emp.EMP_NAME}`, 14, 40);
@@ -148,17 +139,12 @@ export class PaySlipComponent {
         // --- Earnings and Deductions Table ---
         const earnings = emp.SalaryHeads.filter((h: any) => h.HEAD_TYPE === 1);
         const deductions = emp.SalaryHeads.filter(
-          (h: any) => h.HEAD_TYPE === 3,
+          (h: any) => h.HEAD_TYPE === 2 || h.HEAD_TYPE === 3,
         );
-        const totalEarnings = earnings.reduce(
-          (sum:any, e:any) => sum + e.HEAD_AMOUNT,
-          0,
-        );
-        const totalDeductions = deductions.reduce(
-          (sum:any, d:any) => sum + d.HEAD_AMOUNT,
-          0,
-        );
+        const totalEarnings = earnings.reduce((sum: any, e: any) => sum + e.HEAD_AMOUNT, 0);
+        const totalDeductions = deductions.reduce((sum: any, d: any) => sum + d.HEAD_AMOUNT, 0);
         const netPay = totalEarnings - totalDeductions;
+        
         autoTable(doc, {
           startY: 90,
           theme: 'grid',
@@ -173,47 +159,28 @@ export class PaySlipComponent {
           ]),
           foot: [
             [
-              {
-                content: 'Gross Salary',
-                styles: { halign: 'right', fontStyle: 'bold' },
-              },
-              {
-                content: totalEarnings.toFixed(2),
-                styles: { fontStyle: 'bold' },
-              },
-              {
-                content: 'Total Deductions',
-                styles: { halign: 'right', fontStyle: 'bold' },
-              },
-              {
-                content: totalDeductions.toFixed(2),
-                styles: { fontStyle: 'bold' },
-              },
+              { content: 'Gross Salary', styles: { halign: 'right', fontStyle: 'bold' } },
+              { content: totalEarnings.toFixed(2), styles: { fontStyle: 'bold' } },
+              { content: 'Total Deductions', styles: { halign: 'right', fontStyle: 'bold' } },
+              { content: totalDeductions.toFixed(2), styles: { fontStyle: 'bold' } },
             ],
           ],
           styles: { fontSize: 10 },
         });
+        
         const finalY = (doc as any).lastAutoTable?.finalY || 90;
         doc.setFontSize(12);
-        doc.text(`Net Payable Salary: ${netPay.toFixed(2)}`, 190, finalY + 10, {
-          align: 'right',
-        });
+        doc.text(`Net Payable Salary: ${netPay.toFixed(2)}`, 190, finalY + 10, { align: 'right' });
 
-        // --- Amount in Words ---
         // --- Amount in Words (aligned with table width) ---
         doc.setFontSize(10);
 
-        // Get table boundaries
         const table = (doc as any).lastAutoTable;
         const tableStartX = table?.settings.margin.left || 10;
-        const tableEndX =
-          doc.internal.pageSize.getWidth() -
-          (table?.settings.margin.right || 10);
+        const tableEndX = doc.internal.pageSize.getWidth() - (table?.settings.margin.right || 10);
 
-        // Line above
         doc.line(tableStartX, finalY + 15, tableEndX, finalY + 15);
 
-        // Text centered between table edges
         doc.text(
           `RUPEES ${this.numberToWords(netPay)} ONLY`,
           (tableStartX + tableEndX) / 2,
@@ -221,20 +188,16 @@ export class PaySlipComponent {
           { align: 'center' },
         );
 
-        // Line below
         doc.line(tableStartX, finalY + 23, tableEndX, finalY + 23);
 
-        const footerY = finalY + 45; // adjust vertical spacing as needed
-
-        // Left side: Verified By
+        // --- Footer signatures ---
+        const footerY = finalY + 45; 
         doc.setFontSize(11);
         doc.text('Verified By:', 14, footerY);
-        doc.line(14, footerY + 8, 80, footerY + 8); // horizontal line for writing
+        doc.line(14, footerY + 8, 80, footerY + 8); 
 
-        // Right side: Received By
         const rightX = 140;
         doc.text('Received By:', rightX, footerY);
-        // doc.line(rightX, footerY + 6, rightX + 50, footerY + 6);
 
         doc.text('Signature:', rightX, footerY + 10);
         doc.line(rightX + 20, footerY + 10, rightX + 60, footerY + 10);
@@ -244,6 +207,7 @@ export class PaySlipComponent {
 
         doc.text('Name:', rightX, footerY + 30);
         doc.line(rightX + 15, footerY + 30, rightX + 60, footerY + 30);
+        
         // Add new page if not last employee
         if (index < response.PaySlipDetails.length - 1) doc.addPage();
       });
@@ -255,54 +219,55 @@ export class PaySlipComponent {
     });
   }
 
-  // Helper to convert number to words (simple version)
-  numberToWords(amount: number) {
-    return amount.toLocaleString('en-IN', { style: 'decimal' });
+  // ================= Event Handlers =================
+
+  onMonthChange(e: any): void {
+    const [year, month] = e.value.split('-');
+    this.selectedMonth = `${year}-${month}`;
+    this.payloadDate = `${year}-${month}-09`;
   }
 
-  generateMonths(year: number) {
+  onEmployeeChange(e: any): void {
+    this.selectedEmployee = e.value;
+  }
+
+  handleSelection(e: any, tagBox: any): void {
+    const selectedCount = e.component.option('value').length;
+    this.allSelected = selectedCount === this.employeeList.length;
+
+    if (this.allSelected) {
+      const allIds = this.employeeList.map((item: any) => item.ID);
+      tagBox.option('value', allIds); 
+      tagBox.option('displayValue', 'All Employees Selected'); 
+    } else {
+      tagBox.option('displayValue', null); 
+    }
+  }
+
+  // ================= Helper Methods =================
+
+  private generateMonths(year: number): void {
     this.months = [];
     const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
     ];
 
     for (let i = 0; i < 12; i++) {
       const formattedMonth = String(i + 1).padStart(2, '0');
       this.months.push({
         name: `${monthNames[i]} ${year}`,
-        value: `${year}-${formattedMonth}`, // YYYY-MM
+        value: `${year}-${formattedMonth}`, 
       });
     }
 
-    // default selected month in YYYY-MM
     const now = new Date();
     this.selectedMonth =
       this.selectedMonth ||
       `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
 
-  onMonthChange(e: any) {
-    const [year, month] = e.value.split('-');
-    this.selectedMonth = `${year}-${month}`;
-    this.payloadDate = `${year}-${month}-09`;
-  }
-
-  onEmployeeChange(e: any) {
-    this.selectedEmployee = e.value;
-  }
-
-  GetEmployeeList() {
+  private GetEmployeeList(): void {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       Name: 'EMP PAYSLIP',
@@ -312,32 +277,17 @@ export class PaySlipComponent {
     });
   }
 
-  handleSelection(e: any, tagBox: any) {
-    const selectedCount = e.component.option('value').length;
-    this.allSelected = selectedCount === this.employeeList.length;
-
-    if (this.allSelected) {
-      // Replace displayed tags with a single summary
-      const allIds = this.employeeList.map((item: any) => item.ID);
-      tagBox.option('value', allIds); // keep all selected internally
-      tagBox.option('displayValue', 'All Employees Selected'); // summary text
-    } else {
-      tagBox.option('displayValue', null); // show normal tags
-    }
-  }
-
-  sesstion_Details() {
+  private sesstion_Details(): void {
     const savedData = sessionStorage.getItem('savedUserData');
     if (savedData) {
       const sessionData = JSON.parse(savedData);
       this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
       this.selected_Company_name = sessionData.SELECTED_COMPANY.COMPANY_NAME;
-      const sessionYear = sessionData.FINANCIAL_YEARS;
-      this.financialYeaDate = sessionYear[0].DATE_FROM;
-      this.formatted_from_date = this.financialYeaDate;
-
-      this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     }
+  }
+
+  private numberToWords(amount: number): string {
+    return amount.toLocaleString('en-IN', { style: 'decimal' });
   }
 }
 
@@ -361,7 +311,6 @@ export class PaySlipComponent {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
     DxoItemModule,

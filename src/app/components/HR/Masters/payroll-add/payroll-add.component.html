@@ -2,38 +2,32 @@
   <div class="grid-container">
     <dx-data-grid
       #dataGrid
-      noDataText=" "
+      noDataText="No data available"
       [width]="'100%'"
       [height]="'65vh'"
       [loadPanel]="{
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true,
+        showPane: true
       }"
       class="grid theme-dependent"
       [dataSource]="timesheetList"
       [showBorders]="true"
       [showColumnLines]="true"
-      [columnAutoWidth]="false"
+      [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
       [allowColumnReordering]="true"
       [filterRow]="{ visible: filterRowVisible, applyFilter: 'auto' }"
       [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
       [allowColumnResizing]="true"
       [columnResizingMode]="'nextColumn'"
       [scrolling]="{ mode: 'standard' }"
       rowAlternationInterval="2"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
-      focusStateEnabled="false"
+      [focusStateEnabled]="false"
     >
-      <!-- <dxo-editing
-        mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
-      ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -53,13 +47,9 @@
         [enabled]="true"
         [allowExportSelectedData]="true"
         [formats]="['xlsx', 'pdf']"
-      >
-      </dxo-export>
-      <dxo-toolbar>
-        <!-- <dxi-item location="before">
-          <div class="grid-header">Timesheet</div>
-        </dxi-item> -->
+      ></dxo-export>
 
+      <dxo-toolbar>
         <dxi-item location="after" locateInMenu="auto">
           <dx-button
             hint="Generate Payroll"
@@ -79,7 +69,6 @@
       <dxi-column
         dataField="EMP_NAME"
         caption="Employee Name"
-        width="120"
       ></dxi-column>
       <dxi-column
         dataField="WORKED_DAYS"
@@ -101,16 +90,17 @@
         dataField="STATUS"
         caption="Status"
         cellTemplate="statusCellTemplate"
-        width="80"
-        alignment="right"
-      >
-      </dxi-column>
+        width="100"
+        alignment="center"
+      ></dxi-column>
+
+      <!-- Status Flag Template -->
       <div *dxTemplate="let cellData of 'statusCellTemplate'">
         <i
           class="fas fa-flag"
-          [ngClass]="getStatusFlagClass(cellData.value)"
+          [style.color]="getStatusColor(cellData.value)"
           [attr.title]="cellData.value"
-          style="margin-left: 10px; cursor: default"
+          style="font-size: 16px; cursor: default;"
         ></i>
       </div>
     </dx-data-grid>

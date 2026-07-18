@@ -79,8 +79,18 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
   yearSelectorVisible = false;
   years: number[] = [];
   monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   previousYearButtonOptions = {
@@ -162,7 +172,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
 
   private getDocNo() {
     if (!this.selected_Company_id) return;
-    
+
     const payload = {
       TRANS_TYPE: 30,
       COMPANY_ID: this.selected_Company_id,
@@ -198,8 +208,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     this.receiptMode = payTypeReverseMapping[data.PAY_TYPE_ID] || 'Cash';
 
     this.salaryPaymentData.VOUCHER_NO = data.VOUCHER_NO || '';
-    this.salaryPaymentData.TRANS_DATE = this.parseDateString(data.TRANS_DATE);
-    
+    this.salaryPaymentData.TRANS_DATE = new Date();
     if (data.SAL_MONTH) {
       const [month, year] = data.SAL_MONTH.split('-').map(Number);
       this.selectedMonth = new Date(year, month - 1, 1, 12);
@@ -219,19 +228,19 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
   private parseDateString(dateStr: any): Date | null {
     if (!dateStr) return null;
     if (dateStr instanceof Date) return dateStr;
-    
+
     if (typeof dateStr === 'string' && dateStr.includes('-')) {
-        const parts = dateStr.split('-');
-        // Check for DD-MM-YYYY format
-        if (parts.length === 3 && parts[0].length === 2 && parts[2].length >= 4) {
-             const day = parseInt(parts[0], 10);
-             const month = parseInt(parts[1], 10) - 1;
-             const year = parseInt(parts[2].substring(0, 4), 10);
-             const parsedDate = new Date(year, month, day);
-             if (!isNaN(parsedDate.getTime())) return parsedDate;
-        }
+      const parts = dateStr.split('-');
+      // Check for DD-MM-YYYY format
+      if (parts.length === 3 && parts[0].length === 2 && parts[2].length >= 4) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2].substring(0, 4), 10);
+        const parsedDate = new Date(year, month, day);
+        if (!isNaN(parsedDate.getTime())) return parsedDate;
+      }
     }
-    
+
     const fallbackDate = new Date(dateStr);
     return isNaN(fallbackDate.getTime()) ? null : fallbackDate;
   }
@@ -249,35 +258,36 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
         .padStart(2, '0')}-${this.selectedMonth.getFullYear()}`,
     };
 
-    this.dataService.getPendingSalaryPayments(payload).subscribe((response: any) => {
-      const pendingList = response?.data || [];
-      
-      if (this.isEditing && this.EditingResponseData) {
-        const data = Array.isArray(this.EditingResponseData)
-          ? this.EditingResponseData[0]
-          : this.EditingResponseData;
-          
-        const savedList = data.DetailList || [];
-        const savedIds = new Set(savedList.map((item: any) => item.ID));
-        
-        const mergedList = [...savedList];
-        pendingList.forEach((item: any) => {
-          if (!savedIds.has(item.ID)) {
-            mergedList.push(item);
-          }
-        });
-        
-        this.salaryPendingList = mergedList;
-        this.selectedIds = Array.from(savedIds);
-      } else {
-        this.salaryPendingList = pendingList;
-        this.selectedIds = [];
-      }
-    });
+    this.dataService
+      .getPendingSalaryPayments(payload)
+      .subscribe((response: any) => {
+        const pendingList = response?.data || [];
+
+        if (this.isEditing && this.EditingResponseData) {
+          const data = Array.isArray(this.EditingResponseData)
+            ? this.EditingResponseData[0]
+            : this.EditingResponseData;
+
+          const savedList = data.DetailList || [];
+          const savedIds = new Set(savedList.map((item: any) => item.ID));
+
+          const mergedList = [...savedList];
+          pendingList.forEach((item: any) => {
+            if (!savedIds.has(item.ID)) {
+              mergedList.push(item);
+            }
+          });
+
+          this.salaryPendingList = mergedList;
+          this.selectedIds = Array.from(savedIds);
+        } else {
+          this.salaryPendingList = pendingList;
+          this.selectedIds = [];
+        }
+      });
   }
 
   // =========== UI & Event Handlers ===========
-
   onSelectionChanged(e: any) {
     this.selectedRows = e.selectedRowsData || [];
     this.selectedIds = this.selectedRows.map((row: any) => row.ID);
@@ -287,22 +297,29 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     this.receiptMode = e.value;
 
     if (this.receiptMode === 'Cash') {
-      this.filteredLedgerList = this.ledgerList.filter((item) => item.GROUP_ID === 13);
+      this.filteredLedgerList = this.ledgerList.filter(
+        (item) => item.GROUP_ID === 13,
+      );
     } else if (this.receiptMode === 'Bank') {
-      this.filteredLedgerList = this.ledgerList.filter((item) => item.GROUP_ID === 14);
+      this.filteredLedgerList = this.ledgerList.filter(
+        (item) => item.GROUP_ID === 14,
+      );
     } else if (this.receiptMode === 'Adjustments') {
-      this.filteredLedgerList = this.ledgerList.filter((item) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14);
+      this.filteredLedgerList = this.ledgerList.filter(
+        (item) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
+      );
     } else {
       this.filteredLedgerList = [...this.ledgerList];
     }
   }
 
   // =========== Date Selection Handlers ===========
-
   toggleCalendar() {
     this.calendarVisible = !this.calendarVisible;
     if (this.calendarVisible) {
-      setTimeout(() => document.addEventListener('click', this.outsideClickListener));
+      setTimeout(() =>
+        document.addEventListener('click', this.outsideClickListener),
+      );
     } else {
       document.removeEventListener('click', this.outsideClickListener);
     }
@@ -333,7 +350,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
       1,
-      12
+      12,
     );
     this.updateMonthString();
     this.getSalaryPendingList();
@@ -362,12 +379,12 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     });
   }
 
-  formatDate(date: Date): string {
+  formatDateISO(date: Date): string {
     if (!date) return '';
     const year = date.getFullYear();
     const month = ('0' + (date.getMonth() + 1)).slice(-2);
     const day = ('0' + date.getDate()).slice(-2);
-    return `${day}-${month}-${year}`;
+    return `${year}-${month}-${day}`;
   }
 
   private outsideClickListener = (event: any) => {
@@ -375,8 +392,10 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     const labelElement = document.querySelector('.month-label');
 
     if (
-      calendarElement && !calendarElement.contains(event.target) &&
-      labelElement && !labelElement.contains(event.target)
+      calendarElement &&
+      !calendarElement.contains(event.target) &&
+      labelElement &&
+      !labelElement.contains(event.target)
     ) {
       this.calendarVisible = false;
       document.removeEventListener('click', this.outsideClickListener);
@@ -401,7 +420,8 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
       PDC: 3,
       Adjustments: 4,
     };
-    this.salaryPaymentData.PAY_TYPE_ID = payTypeMapping[this.receiptMode] || null;
+    this.salaryPaymentData.PAY_TYPE_ID =
+      payTypeMapping[this.receiptMode] || null;
 
     if (this.salaryPaymentData.PAY_TYPE_ID === 2) {
       if (
@@ -412,7 +432,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
         notify(
           'Please enter Cheque No, Cheque Date, and Bank Name before saving.',
           'warning',
-          2000
+          2000,
         );
         return false;
       }
@@ -420,6 +440,18 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
 
     if (this.itemsGridRef?.instance) {
       this.itemsGridRef.instance.closeEditCell();
+    }
+
+    // Format dates to prevent UTC timezone offset issues (minus one day bug)
+    if (this.salaryPaymentData.TRANS_DATE instanceof Date) {
+      this.salaryPaymentData.TRANS_DATE = this.formatDateISO(
+        this.salaryPaymentData.TRANS_DATE,
+      );
+    }
+    if (this.salaryPaymentData.CHEQUE_DATE instanceof Date) {
+      this.salaryPaymentData.CHEQUE_DATE = this.formatDateISO(
+        this.salaryPaymentData.CHEQUE_DATE,
+      );
     }
 
     this.salaryPaymentData.COMPANY_ID = this.companyId;
@@ -447,7 +479,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
           notify('Failed to save Salary Payment', 'error', 2000);
         }
       },
-      error: () => notify('Error occurred while saving', 'error', 2000)
+      error: () => notify('Error occurred while saving', 'error', 2000),
     });
   }
 
@@ -464,18 +496,19 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
           notify(
             `Salary Payment ${this.isApproved ? 'approved' : 'updated'} successfully`,
             'success',
-            2000
+            2000,
           );
           this.popupClosed.emit();
         } else {
           notify(
             `Failed to ${this.isApproved ? 'approve' : 'save'} Salary Payment`,
             'error',
-            2000
+            2000,
           );
         }
       },
-      error: () => notify('Error occurred while processing request', 'error', 2000)
+      error: () =>
+        notify('Error occurred while processing request', 'error', 2000),
     });
   }
 
@@ -513,4 +546,3 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AddSalaryPaymentModule {}
-
