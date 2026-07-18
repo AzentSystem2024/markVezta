@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { FormBuilder, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import {
@@ -67,13 +67,9 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
-import { AddSalesInvoiceRetailModule } from '../../OPERATIONS/add-sales-invoice-retail/add-sales-invoice-retail.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 
-// import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-// import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 @Component({
   selector: 'app-ledger-statement',
   templateUrl: './ledger-statement.component.html',
@@ -106,13 +102,13 @@ export class LedgerStatementComponent {
   isViewCreditNote: boolean = false;
   selectedCreditNote: any;
   isViewInvoice: boolean = false;
-  isRetailInvoice:boolean = false;
+  isRetailInvoice: boolean = false;
   selectedInvoice: any;
   isViewReceipt: boolean = false;
   selectedReceipt: any;
   selected_Company_id: any;
   isReadOnlyReceipt: boolean = true;
-   isReadOnlyInvoice: boolean = true;
+  isReadOnlyInvoice: boolean = true;
   isEditReceipt: boolean = false;
   isReadOnlyPayment: boolean = true;
   selectedmiscellaneousData: any;
@@ -185,8 +181,8 @@ export class LedgerStatementComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
-     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-  this.selectedmonth = currentMonth;
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -225,8 +221,6 @@ export class LedgerStatementComponent {
     });
 
     this.loadLedgerData();
-
-
   }
 
   loadHeadList() {
@@ -238,50 +232,6 @@ export class LedgerStatementComponent {
         this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
       });
   }
-
-  // ngOnInit() {
-  //   this.get_sessionstorage_data();
-  //   this.get_fin_id();
-  //   this.sesstion_Details();
-  //   const userDataString = localStorage.getItem('userData');
-  //   const userData = JSON.parse(
-  //     sessionStorage.getItem('savedUserData') || '{}',
-  //   );
-  //   if (userDataString) {
-  //     const userData = JSON.parse(userDataString);
-  //     const selectedCompany = userData?.SELECTED_COMPANY;
-  //     this.selected_Company_id = selectedCompany.COMPANY_ID;
-  //     console.log(this.selected_Company_id, 'SELECTEDDDDDDDDDDDDDDDDDDDD---');
-  //   }
-  //   console.log('ledgerstatementttttttttttttttttttttt');
-  //   // this.resetPopups();
-  //   // Prevent stale popup rendering
-  //   setTimeout(() => {
-  //     this.popupReady = false;
-  //     this.cdr.detectChanges();
-  //   });
-
-  //   this.loadLedgerData();
-
-  //   this.ledgerSummaryData = this.Ledger_statement_datasource;
-  //   this.dataService
-  //     .HeadId_Dropdown_api(this.selected_Company_id)
-  //     .subscribe((res: any) => {
-  //       this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
-  //       console.log(this.HEAD_ID_LIST, 'HEADLISTTTTTTTTTTTTTT');
-  //     });
-
-  //   const today = new Date();
-  //   const SystemDate =
-  //     today.getFullYear() +
-  //     '-' +
-  //     String(today.getMonth() + 1).padStart(2, '0') +
-  //     '-' +
-  //     String(today.getDate()).padStart(2, '0');
-
-  //   this.selected_from_date = SystemDate;
-  //   this.selected_To_date = SystemDate;
-  // }
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -318,30 +268,6 @@ export class LedgerStatementComponent {
       );
     }
   }
-  //  ngAfterViewInit() {
-  //   setTimeout(() => this.resetPopups());
-  // }
-
-  //   resetPopups() {
-  //   this.isViewJournalVoucher = false;
-  //   this.isViewDebitNote = false;
-  //   this.isViewCreditNote = false;
-  //   this.isViewInvoice = false;
-  //   this.isEditInvoice = false;
-  //   this.isEditCustomerReceipt = false;
-  //   this.editMiscPopup = false;
-  //   this.editMiscPopupOpened = false;
-  //   this.editPrePaymentPopupOpened = false;
-  //   this.isEditReceipt = false;
-  //   this.isEditPurchaseReturn = false;
-  //   this.isEditTransferOut = false;
-  //   this.isEditTransferIn = false;
-  //   this.editSalaryPopup = false;
-  //   this.EditDepreciationPopupVisible = false;
-  //   this.isEditPopUp = false;
-
-  //   // this.isEditPopupPrepaymentPosting = false;
-  // }
 
   getSessionData(key: string) {
     const data = sessionStorage.getItem(key);
@@ -371,12 +297,11 @@ export class LedgerStatementComponent {
     });
   }
 
-
   //-----------------data loading based on session storage value when navigate back to this page-----------------
   loadLedgerData() {
     const sessiondata = this.getSessionData('viewclickvalue');
     const headid = this.getSessionData('HEADID');
-    const storeid = this.getSessionData('STOREID')
+    const storeid = this.getSessionData('STOREID');
     this.selectedStoreid = storeid ? [storeid] : [];
     // this.selectedStoreid = sessiondata.selectedStoreid
     const payload = {
@@ -385,27 +310,19 @@ export class LedgerStatementComponent {
       HEAD_ID: headid,
       DATE_FROM: sessiondata.dateFrom,
       DATE_TO: sessiondata.dateTo,
-      // STORE_ID: this.selectedStoreid?.length
-      //   ? this.selectedStoreid.join(',') // FINAL FIX
-      //   : storeid
-       STORE_ID: String(storeid)
+      STORE_ID: storeid ? String(storeid) : '',
     };
-
-    console.log(payload, '=========payload=========');
 
     this.selectedCompanyId = payload.COMPANY_ID;
     this.selected_Head_Id = payload.HEAD_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
-    
 
-this.selectedStoreid = storeid ? [storeid] : [];
-this.updateStoreHint();
+    this.selectedStoreid = storeid ? [storeid] : [];
+    this.updateStoreHint();
     // this.selectedStoreid = sessiondata.selectedStoreid || [];
 
-
-
-    this
+    this;
 
     // use your existing datasource creator
     this.createLedgerDataSource(payload);
@@ -465,7 +382,7 @@ this.updateStoreHint();
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    this.vat_title = sessionData?.GeneralSettings.VAT_TITLE
+    this.vat_title = sessionData?.GeneralSettings.VAT_TITLE;
   }
 
   load_Ledgre_data() {
@@ -482,9 +399,8 @@ this.updateStoreHint();
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
       STORE_ID: this.selectedStoreid?.length
         ? this.selectedStoreid.join(',') // ✅ FINAL FIX
-        : ''
+        : '',
     };
-
 
     this.createLedgerDataSource(payload);
   }
@@ -520,7 +436,6 @@ this.updateStoreHint();
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-    
 
     if (TRANS_TYPE_ID == 4) {
       this.dataService
@@ -545,33 +460,28 @@ this.updateStoreHint();
         this.cdr.detectChanges();
       });
     } else if (TRANS_TYPE_ID === 25) {
+      if (this.vat_title === 'GST') {
+        this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+          this.selectedInvoice = response.Data;
 
-  if (this.vat_title === 'GST') {
+          this.isViewInvoice = true;
+          this.isRetailInvoice = false;
 
-    this.dataService.selectInvoice(trans_id)
-      .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
+          this.cdr.detectChanges();
+        });
+      } else {
+        this.dataService
+          .selectInvoiceRetail(trans_id)
+          .subscribe((response: any) => {
+            this.selectedInvoice = response.Data;
 
-        this.isViewInvoice = true;
-        this.isRetailInvoice = false;
+            this.isRetailInvoice = true;
+            this.isViewInvoice = false;
 
-        this.cdr.detectChanges();
-      });
-
-  } else {
-
-    this.dataService.selectInvoiceRetail(trans_id)
-      .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
-
-        this.isRetailInvoice = true;
-        this.isViewInvoice = false;
-
-        this.cdr.detectChanges();
-      });
-
-  }
-}else if (TRANS_TYPE_ID == 19) {
+            this.cdr.detectChanges();
+          });
+      }
+    } else if (TRANS_TYPE_ID == 19) {
       this.dataService
         .selectPurchaseInvoice(trans_id)
         .subscribe((response: any) => {
@@ -737,22 +647,24 @@ this.updateStoreHint();
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
-    }
-    else if (TRANS_TYPE_ID === 105) {
-      this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
-        this.selectedInvoice = response;
-        this.isMiscViewInvoice = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-      });
-    }
-    else if (TRANS_TYPE_ID === 29) {
-      this.dataService.viewSelectedPayroll(trans_id).subscribe((response: any) => {
-        this.selectedPayroll = response;
-        this.viewPayrollPopupOpened = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-      });
+    } else if (TRANS_TYPE_ID === 105) {
+      this.dataService
+        .getMiscSalesInvoiceByID(trans_id)
+        .subscribe((response: any) => {
+          this.selectedInvoice = response;
+          this.isMiscViewInvoice = true;
+          this.cdr.detectChanges();
+          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+        });
+    } else if (TRANS_TYPE_ID === 29) {
+      this.dataService
+        .viewSelectedPayroll(trans_id)
+        .subscribe((response: any) => {
+          this.selectedPayroll = response;
+          this.viewPayrollPopupOpened = true;
+          this.cdr.detectChanges();
+          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+        });
     } else {
     }
   }
@@ -771,9 +683,9 @@ this.updateStoreHint();
       return;
     }
 
-    const selectedNames = this.Store
-      .filter(x => this.selectedStoreid.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
 
     this.storeHint = selectedNames.join(', ');
   }
@@ -781,17 +693,17 @@ this.updateStoreHint();
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id
-    }
-   this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-  this.Store = res;
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
 
-   const storeid = Number(sessionStorage.getItem('STOREID'));
-  // this.selectedStoreid = [storeid];
-  this.selectedStoreid = storeid ? [storeid] : [];
+      const storeid = Number(sessionStorage.getItem('STOREID'));
+      // this.selectedStoreid = [storeid];
+      this.selectedStoreid = storeid ? [storeid] : [];
 
-  this.updateStoreHint();
-});
+      this.updateStoreHint();
+    });
   }
 
   // POPUP shown → allow child to render
@@ -990,11 +902,10 @@ this.updateStoreHint();
     ProductionJvViewModule,
     MiscSalesInvoiceFormModule,
     AddInvoiceRetailModule,
-
   ],
   providers: [],
   declarations: [LedgerStatementComponent],
   exports: [LedgerStatementComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LedgerStatementModule { }
+export class LedgerStatementModule {}
