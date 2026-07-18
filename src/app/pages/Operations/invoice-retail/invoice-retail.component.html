@@ -35,6 +35,7 @@
       (onRowRemoving)="onDeleteInvoice($event)"
       (onCellPrepared)="onCellPrepared($event)"
       [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
     >
       <dxo-editing
         mode="popup"

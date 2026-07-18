@@ -253,7 +253,7 @@ export class LeavelistComponent {
     };
 
     this.dataService.LeaveListReport(payload).subscribe((res: any) => {
-      this.LeavelistReport = res.Data;
+      this.LeavelistReport = res;
     });
     }
   

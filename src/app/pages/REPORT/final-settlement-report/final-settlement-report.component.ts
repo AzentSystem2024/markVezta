@@ -40,6 +40,8 @@ import {
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
+import { formatDate } from '@angular/common';
+import notify from 'devextreme/ui/notify';
 
 
 @Component({
@@ -62,6 +64,7 @@ export class FinalSettlementReportComponent {
       vat_title: any;
     EmployeeDropdown: any;
     selectedEmployeeId: number;
+    headerCaption = 'Value';
     
       constructor(
         private dataService: DataService,
@@ -124,7 +127,7 @@ export class FinalSettlementReportComponent {
      EmployeeListDropDown() {
       const payload = {
         COMPANY_ID: this.selected_Company_id,
-        NAME: 'Employee',
+        NAME: 'LEFT_EMP',
       };
       this.dataService.getEmployeeDropDown(payload).subscribe((response: any) => {
         this.EmployeeDropdown = response;
@@ -134,6 +137,10 @@ export class FinalSettlementReportComponent {
     reportData: any[] = [];
 
       FinalSettlement_Report(){
+        if (!this.selectedEmployeeId) {
+    notify('Please select an employee.', 'warning', 2000);
+    return;
+  }
         const payload = {
         EmployeeId: this.selectedEmployeeId || 0,
       };
@@ -141,10 +148,15 @@ export class FinalSettlementReportComponent {
       this.dataService.FinalSettlementReport(payload).subscribe((res: any) => {
 
     const d = res;
+    this.headerCaption = `${d.EmployeeCode} - ${d.EmployeeName} - ${d.SettlementType}`;
 
     this.reportData = [
-  { Description: 'Date of Joining', Value: d.DateOfJoining },
-  { Description: 'Last Working Day', Value: d.LastWorkingDay },
+  { Description: 'Date of Joining', Value: d.DateOfJoining
+      ? formatDate(d.DateOfJoining, 'dd-MM-yyyy', 'en-US')
+      : '' },
+  { Description: 'Last Working Day', Value: d.LastWorkingDay
+      ? formatDate(d.LastWorkingDay, 'dd-MM-yyyy', 'en-US')
+      : '' },
   { Description: 'Basic Salary (Dirhams)', Value: d.BasicSalary },
   { Description: 'Allowance', Value: d.Allowance },
   { Description: 'Unpaid Leave Days', Value: d.UnPaidLeaveDays },
@@ -173,138 +185,13 @@ this.reportData.push({
   });
       }
     
-      onViewClick(e: any) {
-        console.log(e);
-        const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
-    
-        const trans_id = e.row.data.TRANS_ID;
-        this.loadingInvoice = true;
-        this.popupReady = false;
-      }
-  
       // POPUP shown → allow child to render
       onPopupShown() {
         this.popupReady = true;
         this.cdr.detectChanges();
       }
   
-      summaryColumnsData = {
-      
-      totalItems: [
-        {
-          column: 'BasicPay',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'BasicPay',
-          alignment: 'right',
-        },
-        {
-          column: 'Allowance',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'Allowance',
-          alignment: 'right',
-        },
-        {
-          column: 'TotalDue',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'TotalDue',
-          alignment: 'right',
-        },
-        {
-          column: 'Overtime',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'Overtime',
-          alignment: 'right',
-        },
-        {
-          column: 'Advance',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'Advance',
-          alignment: 'right',
-        },
-        {
-          column: 'Deductions',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'Deductions',
-          alignment: 'right',
-        },
-        {
-          column: 'NetPayable',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'NetPayable',
-          alignment: 'right',
-        },
-      ],
-      groupItems: [
-        {
-          column: 'BasicPay',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'Allowance',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'TotalDue',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'Overtime',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'Advance',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'Deductions',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'NetPayable',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-      ],
-      calculateCustomSummary: (options) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed
-        }
-      },
-    };
+   
     
       onExporting(event: any) {
         const fileName = 'Final Settlement Report';
