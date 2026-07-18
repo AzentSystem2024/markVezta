@@ -40,6 +40,8 @@ import {
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
+import notify from 'devextreme/ui/notify';
+import DataSource from 'devextreme/data/data_source';
 
 
 @Component({
@@ -49,7 +51,7 @@ import { Router } from '@angular/router';
 })
 export class PayrollReportComponent {
 
-   PayrollReport: any[]=[];
+   PayrollReport: any;
     company_list: any[] = [];
     selectedCompanyId: any;
     company_id: any;
@@ -241,17 +243,43 @@ export class PayrollReportComponent {
     });
   }
 
-    Payroll_Report(){
+    Payroll_Report() {
       const payload = {
-      FromDate: this.selected_from_date,
-      ToDate :this.selected_To_date,
-      PaymentMode: this.selected_payment_mode || 0,
-      DepartmentId: this.select_department_id || 0,
-    };
-
-    this.dataService.PayrollReport(payload).subscribe((res: any) => {
-      this.PayrollReport = res.Data;
-    });
+        FromDate: this.selected_from_date,
+        ToDate: this.selected_To_date,
+        PaymentMode: this.selected_payment_mode || 0,
+        DepartmentId: this.select_department_id || 0,
+      };
+    
+      this.PayrollReport = new DataSource({
+        load: () =>
+          new Promise((resolve) => {
+            this.dataService.PayrollReport(payload).subscribe({
+              next: (res: any) => {
+                const list = res.Data || [];
+    
+                this.PayrollReport = list;
+    
+                if (list.length === 0) {
+                  notify({
+                    message: 'No data available',
+                    type: 'warning',
+                    displayTime: 2000,
+                    position: {
+                      at: 'top center',
+                      my: 'top center',
+                    },
+                  });
+                }
+                resolve(list);
+              },
+              error: () => {
+                this.PayrollReport = [];
+                resolve([]);
+              },
+            });
+          }),
+      });
     }
   
     onViewClick(e: any) {

@@ -157,15 +157,30 @@ export class FinalSettlementReportComponent {
   { Description: 'Last Working Day', Value: d.LastWorkingDay
       ? formatDate(d.LastWorkingDay, 'dd-MM-yyyy', 'en-US')
       : '' },
-  { Description: 'Basic Salary (Dirhams)', Value: d.BasicSalary },
-  { Description: 'Allowance', Value: d.Allowance },
+  { Description: 'Basic Salary (Dirhams)', Value: Number(d.BasicSalary).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }), },
+  { Description: 'Allowance', Value: Number(d.Allowance).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }),},
   { Description: 'Unpaid Leave Days', Value: d.UnPaidLeaveDays },
   { Description: 'Total Service Days', Value: d.TotalServiceDays },
-  { Description: 'Indemnity Entitled Days for First Five Years', Value: d.IndemnityFirstFiveYears },
-  { Description: 'Indemnity Entitled Days After Five Years', Value: d.IndemnityAfterFiveYears },
+  { Description: 'Indemnity Entitled Days for First Five Years',Value: Number(d.IndemnityFirstFiveYears).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }),  },
+  { Description: 'Indemnity Entitled Days After Five Years', Value: Number(d.IndemnityAfterFiveYears).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }),  },
   { Description: 'Total Indemnity Entitlement', Value: d.TotalIndemnityDays },
   { Description: 'Entitled Leave Days', Value: d.EntitledLeaveDays },
-  { Description: 'Payment for Indemnity', Value: d.IndemnityAmount },
+  { Description: 'Payment for Indemnity',Value: Number(d.IndemnityAmount).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }), },
   { Description: 'Leave Salary', Value: d.LeaveSalary }
 ];
 
@@ -173,7 +188,10 @@ export class FinalSettlementReportComponent {
 d.SalaryComponents.forEach((item: any) => {
   this.reportData.push({
     Description: `${item.HeadName} in ${item.SalaryMonth}`,
-    Value: item.Amount
+    Value: Number(item.Amount || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
   });
 });
 

@@ -171,20 +171,23 @@
       <dxi-column
         dataField="LeaveCode"
         caption="Leave Code"
+        width="150"
       ></dxi-column>
       <dxi-column
         dataField="ApplicationNo"
         caption="Application No"
+        width="150"
       ></dxi-column>
-      <dxi-column dataField="EmployeeCode" caption="Emp Code"></dxi-column>
-      <dxi-column dataField="EmployeeName" caption="Emp Name"></dxi-column>
-      <dxi-column dataField="DepartmentCode" caption="Dept Code"></dxi-column>
-      <dxi-column dataField="LeaveBalance" caption="Leave Balance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
+      <dxi-column dataField="EmployeeCode" caption="Emp Code" width="120"></dxi-column>
+      <dxi-column dataField="EmployeeName" caption="Emp Name" width="200"></dxi-column>
+      <dxi-column dataField="DepartmentCode" caption="Dept Code" width="150"></dxi-column>
+      <dxi-column dataField="LeaveBalance" caption="Leave Balance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }" width="150"></dxi-column>
       <dxi-column
         dataField="LeaveStartDate"
         caption="Leave Start Date"
        dataType="date"
        format="dd-MM-yyyy"
+       width="150"
       >
       </dxi-column>
 
@@ -193,6 +196,7 @@
           dataType="date"
         caption="Leave End Date"
          format="dd-MM-yyyy"
+         width="150"
       >
       </dxi-column>
 
@@ -200,6 +204,7 @@
         dataField="ApprovedDays"
         caption="Approved Days"
         alignment="right"
+        width="150"
       >
       </dxi-column>
 
@@ -208,6 +213,7 @@
         caption="Approved Status"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+        width="150"
       >
       </dxi-column>
 
@@ -216,6 +222,7 @@
         caption="Resumed Date"
         dataType="date"
          format="dd-MM-yyyy"
+         width="150"
       >
       </dxi-column>
 
