@@ -84,7 +84,13 @@
                           icon="chevronleft"
                           (onClick)="goToPreviousMonth()"
                         ></dx-button>
-                        <span class="month-label" (click)="!isEditing && toggleCalendar()" [ngStyle]="{'cursor': isEditing ? 'default' : 'pointer'}">
+                        <span
+                          class="month-label"
+                          (click)="!isEditing && toggleCalendar()"
+                          [ngStyle]="{
+                            cursor: isEditing ? 'default' : 'pointer',
+                          }"
+                        >
                           {{ selectedMonth | date: "MMMM yyyy" }}
                         </span>
                         <dx-button

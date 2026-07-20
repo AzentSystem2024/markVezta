@@ -40,6 +40,8 @@ import {
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-payroll-ot-report',
@@ -48,7 +50,7 @@ import { Router } from '@angular/router';
 })
 export class PayrollOtReportComponent {
 
-  PayrollReport: any[]=[];
+  PayrollReport: any;
     company_list: any[] = [];
     selectedCompanyId: any;
     company_id: any;
@@ -240,18 +242,44 @@ export class PayrollOtReportComponent {
     });
   }
 
-    Payroll_Report(){
-       const payload = {
-      FromDate: this.selected_from_date,
-      ToDate :this.selected_To_date,
-      PaymentMode: this.selected_payment_mode || 0,
-      DepartmentId: this.select_department_id || 0,
-    };
+Payroll_Report() {
+  const payload = {
+    FromDate: this.selected_from_date,
+    ToDate: this.selected_To_date,
+    PaymentMode: this.selected_payment_mode || 0,
+    DepartmentId: this.select_department_id || 0,
+  };
 
-    this.dataService.PayrollOTReport(payload).subscribe((res: any) => {
-      this.PayrollReport = res.Data;
-    });
-    }
+  this.PayrollReport = new DataSource({
+    load: () =>
+      new Promise((resolve) => {
+        this.dataService.PayrollOTReport(payload).subscribe({
+          next: (res: any) => {
+            const list = res.Data || [];
+
+            this.PayrollReport = list;
+
+            if (list.length === 0) {
+              notify({
+                message: 'No data available',
+                type: 'warning',
+                displayTime: 2000,
+                position: {
+                  at: 'top center',
+                  my: 'top center',
+                },
+              });
+            }
+            resolve(list);
+          },
+          error: () => {
+            this.PayrollReport = [];
+            resolve([]);
+          },
+        });
+      }),
+  });
+}
   
     onViewClick(e: any) {
       console.log(e);

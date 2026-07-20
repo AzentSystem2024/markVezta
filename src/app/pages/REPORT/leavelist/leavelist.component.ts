@@ -40,6 +40,8 @@ import {
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
 
 
 @Component({
@@ -49,7 +51,7 @@ import { Router } from '@angular/router';
 })
 export class LeavelistComponent {
 
-  LeavelistReport: any[]=[];
+  LeavelistReport: any;
     company_list: any[] = [];
     selectedCompanyId: any;
     company_id: any;
@@ -252,9 +254,35 @@ export class LeavelistComponent {
       DepartmentId: this.select_department_id || 0,
     };
 
-    this.dataService.LeaveListReport(payload).subscribe((res: any) => {
-      this.LeavelistReport = res;
-    });
+        this.LeavelistReport = new DataSource({
+            load: () =>
+              new Promise((resolve) => {
+                this.dataService.LeaveListReport(payload).subscribe({
+                  next: (res: any) => {
+                    const list = res.Data || [];
+        
+                    this.LeavelistReport = list;
+        
+                    if (list.length === 0) {
+                      notify({
+                        message: 'No data available',
+                        type: 'warning',
+                        displayTime: 2000,
+                        position: {
+                          at: 'top center',
+                          my: 'top center',
+                        },
+                      });
+                    }
+                    resolve(list);
+                  },
+                  error: () => {
+                    this.LeavelistReport = [];
+                    resolve([]);
+                  },
+                });
+              }),
+          });
     }
   
     onViewClick(e: any) {

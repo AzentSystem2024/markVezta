@@ -48,6 +48,7 @@ export class EmployeeSalarySettingsComponent {
 
   @ViewChild(DxDataGridComponent, { static: true })
   EmployeeSalarySettingsDatasource: any[] = [];
+  
   displayMode: any = 'full';
   showPageSizeSelector = true;
   addEmployeePopupOpened: boolean = false;
@@ -271,7 +272,7 @@ export class EmployeeSalarySettingsComponent {
     this.addEmployeePopupOpened = false;
     this.getEmployeeSalarySettingsList();
     if (this.EmployeeSalarySettingsAddComponent) {
-      this.EmployeeSalarySettingsAddComponent.resetForm();
+      this.EmployeeSalarySettingsAddComponent?.resetForm();
     }
 
     this.salarySettings?.resetForm();

@@ -7048,7 +7048,7 @@ The result can be exported to HTML or Markdown.`;
 
   //=================PROFIT & LOSS DIMENSION===================
   Profit_Loss_Dimension_Api(payload: any) {
-    const getEndpoint = this.apiUrl + 'AC_Report/profitlossdimension';
+    const getEndpoint = this.apiUrl + 'AC_Report/profitloss';
     return this.http.post(getEndpoint, payload);
   }
 

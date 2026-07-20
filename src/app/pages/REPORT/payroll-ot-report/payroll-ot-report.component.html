@@ -26,6 +26,7 @@
       }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
       <!-- (onEditingStart)="onEditLedger($event)" -->
       <!-- <dxo-editing
@@ -170,26 +171,30 @@
       <dxi-column
         dataField="SalaryMonth"
         caption="Salary Month"
+        width="150"
       ></dxi-column>
       <dxi-column
         dataField="TRANS_TYPE_NAME"
         caption="Emp No"
+         width="120"
       ></dxi-column>
-      <dxi-column dataField="Name" caption="Name"></dxi-column>
-      <dxi-column dataField="Designation" caption="Designation"></dxi-column>
-      <dxi-column dataField="BasicPay" caption="BasicPay"  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
-      <dxi-column dataField="Allowance" caption="Allowance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"></dxi-column>
+      <dxi-column dataField="Name" caption="Name"  width="190"></dxi-column>
+      <dxi-column dataField="Designation" caption="Designation"  width="150"></dxi-column>
+      <dxi-column dataField="BasicPay" caption="BasicPay"  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"  width="150"></dxi-column>
+      <dxi-column dataField="Allowance" caption="Allowance" [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"  width="150"></dxi-column>
       <dxi-column
         dataField="Salary"
         caption="Salary"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+         width="150"
       >
       </dxi-column>
 
       <dxi-column
         dataField="NormalOT"
         caption="Normal OT"
+         width="150"
         alignment="right"
       >
       </dxi-column>
@@ -198,6 +203,7 @@
         dataField="HolidayOT"
         caption="Holiday OT"
         alignment="right"
+         width="150"
       >
       </dxi-column>
 
@@ -206,6 +212,7 @@
         caption="Normal OT Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+         width="150"
       >
       </dxi-column>
 
@@ -214,6 +221,7 @@
         caption="Holiday OT Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+         width="150"
       >
       </dxi-column>
 
@@ -221,6 +229,7 @@
         dataField="TotalOT"
         caption="Total OT"
         alignment="right"
+         width="150"
       >
       </dxi-column>
 
@@ -229,6 +238,7 @@
         caption="Total OT Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
+         width="150"
       >
       </dxi-column>
 
