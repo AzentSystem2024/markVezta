@@ -41,7 +41,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./advance.component.scss'],
 })
 export class AdvanceComponent {
-  // ==========================================
   // 1. VIEW CHILDS
   // ==========================================
   @ViewChild('formValidationGroup', { static: false })
@@ -53,7 +52,6 @@ export class AdvanceComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
 
-  // ==========================================
   // 2. STATE & TOGGLES
   // ==========================================
   isLoading: boolean = true;
@@ -67,7 +65,6 @@ export class AdvanceComponent {
   isFormSubmitted: boolean = false;
   approveValue: boolean = false;
 
-  // ==========================================
   // 3. PERMISSIONS
   // ==========================================
   canAdd: boolean = false;
@@ -78,7 +75,6 @@ export class AdvanceComponent {
   canVerify: boolean = false;
   canPrint: boolean = false;
 
-  // ==========================================
   // 4. GLOBAL & SESSION INFO
   // ==========================================
   selected_Company_id: any;
@@ -86,7 +82,6 @@ export class AdvanceComponent {
   companyId: any;
   docNo: any;
 
-  // ==========================================
   // 5. GRID SETTINGS & DATA
   // ==========================================
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -116,7 +111,6 @@ export class AdvanceComponent {
     { text: 'Verified', value: 'Verified' },
   ];
 
-  // ==========================================
   // 6. FORM & DROPDOWN VARIABLES
   // ==========================================
   formSource!: FormGroup;
@@ -155,7 +149,6 @@ export class AdvanceComponent {
   selected_Cheque_Date: any;
   Recovery_Date: any;
 
-  // ==========================================
   // 7. GRID ACTION BUTTON CONFIGURATIONS
   // ==========================================
   addButtonOptions = {
@@ -236,10 +229,9 @@ export class AdvanceComponent {
           (e.row.data.STATUS === 'Verified' && !this.canApprove)),
     },
   ];
-  
+
   Advance_types_ID: any;
 
-  // ==========================================
   // 8. CONSTRUCTOR & LIFECYCLE HOOKS
   // ==========================================
   constructor(
@@ -298,7 +290,6 @@ export class AdvanceComponent {
     this.get_advance_list();
   }
 
-  // ==========================================
   // 9. DATA FETCHING METHODS
   // ==========================================
   sesstion_Details() {
@@ -454,7 +445,6 @@ export class AdvanceComponent {
     });
   }
 
-  // ==========================================
   // 10. EVENT HANDLERS & ACTIONS
   // ==========================================
   refreshGrid() {
@@ -546,7 +536,6 @@ export class AdvanceComponent {
     }
   }
 
-  // ==========================================
   // 11. GRID FORMATTING & HELPERS
   // ==========================================
   parseApiDate(dateStr: string): Date | null {
@@ -598,7 +587,6 @@ export class AdvanceComponent {
     }
   }
 
-  // ==========================================
   // 12. CALCULATIONS
   // ==========================================
   setupInstallmentCalculation() {
@@ -641,7 +629,7 @@ export class AdvanceComponent {
     }
   }
 
-  // ==========================================
+ 
   // 13. POPUP MODALS
   // ==========================================
   add_pop() {
@@ -715,7 +703,7 @@ export class AdvanceComponent {
     this.loadAdvanceDetails(e.row.data.TRANS_ID);
   };
 
-  // ==========================================
+
   // 14. CRUD OPERATIONS
   // ==========================================
   Add_Advace() {
@@ -916,7 +904,7 @@ export class AdvanceComponent {
   }
 }
 
-// ==========================================
+
 // MODULE DEFINITION
 // ==========================================
 @NgModule({
