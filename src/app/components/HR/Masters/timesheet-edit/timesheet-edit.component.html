@@ -127,7 +127,23 @@
         box-sizing: border-box;
       "
     >
-      <p style="margin: 0 0 10px"><strong>Timesheet Details</strong></p>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        "
+      >
+        <p style="margin: 0"><strong>Timesheet Details</strong></p>
+        <dx-button
+          text=""
+          icon="plus"
+          type="default"
+          (onClick)="addNewRow()"
+          *ngIf="!is_approve"
+        ></dx-button>
+      </div>
       <div class="grid-container">
         <dx-data-grid
           #dataGrid
@@ -146,7 +162,7 @@
           [columnAutoWidth]="true"
           [wordWrapEnabled]="false"
           [rowAlternationEnabled]="true"
-          [headerFilter]="{ visible: true }"
+          [headerFilter]="{ visible: false }"
           [allowColumnReordering]="true"
           [allowColumnResizing]="true"
           [columnResizingMode]="'nextColumn'"
@@ -158,6 +174,7 @@
           [editing]="{
             mode: 'cell',
             allowUpdating: !is_approve,
+            allowDeleting: !is_approve,
           }"
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
           (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
@@ -173,14 +190,14 @@
               </dxi-validation-rule>
             </dxo-lookup>
           </dxi-column>
-          <dxi-column dataField="DEPT_ID" caption="Department">
+          <!-- <dxi-column dataField="DEPT_ID" caption="Department">
             <dxo-lookup
               [dataSource]="Departments"
               displayExpr="DESCRIPTION"
               valueExpr="ID"
               [allowClearing]="false"
             ></dxo-lookup>
-          </dxi-column>
+          </dxi-column> -->
 
           <dxi-column dataField="DAYS" caption="Worked Days">
             <dxi-validation-rule
@@ -351,7 +368,7 @@
     text="Update"
     type="default"
     (onClick)="updateTimesheet()"
-    [visible]="!is_verify && !is_approved  && !isReadOnlyMode"
+    [visible]="!is_verify && !is_approved && !isReadOnlyMode"
   ></dx-button>
   <dx-button
     text="Approve"
@@ -359,10 +376,4 @@
     (onClick)="approveTimesheet()"
     [visible]="is_approved"
   ></dx-button>
-  <!-- <dx-button
-    text="Update"
-    type="default"
-    (onClick)="updateTimesheet()"
-    [visible]="!is_approve"
-  ></dx-button> -->
 </div>

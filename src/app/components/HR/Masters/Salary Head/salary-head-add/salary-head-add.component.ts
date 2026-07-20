@@ -1,12 +1,11 @@
-// import { Component } from '@angular/core';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
   NgModule,
-  NgZone,
   Output,
   ViewChild,
+  OnInit,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -25,7 +24,6 @@ import {
   DxPopupModule,
   DxDropDownBoxModule,
   DxToolbarModule,
-  DxDataGridComponent,
   DxValidationGroupModule,
   DxNumberBoxModule,
   DxValidationGroupComponent,
@@ -40,7 +38,6 @@ import {
 import { SelectionChangedEvent } from 'devextreme/ui/data_grid';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { DataService } from 'src/app/services';
-
 import notify from 'devextreme/ui/notify';
 
 @Component({
@@ -48,18 +45,16 @@ import notify from 'devextreme/ui/notify';
   templateUrl: './salary-head-add.component.html',
   styleUrls: ['./salary-head-add.component.scss'],
 })
-export class SalaryHeadAddComponent {
+export class SalaryHeadAddComponent implements OnInit {
   @Output() formClosed = new EventEmitter<void>();
 
   @ViewChild('SalaryHeadValidation', { static: false })
   SalaryHeadValidation: DxValidationGroupComponent | undefined;
+
   selectedHeads: any;
   Ac_head_values: any;
-  affective_value: boolean = false;
   selectedNatureId: any;
   isEnabled = true;
-  HeadType_value: any;
-  isDisableNumberbox: boolean = false;
   ApplicableWorkingDay: boolean = false;
   selecteNatureTypeTwo: boolean = false;
   selecteNatureTypeone: boolean = false;
@@ -67,6 +62,15 @@ export class SalaryHeadAddComponent {
   head_percent: boolean = false;
   head_From: boolean = false;
   head_To: boolean = false;
+  is_time_entry: boolean = false;
+  selectedPaytime = 1;
+  selectedPriority: any;
+  selectedType: any;
+  selectedRows: any;
+  salaryHeadList: any = [];
+  selected_Company_id: any;
+  payload: any;
+
   SalaryHeadData = {
     HEAD_NAME: '',
     PAYSLIP_TITLE: '',
@@ -87,73 +91,31 @@ export class SalaryHeadAddComponent {
     RANGE_TO: 0,
     IS_TIMESHEET_ENTRY: false,
   };
-  is_time_entry: boolean = false;
 
   priorities = [
     { id: 1, name: 'Gross' },
     { id: 2, name: 'Deduction' },
     { id: 3, name: 'Advance' },
   ];
+
   RequlerOrpaytime = [
     { name: 'Regular Salary', value: 1 },
     { name: 'Paytime Entry', value: 2 },
   ];
 
-  selectedPaytime = 1;
-  // selectedPriority  = this.priorities[0];
-  // // or set by id
-
-  selectedPriority = this.priorities.find((p) => p.id === 1);
   salaryHeadTypes = [{ label: 'Fixed Amount', value: 'fixed' }];
   salaryHeadTypes2 = [{ label: '', value: 'percentage' }];
   salaryHeadTypes3 = [{ label: 'Others', value: 'others' }];
 
-  //  , // Label not shown for second radio
-  //
-  // selectedType:any
-  selectedType: any;
-  selectedRows: any[] | undefined;
-  salaryHeadList: any = [];
-  payload: any = {
-    COMPANY_ID: null,
-    HEAD_NATURE: null,
-    HEAD_TYPE: null,
-    HEAD_NAME: '',
-    PAYSLIP_TITLE: '',
-    HEAD_ACTIVE: true,
-    INSTALLMENT_RECOVERY: false,
-    HEAD_PERCENT_INCLUDE_OT: true,
-    IS_INACTIVE: false,
-    AFFECT_LEAVE: false,
-    AC_HEAD_ID: 0,
-    HEAD_ORDER: 0,
-    FIXED_AMOUNT: 0,
-    HEAD_PERCENT: 0,
-    PERCENT_HEAD_ID: [] as any[],
-    RANGE_EXISTS: false,
-    RANGE_FROM: 0,
-    RANGE_TO: 0,
-    IS_TIMESHEET_ENTRY: false,
-  };
-  selected_Company_id: any;
-
-  constructor(private dataservice: DataService) { }
+  constructor(private dataservice: DataService) {}
 
   ngOnInit() {
-    // Default priority
     this.selectedPriority = this.priorities.find((p) => p.id === 1);
     this.selectedPaytime = 1;
-
-    this.HeadType_value = 1;
     this.isEnabled = true;
-
-    // Default radio selection
     this.selectedType = 'fixed';
 
-    // Apply UI enable/disable logic
     this.onTypeChange();
-
-    // Load dropdowns & lists
     this.get_headnameGrid();
     this.sesstion_Details();
     this.getSalaryHeadList();
@@ -163,32 +125,6 @@ export class SalaryHeadAddComponent {
     });
   }
 
-
-  //=============== head_name dropdown==========
-  get_headnameGrid() {
-    this.dataservice.Dropdown_advance_types(name).subscribe((res: any) => {
-      this.selectedHeads = res;
-    });
-  }
-
-  //===================grid value=====================
-  onSelectionChanged(event: SelectionChangedEvent) {
-    const selectedRowsData = event.selectedRowsData;
-
-    this.SalaryHeadData.PERCENT_HEAD_ID = selectedRowsData.map(
-      (row: any) => row.ID,
-    );
-  }
-  //================auto fill payslip title=====================
-  onHeadNameChanged(e: any) {
-    this.SalaryHeadData.HEAD_NAME = e.value;
-
-    // Auto-fill PAYSLIP_TITLE only if it's empty
-    if (!this.SalaryHeadData.PAYSLIP_TITLE) {
-      this.SalaryHeadData.PAYSLIP_TITLE = e.value;
-    }
-  }
-
   sesstion_Details() {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -196,7 +132,12 @@ export class SalaryHeadAddComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
-  //=======================list data=============
+  get_headnameGrid() {
+    this.dataservice.Dropdown_advance_types().subscribe((res: any) => {
+      this.selectedHeads = res;
+    });
+  }
+
   getSalaryHeadList() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -206,78 +147,69 @@ export class SalaryHeadAddComponent {
       this.setNextHeadOrder();
     });
   }
+
   setNextHeadOrder() {
-    // this.getSalaryHeadList()
     if (this.salaryHeadList && this.salaryHeadList.length > 0) {
       const maxOrder = Math.max(
         ...this.salaryHeadList.map((item: any) => item.HEAD_ORDER || 0),
       );
       this.SalaryHeadData.HEAD_ORDER = maxOrder + 1;
     } else {
-      this.SalaryHeadData.HEAD_ORDER = 1; // Default if list is empty
+      this.SalaryHeadData.HEAD_ORDER = 1;
     }
   }
 
+  onSelectionChanged(event: SelectionChangedEvent) {
+    const selectedRowsData = event.selectedRowsData;
+    this.SalaryHeadData.PERCENT_HEAD_ID = selectedRowsData.map(
+      (row: any) => row.ID,
+    );
+  }
 
+  onHeadNameChanged(e: any) {
+    this.SalaryHeadData.HEAD_NAME = e.value;
+    if (!this.SalaryHeadData.PAYSLIP_TITLE) {
+      this.SalaryHeadData.PAYSLIP_TITLE = e.value;
+    }
+  }
 
   onPriorityChanged(e: any) {
     this.selectedPriority = e.value;
-    this.HeadType_value = e.value.id || 1;
+    const priorityId = this.selectedPriority?.id || this.selectedPriority;
 
-    this.isEnabled = this.HeadType_value === 1 || this.HeadType_value === 2;
+    this.isEnabled = priorityId === 1 || priorityId === 2;
 
-    if (this.HeadType_value == 3) {
-      this.SalaryHeadData.FIXED_AMOUNT = 0
+    if (priorityId === 3) {
+      this.SalaryHeadData.FIXED_AMOUNT = 0;
       this.SalaryHeadData.RANGE_EXISTS = false;
       this.SalaryHeadData.RANGE_TO = 0;
       this.SalaryHeadData.RANGE_FROM = 0;
-      this.SalaryHeadData.AFFECT_LEAVE = false
-      this.selectedRows = []
-      this.SalaryHeadData.HEAD_PERCENT = 0
-      const defaultNumericValue = 3;
-
-      const defaultTypeMap: { [key: number]: string } = {
-        1: 'fixed',
-        2: 'percentage',
-        3: 'others',
-      };
-      // Set selectedType based on numeric default
-      this.selectedType = defaultTypeMap[defaultNumericValue];
-    } else if (this.HeadType_value == 1 || this.HeadType_value == 2) {
+      this.SalaryHeadData.AFFECT_LEAVE = false;
+      this.selectedRows = [];
+      this.SalaryHeadData.HEAD_PERCENT = 0;
+      
+      this.selectedType = 'others';
+    } else if (priorityId === 1 || priorityId === 2) {
       this.SalaryHeadData.INSTALLMENT_RECOVERY = false;
-
     }
   }
 
-
-  //===================used in list when the popup open reas form set deaful values=========
   setDefaultValues() {
-    const defaultNumericValue = 1;
-    const defaultTypeMap: { [key: number]: string } = {
-      1: 'fixed',
-      2: 'percentage',
-      3: 'others',
-    };
-
-    // Set selectedType based on numeric default
-    this.selectedType = defaultTypeMap[defaultNumericValue];
-    if (this.selectedType == 'fixed') {
-      this.selecteNatureTypeTwo = true;
-      this.head_percent = true;
-      this.head_From = true;
-      this.head_To = true;
-      this.ApplicableWithBasicRange = true;
-    }
-    this.selectedPriority = this.priorities.find((p) => p.id === 1); // Allowance
+    this.selectedType = 'fixed';
+    this.selecteNatureTypeTwo = true;
+    this.head_percent = true;
+    this.head_From = true;
+    this.head_To = true;
+    this.ApplicableWithBasicRange = true;
+    this.selectedPriority = this.priorities.find((p) => p.id === 1);
     this.selectedPaytime = 1;
     this.SalaryHeadData.HEAD_TYPE = 1;
-    this.HeadType_value = 1;
     this.isEnabled = true;
   }
 
-
   validateAcLedger = (e: any): boolean => {
-    if (this.HeadType_value === 3) {
+    const priorityId = this.selectedPriority?.id || this.selectedPriority;
+    if (priorityId === 3) {
       return e.value !== null && e.value !== undefined && e.value !== '';
     }
     return true;
@@ -302,7 +234,7 @@ export class SalaryHeadAddComponent {
       this.SalaryHeadData.RANGE_EXISTS = false;
       this.SalaryHeadData.RANGE_TO = 0;
       this.SalaryHeadData.RANGE_FROM = 0;
-      this.selectedRows = []
+      this.selectedRows = [];
     } else if (this.selectedNatureId === 2) {
       this.selecteNatureTypeTwo = true;
       this.head_percent = false;
@@ -311,8 +243,8 @@ export class SalaryHeadAddComponent {
       this.ApplicableWorkingDay = true;
       this.selecteNatureTypeone = true;
       this.ApplicableWithBasicRange = false;
-      this.SalaryHeadData.FIXED_AMOUNT = 0
-      this.SalaryHeadData.AFFECT_LEAVE = false
+      this.SalaryHeadData.FIXED_AMOUNT = 0;
+      this.SalaryHeadData.AFFECT_LEAVE = false;
     } else if (this.selectedNatureId === 3) {
       this.head_percent = true;
       this.head_From = true;
@@ -321,13 +253,12 @@ export class SalaryHeadAddComponent {
       this.ApplicableWorkingDay = true;
       this.selecteNatureTypeone = true;
       this.selecteNatureTypeTwo = true;
-      this.SalaryHeadData.FIXED_AMOUNT = 0
+      this.SalaryHeadData.FIXED_AMOUNT = 0;
       this.SalaryHeadData.RANGE_EXISTS = false;
       this.SalaryHeadData.RANGE_TO = 0;
       this.SalaryHeadData.RANGE_FROM = 0;
-      this.SalaryHeadData.AFFECT_LEAVE = false
-      this.selectedRows = []
-
+      this.SalaryHeadData.AFFECT_LEAVE = false;
+      this.selectedRows = [];
     }
   }
 
@@ -335,7 +266,6 @@ export class SalaryHeadAddComponent {
     return this.SalaryHeadValidation?.instance.validate().isValid;
   }
 
-  //=============save salary head data========================
   saveSalaryHeadData() {
     if (!this.isValid()) return;
     if (this.SalaryHeadData.HEAD_NAME) {
@@ -383,28 +313,19 @@ export class SalaryHeadAddComponent {
         return;
       }
 
+      this.payload = {
+        ...this.SalaryHeadData,
+        COMPANY_ID: this.selected_Company_id,
+        HEAD_NATURE: this.selectedNatureId,
+        HEAD_TYPE: priorityId || 1,
+        IS_TIMESHEET_ENTRY: this.is_time_entry,
+      };
+
       if (this.SalaryHeadData.HEAD_NATURE === 3) {
-        this.payload = {
-          ...this.SalaryHeadData,
-          COMPANY_ID: this.selected_Company_id,
-          HEAD_NATURE: this.selectedNatureId,
-          FIXED_AMOUNT: 0,
-          HEAD_TYPE: this.HeadType_value || 1,
-          IS_TIMESHEET_ENTRY: this.is_time_entry,
-        };
-      } else {
-        this.payload = {
-          ...this.SalaryHeadData,
-          COMPANY_ID: this.selected_Company_id,
-          HEAD_NATURE: this.selectedNatureId,
-          HEAD_TYPE: this.HeadType_value || 1,
-          IS_TIMESHEET_ENTRY: this.is_time_entry,
-        };
+        this.payload.FIXED_AMOUNT = 0;
       }
 
-      const data = this.payload;
-
-      this.dataservice.Add_salary_Head_api(data).subscribe((res: any) => {
+      this.dataservice.Add_salary_Head_api(this.payload).subscribe((res: any) => {
         this.getSalaryHeadList();
         notify(
           {
@@ -420,7 +341,6 @@ export class SalaryHeadAddComponent {
         });
         this.selectedRows = [];
         this.selectedNatureId = null;
-        this.selectedPriority;
         this.resetForm();
       });
     }
@@ -448,12 +368,9 @@ export class SalaryHeadAddComponent {
       IS_TIMESHEET_ENTRY: false,
     };
 
-    // Reset to default priority (Allowance)
     this.selectedPriority = this.priorities.find((p) => p.id === 1);
-    // this.HeadType_value = 1; // Reset HeadType_value as well
     this.isEnabled = true;
 
-    // Reset other UI flags
     this.selecteNatureTypeTwo = false;
     this.head_percent = false;
     this.head_From = false;
@@ -462,21 +379,13 @@ export class SalaryHeadAddComponent {
     this.ApplicableWorkingDay = false;
     this.selecteNatureTypeone = false;
 
-    // Reset validation and selections
     setTimeout(() => {
       this.SalaryHeadValidation?.instance?.reset();
     });
     this.selectedRows = [];
     this.selectedNatureId = null;
-    this.selectedType = null; // Reset the selected type as well
-
-    this.selectedPriority = this.priorities.find((p) => p.id === 1); // Reset to Allowance
-    this.HeadType_value = 1;
+    this.selectedType = null;
   }
-
-
-  //=====cancel==============================
-  //
 
   cancel() {
     this.formClosed.emit();
@@ -486,9 +395,8 @@ export class SalaryHeadAddComponent {
     });
     this.selectedRows = [];
   }
-  onRequlerOrpaytimeChanged(e: any) {
-    console.log(e.value); // true or false
 
+  onRequlerOrpaytimeChanged(e: any) {
     this.is_time_entry = e.value === 2;
   }
 }
@@ -514,13 +422,10 @@ export class SalaryHeadAddComponent {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
-    DxoItemModule,
     DxNumberBoxModule,
     DxiGroupModule,
-    DxValidatorModule,
     DxValidationGroupModule,
   ],
   providers: [],
@@ -528,4 +433,4 @@ export class SalaryHeadAddComponent {
   exports: [SalaryHeadAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalaryHeadAddModule { }
+export class SalaryHeadAddModule {}

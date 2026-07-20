@@ -102,14 +102,7 @@
           style="flex: 1 1 30%"
           [readOnly]="true"
         ></dx-date-box>
-        <!-- <dx-text-box
-          [(value)]="timesheetFormData.LEAVE_TO"
-          label="To"
-          [labelMode]="'floating'"
-          type="date"
-          placeholder="Select Upto Date"
-          style="flex: 1 1 30%"
-        ></dx-text-box> -->
+
         <dx-number-box
           [(value)]="timesheetFormData.DAYS"
           label="Total Days Worked"
@@ -136,7 +129,22 @@
         box-sizing: border-box;
       "
     >
-      <p style="margin: 0 0 10px"><strong>Timesheet Details</strong></p>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        "
+      >
+        <p style="margin: 0"><strong>Timesheet Details</strong></p>
+        <dx-button
+          text=""
+          icon="plus"
+          type="default"
+          (onClick)="addNewRow()"
+        ></dx-button>
+      </div>
       <div class="grid-container">
         <dx-data-grid
           #dataGrid
@@ -155,7 +163,7 @@
           [columnAutoWidth]="true"
           [wordWrapEnabled]="false"
           [rowAlternationEnabled]="true"
-          [headerFilter]="{ visible: true }"
+          [headerFilter]="{ visible: false }"
           [allowColumnReordering]="true"
           [allowColumnResizing]="true"
           [columnResizingMode]="'nextColumn'"
@@ -163,7 +171,7 @@
           rowAlternationInterval="2"
           [selection]="{ mode: 'single' }"
           focusStateEnabled="false"
-          [editing]="{ mode: 'cell', allowUpdating: true }"
+          [editing]="{ mode: 'cell', allowUpdating: true, allowDeleting: true }"
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
           (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
         >
@@ -178,14 +186,14 @@
               </dxi-validation-rule>
             </dxo-lookup>
           </dxi-column>
-          <dxi-column dataField="DEPT_ID" caption="Department">
+          <!-- <dxi-column dataField="DEPT_ID" caption="Department">
             <dxo-lookup
               [dataSource]="Departments"
               displayExpr="DESCRIPTION"
               valueExpr="ID"
               [allowClearing]="false"
             ></dxo-lookup>
-          </dxi-column>
+          </dxi-column> -->
 
           <dxi-column dataField="DAYS" caption="Worked Days">
             <dxi-validation-rule

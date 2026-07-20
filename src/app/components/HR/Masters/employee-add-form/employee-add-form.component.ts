@@ -156,8 +156,8 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   selected_Company_id: any;
   SubDepartmentDataSource: any = null;
   mobile_limit: any;
-  countryCodes: any = []
-  countryCode: any
+  countryCodes: any = [];
+  countryCode: any;
   CountryId: any;
 
   constructor(public dataservice: DataService) {
@@ -171,7 +171,6 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     dataservice.getCountryWithFlags().subscribe((data) => {
       this.countries = data;
       this.countryCodes = data;
-
     });
     const dept_payload = {
       NAME: 'DEPT',
@@ -362,10 +361,14 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   onDepartmentChange(e: any) {
-    const selectedDept = this.departments.find((dept: any) => dept.ID === e.value);
+    const selectedDept = this.departments.find(
+      (dept: any) => dept.ID === e.value,
+    );
     this.employeeFormData.DEPT_NAME = selectedDept
       ? selectedDept.DESCRIPTION
       : '';
+    this.employeeFormData.SUB_DEPT_ID = null;
+    this.SubDepartmentDataSource = [];
     this.dataservice
       .get_Sub_Dept_DropdownData(e.value)
       .subscribe((res: any) => {
@@ -514,7 +517,10 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     } else {
       // 5️ Fallback if no country found
       this.countryCode = '';
-      console.warn(' No matching country found for ID:', this.employeeFormData.COUNTRY_ID);
+      console.warn(
+        ' No matching country found for ID:',
+        this.employeeFormData.COUNTRY_ID,
+      );
     }
   }
 }
@@ -556,4 +562,4 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   exports: [EmployeeAddFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeAddFormModule { }
+export class EmployeeAddFormModule {}

@@ -366,7 +366,8 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     this.employeeFormData.DEPT_NAME = selectedDept
       ? selectedDept.DESCRIPTION
       : '';
-
+    this.employeeFormData.SUB_DEPT_ID = null;
+    this.SubDepartmentDataSource = [];
     if (e.value) {
       this.dataservice
         .get_Sub_Dept_DropdownData(e.value)
