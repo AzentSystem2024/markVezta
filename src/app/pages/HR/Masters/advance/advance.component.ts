@@ -763,20 +763,20 @@ export class AdvanceComponent {
           ? 2
           : this.selected_pay_type_id;
 
-    const validationResult = this.editValidationGroup.instance.validate();
+    // const validationResult = this.editValidationGroup.instance.validate();
 
-    if (!validationResult.isValid) {
-      notify(
-        {
-          message: 'Please fill all the required fields.',
-          position: { at: 'top right', my: 'top right' },
-          displayTime: 500,
-        },
-        'error',
-      );
-      this.isEditPopUp = true;
-      return;
-    }
+    // if (!validationResult.isValid) {
+    //   notify(
+    //     {
+    //       message: 'Please fill all the required fields.',
+    //       position: { at: 'top right', my: 'top right' },
+    //       displayTime: 500,
+    //     },
+    //     'error',
+    //   );
+    //   this.isEditPopUp = true;
+    //   return;
+    // }
 
     if (this.buttonText === 'Update') {
       this.dataService
