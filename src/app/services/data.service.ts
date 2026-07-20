@@ -1108,7 +1108,7 @@ export class DataService {
     return this.http.post(`${this.apiUrl}Delivery_Note/Save`, data);
   }
 
-    saveDeliveryNoteFin(items: any) {
+  saveDeliveryNoteFin(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/Insert`, data);
   }
@@ -1123,11 +1123,11 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/Edit`, data);
   }
-    updateDeliveryNoteFin(items: any) {
+  updateDeliveryNoteFin(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/Update`, data);
   }
-   verifyDeliveryNoteFin(items: any) {
+  verifyDeliveryNoteFin(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/DNVerify`, data);
   }
@@ -1135,7 +1135,7 @@ export class DataService {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/Commit`, data);
   }
-   approveDeliveryNoteFin(items: any) {
+  approveDeliveryNoteFin(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}Delivery_Note/approve`, data);
   }
@@ -7142,8 +7142,7 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
-
-    //==================AR Manual Matching=======================
+  //==================AR Manual Matching=======================
   getARManualMatchingReceiptList(payload: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}ARManualMatching/receiptlist`,
@@ -7191,14 +7190,14 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}Dashboard/getdashboard`, payload);
   }
 
-    //-----------------------sales summary report-------------------------
-PurchaseReport(payload: any) {
+  //-----------------------sales summary report-------------------------
+  PurchaseReport(payload: any) {
     const getEndpoint = this.apiUrl + 'PurchaseReport/PurchaseSummary';
     return this.http.post(getEndpoint, payload);
   }
 
-      //-----------------------sales summary report-------------------------
- ItemwisePurchaseReport(payload: any) {
+  //-----------------------sales summary report-------------------------
+  ItemwisePurchaseReport(payload: any) {
     const getEndpoint = this.apiUrl + 'PurchaseReport/itemwisepurchase';
     return this.http.post(getEndpoint, payload);
   }
@@ -7213,17 +7212,17 @@ PurchaseReport(payload: any) {
     return this.http.post(getEndpoint, payload);
   }
 
-   PayrollOTReport(payload: any) {
+  PayrollOTReport(payload: any) {
     const getEndpoint = this.apiUrl + 'Payroll/GetPayrollOT';
     return this.http.post(getEndpoint, payload);
   }
 
-   LeaveListReport(payload: any) {
+  LeaveListReport(payload: any) {
     const getEndpoint = this.apiUrl + 'LeaveType/LeaveApplicationList';
     return this.http.post(getEndpoint, payload);
   }
 
-   FinalSettlementReport(payload: any) {
+  FinalSettlementReport(payload: any) {
     const getEndpoint = this.apiUrl + 'FinalSettlement/Settlement';
     return this.http.post(getEndpoint, payload);
   }
