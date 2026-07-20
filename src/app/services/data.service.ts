@@ -4914,6 +4914,7 @@ The result can be exported to HTML or Markdown.`;
       CHEQUE_NO: cheque_no,
       CHEQUE_DATE: cheque_date,
       PAY_TYPE_ID: pay_Type_id,
+      COMPANY_ID: this.selected_Company_id,
     };
     return this.http.post(`${this.apiUrl}Advance/update`, reqBody);
   }
@@ -4954,6 +4955,7 @@ The result can be exported to HTML or Markdown.`;
       PAY_HEAD_ID: pay_head_id,
       CHEQUE_NO: cheque_no,
       CHEQUE_DATE: cheque_date,
+      COMPANY_ID: this.selected_Company_id,
       PAY_TYPE_ID: pay_Type_id,
     };
     return this.http.post(`${this.apiUrl}Advance/verify`, reqBody);
@@ -4996,6 +4998,7 @@ The result can be exported to HTML or Markdown.`;
       CHEQUE_NO: cheque_no,
       CHEQUE_DATE: cheque_date,
       PAY_TYPE_ID: pay_Type_id,
+      COMPANY_ID: this.selected_Company_id,
     };
     return this.http.post(`${this.apiUrl}Advance/approve`, reqBody);
   }
