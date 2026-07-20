@@ -190,7 +190,7 @@
               </div>
             </div>
 
-            <!-- <div class="three-column-layout">
+            <div class="three-column-layout" *ngIf="sessiondata?.VAT_NAME === 'GST'">
               <div>
                 <dx-text-box
                   [(value)]="employeeFormData.PF_AC_NO"
@@ -221,8 +221,8 @@
                 >
                 </dx-number-box>
               </div>
-            </div> -->
-            <!-- </dx-form> -->
+            </div>
+           
           </div>
         </div>
 

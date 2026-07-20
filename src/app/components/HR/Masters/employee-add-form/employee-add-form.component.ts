@@ -159,6 +159,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   countryCodes: any = [];
   countryCode: any;
   CountryId: any;
+  sessiondata: any;
 
   constructor(public dataservice: DataService) {
     const savedUserData = sessionStorage.getItem('savedUserData');
@@ -329,8 +330,8 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   sesstion_Details() {
     const savedUserData = sessionStorage.getItem('savedUserData');
     if (savedUserData) {
-      const sessionData = JSON.parse(savedUserData);
-      this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+      this.sessiondata = JSON.parse(savedUserData);
+      this.selected_Company_id = this.sessiondata.SELECTED_COMPANY.COMPANY_ID;
     }
   }
 

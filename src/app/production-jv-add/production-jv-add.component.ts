@@ -1,5 +1,4 @@
 import {
-  ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   EventEmitter,
@@ -7,7 +6,7 @@ import {
   NgModule,
   NgZone,
   Output,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -51,14 +50,10 @@ import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component'
 import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
 import {
-  InvoiceTrOutAddComponent,
-  InvoiceTrOutAddModule,
+  InvoiceTrOutAddModule
 } from '../pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
-import { InvoiceTrOutComponent } from '../pages/OPERATIONS/invoice-tr-out/invoice-tr-out.component';
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
-import { Router } from '@angular/router';
-import { get } from 'jquery';
 import notify from 'devextreme/ui/notify';
 
 @Component({

@@ -174,6 +174,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   // Session Data
   COMPANY_ID: any;
   selected_Company_id: any;
+  sessiondata: any;
 
   // Flags
   salaryHeadLoaded = false;
@@ -293,13 +294,14 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   private loadSessionDetails() {
     const savedUserData = sessionStorage.getItem('savedUserData');
     if (savedUserData) {
-      const sessionData = JSON.parse(savedUserData);
-      const companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+      this.sessiondata = JSON.parse(savedUserData);
+      const companyId = this.sessiondata?.SELECTED_COMPANY?.COMPANY_ID;
       this.selected_Company_id = companyId;
       this.COMPANY_ID = companyId;
     } else {
       this.selected_Company_id = null;
       this.COMPANY_ID = null;
+      this.sessiondata = null;
     }
   }
 
