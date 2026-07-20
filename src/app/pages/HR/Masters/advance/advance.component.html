@@ -416,7 +416,8 @@
   [width]="640"
   height="'100vh'"
 >
-  <dx-form id="form">
+  <dx-validation-group #editValidationGroup>
+    <dx-form id="form">
     <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
       <!-- Date Picker -->
       <dxi-item>
@@ -428,7 +429,11 @@
           [readOnly]="isEditReadOnly"
           (onValueChanged)="onDateValueChanged($event)"
           [labelMode]="'floating'"
-        ></dx-date-box>
+        >
+          <dx-validator>
+            <dxi-validation-rule type="required" message="Date is required"></dxi-validation-rule>
+          </dx-validator>
+        </dx-date-box>
       </dxi-item>
     </dxi-item>
 
@@ -445,7 +450,11 @@
         label="Employee *"
         (onValueChanged)="onEmployee_Change($event)"
         [labelMode]="'floating'"
-      ></dx-select-box>
+      >
+        <dx-validator>
+          <dxi-validation-rule type="required" message="Employee is required"></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
     </dxi-item>
 
     <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
@@ -463,6 +472,9 @@
           (onValueChanged)="onAdvance_type_Change($event)"
           [labelMode]="'floating'"
         >
+          <dx-validator>
+            <dxi-validation-rule type="required" message="Advance Type is required"></dxi-validation-rule>
+          </dx-validator>
           <ng-template let-data dxTemplate="value">
             {{ getAdvanceTypeName(data) }}
           </ng-template>
@@ -479,7 +491,11 @@
           (onValueChanged)="onAmountInput($event)"
           [inputAttr]="{ style: 'text-align: right;' }"
           [labelMode]="'floating'"
-        ></dx-number-box>
+        >
+          <dx-validator>
+            <dxi-validation-rule type="required" message="Amount is required"></dxi-validation-rule>
+          </dx-validator>
+        </dx-number-box>
       </dxi-item>
     </dxi-item>
 
@@ -627,7 +643,14 @@
         displayExpr="HEAD_NAME"
         valueExpr="HEAD_ID"
         placeholder=" Payment Ac"
-      ></dx-select-box>
+      >
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="Payment Ac is required"
+          ></dxi-validation-rule>
+        </dx-validator>
+      </dx-select-box>
     </dxi-item>
     <label style="text-decoration: underline; text-underline-offset: 4px">
       Bank remittance Details
@@ -675,4 +698,5 @@
       </div>
     </dxi-item>
   </dx-form>
+  </dx-validation-group>
 </dx-popup>

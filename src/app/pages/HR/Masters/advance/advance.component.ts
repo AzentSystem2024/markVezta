@@ -47,6 +47,9 @@ export class AdvanceComponent {
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup!: DxValidationGroupComponent;
 
+  @ViewChild('editValidationGroup', { static: false })
+  editValidationGroup!: DxValidationGroupComponent;
+
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
 
@@ -233,6 +236,7 @@ export class AdvanceComponent {
           (e.row.data.STATUS === 'Verified' && !this.canApprove)),
     },
   ];
+  
   Advance_types_ID: any;
 
   // ==========================================
@@ -771,12 +775,9 @@ export class AdvanceComponent {
           ? 2
           : this.selected_pay_type_id;
 
-    if (
-      !this.emp_id ||
-      !this.date_value ||
-      !this.adv_type_id_value ||
-      !this.Advance_Amount_value
-    ) {
+    const validationResult = this.editValidationGroup.instance.validate();
+
+    if (!validationResult.isValid) {
       notify(
         {
           message: 'Please fill all the required fields.',
