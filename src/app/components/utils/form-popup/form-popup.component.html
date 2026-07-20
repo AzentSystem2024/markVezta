@@ -47,7 +47,7 @@
             [text]="isSaveDisabled ? 'Disabled' : saveButtonText"
             stylingMode="contained"
             type="default"
-            [disabled]="isSaveDisabled"
+            *ngIf="!isSaveDisabled"
             [icon]="isSaveDisabled ? 'spin' : ''"
             (onClick)="onSaveClick()"
           ></dx-button>
