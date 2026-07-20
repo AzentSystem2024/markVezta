@@ -30,14 +30,9 @@
       "
       (onExporting)="onExporting($event)"
     >
-      <!-- (onEditingStart)="onEditLedger($event)" -->
-      <!-- <dxo-editing
-        mode="popup"s
-        [allowUpdating]="true"
-      ></dxo-editing> -->
+    
       <dxo-paging [pageSize]="10"></dxo-paging>
-     
-      
+
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
@@ -48,7 +43,7 @@
               font-size: 20px;
               margin-left: 12px;
               padding: -3px;
-              margin-right:  3px;
+              margin-right: 3px;
             "
           >
             Ledger Statement
@@ -60,7 +55,6 @@
             labelMode="floating"
             labelLocation="left"
             label="Year"
-            [width]="90"
             [(value)]="selectedYear"
             [dataSource]="years"
             (onValueChanged)="onYearChanged($event)"
@@ -116,7 +110,6 @@
               displayExpr="NAME"
               valueExpr="ID"
               [(value)]="selected_Head_Id"
-              (onValueChanged)="onHeadIdChange($event)"
               [searchEnabled]="true"
               ><dx-validator>
                 <dxi-validation-rule
@@ -174,10 +167,7 @@
       <dxo-header-filter [visible]="true">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
-      <!-- <dxo-filter-row
-      [visible]="isFilterRowVisible"
-      [applyFilter]="auto"
-    ></dxo-filter-row> -->
+    
       <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
@@ -193,24 +183,40 @@
       <dxi-column
         dataField="TRANS_TYPE_NAME"
         caption="Document Type"
-         width="170"
+        width="170"
       ></dxi-column>
-      <dxi-column dataField="VOUCHER_NO" caption="Voucher No"  width="120"></dxi-column>
-      <dxi-column dataField="PARTICULARS" caption="Particulars"  width="180"></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store/Branch"  width="250"></dxi-column>
-      <dxi-column dataField="DEPT_NAME" caption="Department"  width="120"></dxi-column>
+      <dxi-column
+        dataField="VOUCHER_NO"
+        caption="Voucher No"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="PARTICULARS"
+        caption="Particulars"
+        width="180"
+      ></dxi-column>
+      <dxi-column
+        dataField="STORE_NAME"
+        caption="Store/Branch"
+        width="250"
+      ></dxi-column>
+      <dxi-column
+        dataField="DEPT_NAME"
+        caption="Department"
+        width="120"
+      ></dxi-column>
       <dxi-column
         dataField="DR_AMOUNT"
         caption="Debit Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
-         width="120"
+        width="120"
       >
       </dxi-column>
 
       <dxi-column
         dataField="CR_AMOUNT"
-         width="120"
+        width="120"
         caption="Credit Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
@@ -220,7 +226,7 @@
       <dxi-column
         dataField="BALANCE"
         caption="Balance"
-         width="120"
+        width="120"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
       >
@@ -255,6 +261,7 @@
     ></app-production-jv-view>
   </ng-container>
 </dx-popup>
+
 <dx-popup
   *ngIf="isViewJournalVoucher"
   [(visible)]="isViewJournalVoucher"
@@ -334,7 +341,8 @@
     [isEditing]="true"
     [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
-    (popupClosed)="handleClose()">
+    (popupClosed)="handleClose()"
+  >
   </app-add-invoice-retail>
 </dx-popup>
 
@@ -393,24 +401,6 @@
     (popupClosed)="handleClose()"
   ></app-add-salary-payment>
 </dx-popup>
-
-<!-- //=======================Supplier payment=================== -->
-
-<!-- <dx-popup
-  [(visible)]="isEditReceipt"
-  [width]="'75vw'"
-  [height]="'100vh'"
-  title="Supplier Payment"
-  (onHiding)="handleClose()"
->
-   <ng-container *ngIf="isAddInvoice"> -->
-<!-- <app-edit-supplier-payment
-    [paymentData]="selectedReceipt"
-    [isReadOnlyMode]="isReadOnlyReceipt"
-    (popupClosed)="handleClose()"
-  ></app-edit-supplier-payment> -->
-<!-- </ng-container> -->
-<!-- </dx-popup> -->
 
 <!-- //=======================Pre payment=================== -->
 
@@ -626,9 +616,8 @@
   title="Payroll"
   (onHiding)="handleClose()"
 >
-  <app-payroll-view
-    *ngIf="viewPayrollPopupOpened"
+  <app-payroll-view-report
     [payroll]="selectedPayroll"
     (popupClosed)="handleClose()"
-  ></app-payroll-view>
+  ></app-payroll-view-report>
 </dx-popup>

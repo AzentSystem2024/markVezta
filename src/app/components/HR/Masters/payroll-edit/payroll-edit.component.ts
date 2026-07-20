@@ -80,6 +80,7 @@ export class PayrollEditComponent {
 
   salaryHeadList: any;
   selected_Company_id: any;
+  Finid:any
   userId: any;
   incomingPayroll: any;
   incomingPayrollData: any;
@@ -122,13 +123,6 @@ export class PayrollEditComponent {
     }
   }
 
-  // getSalaryHeadDropdown() {
-  //   this.dataService
-  //     .getDropdownData('SALARY_HEAD')
-  //     .subscribe((response: any) => {
-  //       this.salaryHeadList = response;
-  //     });
-  // }
 
   onRowUpdating(event: any) {
     // Log old and new data
@@ -246,6 +240,7 @@ export class PayrollEditComponent {
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.Finid = sessionData.FINANCIAL_YEARS[0].FIN_ID;  
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -298,6 +293,7 @@ export class PayrollEditComponent {
         }
       });
   }
+
   update(shouldVerify: boolean = false) {
     const details = this.payRollData?.PAY_DETAILS || [];
 
@@ -418,6 +414,7 @@ export class PayrollEditComponent {
   executeVerify() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      FIN_ID:this.Finid,
       USER_ID: this.userId,
       PAYDETAIL_ID: [
         this.payRollData.PAYDETAIL_ID || this.payRollData.SALARY_BILL_NO,
@@ -441,6 +438,7 @@ export class PayrollEditComponent {
   approve() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      FIN_ID:this.Finid,
       USER_ID: this.userId,
       PAYDETAIL_ID: [
         this.payRollData.PAYDETAIL_ID || this.payRollData.SALARY_BILL_NO,

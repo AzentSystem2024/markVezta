@@ -41,16 +41,17 @@ import { Router } from '@angular/router';
   styleUrls: ['./advance.component.scss'],
 })
 export class AdvanceComponent {
-  // ==========================================
   // 1. VIEW CHILDS
   // ==========================================
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup!: DxValidationGroupComponent;
 
+  @ViewChild('editValidationGroup', { static: false })
+  editValidationGroup!: DxValidationGroupComponent;
+
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
 
-  // ==========================================
   // 2. STATE & TOGGLES
   // ==========================================
   isLoading: boolean = true;
@@ -64,7 +65,6 @@ export class AdvanceComponent {
   isFormSubmitted: boolean = false;
   approveValue: boolean = false;
 
-  // ==========================================
   // 3. PERMISSIONS
   // ==========================================
   canAdd: boolean = false;
@@ -75,7 +75,6 @@ export class AdvanceComponent {
   canVerify: boolean = false;
   canPrint: boolean = false;
 
-  // ==========================================
   // 4. GLOBAL & SESSION INFO
   // ==========================================
   selected_Company_id: any;
@@ -83,7 +82,6 @@ export class AdvanceComponent {
   companyId: any;
   docNo: any;
 
-  // ==========================================
   // 5. GRID SETTINGS & DATA
   // ==========================================
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -113,7 +111,6 @@ export class AdvanceComponent {
     { text: 'Verified', value: 'Verified' },
   ];
 
-  // ==========================================
   // 6. FORM & DROPDOWN VARIABLES
   // ==========================================
   formSource!: FormGroup;
@@ -152,7 +149,6 @@ export class AdvanceComponent {
   selected_Cheque_Date: any;
   Recovery_Date: any;
 
-  // ==========================================
   // 7. GRID ACTION BUTTON CONFIGURATIONS
   // ==========================================
   addButtonOptions = {
@@ -233,9 +229,9 @@ export class AdvanceComponent {
           (e.row.data.STATUS === 'Verified' && !this.canApprove)),
     },
   ];
+
   Advance_types_ID: any;
 
-  // ==========================================
   // 8. CONSTRUCTOR & LIFECYCLE HOOKS
   // ==========================================
   constructor(
@@ -294,7 +290,6 @@ export class AdvanceComponent {
     this.get_advance_list();
   }
 
-  // ==========================================
   // 9. DATA FETCHING METHODS
   // ==========================================
   sesstion_Details() {
@@ -446,11 +441,11 @@ export class AdvanceComponent {
       this.approveValue = this.selected_Data.STATUS === 'Approved';
       this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
 
+      this.ledgerlist();
       this.cdr.detectChanges();
     });
   }
 
-  // ==========================================
   // 10. EVENT HANDLERS & ACTIONS
   // ==========================================
   refreshGrid() {
@@ -542,7 +537,6 @@ export class AdvanceComponent {
     }
   }
 
-  // ==========================================
   // 11. GRID FORMATTING & HELPERS
   // ==========================================
   parseApiDate(dateStr: string): Date | null {
@@ -594,7 +588,6 @@ export class AdvanceComponent {
     }
   }
 
-  // ==========================================
   // 12. CALCULATIONS
   // ==========================================
   setupInstallmentCalculation() {
@@ -637,7 +630,6 @@ export class AdvanceComponent {
     }
   }
 
-  // ==========================================
   // 13. POPUP MODALS
   // ==========================================
   add_pop() {
@@ -675,7 +667,6 @@ export class AdvanceComponent {
     this.isEditPopUp = true;
     this.isEditReadOnly = false;
     this.loadAdvanceDetails(e.data.TRANS_ID);
-    this.ledgerlist();
   }
 
   onViewClick = (e: any) => {
@@ -698,20 +689,21 @@ export class AdvanceComponent {
   onVerifyClick = (e: any) => {
     e.cancel = true;
     this.isEditPopUp = true;
-   
+
     const status = e.row.data.STATUS;
     if (status === 'Verified') {
       this.buttonText = 'Approve';
+      this.isEditReadOnly = false;
     } else if (status === 'Open') {
       this.buttonText = 'Verify';
+      this.isEditReadOnly = false;
     } else {
-       this.isEditReadOnly = true;
+      this.isEditReadOnly = true;
       this.buttonText = 'View';
     }
     this.loadAdvanceDetails(e.row.data.TRANS_ID);
   };
 
-  // ==========================================
   // 14. CRUD OPERATIONS
   // ==========================================
   Add_Advace() {
@@ -772,11 +764,13 @@ export class AdvanceComponent {
           : this.selected_pay_type_id;
 
     if (
-      !this.emp_id ||
       !this.date_value ||
+      !this.emp_id ||
       !this.adv_type_id_value ||
-      !this.Advance_Amount_value
+      !this.Advance_Amount_value ||
+      !this.Payment_Head
     ) {
+      this.editValidationGroup?.instance?.validate(); // trigger UI highlights
       notify(
         {
           message: 'Please fill all the required fields.',
@@ -894,28 +888,28 @@ export class AdvanceComponent {
 
   deleteData(event: any) {
     const id = event.data.ID;
-    confirm('Are you sure you want to delete this record?', 'Confirm Delete').then(
-      (result) => {
-        if (result) {
-          this.dataService.Api_Delete_advance(id).subscribe((res: any) => {
-            notify(
-              {
-                message: 'Advance Deleted successfully',
-                position: { at: 'top right', my: 'top right' },
-                displayTime: 500,
-              },
-              'success',
-            );
-            this.get_advance_list();
-            this.isLoading = false;
-          });
-        }
+    confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    ).then((result) => {
+      if (result) {
+        this.dataService.Api_Delete_advance(id).subscribe((res: any) => {
+          notify(
+            {
+              message: 'Advance Deleted successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+          this.get_advance_list();
+          this.isLoading = false;
+        });
       }
-    );
+    });
   }
 }
 
-// ==========================================
 // MODULE DEFINITION
 // ==========================================
 @NgModule({

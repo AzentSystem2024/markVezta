@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
@@ -46,6 +47,9 @@ import {
 
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
+import DataSource from 'devextreme/data/data_source';
+
+// Modules
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
@@ -64,97 +68,126 @@ import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/
 import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
-import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
-import { MiscSalesInvoiceFormModule } from '../../OPERATIONS/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
+import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
+import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 
 @Component({
   selector: 'app-ledger-statement',
   templateUrl: './ledger-statement.component.html',
   styleUrls: ['./ledger-statement.component.scss'],
 })
-export class LedgerStatementComponent {
+export class LedgerStatementComponent implements OnInit {
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup!: DxValidationGroupComponent;
 
-  Ledger_statement_datasource: DataSource;
-  isEditJournalVoucher: boolean = false;
-  isViewJournalVoucher: boolean = false;
-  isViewDebitNote: boolean = false;
+  // -------------------------------------------------------------
+  // Data Sources & Core Lists
+  // -------------------------------------------------------------
+  Ledger_statement_datasource!: DataSource;
+  ledgerSummaryData: any = [];
+  ledgerRowCount: number = 0;
+  
   company_list: any[] = [];
-  selectedCompanyId: any;
-  company_id: any;
   HEAD_ID_LIST: any[] = [];
   fin_id: any[] = [];
-  ledgerSummaryData: any = [];
+  Store: any;
+  monthDataSource: { name: string; value: any }[];
+  years: number[] = [];
+
+  // -------------------------------------------------------------
+  // Application State & Selection
+  // -------------------------------------------------------------
   savedUserData: any;
-  selected_from_date: any;
-  selected_To_date: any;
+  vat_title: any;
+  
+  selectedCompanyId: any;
+  company_id: any;
+  selected_Company_id: any;
+  
   selected_Head_Id: any;
   selected_fin_id: any;
-  selectedJournalVoucher: any;
+  selectedStoreid: any[] = [];
+  storeHint: string = '';
+  
+  selectedYear: number | null = null;
+  selectedmonth: any = '';
+  
+  selected_from_date: any;
+  selected_To_date: any;
   formatted_from_date: any;
   formatted_To_date: any;
-  editLedgerPopup: boolean = false;
-  selectedDebitNote: any;
-  isViewCreditNote: boolean = false;
-  selectedCreditNote: any;
-  isViewInvoice: boolean = false;
-  isRetailInvoice: boolean = false;
-  selectedInvoice: any;
-  isViewReceipt: boolean = false;
-  selectedReceipt: any;
-  selected_Company_id: any;
+  transtypeId: any;
+  
+  // -------------------------------------------------------------
+  // Read-Only Flags
+  // -------------------------------------------------------------
   isReadOnlyReceipt: boolean = true;
   isReadOnlyInvoice: boolean = true;
-  isEditReceipt: boolean = false;
   isReadOnlyPayment: boolean = true;
-  selectedmiscellaneousData: any;
-  editMiscPopupOpened: boolean = false;
-  Selected_Depreciation_data: any;
-  EditDepreciationPopupVisible: boolean = false;
-  editPrePaymentPopupOpened: boolean = false;
-  viewPayrollPopupOpened: boolean = false;
-  selectedSalaryData: any;
-  editSalaryPopup: boolean = false;
-  selectedPrePayment: any;
   isEditReadOnly: boolean = true;
-  selected_Data: any;
-  isEditPopUp: boolean = false;
-  loadingInvoice = false;
-  popupReady = false;
-  editMiscPopup: boolean = false;
-  isEditInvoice: boolean = false;
   isEditInvoiceReadOnly: boolean = true;
-  isEditPurchaseReturn: boolean = false;
-  selectedPurchaseReturn: any;
   isReadOnlyPurchaseReturn: boolean = true;
-  selectedTrOut: any;
-  selectedTrIn: any;
-  selectedSaleReturn: any;
-  isEditTransferOut: boolean = false;
-  isEditTransferIn: boolean = false;
   isReadOnlyTrOut: boolean = true;
   isReadOnlyTrIn: boolean = true;
   isReadOnlySaleReturn: boolean = true;
+
+  // -------------------------------------------------------------
+  // Popup Visibility Flags
+  // -------------------------------------------------------------
+  isEditPopUp: boolean = false;
+  editLedgerPopup: boolean = false;
+  isViewJournalVoucher: boolean = false;
+  isEditJournalVoucher: boolean = false;
+  isViewDebitNote: boolean = false;
+  isViewCreditNote: boolean = false;
+  isViewInvoice: boolean = false;
+  isRetailInvoice: boolean = false;
+  isViewReceipt: boolean = false;
+  isEditReceipt: boolean = false;
+  editMiscPopupOpened: boolean = false;
+  editMiscPopup: boolean = false;
+  EditDepreciationPopupVisible: boolean = false;
+  editPrePaymentPopupOpened: boolean = false;
+  viewPayrollPopupOpened: boolean = false;
+  editSalaryPopup: boolean = false;
+  isEditInvoice: boolean = false;
+  isEditPurchaseReturn: boolean = false;
+  isEditTransferOut: boolean = false;
+  isEditTransferIn: boolean = false;
   isEditCustomerReceipt: boolean = false;
   isEditSaleReturn: boolean = false;
-  ledgerRowCount = 0;
-  selectedYear: number | null = null;
-  years: number[] = [];
-  monthDataSource: { name: string; value: any }[];
-  selectedmonth: any = '';
-  transtypeId: any;
-  isViewBoxProduction: boolean;
-  selectedProduction: any;
-  isViewProduction: boolean;
+  isViewBoxProduction: boolean = false;
+  isViewProduction: boolean = false;
   isMiscViewInvoice: boolean = false;
+  
+  // -------------------------------------------------------------
+  // Selected Data for Popups
+  // -------------------------------------------------------------
+  selectedJournalVoucher: any;
+  selectedDebitNote: any;
+  selectedCreditNote: any;
+  selectedInvoice: any;
+  selectedReceipt: any;
+  selectedmiscellaneousData: any;
+  Selected_Depreciation_data: any;
+  selectedPrePayment: any;
+  selectedSalaryData: any;
+  selected_Data: any;
+  selectedPurchaseReturn: any;
+  selectedTrOut: any;
+  selectedTrIn: any;
+  selectedSaleReturn: any;
+  selectedProduction: any;
   selectedPayroll: any;
-  Store: any;
-  selectedStoreid: any;
-  vat_title: any;
+
+  // -------------------------------------------------------------
+  // Loading & UI States
+  // -------------------------------------------------------------
+  loadingInvoice: boolean = false;
+  popupReady: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -162,9 +195,6 @@ export class LedgerStatementComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
   ) {
-    // this.resetPopups();
-
-    // Detect when component is revisited
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event) => {
@@ -173,20 +203,19 @@ export class LedgerStatementComponent {
         }
       });
 
-    //============Year field dataSource===============
+    // Initialize Year DataSource
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-    //============Month field dataSource===============
+    
+    // Initialize Month DataSource
     this.monthDataSource = this.dataService.getMonths();
-    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-    this.selectedmonth = currentMonth;
+    this.selectedmonth = new Date().getMonth();
   }
 
   ngOnInit() {
-    console.log('ledgerstatementttttttttttttttttttttt');
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -197,21 +226,11 @@ export class LedgerStatementComponent {
 
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
-    this.get_sessionstorage_data();
-    this.get_fin_id();
-    this.sesstion_Details();
+
+    this.initSessionData();
     this.store_dropdown();
-    const userDataString = localStorage.getItem('userData');
 
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-      const selectedCompany = userData?.SELECTED_COMPANY;
-
-      this.selected_Company_id = selectedCompany?.COMPANY_ID;
-
-      console.log(this.selected_Company_id, 'SELECTED COMPANY ID');
-
-      // ✅ CALL API HERE AFTER VALUE IS SET
+    if (this.selected_Company_id) {
       this.loadHeadList();
     }
 
@@ -223,49 +242,30 @@ export class LedgerStatementComponent {
     this.loadLedgerData();
   }
 
-  loadHeadList() {
-    this.dataService
-      .HeadId_Dropdown_api(this.selected_Company_id)
-      .subscribe((res: any) => {
-        console.log('HEAD API RESPONSE', res);
-
-        this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
-      });
-  }
-
-  //================ Year value change ===================
-  onYearChanged(e: any): void {
-    this.selectedYear = e.value;
-    this.selectedmonth = '';
-    const currentYear = new Date().getFullYear();
-    const today = new Date();
-    if (this.selectedYear === currentYear) {
-      // Set from date to the start of the year and to date to today
-      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
-      this.selected_To_date = today; // Today's date
-    } else {
-      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
-      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
+  // -------------------------------------------------------------
+  // Initialization & Session Handling
+  // -------------------------------------------------------------
+  initSessionData() {
+    const sessionDataStr = sessionStorage.getItem('savedUserData');
+    const localDataStr = localStorage.getItem('userData');
+    
+    this.savedUserData = sessionDataStr ? JSON.parse(sessionDataStr) : null;
+    
+    if (this.savedUserData) {
+      this.company_list = this.savedUserData.Companies || [];
+      this.fin_id = this.savedUserData.FINANCIAL_YEARS || [];
+      
+      if (this.fin_id.length) {
+        this.selected_fin_id = this.fin_id[0].FIN_ID;
+      }
+      this.vat_title = this.savedUserData.GeneralSettings?.VAT_TITLE;
     }
-  }
-
-  //================Month value change ===================
-  onMonthValueChanged(e: any) {
-    this.selectedmonth = e.value ?? '';
-    if (this.selectedmonth === '') {
-      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
-      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
-    } else {
-      this.selected_from_date = new Date(
-        this.selectedYear,
-        this.selectedmonth,
-        1,
-      );
-      this.selected_To_date = new Date(
-        this.selectedYear,
-        this.selectedmonth + 1,
-        0,
-      );
+    
+    if (localDataStr) {
+      const userData = JSON.parse(localDataStr);
+      this.selected_Company_id = userData?.SELECTED_COMPANY?.COMPANY_ID;
+    } else if (this.savedUserData?.SELECTED_COMPANY) {
+       this.selected_Company_id = this.savedUserData.SELECTED_COMPANY.COMPANY_ID;
     }
   }
 
@@ -274,18 +274,50 @@ export class LedgerStatementComponent {
     return data ? JSON.parse(data) : null;
   }
 
+  loadHeadList() {
+    this.dataService
+      .HeadId_Dropdown_api(this.selected_Company_id)
+      .subscribe((res: any) => {
+        this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
+      });
+  }
+
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+      const storeid = Number(sessionStorage.getItem('STOREID'));
+      this.selectedStoreid = storeid ? [storeid] : [];
+      this.updateStoreHint();
+    });
+  }
+
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+    const selectedNames = this.Store
+      ?.filter((x: any) => this.selectedStoreid.includes(x.ID))
+      .map((x: any) => x.DESCRIPTION);
+    this.storeHint = selectedNames ? selectedNames.join(', ') : 'No store selected';
+  }
+
+  // -------------------------------------------------------------
+  // Data Loading
+  // -------------------------------------------------------------
   createLedgerDataSource(payload: any) {
-    console.log('testingssssssss+++++++++++++++++++++++++');
     this.Ledger_statement_datasource = new DataSource({
       load: () =>
         new Promise((resolve, reject) => {
           this.dataService.get_ladger_statement_api(payload).subscribe({
             next: (res: any) => {
               const data = res?.data || [];
-
               this.ledgerSummaryData = data;
-              this.ledgerRowCount = data.length; // ✅ store length
-
+              this.ledgerRowCount = data.length;
               resolve(data);
             },
             error: () => {
@@ -297,13 +329,13 @@ export class LedgerStatementComponent {
     });
   }
 
-  //-----------------data loading based on session storage value when navigate back to this page-----------------
   loadLedgerData() {
     const sessiondata = this.getSessionData('viewclickvalue');
+    if (!sessiondata) return;
+
     const headid = this.getSessionData('HEADID');
     const storeid = this.getSessionData('STOREID');
-    this.selectedStoreid = storeid ? [storeid] : [];
-    // this.selectedStoreid = sessiondata.selectedStoreid
+
     const payload = {
       COMPANY_ID: Number(sessiondata.companyId),
       FIN_ID: Number(sessiondata.finId),
@@ -317,52 +349,70 @@ export class LedgerStatementComponent {
     this.selected_Head_Id = payload.HEAD_ID;
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
-
     this.selectedStoreid = storeid ? [storeid] : [];
+    
     this.updateStoreHint();
-    // this.selectedStoreid = sessiondata.selectedStoreid || [];
-
-    this;
-
-    // use your existing datasource creator
     this.createLedgerDataSource(payload);
-
     this.cdr.detectChanges();
   }
 
-  get_sessionstorage_data() {
-    this.savedUserData = this.getSessionData('savedUserData');
-    if (this.savedUserData) {
-      this.company_list = this.savedUserData.Companies || [];
-    }
+  load_Ledgre_data() {
+    const validationResult = this.formValidationGroup?.instance?.validate();
+    if (!validationResult?.isValid) return;
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.selected_fin_id,
+      HEAD_ID: this.selected_Head_Id,
+      DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
+      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
+      STORE_ID: this.selectedStoreid?.length ? this.selectedStoreid.join(',') : '',
+    };
+
+    this.createLedgerDataSource(payload);
   }
 
-  get_fin_id() {
-    this.fin_id = this.savedUserData?.FINANCIAL_YEARS || [];
-    if (this.fin_id.length) {
-      this.selected_fin_id = this.fin_id[0].FIN_ID;
-    }
-  }
-
+  // -------------------------------------------------------------
+  // Event Handlers
+  // -------------------------------------------------------------
   onCompanyChange(event: any) {
     this.company_id = event.value;
+    this.selected_Company_id = event.value;
+    this.loadHeadList();
+  }
 
-    this.dataService
-      .HeadId_Dropdown_api(this.selected_Company_id)
-      .subscribe((res: any) => {
-        this.HEAD_ID_LIST = res;
-        console.log('===============ledger=========', res);
-      });
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    
+    if (this.selectedYear === currentYear) {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1);
+      this.selected_To_date = today;
+    } else {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1);
+      this.selected_To_date = new Date(this.selectedYear, 11, 31);
+    }
+  }
+
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.selected_from_date = new Date(this.selectedYear!, 0, 1);
+      this.selected_To_date = new Date(this.selectedYear!, 11, 31);
+    } else {
+      this.selected_from_date = new Date(this.selectedYear!, this.selectedmonth, 1);
+      this.selected_To_date = new Date(this.selectedYear!, this.selectedmonth + 1, 0);
+    }
   }
 
   onFromDateChange(event: any) {
-    const rawDate: Date = new Date(event.value);
-    this.formatted_from_date = this.formatDate(rawDate);
+    this.formatted_from_date = this.formatDate(new Date(event.value));
   }
 
   onToDateChange(event: any) {
-    const rawDate: Date = new Date(event.value);
-    this.formatted_To_date = this.formatDate(rawDate);
+    this.formatted_To_date = this.formatDate(new Date(event.value));
   }
 
   formatDate(date: Date): string {
@@ -372,348 +422,275 @@ export class LedgerStatementComponent {
     return `${year}-${month}-${day}`;
   }
 
-  onHeadIdChange(event: any) {
-    // Optional: Update sessionStorage if needed
-  }
-
-  sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-    this.vat_title = sessionData?.GeneralSettings.VAT_TITLE;
-  }
-
-  load_Ledgre_data() {
-    //  Validate main form
-    const validationResult = this.formValidationGroup?.instance?.validate();
-    if (!validationResult?.isValid) {
-      return;
-    }
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.selected_fin_id,
-      HEAD_ID: this.selected_Head_Id,
-      DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-      STORE_ID: this.selectedStoreid?.length
-        ? this.selectedStoreid.join(',') // ✅ FINAL FIX
-        : '',
-    };
-
-    this.createLedgerDataSource(payload);
-  }
-
   formatDates(cellData: any): string {
     const date = new Date(cellData);
     if (isNaN(date.getTime())) return '';
-
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-
     return `${day}-${month}-${year}`;
   }
 
+  isViewVisible(e: any): boolean {
+    this.transtypeId = e.row.data.TRANS_TYPE_ID;
+    return this.transtypeId !== 0 && this.transtypeId !== 1;
+  }
+
+  onExporting(event: any) {
+    const fileName = 'Ledger Statement Report';
+    this.dataService.exportDataGridReport(event, fileName);
+  }
+
+  // -------------------------------------------------------------
+  // Popup Management
+  // -------------------------------------------------------------
+  onPopupShown() {
+    this.popupReady = true;
+    this.cdr.detectChanges();
+  }
+
   handleClose() {
-    this.editLedgerPopup = false;
+    this.resetPopups();
+  }
+
+  resetPopups() {
+    this.isEditPopUp = false;
     this.editLedgerPopup = false;
     this.isViewJournalVoucher = false;
+    this.isEditJournalVoucher = false;
     this.isViewDebitNote = false;
     this.isViewCreditNote = false;
     this.isViewInvoice = false;
     this.isRetailInvoice = false;
     this.isViewReceipt = false;
+    this.isEditReceipt = false;
+    this.editMiscPopupOpened = false;
+    this.editMiscPopup = false;
+    this.EditDepreciationPopupVisible = false;
+    this.editPrePaymentPopupOpened = false;
+    this.viewPayrollPopupOpened = false;
+    this.editSalaryPopup = false;
+    this.isEditInvoice = false;
+    this.isEditPurchaseReturn = false;
+    this.isEditTransferOut = false;
+    this.isEditTransferIn = false;
+    this.isEditCustomerReceipt = false;
+    this.isEditSaleReturn = false;
+    this.isViewBoxProduction = false;
     this.isViewProduction = false;
+    this.isMiscViewInvoice = false;
+    
+    this.selectedInvoice = null;
+    this.loadingInvoice = false;
+    this.popupReady = false;
+    this.cdr.detectChanges();
   }
 
   onViewClick(e: any) {
-    console.log(e);
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
-
     const trans_id = e.row.data.TRANS_ID;
-    this.selectedInvoice = null;
+    
+    this.resetPopups();
     this.loadingInvoice = true;
-    this.popupReady = false;
 
-    if (TRANS_TYPE_ID == 4) {
-      this.dataService
-        .selectJournalVoucher(trans_id)
-        .subscribe((response: any) => {
-          this.selectedJournalVoucher = response.Data;
-
-          this.isViewJournalVoucher = true;
-          this.cdr.detectChanges();
-        });
-    } else if (TRANS_TYPE_ID === 36) {
-      this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-        this.selectedDebitNote = response.Data;
-        this.isViewDebitNote = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedDebitNote, 'selected debit note');
-      });
-    } else if (TRANS_TYPE_ID === 37) {
-      this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-        this.selectedCreditNote = response.Data;
-        this.isViewCreditNote = true;
-        this.cdr.detectChanges();
-      });
-    } else if (TRANS_TYPE_ID === 25) {
-      if (this.vat_title === 'GST') {
-        this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
-          this.selectedInvoice = response.Data;
-
-          this.isViewInvoice = true;
-          this.isRetailInvoice = false;
-
-          this.cdr.detectChanges();
-        });
-      } else {
-        this.dataService
-          .selectInvoiceRetail(trans_id)
-          .subscribe((response: any) => {
-            this.selectedInvoice = response.Data;
-
-            this.isRetailInvoice = true;
-            this.isViewInvoice = false;
-
-            this.cdr.detectChanges();
-          });
-      }
-    } else if (TRANS_TYPE_ID == 19) {
-      this.dataService
-        .selectPurchaseInvoice(trans_id)
-        .subscribe((response: any) => {
-          this.selectedInvoice = response.Data;
-          this.loadingInvoice = false;
-
-          this.isEditInvoice = true;
-          this.cdr.detectChanges();
-        });
-    } else if (TRANS_TYPE_ID === 20) {
-      this.dataService
-        .selectPurchaseReturn(trans_id)
-        .subscribe((response: any) => {
-          this.selectedPurchaseReturn = response;
-          this.isEditPurchaseReturn = true;
-
-          this.cdr.detectChanges();
-          console.log(
-            this.selectedPurchaseReturn,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
-        });
-    } else if (TRANS_TYPE_ID === 14) {
-      this.dataService
-        .selectTransferOutForInventory(trans_id)
-        .subscribe((response: any) => {
-          this.selectedTrOut = response;
-          console.log(this.selectedTrOut);
-          this.isEditTransferOut = true;
-
-          this.cdr.detectChanges();
-          console.log(this.selectedTrOut, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-        });
-    } else if (TRANS_TYPE_ID === 15) {
-      this.dataService
-        .selectTransferInForInventory(trans_id)
-        .subscribe((response: any) => {
-          this.selectedTrIn = response;
-          this.loadingInvoice = false;
-
-          this.isEditTransferIn = true;
-          this.cdr.detectChanges();
-          console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
-        });
-    } else if (TRANS_TYPE_ID === 27) {
-      this.dataService
-        .selectCustomerReceipt(trans_id)
-        .subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
-          this.isEditCustomerReceipt = true;
-          this.cdr.detectChanges();
-        });
-    } else if (TRANS_TYPE_ID === 3) {
-      console.log('=====navigate to 2 mis payament=====');
-      this.dataService
-        .selectMiscPayment(trans_id)
-        .subscribe((response: any) => {
-          this.selectedmiscellaneousData = response;
-          this.editMiscPopupOpened = true;
-          this.cdr.detectChanges();
-        });
-    } else if (TRANS_TYPE_ID === 9) {
-      console.log('=====navigate to 2 mis payament=====');
-      this.dataService
-        .select_Depreciation_Asset(trans_id)
-        .subscribe((response: any) => {
-          this.Selected_Depreciation_data = response.Data;
-          this.EditDepreciationPopupVisible = true;
-          this.cdr.detectChanges();
-          console.log(
-            this.Selected_Depreciation_data,
-            'Selected_Depreciation_data=====',
-          );
-        });
-    } else if (TRANS_TYPE_ID === 38) {
-      console.log('=====navigate to 2 mis payament=====');
-      this.dataService
-        .Select_PrePayment(trans_id)
-        .subscribe((response: any) => {
-          this.selectedPrePayment = response.Data;
-          this.editPrePaymentPopupOpened = true;
-          this.cdr.detectChanges();
-          console.log(
-            this.Selected_Depreciation_data,
-            'Selected_Depreciation_data=====',
-          );
-        });
-    } else if (TRANS_TYPE_ID === 30) {
-      this.dataService
-        .selectSalaryPayment(trans_id)
-        .subscribe((response: any) => {
-          this.selectedSalaryData = response.Data;
-          this.editSalaryPopup = true;
-          this.cdr.detectChanges();
-          console.log(
-            this.selectedSalaryData,
-            'Selected_Depreciation_data=====',
-          );
-        });
-    } else if (TRANS_TYPE_ID === 21) {
-      this.isEditReceipt = true;
-
-      this.dataService
-        .selectSupplierPayment(trans_id)
-        .subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
-          console.log(this.selectedReceipt, 'Selected data');
-
-          this.cdr.detectChanges();
-        });
-    } else if (TRANS_TYPE_ID === 2) {
-      this.dataService
-        .selectMiscReceipt(trans_id)
-        .subscribe((response: any) => {
-          this.selectedmiscellaneousData = response.Data;
-          this.editMiscPopup = true;
-          this.cdr.detectChanges();
-          console.log(
-            this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
-        });
-    } else if (TRANS_TYPE_ID === 28) {
-      this.dataService.select_Advance(trans_id).subscribe((response: any) => {
-        this.selected_Data = response;
-        this.isEditPopUp = true;
-        this.cdr.detectChanges();
-      });
-    } else if (TRANS_TYPE_ID === 1) {
-      this.dataService
-        .selectOpeningBalance(trans_id)
-        .subscribe((response: any) => {
+    switch (TRANS_TYPE_ID) {
+      case 1: // Opening Balance
+        this.dataService.selectOpeningBalance(trans_id).subscribe((response: any) => {
           this.selected_Data = response;
           this.isEditPopUp = true;
           this.cdr.detectChanges();
         });
-    } else if (TRANS_TYPE_ID === 28) {
-      this.dataService.select_Advance(trans_id).subscribe((response: any) => {
-        this.selected_Data = response;
-        this.isEditPopUp = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-      });
-    } else if (TRANS_TYPE_ID === 26) {
-      this.dataService.selectSaleReturn(trans_id).subscribe((response: any) => {
-        this.selectedSaleReturn = response;
-        this.isEditSaleReturn = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-      });
-    } else if (TRANS_TYPE_ID === 104) {
-      this.dataService
-        .selectBoxProduction(trans_id)
-        .subscribe((response: any) => {
+        break;
+
+      case 2: // Misc Receipt
+        this.dataService.selectMiscReceipt(trans_id).subscribe((response: any) => {
+          this.selectedmiscellaneousData = response.Data;
+          this.editMiscPopup = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 3: // Misc Payment
+        this.dataService.selectMiscPayment(trans_id).subscribe((response: any) => {
+          this.selectedmiscellaneousData = response;
+          this.editMiscPopupOpened = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 4: // Journal Voucher
+        this.dataService.selectJournalVoucher(trans_id).subscribe((response: any) => {
+          this.selectedJournalVoucher = response.Data;
+          this.isViewJournalVoucher = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 9: // Depreciation Asset
+        this.dataService.select_Depreciation_Asset(trans_id).subscribe((response: any) => {
+          this.Selected_Depreciation_data = response.Data;
+          this.EditDepreciationPopupVisible = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 14: // Transfer Out
+        this.dataService.selectTransferOutForInventory(trans_id).subscribe((response: any) => {
+          this.selectedTrOut = response;
+          this.isEditTransferOut = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 15: // Transfer In
+        this.dataService.selectTransferInForInventory(trans_id).subscribe((response: any) => {
+          this.selectedTrIn = response;
+          this.loadingInvoice = false;
+          this.isEditTransferIn = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 19: // Purchase Invoice
+        this.dataService.selectPurchaseInvoice(trans_id).subscribe((response: any) => {
+          this.selectedInvoice = response.Data;
+          this.loadingInvoice = false;
+          this.isEditInvoice = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 20: // Purchase Return
+        this.dataService.selectPurchaseReturn(trans_id).subscribe((response: any) => {
+          this.selectedPurchaseReturn = response;
+          this.isEditPurchaseReturn = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 21: // Supplier Payment
+        this.dataService.selectSupplierPayment(trans_id).subscribe((response: any) => {
+          this.selectedReceipt = response.Data;
+          this.isEditReceipt = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 25: // Sales Invoice
+        if (this.vat_title === 'GST') {
+          this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
+            this.selectedInvoice = response.Data;
+            this.isViewInvoice = true;
+            this.cdr.detectChanges();
+          });
+        } else {
+          this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
+            this.selectedInvoice = response.Data;
+            this.isRetailInvoice = true;
+            this.cdr.detectChanges();
+          });
+        }
+        break;
+
+      case 26: // Sale Return
+        this.dataService.selectSaleReturn(trans_id).subscribe((response: any) => {
+          this.selectedSaleReturn = response;
+          this.isEditSaleReturn = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 27: // Customer Receipt
+        this.dataService.selectCustomerReceipt(trans_id).subscribe((response: any) => {
+          this.selectedReceipt = response.Data;
+          this.isEditCustomerReceipt = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 28: // Advance
+        this.dataService.select_Advance(trans_id).subscribe((response: any) => {
+          this.selected_Data = response;
+          this.isEditPopUp = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 29: // Payroll Report
+        this.dataService.viewSelectedPayrollForReport(trans_id).subscribe((response: any) => {
+          this.selectedPayroll = response;
+          this.viewPayrollPopupOpened = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 30: // Salary Payment
+        this.dataService.selectSalaryPayment(trans_id).subscribe((response: any) => {
+          this.selectedSalaryData = response.Data;
+          this.editSalaryPopup = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 36: // Debit Note
+        this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
+          this.selectedDebitNote = response.Data;
+          this.isViewDebitNote = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 37: // Credit Note
+        this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
+          this.selectedCreditNote = response.Data;
+          this.isViewCreditNote = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 38: // Pre-Payment
+        this.dataService.Select_PrePayment(trans_id).subscribe((response: any) => {
+          this.selectedPrePayment = response.Data;
+          this.editPrePaymentPopupOpened = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 103: // Production
+        this.dataService.selectProduction(trans_id).subscribe((response: any) => {
           this.selectedProduction = response;
           this.isViewProduction = true;
           this.cdr.detectChanges();
         });
-    } else if (TRANS_TYPE_ID === 103) {
-      this.dataService.selectProduction(trans_id).subscribe((response: any) => {
-        this.selectedProduction = response;
-        this.isViewProduction = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-      });
-    } else if (TRANS_TYPE_ID === 105) {
-      this.dataService
-        .getMiscSalesInvoiceByID(trans_id)
-        .subscribe((response: any) => {
+        break;
+
+      case 104: // Box Production
+        this.dataService.selectBoxProduction(trans_id).subscribe((response: any) => {
+          this.selectedProduction = response;
+          this.isViewProduction = true;
+          this.cdr.detectChanges();
+        });
+        break;
+
+      case 105: // Misc Sales Invoice
+        this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
           this.selectedInvoice = response;
           this.isMiscViewInvoice = true;
           this.cdr.detectChanges();
-          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
         });
-    } else if (TRANS_TYPE_ID === 29) {
-      this.dataService
-        .viewSelectedPayroll(trans_id)
-        .subscribe((response: any) => {
-          this.selectedPayroll = response;
-          this.viewPayrollPopupOpened = true;
-          this.cdr.detectChanges();
-          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-        });
-    } else {
+        break;
+
+      default:
+        this.loadingInvoice = false;
+        break;
     }
   }
 
-  isViewVisible(e: any): boolean {
-    console.log(e.row.data, 'event');
-    this.transtypeId = e.row.data.TRANS_TYPE_ID;
-    return this.transtypeId !== 0 && this.transtypeId !== 1;
-  }
-
-  storeHint: string = '';
-
-  updateStoreHint() {
-    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-      this.storeHint = 'No store selected';
-      return;
-    }
-
-    const selectedNames = this.Store.filter((x) =>
-      this.selectedStoreid.includes(x.ID),
-    ).map((x) => x.DESCRIPTION);
-
-    this.storeHint = selectedNames.join(', ');
-  }
-
-  store_dropdown() {
-    const payload = {
-      NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-      this.Store = res;
-
-      const storeid = Number(sessionStorage.getItem('STOREID'));
-      // this.selectedStoreid = [storeid];
-      this.selectedStoreid = storeid ? [storeid] : [];
-
-      this.updateStoreHint();
-    });
-  }
-
-  // POPUP shown → allow child to render
-  onPopupShown() {
-    this.popupReady = true;
-    this.cdr.detectChanges();
-  }
+  // -------------------------------------------------------------
+  // DataGrid Summaries
+  // -------------------------------------------------------------
   summaryColumnsData = {
     totalItems: [
-      // 1. Total Debitṅ
       {
         column: 'PARTICULARS',
         summaryType: '',
@@ -747,7 +724,6 @@ export class LedgerStatementComponent {
         showInColumn: 'DR_AMOUNT',
         alignment: 'right',
       },
-      // 2. Total Credit
       {
         name: 'totalCr',
         column: 'CR_AMOUNT',
@@ -757,7 +733,6 @@ export class LedgerStatementComponent {
         showInColumn: 'CR_AMOUNT',
         alignment: 'right',
       },
-      // 3. Closing Balance (shows in Debit or Credit column based on value)
       {
         name: 'closingBalanceDr',
         summaryType: 'custom',
@@ -774,7 +749,6 @@ export class LedgerStatementComponent {
         showInColumn: 'CR_AMOUNT',
         alignment: 'right',
       },
-      // 4. Grand Total (sum of totals + closing balance)
       {
         name: 'grandTotalDr',
         summaryType: 'custom',
@@ -797,7 +771,7 @@ export class LedgerStatementComponent {
       if (options.summaryProcess === 'finalize') {
         const items = this.ledgerSummaryData || [];
 
-        const totalDr = items.reduce((sum, item) => {
+        const totalDr = items.reduce((sum: number, item: any) => {
           const val = parseFloat(
             String(item?.DR_AMOUNT || '0')
               .replace(/,/g, '')
@@ -806,7 +780,7 @@ export class LedgerStatementComponent {
           return sum + (isNaN(val) ? 0 : val);
         }, 0);
 
-        const totalCr = items.reduce((sum, item) => {
+        const totalCr = items.reduce((sum: number, item: any) => {
           const val = parseFloat(
             String(item?.CR_AMOUNT || '0')
               .replace(/,/g, '')
@@ -817,33 +791,21 @@ export class LedgerStatementComponent {
 
         const closingBalance = totalDr - totalCr;
 
-        // Closing Balance
         if (options.name === 'closingBalanceCr') {
           options.totalValue = closingBalance > 0 ? closingBalance : 0;
         }
-
         if (options.name === 'closingBalanceDr') {
-          options.totalValue =
-            closingBalance < 0 ? Math.abs(closingBalance) : 0;
+          options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
         }
-
-        // Grand Total
         if (options.name === 'grandTotalCr') {
-          options.totalValue =
-            totalCr + (closingBalance > 0 ? closingBalance : 0);
+          options.totalValue = totalCr + (closingBalance > 0 ? closingBalance : 0);
         }
         if (options.name === 'grandTotalDr') {
-          options.totalValue =
-            totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
+          options.totalValue = totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
         }
       }
     },
   };
-
-  onExporting(event: any) {
-    const fileName = 'Ledger Statement Report';
-    this.dataService.exportDataGridReport(event, fileName);
-  }
 }
 
 @NgModule({
@@ -867,10 +829,8 @@ export class LedgerStatementComponent {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
-    DxoItemModule,
     DxTabPanelModule,
     DxTabsModule,
     DxiGroupModule,
@@ -893,7 +853,6 @@ export class LedgerStatementComponent {
     AddMiscellaneousPaymentModule,
     AddSalaryPaymentModule,
     ViewSalaryAdvanceModule,
-    AddMiscReceiptModule,
     EditPurchaseInvoiceModule,
     PurchaseReturnDebitFormModule,
     TransferOutInventoryAddModule,
@@ -902,8 +861,8 @@ export class LedgerStatementComponent {
     ProductionJvViewModule,
     MiscSalesInvoiceFormModule,
     AddInvoiceRetailModule,
+    PayrollViewReportModule,
   ],
-  providers: [],
   declarations: [LedgerStatementComponent],
   exports: [LedgerStatementComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

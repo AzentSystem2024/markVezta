@@ -44,7 +44,7 @@ export class VatClassListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  VatClassDataSource: DataSource | undefined;
+  VatClassDataSource!: DataSource ;
   vatClassArray: any[] = [];
   vatClassCount = 0;
   isAddVatclassPopupOpened = false;

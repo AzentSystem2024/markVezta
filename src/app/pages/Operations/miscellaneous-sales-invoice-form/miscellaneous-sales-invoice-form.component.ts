@@ -39,7 +39,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddInvoiceRetailComponent } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
 import notify from 'devextreme/ui/notify';
