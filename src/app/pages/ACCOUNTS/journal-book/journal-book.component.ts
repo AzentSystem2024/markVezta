@@ -51,6 +51,7 @@ import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/pa
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
+import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 
 @Component({
   selector: 'app-journal-book',
@@ -118,6 +119,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   isEditPopupPrepaymentPosting = false;
   isEditSaleReturn = false;
   isMiscViewInvoice = false;
+  editSalaryPopup = false;
   viewPayrollPopupOpened = false;
   isViewProduction = false;
   isEditPopUp = false;
@@ -216,6 +218,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
+  selectedSalaryData: any;
 
   constructor(
     private dataService: DataService,
@@ -325,6 +328,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
     this.isEditPopupPrepaymentPosting = false;
     this.isEditSaleReturn = false;
     this.isMiscViewInvoice = false;
+    this.editSalaryPopup = false;
     this.viewPayrollPopupOpened = false;
     this.isViewProduction = false;
     this.isEditPopUp = false;
@@ -553,6 +557,18 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
           this.cdr.detectChanges();
         });
         break;
+        case 30:
+           this.dataService.selectSalaryPayment(trans_id).subscribe({
+      next: (response: any) => {
+        this.selectedSalaryData = response.Data;
+        this.editSalaryPopup = true;
+        this.isReadOnlyPayment = true;
+      },
+      error: (err) => {
+        console.error('Failed to fetch salary revision:', err);
+      },
+    });
+    break;
       case 105:
         this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
           this.selectedInvoice = response;
@@ -641,6 +657,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
     PayrollViewReportModule,
     DxTagBoxModule,
     AddInvoiceRetailModule,
+    AddSalaryPaymentModule,
   ],
   providers: [],
   exports: [],

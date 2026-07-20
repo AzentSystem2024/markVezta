@@ -782,3 +782,19 @@
     (popupClosed)="handleClose()"
   ></app-payroll-view-report>
 </dx-popup>
+
+<dx-popup
+  [(visible)]="editSalaryPopup"
+  [width]="'60vw'"
+  [height]="'100vh'"
+  title="Salary Payment"
+  (onHiding)="handleClose()"
+>
+  <app-add-salary-payment
+    *ngIf="editSalaryPopup"
+    [isEditing]="true"
+    [EditingResponseData]="selectedSalaryData"
+    [isReadOnlyMode]="isReadOnlyPayment"
+    (popupClosed)="handleClose()"
+  ></app-add-salary-payment>
+</dx-popup>
