@@ -178,7 +178,10 @@
               </div>
             </div>
 
-            <div class="three-column-layout" *ngIf="sessiondata?.VAT_NAME === 'GST'">
+            <div
+              class="three-column-layout"
+              *ngIf="sessiondata?.GeneralSettings?.VAT_TITLE === 'GST'"
+            >
               <div>
                 <dx-text-box
                   [(value)]="employeeFormData.PF_AC_NO"
@@ -315,7 +318,6 @@
                 />
                 {{ data.CODE }} {{ data.COUNTRY_NAME }}
               </div>
-             
             </dx-select-box>
             <dx-text-box
               [(value)]="employeeFormData.MOBILE"
