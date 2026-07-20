@@ -441,6 +441,7 @@ export class AdvanceComponent {
       this.approveValue = this.selected_Data.STATUS === 'Approved';
       this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
 
+      this.ledgerlist();
       this.cdr.detectChanges();
     });
   }
@@ -629,7 +630,6 @@ export class AdvanceComponent {
     }
   }
 
- 
   // 13. POPUP MODALS
   // ==========================================
   add_pop() {
@@ -667,7 +667,6 @@ export class AdvanceComponent {
     this.isEditPopUp = true;
     this.isEditReadOnly = false;
     this.loadAdvanceDetails(e.data.TRANS_ID);
-    this.ledgerlist();
   }
 
   onViewClick = (e: any) => {
@@ -690,19 +689,20 @@ export class AdvanceComponent {
   onVerifyClick = (e: any) => {
     e.cancel = true;
     this.isEditPopUp = true;
-   
+
     const status = e.row.data.STATUS;
     if (status === 'Verified') {
       this.buttonText = 'Approve';
+      this.isEditReadOnly = false;
     } else if (status === 'Open') {
       this.buttonText = 'Verify';
+      this.isEditReadOnly = false;
     } else {
-       this.isEditReadOnly = true;
+      this.isEditReadOnly = true;
       this.buttonText = 'View';
     }
     this.loadAdvanceDetails(e.row.data.TRANS_ID);
   };
-
 
   // 14. CRUD OPERATIONS
   // ==========================================
@@ -763,20 +763,25 @@ export class AdvanceComponent {
           ? 2
           : this.selected_pay_type_id;
 
-    // const validationResult = this.editValidationGroup.instance.validate();
-
-    // if (!validationResult.isValid) {
-    //   notify(
-    //     {
-    //       message: 'Please fill all the required fields.',
-    //       position: { at: 'top right', my: 'top right' },
-    //       displayTime: 500,
-    //     },
-    //     'error',
-    //   );
-    //   this.isEditPopUp = true;
-    //   return;
-    // }
+    if (
+      !this.date_value ||
+      !this.emp_id ||
+      !this.adv_type_id_value ||
+      !this.Advance_Amount_value ||
+      !this.Payment_Head
+    ) {
+      this.editValidationGroup?.instance?.validate(); // trigger UI highlights
+      notify(
+        {
+          message: 'Please fill all the required fields.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 500,
+        },
+        'error',
+      );
+      this.isEditPopUp = true;
+      return;
+    }
 
     if (this.buttonText === 'Update') {
       this.dataService
@@ -883,27 +888,27 @@ export class AdvanceComponent {
 
   deleteData(event: any) {
     const id = event.data.ID;
-    confirm('Are you sure you want to delete this record?', 'Confirm Delete').then(
-      (result) => {
-        if (result) {
-          this.dataService.Api_Delete_advance(id).subscribe((res: any) => {
-            notify(
-              {
-                message: 'Advance Deleted successfully',
-                position: { at: 'top right', my: 'top right' },
-                displayTime: 500,
-              },
-              'success',
-            );
-            this.get_advance_list();
-            this.isLoading = false;
-          });
-        }
+    confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    ).then((result) => {
+      if (result) {
+        this.dataService.Api_Delete_advance(id).subscribe((res: any) => {
+          notify(
+            {
+              message: 'Advance Deleted successfully',
+              position: { at: 'top right', my: 'top right' },
+              displayTime: 500,
+            },
+            'success',
+          );
+          this.get_advance_list();
+          this.isLoading = false;
+        });
       }
-    );
+    });
   }
 }
-
 
 // MODULE DEFINITION
 // ==========================================
