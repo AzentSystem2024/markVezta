@@ -328,7 +328,7 @@ export class PayrollListComponent {
   onEditOrViewPayroll(e: any) {
     e.cancel = true;
     const payrollId = e.data.SALARY_BILL_NO;
-    const payload = { PAYDETAIL_ID: payrollId };
+    const payload = { PAYDETAIL_ID: payrollId , COMPANY_ID : this.selectedCompanyId };
 
     this.dataService.viewSelectedPayroll(payload).subscribe({
       next: (response: any) => {
@@ -376,7 +376,7 @@ export class PayrollListComponent {
       return;
     }
 
-    const payload = { PAYDETAIL_ID: payrollId };
+    const payload = { PAYDETAIL_ID: payrollId , COMPANY_ID:this.selectedCompanyId };
 
     this.dataService.viewSelectedPayroll(payload).subscribe({
       next: (response: any) => {
