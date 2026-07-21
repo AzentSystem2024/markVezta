@@ -76,9 +76,10 @@
                 <dxi-item class="spacing-item">
                   <div *dxTemplate>
                     <dx-text-box
-                      label="Description"
+                      label="Descriptionnnn"
                       [(value)]="itemData.DESCRIPTION"
                       [labelMode]="'floating'"
+                      (onValueChanged)="onDescriptionChanged($event)"
                     >
                       <dx-validator>
                         <dxi-validation-rule
@@ -97,6 +98,7 @@
                       label="POS Description"
                       [(value)]="itemData.POS_DESCRIPTION"
                       [labelMode]="'floating'"
+                      [maxLength]="45"
                     ></dx-text-box>
                   </div>
                 </dxi-item>

@@ -385,26 +385,23 @@ export class UserRoleComponent implements OnInit {
   }
 
   formatLastModifiedTime(rowData: any): string {
-    const celldate = rowData.LastModifiedTime;
-    if (!celldate) return '';
+    if (!rowData?.LastModifiedTime) {
+      return '';
+    }
 
-    const date = new Date(celldate);
+    const date = new Date(rowData.LastModifiedTime);
 
-    // Extract parts of the date
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = date
-      .toLocaleString('en-US', { month: 'short' })
-      .toUpperCase();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
     const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
 
-    // Convert hours from 24-hour format to 12-hour format
-    const hour12 = hours % 12 || 12;
-
-    // Construct the formatted string
-    return `${day} ${month} ${year}, ${hour12}:${minutes} ${ampm}`;
+    return `${day}-${month}-${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
   }
 }
 

@@ -36,6 +36,7 @@ export class ChangePasswordComponent {
   showConfirmPassword: boolean = false;
   isPasswordVisible: boolean = false;
   isOldPasswordVisible: boolean = false;
+  isConfirmPasswordVisible: boolean = false;
   isSaving: boolean = false; // Property to track saving state
 
   constructor(
@@ -48,13 +49,9 @@ export class ChangePasswordComponent {
     // this.UserID = sessionStorage.getItem('USER_ID');
     this.sesstion_Details();
   }
-  onOldPasswordValueChanged(event: any): void {
-    this.oldPassword = event.value;
-  }
 
   ngOnInit(): void {
     this.getSecurityPolicyData();
-    this.getUserPassword();
     this.sesstion_Details();
   }
 
@@ -69,26 +66,72 @@ export class ChangePasswordComponent {
     });
   }
 
-  getUserPassword() {
-    this.dataService.get_User_Data_By_Id(this.UserID).subscribe((res: any) => {
-      this.getOldPassword = res.Password;
+  // Custom async validation function for old password
+  validateOldPassword = (params: any): Promise<any> => {
+    return new Promise((resolve) => {
+      // Check if oldPassword is set to avoid running validation unnecessarily
+      if (!params.value) {
+        this.oldPasswordBorderColor = '1px solid #ddd';
+        resolve(true);
+        return;
+      }
+
+      this.dataService.get_User_Data_By_Id(this.UserID).subscribe(
+        (res: any) => {
+          let actualOldPassword = '';
+          if (res && res.Data && res.Data.length > 0) {
+            actualOldPassword = res.Data[0].PASSWORD || res.Data[0].Password;
+          } else {
+            actualOldPassword = res.Password || res.PASSWORD;
+          }
+
+          if (params.value !== actualOldPassword) {
+            this.oldPasswordBorderColor = '2px solid red';
+            resolve({ isValid: false, message: 'Incorrect password' });
+          } else {
+            this.oldPasswordBorderColor = '2px solid green';
+            resolve(true);
+          }
+        },
+        () => {
+          resolve({ isValid: false, message: 'Validation failed' });
+        },
+      );
     });
-  }
+  };
 
-  // // Custom validation function for old password
-  // validateOldPassword = (params: any): boolean => {
-  //   // // Check if oldPassword is set to avoid running validation unnecessarily
-  //   // if (!this.oldPassword || !this.getOldPassword) {
-  //   //   return false;
-  //   // }
+  validateNewPasswordNotSame = (params: any): Promise<any> => {
+    return new Promise((resolve) => {
+      if (!params.value) {
+        resolve(true);
+        return;
+      }
 
-  //   if (this.oldPassword !== this.getOldPassword) {
-  //     params.rule.message = 'Incorrect password'; // Set custom error message
-  //     this.oldPasswordBorderColor = '2px solid green';
-  //     return false; // Validation fails
-  //   }
-  //   return true; // Validation passes
-  // };
+      this.dataService.get_User_Data_By_Id(this.UserID).subscribe(
+        (res: any) => {
+          let actualOldPassword = '';
+          if (res && res.Data && res.Data.length > 0) {
+            actualOldPassword = res.Data[0].PASSWORD || res.Data[0].Password;
+          } else {
+            actualOldPassword = res.Password || res.PASSWORD;
+          }
+
+          if (params.value === actualOldPassword) {
+            resolve({
+              isValid: false,
+              message:
+                'New password cannot be the same as the current password',
+            });
+          } else {
+            resolve(true);
+          }
+        },
+        () => {
+          resolve(true);
+        },
+      );
+    });
+  };
 
   checkPasswordStrength(): boolean {
     // Skip password validation if not required
@@ -148,6 +191,9 @@ export class ChangePasswordComponent {
   }
   toggleOldPasswordVisibility(): void {
     this.isOldPasswordVisible = !this.isOldPasswordVisible; // Toggle the visibility
+  }
+  toggleConfirmPasswordVisibility(): void {
+    this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible; // Toggle the visibility
   }
 
   checkNumbers(): boolean {
