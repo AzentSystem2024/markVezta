@@ -415,7 +415,7 @@
 <dx-popup
   (onHiding)="isEditPopUp = false"
   [(visible)]="isEditPopUp"
-  title="Advance View"
+  title="Advance"
   [width]="640"
   height="'100vh'"
 >
@@ -569,12 +569,18 @@
     </dxi-item>
 
     <dxi-item>
-      <dx-text-box
-        label="Payment Ac ID"
+      <dx-select-box
+        label="Payment Ac"
         [labelMode]="'floating'"
         [readOnly]="true"
         [value]="selected_Data?.PAY_HEAD_ID"
-      ></dx-text-box>
+        [searchEnabled]="true"
+        [items]="ledgerlistdata"
+        displayExpr="HEAD_NAME"
+        valueExpr="HEAD_ID"
+        placeholder="Payment Ac"
+      >
+      </dx-select-box>
     </dxi-item>
 
     <label style="text-decoration: underline; text-underline-offset: 4px">

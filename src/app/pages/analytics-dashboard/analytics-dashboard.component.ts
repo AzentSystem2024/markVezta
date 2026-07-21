@@ -77,7 +77,7 @@ export class AnalyticsDashboardComponent implements OnInit {
     { type: 'Net Sales', value: 130000 },
   ];
   opportunities: any = [];
-  // Transactions trend
+
   transactionsData = [
     { period: 'Jan', value: 120 },
     { period: 'Feb', value: 150 },
@@ -98,9 +98,19 @@ export class AnalyticsDashboardComponent implements OnInit {
   customStartDate: any = null;
   isLoading: boolean = true;
   customPalette = [
-    '#F59E0B', '#EC4899', '#0EA5E9',
-    '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
-    '#F97316', '#3B82F6', '#22C55E', '#D946EF', '#06B6D4',
+    '#F59E0B',
+    '#EC4899',
+    '#0EA5E9',
+    '#8B5CF6',
+    '#EF4444',
+    '#14B8A6',
+    '#EAB308',
+    '#64748B',
+    '#F97316',
+    '#3B82F6',
+    '#22C55E',
+    '#D946EF',
+    '#06B6D4',
   ];
   colors: string[] = [
     '#1E3A8A',
@@ -126,36 +136,39 @@ export class AnalyticsDashboardComponent implements OnInit {
   startDate_of_Financial_year: any;
   customDateRangeText: any;
   customDateLabel = '';
-  listSyncData: any[] = []
-  synch_pending_intervel: any
-  notificationCount: any
-  show_sync_reminder: boolean = false
-  popupVisible: boolean = false
-  buttonText: any
+  listSyncData: any[] = [];
+  synch_pending_intervel: any;
+  notificationCount: any;
+  show_sync_reminder: boolean = false;
+  popupVisible: boolean = false;
+  buttonText: any;
   storeinfo: any = [];
-  profitAndLoss_List: any = {}
+  profitAndLoss_List: any = {};
   seriesList_profitAndLoss: any[] = [];
   totalCash = 0;
-totalFabPosCard = 0;
+  totalFabPosCard = 0;
+  sessiondata: any;
 
   constructor(private service: DataService) {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '')
-    console.log(sessionData)
-    this.synch_pending_intervel = sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL
-    this.show_sync_reminder = sessionData.GeneralSettings.SHOW_SYNCH_REMINDER
+    this.sessiondata = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const sessionData = this.sessiondata;
+    console.log(sessionData);
+    this.synch_pending_intervel =
+      sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL;
+    this.show_sync_reminder = sessionData.GeneralSettings.SHOW_SYNCH_REMINDER;
     const hours =
       Number(sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL) / 60;
 
-    this.buttonText = `List of stores not synchronized in last ${hours}  hours`
+    this.buttonText = `List of stores not synchronized in last ${hours}  hours`;
 
-    this.Get_SyncData()
+    this.Get_SyncData();
     if (this.show_sync_reminder) {
-      this.popupVisible = true
+      this.popupVisible = true;
+    } else {
+      this.popupVisible = false;
     }
-    else {
-      this.popupVisible = false
-    }
-
   }
 
   selectionChange(dates: Dates) {
@@ -203,6 +216,7 @@ totalFabPosCard = 0;
     this.onDateRangeChange({
       value: 'last30',
     });
+    this.sesstion_Details();
   }
   //====================session Details===========================
   sesstion_Details() {
@@ -255,7 +269,11 @@ totalFabPosCard = 0;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
         break;
 
       case 'currentYear':
@@ -266,10 +284,13 @@ totalFabPosCard = 0;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
 
         break;
-
 
       case 'all':
         this.fromDate = new Date(this.startDate_of_Financial_year); // or your minimum date
@@ -284,105 +305,10 @@ totalFabPosCard = 0;
 
     this.getDashboardData();
   }
+  
   dateChanged() {
     this.getDashboardData();
   }
-
-  // getDashboardData() {
-  //   console.log('call this function');
-  //   console.log('From Date:', this.fromDate);
-  //   console.log('To Date:', this.toDate);
-  //   this.loadingVisible = true;
-  //   const timeoutId = setTimeout(() => {
-  //     this.loadingVisible = false;
-  //     alert('Request timeout. Please try again.');
-  //   }, 50000); // 50   seconds
-
-  //   this.sesstion_Details();
-
-  //   const payload = {
-  //     DATE_FROM: this.formatDate(this.fromDate),
-  //     DATE_TO: this.formatDate(this.toDate),
-  //     COMPANY_ID: this.selected_Company_id,
-  //     FIN_ID: this.selected_fin_id,
-  //   };
-
-  //   console.log(payload);
-  //   this.service.Dashboard_Data_api(payload).subscribe(
-  //     (res: any) => {
-  //       clearTimeout(timeoutId); // stop timeout
-
-  //       this.loadingVisible = false;
-  //       this.gross_Sales_list = res.data.GrossSale;
-  //       // this.TopMovingItems_list = res.data.
-  //       const item_list = res.data.TopMovingItems;
-  //       console.log(item_list, '==========item_list===========');
-  //       const maxQty = item_list.reduce((max: number, item: any) => {
-  //         return item.QTY_SOLD > max ? item.QTY_SOLD : max;
-  //       }, 0);
-  //       console.log(maxQty, '==========maxQty===========');
-
-  //       this.TopMovingItems_list = res.data.TopMovingItems.map((item: any) => ({
-  //         ITEM_CODE: item.ITEM_CODE,
-  //         QTY_SOLD: item.QTY_SOLD,
-  //         DESCRIPTION: item.DESCRIPTION,
-  //       }));
-  //       this.TenderSummary_list = res.data.TenderSummary;
-
-  //       this.chartData = this.TenderSummary_list.map((store: any) => {
-  //         const obj: any = {
-  //           STORE_NAME: store.STORE_NAME,
-  //         };
-
-  //         store.TenderTypes.forEach((t: any) => {
-  //           obj[t.TENDER] = t.AMOUNT;
-  //         });
-  //         this.generateSeries();
-
-  //         return obj;
-  //       });
-
-  //       console.log(
-  //         this.gross_Sales_list,
-  //         this.TopMovingItems_list,
-  //         this.TenderSummary_list,
-  //       );
-  //     },
-  //     (error) => {
-  //       clearTimeout(timeoutId); // stop timeout
-  //       this.loadingVisible = false;
-
-  //       // alert('Error occurred while loading data.');
-  //       notify('Error occurred while loading data.', 'error', 3000);
-  //     },
-  //   );
-  //   this.dateRanges = this.dateRanges.map((option) =>
-  //     option.value === 'custom' ? { ...option, label: 'Custom' } : option,
-  //   );
-  // }
-  // generateSeries() {
-  //   const tenders = new Set<string>();
-
-  //   this.TenderSummary_list.forEach((store: any) => {
-  //     store.TenderTypes.forEach((t: any) => {
-  //       tenders.add(t.TENDER);
-  //     });
-  //   });
-
-  //   // A large enough palette that visually distinct colors cycle predictably
-  //   const palette = [
-  //     '#10B981', '#4F46E5', '#F59E0B', '#EC4899', '#0EA5E9',
-  //     '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
-  //     '#F97316', '#3B82F6', '#22C55E', '#D946EF', '#06B6D4',
-  //   ];
-
-  //   this.seriesList = Array.from(tenders).map((tender, index) => ({
-  //     valueField: tender,
-  //     name: tender,
-  //     type: 'bar',
-  //     color: palette[index % palette.length],
-  //   }));
-  // }
 
   getDashboardData() {
     this.loadingVisible = true;
@@ -392,7 +318,6 @@ totalFabPosCard = 0;
     }, 50000);
 
     this.sesstion_Details();
-    
 
     const payload = {
       DATE_FROM: this.formatDate(this.fromDate),
@@ -421,13 +346,13 @@ totalFabPosCard = 0;
         const allTenderKeys = this.seriesList.map((s: any) => s.valueField);
 
         this.storeinfo = this.TenderSummary_list.map((store: any) => {
-          console.log(store, '----stores----')
+          console.log(store, '----stores----');
           const obj: any = {
             store: store.STORE_NAME,
             Total: 0,
             TOTAL: store.TenderTypes.reduce((sum: number, tender: any) => {
               return sum + Number(tender.AMOUNT || 0);
-            }, 0)
+            }, 0),
           };
 
           allTenderKeys.forEach((key: string) => (obj[key] = 0));
@@ -437,16 +362,16 @@ totalFabPosCard = 0;
             obj.Total += Number(t.AMOUNT);
           });
           // Total = Cash + FAB POS CARD
-obj.TOTAL = obj.Total;
-console.log(obj.TOTAL)
+          obj.TOTAL = obj.Total;
+          console.log(obj.TOTAL);
           return obj;
         });
 
         // const revenue = res.data.ProfitLoss.Revenue || [];
         // const expense = res.data.ProfitLoss.Expense || [];
 
-        const RevenuExpe = res.data.ProfitLoss
-        console.log(RevenuExpe, '----------------RevenuExpe------------')
+        const RevenuExpe = res.data.ProfitLoss;
+        console.log(RevenuExpe, '----------------RevenuExpe------------');
 
         // const data = {
         //   ...revenue, ...expense
@@ -461,37 +386,35 @@ console.log(obj.TOTAL)
           chartMap.set(item.STORE, {
             STORE_NAME: item.STORE,
             Revenue: Number(item.REVENUE) || 0,
-            Expense: 0
+            Expense: 0,
           });
         });
 
         // Expense
         expense.forEach((item: any) => {
-
           if (chartMap.has(item.STORE)) {
             chartMap.get(item.STORE).Expense = Number(item.EXPENSE) || 0;
           } else {
             chartMap.set(item.STORE, {
               STORE_NAME: item.STORE,
               Revenue: 0,
-              Expense: Number(item.EXPENSE) || 0
+              Expense: Number(item.EXPENSE) || 0,
             });
           }
-
         });
 
         this.chartData = Array.from(chartMap.values());
-        console.log(this.chartData, this.seriesList_profitAndLoss)
+        console.log(this.chartData, this.seriesList_profitAndLoss);
 
         this.seriesList_profitAndLoss = [
           {
             valueField: 'Revenue',
-            name: 'Revenue'
+            name: 'Revenue',
           },
           {
             valueField: 'Expense',
-            name: 'Expense'
-          }
+            name: 'Expense',
+          },
         ];
 
         // console.log(data, '=================full reven and expence')
@@ -525,8 +448,16 @@ console.log(obj.TOTAL)
     });
 
     const palette = [
-      '#10B981', '#4F46E5', '#F59E0B', '#EC4899', '#0EA5E9',
-      '#8B5CF6', '#EF4444', '#14B8A6', '#EAB308', '#64748B',
+      '#10B981',
+      '#4F46E5',
+      '#F59E0B',
+      '#EC4899',
+      '#0EA5E9',
+      '#8B5CF6',
+      '#EF4444',
+      '#14B8A6',
+      '#EAB308',
+      '#64748B',
     ];
 
     this.seriesList = Array.from(tenders).map((tender, index) => ({
@@ -567,9 +498,10 @@ console.log(obj.TOTAL)
     `,
     };
   }
-  barChartcustomizeTooltip() { }
-  MillioncustomizeLabel() { }
-  onChartInitialized(e: any) { }
+  barChartcustomizeTooltip() {}
+  MillioncustomizeLabel() {}
+  onChartInitialized(e: any) {}
+
   customizeFunnelLabel = (arg: any) => {
     return `${arg.item.STORE_NAME}
 ${this.formatAmount(arg.value)}`;
@@ -598,6 +530,7 @@ ${this.formatAmount(arg.value)}`;
       color: this.colors[index % this.colors.length],
     };
   };
+
   formatNumber(value: number): string {
     if (value === null || value === undefined) {
       return '0';
@@ -606,25 +539,18 @@ ${this.formatAmount(arg.value)}`;
     return new Intl.NumberFormat('en-IN').format(value);
   }
 
-  // customizeCommonLabel = (arg: any) => {
-  //   // return this.formatAmountTender(arg.value);
-  //   return {
-  //     text: `${arg.item.argument}${this.formatAmountTender(arg.value)}`,
-  //   };
-  // };
+
   customizeCommonLabel = (pointInfo: any) => {
     return `${this.formatAmountTender(pointInfo.value)}`;
   };
 
-
-
-
   customizeCommonTooltip = (arg: any) => {
-    console.log(arg)
+    console.log(arg);
     return {
       text: `${arg.item.argument}${this.formatNumber(arg.value)}`,
     };
   };
+
   customizeCommonLabelFortopmovin = (pointInfo: any): string => {
     return `${pointInfo.value}`;
   };
@@ -681,7 +607,11 @@ ${this.formatAmount(arg.value)}`;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
         break;
 
       case 'currentYear':
@@ -692,7 +622,11 @@ ${this.formatAmount(arg.value)}`;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(this.fromDate, this.toDate, '================currentMonth=================');
+        console.log(
+          this.fromDate,
+          this.toDate,
+          '================currentMonth=================',
+        );
 
         break;
 
@@ -733,17 +667,7 @@ ${this.formatAmount(arg.value)}`;
     this.showCustomDatePopup = false;
   }
 
-  private parseDateString(dateStr: string): Date {
-    if (!dateStr || typeof dateStr !== 'string') {
-      console.warn('Invalid date string:', dateStr);
-      return new Date('Invalid'); // or new Date(0) if you want a fallback
-    }
 
-    const [day, month, year] = dateStr
-      .split('-')
-      .map((part) => parseInt(part, 10));
-    return new Date(year, month - 1, day);
-  }
 
   displayExpr = (item: any) => {
     if (!item) return '';
@@ -817,21 +741,18 @@ ${this.formatAmount(arg.value)}`;
 
   //===================Show synch reminder===============
 
-
-
   Get_SyncData() {
     this.service.get_sync_Data_api().subscribe({
       next: (res: any) => {
-
         const pendingData = res.filter(
-          (item: any) => Number(item.TIME_DIFFERENCE) > this.synch_pending_intervel
+          (item: any) =>
+            Number(item.TIME_DIFFERENCE) > this.synch_pending_intervel,
         );
 
         this.listSyncData = pendingData.map((item: any, index: number) => ({
           ...item,
           SL_NO: index + 1,
-          IsPending: true
-
+          IsPending: true,
         }));
 
         this.notificationCount = this.listSyncData.length;
@@ -841,12 +762,11 @@ ${this.formatAmount(arg.value)}`;
       },
       error: (err) => {
         console.log(err);
-      }
+      },
     });
   }
   onRowPrepared(e: any) {
     if (e.rowType !== 'data') return;
-
 
     if (e.data.IsPending) {
       e.rowElement.style.color = 'red';
@@ -868,7 +788,7 @@ ${this.formatAmount(arg.value)}`;
       year: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
     }).format(date);
   };
 
@@ -904,7 +824,6 @@ ${this.formatAmount(arg.value)}`;
     return {
       text: `${arg.seriesName}: ${this.formatTenderAmount(arg.value)}`,
     };
-
   };
 
   //===================gross claimed tender summary chart========================
@@ -924,9 +843,9 @@ ${this.formatAmount(arg.value)}`;
   // customizeText for dxo-label must return a STRING directly
   customizeGrossSalesLabel = (arg: any) => {
     return {
-      text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`
+      text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
     };
-  }
+  };
 
   customizeGrossSalesTooltip = (arg: any) => {
     return {
@@ -947,23 +866,22 @@ ${this.formatAmount(arg.value)}`;
   }
 
   // Tooltip - shows exact value only
- customizeTooltipTender = (pointInfo: any) => {
-  const data = pointInfo.point.data;
+  customizeTooltipTender = (pointInfo: any) => {
+    const data = pointInfo.point.data;
 
-  return {
-    html: `
+    return {
+      html: `
       <b>${data.store}</b><br/>
       ${pointInfo.seriesName}: ${pointInfo.valueText}<br/>
       <b>Total: ${data.TOTAL.toLocaleString()}</b>
     `,
+    };
   };
-};
 
   // Data labels on bars - shows exact value only
   customizeLabelTender = (pointInfo: any) => {
     return this.formatAmountTender(pointInfo.value);
   };
-
 
   //=================
   customizeTotalLabel = (arg: any) => {
@@ -983,13 +901,13 @@ ${this.formatAmount(arg.value)}`;
   customizeCommonLabelProfitandLoss = (arg: any) => {
     return new Intl.NumberFormat('en', {
       notation: 'compact',
-      maximumFractionDigits: 1
+      maximumFractionDigits: 1,
     }).format(arg.value);
   };
   customizeProfitandLoss = (arg: any) => {
     return new Intl.NumberFormat('en-IN', {
       notation: 'compact',
-      maximumFractionDigits: 1
+      maximumFractionDigits: 1,
     }).format(arg.value);
   };
   customizeProfitAndLossTooltip = (arg: any) => {
@@ -998,19 +916,18 @@ ${this.formatAmount(arg.value)}`;
         'en-IN',
         {
           minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }
-      ).format(arg.value)} AED`
+          maximumFractionDigits: 2,
+        },
+      ).format(arg.value)} AED`,
     };
   };
 
   customizeLabelTenderTotal = (pointInfo: any) => {
-
     const data = pointInfo.point.data;
 
     let total = 0;
 
-    this.seriesList.forEach(series => {
+    this.seriesList.forEach((series) => {
       total += Number(data[series.valueField] || 0);
     });
 
@@ -1032,11 +949,8 @@ ${this.formatAmount(arg.value)}`;
   };
 
   customizeInsideLabel = (arg: any) => {
-    return arg.valueText;   // Shows 81, 13, etc.
+    return arg.valueText; // Shows 81, 13, etc.
   };
-
-
-
 }
 
 @NgModule({
@@ -1067,11 +981,10 @@ ${this.formatAmount(arg.value)}`;
     DxLoadPanelModule,
     CustomDatePopupModule,
     DxPopupModule,
-
   ],
   providers: [],
   exports: [],
   declarations: [AnalyticsDashboardComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AnalyticsDashboardModule { }
+export class AnalyticsDashboardModule {}
