@@ -279,6 +279,7 @@ export class LedgerStatementComponent implements OnInit {
       .HeadId_Dropdown_api(this.selected_Company_id)
       .subscribe((res: any) => {
         this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
+        console.log("ledger head id fetched",this.HEAD_ID_LIST)
       });
   }
 
