@@ -7060,7 +7060,7 @@ The result can be exported to HTML or Markdown.`;
 
   //===========Balance sheet Dimension======================
   Balance_Sheet_Dimension_Api(payload: any) {
-    const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheetDimension';
+    const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheet';
     return this.http.post(getEndpoint, payload);
   }
 

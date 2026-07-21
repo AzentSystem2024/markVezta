@@ -271,14 +271,18 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
           const savedList = data.DetailList || [];
           const savedIds = new Set(savedList.map((item: any) => item.ID));
 
-          const mergedList = [...savedList];
-          pendingList.forEach((item: any) => {
-            if (!savedIds.has(item.ID)) {
-              mergedList.push(item);
-            }
-          });
+          if (this.isReadOnlyMode) {
+            this.salaryPendingList = savedList;
+          } else {
+            const mergedList = [...savedList];
+            pendingList.forEach((item: any) => {
+              if (!savedIds.has(item.ID)) {
+                mergedList.push(item);
+              }
+            });
+            this.salaryPendingList = mergedList;
+          }
 
-          this.salaryPendingList = mergedList;
           this.selectedIds = Array.from(savedIds);
         } else {
           this.salaryPendingList = pendingList;
