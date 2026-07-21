@@ -138,6 +138,7 @@ export class EditCustomerReceiptComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['receiprtFormData'] && this.receiprtFormData) {
       const firstReceipt = this.receiprtFormData[0];
+      console.log(this.receiprtFormData, 'RECEIPTFORMDATA');
       if (firstReceipt.REC_DATE && typeof firstReceipt.REC_DATE === 'string') {
         const [day, month, year] = firstReceipt.REC_DATE.split('-').map(Number);
         firstReceipt.REC_DATE = `${year}-${String(month).padStart(
@@ -172,7 +173,7 @@ export class EditCustomerReceiptComponent {
         this.onReceiptModeChange({ value: this.receiptMode });
       }
       this.selectedCompanyId = firstReceipt.COMPANY_ID;
-
+      this.AC_Default();
       this.getCompanyListDropdown();
 
       this.mainInvoiceGridList = firstReceipt.REC_DETAIL || [];
@@ -215,18 +216,25 @@ export class EditCustomerReceiptComponent {
     }
   }
 
-           AC_Default(){
-   const payload = {
-    CompanyID : this.selectedCompanyId
-   }
-    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-      this.settings = res.Data
-      this.CashID = this.settings.GP_CASH_ID;  
-      console.log(this.CashID) 
+  AC_Default() {
+    const payload = {
+      CompanyID: this.selectedCompanyId,
+    };
+
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res: any) => {
+      this.settings = res.Data;
+
+      this.CashID = this.settings.GP_CASH_ID;
       this.BankID = this.settings.GP_BANK_ID;
-      console.log(this.BankID)
-    })
+
+      console.log('CashID', this.CashID);
+      console.log('BankID', this.BankID);
+
+      // Apply filter only after IDs are loaded
+      if (this.receiptMode) {
+        this.applyReceiptModeFilter();
+      }
+    });
   }
 
   getSlNo = (rowData: any, index?: number): number => {
@@ -381,6 +389,18 @@ export class EditCustomerReceiptComponent {
     } else {
       this.filteredLedgerList = [...this.ledgerList]; // For 'PDC' or others
     }
+    console.log('Receipt Mode:', this.receiptMode);
+    console.log('PAY_HEAD_ID:', this.receiprtFormData.PAY_HEAD_ID);
+    console.log('BankID:', this.BankID);
+    console.log('CashID:', this.CashID);
+    console.log('Filtered Ledger List:', this.filteredLedgerList);
+
+    const selectedLedger = this.filteredLedgerList.find(
+      (x: any) =>
+        Number(x.HEAD_ID) === Number(this.receiprtFormData.PAY_HEAD_ID),
+    );
+
+    console.log('Selected Ledger:', selectedLedger);
   }
 
   onSearchCheque() {
@@ -572,6 +592,7 @@ export class EditCustomerReceiptComponent {
 
   onCustomerChanged(event: any): void {
     const selectedId = event.value;
+    console.log(selectedId, 'SELECTEDIDDD');
     if (selectedId) {
       this.selectedCustomer = this.distributorList.find(
         (s: any) => s.ID === selectedId,
@@ -738,51 +759,49 @@ export class EditCustomerReceiptComponent {
     this.showFillAmountPopup = false;
   }
 
-onSaveClick(): void {
-  const status = this.receiprtFormData.TRANS_STATUS;
-  console.log(status)
-  // APPROVE / COMMIT
-  if (
-    this.receiprtFormData.IS_APPROVED ||
-    this.receiprtFormData.TRANS_STATUS === 2 && this.canApprove ===true
-  ) {
-    confirm(
-      'It will approve and commit. Are you sure you want to commit?',
-      'Confirm Commit'
-    ).then((dialogResult) => {
-      if (dialogResult) {
-        this.isSaving = true;
-        this.commitReceipt();
-      }
-    });
+  onSaveClick(): void {
+    const status = this.receiprtFormData.TRANS_STATUS;
+    console.log(status);
+    // APPROVE / COMMIT
+    if (
+      this.receiprtFormData.IS_APPROVED ||
+      (this.receiprtFormData.TRANS_STATUS === 2 && this.canApprove === true)
+    ) {
+      confirm(
+        'It will approve and commit. Are you sure you want to commit?',
+        'Confirm Commit',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          this.isSaving = true;
+          this.commitReceipt();
+        }
+      });
 
-    return;
+      return;
+    }
+
+    // VERIFY
+    if (this.isVerifyReceipt === true) {
+      confirm(
+        'Are you sure you want to verify this Customer Receipt?',
+        'Confirm Verification',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          this.isSaving = true;
+          this.VerifyReceipt();
+        } else {
+          this.isSaving = false;
+          notify('Verification cancelled', 'info', 2000);
+        }
+      });
+
+      return;
+    }
+
+    // NORMAL UPDATE
+    this.isSaving = true;
+    this.UpdateReceipt();
   }
-
-  // VERIFY
-  if (this.isVerifyReceipt === true) {
-    confirm(
-      'Are you sure you want to verify this Customer Receipt?',
-      'Confirm Verification'
-    ).then((dialogResult) => {
-      if (dialogResult) {
-        this.isSaving = true;
-        this.VerifyReceipt();
-      } else {
-        this.isSaving = false;
-        notify('Verification cancelled', 'info', 2000);
-      }
-    });
-
-    return;
-  }
-
-  // NORMAL UPDATE
-  this.isSaving = true;
-  this.UpdateReceipt();
-}
-
-
 
   onConfirmCommit(): void {
     this.showCommitConfirmPopup = false;
@@ -893,61 +912,59 @@ onSaveClick(): void {
     });
   }
 
-
-
   VerifyReceipt() {
-  if (!this.selectedDistributorId || this.selectedDistributorId == '') {
-    notify('Please select a customer', 'warning', 3000);
-    return;
-  }
+    if (!this.selectedDistributorId || this.selectedDistributorId == '') {
+      notify('Please select a customer', 'warning', 3000);
+      return;
+    }
 
-  const selectedRows =
-    this.itemsGridRef?.instance?.getSelectedRowsData() || [];
+    const selectedRows =
+      this.itemsGridRef?.instance?.getSelectedRowsData() || [];
 
-  const validDetails = selectedRows
-    .filter((row: any) => Number(row.AMOUNT) > 0)
-    .map((row: any) => ({
-      BILL_ID: row.BILL_ID,
-      AMOUNT: Number(row.AMOUNT),
-    }));
+    const validDetails = selectedRows
+      .filter((row: any) => Number(row.AMOUNT) > 0)
+      .map((row: any) => ({
+        BILL_ID: row.BILL_ID,
+        AMOUNT: Number(row.AMOUNT),
+      }));
 
-  if (validDetails.length === 0) {
-    notify(
-      'Please enter a valid Received Amount for at least one selected row',
-      'warning',
-      3000,
+    if (validDetails.length === 0) {
+      notify(
+        'Please enter a valid Received Amount for at least one selected row',
+        'warning',
+        3000,
+      );
+      return;
+    }
+
+    const netAmount = validDetails.reduce(
+      (sum: number, row: any) => sum + row.AMOUNT,
+      0,
     );
-    return;
+
+    this.receiprtFormData.NET_AMOUNT = netAmount;
+
+    const payload = {
+      ...this.receiprtFormData,
+      DISTRIBUTOR_ID: this.selectedDistributorId,
+      REC_DETAIL: validDetails,
+    };
+
+    this.dataService.verifyReceipt(payload).subscribe({
+      next: (response: any) => {
+        this.isSaving = false;
+
+        if (response.Flag == 1 || response.flag == 1) {
+          notify('Receipt verified successfully', 'success', 3000);
+          this.popupClosed.emit();
+        }
+      },
+      error: () => {
+        this.isSaving = false;
+        notify('An error occurred while verifying the receipt', 'error', 3000);
+      },
+    });
   }
-
-  const netAmount = validDetails.reduce(
-    (sum: number, row: any) => sum + row.AMOUNT,
-    0,
-  );
-
-  this.receiprtFormData.NET_AMOUNT = netAmount;
-
-  const payload = {
-    ...this.receiprtFormData,
-    DISTRIBUTOR_ID: this.selectedDistributorId,
-    REC_DETAIL: validDetails,
-  };
-
-  this.dataService.verifyReceipt(payload).subscribe({
-    next: (response: any) => {
-      this.isSaving = false;
-
-      if (response.Flag == 1 || response.flag == 1) {
-        notify('Receipt verified successfully', 'success', 3000);
-        this.popupClosed.emit();
-      }
-    },
-    error: () => {
-      this.isSaving = false;
-      notify('An error occurred while verifying the receipt', 'error', 3000);
-    },
-  });
-}
 
   resetFillAmountForm() {
     this.fillAmountData.field1 = 0;
