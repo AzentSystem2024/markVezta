@@ -157,21 +157,20 @@ export class AddCutomerReceiptComponent {
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
   }
 
-          AC_Default(){
-   const payload = {
-    CompanyID : this.selectedCompanyId
-   }
-    this.dataService.AC_Default_Settings_Api(payload).subscribe((res:any)=>{
-      console.log(res)
-      this.settings = res.Data
-      this.CashID = this.settings.GP_CASH_ID;  
-      console.log(this.CashID) 
+  AC_Default() {
+    const payload = {
+      CompanyID: this.selectedCompanyId,
+    };
+    this.dataService.AC_Default_Settings_Api(payload).subscribe((res: any) => {
+      console.log(res);
+      this.settings = res.Data;
+      this.CashID = this.settings.GP_CASH_ID;
+      console.log(this.CashID, 'CASHIDDDDDDDDDDDDDDDDD');
       this.BankID = this.settings.GP_BANK_ID;
-      console.log(this.BankID)
-    })
+      console.log(this.BankID, 'BANKIDDDDDDDDDDDDDDDDDDDD');
+    });
   }
 
-  
   getSlNo = (rowData: any, index?: number): number => {
     // index is not provided by default, so we calculate based on array position
     if (!this.pendingInvoiceList) return 0;
@@ -216,34 +215,66 @@ export class AddCutomerReceiptComponent {
     if (e.parentType !== 'dataRow') return;
 
     if (e.dataField === 'RECEIVED_AMOUNT') {
-      e.editorOptions = e.editorOptions || {};
+      const isSelected = this.itemsGridRef?.instance
+        ?.getSelectedRowKeys()
+        ?.includes(e.row.key);
 
-      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.readOnly = !isSelected;
+
+      e.editorOptions.showSpinButtons = false;
+
       e.editorOptions.elementAttr = {
         style: `
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
+        height:100%;
+        margin:0;
+        padding:0;
+        display:flex;
+        align-items:center;
       `,
       };
 
-      // Make sure the input fits snugly inside
       e.editorOptions.inputAttr = {
         style: `
-        height: 100%;
-        padding: 0 4px;
-        box-sizing: border-box;
+        height:100%;
+        padding:0 4px;
+        box-sizing:border-box;
       `,
       };
-
-      // Remove spin buttons to prevent layout changes
-      if (e.editorName === 'dxNumberBox') {
-        e.editorOptions.showSpinButtons = false;
-      }
     }
   }
+
+  // onEditorPreparing(e: any) {
+  //   if (e.parentType !== 'dataRow') return;
+
+  //   if (e.dataField === 'RECEIVED_AMOUNT') {
+  //     e.editorOptions = e.editorOptions || {};
+
+  //     // Let the editor inherit row height naturally (no fixed height)
+  //     e.editorOptions.elementAttr = {
+  //       style: `
+  //       height: 100%;
+  //       margin: 0;
+  //       padding: 0;
+  //       display: flex;
+  //       align-items: center;
+  //     `,
+  //     };
+
+  //     // Make sure the input fits snugly inside
+  //     e.editorOptions.inputAttr = {
+  //       style: `
+  //       height: 100%;
+  //       padding: 0 4px;
+  //       box-sizing: border-box;
+  //     `,
+  //     };
+
+  //     // Remove spin buttons to prevent layout changes
+  //     if (e.editorName === 'dxNumberBox') {
+  //       e.editorOptions.showSpinButtons = false;
+  //     }
+  //   }
+  // }
 
   onGridContentReady(e: any) {
     if (e.component) {
@@ -397,6 +428,17 @@ export class AddCutomerReceiptComponent {
 
   onSelectionChanged(e: any) {
     this.selectedRowsCount = e.selectedRowsData.length;
+    // Clear received amount from unselected rows
+    e.currentDeselectedRowKeys.forEach((key: any) => {
+      const row = this.pendingInvoiceList.find((r) => r.BILL_ID === key);
+
+      if (row) {
+        row.RECEIVED_AMOUNT = 0;
+      }
+    });
+
+    // Refresh grid so readOnly state changes immediately
+    this.itemsGridRef.instance.refresh();
   }
 
   onFillAmountClick() {
