@@ -420,6 +420,12 @@ export class AdvanceComponent {
       this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
       this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
       this.date_value = this.selected_Data.DATE;
+      if (this.date_value) {
+        const d = new Date(this.date_value);
+        if (!isNaN(d.getTime())) {
+          this.minDateUpdate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+        }
+      }
       this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
       this.selectTransId = this.selected_Data.TRANS_ID;
       this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
@@ -596,6 +602,14 @@ export class AdvanceComponent {
     });
     this.formSource.get('No_installments')?.valueChanges.subscribe(() => {
       this.calculateInstallmentAmount();
+    });
+    this.formSource.get('Date')?.valueChanges.subscribe((value) => {
+      if (value) {
+        const d = new Date(value);
+        if (!isNaN(d.getTime())) {
+          this.minDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+        }
+      }
     });
   }
 
