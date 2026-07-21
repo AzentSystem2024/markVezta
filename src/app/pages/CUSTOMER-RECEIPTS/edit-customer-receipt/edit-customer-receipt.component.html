@@ -9,8 +9,69 @@
       box-sizing: border-box;
     "
   >
-    <div class="salary-grid-wrapper" style="padding: 0 10px">
-      <div class="grid-container">
+    <div
+      class="salary-grid-wrapper"
+      style="
+        padding: 0 10px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          padding-top: 12px;
+          margin-bottom: 15px;
+          gap: 15px;
+        "
+      >
+        <!-- Left -->
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <dx-text-box
+            [(value)]="receiprtFormData.DOC_NO"
+            label="Receipt No"
+            labelMode="floating"
+            [width]="200"
+            [readOnly]="true"
+          >
+          </dx-text-box>
+
+          <dx-select-box
+            [(value)]="selectedDistributorId"
+            [dataSource]="distributorList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [width]="320"
+            [searchEnabled]="true"
+            [showClearButton]="true"
+            label="Customer"
+            labelMode="floating"
+            [readOnly]="true"
+            (onValueChanged)="onCustomerChanged($event)"
+          >
+          </dx-select-box>
+        </div>
+
+        <!-- Right -->
+        <dx-date-box
+          [(value)]="receiprtFormData.REC_DATE"
+          label="Date"
+          labelMode="floating"
+          displayFormat="dd-MM-yyyy"
+          type="date"
+          [width]="180"
+          [readOnly]="true"
+        >
+        </dx-date-box>
+      </div>
+      <div
+        class="grid-container"
+        style="display: flex; flex-direction: column; flex: 1; min-height: 0"
+      >
         <dx-data-grid
           #itemsGridRef
           [dataSource]="pendingInvoiceList"
@@ -26,7 +87,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'40vh'"
+          [height]="'100%'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -49,7 +110,7 @@
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
-          <dxo-toolbar>
+          <!-- <dxo-toolbar>
             <div
               class="stacked-toolbar-group"
               style="display: flex; flex-direction: column; gap: 2px"
@@ -93,7 +154,6 @@
             </dxi-item>
             <dxi-item location="after" locateInMenu="auto">
               <div>
-                <!-- push it down -->
                 <dx-date-box
                   label="Date"
                   labelMode="floating"
@@ -105,7 +165,7 @@
                 ></dx-date-box>
               </div>
             </dxi-item>
-          </dxo-toolbar>
+          </dxo-toolbar> -->
           <dxi-column
             dataField="SL_NO"
             caption="Sl No"

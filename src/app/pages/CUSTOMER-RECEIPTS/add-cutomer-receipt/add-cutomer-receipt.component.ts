@@ -195,12 +195,6 @@ export class AddCutomerReceiptComponent {
       .getInvoiceListForCustomerReceipt(payload)
       .subscribe((response: any) => {
         this.pendingInvoiceList = response.Data;
-        console.table(this.pendingInvoiceList);
-
-        const ids = this.pendingInvoiceList.map((x) => x.BILL_ID);
-        console.log(ids);
-
-        console.log('Unique:', new Set(ids).size, 'Total:', ids.length);
       });
   }
 
@@ -434,8 +428,6 @@ export class AddCutomerReceiptComponent {
 
   onSelectionChanged(e: any) {
     this.selectedRowsCount = e.selectedRowsData.length;
-    const selectedKeys = e.selectedRowKeys || [];
-
     // Clear received amount from unselected rows
     e.currentDeselectedRowKeys.forEach((key: any) => {
       const row = this.pendingInvoiceList.find((r: any) => r.BILL_ID === key);
