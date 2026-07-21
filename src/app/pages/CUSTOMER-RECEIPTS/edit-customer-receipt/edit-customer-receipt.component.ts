@@ -496,6 +496,53 @@ export class EditCustomerReceiptComponent {
     return value <= pending;
   };
 
+  // onEditorPreparing(e: any) {
+  //   // Disable selection checkbox when in read-only mode
+  //   if (e.parentType === 'dataRow' && e.dataField === 'selected') {
+  //     if (this.isReadOnlyMode) {
+  //       e.editorOptions.readOnly = true;
+  //       e.editorOptions.disabled = true;
+  //     }
+  //   }
+
+  //   // Disable header checkbox (select all)
+  //   if (e.parentType === 'headerRow' && e.dataField === 'selected') {
+  //     if (this.isReadOnlyMode) {
+  //       e.editorOptions.readOnly = true;
+  //       e.editorOptions.disabled = true;
+  //     }
+  //   }
+  //   if (e.parentType !== 'dataRow') return;
+
+  //   if (e.dataField === 'AMOUNT') {
+  //     e.editorOptions = e.editorOptions || {};
+
+  //     // Let the editor inherit row height naturally (no fixed height)
+  //     e.editorOptions.elementAttr = {
+  //       style: `
+  //       height: 100%;
+  //       margin: 0;
+  //       padding: 0;
+  //       display: flex;
+  //       align-items: center;
+  //     `,
+  //     };
+
+  //     // Make sure the input fits snugly inside
+  //     e.editorOptions.inputAttr = {
+  //       style: `
+  //       height: 100%;
+  //       padding: 0 4px;
+  //       box-sizing: border-box;
+  //     `,
+  //     };
+
+  //     // Remove spin buttons to prevent layout changes
+  //     if (e.editorName === 'dxNumberBox') {
+  //       e.editorOptions.showSpinButtons = false;
+  //     }
+  //   }
+  // }
   onEditorPreparing(e: any) {
     // Disable selection checkbox when in read-only mode
     if (e.parentType === 'dataRow' && e.dataField === 'selected') {
@@ -512,12 +559,19 @@ export class EditCustomerReceiptComponent {
         e.editorOptions.disabled = true;
       }
     }
+
     if (e.parentType !== 'dataRow') return;
 
     if (e.dataField === 'AMOUNT') {
       e.editorOptions = e.editorOptions || {};
 
-      // Let the editor inherit row height naturally (no fixed height)
+      // NEW: Only selected rows can edit
+      const isSelected = this.selectedRowsKeys.includes(e.row.data.BILL_ID);
+
+      e.editorOptions.readOnly = !isSelected || this.isReadOnlyMode;
+      e.editorOptions.disabled = !isSelected || this.isReadOnlyMode;
+
+      // Existing code
       e.editorOptions.elementAttr = {
         style: `
         height: 100%;
@@ -528,7 +582,6 @@ export class EditCustomerReceiptComponent {
       `,
       };
 
-      // Make sure the input fits snugly inside
       e.editorOptions.inputAttr = {
         style: `
         height: 100%;
@@ -537,7 +590,6 @@ export class EditCustomerReceiptComponent {
       `,
       };
 
-      // Remove spin buttons to prevent layout changes
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
@@ -547,16 +599,19 @@ export class EditCustomerReceiptComponent {
   onSelectionChanged(e: any) {
     // Prevent selection changes in read-only mode
     if (this.isReadOnlyMode) {
-      // Reset selection to previous state
       e.component.selectRows(this.selectedRowsKeys, false);
       return;
     }
+
+    // NEW
+    this.selectedRowsKeys = [...e.selectedRowKeys];
+
     const selectedIds = e.selectedRowKeys;
     this.selectedRowsCount = e.selectedRowsData.length;
 
     let deduction = 0;
 
-    // Reset RECEIVED_AMOUNT for unselected rows
+    // Reset AMOUNT for unselected rows
     this.pendingInvoiceList.forEach((row: any) => {
       if (!selectedIds.includes(row.BILL_ID)) {
         deduction += Number(row.AMOUNT || 0);
@@ -568,13 +623,13 @@ export class EditCustomerReceiptComponent {
     this.receiprtFormData.NET_AMOUNT =
       Number(this.receiprtFormData.NET_AMOUNT || 0) - deduction;
 
-    // ✅ Calculate total of selected RECEIVED_AMOUNT
+    // Calculate total of selected AMOUNT
     const selectedTotal = e.selectedRowsData.reduce(
       (sum: number, row: any) => sum + Number(row.AMOUNT || 0),
       0,
     );
 
-    // ✅ Update the summary footer dynamically
+    // Update footer summary
     e.component
       .option('summary.totalItems')
       .forEach((item: any, index: number) => {
@@ -586,9 +641,57 @@ export class EditCustomerReceiptComponent {
         }
       });
 
-    // ✅ Force grid refresh if needed
+    // Existing code
     this.pendingInvoiceList = [...this.pendingInvoiceList];
+
+    // NEW: Refresh editors
+    this.itemsGridRef.instance.repaint();
   }
+  // onSelectionChanged(e: any) {
+  //   // Prevent selection changes in read-only mode
+  //   if (this.isReadOnlyMode) {
+  //     // Reset selection to previous state
+  //     e.component.selectRows(this.selectedRowsKeys, false);
+  //     return;
+  //   }
+  //   const selectedIds = e.selectedRowKeys;
+  //   this.selectedRowsCount = e.selectedRowsData.length;
+
+  //   let deduction = 0;
+
+  //   // Reset RECEIVED_AMOUNT for unselected rows
+  //   this.pendingInvoiceList.forEach((row: any) => {
+  //     if (!selectedIds.includes(row.BILL_ID)) {
+  //       deduction += Number(row.AMOUNT || 0);
+  //       row.AMOUNT = 0;
+  //     }
+  //   });
+
+  //   // Update NET_AMOUNT after deduction
+  //   this.receiprtFormData.NET_AMOUNT =
+  //     Number(this.receiprtFormData.NET_AMOUNT || 0) - deduction;
+
+  //   // ✅ Calculate total of selected RECEIVED_AMOUNT
+  //   const selectedTotal = e.selectedRowsData.reduce(
+  //     (sum: number, row: any) => sum + Number(row.AMOUNT || 0),
+  //     0,
+  //   );
+
+  //   // ✅ Update the summary footer dynamically
+  //   e.component
+  //     .option('summary.totalItems')
+  //     .forEach((item: any, index: number) => {
+  //       if (item.name === 'selectedTotal') {
+  //         e.component.option(
+  //           `summary.totalItems[${index}].value`,
+  //           selectedTotal,
+  //         );
+  //       }
+  //     });
+
+  //   // ✅ Force grid refresh if needed
+  //   this.pendingInvoiceList = [...this.pendingInvoiceList];
+  // }
 
   onCustomerChanged(event: any): void {
     const selectedId = event.value;
