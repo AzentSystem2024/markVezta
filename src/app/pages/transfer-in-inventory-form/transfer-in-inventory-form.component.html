@@ -77,27 +77,39 @@
             </dxi-item>
             <dxi-item location="after" locateInMenu="auto">
               <div class="stacked-toolbar-group">
-                <dx-select-box
-                  [(value)]="transferInFormData.ORIGIN_STORE_ID"
-                  [dataSource]="transferstores"
-                  displayExpr="DESCRIPTION"
-                  valueExpr="ID"
-                  [width]="200"
-                  [searchEnabled]="true"
-                  label="Issued from"
-                  labelMode="floating"
-                  (onValueChanged)="onStoreChange($event)"
-                  [readOnly]="isReadOnlyMode || isEditing"
-                ></dx-select-box>
-                <div style="margin-top: 2px; text-align: left">
+                <div style="display: flex; gap: 5px">
+                  <dx-select-box
+                    [(value)]="transferInFormData.ORIGIN_STORE_ID"
+                    [dataSource]="transferstores"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="200"
+                    [searchEnabled]="true"
+                    label="Issued from"
+                    labelMode="floating"
+                    (onValueChanged)="onStoreChange($event)"
+                    [readOnly]="isReadOnlyMode || isEditing"
+                  ></dx-select-box>
+
+                  <dx-select-box
+                    [(value)]="transferInFormData.DEPT_ID"
+                    [dataSource]="departments"
+                    displayExpr="DESCRIPTION"
+                    valueExpr="ID"
+                    [width]="200"
+                    [searchEnabled]="true"
+                    label="Department"
+                    labelMode="floating"
+                    [readOnly]="isReadOnlyMode"
+                  ></dx-select-box>
+                </div>
+                <div style="margin-top: -4px; text-align: left; display: flex; gap: 5px">
                   <dx-button
                     [width]="200"
                     stylingMode="contained"
                     class="blue-contained-btn"
                     (onClick)="onAddItems()"
-                    [disabled]="
-                      !transferInFormData.ORIGIN_STORE_ID || isReadOnlyMode
-                    "
+                    [disabled]="!transferInFormData.ORIGIN_STORE_ID || isReadOnlyMode"
                   >
                     <div *dxTemplate="let data of 'content'">
                       <span
