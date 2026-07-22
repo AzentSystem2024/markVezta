@@ -475,7 +475,7 @@ export class StaffEOSComponent {
       status == null || status === ''
         ? '#000000'
         : status === 'Left Service'
-          ? '#EF4444' // Left Service
+          ? '#237c20ff' // Left Service
           : status === 'Verified'
             ? '#0073D8' // Verified
             : '#FFA500'; // Open

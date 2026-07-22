@@ -87,6 +87,7 @@ export class EmployeeSalarySettingsEditComponent {
       changes['employeeData'].currentValue.ID
     ) {
       this.selectedEmployee = changes['employeeData'].currentValue;
+      console.log('selected in changes', this.selectedEmployee);
       this.selectedEmployeeId = this.selectedEmployee.ID;
 
       this.SalaryDetails = [];
@@ -150,8 +151,6 @@ export class EmployeeSalarySettingsEditComponent {
           : null,
         IS_INACTIVE: this.selectedEmployee.IS_INACTIVE || false,
       };
-      console.log('selected employeesssss', this.selectedEmployee);
-      console.log('selected employee', this.employeeFormData);
     }
 
     const payload = {
@@ -172,10 +171,12 @@ export class EmployeeSalarySettingsEditComponent {
 
         this.SalaryDetails = this.salaryGridData.Details || [];
         this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
-        
+
         // Ensure UI bindings are updated if switching employees via the dropdown
         if (this.PreviousRevision) {
-          this.employeeFormData.PREVIOUS_EFFECT_FROM = this.parseDateSafe(this.PreviousRevision);
+          this.employeeFormData.PREVIOUS_EFFECT_FROM = this.parseDateSafe(
+            this.PreviousRevision,
+          );
         }
 
         this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY

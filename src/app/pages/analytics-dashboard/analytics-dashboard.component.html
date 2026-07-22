@@ -206,52 +206,7 @@
 <div
   class="view-wrapper"
   *ngIf="sessiondata?.GeneralSettings?.VAT_TITLE === 'VAT'"
->
-  <div class="dashboard-wrapper">
-    <div class="dashboard-row" style="display: flex; gap: 20px;">
-      <!-- Dummy Pie Chart -->
-      <div class="dashboard-card" style="flex: 1;">
-        <h6 class="card-title mt-2 mb-2">Sales Comparison (Dummy)</h6>
-        <dx-pie-chart
-          id="pie"
-          palette="bright"
-          [dataSource]="salesComparison"
-        >
-          <dxo-series
-            argumentField="type"
-            valueField="value"
-          >
-            <dxo-label [visible]="true">
-              <dxo-connector [visible]="true" [width]="1"></dxo-connector>
-            </dxo-label>
-          </dxo-series>
-          <dxo-legend
-            horizontalAlignment="center"
-            verticalAlignment="bottom"
-          ></dxo-legend>
-        </dx-pie-chart>
-      </div>
-
-      <!-- Dummy Bar Chart -->
-      <div class="dashboard-card" style="flex: 1;">
-        <h6 class="card-title mt-2 mb-2">Transactions Trend (Dummy)</h6>
-        <dx-chart
-          id="chart"
-          [dataSource]="transactionsData"
-        >
-          <dxo-series
-            argumentField="period"
-            valueField="value"
-            name="Transactions"
-            type="bar"
-            color="#ffaa66"
-          ></dxo-series>
-          <dxo-legend [visible]="false"></dxo-legend>
-        </dx-chart>
-      </div>
-    </div>
-  </div>
-</div>
+></div>
 
 <!-- ============= Custome popup =============== -->
 <app-custom-date-popup
