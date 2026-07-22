@@ -53,8 +53,10 @@ import { Router } from '@angular/router';
 export class PromotionSchemaLogComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent | undefined;
-  @ViewChild(DxValidationGroupComponent) validationGroup!: DxValidationGroupComponent;
-  @ViewChild('editValidationGroup') editValidationGroup!: DxValidationGroupComponent;
+  @ViewChild(DxValidationGroupComponent)
+  validationGroup!: DxValidationGroupComponent;
+  @ViewChild('editValidationGroup')
+  editValidationGroup!: DxValidationGroupComponent;
 
   showHeaderFilter = true;
   logList: any;
@@ -165,7 +167,7 @@ export class PromotionSchemaLogComponent {
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private router: Router
+    private router: Router,
   ) {
     const payload = {
       name: 'PROMOTIONSCHEMA_TYPE',
@@ -177,7 +179,6 @@ export class PromotionSchemaLogComponent {
   }
 
   ngOnInit() {
-
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -250,27 +251,28 @@ export class PromotionSchemaLogComponent {
     this.logDataSource = new DataSource({
       load: () => {
         return new Promise((resolve) => {
-          this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
+          this.dataservice
+            .getPromotionSchemaLog()
+            .subscribe((response: any) => {
+              let data = response.promotion_data || [];
 
-            let data = response.promotion_data || [];
+              // Sort descending by ID
+              data = data.sort((a: any, b: any) => {
+                return (b.ID || 0) - (a.ID || 0);
+              });
 
-            // Sort descending by ID
-            data = data.sort((a: any, b: any) => {
-              return (b.ID || 0) - (a.ID || 0);
+              //  Store in logList ALSO
+              this.logList = data;
+
+              console.log(this.logList, 'Sorted LOGLIST');
+
+              resolve({
+                data: data,
+                totalCount: data.length,
+              });
             });
-
-            //  Store in logList ALSO
-            this.logList = data;
-
-            console.log(this.logList, 'Sorted LOGLIST');
-
-            resolve({
-              data: data,
-              totalCount: data.length
-            });
-          });
         });
-      }
+      },
     });
   }
 
@@ -341,7 +343,6 @@ export class PromotionSchemaLogComponent {
       this.validationGroup.instance.reset();
     }
 
-
     this.id = null;
     this.isPopupVisible = true;
 
@@ -357,7 +358,6 @@ export class PromotionSchemaLogComponent {
   }
 
   savePromotionShema() {
-
     const result = this.validationGroup.instance.validate();
 
     if (!result.isValid) {
@@ -396,27 +396,36 @@ export class PromotionSchemaLogComponent {
 
     //  MIX & MATCH VALIDATION
     if (this.selectedPromotionSchema === 3) {
-
       if (!this.tableData || this.tableData.length === 0) {
         this.isSaving = false;
-        notify({
-          message: 'Please add at least one row for Mix & Match schema',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Please add at least one row for Mix & Match schema',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
 
-      const invalidRow = this.tableData.find(row =>
-        !row.qtyToBuy || row.qtyToBuy <= 0 ||
-        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      const invalidRow = this.tableData.find(
+        (row) =>
+          !row.qtyToBuy ||
+          row.qtyToBuy <= 0 ||
+          row.discount === null ||
+          row.discount === undefined ||
+          isNaN(row.discount),
       );
 
       if (invalidRow) {
         this.isSaving = false;
-        notify({
-          message: 'Qty must be > 0 and Discount must be a valid number',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Qty must be > 0 and Discount must be a valid number',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
     }
@@ -434,10 +443,10 @@ export class PromotionSchemaLogComponent {
       promotionschema_entry:
         this.tableData.length > 0
           ? this.tableData.map((row) => ({
-            QTY_BUY: row.qtyToBuy ?? 0,
-            DISC_PERCENT: row.discount ?? 0,
-            DESCRIPTION: row.description || '',
-          }))
+              QTY_BUY: row.qtyToBuy ?? 0,
+              DISC_PERCENT: row.discount ?? 0,
+              DESCRIPTION: row.description || '',
+            }))
           : [{ QTY_BUY: 0, DISC_PERCENT: 0, DESCRIPTION: '' }],
     };
     this.dataservice.savePromotionSchema(payload).subscribe((response: any) => {
@@ -480,7 +489,6 @@ export class PromotionSchemaLogComponent {
   }
 
   updatePromotionSchema() {
-
     const result = this.editValidationGroup.instance.validate();
 
     if (!result.isValid) {
@@ -510,31 +518,39 @@ export class PromotionSchemaLogComponent {
     }
 
     if (this.selectedPromotionSchema === 3) {
-
       if (!this.tableData || this.tableData.length === 0) {
         this.isUpdating = false;
-        notify({
-          message: 'Please add at least one row for Mix & Match schema',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Please add at least one row for Mix & Match schema',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
 
-      const invalidRow = this.tableData.find(row =>
-        !row.qtyToBuy || row.qtyToBuy <= 0 ||
-        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      const invalidRow = this.tableData.find(
+        (row) =>
+          !row.qtyToBuy ||
+          row.qtyToBuy <= 0 ||
+          row.discount === null ||
+          row.discount === undefined ||
+          isNaN(row.discount),
       );
 
       if (invalidRow) {
         this.isUpdating = false;
-        notify({
-          message: 'Qty must be > 0 and Discount must be a valid number',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Qty must be > 0 and Discount must be a valid number',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
     }
-
 
     const payload = {
       ID: this.promotionData.ID,
@@ -724,7 +740,6 @@ export class PromotionSchemaLogComponent {
     }
     this.resetPopup(); // optional but recommended
   }
-
 }
 @NgModule({
   imports: [
@@ -761,4 +776,4 @@ export class PromotionSchemaLogComponent {
   declarations: [PromotionSchemaLogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PromotionSchemaLogModule { }
+export class PromotionSchemaLogModule {}

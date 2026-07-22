@@ -47,6 +47,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
   checkedRows: any;
   resetValue: boolean = false;
   clearData: any;
+  isAdministrator = false;
 
   constructor(
     private fb: FormBuilder,
@@ -137,7 +138,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
               CanEdit: menu.canEdit ?? false,
               CanVerify: menu.canVerify ?? false,
               CanApprove: menu.canApprove ?? false,
-              HideCost : menu.HideCost ?? false,
+              HideCost: menu.HideCost ?? false,
               CanDelete: menu.canDelete ?? false,
               CanPrint: menu.canPrint ?? false,
             });
@@ -207,10 +208,10 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             CanAdd: menu.CanAdd ?? false,
             CanView: menu.CanView ?? true,
             CanEdit: menu.CanEdit ?? false,
-            CanVerify:menu.CanVerify ?? false,
+            CanVerify: menu.CanVerify ?? false,
             CanApprove: menu.CanApprove ?? false,
             CanDelete: menu.CanDelete ?? false,
-            HideCost : menu.HideCost ?? false,
+            HideCost: menu.HideCost ?? false,
             CanPrint: menu.CanPrint ?? false,
           });
         }

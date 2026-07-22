@@ -130,3 +130,15 @@
   margin-top: 20px; /* Adds space above */
   margin-bottom: 20px; /* Adds space below (before cards) */
 }
+
+/* Highlight styling for read-only Current Credit field */
+::ng-deep .highlight-readonly .dx-texteditor-input {
+  background-color: #f0f4f8 !important; /* Soft distinct background */
+  font-weight: 600 !important;
+  color: #0d47a1 !important; /* Stand-out text color */
+}
+
+::ng-deep .highlight-readonly {
+  border: 1px solid #90caf9 !important; /* Light blue border */
+  border-radius: 4px;
+}

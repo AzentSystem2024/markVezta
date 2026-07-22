@@ -512,8 +512,16 @@ export class PurchaseReturnDebitFormComponent {
     this.isTrOutPopupVisible = false;
 
     setTimeout(() => {
-      this.itemsGridRef.instance.editCell(0, 'QUANTITY');
+      const lastRowIndex = this.mainGridData.length - 1;
+
+      if (lastRowIndex >= 0) {
+        this.itemsGridRef.instance.editCell(lastRowIndex, 'QUANTITY');
+      }
     }, 200);
+
+    // setTimeout(() => {
+    //   this.itemsGridRef.instance.editCell(0, 'QUANTITY');
+    // }, 200);
   }
 
   onContentReady(e: any): void {
