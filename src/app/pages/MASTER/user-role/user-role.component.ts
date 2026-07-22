@@ -185,16 +185,37 @@ export class UserRoleComponent implements OnInit {
     this.isAddFormVisible = true;
   }
 
-  isDeleteIconVisible({ row }: { row: any }): boolean {
-    return row.data.UserRoles !== 'Administrator';
-  }
+  isEditIconVisible = (e: any): boolean => {
+    if (!this.canEdit) return false;
+    const roleName = e?.row?.data?.UserRoles || e?.data?.UserRoles;
+    return roleName?.toString().trim().toLowerCase() !== 'administrator';
+  };
+
+  isDeleteIconVisible = (e: any): boolean => {
+    if (!this.canDelete) return false;
+    const roleName = e?.row?.data?.UserRoles || e?.data?.UserRoles;
+    return roleName?.toString().trim().toLowerCase() !== 'administrator';
+  };
 
   onEditingStart(event: any) {
-    event.cancel = true; // Cancel the editing if a certain condition is met
+    const roleName = event?.data?.UserRoles?.toString().trim().toLowerCase();
+    if (roleName === 'administrator') {
+      event.cancel = true;
+      notify(
+        {
+          message: 'Administrator role cannot be edited',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'error',
+      );
+      return;
+    }
+
+    event.cancel = true; // Cancel standard inline editing to open custom edit popup form
 
     this.clickedRowData = event.data;
     this.selectData(event);
-    event.cancel = true;
     this.iseditFormVisible = true;
     this.cdr.detectChanges();
   }
@@ -303,6 +324,22 @@ export class UserRoleComponent implements OnInit {
 
   //=======================row data update=======================
   onRowUpdating() {
+    if (
+      this.clickedRowData?.UserRoles?.toString().trim().toLowerCase() ===
+      'administrator'
+    ) {
+      notify(
+        {
+          message: 'Administrator role cannot be edited',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'error',
+      );
+      this.iseditFormVisible = false;
+      return;
+    }
+
     this.isUpdating = true;
 
     const editedData: any = this.userlevelEditForm.getNewUSerLevelEditedData();
@@ -350,7 +387,23 @@ export class UserRoleComponent implements OnInit {
   onRowRemoving(event: any) {
     event.cancel = true; // prevent default delete
 
-    const selectedRow = event.key;
+    const selectedRow = event.key || event.data;
+    const roleName = (selectedRow?.UserRoles || event?.data?.UserRoles)
+      ?.toString()
+      .trim()
+      .toLowerCase();
+
+    if (roleName === 'administrator') {
+      notify(
+        {
+          message: 'Administrator role cannot be deleted',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'error',
+      );
+      return;
+    }
 
     this.dataservice
       .Remove_userLevel_Row_Data(selectedRow.ID)
