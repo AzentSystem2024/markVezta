@@ -11,6 +11,7 @@
         [searchEnabled]="true"
         [showClearButton]="true"
         [labelMode]="'floating'"
+        [readOnly]="isReadOnlyMode"
         (onValueChanged)="onEmployeeChanged($event)"
       >
         <dx-validator>
@@ -28,6 +29,7 @@
           label="Basic Salary *"
           [(value)]="employeeFormData.BASIC_SALARY"
           [labelMode]="'floating'"
+          [readOnly]="isReadOnlyMode"
           [format]="{ type: 'fixedPoint', precision: 2 }"
         >
           <dx-validator>
@@ -60,6 +62,7 @@
         [showClearButton]="true"
         [labelMode]="'floating'"
         pickerType="calendar"
+        [readOnly]="isReadOnlyMode"
         [calendarOptions]="{
           maxZoomLevel: 'year',
           minZoomLevel: 'century',
@@ -85,7 +88,7 @@
   width="100%"
   [editing]="{
     mode: 'cell',
-    allowUpdating: true,
+    allowUpdating: isReadOnlyMode,
   }"
 >
   <dxo-scrolling
@@ -143,6 +146,7 @@
     (onClick)="cancel()"
   ></dx-button>
   <dx-button
+    [disabled]="isReadOnlyMode"
     text="Update"
     stylingMode="contained"
     type="default"
