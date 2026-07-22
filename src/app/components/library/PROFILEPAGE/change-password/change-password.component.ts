@@ -266,7 +266,24 @@ export class ChangePasswordComponent {
     return true;
   }
 
+  resetForm() {
+    this.oldPassword = '';
+    this.newPassword = '';
+    this.confirmPassword = '';
+
+    this.oldPasswordBorderColor = '1px solid #ddd';
+    this.newPasswordBorderColor = '1px solid #ddd';
+    this.confirmPasswordBorderColor = '1px solid #ddd';
+
+    this.isOldPasswordVisible = false;
+    this.isPasswordVisible = false;
+    this.isConfirmPasswordVisible = false;
+
+    this.validationGroup.instance.reset();
+  }
+
   closeChangePassword() {
+
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -278,6 +295,7 @@ export class ChangePasswordComponent {
     } else {
       this.route.navigate(['/analytics-dashboard']);
     }
+    this.resetForm();
   }
 
   saveNewPassword() {
@@ -357,6 +375,7 @@ export class ChangePasswordComponent {
         );
       },
     );
+    this.resetForm();
   }
 }
 
@@ -373,4 +392,4 @@ export class ChangePasswordComponent {
   exports: [ChangePasswordComponent],
   declarations: [ChangePasswordComponent],
 })
-export class ChangePasswordModule {}
+export class ChangePasswordModule { }

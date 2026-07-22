@@ -33,7 +33,7 @@
 
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
-        <dxi-item location="after" template="DepartmentFilterTemplate"></dxi-item>
+
 
         <dxi-item location="after" locateInMenu="auto" widget="dxButton" [options]="refreshButtonOptions"></dxi-item>
 
@@ -53,13 +53,6 @@
         <dx-tag-box label="Store" labelMode="floating" displayExpr="DESCRIPTION" valueExpr="ID" [items]="Store"
           [searchEnabled]="true" [(value)]="selectedStoreid" [showSelectionControls]="true" [showMultiTagOnly]="true"
           [multiline]="false" [width]="200" (onValueChanged)="onStoreChanged($event)"></dx-tag-box>
-      </div>
-
-      <div *dxTemplate="let data of 'DepartmentFilterTemplate'" style="margin-bottom: 5px">
-        <dx-select-box label="Department" labelMode="floating" [(value)]="selectedDepartment" [dataSource]="Department"
-          displayExpr="DESCRIPTION" valueExpr="ID" [searchEnabled]="true" [width]="200"
-          (onValueChanged)="onDepartmentChanged($event)">
-        </dx-select-box>
       </div>
 
       <dxi-column dataField="DOC_NO" caption="Transfer No." [allowEditing]="false" width="120"></dxi-column>

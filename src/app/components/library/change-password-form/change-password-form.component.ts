@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './change-password-form.component.html',
 })
 export class ChangePasswordFormComponent implements OnInit, OnDestroy {
-  
+
   loading = false;
 
   formData: any = {};

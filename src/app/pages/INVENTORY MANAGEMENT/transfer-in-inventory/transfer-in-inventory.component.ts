@@ -199,8 +199,7 @@ export class TransferInInventoryComponent {
   ];
   selected_Data_Status: any;
   buttonText: string;
-  selectedDepartment: any;
-  Department: any;
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -234,7 +233,7 @@ export class TransferInInventoryComponent {
 
     }
     this.getTransferInList();
-    this.department_dropdown();
+
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
@@ -243,15 +242,7 @@ export class TransferInInventoryComponent {
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
-  department_dropdown() {
-    const payload = {
-      NAME: 'DEPT',
-      COMPANY_ID: this.selected_Company_id
-    }
-    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-      this.Department = res;
-    });
-  }
+
 
   getTransferInList(dateRange: string = this.selectedDateRange) {
     // const datePayload = this.getDateRangePayload(dateRange);
@@ -648,9 +639,7 @@ export class TransferInInventoryComponent {
     console.log('Selected store IDs:', this.selectedStoreid);
     this.applyStoreFilter(); //     ONLY store filter
   }
-  onDepartmentChanged(e: any) {
-    console.log('Selected Department ID:', this.selectedDepartment);
-  }
+
   onViewClick(e: any) {
     const trInId = e.row.data.TRANS_ID;
     this.selected_Data_Status = e.row.data.STATUS;
