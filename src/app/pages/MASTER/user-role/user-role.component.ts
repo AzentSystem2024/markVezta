@@ -140,6 +140,7 @@ export class UserRoleComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log('usernew form');
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(

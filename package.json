@@ -42,6 +42,7 @@
     "jsbarcode": "^3.12.3",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
+    "libphonenumber-js": "^1.13.9",
     "luxon": "^3.3.0",
     "medium-zoom": "^1.1.0",
     "pdfmake": "^0.2.20",

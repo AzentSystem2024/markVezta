@@ -230,12 +230,14 @@
                 style="width: 150px"
                 placeholder="Get"
               >
-                <dx-validator *ngIf="!isQtyGetDisabled">
+                <dx-validator>
                   <dxi-validation-rule
+                    *ngIf="!isQtyGetDisabled"
                     type="required"
                     message="Get quantity required"
                   ></dxi-validation-rule>
                   <dxi-validation-rule
+                    *ngIf="!isQtyGetDisabled"
                     type="range"
                     [min]="1"
                     message="Must be greater than 0"
@@ -251,7 +253,7 @@
                 [max]="100"
                 [showSpinButtons]="true"
                 [inputAttr]="{ 'aria-label': 'Sales', placeholder: 'Discount' }"
-                [(value)]="DISC_PERCENT"
+                [(value)]="promotionData.DISC_PERCENT"
                 (valueChange)="onPercentageChange($event)"
                 [disabled]="buyAndGetDisabled"
                 style="width: 150px"
@@ -550,12 +552,14 @@
                 [disabled]="isQtyGetDisabled || buyAndGetDisabled"
                 style="width: 150px"
               >
-                <dx-validator *ngIf="!isQtyGetDisabled">
+                <dx-validator>
                   <dxi-validation-rule
+                    *ngIf="!isQtyGetDisabled"
                     type="required"
                     message="Get quantity required"
                   ></dxi-validation-rule>
                   <dxi-validation-rule
+                    *ngIf="!isQtyGetDisabled"
                     type="range"
                     [min]="1"
                     message="Must be greater than 0"
@@ -603,7 +607,7 @@
                       'Schema is applicable on the multiple of promotion quantity',
                   },
                   {
-                    value: 'regular',
+                    value: 'more',
                     label:
                       'Schema is applicable when the quantity is more than promotion quantity',
                   },
