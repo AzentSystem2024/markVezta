@@ -206,34 +206,24 @@
             dataField="NORMAL_OT"
             caption="OT Hours"
             dataType="number"
-            [editorOptions]="{ max: 12 }"
             ><dxi-validation-rule
               type="custom"
               [validationCallback]="validTime"
-              message="Maximum allowed OT time is 12 hours"
             ></dxi-validation-rule
           ></dxi-column>
           <dxi-column
             dataField="HOLIDAY_OT"
             caption="Holiday OT"
             dataType="number"
-            [editorOptions]="{ max: 12 }"
             ><dxi-validation-rule
               type="custom"
               [validationCallback]="validTime"
-              message="Maximum allowed OT is 12 hours"
             ></dxi-validation-rule
           ></dxi-column>
           <dxo-summary>
-            <!-- Footer Summary with custom alignment -->
+           
 
-            <!-- Count summary -->
-            <!-- <dxi-total-item
-              column="DEPARTMENT"
-              summaryType="count"
-              [displayFormat]="'Total : {0}'"
-              [showInColumn]="'DEPARTMENT'"
-            ></dxi-total-item> -->
+           
             <dxi-total-item
               column="DAYS"
               summaryType="sum"

@@ -76,9 +76,10 @@
                 <dxi-item class="spacing-item">
                   <div *dxTemplate>
                     <dx-text-box
-                      label="Description"
+                      label="Descriptionnnn"
                       [(value)]="itemData.DESCRIPTION"
                       [labelMode]="'floating'"
+                      (onValueChanged)="onDescriptionChanged($event)"
                     >
                       <dx-validator>
                         <dxi-validation-rule
@@ -97,6 +98,7 @@
                       label="POS Description"
                       [(value)]="itemData.POS_DESCRIPTION"
                       [labelMode]="'floating'"
+                      [maxLength]="45"
                     ></dx-text-box>
                   </div>
                 </dxi-item>
@@ -625,15 +627,17 @@
                     ></dx-number-box>
                   </div>
                   <div class="inventory-item">
-                    <label>Profit Margin:</label>
+                    <label>Profit Margin (%):</label>
                     <dx-number-box
                       [value]="calculateProfitMargin()"
                       (onValueChanged)="onProfitmarginChange($event)"
+                      format="percent"
+                      [step]="0.01"
                       [labelMode]="'floating'"
-                      [format]="'#,##0.00'"
                       [inputAttr]="{ style: 'text-align: right;' }"
                       [width]="200"
-                    ></dx-number-box>
+                    >
+                    </dx-number-box>
                   </div>
 
                   <div class="inventory-item">

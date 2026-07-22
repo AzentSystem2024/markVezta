@@ -86,7 +86,7 @@
         caption="OT Hours"
         width="120"
       ></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         dataField="STATUS"
         caption="Status"
         cellTemplate="statusCellTemplate"
@@ -94,7 +94,7 @@
         alignment="center"
       ></dxi-column>
 
-      <!-- Status Flag Template -->
+      
       <div *dxTemplate="let cellData of 'statusCellTemplate'">
         <i
           class="fas fa-flag"
@@ -102,7 +102,7 @@
           [attr.title]="cellData.value"
           style="font-size: 16px; cursor: default;"
         ></i>
-      </div>
+      </div> -->
     </dx-data-grid>
   </div>
 </div>

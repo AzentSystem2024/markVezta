@@ -58,7 +58,7 @@ export class UserComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) { }
+  ) {}
 
   selectedData: any;
   popupwidth: any = '75%';
@@ -192,6 +192,7 @@ export class UserComponent {
 
   onClickSaveNewData() {
     const data = this.userNewForm.getNewUserData();
+    if (!data) return;
     console.log(data);
     console.log(this.user_list);
 
@@ -357,7 +358,7 @@ export class UserComponent {
   }
 
   get_userlist() {
-    this.dataservice.get_User_data().subscribe((res: any) => { });
+    this.dataservice.get_User_data().subscribe((res: any) => {});
   }
 
   CloseEditForm() {
@@ -388,4 +389,4 @@ export class UserComponent {
   exports: [],
   declarations: [UserComponent],
 })
-export class UserModule { }
+export class UserModule {}

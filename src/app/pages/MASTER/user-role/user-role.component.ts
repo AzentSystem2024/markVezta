@@ -140,6 +140,7 @@ export class UserRoleComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log('usernew form');
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -184,16 +185,37 @@ export class UserRoleComponent implements OnInit {
     this.isAddFormVisible = true;
   }
 
-  isDeleteIconVisible({ row }: { row: any }): boolean {
-    return row.data.UserRoles !== 'Administrator';
-  }
+  isEditIconVisible = (e: any): boolean => {
+    if (!this.canEdit) return false;
+    const roleName = e?.row?.data?.UserRoles || e?.data?.UserRoles;
+    return roleName?.toString().trim().toLowerCase() !== 'administrator';
+  };
+
+  isDeleteIconVisible = (e: any): boolean => {
+    if (!this.canDelete) return false;
+    const roleName = e?.row?.data?.UserRoles || e?.data?.UserRoles;
+    return roleName?.toString().trim().toLowerCase() !== 'administrator';
+  };
 
   onEditingStart(event: any) {
-    event.cancel = true; // Cancel the editing if a certain condition is met
+    const roleName = event?.data?.UserRoles?.toString().trim().toLowerCase();
+    if (roleName === 'administrator') {
+      event.cancel = true;
+      notify(
+        {
+          message: 'Administrator role cannot be edited',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'error',
+      );
+      return;
+    }
+
+    event.cancel = true; // Cancel standard inline editing to open custom edit popup form
 
     this.clickedRowData = event.data;
     this.selectData(event);
-    event.cancel = true;
     this.iseditFormVisible = true;
     this.cdr.detectChanges();
   }
@@ -302,6 +324,22 @@ export class UserRoleComponent implements OnInit {
 
   //=======================row data update=======================
   onRowUpdating() {
+    if (
+      this.clickedRowData?.UserRoles?.toString().trim().toLowerCase() ===
+      'administrator'
+    ) {
+      notify(
+        {
+          message: 'Administrator role cannot be edited',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'error',
+      );
+      this.iseditFormVisible = false;
+      return;
+    }
+
     this.isUpdating = true;
 
     const editedData: any = this.userlevelEditForm.getNewUSerLevelEditedData();
@@ -349,7 +387,23 @@ export class UserRoleComponent implements OnInit {
   onRowRemoving(event: any) {
     event.cancel = true; // prevent default delete
 
-    const selectedRow = event.key;
+    const selectedRow = event.key || event.data;
+    const roleName = (selectedRow?.UserRoles || event?.data?.UserRoles)
+      ?.toString()
+      .trim()
+      .toLowerCase();
+
+    if (roleName === 'administrator') {
+      notify(
+        {
+          message: 'Administrator role cannot be deleted',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'error',
+      );
+      return;
+    }
 
     this.dataservice
       .Remove_userLevel_Row_Data(selectedRow.ID)
@@ -385,26 +439,23 @@ export class UserRoleComponent implements OnInit {
   }
 
   formatLastModifiedTime(rowData: any): string {
-    const celldate = rowData.LastModifiedTime;
-    if (!celldate) return '';
+    if (!rowData?.LastModifiedTime) {
+      return '';
+    }
 
-    const date = new Date(celldate);
+    const date = new Date(rowData.LastModifiedTime);
 
-    // Extract parts of the date
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = date
-      .toLocaleString('en-US', { month: 'short' })
-      .toUpperCase();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
     const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
 
-    // Convert hours from 24-hour format to 12-hour format
-    const hour12 = hours % 12 || 12;
-
-    // Construct the formatted string
-    return `${day} ${month} ${year}, ${hour12}:${minutes} ${ampm}`;
+    return `${day}-${month}-${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
   }
 }
 
