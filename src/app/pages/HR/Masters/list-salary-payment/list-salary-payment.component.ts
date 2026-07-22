@@ -120,6 +120,8 @@ export class ListSalaryPaymentComponent {
   editMiscPopup: boolean = false;
   addSalaryPopup: boolean = false;
   editSalaryPopup: boolean = false;
+  verifySalaryPopup: boolean = false;
+  approveSalaryPopup: boolean = false;
   selectedSalaryData: any;
   salaryPaymentList: any;
   sessionData: any;
@@ -532,6 +534,8 @@ export class ListSalaryPaymentComponent {
   handleClose() {
     this.addSalaryPopup = false;
     this.editSalaryPopup = false;
+    this.verifySalaryPopup = false;
+    this.approveSalaryPopup = false;
     this.getSalaryPaymentList();
   }
 
@@ -551,8 +555,19 @@ export class ListSalaryPaymentComponent {
       next: (response: any) => {
         if (response && response.Data) {
           this.selectedSalaryData = response.Data;
-          this.editSalaryPopup = true;
-          this.isReadOnlyPayment = status === 5;
+          if (status === 5) {
+            // Approved -> View mode
+            this.isReadOnlyPayment = true;
+            this.editSalaryPopup = true;
+          } else if (status === 2) {
+            // Verified -> Approve mode
+            this.isReadOnlyPayment = false;
+            this.approveSalaryPopup = true;
+          } else {
+            // Open -> Verify mode
+            this.isReadOnlyPayment = false;
+            this.verifySalaryPopup = true;
+          }
         } else {
           const errorMessage =
             response?.Message || 'Failed to fetch salary payment data.';

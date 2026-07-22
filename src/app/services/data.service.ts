@@ -1508,6 +1508,11 @@ export class DataService {
   getPendingSalaryPayments(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}SalaryPayment/list`, data);
   }
+  
+  verifySalaryPayment(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalaryPayment/Verify`, data);
+  }
 
   insertSalaryPayment(items: any) {
     const data = items;
