@@ -84,10 +84,10 @@ export class TimesheetAddComponent implements OnInit {
     REMARKS: '',
     TIMESHEET_DETAIL: [
       {
-        STORE_ID: '',
-        DAYS: '',
-        NORMAL_OT: '',
-        HOLIDAY_OT: '',
+        STORE_ID: null,
+        DAYS: null,
+        NORMAL_OT: null,
+        HOLIDAY_OT: null,
       },
     ],
     TIMESHEET_SALARY: [
@@ -205,9 +205,9 @@ export class TimesheetAddComponent implements OnInit {
       this.timesheetDetails = [
         {
           DEPT_ID: null,
-          DAYS: 0,
-          NORMAL_OT: 0,
-          HOLIDAY_OT: 0,
+          DAYS: null,
+          NORMAL_OT: null,
+          HOLIDAY_OT: null,
           STORE_ID: null,
         },
       ];
@@ -503,9 +503,9 @@ export class TimesheetAddComponent implements OnInit {
 
     this.timesheetDetails.push({
       DEPT_ID: null,
-      DAYS: 0,
-      NORMAL_OT: 0,
-      HOLIDAY_OT: 0,
+      DAYS: null,
+      NORMAL_OT: null,
+      HOLIDAY_OT: null,
       STORE_ID: null,
     });
 

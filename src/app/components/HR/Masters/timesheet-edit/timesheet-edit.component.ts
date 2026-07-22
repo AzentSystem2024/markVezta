@@ -93,14 +93,14 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
     REMARKS: '',
     TIMESHEET_DETAIL: [
       {
-        STORE_ID: 0,
-        DAYS: '',
-        NORMAL_OT: 0,
-        HOLIDAY_OT: 0,
+        STORE_ID: null,
+        DAYS: null,
+        NORMAL_OT: null,
+        HOLIDAY_OT: null,
         ID: 0,
         TS_ID: 0,
         STORE_NAME: '',
-        STORE: 0,
+        STORE: null,
         DEPT_ID: 0,
       },
     ],
@@ -249,11 +249,11 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
         this.timesheetFormData.TIMESHEET_DETAIL.length === 0
       ) {
         this.timesheetDetails = this.Departments.map(() => ({
-          DEPT_ID: 0,
-          DAYS: 0,
-          NORMAL_OT: 0,
-          HOLIDAY_OT: 0,
-          STORE_ID: 0,
+          DEPT_ID: null,
+          DAYS: null,
+          NORMAL_OT: null,
+          HOLIDAY_OT: null,
+          STORE_ID: null,
         }));
       }
     });
@@ -537,9 +537,9 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
 
     this.timesheetDetails.push({
       DEPT_ID: null,
-      DAYS: 0,
-      NORMAL_OT: 0,
-      HOLIDAY_OT: 0,
+      DAYS: null,
+      NORMAL_OT: null,
+      HOLIDAY_OT: null,
       STORE_ID: null,
     });
 
