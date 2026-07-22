@@ -58,7 +58,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -106,6 +106,21 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
     }
   }
 
+  selectAllAdd = false;
+  selectAllEdit = false;
+  selectAllVerify = false;
+  selectAllApprove = false;
+  selectAllDelete = false;
+  selectAllHideCost = false;
+  selectAllPrint = false;
+
+  toggleColumn(field: string, value: boolean) {
+    this.selectedTabData.forEach((row: any) => {
+      row[field] = value;
+    });
+
+    this.selectedTabData = [...this.selectedTabData];
+  }
   //==============All Menu List========================
   get_All_MenuList() {
     this.dataservice.get_usermenu_Api().subscribe((response: any) => {
@@ -394,4 +409,4 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
   declarations: [UserLevelNewFormComponent],
   exports: [UserLevelNewFormComponent],
 })
-export class UserLevelNewFormModule {}
+export class UserLevelNewFormModule { }

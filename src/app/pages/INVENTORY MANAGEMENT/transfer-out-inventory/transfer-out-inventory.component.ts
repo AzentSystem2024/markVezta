@@ -75,7 +75,7 @@ export class TransferOutInventoryComponent {
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
-  selectedDepartment: any;
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -196,7 +196,7 @@ export class TransferOutInventoryComponent {
   StatusType: any;
   selected_Data_Status: any;
   buttonText: string;
-  Department: any;
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -232,7 +232,6 @@ export class TransferOutInventoryComponent {
     this.store_dropdown()
 
     this.getTransferOutList();
-    this.department_dropdown();
   }
 
   sessionData_tax() {
@@ -242,15 +241,6 @@ export class TransferOutInventoryComponent {
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
-  department_dropdown() {
-    const payload = {
-      NAME: 'DEPT',
-      COMPANY_ID: this.selected_Company_id
-    }
-    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-      this.Department = res;
-    });
-  }
 
   getTransferOutList(dateRange: string = this.selectedDateRange) {
     const payload = {
@@ -725,9 +715,7 @@ export class TransferOutInventoryComponent {
     console.log('Selected store IDs:', this.selectedStoreid);
     this.applyStoreFilter(); // ✅ ONLY store filter
   }
-  onDepartmentChanged(e: any) {
-    console.log('Selected department ID:', this.selectedDepartment);
-  }
+
   onViewClick(e: any) {
     console.log('Edit button clicked for row:', e.row.data);
     e.cancel = true;

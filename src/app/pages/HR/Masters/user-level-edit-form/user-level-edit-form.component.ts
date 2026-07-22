@@ -52,7 +52,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.get_All_MenuList();
@@ -154,6 +154,22 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
     }
   }
 
+  selectAllAdd = false;
+  selectAllEdit = false;
+  selectAllVerify = false;
+  selectAllApprove = false;
+  selectAllDelete = false;
+  selectAllHideCost = false;
+  selectAllPrint = false;
+
+  toggleColumn(field: string, value: boolean) {
+    this.selectedTabData.forEach((row: any) => {
+      row[field] = value;
+    });
+
+    this.selectedTabData = [...this.selectedTabData];
+  }
+
   onPermissionCheckboxChanged(e: any): void {
     this.combineSelectedRows(); // Rebuild the latest data from updated grid values
   }
@@ -253,4 +269,4 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
   declarations: [UserLevelEditFormComponent],
   exports: [UserLevelEditFormComponent],
 })
-export class UserLevelEditFormModule {}
+export class UserLevelEditFormModule { }
