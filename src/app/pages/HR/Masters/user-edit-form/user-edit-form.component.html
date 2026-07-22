@@ -1,22 +1,6 @@
 <div class="tabs-demo view-wrapper">
   <div class="widget-container">
-    <!-- User Details Section with Hide/Show Button -->
-    <div style="display: flex; align-items: center; margin-bottom: 10px">
-      <label style="font-weight: bold; font-size: 16px; margin-right: 10px"
-        >User Details:</label
-      >
-      <dx-button
-        icon="{{ showUserDetails ? 'chevronup' : 'chevrondown' }}"
-        type="default"
-        (onClick)="toggleUserDetails()"
-        [elementAttr]="{
-          style: 'background-color: transparent; border: none; color: #000;',
-        }"
-        stylingMode="text"
-      ></dx-button>
-    </div>
-
-    <div *ngIf="showUserDetails">
+    <dx-validation-group #validationGroup>
       <!-- User Details Form in Two Columns -->
       <div
         class="user-details"
@@ -29,7 +13,7 @@
             hint="User Name"
             labelMode="floating"
             (input)="onUserNameInput($event)"
-            >`
+          >
             <dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -73,92 +57,142 @@
           </div>
 
           <div style="display: flex">
-            <dx-select-box
-              label="Country Code *"
-              [searchEnabled]="true"
-              [acceptCustomValue]="false"
-              [(value)]="countryCode"
-              [items]="countryCodes"
-              valueExpr="CODE"
-              [displayExpr]="countryDisplay"
-              [width]="200"
-              placeholder="+1"
+            <dx-drop-down-box
+              label="Code *"
               labelMode="floating"
-              [dropDownOptions]="{ width: '370px' }"
-              hint="Country Code"
-              (onValueChanged)="updateMobileNumber()"
-              (onOpened)="onDropdownOpened()"
-              (onClosed)="onDropdownClosed()"
-              (onValueChanged)="onCountrycodeChange($event)"
+              [(value)]="countryCode"
+              (onValueChanged)="onCountrySelected($event)"
+              valueExpr="data.dial_code"
+              displayExpr="display"
+              [(opened)]="isCountryDropdownOpen"
+              [dataSource]="countryCodes"
+              [width]="120"
+              [dropDownOptions]="{ width: 350 }"
             >
-              <!-- Custom template for the dropdown list items -->
-              <div *dxTemplate="let data of 'item'">
-                <img
-                  [src]="data.FLAG_URL"
-                  width="20"
-                  style="margin-right: 8px"
-                />
-                {{ data.CODE }} {{ data.COUNTRY_NAME }}
+              <div *dxTemplate="let data of 'content'">
+                <dx-list
+                  [dataSource]="countryCodes"
+                  selectionMode="single"
+                  [searchEnabled]="true"
+                  [searchExpr]="['data.name', 'data.dial_code']"
+                  [focusStateEnabled]="false"
+                  (onItemClick)="onCountrySelected($event)"
+                >
+                  <div
+                    *dxTemplate="let item of 'item'"
+                    style="display: flex; align-items: center; gap: 8px"
+                  >
+                    <img
+                      [src]="item.flagUrl"
+                      width="20"
+                      height="14"
+                      style="border-radius: 2px"
+                    />
+                    <span style="min-width: 55px">
+                      {{ item.data.dial_code }}
+                    </span>
+                    <span>
+                      {{ item.data.name }}
+                    </span>
+                  </div>
+                </dx-list>
               </div>
-
-              <dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="Country code is required"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-select-box>
+            </dx-drop-down-box>
 
             <dx-text-box
+              #mobileBox
               label=" Mobile No. *"
               [(value)]="newUserData.MOBILE"
               labelMode="floating"
               [width]="'100%'"
               style="margin-left: 10px"
               hint="Mobile No"
-              [valueChangeEvent]="'input'"
+              valueChangeEvent="input"
               (input)="onMobileInputChange($event)"
               [maxLength]="17"
             >
-              <dx-validator>
+              <dx-validator #mobileValidator>
                 <dxi-validation-rule
                   type="required"
                   message="Mobile No is required"
                 ></dxi-validation-rule>
                 <dxi-validation-rule
                   type="custom"
-                  [validationCallback]="validateMobileLength"
-                  [message]="
-                    'Mobile no. must be  ' + mobile_limit + ' digits long'
-                  "
+                  [validationCallback]="MobileValidate"
+                  message="Invalid mobile number"
                 ></dxi-validation-rule>
               </dx-validator>
             </dx-text-box>
           </div>
 
-          <dx-text-box
-            label="Whatsapp No *"
-            labelMode="floating"
-            [(value)]="newUserData.WHATSAPP_NO"
-            (input)="validateWhatsapp($event)"
-            hint="Whatsapp No"
-            (onFocusIn)="autoBindWhatsapp()"
-            [maxLength]="17"
-          >
-            <dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="Whatsapp no. is required"
-              ></dxi-validation-rule>
-              <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateMobileLength"
-                [message]="
-                  'Mobile no. must be  ' + mobile_limit + ' digits long'
-                "
-              ></dxi-validation-rule>
-            </dx-validator>
-          </dx-text-box>
+          <div style="display: flex; margin-top: 15px">
+            <dx-drop-down-box
+              label="Code *"
+              labelMode="floating"
+              [(value)]="whatsappCountryCode"
+              (onValueChanged)="onWhatsappCountrySelected($event)"
+              valueExpr="data.dial_code"
+              displayExpr="display"
+              [(opened)]="isWhatsappDropdownOpen"
+              [dataSource]="countryCodes"
+              [width]="120"
+              [dropDownOptions]="{ width: 350 }"
+            >
+              <div *dxTemplate="let data of 'content'">
+                <dx-list
+                  [dataSource]="countryCodes"
+                  selectionMode="single"
+                  [searchEnabled]="true"
+                  [searchExpr]="['data.name', 'data.dial_code']"
+                  [focusStateEnabled]="false"
+                  (onItemClick)="onWhatsappCountrySelected($event)"
+                >
+                  <div
+                    *dxTemplate="let item of 'item'"
+                    style="display: flex; align-items: center; gap: 8px"
+                  >
+                    <img
+                      [src]="item.flagUrl"
+                      width="20"
+                      height="14"
+                      style="border-radius: 2px"
+                    />
+                    <span style="min-width: 55px">
+                      {{ item.data.dial_code }}
+                    </span>
+                    <span>
+                      {{ item.data.name }}
+                    </span>
+                  </div>
+                </dx-list>
+              </div>
+            </dx-drop-down-box>
+
+            <dx-text-box
+              #whatsappBox
+              label="Whatsapp No *"
+              labelMode="floating"
+              [(value)]="newUserData.WHATSAPP_NO"
+              (input)="validateWhatsapp($event)"
+              hint="Whatsapp No"
+              (onFocusIn)="autoBindWhatsapp()"
+              style="margin-left: 10px"
+              [width]="'100%'"
+              [maxLength]="17"
+            >
+              <dx-validator #whatsappValidator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Whatsapp no. is required"
+                ></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="custom"
+                  [validationCallback]="WhatsappValidate"
+                  message="Invalid Whatsapp number"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
         </div>
 
         <div class="form-column" style="flex: 2">
@@ -202,6 +236,12 @@
             placeholder="Select User Role"
             hint="User Role"
           >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="User Role is required"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-select-box>
 
           <dx-text-box
@@ -211,6 +251,16 @@
             labelMode="floating"
             (input)="onEmailInput($event)"
           >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Email is required"
+              ></dxi-validation-rule>
+              <dxi-validation-rule
+                type="email"
+                message="Invalid Email address"
+              ></dxi-validation-rule>
+            </dx-validator>
           </dx-text-box>
 
           <div
@@ -226,11 +276,12 @@
               text="Inactive"
               stylingMode="outlined"
               hint="Inactive"
+              labelMode="floating"
             ></dx-check-box>
           </div>
         </div>
       </div>
-    </div>
+    </dx-validation-group>
   </div>
 
   <dx-data-grid

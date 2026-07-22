@@ -19,11 +19,9 @@
     <dxo-paging [pageSize]="100"></dxo-paging>
     <dxo-editing
       mode="popup"
-      [allowUpdating]="isDeleteIconVisible"
+      [allowUpdating]="isEditIconVisible"
       [allowDeleting]="isDeleteIconVisible"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
-      [allowAdding]="true"
+      [allowAdding]="canAdd"
     >
     </dxo-editing>
     <dxo-pager

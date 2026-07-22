@@ -627,15 +627,17 @@
                     ></dx-number-box>
                   </div>
                   <div class="inventory-item">
-                    <label>Profit Margin:</label>
+                    <label>Profit Margin (%):</label>
                     <dx-number-box
                       [value]="calculateProfitMargin()"
                       (onValueChanged)="onProfitmarginChange($event)"
+                      format="percent"
+                      [step]="0.01"
                       [labelMode]="'floating'"
-                      [format]="'#,##0.00'"
                       [inputAttr]="{ style: 'text-align: right;' }"
                       [width]="200"
-                    ></dx-number-box>
+                    >
+                    </dx-number-box>
                   </div>
 
                   <div class="inventory-item">

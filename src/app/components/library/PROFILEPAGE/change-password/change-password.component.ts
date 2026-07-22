@@ -31,6 +31,7 @@ export class ChangePasswordComponent {
   confirmPassword: string = '';
   confirmPasswordBorderColor: string = '1px solid #ddd'; // Default border color
   oldPasswordBorderColor: string = '1px solid #ddd'; // Default border color
+  newPasswordBorderColor: string = '1px solid #ddd'; // Default border color
   oldPasswordError: string = ''; // Error message for old password validation
   dummyId: any;
   showConfirmPassword: boolean = false;
@@ -161,7 +162,24 @@ export class ChangePasswordComponent {
     target.value = sanitizedValue;
     this.newPassword = sanitizedValue; // Update the password value
 
-    this.checkPasswordStrength(); // Call the function to check the strength of the password
+    this.checkPasswordStrength();
+    this.validateNewPasswordBorder();
+    if (this.confirmPassword) {
+      this.validateConfirmPassword();
+    }
+  }
+
+  validateNewPasswordBorder(): void {
+    if (!this.newPassword) {
+      this.newPasswordBorderColor = '1px solid #ddd';
+      return;
+    }
+
+    if (this.checkPasswordStrength() && this.newPassword !== this.oldPassword) {
+      this.newPasswordBorderColor = '2px solid green';
+    } else {
+      this.newPasswordBorderColor = '2px solid red';
+    }
   }
 
   onConfirmPasswordKeyDown(event: KeyboardEvent): void {
@@ -174,8 +192,13 @@ export class ChangePasswordComponent {
   }
 
   validateConfirmPassword(): void {
+    if (!this.confirmPassword) {
+      this.confirmPasswordBorderColor = '1px solid #ddd';
+      return;
+    }
+
     // Validate if confirmPassword matches newPassword
-    if (this.confirmPassword === this.newPassword) {
+    if (this.confirmPassword === this.newPassword && this.newPassword !== '') {
       this.confirmPasswordBorderColor = '2px solid green'; // Set border color to green
     } else {
       this.confirmPasswordBorderColor = '2px solid red'; // Set border color to red
@@ -219,7 +242,28 @@ export class ChangePasswordComponent {
   }
 
   checkMinimumLength(): boolean {
-    return this.newPassword.length >= this.securityPolicyData.MinimumLength;
+    const minLen = this.securityPolicyData?.MinimumLength || 8;
+    return (this.newPassword || '').length >= minLen;
+  }
+
+  isFormValid(): boolean {
+    if (!this.oldPassword || !this.newPassword || !this.confirmPassword) {
+      return false;
+    }
+
+    if (this.oldPasswordBorderColor !== '2px solid green') {
+      return false;
+    }
+
+    if (this.newPasswordBorderColor !== '2px solid green') {
+      return false;
+    }
+
+    if (this.confirmPasswordBorderColor !== '2px solid green') {
+      return false;
+    }
+
+    return true;
   }
 
   closeChangePassword() {
@@ -236,92 +280,72 @@ export class ChangePasswordComponent {
     }
   }
 
-  // closeChangePassword() {
-  //   this.route.navigateByUrl('/analytics-dashboard');
-  // }
-
   saveNewPassword() {
-    // this.isSaving = true;
+    if (!this.isFormValid()) {
+      return;
+    }
 
-    // // Validate the entire validation group
-    // const validationResult = this.validationGroup.instance.validate();
+    if (this.validationGroup?.instance) {
+      const validationResult = this.validationGroup.instance.validate();
+      if (!validationResult.isValid) {
+        return;
+      }
+    }
 
-    // // Check if the form is valid before proceeding
-    // if (!validationResult.isValid) {
-    //   this.isSaving = false;
-    //   return; // Stop execution if form is not valid; error messages will be shown next to the fields
-    // }
-
-    // Check if the new password meets the security policy
-    // if (!this.checkPasswordStrength()) {
-    //   this.isSaving = false;
-    //   // Show error message if the password does not meet the security policy
-    //   notify(
-    //     {
-    //       message: 'New password does not meet the security requirements.',
-    //       position: { at: 'top right', my: 'top right' },
-    //       displayTime: 500,
-    //     },
-    //     'error'
-    //   );
-    //   return; // Stop execution if the password does not meet the policy
-    // }
+    this.isSaving = true;
 
     const PasswordData = {
       UserID: this.UserID,
       NewPassword: this.newPassword,
-      // ChangePasswordOnLogin: false,
-      // ModifiedFrom: this.UserID,
     };
 
-    this.dataService.reset_Password(PasswordData).subscribe((res) => {
-      try {
-        if (res) {
-          notify(
-            {
-              message: 'Password Updated successfully',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 500,
-            },
-            'success',
-          );
-          setTimeout(() => {
-            const sessionData = JSON.parse(
-              sessionStorage.getItem('savedUserData') || '{}',
+    this.dataService.reset_Password(PasswordData).subscribe(
+      (res) => {
+        try {
+          if (res) {
+            notify(
+              {
+                message: 'Password Updated successfully',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 500,
+              },
+              'success',
             );
+            setTimeout(() => {
+              const sessionData = JSON.parse(
+                sessionStorage.getItem('savedUserData') || '{}',
+              );
 
-            if (sessionData?.GeneralSettings?.VAT_TITLE === 'GST') {
-              this.route.navigate(['/mark-dashboard']);
-            } else {
-              this.route.navigate(['/analytics-dashboard']);
-            }
-          }, 500);
-
-          // Navigate to login page after notification
-          // setTimeout(() => {
-          //   this.authService.logOut();
-          //   this.authService.logOut().subscribe((response: any) => {
-          //     if (response) {
-          //       localStorage.removeItem('sidemenuItems');
-          //       localStorage.clear();
-          //       sessionStorage.clear();
-          //       this.reuseStrategy.clearStoredData();
-          //       this.route.navigate(['/auth/login']);
-          //     }
-          //   });
-          // }); // Wait for notification to display before navigating
-        } else {
+              if (sessionData?.GeneralSettings?.VAT_TITLE === 'GST') {
+                this.route.navigate(['/mark-dashboard']);
+              } else {
+                this.route.navigate(['/analytics-dashboard']);
+              }
+            }, 500);
+          } else {
+            this.isSaving = false;
+            notify(
+              {
+                message: res,
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 500,
+              },
+              'error',
+            );
+          }
+        } catch (error) {
           this.isSaving = false;
           notify(
             {
-              message: res,
+              message: 'Password update operation failed',
               position: { at: 'top right', my: 'top right' },
               displayTime: 500,
             },
             'error',
           );
         }
-      } catch (error) {
+      },
+      (error) => {
         this.isSaving = false;
         notify(
           {
@@ -331,8 +355,8 @@ export class ChangePasswordComponent {
           },
           'error',
         );
-      }
-    });
+      },
+    );
   }
 }
 
