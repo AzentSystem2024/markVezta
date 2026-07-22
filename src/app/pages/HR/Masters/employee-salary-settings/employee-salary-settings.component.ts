@@ -234,7 +234,6 @@ export class EmployeeSalarySettingsComponent {
     const EffectFrom = e.data.EFFECT_FROM;
     const BatchId = e.data.BATCH_ID;
     this.editEmployeePopupOpened = true;
-    //  Format EFFECT_FROM to 'yyyy-MM-dd'
     const formattedEffectFrom = formatDate(EffectFrom, 'yyyy-MM-dd', 'en-US');
     const payload = {
       EMP_ID: employeeId,
@@ -246,9 +245,7 @@ export class EmployeeSalarySettingsComponent {
       .Select_EmployeeSalarySettings_Api(payload)
       .subscribe((response: any) => {
         this.selectedEmployee = response.Data[0];
-
         this.effectFromRaw = this.selectedEmployee.EFFECT_FROM;
-
         this.previousEffectFrom = this.selectedEmployee.PREVIOUS_EFFECT_FROM;
       });
   }

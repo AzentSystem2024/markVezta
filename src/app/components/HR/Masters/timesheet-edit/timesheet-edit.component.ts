@@ -8,7 +8,7 @@ import {
   SimpleChanges,
   ViewChild,
   OnInit,
-  OnChanges
+  OnChanges,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -46,22 +46,39 @@ import { confirm } from 'devextreme/ui/dialog';
   styleUrls: ['./timesheet-edit.component.scss'],
 })
 export class TimesheetEditComponent implements OnInit, OnChanges {
+  // 1. Angular Decorators & Properties
+  // =========================================================================
   @ViewChild('dataGrid') dataGrid!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
-  
+
   @Input() timesheet: any;
   @Input() existingTimesheets: any[] = [];
   @Input() isVerifyMode: boolean = false;
   @Input() isApproveMode: boolean = false;
   @Input() isReadOnlyMode: boolean = false;
 
+  // Data Collections
+  Departments: any[] = [];
+  employee: any[] = [];
   salaryHead: any[] = [];
   salaryDataSource: any[] = [];
   stores: any[] = [];
+  storeData: any[] = [];
+  Stores_List: any[] = [];
   timesheetDetails: any[] = [];
-  employee: any[] = [];
+  timesheetList: any[] = [];
+
+  // State Variables
+  employee_leaveperiopd_Data: any;
+  employeeid: any;
+  is_approve: boolean = false;
+  is_approved: boolean = false;
+  is_verify: boolean = false;
+  paySettings: any = {};
+  selected_Company_id: any;
   tsMonthDate: Date = new Date();
-  
+
+  // Form State
   timesheetFormData: any = {
     TS_MONTH: '',
     COMPANY_ID: 0,
@@ -95,17 +112,8 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
     ],
   };
 
-  storeData: any[] = [];
-  selected_Company_id: any;
-  Departments: any[] = [];
-  employeeid: any;
-  employee_leaveperiopd_Data: any;
-  timesheetList: any[] = [];
-  is_approve: boolean = false;
-  Stores_List: any[] = [];
-  is_verify: boolean = false;
-  is_approved: boolean = false;
-
+  // 2. Constructor & Lifecycle Hooks
+  // =========================================================================
   constructor(private dataService: DataService) {}
 
   ngOnInit() {
@@ -114,7 +122,8 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
     this.getSalaryHead(this.timesheetFormData.TIMESHEET_SALARY || []);
     this.getStoreDropdown();
     this.getEmployeeDropdown();
-    this.Timesheetlistdata();
+    this.fetchTimesheetList();
+    this.getPaySettings();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -130,14 +139,14 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
       this.is_verify = this.isVerifyMode;
       this.is_approved = this.isApproveMode;
       this.is_approve = this.isReadOnlyMode || this.isVerifyMode;
-      
+
       this.timesheetDetails = (
         this.timesheetFormData.TIMESHEET_DETAIL || []
       ).map((detail: any) => ({
         ...detail,
         STORE: String(detail.STORE_ID),
       }));
-      
+
       if (this.stores && this.stores.length > 0) {
         this.stores = this.stores.map((store: any) => ({
           ...store,
@@ -146,26 +155,84 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
       }
 
       if (
-        this.stores && this.stores.length > 0 &&
-        this.storeData && this.storeData.length > 0
+        this.stores &&
+        this.stores.length > 0 &&
+        this.storeData &&
+        this.storeData.length > 0
       ) {
         this.timesheetDetails = [
           ...this.timesheetDetails,
           ...this.storeData.filter(
             (storeRow: any) =>
-              !this.timesheetDetails.some((ts: any) => ts.STORE === storeRow.STORE),
+              !this.timesheetDetails.some(
+                (ts: any) => ts.STORE === storeRow.STORE,
+              ),
           ),
         ];
       }
 
-      this.Timesheetlistdata();
+      this.fetchTimesheetList();
       this.employeeid = this.timesheetFormData.EMP_ID;
     }
   }
 
+  // 3. Initialization & Configuration
+  // =========================================================================
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+  }
+
+  getPaySettings() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.get_PaySettingsList(payload).subscribe((res: any) => {
+      this.paySettings = Array.isArray(res.data) ? res.data[0] : res.data || {};
+    });
+  }
+
+  // 4. Data Fetching (API Calls)
+  // =========================================================================
+  fetchTimesheetList() {
+    const dateObj = new Date(this.timesheetFormData.TS_MONTH);
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      MONTH: dateObj
+        .toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        })
+        .replace(/\s/g, ''),
+    };
+
+    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+      this.timesheetList = response.data;
+    });
+  }
+
+  getEmployeeDropdown() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'EMPLOYEE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.employee = response;
+      this.setEmployeeName();
+    });
+  }
+
+  getStoreDropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.Stores_List = response;
+    });
   }
 
   loadDepartment() {
@@ -190,40 +257,6 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
         }));
       }
     });
-  }
-
-  getStoreDropdown() {
-    const payload = {
-      NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id,
-    };
-    this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.Stores_List = response;
-    });
-  }
-
-  getEmployeeDropdown() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'EMPLOYEE',
-    };
-    this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.employee = response;
-      this.setEmployeeName();
-    });
-  }
-
-  setEmployeeName() {
-    if (this.timesheetFormData.EMP_ID && this.employee?.length) {
-      const matchedEmployee = this.employee.find(
-        (emp: any) => emp.ID == this.timesheetFormData.EMP_ID,
-      );
-      if (matchedEmployee) {
-        this.timesheetFormData.EMP_NAME = matchedEmployee.ID; 
-      } else {
-        this.timesheetFormData.EMP_NAME = null;
-      }
-    }
   }
 
   getSalaryHead(existingData: any[] = []) {
@@ -252,24 +285,6 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
     });
   }
 
-  Timesheetlistdata() {
-    const dateObj = new Date(this.timesheetFormData.TS_MONTH);
-
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      MONTH: dateObj
-        .toLocaleDateString('en-US', {
-          month: 'long',
-          year: 'numeric',
-        })
-        .replace(/\s/g, ''),
-    };
-
-    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-      this.timesheetList = response.data;
-    });
-  }
-
   Employee_leaveperiod() {
     this.dataService.Employee_leave_period().subscribe((res: any) => {
       this.employee_leaveperiopd_Data = res.data[0];
@@ -281,18 +296,20 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
     });
   }
 
+  // 5. Event Handlers
+  // =========================================================================
   onEmployeeSelected(e: any) {
     this.employeeid = e.value;
     this.Employee_leaveperiod();
     this.timesheetFormData.EMP_NAME = e.value;
     this.timesheetFormData.DAYS = '30';
-    
+
     const selectedEmployee = this.employee.find(
       (emp: any) => emp.ID === this.timesheetFormData.EMP_NAME,
     );
-    
+
     if (selectedEmployee) {
-      this.timesheetFormData.EMP_NO = selectedEmployee.EMP_NO; 
+      this.timesheetFormData.EMP_NO = selectedEmployee.EMP_NO;
       this.timesheetFormData.EMP_NAME = selectedEmployee.DESCRIPTION;
     }
 
@@ -300,7 +317,7 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
       (ts: any) =>
         ts.TS_MONTH === this.timesheetFormData.TS_MONTH &&
         ts.EMP_NO == selectedEmployee?.EMP_NO &&
-        ts.ID !== this.timesheetFormData.ID, 
+        ts.ID !== this.timesheetFormData.ID,
     );
 
     if (duplicateTimesheet) {
@@ -328,9 +345,7 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
   onEditorPreparingTImesheetdetails(e: any) {
     if (
       e.parentType !== 'dataRow' ||
-      !['STORE_ID', 'DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(
-        e.dataField,
-      )
+      !['STORE_ID', 'DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(e.dataField)
     ) {
       return;
     }
@@ -401,18 +416,6 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
           });
           break;
 
-        // case 'DEPT_ID':
-        //   if (!args.component.option('opened')) {
-        //     args.component.open();
-        //     return;
-        //   }
-        //   grid.saveEditData().then(() => {
-        //     setTimeout(() => {
-        //       grid.editCell(rowIndex, 'DAYS');
-        //     }, 50);
-        //   });
-        //   break;
-
         case 'DAYS':
           grid.saveEditData().then(() => {
             setTimeout(() => {
@@ -459,36 +462,6 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
     };
   }
 
-  addNewRow() {
-    const hasEmptyRow = this.timesheetDetails.some(
-      (row: any) =>
-        (!row.DAYS || row.DAYS === 0) &&
-        (!row.NORMAL_OT || row.NORMAL_OT === 0) &&
-        (!row.HOLIDAY_OT || row.HOLIDAY_OT === 0)
-    );
-
-    if (hasEmptyRow) {
-      notify(
-        {
-          message: 'An empty row already exists. Please fill it before adding a new one.',
-          position: { at: 'top center', my: 'top center' },
-        },
-        'warning'
-      );
-      return;
-    }
-
-    this.timesheetDetails.push({
-      DEPT_ID: null,
-      DAYS: 0,
-      NORMAL_OT: 0,
-      HOLIDAY_OT: 0,
-      STORE_ID: null,
-    });
-
-    this.timesheetDetails = [...this.timesheetDetails];
-  }
-
   onTimesheetDetailsUpdated(e: any) {
     const rowIndex = e.component.getRowIndexByKey(e.key);
 
@@ -502,25 +475,6 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
       setTimeout(() => {
         this.calculateTotalWorkedDays();
       }, 0);
-    }
-  }
-
-  calculateTotalWorkedDays() {
-    if (this.timesheetFormData && this.timesheetFormData.TIMESHEET_DETAIL) {
-      const totalDays = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail: any) => Number(detail.DAYS) || 0,
-      ).reduce((sum: number, val: number) => sum + val, 0);
-      this.timesheetFormData.WORKED_DAYS = totalDays;
-
-      const totalOTHours = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail: any) => Number(detail.NORMAL_OT) || 0,
-      ).reduce((sum: number, val: number) => sum + val, 0);
-      this.timesheetFormData.NORMAL_OT = totalOTHours;
-
-      const totalHolidayOT = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail: any) => Number(detail.HOLIDAY_OT) || 0,
-      ).reduce((sum: number, val: number) => sum + val, 0);
-      this.timesheetFormData.HOLIDAY_OT = totalHolidayOT;
     }
   }
 
@@ -544,6 +498,71 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
       this.timesheetFormData.TIMESHEET_SALARY.filter(
         (item: any) => item.SALARY_HEAD_ID !== '' && item.AMOUNT !== '',
       );
+  }
+
+  // 6. Data Processing & Helpers
+  // =========================================================================
+  setEmployeeName() {
+    if (this.timesheetFormData.EMP_ID && this.employee?.length) {
+      const matchedEmployee = this.employee.find(
+        (emp: any) => emp.ID == this.timesheetFormData.EMP_ID,
+      );
+      if (matchedEmployee) {
+        this.timesheetFormData.EMP_NAME = matchedEmployee.ID;
+      } else {
+        this.timesheetFormData.EMP_NAME = null;
+      }
+    }
+  }
+
+  addNewRow() {
+    const hasEmptyRow = this.timesheetDetails.some(
+      (row: any) =>
+        (!row.DAYS || row.DAYS === 0) &&
+        (!row.NORMAL_OT || row.NORMAL_OT === 0) &&
+        (!row.HOLIDAY_OT || row.HOLIDAY_OT === 0),
+    );
+
+    if (hasEmptyRow) {
+      notify(
+        {
+          message:
+            'An empty row already exists. Please fill it before adding a new one.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'warning',
+      );
+      return;
+    }
+
+    this.timesheetDetails.push({
+      DEPT_ID: null,
+      DAYS: 0,
+      NORMAL_OT: 0,
+      HOLIDAY_OT: 0,
+      STORE_ID: null,
+    });
+
+    this.timesheetDetails = [...this.timesheetDetails];
+  }
+
+  calculateTotalWorkedDays() {
+    if (this.timesheetFormData && this.timesheetFormData.TIMESHEET_DETAIL) {
+      const totalDays = this.timesheetFormData.TIMESHEET_DETAIL.map(
+        (detail: any) => Number(detail.DAYS) || 0,
+      ).reduce((sum: number, val: number) => sum + val, 0);
+      this.timesheetFormData.WORKED_DAYS = totalDays;
+
+      const totalOTHours = this.timesheetFormData.TIMESHEET_DETAIL.map(
+        (detail: any) => Number(detail.NORMAL_OT) || 0,
+      ).reduce((sum: number, val: number) => sum + val, 0);
+      this.timesheetFormData.NORMAL_OT = totalOTHours;
+
+      const totalHolidayOT = this.timesheetFormData.TIMESHEET_DETAIL.map(
+        (detail: any) => Number(detail.HOLIDAY_OT) || 0,
+      ).reduce((sum: number, val: number) => sum + val, 0);
+      this.timesheetFormData.HOLIDAY_OT = totalHolidayOT;
+    }
   }
 
   buildTimesheetPayload() {
@@ -581,6 +600,58 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
     };
   }
 
+  validTime = (e: any) => {
+    const value = Number(e.value) || 0;
+    const maxOt = Number(this.paySettings?.MAX_OT_MTS) || 12;
+    const dataField = e.column?.dataField;
+
+    let cellMax = maxOt;
+    if (dataField === 'NORMAL_OT') {
+      cellMax = Number(this.paySettings?.NORMAL_OT_RATE) || maxOt;
+    } else if (dataField === 'HOLIDAY_OT') {
+      cellMax = Number(this.paySettings?.HOLIDAY_OT_RATE) || maxOt;
+    }
+
+    if (value > cellMax) {
+      e.rule.message = `Maximum allowed ${e.column?.caption || 'OT'} is ${cellMax} hours`;
+      return false;
+    }
+
+    if (e.data) {
+      const normalOt =
+        dataField === 'NORMAL_OT' ? value : Number(e.data.NORMAL_OT) || 0;
+      const holidayOt =
+        dataField === 'HOLIDAY_OT' ? value : Number(e.data.HOLIDAY_OT) || 0;
+
+      if (normalOt + holidayOt > maxOt) {
+        e.rule.message = `Total OT (Normal + Holiday) cannot exceed ${maxOt} hours`;
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  validateDays = (e: any) => {
+    const enteredDays = Number(e.value) || 0;
+    const maxDays = Number(this.timesheetFormData.DAYS) || 0;
+
+    return enteredDays <= maxDays;
+  };
+
+  formatDateDDMMYYYY(date: any) {
+    if (!date) return null;
+
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
+
+  // 7. Action Methods (Submissions)
+  // =========================================================================
   updateTimesheet() {
     if (
       !this.timesheetFormData.TIMESHEET_SALARY ||
@@ -615,14 +686,13 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
 
     const expectedDays = Number(this.timesheetFormData.DAYS) || 0;
 
-    if (Math.abs(expectedDays - totalworkdays) < 0.001) {
+    if (totalworkdays <= expectedDays + 0.001) {
       const enteredRows = this.timesheetDetails.filter(
         (item: any) =>
           item.STORE_ID ||
-          // item.DEPT_ID ||
           Number(item.DAYS) > 0 ||
           Number(item.NORMAL_OT) > 0 ||
-          Number(item.HOLIDAY_OT) > 0
+          Number(item.HOLIDAY_OT) > 0,
       );
 
       const invalidStore = enteredRows.some(
@@ -646,7 +716,7 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
       const isEmployeeExists = this.timesheetList?.some(
         (item: any) =>
           Number(item.EMP_ID) === Number(this.employeeid) &&
-          item.ID !== this.timesheetFormData.ID, 
+          item.ID !== this.timesheetFormData.ID,
       );
 
       if (isEmployeeExists) {
@@ -660,31 +730,32 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
         return;
       }
 
-      this.dataService.updateTimesheet(finalPayload).subscribe((response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Timesheet Updated Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.popupClosed.emit();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not updated',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+      this.dataService
+        .updateTimesheet(finalPayload)
+        .subscribe((response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Timesheet Updated Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            this.popupClosed.emit();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not updated',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        });
     } else {
       notify(
         {
-          message:
-            `Total days worked (${expectedDays}) and entered total days in grid (${totalworkdays}) must be equal`,
+          message: `Entered total days in grid (${totalworkdays}) cannot be greater than total days worked (${expectedDays})`,
           position: { at: 'top right', my: 'top right' },
         },
         'error',
@@ -750,24 +821,6 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
 
   handleClose() {
     this.popupClosed.emit();
-  }
-
-  validateDays = (e: any) => {
-    const enteredDays = Number(e.value) || 0;
-    const maxDays = Number(this.timesheetFormData.DAYS) || 0;
-
-    return enteredDays <= maxDays;
-  };
-
-  formatDateDDMMYYYY(date: any) {
-    if (!date) return null;
-
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-
-    return `${day}-${month}-${year}`;
   }
 }
 
