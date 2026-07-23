@@ -374,11 +374,16 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
           const details = response.Data[0];
 
           // Bind API data into your form object
-          this.deliveryFormData.CONTACT_NAME = details.CONTACT_NAME;
-          this.deliveryFormData.CONTACT_FAX = details.CONTACT_FAX;
-          this.deliveryFormData.CONTACT_PHONE = details.CONTACT_PHONE;
-          this.deliveryFormData.CONTACT_MOBILE = details.CONTACT_MOBILE;
-          this.deliveryFormData.CONTACT_EMAIL = details.CONTACT_EMAIL;
+          this.deliveryFormData.CONTACT_NAME = details.CONTACT_NAME ?? '';
+          this.deliveryFormData.CONTACT_FAX = details.CONTACT_FAX ?? '';
+          this.deliveryFormData.CONTACT_PHONE = details.CONTACT_PHONE ?? '';
+          this.deliveryFormData.CONTACT_MOBILE = details.CONTACT_MOBILE ?? '';
+          this.deliveryFormData.CONTACT_EMAIL = details.CONTACT_EMAIL ?? '';
+          // this.deliveryFormData.CONTACT_NAME = details.CONTACT_NAME;
+          // this.deliveryFormData.CONTACT_FAX = details.CONTACT_FAX;
+          // this.deliveryFormData.CONTACT_PHONE = details.CONTACT_PHONE;
+          // this.deliveryFormData.CONTACT_MOBILE = details.CONTACT_MOBILE;
+          // this.deliveryFormData.CONTACT_EMAIL = details.CONTACT_EMAIL;
         }
       },
       error: (err) => console.error('API error:', err),
