@@ -18,16 +18,14 @@
             [showBorders]="true"
             [showRowLines]="true"
             [showColumnLines]="true"
-            [columnAutoWidth]="false"
             [wordWrapEnabled]="false"
             [rowAlternationEnabled]="true"
             [headerFilter]="{ visible: true, allowSearch: true }"
             [allowColumnReordering]="true"
             [showColumnHeaders]="true"
-            [columnAutoWidth]="true"
             [allowColumnResizing]="true"
             [height]="'52vh'"
-            [columnResizingMode]="'nextColumn'"
+            [columnResizingMode]="'widget'"
             [scrolling]="{ mode: 'virtual' }"
             rowAlternationInterval="2"
             [keyboardNavigation]="{ editOnKeyPress: true }"
@@ -177,27 +175,19 @@
             <dxi-column
               dataField="EMP_CODE"
               caption="Employee Code"
-              [allowEditing]="!isReadOnlyMode"
             ></dxi-column>
 
             <dxi-column
               dataField="EMP_NAME"
               caption="Employee Name"
-              [allowEditing]="!isReadOnlyMode"
             ></dxi-column>
 
             <dxi-column
               dataField="NET_AMOUNT"
               caption="Salary Amount"
-              [allowEditing]="!isReadOnlyMode"
               dataType="number"
               [format]="{ type: 'fixedPoint', precision: 2 }"
             ></dxi-column>
-
-            <dxi-column *ngIf="!isReadOnlyMode" type="buttons">
-              <dxi-button name="edit"></dxi-button>
-              <dxi-button name="delete"></dxi-button>
-            </dxi-column>
 
             <dxo-summary>
               <dxi-total-item
@@ -211,7 +201,6 @@
             </dxo-summary>
           </dx-data-grid>
 
-          <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
           <div
             class="bordered-grid"
             style="
