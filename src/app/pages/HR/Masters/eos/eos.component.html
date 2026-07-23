@@ -50,8 +50,8 @@
     ></dxo-pager>
     <dxo-editing
       mode="popup"
-      [allowUpdating]="canEdit"
-      [allowDeleting]="canDelete"
+      [allowUpdating]="isUpdateAllowed"
+      [allowDeleting]="isDeleteAllowed"
     >
       <dxo-popup
         title="Edit EOS"
@@ -132,7 +132,7 @@
       <i
         class="fas fa-flag"
         [ngClass]="getStatusFlagClass(cellData.value)"
-        [attr.title]="cellData.value"
+        [attr.title]="cellData.value === false ? 'Active' : 'Inactive'"
         style="margin-left: 10px; cursor: default"
       ></i>
     </div>
