@@ -61,10 +61,10 @@ export class EmployeeSalarySettingsAddComponent implements OnInit {
 
   constructor(private dataservice: DataService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.sessionDetails();
-    this.EmployeeListDropDown();
-    this.get_SalaryHead_List();
+    await this.EmployeeListDropDown();
+    await this.get_SalaryHead_List();
   }
 
   sessionDetails() {
@@ -125,14 +125,17 @@ export class EmployeeSalarySettingsAddComponent implements OnInit {
     return eff > previous;
   };
 
-  EmployeeListDropDown() {
+  async EmployeeListDropDown() {
     const payload = { COMPANY_ID: this.selected_Company_id, NAME: 'Employee' };
-    this.dataservice.getEmployeeDropDown(payload).subscribe((response: any) => {
+    try {
+      const response: any = await this.dataservice.getEmployeeDropDown(payload).toPromise();
       this.EmployeeDropdown = response;
-    });
+    } catch (error) {
+      console.error('Failed to load Employee DropDown:', error);
+    }
   }
 
-  get_SalaryHead_List() {
+  async get_SalaryHead_List() {
     if (!this.selectedEmployeeId) return;
 
     const payload = {
@@ -140,8 +143,9 @@ export class EmployeeSalarySettingsAddComponent implements OnInit {
       COMPANY_ID: this.selected_Company_id,
     };
 
-    this.dataservice.get_SalaryHeadList_Api(payload).subscribe((res: any) => {
-      this.salaryGridData = res.Data[0];
+    try {
+      const res: any = await this.dataservice.get_SalaryHeadList_Api(payload).toPromise();
+      this.salaryGridData = res?.Data?.[0] || {};
       this.selectedRows = [];
 
       const selecteddata = this.salaryGridData?.Details || [];
@@ -156,7 +160,9 @@ export class EmployeeSalarySettingsAddComponent implements OnInit {
 
       this.employeeFormData.BASIC_SALARY = this.salaryGridData?.SALARY || 0;
       this.effectFromValidator?.instance?.validate();
-    });
+    } catch (error) {
+      console.error('Failed to load Salary Head List:', error);
+    }
   }
 
   onSelectionChanged(e: any) {

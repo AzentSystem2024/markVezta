@@ -37,8 +37,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
+        [allowUpdating]="isEditAllowed"
+        [allowDeleting]="isDeleteAllowed"
       ></dxo-editing>
       <!-- <dxi-item name="exportButton" ></dxi-item> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -52,10 +52,7 @@
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-search-panel
-        [visible]="true"
-        [highlightCaseSensitive]="false"
-      ></dxo-search-panel>
+
       <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
       <dxo-export
         [enabled]="true"
@@ -64,10 +61,10 @@
       >
       </dxo-export>
       <dxo-header-filter
-        [visible]="true"
+        [visible]="isFilterRowVisible"
         [search]="{ enabled: true }"
       ></dxo-header-filter>
-      <!-- <dxo-filter-panel [visible]="true"></dxo-filter-panel> -->
+
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
 
@@ -128,7 +125,7 @@
         <i
           class="fas fa-flag"
           [ngClass]="getStatusFlagClass(cellData.value)"
-          [attr.title]="cellData.value ? true : false"
+          [attr.title]="cellData.value ? 'Inactive' : 'Active'"
           style="margin-left: 10px; cursor: default"
         ></i>
       </div>

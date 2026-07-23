@@ -71,6 +71,20 @@ export class SalaryHeadListComponent {
   canApprove = false;
   canPrint = false;
 
+  isEditAllowed = (e: any) => {
+    if (e.row?.data?.HEAD_NAME?.toLowerCase() === 'overtime allowance') {
+      return false;
+    }
+    return this.canEdit;
+  };
+
+  isDeleteAllowed = (e: any) => {
+    if (e.row?.data?.HEAD_NAME?.toLowerCase() === 'overtime allowance') {
+      return false;
+    }
+    return this.canDelete;
+  };
+
   //=================================refresh=============================
   addButtonOptions = {
     type: 'default',
