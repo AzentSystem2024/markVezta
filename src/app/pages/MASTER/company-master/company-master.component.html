@@ -111,11 +111,13 @@
     <dxi-column
       dataField="COMPANY_TYPE_NAME"
       caption="Company Type"
+      [minWidth]="250"
     ></dxi-column>
 
     <dxi-column
       dataField="IS_INACTIVE"
       caption="Status"
+      [width]="100"
       cellTemplate="statusCellTemplate"
     ></dxi-column>
     <div *dxTemplate="let cellData of 'statusCellTemplate'">

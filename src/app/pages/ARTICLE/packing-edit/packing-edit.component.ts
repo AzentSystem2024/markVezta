@@ -369,21 +369,21 @@ export class PackingEditComponent {
 
   ensureEmptyRow() {
 
-  const hasEmptyRow = this.items.some(
-    (r) => !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY
-  );
+    const hasEmptyRow = this.items.some(
+      (r) => !r.ITEM && !r.DESCRIPTION && !r.UOM && !r.QUANTITY
+    );
 
-  if (!hasEmptyRow) {
-    this.items.push({
-      ITEM: null,
-      DESCRIPTION: '',
-      UOM: '',
-      QUANTITY: null,
-      ITEM_ID: null
-    });
+    if (!hasEmptyRow) {
+      this.items.push({
+        ITEM: null,
+        DESCRIPTION: '',
+        UOM: '',
+        QUANTITY: null,
+        ITEM_ID: null
+      });
+    }
+
   }
-
-}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['PackingData'] && changes['PackingData'].currentValue) {
@@ -397,18 +397,7 @@ export class PackingEditComponent {
       this.totalQuantity = this.PackingData.PAIR_QTY;
       console.log(this.totalQuantity);
       this.isArticleFieldsDisabled = true;
-      //    if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
-      //   // Backend → UI
-      //   this.PackingData.UNIT_ID = incomingData.Units.map(
-      //     (u: any) => u.UNIT_ID
-      //   );
-      //   console.log(this.PackingData.UNIT_ID, 'UNIT_ID in ngOnChanges');
-      // } else if (incomingData.UNIT_ID) {
-      //   // Backward compatibility
-      //   this.PackingData.UNIT_ID = [incomingData.UNIT_ID];
-      // } else {
-      //   this.PackingData.UNIT_ID = [];
-      // }
+
 
       if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
         this.PackingData.UNIT_ID = incomingData.Units[0].UNIT_ID; //  SINGLE VALUE
@@ -855,13 +844,34 @@ export class PackingEditComponent {
     //   return;
     // }
     this.isArticleFieldsDisabled = true;
-
     this.dataService
       .get_combinbation_list_api(payload)
       .subscribe((response: any) => {
-        this.articleSizeData = response;
+        this.PackingEntriesData = (response || []).map((item: any) => ({
+          ...item,
+          SIZE: parseInt(item.Size, 10),
+          QUANTITY: Number(item.QUANTITY || 0),
+          ARTICLE_ID: Number(item.ArticleID),
+          rowKey: `${item.ARTICLE_ID}_${parseInt(item.Size, 10)}`,
+        }));
+
         this.PackingData.COMBINATION = '';
+
+        // Auto-select rows where quantity > 0
+        const keysToSelect = this.PackingEntriesData
+          .filter((r: any) => r.QUANTITY > 0)
+          .map((r: any) => r.rowKey);
+
+        this.selectedRowKeys = keysToSelect;
       });
+
+    //==============old function===================
+    // this.dataService
+    //   .get_combinbation_list_api(payload)
+    //   .subscribe((response: any) => {
+    //     this.articleSizeData = response;
+    //     this.PackingData.COMBINATION = '';
+    //   });
   }
   // selectedSizeRows: any[] = [];
 
@@ -870,6 +880,10 @@ export class PackingEditComponent {
   }
 
   clearForm() {
+
+    const aliasNo = this.PackingData.ALIAS_NO;
+    const partNo = this.PackingData.PART_NO;
+
     this.PackingData = {
       ART_NO: '',
       ORDER_NO: '',
@@ -897,9 +911,14 @@ export class PackingEditComponent {
     this.articleSizeData = [];
     this.combination_value = [];
     this.totalQuantity = 0;
+
+    this.PackingData.ALIAS_NO = aliasNo
+    this.PackingData.PART_NO = partNo
+
   }
 
-  close() {}
+
+  close() { }
 
   onSelectionChanged(e: any) {
     this.selectedRowKeys = e.selectedRowKeys;
@@ -1280,4 +1299,4 @@ export class PackingEditComponent {
   exports: [PackingEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PackingEditModule {}
+export class PackingEditModule { }

@@ -113,6 +113,7 @@
       <dxi-column dataField="ART_NO" caption="Art No."></dxi-column>
       <dxi-column dataField="CATEGORY_NAME" caption="Category"></dxi-column>
       <dxi-column dataField="COLOR" caption="Color"></dxi-column>
+
       <!-- <dxi-column
         dataField="CREATED_DATE"
         caption="Date"
@@ -133,6 +134,8 @@
         caption="Article Type"
       ></dxi-column>
       <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
+                  <dxi-column dataField="STANDARD_PACKING" caption="Pair Qty"></dxi-column>
+
       <!-- <dxi-column dataField="ALIAS_NO" caption="Alias No."></dxi-column> -->
       <!-- <dxi-column dataField="PART_NO" caption="Part No."></dxi-column> -->
       <!-- <dxi-column dataField="STATUS" caption="Status"></dxi-column> -->
@@ -144,7 +147,7 @@
 <dx-popup
   [(visible)]="addArticlePopupOpened"
   [width]="'70vw'"
-  [height]="'100vh'"
+  [height]="auto"
   title="New Article"
   (onHiding)="handleClose()"
 >
@@ -154,7 +157,7 @@
 <dx-popup
   [(visible)]="editArticlePopupOpened"
   [width]="'70vw'"
-  [height]="'100vh'"
+  [height]="auto"
   title="Update Article"
   (onHiding)="handleClose()"
 >

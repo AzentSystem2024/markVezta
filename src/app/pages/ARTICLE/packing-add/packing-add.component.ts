@@ -229,7 +229,7 @@ export class PackingAddComponent {
 
   //======================== check box for select ==========================
 
-  onQtyCheckboxChanged(event: any) {}
+  onQtyCheckboxChanged(event: any) { }
 
   getLastOrderNo() {
     this.selectedProductionUnitId = this.PackingData.UNIT_ID;
@@ -828,6 +828,9 @@ export class PackingAddComponent {
   }
 
   clearForm() {
+    const aliasNo = this.PackingData.ALIAS_NO;
+    console.log(aliasNo, '----------------item code ----------------------------')
+
     setTimeout(() => {
       this.formValidationGroup?.instance?.reset();
     });
@@ -846,7 +849,6 @@ export class PackingAddComponent {
     this.PackingData = {
       ART_NO: '',
       ORDER_NO: '',
-      ALIAS_NO: '',
       CATEGORY_ID: null,
       COLOR: '',
       DESCRIPTION: '',
@@ -854,7 +856,7 @@ export class PackingAddComponent {
       PAIR_QTY: null,
       IS_INACTIVE: false,
       PART_NO: '',
-      // ALIAS_NO: '',
+      ALIAS_NO: aliasNo,
       ART_SERIAL: '',
       COMBINATION: '2x4',
       PACK_PRICE: null,
@@ -871,54 +873,10 @@ export class PackingAddComponent {
     this.PackingData.IS_PURCHASABLE = false;
     this.PackingData.IS_EXPORT = false;
     this.PackingData.IS_ANY_COMB = false;
+    this.getAliasNo()
+    this.getPartNo()
   }
 
-  // resetForm() {
-  //    const preservedAliasNo = this.PackingData.ALIAS_NO;
-  //   this.PackingData = {
-  //     ART_NO: '',
-  //     ORDER_NO: '',
-  //     CATEGORY_ID: null,
-  //     COLOR: '',
-  //     DESCRIPTION: '',
-  //     ARTICLE_TYPE: null,
-  //     PAIR_QTY: null,
-  //     IS_INACTIVE: false,
-  //     PART_NO: '',
-  //     ALIAS_NO: preservedAliasNo,
-  //     ART_SERIAL: '',
-  //     COMBINATION: '2x4',
-  //     PACK_PRICE: null,
-  //     UNIT_ID: null,
-  //     IS_PURCHASABLE: false,
-  //     IS_EXPORT: false,
-  //     IS_ANY_COMB: false,
-  //     SUPP_ID: null,
-  //     STD_PRICE_EFFECT_FROM: new Date()
-  //   };
-
-  //   this.formValidationGroup?.instance?.reset();
-  //   this.ArtnoValidationGroup?.instance?.reset();
-  //   this.ColorValidationGroup?.instance?.reset();
-  //   this.CategoryValidationGroup?.instance?.reset();
-  //   this.UnitValidationGroup?.instance?.reset();
-  //   this.isArticleFieldsDisabled = false;
-  //   this.articleSizeData = []; // Clear the article size data after adding
-  //   // this.isArticleFieldsDisabled = false;
-  //   //       this.articleSizeData = []; // Clear the article size data after adding
-  //   this.combination_value = []; // Clear the combination value array
-  //   this.totalQuantity = 0;
-  //   this.PackingData.IS_PURCHASABLE = false;
-  //   this.PackingData.IS_EXPORT = false;
-  //   this.PackingData.IS_ANY_COMB = false;
-  //   setTimeout(() => {
-  //     this.formValidationGroup?.instance?.reset();
-  //   });
-
-  //   setTimeout(() => {
-  //     this.ColorValidationGroup?.instance?.reset();
-  //   });
-  // }
 
   resetForm() {
     // FIRST reset validation
@@ -1208,4 +1166,4 @@ export class PackingAddComponent {
   exports: [PackingAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PackingAddModule {}
+export class PackingAddModule { }

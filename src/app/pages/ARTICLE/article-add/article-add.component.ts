@@ -145,6 +145,7 @@ export class ArticleAddComponent {
   selectedItem: any;
   selectedItems: any[] = [];
   ComponentpopupVisible: boolean = false;
+  Default_company_Type: any;
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
@@ -451,8 +452,14 @@ export class ArticleAddComponent {
   }
 
   getArticles() {
+    const payload = {
+      COMPANY_TYPE: this.Default_company_Type,
+      COMPANY_ID: this.selected_Company_id
+
+
+    }
     // const payload = { COMPANY_ID: this.selected_Company_id };
-    this.dataService.getArticleList().subscribe((response: any) => {
+    this.dataService.getArticleList(payload).subscribe((response: any) => {
       if (response?.Data && Array.isArray(response.Data)) {
         // Store full list (reversed) in articleList
         // this.articleList = response.Data.reverse();
@@ -468,8 +475,11 @@ export class ArticleAddComponent {
 
   addComponent() {
     this.ComponentpopupVisible = true;
-
-    this.dataService.getArticleList().subscribe((response: any) => {
+    const payload = {
+      COMPANY_TYPE: this.Default_company_Type,
+      COMPANY_ID: this.selected_Company_id
+    }
+    this.dataService.getArticleList(payload).subscribe((response: any) => {
       if (response?.Data && Array.isArray(response.Data)) {
         this.articleList = response.Data.reverse();
 
@@ -555,8 +565,9 @@ export class ArticleAddComponent {
 
   getDropdownLists() {
     const payload = {
-      COMPANY_ID: 0,
+      COMPANY_ID: this.selected_Company_id,
       NAME: 'PRODUCTION_UNITS',
+      COMPANY_TYPE: this.Default_company_Type
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.produCtionUnits = response;
@@ -740,6 +751,7 @@ export class ArticleAddComponent {
   onSizeSelectionChanged(e: any) {
     this.selectedSizeRows = e.selectedRowKeys;
     this.selectedSizeRowData = e.selectedRowsData || [];
+    console.log(this.selectedSizeRowData, '----selectedSizeRowData----------------')
   }
 
   enforceArtNoLimit(e: any) {
@@ -773,6 +785,9 @@ export class ArticleAddComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.Default_company_Type = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
+
+
   }
 
   // private getSelectedSizes(): number[] {
@@ -1160,6 +1175,7 @@ export class ArticleAddComponent {
       COMPONENT_ARTICLE_ID: 0,
       IS_COMPONENT: false,
       SUPPLIER_ID: 0,
+      CREATE_PACKING: false
     };
     this.attachGridData = [];
     this.imagePreview = null;
