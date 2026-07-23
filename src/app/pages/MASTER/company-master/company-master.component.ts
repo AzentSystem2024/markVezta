@@ -671,4 +671,4 @@ export class CompanyMasterComponent {
   exports: [],
   declarations: [CompanyMasterComponent],
 })
-export class CompanyMasterModule {}
+export class CompanyMasterModule { }

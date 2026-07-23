@@ -60,7 +60,6 @@
         [formats]="['xlsx']"
       >
       </dxo-export>
-     
 
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
@@ -113,10 +112,13 @@
       <dxi-column dataField="AliasNo" caption="Item Code"></dxi-column>
       <dxi-column dataField="PartNo" caption="Part No."></dxi-column>
       <dxi-column dataField="PairQty" caption="Pair Qty"></dxi-column>
+
+
       <dxi-column
         dataField="Status"
         caption="Status"
         alignment="center"
+        [width]="100"
         cellTemplate="statusCellTemplate"
       ></dxi-column>
 
