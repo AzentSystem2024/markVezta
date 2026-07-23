@@ -44,10 +44,10 @@
           ></dx-button>
 
           <dx-button
-            [text]="isSaveDisabled ? 'Saving...' : saveButtonText"
+            [text]="isSaveDisabled ? 'Disabled' : saveButtonText"
             stylingMode="contained"
             type="default"
-            [disabled]="isSaveDisabled"
+            *ngIf="!isSaveDisabled"
             [icon]="isSaveDisabled ? 'spin' : ''"
             (onClick)="onSaveClick()"
           ></dx-button>

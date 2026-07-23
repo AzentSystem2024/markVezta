@@ -75,6 +75,7 @@ export class TransferOutInventoryComponent {
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -195,6 +196,7 @@ export class TransferOutInventoryComponent {
   StatusType: any;
   selected_Data_Status: any;
   buttonText: string;
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -238,6 +240,7 @@ export class TransferOutInventoryComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
+
 
   getTransferOutList(dateRange: string = this.selectedDateRange) {
     const payload = {
@@ -712,6 +715,7 @@ export class TransferOutInventoryComponent {
     console.log('Selected store IDs:', this.selectedStoreid);
     this.applyStoreFilter(); // ✅ ONLY store filter
   }
+
   onViewClick(e: any) {
     console.log('Edit button clicked for row:', e.row.data);
     e.cancel = true;

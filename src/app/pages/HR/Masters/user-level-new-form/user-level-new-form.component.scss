@@ -8,7 +8,8 @@
   overflow-y: hidden;
   margin: 0px;
 }
-.view-wrapper{
+
+.view-wrapper {
   padding: 0px;
   margin: 0px;
 }
@@ -18,10 +19,12 @@
   display: flex;
   justify-content: center;
 }
+
 .inputBox {
   width: 37%;
   padding: 0px;
 }
+
 .topDiv {
   height: 25%;
   border-radius: 8px;
@@ -30,17 +33,21 @@
   margin-bottom: var(--content-padding);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.04);
 }
+
 .headDiv {
   height: 55px;
 }
+
 .tabs-demo {
   height: 100%;
   background-color: var(--base-bg);
   border-radius: 8px;
 }
+
 .grid-header {
   @include header();
 }
+
 .dx-datagrid {
   padding: 0px;
   margin: 0px;
@@ -53,7 +60,8 @@
   overflow-y: hidden;
   margin: 0px;
 }
-.view-wrapper{
+
+.view-wrapper {
   padding: 0px;
   margin: 0px;
 }
@@ -63,10 +71,12 @@
   display: flex;
   justify-content: center;
 }
+
 .inputBox {
   width: 40%;
   padding: 0px;
 }
+
 .topDiv {
   height: 25%;
   border-radius: 8px;
@@ -75,18 +85,32 @@
   margin-bottom: var(--content-padding);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.04);
 }
+
 .headDiv {
   height: 55px;
 }
+
 .tabs-demo {
   height: 100%;
   background-color: var(--base-bg);
   border-radius: 8px;
 }
+
 .grid-header {
   @include header();
 }
+
 .dx-datagrid {
   padding: 0px;
   margin: 0px;
+}
+
+.header-checkbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-checkbox .dx-checkbox {
+  margin-top: 4px;
 }

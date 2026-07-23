@@ -246,6 +246,11 @@
             allowUpdating: true,
           }"
         >
+          <dxo-scrolling mode="virtual"></dxo-scrolling>
+          <dxo-header-filter
+            [visible]="true"
+            [allowSearch]="true"
+          ></dxo-header-filter>
           <dxi-column
             [width]="'auto'"
             dataField="DESCRIPTION"
@@ -253,31 +258,6 @@
             alignment="left"
           ></dxi-column>
         </dx-data-grid>
-
-        <!-- <dx-data-grid
-  [showBorders]="true"
-  [selection]="{ mode: 'multiple' }"
-  height="200"
-  [dataSource]="selectedHeads"
-   [(selectedRowKeys)]="SalaryHeadData.PERCENT_HEAD_ID"
-   (onSelectionChanged)="onSelectionChanged($event)"
-  width="100%"
-  [editing]="{
-    mode: 'cell',
-    allowUpdating: true
-  }"
-  
->
- 
-  <dxi-column
-    [width]="'auto'"
-    dataField="DESCRIPTION"
-    caption="Head Name"
-    alignment="Left"
-  >
-  
-  </dxi-column>
-</dx-data-grid> -->
       </div>
     </div>
   </dx-validation-group>

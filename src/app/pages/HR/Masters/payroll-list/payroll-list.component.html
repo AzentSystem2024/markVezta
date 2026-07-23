@@ -180,17 +180,7 @@
           [options]="approveButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
-      <dxi-column
-        dataField="SALARY_BILL_NO"
-        caption="Salary Bill No."
-        alignment="left"
-      ></dxi-column>
-      <dxi-column
-        dataField="SAL_MONTH"
-        caption="Date"
-        dataType="date"
-        [format]="{ type: 'custom', formatter: formatDate }"
-      ></dxi-column>
+    
       <dxi-column dataField="EMPLOYEE_NO" caption="Employee No."></dxi-column>
       <dxi-column
         dataField="EMPLOYEE_NAME"
@@ -211,11 +201,15 @@
       <dxi-column
         dataField="STATUS"
         caption="Status"
+        alignment="center"
         cellTemplate="statusCellRender"
       >
       </dxi-column>
 
-      <div *dxTemplate="let data of 'statusCellRender'">
+      <div
+        *dxTemplate="let data of 'statusCellRender'"
+        style="text-align: center; width: 100%"
+      >
         <i
           class="fas fa-flag"
           [style.color]="

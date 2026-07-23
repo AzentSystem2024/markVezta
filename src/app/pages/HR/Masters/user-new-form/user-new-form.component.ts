@@ -25,6 +25,7 @@ import {
   DxTemplateModule,
   DxTabsModule,
   DxTextBoxModule,
+  DxTextBoxComponent,
   DxButtonModule,
   DxDataGridModule,
   DxTreeViewModule,
@@ -38,6 +39,7 @@ import {
   DxFileUploaderComponent,
   DxTooltipModule,
   DxValidationGroupModule,
+  DxValidationGroupComponent,
   DxNumberBoxModule,
   DxDropDownBoxModule,
   DxListModule,
@@ -46,6 +48,8 @@ import { FormTextboxModule } from 'src/app/components';
 import { BrowserModule } from '@angular/platform-browser';
 import CountryList from 'country-list-with-dial-code-and-flag';
 import { DataService } from 'src/app/services';
+import notify from 'devextreme/ui/notify';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 @Component({
   selector: 'app-user-new-form',
@@ -57,6 +61,20 @@ export class UserNewFormComponent {
   fileUploader!: DxFileUploaderComponent; // Update the type here
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('currencySelectBox') currencySelectBox: ElementRef;
+  @ViewChild('mobileValidator', { static: false })
+  mobileValidator!: DxValidatorComponent;
+  @ViewChild('whatsappValidator', { static: false })
+  whatsappValidator!: DxValidatorComponent;
+  @ViewChild('mobileBox', { static: false }) mobileBox!: DxTextBoxComponent;
+  @ViewChild('whatsappBox', { static: false }) whatsappBox!: DxTextBoxComponent;
+  @ViewChild('validationGroup', { static: false })
+  validationGroup!: DxValidationGroupComponent;
+
+  countryCode: string = '+971';
+  whatsappCountryCode: string = '+971';
+  isCountryDropdownOpen = false;
+  isWhatsappDropdownOpen = false;
+  user_list: any[] = [];
 
   userData: any = {
     UserName: '',
@@ -102,7 +120,14 @@ export class UserNewFormComponent {
     private fb: FormBuilder,
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    const codes = CountryList.getAll();
+    this.countryCodes = codes.map((country: any) => ({
+      ...country,
+      flagUrl: `https://flagcdn.com/w20/${country.code.toLowerCase()}.png`,
+      display: `${country.dial_code}`,
+    }));
+  }
 
   countryCodes: any[] = [];
 
@@ -172,19 +197,16 @@ export class UserNewFormComponent {
     this.sesstion_Details();
   }
 
-   sesstion_Details() {
+  sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.storeid = this.sessionData.Configuration[0].STORE_ID
-    console.log(this.storeid)
+    this.storeid = this.sessionData.Configuration[0].STORE_ID;
+    console.log(this.storeid);
   }
 
   getUSerData() {
-    this.dataservice.get_User_data().subscribe((data) => {
-      this.userList = data;
-    });
-
-    this.dataservice.getCountryWithFlags().subscribe((data) => {
-      this.countryCodes = data;
+    this.dataservice.get_User_data().subscribe((data: any) => {
+      this.user_list = data?.Data || data?.data || data || [];
+      this.userList = this.user_list;
     });
   }
 
@@ -245,50 +267,6 @@ export class UserNewFormComponent {
 
   onSelectionChanged(e: any) {
     this.selectedRows = e.selectedRowKeys;
-  }
-
-  //   // Method to handle tab click and set selected index
-  // onTabClick(event: any) {
-  //     ;
-  //   this.selectedIndex = event.itemIndex;
-  // }
-
-  WhatsappValidate = (e: any): boolean => {
-    const whatsappNumber = e.value;
-
-    // Remove all non-digit characters
-    const sanitizedNumber = whatsappNumber.replace(/\D/g, '');
-
-    // Check if the sanitized number has at least 10 digits
-    if (sanitizedNumber.length >= 10) {
-      return true; // Valid
-    }
-    return false; // Invalid
-  };
-
-  autoBindWhatsapp() {
-    setTimeout(() => {
-      if (!this.newUserData.Whatsapp && this.newUserData.Mobile) {
-        this.newUserData.Whatsapp = this.newUserData.Mobile;
-      }
-    }, 0);
-  }
-
-  validateWhatsapp(event: any) {
-    const target = event.target as HTMLInputElement;
-
-    // Allow only input that starts with '+' and contains only digits
-    const sanitizedValue = target.value.replace(/[^0-9+]/g, '');
-
-    // Ensure the '+' is only at the start
-    if (sanitizedValue.indexOf('+') > 0) {
-      target.value = '+' + sanitizedValue.replace(/\+/g, '');
-    } else {
-      target.value = sanitizedValue;
-    }
-
-    // Update the WhatsApp property with the sanitized value
-    this.newUserData.Whatsapp = target.value;
   }
 
   getFormattedDate(format: string): string {
@@ -368,59 +346,40 @@ export class UserNewFormComponent {
     return e.valid;
   };
 
-  // This function removes spaces from the email input and updates the Email property
-  onEmailInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-
-    // Remove spaces from the email input
-    const sanitizedValue = target.value.replace(/\s/g, '');
-
-    // Update the target value and the Email property
-    target.value = sanitizedValue;
-    this.newUserData.Email = sanitizedValue;
-    this.checkEmailExists({ value: sanitizedValue });
-  }
-
   onDateOfBirthChange(event: any) {
     this.newUserData.DateofBirth = event.value; // Update the model with the selected date
   }
 
   checkLoginNameExists = (e: any): boolean => {
-    const loginName = e.value?.trim();
+    const loginName = (e.value || '').trim().toLowerCase();
+    if (!loginName) return true;
 
-    if (!Array.isArray(this.userList)) {
-      console.warn('userList is not loaded yet');
-      e.valid = true; // allow validation to pass, or set false to block
-      return true;
-    }
+    const list = this.user_list || this.userList || [];
 
-    const exists = this.userList.some((user) => user.LoginName === loginName);
+    const exists = list.some(
+      (user: any) =>
+        (user.LOGIN_NAME || user.LoginName || '').trim().toLowerCase() ===
+        loginName,
+    );
 
-    // Return true if it does NOT exist, false if it DOES exist
-    e.valid = !exists;
-    return e.valid;
+    return !exists;
   };
 
   onLoginNameInput(event: Event): void {
     const target = event.target as HTMLInputElement;
 
-    // Remove spaces from the current value and sanitize it
     const sanitizedValue = target.value
       .replace(/\s/g, '')
       .replace(/[^a-zA-Z0-9]/g, '');
 
-    // Check if the first character is an alphabet
     if (sanitizedValue.length > 0 && /^[a-zA-Z]/.test(sanitizedValue[0])) {
-      // Update the target value and the LoginName property
       target.value = sanitizedValue;
-      this.newUserData.LoginName = sanitizedValue; // Update the login name value
-
-      // Validate the login name directly
-      this.checkLoginNameExists({ value: sanitizedValue });
+      this.newUserData.LoginName = sanitizedValue;
+      this.newUserData.LOGIN_NAME = sanitizedValue;
     } else {
-      // If the first character is not an alphabet, reset the input
-      target.value = ''; // Optionally clear the input
-      this.newUserData.LoginName = ''; // Reset the login name value
+      target.value = '';
+      this.newUserData.LoginName = '';
+      this.newUserData.LOGIN_NAME = '';
     }
   }
 
@@ -493,55 +452,176 @@ export class UserNewFormComponent {
     return digitsOnly.startsWith('0') ? '' : digitsOnly;
   }
 
-  // 1. Ensure mobile_limit is defined (e.g., 9 or 10)
+  onCountrySelected(event: any) {
+    const dialCode =
+      event?.itemData?.dial_code ||
+      event?.itemData?.data?.dial_code ||
+      (typeof event?.value === 'string' ? event.value : '');
 
-  // 2. Use arrow function to preserve 'this' context
-  MobileNumberValidate = (e: any): boolean => {
-    const fullValue = e.value || '';
-    const countryCode = this.newUserData.countryCode || '';
+    if (dialCode) {
+      if (this.countryCode && this.countryCode !== dialCode) {
+        this.newUserData.Mobile = '';
+        this.newUserData.MOBILE = '';
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', true);
+        }
+      }
+      this.countryCode = dialCode;
+      this.newUserData.countryCode = dialCode;
+    }
+    this.isCountryDropdownOpen = false;
+    this.revalidateMobile();
+  }
 
-    // If no country code is selected, fail validation
-    if (!countryCode) return false;
+  onWhatsappCountrySelected(event: any) {
+    const dialCode =
+      event?.itemData?.dial_code ||
+      event?.itemData?.data?.dial_code ||
+      (typeof event?.value === 'string' ? event.value : '');
 
-    // Remove the country code from the beginning of the string
-    // and remove all non-digit characters (spaces, dashes, etc.)
-    let pureNumber = '';
-    if (fullValue.startsWith(countryCode)) {
-      pureNumber = fullValue.substring(countryCode.length).replace(/\D/g, '');
-    } else {
-      pureNumber = fullValue.replace(/\D/g, '');
+    if (dialCode) {
+      if (this.whatsappCountryCode && this.whatsappCountryCode !== dialCode) {
+        this.newUserData.Whatsapp = '';
+        this.newUserData.WHATSAPP_NO = '';
+        if (this.whatsappBox?.instance) {
+          this.whatsappBox.instance.option('isValid', true);
+        }
+      }
+      this.whatsappCountryCode = dialCode;
+    }
+    this.isWhatsappDropdownOpen = false;
+    this.revalidateWhatsapp();
+  }
+
+  revalidateMobile() {
+    setTimeout(() => {
+      const val = this.newUserData.Mobile || this.newUserData.MOBILE || '';
+      if (val) {
+        const isValid = this.MobileValidate({ value: val });
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.mobileBox.instance.option('validationError', {
+              message: 'Invalid mobile number',
+            });
+          }
+        }
+      } else if (this.mobileBox?.instance) {
+        this.mobileBox.instance.option('isValid', true);
+      }
+      this.mobileValidator?.instance?.validate();
+    }, 0);
+  }
+
+  revalidateWhatsapp() {
+    setTimeout(() => {
+      const val =
+        this.newUserData.Whatsapp || this.newUserData.WHATSAPP_NO || '';
+      if (val) {
+        const isValid = this.WhatsappValidate({ value: val });
+        if (this.whatsappBox?.instance) {
+          this.whatsappBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.whatsappBox.instance.option('validationError', {
+              message: 'Invalid Whatsapp number',
+            });
+          }
+        }
+      } else if (this.whatsappBox?.instance) {
+        this.whatsappBox.instance.option('isValid', true);
+      }
+      this.whatsappValidator?.instance?.validate();
+    }, 0);
+  }
+
+  MobileValidate = (e: any): boolean => {
+    const dialCode = (this.countryCode || '').trim();
+    const mobileValue = e.value ? e.value.toString().trim() : '';
+    const mobileNumber = mobileValue.replace(/\D/g, '');
+    if (!mobileNumber) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return mobileNumber.length === 9;
     }
 
-    // Return true only if length matches exactly
-    return pureNumber.length === this.mobile_limit;
+    try {
+      return isValidPhoneNumber(dialCode + mobileNumber);
+    } catch {
+      return false;
+    }
   };
 
-  onMobileInputChange(event: any) {
-    const target = event.event.target as HTMLInputElement; // Get the raw input
-    let inputValue = target.value;
-    const dialCode = this.newUserData.countryCode || '';
+  WhatsappValidate = (e: any): boolean => {
+    const dialCode = (this.whatsappCountryCode || '').trim();
+    const mobileValue = e.value ? e.value.toString().trim() : '';
+    const mobileNumber = mobileValue.replace(/\D/g, '');
+    if (!mobileNumber) return true;
 
-    // 1. Force the dial code to be at the start
-    if (!inputValue.startsWith(dialCode)) {
-      inputValue = dialCode;
+    if (dialCode === '+971' || dialCode === '971') {
+      return mobileNumber.length === 9;
     }
 
-    // 2. Get the part after the dial code
-    let numberPart = inputValue.substring(dialCode.length);
-
-    // 3. Clean the number part: remove non-digits and prevent leading zero
-    numberPart = numberPart.replace(/\D/g, '');
-    if (numberPart.startsWith('0')) {
-      numberPart = numberPart.substring(1);
+    try {
+      return isValidPhoneNumber(dialCode + mobileNumber);
+    } catch {
+      return false;
     }
+  };
 
-    // 4. Update the model and the UI
-    const finalValue = dialCode + numberPart;
-
-    // Use setTimeout to ensure the validation triggers AFTER the value is updated
+  autoBindWhatsapp() {
     setTimeout(() => {
-      this.newUserData.Mobile = finalValue;
+      if (!this.newUserData.Whatsapp && this.newUserData.Mobile) {
+        this.newUserData.Whatsapp = this.newUserData.Mobile;
+        this.newUserData.WHATSAPP_NO = this.newUserData.Mobile;
+      }
     }, 0);
+  }
+
+  onMobileInputChange(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.newUserData.Mobile = digits;
+    this.newUserData.MOBILE = digits;
+    this.revalidateMobile();
+  }
+
+  validateWhatsapp(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.newUserData.Whatsapp = digits;
+    this.newUserData.WHATSAPP_NO = digits;
+    this.revalidateWhatsapp();
+  }
+
+  onUserNameInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+
+    let sanitizedValue = target.value
+      .replace(/[^a-zA-Z\s]/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/^\s+/g, '')
+      .toUpperCase();
+
+    target.value = sanitizedValue;
+    this.newUserData.UserName = sanitizedValue;
+    this.newUserData.USER_NAME = sanitizedValue;
+  }
+
+  onEmailInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    let sanitizedValue = target.value.replace(/\s/g, '');
+    target.value = sanitizedValue;
+    this.newUserData.Email = sanitizedValue;
   }
 
   refreshPassword(): void {
@@ -621,20 +701,6 @@ export class UserNewFormComponent {
       .join('');
 
     return password;
-  }
-
-  onUserNameInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-
-    // Regular expression to allow only alphabets with a single space between words
-    let sanitizedValue = target.value
-      .replace(/[^a-zA-Z\s]/g, '') // Remove all characters except alphabets and spaces
-      .replace(/\s{2,}/g, ' ') // Replace multiple spaces with a single space
-      .replace(/^\s+/g, '') // Remove spaces at the beginning of the string
-      .toUpperCase();
-
-    target.value = sanitizedValue;
-    this.newUserData.UserName = sanitizedValue; // Update the UserName value
   }
 
   toggleUserDetails(): void {
@@ -723,15 +789,60 @@ export class UserNewFormComponent {
   // });
 
   getNewUserData = () => {
-  console.log('storeid inside payload:', this.storeid);
+    let isValid = true;
+    if (this.validationGroup?.instance) {
+      const res = this.validationGroup.instance.validate();
+      isValid = res.isValid;
+    }
 
-  return {
-    ...this.newUserData,
-    COMPANY_ID: this.selectedRows,
-    STORE_ID: this.storeid,
-    MOBILE: this.newUserData.countryCode + '-' + this.newUserData.Mobile,
+    const isMobileValid = this.MobileValidate({
+      value: this.newUserData.Mobile || this.newUserData.MOBILE,
+    });
+    const isWhatsappValid = this.WhatsappValidate({
+      value: this.newUserData.Whatsapp || this.newUserData.WHATSAPP_NO,
+    });
+
+    if (!isMobileValid) {
+      this.revalidateMobile();
+      isValid = false;
+    }
+    if (!isWhatsappValid) {
+      this.revalidateWhatsapp();
+      isValid = false;
+    }
+
+    if (!isValid) {
+      notify(
+        {
+          message: 'Please resolve all validation errors before saving.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+      );
+      return null;
+    }
+
+    const mobileVal = this.newUserData.Mobile || this.newUserData.MOBILE || '';
+    const whatsappVal =
+      this.newUserData.Whatsapp || this.newUserData.WHATSAPP_NO || '';
+    const mobileCode = this.countryCode || '+971';
+    const whatsappCode = this.whatsappCountryCode || this.countryCode || '+971';
+
+    return {
+      ...this.newUserData,
+      UserName: this.newUserData.UserName || this.newUserData.USER_NAME,
+      LoginName: this.newUserData.LoginName || this.newUserData.LOGIN_NAME,
+      LOGIN_NAME: this.newUserData.LOGIN_NAME || this.newUserData.LoginName,
+      COMPANY_ID: this.selectedRows,
+      STORE_ID: this.storeid,
+      Mobile: mobileCode + '-' + mobileVal,
+      MOBILE: mobileCode + '-' + mobileVal,
+      Whatsapp: whatsappCode + '-' + whatsappVal,
+      WHATSAPP_NO: whatsappCode + '-' + whatsappVal,
+      WHATSAPP: whatsappCode + '-' + whatsappVal,
+      countryCode: mobileCode,
+    };
   };
-};
 }
 
 @NgModule({

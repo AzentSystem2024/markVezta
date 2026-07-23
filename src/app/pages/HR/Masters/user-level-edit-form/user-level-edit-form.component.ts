@@ -47,11 +47,12 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
   checkedRows: any;
   resetValue: boolean = false;
   clearData: any;
+  isAdministrator = false;
 
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.get_All_MenuList();
@@ -137,7 +138,7 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
               CanEdit: menu.canEdit ?? false,
               CanVerify: menu.canVerify ?? false,
               CanApprove: menu.canApprove ?? false,
-              HideCost : menu.HideCost ?? false,
+              HideCost: menu.HideCost ?? false,
               CanDelete: menu.canDelete ?? false,
               CanPrint: menu.canPrint ?? false,
             });
@@ -151,6 +152,22 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
         Menus: enrichedMenus,
       });
     }
+  }
+
+  selectAllAdd = false;
+  selectAllEdit = false;
+  selectAllVerify = false;
+  selectAllApprove = false;
+  selectAllDelete = false;
+  selectAllHideCost = false;
+  selectAllPrint = false;
+
+  toggleColumn(field: string, value: boolean) {
+    this.selectedTabData.forEach((row: any) => {
+      row[field] = value;
+    });
+
+    this.selectedTabData = [...this.selectedTabData];
   }
 
   onPermissionCheckboxChanged(e: any): void {
@@ -207,10 +224,10 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
             CanAdd: menu.CanAdd ?? false,
             CanView: menu.CanView ?? true,
             CanEdit: menu.CanEdit ?? false,
-            CanVerify:menu.CanVerify ?? false,
+            CanVerify: menu.CanVerify ?? false,
             CanApprove: menu.CanApprove ?? false,
             CanDelete: menu.CanDelete ?? false,
-            HideCost : menu.HideCost ?? false,
+            HideCost: menu.HideCost ?? false,
             CanPrint: menu.CanPrint ?? false,
           });
         }
@@ -252,4 +269,4 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
   declarations: [UserLevelEditFormComponent],
   exports: [UserLevelEditFormComponent],
 })
-export class UserLevelEditFormModule {}
+export class UserLevelEditFormModule { }

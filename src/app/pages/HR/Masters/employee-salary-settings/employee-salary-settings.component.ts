@@ -77,6 +77,7 @@ export class EmployeeSalarySettingsComponent {
   canApprove: boolean = false;
   canPrint: boolean = false;
   selected_Company_id: any;
+  isReadOnly: boolean = false;
 
   filterSelectBoxOptions = {
     items: this.filterOptions,
@@ -231,10 +232,29 @@ export class EmployeeSalarySettingsComponent {
   onEditEmployee(e: any) {
     e.cancel = true;
     const employeeId = e.data.ID;
+    const empCode = e.data.EMP_CODE;
     const EffectFrom = e.data.EFFECT_FROM;
     const BatchId = e.data.BATCH_ID;
     this.editEmployeePopupOpened = true;
-    //  Format EFFECT_FROM to 'yyyy-MM-dd'
+
+    if (Number(this.selectedFilterAction) !== 6) {
+      this.isReadOnly = false;
+    } else {
+      const allRecordsForEmp = this.EmployeeSalarySettingsDatasource.filter(
+        (item) => item.EMP_CODE === empCode
+      );
+
+      let isLatest = true;
+      if (allRecordsForEmp.length > 0) {
+        // Sort purely by BATCH_ID descending to avoid any browser-specific date parsing bugs
+        allRecordsForEmp.sort((a, b) => {
+          return (b.BATCH_ID || 0) - (a.BATCH_ID || 0);
+        });
+        isLatest = allRecordsForEmp[0].BATCH_ID === BatchId;
+      }
+      this.isReadOnly = !isLatest;
+    }
+
     const formattedEffectFrom = formatDate(EffectFrom, 'yyyy-MM-dd', 'en-US');
     const payload = {
       EMP_ID: employeeId,
@@ -246,9 +266,7 @@ export class EmployeeSalarySettingsComponent {
       .Select_EmployeeSalarySettings_Api(payload)
       .subscribe((response: any) => {
         this.selectedEmployee = response.Data[0];
-
         this.effectFromRaw = this.selectedEmployee.EFFECT_FROM;
-
         this.previousEffectFrom = this.selectedEmployee.PREVIOUS_EFFECT_FROM;
       });
   }

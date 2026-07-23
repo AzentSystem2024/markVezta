@@ -269,7 +269,7 @@
                 <!-- Cheque No & Due Date -->
                 <div style="display: flex; gap: 10px">
                   <dx-text-box
-                    label="Cheque No"
+                    label="Reference No"
                     labelMode="floating"
                     [(value)]="salaryPaymentData.CHEQUE_NO"
                     [width]="'100%'"
@@ -316,12 +316,7 @@
               ></dx-text-box>
             </div>
           </div>
-          <dx-check-box
-            *ngIf="isEditing && !isReadOnlyMode"
-            [(value)]="isApproved"
-            text="Approve"
-            style="margin-top: 10px"
-          ></dx-check-box>
+
         </div>
       </div>
     </div>
@@ -338,10 +333,10 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      [text]="isEditing ? (isApproved ? 'Commit' : 'Update') : 'Save'"
+      [text]="isVerifying ? 'Verify' : isApproving ? 'Approve' : isEditing ? 'Update' : 'Save'"
       stylingMode="contained"
       type="default"
-      (onClick)="isEditing ? onUpdateSalaryPayment() : onSaveSalaryPayment()"
+      (onClick)="isVerifying ? onVerifySalaryPayment() : (isEditing ? onUpdateSalaryPayment() : onSaveSalaryPayment())"
     >
     </dx-button>
   </div>

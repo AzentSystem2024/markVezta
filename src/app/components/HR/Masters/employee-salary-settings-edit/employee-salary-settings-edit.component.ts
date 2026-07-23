@@ -47,6 +47,7 @@ export class EmployeeSalarySettingsEditComponent {
   SalaryHeadValidation: DxValidationGroupComponent | undefined;
 
   @Input() employeeData: any;
+  @Input() isReadOnlyMode: boolean = false;
 
   EmployeeDropdown: any;
   selectedEmployee: any;
@@ -73,7 +74,9 @@ export class EmployeeSalarySettingsEditComponent {
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    
+  }
 
   ngOnInit() {
     this.sessionDetails();
@@ -87,6 +90,7 @@ export class EmployeeSalarySettingsEditComponent {
       changes['employeeData'].currentValue.ID
     ) {
       this.selectedEmployee = changes['employeeData'].currentValue;
+      console.log('this.isReadOnlyMode', this.isReadOnlyMode);
       this.selectedEmployeeId = this.selectedEmployee.ID;
 
       this.SalaryDetails = [];
@@ -130,64 +134,42 @@ export class EmployeeSalarySettingsEditComponent {
       return;
     }
 
-    if (this.selectedEmployee) {
-      this.selected_Batch_id = this.selectedEmployee.BATCH_ID;
-
-      this.employeeFormData = {
-        EMP_CODE: this.selectedEmployee.EMP_CODE || '',
-        EMP_NAME: this.selectedEmployee.EMP_NAME || '',
-        DESIGNATION: this.selectedEmployee.DESG_NAME || '',
-        BASIC_SALARY: this.selectedEmployee.SALARY
-          ? Number(this.selectedEmployee.SALARY)
-          : undefined,
-        EFFECT_FROM: new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          1,
-        ),
-        PREVIOUS_EFFECT_FROM: this.selectedEmployee.PREVIOUS_EFFECT_FROM
-          ? this.parseDateSafe(this.selectedEmployee.PREVIOUS_EFFECT_FROM)
-          : null,
-        IS_INACTIVE: this.selectedEmployee.IS_INACTIVE || false,
-      };
-      console.log('selected employeesssss', this.selectedEmployee);
-      console.log('selected employee', this.employeeFormData);
+    if (!this.selectedEmployee) {
+      console.warn('No employee data available');
+      return;
     }
 
-    const payload = {
-      EMP_ID: this.selectedEmployeeId,
-      COMPANY_ID: this.selected_Company_id,
+    // Extract the employee object (handle both array and object formats)
+    const empData = Array.isArray(this.selectedEmployee) 
+      ? this.selectedEmployee[0] 
+      : this.selectedEmployee;
+
+    if (!empData) return;
+
+    this.selected_Batch_id = empData.BATCH_ID;
+
+    this.employeeFormData = {
+      EMP_CODE: empData.EMP_CODE || '',
+      EMP_NAME: empData.EMP_NAME || '',
+      DESIGNATION: empData.DESG_NAME || '',
+      BASIC_SALARY: empData.SALARY ? Number(empData.SALARY) : undefined,
+      EFFECT_FROM: empData.EFFECT_FROM 
+        ? this.parseDateSafe(empData.EFFECT_FROM) 
+        : null,
+      PREVIOUS_EFFECT_FROM: empData.PREVIOUS_EFFECT_FROM
+        ? this.parseDateSafe(empData.PREVIOUS_EFFECT_FROM)
+        : null,
+      IS_INACTIVE: empData.IS_INACTIVE || false,
     };
 
-    this.isLoading = true;
-    this.dataservice.get_SalaryHeadList_Api(payload).subscribe({
-      next: (res: any) => {
-        this.salaryGridData = res.Data[0];
-        this.selectedRows = [];
+    this.salaryGridData = empData;
+    this.SalaryDetails = empData.Details || [];
+    this.PreviousRevision = empData.PREVIOUS_EFFECT_FROM || '';
 
-        const selecteddata = this.salaryGridData.Details;
-        this.selectedRows = selecteddata
-          .filter((item: any) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
-          .map((item: any) => item.HEAD_ID);
-
-        this.SalaryDetails = this.salaryGridData.Details || [];
-        this.PreviousRevision = this.salaryGridData.EFFECT_FROM || '';
-        
-        // Ensure UI bindings are updated if switching employees via the dropdown
-        if (this.PreviousRevision) {
-          this.employeeFormData.PREVIOUS_EFFECT_FROM = this.parseDateSafe(this.PreviousRevision);
-        }
-
-        this.employeeFormData.BASIC_SALARY = this.salaryGridData.SALARY
-          ? Number(this.salaryGridData.SALARY)
-          : undefined;
-        this.isLoading = false;
-      },
-      error: (err: any) => {
-        this.isLoading = false;
-        console.error(err);
-      },
-    });
+    // Pre-select rows that have a positive amount or percent
+    this.selectedRows = this.SalaryDetails
+      .filter((item: any) => item.HEAD_AMOUNT > 0 || item.HEAD_PERCENT > 0)
+      .map((item: any) => item.HEAD_ID);
   }
 
   onEmployeeChanged(event: any) {
@@ -323,6 +305,7 @@ export class EmployeeSalarySettingsEditComponent {
   isValid() {
     return this.SalaryHeadValidation?.instance.validate().isValid;
   }
+  
   stripToDateOnly(date: Date | null): string | null {
     if (!(date instanceof Date) || isNaN(date.getTime())) return null;
     const yyyy = date.getFullYear();

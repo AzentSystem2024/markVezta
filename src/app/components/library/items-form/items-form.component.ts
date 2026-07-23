@@ -148,6 +148,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   consignment: boolean = false;
   showCheckbox: boolean = true;
   showSupplier: any = false;
+  selectedStoreRows: any[] = [];
   showSuppliers: boolean = true;
   showSupplierTab: boolean = true;
   isParentItemSelected: boolean = false;
@@ -498,12 +499,33 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     //  FORCE supplier grid to commit edits
     this.supplierGrid?.instance.saveEditData();
 
+    let mappedStores = [];
+    if (this.selectedStoreRows && this.selectedStoreRows.length > 0) {
+      mappedStores = this.selectedStoreRows.map((row) => ({
+        STORE_ID: row.ID,
+        SALE_PRICE: Number(row.SALE_PRICE) || 0,
+        SALE_PRICE1: Number(row.SALE_PRICE1) || 0,
+        SALE_PRICE2: Number(row.SALE_PRICE2) || 0,
+        SALE_PRICE3: Number(row.SALE_PRICE3) || 0,
+        SALE_PRICE4: Number(row.SALE_PRICE4) || 0,
+        SALE_PRICE5: Number(row.SALE_PRICE5) || 0,
+        IS_INACTIVE: !!row.IS_INACTIVE,
+        IS_NOT_SALE_ITEM: !!row.IS_NOT_SALE_ITEM,
+        IS_NOT_SALE_RETURN: !!row.IS_NOT_SALE_RETURN,
+        IS_PRICE_REQUIRED: !!row.IS_PRICE_REQUIRED,
+        IS_NOT_DISCOUNTABLE: !!row.IS_NOT_DISCOUNTABLE,
+        COST: Number(row.COST) || 0,
+      }));
+    } else {
+      mappedStores = this.formItemsData.ITEM_STORES;
+    }
+
     return {
       ...this.newItems,
       COMPANY_ID: this.selected_Company_id,
       UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
 
-      ITEM_STORES: this.selectedStoresMap || this.formItemsData.ITEM_STORES,
+      ITEM_STORES: mappedStores,
 
       //  SUPPLIER PAYLOAD (NOW WILL WORK)
       ITEM_SUPPLIERS: (this.datasource || [])
@@ -596,7 +618,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       (option) => option.ID !== this.selectedUom,
     );
   }
-  onSelectPackAdd(event: any) { }
+  onSelectPackAdd(event: any) {}
 
   onUOMChange(event: any) {
     this.selectedUom = this.newItems.UNIT_ID;
@@ -604,7 +626,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
     this.filterDropdownOptions(); // Filter the options when the selection changes
   }
-  onPriorityChange(event: any) { }
+  onPriorityChange(event: any) {}
 
   // onParentItemChanged(e: any) {
   //   if (e.selectedRowKeys.length > 0) {
@@ -745,6 +767,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   }
 
   updatePriceLevel(selectedRows: any[]) {
+    this.selectedStoreRows = selectedRows;
     if (selectedRows.length > 0) {
       selectedRows.forEach((row) => {
         row.SALE_PRICE = this.formItemsData.SALE_PRICE;
@@ -759,26 +782,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
         row.IS_PRICE_REQUIRED = this.formItemsData.IS_PRICE_REQUIRED;
         row.IS_NOT_DISCOUNTABLE = this.formItemsData.IS_NOT_SALE_RETURN;
         row.COST = this.formItemsData.COST;
-
-        this.formItemsData.ITEM_STORES.forEach((store, index) => {
-          this.formItemsData.ITEM_STORES[index].STORE_ID = row.ID;
-          this.formItemsData.ITEM_STORES[index].SALE_PRICE = row.SALE_PRICE;
-          this.formItemsData.ITEM_STORES[index].SALE_PRICE1 = row.SALE_PRICE1;
-          this.formItemsData.ITEM_STORES[index].SALE_PRICE2 = row.SALE_PRICE2;
-          this.formItemsData.ITEM_STORES[index].SALE_PRICE3 = row.SALE_PRICE3;
-          this.formItemsData.ITEM_STORES[index].SALE_PRICE4 = row.SALE_PRICE4;
-          this.formItemsData.ITEM_STORES[index].SALE_PRICE5 = row.SALE_PRICE5;
-          this.formItemsData.ITEM_STORES[index].IS_INACTIVE = row.IS_INACTIVE;
-          this.formItemsData.ITEM_STORES[index].IS_NOT_SALE_ITEM =
-            row.IS_NOT_SALE_ITEM;
-          this.formItemsData.ITEM_STORES[index].IS_NOT_SALE_RETURN =
-            row.IS_NOT_SALE_RETURN;
-          this.formItemsData.ITEM_STORES[index].IS_PRICE_REQUIRED =
-            row.IS_PRICE_REQUIRED;
-          this.formItemsData.ITEM_STORES[index].IS_NOT_DISCOUNTABLE =
-            row.IS_NOT_DISCOUNTABLE;
-          this.formItemsData.ITEM_STORES[index].COST = row.COST;
-        });
       });
     } else {
       this.store.forEach((row) => {
@@ -913,7 +916,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       };
     }
   }
-  onRowClick(e: any) { }
+  onRowClick(e: any) {}
 
   onRowInserted(event: any) {
     // const newRecordIsPrimary = event.data.IS_PRIMARY === true;
@@ -955,7 +958,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   // this.formItemsData.ITEM_ALIAS.push({ ALIAS: event.data.ALIAS, ALIAS_TYPE_ID: this.selectedPriority   });
 
   // }
-  onClickSaveSupplier() { }
+  onClickSaveSupplier() {}
 
   onRowUpdatedAlias(event: any) {
     // Find the index of the alias being updated
@@ -1085,6 +1088,10 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     this.cdr.detectChanges();
   }
 
+  onDescriptionChanged(e: any): void {
+    this.newItems.POS_DESCRIPTION = (e.value || '').substring(0, 45);
+  }
+
   cancelPopup() {
     this.isPopupVisible = false;
     this.formData = {
@@ -1138,4 +1145,4 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   exports: [ItemsFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsFormModule { }
+export class ItemsFormModule {}

@@ -139,6 +139,7 @@
   <app-employee-salary-settings-edit
     #editSalarySettings
     [employeeData]="selectedEmployee"
+    [isReadOnlyMode]="isReadOnly"
     (formClosed)="handleEditClose($event)"
   ></app-employee-salary-settings-edit>
 </dx-popup>

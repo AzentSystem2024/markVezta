@@ -53,8 +53,10 @@ import { Router } from '@angular/router';
 export class PromotionSchemaLogComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent | undefined;
-  @ViewChild(DxValidationGroupComponent) validationGroup!: DxValidationGroupComponent;
-  @ViewChild('editValidationGroup') editValidationGroup!: DxValidationGroupComponent;
+  @ViewChild(DxValidationGroupComponent)
+  validationGroup!: DxValidationGroupComponent;
+  @ViewChild('editValidationGroup')
+  editValidationGroup!: DxValidationGroupComponent;
 
   showHeaderFilter = true;
   logList: any;
@@ -165,7 +167,7 @@ export class PromotionSchemaLogComponent {
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private router: Router
+    private router: Router,
   ) {
     const payload = {
       name: 'PROMOTIONSCHEMA_TYPE',
@@ -177,7 +179,6 @@ export class PromotionSchemaLogComponent {
   }
 
   ngOnInit() {
-
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -206,11 +207,70 @@ export class PromotionSchemaLogComponent {
   setSchemaType() {
     this.selectedSchemaType = this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE
       ? 'multiple'
-      : 'regular';
+      : 'more';
+  }
+
+  getSchemaTypeCode(schemaTypeIdOrObject: any, itemData?: any): number {
+    if (!schemaTypeIdOrObject && !itemData) return 1;
+
+    const item =
+      itemData ||
+      (typeof schemaTypeIdOrObject === 'object' ? schemaTypeIdOrObject : null);
+    let targetId = item ? (item.ID ?? item.id) : schemaTypeIdOrObject;
+    targetId = Number(targetId);
+
+    const schemaObj =
+      item ||
+      this.promotionSchema?.find(
+        (s: any) =>
+          Number(s.ID ?? s.id) === targetId ||
+          s.ID == targetId ||
+          s.id == targetId,
+      );
+
+    if (schemaObj) {
+      if (Array.isArray(this.promotionSchema)) {
+        const idx = this.promotionSchema.indexOf(schemaObj);
+        if (idx === 0) return 1;
+        if (idx === 1) return 2;
+        if (idx === 2) return 3;
+      }
+
+      const remarks = String(
+        schemaObj.REMARKS ?? schemaObj.remarks ?? '',
+      ).trim();
+      const desc = String(
+        schemaObj.DESCRIPTION ?? schemaObj.description ?? '',
+      ).toLowerCase();
+
+      if (
+        remarks === '2' ||
+        desc.includes('buy x get y') ||
+        desc.includes('get y')
+      ) {
+        return 2;
+      }
+      if (remarks === '3' || desc.includes('mix') || desc.includes('match')) {
+        return 3;
+      }
+      if (
+        remarks === '1' ||
+        desc.includes('buy x get %') ||
+        desc.includes('get %') ||
+        desc.includes('get percent')
+      ) {
+        return 1;
+      }
+    }
+
+    if (targetId === 2) return 2;
+    if (targetId === 3) return 3;
+    return 1;
   }
 
   adjustPopupSize() {
-    if (this.selectedPromotionSchema === 3) {
+    const code = this.getSchemaTypeCode(this.selectedPromotionSchema);
+    if (code === 3) {
       this.popupWidth = 650;
       this.popupHeight = 500;
     } else {
@@ -220,57 +280,71 @@ export class PromotionSchemaLogComponent {
   }
 
   onPromotionSchemaChange(event: any) {
-    this.selectedPromotionSchema = event.value;
-    this.areRadioButtonsDisabled = this.selectedPromotionSchema !== 1;
-    // ✅ set value ONLY when enabled
-    if (!this.areRadioButtonsDisabled) {
+    const selectedID = Number(event?.value);
+    this.selectedPromotionSchema = selectedID;
+
+    const schemaTypeCode = this.getSchemaTypeCode(selectedID, event?.itemData);
+
+    this.areRadioButtonsDisabled = schemaTypeCode !== 1;
+    this.isQtyGetDisabled = schemaTypeCode !== 2;
+    this.buyAndGetDisabled = schemaTypeCode === 3;
+
+    if (schemaTypeCode === 1) {
       this.selectedSchemaCondition = 'multiple';
+      this.selectedSchemaType = 'multiple';
+      this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = true;
+      this.promotionData.SCHEMA_ON_REGULAR_PRICE = false;
+      this.promotionData.QTY_GET = 0;
+    } else if (schemaTypeCode === 2) {
+      this.selectedSchemaCondition = '';
+      this.selectedSchemaType = '';
+      this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = false;
+      this.promotionData.SCHEMA_ON_REGULAR_PRICE = false;
+      if (
+        this.promotionData.QTY_GET === 0 ||
+        this.promotionData.QTY_GET === '0'
+      ) {
+        this.promotionData.QTY_GET = null;
+      }
     } else {
       this.selectedSchemaCondition = '';
+      this.selectedSchemaType = '';
+      this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE = false;
+      this.promotionData.SCHEMA_ON_REGULAR_PRICE = false;
+      this.promotionData.QTY_GET = 0;
+      this.tableData = [];
     }
 
-    const selectedID = event.value;
-    this.selectedPromotionSchema !== this.promotionSchema[0]?.DESCRIPTION;
-    this.isQtyGetDisabled =
-      this.selectedPromotionSchema === this.promotionSchema[0]?.ID;
-    this.buyAndGetDisabled =
-      this.selectedPromotionSchema === this.promotionSchema[2]?.ID;
-    const selectedSchema = this.promotionSchema.find(
-      (schema) => schema.ID === this.selectedPromotionSchema,
-    );
-    if (this.selectedPromotionSchema === 3) {
-      this.tableData = [];
-    } else {
-      this.tableData = [];
-    }
     this.adjustPopupSize();
+    this.cdr.detectChanges();
   }
 
   getLogList() {
     this.logDataSource = new DataSource({
       load: () => {
         return new Promise((resolve) => {
-          this.dataservice.getPromotionSchemaLog().subscribe((response: any) => {
+          this.dataservice
+            .getPromotionSchemaLog()
+            .subscribe((response: any) => {
+              let data = response.promotion_data || [];
 
-            let data = response.promotion_data || [];
+              // Sort descending by ID
+              data = data.sort((a: any, b: any) => {
+                return (b.ID || 0) - (a.ID || 0);
+              });
 
-            // Sort descending by ID
-            data = data.sort((a: any, b: any) => {
-              return (b.ID || 0) - (a.ID || 0);
+              //  Store in logList ALSO
+              this.logList = data;
+
+              console.log(this.logList, 'Sorted LOGLIST');
+
+              resolve({
+                data: data,
+                totalCount: data.length,
+              });
             });
-
-            //  Store in logList ALSO
-            this.logList = data;
-
-            console.log(this.logList, 'Sorted LOGLIST');
-
-            resolve({
-              data: data,
-              totalCount: data.length
-            });
-          });
         });
-      }
+      },
     });
   }
 
@@ -282,15 +356,37 @@ export class PromotionSchemaLogComponent {
         (response: any) => {
           if (response) {
             this.promotionData = response; // Store the fetched data
-            this.tableData = response.promotionschema_entry;
+            this.tableData = response.promotionschema_entry || [];
+            this.DISC_PERCENT = response.DISC_PERCENT;
+            this.selectedPromotionSchema = Number(response.SCHEMA_TYPE_ID);
+
+            const schemaTypeCode = this.getSchemaTypeCode(
+              response.SCHEMA_TYPE_ID,
+            );
+            this.areRadioButtonsDisabled = schemaTypeCode !== 1;
+            this.isQtyGetDisabled = schemaTypeCode !== 2;
+            this.buyAndGetDisabled = schemaTypeCode === 3;
+
+            if (response.SCHEMA_ON_QUANTITY_MULTIPLE) {
+              this.selectedSchemaType = 'multiple';
+              this.selectedSchemaCondition = 'multiple';
+            } else if (response.SCHEMA_ON_REGULAR_PRICE) {
+              this.selectedSchemaType = 'more';
+              this.selectedSchemaCondition = 'more';
+            } else {
+              this.selectedSchemaType = '';
+              this.selectedSchemaCondition = '';
+            }
+
             console.log(this.promotionData, 'PROMOTION');
-            this.setSchemaType();
+            this.adjustPopupSize();
             setTimeout(() => {
               this.cdr.detectChanges();
             }, 0);
-            // this.dataReady = true;
             this.isEditPopupVisible = true; // Show the edit popup
-            this.dataGrid.instance.refresh();
+            if (this.dataGrid?.instance) {
+              this.dataGrid.instance.refresh();
+            }
           } else {
             console.error('Error fetching promotion schema:', response.message);
           }
@@ -341,7 +437,6 @@ export class PromotionSchemaLogComponent {
       this.validationGroup.instance.reset();
     }
 
-
     this.id = null;
     this.isPopupVisible = true;
 
@@ -357,7 +452,6 @@ export class PromotionSchemaLogComponent {
   }
 
   savePromotionShema() {
-
     const result = this.validationGroup.instance.validate();
 
     if (!result.isValid) {
@@ -396,27 +490,36 @@ export class PromotionSchemaLogComponent {
 
     //  MIX & MATCH VALIDATION
     if (this.selectedPromotionSchema === 3) {
-
       if (!this.tableData || this.tableData.length === 0) {
         this.isSaving = false;
-        notify({
-          message: 'Please add at least one row for Mix & Match schema',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Please add at least one row for Mix & Match schema',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
 
-      const invalidRow = this.tableData.find(row =>
-        !row.qtyToBuy || row.qtyToBuy <= 0 ||
-        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      const invalidRow = this.tableData.find(
+        (row) =>
+          !row.qtyToBuy ||
+          row.qtyToBuy <= 0 ||
+          row.discount === null ||
+          row.discount === undefined ||
+          isNaN(row.discount),
       );
 
       if (invalidRow) {
         this.isSaving = false;
-        notify({
-          message: 'Qty must be > 0 and Discount must be a valid number',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Qty must be > 0 and Discount must be a valid number',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
     }
@@ -424,20 +527,21 @@ export class PromotionSchemaLogComponent {
     const payload = {
       DESCRIPTION: this.promotionData.DESCRIPTION, // Use promotionData
       QTY_BUY: this.promotionData.QTY_BUY ?? 1.0,
-      QTY_GET: this.promotionData.QTY_GET,
-      DISC_PERCENT: this.DISC_PERCENT,
+      QTY_GET: this.promotionData.QTY_GET ?? 0,
+      DISC_PERCENT: this.promotionData.DISC_PERCENT ?? 0,
       IS_INACTIVE: this.promotionData.IS_INACTIVE || false,
       SCHEMA_TYPE_ID: this.promotionData.SCHEMA_TYPE_ID || 1, // Use promotionData
       SCHEMA_ON_QUANTITY_MULTIPLE:
-        this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE,
-      SCHEMA_ON_REGULAR_PRICE: this.promotionData.SCHEMA_ON_REGULAR_PRICE,
+        this.promotionData.SCHEMA_ON_QUANTITY_MULTIPLE || false,
+      SCHEMA_ON_REGULAR_PRICE:
+        this.promotionData.SCHEMA_ON_REGULAR_PRICE || false,
       promotionschema_entry:
         this.tableData.length > 0
           ? this.tableData.map((row) => ({
-            QTY_BUY: row.qtyToBuy ?? 0,
-            DISC_PERCENT: row.discount ?? 0,
-            DESCRIPTION: row.description || '',
-          }))
+              QTY_BUY: row.qtyToBuy ?? 0,
+              DISC_PERCENT: row.discount ?? 0,
+              DESCRIPTION: row.description || '',
+            }))
           : [{ QTY_BUY: 0, DISC_PERCENT: 0, DESCRIPTION: '' }],
     };
     this.dataservice.savePromotionSchema(payload).subscribe((response: any) => {
@@ -480,7 +584,6 @@ export class PromotionSchemaLogComponent {
   }
 
   updatePromotionSchema() {
-
     const result = this.editValidationGroup.instance.validate();
 
     if (!result.isValid) {
@@ -510,31 +613,39 @@ export class PromotionSchemaLogComponent {
     }
 
     if (this.selectedPromotionSchema === 3) {
-
       if (!this.tableData || this.tableData.length === 0) {
         this.isUpdating = false;
-        notify({
-          message: 'Please add at least one row for Mix & Match schema',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Please add at least one row for Mix & Match schema',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
 
-      const invalidRow = this.tableData.find(row =>
-        !row.qtyToBuy || row.qtyToBuy <= 0 ||
-        row.discount === null || row.discount === undefined || isNaN(row.discount)
+      const invalidRow = this.tableData.find(
+        (row) =>
+          !row.qtyToBuy ||
+          row.qtyToBuy <= 0 ||
+          row.discount === null ||
+          row.discount === undefined ||
+          isNaN(row.discount),
       );
 
       if (invalidRow) {
         this.isUpdating = false;
-        notify({
-          message: 'Qty must be > 0 and Discount must be a valid number',
-          position: { at: 'top right', my: 'top right' }
-        }, 'error');
+        notify(
+          {
+            message: 'Qty must be > 0 and Discount must be a valid number',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
         return;
       }
     }
-
 
     const payload = {
       ID: this.promotionData.ID,
@@ -649,6 +760,12 @@ export class PromotionSchemaLogComponent {
     this.promotionData = {}; // Clear the main data object
     this.tableData = []; // Reset table data
     this.selectedPromotionSchema = null;
+    this.DISC_PERCENT = null;
+    this.selectedSchemaCondition = 'multiple';
+    this.selectedSchemaType = 'multiple';
+    this.isQtyGetDisabled = false;
+    this.buyAndGetDisabled = false;
+    this.areRadioButtonsDisabled = true;
   }
 
   onSchemaConditionChange(field: string, value: boolean) {
@@ -665,7 +782,7 @@ export class PromotionSchemaLogComponent {
   }
 
   onPercentageChange(event: any) {
-    let value = event.value;
+    let value = event?.value !== undefined ? event.value : event;
 
     // If the value contains the '%' symbol, remove it
     if (typeof value === 'string' && value.includes('%')) {
@@ -676,8 +793,10 @@ export class PromotionSchemaLogComponent {
     const numericValue = parseFloat(value);
     if (!isNaN(numericValue)) {
       this.promotionData.DISC_PERCENT = numericValue;
+      this.DISC_PERCENT = numericValue;
     } else {
       this.promotionData.DISC_PERCENT = 0; // Default to 0 if invalid
+      this.DISC_PERCENT = 0;
     }
   }
 
@@ -724,7 +843,6 @@ export class PromotionSchemaLogComponent {
     }
     this.resetPopup(); // optional but recommended
   }
-
 }
 @NgModule({
   imports: [
@@ -761,4 +879,4 @@ export class PromotionSchemaLogComponent {
   declarations: [PromotionSchemaLogComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PromotionSchemaLogModule { }
+export class PromotionSchemaLogModule {}

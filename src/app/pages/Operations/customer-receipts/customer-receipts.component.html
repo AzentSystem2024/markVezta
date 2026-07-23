@@ -122,21 +122,6 @@
       </div>
 
       <dxi-column dataField="DOC_NO" caption="Receipt No"></dxi-column>
-      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
-      <dxi-column dataField="PAY_TYPE_NAME" caption="Payment Type"></dxi-column>
-      <dxi-column
-        dataField="NET_AMOUNT"
-        caption="Net Amount"
-        dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
-      <dxi-column
-        dataField="RECEIVED_AMOUNT"
-        caption="Received Amount"
-        dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
-      <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
       <dxi-column
         dataField="REC_DATE"
         caption="Date"
@@ -144,6 +129,22 @@
         [allowEditing]="false"
         format="dd-MM-yyyy"
       ></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+      <!-- <dxi-column dataField="PAY_TYPE_NAME" caption="Payment Type"></dxi-column> -->
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="Net Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <!-- <dxi-column
+        dataField="RECEIVED_AMOUNT"
+        caption="Received Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column> -->
+      <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
+
       <dxi-column
         caption="Status"
         dataField="STATUS"
@@ -159,7 +160,7 @@
       >
       </dxi-column>
 
-       <dxi-column
+      <dxi-column
         type="buttons"
         caption="Actions"
         [width]="140"

@@ -494,15 +494,17 @@ export class ItemsEditFormComponent implements OnInit {
       this.countries = data;
     });
   }
-
-
-  isValid() {
-  if (!this.validationGroup || !this.validationGroup.instance) {
-    return true; // or false based on your need
+  onDescriptionChanged(e: any): void {
+    this.itemData.POS_DESCRIPTION = (e.value || '').substring(0, 45);
   }
 
-  return this.validationGroup.instance.validate().isValid;
-}
+  isValid() {
+    if (!this.validationGroup || !this.validationGroup.instance) {
+      return true; // or false based on your need
+    }
+
+    return this.validationGroup.instance.validate().isValid;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['itemData'] && this.itemData) {
@@ -518,7 +520,7 @@ export class ItemsEditFormComponent implements OnInit {
         this.imageUploaded = false; // Mark as no image uploaded
       }
 
-      if(this.itemData.ITEM_CODE === 0){
+      if (this.itemData.ITEM_CODE === 0) {
         this.itemData.ITEM_CODE = null;
       }
 
@@ -526,11 +528,11 @@ export class ItemsEditFormComponent implements OnInit {
         this.itemData.TYPE_ID = null;
       }
 
-      if (this.itemData.VAT_CLASS_ID === 0){
+      if (this.itemData.VAT_CLASS_ID === 0) {
         this.itemData.VAT_CLASS_ID = null;
       }
 
-      if(this.itemData.UNIT_ID === 0){
+      if (this.itemData.UNIT_ID === 0) {
         this.itemData.UNIT_ID = null;
       }
 
@@ -810,7 +812,6 @@ export class ItemsEditFormComponent implements OnInit {
   }
 
   saveData() {
-
     const result = this.validationGroup.instance.validate();
     if (!result.isValid) {
       return;
@@ -829,7 +830,7 @@ export class ItemsEditFormComponent implements OnInit {
         SALE_PRICE4: this.toNumber(s.SALE_PRICE4),
         SALE_PRICE5: this.toNumber(s.SALE_PRICE5),
         STORE_CODE: s.STORE_CODE,
-        STORE_NAME: s.STORE_NAME, 
+        STORE_NAME: s.STORE_NAME,
         COST: s.COST ?? 0,
         IS_INACTIVE: s.IS_INACTIVE ?? false,
         IS_NOT_SALE_ITEM: s.IS_NOT_SALE_ITEM ?? false,
@@ -918,11 +919,11 @@ export class ItemsEditFormComponent implements OnInit {
   }
 
   toNumber(value: any): number {
-  if (value === '' || value === null || value === undefined) {
-    return 0;
+    if (value === '' || value === null || value === undefined) {
+      return 0;
+    }
+    return Number(value);
   }
-  return Number(value);
-}
 
   onFileInputChange(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -1244,7 +1245,7 @@ export class ItemsEditFormComponent implements OnInit {
     DxPopupModule,
     DxDropDownBoxModule,
     DxNumberBoxModule,
-    DxValidationGroupModule
+    DxValidationGroupModule,
   ],
   providers: [],
   exports: [ItemsEditFormComponent],

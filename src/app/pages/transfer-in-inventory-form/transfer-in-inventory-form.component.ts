@@ -99,6 +99,7 @@ export class TransferInInventoryFormComponent {
   storeFromSession: any;
   stores: any;
   reasons: any;
+  departments: any[] = [];
   transferInFormData: any = {
     COMPANY_ID: '',
     STORE_ID: '',
@@ -110,6 +111,7 @@ export class TransferInInventoryFormComponent {
     USER_ID: '',
     NARRATION: '',
     REASON_ID: '',
+    DEPT_ID: '',
     IS_APPROVED: false,
 
     DETAILS: [], // <-- start empty
@@ -168,6 +170,7 @@ export class TransferInInventoryFormComponent {
     }
     this.getStoreDropdown();
     this.getReasonsDropdown();
+    this.getDepartmentsDropdown();
 
     // this.items = [];
     // this.addEmptyRow();
@@ -189,6 +192,7 @@ export class TransferInInventoryFormComponent {
           : null,
       ORIGIN_STORE_ID: data.ORIGIN_STORE_ID,
       REASON_ID: data.REASON_ID,
+      DEPT_ID: data.DEPT_ID,
       DETAILS: data.DETAILS ? [...data.DETAILS] : [],
       NARRATION: data.NARRATION || '',
       NET_AMOUNT: data.NET_AMOUNT,
@@ -269,6 +273,15 @@ export class TransferInInventoryFormComponent {
     }
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
+    });
+  }
+  getDepartmentsDropdown() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'DEPT'
+    }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.departments = response;
     });
   }
 

@@ -7,8 +7,9 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  OnInit,
+  OnChanges,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
@@ -22,12 +23,9 @@ import {
   DxDataGridModule,
   DxButtonModule,
   DxValidatorModule,
-  DxProgressBarModule,
   DxPopupModule,
   DxDropDownBoxModule,
   DxToolbarModule,
-  DxTabPanelModule,
-  DxTabsModule,
   DxNumberBoxModule,
   DxDataGridComponent,
 } from 'devextreme-angular';
@@ -36,10 +34,8 @@ import {
   DxoFormItemModule,
   DxoLookupModule,
   DxiItemModule,
-  DxiGroupModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { TimesheetAddComponent } from '../timesheet-add/timesheet-add.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
@@ -49,17 +45,40 @@ import { confirm } from 'devextreme/ui/dialog';
   templateUrl: './timesheet-edit.component.html',
   styleUrls: ['./timesheet-edit.component.scss'],
 })
-export class TimesheetEditComponent {
-  @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+export class TimesheetEditComponent implements OnInit, OnChanges {
+  // 1. Angular Decorators & Properties
+  // =========================================================================
+  @ViewChild('dataGrid') dataGrid!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
+
   @Input() timesheet: any;
   @Input() existingTimesheets: any[] = [];
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
+  @Input() isReadOnlyMode: boolean = false;
+
+  // Data Collections
+  Departments: any[] = [];
+  employee: any[] = [];
   salaryHead: any[] = [];
-  salaryDataSource: any;
-  stores: any;
-  timesheetDetails: any;
-  employee: any;
+  salaryDataSource: any[] = [];
+  stores: any[] = [];
+  storeData: any[] = [];
+  Stores_List: any[] = [];
+  timesheetDetails: any[] = [];
+  timesheetList: any[] = [];
+
+  // State Variables
+  employee_leaveperiopd_Data: any;
+  employeeid: any;
+  is_approve: boolean = false;
+  is_approved: boolean = false;
+  is_verify: boolean = false;
+  paySettings: any = {};
+  selected_Company_id: any;
   tsMonthDate: Date = new Date();
+
+  // Form State
   timesheetFormData: any = {
     TS_MONTH: '',
     COMPANY_ID: 0,
@@ -74,14 +93,14 @@ export class TimesheetEditComponent {
     REMARKS: '',
     TIMESHEET_DETAIL: [
       {
-        STORE_ID: 0,
-        DAYS: '',
-        NORMAL_OT: 0,
-        HOLIDAY_OT: 0,
+        STORE_ID: null,
+        DAYS: null,
+        NORMAL_OT: null,
+        HOLIDAY_OT: null,
         ID: 0,
         TS_ID: 0,
         STORE_NAME: '',
-        STORE: 0,
+        STORE: null,
         DEPT_ID: 0,
       },
     ],
@@ -92,74 +111,10 @@ export class TimesheetEditComponent {
       },
     ],
   };
-  storeData: any;
-  salaryHeadList: { SALARY_HEAD_ID: any; AMOUNT: any }[];
-  selected_Company_id: any;
-  Departments: any;
-  employeeid: any;
-  employee_leaveperiopd_Data: any;
-  timesheetList: any = [];
-  is_approve: boolean = false;
-  Stores_List: any = [];
-  is_verify = false;
-  is_approved = false;
-  @Input() isVerifyMode: boolean = false;
-  @Input() isApproveMode: boolean = false;
-  @Input() isReadOnlyMode: boolean = false;
+
+  // 2. Constructor & Lifecycle Hooks
+  // =========================================================================
   constructor(private dataService: DataService) {}
-
-  ngOnChanges(changes: SimpleChanges) {
-    console.log('VERIFY');
-    if (changes['timesheet'] && changes['timesheet'].currentValue) {
-      // Deep copy to avoid reference issues
-      this.timesheetFormData = {
-        ...this.timesheetFormData,
-        ...changes['timesheet'].currentValue,
-      };
-      console.log(
-        'TIMESHEET_SALARY from select',
-        this.timesheetFormData.TIMESHEET_SALARY,
-      );
-      const existingSalary = this.timesheetFormData.TIMESHEET_SALARY || [];
-      this.getSalaryHead(existingSalary);
-      console.log(this.timesheetFormData);
-      // this.is_approve = this.timesheetFormData.STATUS === 'Approved';
-      // this.is_verify = this.timesheetFormData.STATUS === 'Open';
-      this.is_verify = this.isVerifyMode;
-      this.is_approved = this.isApproveMode;
-      this.is_approve = this.isReadOnlyMode || this.isVerifyMode;
-      this.timesheetDetails = (
-        this.timesheetFormData.TIMESHEET_DETAIL || []
-      ).map((detail) => ({
-        ...detail,
-        STORE: String(detail.STORE_ID), // Ensure STORE_ID is treated as a string
-      }));
-      this.stores = this.stores.map((store) => ({
-        ...store,
-        ID: String(store.ID), // Convert store ID to string for comparison
-      }));
-
-      // this.timesheetFormData.EMP_NAME=
-
-      // Ensure storeData is merged after both timesheetDetails and storeData are available
-      if (
-        this.stores.length > 0 &&
-        this.storeData &&
-        this.storeData.length > 0
-      ) {
-        this.timesheetDetails = [
-          ...this.timesheetDetails,
-          ...this.storeData.filter(
-            (storeRow) =>
-              !this.timesheetDetails.some((ts) => ts.STORE === storeRow.STORE),
-          ),
-        ];
-      }
-
-      this.Timesheetlistdata();
-      this.employeeid = this.timesheetFormData.EMP_ID;
-    }
-  }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -167,7 +122,107 @@ export class TimesheetEditComponent {
     this.getSalaryHead(this.timesheetFormData.TIMESHEET_SALARY || []);
     this.getStoreDropdown();
     this.getEmployeeDropdown();
-    this.Timesheetlistdata();
+    this.fetchTimesheetList();
+    this.getPaySettings();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['timesheet'] && changes['timesheet'].currentValue) {
+      this.timesheetFormData = {
+        ...this.timesheetFormData,
+        ...changes['timesheet'].currentValue,
+      };
+
+      const existingSalary = this.timesheetFormData.TIMESHEET_SALARY || [];
+      this.getSalaryHead(existingSalary);
+
+      this.is_verify = this.isVerifyMode;
+      this.is_approved = this.isApproveMode;
+      this.is_approve = this.isReadOnlyMode || this.isVerifyMode;
+
+      this.timesheetDetails = (
+        this.timesheetFormData.TIMESHEET_DETAIL || []
+      ).map((detail: any) => ({
+        ...detail,
+        STORE: String(detail.STORE_ID),
+      }));
+
+      if (this.stores && this.stores.length > 0) {
+        this.stores = this.stores.map((store: any) => ({
+          ...store,
+          ID: String(store.ID),
+        }));
+      }
+
+      if (
+        this.stores &&
+        this.stores.length > 0 &&
+        this.storeData &&
+        this.storeData.length > 0
+      ) {
+        this.timesheetDetails = [
+          ...this.timesheetDetails,
+          ...this.storeData.filter(
+            (storeRow: any) =>
+              !this.timesheetDetails.some(
+                (ts: any) => ts.STORE === storeRow.STORE,
+              ),
+          ),
+        ];
+      }
+
+      this.fetchTimesheetList();
+      this.employeeid = this.timesheetFormData.EMP_ID;
+    }
+  }
+
+  // 3. Initialization & Configuration
+  // =========================================================================
+  sesstion_Details() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.selected_Company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+  }
+
+  getPaySettings() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.get_PaySettingsList(payload).subscribe((res: any) => {
+      this.paySettings = Array.isArray(res.data) ? res.data[0] : res.data || {};
+    });
+  }
+
+  // 4. Data Fetching (API Calls)
+  // =========================================================================
+  fetchTimesheetList() {
+    const dateObj = new Date(this.timesheetFormData.TS_MONTH);
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      MONTH: dateObj
+        .toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        })
+        .replace(/\s/g, ''),
+    };
+
+    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
+      this.timesheetList = response.data;
+    });
+  }
+
+  getEmployeeDropdown() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'EMPLOYEE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.employee = response;
+      this.setEmployeeName();
+    });
   }
 
   getStoreDropdown() {
@@ -179,59 +234,6 @@ export class TimesheetEditComponent {
       this.Stores_List = response;
     });
   }
-  getPayTimeEntries() {
-    this.dataService.getDropdownData('PAYTIME_ENTRY').subscribe((data: any) => {
-      this.salaryHead = data;
-      // Pre-fill the data grid's rows with SALARY_HEAD_ID
-      this.salaryHeadList = this.salaryHead.map((item) => ({
-        SALARY_HEAD_ID: '',
-        AMOUNT: null, // Let user enter this
-      }));
-      this.salaryDataSource = [
-        ...(this.salaryDataSource || []),
-        ...this.salaryHeadList,
-      ];
-    });
-  }
-  getEmployeeDropdown() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'EMPLOYEE',
-    };
-    this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.employee = response;
-      console.log(this.employee);
-      console.log(this.timesheetList);
-
-      // if (employee_res) {
-      //   this.employee = employee_res.filter(
-      //     (emp) =>
-      //       !this.timesheetList?.some((ts) => Number(ts.EMP_ID) === emp.ID),
-      //   );
-      // }
-
-      console.log(this.employee, 'empployeeeeeeeeeee');
-      this.setEmployeeName(); // <-- MOVE setEmployeeName here
-    });
-  }
-
-  setEmployeeName() {
-    if (this.timesheetFormData.EMP_ID && this.employee?.length) {
-      const matchedEmployee = this.employee.find(
-        (emp) => emp.ID == this.timesheetFormData.EMP_ID,
-      );
-      if (matchedEmployee) {
-        this.timesheetFormData.EMP_NAME = matchedEmployee.ID; // For value binding
-      } else {
-        this.timesheetFormData.EMP_NAME = null;
-      }
-    }
-  }
-
-  sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-  }
 
   loadDepartment() {
     const payload = {
@@ -239,26 +241,25 @@ export class TimesheetEditComponent {
       NAME: 'DEPT',
     };
 
-    this.dataService.getDropdownData(payload).subscribe((response) => {
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.Departments = response;
 
-      // ✅ Only create empty rows if NOT editing
       if (
         !this.timesheetFormData.TIMESHEET_DETAIL ||
         this.timesheetFormData.TIMESHEET_DETAIL.length === 0
       ) {
         this.timesheetDetails = this.Departments.map(() => ({
-          DEPT_ID: 0,
-          DAYS: 0,
-          NORMAL_OT: 0,
-          HOLIDAY_OT: 0,
-          STORE_ID: 0,
+          DEPT_ID: null,
+          DAYS: null,
+          NORMAL_OT: null,
+          HOLIDAY_OT: null,
+          STORE_ID: null,
         }));
       }
     });
   }
 
-  getSalaryHead(existingData = []) {
+  getSalaryHead(existingData: any[] = []) {
     const payload = {
       NAME: 'PAYTIME_ENTRY',
     };
@@ -266,21 +267,9 @@ export class TimesheetEditComponent {
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.salaryHead = response.data || response;
 
-      // ===== DEBUG =====
-      console.log('existingData', existingData);
-      console.log('salaryHead', this.salaryHead);
-
       this.salaryDataSource = this.salaryHead.map((item: any) => {
         const existing = existingData.find(
           (x: any) => Number(x.SALARY_HEAD_ID) === Number(item.ID),
-        );
-
-        console.log(
-          'Matching:',
-          'SalaryHead ID =',
-          item.ID,
-          'Matched =',
-          existing,
         );
 
         return {
@@ -289,15 +278,63 @@ export class TimesheetEditComponent {
         };
       });
 
-      console.log('salaryDataSource', this.salaryDataSource);
-
       this.salaryDataSource = [...this.salaryDataSource];
       setTimeout(() => {
         this.dataGrid?.instance?.refresh();
       });
-      console.log('FINAL salaryDataSource', this.salaryDataSource);
     });
   }
+
+  Employee_leaveperiod() {
+    this.dataService.Employee_leave_period().subscribe((res: any) => {
+      this.employee_leaveperiopd_Data = res.data[0];
+      this.timesheetFormData.LEAVE_FROM =
+        this.employee_leaveperiopd_Data?.LEAVE_FROM || '';
+      this.timesheetFormData.LEAVE_TO =
+        this.employee_leaveperiopd_Data?.LEAVE_TO || '';
+      this.timesheetFormData.DAYS = this.employee_leaveperiopd_Data?.TOTAL_DAYS;
+    });
+  }
+
+  // 5. Event Handlers
+  // =========================================================================
+  onEmployeeSelected(e: any) {
+    this.employeeid = e.value;
+    this.Employee_leaveperiod();
+    this.timesheetFormData.EMP_NAME = e.value;
+    this.timesheetFormData.DAYS = '30';
+
+    const selectedEmployee = this.employee.find(
+      (emp: any) => emp.ID === this.timesheetFormData.EMP_NAME,
+    );
+
+    if (selectedEmployee) {
+      this.timesheetFormData.EMP_NO = selectedEmployee.EMP_NO;
+      this.timesheetFormData.EMP_NAME = selectedEmployee.DESCRIPTION;
+    }
+
+    const duplicateTimesheet = this.existingTimesheets.find(
+      (ts: any) =>
+        ts.TS_MONTH === this.timesheetFormData.TS_MONTH &&
+        ts.EMP_NO == selectedEmployee?.EMP_NO &&
+        ts.ID !== this.timesheetFormData.ID,
+    );
+
+    if (duplicateTimesheet) {
+      notify(
+        {
+          message: `Employee "${selectedEmployee?.DESCRIPTION}" already has a timesheet for ${this.timesheetFormData.TS_MONTH}.`,
+          position: { at: 'top center', my: 'top center' },
+        },
+        'error',
+      );
+
+      this.timesheetFormData.EMP_ID = null;
+      this.timesheetFormData.EMP_NO = null;
+      this.timesheetFormData.EMP_NAME = null;
+    }
+  }
+
   onMonthChanged(event: any) {
     this.tsMonthDate = new Date(event.value);
     const year = this.tsMonthDate.getFullYear();
@@ -308,9 +345,7 @@ export class TimesheetEditComponent {
   onEditorPreparingTImesheetdetails(e: any) {
     if (
       e.parentType !== 'dataRow' ||
-      !['STORE_ID', 'DEPT_ID', 'DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(
-        e.dataField,
-      )
+      !['STORE_ID', 'DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(e.dataField)
     ) {
       return;
     }
@@ -350,9 +385,6 @@ export class TimesheetEditComponent {
 
       args.event.preventDefault();
 
-      // Ensure the newly typed value is committed to the grid cell before moving focus.
-      // Use the raw DOM input value for numeric fields because the DevExtreme component's
-      // internal value state is stale during the 'keydown' event if default is prevented.
       if (typeof e.setValue === 'function') {
         if (
           ['DAYS', 'NORMAL_OT', 'HOLIDAY_OT'].includes(e.dataField) &&
@@ -364,8 +396,6 @@ export class TimesheetEditComponent {
             e.setValue(Number(typedValue));
           }
         } else {
-          // For lookup columns (STORE_ID, DEPT_ID), the component value is correct
-          // and we MUST NOT use the raw input text because it's just the display string.
           e.setValue(args.component.option('value'));
         }
       }
@@ -374,65 +404,42 @@ export class TimesheetEditComponent {
       const rowIndex = e.row.rowIndex;
 
       switch (e.dataField) {
-        //================ STORE =================
         case 'STORE_ID':
           if (!args.component.option('opened')) {
             args.component.open();
             return;
           }
-
-          grid.saveEditData().then(() => {
-            setTimeout(() => {
-              grid.editCell(rowIndex, 'DEPT_ID');
-            }, 50);
-          });
-
-          break;
-
-        //================ DEPARTMENT =================
-        case 'DEPT_ID':
-          if (!args.component.option('opened')) {
-            args.component.open();
-            return;
-          }
-
           grid.saveEditData().then(() => {
             setTimeout(() => {
               grid.editCell(rowIndex, 'DAYS');
             }, 50);
           });
-
           break;
 
-        //================ WORKED DAYS =================
         case 'DAYS':
           grid.saveEditData().then(() => {
             setTimeout(() => {
               grid.editCell(rowIndex, 'NORMAL_OT');
             }, 50);
           });
-
           break;
 
-        //================ OT HOURS =================
         case 'NORMAL_OT':
           grid.saveEditData().then(() => {
             setTimeout(() => {
               grid.editCell(rowIndex, 'HOLIDAY_OT');
             }, 50);
           });
-
           break;
 
-        //================ HOLIDAY OT =================
         case 'HOLIDAY_OT':
           grid.saveEditData().then(() => {
             const row = this.timesheetDetails[rowIndex];
 
-            if (!row.STORE_ID || !row.DEPT_ID || !row.DAYS) {
+            if (!row.STORE_ID || !row.DAYS) {
               notify(
                 {
-                  message: 'Store, Department and Worked Days are mandatory.',
+                  message: 'Store and Worked Days are mandatory.',
                   position: {
                     at: 'top center',
                     my: 'top center',
@@ -450,27 +457,12 @@ export class TimesheetEditComponent {
               grid.editCell(newRowIndex, 'STORE_ID');
             }, 100);
           });
-
           break;
       }
     };
   }
 
-  // addNewRow() {
-  //   this.timesheetDetails.push({
-  //     DEPT_ID: null,
-  //     DAYS: 0,
-  //     NORMAL_OT: 0,
-  //     HOLIDAY_OT: 0,
-  //     STORE_ID: 0,
-  //   });
-
-  //   // refresh grid if needed
-  //   this.timesheetDetails = [...this.timesheetDetails];
-  // }
-
   onTimesheetDetailsUpdated(e: any) {
-    // this.calculateTotalWorkedDays()
     const rowIndex = e.component.getRowIndexByKey(e.key);
 
     if (rowIndex !== -1) {
@@ -483,28 +475,6 @@ export class TimesheetEditComponent {
       setTimeout(() => {
         this.calculateTotalWorkedDays();
       }, 0);
-    }
-  }
-
-  calculateTotalWorkedDays() {
-    if (this.timesheetFormData && this.timesheetFormData.TIMESHEET_DETAIL) {
-      const totalDays = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail) => Number(detail.DAYS) || 0,
-      ).reduce((sum, val) => sum + val, 0);
-      this.timesheetFormData.WORKED_DAYS = totalDays;
-
-      const totalOTHours = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail) => Number(detail.NORMAL_OT) || 0,
-      ).reduce((sum, val) => sum + val, 0);
-      this.timesheetFormData.NORMAL_OT = totalOTHours;
-
-      const totalHolidayOT = this.timesheetFormData.TIMESHEET_DETAIL.map(
-        (detail) => Number(detail.HOLIDAY_OT) || 0,
-      ).reduce((sum, val) => sum + val, 0);
-      this.timesheetFormData.HOLIDAY_OT = totalHolidayOT;
-
-      // Manually trigger change detection to update the view
-      // this.cdr.detectChanges();
     }
   }
 
@@ -524,11 +494,75 @@ export class TimesheetEditComponent {
       });
     }
 
-    // Clean up empty entries
     this.timesheetFormData.TIMESHEET_SALARY =
       this.timesheetFormData.TIMESHEET_SALARY.filter(
-        (item) => item.SALARY_HEAD_ID !== '' && item.AMOUNT !== '',
+        (item: any) => item.SALARY_HEAD_ID !== '' && item.AMOUNT !== '',
       );
+  }
+
+  // 6. Data Processing & Helpers
+  // =========================================================================
+  setEmployeeName() {
+    if (this.timesheetFormData.EMP_ID && this.employee?.length) {
+      const matchedEmployee = this.employee.find(
+        (emp: any) => emp.ID == this.timesheetFormData.EMP_ID,
+      );
+      if (matchedEmployee) {
+        this.timesheetFormData.EMP_NAME = matchedEmployee.ID;
+      } else {
+        this.timesheetFormData.EMP_NAME = null;
+      }
+    }
+  }
+
+  addNewRow() {
+    const hasEmptyRow = this.timesheetDetails.some(
+      (row: any) =>
+        (!row.DAYS || row.DAYS === 0) &&
+        (!row.NORMAL_OT || row.NORMAL_OT === 0) &&
+        (!row.HOLIDAY_OT || row.HOLIDAY_OT === 0),
+    );
+
+    if (hasEmptyRow) {
+      notify(
+        {
+          message:
+            'An empty row already exists. Please fill it before adding a new one.',
+          position: { at: 'top center', my: 'top center' },
+        },
+        'warning',
+      );
+      return;
+    }
+
+    this.timesheetDetails.push({
+      DEPT_ID: null,
+      DAYS: null,
+      NORMAL_OT: null,
+      HOLIDAY_OT: null,
+      STORE_ID: null,
+    });
+
+    this.timesheetDetails = [...this.timesheetDetails];
+  }
+
+  calculateTotalWorkedDays() {
+    if (this.timesheetFormData && this.timesheetFormData.TIMESHEET_DETAIL) {
+      const totalDays = this.timesheetFormData.TIMESHEET_DETAIL.map(
+        (detail: any) => Number(detail.DAYS) || 0,
+      ).reduce((sum: number, val: number) => sum + val, 0);
+      this.timesheetFormData.WORKED_DAYS = totalDays;
+
+      const totalOTHours = this.timesheetFormData.TIMESHEET_DETAIL.map(
+        (detail: any) => Number(detail.NORMAL_OT) || 0,
+      ).reduce((sum: number, val: number) => sum + val, 0);
+      this.timesheetFormData.NORMAL_OT = totalOTHours;
+
+      const totalHolidayOT = this.timesheetFormData.TIMESHEET_DETAIL.map(
+        (detail: any) => Number(detail.HOLIDAY_OT) || 0,
+      ).reduce((sum: number, val: number) => sum + val, 0);
+      this.timesheetFormData.HOLIDAY_OT = totalHolidayOT;
+    }
   }
 
   buildTimesheetPayload() {
@@ -565,6 +599,59 @@ export class TimesheetEditComponent {
       EMP_NAME: actualEmpName,
     };
   }
+
+  validTime = (e: any) => {
+    const value = Number(e.value) || 0;
+    const maxOt = Number(this.paySettings?.MAX_OT_MTS) || 12;
+    const dataField = e.column?.dataField;
+
+    let cellMax = maxOt;
+    if (dataField === 'NORMAL_OT') {
+      cellMax = Number(this.paySettings?.NORMAL_OT_RATE) || maxOt;
+    } else if (dataField === 'HOLIDAY_OT') {
+      cellMax = Number(this.paySettings?.HOLIDAY_OT_RATE) || maxOt;
+    }
+
+    if (value > cellMax) {
+      e.rule.message = `Maximum allowed ${e.column?.caption || 'OT'} is ${cellMax} hours`;
+      return false;
+    }
+
+    if (e.data) {
+      const normalOt =
+        dataField === 'NORMAL_OT' ? value : Number(e.data.NORMAL_OT) || 0;
+      const holidayOt =
+        dataField === 'HOLIDAY_OT' ? value : Number(e.data.HOLIDAY_OT) || 0;
+
+      if (normalOt + holidayOt > maxOt) {
+        e.rule.message = `Total OT (Normal + Holiday) cannot exceed ${maxOt} hours`;
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  validateDays = (e: any) => {
+    const enteredDays = Number(e.value) || 0;
+    const maxDays = Number(this.timesheetFormData.DAYS) || 0;
+
+    return enteredDays <= maxDays;
+  };
+
+  formatDateDDMMYYYY(date: any) {
+    if (!date) return null;
+
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
+
+  // 7. Action Methods (Submissions)
+  // =========================================================================
   updateTimesheet() {
     if (
       !this.timesheetFormData.TIMESHEET_SALARY ||
@@ -574,21 +661,18 @@ export class TimesheetEditComponent {
         { SALARY_HEAD_ID: 0, AMOUNT: 0 },
       ];
     } else {
-      // Force conversion to number (in case bound as strings in UI)
       this.timesheetFormData.TIMESHEET_SALARY =
-        this.timesheetFormData.TIMESHEET_SALARY.map((salary) => ({
+        this.timesheetFormData.TIMESHEET_SALARY.map((salary: any) => ({
           SALARY_HEAD_ID: Number(salary.SALARY_HEAD_ID) || 0,
           AMOUNT: Number(salary.AMOUNT) || 0,
         }));
     }
     const rawDatefrom = this.timesheetFormData.LEAVE_FROM;
-    const dateOnlyfrom = rawDatefrom.split(' ')[0];
+    const dateOnlyfrom = rawDatefrom?.split(' ')[0] || '';
 
-    console.log(dateOnlyfrom);
     const rawDateTo = this.timesheetFormData.LEAVE_TO;
-    const dateOnlyto = rawDateTo.split(' ')[0];
+    const dateOnlyto = rawDateTo?.split(' ')[0] || '';
 
-    console.log(dateOnlyto);
     const payload = {
       ...this.timesheetFormData,
       LEAVE_FROM: this.formatDateDDMMYYYY(dateOnlyfrom),
@@ -599,43 +683,40 @@ export class TimesheetEditComponent {
       (sum, item) => sum + (Number(item.DAYS) || 0),
       0,
     );
-    console.log(totalworkdays, '=======totalworkdays===========');
 
-    if (Number(this.timesheetFormData.DAYS) == totalworkdays) {
-      let actualEmpName = '';
-      let actualEmpCode = '';
-      const empIdValue = this.timesheetFormData.EMP_ID || this.employeeid;
-      if (this.employee && this.employee.length) {
-        const emp = this.employee.find((e: any) => e.ID == empIdValue);
-        if (emp) {
-          actualEmpName = emp.DESCRIPTION;
-          actualEmpCode = emp.EMP_NO || '';
-        }
+    const expectedDays = Number(this.timesheetFormData.DAYS) || 0;
+
+    if (totalworkdays <= expectedDays + 0.001) {
+      const enteredRows = this.timesheetDetails.filter(
+        (item: any) =>
+          item.STORE_ID ||
+          Number(item.DAYS) > 0 ||
+          Number(item.NORMAL_OT) > 0 ||
+          Number(item.HOLIDAY_OT) > 0,
+      );
+
+      const invalidStore = enteredRows.some(
+        (item: any) => !item.STORE_ID || Number(item.STORE_ID) === 0,
+      );
+
+      if (invalidStore) {
+        notify(
+          {
+            message: 'Store is mandatory in Timesheet Details',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+        return;
       }
 
-      const formattedDetails = this.timesheetDetails.map((item: any) => ({
-        ...item,
-        ID: item.ID || 0,
-        TS_ID: item.TS_ID || 0,
-      }));
-
-      // const payload = {
-      //   ...this.timesheetFormData,
-      //   TIMESHEET_DETAIL: formattedDetails,
-      //   WORKED_DAYS: totalworkdays,
-      //   COMPANY_ID: this.selected_Company_id,
-      //   EMP_ID: empIdValue,
-      //   EMP_CODE: actualEmpCode,
-      //   EMP_NAME: actualEmpName,
-      // };
-      const payload = this.buildTimesheetPayload();
-      console.log(this.timesheetList, '=======timesheetList===========');
-      console.log(this.employeeid, '=======employeeid===========');
+      this.timesheetDetails = enteredRows;
+      const finalPayload = this.buildTimesheetPayload();
 
       const isEmployeeExists = this.timesheetList?.some(
-        (item) =>
+        (item: any) =>
           Number(item.EMP_ID) === Number(this.employeeid) &&
-          item.ID !== this.timesheetFormData.ID, // exclude current editing row
+          item.ID !== this.timesheetFormData.ID,
       );
 
       if (isEmployeeExists) {
@@ -649,45 +730,32 @@ export class TimesheetEditComponent {
         return;
       }
 
-      const invalidStore = this.timesheetDetails.some(
-        (item) => !item.STORE_ID || Number(item.STORE_ID) === 0,
-      );
-
-      if (invalidStore) {
-        notify(
-          {
-            message: 'Store is mandatory in Timesheet Details',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-        return;
-      }
-      this.dataService.updateTimesheet(payload).subscribe((response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Timesheet Updated Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.popupClosed.emit();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not updated',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-      });
+      this.dataService
+        .updateTimesheet(finalPayload)
+        .subscribe((response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Timesheet Updated Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            this.popupClosed.emit();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not updated',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        });
     } else {
       notify(
         {
-          message:
-            'Total days worked and Timesheet Details worked days toal must be equal',
+          message: `Entered total days in grid (${totalworkdays}) cannot be greater than total days worked (${expectedDays})`,
           position: { at: 'top right', my: 'top right' },
         },
         'error',
@@ -754,167 +822,6 @@ export class TimesheetEditComponent {
   handleClose() {
     this.popupClosed.emit();
   }
-  validateDays = (e: any) => {
-    const enteredDays = Number(e.value) || 0;
-    const maxDays = Number(this.timesheetFormData.DAYS) || 0;
-
-    return enteredDays <= maxDays;
-  };
-  // onEditorPreparingTImesheetdetails(e: any) {
-  //   if (
-  //     e.dataField === 'DEPT_ID' ||
-  //     e.dataField === 'DAYS' ||
-  //     e.dataField === 'NORMAL_OT' ||
-  //     e.dataField === 'HOLIDAY_OT' ||
-  //     e.dataField === 'STORE_ID'
-  //   ) {
-  //     e.editorOptions = e.editorOptions || {};
-
-  //     e.editorOptions.elementAttr = {
-  //       style: `
-  //       height: 100%;
-  //       margin: 0;
-  //       padding: 0;
-  //       display: flex;
-  //       align-items: center;
-  //     `,
-  //     };
-
-  //     e.editorOptions.inputAttr = {
-  //       style: `
-  //       height: 100%;
-  //       padding: 0 4px;
-  //       box-sizing: border-box;
-  //     `,
-  //     };
-
-  //     if (e.editorName === 'dxNumberBox') {
-  //       e.editorOptions.showSpinButtons = false;
-  //     }
-
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         const grid = this.dataGrid?.instance;
-  //         const visibleRows = grid.getVisibleRows();
-
-  //         const rowIndex = visibleRows.findIndex(
-  //           (r) => r?.data === e.row?.data,
-  //         );
-
-  //         setTimeout(() => {
-  //           // existing logic untouched
-  //         }, 50);
-  //       }
-  //     };
-  //   }
-  //   if (e.parentType === 'dataRow') {
-  //     e.editorOptions.onKeyDown = (event: any) => {
-  //       if (event.event.key === 'Enter') {
-  //         this.addNewRow();
-  //       }
-  //     };
-  //   }
-  // }
-  addNewRow() {
-    this.timesheetDetails.push({
-      DEPT_ID: null,
-      DAYS: null,
-      NORMAL_OT: 0,
-      STORE_ID: 0,
-      HOLIDAY_OT: 0,
-    });
-
-    // refresh grid if needed
-    this.timesheetDetails = [...this.timesheetDetails];
-    console.log(
-      this.timesheetDetails,
-      '============time sheet details=========',
-    );
-  }
-
-  formatDateDDMMYYYY(date: any) {
-    if (!date) return null;
-
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-
-    return `${day}-${month}-${year}`;
-  }
-
-  onEmployeeSelected(e: any) {
-    this.employeeid = e.value;
-    this.Employee_leaveperiod();
-    this.timesheetFormData.EMP_NAME = e.value;
-    this.timesheetFormData.DAYS = '30';
-    const selectedEmployee = this.employee.find(
-      (emp) => emp.ID === this.timesheetFormData.EMP_NAME,
-    );
-    if (selectedEmployee) {
-      this.timesheetFormData.EMP_NO = selectedEmployee.EMP_NO; // If you need EMP_NO also
-      this.timesheetFormData.EMP_NAME = selectedEmployee.DESCRIPTION;
-    }
-
-    // Now check if employee already has a timesheet for the month
-    const duplicateTimesheet = this.existingTimesheets.find(
-      (ts) =>
-        ts.TS_MONTH === this.timesheetFormData.TS_MONTH &&
-        ts.EMP_NO == selectedEmployee?.EMP_NO &&
-        ts.ID !== this.timesheetFormData.ID, // ignore self while editing
-    );
-
-    if (duplicateTimesheet) {
-      notify(
-        {
-          message: `Employee "${selectedEmployee?.DESCRIPTION}" already has a timesheet for ${this.timesheetFormData.TS_MONTH}.`,
-          position: { at: 'top center', my: 'top center' },
-        },
-        'error',
-      );
-
-      // Optional: Clear the selected employee if duplicate found
-      this.timesheetFormData.EMP_ID = null;
-      this.timesheetFormData.EMP_NO = null;
-      this.timesheetFormData.EMP_NAME = null;
-    }
-  }
-
-  Employee_leaveperiod() {
-    this.dataService.Employee_leave_period().subscribe((res: any) => {
-      this.employee_leaveperiopd_Data = res.data[0];
-      console.log(
-        this.employee_leaveperiopd_Data,
-        '=======leve================',
-      );
-      this.timesheetFormData.LEAVE_FROM =
-        this.employee_leaveperiopd_Data.LEAVE_FROM || '';
-      this.timesheetFormData.LEAVE_TO =
-        this.employee_leaveperiopd_Data.LEAVE_TO || '';
-      this.timesheetFormData.DAYS = this.employee_leaveperiopd_Data.TOTAL_DAYS;
-    });
-  }
-  //====================LIST OF TIMESHEET=================
-
-  //
-  Timesheetlistdata() {
-    const dateObj = new Date(this.timesheetFormData.TS_MONTH);
-
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      MONTH: dateObj
-        .toLocaleDateString('en-US', {
-          month: 'long',
-          year: 'numeric',
-        })
-        .replace(/\s/g, ''),
-    };
-
-    this.dataService.Timesheet_List_Api(payload).subscribe((response: any) => {
-      this.timesheetList = response.data;
-      console.log(this.timesheetList, 'time sheeet list');
-    });
-  }
 }
 
 @NgModule({
@@ -935,17 +842,10 @@ export class TimesheetEditComponent {
     DxoFormItemModule,
     DxoLookupModule,
     DxValidatorModule,
-    DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
-    DxoItemModule,
-    DxTabPanelModule,
-    DxTabsModule,
-    DxiGroupModule,
-    FormsModule,
     DxNumberBoxModule,
   ],
   providers: [],

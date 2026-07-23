@@ -30,14 +30,8 @@
       "
       (onExporting)="onExporting($event)"
     >
-      <!-- (onEditingStart)="onEditLedger($event)" -->
-      <!-- <dxo-editing
-        mode="popup"s
-        [allowUpdating]="true"
-      ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
-     
-      
+
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
@@ -48,7 +42,7 @@
               font-size: 20px;
               margin-left: 12px;
               padding: -3px;
-              margin-right:  3px;
+              margin-right: 3px;
             "
           >
             Ledger Statement
@@ -60,7 +54,6 @@
             labelMode="floating"
             labelLocation="left"
             label="Year"
-            [width]="90"
             [(value)]="selectedYear"
             [dataSource]="years"
             (onValueChanged)="onYearChanged($event)"
@@ -116,7 +109,6 @@
               displayExpr="NAME"
               valueExpr="ID"
               [(value)]="selected_Head_Id"
-              (onValueChanged)="onHeadIdChange($event)"
               [searchEnabled]="true"
               ><dx-validator>
                 <dxi-validation-rule
@@ -174,10 +166,7 @@
       <dxo-header-filter [visible]="true">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
-      <!-- <dxo-filter-row
-      [visible]="isFilterRowVisible"
-      [applyFilter]="auto"
-    ></dxo-filter-row> -->
+
       <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
@@ -193,24 +182,40 @@
       <dxi-column
         dataField="TRANS_TYPE_NAME"
         caption="Document Type"
-         width="170"
+        width="170"
       ></dxi-column>
-      <dxi-column dataField="VOUCHER_NO" caption="Voucher No"  width="120"></dxi-column>
-      <dxi-column dataField="PARTICULARS" caption="Particulars"  width="180"></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store/Branch"  width="250"></dxi-column>
-      <dxi-column dataField="DEPT_NAME" caption="Department"  width="120"></dxi-column>
+      <dxi-column
+        dataField="VOUCHER_NO"
+        caption="Voucher No"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="PARTICULARS"
+        caption="Particulars"
+        width="180"
+      ></dxi-column>
+      <dxi-column
+        dataField="STORE_NAME"
+        caption="Store/Branch"
+        width="250"
+      ></dxi-column>
+      <dxi-column
+        dataField="DEPT_NAME"
+        caption="Department"
+        width="120"
+      ></dxi-column>
       <dxi-column
         dataField="DR_AMOUNT"
         caption="Debit Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
-         width="120"
+        width="120"
       >
       </dxi-column>
 
       <dxi-column
         dataField="CR_AMOUNT"
-         width="120"
+        width="120"
         caption="Credit Amount"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
@@ -220,7 +225,7 @@
       <dxi-column
         dataField="BALANCE"
         caption="Balance"
-         width="120"
+        width="120"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         alignment="right"
       >
@@ -255,6 +260,7 @@
     ></app-production-jv-view>
   </ng-container>
 </dx-popup>
+
 <dx-popup
   *ngIf="isViewJournalVoucher"
   [(visible)]="isViewJournalVoucher"
@@ -334,11 +340,12 @@
     [isEditing]="true"
     [isReadOnlyMode]="isReadOnlyInvoice"
     [EditingResponseData]="selectedInvoice"
-    (popupClosed)="handleClose()">
+    (popupClosed)="handleClose()"
+  >
   </app-add-invoice-retail>
 </dx-popup>
 
-<!-- //======================= coustom receipt=================== -->
+<!-- ======================= coustom receipt=================== -->
 
 <dx-popup
   *ngIf="isEditCustomerReceipt"
@@ -375,7 +382,7 @@
   <!-- </ng-container> -->
 </dx-popup>
 
-<!-- //=======================salary payment=================== -->
+<!-- =======================salary payment=================== -->
 
 <dx-popup
   *ngIf="editSalaryPopup"
@@ -394,25 +401,7 @@
   ></app-add-salary-payment>
 </dx-popup>
 
-<!-- //=======================Supplier payment=================== -->
-
-<!-- <dx-popup
-  [(visible)]="isEditReceipt"
-  [width]="'75vw'"
-  [height]="'100vh'"
-  title="Supplier Payment"
-  (onHiding)="handleClose()"
->
-   <ng-container *ngIf="isAddInvoice"> -->
-<!-- <app-edit-supplier-payment
-    [paymentData]="selectedReceipt"
-    [isReadOnlyMode]="isReadOnlyReceipt"
-    (popupClosed)="handleClose()"
-  ></app-edit-supplier-payment> -->
-<!-- </ng-container> -->
-<!-- </dx-popup> -->
-
-<!-- //=======================Pre payment=================== -->
+<!-- =======================Pre payment=================== -->
 
 <dx-popup
   *ngIf="editPrePaymentPopupOpened"
@@ -431,7 +420,7 @@
   </ng-container>
 </dx-popup>
 
-<!-- //=======================  Depreciation=================== -->
+<!-- =======================  Depreciation=================== -->
 
 <dx-popup
   *ngIf="EditDepreciationPopupVisible"
@@ -447,7 +436,7 @@
   ></app-depreciation-edit>
 </dx-popup>
 
-<!-- //======================= mis_payment=================== -->
+<!-- ======================= mis_payment=================== -->
 
 <dx-popup
   *ngIf="editMiscPopupOpened"
@@ -468,15 +457,228 @@
 
 <!-- ====================Salary Advance(LOANS)================================================ -->
 
+<!-- View Advance Popup -->
 <dx-popup
+  (onHiding)="isEditPopUp = false"
   *ngIf="isEditPopUp"
   [(visible)]="isEditPopUp"
-  title=" View Advance "
-  [height]="640"
-  [width]="700"
+  title="Advance"
+  [width]="640"
+  height="'100vh'"
 >
-  <app-view-salary-advance [advanceData]="selected_Data">
-  </app-view-salary-advance>
+  <dx-form id="form">
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-date-box
+          label="Date"
+          [value]="selected_Data?.DATE"
+          displayFormat="dd/MM/yyyy"
+          [readOnly]="true"
+          [labelMode]="'floating'"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        [value]="selected_Data?.EMP_NAME || selected_Data?.EMP_ID"
+        [readOnly]="true"
+        label="Employee"
+        [labelMode]="'floating'"
+      ></dx-text-box>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          [value]="selected_Data?.ADV_TYPE_NAME"
+          [readOnly]="true"
+          label="Advance Type"
+          [labelMode]="'floating'"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Amount"
+          format="#,##0.00"
+          [readOnly]="true"
+          [value]="selected_Data?.ADVANCE_AMOUNT"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          [labelMode]="'floating'"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item style="text-align: left">
+      <label style="text-decoration: underline; text-underline-offset: 4px">
+        Recovery details:
+      </label>
+    </dxi-item>
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-number-box
+          label="Net amount to be recovered"
+          format="#,##0.00"
+          [readOnly]="true"
+          [value]="selected_Data?.REC_AMOUNT"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          [labelMode]="'floating'"
+        ></dx-number-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Amt. Recovered through Salary"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          [value]="selected_Data?.RECOVERED_AMOUNT"
+          [readOnly]="true"
+          [labelMode]="'floating'"
+          format="#,##0.00"
+        ></dx-number-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+      <dxi-item>
+        <dx-number-box
+          label="No of installments"
+          [format]="'#,##0.##'"
+          [readOnly]="true"
+          [value]="selected_Data?.REC_INSTALL_COUNT"
+          [inputAttr]="{ style: 'text-align: right;' }"
+          [labelMode]="'floating'"
+        ></dx-number-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-number-box
+          label="Installment Amount"
+          format="#,##0.00"
+          [readOnly]="true"
+          [value]="selected_Data?.REC_INSTALL_AMOUNT"
+          [labelMode]="'floating'"
+        ></dx-number-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          label="Recovery Starts from"
+          displayFormat="MMMM/yyyy"
+          [readOnly]="true"
+          [value]="selected_Data?.REC_START_MONTH"
+          labelMode="floating"
+          style="border: 1px"
+        >
+        </dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-text-box
+        label="Remarks"
+        [value]="selected_Data?.REMARKS"
+        [labelMode]="'floating'"
+        [readOnly]="true"
+      ></dx-text-box>
+    </dxi-item>
+    <dxi-item style="text-align: center">
+      <label
+        style="
+          display: block;
+          text-align: left;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+        "
+        >Payment Details</label
+      >
+    </dxi-item>
+
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          [readOnly]="true"
+          label="Voucher No"
+          [labelMode]="'floating'"
+          [value]="selected_Data?.ADV_NO"
+        ></dx-text-box>
+      </dxi-item>
+
+      <dxi-item>
+        <dx-date-box
+          label="Voucher Date"
+          [readOnly]="true"
+          [value]="selected_Data?.DATE"
+          labelMode="floating"
+          displayFormat="dd/MM/yyyy"
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-select-box
+        label="Payment Ac"
+        [labelMode]="'floating'"
+        [readOnly]="true"
+        [value]="selected_Data?.PAY_HEAD_ID"
+        [searchEnabled]="true"
+        [items]="HEAD_ID_LIST"
+        displayExpr="NAME"
+        valueExpr="ID"
+        placeholder="Payment Ac"
+      >
+      </dx-select-box>
+    </dxi-item>
+
+    <label style="text-decoration: underline; text-underline-offset: 4px">
+      Bank remittance Details
+    </label>
+    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+      <dxi-item>
+        <dx-text-box
+          label="Cheque No"
+          [labelMode]="'floating'"
+          [value]="selected_Data?.CHEQUE_NO"
+          [readOnly]="true"
+          [visible]="
+            selected_Data?.PAY_TYPE_ID === 2 ||
+            selected_Data?.PAY_TYPE_ID === 14
+          "
+        ></dx-text-box>
+      </dxi-item>
+      <dxi-item>
+        <dx-date-box
+          label="Due Date"
+          [readOnly]="true"
+          [value]="selected_Data?.CHEQUE_DATE"
+          labelMode="floating"
+          displayFormat="dd/MM/yyyy"
+          [visible]="
+            selected_Data?.PAY_TYPE_ID === 2 ||
+            selected_Data?.PAY_TYPE_ID === 14
+          "
+        ></dx-date-box>
+      </dxi-item>
+    </dxi-item>
+
+    <dxi-item
+      class="fixed-footer"
+      itemType="group"
+      [colCount]="2"
+      [colSpan]="2"
+    >
+      <div
+        class="fixed-footer"
+        style="display: flex; justify-content: flex-end; width: 100%"
+      >
+        <dx-button
+          [stylingMode]="'outlined'"
+          text="Close"
+          (onClick)="isEditPopUp = false"
+        ></dx-button>
+      </div>
+    </dxi-item>
+  </dx-form>
 </dx-popup>
 
 <!-- ====================Misc Receipt=========================== -->
@@ -566,7 +768,6 @@
 </dx-popup>
 
 <!-- ======================================TransferIn============================= -->
-
 <dx-popup
   *ngIf="isEditTransferIn"
   [(visible)]="isEditTransferIn"
@@ -626,9 +827,8 @@
   title="Payroll"
   (onHiding)="handleClose()"
 >
-  <app-payroll-view
-    *ngIf="viewPayrollPopupOpened"
+  <app-payroll-view-report
     [payroll]="selectedPayroll"
     (popupClosed)="handleClose()"
-  ></app-payroll-view>
+  ></app-payroll-view-report>
 </dx-popup>

@@ -11,7 +11,6 @@
       [showColumnLines]="true"
       [columnAutoWidth]="true"
       [groupPanel]="{ visible: true }"
-      [grouping]="{ autoExpandAll: false }"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [summary]="summaryColumnsData"
@@ -26,8 +25,14 @@
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
       (onCellClick)="onCellClick($event)"
+       [grouping]="{ autoExpandAll: false }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-grouping
+    [autoExpandAll]="false"
+    [contextMenuEnabled]="true"
+    expandMode="rowClick">
+</dxo-grouping>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
@@ -101,11 +106,6 @@
         ></dx-tag-box>
       </div>
 
-      <dxo-grouping
-        [autoExpandAll]="false"
-        [contextMenuEnabled]="true"
-        [expandMode]="'rowClick'"
-      ></dxo-grouping>
 
       <dxo-header-filter
         [visible]="true"
@@ -120,14 +120,23 @@
         dataField="MainGroup"
         caption="Main Group"
         dataType="string"
+        [groupIndex]="0"
+        [autoExpandGroup]="true"
       ></dxi-column>
       <dxi-column
         dataField="SubGroup"
         caption="Sub Group"
         alignment="left"
         dataType="number"
+        [groupIndex]="1"
+        [autoExpandGroup]="true"
       ></dxi-column>
-      <dxi-column dataField="Category" caption="Category"></dxi-column>
+      <dxi-column
+        dataField="Category"
+        caption="Category"
+        [groupIndex]="2"
+        [autoExpandGroup]="false"
+      ></dxi-column>
       <dxi-column
         dataField="LedgerCode"
         caption="Ledger Code"

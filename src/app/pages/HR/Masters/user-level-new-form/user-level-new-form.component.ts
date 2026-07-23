@@ -53,11 +53,12 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
   clearData: any;
 
   isLoading: boolean = false;
+  isAdministrator = false;
 
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // setTimeout(() => {
@@ -105,6 +106,21 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
     }
   }
 
+  selectAllAdd = false;
+  selectAllEdit = false;
+  selectAllVerify = false;
+  selectAllApprove = false;
+  selectAllDelete = false;
+  selectAllHideCost = false;
+  selectAllPrint = false;
+
+  toggleColumn(field: string, value: boolean) {
+    this.selectedTabData.forEach((row: any) => {
+      row[field] = value;
+    });
+
+    this.selectedTabData = [...this.selectedTabData];
+  }
   //==============All Menu List========================
   get_All_MenuList() {
     this.dataservice.get_usermenu_Api().subscribe((response: any) => {
@@ -152,33 +168,48 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
     this.cdr.detectChanges();
   }
 
-onSelectionChanged(event: any): void {
-  if (this.UserLevelValue == '') {
-    this.isErrorVisible = true;
-  }
-
-  const selectedKeys = new Set(event.selectedRowKeys);
-
-  this.selectedRows[this.selectedTab] = event.selectedRowKeys;
-
-  this.selectedTabData.forEach((menu: any) => {
-    if (selectedKeys.has(menu.MenuId)) {
-      menu.CanView = true; // default
-    } else {
-      // reset all permissions
-      menu.CanAdd = false;
-      menu.CanView = false;
-      menu.CanEdit = false;
-      menu.CanVerify = false;
-      menu.CanApprove = false;
-      menu.CanDelete = false;
-      menu.CanPrint = false;
-      menu.HideCost = false;
+  onSelectionChanged(event: any): void {
+    if (this.UserLevelValue == '') {
+      this.isErrorVisible = true;
     }
-  });
 
-  this.combineSelectedRows();
-}
+    const selectedKeys = new Set(event.selectedRowKeys);
+    const isSelectAll =
+      event.selectedRowKeys.length === this.selectedTabData.length;
+
+    this.selectedRows[this.selectedTab] = event.selectedRowKeys;
+
+    this.selectedTabData.forEach((menu: any) => {
+      if (selectedKeys.has(menu.MenuId)) {
+        menu.CanView = true; // default
+        // If "Select All" is triggered, grant all privileges to the newly selected rows
+        if (
+          isSelectAll &&
+          event.currentSelectedRowKeys?.includes(menu.MenuId)
+        ) {
+          menu.CanAdd = true;
+          menu.CanEdit = true;
+          menu.CanVerify = true;
+          menu.CanApprove = true;
+          menu.CanDelete = true;
+          menu.CanPrint = true;
+          menu.HideCost = true;
+        }
+      } else {
+        // reset all permissions
+        menu.CanAdd = false;
+        menu.CanView = false;
+        menu.CanEdit = false;
+        menu.CanVerify = false;
+        menu.CanApprove = false;
+        menu.CanDelete = false;
+        menu.CanPrint = false;
+        menu.HideCost = false;
+      }
+    });
+
+    this.combineSelectedRows();
+  }
 
   //   onSelectionChanged(event: any): void {
   //   if (this.UserLevelValue == '') {
@@ -289,35 +320,35 @@ onSelectionChanged(event: any): void {
   }
 
   onEditorPreparing(e: any): void {
-  if (e.parentType === 'dataRow' && e.dataField) {
-    const originalOnValueChanged = e.editorOptions.onValueChanged;
+    if (e.parentType === 'dataRow' && e.dataField) {
+      const originalOnValueChanged = e.editorOptions.onValueChanged;
 
-    e.editorOptions.onValueChanged = (args: any) => {
-      // 🔥 Update actual object immediately
-      e.row.data[e.dataField] = args.value;
+      e.editorOptions.onValueChanged = (args: any) => {
+        // 🔥 Update actual object immediately
+        e.row.data[e.dataField] = args.value;
 
-      // Call default behavior
-      if (originalOnValueChanged) {
-        originalOnValueChanged(args);
-      }
+        // Call default behavior
+        if (originalOnValueChanged) {
+          originalOnValueChanged(args);
+        }
 
-      // Rebuild payload
-      this.combineSelectedRows();
-    };
-  }
-}
-
-onPermissionCheckboxChanged(e: any): void {
-  const { data, column, value } = e;
-
-  if (data && column?.dataField) {
-    data[column.dataField] = value; //  THIS IS THE KEY FIX
+        // Rebuild payload
+        this.combineSelectedRows();
+      };
+    }
   }
 
-  this.combineSelectedRows();
-}
+  onPermissionCheckboxChanged(e: any): void {
+    const { data, column, value } = e;
 
-combineSelectedRows(): void {
+    if (data && column?.dataField) {
+      data[column.dataField] = value; //  THIS IS THE KEY FIX
+    }
+
+    this.combineSelectedRows();
+  }
+
+  combineSelectedRows(): void {
     this.allSelectedRows = [];
 
     const selectedMenuIds = new Set<string>();
@@ -340,10 +371,10 @@ combineSelectedRows(): void {
             CanAdd: menu.CanAdd ?? false,
             CanView: menu.CanView ?? true,
             CanEdit: menu.CanEdit ?? false,
-            CanVerify:menu.CanVerify ?? false,
+            CanVerify: menu.CanVerify ?? false,
             CanApprove: menu.CanApprove ?? false,
             CanDelete: menu.CanDelete ?? false,
-            HideCost : menu.HideCost ?? false,
+            HideCost: menu.HideCost ?? false,
             CanPrint: menu.CanPrint ?? false,
           });
         }
@@ -355,7 +386,6 @@ combineSelectedRows(): void {
       Menus: enrichedMenus,
     });
   }
-
 
   getNewUSerLevelData = () => ({ ...this.allSelectedRows });
 }
@@ -379,4 +409,4 @@ combineSelectedRows(): void {
   declarations: [UserLevelNewFormComponent],
   exports: [UserLevelNewFormComponent],
 })
-export class UserLevelNewFormModule {}
+export class UserLevelNewFormModule { }

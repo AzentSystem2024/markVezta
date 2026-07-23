@@ -1511,6 +1511,11 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SalaryPayment/list`, data);
   }
 
+  verifySalaryPayment(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}SalaryPayment/Verify`, data);
+  }
+
   insertSalaryPayment(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}SalaryPayment/insert`, data);
@@ -4647,8 +4652,11 @@ The result can be exported to HTML or Markdown.`;
   }
   //==============================APi for  Salary Head dropdowun salary expense  ==========================
 
-  Dropdown_advance_types(type: any) {
-    const reqbody = { NAME: 'ACCOUNT_HEAD' };
+  Dropdown_advance_types() {
+    const reqbody = {
+      NAME: 'SALARY_HEAD',
+      COMPANY_ID: this.selected_Company_id,
+    };
     return this.http.post(`${this.apiUrl}DropDown`, reqbody);
   }
   //==================================Api for Advance types select==========================
@@ -4913,6 +4921,7 @@ The result can be exported to HTML or Markdown.`;
       CHEQUE_NO: cheque_no,
       CHEQUE_DATE: cheque_date,
       PAY_TYPE_ID: pay_Type_id,
+      COMPANY_ID: this.selected_Company_id,
     };
     return this.http.post(`${this.apiUrl}Advance/update`, reqBody);
   }
@@ -4953,6 +4962,7 @@ The result can be exported to HTML or Markdown.`;
       PAY_HEAD_ID: pay_head_id,
       CHEQUE_NO: cheque_no,
       CHEQUE_DATE: cheque_date,
+      COMPANY_ID: this.selected_Company_id,
       PAY_TYPE_ID: pay_Type_id,
     };
     return this.http.post(`${this.apiUrl}Advance/verify`, reqBody);
@@ -4995,6 +5005,7 @@ The result can be exported to HTML or Markdown.`;
       CHEQUE_NO: cheque_no,
       CHEQUE_DATE: cheque_date,
       PAY_TYPE_ID: pay_Type_id,
+      COMPANY_ID: this.selected_Company_id,
     };
     return this.http.post(`${this.apiUrl}Advance/approve`, reqBody);
   }
@@ -7056,7 +7067,7 @@ The result can be exported to HTML or Markdown.`;
 
   //===========Balance sheet Dimension======================
   Balance_Sheet_Dimension_Api(payload: any) {
-    const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheetDimension';
+    const getEndpoint = this.apiUrl + 'AC_Report/BalanceSheet';
     return this.http.post(getEndpoint, payload);
   }
 
@@ -7143,7 +7154,6 @@ The result can be exported to HTML or Markdown.`;
       item,
     );
   }
-
 
   //==================AR Manual Matching=======================
   getARManualMatchingReceiptList(payload: any): Observable<any> {

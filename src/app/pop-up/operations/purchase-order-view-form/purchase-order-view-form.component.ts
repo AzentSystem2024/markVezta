@@ -173,6 +173,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   storeOrLocation: any;
   logoImg: string;
   PoID: any;
+  expandedRowKey: null;
 
   constructor(
     private service: DataService,
@@ -622,9 +623,19 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     });
   }
 
+  // onRowClick(event: any) {
+  //   const itemId = event.data.ITEM_ID;
+  //   this.loadPurchaseOrders(itemId);
+  // }
+
   onRowClick(event: any) {
-    const itemId = event.data.ITEM_ID;
+    const itemId = event.key.ITEM_ID;
     this.loadPurchaseOrders(itemId);
+
+    if (this.expandedRowKey !== null && this.expandedRowKey !== event.key) {
+      event.component.collapseRow(this.expandedRowKey);
+    }
+    this.expandedRowKey = event.key;
   }
 
   sessionDetails() {

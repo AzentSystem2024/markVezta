@@ -48,6 +48,8 @@ import { DataService } from 'src/app/services';
 export class AddSalaryPaymentComponent implements OnInit, OnChanges {
   // --- Inputs, Outputs & ViewChildren ---
   @Input() isEditing: boolean = false;
+  @Input() isApproving: boolean = false;
+  @Input() isVerifying: boolean = false;
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
@@ -195,6 +197,10 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
   private isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
+    if (this.isApproving) {
+      this.isApproved = true;
+    }
+
     const data = Array.isArray(this.EditingResponseData)
       ? this.EditingResponseData[0]
       : this.EditingResponseData;
@@ -271,14 +277,18 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
           const savedList = data.DetailList || [];
           const savedIds = new Set(savedList.map((item: any) => item.ID));
 
-          const mergedList = [...savedList];
-          pendingList.forEach((item: any) => {
-            if (!savedIds.has(item.ID)) {
-              mergedList.push(item);
-            }
-          });
+          if (this.isReadOnlyMode) {
+            this.salaryPendingList = savedList;
+          } else {
+            const mergedList = [...savedList];
+            pendingList.forEach((item: any) => {
+              if (!savedIds.has(item.ID)) {
+                mergedList.push(item);
+              }
+            });
+            this.salaryPendingList = mergedList;
+          }
 
-          this.salaryPendingList = mergedList;
           this.selectedIds = Array.from(savedIds);
         } else {
           this.salaryPendingList = pendingList;
@@ -483,10 +493,26 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     });
   }
 
+  onVerifySalaryPayment() {
+    if (!this.preparePayload()) return;
+
+    this.dataService.verifySalaryPayment(this.salaryPaymentData).subscribe({
+      next: (res: any) => {
+        if (res.flag === 1) {
+          notify('Salary Payment verified successfully', 'success', 2000);
+          this.popupClosed.emit();
+        } else {
+          notify('Failed to verify Salary Payment', 'error', 2000);
+        }
+      },
+      error: () => notify('Error occurred while verifying', 'error', 2000),
+    });
+  }
+
   onUpdateSalaryPayment() {
     if (!this.preparePayload()) return;
 
-    const request$ = this.isApproved
+    const request$ = this.isApproved || this.isApproving
       ? this.dataService.approveSalaryPayment(this.salaryPaymentData)
       : this.dataService.updateSalaryPayment(this.salaryPaymentData);
 
@@ -494,14 +520,14 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
       next: (response: any) => {
         if (response.flag === 1) {
           notify(
-            `Salary Payment ${this.isApproved ? 'approved' : 'updated'} successfully`,
+            `Salary Payment ${this.isApproved || this.isApproving ? 'approved' : 'updated'} successfully`,
             'success',
             2000,
           );
           this.popupClosed.emit();
         } else {
           notify(
-            `Failed to ${this.isApproved ? 'approve' : 'save'} Salary Payment`,
+            `Failed to ${this.isApproved || this.isApproving ? 'approve' : 'save'} Salary Payment`,
             'error',
             2000,
           );

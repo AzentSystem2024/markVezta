@@ -96,6 +96,7 @@ export class TransferOutInventoryAddComponent {
   storeFromSession: any;
   stores: any;
   reasons: any;
+  departments: any[] = [];
   transferOutFormData: any = {
     COMPANY_ID: '',
     STORE_ID: '',
@@ -106,6 +107,7 @@ export class TransferOutInventoryAddComponent {
     USER_ID: '',
     NARRATION: '',
     REASON_ID: '',
+    DEPT_ID: '',
     IS_APPROVED: false,
     DETAILS: [], // <-- start empty
   };
@@ -168,6 +170,7 @@ export class TransferOutInventoryAddComponent {
     }
     this.getStoreDropdown();
     this.getReasonsDropdown();
+    this.getDepartmentsDropdown();
 
     // this.items = [];
     // this.addEmptyRow();
@@ -195,12 +198,12 @@ export class TransferOutInventoryAddComponent {
       TRANSFER_DATE: data.TRANSFER_DATE ? new Date(data.TRANSFER_DATE) : null,
       DEST_STORE_ID: data.DEST_STORE_ID,
       REASON_ID: data.REASON_ID,
+      DEPT_ID: data.DEPT_ID,
       DETAILS: data.DETAILS ? [...data.DETAILS] : [],
       NARRATION: data.NARRATION || '',
       NET_AMOUNT: data.NET_AMOUNT,
       DOC_NO: data.DOC_NO,
       IS_APPROVED: data.IS_APPROVED || false,
-
     };
     this.transferOutFormData.DETAILS.forEach((row: any, index: number) => {
       row.SL_NO = index + 1;
@@ -253,6 +256,15 @@ export class TransferOutInventoryAddComponent {
     }
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
+    });
+  }
+  getDepartmentsDropdown() {
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.companyID
+    }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.departments = response;
     });
   }
   onStoreChange(e: any) {
