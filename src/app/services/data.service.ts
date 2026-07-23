@@ -375,8 +375,10 @@ export class DataService {
   listItemsForArticle(): Observable<any> {
     return this.http.post(`${this.apiUrl}Article/listitem`, {});
   }
-  getArticleList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}article/List`, {});
+  getArticleList(item: any): Observable<any> {
+    const data = item;
+
+    return this.http.post(`${this.apiUrl}article/List`, data);
   }
 
   getLastAliasNo(): Observable<any> {
@@ -1508,7 +1510,7 @@ export class DataService {
   getPendingSalaryPayments(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}SalaryPayment/list`, data);
   }
-  
+
   verifySalaryPayment(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}SalaryPayment/Verify`, data);

@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="timesheetList"
@@ -53,7 +53,7 @@
         <dxi-item location="after" locateInMenu="auto">
           <dx-button
             hint="Generate Payroll"
-            text="Generate Payroll"
+            icon="fas fa-file-invoice-dollar"
             type="default"
             stylingMode="contained"
             (onClick)="generatePayroll()"
@@ -66,10 +66,7 @@
         caption="Employee No."
         width="120"
       ></dxi-column>
-      <dxi-column
-        dataField="EMP_NAME"
-        caption="Employee Name"
-      ></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Employee Name"></dxi-column>
       <dxi-column
         dataField="WORKED_DAYS"
         caption="Worked Days"
@@ -77,32 +74,10 @@
         width="120"
       ></dxi-column>
       <dxi-column
-        dataField="LESS_HOURS"
-        caption="Less Hours"
-        width="120"
-      ></dxi-column>
-      <dxi-column
         dataField="OT_HOURS"
         caption="OT Hours"
         width="120"
       ></dxi-column>
-      <!-- <dxi-column
-        dataField="STATUS"
-        caption="Status"
-        cellTemplate="statusCellTemplate"
-        width="100"
-        alignment="center"
-      ></dxi-column>
-
-      
-      <div *dxTemplate="let cellData of 'statusCellTemplate'">
-        <i
-          class="fas fa-flag"
-          [style.color]="getStatusColor(cellData.value)"
-          [attr.title]="cellData.value"
-          style="font-size: 16px; cursor: default;"
-        ></i>
-      </div> -->
     </dx-data-grid>
   </div>
 </div>

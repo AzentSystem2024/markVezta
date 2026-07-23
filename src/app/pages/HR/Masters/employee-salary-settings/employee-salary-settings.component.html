@@ -35,8 +35,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
+        [allowUpdating]="isEditAllowed"
+        [allowDeleting]="isDeleteAllowed"
       ></dxo-editing>
 
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -119,7 +119,6 @@
       [width]="'60vw'"
       [height]="'100vh'"
       title="Add employee salary settings"
-      (onHiding)="handleClose()"
     >
       <app-employee-salary-settings-add
         #salarySettings
@@ -134,7 +133,6 @@
   [width]="'60vw'"
   [height]="'100vh'"
   title="Edit employee salary settings"
-  (onHiding)="handleEditClose($event)"
 >
   <app-employee-salary-settings-edit
     #editSalarySettings
