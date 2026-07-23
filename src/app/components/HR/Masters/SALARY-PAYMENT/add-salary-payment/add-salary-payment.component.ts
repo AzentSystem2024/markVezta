@@ -120,7 +120,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     NARRATION: '',
     TRANS_TYPE: 30,
     CHEQUE_NO: '',
-    CHEQUE_DATE: '',
+    CHEQUE_DATE: new Date(),
     BANK_NAME: '',
     CREATE_USER_ID: '',
     SUPP_ID: 0,
@@ -132,6 +132,9 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
   // =========== Lifecycle Hooks ===========
 
   ngOnInit() {
+    this.selectedYear = this.selectedMonth.getFullYear();
+    this.generateYears();
+
     this.loadUserData();
     this.sessionDetails();
     this.getLedgerCodeDropdown();
@@ -370,6 +373,7 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     const currentDate = new Date(this.selectedMonth);
     currentDate.setMonth(currentDate.getMonth() + 1);
     this.selectedMonth = currentDate;
+    this.selectedYear = this.selectedMonth.getFullYear();
     this.updateMonthString();
     this.getSalaryPendingList();
   }
@@ -378,8 +382,17 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
     const currentDate = new Date(this.selectedMonth);
     currentDate.setMonth(currentDate.getMonth() - 1);
     this.selectedMonth = currentDate;
+    this.selectedYear = this.selectedMonth.getFullYear();
     this.updateMonthString();
     this.getSalaryPendingList();
+  }
+
+  generateYears() {
+    const currentYear = new Date().getFullYear();
+    this.years = [];
+    for (let i = currentYear - 10; i <= currentYear + 4; i++) {
+      this.years.push(i);
+    }
   }
 
   private updateMonthString() {
@@ -512,9 +525,10 @@ export class AddSalaryPaymentComponent implements OnInit, OnChanges {
   onUpdateSalaryPayment() {
     if (!this.preparePayload()) return;
 
-    const request$ = this.isApproved || this.isApproving
-      ? this.dataService.approveSalaryPayment(this.salaryPaymentData)
-      : this.dataService.updateSalaryPayment(this.salaryPaymentData);
+    const request$ =
+      this.isApproved || this.isApproving
+        ? this.dataService.approveSalaryPayment(this.salaryPaymentData)
+        : this.dataService.updateSalaryPayment(this.salaryPaymentData);
 
     request$.subscribe({
       next: (response: any) => {

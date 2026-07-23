@@ -47,6 +47,7 @@ export class EmployeeSalarySettingsEditComponent {
   SalaryHeadValidation: DxValidationGroupComponent | undefined;
 
   @Input() employeeData: any;
+  @Input() isReadOnlyMode: boolean = false;
 
   EmployeeDropdown: any;
   selectedEmployee: any;
@@ -73,7 +74,9 @@ export class EmployeeSalarySettingsEditComponent {
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    
+  }
 
   ngOnInit() {
     this.sessionDetails();
@@ -87,7 +90,7 @@ export class EmployeeSalarySettingsEditComponent {
       changes['employeeData'].currentValue.ID
     ) {
       this.selectedEmployee = changes['employeeData'].currentValue;
-      console.log('selected in changes', this.selectedEmployee);
+      console.log('this.isReadOnlyMode', this.isReadOnlyMode);
       this.selectedEmployeeId = this.selectedEmployee.ID;
 
       this.SalaryDetails = [];

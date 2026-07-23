@@ -146,6 +146,7 @@ export class ArticleListComponent {
   filteredInvoiceList: any;
 
   selected_Company_id: any;
+  Default_company: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -192,16 +193,24 @@ export class ArticleListComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.Default_company = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
+
   }
 
   getArticles() {
+
     this.articleList = new DataSource({
       load: () =>
         new Promise((resolve, reject) => {
           // const payload = {
           //   COMPANY_ID: this.selected_Company_id,
           // }; // Add any necessary payload data here
-          this.dataService.getArticleList().subscribe({
+          const payload = {
+            COMPANY_TYPE: this.Default_company,
+            COMPANY_ID: this.selected_Company_id
+
+          }
+          this.dataService.getArticleList(payload).subscribe({
             next: (response: any) => {
               if (response?.flag === 1 && Array.isArray(response.Data)) {
                 //  Sort articles by ID (latest first)

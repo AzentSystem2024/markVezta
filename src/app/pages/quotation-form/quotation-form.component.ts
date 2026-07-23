@@ -562,7 +562,8 @@ export class QuotationFormComponent {
 
     return this.dataService.getItemsForQuotation(payload).pipe(
       tap((response: any) => {
-        this.items = (response.Data || []).slice(0, 200);
+        // this.items = (response.Data || []).slice(0, 1000);
+        this.items = response.Data || [];
         this.itemDataCache.set(cacheKey, [...this.items]);
       }),
     );
@@ -990,7 +991,7 @@ export class QuotationFormComponent {
   //   const content = document.createElement('div');
   //   content.innerHTML = `
   //   <div style="font-family: Arial, sans-serif; font-size: 13px; margin: 20px;">
-      
+
   //     <!-- COMPANY HEADER -->
   //     <div style="text-align: center; margin-bottom: 20px;">
   //       <h2 style="margin-top: 5px;">Quotation</h2>
@@ -1162,251 +1163,241 @@ export class QuotationFormComponent {
   printQuotation() {
     console.log('Open PDF clicked');
     const returnId = this.EditingResponseData.ID;
-    console.log(returnId)
+    console.log(returnId);
     // Example:
-    this.dataService
-      .selectSalesQuotation(returnId)
-      .subscribe((res: any) => {
-        this.generatePDF(res);
-      });
-  }
-
-   getBase64ImageFromURL(url: string): Promise<string> {
-  return fetch(url)
-    .then(res => res.blob())
-    .then(blob => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
+    this.dataService.selectSalesQuotation(returnId).subscribe((res: any) => {
+      this.generatePDF(res);
     });
-}
-
- async  generatePDF(data: any) {
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  // ============================================================
-  // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
-  // ============================================================
-
-  const headerY = 10;
-
-  // --- Logo placeholder (replace with addImage if needed)
-  const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
-
-  doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 35);
-
-  // --- Title
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('SALES QUOTATION', pageWidth / 2, headerY + 25, {
-    align: 'center',
-  });
-
- // ======================================================
-  // RIGHT HEADER DETAILS
-  // ======================================================
-
-  doc.setFontSize(10);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Quotation No :', 135, 15);
-
-doc.text(
-  `${data.Data.QTN_NO}`,
-  195,
-  15,
-  { align: 'right' }
-);
-
-  doc.text('Reference No :', 135, 22);
-
-doc.text(
-  `${data.Data.REF_NO}`,
-  195,
-  22,
-  { align: 'right' }
-);
-
-doc.text('Date :', 135, 29);
-
-doc.text(
-  `${data.Data.QTN_DATE}`,
-  195,
-  29,
-  { align: 'right' }
-);
-
-
-   // ======================================================
-  // BUYER DETAILS
-  // ======================================================
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Buyer Details', 12, 60);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Store:', 12, 67);
-
-// doc.text(
-//   `${data.Data.ADDRESS1}`,
-//   38,
-//   67
-// );
-
-  doc.text('Salesman:', 12, 74);
-  // doc.text(`${data.Data.PHONE}`, 38, 74);
-
-  doc.text('Tel:', 12, 83);
-  // doc.text(`${data.Data.GST_NO}`, 38, 83);
-
-  
-  // ======================================================
-  // SELLER DETAILS
-  // ======================================================
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Seller Details', 140, 60);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Name:', 140, 67);
-
-  const customerName = doc.splitTextToSize(data.Data.CUST_NAME, 35);
-doc.text(customerName, 165, 67);
-
-  doc.text('Contact Name:', 140, 80);
-  doc.text(`${data.Data.CONTACT_NAME}`, 165, 80);
-
-  doc.text('Tel:', 140, 87);
-  // doc.text(`${data.Data.ZIP}`, 165, 83);
-
-
-  // ======================================================
-// QUOTATION INFO TABLE (Ship Method / Payment / Currency)
-// ======================================================
-
-autoTable(doc, {
-  startY: 95,
-  head: [[
-    'Ship Method',
-    'Payment Terms',
-    'Currency',
-    'Remark (If any)',
-    'Validity'
-  ]],
-  body: [[
-    data.Data.DELIVERY_TERM_NAME,
-    data.Data.PAY_TERM_NAME,
-    data.Data.CURRENCY || '',
-    data.Data.NARRATION || '',
-    `${data.Data.VALID_DAYS} days`
-  ]],
-  theme: 'grid',
-  styles: {
-    fontSize: 8,
-    halign: 'center',
-    valign: 'middle'
-  },
-  headStyles: {
-    fillColor: [210, 225, 240],
-    textColor: 0,
-    fontStyle: 'bold'
   }
-});
 
-
-// ======================================================
-// ITEM DETAILS TABLE
-// ======================================================
-
-const itemRows = data.Data.Details.map((item: any) => [
-  item.ITEM_CODE,
-  item.ITEM_NAME,
-  item.UOM,
-  item.QUANTITY,
-  item.PRICE,
-  item.AMOUNT,
-  item.DISC_PERCENT,
-  item.AMOUNT,
-  item.TAX_PERCENT,
-  item.TOTAL_AMOUNT
-]);
-
-autoTable(doc, {
-  startY: (doc as any).lastAutoTable.finalY + 10,
-  head: [[
-    'Item Code',
-    'Description',
-    'UOM',
-    'Qty',
-    'Price',
-    'Amount',
-    'Disc(%)',
-    'Taxable',
-    'Tax(%)',
-    'Total Price'
-  ]],
-  body: itemRows,
-  foot: [[
-    '',
-    'TOTAL',
-    '',
-    data.Data.Details.reduce((sum: number, item: any) => sum + item.QUANTITY, 0),
-    '',
-    data.Data.GROSS_AMOUNT,
-    '',
-    '',
-    '',
-    data.Data.NET_AMOUNT
-  ]],
-  theme: 'grid',
-  styles: {
-    fontSize: 8,
-    cellPadding: 2,
-    halign: 'center'
-  },
-  headStyles: {
-    fillColor: [210, 225, 240],
-    textColor: 0,
-    fontStyle: 'bold'
-  },
-  footStyles: {
-    fontStyle: 'bold',
-    fillColor: [255, 255, 255],
-    textColor: 0
+  getBase64ImageFromURL(url: string): Promise<string> {
+    return fetch(url)
+      .then((res) => res.blob())
+      .then((blob) => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      });
   }
-});
 
+  async generatePDF(data: any) {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-// ======================================================
-// AMOUNT IN WORDS
-// ======================================================
+    // ============================================================
+    // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
+    // ============================================================
 
-const amountY = (doc as any).lastAutoTable.finalY + 10;
+    const headerY = 10;
 
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(10);
+    // --- Logo placeholder (replace with addImage if needed)
+    const logoBase64 = await this.getBase64ImageFromURL(
+      'assets/images/image16.png',
+    );
 
-doc.text('Amount Chargeable (in words):', 60, amountY);
+    doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 35);
 
-doc.setTextColor(0, 102, 204);
-doc.text('AED Three Thousand One Hundred Thirty Five Only', 120, amountY);
+    // --- Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('SALES QUOTATION', pageWidth / 2, headerY + 25, {
+      align: 'center',
+    });
 
-doc.setTextColor(0);
+    // ======================================================
+    // RIGHT HEADER DETAILS
+    // ======================================================
 
+    doc.setFontSize(10);
 
-  // ============================================================
-  // 3) OPEN PDF
-  // ============================================================
+    doc.setFont('helvetica', 'normal');
 
-  doc.output('dataurlnewwindow');
-}
+    doc.text('Quotation No :', 135, 15);
+
+    doc.text(`${data.Data.QTN_NO}`, 195, 15, { align: 'right' });
+
+    doc.text('Reference No :', 135, 22);
+
+    doc.text(`${data.Data.REF_NO}`, 195, 22, { align: 'right' });
+
+    doc.text('Date :', 135, 29);
+
+    doc.text(`${data.Data.QTN_DATE}`, 195, 29, { align: 'right' });
+
+    // ======================================================
+    // BUYER DETAILS
+    // ======================================================
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buyer Details', 12, 60);
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text('Store:', 12, 67);
+
+    // doc.text(
+    //   `${data.Data.ADDRESS1}`,
+    //   38,
+    //   67
+    // );
+
+    doc.text('Salesman:', 12, 74);
+    // doc.text(`${data.Data.PHONE}`, 38, 74);
+
+    doc.text('Tel:', 12, 83);
+    // doc.text(`${data.Data.GST_NO}`, 38, 83);
+
+    // ======================================================
+    // SELLER DETAILS
+    // ======================================================
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Seller Details', 140, 60);
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text('Name:', 140, 67);
+
+    const customerName = doc.splitTextToSize(data.Data.CUST_NAME, 35);
+    doc.text(customerName, 165, 67);
+
+    doc.text('Contact Name:', 140, 80);
+    doc.text(`${data.Data.CONTACT_NAME}`, 165, 80);
+
+    doc.text('Tel:', 140, 87);
+    // doc.text(`${data.Data.ZIP}`, 165, 83);
+
+    // ======================================================
+    // QUOTATION INFO TABLE (Ship Method / Payment / Currency)
+    // ======================================================
+
+    autoTable(doc, {
+      startY: 95,
+      head: [
+        [
+          'Ship Method',
+          'Payment Terms',
+          'Currency',
+          'Remark (If any)',
+          'Validity',
+        ],
+      ],
+      body: [
+        [
+          data.Data.DELIVERY_TERM_NAME,
+          data.Data.PAY_TERM_NAME,
+          data.Data.CURRENCY || '',
+          data.Data.NARRATION || '',
+          `${data.Data.VALID_DAYS} days`,
+        ],
+      ],
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        halign: 'center',
+        valign: 'middle',
+      },
+      headStyles: {
+        fillColor: [210, 225, 240],
+        textColor: 0,
+        fontStyle: 'bold',
+      },
+    });
+
+    // ======================================================
+    // ITEM DETAILS TABLE
+    // ======================================================
+
+    const itemRows = data.Data.Details.map((item: any) => [
+      item.ITEM_CODE,
+      item.ITEM_NAME,
+      item.UOM,
+      item.QUANTITY,
+      item.PRICE,
+      item.AMOUNT,
+      item.DISC_PERCENT,
+      item.AMOUNT,
+      item.TAX_PERCENT,
+      item.TOTAL_AMOUNT,
+    ]);
+
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 10,
+      head: [
+        [
+          'Item Code',
+          'Description',
+          'UOM',
+          'Qty',
+          'Price',
+          'Amount',
+          'Disc(%)',
+          'Taxable',
+          'Tax(%)',
+          'Total Price',
+        ],
+      ],
+      body: itemRows,
+      foot: [
+        [
+          '',
+          'TOTAL',
+          '',
+          data.Data.Details.reduce(
+            (sum: number, item: any) => sum + item.QUANTITY,
+            0,
+          ),
+          '',
+          data.Data.GROSS_AMOUNT,
+          '',
+          '',
+          '',
+          data.Data.NET_AMOUNT,
+        ],
+      ],
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        halign: 'center',
+      },
+      headStyles: {
+        fillColor: [210, 225, 240],
+        textColor: 0,
+        fontStyle: 'bold',
+      },
+      footStyles: {
+        fontStyle: 'bold',
+        fillColor: [255, 255, 255],
+        textColor: 0,
+      },
+    });
+
+    // ======================================================
+    // AMOUNT IN WORDS
+    // ======================================================
+
+    const amountY = (doc as any).lastAutoTable.finalY + 10;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    doc.text('Amount Chargeable (in words):', 60, amountY);
+
+    doc.setTextColor(0, 102, 204);
+    doc.text('AED Three Thousand One Hundred Thirty Five Only', 120, amountY);
+
+    doc.setTextColor(0);
+
+    // ============================================================
+    // 3) OPEN PDF
+    // ============================================================
+
+    doc.output('dataurlnewwindow');
+  }
 
   convertNumberToWords(num: number): string {
     if (num === 0) return 'Zero';
@@ -1466,7 +1457,6 @@ doc.setTextColor(0);
 
     return str.trim();
   }
-
 }
 
 @NgModule({

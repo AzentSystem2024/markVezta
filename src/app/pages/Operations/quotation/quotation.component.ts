@@ -294,8 +294,13 @@ export class QuotationComponent {
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
     icon.style.fontSize = '18px';
-    icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.title = status === 5 ? 'APPROVED' : 'OPEN';
+    icon.style.color =
+      status === 5
+        ? '#10B981' // Approved
+        : status === 2
+          ? '#0073D8' // Verified
+          : '#FFA500'; // Open
+    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
 
     icon.style.display = 'flex';
     icon.style.justifyContent = 'center';
@@ -312,6 +317,10 @@ export class QuotationComponent {
     {
       text: 'Open',
       value: 1,
+    },
+    {
+      text: 'Verified',
+      value: 2,
     },
   ];
 
@@ -642,9 +651,9 @@ export class QuotationComponent {
   handleClose() {
     this.isAddQuotation = false;
     this.isEditQuotation = false;
-    this.isVerifyQuotation= false;
-    this.isApproveQuotation= false;
-    this.isViewQuotation= false;
+    this.isVerifyQuotation = false;
+    this.isApproveQuotation = false;
+    this.isViewQuotation = false;
     this.getQuotationList();
   }
 }

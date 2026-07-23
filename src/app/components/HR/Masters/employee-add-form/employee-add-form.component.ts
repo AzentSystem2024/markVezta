@@ -272,14 +272,46 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   }
 
   validateMobile(event: any) {
-    const mobileNumber = event.target.value;
-    const mobilePattern = /^[6-9]\d{9}$/; // Valid 10-digit number starting with 6-9
+    const mobileNumber = event?.target ? event.target.value : event || '';
 
-    if (!mobilePattern.test(mobileNumber)) {
-      this.mobileError =
-        'Please enter a valid 10-digit mobile number starting with 6-9';
+    if (!mobileNumber) {
+      this.mobileError = '';
+      return;
+    }
+
+    // Ignore spaces for validation
+    const normalizedMobile = mobileNumber.replace(/\s+/g, '');
+
+    if (this.countryCode === '+91') {
+      const mobilePattern = /^[6-9]\d{9}$/;
+      if (!mobilePattern.test(normalizedMobile)) {
+        this.mobileError =
+          'Please enter a valid 10-digit mobile number starting with 6-9';
+      } else {
+        this.mobileError = ''; // Clear error if valid
+      }
+    } else if (this.countryCode === '+971') {
+      const uaePattern = /^5\d{8}$/;
+      if (!uaePattern.test(normalizedMobile)) {
+        this.mobileError =
+          'Please enter a valid 9-digit UAE mobile number starting with 5';
+      } else {
+        this.mobileError = '';
+      }
+    } else if (this.mobile_limit) {
+      const regex = new RegExp(`^\\d{${this.mobile_limit}}$`);
+      if (!regex.test(normalizedMobile)) {
+        this.mobileError = `Please enter a valid ${this.mobile_limit}-digit mobile number`;
+      } else {
+        this.mobileError = ''; // Clear error if valid
+      }
     } else {
-      this.mobileError = ''; // Clear error if valid
+      const fallbackRegex = /^\d+$/;
+      if (!fallbackRegex.test(normalizedMobile)) {
+        this.mobileError = 'Please enter a valid mobile number';
+      } else {
+        this.mobileError = '';
+      }
     }
   }
 
@@ -444,7 +476,11 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
 
     this.isSaving = true; // start loading
 
-    const payload = { ...this.employeeFormData, Company_Id: this.COMPANY_ID };
+    const payload = { 
+      ...this.employeeFormData, 
+      Company_Id: this.COMPANY_ID,
+      MOBILE: this.countryCode ? `${this.countryCode}-${this.employeeFormData.MOBILE}` : this.employeeFormData.MOBILE
+    };
 
     this.dataservice.saveEmployeeData(payload).subscribe({
       next: (response: any) => {
@@ -494,6 +530,9 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
       this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+      if (this.employeeFormData.MOBILE) {
+        this.validateMobile(this.employeeFormData.MOBILE);
+      }
     });
   }
   countryDisplay(item: any) {
@@ -503,26 +542,9 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
 
   onCountrySelectionChanged(event: any) {
     this.CountryId = event.value;
-    // const selectedCountry = this.CountryDropdownData.find(country => country.ID === event.value);
-    // if (selectedCountry) {
-    //   this.countryCode = selectedCountry.CODE;
-    // }
-    // this.get_Country_Dropdown_List();
-
     const selectedCountry = this.countries.find(
       (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
     );
-    // 4️ If found, set code & name
-    if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE; // e.g., '+971'
-    } else {
-      // 5️ Fallback if no country found
-      this.countryCode = '';
-      console.warn(
-        ' No matching country found for ID:',
-        this.employeeFormData.COUNTRY_ID,
-      );
-    }
   }
 }
 
