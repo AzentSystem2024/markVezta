@@ -80,7 +80,7 @@ export class PayrollEditComponent {
 
   salaryHeadList: any;
   selected_Company_id: any;
-  Finid:any
+  Finid: any;
   userId: any;
   incomingPayroll: any;
   incomingPayrollData: any;
@@ -90,7 +90,6 @@ export class PayrollEditComponent {
   ) {}
 
   ngOnInit() {
-    // this.getSalaryHeadDropdown();
     this.sesstion_Details();
     this.getSalaryHeadList();
   }
@@ -103,10 +102,18 @@ export class PayrollEditComponent {
         this.isReadOnlyMode || this.isVerifyMode || this.isApproveMode;
 
       this.incomingPayrollData = changes['payroll'].currentValue;
-      console.log(this.incomingPayrollData, 'INCOMINGPAYROLLDATA');
-      // Update the payRollData object with the incoming payroll
+
+      let parsedMonth = null;
+      if (this.incomingPayrollData.MONTH) {
+        const parts = this.incomingPayrollData.MONTH.split('-');
+        if (parts.length >= 3) {
+          parsedMonth = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        }
+      }
+
       this.payRollData = {
         ...this.incomingPayrollData,
+        MONTH: parsedMonth,
         PAY_DETAILS: this.incomingPayrollData.DATA.filter((detail: any) => {
           const gross = parseFloat(detail.GROSS_AMOUNT) || 0;
           const deduct = parseFloat(detail.DEDUCTION_AMOUNT) || 0;
@@ -119,10 +126,9 @@ export class PayrollEditComponent {
           DEDUCTION_AMOUNT: parseFloat(detail.DEDUCTION_AMOUNT) || 0,
         })),
       };
-      // this.calculateGross();
+      console.log('PAYROLL DATA : ', this.payRollData);
     }
   }
-
 
   onRowUpdating(event: any) {
     // Log old and new data
@@ -240,7 +246,7 @@ export class PayrollEditComponent {
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.Finid = sessionData.FINANCIAL_YEARS[0].FIN_ID;  
+    this.Finid = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -269,8 +275,17 @@ export class PayrollEditComponent {
         this.salaryHeadList = response.Data;
 
         if (this.incomingPayrollData) {
+          let parsedMonth = null;
+          if (this.incomingPayrollData.MONTH) {
+            const parts = this.incomingPayrollData.MONTH.split('-');
+            if (parts.length >= 3) {
+              parsedMonth = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+            }
+          }
+
           this.payRollData = {
             ...this.incomingPayrollData,
+            MONTH: parsedMonth,
             PAY_DETAILS: this.incomingPayrollData.DATA.filter((detail: any) => {
               const gross = parseFloat(detail.GROSS_AMOUNT) || 0;
               const deduct = parseFloat(detail.DEDUCTION_AMOUNT) || 0;
@@ -414,7 +429,7 @@ export class PayrollEditComponent {
   executeVerify() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      FIN_ID:this.Finid,
+      FIN_ID: this.Finid,
       USER_ID: this.userId,
       PAYDETAIL_ID: [
         this.payRollData.PAYDETAIL_ID || this.payRollData.SALARY_BILL_NO,
@@ -438,7 +453,7 @@ export class PayrollEditComponent {
   approve() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      FIN_ID:this.Finid,
+      FIN_ID: this.Finid,
       USER_ID: this.userId,
       PAYDETAIL_ID: [
         this.payRollData.PAYDETAIL_ID || this.payRollData.SALARY_BILL_NO,
