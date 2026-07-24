@@ -119,3 +119,19 @@
   height: 24px;
   margin: 0 4px;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Scoped to .edit-item-popup only (via [wrapperAttr])
+   Mirrors the form-popup padding so Edit Item General tab looks identical
+   to the New Item form.
+   ───────────────────────────────────────────────────────────────────────────── */
+::ng-deep .edit-item-popup {
+  .dx-popup-content {
+    padding: 10px 16px !important;
+  }
+
+  /* Remove extra bottom margin from tabpanel container */
+  .dx-tabpanel-container {
+    margin-bottom: 0 !important;
+  }
+}

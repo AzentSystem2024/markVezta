@@ -562,8 +562,10 @@ export class ItemsEditFormComponent implements OnInit {
 
       this.Edit_Store = this.itemData.item_stores || [];
 
-      // ✅ selection based on ID
-      this.selectedRowKeys = this.Edit_Store.map((x: any) => x.STORE_ID);
+      // ✅ selection based on ID where IS_SELECTED is true
+      this.selectedRowKeys = this.Edit_Store.filter(
+        (x: any) => x.IS_SELECTED,
+      ).map((x: any) => x.STORE_ID);
 
       console.log(this.Edit_Store, '===========edit store================');
       console.log(
@@ -589,8 +591,12 @@ export class ItemsEditFormComponent implements OnInit {
       return matched ? { ...storeItem, ...matched } : storeItem;
     });
 
-    // 🔹 Set selected keys
-    this.selectedRowKeys = [...this.Edit_Store.map((x: any) => x.STORE_ID)];
+    // 🔹 Set selected keys (only selected ones)
+    this.selectedRowKeys = [
+      ...this.Edit_Store.filter((x: any) => x.IS_SELECTED).map(
+        (x: any) => x.STORE_ID,
+      ),
+    ];
 
     // 🔹 Force UI refresh (important)
     this.store = [...this.store];
@@ -811,9 +817,62 @@ export class ItemsEditFormComponent implements OnInit {
     this.selectedRowKeys = [...selectedIds];
   }
 
+  // Filter already-selected suppliers from the dropdown in subsequent rows
+  onSupplierEditorPreparing(event: any) {
+    if (event.parentType === 'dataRow' && event.dataField === 'SUPP_ID') {
+      const currentSuppId = event.row?.data?.SUPP_ID;
+      const gridData: any[] = this.edit_Suplier || [];
+
+      // Collect all selected supplier IDs except the current row's own supplier
+      const selectedSuppIds = gridData
+        .map((item: any) => item.SUPP_ID)
+        .filter((id: any) => id && id !== currentSuppId);
+
+      const allSuppliers = this.supplier || [];
+      // Only show suppliers not already used in other rows
+      event.editorOptions.dataSource = allSuppliers.filter(
+        (supp: any) => !selectedSuppIds.includes(supp.ID),
+      );
+
+      event.editorOptions.onValueChanged = (e: any) => {
+        const selectedSupplier = this.supplier?.find(
+          (s: any) => s.ID === e.value,
+        );
+        if (selectedSupplier) {
+          event.component.cellValue(event.row.rowIndex, 'SUPP_ID', e.value);
+          event.component.cellValue(
+            event.row.rowIndex,
+            'CURRENCY',
+            selectedSupplier.CURRENCY_CODE,
+          );
+        }
+      };
+    }
+  }
+
   saveData() {
     const result = this.validationGroup.instance.validate();
     if (!result.isValid) {
+      notify(
+        {
+          message: 'Please fill all required fields',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        3000,
+      );
+      return;
+    }
+
+    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one store',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        4000,
+      );
       return;
     }
     console.log(this.selectedRowKeys, '==========selectedRowKeys============');
@@ -1160,6 +1219,21 @@ export class ItemsEditFormComponent implements OnInit {
         ...this.itemData.item_stores[itemIndex],
         ...e.data,
       };
+    }
+  }
+
+  onEditorPreparing(e: any) {
+    if (e.dataField === 'SUPP_ID' && e.parentType === 'dataRow') {
+      const currentSuppId = e.row?.data?.SUPP_ID;
+      const gridData = this.edit_Suplier || [];
+      const selectedSuppIds = gridData
+        .map((item: any) => item.SUPP_ID)
+        .filter((id: any) => id && id !== currentSuppId);
+
+      const allSuppliers = this.supplier || [];
+      e.editorOptions.dataSource = allSuppliers.filter(
+        (supp: any) => !selectedSuppIds.includes(supp.ID),
+      );
     }
   }
 

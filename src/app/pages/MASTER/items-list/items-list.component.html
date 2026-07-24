@@ -65,10 +65,8 @@
       <dxi-item location="before">
         <div class="grid-header">Items</div>
       </dxi-item>
-      
-      <dxi-item location="after" locateInMenu="auto">
-        
-      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
       <dxi-item
         location="after"
@@ -466,8 +464,28 @@
   [deferRendering]="false"
   [height]="'100vh'"
   title="Edit Item"
+  [wrapperAttr]="{ class: 'edit-item-popup' }"
 >
+  <!-- Static bottom toolbar — same as form-popup -->
+  <dxi-toolbar-item toolbar="bottom" location="after">
+    <div style="display: flex; gap: 10px">
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="handleFormClosed()"
+      ></dx-button>
+      <dx-button
+        text="Save"
+        stylingMode="contained"
+        type="default"
+        (onClick)="editFormRef.saveData()"
+      ></dx-button>
+    </div>
+  </dxi-toolbar-item>
+
   <app-items-edit-form
+    #editFormRef
     [itemData]="selectedItemData"
     (formClosed)="handleFormClosed()"
   ></app-items-edit-form>

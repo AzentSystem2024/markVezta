@@ -2,21 +2,17 @@
   <dx-validation-group #validationGroup>
     <dx-form class="plain-styled-form" [(visible)]="popupVisible">
       <dxi-item itemType="tabbed">
-        <dxi-tab title="General">
-          <dxi-item itemType="group" [colCount]="3">
-            <dxi-item
-              itemType="group"
-              [colCount]="1"
-              [colSpan]="2"
-              class="spacing-item"
-            >
-              <!-- <dxo-scrolling mode="standard"></dxo-scrolling> -->
+        <dxi-tab title="General" class="tab-style">
+          <dxi-item itemType="group" [colCount]="3" class="tab-style">
+            <!-- LEFT 2 COLUMNS -->
+            <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+              <!-- Row 1: Item Code & BarCode -->
               <dxi-item itemType="group" [colCount]="2">
-                <dxi-item class="spacing-item">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-text-box
-                      label="Item Code"
-                      [labelMode]="'floating'"
+                      label="Item Code *"
+                      labelMode="floating"
                       [(value)]="itemData.ITEM_CODE"
                     >
                       <dx-validator>
@@ -24,16 +20,21 @@
                           type="required"
                           message="This field is required"
                         ></dxi-validation-rule>
+                        <dxi-validation-rule
+                          type="pattern"
+                          [pattern]="'^[a-zA-Z0-9]+$'"
+                          message="Only alphanumeric allowed"
+                        ></dxi-validation-rule>
                       </dx-validator>
                     </dx-text-box>
                   </div>
                 </dxi-item>
 
-                <dxi-item class="spacing-item">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-text-box
-                      label="BarCode"
-                      [labelMode]="'floating'"
+                      label="BarCode *"
+                      labelMode="floating"
                       [(value)]="itemData.BARCODE"
                     >
                       <dx-validator>
@@ -46,18 +47,19 @@
                   </div>
                 </dxi-item>
               </dxi-item>
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-                <dxi-item class="spacing-item">
+
+              <!-- Row 2: Item Type & Matrix Code -->
+              <dxi-item itemType="group" [colCount]="2">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-select-box
-                      class="spacing-item"
-                      label="Item Type"
+                      label="Item Type *"
                       displayExpr="DESCRIPTION"
-                      [items]="itemtype"
-                      valueExpr="ID"
-                      [labelMode]="'floating'"
-                      placeholder="Select Item Type"
                       [searchEnabled]="true"
+                      [items]="itemtype"
+                      labelMode="floating"
+                      valueExpr="ID"
+                      placeholder="Select Item Type"
                       [(value)]="itemData.TYPE_ID"
                       [width]="'100%'"
                       (onValueChanged)="onTypeIdChange($event)"
@@ -66,19 +68,34 @@
                         <dxi-validation-rule
                           type="required"
                           message="This field is required"
-                        ></dxi-validation-rule> </dx-validator
-                    ></dx-select-box>
+                        ></dxi-validation-rule>
+                      </dx-validator>
+                    </dx-select-box>
+                  </div>
+                </dxi-item>
+
+                <dxi-item>
+                  <div *dxTemplate>
+                    <dx-text-box
+                      [visible]="ENABLE_Matrix_Code"
+                      label="Matrix Code"
+                      [(value)]="itemData.MATRIX_CODE"
+                      [labelMode]="'floating'"
+                      [width]="'100%'"
+                    >
+                    </dx-text-box>
                   </div>
                 </dxi-item>
               </dxi-item>
 
+              <!-- Row 3: Description -->
               <dxi-item itemType="group" [colCount]="1">
-                <dxi-item class="spacing-item">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-text-box
-                      label="Descriptionnnn"
+                      label="Description *"
                       [(value)]="itemData.DESCRIPTION"
-                      [labelMode]="'floating'"
+                      labelMode="floating"
                       (onValueChanged)="onDescriptionChanged($event)"
                     >
                       <dx-validator>
@@ -91,87 +108,64 @@
                   </div>
                 </dxi-item>
               </dxi-item>
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-                <dxi-item class="spacing-item">
+
+              <!-- Row 4: POS Description & Department -->
+              <dxi-item itemType="group" [colCount]="2">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-text-box
                       label="POS Description"
+                      labelMode="floating"
                       [(value)]="itemData.POS_DESCRIPTION"
-                      [labelMode]="'floating'"
                       [maxLength]="45"
                     ></dx-text-box>
                   </div>
                 </dxi-item>
 
-                <dxi-item class="spacing-items">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-select-box
                       label="Department"
-                      displayExpr="DESCRIPTION"
+                      displayExpr="DEPT_NAME"
+                      labelMode="floating"
                       [items]="department"
-                      [labelMode]="'floating'"
                       valueExpr="ID"
                       placeholder="Select Department"
                       [searchEnabled]="true"
                       [(value)]="itemData.DEPT_ID"
-                    ></dx-select-box>
+                    >
+                      <dx-validator>
+                        <dxi-validation-rule
+                          type="required"
+                          message="This field is required"
+                        ></dxi-validation-rule>
+                      </dx-validator>
+                    </dx-select-box>
                   </div>
                 </dxi-item>
               </dxi-item>
 
+              <!-- Row 5: Category & Sub Category -->
               <dxi-item itemType="group" [colCount]="2">
-                <!-- <dxi-item class="spacing-item">
-                <div *dxTemplate>
-                  <dx-select-box
-                    label="Brand"
-                    [items]="brand"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    placeholder="Select Brand"
-                    [searchEnabled]="true"
-                    [(value)]="itemData.BRAND_ID"
-                    [labelMode]="'floating'"
-                  >
-                  </dx-select-box>
-                </div>
-              </dxi-item> -->
-                <!-- <dxi-item class="spacing-item">
-                <div *dxTemplate>
-                  <dx-select-box
-                    label="Category"
-                    [items]="catagory"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [searchEnabled]="true"
-                    placeholder="Select Category"
-                    [labelMode]="'floating'"
-                    [(value)]="itemData.CAT_ID"
-                  >
-                    </dx-select-box>
-                </div>
-              </dxi-item> -->
-              </dxi-item>
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-              </dxi-item>
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
                 <dxi-item>
                   <div *dxTemplate>
                     <dx-select-box
                       label="Category"
+                      labelMode="floating"
                       [items]="catagory"
                       displayExpr="DESCRIPTION"
                       valueExpr="ID"
-                      [searchEnabled]="true"
                       placeholder="Select Category"
-                      [labelMode]="'floating'"
+                      [searchEnabled]="true"
                       [(value)]="itemData.CAT_ID"
                     >
                       <dx-validator>
                         <dxi-validation-rule
                           type="required"
                           message="This field is required"
-                        ></dxi-validation-rule> </dx-validator
-                    ></dx-select-box>
+                        ></dxi-validation-rule>
+                      </dx-validator>
+                    </dx-select-box>
                   </div>
                 </dxi-item>
 
@@ -179,72 +173,53 @@
                   <div *dxTemplate>
                     <dx-select-box
                       label="Sub Category"
+                      labelMode="floating"
                       [items]="subcatagory"
                       displayExpr="SUBCAT_NAME"
                       valueExpr="ID"
                       placeholder="Select Sub Category"
                       [searchEnabled]="true"
-                      [labelMode]="'floating'"
                       [(value)]="itemData.SUBCAT_ID"
                     >
                       <dx-validator>
                         <dxi-validation-rule
                           type="required"
                           message="This field is required"
-                        ></dxi-validation-rule> </dx-validator
-                    ></dx-select-box>
+                        ></dxi-validation-rule>
+                      </dx-validator>
+                    </dx-select-box>
                   </div>
                 </dxi-item>
               </dxi-item>
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-              </dxi-item>
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-                <!-- <dxi-item>
-                <div *dxTemplate>
-                  <dx-select-box
-                    label="Sub Category"
-                    [items]="subcatagory"
-                    displayExpr="SUBCAT_NAME"
-                    valueExpr="ID"
-                    placeholder="Select Sub Category"
-                    [searchEnabled]="true"
-                    [labelMode]="'floating'"
-                    [(value)]="itemData.SUBCAT_ID"
-                  >
-                    <dx-validator>
-                      <dxi-validation-rule
-                        type="required"
-                        message="This field is required"
-                      ></dxi-validation-rule> </dx-validator
-                  ></dx-select-box>
-                </div>
-              </dxi-item> -->
 
-                <dxi-item class="spacing-item">
+              <!-- Row 6: Brand & Item Tax -->
+              <dxi-item itemType="group" [colCount]="2">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-select-box
                       label="Brand"
+                      labelMode="floating"
                       [items]="brand"
                       displayExpr="DESCRIPTION"
                       valueExpr="ID"
                       placeholder="Select Brand"
                       [searchEnabled]="true"
                       [(value)]="itemData.BRAND_ID"
-                      [labelMode]="'floating'"
                     >
                     </dx-select-box>
                   </div>
                 </dxi-item>
-                <dxi-item class="spacing-item">
+
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-select-box
-                      label="Item Tax"
-                      [searchEnabled]="true"
+                      label="Item Tax *"
+                      labelMode="floating"
                       [items]="vat"
-                      displayExpr="DESCRIPTION"
                       valueExpr="ID"
+                      displayExpr="DESCRIPTION"
                       placeholder="Select Tax"
-                      [labelMode]="'floating'"
+                      [searchEnabled]="true"
                       [(value)]="itemData.VAT_CLASS_ID"
                     >
                       <dx-validator>
@@ -258,11 +233,12 @@
                 </dxi-item>
               </dxi-item>
 
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-                <dxi-item class="spacing-item">
+              <!-- Row 7: Unit of Measure & HSN Code -->
+              <dxi-item itemType="group" [colCount]="2">
+                <dxi-item>
                   <div *dxTemplate>
                     <dx-select-box
-                      label="Unit of Measure"
+                      label="Unit of Measure *"
                       labelMode="floating"
                       [items]="uom"
                       displayExpr="DESCRIPTION"
@@ -281,7 +257,6 @@
                     </dx-select-box>
                   </div>
                 </dxi-item>
-
                 <dxi-item>
                   <div *dxTemplate>
                     <dx-text-box
@@ -292,77 +267,65 @@
                     </dx-text-box>
                   </div>
                 </dxi-item>
-
-                <!-- <dxi-item>
-                <div *dxTemplate>
-                  <dx-text-box
-                    label="GST%"
-                    labelMode="floating"
-                    [(value)]="itemData.GST_PERC"
-                  >
-                  </dx-text-box>
-                </div>
-              </dxi-item> -->
               </dxi-item>
 
-              <dxi-item itemType="group" [colCount]="3" class="spacing-item">
-                <dxi-item class="spacing-item">
-                  <div *dxTemplate>
+              <!-- Row 8: UOM Options -->
+              <dxi-item itemType="group" [colCount]="3">
+                <dxi-item>
+                  <div
+                    *dxTemplate
+                    style="display: flex; align-items: center; height: 100%"
+                  >
                     <dx-check-box
                       [(value)]="itemData.IS_DIFFERENT_UOM_PURCH"
                       text="Is Different UOM"
-                      [width]="150"
-                      [labelMode]="'floating'"
-                      class="custom-checkbox"
                     >
                     </dx-check-box>
                   </div>
                 </dxi-item>
+
                 <dxi-item *ngIf="itemData.IS_DIFFERENT_UOM_PURCH">
                   <dx-select-box
-                    label="Option"
-                    [(value)]="selectedData"
+                    label="Purchase UOM"
+                    labelMode="floating"
                     [items]="filteredUOMs"
                     displayExpr="DESCRIPTION"
                     valueExpr="DESCRIPTION"
-                    [labelMode]="'floating'"
-                    placeholder="Choose an option"
                     [searchEnabled]="true"
+                    placeholder="Choose an option"
+                    [(value)]="itemData.UOM_PURCH"
                   >
                   </dx-select-box>
                 </dxi-item>
 
                 <dxi-item *ngIf="itemData.IS_DIFFERENT_UOM_PURCH">
-                  <dx-number-box
+                  <dx-text-box
                     label="Conversion Quantity"
                     [(value)]="itemData.UOM_MULTPLE"
-                    placeholder="Conversion Quantity"
-                    [width]="190"
                     labelMode="floating"
+                    placeholder="Conversion Quantity"
                     [disabled]="!itemData.IS_DIFFERENT_UOM_PURCH"
-                    [min]="0"
-                    [step]="0.01"
-                    format="#0.00"
-                    [showSpinButtons]="true"
                   >
-                  </dx-number-box>
+                  </dx-text-box>
                 </dxi-item>
               </dxi-item>
-              <dxi-item itemType="group" [colCount]="2" class="spacing-item">
-              </dxi-item>
+
+              <!-- Row 9: Notes -->
               <dxi-item itemType="group" [colCount]="1">
                 <div *dxTemplate>
                   <dx-text-box
                     label="Notes"
-                    [(value)]="itemData.LONG_DESCRIPTION"
                     labelMode="floating"
+                    [(value)]="itemData.LONG_DESCRIPTION"
                   ></dx-text-box>
                 </div>
               </dxi-item>
             </dxi-item>
+
+            <!-- RIGHT COLUMN (Image & Properties) -->
             <dxi-item itemType="group" [colCount]="1">
               <dxi-item itemType="group" [colCount]="1">
-                <dxi-item class="spacing-custom">
+                <dxi-item>
                   <div class="widget-container flex-box">
                     <div
                       id="dropzone-external"
@@ -371,7 +334,7 @@
                       (click)="onDropZoneClick()"
                       style="
                         padding: 0;
-                        margin: 0;
+                        margin: 0 auto;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -382,7 +345,7 @@
                         [src]="imageSource"
                         *ngIf="imageSource"
                         alt=""
-                        style="height: 100%; width: 100%; object-fit: cover"
+                        style="height: 80%; width: 80%; object-fit: cover"
                         (click)="openModal($event)"
                       />
                       <div
@@ -390,6 +353,7 @@
                         class="flex-box"
                         *ngIf="textVisible"
                       >
+                        <i class="fa fa-plus"></i>
                         <span>Upload Image</span>
                       </div>
                     </div>
@@ -407,11 +371,13 @@
                       #fileInput
                       style="display: none"
                       (change)="onFileInputChange($event)"
-                      labelMode="'floating'"
                     />
-                    <div class="button-container" style="margin-top: 10px">
+                    <div
+                      class="button-container"
+                      style="margin-top: 5px"
+                      *ngIf="imageUploaded"
+                    >
                       <dx-button
-                        *ngIf="imageUploaded"
                         (click)="clearImage()"
                         class="clear-button-container"
                       >
@@ -427,12 +393,10 @@
                 </div>
               </dxi-item>
 
-              <dxi-item itemType="group" [colCount]="2"> </dxi-item>
-
               <dxi-item>
                 <div *dxTemplate>
                   <dx-select-box
-                    class="field-spacing"
+                    [searchEnabled]="true"
                     label="{{ itemlabel1 }}"
                     [items]="itemprop1"
                     displayExpr="DESCRIPTION"
@@ -440,8 +404,7 @@
                     placeholder="Select {{ ITEM_PROPERTY1 }}"
                     labelMode="floating"
                     [(value)]="itemData.ITEM_PROPERTY1"
-                    style="width: 275px; margin-left: 45px"
-                    [searchEnabled]="true"
+                    [width]="'100%'"
                     [label]="
                       ITEM_PROPERTY1 && ITEM_PROPERTY1 !== ''
                         ? ITEM_PROPERTY1
@@ -455,9 +418,9 @@
               <dxi-item>
                 <div *dxTemplate>
                   <dx-select-box
-                    class="field-spacing"
                     label="{{ itemlabel2 }}"
                     [items]="itemprop2"
+                    [searchEnabled]="true"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     placeholder="Select {{ ITEM_PROPERTY2 }}"
@@ -467,16 +430,9 @@
                         : itemlabel1
                     "
                     labelMode="floating"
-                    [searchEnabled]="true"
                     [(value)]="itemData.ITEM_PROPERTY2"
-                    style="width: 275px; margin-left: 45px"
+                    [width]="'100%'"
                   >
-                    <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="This field is required"
-                  ></dxi-validation-rule>
-                </dx-validator> -->
                   </dx-select-box>
                 </div>
               </dxi-item>
@@ -484,14 +440,12 @@
               <dxi-item>
                 <div *dxTemplate>
                   <dx-select-box
-                    class="field-spacing"
-                    [searchEnabled]="true"
                     label="{{ itemlabel3 }}"
                     [items]="itemprop3"
+                    [searchEnabled]="true"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     placeholder="Select {{ ITEM_PROPERTY3 }}"
-                    style="width: 275px; margin-left: 45px"
                     [label]="
                       ITEM_PROPERTY3 && ITEM_PROPERTY3 !== ''
                         ? ITEM_PROPERTY3
@@ -499,13 +453,8 @@
                     "
                     labelMode="floating"
                     [(value)]="itemData.ITEM_PROPERTY3"
+                    [width]="'100%'"
                   >
-                    <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="This field is required"
-                  ></dxi-validation-rule>
-                </dx-validator> -->
                   </dx-select-box>
                 </div>
               </dxi-item>
@@ -513,11 +462,10 @@
               <dxi-item>
                 <div *dxTemplate>
                   <dx-select-box
-                    [searchEnabled]="true"
-                    class="field-spacing"
                     [visible]="ITEM_PROPERTY4 && ITEM_PROPERTY4 !== ''"
                     label="{{ itemlabel4 }}"
                     [items]="itemprop4"
+                    [searchEnabled]="true"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
                     placeholder="Select {{ ITEM_PROPERTY4 }}"
@@ -528,14 +476,8 @@
                     "
                     labelMode="floating"
                     [(value)]="itemData.ITEM_PROPERTY4"
-                    style="width: 275px; margin-left: 45px"
+                    [width]="'100%'"
                   >
-                    <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="This field is required"
-                  ></dxi-validation-rule>
-                </dx-validator> -->
                   </dx-select-box>
                 </div>
               </dxi-item>
@@ -543,22 +485,21 @@
               <dxi-item>
                 <div *dxTemplate>
                   <dx-select-box
-                    class="field-spacing"
-                    [searchEnabled]="true"
                     label="{{ itemlabel5 }}"
                     [visible]="ITEM_PROPERTY5 && ITEM_PROPERTY5 !== ''"
                     [items]="itemprop5"
                     displayExpr="DESCRIPTION"
                     valueExpr="ID"
+                    [searchEnabled]="true"
                     placeholder="Select {{ ITEM_PROPERTY5 }}"
                     [label]="
                       ITEM_PROPERTY5 && ITEM_PROPERTY5 !== ''
                         ? ITEM_PROPERTY5
                         : itemlabel5
                     "
-                    style="width: 275px; margin-left: 45px"
                     labelMode="floating"
                     [(value)]="itemData.ITEM_PROPERTY5"
+                    [width]="'100%'"
                   >
                   </dx-select-box>
                 </div>
@@ -600,128 +541,111 @@
           <div class="container-wrapper">
             <!-- Left Container (Pricing Section) -->
             <div class="left-container">
-              <dxi-item class="spacing-custom">
-                <div class="price-header">Pricing</div>
-              </dxi-item>
-              <dxi-item itemType="group" [colCount]="2">
-                <div class="form-container">
-                  <div class="inventory-item">
-                    <label>Price:</label>
+              <div class="price-header">Pricing</div>
+              <div class="inventory-item">
+                <label>Price:</label>
+                <dx-number-box
+                  [(value)]="salePrice"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [width]="200"
+                  (onValueChanged)="onPriceChange($event)"
+                ></dx-number-box>
+              </div>
+              <div class="inventory-item">
+                <label>Cost:</label>
+                <dx-number-box
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [(value)]="itemData.COST"
+                  [width]="200"
+                ></dx-number-box>
+              </div>
+              <div class="inventory-item">
+                <label>Profit Margin (%):</label>
+                <dx-number-box
+                  [value]="calculateProfitMargin()"
+                  (onValueChanged)="onProfitmarginChange($event)"
+                  format="#0.##'%'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [width]="200"
+                >
+                </dx-number-box>
+              </div>
 
-                    <dx-number-box
-                      [(value)]="salePrice"
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                      (onValueChanged)="onPriceChange($event)"
-                    ></dx-number-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Cost:</label>
-                    <dx-number-box
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [(value)]="itemData.COST"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-number-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Profit Margin (%):</label>
-                    <dx-number-box
-                      [value]="calculateProfitMargin()"
-                      (onValueChanged)="onProfitmarginChange($event)"
-                      format="#0.##'%'"
-                      [labelMode]="'floating'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [width]="200"
-                    >
-                    </dx-number-box>
-                  </div>
-
-                  <div class="inventory-item">
-                    <label>Price Level 1:</label>
-                    <dx-number-box
-                      [(value)]="itemData.SALE_PRICE1"
-                      (onValueChanged)="onSalesPrice1Change($event)"
-                      (onValueChanged)="onSalesPrice1Change($event)"
-                      [labelMode]="'floating'"
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [width]="200"
-                    ></dx-number-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Price Level 2:</label>
-                    <dx-number-box
-                      [(value)]="itemData.SALE_PRICE2"
-                      (onValueChanged)="onSalesPrice2Change($event)"
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-number-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Price Level 3:</label>
-                    <dx-number-box
-                      [(value)]="itemData.SALE_PRICE3"
-                      (onValueChanged)="onSalesPrice3Change($event)"
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-number-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Price Level 4:</label>
-                    <dx-number-box
-                      [(value)]="itemData.SALE_PRICE4"
-                      (onValueChanged)="onSalesPrice4Change($event)"
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-number-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Price Level 5:</label>
-                    <dx-number-box
-                      [(value)]="itemData.SALE_PRICE5"
-                      (onValueChanged)="onSalesPrice5Change($event)"
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-number-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Costing Method:</label>
-                    <dx-select-box
-                      [items]="costingMethodOptions"
-                      displayExpr="DESCRIPTION"
-                      valueExpr="ID"
-                      [searchEnabled]="true"
-                      placeholder="Select Costing Method"
-                      [(value)]="itemData.COSTING_METHOD"
-                      [labelMode]="'floating'"
-                    >
-                    </dx-select-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Last Purchase Price:</label>
-                    <dx-number-box
-                      [(value)]="itemData.PURCH_PRICE"
-                      [format]="'#,##0.00'"
-                      [inputAttr]="{ style: 'text-align: right;' }"
-                      [readOnly]="false"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-number-box>
-                  </div>
-                </div>
-              </dxi-item>
+              <div class="inventory-item">
+                <label>Price Level 1:</label>
+                <dx-number-box
+                  [(value)]="itemData.SALE_PRICE1"
+                  (onValueChanged)="onSalesPrice1Change($event)"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [width]="200"
+                ></dx-number-box>
+              </div>
+              <div class="inventory-item">
+                <label>Price Level 2:</label>
+                <dx-number-box
+                  [(value)]="itemData.SALE_PRICE2"
+                  (onValueChanged)="onSalesPrice2Change($event)"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [width]="200"
+                ></dx-number-box>
+              </div>
+              <div class="inventory-item">
+                <label>Price Level 3:</label>
+                <dx-number-box
+                  [(value)]="itemData.SALE_PRICE3"
+                  (onValueChanged)="onSalesPrice3Change($event)"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [width]="200"
+                ></dx-number-box>
+              </div>
+              <div class="inventory-item">
+                <label>Price Level 4:</label>
+                <dx-number-box
+                  [(value)]="itemData.SALE_PRICE4"
+                  (onValueChanged)="onSalesPrice4Change($event)"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [width]="200"
+                ></dx-number-box>
+              </div>
+              <div class="inventory-item">
+                <label>Price Level 5:</label>
+                <dx-number-box
+                  [(value)]="itemData.SALE_PRICE5"
+                  (onValueChanged)="onSalesPrice5Change($event)"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [width]="200"
+                ></dx-number-box>
+              </div>
+              <div class="inventory-item">
+                <label>Costing Method:</label>
+                <dx-select-box
+                  [items]="costingMethodOptions"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [searchEnabled]="true"
+                  placeholder="Select Costing Method"
+                  [(value)]="itemData.COSTING_METHOD"
+                  [width]="200"
+                >
+                </dx-select-box>
+              </div>
+              <div class="inventory-item">
+                <label>Last Purchase Price:</label>
+                <dx-number-box
+                  [(value)]="itemData.PURCH_PRICE"
+                  [format]="'#,##0.00'"
+                  [inputAttr]="{ style: 'text-align: right;' }"
+                  [readOnly]="false"
+                  [width]="200"
+                ></dx-number-box>
+              </div>
             </div>
 
             <!-- Right Containers (Inventory and History) -->
@@ -729,53 +653,46 @@
               <!-- Inventory Container -->
               <div class="inventory-container">
                 <div class="price-header">Inventory</div>
-                <dxi-item itemType="group" [colCount]="2">
-                  <div class="inventory-item">
-                    <label>On Hand Quantity:</label>
-                    <dx-text-box
-                      [value]="itemData.QTY_STOCK"
-                      [width]="200"
-                      [labelMode]="'floating'"
-                      [readOnly]="true"
-                    ></dx-text-box>
-                  </div>
+                <div class="inventory-item">
+                  <label>On Hand Quantity:</label>
+                  <dx-text-box
+                    [value]="itemData.QTY_STOCK"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                </div>
 
-                  <div class="inventory-item">
-                    <label>Committed Quantity:</label>
-                    <dx-text-box
-                      [value]="itemData.QTY_COMMITTED"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                      [readOnly]="true"
-                    ></dx-text-box>
-                  </div>
+                <div class="inventory-item">
+                  <label>Committed Quantity:</label>
+                  <dx-text-box
+                    [value]="itemData.QTY_COMMITTED"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                </div>
 
-                  <div class="inventory-item">
-                    <label>Available Quantity:</label>
-                    <dx-text-box
-                      [value]="itemData.QTY_STOCK"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                      [readOnly]="true"
-                    ></dx-text-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Restock Level:</label>
-                    <dx-text-box
-                      [(value)]="itemData.RESTOCK_LEVEL"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-text-box>
-                  </div>
-                  <div class="inventory-item">
-                    <label>Reorder Quantity:</label>
-                    <dx-text-box
-                      [(value)]="itemData.REORDER_POINT"
-                      [labelMode]="'floating'"
-                      [width]="200"
-                    ></dx-text-box>
-                  </div>
-                </dxi-item>
+                <div class="inventory-item">
+                  <label>Available Quantity:</label>
+                  <dx-text-box
+                    [value]="itemData.QTY_STOCK"
+                    [width]="200"
+                    [readOnly]="true"
+                  ></dx-text-box>
+                </div>
+                <div class="inventory-item">
+                  <label>Restock Level:</label>
+                  <dx-text-box
+                    [(value)]="itemData.RESTOCK_LEVEL"
+                    [width]="200"
+                  ></dx-text-box>
+                </div>
+                <div class="inventory-item">
+                  <label>Reorder Quantity:</label>
+                  <dx-text-box
+                    [(value)]="itemData.REORDER_POINT"
+                    [width]="200"
+                  ></dx-text-box>
+                </div>
               </div>
 
               <!-- History Container -->
@@ -786,7 +703,6 @@
                   <dx-date-box
                     [value]="itemData.CREATED_DATE"
                     displayFormat="dd/MM/yyyy"
-                    [labelMode]="'floating'"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-date-box>
@@ -796,7 +712,6 @@
                   <dx-date-box
                     [value]="itemData.LAST_PO_DATE"
                     displayFormat="dd/MM/yyyy"
-                    [labelMode]="'floating'"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-date-box>
@@ -806,7 +721,6 @@
                   <dx-date-box
                     [value]="itemData.LAST_GRN_DATE"
                     displayFormat="dd/MM/yyyy"
-                    [labelMode]="'floating'"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-date-box>
@@ -816,7 +730,6 @@
                   <dx-date-box
                     [value]="itemData.LAST_SALE_DATE"
                     displayFormat="dd/MM/yyyy"
-                    [labelMode]="'floating'"
                     [width]="200"
                     [readOnly]="true"
                   ></dx-date-box>
@@ -829,8 +742,15 @@
         <dxi-tab title="Stores">
           <dxi-item>
             <dx-data-grid
-              class="grid theme-dependent always-show-scrollbar"
+              class="grid theme-dependent"
               [dataSource]="store"
+              [columnAutoWidth]="true"
+              [showBorders]="true"
+              [showColumnLines]="true"
+              [showRowLines]="true"
+              [rowAlternationEnabled]="true"
+              [maxHeight]="420"
+              width="100%"
               keyExpr="ID"
               [(selectedRowKeys)]="selectedRowKeys"
               (onRowUpdated)="onRowUpdatedStore($event)"
@@ -914,12 +834,6 @@
                 [editorOptions]="{ enableTwoStateBehavior: true }"
               >
               </dxi-column>
-              <!-- <dxi-column>
-              <dx-check-box
-                text="Price On Transaction "
-                [(value)]="itemData.IS_PRICE_REQUIRED"
-              ></dx-check-box>
-            </dxi-column> -->
 
               <dxi-column
                 dataField="IS_PRICE_REQUIRED"
@@ -1168,12 +1082,17 @@
           <dxi-item>
             <dx-data-grid
               class="grid theme-dependent"
-              [columnAutoWidth]="false"
-              height="300"
-              keyExpr="ID"
               [showBorders]="true"
+              [showColumnLines]="true"
+              [showRowLines]="true"
+              [rowAlternationEnabled]="true"
+              [columnAutoWidth]="true"
+              [maxHeight]="350"
+              width="100%"
+              keyExpr="ID"
               [dataSource]="edit_Suplier"
               (onRowUpdated)="onRowUpdated($event)"
+              (onEditorPreparing)="onSupplierEditorPreparing($event)"
               [editing]="{
                 mode: 'cell',
                 allowUpdating: true,
@@ -1196,6 +1115,10 @@
                   [displayExpr]="'SUPP_NAME'"
                   [valueExpr]="'ID'"
                 ></dxo-editor-options>
+                <dxi-validation-rule
+                  type="required"
+                  message="Supplier Name is required"
+                ></dxi-validation-rule>
               </dxi-column>
 
               <!-- Currency (Read Only) -->
@@ -1221,7 +1144,10 @@
                 alignment="right"
                 dataType="number"
               >
-                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="required"
+                  message="Cost is mandatory"
+                ></dxi-validation-rule>
               </dxi-column>
 
               <!-- Primary Checkbox -->
@@ -1278,21 +1204,6 @@
         </dxi-tab>
       </dxi-item>
     </dx-form>
-
-    <div class="form-popup-buttons-container">
-      <dx-button
-        text="Cancel"
-        stylingMode="outlined"
-        type="normal"
-        (onClick)="closeForm()"
-      ></dx-button>
-      <dx-button
-        text="Save"
-        stylingMode="contained"
-        type="default"
-        (onClick)="saveData()"
-      ></dx-button>
-    </div>
   </dx-validation-group>
 </div>
 

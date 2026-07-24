@@ -256,10 +256,9 @@ export class QuotationFormComponent {
     //   this.isEditDataAvailable();
     // }
 
-    this.getItems()?.subscribe();
-
-    // Immediately load edit data
-    this.isEditDataAvailable();
+    this.getItems()?.subscribe(() => {
+      this.isEditDataAvailable();
+    });
 
     this.setTaxSummaryLabel();
   }
@@ -280,8 +279,8 @@ export class QuotationFormComponent {
       ? data.Details.map((item: any) => ({
           ...item,
           DESCRIPTION: item.ITEM_ID,
-          ITEM_CODE: item.ITEM_ID,
-          ITEM_ID: item.ITEM_ID,
+          // ITEM_CODE: item.ITEM_CODE,
+          // ITEM_ID: item.ITEM_NAME,
           STOCK_QTY: item.QUANTITY,
           CUST_ID: data.CUST_ID || 0,
         }))
@@ -635,7 +634,14 @@ export class QuotationFormComponent {
       return of(this.items);
     }
 
-    const payload = { STORE_ID, CUSTOMER_ID: this.quotationFormData.CUST_ID };
+    const customerId =
+      this.quotationFormData.CUST_ID ||
+      (this.isEditing ? this.EditingResponseData?.CUST_ID : 0);
+
+    const payload = {
+      STORE_ID,
+      CUSTOMER_ID: customerId,
+    };
 
     this.isItemsLoading = true;
     this.itemsObservable$ = this.dataService.getItemsForQuotation(payload).pipe(

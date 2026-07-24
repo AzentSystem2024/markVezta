@@ -507,6 +507,18 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
     //   return; //  stop execution
     // }
 
+    if (!items.ITEM_STORES || items.ITEM_STORES.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one store',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        4000,
+      );
+      return; // stop execution
+    }
+
     if (items.COSTING_METHOD == 0 || '') {
       notify(
         {
@@ -783,7 +795,7 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   //   this.isEditItemsPopupOpened = true;
   // }
 
-  onValueChanged(event) { }
+  onValueChanged(event) {}
 
   handleFormClosed() {
     this.isEditItemsPopupOpened = false;
@@ -838,5 +850,5 @@ export class ItemsListComponent implements OnInit, AfterViewInit {
   bootstrap: [ItemsListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsListModule { }
+export class ItemsListModule {}
 platformBrowserDynamic().bootstrapModule(ItemsListModule);
