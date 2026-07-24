@@ -278,7 +278,7 @@ export class ListSalaryPaymentComponent {
 
     if (isConfirmed) {
       // Call your delete API
-      this.dataService.deleteMiscReceipt(miscId).subscribe(
+      this.dataService.deleteSalaryPayment(miscId).subscribe(
         (response: any) => {
           if (response) {
             notify(

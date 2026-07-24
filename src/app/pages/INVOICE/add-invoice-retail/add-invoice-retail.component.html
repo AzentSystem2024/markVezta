@@ -79,6 +79,7 @@
             label="Store"
             labelMode="floating"
             [readOnly]="isEditing"
+            (onValueChanged)="onStoreChanged($event)"
           >
           </dx-select-box>
         </div>
@@ -155,10 +156,11 @@
             caption="Item Code"
             [allowEditing]="!isReadOnlyMode"
             [editorType]="'dxSelectBox'"
+            headerCellTemplate="itemCodeHeader"
             [lookup]="{
               dataSource: itemsList,
-              valueExpr: 'ID',
-              displayExpr: 'DESCRIPTION',
+              valueExpr: 'ITEM_ID',
+              displayExpr: 'ITEM_CODE',
               searchEnabled: true,
               searchMode: 'contains',
               minSearchLength: 2,
@@ -167,14 +169,20 @@
               pageSize: 50,
             }"
           ></dxi-column>
+          <div *dxTemplate="let data of 'itemCodeHeader'">
+            <div style="text-align: center; line-height: 16px">
+              Item<br />Code
+            </div>
+          </div>
           <dxi-column
             dataField="DESCRIPTION"
-            caption="Descriptiom"
+            caption="Description"
             [allowEditing]="!isReadOnlyMode"
             [editorType]="'dxSelectBox'"
+            [width]="120"
             [lookup]="{
               dataSource: itemsDescriptionList,
-              valueExpr: 'ID',
+              valueExpr: 'ITEM_ID',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               searchMode: 'contains',
@@ -197,13 +205,36 @@
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [allowEditing]="!isReadOnlyMode"
+            headerCellTemplate="priceHeader"
           ></dxi-column>
-
+          <div *dxTemplate="let data of 'priceHeader'">
+            <div
+              style="text-align: center; line-height: 16px"
+              [innerHTML]="
+                inclVAT ? 'Price<br>(Incl. VAT)' : 'Price<br>(Excl. VAT)'
+              "
+            ></div>
+          </div>
+          <dxi-column
+            dataField="QTY_STOCK"
+            caption="Stock Qty"
+            [allowEditing]="false"
+          ></dxi-column>
           <dxi-column
             dataField="QUANTITY"
             caption="Quantity"
             [allowEditing]="!isReadOnlyMode"
-          ></dxi-column>
+          >
+            <dxi-validation-rule type="required" message="Quantity is required">
+            </dxi-validation-rule>
+
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateQuantity"
+              message="Quantity cannot be greater than Stock Qty"
+            >
+            </dxi-validation-rule>
+          </dxi-column>
           <dxi-column
             dataField="AMOUNT"
             caption="Amount"
@@ -222,7 +253,13 @@
             caption="Disc Amount"
             [allowEditing]="false"
             [calculateCellValue]="calculateDiscAmt"
+            headerCellTemplate="discAmtHeader"
           ></dxi-column>
+          <div *dxTemplate="let data of 'discAmtHeader'">
+            <div style="text-align: center; line-height: 16px">
+              Disc<br />Amount
+            </div>
+          </div>
           <dxi-column
             dataField="TAX_PERC"
             [caption]="vatTitle + '%'"
@@ -236,8 +273,13 @@
             [format]="{ type: 'fixedPoint', precision: 2 }"
             [calculateCellValue]="calculateTax"
             [visibleIndex]="inclVAT ? 999 : undefined"
+            headerCellTemplate="taxAmtHeader"
           ></dxi-column>
-
+          <div *dxTemplate="let data of 'taxAmtHeader'">
+            <div style="text-align: center; line-height: 16px">
+              {{ vatTitle }}<br />Amount
+            </div>
+          </div>
           <dxi-column
             dataField="TOTAL_AMOUNT"
             caption="Total"

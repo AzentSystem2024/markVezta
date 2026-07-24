@@ -107,7 +107,11 @@ export class PayrollEditComponent {
       if (this.incomingPayrollData.MONTH) {
         const parts = this.incomingPayrollData.MONTH.split('-');
         if (parts.length >= 3) {
-          parsedMonth = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+          parsedMonth = new Date(
+            parseInt(parts[2], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[0], 10),
+          );
         }
       }
 
@@ -217,14 +221,6 @@ export class PayrollEditComponent {
     }
   }
 
-  onRowInserted(e: any) {
-    // Add your logic here for handling inserted rows
-  }
-
-  onRowRemoved(e: any) {
-    // Add your logic here for handling removed rows
-  }
-
   addNewRow() {
     const hasEmptyRow = this.payRollData.PAY_DETAILS.some(
       (row) =>
@@ -279,7 +275,11 @@ export class PayrollEditComponent {
           if (this.incomingPayrollData.MONTH) {
             const parts = this.incomingPayrollData.MONTH.split('-');
             if (parts.length >= 3) {
-              parsedMonth = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+              parsedMonth = new Date(
+                parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10),
+              );
             }
           }
 
