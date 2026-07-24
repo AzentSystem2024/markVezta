@@ -574,7 +574,7 @@ export class AddInvoiceRetailComponent {
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
       CUSTOMER_ID: data.CUSTOMER_ID,
-      QTY_STOCK: data.QTY_STOCK,
+      QTY_STOCK: item.QTY_STOCK,
     }));
 
     // refresh grid
