@@ -66,6 +66,7 @@ export class DataService {
   getLeavesByEmployee(empId: number) {
     throw new Error('Method not implemented.');
   }
+
   getDepartments() {
     throw new Error('Method not implemented.');
   }
@@ -7244,5 +7245,35 @@ The result can be exported to HTML or Markdown.`;
   FinalSettlementReport(payload: any) {
     const getEndpoint = this.apiUrl + 'FinalSettlement/Settlement';
     return this.http.post(getEndpoint, payload);
+  }
+
+  // --- EOS Payment APIs ---
+
+  get_EOS_payment_list(payload: any) {
+    return this.http.post(this.apiUrl + 'EOSPayment/list', {});
+  }
+
+  get_EOS_payment_details(id: any) {
+    return this.http.post(`${this.apiUrl}EOSPayment/select/${id}`, {});
+  }
+
+  add_EOS_payment(payload: any) {
+    return this.http.post(this.apiUrl + 'EOSPayment/save', payload);
+  }
+
+  update_EOS_payment(payload: any) {
+    return this.http.post(this.apiUrl + 'EOSPayment/edit', payload);
+  }
+
+  verify_EOS_payment(payload: any) {
+    return this.http.post(this.apiUrl + 'EOSPayment/verify', payload);
+  }
+
+  approve_EOS_payment(payload: any) {
+    return this.http.post(this.apiUrl + 'EOSPayment/approve', payload);
+  }
+
+  delete_EOS_payment(payload: any) {
+    return this.http.post(this.apiUrl + 'EOSPayment/delete', payload);
   }
 }
