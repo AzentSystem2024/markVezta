@@ -89,7 +89,7 @@ export class LedgerStatementComponent implements OnInit {
   Ledger_statement_datasource!: DataSource;
   ledgerSummaryData: any = [];
   ledgerRowCount: number = 0;
-  
+
   company_list: any[] = [];
   HEAD_ID_LIST: any[] = [];
   fin_id: any[] = [];
@@ -102,25 +102,25 @@ export class LedgerStatementComponent implements OnInit {
   // -------------------------------------------------------------
   savedUserData: any;
   vat_title: any;
-  
+
   selectedCompanyId: any;
   company_id: any;
   selected_Company_id: any;
-  
+
   selected_Head_Id: any;
   selected_fin_id: any;
   selectedStoreid: any[] = [];
   storeHint: string = '';
-  
+
   selectedYear: number | null = null;
   selectedmonth: any = '';
-  
+
   selected_from_date: any;
   selected_To_date: any;
   formatted_from_date: any;
   formatted_To_date: any;
   transtypeId: any;
-  
+
   // -------------------------------------------------------------
   // Read-Only Flags
   // -------------------------------------------------------------
@@ -162,7 +162,7 @@ export class LedgerStatementComponent implements OnInit {
   isViewBoxProduction: boolean = false;
   isViewProduction: boolean = false;
   isMiscViewInvoice: boolean = false;
-  
+
   // -------------------------------------------------------------
   // Selected Data for Popups
   // -------------------------------------------------------------
@@ -209,7 +209,7 @@ export class LedgerStatementComponent implements OnInit {
       this.years.push(year);
     }
     this.selectedYear = currentYear;
-    
+
     // Initialize Month DataSource
     this.monthDataSource = this.dataService.getMonths();
     this.selectedmonth = new Date().getMonth();
@@ -239,6 +239,16 @@ export class LedgerStatementComponent implements OnInit {
       this.cdr.detectChanges();
     });
 
+    const headId = Number(sessionStorage.getItem('HEADID'));
+    const storeId = Number(sessionStorage.getItem('STOREID'));
+
+    this.selected_Head_Id = headId;
+    this.selectedStoreid = [storeId];
+
+    this.selected_from_date = sessionStorage.getItem('DATEFROM');
+    this.selected_To_date = sessionStorage.getItem('DATETO');
+
+
     this.loadLedgerData();
   }
 
@@ -248,24 +258,24 @@ export class LedgerStatementComponent implements OnInit {
   initSessionData() {
     const sessionDataStr = sessionStorage.getItem('savedUserData');
     const localDataStr = localStorage.getItem('userData');
-    
+
     this.savedUserData = sessionDataStr ? JSON.parse(sessionDataStr) : null;
-    
+
     if (this.savedUserData) {
       this.company_list = this.savedUserData.Companies || [];
       this.fin_id = this.savedUserData.FINANCIAL_YEARS || [];
-      
+
       if (this.fin_id.length) {
         this.selected_fin_id = this.fin_id[0].FIN_ID;
       }
       this.vat_title = this.savedUserData.GeneralSettings?.VAT_TITLE;
     }
-    
+
     if (localDataStr) {
       const userData = JSON.parse(localDataStr);
       this.selected_Company_id = userData?.SELECTED_COMPANY?.COMPANY_ID;
     } else if (this.savedUserData?.SELECTED_COMPANY) {
-       this.selected_Company_id = this.savedUserData.SELECTED_COMPANY.COMPANY_ID;
+      this.selected_Company_id = this.savedUserData.SELECTED_COMPANY.COMPANY_ID;
     }
   }
 
@@ -279,7 +289,7 @@ export class LedgerStatementComponent implements OnInit {
       .HeadId_Dropdown_api(this.selected_Company_id)
       .subscribe((res: any) => {
         this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
-        console.log("ledger head id fetched",this.HEAD_ID_LIST)
+        console.log("ledger head id fetched", this.HEAD_ID_LIST)
       });
   }
 
@@ -337,12 +347,18 @@ export class LedgerStatementComponent implements OnInit {
     const headid = this.getSessionData('HEADID');
     const storeid = this.getSessionData('STOREID');
 
+    const dateFrom =
+      sessionStorage.getItem('DATEFROM') || sessiondata?.dateFrom;
+
+    const dateTo =
+      sessionStorage.getItem('DATETO') || sessiondata?.dateTo;
+
     const payload = {
-      COMPANY_ID: Number(sessiondata.companyId),
-      FIN_ID: Number(sessiondata.finId),
+      COMPANY_ID: Number(this.selected_Company_id),
+      FIN_ID: Number(this.selected_fin_id),
       HEAD_ID: headid,
-      DATE_FROM: sessiondata.dateFrom,
-      DATE_TO: sessiondata.dateTo,
+      DATE_FROM: dateFrom,
+      DATE_TO: dateTo,
       STORE_ID: storeid ? String(storeid) : '',
     };
 
@@ -351,7 +367,7 @@ export class LedgerStatementComponent implements OnInit {
     this.selected_from_date = payload.DATE_FROM;
     this.selected_To_date = payload.DATE_TO;
     this.selectedStoreid = storeid ? [storeid] : [];
-    
+
     this.updateStoreHint();
     this.createLedgerDataSource(payload);
     this.cdr.detectChanges();
@@ -387,7 +403,7 @@ export class LedgerStatementComponent implements OnInit {
     this.selectedmonth = '';
     const currentYear = new Date().getFullYear();
     const today = new Date();
-    
+
     if (this.selectedYear === currentYear) {
       this.selected_from_date = new Date(this.selectedYear, 0, 1);
       this.selected_To_date = today;
@@ -480,7 +496,7 @@ export class LedgerStatementComponent implements OnInit {
     this.isViewBoxProduction = false;
     this.isViewProduction = false;
     this.isMiscViewInvoice = false;
-    
+
     this.selectedInvoice = null;
     this.loadingInvoice = false;
     this.popupReady = false;
@@ -490,7 +506,7 @@ export class LedgerStatementComponent implements OnInit {
   onViewClick(e: any) {
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
     const trans_id = e.row.data.TRANS_ID;
-    
+
     this.resetPopups();
     this.loadingInvoice = true;
 
@@ -868,4 +884,4 @@ export class LedgerStatementComponent implements OnInit {
   exports: [LedgerStatementComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LedgerStatementModule {}
+export class LedgerStatementModule { }

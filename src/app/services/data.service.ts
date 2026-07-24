@@ -1538,6 +1538,10 @@ export class DataService {
     return this.http.post(`${this.apiUrl}SalaryPayment/commit`, data);
   }
 
+  deleteSalaryPayment(id: number) {
+    return this.http.post<any>(`${this.apiUrl}SalaryPayment/delete/` + id, {});
+  }
+
   //  ===========ARTICLE PRODUCTION======================
   get_ArticleProduction_view(payload: any) {
     return this.http.post(`${this.apiUrl}AC_Report/articleproduction`, payload);

@@ -37,6 +37,7 @@ import { ListMiscReceiptComponent } from '../../../ACCOUNTS/list-misc-receipt/li
 import { AddSalaryPaymentModule } from '../../../../components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { DataService } from 'src/app/services/data.service';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
@@ -265,39 +266,46 @@ export class ListSalaryPaymentComponent {
     });
   }
 
-  onDeleteSalaryPayment(e: any) {
+  async onDeleteSalaryPayment(e: any) {
     const miscId = e.data.TRANS_ID;
-    // Optionally prevent the default delete behavior
+    
     e.cancel = true;
 
-    // Call your delete API
-    this.dataService.deleteMiscReceipt(miscId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Miscellaneous Receipt Log Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.getSalaryPaymentList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
+    const isConfirmed = await confirm(
+      'Are you sure you want to delete this salary payment?',
+      'Confirm Delete',
     );
+
+    if (isConfirmed) {
+      // Call your delete API
+      this.dataService.deleteSalaryPayment(miscId).subscribe(
+        (response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Data Deleted Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+            this.getSalaryPaymentList();
+            // this.dataGrid.instance.refresh();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not deleted',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+          // or whatever method you use to refresh `employeeList`
+        },
+        (error) => {
+          console.error('Error deleting employee:', error);
+        },
+      );
+    }
   }
 
   refreshGrid() {

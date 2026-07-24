@@ -18,16 +18,14 @@
             [showBorders]="true"
             [showRowLines]="true"
             [showColumnLines]="true"
-            [columnAutoWidth]="false"
             [wordWrapEnabled]="false"
             [rowAlternationEnabled]="true"
             [headerFilter]="{ visible: true, allowSearch: true }"
             [allowColumnReordering]="true"
             [showColumnHeaders]="true"
-            [columnAutoWidth]="true"
             [allowColumnResizing]="true"
             [height]="'52vh'"
-            [columnResizingMode]="'nextColumn'"
+            [columnResizingMode]="'widget'"
             [scrolling]="{ mode: 'virtual' }"
             rowAlternationInterval="2"
             [keyboardNavigation]="{ editOnKeyPress: true }"
@@ -65,7 +63,7 @@
                   class="stacked-toolbar-group"
                   style="display: flex; flex-direction: row; gap: 10px"
                 >
-                  <!-- ============================================================================= -->
+                  <!-- ============================== -->
                   <div
                     style="
                       display: flex;
@@ -79,11 +77,13 @@
                         class="month-selector"
                         style="display: flex; align-items: center; gap: 8px"
                       >
-                        <dx-button
+                        <div
+                          class="nav-btn"
+                          (click)="goToPreviousMonth()"
                           *ngIf="!isReadOnlyMode && !isEditing"
-                          icon="chevronleft"
-                          (onClick)="goToPreviousMonth()"
-                        ></dx-button>
+                        >
+                          <i class="dx-icon dx-icon-chevronleft"></i>
+                        </div>
                         <span
                           class="month-label"
                           (click)="!isEditing && toggleCalendar()"
@@ -93,18 +93,21 @@
                         >
                           {{ selectedMonth | date: "MMMM yyyy" }}
                         </span>
-                        <dx-button
+                        <!-- ▶ Next -->
+                        <div
+                          class="nav-btn"
+                          (click)="goToNextMonth()"
                           *ngIf="!isReadOnlyMode && !isEditing"
-                          icon="chevronright"
-                          (onClick)="goToNextMonth()"
-                        ></dx-button>
+                        >
+                          <i class="dx-icon dx-icon-chevronright"></i>
+                        </div>
                       </div>
                       <div *ngIf="calendarVisible" class="calendar-popup">
-                        <div class="calendar-header">
-                          <dx-button
-                            class="year-button"
-                            [options]="previousYearButtonOptions"
-                          ></dx-button>
+                        <div
+                          class="calendar-header"
+                          style="justify-content: center"
+                        >
+                          <!-- <dx-button [options]="previousYearButtonOptions"></dx-button> -->
 
                           <span
                             class="year-clickable"
@@ -113,10 +116,7 @@
                             {{ selectedYear }}
                           </span>
 
-                          <dx-button
-                            class="year-button"
-                            [options]="nextYearButtonOptions"
-                          ></dx-button>
+                          <!-- <dx-button [options]="nextYearButtonOptions"></dx-button> -->
                         </div>
 
                         <div
@@ -155,7 +155,7 @@
                     </dxi-item>
                   </div>
 
-                  <!-- ============================================================================= -->
+                  <!-- ================ -->
                   <!--  -->
 
                   <div style="display: flex; gap: 5px">
@@ -175,31 +175,23 @@
             <dxi-column
               dataField="EMP_CODE"
               caption="Employee Code"
-              [allowEditing]="!isReadOnlyMode"
             ></dxi-column>
 
             <dxi-column
               dataField="EMP_NAME"
               caption="Employee Name"
-              [allowEditing]="!isReadOnlyMode"
             ></dxi-column>
 
             <dxi-column
               dataField="NET_AMOUNT"
               caption="Salary Amount"
-              [allowEditing]="!isReadOnlyMode"
               dataType="number"
               [format]="{ type: 'fixedPoint', precision: 2 }"
             ></dxi-column>
 
-            <dxi-column *ngIf="!isReadOnlyMode" type="buttons">
-              <dxi-button name="edit"></dxi-button>
-              <dxi-button name="delete"></dxi-button>
-            </dxi-column>
-
             <dxo-summary>
               <dxi-total-item
-                column="AMOUNT"
+                column="NET_AMOUNT"
                 summaryType="sum"
                 valueFormat="#,##0.00"
                 displayFormat="Total: {0}"
@@ -209,7 +201,6 @@
             </dxo-summary>
           </dx-data-grid>
 
-          <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
           <div
             class="bordered-grid"
             style="
@@ -279,7 +270,7 @@
                   ></dx-text-box>
 
                   <dx-date-box
-                    label="Due Date"
+                    label="Date"
                     labelMode="floating"
                     [(value)]="salaryPaymentData.CHEQUE_DATE"
                     type="date"
@@ -316,7 +307,6 @@
               ></dx-text-box>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -333,10 +323,24 @@
     ></dx-button>
     <dx-button
       #saveButtonRef
-      [text]="isVerifying ? 'Verify' : isApproving ? 'Approve' : isEditing ? 'Update' : 'Save'"
+      [text]="
+        isVerifying
+          ? 'Verify'
+          : isApproving
+            ? 'Approve'
+            : isEditing
+              ? 'Update'
+              : 'Save'
+      "
       stylingMode="contained"
       type="default"
-      (onClick)="isVerifying ? onVerifySalaryPayment() : (isEditing ? onUpdateSalaryPayment() : onSaveSalaryPayment())"
+      (onClick)="
+        isVerifying
+          ? onVerifySalaryPayment()
+          : isEditing
+            ? onUpdateSalaryPayment()
+            : onSaveSalaryPayment()
+      "
     >
     </dx-button>
   </div>

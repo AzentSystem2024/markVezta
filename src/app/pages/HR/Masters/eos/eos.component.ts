@@ -74,6 +74,22 @@ export class EOSComponent {
   Eos: any;
   isFilterOpened = false;
 
+  isUpdateAllowed = (e: any): boolean => {
+    if (!this.canEdit) return false;
+    if (e.row?.data?.ID < 5) {
+      return false;
+    }
+    return true;
+  };
+
+  isDeleteAllowed = (e: any): boolean => {
+    if (!this.canDelete) return false;
+    if (e.row?.data?.ID < 5) {
+      return false;
+    }
+    return true;
+  };
+
   ngOnInit() {
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(

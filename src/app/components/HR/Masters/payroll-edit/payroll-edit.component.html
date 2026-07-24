@@ -39,14 +39,18 @@
       <dxo-toolbar>
         <dxi-item location="before" locateInMenu="auto">
           <div class="stacked-toolbar-group">
-            <dx-text-box
+            <dx-date-box
               class="custom-select-box"
-              [placeholder]="'Select Employee'"
               label="Salary Month"
               [labelMode]="'floating'"
               [(value)]="payRollData.MONTH"
               [readOnly]="true"
-            ></dx-text-box>
+              displayFormat="MMMM yyyy"
+              [calendarOptions]="{
+                maxZoomLevel: 'year',
+                minZoomLevel: 'century',
+              }"
+            ></dx-date-box>
             <dx-text-box
               class="custom-text-box"
               [placeholder]="'Employee '"
@@ -75,21 +79,8 @@
         </dxi-item>
 
         <dxi-item location="after" locateInMenu="auto">
-          <div class="stacked-toolbar-group ot-hours-container">
-            <dx-number-box
-              [placeholder]="'OT Hours'"
-              [label]="'OT Hours'"
-              [labelMode]="'floating'"
-              [(value)]="payRollData.OT_HOURS"
-              [width]="180"
-              [min]="0"
-              [max]="12"
-              [readOnly]="is_approve"
-            ></dx-number-box>
-          </div>
-        </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <div class="stacked-toolbar-group">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <!-- First Row: Worked Days -->
             <dx-text-box
               [placeholder]="'Worked Days'"
               label="Worked Days"
@@ -98,24 +89,24 @@
               [width]="180"
               [readOnly]="true"
             ></dx-text-box>
-            <div style="display: flex; align-items: center; gap: 3px">
+
+            <!-- Second Row: OT Hours & Add Button -->
+            <div style="display: flex; align-items: center; gap: 8px">
               <dx-number-box
-                [placeholder]="'Less Hours'"
-                [label]="'Less Hours'"
+                [placeholder]="'OT Hours'"
+                [label]="'OT Hours'"
                 [labelMode]="'floating'"
-                [(value)]="payRollData.LESS_HOURS"
-                [width]="140"
+                [(value)]="payRollData.OT_HOURS"
+                [width]="139"
                 [min]="0"
                 [max]="12"
                 [readOnly]="is_approve"
               ></dx-number-box>
-
               <dx-button
                 icon="plus"
                 stylingMode="contained"
                 [width]="33"
                 [height]="31"
-                style="margin-top: 10px"
                 (onClick)="addNewRow()"
                 [disabled]="is_approve"
               ></dx-button>
