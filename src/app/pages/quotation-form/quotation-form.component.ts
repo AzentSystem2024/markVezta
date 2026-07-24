@@ -49,8 +49,10 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
 import CustomStore from 'devextreme/data/custom_store';
+import DataSource from 'devextreme/data/data_source';
+import ArrayStore from 'devextreme/data/array_store';
 import notify from 'devextreme/ui/notify';
-import { tap } from 'rxjs';
+import { tap, of, throwError, catchError, shareReplay, Observable } from 'rxjs';
 import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -88,6 +90,10 @@ export class QuotationFormComponent {
   auto: string = 'auto';
   isPopupVisible: boolean = false;
   items: any[] = [];
+  itemMap: Map<any, any> = new Map();
+  itemsDataSource: DataSource | null = null;
+  isItemsLoading = false;
+  itemsObservable$: Observable<any> | null = null;
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -220,6 +226,7 @@ export class QuotationFormComponent {
     console.log(this.canAdd, this.canEdit, this.canDelete);
 
     // Session + dropdowns
+    this.initItemsDataSource();
     this.sessionData_tax();
     this.getSalesmanDropdown();
     this.getCustomerDropdown();
@@ -341,10 +348,12 @@ export class QuotationFormComponent {
 
   onStoreChanged(event: any) {
     this.storeId = event.value;
+    this.quotationFormData.STORE_ID = event.value;
     console.log(this.storeId, 'STORE_ID');
 
     // Clear old items when store changes
     this.items = [];
+    this.itemMap.clear();
 
     // Call API
     this.getItems()?.subscribe();
@@ -543,31 +552,159 @@ export class QuotationFormComponent {
     });
   }
 
-  getItems() {
-    const STORE_ID = this.storeId;
+  initItemsDataSource() {
+    const customStore = new CustomStore({
+      key: 'ITEM_ID',
+      byKey: (key: any) => {
+        const item = this.itemMap.get(key);
+        return Promise.resolve(item || { ITEM_ID: key });
+      },
+      load: (loadOptions: any) => {
+        const getPaginatedData = () => {
+          let result = this.items || [];
+          if (loadOptions.searchValue) {
+            const query = String(loadOptions.searchValue).toLowerCase();
+            result = result.filter(
+              (item: any) =>
+                (item.ITEM_CODE &&
+                  String(item.ITEM_CODE).toLowerCase().includes(query)) ||
+                (item.DESCRIPTION &&
+                  String(item.DESCRIPTION).toLowerCase().includes(query)),
+            );
+          }
+          const skip = loadOptions.skip || 0;
+          const take = loadOptions.take || 50;
+          return {
+            data: result.slice(skip, skip + take),
+            totalCount: result.length,
+          };
+        };
+
+        // Case 1: Items loaded in memory
+        if (this.items && this.items.length > 0 && !this.isItemsLoading) {
+          return Promise.resolve(getPaginatedData());
+        }
+
+        // Case 2: Items currently loading from backend API
+        if (this.isItemsLoading && this.itemsObservable$) {
+          return new Promise((resolve) => {
+            this.itemsObservable$!.subscribe({
+              next: () => resolve(getPaginatedData()),
+              error: () => resolve({ data: [], totalCount: 0 }),
+            });
+          });
+        }
+
+        // Case 3: Store selected but getItems hasn't triggered
+        const currentStoreId = this.quotationFormData.STORE_ID || this.storeId;
+        if (currentStoreId) {
+          const obs$ = this.getItems();
+          if (obs$) {
+            return new Promise((resolve) => {
+              obs$.subscribe({
+                next: () => resolve(getPaginatedData()),
+                error: () => resolve({ data: [], totalCount: 0 }),
+              });
+            });
+          }
+        }
+
+        return Promise.resolve({ data: [], totalCount: 0 });
+      },
+    });
+
+    this.itemsDataSource = new DataSource({
+      store: customStore,
+      paginate: true,
+      pageSize: 50,
+    });
+  }
+
+  getItems(): Observable<any> | null {
+    const STORE_ID = this.quotationFormData.STORE_ID || this.storeId;
     if (!STORE_ID) {
-      // notify('Please select a Store first', 'warning', 3000);
-      return;
+      return null;
     }
+    this.storeId = STORE_ID;
 
     const cacheKey = `${STORE_ID}`;
 
     // Return from cache
     if (this.itemDataCache.has(cacheKey)) {
-      this.items = [...this.itemDataCache.get(cacheKey)];
-      return;
+      this.populateItemData(this.itemDataCache.get(cacheKey)!);
+      return of(this.items);
     }
 
     const payload = { STORE_ID, CUSTOMER_ID: this.quotationFormData.CUST_ID };
 
-    return this.dataService.getItemsForQuotation(payload).pipe(
+    this.isItemsLoading = true;
+    this.itemsObservable$ = this.dataService.getItemsForQuotation(payload).pipe(
       tap((response: any) => {
-        // this.items = (response.Data || []).slice(0, 1000);
-        this.items = response.Data || [];
-        this.itemDataCache.set(cacheKey, [...this.items]);
+        this.isItemsLoading = false;
+        if (response.Flag === -1) {
+          notify(response.Message, 'error', 3000); // or use your own notification method
+          return;
+        }
+        const rawItems = response.Data || [];
+        this.populateItemData(rawItems, cacheKey);
       }),
+      catchError((err) => {
+        this.isItemsLoading = false;
+        return throwError(() => err);
+      }),
+      shareReplay(1),
     );
+
+    return this.itemsObservable$;
   }
+
+  private populateItemData(data: any[], cacheKey?: string) {
+    this.items = data || [];
+    this.itemMap.clear();
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      if (item && item.ITEM_ID != null) {
+        this.itemMap.set(item.ITEM_ID, item);
+      }
+    }
+    if (cacheKey) {
+      this.itemDataCache.set(cacheKey, this.items);
+    }
+  }
+
+  calculateItemCode = (rowData: any) => {
+    if (!rowData) return '';
+    const itemId = rowData.ITEM_ID || rowData.ITEM_CODE;
+    const item = this.itemMap.get(itemId);
+    if (item && item.ITEM_CODE) {
+      return item.ITEM_CODE;
+    }
+    if (
+      rowData.ITEM_CODE &&
+      typeof rowData.ITEM_CODE === 'string' &&
+      isNaN(Number(rowData.ITEM_CODE))
+    ) {
+      return rowData.ITEM_CODE;
+    }
+    return '';
+  };
+
+  calculateDescription = (rowData: any) => {
+    if (!rowData) return '';
+    const itemId = rowData.ITEM_ID || rowData.DESCRIPTION;
+    const item = this.itemMap.get(itemId);
+    if (item && item.DESCRIPTION) {
+      return item.DESCRIPTION;
+    }
+    if (
+      rowData.DESCRIPTION &&
+      typeof rowData.DESCRIPTION === 'string' &&
+      isNaN(Number(rowData.DESCRIPTION))
+    ) {
+      return rowData.DESCRIPTION;
+    }
+    return '';
+  };
 
   onEditorPreparing(e: any) {
     if (e.parentType !== 'dataRow') return;
@@ -610,6 +747,7 @@ export class QuotationFormComponent {
 
       // ADD ONLY THIS BLOCK
       if (isLookup) {
+        e.editorOptions.dataSource = this.itemsDataSource;
         e.editorOptions.elementAttr = {
           style: `
           height: 100%;
@@ -617,22 +755,32 @@ export class QuotationFormComponent {
           padding: 0;
         `,
         };
+        e.editorOptions.searchEnabled = true;
+        e.editorOptions.searchMode = 'contains';
+        e.editorOptions.minSearchLength = 0;
+        e.editorOptions.showDataBeforeSearch = true;
+        e.editorOptions.paginate = true;
+        e.editorOptions.pageSize = 50;
       }
     }
     if (isLookup) {
       e.editorOptions.onOpened = () => {
-        if (!this.storeId) {
+        const activeStoreId = this.quotationFormData.STORE_ID || this.storeId;
+        if (!activeStoreId) {
           notify('Please select a Store first', 'warning', 3000);
 
           // Close dropdown immediately
           setTimeout(() => {
             e.component.closeEditCell();
           }, 0);
+        } else if (this.itemsDataSource) {
+          this.itemsDataSource.load();
         }
       };
 
       e.editorOptions.onFocusIn = () => {
-        if (!this.storeId) {
+        const activeStoreId = this.quotationFormData.STORE_ID || this.storeId;
+        if (!activeStoreId) {
           notify('Please select a Store first', 'warning', 3000);
           e.component.closeEditCell();
         }
@@ -647,9 +795,9 @@ export class QuotationFormComponent {
         const rowData = e.row.data;
 
         if (e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION') {
-          const selectedItem = this.items.find(
-            (item) => item.ITEM_ID === args.value,
-          );
+          const selectedItem =
+            this.itemMap.get(args.value) ||
+            this.items.find((item) => item.ITEM_ID === args.value);
 
           if (selectedItem) {
             const grid = e.component;

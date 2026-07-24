@@ -684,6 +684,8 @@ export class SaleReturnFormComponent {
     } else {
       this.salesReturnFormData.IS_VERIFIED = false;
     }
+    console.log(this.salesReturnFormData, 'SALESRETURNFORMDATAAAAAAAAAAAAAAA');
+
     const payload = {
       ...this.salesReturnFormData,
       ID: this.salesReturnFormData.TRANS_ID,
