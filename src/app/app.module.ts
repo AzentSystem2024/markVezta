@@ -393,51 +393,40 @@ import { ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and
 import { BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 import {
-  ARManualMatchingComponent,
-  ARManualMatchingModule,
+  ARManualMatchingModule
 } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
 import { LedgerStatementDimensionModule } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
 import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
 import {
-  BarcodePrintComponent,
-  BarcodePrintModule,
+  BarcodePrintModule
 } from './pages/barcode-print/barcode-print.component';
 import { TrialBalanceBranchWiseModule } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
 import {
-  DistrictComponent,
-  DistrictModule,
+  DistrictModule
 } from './pages/district/district.component';
 import {
-  DistrictFormComponent,
-  DistrictFormModule,
+  DistrictFormModule
 } from './pages/district-form/district-form.component';
 import {
-  DashboardMarkComponent,
-  DashboardMarkModule,
+  DashboardMarkModule
 } from './pages/dashboard-mark/dashboard-mark.component';
 import {
-  PurchaseReportComponent,
-  PurchaseReportModule,
+  PurchaseReportModule
 } from './pages/REPORT/purchase-report/purchase-report.component';
 import {
-  ItemwisePurchaseReportComponent,
-  ItemwisePurchaseReportModule,
+  ItemwisePurchaseReportModule
 } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
 import {
-  TimesheetReportComponent,
-  TimesheetReportModule,
+  TimesheetReportModule
 } from './pages/HR/timesheet-report/timesheet-report.component';
 import {
-  PayrollReportComponent,
-  PayrollReportModule,
+  PayrollReportModule
 } from './pages/REPORT/payroll-report/payroll-report.component';
 import {
-  PayrollOtReportComponent,
-  PayrollOtReportModule,
+  PayrollOtReportModule
 } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
 import {
-  LeavelistComponent,
-  LeavelistModule,
+  LeavelistModule
 } from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 
