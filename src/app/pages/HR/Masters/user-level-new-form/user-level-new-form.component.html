@@ -1,7 +1,7 @@
 <div class="dx-theme-fluent dx-theme-fluent">
   <div class="view-wrapper topDiv d-flex mb-2 mt-0">
-    <div class="headDiv d-flex align-items-center m-0 p-0">
-      <div class="inputBox ms-3">
+    <div class="headDiv">
+      <div class="inputBox">
         <dx-text-box [(value)]="UserLevelValue" label="Enter User Role *" labelMode="floating"
           validationMessagePosition="right">
           <dx-validator *ngIf="isErrorVisible">
@@ -9,7 +9,7 @@
           </dx-validator>
         </dx-text-box>
       </div>
-      <div class="inputBox ms-3">
+      <div class="inputBox">
         <dx-select-box [(value)]="CopiedUserLevelValue" [items]="userRoles" label="Copy User Role" labelMode="floating"
           [showClearButton]="true" validationMessagePosition="right"
           (onValueChanged)="onUserRoleCopySelectionChange($event)">
