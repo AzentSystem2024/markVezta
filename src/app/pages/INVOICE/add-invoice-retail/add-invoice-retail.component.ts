@@ -186,7 +186,7 @@ export class AddInvoiceRetailComponent {
     //   this.filteredStoreList = this.storeList;
     // }
     this.getItems();
-    this.getItemsDescription();
+    // this.getItemsDescription();
     if (!this.isEditing) {
       this.getDocNo();
     }
@@ -236,6 +236,7 @@ export class AddInvoiceRetailComponent {
         );
 
         this.invoiceFormData.STORE_ID = Number(this.storeID);
+        this.getItems();
       } else {
         // EDIT / VERIFY / APPROVE / VIEW
         this.filteredStoreList = res;
@@ -244,6 +245,7 @@ export class AddInvoiceRetailComponent {
           this.invoiceFormData.STORE_ID = Number(
             this.EditingResponseData.STORE_ID,
           );
+          this.getItems();
         }
       }
 
@@ -253,37 +255,41 @@ export class AddInvoiceRetailComponent {
     });
   }
 
-  // getStoreData() {
-  //   const payload = {
-  //     NAME: 'STORE',
-  //     COMPANY_ID: this.selectedCompanyId,
-  //   };
-  //   this.dataService.getDropdownData(payload).subscribe((res) => {
-  //     this.storeList = res;
-  //     console.log(this.storeID, 'STORELISTTTTTTTTTTT');
-  //     if (!this.isHQApp) {
-  //       this.filteredStoreList = this.storeList; //update here
-  //     }
-  //   });
-  // }
-
   getItems() {
     const payload = {
-      name: 'ITEMS',
+      STORE_ID: this.invoiceFormData.STORE_ID,
     };
-    this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      // this.itemsList = response;
-      this.itemsList = {
-        store: {
-          type: 'array',
-          data: response,
-          key: 'ID',
-        },
-        paginate: true,
-        pageSize: 50,
-      };
+
+    this.dataService.getItemsForStore(payload).subscribe((response: any) => {
+      const items = response.Data || [];
+
+      this.itemsList = items;
+      this.itemsDescriptionList = items;
     });
   }
+
+  onStoreChanged(e: any) {
+    this.invoiceFormData.STORE_ID = e.value;
+    this.getItems();
+  }
+
+  // getItems() {
+  //   const payload = {
+  //     name: 'ITEMS',
+  //   };
+  //   this.dataService.getDropdownData(payload).subscribe((response: any) => {
+  //     // this.itemsList = response;
+  //     this.itemsList = {
+  //       store: {
+  //         type: 'array',
+  //         data: response,
+  //         key: 'ID',
+  //       },
+  //       paginate: true,
+  //       pageSize: 50,
+  //     };
+  //   });
+  // }
   getItemsDescription() {
     const payload = {
       name: 'ITEMSDESC',
@@ -300,13 +306,29 @@ export class AddInvoiceRetailComponent {
       };
     });
   }
+
   getItemsData(itemId: any, rowData: any) {
     const payload = {
       ITEM_ID: itemId,
       CUSTOMER_ID: this.invoiceFormData.CUSTOMER_ID,
+      STORE_ID: this.invoiceFormData.STORE_ID,
     };
 
     this.dataService.getItemsDetails(payload).subscribe((response: any) => {
+      if (response.Flag === -1) {
+        notify({
+          message: response.Message,
+          type: 'warning',
+          displayTime: 3000,
+          position: {
+            my: 'center top',
+            at: 'center top',
+            of: window,
+          },
+        });
+
+        return;
+      }
       const data = response?.Data?.[0];
       if (!data) return;
 
@@ -318,13 +340,14 @@ export class AddInvoiceRetailComponent {
       if (rowIndex === -1) return;
 
       //  UPDATE VALUES
-      grid.cellValue(rowIndex, 'ITEM_ID', data.ID);
-      grid.cellValue(rowIndex, 'ITEM_CODE', data.ID);
-      grid.cellValue(rowIndex, 'DESCRIPTION', data.ID);
+      grid.cellValue(rowIndex, 'ITEM_ID', data.ITEM_ID);
+      grid.cellValue(rowIndex, 'ITEM_CODE', data.ITEM_ID);
+      grid.cellValue(rowIndex, 'DESCRIPTION', data.ITEM_ID);
 
       grid.cellValue(rowIndex, 'HSN_CODE', data.HSN_CODE);
       grid.cellValue(rowIndex, 'UOM', data.UOM);
       grid.cellValue(rowIndex, 'PRICE', data.PRICE);
+      grid.cellValue(rowIndex, 'QTY_STOCK', data.QTY_STOCK);
       grid.cellValue(rowIndex, 'TAX_PERC', data.TAX_PERC);
 
       //  FORCE UI UPDATE
@@ -349,42 +372,7 @@ export class AddInvoiceRetailComponent {
       }, 50);
     });
   }
-  // onCellValueChanged(e: any) {
-  //   // // 🔹 existing calculation logic can stay
-  //   // //  Trigger when quantity is entered (or TOTAL if you prefer)
-  //   if (e.dataField === 'DISC_PERC') {
-  //     const grid = this.itemsGridRef.instance;
-  //     const visibleRows = grid.getVisibleRows();
-  //     const rowIndex = grid.getRowIndexByKey(e.key);
-  //     const isLastRow = rowIndex === visibleRows.length - 1;
-  //     if (isLastRow) {
-  //       // 🔥 Add new empty row
-  //       const newRow = {
-  //         ITEM_ID: null,
-  //         ITEM_CODE: null,
-  //         DESCRIPTION: null,
-  //         HSN_CODE: '',
-  //         UOM: '',
-  //         PRICE: 0,
-  //         QUANTITY: 0,
-  //         AMOUNT: 0,
-  //         TAX_PERC: 0,
-  //         DISC_PERC: 0,
-  //         DISC_AMT: 0,
-  //         TAX_AMOUNT: 0,
-  //         TOTAL_AMOUNT: 0,
-  //       };
-  //       this.invoiceFormData.Details.push(newRow);
-  //       // Refresh grid
-  //       setTimeout(() => {
-  //         grid.refresh();
-  //         //  Move focus to new row first column
-  //         const newRowIndex = this.invoiceFormData.Details.length - 1;
-  //         grid.editCell(newRowIndex, 'ITEM_CODE');
-  //       }, 50);
-  //     }
-  //   }
-  // }
+
   onRowRemoved(e: any) {
     const removedData = e.data;
 
@@ -531,7 +519,12 @@ export class AddInvoiceRetailComponent {
 
   //   return taxableAmount + tax;
   // };
+  validateQuantity = (e: any) => {
+    const enteredQty = Number(e.value) || 0;
+    const stockQty = Number(e.data?.QTY_STOCK) || 0;
 
+    return enteredQty <= stockQty;
+  };
   getCustomerOrUnitLst() {
     console.log('getCustomer called');
     const payload = {
@@ -581,6 +574,7 @@ export class AddInvoiceRetailComponent {
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
       CUSTOMER_ID: data.CUSTOMER_ID,
+      QTY_STOCK: item.QTY_STOCK,
     }));
 
     // refresh grid
@@ -668,8 +662,9 @@ export class AddInvoiceRetailComponent {
             e.dataField === 'ITEM_CODE'
               ? this.itemsList
               : this.itemsDescriptionList,
-          valueExpr: 'ID',
-          displayExpr: 'DESCRIPTION',
+          valueExpr: 'ITEM_ID',
+          displayExpr:
+            e.dataField === 'ITEM_CODE' ? 'ITEM_CODE' : 'DESCRIPTION',
           searchEnabled: true,
 
           onValueChanged: (args: any) => {
@@ -704,7 +699,7 @@ export class AddInvoiceRetailComponent {
             const selectedItem = editor.option('selectedItem');
 
             if (selectedItem) {
-              editor.option('value', selectedItem.ID);
+              editor.option('value', selectedItem.ITEM_ID);
             }
 
             setTimeout(() => {

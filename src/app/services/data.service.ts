@@ -6792,7 +6792,9 @@ The result can be exported to HTML or Markdown.`;
   getItemsDetails(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/getitem`, data);
   }
-
+  getItemsForStore(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/getstoreitem`, data);
+  }
   saveRetailInvoice(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/insert`, data);
   }
