@@ -45,10 +45,11 @@ $theme-mode: null !default;
   --side-panel-background: var(--base-bg-darken-5);
   --card-background: var(--base-bg);
   --calendar-width: 292px;
+  --card-bg-color: var(--base-bg);
   // --bg-side-panel:#00a2ed;
   --bg-side-panel: #ffffff;
   --tab-bg-color: #ffffff;
-  --tab-selected-bg-color: #B0D4F3;
+  --tab-selected-bg-color: #b0d4f3;
   --tab-unselected-bg-color: #e6f1fb;
   --main-menu-expanded-color: #0073d8;
   --sub-menu-color: #fe4a49;
@@ -72,7 +73,8 @@ $theme-mode: null !default;
   --icon-color-select: #3333;
   --divider: #64748b;
 
-  @if $theme-mode == dark {
+  @if $theme-mode ==dark {
+    --card-bg-color: rgba(128, 128, 128, 0.03);
     --card-background: var(--base-bg-darken-5);
     --bg-side-panel: rgb(41, 41, 41);
     --tab-bg-color: #131111;

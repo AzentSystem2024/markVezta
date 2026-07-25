@@ -3,6 +3,7 @@
   margin-top: 10px;
   margin-bottom: 5px;
 }
+
 .file-uploader-container {
   display: flex;
   align-items: center;
@@ -10,8 +11,10 @@
 
 /* Ensures the form scales properly */
 .plain-styled-form {
-  width: 100%; /* Makes the form stretch to the container */
-  max-width: 100%; /* Prevents overflowing the container */
+  width: 100%;
+  /* Makes the form stretch to the container */
+  max-width: 100%;
+  /* Prevents overflowing the container */
 }
 
 /* Handle smaller screens using media queries */
@@ -21,25 +24,35 @@
   }
 
   .spacing-item {
-    padding: 15px; /* Adjust padding for smaller screens */
+    padding: 15px;
+    /* Adjust padding for smaller screens */
   }
 }
 
 .field-spacing {
-  margin-bottom: 16px; /* Adjust as needed */
+  margin-bottom: 16px;
+  /* Adjust as needed */
 }
 
 .clear-button-container {
-  margin-left: 1px; /* Adjust as needed */
+  margin-left: 1px;
+  /* Adjust as needed */
   // pointer-events: none;
 }
+
 .clear-button-container {
-  background-color: transparent; /* Make background transparent */
-  border: none; /* Remove border */
-  padding: 0; /* Remove padding */
-  color: rgb(10, 10, 10); /* Change color if desired */
-  font-size: 1em; /* Adjust size as needed */
-  cursor: pointer; /* Change cursor to pointer */
+  background-color: transparent;
+  /* Make background transparent */
+  border: none;
+  /* Remove border */
+  padding: 0;
+  /* Remove padding */
+  color: rgb(10, 10, 10);
+  /* Change color if desired */
+  font-size: 1em;
+  /* Adjust size as needed */
+  cursor: pointer;
+  /* Change cursor to pointer */
 }
 
 .country-item {
@@ -48,69 +61,154 @@
 }
 
 .flag-icon {
-  width: 20px; /* Adjust according to your flag image size */
-  height: 15px; /* Adjust according to your flag image size */
+  width: 20px;
+  /* Adjust according to your flag image size */
+  height: 15px;
+  /* Adjust according to your flag image size */
   margin-right: 8px;
 }
 
 .spacing-item {
-  margin-bottom: 6px; /* Adjust the value as needed */
+  margin-bottom: 6px;
+  /* Adjust the value as needed */
 }
 
 .spacing-custom-items {
-  margin-bottom: 30px; /* Adjust the value as needed */
+  margin-bottom: 30px;
+  /* Adjust the value as needed */
 }
 
 .spacing-custom {
-  margin-bottom: 10px; /* Adjust the value as needed */
+  margin-bottom: 10px;
+  /* Adjust the value as needed */
 }
 
-::ng-deep #dropzone-external {
-  width: 270px;
-  height: 280px;
-  background-color: rgb(183 183 183 / 10%);
-  border-width: 2px;
-  border-style: dashed;
-  padding: 10px;
-  border-color: var(--dx-color-border);
+/* ─────────────────────────────────────────────────────────────────────────────
+   All ::ng-deep rules scoped inside .edit-form-container
+   so they ONLY affect the Items Edit Form — not any other page.
+   ───────────────────────────────────────────────────────────────────────────── */
+.edit-form-container {
+  /* Dropzone — match items-form dimensions exactly */
+  ::ng-deep #dropzone-external {
+    width: 100%;
+    max-width: 240px;
+    height: 170px;
+    background-color: rgb(183 183 183 / 10%);
+    border-width: 2px;
+    border-style: dashed;
+    padding: 10px;
+    border-color: var(--dx-color-border);
+  }
+
+  ::ng-deep #dropzone-external > * {
+    pointer-events: none;
+  }
+
+  ::ng-deep #dropzone-external.dropzone-active {
+    border-style: solid;
+    border-color: var(--dx-color-primary);
+  }
+
+  ::ng-deep .widget-container > span {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  ::ng-deep #dropzone-image {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  ::ng-deep #dropzone-text > span {
+    font-weight: 100;
+    opacity: 0.5;
+  }
+
+  /* Empty grid cell non-breaking space */
+  ::ng-deep .dx-data-grid .dx-row > td:empty::after {
+    content: "\00a0";
+    display: block;
+  }
+
+  ::ng-deep .dx-tabpanel-container {
+    margin-bottom: 0 !important;
+  }
+
+  /* DataGrid header styles */
+  ::ng-deep .dx-datagrid-headers {
+    background-color: var(
+      --card-bg-color,
+      rgba(128, 128, 128, 0.06)
+    ) !important;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.25) !important;
+
+    .dx-datagrid-text-content {
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      color: inherit !important;
+    }
+  }
+
+  /* DataGrid row height — uniform across Alias, Supplier, and all child grids */
+  ::ng-deep .dx-datagrid-rowsview,
+  ::ng-deep .dx-datagrid-rowsview .dx-datagrid-content {
+    height: auto !important;
+  }
+
+  ::ng-deep .dx-datagrid-rowsview .dx-row > td {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    height: 34px !important;
+    max-height: 34px !important;
+    vertical-align: middle !important;
+
+    .dx-texteditor,
+    .dx-lookup,
+    .dx-dropdowneditor,
+    .dx-selectbox,
+    .dx-numberbox,
+    .dx-checkbox {
+      height: 26px !important;
+      min-height: 26px !important;
+      max-height: 26px !important;
+      line-height: 26px !important;
+    }
+
+    .dx-texteditor-input {
+      height: 26px !important;
+      min-height: 26px !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .dx-checkbox-icon {
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  ::ng-deep .dx-datagrid-headers .dx-header-row > td {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    height: 36px !important;
+    vertical-align: middle !important;
+  }
+
+  /* Upload progress */
+  ::ng-deep #upload-progress {
+    display: flex;
+    margin-top: 10px;
+  }
+
+  ::ng-deep .flex-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
-::ng-deep #dropzone-external > * {
-  pointer-events: none;
-}
-
-::ng-deep #dropzone-external.dropzone-active {
-  border-style: solid;
-  border-color: var(--dx-color-primary);
-}
-
-::ng-deep .widget-container > span {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 16px;
-}
-
-::ng-deep #dropzone-image {
-  max-width: 100%;
-  max-height: 100%;
-}
-
-::ng-deep #dropzone-text > span {
-  font-weight: 100;
-  opacity: 0.5;
-}
-
-::ng-deep #upload-progress {
-  display: flex;
-  margin-top: 10px;
-}
-
-::ng-deep .flex-box {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
 .dx-fileuploader-button {
   display: none;
 }
@@ -120,7 +218,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 250px; /* Adjust this height based on your image and button sizes */
+  height: 250px;
+  /* Adjust this height based on your image and button sizes */
 }
 
 .image-container {
@@ -132,7 +231,8 @@
 }
 
 .button-container {
-  height: 40px; /* Adjust this height based on the button height */
+  height: 40px;
+  /* Adjust this height based on the button height */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,17 +240,26 @@
 
 /* Modal styles */
 .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  padding-top: 100px;
+  /* Location of the box */
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0, 0, 0); /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.9);
+  /* Black w/ opacity */
 }
 
 .modal-content {
@@ -170,6 +279,7 @@
   from {
     transform: scale(0);
   }
+
   to {
     transform: scale(1);
   }
@@ -194,8 +304,10 @@
 }
 
 .form-container {
-  width: 90%; /* Or any percentage less than 100% */
-  margin: 0 auto; /* Center the form */
+  width: 90%;
+  /* Or any percentage less than 100% */
+  margin: 0 auto;
+  /* Center the form */
   overflow-x: auto;
   display: flex;
   flex-direction: column;
@@ -228,80 +340,94 @@
 .container-wrapper {
   display: flex;
   justify-content: space-between;
+  gap: 16px;
+}
+
+/* Default (Light Mode) Styling */
+.left-container,
+.inventory-container,
+.history-container {
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  background: var(--card-bg-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
 }
 
 .left-container {
-  border: none;
-  padding: 10px;
-  width: calc(
-    50% - 20px
-  ); /* Adjust width to leave space for borders and padding */
-  max-height: 530px;
-  border: 1px solid #ccc;
-  max-width: 100%;
+  flex: 1;
+  align-self: flex-start;
 }
 
 .right-containers {
-  // border: none;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  width: calc(
-    52% - 22px
-  ); /* Adjust width to leave space for borders and padding */
-  // box-shadow: 0 0 0 0.5px black;
-}
-
-.inventory-container,
-.history-container {
-  border: none;
-  padding: 10px;
-  margin-bottom: 30px; /* Adjust margin between Inventory and History containers */
-  box-sizing: border-box; /* Include padding and border in the width calculation */
-  border: 1px solid #ccc;
+  gap: 12px;
 }
 
 .price-header {
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  color: inherit;
+  opacity: 0.9;
 }
 
 .inventory-item,
 .history-item {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  justify-content: space-between;
 }
 
 .inventory-item label,
 .history-item label {
-  width: 200px; /* Adjust width as needed */
-  margin-right: 10px; /* Adjust spacing between label and input */
+  width: 170px;
+  min-width: 150px;
+  font-size: 13px;
+  margin-right: 10px;
+  color: inherit;
+  opacity: 0.85;
 }
 
 .dx-text-box {
-  width: 100%; /* Full width within its container */
+  width: 100%;
+  /* Full width within its container */
 }
 
 /* Force the grid to always show the horizontal scrollbar */
 .always-show-scrollbar .dx-datagrid-rowsview {
   overflow-x: scroll !important;
-  overflow-y: hidden; /* Adjust if you don't want a vertical scrollbar */
+  overflow-y: hidden;
+  /* Adjust if you don't want a vertical scrollbar */
 }
 
 .dx-datagrid-rowsview {
   overflow-x: auto !important;
 }
+
 .dx-scrollable-scrollbar.dx-scrollbar-horizontal {
-  height: 16px; /* Adjust based on your design */
-  background-color: #f1f1f1; /* Optional: Background color for visibility */
+  height: 16px;
+  /* Adjust based on your design */
+  background-color: #f1f1f1;
+  /* Optional: Background color for visibility */
 }
 
 /* Ensure the horizontal scrollbar is visible and correctly styled */
 .always-show-scrollbar .dx-scrollbar-horizontal {
-  height: 16px; /* Adjust based on your design */
+  height: 16px;
+  /* Adjust based on your design */
   opacity: 1 !important;
   visibility: visible !important;
-  background-color: #ccc; /* Adjust if needed to make scrollbar more visible */
+  background-color: #ccc;
+  /* Adjust if needed to make scrollbar more visible */
 }
 
 /* Force the scrollbar content to always be visible */
@@ -309,28 +435,16 @@
   opacity: 1 !important;
   visibility: visible !important;
   height: 100%;
-  background-color: #ccc; /* Adjust if needed to make scrollbar more visible */
+  background-color: #ccc;
+  /* Adjust if needed to make scrollbar more visible */
 }
 
 /* Optional: Style the scrollbar thumb to make it more visible */
 .always-show-scrollbar .dx-scrollbar-horizontal .dx-scrollable-scroll {
-  background-color: #888; /* Adjust the color for visibility */
-  border-radius: 8px; /* Optional: rounded scrollbar thumb */
-}
-
-.inventory-container {
-  width: 100%; /* Adjust as needed */
-  max-width: 800px; /* Set a maximum width if necessary */
-  margin: 0 auto; /* Center the container if needed */
-  padding: 10px; /* Add some padding for better spacing */
-  margin-bottom: 20px;
-}
-
-.history-container {
-  border: none;
-  padding: 10px;
-  box-sizing: border-box; /* Include padding and border in the width calculation */
-  border: 1px solid #ccc;
+  background-color: #888;
+  /* Adjust the color for visibility */
+  border-radius: 8px;
+  /* Optional: rounded scrollbar thumb */
 }
 
 .container {
@@ -344,7 +458,8 @@
 }
 
 .item {
-  flex: 1 1 auto; /* Each item will grow and shrink as needed */
+  flex: 1 1 auto;
+  /* Each item will grow and shrink as needed */
   margin: 10px;
 }
 
@@ -369,12 +484,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 30vh; /* Match the dropdown height */
+  height: 30vh;
+  /* Match the dropdown height */
 }
 
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #000; /* Color of the spinner */
+  border-left-color: #000;
+  /* Color of the spinner */
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -386,9 +503,12 @@
     transform: rotate(360deg);
   }
 }
+
 .button-container1 {
-  margin-top: 20px; /* Adjust the value to increase/decrease the space */
-  text-align: right; /* Optional: Aligns buttons to the right */
+  margin-top: 20px;
+  /* Adjust the value to increase/decrease the space */
+  text-align: right;
+  /* Optional: Aligns buttons to the right */
 }
 
 .spacing-itemUOM {
@@ -398,77 +518,121 @@
 .checkbox-container {
   display: flex;
   align-items: center;
-  gap: 5px; /* Space between label and checkbox */
+  gap: 5px;
+  /* Space between label and checkbox */
 }
 
 .checkbox-label {
   font-size: 14px;
-  color: #333; /* Adjust label color */
+  color: #333;
+  /* Adjust label color */
 }
 
 #drop-area {
-  border: 2px dashed #ccc; /* Dashed border for the drop area */
-  border-radius: 10px; /* Rounded corners */
-  width: 150px; /* Full width */
+  border: 2px dashed #ccc;
+  /* Dashed border for the drop area */
+  border-radius: 10px;
+  /* Rounded corners */
+  width: 150px;
+  /* Full width */
   max-height: 200px;
-  max-width: 200px; /* Maximum width */
-  height: 150px; /* Fixed height for the drop area */
-  margin: 20px auto; /* Centered with margin */
-  padding: 20px; /* Padding inside the area */
-  text-align: center; /* Centered text */
-  transition: border-color 0.3s; /* Smooth transition for border color */
-  position: relative; /* Positioning for absolute children */
-  overflow: hidden; /* Hide overflow to make image cover */
+  max-width: 200px;
+  /* Maximum width */
+  height: 150px;
+  /* Fixed height for the drop area */
+  margin: 20px auto;
+  /* Centered with margin */
+  padding: 20px;
+  /* Padding inside the area */
+  text-align: center;
+  /* Centered text */
+  transition: border-color 0.3s;
+  /* Smooth transition for border color */
+  position: relative;
+  /* Positioning for absolute children */
+  overflow: hidden;
+  /* Hide overflow to make image cover */
 }
 
 #drop-area.highlight {
-  border-color: purple; /* Highlight color when dragging over */
+  border-color: purple;
+  /* Highlight color when dragging over */
 }
 
 button {
-  margin-top: 10px; /* Space above the button */
-  padding: 8px 16px; /* Padding inside the button */
-  font-size: 13px; /* Font size for button text */
-  cursor: pointer; /* Pointer cursor for hover effect */
-  background-color: #007bff; /* Button background color */
-  color: white; /* Button text color */
-  border: none; /* No border */
-  border-radius: 5px; /* Rounded button corners */
-  transition: background-color 0.3s; /* Smooth transition for background color */
-  position: relative; /* Ensure button is above the image */
-  z-index: 2; /* Higher z-index to ensure the button is clickable */
+  margin-top: 10px;
+  /* Space above the button */
+  padding: 8px 16px;
+  /* Padding inside the button */
+  font-size: 13px;
+  /* Font size for button text */
+  cursor: pointer;
+  /* Pointer cursor for hover effect */
+  background-color: #007bff;
+  /* Button background color */
+  color: white;
+  /* Button text color */
+  border: none;
+  /* No border */
+  border-radius: 5px;
+  /* Rounded button corners */
+  transition: background-color 0.3s;
+  /* Smooth transition for background color */
+  position: relative;
+  /* Ensure button is above the image */
+  z-index: 2;
+  /* Higher z-index to ensure the button is clickable */
 }
 
 button:hover {
-  background-color: #0056b3; /* Darker color on hover */
+  background-color: #0056b3;
+  /* Darker color on hover */
 }
 
 #gallery {
-  position: absolute; /* Absolute positioning to cover drop area */
-  top: 0; /* Align to the top */
-  left: 0; /* Align to the left */
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  display: flex; /* Flexbox for centering */
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  z-index: 1; /* Lower z-index to ensure it's behind the button */
+  position: absolute;
+  /* Absolute positioning to cover drop area */
+  top: 0;
+  /* Align to the top */
+  left: 0;
+  /* Align to the left */
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  display: flex;
+  /* Flexbox for centering */
+  align-items: center;
+  /* Center vertically */
+  justify-content: center;
+  /* Center horizontally */
+  z-index: 1;
+  /* Lower z-index to ensure it's behind the button */
 }
 
 #gallery img {
-  width: 100%; /* Make image cover the full width */
-  height: 135px; /* Make image cover the full height */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
-  transition: transform 0.3s; /* Smooth transition for transform */
+  width: 100%;
+  /* Make image cover the full width */
+  height: 135px;
+  /* Make image cover the full height */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  /* Shadow effect */
+  transition: transform 0.3s;
+  /* Smooth transition for transform */
 }
 
 #gallery img:hover {
-  transform: scale(1.05); /* Slight zoom effect on hover */
+  transform: scale(1.05);
+  /* Slight zoom effect on hover */
 }
+
 .close-icon {
-  position: absolute; /* Absolute positioning for close icon */
-  bottom: 10px; /* Distance from top */
-  right: 50%; /* Distance from right */
+  position: absolute;
+  /* Absolute positioning for close icon */
+  bottom: 10px;
+  /* Distance from top */
+  right: 50%;
+  /* Distance from right */
   color: red;
   font-weight: bolder;
   cursor: pointer;
@@ -481,15 +645,19 @@ button:hover {
 }
 
 .custom-field {
-  margin-bottom: 0px !important; /* Removes vertical gap */
+  margin-bottom: 0px !important;
+  /* Removes vertical gap */
   padding-bottom: 0px !important;
 }
+
 .dx-field-item-content {
-  padding: 2px 0 !important; /* Reduce top & bottom padding */
+  padding: 2px 0 !important;
+  /* Reduce top & bottom padding */
 }
 
 .dx-texteditor-input {
-  height: 24px !important; /* Reduce input field height */
+  height: 24px !important;
+  /* Reduce input field height */
 }
 
 // .plus-btn {
@@ -508,14 +676,19 @@ button:hover {
 
 .form-popup-buttons-container {
   display: flex;
-  justify-content: flex-end; /* push buttons to right */
-  gap: 10px; /* space between buttons */
-  margin-top: 20px; /* add some top spacing */
+  justify-content: flex-end;
+  /* push buttons to right */
+  gap: 10px;
+  /* space between buttons */
+  margin-top: 20px;
+  /* add some top spacing */
 }
 
 ::ng-deep .fixed-footer {
-  padding: 8px 20px 8px; /* tighter than before */
-  margin-top: 4px; /* reduced top gap */
+  padding: 8px 20px 8px;
+  /* tighter than before */
+  margin-top: 4px;
+  /* reduced top gap */
 }
 
 /* Right aligned buttons */
@@ -564,8 +737,10 @@ button:hover {
 }
 
 ::ng-deep .fixed-footer {
-  margin-top: 0px; /* reduce space above buttons */
-  padding-top: 6px; /* optional: tighter look */
+  margin-top: 0px;
+  /* reduce space above buttons */
+  padding-top: 6px;
+  /* optional: tighter look */
 }
 
 /* Common button size */

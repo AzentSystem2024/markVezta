@@ -517,7 +517,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
         COST: Number(row.COST) || 0,
       }));
     } else {
-      mappedStores = this.formItemsData.ITEM_STORES;
+      mappedStores = [];
     }
 
     return {
@@ -852,6 +852,17 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
   onEditorPreparing(event: any) {
     if (event.parentType == 'dataRow' && event.dataField === 'SUPP_ID') {
+      const currentSuppId = event.row?.data?.SUPP_ID;
+      const gridData = this.datasource || [];
+      const selectedSuppIds = gridData
+        .map((item: any) => item.SUPP_ID)
+        .filter((id: any) => id && id !== currentSuppId);
+
+      const allSuppliers = this.supplier || [];
+      event.editorOptions.dataSource = allSuppliers.filter(
+        (supp: any) => !selectedSuppIds.includes(supp.ID),
+      );
+
       event.editorOptions.onValueChanged = (e: any) => {
         const selectedSupplierId = e.value;
         const selectedSupplier = this.supplier.find(
@@ -897,18 +908,16 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
             setTimeout(() => {
               const visibleRows = grid.getVisibleRows();
 
-              // 🔥 new row is ALWAYS first (index 0)
-              const newRow = visibleRows[0];
+              // New row is added at the end (position 'last')
+              const newRow = visibleRows[visibleRows.length - 1];
 
               if (!newRow) return;
 
               const rowIndex = newRow.rowIndex;
               const rowKey = newRow.key;
 
-              // 🔥 force focus using key
+              // Force focus on newly created row's supplier cell
               grid.option('focusedRowKey', rowKey);
-
-              // 🔥 open editor
               grid.editCell(rowIndex, 'SUPP_ID');
             }, 100);
           }, 0);
