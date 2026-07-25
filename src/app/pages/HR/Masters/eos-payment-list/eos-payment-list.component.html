@@ -21,7 +21,7 @@
           <div class="grid-header">EOS Payments</div>
         </dxi-item>
 
-        <dxi-item widget="dxSelectBox" [options]="dateRangeOptions"></dxi-item>
+        <!-- <dxi-item widget="dxSelectBox" [options]="dateRangeOptions"></dxi-item> -->
 
         <dxi-item
           location="after"
@@ -60,7 +60,7 @@
       <dxo-filter-row [visible]="isFilterOpened"></dxo-filter-row>
       <dxo-header-filter [visible]="isFilterOpened"> </dxo-header-filter>
 
-      <dxi-column dataField="VOUCHER_NO" caption="Voucher No"></dxi-column>
+      <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
       <dxi-column
         dataField="DOC_DATE"
         caption="Date"
@@ -373,7 +373,7 @@
             width="100%"
             format="#,##0.00"
           ></dx-number-box>
-          <!-- <dx-button text="View" icon="bulletlist" stylingMode="contained" class="ms-1" [disabled]="isReadOnlyMode"></dx-button> -->
+
         </div>
 
         <dx-number-box
@@ -402,14 +402,6 @@
           [readOnly]="isReadOnlyMode"
           width="100%"
         ></dx-text-box>
-        <dx-text-box
-          class="mb-2"
-          label="Remarks 2"
-          labelMode="floating"
-          [(value)]="eosFormData.Remarks2"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-        ></dx-text-box>
       </div>
     </div>
 
@@ -428,41 +420,67 @@
           >
           <dx-radio-group
             [items]="['Cash', 'Bank']"
-            [(value)]="eosFormData.PaymentMode"
+            [value]="eosFormData.PaymentMode"
+            (onValueChanged)="onReceiptModeChange($event)"
             layout="horizontal"
-            [readOnly]="isReadOnlyMode"
+            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
           ></dx-radio-group>
         </div>
         <div class="col-md-6">
-          <dx-text-box
+          <dx-select-box
             label="Ledger"
             labelMode="floating"
+            [dataSource]="filteredLedgerList"
+            displayExpr="HEAD_NAME"
+            valueExpr="HEAD_ID"
             [(value)]="eosFormData.Ledger"
-            [readOnly]="isReadOnlyMode"
+            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
+            [searchEnabled]="true"
             width="100%"
-          ></dx-text-box>
+          >
+            <dx-validator *ngIf="isApproveMode">
+              <dxi-validation-rule
+                type="required"
+                message="Ledger is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
         </div>
       </div>
 
       <div class="row mt-1" *ngIf="eosFormData.PaymentMode === 'Bank'">
         <div class="col-md-6">
           <dx-text-box
-            label="Cheque No"
+            label="Reference No"
             labelMode="floating"
             [(value)]="eosFormData.ChequeNo"
-            [readOnly]="isReadOnlyMode"
+            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
             width="100%"
-          ></dx-text-box>
+          >
+            <dx-validator *ngIf="isApproveMode">
+              <dxi-validation-rule
+                type="required"
+                message="Cheque No is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
         </div>
         <div class="col-md-6">
           <dx-date-box
-            label="Due Date"
+            label="Date"
             labelMode="floating"
             [(value)]="eosFormData.DueDate"
             displayFormat="dd-MM-yyyy"
-            [readOnly]="isReadOnlyMode"
+            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
             width="100%"
-          ></dx-date-box>
+          >
+            <dx-validator *ngIf="isApproveMode">
+              <dxi-validation-rule
+                type="required"
+                message="Due Date is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-date-box>
         </div>
       </div>
     </fieldset>
@@ -474,7 +492,7 @@
           label="Narration"
           labelMode="floating"
           [(value)]="eosFormData.Narration"
-          [readOnly]="isReadOnlyMode"
+          [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
           width="100%"
         ></dx-text-box>
       </div>
@@ -520,14 +538,7 @@
           (onClick)="onApprove()"
           *ngIf="isApproveMode"
         ></dx-button>
-        <!-- <dx-button
-          text="Clear"
-          icon="clear"
-          stylingMode="contained"
-          class="me-2"
-          (onClick)="resetForm()"
-          *ngIf="!isReadOnlyMode"
-        ></dx-button> -->
+
       </div>
     </div>
   </div>
