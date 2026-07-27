@@ -88,6 +88,15 @@
 
 .headDiv {
   height: 55px;
+  display: flex;
+  align-items: center;
+  gap: 16px;          // spacing between controls
+}
+
+.inputBox {
+  flex: 1;            // both take equal width
+  min-width: 0;
+  padding: 0;
 }
 
 .tabs-demo {

@@ -49,8 +49,10 @@ import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
 import CustomStore from 'devextreme/data/custom_store';
+import DataSource from 'devextreme/data/data_source';
+import ArrayStore from 'devextreme/data/array_store';
 import notify from 'devextreme/ui/notify';
-import { tap } from 'rxjs';
+import { tap, of, throwError, catchError, shareReplay, Observable } from 'rxjs';
 import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -88,6 +90,10 @@ export class QuotationFormComponent {
   auto: string = 'auto';
   isPopupVisible: boolean = false;
   items: any[] = [];
+  itemMap: Map<any, any> = new Map();
+  itemsDataSource: DataSource | null = null;
+  isItemsLoading = false;
+  itemsObservable$: Observable<any> | null = null;
   addButtonOptions = {
     text: 'New',
     icon: 'bi bi-file-earmark-plus',
@@ -220,6 +226,7 @@ export class QuotationFormComponent {
     console.log(this.canAdd, this.canEdit, this.canDelete);
 
     // Session + dropdowns
+    this.initItemsDataSource();
     this.sessionData_tax();
     this.getSalesmanDropdown();
     this.getCustomerDropdown();
@@ -249,10 +256,9 @@ export class QuotationFormComponent {
     //   this.isEditDataAvailable();
     // }
 
-    this.getItems()?.subscribe();
-
-    // Immediately load edit data
-    this.isEditDataAvailable();
+    this.getItems()?.subscribe(() => {
+      this.isEditDataAvailable();
+    });
 
     this.setTaxSummaryLabel();
   }
@@ -273,8 +279,8 @@ export class QuotationFormComponent {
       ? data.Details.map((item: any) => ({
           ...item,
           DESCRIPTION: item.ITEM_ID,
-          ITEM_CODE: item.ITEM_ID,
-          ITEM_ID: item.ITEM_ID,
+          // ITEM_CODE: item.ITEM_CODE,
+          // ITEM_ID: item.ITEM_NAME,
           STOCK_QTY: item.QUANTITY,
           CUST_ID: data.CUST_ID || 0,
         }))
@@ -341,10 +347,12 @@ export class QuotationFormComponent {
 
   onStoreChanged(event: any) {
     this.storeId = event.value;
+    this.quotationFormData.STORE_ID = event.value;
     console.log(this.storeId, 'STORE_ID');
 
     // Clear old items when store changes
     this.items = [];
+    this.itemMap.clear();
 
     // Call API
     this.getItems()?.subscribe();
@@ -543,30 +551,166 @@ export class QuotationFormComponent {
     });
   }
 
-  getItems() {
-    const STORE_ID = this.storeId;
+  initItemsDataSource() {
+    const customStore = new CustomStore({
+      key: 'ITEM_ID',
+      byKey: (key: any) => {
+        const item = this.itemMap.get(key);
+        return Promise.resolve(item || { ITEM_ID: key });
+      },
+      load: (loadOptions: any) => {
+        const getPaginatedData = () => {
+          let result = this.items || [];
+          if (loadOptions.searchValue) {
+            const query = String(loadOptions.searchValue).toLowerCase();
+            result = result.filter(
+              (item: any) =>
+                (item.ITEM_CODE &&
+                  String(item.ITEM_CODE).toLowerCase().includes(query)) ||
+                (item.DESCRIPTION &&
+                  String(item.DESCRIPTION).toLowerCase().includes(query)),
+            );
+          }
+          const skip = loadOptions.skip || 0;
+          const take = loadOptions.take || 50;
+          return {
+            data: result.slice(skip, skip + take),
+            totalCount: result.length,
+          };
+        };
+
+        // Case 1: Items loaded in memory
+        if (this.items && this.items.length > 0 && !this.isItemsLoading) {
+          return Promise.resolve(getPaginatedData());
+        }
+
+        // Case 2: Items currently loading from backend API
+        if (this.isItemsLoading && this.itemsObservable$) {
+          return new Promise((resolve) => {
+            this.itemsObservable$!.subscribe({
+              next: () => resolve(getPaginatedData()),
+              error: () => resolve({ data: [], totalCount: 0 }),
+            });
+          });
+        }
+
+        // Case 3: Store selected but getItems hasn't triggered
+        const currentStoreId = this.quotationFormData.STORE_ID || this.storeId;
+        if (currentStoreId) {
+          const obs$ = this.getItems();
+          if (obs$) {
+            return new Promise((resolve) => {
+              obs$.subscribe({
+                next: () => resolve(getPaginatedData()),
+                error: () => resolve({ data: [], totalCount: 0 }),
+              });
+            });
+          }
+        }
+
+        return Promise.resolve({ data: [], totalCount: 0 });
+      },
+    });
+
+    this.itemsDataSource = new DataSource({
+      store: customStore,
+      paginate: true,
+      pageSize: 50,
+    });
+  }
+
+  getItems(): Observable<any> | null {
+    const STORE_ID = this.quotationFormData.STORE_ID || this.storeId;
     if (!STORE_ID) {
-      // notify('Please select a Store first', 'warning', 3000);
-      return;
+      return null;
     }
+    this.storeId = STORE_ID;
 
     const cacheKey = `${STORE_ID}`;
 
     // Return from cache
     if (this.itemDataCache.has(cacheKey)) {
-      this.items = [...this.itemDataCache.get(cacheKey)];
-      return;
+      this.populateItemData(this.itemDataCache.get(cacheKey)!);
+      return of(this.items);
     }
 
-    const payload = { STORE_ID, CUSTOMER_ID: this.quotationFormData.CUST_ID };
+    const customerId =
+      this.quotationFormData.CUST_ID ||
+      (this.isEditing ? this.EditingResponseData?.CUST_ID : 0);
 
-    return this.dataService.getItemsForQuotation(payload).pipe(
+    const payload = {
+      STORE_ID,
+      CUSTOMER_ID: customerId,
+    };
+
+    this.isItemsLoading = true;
+    this.itemsObservable$ = this.dataService.getItemsForQuotation(payload).pipe(
       tap((response: any) => {
-        this.items = (response.Data || []).slice(0, 200);
-        this.itemDataCache.set(cacheKey, [...this.items]);
+        this.isItemsLoading = false;
+        if (response.Flag === -1) {
+          notify(response.Message, 'error', 3000); // or use your own notification method
+          return;
+        }
+        const rawItems = response.Data || [];
+        this.populateItemData(rawItems, cacheKey);
       }),
+      catchError((err) => {
+        this.isItemsLoading = false;
+        return throwError(() => err);
+      }),
+      shareReplay(1),
     );
+
+    return this.itemsObservable$;
   }
+
+  private populateItemData(data: any[], cacheKey?: string) {
+    this.items = data || [];
+    this.itemMap.clear();
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      if (item && item.ITEM_ID != null) {
+        this.itemMap.set(item.ITEM_ID, item);
+      }
+    }
+    if (cacheKey) {
+      this.itemDataCache.set(cacheKey, this.items);
+    }
+  }
+
+  calculateItemCode = (rowData: any) => {
+    if (!rowData) return '';
+    const itemId = rowData.ITEM_ID || rowData.ITEM_CODE;
+    const item = this.itemMap.get(itemId);
+    if (item && item.ITEM_CODE) {
+      return item.ITEM_CODE;
+    }
+    if (
+      rowData.ITEM_CODE &&
+      typeof rowData.ITEM_CODE === 'string' &&
+      isNaN(Number(rowData.ITEM_CODE))
+    ) {
+      return rowData.ITEM_CODE;
+    }
+    return '';
+  };
+
+  calculateDescription = (rowData: any) => {
+    if (!rowData) return '';
+    const itemId = rowData.ITEM_ID || rowData.DESCRIPTION;
+    const item = this.itemMap.get(itemId);
+    if (item && item.DESCRIPTION) {
+      return item.DESCRIPTION;
+    }
+    if (
+      rowData.DESCRIPTION &&
+      typeof rowData.DESCRIPTION === 'string' &&
+      isNaN(Number(rowData.DESCRIPTION))
+    ) {
+      return rowData.DESCRIPTION;
+    }
+    return '';
+  };
 
   onEditorPreparing(e: any) {
     if (e.parentType !== 'dataRow') return;
@@ -609,6 +753,7 @@ export class QuotationFormComponent {
 
       // ADD ONLY THIS BLOCK
       if (isLookup) {
+        e.editorOptions.dataSource = this.itemsDataSource;
         e.editorOptions.elementAttr = {
           style: `
           height: 100%;
@@ -616,22 +761,32 @@ export class QuotationFormComponent {
           padding: 0;
         `,
         };
+        e.editorOptions.searchEnabled = true;
+        e.editorOptions.searchMode = 'contains';
+        e.editorOptions.minSearchLength = 0;
+        e.editorOptions.showDataBeforeSearch = true;
+        e.editorOptions.paginate = true;
+        e.editorOptions.pageSize = 50;
       }
     }
     if (isLookup) {
       e.editorOptions.onOpened = () => {
-        if (!this.storeId) {
+        const activeStoreId = this.quotationFormData.STORE_ID || this.storeId;
+        if (!activeStoreId) {
           notify('Please select a Store first', 'warning', 3000);
 
           // Close dropdown immediately
           setTimeout(() => {
             e.component.closeEditCell();
           }, 0);
+        } else if (this.itemsDataSource) {
+          this.itemsDataSource.load();
         }
       };
 
       e.editorOptions.onFocusIn = () => {
-        if (!this.storeId) {
+        const activeStoreId = this.quotationFormData.STORE_ID || this.storeId;
+        if (!activeStoreId) {
           notify('Please select a Store first', 'warning', 3000);
           e.component.closeEditCell();
         }
@@ -646,9 +801,9 @@ export class QuotationFormComponent {
         const rowData = e.row.data;
 
         if (e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION') {
-          const selectedItem = this.items.find(
-            (item) => item.ITEM_ID === args.value,
-          );
+          const selectedItem =
+            this.itemMap.get(args.value) ||
+            this.items.find((item) => item.ITEM_ID === args.value);
 
           if (selectedItem) {
             const grid = e.component;
@@ -990,7 +1145,7 @@ export class QuotationFormComponent {
   //   const content = document.createElement('div');
   //   content.innerHTML = `
   //   <div style="font-family: Arial, sans-serif; font-size: 13px; margin: 20px;">
-      
+
   //     <!-- COMPANY HEADER -->
   //     <div style="text-align: center; margin-bottom: 20px;">
   //       <h2 style="margin-top: 5px;">Quotation</h2>
@@ -1162,251 +1317,241 @@ export class QuotationFormComponent {
   printQuotation() {
     console.log('Open PDF clicked');
     const returnId = this.EditingResponseData.ID;
-    console.log(returnId)
+    console.log(returnId);
     // Example:
-    this.dataService
-      .selectSalesQuotation(returnId)
-      .subscribe((res: any) => {
-        this.generatePDF(res);
-      });
-  }
-
-   getBase64ImageFromURL(url: string): Promise<string> {
-  return fetch(url)
-    .then(res => res.blob())
-    .then(blob => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
+    this.dataService.selectSalesQuotation(returnId).subscribe((res: any) => {
+      this.generatePDF(res);
     });
-}
-
- async  generatePDF(data: any) {
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  // ============================================================
-  // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
-  // ============================================================
-
-  const headerY = 10;
-
-  // --- Logo placeholder (replace with addImage if needed)
-  const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
-
-  doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 35);
-
-  // --- Title
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('SALES QUOTATION', pageWidth / 2, headerY + 25, {
-    align: 'center',
-  });
-
- // ======================================================
-  // RIGHT HEADER DETAILS
-  // ======================================================
-
-  doc.setFontSize(10);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Quotation No :', 135, 15);
-
-doc.text(
-  `${data.Data.QTN_NO}`,
-  195,
-  15,
-  { align: 'right' }
-);
-
-  doc.text('Reference No :', 135, 22);
-
-doc.text(
-  `${data.Data.REF_NO}`,
-  195,
-  22,
-  { align: 'right' }
-);
-
-doc.text('Date :', 135, 29);
-
-doc.text(
-  `${data.Data.QTN_DATE}`,
-  195,
-  29,
-  { align: 'right' }
-);
-
-
-   // ======================================================
-  // BUYER DETAILS
-  // ======================================================
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Buyer Details', 12, 60);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Store:', 12, 67);
-
-// doc.text(
-//   `${data.Data.ADDRESS1}`,
-//   38,
-//   67
-// );
-
-  doc.text('Salesman:', 12, 74);
-  // doc.text(`${data.Data.PHONE}`, 38, 74);
-
-  doc.text('Tel:', 12, 83);
-  // doc.text(`${data.Data.GST_NO}`, 38, 83);
-
-  
-  // ======================================================
-  // SELLER DETAILS
-  // ======================================================
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Seller Details', 140, 60);
-
-  doc.setFont('helvetica', 'normal');
-
-  doc.text('Name:', 140, 67);
-
-  const customerName = doc.splitTextToSize(data.Data.CUST_NAME, 35);
-doc.text(customerName, 165, 67);
-
-  doc.text('Contact Name:', 140, 80);
-  doc.text(`${data.Data.CONTACT_NAME}`, 165, 80);
-
-  doc.text('Tel:', 140, 87);
-  // doc.text(`${data.Data.ZIP}`, 165, 83);
-
-
-  // ======================================================
-// QUOTATION INFO TABLE (Ship Method / Payment / Currency)
-// ======================================================
-
-autoTable(doc, {
-  startY: 95,
-  head: [[
-    'Ship Method',
-    'Payment Terms',
-    'Currency',
-    'Remark (If any)',
-    'Validity'
-  ]],
-  body: [[
-    data.Data.DELIVERY_TERM_NAME,
-    data.Data.PAY_TERM_NAME,
-    data.Data.CURRENCY || '',
-    data.Data.NARRATION || '',
-    `${data.Data.VALID_DAYS} days`
-  ]],
-  theme: 'grid',
-  styles: {
-    fontSize: 8,
-    halign: 'center',
-    valign: 'middle'
-  },
-  headStyles: {
-    fillColor: [210, 225, 240],
-    textColor: 0,
-    fontStyle: 'bold'
   }
-});
 
-
-// ======================================================
-// ITEM DETAILS TABLE
-// ======================================================
-
-const itemRows = data.Data.Details.map((item: any) => [
-  item.ITEM_CODE,
-  item.ITEM_NAME,
-  item.UOM,
-  item.QUANTITY,
-  item.PRICE,
-  item.AMOUNT,
-  item.DISC_PERCENT,
-  item.AMOUNT,
-  item.TAX_PERCENT,
-  item.TOTAL_AMOUNT
-]);
-
-autoTable(doc, {
-  startY: (doc as any).lastAutoTable.finalY + 10,
-  head: [[
-    'Item Code',
-    'Description',
-    'UOM',
-    'Qty',
-    'Price',
-    'Amount',
-    'Disc(%)',
-    'Taxable',
-    'Tax(%)',
-    'Total Price'
-  ]],
-  body: itemRows,
-  foot: [[
-    '',
-    'TOTAL',
-    '',
-    data.Data.Details.reduce((sum: number, item: any) => sum + item.QUANTITY, 0),
-    '',
-    data.Data.GROSS_AMOUNT,
-    '',
-    '',
-    '',
-    data.Data.NET_AMOUNT
-  ]],
-  theme: 'grid',
-  styles: {
-    fontSize: 8,
-    cellPadding: 2,
-    halign: 'center'
-  },
-  headStyles: {
-    fillColor: [210, 225, 240],
-    textColor: 0,
-    fontStyle: 'bold'
-  },
-  footStyles: {
-    fontStyle: 'bold',
-    fillColor: [255, 255, 255],
-    textColor: 0
+  getBase64ImageFromURL(url: string): Promise<string> {
+    return fetch(url)
+      .then((res) => res.blob())
+      .then((blob) => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      });
   }
-});
 
+  async generatePDF(data: any) {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-// ======================================================
-// AMOUNT IN WORDS
-// ======================================================
+    // ============================================================
+    // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
+    // ============================================================
 
-const amountY = (doc as any).lastAutoTable.finalY + 10;
+    const headerY = 10;
 
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(10);
+    // --- Logo placeholder (replace with addImage if needed)
+    const logoBase64 = await this.getBase64ImageFromURL(
+      'assets/images/image16.png',
+    );
 
-doc.text('Amount Chargeable (in words):', 60, amountY);
+    doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 35);
 
-doc.setTextColor(0, 102, 204);
-doc.text('AED Three Thousand One Hundred Thirty Five Only', 120, amountY);
+    // --- Title
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('SALES QUOTATION', pageWidth / 2, headerY + 25, {
+      align: 'center',
+    });
 
-doc.setTextColor(0);
+    // ======================================================
+    // RIGHT HEADER DETAILS
+    // ======================================================
 
+    doc.setFontSize(10);
 
-  // ============================================================
-  // 3) OPEN PDF
-  // ============================================================
+    doc.setFont('helvetica', 'normal');
 
-  doc.output('dataurlnewwindow');
-}
+    doc.text('Quotation No :', 135, 15);
+
+    doc.text(`${data.Data.QTN_NO}`, 195, 15, { align: 'right' });
+
+    doc.text('Reference No :', 135, 22);
+
+    doc.text(`${data.Data.REF_NO}`, 195, 22, { align: 'right' });
+
+    doc.text('Date :', 135, 29);
+
+    doc.text(`${data.Data.QTN_DATE}`, 195, 29, { align: 'right' });
+
+    // ======================================================
+    // BUYER DETAILS
+    // ======================================================
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buyer Details', 12, 60);
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text('Store:', 12, 67);
+
+    // doc.text(
+    //   `${data.Data.ADDRESS1}`,
+    //   38,
+    //   67
+    // );
+
+    doc.text('Salesman:', 12, 74);
+    // doc.text(`${data.Data.PHONE}`, 38, 74);
+
+    doc.text('Tel:', 12, 83);
+    // doc.text(`${data.Data.GST_NO}`, 38, 83);
+
+    // ======================================================
+    // SELLER DETAILS
+    // ======================================================
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Seller Details', 140, 60);
+
+    doc.setFont('helvetica', 'normal');
+
+    doc.text('Name:', 140, 67);
+
+    const customerName = doc.splitTextToSize(data.Data.CUST_NAME, 35);
+    doc.text(customerName, 165, 67);
+
+    doc.text('Contact Name:', 140, 80);
+    doc.text(`${data.Data.CONTACT_NAME}`, 165, 80);
+
+    doc.text('Tel:', 140, 87);
+    // doc.text(`${data.Data.ZIP}`, 165, 83);
+
+    // ======================================================
+    // QUOTATION INFO TABLE (Ship Method / Payment / Currency)
+    // ======================================================
+
+    autoTable(doc, {
+      startY: 95,
+      head: [
+        [
+          'Ship Method',
+          'Payment Terms',
+          'Currency',
+          'Remark (If any)',
+          'Validity',
+        ],
+      ],
+      body: [
+        [
+          data.Data.DELIVERY_TERM_NAME,
+          data.Data.PAY_TERM_NAME,
+          data.Data.CURRENCY || '',
+          data.Data.NARRATION || '',
+          `${data.Data.VALID_DAYS} days`,
+        ],
+      ],
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        halign: 'center',
+        valign: 'middle',
+      },
+      headStyles: {
+        fillColor: [210, 225, 240],
+        textColor: 0,
+        fontStyle: 'bold',
+      },
+    });
+
+    // ======================================================
+    // ITEM DETAILS TABLE
+    // ======================================================
+
+    const itemRows = data.Data.Details.map((item: any) => [
+      item.ITEM_CODE,
+      item.ITEM_NAME,
+      item.UOM,
+      item.QUANTITY,
+      item.PRICE,
+      item.AMOUNT,
+      item.DISC_PERCENT,
+      item.AMOUNT,
+      item.TAX_PERCENT,
+      item.TOTAL_AMOUNT,
+    ]);
+
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 10,
+      head: [
+        [
+          'Item Code',
+          'Description',
+          'UOM',
+          'Qty',
+          'Price',
+          'Amount',
+          'Disc(%)',
+          'Taxable',
+          'Tax(%)',
+          'Total Price',
+        ],
+      ],
+      body: itemRows,
+      foot: [
+        [
+          '',
+          'TOTAL',
+          '',
+          data.Data.Details.reduce(
+            (sum: number, item: any) => sum + item.QUANTITY,
+            0,
+          ),
+          '',
+          data.Data.GROSS_AMOUNT,
+          '',
+          '',
+          '',
+          data.Data.NET_AMOUNT,
+        ],
+      ],
+      theme: 'grid',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        halign: 'center',
+      },
+      headStyles: {
+        fillColor: [210, 225, 240],
+        textColor: 0,
+        fontStyle: 'bold',
+      },
+      footStyles: {
+        fontStyle: 'bold',
+        fillColor: [255, 255, 255],
+        textColor: 0,
+      },
+    });
+
+    // ======================================================
+    // AMOUNT IN WORDS
+    // ======================================================
+
+    const amountY = (doc as any).lastAutoTable.finalY + 10;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    doc.text('Amount Chargeable (in words):', 60, amountY);
+
+    doc.setTextColor(0, 102, 204);
+    doc.text('AED Three Thousand One Hundred Thirty Five Only', 120, amountY);
+
+    doc.setTextColor(0);
+
+    // ============================================================
+    // 3) OPEN PDF
+    // ============================================================
+
+    doc.output('dataurlnewwindow');
+  }
 
   convertNumberToWords(num: number): string {
     if (num === 0) return 'Zero';
@@ -1466,7 +1611,6 @@ doc.setTextColor(0);
 
     return str.trim();
   }
-
 }
 
 @NgModule({

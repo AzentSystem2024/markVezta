@@ -237,57 +237,70 @@
         <dxi-item itemType="group" [colCount]="1">
           <dxi-item>
             <div *dxTemplate style="display: flex">
-              <dx-select-box
-                label="Country code *"
-                [searchEnabled]="true"
+              <dx-drop-down-box
+                label="Code *"
                 labelMode="floating"
                 [(value)]="countryCode"
-                [items]="countryCodes"
-                valueExpr="CODE"
-                [displayExpr]="countryDisplay"
-                placeholder="+1"
-                [dropDownOptions]="{ width: '370px' }"
-                hint="Country Code"
-                (valueChange)="updateMobileNumber()"
-                (onOpened)="onDropdownOpened()"
-                (onClosed)="onDropdownClosed()"
-                (onValueChanged)="onCountrycodeChange($event)"
+                (onValueChanged)="onCountrySelected($event)"
+                valueExpr="data.dial_code"
+                displayExpr="display"
+                [(opened)]="isCountryDropdownOpen"
+                [dataSource]="countryCodes"
+                [width]="120"
+                [dropDownOptions]="{ width: 350 }"
               >
-                <div *dxTemplate="let data of 'item'">
-                  <img
-                    [src]="data.FLAG_URL"
-                    width="20"
-                    style="margin-right: 8px"
-                  />
-                  {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                <div *dxTemplate="let data of 'content'">
+                  <dx-list
+                    [dataSource]="countryCodes"
+                    selectionMode="single"
+                    [searchEnabled]="true"
+                    [searchExpr]="['data.name', 'data.dial_code']"
+                    [focusStateEnabled]="false"
+                    (onItemClick)="onCountrySelected($event)"
+                  >
+                    <div
+                      *dxTemplate="let item of 'item'"
+                      style="display: flex; align-items: center; gap: 8px"
+                    >
+                      <img
+                        [src]="item.flagUrl"
+                        width="20"
+                        height="14"
+                        style="border-radius: 2px"
+                      />
+                      <span style="min-width: 55px">
+                        {{ item.data.dial_code }}
+                      </span>
+                      <span>
+                        {{ item.data.name }}
+                      </span>
+                    </div>
+                  </dx-list>
                 </div>
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Country code is required"
-                  ></dxi-validation-rule>
-                </dx-validator>
-              </dx-select-box>
+              </dx-drop-down-box>
 
               <dx-text-box
+                #mobileBox
                 label="Mobile *"
                 class="phone-style"
                 [(value)]="mobileNumber"
                 labelMode="floating"
-                (keypress)="keyPressNumbers($event)"
+                [width]="'100%'"
+                style="margin-left: 10px"
+                hint="Mobile No"
+                valueChangeEvent="input"
+                (input)="onMobileInputChange($event)"
+                [maxLength]="17"
               >
-                <dx-validator>
+                <dx-validator #mobileValidator>
                   <dxi-validation-rule
                     type="required"
                     message="Mobile number is required"
-                  >
-                  </dxi-validation-rule>
+                  ></dxi-validation-rule>
                   <dxi-validation-rule
                     type="custom"
-                    [validationCallback]="validateMobileLength"
-                    [message]="
-                      'Mobile no. must be  ' + mobile_limit + ' digits long'
-                    "
+                    [validationCallback]="MobileValidate"
+                    message="Invalid mobile number"
                   ></dxi-validation-rule>
                 </dx-validator>
               </dx-text-box>
@@ -295,60 +308,73 @@
           </dxi-item>
 
           <dxi-item>
-            <div *dxTemplate style="display: flex">
-              <dx-select-box
-                label="Country code *"
-                [searchEnabled]="true"
+            <div *dxTemplate style="display: flex; margin-top: 15px">
+              <dx-drop-down-box
+                label="Code *"
                 labelMode="floating"
-                [(value)]="PhonenumberCode"
-                [items]="countryCodes"
-                valueExpr="CODE"
-                [displayExpr]="countryDisplay"
-                placeholder="+1"
-                [dropDownOptions]="{ width: '370px' }"
-                hint="Country Code"
-                (valueChange)="updateMobileNumber()"
-                (onOpened)="onDropdownOpened()"
-                (onClosed)="onDropdownClosed()"
-                (onValueChanged)="onCountrycodeChangePhoneNocode($event)"
+                [(value)]="phoneCountryCode"
+                (onValueChanged)="onPhoneCountrySelected($event)"
+                valueExpr="data.dial_code"
+                displayExpr="display"
+                [(opened)]="isPhoneDropdownOpen"
+                [dataSource]="countryCodes"
+                [width]="120"
+                [dropDownOptions]="{ width: 350 }"
               >
-                <div *dxTemplate="let data of 'item'">
-                  <img
-                    [src]="data.FLAG_URL"
-                    width="20"
-                    style="margin-right: 8px"
-                  />
-                  {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                <div *dxTemplate="let data of 'content'">
+                  <dx-list
+                    [dataSource]="countryCodes"
+                    selectionMode="single"
+                    [searchEnabled]="true"
+                    [searchExpr]="['data.name', 'data.dial_code']"
+                    [focusStateEnabled]="false"
+                    (onItemClick)="onPhoneCountrySelected($event)"
+                  >
+                    <div
+                      *dxTemplate="let item of 'item'"
+                      style="display: flex; align-items: center; gap: 8px"
+                    >
+                      <img
+                        [src]="item.flagUrl"
+                        width="20"
+                        height="14"
+                        style="border-radius: 2px"
+                      />
+                      <span style="min-width: 55px">
+                        {{ item.data.dial_code }}
+                      </span>
+                      <span>
+                        {{ item.data.name }}
+                      </span>
+                    </div>
+                  </dx-list>
                 </div>
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Country code is required"
-                  ></dxi-validation-rule>
-                </dx-validator>
-              </dx-select-box>
+              </dx-drop-down-box>
 
               <dx-text-box
+                #phoneBox
                 label="Phone *"
                 class="phone-style"
                 [(value)]="newCustomer.PHONE"
                 labelMode="floating"
-                (keypress)="keyPressNumbers($event)"
+                [width]="'100%'"
+                style="margin-left: 10px"
+                hint="Phone"
+                valueChangeEvent="input"
+                (input)="validatePhone($event)"
+                [maxLength]="17"
               >
-                <dx-validator>
+                <dx-validator #phoneValidator>
                   <dxi-validation-rule
                     type="required"
                     message="Phone number is required"
-                  >
-                  </dxi-validation-rule>
+                  ></dxi-validation-rule>
                   <dxi-validation-rule
                     type="custom"
-                    [validationCallback]="validatePhoneLength"
-                    [message]="
-                      'Phone no. must be  ' + Phone_limit + ' digits long'
-                    "
-                  ></dxi-validation-rule
-                ></dx-validator>
+                    [validationCallback]="PhoneValidate"
+                    message="Invalid phone number"
+                  ></dxi-validation-rule>
+                </dx-validator>
               </dx-text-box>
             </div>
           </dxi-item>
@@ -631,63 +657,72 @@
           </dx-text-box>
         </dxi-item>
 
-        <!-- Country + Mobile in same row -->
-        <dxi-item itemType="group" [colCount]="12" [colSpan]="2">
-          <!-- Country Code (3/12) -->
-          <dxi-item [colSpan]="2" class="me-2">
-            <dx-select-box
-              style="width: 100px; margin-right: 10px"
-              label="Country Code *"
-              [searchEnabled]="true"
-              [acceptCustomValue]="false"
-              [(value)]="countryCodeDeliveryaddress"
-              [items]="countryCodes"
-              valueExpr="CODE"
-              [displayExpr]="countryDisplay"
-              placeholder="+1"
+        <!-- Country + Mobile in same row with flex layout -->
+        <dxi-item>
+          <div *dxTemplate style="display: flex">
+            <dx-drop-down-box
+              label="Code *"
               labelMode="floating"
-              [dropDownOptions]="{ width: '370px' }"
-              hint="Country Code"
-              (onValueChanged)="updateMobileNumber()"
-              (onOpened)="onDropdownOpened()"
-              (onClosed)="onDropdownClosed()"
-              (onValueChanged)="onCountrycodeChangeDeliveryAddress($event)"
+              [(value)]="countryCodeDeliveryaddress"
+              (onValueChanged)="onDeliveryCountrySelected($event)"
+              valueExpr="data.dial_code"
+              displayExpr="display"
+              [(opened)]="isDeliveryCountryDropdownOpen"
+              [dataSource]="countryCodes"
+              [width]="120"
+              [dropDownOptions]="{ width: 350 }"
             >
-              <div *dxTemplate="let data of 'item'">
-                <img
-                  [src]="data.FLAG_URL"
-                  width="20"
-                  style="margin-right: 8px"
-                />
-                {{ data.CODE }} {{ data.COUNTRY_NAME }}
+              <div *dxTemplate="let data of 'content'">
+                <dx-list
+                  [dataSource]="countryCodes"
+                  selectionMode="single"
+                  [searchEnabled]="true"
+                  [searchExpr]="['data.name', 'data.dial_code']"
+                  [focusStateEnabled]="false"
+                  (onItemClick)="onDeliveryCountrySelected($event)"
+                >
+                  <div
+                    *dxTemplate="let item of 'item'"
+                    style="display: flex; align-items: center; gap: 8px"
+                  >
+                    <img
+                      [src]="item.flagUrl"
+                      width="20"
+                      height="14"
+                      style="border-radius: 2px"
+                    />
+                    <span style="min-width: 55px">
+                      {{ item.data.dial_code }}
+                    </span>
+                    <span>
+                      {{ item.data.name }}
+                    </span>
+                  </div>
+                </dx-list>
               </div>
-            </dx-select-box>
-          </dxi-item>
+            </dx-drop-down-box>
 
-          <!-- Mobile (9/12) -->
-          <dxi-item [colSpan]="4">
             <dx-text-box
-              #mobileBoxRef
-              style="width: 230px; margin-left: 35px"
+              #deliveryMobileBox
               label="Mobile"
               labelMode="floating"
               [(value)]="MobileValue"
-              mode="tel"
-              (onInput)="allowOnlyNumbers($event)"
+              [width]="'100%'"
+              style="margin-left: 10px"
+              hint="Mobile"
+              valueChangeEvent="input"
+              (input)="onDeliveryMobileInputChange($event)"
+              [maxLength]="17"
             >
-              <dx-validator>
+              <dx-validator #deliveryMobileValidator>
                 <dxi-validation-rule
                   type="custom"
-                  [validationCallback]="validateMobileLengthdeliveryaddress"
-                  [message]="
-                    'Mobile no. must be  ' +
-                    mobile_limit_Delivery_Address +
-                    ' digits long'
-                  "
+                  [validationCallback]="DeliveryMobileValidate"
+                  message="Invalid mobile number"
                 ></dxi-validation-rule>
               </dx-validator>
             </dx-text-box>
-          </dxi-item>
+          </div>
         </dxi-item>
 
         <dxi-item>

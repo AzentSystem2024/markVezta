@@ -5,19 +5,17 @@
       [dataSource]="payRollData.PAY_DETAILS"
       [showBorders]="true"
       [showColumnLines]="true"
-      [columnAutoWidth]="false"
-      [wordWrapEnabled]="false"
-      [rowAlternationEnabled]="true"
-      [headerFilter]="{ visible: true }"
-      [allowColumnReordering]="true"
       [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
       [allowColumnResizing]="true"
-      [height]="'55vh'"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
       [columnResizingMode]="'nextColumn'"
       [headerFilter]="{ visible: true }"
+      [height]="'55vh'"
       [scrolling]="{ mode: 'virtual' }"
-      rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       [editing]="{
         mode: 'cell',
@@ -28,25 +26,26 @@
       }"
       (onEditorPreparing)="onEditorPreparing($event)"
       (onContentReady)="onContentReady($event)"
-      (onRowInserted)="onRowInserted($event)"
-      (onRowRemoved)="onRowRemoved($event)"
     >
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before" locateInMenu="auto">
           <div class="stacked-toolbar-group">
-            <dx-text-box
+            <dx-date-box
               class="custom-select-box"
-              [placeholder]="'Select Employee'"
               label="Salary Month"
               [labelMode]="'floating'"
               [(value)]="payRollData.MONTH"
               [readOnly]="true"
-            ></dx-text-box>
+              displayFormat="MMMM yyyy"
+              [calendarOptions]="{
+                maxZoomLevel: 'year',
+                minZoomLevel: 'century',
+              }"
+            ></dx-date-box>
             <dx-text-box
               class="custom-text-box"
               [placeholder]="'Employee '"
@@ -75,49 +74,32 @@
         </dxi-item>
 
         <dxi-item location="after" locateInMenu="auto">
-          <div class="stacked-toolbar-group ot-hours-container">
-            <dx-number-box
-              [placeholder]="'OT Hours'"
-              [label]="'OT Hours'"
-              [labelMode]="'floating'"
-              [(value)]="payRollData.OT_HOURS"
-              [width]="180"
-              [min]="0"
-              [max]="12"
-              [readOnly]="is_approve"
-            ></dx-number-box>
-          </div>
-        </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <div class="stacked-toolbar-group">
-            <dx-text-box
-              [placeholder]="'Worked Days'"
-              label="Worked Days"
-              [labelMode]="'floating'"
-              [(value)]="payRollData.WORKED_DAYS"
-              [width]="180"
-              [readOnly]="true"
-            ></dx-text-box>
-            <div style="display: flex; align-items: center; gap: 3px">
-              <dx-number-box
-                [placeholder]="'Less Hours'"
-                [label]="'Less Hours'"
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <dx-text-box
+                [placeholder]="'Worked Days'"
+                label="Worked Days"
                 [labelMode]="'floating'"
-                [(value)]="payRollData.LESS_HOURS"
-                [width]="140"
-                [min]="0"
-                [max]="12"
+                [(value)]="payRollData.WORKED_DAYS"
+                [width]="139"
+                [readOnly]="true"
+              ></dx-text-box>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <dx-number-box
+                [placeholder]="'OT Hours'"
+                [label]="'OT Hours'"
+                [labelMode]="'floating'"
+                [(value)]="payRollData.OT_HOURS"
+                [width]="139"
                 [readOnly]="is_approve"
               ></dx-number-box>
-
-              <dx-button
+              <dx-button class="mt-2"
+                *ngIf="!is_approve"
                 icon="plus"
+                type="default"
                 stylingMode="contained"
-                [width]="33"
-                [height]="31"
-                style="margin-top: 10px"
                 (onClick)="addNewRow()"
-                [disabled]="is_approve"
               ></dx-button>
             </div>
           </div>
@@ -125,9 +107,10 @@
       </dxo-toolbar>
       <dxi-column
         dataField="SNO"
-        caption="Sl. No"
-        [width]="70"
+        caption="Sl No"
+        [width]="90"
         [allowEditing]="false"
+        alignment="left"
       ></dxi-column>
 
       <dxi-column
@@ -142,12 +125,11 @@
       >
       </dxi-column>
 
-      <!-- <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column> -->
       <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Gross"
         dataType="number"
-        [width]="150"
+        [width]="160"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         [editorOptions]="{ format: '#,##0.00' }"
       ></dxi-column>
@@ -156,10 +138,10 @@
         caption="Deduction"
         [format]="{ type: 'fixedPoint', precision: 2 }"
         dataType="number"
-        [width]="100"
+        [width]="160"
         [editorOptions]="{ format: '#,##0.00' }"
       ></dxi-column>
-      <dxi-column type="buttons" width="110">
+      <dxi-column type="buttons" width="110" [visible]="!is_approve">
         <dxi-button name="edit"></dxi-button>
         <dxi-button name="delete"></dxi-button>
       </dxi-column>
@@ -218,7 +200,7 @@
   </div>
 </div>
 
-<div class="form-popup-buttons-container">
+<div class="form-popup-buttons-container mt-4">
   <div class="popup-footer">
     <dx-button
       text="Cancel"

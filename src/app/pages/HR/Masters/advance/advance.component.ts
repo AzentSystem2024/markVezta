@@ -119,7 +119,8 @@ export class AdvanceComponent {
 
   EMPLOYEE_VALUE: any[] = [];
   ADVANCETYPE_VALUE: any[] = [];
-  payment_Detilas: any[] = [];
+  ledgerList: any[] = [];
+  filteredLedgerList: any[] = [];
 
   paymentModes = [
     { value: '13', label: 'Cash' },
@@ -264,7 +265,7 @@ export class AdvanceComponent {
 
   ngOnInit() {
     const today = new Date();
-    this.minDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    this.minDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
@@ -288,6 +289,7 @@ export class AdvanceComponent {
 
     this.get_Employee_dropdown();
     this.get_advance_list();
+    this.getLedgerCodeDropdown();
   }
 
   // 9. DATA FETCHING METHODS
@@ -401,36 +403,54 @@ export class AdvanceComponent {
     });
   }
 
-  ledgerlist() {
-    this.dataService.listledgerlist().subscribe((res: any) => {
-      const filterdledgerlist = res.Data || [];
-      this.payment_Detilas = filterdledgerlist.filter(
-        (item: any) => item.GROUP_ID == this.selectedPaymentMode,
-      );
+  getLedgerCodeDropdown() {
+    this.dataService.getAccountHeadList().subscribe({
+      next: (response: any) => {
+        this.ledgerList = response?.Data || [];
+        this.filterLedgerList();
+      },
+      error: () => {},
     });
+  }
+
+  filterLedgerList() {
+    if (this.selectedPaymentMode === '13') {
+      this.filteredLedgerList = this.ledgerList.filter(
+        (item) => item.GROUP_ID === 13,
+      );
+    } else if (this.selectedPaymentMode === '14') {
+      this.filteredLedgerList = this.ledgerList.filter(
+        (item) => item.GROUP_ID === 14,
+      );
+    } else {
+      this.filteredLedgerList = [...this.ledgerList];
+    }
   }
 
   loadAdvanceDetails(id: any) {
     this.dataService.select_Advance(id).subscribe((res: any) => {
       this.selected_Data = res;
 
-      this.id = this.selected_Data.ID;
-      this.Advance_Amount_value = this.selected_Data.ADVANCE_AMOUNT;
-      this.adv_no_value = this.selected_Data.ADV_NO;
-      this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID;
-      this.adv_type_name = this.selected_Data.ADV_TYPE_NAME;
-      this.date_value = this.selected_Data.DATE;
+      this.id = this.selected_Data.ID ?? null;
+      this.Advance_Amount_value = this.selected_Data.ADVANCE_AMOUNT ?? 0;
+      this.adv_no_value = this.selected_Data.ADV_NO ?? null;
+      this.adv_type_id_value = this.selected_Data.ADV_TYPE_ID ?? null;
+      this.adv_type_name = this.selected_Data.ADV_TYPE_NAME ?? null;
+      this.date_value = this.selected_Data.DATE ?? null;
       if (this.date_value) {
         const d = new Date(this.date_value);
         if (!isNaN(d.getTime())) {
-          this.minDateUpdate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+          this.minDateUpdate = new Date(d.getFullYear(), d.getMonth(), 1);
         }
       }
-      this.Payment_Head = this.selected_Data.PAY_HEAD_ID;
-      this.selectTransId = this.selected_Data.TRANS_ID;
-      this.selected_Cheque_No = this.selected_Data.CHEQUE_NO;
-      this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE;
-      this.selected_pay_type_id = this.selected_Data.PAY_TYPE_ID;
+      this.Payment_Head =
+        this.selected_Data.PAY_HEAD_ID === 0
+          ? null
+          : (this.selected_Data.PAY_HEAD_ID ?? null);
+      this.selectTransId = this.selected_Data.TRANS_ID ?? null;
+      this.selected_Cheque_No = this.selected_Data.CHEQUE_NO ?? null;
+      this.selected_Cheque_Date = this.selected_Data.CHEQUE_DATE ?? null;
+      this.selected_pay_type_id = this.selected_Data.PAY_TYPE_ID ?? 0;
 
       if (this.selected_pay_type_id === 0 || this.selected_pay_type_id === 1) {
         this.selectedPaymentMode = '13'; // Cash
@@ -438,16 +458,17 @@ export class AdvanceComponent {
         this.selectedPaymentMode = '14'; // Bank
       }
 
-      this.emp_id = this.selected_Data.EMP_ID;
-      this.reco_Amount_value = this.selected_Data.REC_AMOUNT;
-      this.reco_install_Amount_value = this.selected_Data.REC_INSTALL_AMOUNT;
-      this.reco_inst_count_value = this.selected_Data.REC_INSTALL_COUNT;
-      this.reco_stat_month = this.selected_Data.REC_START_MONTH;
-      this.remark_value = this.selected_Data.REMARKS;
+      this.emp_id = this.selected_Data.EMP_ID ?? null;
+      this.reco_Amount_value = this.selected_Data.REC_AMOUNT ?? 0;
+      this.reco_install_Amount_value =
+        this.selected_Data.REC_INSTALL_AMOUNT ?? 0;
+      this.reco_inst_count_value = this.selected_Data.REC_INSTALL_COUNT ?? 0;
+      this.reco_stat_month = this.selected_Data.REC_START_MONTH ?? null;
+      this.remark_value = this.selected_Data.REMARKS ?? null;
       this.approveValue = this.selected_Data.STATUS === 'Approved';
-      this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT;
+      this.recoverd_Amt_value = this.selected_Data.RECOVERED_AMOUNT ?? 0;
 
-      this.ledgerlist();
+      this.filterLedgerList();
       this.cdr.detectChanges();
     });
   }
@@ -508,7 +529,10 @@ export class AdvanceComponent {
   }
 
   paymentModesValue(event: any) {
-    this.ledgerlist();
+    if (event.value === '14') {
+      this.selected_Cheque_Date = new Date();
+    }
+    this.filterLedgerList();
   }
 
   onEmployee_Change(event: any) {
@@ -539,7 +563,7 @@ export class AdvanceComponent {
     this.date_value = e.value;
     if (this.date_value) {
       const d = new Date(this.date_value);
-      this.minDateUpdate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      this.minDateUpdate = new Date(d.getFullYear(), d.getMonth(), 1);
     }
   }
 
@@ -607,7 +631,7 @@ export class AdvanceComponent {
       if (value) {
         const d = new Date(value);
         if (!isNaN(d.getTime())) {
-          this.minDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+          this.minDate = new Date(d.getFullYear(), d.getMonth(), 1);
         }
       }
     });
@@ -767,6 +791,20 @@ export class AdvanceComponent {
       });
   }
 
+  validatePaymentHead = (e: any) => {
+    if (this.buttonText === 'Approve') {
+      return !!e.value;
+    }
+    return true;
+  };
+
+  validateReferenceNo = (e: any) => {
+    if (this.buttonText === 'Approve' && this.selectedPaymentMode === '14') {
+      return !!e.value;
+    }
+    return true;
+  };
+
   Update_advance() {
     this.isFormSubmitted = true;
 
@@ -782,7 +820,10 @@ export class AdvanceComponent {
       !this.emp_id ||
       !this.adv_type_id_value ||
       !this.Advance_Amount_value ||
-      !this.Payment_Head
+      (this.buttonText === 'Approve' && !this.Payment_Head) ||
+      (this.buttonText === 'Approve' &&
+        this.selectedPaymentMode === '14' &&
+        !this.selected_Cheque_No)
     ) {
       this.editValidationGroup?.instance?.validate(); // trigger UI highlights
       notify(

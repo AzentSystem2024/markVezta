@@ -92,14 +92,14 @@
             </div>
           </div>
           <div *ngIf="calendarVisible" class="calendar-popup">
-            <div class="calendar-header">
-              <dx-button [options]="previousYearButtonOptions"></dx-button>
+            <div class="calendar-header" style="justify-content: center">
+              <!-- <dx-button [options]="previousYearButtonOptions"></dx-button> -->
 
               <span class="year-clickable" (click)="toggleYearSelector()">
                 {{ selectedYear }}
               </span>
 
-              <dx-button [options]="nextYearButtonOptions"></dx-button>
+              <!-- <dx-button [options]="nextYearButtonOptions"></dx-button> -->
             </div>
 
             <div
@@ -180,7 +180,7 @@
           [options]="approveButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
-    
+
       <dxi-column dataField="EMPLOYEE_NO" caption="Employee No."></dxi-column>
       <dxi-column
         dataField="EMPLOYEE_NAME"
@@ -206,6 +206,14 @@
       >
       </dxi-column>
 
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+
       <div
         *dxTemplate="let data of 'statusCellRender'"
         style="text-align: center; width: 100%"
@@ -213,7 +221,9 @@
         <i
           class="fas fa-flag"
           [style.color]="
-            data.data.STATUS === 'Approved'
+            data.data.STATUS === 'Paid'
+              ? '#8B5CF6'
+              : data.data.STATUS === 'Approved'
               ? '#10B981'
               : data.data.STATUS === 'Verified'
                 ? '#0073D8'
@@ -223,13 +233,7 @@
           style="cursor: default"
         ></i>
       </div>
-      <dxi-column
-        type="buttons"
-        caption="Actions"
-        [width]="140"
-        cellTemplate="actionTemplate"
-      >
-      </dxi-column>
+
       <div *dxTemplate="let cellData of 'actionTemplate'">
         <!-- Edit -->
         <i
@@ -237,13 +241,15 @@
           class="dx-icon dx-icon-edit"
           [style.opacity]="
             cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Paid'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
             cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Paid'
               ? 'none'
               : 'auto'
           "
@@ -258,13 +264,15 @@
           class="dx-icon dx-icon-trash"
           [style.opacity]="
             cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Paid'
               ? '0.4'
               : '1'
           "
           [style.pointer-events]="
             cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Paid'
               ? 'none'
               : 'auto'
           "
@@ -286,7 +294,9 @@
             vertical-align: middle;
           "
           [title]="
-            cellData.data.STATUS === 'Approved'
+            cellData.data.STATUS === 'Paid'
+              ? 'Paid'
+              : cellData.data.STATUS === 'Approved'
               ? 'Approved'
               : cellData.data.STATUS === 'Verified'
                 ? 'Approve'
@@ -300,7 +310,9 @@
           <i
             class="fas fa-certificate"
             [style.color]="
-              cellData.data.STATUS === 'Approved'
+              cellData.data.STATUS === 'Paid'
+                ? '#8B5CF6'
+                : cellData.data.STATUS === 'Approved'
                 ? '#10B981'
                 : cellData.data.STATUS === 'Verified'
                   ? '#0073D8'

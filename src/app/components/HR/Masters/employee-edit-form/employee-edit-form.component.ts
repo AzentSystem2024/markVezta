@@ -38,7 +38,7 @@ import {
   DxDataGridComponent,
   DxNumberBoxModule,
   DxValidationGroupComponent,
-  DxValidationGroupModule
+  DxValidationGroupModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -226,19 +226,42 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
       this.CountryId = this.employeeFormData.COUNTRY_ID;
 
       // Parse dates to prevent dx-date-box validation failures
-      this.employeeFormData.DOJ = this.parseDateString(this.employeeFormData.DOJ);
-      this.employeeFormData.DOB = this.parseDateString(this.employeeFormData.DOB);
-      this.employeeFormData.PP_EXPIRY = this.parseDateString(this.employeeFormData.PP_EXPIRY);
-      this.employeeFormData.VISA_EXPIRY = this.parseDateString(this.employeeFormData.VISA_EXPIRY);
-      this.employeeFormData.WORK_PERMIT_EXPIRY = this.parseDateString(this.employeeFormData.WORK_PERMIT_EXPIRY);
-      this.employeeFormData.LICENSE_EXPIRY = this.parseDateString(this.employeeFormData.LICENSE_EXPIRY);
-      this.employeeFormData.LAST_REJOIN_DATE = this.parseDateString(this.employeeFormData.LAST_REJOIN_DATE);
-
-      const selectedCountry = this.countries?.find(
-        (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+      this.employeeFormData.DOJ = this.parseDateString(
+        this.employeeFormData.DOJ,
+      );
+      this.employeeFormData.DOB = this.parseDateString(
+        this.employeeFormData.DOB,
+      );
+      this.employeeFormData.PP_EXPIRY = this.parseDateString(
+        this.employeeFormData.PP_EXPIRY,
+      );
+      this.employeeFormData.VISA_EXPIRY = this.parseDateString(
+        this.employeeFormData.VISA_EXPIRY,
+      );
+      this.employeeFormData.WORK_PERMIT_EXPIRY = this.parseDateString(
+        this.employeeFormData.WORK_PERMIT_EXPIRY,
+      );
+      this.employeeFormData.LICENSE_EXPIRY = this.parseDateString(
+        this.employeeFormData.LICENSE_EXPIRY,
+      );
+      this.employeeFormData.LAST_REJOIN_DATE = this.parseDateString(
+        this.employeeFormData.LAST_REJOIN_DATE,
       );
 
-      this.countryCode = selectedCountry ? selectedCountry.CODE : '';
+      if (
+        this.employeeFormData.MOBILE &&
+        this.employeeFormData.MOBILE.includes('-')
+      ) {
+        const parts = this.employeeFormData.MOBILE.split('-');
+        this.countryCode = parts[0];
+        this.employeeFormData.MOBILE = parts[1];
+      } else {
+        // Fallback for existing records without hyphen format
+        const selectedCountry = this.countries?.find(
+          (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+        );
+        this.countryCode = selectedCountry ? selectedCountry.CODE : '';
+      }
 
       this.imageUrl = this.employeeFormData.IMAGE_NAME || null;
 
@@ -264,31 +287,31 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
         if (matched) this.countryCode = matched.CODE;
       }
     });
-     const dept_payload = {
-       NAME: 'DEPT',
-       COMPANY_ID: this.COMPANY_ID || 1,
-     };
-     this.dataservice.getDropdownData(dept_payload).subscribe((data) => {
-       this.departments = data;
-     });
-     const payload = {
-       NAME: 'DESIGNATION',
-     };
-     this.dataservice.getDropdownData(payload).subscribe((data) => {
-       this.designations = data;
-     });
-     const paymentType_payload = {
-       NAME: 'SALARY PAYMENT TYPE',
-     };
-     this.dataservice.getDropdownData(paymentType_payload).subscribe((data) => {
-       this.paymentType = data;
-     });
-     const state_payload = {
-       NAME: 'STATE',
-     };
-     this.dataservice.getDropdownData(state_payload).subscribe((data) => {
-       this.states = data;
-     });
+    const dept_payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.COMPANY_ID || 1,
+    };
+    this.dataservice.getDropdownData(dept_payload).subscribe((data) => {
+      this.departments = data;
+    });
+    const payload = {
+      NAME: 'DESIGNATION',
+    };
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
+      this.designations = data;
+    });
+    const paymentType_payload = {
+      NAME: 'SALARY PAYMENT TYPE',
+    };
+    this.dataservice.getDropdownData(paymentType_payload).subscribe((data) => {
+      this.paymentType = data;
+    });
+    const state_payload = {
+      NAME: 'STATE',
+    };
+    this.dataservice.getDropdownData(state_payload).subscribe((data) => {
+      this.states = data;
+    });
   }
 
   private loadSessionDetails() {
@@ -391,21 +414,21 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     const selectedCountry = this.countries?.find(
       (country: any) => country.ID === event.value,
     );
-    this.countryCode = selectedCountry ? selectedCountry.CODE : '';
   }
 
   onCountrycodeChange(e: any) {
     const payload = { COUNTRY_CODE: e.value };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
       this.mobile_limit = Number(res?.Data?.[0]?.MOBILE_DIGITS) || 0;
+      if (this.employeeFormData.MOBILE) {
+        this.validateMobile(this.employeeFormData.MOBILE);
+      }
     });
   }
 
   countryDisplay(item: any) {
     return item ? `${item.CODE}` : '';
   }
-
-  logGridData(e: any) {}
 
   // ==================== Validation ====================
 
@@ -419,12 +442,47 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   }
 
   validateMobile(event: any) {
-    const mobileNumber = event.target.value;
-    const mobilePattern = /^[6-9]\d{9}$/;
-    this.mobileError =
-      !mobileNumber || mobilePattern.test(mobileNumber)
-        ? ''
-        : 'Please enter a valid 10-digit mobile number starting with 6-9';
+    const mobileNumber = event?.target ? event.target.value : event || '';
+
+    if (!mobileNumber) {
+      this.mobileError = '';
+      return;
+    }
+
+    // Ignore spaces for validation
+    const normalizedMobile = mobileNumber.replace(/\s+/g, '');
+
+    if (this.countryCode === '+91') {
+      const mobilePattern = /^[6-9]\d{9}$/;
+      if (!mobilePattern.test(normalizedMobile)) {
+        this.mobileError =
+          'Please enter a valid 10-digit mobile number starting with 6-9';
+      } else {
+        this.mobileError = ''; // Clear error if valid
+      }
+    } else if (this.countryCode === '+971') {
+      const uaePattern = /^5\d{8}$/;
+      if (!uaePattern.test(normalizedMobile)) {
+        this.mobileError =
+          'Please enter a valid 9-digit UAE mobile number starting with 5';
+      } else {
+        this.mobileError = '';
+      }
+    } else if (this.mobile_limit) {
+      const regex = new RegExp(`^\\d{${this.mobile_limit}}$`);
+      if (!regex.test(normalizedMobile)) {
+        this.mobileError = `Please enter a valid ${this.mobile_limit}-digit mobile number`;
+      } else {
+        this.mobileError = ''; // Clear error if valid
+      }
+    } else {
+      const fallbackRegex = /^\d+$/;
+      if (!fallbackRegex.test(normalizedMobile)) {
+        this.mobileError = 'Please enter a valid mobile number';
+      } else {
+        this.mobileError = '';
+      }
+    }
   }
 
   isValid() {
@@ -615,8 +673,10 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
 
     const payload = {
       ...this.employeeFormData,
-      Company_Id: this.COMPANY_ID,
       COMPANY_ID: this.COMPANY_ID,
+      MOBILE: this.countryCode
+        ? `${this.countryCode}-${this.employeeFormData.MOBILE}`
+        : this.employeeFormData.MOBILE,
     };
 
     this.dataservice.updateEmployee(payload).subscribe({
@@ -680,7 +740,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     DxiGroupModule,
     FormsModule,
     DxNumberBoxModule,
-    DxValidationGroupModule
+    DxValidationGroupModule,
   ],
   providers: [],
   declarations: [EmployeeEditFormComponent],

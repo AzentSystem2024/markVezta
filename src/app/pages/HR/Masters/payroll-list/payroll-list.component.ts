@@ -179,7 +179,8 @@ export class PayrollListComponent {
       hint: 'Delete',
       icon: 'trash',
       text: 'Delete',
-      visible: (e: any) => e.row.data.STATUS !== 'Approved',
+      visible: (e: any) =>
+        e.row.data.STATUS !== 'Approved' && e.row.data.STATUS !== 'Paid',
     },
   ];
 
@@ -328,7 +329,10 @@ export class PayrollListComponent {
   onEditOrViewPayroll(e: any) {
     e.cancel = true;
     const payrollId = e.data.SALARY_BILL_NO;
-    const payload = { PAYDETAIL_ID: payrollId , COMPANY_ID : this.selectedCompanyId };
+    const payload = {
+      PAYDETAIL_ID: payrollId,
+      COMPANY_ID: this.selectedCompanyId,
+    };
 
     this.dataService.viewSelectedPayroll(payload).subscribe({
       next: (response: any) => {
@@ -338,7 +342,10 @@ export class PayrollListComponent {
         );
         if (actionButton) {
           let hintText = 'Edit';
-          if (this.selectedPayroll.STATUS === 'Approved') {
+          if (
+            this.selectedPayroll.STATUS === 'Approved' ||
+            this.selectedPayroll.STATUS === 'Paid'
+          ) {
             hintText = 'View';
           } else if (this.selectedPayroll.STATUS !== 'Pending') {
             hintText = '';
@@ -351,7 +358,10 @@ export class PayrollListComponent {
         this.isApproveMode = false;
         this.isReadOnlyMode = false;
 
-        if (this.selectedPayroll.STATUS === 'Approved') {
+        if (
+          this.selectedPayroll.STATUS === 'Approved' ||
+          this.selectedPayroll.STATUS === 'Paid'
+        ) {
           this.isReadOnlyMode = true;
           this.isApproveMode = true;
           this.PopupTitle = 'View Payroll';
@@ -376,7 +386,10 @@ export class PayrollListComponent {
       return;
     }
 
-    const payload = { PAYDETAIL_ID: payrollId , COMPANY_ID:this.selectedCompanyId };
+    const payload = {
+      PAYDETAIL_ID: payrollId,
+      COMPANY_ID: this.selectedCompanyId,
+    };
 
     this.dataService.viewSelectedPayroll(payload).subscribe({
       next: (response: any) => {
@@ -391,7 +404,7 @@ export class PayrollListComponent {
           this.isApproveMode = true;
           this.isReadOnlyMode = true;
           this.PopupTitle = 'Approve Payroll';
-        } else if (status === 'Approved') {
+        } else if (status === 'Approved' || status === 'Paid') {
           this.isVerifyMode = false;
           this.isApproveMode = false;
           this.isReadOnlyMode = true;
@@ -553,14 +566,18 @@ export class PayrollListComponent {
 
   onSelectionChanged(e: any) {
     // Prevent selection of Approved rows (e.g. from Select All)
-    const newlySelectedApprovedKeys = e.currentSelectedRowKeys.filter((key: any) => {
-      const row = e.selectedRowsData.find((r: any) => r.SALARY_BILL_NO === key || r === key);
-      return row && row.STATUS === 'Approved';
-    });
+    const newlySelectedApprovedKeys = e.currentSelectedRowKeys.filter(
+      (key: any) => {
+        const row = e.selectedRowsData.find(
+          (r: any) => r.SALARY_BILL_NO === key || r === key,
+        );
+        return row && row.STATUS === 'Approved';
+      },
+    );
 
     if (newlySelectedApprovedKeys.length > 0) {
       e.component.deselectRows(newlySelectedApprovedKeys);
-      return; 
+      return;
     }
 
     const selectedRows = e.selectedRowsData || [];
@@ -606,7 +623,9 @@ export class PayrollListComponent {
 
   onRowClick(e: any) {
     if (e.data.STATUS === 'Approved') {
-      const key = e.component.option('keyExpr') ? e.data[e.component.option('keyExpr')] : e.data;
+      const key = e.component.option('keyExpr')
+        ? e.data[e.component.option('keyExpr')]
+        : e.data;
       e.component.deselectRows([key]);
     }
   }

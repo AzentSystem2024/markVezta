@@ -282,6 +282,71 @@ export class TrialBalanceBranchWiseComponent {
     });
   }
 
+  onCellClick(e: any) {
+    console.log(e, 'event');
+
+    // Only data rows
+    if (e.rowType !== 'data') return;
+
+    const dataField = e.column.dataField || '';
+
+    const isOpening = dataField.startsWith('Opening -');
+    const isDuring = dataField.startsWith('During_Period -');
+    const isClosing = dataField.startsWith('Closing -');
+
+    // Allow only Opening, During and Closing columns
+    if (!(isOpening || isDuring || isClosing)) return;
+
+    // Get branch name
+    let branchName = '';
+
+    if (isOpening) {
+      branchName = dataField.replace('Opening - ', '').trim();
+    } else if (isDuring) {
+      branchName = dataField.replace('During_Period - ', '').trim();
+    } else if (isClosing) {
+      branchName = dataField.replace('Closing - ', '').trim();
+    }
+
+    // Find Store
+    const store = this.Store.find(
+      (x: any) =>
+        x.DESCRIPTION.trim().toUpperCase() === branchName.toUpperCase()
+    );
+
+    if (!store) {
+      console.log('Store not found');
+      return;
+    }
+
+    // Identify clicked column
+    let clickType = '';
+
+    if (isOpening) {
+      clickType = 'OPENING';
+    } else if (isDuring) {
+      clickType = 'DURING';
+    } else if (isClosing) {
+      clickType = 'CLOSING';
+    }
+
+    // Save data
+    sessionStorage.setItem('HEADID', e.data.HEAD_ID);
+    sessionStorage.setItem('STOREID', store.ID);
+    sessionStorage.setItem('DATEFROM', this.formatted_from_date);
+    sessionStorage.setItem('DATETO', this.formatted_To_date);
+
+    // Save clicked column type and amount
+    sessionStorage.setItem('CLICK_TYPE', clickType);
+    sessionStorage.setItem('CLICK_VALUE', String(e.value));
+
+    console.log('Click Type:', clickType);
+    console.log('Clicked Amount:', e.value);
+
+    // Navigate
+    this.router.navigate(['/ledger-statement']);
+  }
+
   onViewClick(e: any) {
     this.HeadId = e.row.data.HeadID;
     console.log(this.HeadId);
@@ -524,4 +589,4 @@ export class TrialBalanceBranchWiseComponent {
   exports: [],
   declarations: [TrialBalanceBranchWiseComponent],
 })
-export class TrialBalanceBranchWiseModule {}
+export class TrialBalanceBranchWiseModule { }

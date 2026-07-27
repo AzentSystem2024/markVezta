@@ -18,7 +18,8 @@
                   [allowColumnResizing]="true"
                   [height]="'50vh'"
                   [columnResizingMode]="'nextColumn'"
-                  [scrolling]="{ mode: 'virtual' }"
+                  [scrolling]="{ mode: 'virtual', rowRenderingMode: 'virtual' }"
+                  [renderAsync]="true"
                   rowAlternationInterval="2"
                   [selection]="{ mode: 'single' }"
                   [editing]="{
@@ -163,14 +164,15 @@
                     caption="Item Code"
                     [editorType]="'dxSelectBox'"
                     [editorOptions]="{ disabled: !quotationFormData.STORE_ID }"
+                    [calculateDisplayValue]="calculateItemCode"
                     [lookup]="{
-                      dataSource: items,
+                      dataSource: itemsDataSource,
                       valueExpr: 'ITEM_ID',
                       displayExpr: 'ITEM_CODE',
                       searchEnabled: true,
-                      searchMode: 'startswith',
-                      minSearchLength: 2,
-                      showDataBeforeSearch: false,
+                      searchMode: 'contains',
+                      minSearchLength: 0,
+                      showDataBeforeSearch: true,
                       paginate: true,
                       pageSize: 50,
                     }"
@@ -182,14 +184,15 @@
                     caption="Description"
                     [editorType]="'dxSelectBox'"
                     [editorOptions]="{ disabled: !quotationFormData.STORE_ID }"
+                    [calculateDisplayValue]="calculateDescription"
                     [lookup]="{
-                      dataSource: items,
+                      dataSource: itemsDataSource,
                       valueExpr: 'ITEM_ID',
                       displayExpr: 'DESCRIPTION',
                       searchEnabled: true,
-                      searchMode: 'startswith',
-                      minSearchLength: 2,
-                      showDataBeforeSearch: false,
+                      searchMode: 'contains',
+                      minSearchLength: 0,
+                      showDataBeforeSearch: true,
                       paginate: true,
                       pageSize: 50,
                     }"

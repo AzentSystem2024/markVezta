@@ -187,7 +187,7 @@ import { TenderSummaryComponent } from './pages/REPORT/tender-summary/tender-sum
 import { ZReportComponent } from './pages/REPORT/zreport/zreport.component';
 import { ItemStorePriceApproveComponent } from './pages/item-store-price-approve/item-store-price-approve.component';
 import { ImportArDataComponent } from './pages/ERP-INTEGRATION/import-ar-data/import-ar-data.component';
-import { InvoiceRetailComponent } from './pages/OPERATIONS/invoice-retail/invoice-retail.component';
+import { InvoiceRetailComponent } from './pages/Operations//invoice-retail/invoice-retail.component';
 import { MiscPurchaseInvoiceComponent } from './pages/OPERATIONS/misc-purchase-invoice/misc-purchase-invoice.component';
 import { MiscellaneousSalesInvoiceComponent } from './pages/OPERATIONS/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { SalesInvoiceRetailComponent } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
@@ -222,6 +222,7 @@ import {
   LeavelistModule,
 } from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
+import { EosPaymentListComponent } from './pages/HR/Masters/eos-payment-list/eos-payment-list.component';
 
 const routes: Routes = [
   {
@@ -1011,6 +1012,11 @@ const routes: Routes = [
       {
         path: 'staff-end-of-service',
         component: StaffEOSComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'eos-payment',
+        component: EosPaymentListComponent,
         canActivate: [AuthGuardService],
       },
       {

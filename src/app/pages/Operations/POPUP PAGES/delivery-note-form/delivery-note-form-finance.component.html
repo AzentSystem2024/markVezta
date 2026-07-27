@@ -169,7 +169,7 @@
           <dxi-column
             dataField="DELIVERED_QUANTITY"
             caption="Delivered Quantity"
-            [allowEditing]="!isReadOnlyMode"
+            [allowEditing]="!isReadOnlyMode && !isVerifyMode && !isApproveMode"
             alignment="right"
             [validationRules]="[
               { type: 'required', message: 'Quantity is required' },
@@ -258,7 +258,10 @@
             </div>
 
             <!-- Approve Checkbox -->
-            <div class="approve-container" *ngIf="canApprove">
+            <div
+              class="approve-container"
+              *ngIf="canApprove && !isVerifyMode && !isApproveMode"
+            >
               <dx-check-box
                 [value]="isReadOnlyMode ? true : deliveryFormData.IS_APPROVED"
                 (valueChange)="
