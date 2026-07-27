@@ -1203,16 +1203,14 @@ body {
 
 .add-button.dx-button.dx-button-default {
   border-radius: 8px !important;
-  background-color: #0073D8 !important;
+  background-color: #0073d8 !important;
   color: #fff !important; /* text color */
 }
 .add-button.dx-button.dx-button-default:hover {
   border-radius: 8px !important;
-  background-color: #0068C2 !important;
+  background-color: #0068c2 !important;
   color: #fff !important; /* text color */
 }
-
-
 
 /* ========================= */
 /* 🔥 TAB CONTAINER */
@@ -1235,7 +1233,6 @@ body {
 /* 🔵 TAB */
 /* ========================= */
 
-
 /* ========================= */
 /* 🟦 ACTIVE */
 /* ========================= */
@@ -1243,8 +1240,6 @@ body {
   background-color: var(--tab-selected-bg-color) !important;
   color: var(--selected-text-color);
 }
-
-
 
 /* ========================= */
 /* 🖱 HOVER */
@@ -1263,10 +1258,10 @@ body {
   display: none !important;
 }
 
-.custom-tab 
-.dx-tabs-styling-mode-secondary 
-.dx-tab.dx-tab-selected 
-.dx-tab-content::after {
+.custom-tab
+  .dx-tabs-styling-mode-secondary
+  .dx-tab.dx-tab-selected
+  .dx-tab-content::after {
   display: none !important;
   content: none !important;
 }
@@ -1290,6 +1285,7 @@ body {
   color: var(--selected-text-color);
 }
 
-
-
-
+::ng-deep .dx-popup-title.dx-toolbar .dx-toolbar-before {
+  padding-inline-end: 12px;
+  width: 400px !important;
+}

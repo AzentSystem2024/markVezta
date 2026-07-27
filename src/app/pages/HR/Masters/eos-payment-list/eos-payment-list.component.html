@@ -271,7 +271,14 @@
           [readOnly]="isReadOnlyMode"
           [searchEnabled]="true"
           width="100%"
-        ></dx-select-box>
+        >
+          <dx-validator validationGroup="eosForm">
+            <dxi-validation-rule
+              type="required"
+              message="Employee is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-select-box>
       </div>
     </div>
 
@@ -418,14 +425,6 @@
           [readOnly]="isReadOnlyMode"
           width="100%"
         ></dx-text-box>
-        <dx-text-box
-          class="mb-2"
-          label="Remarks"
-          labelMode="floating"
-          [(value)]="eosFormData.Remarks2"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-        ></dx-text-box>
       </div>
     </div>
 
@@ -452,7 +451,7 @@
             [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
           ></dx-radio-group>
         </div>
-        <div class="col-md-12">
+        <div class="col-md-6">
           <dx-select-box
             label="Ledger"
             labelMode="floating"
@@ -464,7 +463,7 @@
             [searchEnabled]="true"
             width="100%"
           >
-            <dx-validator *ngIf="isApproveMode">
+            <dx-validator validationGroup="eosForm" *ngIf="isApproveMode">
               <dxi-validation-rule
                 type="required"
                 message="Ledger is required"
@@ -487,11 +486,13 @@
               label="Reference No"
               labelMode="floating"
               [(value)]="eosFormData.ChequeNo"
-              [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-              [disabled]="eosFormData.PAY_TYPE_ID !== 2"
+              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
               width="100%"
             >
-              <dx-validator *ngIf="isApproveMode">
+              <dx-validator
+                validationGroup="eosForm"
+                *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+              >
                 <dxi-validation-rule
                   type="required"
                   message="Reference No is required"
@@ -505,11 +506,13 @@
               labelMode="floating"
               [(value)]="eosFormData.DueDate"
               displayFormat="dd-MM-yyyy"
-              [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-              [disabled]="eosFormData.PAY_TYPE_ID !== 2"
+              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
               width="100%"
             >
-              <dx-validator *ngIf="isApproveMode">
+              <dx-validator
+                validationGroup="eosForm"
+                *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+              >
                 <dxi-validation-rule
                   type="required"
                   message="Date is required"
@@ -543,7 +546,8 @@
         <dx-button
           text="Close"
           icon=""
-          stylingMode="contained"
+          type="normal"
+          stylingMode="outlined"
           (onClick)="handleClose()"
           class="me-2"
         ></dx-button>
@@ -552,8 +556,9 @@
           icon="save"
           type="default"
           stylingMode="contained"
+          validationGroup="eosForm"
           class="me-2"
-          (onClick)="onSave()"
+          (onClick)="onSave($event)"
           *ngIf="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
         ></dx-button>
         <dx-button
@@ -561,17 +566,19 @@
           icon="check"
           stylingMode="contained"
           type="default"
+          validationGroup="eosForm"
           class="me-2"
-          (onClick)="onVerify()"
+          (onClick)="onVerify($event)"
           *ngIf="isVerifyMode"
         ></dx-button>
         <dx-button
           text="Approve"
           icon="check"
           stylingMode="contained"
-          type="success"
+          type="default"
+          validationGroup="eosForm"
           class="me-2"
-          (onClick)="onApprove()"
+          (onClick)="onApprove($event)"
           *ngIf="isApproveMode"
         ></dx-button>
       </div>

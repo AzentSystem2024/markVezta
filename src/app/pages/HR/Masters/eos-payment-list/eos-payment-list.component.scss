@@ -54,3 +54,19 @@
     display: inherit;
   }
 }
+
+::ng-deep .dx-popup-title .dx-toolbar-label {
+  white-space: normal !important;
+  line-height: 1.2 !important;
+
+  & > div {
+    text-overflow: unset !important;
+    overflow: visible !important;
+    white-space: normal !important;
+  }
+}
+
+::ng-deep .dx-popup-title.dx-toolbar .dx-toolbar-before {
+  padding-inline-end: 12px;
+  width: 400px !important;
+}
