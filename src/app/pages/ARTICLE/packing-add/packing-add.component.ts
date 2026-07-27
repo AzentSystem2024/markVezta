@@ -139,6 +139,7 @@ export class PackingAddComponent {
   ItempopupVisible: boolean = false;
   selectedItems: any[] = [];
   ItemListDataSource: any[] = [];
+  Default_company_Type: any;
 
   //===================dummy datasource of =========================
   constructor(private dataService: DataService) {
@@ -169,7 +170,11 @@ export class PackingAddComponent {
     ];
   }
   getPackingList() {
-    this.dataService.get_packages_list_api().subscribe((res: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      COMPANY_TYPE: this.Default_company_Type
+    };
+    this.dataService.get_packages_list_api(payload).subscribe((res: any) => {
       this.packing_list = res.Data;
     });
   }
@@ -190,6 +195,7 @@ export class PackingAddComponent {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'PRODUCTION_UNITS',
+      COMPANY_TYPE: this.Default_company_Type
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.produCtionUnits = response;
@@ -228,8 +234,6 @@ export class PackingAddComponent {
   }
 
   //======================== check box for select ==========================
-
-  onQtyCheckboxChanged(event: any) { }
 
   getLastOrderNo() {
     this.selectedProductionUnitId = this.PackingData.UNIT_ID;
@@ -586,9 +590,8 @@ export class PackingAddComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
+    this.Default_company_Type = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
-
     this.company_code = sessionData.SELECTED_COMPANY.COMPANY_CODE;
   }
 

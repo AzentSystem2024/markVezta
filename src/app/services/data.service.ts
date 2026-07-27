@@ -6053,9 +6053,10 @@ The result can be exported to HTML or Markdown.`;
 
   //==============================Api for package master=======================
 
-  get_packages_list_api() {
+  get_packages_list_api(item: any) {
+    const payload = item;
     const getEndpoint = this.apiUrl + 'packing/List';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, payload);
   }
 
   get_combinbation_list_api(item: any) {
