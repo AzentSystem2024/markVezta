@@ -112,15 +112,18 @@ export class PackingEditComponent {
   ItempopupVisible: boolean = false;
   selectedItems: any[] = [];
   ItemListDataSource: any[] = [];
+  Default_company_Type: any;
 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
     this.getDropdownLists();
 
-    // const payload = {
-    //   COMPANY_ID: this.selected_Company_id,
-    // };
-    this.dataService.get_packages_list_api().subscribe((res: any) => {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      COMPANY_TYPE: this.Default_company_Type
+
+    };
+    this.dataService.get_packages_list_api(payload).subscribe((res: any) => {
       this.packing_list = res.Data;
     });
   }
@@ -139,6 +142,8 @@ export class PackingEditComponent {
     );
 
     this.company_code = sessionData.SELECTED_COMPANY.COMPANY_CODE;
+    this.Default_company_Type = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
+
     console.log(this.company_code, '============company code==============');
     this.user_id = sessionData.USER_ID;
     console.log(this.user_id, '============user id==================');
@@ -191,6 +196,7 @@ export class PackingEditComponent {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'PRODUCTION_UNITS',
+      COMPANY_TYPE: this.Default_company_Type
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.produCtionUnits = response;

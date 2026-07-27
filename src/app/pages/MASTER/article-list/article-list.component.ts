@@ -146,7 +146,7 @@ export class ArticleListComponent {
   filteredInvoiceList: any;
 
   selected_Company_id: any;
-  Default_company: any;
+  Default_company_Type: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -193,7 +193,7 @@ export class ArticleListComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.Default_company = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
+    this.Default_company_Type = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
 
   }
 
@@ -206,7 +206,7 @@ export class ArticleListComponent {
           //   COMPANY_ID: this.selected_Company_id,
           // }; // Add any necessary payload data here
           const payload = {
-            COMPANY_TYPE: this.Default_company,
+            COMPANY_TYPE: this.Default_company_Type,
             COMPANY_ID: this.selected_Company_id
 
           }
