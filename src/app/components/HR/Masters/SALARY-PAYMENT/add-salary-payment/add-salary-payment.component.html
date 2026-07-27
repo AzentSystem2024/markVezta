@@ -313,7 +313,7 @@
   </div>
 </dx-validation-group>
 
-<div class="form-popup-buttons-container" *ngIf="!isReadOnlyMode">
+<div class="form-popup-buttons-container" >
   <div class="popup-footer">
     <dx-button
       text="Cancel"
@@ -321,7 +321,7 @@
       type="normal"
       (onClick)="cancel()"
     ></dx-button>
-    <dx-button
+    <dx-button *ngIf="!isReadOnlyMode"
       #saveButtonRef
       [text]="
         isVerifying

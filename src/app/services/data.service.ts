@@ -7273,7 +7273,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(this.apiUrl + 'EOSPayment/approve', payload);
   }
 
-  delete_EOS_payment(payload: any) {
-    return this.http.post(this.apiUrl + 'EOSPayment/delete', payload);
+  delete_EOS_payment(id: any) {
+    return this.http.post(`${this.apiUrl}EOSPayment/delete/${id}`, {});
   }
 }
