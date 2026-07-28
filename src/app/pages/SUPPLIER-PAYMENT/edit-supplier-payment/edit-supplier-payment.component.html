@@ -234,7 +234,7 @@
 
               <div style="display: flex; gap: 10px">
                 <dx-button
-                  *ngIf="!isReadOnlyMode"
+                  *ngIf="!isReadOnlyMode && receiptMode === 'PDC'"
                   icon="search"
                   stylingMode="outlined"
                   type="default"

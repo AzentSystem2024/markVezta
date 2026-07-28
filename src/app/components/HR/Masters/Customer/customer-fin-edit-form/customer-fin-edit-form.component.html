@@ -397,6 +397,22 @@
             </div>
           </dxi-item>
         </dxi-item>
+        <dxi-item itemType="group" [colCount]="2">
+          <dxi-item>
+            <div *dxTemplate>
+              <dx-select-box
+                label="Salesman"
+                [items]="salesmanList"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                placeholder="Salesman"
+                [(value)]="formCustomerData.SALESMAN_ID"
+                labelMode="floating"
+              >
+              </dx-select-box>
+            </div>
+          </dxi-item>
+        </dxi-item>
       </dxi-item>
 
       <!-- COLUMN 2 -->

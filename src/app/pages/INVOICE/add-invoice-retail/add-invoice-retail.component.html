@@ -212,9 +212,7 @@
           <div *dxTemplate="let data of 'priceHeader'">
             <div
               style="text-align: center; line-height: 16px"
-              [innerHTML]="
-                inclVAT ? 'Price<br>(Incl. VAT)' : 'Price<br>(Excl. VAT)'
-              "
+              [innerHTML]="inclVAT ? 'Price<br>(Incl. VAT)' : 'Price<br>'"
             ></div>
           </div>
           <dxi-column

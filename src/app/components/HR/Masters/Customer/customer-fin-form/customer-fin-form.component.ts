@@ -118,6 +118,7 @@ export class CustomerFinFormComponent {
     DEALER_ID: null,
     IS_COMPANY_BRANCH: 0,
     DeliveryAddresses: [] as any[],
+    SALESMAN_ID: 0,
   };
   IS_COMPANY_BRANCH_VALUE: boolean = false;
   selected_fin_id: any;
@@ -150,6 +151,7 @@ export class CustomerFinFormComponent {
   selectedCompanyId: any;
   companyList: any = [];
   Customer_type_list: any = [];
+  salesmanList: any;
 
   constructor(
     private service: DataService,
@@ -399,6 +401,7 @@ export class CustomerFinFormComponent {
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
     }
+    this.getSalesmanDropDown();
     this.sesstion_Details();
     this.get_Country_Dropdown_List();
     this.getDealerDropDown();
@@ -815,6 +818,15 @@ export class CustomerFinFormComponent {
       return code === value && item.ID !== currentId;
     });
   };
+  getSalesmanDropDown() {
+    const payload = {
+      NAME: 'SALESMAN',
+      COMPANY_ID: this.selectedCompanyId,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.salesmanList = data;
+    });
+  }
 }
 
 @NgModule({
