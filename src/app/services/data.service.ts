@@ -6058,9 +6058,10 @@ The result can be exported to HTML or Markdown.`;
 
   //==============================Api for package master=======================
 
-  get_packages_list_api() {
+  get_packages_list_api(item: any) {
+    const payload = item;
     const getEndpoint = this.apiUrl + 'packing/List';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, payload);
   }
 
   get_combinbation_list_api(item: any) {
@@ -7273,7 +7274,7 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(this.apiUrl + 'EOSPayment/approve', payload);
   }
 
-  delete_EOS_payment(payload: any) {
-    return this.http.post(this.apiUrl + 'EOSPayment/delete', payload);
+  delete_EOS_payment(id: any) {
+    return this.http.post(`${this.apiUrl}EOSPayment/delete/${id}`, {});
   }
 }

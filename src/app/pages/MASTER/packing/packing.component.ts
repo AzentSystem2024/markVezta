@@ -110,6 +110,7 @@ export class PackingComponent {
   };
 
   selected_Company_id: any;
+  Default_company_Type: any;
 
   constructor(
     private dataService: DataService,
@@ -202,13 +203,20 @@ export class PackingComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.Default_company_Type = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
+
   }
 
   getPackingList() {
     this.PackingDataSource = new DataSource({
+
       load: () =>
         new Promise((resolve) => {
-          this.dataService.get_packages_list_api().subscribe({
+          const payload = {
+            COMPANY_TYPE: this.Default_company_Type,
+            COMPANY_ID: this.selected_Company_id
+          }
+          this.dataService.get_packages_list_api(payload).subscribe({
             next: (res: any) => {
               const list = (res?.Data || []).map(
                 (item: any, index: number) => ({
