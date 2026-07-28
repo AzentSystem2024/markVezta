@@ -29,6 +29,8 @@ import {
   DxFormModule,
   DxDropDownBoxModule,
   DxListModule,
+  DxPopupModule,
+  DxDataGridModule,
 } from 'devextreme-angular';
 import {
   DxTextBoxModule,
@@ -943,6 +945,8 @@ export class CustomerFinEditFormComponent {
     DxNumberBoxModule,
     DxDropDownBoxModule,
     DxListModule,
+    DxPopupModule,
+    DxDataGridModule,
   ],
   declarations: [CustomerFinEditFormComponent],
   exports: [CustomerFinEditFormComponent],

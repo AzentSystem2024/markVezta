@@ -641,6 +641,7 @@
               <div class="inventory-item">
                 <label>On Hand Quantity:</label>
                 <dx-text-box
+                  class="highlight-readonly"
                   [value]="newItems.QTY_STOCK"
                   [width]="200"
                   [readOnly]="true"
@@ -651,6 +652,7 @@
               <div class="inventory-item">
                 <label>Committed Quantity:</label>
                 <dx-text-box
+                  class="highlight-readonly"
                   [value]="newItems.QTY_COMMITTED"
                   [width]="200"
                   [readOnly]="true"
@@ -661,6 +663,7 @@
               <div class="inventory-item">
                 <label>Available Quantity:</label>
                 <dx-text-box
+                  class="highlight-readonly"
                   [value]="newItems.QTY_STOCK"
                   [width]="200"
                   labelMode="floating"
@@ -692,6 +695,7 @@
             <div class="inventory-item">
               <label>Date Created:</label>
               <dx-date-box
+                class="highlight-readonly"
                 [value]="newItems.CREATED_DATE"
                 [width]="200"
                 [readOnly]="true"
@@ -702,6 +706,7 @@
             <div class="inventory-item">
               <label>Last Ordered:</label>
               <dx-date-box
+                class="highlight-readonly"
                 [value]="newItems.LAST_PO_DATE"
                 [width]="200"
                 displayFormat="dd/MM/yyyy"
@@ -712,6 +717,7 @@
             <div class="inventory-item">
               <label>Last Received:</label>
               <dx-date-box
+                class="highlight-readonly"
                 [value]="newItems.LAST_GRN_DATE"
                 [width]="200"
                 [readOnly]="true"
@@ -722,6 +728,7 @@
             <div class="inventory-item">
               <label>Last Sold:</label>
               <dx-date-box
+                class="highlight-readonly"
                 [value]="newItems.LAST_SALE_DATE"
                 [width]="200"
                 [readOnly]="true"
@@ -737,21 +744,21 @@
     <dxi-tab title="Stores">
       <dxi-item>
         <dx-data-grid
-          class="grid theme-dependent"
+          class="grid theme-dependent stores-grid"
           [dataSource]="store"
           [columnAutoWidth]="true"
           [showBorders]="true"
           [showColumnLines]="true"
           [showRowLines]="true"
           [rowAlternationEnabled]="true"
-          [maxHeight]="420"
+          [height]="360"
           width="100%"
           keyExpr="ID"
           (onRowUpdated)="onRowUpdated($event)"
           (onSelectionChanged)="updatePriceLevel($event.selectedRowsData)"
           [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
         >
-          <dxo-scrolling mode="standard" showScrollbar="always"></dxo-scrolling>
+          <dxo-scrolling mode="virtual" showScrollbar="always"></dxo-scrolling>
           <dxo-selection mode="multiple"> </dxo-selection>
           <dxo-editing mode="cell" [allowUpdating]="true"></dxo-editing>
           <dxi-column
@@ -1096,13 +1103,13 @@
         <div class="grid-container">
           <dx-data-grid
             #supplierGridRef
-            class="grid theme-dependent"
+            class="grid theme-dependent stores-grid"
             [showBorders]="true"
             [showColumnLines]="true"
             [showRowLines]="true"
             [rowAlternationEnabled]="true"
             [columnAutoWidth]="true"
-            [maxHeight]="350"
+            [height]="360"
             width="100%"
             keyExpr="ID"
             [dataSource]="datasource"
@@ -1117,10 +1124,10 @@
               newRowPosition: 'last',
             }"
           >
-            <!-- <dxo-editing mode="row" [allowAdding]="true" [allowDeleting]="true"> -->
-            <!-- </dxo-editing> -->
-
-            <dxo-scrolling mode="virtual"></dxo-scrolling>
+            <dxo-scrolling
+              mode="virtual"
+              showScrollbar="always"
+            ></dxo-scrolling>
             <!-- <dxo-selection mode="multiple"> </dxo-selection> -->
             <dxi-column dataField="SUPP_ID" caption="Supplier Name">
               <dxo-lookup
@@ -1161,11 +1168,7 @@
               dataField="IS_PRIMARY"
               dataType="boolean"
               caption="Primary"
-              [editorOptions]="{ enableTwoStateBehavior: true }"
             ></dxi-column>
-
-            <dxi-column dataField="IS_CONSIGNMENT" [visible]="false">
-            </dxi-column>
           </dx-data-grid>
         </div>
       </dxi-item>

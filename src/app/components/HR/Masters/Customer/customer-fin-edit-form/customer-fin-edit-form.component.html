@@ -7,38 +7,34 @@
 >
   <dxi-item title="Details">
     <dx-form class="plain-styled-form" [colCount]="2">
+      <!-- COLUMN 1 -->
       <dxi-item itemType="group">
-        <dxi-item itemType="group" [colCount]="2">
-          <dxi-item>
-            <div *dxTemplate>
-              <dx-text-box
-                label="Code *"
-                [(value)]="formCustomerData.CUST_CODE"
-                labelMode="floating"
-                [readOnly]="true"
-              >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Code is required"
-                  >
-                  </dxi-validation-rule>
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-box
+              label="Code *"
+              [(value)]="formCustomerData.CUST_CODE"
+              labelMode="floating"
+              [readOnly]="true"
+            >
+              <dx-validator>
+                <dxi-validation-rule type="required" message="Code is required">
+                </dxi-validation-rule>
 
-                  <dxi-validation-rule
-                    type="custom"
-                    [validationCallback]="validateCustomerCode"
-                    message="Code already exists"
-                  ></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="custom"
+                  [validationCallback]="validateCustomerCode"
+                  message="Code already exists"
+                ></dxi-validation-rule>
 
-                  <dxi-validation-rule
-                    type="pattern"
-                    [pattern]="'^[a-zA-Z0-9]+$'"
-                    message="Code should be alphanumeric only"
-                  ></dxi-validation-rule>
-                </dx-validator>
-              </dx-text-box>
-            </div>
-          </dxi-item>
+                <dxi-validation-rule
+                  type="pattern"
+                  [pattern]="'^[a-zA-Z0-9]+$'"
+                  message="Code should be alphanumeric only"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
         </dxi-item>
 
         <dxi-item itemType="group" [colCount]="2">
@@ -54,8 +50,9 @@
                     type="required"
                     message="First name is required"
                   >
-                  </dxi-validation-rule> </dx-validator
-              ></dx-text-box>
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-text-box>
             </div>
           </dxi-item>
           <dxi-item>
@@ -77,70 +74,65 @@
           </dxi-item>
         </dxi-item>
 
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item>
-            <div *dxTemplate>
-              <dx-text-box
-                label="Contact Name *"
-                [(value)]="formCustomerData.CONTACT_NAME"
-                labelMode="floating"
-              >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Contact name is required"
-                  >
-                  </dxi-validation-rule>
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-box
+              label="Contact Name *"
+              [(value)]="formCustomerData.CONTACT_NAME"
+              labelMode="floating"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Contact name is required"
+                >
+                </dxi-validation-rule>
 
-                  <dxi-validation-rule
-                    type="custom"
-                    [validationCallback]="validateCustomername"
-                    message="Contactname already exists"
-                  ></dxi-validation-rule>
-                </dx-validator>
-              </dx-text-box>
-            </div>
-          </dxi-item>
+                <dxi-validation-rule
+                  type="custom"
+                  [validationCallback]="validateCustomername"
+                  message="Contactname already exists"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
         </dxi-item>
 
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item>
-            <div *dxTemplate>
-              <dx-text-box
-                label="Address *"
-                [(value)]="formCustomerData.ADDRESS1"
-                labelMode="floating"
-              >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Address is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator>
-              </dx-text-box>
-            </div>
-          </dxi-item>
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-box
+              label="Address *"
+              [(value)]="formCustomerData.ADDRESS1"
+              labelMode="floating"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Address is required"
+                >
+                </dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
+        </dxi-item>
 
+        <dxi-item itemType="group" [colCount]="2">
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
                 [(value)]="formCustomerData.ADDRESS2"
                 labelMode="floating"
-                label="Address"
-                style="margin-top: 10px"
+                label="Address 2"
               >
               </dx-text-box>
             </div>
           </dxi-item>
-
           <dxi-item>
             <div *dxTemplate>
               <dx-text-box
                 [(value)]="formCustomerData.ADDRESS3"
                 labelMode="floating"
-                label="Address"
-                style="margin-top: 10px"
+                label="Address 3"
               ></dx-text-box>
             </div>
           </dxi-item>
@@ -186,8 +178,9 @@
                     type="required"
                     message="State is required"
                   >
-                  </dxi-validation-rule> </dx-validator
-              ></dx-select-box>
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-select-box>
             </div>
           </dxi-item>
         </dxi-item>
@@ -230,150 +223,148 @@
           </dxi-item>
         </dxi-item>
 
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item>
-            <div *dxTemplate style="display: flex">
-              <dx-drop-down-box
-                label="Code *"
-                labelMode="floating"
-                [(value)]="countryCode"
-                (onValueChanged)="onCountrySelected($event)"
-                valueExpr="data.dial_code"
-                displayExpr="display"
-                [(opened)]="isCountryDropdownOpen"
-                [dataSource]="countryCodes"
-                [width]="120"
-                [dropDownOptions]="{ width: 350 }"
-              >
-                <div *dxTemplate="let data of 'content'">
-                  <dx-list
-                    [dataSource]="countryCodes"
-                    selectionMode="single"
-                    [searchEnabled]="true"
-                    [searchExpr]="['data.name', 'data.dial_code']"
-                    [focusStateEnabled]="false"
-                    (onItemClick)="onCountrySelected($event)"
+        <dxi-item>
+          <div *dxTemplate style="display: flex">
+            <dx-drop-down-box
+              label="Code *"
+              labelMode="floating"
+              [(value)]="countryCode"
+              (onValueChanged)="onCountrySelected($event)"
+              valueExpr="data.dial_code"
+              displayExpr="display"
+              [(opened)]="isCountryDropdownOpen"
+              [dataSource]="countryCodes"
+              [width]="120"
+              [dropDownOptions]="{ width: 350 }"
+            >
+              <div *dxTemplate="let data of 'content'">
+                <dx-list
+                  [dataSource]="countryCodes"
+                  selectionMode="single"
+                  [searchEnabled]="true"
+                  [searchExpr]="['data.name', 'data.dial_code']"
+                  [focusStateEnabled]="false"
+                  (onItemClick)="onCountrySelected($event)"
+                >
+                  <div
+                    *dxTemplate="let item of 'item'"
+                    style="display: flex; align-items: center; gap: 8px"
                   >
-                    <div
-                      *dxTemplate="let item of 'item'"
-                      style="display: flex; align-items: center; gap: 8px"
-                    >
-                      <img
-                        [src]="item.flagUrl"
-                        width="20"
-                        height="14"
-                        style="border-radius: 2px"
-                      />
-                      <span style="min-width: 55px">
-                        {{ item.data.dial_code }}
-                      </span>
-                      <span>
-                        {{ item.data.name }}
-                      </span>
-                    </div>
-                  </dx-list>
-                </div>
-              </dx-drop-down-box>
+                    <img
+                      [src]="item.flagUrl"
+                      width="20"
+                      height="14"
+                      style="border-radius: 2px"
+                    />
+                    <span style="min-width: 55px">
+                      {{ item.data.dial_code }}
+                    </span>
+                    <span>
+                      {{ item.data.name }}
+                    </span>
+                  </div>
+                </dx-list>
+              </div>
+            </dx-drop-down-box>
 
-              <dx-text-box
-                #mobileBox
-                label="Mobile *"
-                class="phone-style"
-                [(value)]="formCustomerData.MOBILE_NO"
-                labelMode="floating"
-                [width]="'100%'"
-                style="margin-left: 10px"
-                hint="Mobile No"
-                valueChangeEvent="input"
-                (input)="onMobileInputChange($event)"
-                [maxLength]="17"
-              >
-                <dx-validator #mobileValidator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Mobile number is required"
-                  ></dxi-validation-rule>
-                  <dxi-validation-rule
-                    type="custom"
-                    [validationCallback]="MobileValidate"
-                    message="Invalid mobile number"
-                  ></dxi-validation-rule>
-                </dx-validator>
-              </dx-text-box>
-            </div>
-          </dxi-item>
+            <dx-text-box
+              #mobileBox
+              label="Mobile *"
+              class="phone-style"
+              [(value)]="formCustomerData.MOBILE_NO"
+              labelMode="floating"
+              [width]="'100%'"
+              style="margin-left: 10px"
+              hint="Mobile No"
+              valueChangeEvent="input"
+              (input)="onMobileInputChange($event)"
+              [maxLength]="17"
+            >
+              <dx-validator #mobileValidator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Mobile number is required"
+                ></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="custom"
+                  [validationCallback]="MobileValidate"
+                  message="Invalid mobile number"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
+        </dxi-item>
 
-          <dxi-item>
-            <div *dxTemplate style="display: flex; margin-top: 15px">
-              <dx-drop-down-box
-                label="Code *"
-                labelMode="floating"
-                [(value)]="phoneCountryCode"
-                (onValueChanged)="onPhoneCountrySelected($event)"
-                valueExpr="data.dial_code"
-                displayExpr="display"
-                [(opened)]="isPhoneDropdownOpen"
-                [dataSource]="countryCodes"
-                [width]="120"
-                [dropDownOptions]="{ width: 350 }"
-              >
-                <div *dxTemplate="let data of 'content'">
-                  <dx-list
-                    [dataSource]="countryCodes"
-                    selectionMode="single"
-                    [searchEnabled]="true"
-                    [searchExpr]="['data.name', 'data.dial_code']"
-                    [focusStateEnabled]="false"
-                    (onItemClick)="onPhoneCountrySelected($event)"
+        <dxi-item>
+          <div *dxTemplate style="display: flex">
+            <dx-drop-down-box
+              label="Code *"
+              labelMode="floating"
+              [(value)]="phoneCountryCode"
+              (onValueChanged)="onPhoneCountrySelected($event)"
+              valueExpr="data.dial_code"
+              displayExpr="display"
+              [(opened)]="isPhoneDropdownOpen"
+              [dataSource]="countryCodes"
+              [width]="120"
+              [dropDownOptions]="{ width: 350 }"
+            >
+              <div *dxTemplate="let data of 'content'">
+                <dx-list
+                  [dataSource]="countryCodes"
+                  selectionMode="single"
+                  [searchEnabled]="true"
+                  [searchExpr]="['data.name', 'data.dial_code']"
+                  [focusStateEnabled]="false"
+                  (onItemClick)="onPhoneCountrySelected($event)"
+                >
+                  <div
+                    *dxTemplate="let item of 'item'"
+                    style="display: flex; align-items: center; gap: 8px"
                   >
-                    <div
-                      *dxTemplate="let item of 'item'"
-                      style="display: flex; align-items: center; gap: 8px"
-                    >
-                      <img
-                        [src]="item.flagUrl"
-                        width="20"
-                        height="14"
-                        style="border-radius: 2px"
-                      />
-                      <span style="min-width: 55px">
-                        {{ item.data.dial_code }}
-                      </span>
-                      <span>
-                        {{ item.data.name }}
-                      </span>
-                    </div>
-                  </dx-list>
-                </div>
-              </dx-drop-down-box>
+                    <img
+                      [src]="item.flagUrl"
+                      width="20"
+                      height="14"
+                      style="border-radius: 2px"
+                    />
+                    <span style="min-width: 55px">
+                      {{ item.data.dial_code }}
+                    </span>
+                    <span>
+                      {{ item.data.name }}
+                    </span>
+                  </div>
+                </dx-list>
+              </div>
+            </dx-drop-down-box>
 
-              <dx-text-box
-                #phoneBox
-                label="Phone *"
-                class="phone-style"
-                [(value)]="formCustomerData.PHONE"
-                labelMode="floating"
-                [width]="'100%'"
-                style="margin-left: 10px"
-                hint="Phone"
-                valueChangeEvent="input"
-                (input)="validatePhone($event)"
-                [maxLength]="17"
-              >
-                <dx-validator #phoneValidator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Phone number is required"
-                  ></dxi-validation-rule>
-                  <dxi-validation-rule
-                    type="custom"
-                    [validationCallback]="PhoneValidate"
-                    message="Invalid phone number"
-                  ></dxi-validation-rule>
-                </dx-validator>
-              </dx-text-box>
-            </div>
-          </dxi-item>
+            <dx-text-box
+              #phoneBox
+              label="Phone *"
+              class="phone-style"
+              [(value)]="formCustomerData.PHONE"
+              labelMode="floating"
+              [width]="'100%'"
+              style="margin-left: 10px"
+              hint="Phone"
+              valueChangeEvent="input"
+              (input)="validatePhone($event)"
+              [maxLength]="17"
+            >
+              <dx-validator #phoneValidator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Phone number is required"
+                ></dxi-validation-rule>
+                <dxi-validation-rule
+                  type="custom"
+                  [validationCallback]="PhoneValidate"
+                  message="Invalid phone number"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
         </dxi-item>
 
         <dxi-item itemType="group" [colCount]="2">
@@ -384,13 +375,6 @@
                 [(value)]="formCustomerData.FAX_NO"
                 labelMode="floating"
               >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="FAX number is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator> -->
               </dx-text-box>
             </div>
           </dxi-item>
@@ -415,24 +399,9 @@
         </dxi-item>
       </dxi-item>
 
-      <dxi-item itemType="group" cssClass="mt-5">
-        <!-- <dxi-item [colSpan]="2">
-          <div *dxTemplate>
-            <dx-select-box
-              label="Customer Type"
-              [items]="Customer_type_list"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              [(value)]="formCustomerData.CUSTOMER_TYPE"
-              placeholder="Select customer type"
-              labelMode="floating"
-              (onValueChanged)="onDealerSelected($event)"
-            ></dx-select-box>
-            
-          </div>
-        </dxi-item> -->
-
-        <dxi-item *ngIf="formCustomerData.CUST_TYPE === 2" [colSpan]="2">
+      <!-- COLUMN 2 -->
+      <dxi-item itemType="group">
+        <dxi-item *ngIf="formCustomerData.CUST_TYPE === 2">
           <div *dxTemplate>
             <dx-select-box
               label="Parent Dealer"
@@ -448,58 +417,25 @@
           </div>
         </dxi-item>
 
-        <!-- <dxi-item itemType="group" [colCount]="2">
-      <dxi-item>
-        <div *dxTemplate>
-          <dx-select-box
-            label="Warehouse"
-            (onValueChanged)="onWarehouseValue($event)"
-                  [items]="Warehouse"
-                  [(value)]="formCustomerData.WAREHOUSE_ID"
-                  labelMode="floating"
-                  [searchEnabled]="true"
-                  valueExpr="ID"
-                  displayExpr="DESCRIPTION"
-          >
-            <dx-validator>
-              <dxi-validation-rule type="required" message="ZIP is required">
-              </dxi-validation-rule>
-            </dx-validator>
-          </dx-select-box>
-        </div>
-      </dxi-item>
-    </dxi-item> -->
-
         <dxi-item itemType="group" [colCount]="2">
           <dxi-item>
             <div *dxTemplate>
               <dx-number-box
-                label="Credit Limit *"
+                label="Credit Limit"
                 labelMode="floating"
                 [(value)]="formCustomerData.CREDIT_LIMIT"
                 [min]="0"
                 [showSpinButtons]="true"
                 format="#0.00"
               >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Credit limit is required"
-                  ></dxi-validation-rule>
-
-                  <dxi-validation-rule
-                    type="numeric"
-                    message="Only numbers are allowed"
-                  ></dxi-validation-rule>
-                </dx-validator> -->
               </dx-number-box>
             </div>
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
               <dx-number-box
-                label="Current Credit *"
                 class="highlight-readonly"
+                label="Current Credit *"
                 [(value)]="formCustomerData.CURRENT_CREDIT"
                 labelMode="floating"
                 [readOnly]="true"
@@ -510,43 +446,26 @@
           </dxi-item>
         </dxi-item>
 
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item>
-            <div *dxTemplate>
-              <dx-select-box
-                label="Payment Terms *"
-                [items]="PaymentTermsDropdownData"
-                displayExpr="DESCRIPTION"
-                valueExpr="ID"
-                [(value)]="formCustomerData.PAY_TERM_ID"
-                placeholder="Select Payment Terms"
-                labelMode="floating"
-              >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Payment terms is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator> -->
-              </dx-select-box>
-            </div>
-          </dxi-item>
-        </dxi-item>
-        <dxi-item itemType="group" [colCount]="1">
+        <dxi-item>
           <div *dxTemplate>
-            <dx-text-area
-              label="Additional Info."
-              [(value)]="formCustomerData.NOTES"
+            <dx-select-box
+              label="Payment Terms"
+              [items]="PaymentTermsDropdownData"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [(value)]="formCustomerData.PAY_TERM_ID"
+              placeholder="Select Payment Terms"
               labelMode="floating"
-            ></dx-text-area>
+            >
+            </dx-select-box>
           </div>
         </dxi-item>
+
         <dxi-item itemType="group" [colCount]="2">
           <dxi-item>
             <div *dxTemplate>
               <dx-select-box
-                label="Default Price Level *"
+                label="Default Price Level"
                 [items]="PriceLevelDropdownData"
                 displayExpr="DESCRIPTION"
                 valueExpr="ID"
@@ -554,20 +473,13 @@
                 [(value)]="formCustomerData.PRICE_CLASS_ID"
                 labelMode="floating"
               >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Select default price level"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator> -->
               </dx-select-box>
             </div>
           </dxi-item>
           <dxi-item>
             <div *dxTemplate>
               <dx-number-box
-                label="Discount % *"
+                label="Discount %"
                 labelMode="floating"
                 [(value)]="formCustomerData.DISCOUNT_PERCENT"
                 [min]="0"
@@ -576,88 +488,54 @@
                 format="#0.00"
                 [showSpinButtons]="true"
               >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Discount percent is required"
-                  ></dxi-validation-rule>
-
-                  <dxi-validation-rule
-                    type="numeric"
-                    message="Only numbers are allowed"
-                  ></dxi-validation-rule>
-
-                  <dxi-validation-rule
-                    type="range"
-                    [min]="0"
-                    [max]="100"
-                    message="Discount must be between 0 and 100"
-                  ></dxi-validation-rule>
-                </dx-validator> -->
               </dx-number-box>
             </div>
           </dxi-item>
         </dxi-item>
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item>
-            <div *dxTemplate>
-              <dx-select-box
-                [items]="VATRuleDropdownData"
-                displayExpr="DESCRIPTION"
-                valueExpr="ID"
-                [(value)]="formCustomerData.CUST_VAT_RULE_ID"
-                placeholder="Select VAT Rule *"
-                labelMode="floating"
-              >
-                <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="State is required"
-                  >
-                  </dxi-validation-rule>
-                </dx-validator>
-              </dx-select-box>
-            </div>
-          </dxi-item>
+
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-select-box
+              [items]="VATRuleDropdownData"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [(value)]="formCustomerData.CUST_VAT_RULE_ID"
+              placeholder="Select VAT Rule *"
+              labelMode="floating"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="VAT rule is required"
+                >
+                </dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+          </div>
         </dxi-item>
-        <dxi-item itemType="group" [colCount]="1">
-          <dxi-item>
-            <div *dxTemplate>
-              <dx-text-box
-                [label]="'  VAT Registration Number *'"
-                [(value)]="formCustomerData.VAT_REGNO"
-                labelMode="floating"
-              >
-                <!-- <dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    [message]="' VAT Registration number is required'"
-                  >
-                    >
-                  </dxi-validation-rule>
-                </dx-validator> -->
-              </dx-text-box>
-            </div>
-          </dxi-item>
+
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-box
+              label="VAT Registration Number"
+              [(value)]="formCustomerData.VAT_REGNO"
+              labelMode="floating"
+            >
+            </dx-text-box>
+          </div>
+        </dxi-item>
+
+        <dxi-item>
+          <div *dxTemplate>
+            <dx-text-area
+              label="Additional Info."
+              [(value)]="formCustomerData.NOTES"
+              labelMode="floating"
+              [height]="71"
+            ></dx-text-area>
+          </div>
         </dxi-item>
       </dxi-item>
-
-      <div class="form-popup-buttons-container">
-        <div class="popup-footer">
-          <dx-button
-            text="Cancel"
-            stylingMode="outlined"
-            (onClick)="closePopup()"
-            type="normal"
-          ></dx-button>
-          <dx-button
-            text="UpdateS"
-            stylingMode="contained"
-            type="default"
-            (onClick)="UpdateData()"
-          ></dx-button>
-        </div>
-      </div>
     </dx-form>
   </dxi-item>
 
@@ -679,6 +557,7 @@
           </dx-text-box>
         </dxi-item>
 
+        <!-- Country + Mobile in same row with flex layout -->
         <dxi-item>
           <div *dxTemplate style="display: flex">
             <dx-drop-down-box
@@ -745,6 +624,7 @@
             </dx-text-box>
           </div>
         </dxi-item>
+
         <dxi-item>
           <dx-text-box
             label="Location"
@@ -763,24 +643,22 @@
             mode="tel"
             (onInput)="allowOnlyNumbers($event)"
           >
-            <dx-validator>
-              <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateMobileLengthdeliveryaddress"
-                [message]="
-                  'Mobile no. must be  ' +
-                  mobile_limit_Delivery_Address +
-                  ' digits long'
-                "
-              ></dxi-validation-rule>
-            </dx-validator>
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateMobileLengthdeliveryaddress"
+              [message]="
+                'Mobile no. must be  ' +
+                mobile_limit_Delivery_Address +
+                ' digits long'
+              "
+            ></dxi-validation-rule>
           </dx-text-box>
         </dxi-item>
       </dx-form>
       <dxi-item>
         <div class="save-btn">
           <dx-button
-            text="Save"
+            [text]="editingIndex !== null ? 'Update' : 'Add'"
             type="default"
             location="after"
             (onClick)="saveDeliveryAddress()"
@@ -820,7 +698,11 @@
                 </div>
               </div>
               <p><strong>Address:</strong> {{ addr.ADDRESS1 }}</p>
-              <p><strong>Mobile:</strong> {{ addr.MOBILE }}</p>
+              <p>
+                <strong>Mobile:</strong> {{ addr.COUNTRY_CODE }}
+                {{ addr.MOBILE }}
+              </p>
+
               <p><strong>Location:</strong> {{ addr.LOCATION }}</p>
               <p><strong>Telephone:</strong> {{ addr.PHONE }}</p>
             </div>
@@ -830,3 +712,22 @@
     </div>
   </dxi-item>
 </dx-tab-panel>
+<dx-popup
+  [(visible)]="isSubDealerPopupVisible"
+  [showTitle]="true"
+  title="Select Main Dealer"
+  [height]="'70vh'"
+  [width]="'50vh'"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+>
+  <dx-data-grid
+    [dataSource]="dealerList"
+    [showBorders]="true"
+    [height]="350"
+    (onSelectionChanged)="onDealerSelected($event)"
+    [selection]="{ mode: 'single' }"
+  >
+    <dxi-column dataField="DEALER" caption="Dealer"></dxi-column>
+  </dx-data-grid>
+</dx-popup>

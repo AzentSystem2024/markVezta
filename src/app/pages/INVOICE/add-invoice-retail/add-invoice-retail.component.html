@@ -157,14 +157,15 @@
             [allowEditing]="!isReadOnlyMode"
             [editorType]="'dxSelectBox'"
             headerCellTemplate="itemCodeHeader"
+            [calculateDisplayValue]="calculateItemCode"
             [lookup]="{
-              dataSource: itemsList,
+              dataSource: itemsDataSource,
               valueExpr: 'ITEM_ID',
               displayExpr: 'ITEM_CODE',
               searchEnabled: true,
               searchMode: 'contains',
-              minSearchLength: 2,
-              showDataBeforeSearch: false,
+              minSearchLength: 0,
+              showDataBeforeSearch: true,
               paginate: true,
               pageSize: 50,
             }"
@@ -180,14 +181,15 @@
             [allowEditing]="!isReadOnlyMode"
             [editorType]="'dxSelectBox'"
             [width]="120"
+            [calculateDisplayValue]="calculateDescription"
             [lookup]="{
-              dataSource: itemsDescriptionList,
+              dataSource: itemsDataSource,
               valueExpr: 'ITEM_ID',
               displayExpr: 'DESCRIPTION',
               searchEnabled: true,
               searchMode: 'contains',
-              minSearchLength: 2,
-              showDataBeforeSearch: false,
+              minSearchLength: 0,
+              showDataBeforeSearch: true,
               paginate: true,
               pageSize: 50,
             }"

@@ -252,6 +252,7 @@
               <div style="display: flex; gap: 10px">
                 <!-- Search Icon Button -->
                 <dx-button
+                  *ngIf="receiptMode === 'PDC'"
                   icon="search"
                   stylingMode="outlined"
                   type="default"

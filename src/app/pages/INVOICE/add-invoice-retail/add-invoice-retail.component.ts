@@ -46,6 +46,9 @@ import { confirm } from 'devextreme/ui/dialog';
 import dxSelectBox from 'devextreme/ui/select_box';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import CustomStore from 'devextreme/data/custom_store';
+import DataSource from 'devextreme/data/data_source';
+import { tap, of, throwError, catchError, shareReplay, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-add-invoice-retail',
@@ -119,6 +122,12 @@ export class AddInvoiceRetailComponent {
   selected_vat_id: any;
   itemsList: any;
   itemsDescriptionList: any;
+  itemsMap: Map<any, any> = new Map();
+  itemsDataSource: DataSource | null = null;
+  isItemsLoading = false;
+  itemsObservable$: Observable<any> | null = null;
+  itemDataCache: Map<string, any[]> = new Map();
+  items: any[] = [];
   isSaving: boolean = false;
   storeID: any;
   invalidQtyRowIndex: number | null = null;
@@ -185,7 +194,8 @@ export class AddInvoiceRetailComponent {
     // } else {
     //   this.filteredStoreList = this.storeList;
     // }
-    this.getItems();
+    this.initItemsDataSource();
+    this.getItems()?.subscribe();
     // this.getItemsDescription();
     if (!this.isEditing) {
       this.getDocNo();
@@ -255,23 +265,168 @@ export class AddInvoiceRetailComponent {
     });
   }
 
-  getItems() {
+  initItemsDataSource() {
+    const customStore = new CustomStore({
+      key: 'ITEM_ID',
+      byKey: (key: any) => {
+        const item = this.itemsMap.get(key);
+        return Promise.resolve(item || { ITEM_ID: key });
+      },
+      load: (loadOptions: any) => {
+        const getPaginatedData = () => {
+          let result = this.items || [];
+          if (loadOptions.searchValue) {
+            const query = String(loadOptions.searchValue).toLowerCase();
+            result = result.filter(
+              (item: any) =>
+                (item.ITEM_CODE &&
+                  String(item.ITEM_CODE).toLowerCase().includes(query)) ||
+                (item.DESCRIPTION &&
+                  String(item.DESCRIPTION).toLowerCase().includes(query)),
+            );
+          }
+          const skip = loadOptions.skip || 0;
+          const take = loadOptions.take || 50;
+          return {
+            data: result.slice(skip, skip + take),
+            totalCount: result.length,
+          };
+        };
+
+        if (this.items && this.items.length > 0 && !this.isItemsLoading) {
+          return Promise.resolve(getPaginatedData());
+        }
+
+        if (this.isItemsLoading && this.itemsObservable$) {
+          return new Promise((resolve) => {
+            this.itemsObservable$!.subscribe({
+              next: () => resolve(getPaginatedData()),
+              error: () => resolve({ data: [], totalCount: 0 }),
+            });
+          });
+        }
+
+        const currentStoreId = this.invoiceFormData.STORE_ID || this.storeID;
+        if (currentStoreId) {
+          const obs$ = this.getItems();
+          if (obs$) {
+            return new Promise((resolve) => {
+              obs$.subscribe({
+                next: () => resolve(getPaginatedData()),
+                error: () => resolve({ data: [], totalCount: 0 }),
+              });
+            });
+          }
+        }
+
+        return Promise.resolve({ data: [], totalCount: 0 });
+      },
+    });
+
+    this.itemsDataSource = new DataSource({
+      store: customStore,
+      paginate: true,
+      pageSize: 50,
+    });
+  }
+
+  getItems(): Observable<any> | null {
+    const STORE_ID = this.invoiceFormData.STORE_ID || this.storeID;
+    if (!STORE_ID) {
+      return null;
+    }
+    this.storeID = STORE_ID;
+
+    const cacheKey = `${STORE_ID}`;
+
+    if (this.itemDataCache.has(cacheKey)) {
+      this.populateItemData(this.itemDataCache.get(cacheKey)!);
+      return of(this.items);
+    }
+
     const payload = {
-      STORE_ID: this.invoiceFormData.STORE_ID,
+      STORE_ID,
     };
 
-    this.dataService.getItemsForStore(payload).subscribe((response: any) => {
-      const items = response.Data || [];
+    this.isItemsLoading = true;
+    this.itemsObservable$ = this.dataService.getItemsForStore(payload).pipe(
+      tap((response: any) => {
+        this.isItemsLoading = false;
+        if (response.Flag === -1) {
+          notify(response.Message, 'error', 3000);
+          return;
+        }
+        const rawItems = response.Data || [];
+        this.populateItemData(rawItems, cacheKey);
+      }),
+      catchError((err) => {
+        this.isItemsLoading = false;
+        return throwError(() => err);
+      }),
+      shareReplay(1),
+    );
 
-      this.itemsList = items;
-      this.itemsDescriptionList = items;
-    });
+    return this.itemsObservable$;
+  }
+
+  private populateItemData(data: any[], cacheKey?: string) {
+    this.items = data || [];
+    this.itemsList = this.items;
+    this.itemsDescriptionList = this.items;
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      if (item && item.ITEM_ID != null) {
+        this.itemsMap.set(item.ITEM_ID, item);
+      }
+    }
+    if (cacheKey) {
+      this.itemDataCache.set(cacheKey, this.items);
+    }
   }
 
   onStoreChanged(e: any) {
     this.invoiceFormData.STORE_ID = e.value;
-    this.getItems();
+    this.storeID = e.value;
+    this.items = [];
+    this.itemsMap.clear();
+    this.getItems()?.subscribe();
   }
+
+  calculateItemCode = (rowData: any) => {
+    if (!rowData) return '';
+    const itemId =
+      rowData.ITEM_ID != null ? rowData.ITEM_ID : rowData.ITEM_CODE;
+    const item = this.itemsMap.get(itemId);
+    if (item && item.ITEM_CODE) {
+      return item.ITEM_CODE;
+    }
+    if (
+      rowData.ITEM_CODE &&
+      typeof rowData.ITEM_CODE === 'string' &&
+      isNaN(Number(rowData.ITEM_CODE))
+    ) {
+      return rowData.ITEM_CODE;
+    }
+    return rowData.ITEM_CODE || '';
+  };
+
+  calculateDescription = (rowData: any) => {
+    if (!rowData) return '';
+    const itemId =
+      rowData.ITEM_ID != null ? rowData.ITEM_ID : rowData.DESCRIPTION;
+    const item = this.itemsMap.get(itemId);
+    if (item && item.DESCRIPTION) {
+      return item.DESCRIPTION;
+    }
+    if (
+      rowData.DESCRIPTION &&
+      typeof rowData.DESCRIPTION === 'string' &&
+      isNaN(Number(rowData.DESCRIPTION))
+    ) {
+      return rowData.DESCRIPTION;
+    }
+    return rowData.DESCRIPTION || rowData.ITEM_NAME || '';
+  };
 
   // getItems() {
   //   const payload = {
@@ -533,7 +688,36 @@ export class AddInvoiceRetailComponent {
     this.dataService
       .getOutsideCustomerWithState(payload)
       .subscribe((response: any) => {
-        this.customerList = response;
+        const list = Array.isArray(response) ? response : [];
+        if (this.EditingResponseData) {
+          const data = this.EditingResponseData;
+          const custId =
+            data.CUSTOMER_ID != null && data.CUSTOMER_ID !== 0
+              ? data.CUSTOMER_ID
+              : data.CUST_ID != null && data.CUST_ID !== 0
+                ? data.CUST_ID
+                : data.PARTY_NAME && !isNaN(Number(data.PARTY_NAME))
+                  ? Number(data.PARTY_NAME)
+                  : 0;
+
+          const custName =
+            data.CUSTOMER_NAME ||
+            data.CUST_NAME ||
+            data.PARTY_NAME ||
+            data.PARTY_DESC ||
+            '';
+
+          if (custId) {
+            const exists = list.some((c: any) => c.ID == custId);
+            if (!exists) {
+              list.push({
+                ID: custId,
+                DESCRIPTION: custName || String(custId),
+              });
+            }
+          }
+        }
+        this.customerList = list;
       });
   }
 
@@ -545,27 +729,78 @@ export class AddInvoiceRetailComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
-    const data = this.EditingResponseData; //  full object
+    const data = this.EditingResponseData; // full object
     const Details = data.Details || [];
     console.log(Details, 'DETAILSSSSSSSSSSSSSSSSS');
-    //  PATCH HEADER
+
+    const customerId =
+      data.CUSTOMER_ID != null && data.CUSTOMER_ID !== 0
+        ? data.CUSTOMER_ID
+        : data.CUST_ID != null && data.CUST_ID !== 0
+          ? data.CUST_ID
+          : data.PARTY_NAME && !isNaN(Number(data.PARTY_NAME))
+            ? Number(data.PARTY_NAME)
+            : 0;
+
+    const customerName =
+      data.CUSTOMER_NAME ||
+      data.CUST_NAME ||
+      data.PARTY_NAME ||
+      data.PARTY_DESC ||
+      '';
+
+    // PATCH HEADER
     this.invoiceFormData = {
       ...this.invoiceFormData,
       ...data,
       TRANS_DATE: this.convertToDate(data.TRANS_DATE),
-      CUSTOMER_ID: data.CUSTOMER_ID,
+      CUSTOMER_ID: customerId,
       REF_NO: data.REF_NO,
-      DOC_NO: data.SALE_NO,
+      DOC_NO: data.SALE_NO || data.DOC_NO,
     };
+
+    // Ensure customerList includes customerId so dx-select-box binds immediately
+    if (customerId) {
+      if (!this.customerList) {
+        this.customerList = [];
+      }
+      const exists = this.customerList.some((c: any) => c.ID == customerId);
+      if (!exists) {
+        this.customerList = [
+          ...this.customerList,
+          { ID: customerId, DESCRIPTION: customerName || String(customerId) },
+        ];
+      }
+    }
+
+    // Pre-fill itemsMap from details so item code and description load INSTANTLY without waiting for API
+    Details.forEach((item: any) => {
+      if (item && item.ITEM_ID != null) {
+        const itemCode =
+          item.ITEM_CODE ||
+          (typeof item.ITEM_ID === 'string' ? item.ITEM_ID : '');
+        const itemDesc = item.DESCRIPTION || item.ITEM_NAME || '';
+        this.itemsMap.set(item.ITEM_ID, {
+          ITEM_ID: item.ITEM_ID,
+          ITEM_CODE: itemCode || String(item.ITEM_ID),
+          DESCRIPTION: itemDesc || String(item.ITEM_ID),
+          UOM: item.UOM,
+          PRICE: item.PRICE,
+          QTY_STOCK: item.QTY_STOCK || item.QUANTITY || 0,
+          TAX_PERC: item.TAX_PERC || item.VAT_PERC || 0,
+        });
+      }
+    });
 
     // PATCH GRID
     this.invoiceFormData.Details = Details.map((item: any) => ({
+      ...item,
       ITEM_ID: item.ITEM_ID,
-      ITEM_CODE: item.ITEM_ID, // lookup uses ID
-      DESCRIPTION: item.ITEM_ID,
+      ITEM_CODE: item.ITEM_ID, // lookup valueExpr uses ITEM_ID
+      DESCRIPTION: item.ITEM_ID, // lookup valueExpr uses ITEM_ID
       HSN_CODE: item.HSN_CODE,
       UOM: item.UOM,
-      PRICE: item.PRICE, // IMPORTANT FIX
+      PRICE: item.PRICE,
       QUANTITY: item.QUANTITY,
       AMOUNT: item.AMOUNT,
       TAX_PERC: item.TAX_PERC,
@@ -573,8 +808,8 @@ export class AddInvoiceRetailComponent {
       DISC_AMT: item.DISC_AMT,
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
-      CUSTOMER_ID: data.CUSTOMER_ID,
-      QTY_STOCK: item.QTY_STOCK,
+      CUSTOMER_ID: customerId,
+      QTY_STOCK: item.QTY_STOCK || item.QUANTITY || 0,
     }));
 
     // refresh grid
@@ -658,14 +893,36 @@ export class AddInvoiceRetailComponent {
 
         e.editorOptions = {
           ...e.editorOptions,
-          dataSource:
-            e.dataField === 'ITEM_CODE'
-              ? this.itemsList
-              : this.itemsDescriptionList,
+          dataSource: this.itemsDataSource,
           valueExpr: 'ITEM_ID',
           displayExpr:
             e.dataField === 'ITEM_CODE' ? 'ITEM_CODE' : 'DESCRIPTION',
           searchEnabled: true,
+          searchMode: 'contains',
+          minSearchLength: 0,
+          showDataBeforeSearch: true,
+          paginate: true,
+          pageSize: 50,
+
+          onOpened: () => {
+            const activeStoreId = this.invoiceFormData.STORE_ID || this.storeID;
+            if (!activeStoreId) {
+              notify('Please select a Store first', 'warning', 3000);
+              setTimeout(() => {
+                grid?.closeEditCell();
+              }, 0);
+            } else if (this.itemsDataSource) {
+              this.itemsDataSource.load();
+            }
+          },
+
+          onFocusIn: () => {
+            const activeStoreId = this.invoiceFormData.STORE_ID || this.storeID;
+            if (!activeStoreId) {
+              notify('Please select a Store first', 'warning', 3000);
+              grid?.closeEditCell();
+            }
+          },
 
           onValueChanged: (args: any) => {
             const selectedId = args.value;

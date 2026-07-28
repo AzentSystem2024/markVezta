@@ -237,6 +237,7 @@
                     caption="Amount"
                     [allowEditing]="false"
                     [calculateCellValue]="calculateGrossAmount"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
                   ></dxi-column>
                   <dxi-column
                     dataField="DISC_PERCENT"
@@ -499,11 +500,11 @@
           *ngIf="!isReadOnlyMode"
           [text]="
             isSaving
-              ? 'Please wait...'
+              ? 'Save...'
               : isApproved
                 ? 'Approve'
                 : isEditing
-                  ? 'Update'
+                  ? 'Save'
                   : 'Save'
           "
           [icon]="isSaving ? 'spin spinner' : ''"

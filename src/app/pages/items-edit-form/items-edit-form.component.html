@@ -656,6 +656,7 @@
                 <div class="inventory-item">
                   <label>On Hand Quantity:</label>
                   <dx-text-box
+                    class="highlight-readonly"
                     [value]="itemData.QTY_STOCK"
                     [width]="200"
                     [readOnly]="true"
@@ -665,6 +666,7 @@
                 <div class="inventory-item">
                   <label>Committed Quantity:</label>
                   <dx-text-box
+                    class="highlight-readonly"
                     [value]="itemData.QTY_COMMITTED"
                     [width]="200"
                     [readOnly]="true"
@@ -674,6 +676,7 @@
                 <div class="inventory-item">
                   <label>Available Quantity:</label>
                   <dx-text-box
+                    class="highlight-readonly"
                     [value]="itemData.QTY_STOCK"
                     [width]="200"
                     [readOnly]="true"
@@ -701,6 +704,7 @@
                 <div class="inventory-item">
                   <label>Date Created:</label>
                   <dx-date-box
+                    class="highlight-readonly"
                     [value]="itemData.CREATED_DATE"
                     displayFormat="dd/MM/yyyy"
                     [width]="200"
@@ -710,6 +714,7 @@
                 <div class="inventory-item">
                   <label>Last Ordered:</label>
                   <dx-date-box
+                    class="highlight-readonly"
                     [value]="itemData.LAST_PO_DATE"
                     displayFormat="dd/MM/yyyy"
                     [width]="200"
@@ -719,6 +724,7 @@
                 <div class="inventory-item">
                   <label>Last Received:</label>
                   <dx-date-box
+                    class="highlight-readonly"
                     [value]="itemData.LAST_GRN_DATE"
                     displayFormat="dd/MM/yyyy"
                     [width]="200"
@@ -728,6 +734,7 @@
                 <div class="inventory-item">
                   <label>Last Sold:</label>
                   <dx-date-box
+                    class="highlight-readonly"
                     [value]="itemData.LAST_SALE_DATE"
                     displayFormat="dd/MM/yyyy"
                     [width]="200"
@@ -742,14 +749,14 @@
         <dxi-tab title="Stores">
           <dxi-item>
             <dx-data-grid
-              class="grid theme-dependent"
+              class="grid theme-dependent stores-grid"
               [dataSource]="store"
               [columnAutoWidth]="true"
               [showBorders]="true"
               [showColumnLines]="true"
               [showRowLines]="true"
               [rowAlternationEnabled]="true"
-              [maxHeight]="420"
+              [height]="360"
               width="100%"
               keyExpr="ID"
               [(selectedRowKeys)]="selectedRowKeys"
@@ -1081,13 +1088,13 @@
         <dxi-tab title="Supplier" *ngIf="showSupplierTab">
           <dxi-item>
             <dx-data-grid
-              class="grid theme-dependent"
+              class="grid theme-dependent stores-grid"
               [showBorders]="true"
               [showColumnLines]="true"
               [showRowLines]="true"
               [rowAlternationEnabled]="true"
               [columnAutoWidth]="true"
-              [maxHeight]="350"
+              [height]="360"
               width="100%"
               keyExpr="ID"
               [dataSource]="edit_Suplier"
@@ -1102,7 +1109,10 @@
                 newRowPosition: 'last',
               }"
             >
-              <dxo-scrolling mode="standard"></dxo-scrolling>
+              <dxo-scrolling
+                mode="virtual"
+                showScrollbar="always"
+              ></dxo-scrolling>
 
               <!-- Supplier Column -->
               <dxi-column dataField="SUPP_ID" caption="Supplier Name">

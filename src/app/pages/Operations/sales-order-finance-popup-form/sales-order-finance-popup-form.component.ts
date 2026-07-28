@@ -1276,14 +1276,14 @@ export class SalesOrderFinancePopupFormComponent {
 
   onAddItemClick() {
     if (!this.salesOrderFormData?.CUST_ID) {
-      notify('Please select a supplier before adding items.', 'warning', 2500);
+      notify('Please select a Customer before adding items.', 'warning', 2500);
       return; //  stop here
     }
 
     //  Supplier selected → proceed
     this.showAddItemPopup = true;
 
-    console.log(this.salesOrderFormData.CUST_ID, 'selected supplier id');
+    console.log(this.salesOrderFormData.CUST_ID, 'selected customer id');
 
     this.getCustomerByid();
   }

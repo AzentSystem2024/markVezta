@@ -16,7 +16,9 @@
       [scrolling]="{ mode: 'virtual' }"
       [height]="'82vh'"
     >
-      <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+      <dxo-header-filter [visible]="showHeaderFilter">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
 
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -106,7 +108,11 @@
       </dxi-column>
 
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
-      <dxi-column *ngIf="IsLedgerEnabled" dataField="HEAD_NAME" caption="Ledger"></dxi-column>
+      <dxi-column
+        *ngIf="IsLedgerEnabled"
+        dataField="HEAD_NAME"
+        caption="Ledger"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </div>

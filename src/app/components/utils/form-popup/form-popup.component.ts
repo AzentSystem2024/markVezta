@@ -19,6 +19,7 @@ import {
 } from 'devextreme-angular';
 import { ScreenService } from 'src/app/services';
 import { ApplyPipeModule } from 'src/app/pipes/apply.pipe';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'form-popup',
@@ -77,6 +78,14 @@ export class FormPopupComponent {
 
   onSaveClick() {
     if (!this.isValid()) {
+      notify(
+        {
+          message: 'Please fill all required fields',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        3000,
+      );
       return;
     }
     this.save.emit();

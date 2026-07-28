@@ -42,6 +42,7 @@ import { DataService } from 'src/app/services';
 
 import notify from 'devextreme/ui/notify';
 import { QuotationFormModule } from '../../quotation-form/quotation-form.component';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-quotation',
@@ -584,43 +585,91 @@ export class QuotationComponent {
 
   onDeleteQuotation(event: any) {
     const quotationId = event.data.ID;
-    const status = event.data.TRANS_STATUS;
+
+    event.cancel = true;
+
     if (event.data.TRANS_STATUS === 5) {
-      event.cancel = true;
       notify('This cannot be deleted.', 'error', 2000);
       return;
     }
-    event.cancel = true;
-    console.log(quotationId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
-    // Call your delete API
-    this.dataService.deleteSalesQuotation(quotationId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.getQuotationList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
-    );
+
+    confirm(
+      'Are you sure you want to delete this quotation?',
+      'Confirm Delete',
+    ).then((dialogResult) => {
+      if (!dialogResult) {
+        return;
+      }
+
+      this.dataService.deleteSalesQuotation(quotationId).subscribe(
+        (response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Deleted Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.getQuotationList();
+          } else {
+            notify(
+              {
+                message: 'Your data was not deleted.',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        },
+        (error) => {
+          console.error(error);
+          notify('Something went wrong.', 'error', 2000);
+        },
+      );
+    });
   }
+
+  // onDeleteQuotation(event: any) {
+  //   const quotationId = event.data.ID;
+  //   const status = event.data.TRANS_STATUS;
+  //   if (event.data.TRANS_STATUS === 5) {
+  //     event.cancel = true;
+  //     notify('This cannot be deleted.', 'error', 2000);
+  //     return;
+  //   }
+  //   event.cancel = true;
+  //   console.log(quotationId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
+  //   // Call your delete API
+  //   this.dataService.deleteSalesQuotation(quotationId).subscribe(
+  //     (response: any) => {
+  //       if (response) {
+  //         notify(
+  //           {
+  //             message: 'Deleted Successfully',
+  //             position: { at: 'top center', my: 'top center' },
+  //           },
+  //           'success',
+  //         );
+  //         this.getQuotationList();
+  //         // this.dataGrid.instance.refresh();
+  //       } else {
+  //         notify(
+  //           {
+  //             message: 'Your Data Not deleted',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'error',
+  //         );
+  //       }
+  //       // or whatever method you use to refresh `employeeList`
+  //     },
+  //     (error) => {
+  //       console.error('Error deleting employee:', error);
+  //     },
+  //   );
+  // }
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
       const buttons = e.cellElement.querySelectorAll('.dx-link');
