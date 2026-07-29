@@ -755,8 +755,123 @@ body {
   content: "\f03e";
   color: #d62a1e !important;
   font-size: 18px;
-  padding-left: 10px;
+  // padding-left: 10px;
 }
+
+.flag-pending,
+.flag-verified,
+.flag-approved,
+.flag-paid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Same width for all */
+  height: 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
+
+.flag-pending {
+  background: #ffa500;
+}
+
+.flag-verified {
+  background: #0073d8;
+}
+
+.flag-approved {
+  background: #10b981;
+}
+
+.flag-paid {
+  background: #8b5cf6;
+}
+
+.verify-badge {
+  position: relative;
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.verify-badge::before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "\f0a3"; // Certificate
+  font-size: 17px;
+}
+
+.verify-badge::after {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "\f00c"; // Check
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 7px;
+  color: #fff;
+  line-height: 1;
+}
+
+/* Flag colors */
+.verify-badge.status-pending::before {
+  color: #ffa500;
+}
+
+.verify-badge.status-verified::before {
+  color: #0073d8;
+}
+
+.verify-badge.status-approved::before {
+  color: #10b981;
+}
+
+.verify-badge.status-paid::before {
+  color: #8b5cf6;
+}
+
+.verify-badge.status-leftservice::before {
+  color: rgb(18, 161, 5);
+}
+
+.verify-badge.disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.verify-badge.disabled::before {
+  opacity: 0.45; /* Keeps green, but faded */
+}
+
+.verify-badge.disabled::after {
+  opacity: 0.45; /* Fades the white check too */
+}
+
+.action-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px; /* Equal gap between all icons */
+}
+
+.action-icons i,
+.action-icons .verify-badge {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
 .dx-treeview-node[aria-expanded="true"] > .dx-item .dx-item-content {
   height: auto;
   color: #0073d8;
@@ -1203,16 +1318,19 @@ body {
 
 .add-button.dx-button.dx-button-default {
   border-radius: 8px !important;
-  background-color: #0073D8 !important;
+  background-color: #0073d8 !important;
   color: #fff !important; /* text color */
 }
 .add-button.dx-button.dx-button-default:hover {
   border-radius: 8px !important;
-  background-color: #0068C2 !important;
+  background-color: #0068c2 !important;
   color: #fff !important; /* text color */
 }
-
-
+.add-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Increase this value as needed */
+}
 
 /* ========================= */
 /* 🔥 TAB CONTAINER */
@@ -1235,7 +1353,6 @@ body {
 /* 🔵 TAB */
 /* ========================= */
 
-
 /* ========================= */
 /* 🟦 ACTIVE */
 /* ========================= */
@@ -1243,8 +1360,6 @@ body {
   background-color: var(--tab-selected-bg-color) !important;
   color: var(--selected-text-color);
 }
-
-
 
 /* ========================= */
 /* 🖱 HOVER */
@@ -1263,10 +1378,10 @@ body {
   display: none !important;
 }
 
-.custom-tab 
-.dx-tabs-styling-mode-secondary 
-.dx-tab.dx-tab-selected 
-.dx-tab-content::after {
+.custom-tab
+  .dx-tabs-styling-mode-secondary
+  .dx-tab.dx-tab-selected
+  .dx-tab-content::after {
   display: none !important;
   content: none !important;
 }
@@ -1289,7 +1404,3 @@ body {
   background-color: var(--tab-selected-bg-color);
   color: var(--selected-text-color);
 }
-
-
-
-

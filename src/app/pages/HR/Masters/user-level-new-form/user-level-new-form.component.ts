@@ -198,7 +198,7 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
       } else {
         // reset all permissions
         menu.CanAdd = false;
-        menu.CanView = false;
+        menu.CanView = true;
         menu.CanEdit = false;
         menu.CanVerify = false;
         menu.CanApprove = false;

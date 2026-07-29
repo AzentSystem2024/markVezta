@@ -23,6 +23,7 @@
     [scrolling]="{ mode: 'standard' }"
     rowAlternationInterval="2"
     (onRowRemoved)="deleteData($event)"
+    [showColumnLines]="true"
     [editing]="{ allowUpdating: true, allowDeleting: true }"
   >
     <dxo-editing
@@ -49,10 +50,27 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">Staff End of Service</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Staff End of Service
+        </div>
       </dxi-item>
 
       <dxi-item widget="dxSelectBox" [options]="dateRangeOptions"></dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
 
       <dxi-item
         location="after"
@@ -62,11 +80,9 @@
       >
       </dxi-item>
 
-      <dxi-item
-        location="after"
-        widget="dxButton"
-        [options]="searchButtonOptions"
-      ></dxi-item>
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
       <dxi-item
         *ngIf="canAdd"
@@ -109,7 +125,7 @@
       dataField="STATUS"
       alignment="center"
       [width]="'auto'"
-      [cellTemplate]="statusCellRender"
+      cellTemplate="statusCellRender"
       [allowHeaderFiltering]="true"
       [headerFilter]="{
         dataSource: getStatusFilterData,
@@ -117,6 +133,20 @@
       }"
     >
     </dxi-column>
+
+    <div *dxTemplate="let data of 'statusCellRender'">
+      <span
+        [ngClass]="{
+          'flag-pending': data.data.STATUS === 'Open',
+          'flag-verified': data.data.STATUS === 'Verified',
+          'flag-approved':
+            data.data.STATUS === 'Left Service' ||
+            data.data.STATUS === 'Approved',
+        }"
+      >
+        {{ data.data.STATUS }}
+      </span>
+    </div>
 
     <dxi-column
       type="buttons"
@@ -126,98 +156,58 @@
     >
     </dxi-column>
     <div *dxTemplate="let cellData of 'actionTemplate'">
-      <!-- Edit -->
-      <i
-        *ngIf="canEdit"
-        class="dx-icon dx-icon-edit"
-        [style.opacity]="
-          cellData.data.STATUS === 'Verified' ||
-          cellData.data.STATUS === 'Left Service'
-            ? '0.4'
-            : '1'
-        "
-        [style.pointer-events]="
-          cellData.data.STATUS === 'Verified' ||
-          cellData.data.STATUS === 'Left Service'
-            ? 'none'
-            : 'auto'
-        "
-        style="cursor: pointer; margin-right: 10px"
-        title="Edit"
-        (click)="onEditingStart({ data: cellData.data, cancel: false })"
-      ></i>
-
-      <!-- Delete -->
-      <i
-        *ngIf="canDelete"
-        class="dx-icon dx-icon-trash"
-        [style.opacity]="
-          cellData.data.STATUS === 'Verified' ||
-          cellData.data.STATUS === 'Left Service'
-            ? '0.4'
-            : '1'
-        "
-        [style.pointer-events]="
-          cellData.data.STATUS === 'Verified' ||
-          cellData.data.STATUS === 'Left Service'
-            ? 'none'
-            : 'auto'
-        "
-        style="cursor: pointer; margin-right: 10px"
-        title="Delete"
-        (click)="deleteData({ data: cellData.data, cancel: false })"
-      ></i>
-
-      <!-- Verify -->
-      <span
-        *ngIf="
-          (cellData.data.STATUS === 'Verified' && canApprove) ||
-          (cellData.data.STATUS !== 'Verified' && canVerify)
-        "
-        style="
-          position: relative;
-          display: inline-block;
-          width: 18px;
-          height: 18px;
-          margin-left: 10px;
-          cursor: pointer;
-          vertical-align: middle;
-        "
-        [title]="
-          cellData.data.STATUS === 'Left Service'
-            ? 'Left Service'
-            : cellData.data.STATUS === 'Verified'
-              ? 'Approve'
-              : 'Verify'
-        "
-        (click)="onVerifyClick({ row: { data: cellData.data } })"
-      >
-        <!-- Blue badge -->
+      <div class="action-icons">
+        <!-- Edit -->
         <i
-          class="fas fa-certificate"
-          [style.color]="
+          *ngIf="canEdit"
+          class="dx-icon dx-icon-edit"
+          style="opacity: 1; pointer-events: auto"
+          [title]="getEditActionTitle(cellData.data)"
+          (click)="onEditingStart({ data: cellData.data, cancel: false })"
+        ></i>
+
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            cellData.data.STATUS === 'Verified' ||
             cellData.data.STATUS === 'Left Service'
-              ? '#237c20ff'
-              : cellData.data.STATUS === 'Verified'
-                ? '#0073D8'
-                : '#FFA500'
+              ? '0.4'
+              : '1'
           "
-          style="font-size: 18px; position: absolute; top: 0; left: 0"
+          [style.pointer-events]="
+            cellData.data.STATUS === 'Verified' ||
+            cellData.data.STATUS === 'Left Service'
+              ? 'none'
+              : 'auto'
+          "
+          title="Delete"
+          (click)="deleteData({ data: cellData.data, cancel: false })"
         ></i>
 
-        <!-- White tick -->
-        <i
-          class="fas fa-check"
-          style="
-            color: white;
-            font-size: 7px;
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            pointer-events: none;
+        <!-- Verify -->
+        <span
+          *ngIf="showVerifyApproveBadge(cellData.data)"
+          class="verify-badge"
+          [ngClass]="{
+            'status-pending':
+              cellData.data.STATUS !== 'Verified' &&
+              cellData.data.STATUS !== 'Left Service' &&
+              cellData.data.STATUS !== 'Approved',
+            'status-verified': cellData.data.STATUS === 'Verified',
+            'status-approved':
+              cellData.data.STATUS === 'Left Service' ||
+              cellData.data.STATUS === 'Approved',
+          }"
+          [class.disabled]="isVerifyApproveDisabled(cellData.data)"
+          [title]="getVerifyApproveTitle(cellData.data)"
+          (click)="
+            !isVerifyApproveDisabled(cellData.data) &&
+              onVerifyAction(cellData.data)
           "
-        ></i>
-      </span>
+        ></span>
+      </div>
     </div>
   </dx-data-grid>
 </div>
@@ -659,7 +649,6 @@
             [useMaskBehavior]="true"
             [displayFormat]="'dd/MM/yyyy'"
             type="date"
-            [readOnly]="true"
             [inputAttr]="{ 'aria-label': 'Date' }"
             [(value)]="selected_data.EOS_DATE"
             labelMode="floating"
@@ -675,7 +664,6 @@
           valueExpr="ID"
           label="Employee *"
           [searchEnabled]="true"
-          [readOnly]="true"
           placeholder="Select.."
           labelMode="floating"
           (onValueChanged)="onEmployee_Change($event)"
@@ -693,10 +681,8 @@
         <dxi-item>
           <dx-text-box
             label="Join Date"
-            [readOnly]="true"
             [(value)]="join_date_value"
             labelMode="floating"
-            [readOnly]="true"
           ></dx-text-box>
         </dxi-item>
         <dxi-item>
@@ -706,7 +692,6 @@
             [showClearButton]="true"
             [useMaskBehavior]="true"
             [displayFormat]="'dd/MM/yyyy'"
-            [readOnly]="true"
             type="date"
             [inputAttr]="{ 'aria-label': 'Date' }"
             [(value)]="selected_data.RELIEVING_DATE"
@@ -734,7 +719,6 @@
           [searchEnabled]="true"
           placeholder="Select.."
           labelMode="floating"
-          [readOnly]="true"
         >
         </dx-select-box>
       </dxi-item>
@@ -745,7 +729,6 @@
           valueChangeEvent="input"
           [(value)]="selected_data.REMARKS"
           labelMode="floating"
-          [readOnly]="true"
         ></dx-text-area>
       </dxi-item>
 

@@ -222,7 +222,7 @@ export class PayrollListComponent {
     private zone: NgZone,
     private router: Router,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   // ==========================================
   // Lifecycle Hooks
@@ -328,95 +328,119 @@ export class PayrollListComponent {
 
   onEditOrViewPayroll(e: any) {
     e.cancel = true;
-    const payrollId = e.data.SALARY_BILL_NO;
+
     const payload = {
-      PAYDETAIL_ID: payrollId,
+      PAYDETAIL_ID: e.data.SALARY_BILL_NO,
       COMPANY_ID: this.selectedCompanyId,
     };
 
-    this.dataService.viewSelectedPayroll(payload).subscribe({
-      next: (response: any) => {
-        this.selectedPayroll = response;
-        const actionButton = this.allActionButtons.find(
-          (btn) => btn.name === 'edit',
-        );
-        if (actionButton) {
-          let hintText = 'Edit';
-          if (
-            this.selectedPayroll.STATUS === 'Approved' ||
-            this.selectedPayroll.STATUS === 'Paid'
-          ) {
-            hintText = 'View';
-          } else if (this.selectedPayroll.STATUS !== 'Pending') {
-            hintText = '';
-          }
-          actionButton.hint = hintText;
-          actionButton.text = hintText;
-        }
+    this.dataService.viewSelectedPayroll(payload).subscribe((response: any) => {
 
-        this.isVerifyMode = false;
-        this.isApproveMode = false;
-        this.isReadOnlyMode = false;
+      this.selectedPayroll = response;
 
-        if (
-          this.selectedPayroll.STATUS === 'Approved' ||
-          this.selectedPayroll.STATUS === 'Paid'
-        ) {
-          this.isReadOnlyMode = true;
-          this.isApproveMode = true;
-          this.PopupTitle = 'View Payroll';
-        } else {
+      this.isVerifyMode = false;
+      this.isApproveMode = false;
+
+      if (e.data.STATUS === 'Pending') {
+
+        if (this.canEdit) {
+
+          // Edit Mode
+          this.isReadOnlyMode = false;
           this.PopupTitle = 'Edit Payroll';
+
+        } else {
+
+          // View Mode
+          this.isReadOnlyMode = true;
+          this.PopupTitle = 'View Payroll';
+
         }
-        this.editPayrollPopupOpened = true;
-      },
-      error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
+
+      } else {
+
+        // Verified / Approved / Paid
+
+        this.isReadOnlyMode = true;
+        this.PopupTitle = 'View Payroll';
+
+      }
+
+      this.editPayrollPopupOpened = true;
+
     });
   }
 
-  onVerifyOrApproveIconClick(e: any): void {
-    e.cancel = true;
-    const payrollId = e.data?.SALARY_BILL_NO;
-    const status = e.data?.STATUS;
 
-    if (!payrollId) {
-      console.warn('No Payroll ID found in row data');
-      return;
+  isVerifyApproveDisabled(row: any): boolean {
+
+    if (row.STATUS === 'Pending') {
+      return !this.canVerify;
     }
 
+    if (row.STATUS === 'Verified') {
+      return !this.canApprove;
+    }
+
+    if (row.STATUS === 'Approved') {
+      return this.canEdit;   // Disable only for edit users
+    }
+
+    if (row.STATUS === 'Paid') {
+      return this.canEdit;   // Disable only for edit users
+    }
+
+    return false;
+  }
+
+  onVerifyOrApproveIconClick(e: any) {
+
     const payload = {
-      PAYDETAIL_ID: payrollId,
+      PAYDETAIL_ID: e.data.SALARY_BILL_NO,
       COMPANY_ID: this.selectedCompanyId,
     };
 
-    this.dataService.viewSelectedPayroll(payload).subscribe({
-      next: (response: any) => {
-        this.selectedPayroll = response;
-        if (status === 'Pending') {
-          this.isVerifyMode = true;
-          this.isApproveMode = false;
-          this.isReadOnlyMode = false;
-          this.PopupTitle = 'Verify Payroll';
-        } else if (status === 'Verified') {
-          this.isVerifyMode = false;
-          this.isApproveMode = true;
-          this.isReadOnlyMode = true;
-          this.PopupTitle = 'Approve Payroll';
-        } else if (status === 'Approved' || status === 'Paid') {
-          this.isVerifyMode = false;
-          this.isApproveMode = false;
-          this.isReadOnlyMode = true;
-          this.PopupTitle = 'View Payroll';
-        }
+    this.dataService.viewSelectedPayroll(payload).subscribe((response: any) => {
 
+      this.selectedPayroll = response;
+
+      // Close all modes first
+      this.isVerifyMode = false;
+      this.isApproveMode = false;
+      this.isReadOnlyMode = false;
+
+      // Pending -> Verify Popup
+      if (e.data.STATUS === 'Pending') {
+
+        this.isVerifyMode = true;
+        this.PopupTitle = 'Verify Payroll';
         this.editPayrollPopupOpened = true;
-      },
-      error: (err) => {
-        console.error('Failed to fetch payroll details:', err);
-      },
+        return;
+      }
+
+      // Verified -> Approve Popup
+      if (e.data.STATUS === 'Verified') {
+
+        this.isApproveMode = true;
+        this.PopupTitle = 'Approve Payroll';
+        this.editPayrollPopupOpened = true;
+        return;
+      }
+
+      // Approved / Paid -> View Popup (only for users without Edit permission)
+      if (
+        (e.data.STATUS === 'Approved' || e.data.STATUS === 'Paid') &&
+        !this.canEdit
+      ) {
+
+        this.isReadOnlyMode = true;
+        this.PopupTitle = 'View Payroll';
+        this.editPayrollPopupOpened = true;
+        return;
+      }
+
     });
+
   }
 
   async onDeletePayroll(e: any) {
@@ -838,4 +862,4 @@ export class PayrollListComponent {
   exports: [PayrollListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PayrollListModule {}
+export class PayrollListModule { }

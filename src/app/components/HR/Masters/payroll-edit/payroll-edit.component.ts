@@ -87,7 +87,7 @@ export class PayrollEditComponent {
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -98,8 +98,7 @@ export class PayrollEditComponent {
     if (changes['payroll'] && changes['payroll'].currentValue) {
       this.is_verify = this.isVerifyMode;
       this.is_approved = this.isApproveMode;
-      this.is_approve =
-        this.isReadOnlyMode || this.isVerifyMode || this.isApproveMode;
+      this.is_approve = this.isReadOnlyMode
 
       this.incomingPayrollData = changes['payroll'].currentValue;
 
@@ -589,4 +588,4 @@ export class PayrollEditComponent {
   exports: [PayrollEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PayrollEditModule {}
+export class PayrollEditModule { }

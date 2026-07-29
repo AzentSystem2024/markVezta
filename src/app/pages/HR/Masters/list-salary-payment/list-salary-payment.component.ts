@@ -134,7 +134,7 @@ export class ListSalaryPaymentComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -251,24 +251,70 @@ export class ListSalaryPaymentComponent {
 
   onEditOrViewSalaryPayment(e: any) {
     e.cancel = true;
+
     const miscId = e.data.TRANS_ID;
     const status = e.data.TRANS_STATUS;
+
     this.StatusType = 'Editscreen';
+
     this.dataService.selectSalaryPayment(miscId).subscribe({
       next: (response: any) => {
+
         this.selectedSalaryData = response.Data;
+
+        // OPEN document
+        if (status === 1) {   // <-- Replace 1 with your actual Open status if different
+
+          if (this.canEdit) {
+            this.isReadOnlyPayment = false;   // Edit mode
+          } else {
+            this.isReadOnlyPayment = true;    // View mode
+          }
+
+        } else {
+
+          // Verified / Approved / Other status
+          this.isReadOnlyPayment = true;
+
+        }
+
         this.editSalaryPopup = true;
-        this.isReadOnlyPayment = status === 5;
       },
+
       error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
+        console.error('Failed to fetch salary payment:', err);
+      }
     });
+  }
+
+  isVerifyApproveDisabled(row: any): boolean {
+
+    // Pending
+    if (row.TRANS_STATUS === 1) {
+      return !this.canVerify;
+    }
+
+    // Verified
+    if (row.TRANS_STATUS === 2) {
+      return !this.canApprove;
+    }
+
+    // Approved
+    if (row.TRANS_STATUS === 5) {
+      return this.canEdit;
+    }
+
+    // Paid
+    if (row.TRANS_STATUS === 6) {
+      return this.canEdit;
+    }
+
+    return false;
   }
 
   async onDeleteSalaryPayment(e: any) {
     const miscId = e.data.TRANS_ID;
-    
+
     e.cancel = true;
 
     const isConfirmed = await confirm(
@@ -328,14 +374,19 @@ export class ListSalaryPaymentComponent {
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
-    // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
       (item: any) => item.name === 'toggleFilterButton',
     );
+
     if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
+      const refreshIndex = toolbarItems.findIndex(
+        (item: any) => item.options?.icon === 'refresh',
+      );
+      const insertIndex = refreshIndex >= 0 ? refreshIndex : toolbarItems.length;
+
+      toolbarItems.splice(insertIndex, 0, {
         widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
+        name: 'toggleFilterButton',
         location: 'after',
         options: {
           icon: 'search',
@@ -346,26 +397,7 @@ export class ListSalaryPaymentComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
 
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {
@@ -556,37 +588,57 @@ export class ListSalaryPaymentComponent {
 
   onverifyClick(e: any) {
     const miscId = e.row.data.TRANS_ID;
-    this.StatusType = 'verifyscreen';
-
     const status = e.row.data.TRANS_STATUS;
+
     this.dataService.selectSalaryPayment(miscId).subscribe({
       next: (response: any) => {
-        if (response && response.Data) {
-          this.selectedSalaryData = response.Data;
-          if (status === 5) {
-            // Approved -> View mode
-            this.isReadOnlyPayment = true;
-            this.editSalaryPopup = true;
-          } else if (status === 2) {
-            // Verified -> Approve mode
-            this.isReadOnlyPayment = false;
-            this.approveSalaryPopup = true;
-          } else {
-            // Open -> Verify mode
-            this.isReadOnlyPayment = false;
-            this.verifySalaryPopup = true;
-          }
-        } else {
-          const errorMessage =
-            response?.Message || 'Failed to fetch salary payment data.';
-          notify(errorMessage, 'error', 3000);
+        if (!response || !response.Data) {
+          notify(
+            response?.Message || 'Failed to fetch salary payment data.',
+            'error',
+            3000
+          );
+          return;
+        }
+
+        this.selectedSalaryData = response.Data;
+
+        // Close all popups first
+        this.editSalaryPopup = false;
+        this.verifySalaryPopup = false;
+        this.approveSalaryPopup = false;
+
+        // ==========================
+        // OPEN -> VERIFY
+        // ==========================
+        if (status == 1) {
+
+          this.verifySalaryPopup = true;
+          this.isReadOnlyPayment = false;
+
+        }
+        else if (status == 2) {
+
+          this.approveSalaryPopup = true;
+          this.isReadOnlyPayment = false;
+
+        }
+        // ==========================
+        // APPROVED / OTHER STATUS
+        // ==========================
+        else {
+          this.isReadOnlyPayment = true;
+          this.editSalaryPopup = true;
         }
       },
+
       error: (err) => {
+        console.error(err);
+
         notify(
           'An error occurred while fetching salary payment details.',
           'error',
-          3000,
+          3000
         );
       },
     });
@@ -626,4 +678,4 @@ export class ListSalaryPaymentComponent {
   exports: [ListSalaryPaymentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ListSalaryPaymentModule {}
+export class ListSalaryPaymentModule { }

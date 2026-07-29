@@ -83,6 +83,7 @@ export class TimesheetListComponent {
   selectedTimesheet: any = null;
   timesheetList: any[] = [];
   PopupTitle: string = '';
+  approveReadOnlyMode = true;
 
   // Month / Year Selection
   selectedMonth: Date = new Date();
@@ -208,7 +209,7 @@ export class TimesheetListComponent {
     private dataService: DataService,
     private zone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   // LIFECYCLE HOOKS
   // ==========================================
@@ -271,29 +272,67 @@ export class TimesheetListComponent {
     this.fetchTimesheetList();
   }
 
+  openTimesheet(data: any) {
+    this.dataService.selectTimesheet(data.ID).subscribe((response: any) => {
+
+      this.selectedTimesheet = response;
+
+      // Open document
+      if (data.STATUS === 'Open') {
+
+        if (this.canEdit) {
+
+          // Edit Mode
+          this.editTimesheetPopupOpened = true;
+
+        } else {
+
+          // View Mode
+          this.viewTimesheetPopupOpened = true;
+
+        }
+
+      } else {
+
+        // Verified / Approved / Any Other Status
+        this.viewTimesheetPopupOpened = true;
+
+      }
+
+    });
+  }
+
+  showVerifyApprove(row: any): boolean {
+
+    if (row.STATUS === 'Open') {
+      return this.SessioncanVerify;
+    }
+
+    if (row.STATUS === 'Verified') {
+      return this.SessioncanApprove;
+    }
+
+    return false;
+  }
+
   statusCellRender = (cellElement: any, cellInfo: any) => {
     const status = cellInfo.data.STATUS;
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag';
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approved'
-        ? '#10B981'
-        : status === 'Verified'
-          ? '#0073D8'
-          : '#FFA500';
 
-    icon.title =
-      status === 'Approved'
-        ? 'Approved'
-        : status === 'Verified'
-          ? 'Verified'
-          : 'Open';
+    const span = document.createElement('span');
+    span.innerText = status;
 
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-    cellElement.appendChild(icon);
+    span.classList.add(
+      status === 'Paid'
+        ? 'flag-paid'
+        : status === 'Approved'
+          ? 'flag-approved'
+          : status === 'Verified'
+            ? 'flag-verified'
+            : 'flag-pending'
+    );
+
+    cellElement.style.textAlign = 'center';
+    cellElement.appendChild(span);
   };
 
   onCellPrepared(e: any) {
@@ -429,7 +468,7 @@ export class TimesheetListComponent {
     this.fetchTimesheetList();
   }
 
-  updateMonthLabel() {}
+  updateMonthLabel() { }
 
   // DATA FETCHING
   // ==========================================
@@ -448,7 +487,7 @@ export class TimesheetListComponent {
   getPayTimeEntries() {
     this.dataService
       .getDropdownData('PAYTIME_ENTRY')
-      .subscribe((res: any) => {});
+      .subscribe((res: any) => { });
   }
 
   fetchTimesheetList() {
@@ -662,17 +701,88 @@ export class TimesheetListComponent {
   }
 
   onVerifyAction(data: any) {
-    const timesheetId = data.ID;
-    this.dataService.selectTimesheet(timesheetId).subscribe((response: any) => {
+    this.dataService.selectTimesheet(data.ID).subscribe((response: any) => {
       this.selectedTimesheet = response;
-      if (data.STATUS === 'Open') {
+
+      // Close all popups
+      this.editTimesheetPopupOpened = false;
+      this.verifyTimesheetPopupOpened = false;
+      this.approveTimesheetPopupOpened = false;
+      this.viewTimesheetPopupOpened = false;
+
+      // Open -> Verify Popup
+      if (data.STATUS === 'Open' && this.SessioncanVerify) {
         this.verifyTimesheetPopupOpened = true;
-      } else if (data.STATUS === 'Verified') {
+        return;
+      }
+
+      // Verified -> Approve Popup
+      if (data.STATUS === 'Verified' && this.SessioncanApprove) {
         this.approveTimesheetPopupOpened = true;
-      } else if (data.STATUS === 'Approved') {
+        return;
+      }
+
+      // Approved / Paid -> View Popup for users without Edit permission
+      if ((data.STATUS === 'Approved' || data.STATUS === 'Paid') && !this.canEdit) {
         this.viewTimesheetPopupOpened = true;
+        return;
       }
     });
+  }
+
+  isEditDisabled(row: any): boolean {
+    // Disable only if you don't want users to open verified/approved records.
+    // If View mode should open, simply return false.
+    return false;
+  }
+
+  isVerifyApproveDisabled(row: any): boolean {
+    if (row.STATUS === 'Open') {
+      return !this.SessioncanVerify;
+    }
+
+    if (row.STATUS === 'Verified') {
+      return !this.SessioncanApprove;
+    }
+
+    if (row.STATUS === 'Approved') {
+      return this.canEdit;
+    }
+
+    return false;
+  }
+
+  showVerifyApproveBadge(row: any): boolean {
+    if (row.STATUS === 'Open') {
+      return this.SessioncanVerify || this.canEdit;
+    }
+
+    if (row.STATUS === 'Verified') {
+      return this.SessioncanApprove || this.canEdit;
+    }
+
+    if (row.STATUS === 'Approved') {
+      return true;
+    }
+
+    return false;
+  }
+
+  getVerifyApproveTitle(row: any): string {
+
+    if (row.STATUS === 'Open') {
+      return this.SessioncanVerify ? 'Verify' : 'Verify';
+    }
+
+    if (row.STATUS === 'Verified') {
+      return this.SessioncanApprove ? 'Approve' : 'Approve';
+    }
+
+    if (row.STATUS === 'Approved') {
+      return this.canEdit ? 'Approved' : 'View';
+    }
+
+    return '';
   }
 
   isDeleteVisible = (e: any) => {
@@ -783,4 +893,4 @@ export class TimesheetListComponent {
   exports: [TimesheetListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetListModule {}
+export class TimesheetListModule { }

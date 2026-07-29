@@ -81,10 +81,24 @@
       <dxo-filter-builder [allowHierarchicalFields]="true"></dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Salary Payment</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Salary Payment
+          </div>
         </dxi-item>
 
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
@@ -99,10 +113,6 @@
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>
-        <dxi-item location="after" locateInMenu="auto"> </dxi-item>
-        <dxi-item location="after" locateInMenu="auto">
-          <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
-        </dxi-item>
       </dxo-toolbar>
 
       <div *dxTemplate="let data of 'dateFilterTemplate'">
@@ -136,8 +146,8 @@
       <dxi-column
         caption="Status"
         dataField="TRANS_STATUS"
-        [width]="80"
-        [cellTemplate]="statusCellRender"
+        [width]="140"
+        cellTemplate="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
@@ -145,6 +155,30 @@
         }"
       >
       </dxi-column>
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-pending': data.data.TRANS_STATUS == 1,
+              'flag-verified': data.data.TRANS_STATUS == 2,
+              'flag-approved': data.data.TRANS_STATUS == 5,
+              'flag-paid': data.data.TRANS_STATUS == 6,
+            }"
+          >
+            {{
+              data.data.TRANS_STATUS == 1
+                ? "Open"
+                : data.data.TRANS_STATUS == 2
+                  ? "Verified"
+                  : data.data.TRANS_STATUS == 5
+                    ? "Approved"
+                    : data.data.TRANS_STATUS == 6
+                      ? "Paid"
+                      : ""
+            }}
+          </span>
+        </div>
+      </div>
       <dxi-column
         type="buttons"
         caption="Actions"
@@ -153,100 +187,46 @@
       >
       </dxi-column>
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- edit icon -->
-        <i
-          *ngIf="canEdit"
-          class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? 'none'
-              : 'auto'
-          "
-          class="dx-icon dx-icon-edit"
-          style="cursor: pointer; margin-right: 10px"
-          title="Edit"
-          (click)="
-            onEditOrViewSalaryPayment({ data: cellData.data, cancel: false })
-          "
-        ></i>
-
-        <!-- Delete -->
-        <i
-          *ngIf="canDelete"
-          class="dx-icon dx-icon-trash"
-          [style.opacity]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Delete"
-          (click)="
-            onDeleteSalaryPayment({ data: cellData.data, cancel: false })
-          "
-        ></i>
-
-        <!-- Verify/Approve/View Icon -->
-        <span
-          *ngIf="
-            canVerify ||
-            (canApprove && cellData.data.TRANS_STATUS === 'Verified') ||
-            (canView && cellData.data.TRANS_STATUS === 'Approved')
-          "
-          style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            margin-right: 10px;
-            cursor: pointer;
-          "
-          [title]="
-            cellData.data.TRANS_STATUS === 5
-              ? 'Approved'
-              : cellData.data.TRANS_STATUS === 2
-                ? 'Approve'
-                : 'Verify'
-          "
-          (click)="onverifyClick({ row: { data: cellData.data } })"
-        >
-          <!-- Badge -->
+        <div class="action-icons">
+          <!-- edit icon -->
           <i
-            class="fas fa-certificate"
-            [style.color]="
-              cellData.data.TRANS_STATUS === 5
-                ? '#10B981'
-                : cellData.data.TRANS_STATUS === 2
-                  ? '#0073D8'
-                  : '#FFA500'
-            "
-            style="font-size: 18px; position: absolute; top: 0; left: 0"
-          ></i>
-
-          <!-- Tick -->
-          <i
-            class="fas fa-check"
-            style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
+            *ngIf="canEdit || canView"
+            class="dx-icon dx-icon-edit"
+            title="Edit"
+            (click)="
+              onEditOrViewSalaryPayment({ data: cellData.data, cancel: false })
             "
           ></i>
-        </span>
+
+          <!-- Delete -->
+          <i
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            [style.opacity]="
+              canDelete && cellData.data.TRANS_STATUS === 1 ? '1' : '0.4'
+            "
+            [style.pointer-events]="
+              canDelete && cellData.data.TRANS_STATUS === 1 ? 'auto' : 'none'
+            "
+            title="Delete"
+            (click)="
+              onDeleteSalaryPayment({ data: cellData.data, cancel: false })
+            "
+          ></i>
+
+          <!-- Verify/Approve/View Icon -->
+          <span
+            class="verify-badge"
+            [ngClass]="{
+              'status-pending': cellData.data.TRANS_STATUS == 1,
+              'status-verified': cellData.data.TRANS_STATUS == 2,
+              'status-approved': cellData.data.TRANS_STATUS == 5,
+            }"
+            [class.disabled]="isVerifyApproveDisabled(cellData.data)"
+            (click)="onverifyClick({ row: { data: cellData.data } })"
+          >
+          </span>
+        </div>
       </div>
     </dx-data-grid>
   </div>

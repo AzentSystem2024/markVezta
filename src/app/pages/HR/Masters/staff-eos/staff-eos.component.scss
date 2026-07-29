@@ -132,21 +132,6 @@
   margin-left: 10px;
 }
 
-.flag-open {
-  color: white; /* or rgb(245, 240, 240) */
-  text-shadow:
-    0 0 1px black,
-    0 0 2px black;
-}
-
-.flag-verified {
-  color: orange;
-}
-
-.flag-approved {
-  color: rgb(255, 8, 8);
-}
-
 /* Set popup height */
 .custom-date-popup .dx-popup-content {
   height: 250px; /* or any height you want */
