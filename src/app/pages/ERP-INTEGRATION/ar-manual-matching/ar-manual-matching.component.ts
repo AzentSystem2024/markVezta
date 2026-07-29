@@ -123,17 +123,20 @@ export class ARManualMatchingComponent implements AfterViewInit {
       dataType: 'number',
       format: '#,##0.00',
       allowEditing: true,
+      setCellValue: (newData: any, value: any, currentRowData: any) => {
+        newData.ReceivedAmount = value;
+        newData.RejectedAmount = (Number(currentRowData.Amount) || 0) - (Number(value) || 0);
+      },
       validationRules: [
         {
           type: 'custom',
-          message: 'Received + Rejected cannot exceed Invoice Amount',
+          message: 'Received + Rejected must equal Invoice Amount',
           validationCallback: (options: any) => {
             if (this.currentEditingColumn !== 'ReceivedAmount') return true;
             const data = options.data || {};
             const amount = Number(data.Amount) || 0;
-            const rejected = Number(data.RejectedAmount) || 0;
             const received = Number(options.value) || 0;
-            return received + rejected <= amount;
+            return received >= 0 && received <= amount;
           },
         },
       ],
@@ -144,17 +147,20 @@ export class ARManualMatchingComponent implements AfterViewInit {
       dataType: 'number',
       format: '#,##0.00',
       allowEditing: true,
+      setCellValue: (newData: any, value: any, currentRowData: any) => {
+        newData.RejectedAmount = value;
+        newData.ReceivedAmount = (Number(currentRowData.Amount) || 0) - (Number(value) || 0);
+      },
       validationRules: [
         {
           type: 'custom',
-          message: 'Received + Rejected cannot exceed Invoice Amount',
+          message: 'Received + Rejected must equal Invoice Amount',
           validationCallback: (options: any) => {
             if (this.currentEditingColumn !== 'RejectedAmount') return true;
             const data = options.data || {};
             const amount = Number(data.Amount) || 0;
-            const received = Number(data.ReceivedAmount) || 0;
             const rejected = Number(options.value) || 0;
-            return received + rejected <= amount;
+            return rejected >= 0 && rejected <= amount;
           },
         },
       ],
@@ -322,9 +328,13 @@ export class ARManualMatchingComponent implements AfterViewInit {
 
     if (e.currentSelectedRowKeys && e.currentSelectedRowKeys.length > 0) {
       e.currentSelectedRowKeys.forEach((key: any) => {
-        const rowData = typeof key === 'object' ? key : this.invoiceData.find(x => x.InvoiceID === key);
+        const rowData =
+          typeof key === 'object'
+            ? key
+            : this.invoiceData.find((x) => x.InvoiceID === key);
         if (rowData) {
           rowData.ReceivedAmount = rowData.Amount;
+          rowData.RejectedAmount = 0;
           hasChanges = true;
         }
       });
@@ -335,6 +345,7 @@ export class ARManualMatchingComponent implements AfterViewInit {
         const rowData = typeof key === 'object' ? key : this.invoiceData.find(x => x.InvoiceID === key);
         if (rowData) {
           rowData.ReceivedAmount = null;
+          rowData.RejectedAmount = null;
           hasChanges = true;
         }
       });
@@ -351,8 +362,10 @@ export class ARManualMatchingComponent implements AfterViewInit {
     const selectedRows = this.invoiceGrid.instance.getSelectedRowsData();
     if (e.parentType === 'dataRow') {
       this.currentEditingColumn = e.dataField;
-      
-      const isSelected = selectedRows.some((row: any) => row.InvoiceID === e.row.data.InvoiceID);
+
+      const isSelected = selectedRows.some(
+        (row: any) => row.InvoiceID === e.row.data.InvoiceID,
+      );
       if (!isSelected) {
         e.editorOptions.disabled = true;
       }
@@ -425,6 +438,23 @@ export class ARManualMatchingComponent implements AfterViewInit {
       (sum: number, i: any) => sum + (Number(i.RejectedAmount) || 0),
       0,
     );
+
+    for (const inv of selectedInvoices) {
+      const amount = Number(inv.Amount) || 0;
+      const received = Number(inv.ReceivedAmount) || 0;
+      const rejected = Number(inv.RejectedAmount) || 0;
+      if (received + rejected !== amount) {
+        notify(
+          {
+            message: `Invoice ${inv.InvoiceNo || ''}: Received + Rejected must equal selected Received Total Amount`,
+            position: 'top right',
+          },
+          'warning',
+          4000,
+        );
+        return;
+      }
+    }
 
     if (
       totalReceiptAmount !== totalInvoiceReceived ||
