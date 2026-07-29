@@ -29,6 +29,8 @@ import {
   DxFormModule,
   DxDropDownBoxModule,
   DxListModule,
+  DxPopupModule,
+  DxDataGridModule,
 } from 'devextreme-angular';
 import {
   DxTextBoxModule,
@@ -124,6 +126,7 @@ export class CustomerFinEditFormComponent {
     DeliveryAddresses: [] as any[],
     IS_COMPANY_BRANCH_VALUE: 0,
     CUSTOMER_TYPE: 0,
+    SALESMAN_ID: 0,
   };
 
   IS_COMPANY_BRANCH_VALUE: boolean = false;
@@ -157,6 +160,7 @@ export class CustomerFinEditFormComponent {
   mobile_limit_Delivery_Address: number = 0;
   savedAddresses: any[] = [];
   Customer_type_list: any = [];
+  salesmanList: any[] = [];
   constructor(private service: DataService) {
     this.getStateDropDown();
     this.showCountry();
@@ -471,6 +475,7 @@ export class CustomerFinEditFormComponent {
   // }
 
   ngOnInit(): void {
+    this.getSalesmanDropDown();
     this.getPaymentTerms();
 
     this.getVATRuleDropDown();
@@ -922,6 +927,16 @@ export class CustomerFinEditFormComponent {
       return code === value && item.ID !== currentId;
     });
   };
+
+  getSalesmanDropDown() {
+    const payload = {
+      NAME: 'SALESMAN',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.salesmanList = data;
+    });
+  }
 }
 
 @NgModule({
@@ -943,6 +958,8 @@ export class CustomerFinEditFormComponent {
     DxNumberBoxModule,
     DxDropDownBoxModule,
     DxListModule,
+    DxPopupModule,
+    DxDataGridModule,
   ],
   declarations: [CustomerFinEditFormComponent],
   exports: [CustomerFinEditFormComponent],

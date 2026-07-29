@@ -1404,3 +1404,8 @@ body {
   background-color: var(--tab-selected-bg-color);
   color: var(--selected-text-color);
 }
+
+::ng-deep .dx-popup-title.dx-toolbar .dx-toolbar-before {
+  padding-inline-end: 12px;
+  width: 400px !important;
+}

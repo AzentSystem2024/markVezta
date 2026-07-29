@@ -210,6 +210,7 @@ export class InvoiceRetailComponent {
     //   this.filteredStoreList = this.storeList;
     // }
     // this.selectedStoreId = configStore.STORE_ID;
+    this.selectedStoreId = userData.Configuration?.[0]?.STORE_ID ?? 0;
     this.getInvoiceList();
   }
   refreshGrid() {
@@ -357,7 +358,8 @@ export class InvoiceRetailComponent {
       COMPANY_ID: this.companyID,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
-      STORE_ID: this.selectedStoreId || 0,
+      // STORE_ID: this.selectedStoreId || 0,
+      STORE_ID: this.selectedStoreId ?? this.storeList?.[0]?.ID ?? 0,
     };
 
     this.InvoiceDataSource = new DataSource({

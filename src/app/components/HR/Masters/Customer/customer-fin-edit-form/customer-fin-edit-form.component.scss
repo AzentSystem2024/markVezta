@@ -1,6 +1,7 @@
 .plain-styled-form {
   margin-top: 15px;
 }
+
 .address-container {
   margin-top: 15px;
 }
@@ -65,20 +66,28 @@
   font-size: 14px;
   color: #333;
 }
+
 .save-btn {
   display: flex;
-  justify-content: flex-end; /* Aligns button to right */
-  margin-top: 20px; /* Adds space above */
-  margin-bottom: 20px; /* Adds space below (before cards) */
+  justify-content: flex-end;
+  /* Aligns button to right */
+  margin-top: 20px;
+  /* Adds space above */
+  margin-bottom: 20px;
+  /* Adds space below (before cards) */
 }
 
 ::ng-deep .highlight-readonly .dx-texteditor-input {
-  background-color: #f0f4f8 !important; /* Soft distinct background */
+  /* Soft distinct background */
   font-weight: 600 !important;
-  color: #0d47a1 !important; /* Stand-out text color */
+  color: #0d47a1 !important;
+  /* Stand-out text color */
 }
 
 ::ng-deep .highlight-readonly {
-  border: 1px solid #90caf9 !important; /* Light blue border */
+  border: 1px solid #90caf9 !important;
+  /* Light blue border */
+  border-top: none !important;
+  /* Remove top border */
   border-radius: 4px;
 }

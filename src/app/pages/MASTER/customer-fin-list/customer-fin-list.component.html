@@ -17,7 +17,9 @@
   >
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-header-filter [visible]="true"></dxo-header-filter>
+    <dxo-header-filter [visible]="true">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
     <!-- <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter> -->

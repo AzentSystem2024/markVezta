@@ -150,25 +150,31 @@
     }
   }
 
-  /* DataGrid row height — uniform across Alias, Supplier, and all child grids */
-  ::ng-deep .dx-datagrid-rowsview,
-  ::ng-deep .dx-datagrid-rowsview .dx-datagrid-content {
-    height: auto !important;
+  /* Prevent table rows from stretching when there are few rows in stores-grid */
+  ::ng-deep .stores-grid {
+    .dx-datagrid-rowsview .dx-datagrid-content .dx-datagrid-table {
+      height: auto !important;
+    }
   }
 
-  ::ng-deep .dx-datagrid-rowsview .dx-row > td {
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
+  ::ng-deep .dx-datagrid-rowsview .dx-row,
+  ::ng-deep .dx-datagrid-rowsview .dx-data-row,
+  ::ng-deep .dx-datagrid-rowsview .dx-data-row > td,
+  ::ng-deep .dx-datagrid-rowsview .dx-data-row > td.dx-command-select,
+  ::ng-deep .dx-datagrid-rowsview .dx-data-row > td.dx-editor-cell {
     height: 34px !important;
+    min-height: 34px !important;
     max-height: 34px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 34px !important;
     vertical-align: middle !important;
 
     .dx-texteditor,
     .dx-lookup,
     .dx-dropdowneditor,
     .dx-selectbox,
-    .dx-numberbox,
-    .dx-checkbox {
+    .dx-numberbox {
       height: 26px !important;
       min-height: 26px !important;
       max-height: 26px !important;
@@ -182,16 +188,49 @@
       padding-bottom: 0 !important;
     }
 
-    .dx-checkbox-icon {
-      width: 18px !important;
+    .dx-checkbox,
+    .dx-select-checkbox,
+    .dx-datagrid-checkbox-size {
       height: 18px !important;
+      min-height: 18px !important;
+      max-height: 18px !important;
+      line-height: 18px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      vertical-align: middle !important;
+
+      .dx-checkbox-container {
+        height: 18px !important;
+        min-height: 18px !important;
+        max-height: 18px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .dx-checkbox-icon {
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        min-height: 16px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
     }
   }
 
+  ::ng-deep .dx-datagrid-headers .dx-header-row,
   ::ng-deep .dx-datagrid-headers .dx-header-row > td {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-    height: 36px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
     vertical-align: middle !important;
   }
 
@@ -207,6 +246,18 @@
     justify-content: center;
     align-items: center;
   }
+}
+
+::ng-deep .highlight-readonly .dx-texteditor-input {
+  background-color: var(--readOnly) !important; /* Soft distinct background */
+  font-weight: 600 !important;
+  color: #0d47a1 !important; /* Stand-out text color */
+}
+
+::ng-deep .highlight-readonly {
+  border: 1px solid #90caf9 !important; /* Light blue border */
+  border-top: none !important; /* Remove top border */
+  border-radius: 4px;
 }
 
 .dx-fileuploader-button {

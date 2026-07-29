@@ -435,9 +435,8 @@ export class ItemsEditFormComponent implements OnInit {
     // });
     const department = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: 'DEPARTMENT',
     };
-    dataservice.getDropdownData(department).subscribe((data) => {
+    dataservice.getDepartmentData(department).subscribe((data) => {
       this.department = data;
     });
     const subcategory = {
@@ -463,8 +462,12 @@ export class ItemsEditFormComponent implements OnInit {
       this.vat = data;
     });
     const payload = { COMPANY_ID: this.selected_Company_id };
-    dataservice.getSupplierData(payload).subscribe((data) => {
+    dataservice.getSupplierData(payload).subscribe((data: any) => {
       this.supplier = data;
+      if (this.edit_Suplier) {
+        this.edit_Suplier = [...this.edit_Suplier];
+      }
+      this.cdr.detectChanges();
     });
     const category = {
       COMPANY_ID: this.selected_Company_id,
@@ -558,7 +561,26 @@ export class ItemsEditFormComponent implements OnInit {
     if (changes['itemData'] && this.itemData) {
       this.formData = { ...this.itemData };
 
-      this.edit_Suplier = this.itemData.item_suppliers;
+      const rawSuppliers =
+        this.itemData.item_suppliers ||
+        this.itemData.ITEM_SUPPLIERS ||
+        this.itemData.item_supplier ||
+        [];
+
+      this.edit_Suplier = rawSuppliers.map((item: any) => {
+        let suppId = item.SUPP_ID;
+        if (suppId !== null && suppId !== undefined && !isNaN(Number(suppId))) {
+          suppId = Number(suppId);
+        }
+        return {
+          ...item,
+          SUPP_ID: suppId,
+        };
+      });
+
+      if (this.supplier && this.edit_Suplier.length > 0) {
+        this.edit_Suplier = [...this.edit_Suplier];
+      }
 
       this.Edit_Store = this.itemData.item_stores || [];
 
@@ -834,12 +856,15 @@ export class ItemsEditFormComponent implements OnInit {
         (supp: any) => !selectedSuppIds.includes(supp.ID),
       );
 
+      const defaultOnValueChanged = event.editorOptions.onValueChanged;
       event.editorOptions.onValueChanged = (e: any) => {
+        if (defaultOnValueChanged) {
+          defaultOnValueChanged(e);
+        }
         const selectedSupplier = this.supplier?.find(
           (s: any) => s.ID === e.value,
         );
         if (selectedSupplier) {
-          event.component.cellValue(event.row.rowIndex, 'SUPP_ID', e.value);
           event.component.cellValue(
             event.row.rowIndex,
             'CURRENCY',

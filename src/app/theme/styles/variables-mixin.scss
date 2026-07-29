@@ -72,6 +72,7 @@ $theme-mode: null !default;
   --icon-color: #3333;
   --icon-color-select: #3333;
   --divider: #64748b;
+  --readOnly: #f0f4f8;
 
   @if $theme-mode ==dark {
     --card-bg-color: rgba(128, 128, 128, 0.03);
@@ -97,6 +98,7 @@ $theme-mode: null !default;
     --toolbar-icon-hover: #e6e6e6;
     --icon-color: #e6f1fb;
     --divider: #64748b;
+    --readOnly: #131111;
   }
 
   --border-color: #{$base-border-color};

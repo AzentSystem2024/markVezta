@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
+import validationEngine from 'devextreme/ui/validation_engine';
 import {
   DxDataGridComponent,
   DxDataGridModule,
@@ -145,6 +146,7 @@ export class EosPaymentListComponent implements OnInit {
   popupTitle: string = 'New EOS Payment';
 
   EmployeeDropdown: any[] = [];
+  OriginalEmployeeDropdown: any[] = [];
   reson_data: any[] = [];
   ledgerList: any[] = [];
   filteredLedgerList: any[] = [];
@@ -171,12 +173,17 @@ export class EosPaymentListComponent implements OnInit {
     NetAmount: 0,
     Remarks: '',
     Remarks2: '',
-    PaymentMode: 'Bank',
-    Ledger: '',
+    PAY_TYPE_ID: 1,
+    PAY_HEAD_ID: null,
     ChequeNo: '',
-    DueDate: null,
+    DueDate: new Date(),
     Narration: '',
   };
+
+  paymentModes = [
+    { id: 1, text: 'Cash' },
+    { id: 2, text: 'Bank' },
+  ];
 
   allActionButtons = [
     {
@@ -240,24 +247,24 @@ export class EosPaymentListComponent implements OnInit {
     this.dataService.getAccountHeadList().subscribe({
       next: (response: any) => {
         this.ledgerList = response?.Data || [];
-        this.onReceiptModeChange({ value: this.eosFormData.PaymentMode });
+        this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
       },
       error: () => {},
     });
   }
 
   onReceiptModeChange(e: any) {
-    this.eosFormData.PaymentMode = e.value;
+    this.eosFormData.PAY_TYPE_ID = e.value;
 
-    if (this.eosFormData.PaymentMode === 'Cash') {
+    if (this.eosFormData.PAY_TYPE_ID === 1) {
       this.filteredLedgerList = this.ledgerList.filter(
         (item) => item.GROUP_ID === 13,
       );
-    } else if (this.eosFormData.PaymentMode === 'Bank') {
+    } else if (this.eosFormData.PAY_TYPE_ID === 2) {
       this.filteredLedgerList = this.ledgerList.filter(
         (item) => item.GROUP_ID === 14,
       );
-    } else if (this.eosFormData.PaymentMode === 'Adjustments') {
+    } else if (this.eosFormData.PAY_TYPE_ID === 4) {
       this.filteredLedgerList = this.ledgerList.filter(
         (item) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
       );
@@ -286,13 +293,25 @@ export class EosPaymentListComponent implements OnInit {
       COMPANY_ID: this.selectedCompanyId,
       Range: this.selectedRange,
     };
+
+    if (this.dataGrid && this.dataGrid.instance) {
+      this.dataGrid.instance.beginCustomLoading('Loading...');
+    }
+
     this.dataService.get_EOS_payment_list(payload).subscribe({
       next: (res: any) => {
         this.eosPaymentList = res?.data || res?.Data || res || [];
+        this.filterEmployeeDropdown();
+        if (this.dataGrid && this.dataGrid.instance) {
+          this.dataGrid.instance.endCustomLoading();
+        }
       },
       error: (err: any) => {
         console.error('Failed to fetch EOS payment list', err);
         notify('Failed to load records', 'error', 2000);
+        if (this.dataGrid && this.dataGrid.instance) {
+          this.dataGrid.instance.endCustomLoading();
+        }
       },
     });
   }
@@ -303,8 +322,24 @@ export class EosPaymentListComponent implements OnInit {
       NAME: 'LEFT_EMP',
     };
     this.dataService.getEmployeeDropDown(payload).subscribe((response: any) => {
-      this.EmployeeDropdown = response;
+      this.OriginalEmployeeDropdown = response || [];
+      this.filterEmployeeDropdown();
     });
+  }
+
+  filterEmployeeDropdown() {
+    if (!this.OriginalEmployeeDropdown || !this.eosPaymentList) return;
+
+    // Create a Set of Employee IDs that are already present in the main list
+    const existingEmpIds = new Set(
+      this.eosPaymentList.map((item: any) => item.EMP_ID || item.EmployeeId)
+    );
+
+    // Filter out employees already in the list, UNLESS they are the currently selected employee in the open popup
+    this.EmployeeDropdown = this.OriginalEmployeeDropdown.filter(
+      (emp: any) =>
+        !existingEmpIds.has(emp.ID) || emp.ID === this.eosFormData.EmployeeId
+    );
   }
 
   onEmployeeSelectionChanged(e: any) {
@@ -361,12 +396,16 @@ export class EosPaymentListComponent implements OnInit {
 
           if (res.VOUCHER_NO) this.eosFormData.VoucherNo = res.VOUCHER_NO;
           if (res.DOC_DATE) this.eosFormData.Date = new Date(res.DOC_DATE);
-          if (res.PAYMENT_MODE) {
-            this.eosFormData.PaymentMode = res.PAYMENT_MODE;
-            this.onReceiptModeChange({ value: res.PAYMENT_MODE });
+          if (res.PAY_TYPE_ID) {
+            this.eosFormData.PAY_TYPE_ID = res.PAY_TYPE_ID;
+            this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
+          } else if (res.PAYMENT_MODE) {
+            this.eosFormData.PAY_TYPE_ID = res.PAYMENT_MODE === 'Bank' ? 2 : 1;
+            this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
           }
-          if (res.PAYMENT_ACCOUNT_ID)
-            this.eosFormData.Ledger = res.PAYMENT_ACCOUNT_ID;
+          if (res.PAY_HEAD_ID || res.PAYMENT_ACCOUNT_ID)
+            this.eosFormData.PAY_HEAD_ID =
+              res.PAY_HEAD_ID || res.PAYMENT_ACCOUNT_ID;
           if (res.CHEQUE_NO) this.eosFormData.ChequeNo = res.CHEQUE_NO;
           if (res.CHEQUE_DATE)
             this.eosFormData.DueDate = new Date(res.CHEQUE_DATE);
@@ -384,10 +423,12 @@ export class EosPaymentListComponent implements OnInit {
     this.isApproveMode = false;
     this.isVerifyMode = false;
     this.resetForm();
+    this.EmployeeListDropDown();
     this.popupVisible = true;
   }
 
   onEditingStart(e: any) {
+    this.EmployeeListDropDown();
     this.popupTitle = 'Edit EOS Payment';
     this.isReadOnlyMode = false;
     this.isApproveMode = false;
@@ -433,8 +474,10 @@ export class EosPaymentListComponent implements OnInit {
       NetAmount: row.NET_AMOUNT || row.NetAmount || 0,
       Remarks: row.REMARKS || row.Remarks || '',
       Remarks2: row.ADD_REMARKS || row.DED_REMARKS || row.Remarks2 || '',
-      PaymentMode: row.PAYMENT_MODE || row.PaymentMode || 'Cash',
-      Ledger: row.PAYMENT_ACCOUNT_ID || row.Ledger,
+      PAY_TYPE_ID:
+        row.PAY_TYPE_ID ||
+        (row.PAYMENT_MODE === 'Bank' || row.PaymentMode === 'Bank' ? 2 : 1),
+      PAY_HEAD_ID: row.PAY_HEAD_ID || row.PAYMENT_ACCOUNT_ID || row.Ledger,
       ChequeNo: row.CHEQUE_NO || row.ChequeNo,
       DueDate: row.CHEQUE_DATE
         ? new Date(row.CHEQUE_DATE)
@@ -444,24 +487,28 @@ export class EosPaymentListComponent implements OnInit {
       Narration: row.REMARKS || row.Narration || '',
     };
 
+    this.EmployeeListDropDown();
     this.popupVisible = true;
   }
 
   deleteData(e: any) {
-    if (
-      confirm('Are you sure you want to delete this record?', 'Confirm Delete')
-    ) {
-      const payload = { ID: e.data.ID };
-      this.dataService.delete_EOS_payment(payload).subscribe({
-        next: (res) => {
-          notify('Record deleted successfully', 'success', 2000);
-          this.getEosPaymentList();
-        },
-        error: (err) => {
-          notify('Failed to delete record', 'error', 2000);
-        },
-      });
-    }
+    const result = confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    );
+    result.then((dialogResult) => {
+      if (dialogResult) {
+        this.dataService.delete_EOS_payment(e.data.ID).subscribe({
+          next: (res) => {
+            notify('Record deleted successfully', 'success', 2000);
+            this.getEosPaymentList();
+          },
+          error: (err) => {
+            notify('Failed to delete record', 'error', 2000);
+          },
+        });
+      }
+    });
   }
 
   onVerifyClick(e: any) {
@@ -491,12 +538,17 @@ export class EosPaymentListComponent implements OnInit {
   }
 
   buildFullPayload(): any {
-    const selectedReason = this.reson_data.find(r => r.ID === this.eosFormData.Reason);
+    const selectedReason = this.reson_data.find(
+      (r: any) => r.ID === this.eosFormData.Reason,
+    );
+
     return {
       ID: this.eosFormData.ID || 0,
       DOC_STATUS: this.eosFormData.DOC_STATUS || 0,
       DOC_NO: this.eosFormData.DocNo || '',
-      EOS_DATE: this.eosFormData.LastWorkingDay || null,
+      EOS_DATE: this.eosFormData.LastWorkingDay
+        ? new Date(this.eosFormData.LastWorkingDay).toISOString()
+        : new Date().toISOString(),
       EOS_ID: this.eosFormData.EOS_ID || 0,
       EMP_ID: this.eosFormData.EmployeeId || 0,
       REASON: selectedReason ? selectedReason.DESCRIPTION : '',
@@ -507,7 +559,9 @@ export class EosPaymentListComponent implements OnInit {
       EMP_NAME: this.eosFormData.EmployeeName || '',
       WORKED_DAYS: this.eosFormData.Days || 0,
       EOS_DOC_NO: this.eosFormData.EOS_DOC_NO || '',
-      DOJ: this.eosFormData.JoinDate || null,
+      DOJ: this.eosFormData.JoinDate
+        ? new Date(this.eosFormData.JoinDate).toISOString()
+        : new Date().toISOString(),
       EOS_AMOUNT: this.eosFormData.EOSAmount || 0,
       PENDING_SALARY: this.eosFormData.PendingSalary || 0,
       LEAVE_AMOUNT: this.eosFormData.UnPaidLeaveSalary || 0,
@@ -516,12 +570,27 @@ export class EosPaymentListComponent implements OnInit {
       ADD_REMARKS: this.eosFormData.Remarks2 || '',
       DED_REMARKS: this.eosFormData.DED_REMARKS || '',
       NET_AMOUNT: this.eosFormData.NetAmount || 0,
-      REMARKS: this.eosFormData.Remarks || ''
+      REMARKS: this.eosFormData.Remarks || '',
+      STATUS: this.eosFormData.Status || '',
+      PAY_HEAD_ID: this.eosFormData.PAY_HEAD_ID || 0,
+      PAY_TYPE_ID: this.eosFormData.PAY_TYPE_ID || 0,
+      NARRATION: this.eosFormData.Narration || '',
+      CHEQUE_NO: this.eosFormData.ChequeNo || '',
+      CHEQUE_DATE: this.eosFormData.DueDate
+        ? new Date(this.eosFormData.DueDate).toISOString()
+        : new Date().toISOString(),
     };
   }
 
-  onSave() {
+  onSave(e: any) {
+    const res = validationEngine.validateGroup('eosForm');
+    if (res && !res.isValid) {
+      return;
+    }
+
     const payload = this.buildFullPayload();
+
+    console.log("payload",payload)
 
     const apiCall = payload.ID
       ? this.dataService.update_EOS_payment(payload)
@@ -539,7 +608,12 @@ export class EosPaymentListComponent implements OnInit {
     });
   }
 
-  onVerify() {
+  onVerify(e: any) {
+    const res = validationEngine.validateGroup('eosForm');
+    if (res && !res.isValid) {
+      return;
+    }
+
     const payload = this.buildFullPayload();
     this.dataService.verify_EOS_payment(payload).subscribe({
       next: (res) => {
@@ -553,20 +627,10 @@ export class EosPaymentListComponent implements OnInit {
     });
   }
 
-  onApprove() {
-    if (!this.eosFormData.Ledger) {
-      notify('Ledger is required', 'error', 2000);
+  onApprove(e: any) {
+    const res = validationEngine.validateGroup('eosForm');
+    if (res && !res.isValid) {
       return;
-    }
-    if (this.eosFormData.PaymentMode === 'Bank') {
-      if (!this.eosFormData.ChequeNo) {
-        notify('Cheque No is required', 'error', 2000);
-        return;
-      }
-      if (!this.eosFormData.DueDate) {
-        notify('Due Date is required', 'error', 2000);
-        return;
-      }
     }
 
     const payload = this.buildFullPayload();
@@ -610,11 +674,12 @@ export class EosPaymentListComponent implements OnInit {
       NetAmount: 0,
       Remarks: '',
       Remarks2: '',
-      PaymentMode: 'Cash',
-      Ledger: '',
+      PAY_TYPE_ID: 1,
+      PAY_HEAD_ID: '',
       ChequeNo: '',
       DueDate: null,
       Narration: '',
+      Status: 'Open',
     };
   }
 }

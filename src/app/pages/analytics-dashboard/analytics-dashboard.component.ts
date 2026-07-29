@@ -305,7 +305,7 @@ export class AnalyticsDashboardComponent implements OnInit {
 
     this.getDashboardData();
   }
-  
+
   dateChanged() {
     this.getDashboardData();
   }
@@ -331,35 +331,38 @@ export class AnalyticsDashboardComponent implements OnInit {
         clearTimeout(timeoutId);
         this.loadingVisible = false;
 
-        this.gross_Sales_list = res.data.GrossSale;
+        this.gross_Sales_list = res?.data?.GrossSale || [];
 
-        this.TopMovingItems_list = res.data.TopMovingItems.map((item: any) => ({
-          ITEM_CODE: item.ITEM_CODE,
-          QTY_SOLD: item.QTY_SOLD,
-          DESCRIPTION: item.DESCRIPTION,
-        }));
+        this.TopMovingItems_list = (res?.data?.TopMovingItems || []).map(
+          (item: any) => ({
+            ITEM_CODE: item.ITEM_CODE,
+            QTY_SOLD: item.QTY_SOLD,
+            DESCRIPTION: item.DESCRIPTION,
+          }),
+        );
 
-        this.TenderSummary_list = res.data.TenderSummary;
+        this.TenderSummary_list = res?.data?.TenderSummary || [];
 
         this.generateTenderSeries();
 
         const allTenderKeys = this.seriesList.map((s: any) => s.valueField);
 
-        this.storeinfo = this.TenderSummary_list.map((store: any) => {
+        this.storeinfo = (this.TenderSummary_list || []).map((store: any) => {
           console.log(store, '----stores----');
+          const tenderTypes = store?.TenderTypes || [];
           const obj: any = {
             store: store.STORE_NAME,
             Total: 0,
-            TOTAL: store.TenderTypes.reduce((sum: number, tender: any) => {
-              return sum + Number(tender.AMOUNT || 0);
+            TOTAL: tenderTypes.reduce((sum: number, tender: any) => {
+              return sum + Number(tender?.AMOUNT || 0);
             }, 0),
           };
 
           allTenderKeys.forEach((key: string) => (obj[key] = 0));
 
-          store.TenderTypes.forEach((t: any) => {
+          tenderTypes.forEach((t: any) => {
             obj[t.TENDER] = t.AMOUNT;
-            obj.Total += Number(t.AMOUNT);
+            obj.Total += Number(t.AMOUNT || 0);
           });
           // Total = Cash + FAB POS CARD
           obj.TOTAL = obj.Total;
@@ -367,17 +370,11 @@ export class AnalyticsDashboardComponent implements OnInit {
           return obj;
         });
 
-        // const revenue = res.data.ProfitLoss.Revenue || [];
-        // const expense = res.data.ProfitLoss.Expense || [];
-
-        const RevenuExpe = res.data.ProfitLoss;
+        const RevenuExpe = res?.data?.ProfitLoss;
         console.log(RevenuExpe, '----------------RevenuExpe------------');
 
-        // const data = {
-        //   ...revenue, ...expense
-        // }
-        const revenue = res.data.ProfitLoss.Revenue || [];
-        const expense = res.data.ProfitLoss.Expense || [];
+        const revenue = res?.data?.ProfitLoss?.Revenue || [];
+        const expense = res?.data?.ProfitLoss?.Expense || [];
 
         const chartMap = new Map<string, any>();
 
@@ -417,8 +414,6 @@ export class AnalyticsDashboardComponent implements OnInit {
           },
         ];
 
-        // console.log(data, '=================full reven and expence')
-
         console.log(this.chartData);
         console.log(this.seriesList_profitAndLoss);
 
@@ -441,9 +436,11 @@ export class AnalyticsDashboardComponent implements OnInit {
   generateTenderSeries() {
     const tenders = new Set<string>();
 
-    this.TenderSummary_list.forEach((store: any) => {
-      store.TenderTypes.forEach((t: any) => {
-        tenders.add(t.TENDER);
+    (this.TenderSummary_list || []).forEach((store: any) => {
+      (store?.TenderTypes || []).forEach((t: any) => {
+        if (t?.TENDER) {
+          tenders.add(t.TENDER);
+        }
       });
     });
 
@@ -538,7 +535,6 @@ ${this.formatAmount(arg.value)}`;
 
     return new Intl.NumberFormat('en-IN').format(value);
   }
-
 
   customizeCommonLabel = (pointInfo: any) => {
     return `${this.formatAmountTender(pointInfo.value)}`;
@@ -666,8 +662,6 @@ ${this.formatAmount(arg.value)}`;
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
   }
-
-
 
   displayExpr = (item: any) => {
     if (!item) return '';

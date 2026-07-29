@@ -237,6 +237,7 @@
                     caption="Amount"
                     [allowEditing]="false"
                     [calculateCellValue]="calculateGrossAmount"
+                    [format]="{ type: 'fixedPoint', precision: 2 }"
                   ></dxi-column>
                   <dxi-column
                     dataField="DISC_PERCENT"
@@ -499,11 +500,11 @@
           *ngIf="!isReadOnlyMode"
           [text]="
             isSaving
-              ? 'Please wait...'
+              ? 'Save...'
               : isApproved
                 ? 'Approve'
                 : isEditing
-                  ? 'Update'
+                  ? 'Save'
                   : 'Save'
           "
           [icon]="isSaving ? 'spin spinner' : ''"
@@ -570,6 +571,7 @@
         dataField="QTN_DATE"
         caption="Date"
         dataType="date"
+        format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column dataField="CUST_NAME" caption="Customer Name"></dxi-column>
       <dxi-column dataField="REF_NO" caption="Ref No"></dxi-column>
@@ -579,11 +581,13 @@
         dataField="UNIT_PRICE"
         caption="Unit Price"
         dataType="number"
+        format="#,##0.00"
       ></dxi-column>
       <dxi-column
         dataField="AMOUNT"
         caption="Amount"
         dataType="number"
+        format="#,##0.00"
       ></dxi-column>
     </dx-data-grid>
   </div>

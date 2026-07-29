@@ -140,7 +140,7 @@ export class QuotationFormComponent {
     REF_NO: '',
     PAY_TERM_ID: 0,
     DELIVERY_TERM_ID: 0,
-    VALID_DAYS: 0,
+    VALID_DAYS: null,
     GROSS_AMOUNT: 0,
     TAX_AMOUNT: 0,
     CHARGE_DESCRIPTION: '',
@@ -305,7 +305,8 @@ export class QuotationFormComponent {
       REF_NO: data.REF_NO || 0,
       PAY_TERM_ID: data.PAY_TERM_ID || 0,
       DELIVERY_TERM_ID: data.DELIVERY_TERM_ID || 0,
-      VALID_DAYS: data.VALID_DAYS || 0,
+      // VALID_DAYS: data.VALID_DAYS || 0,
+      VALID_DAYS: data.VALID_DAYS === 0 ? null : data.VALID_DAYS,
       GROSS_AMOUNT: data.GROSS_AMOUNT || 0,
       TAX_AMOUNT: data.TAX_AMOUNT || 0,
       CHARGE_DESCRIPTION: data.CHARGE_DESCRIPTION || '',
@@ -1022,6 +1023,7 @@ export class QuotationFormComponent {
       FIN_ID: this.finID,
       USER_ID: this.userID,
       ROUND_OFF: this.isRoundOff,
+      VALID_DAYS: this.quotationFormData.VALID_DAYS ?? 0,
       Details: validDetails.map((row: any, index: number) => {
         const grossAmount = this.calculateGrossAmount(row);
         const amount = this.calculateAmount(row);

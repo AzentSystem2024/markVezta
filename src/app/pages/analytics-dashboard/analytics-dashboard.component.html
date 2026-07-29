@@ -13,10 +13,7 @@
   </dx-select-box>
 </div>
 
-<div
-  class="view-wrapper"
-  *ngIf="sessiondata?.GeneralSettings?.VAT_TITLE === 'GST'"
->
+<div class="view-wrapper">
   <div class="dashboard-wrapper">
     <!-- Row 1 -->
     <div class="dashboard-row">
@@ -202,11 +199,6 @@
     </div>
   </div>
 </div>
-
-<div
-  class="view-wrapper"
-  *ngIf="sessiondata?.GeneralSettings?.VAT_TITLE === 'VAT'"
-></div>
 
 <!-- ============= Custome popup =============== -->
 <app-custom-date-popup

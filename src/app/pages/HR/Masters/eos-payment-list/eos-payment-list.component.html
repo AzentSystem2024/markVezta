@@ -198,6 +198,24 @@
             "
           ></i>
         </span>
+
+        <!-- View -->
+        <i
+          *ngIf="
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Paid'
+          "
+          class="fas fa-eye"
+          style="
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 16px;
+            color: #6c757d;
+            vertical-align: middle;
+          "
+          title="View"
+          (click)="onVerifyClick({ row: { data: cellData.data } })"
+        ></i>
       </div>
     </dx-data-grid>
   </div>
@@ -217,8 +235,8 @@
     style="padding-bottom: 50px"
   >
     <!-- Row 1: Voucher No & Date -->
-    <div class="row">
-      <div class="col-md-6 mb-2">
+    <div class="row justify-content-between">
+      <div class="col-md-4 mb-2">
         <dx-text-box
           label="Voucher No"
           labelMode="floating"
@@ -227,7 +245,7 @@
           width="100%"
         ></dx-text-box>
       </div>
-      <div class="col-md-6 mb-2">
+      <div class="col-md-4 mb-2">
         <dx-date-box
           label="Date"
           labelMode="floating"
@@ -253,7 +271,14 @@
           [readOnly]="isReadOnlyMode"
           [searchEnabled]="true"
           width="100%"
-        ></dx-select-box>
+        >
+          <dx-validator validationGroup="eosForm">
+            <dxi-validation-rule
+              type="required"
+              message="Employee is required"
+            ></dxi-validation-rule>
+          </dx-validator>
+        </dx-select-box>
       </div>
     </div>
 
@@ -364,17 +389,15 @@
           width="100%"
         ></dx-date-box>
 
-        <div class="d-flex mb-2">
-          <dx-number-box
-            label="Pending Salary"
-            labelMode="floating"
-            [(value)]="eosFormData.PendingSalary"
-            [readOnly]="isReadOnlyMode"
-            width="100%"
-            format="#,##0.00"
-          ></dx-number-box>
-
-        </div>
+        <dx-number-box
+          class="mb-2"
+          label="Pending Salary"
+          labelMode="floating"
+          [(value)]="eosFormData.PendingSalary"
+          [readOnly]="isReadOnlyMode"
+          width="100%"
+          format="#,##0.00"
+        ></dx-number-box>
 
         <dx-number-box
           class="mb-2"
@@ -413,14 +436,16 @@
       >
         Payment Details
       </legend>
-      <div class="row align-items-center mb-2">
-        <div class="col-md-6 d-flex align-items-center">
+      <div class="row mb-2">
+        <div class="col-md-12 d-flex align-items-center mb-3">
           <label class="form-label text-dark me-3 mb-0" style="font-size: 14px"
             >Payment Mode:</label
           >
           <dx-radio-group
-            [items]="['Cash', 'Bank']"
-            [value]="eosFormData.PaymentMode"
+            [items]="paymentModes"
+            displayExpr="text"
+            valueExpr="id"
+            [value]="eosFormData.PAY_TYPE_ID"
             (onValueChanged)="onReceiptModeChange($event)"
             layout="horizontal"
             [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
@@ -433,12 +458,12 @@
             [dataSource]="filteredLedgerList"
             displayExpr="HEAD_NAME"
             valueExpr="HEAD_ID"
-            [(value)]="eosFormData.Ledger"
+            [(value)]="eosFormData.PAY_HEAD_ID"
             [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
             [searchEnabled]="true"
             width="100%"
           >
-            <dx-validator *ngIf="isApproveMode">
+            <dx-validator validationGroup="eosForm" *ngIf="isApproveMode">
               <dxi-validation-rule
                 type="required"
                 message="Ledger is required"
@@ -448,41 +473,55 @@
         </div>
       </div>
 
-      <div class="row mt-1" *ngIf="eosFormData.PaymentMode === 'Bank'">
-        <div class="col-md-6">
-          <dx-text-box
-            label="Reference No"
-            labelMode="floating"
-            [(value)]="eosFormData.ChequeNo"
-            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-            width="100%"
-          >
-            <dx-validator *ngIf="isApproveMode">
-              <dxi-validation-rule
-                type="required"
-                message="Cheque No is required"
-              ></dxi-validation-rule>
-            </dx-validator>
-          </dx-text-box>
+      <fieldset class="border p-2 mt-2 mx-1" style="border-radius: 5px">
+        <legend
+          class="float-none w-auto text-muted mb-0 px-2"
+          style="font-size: 12px"
+        >
+          Bank remittance details
+        </legend>
+        <div class="row">
+          <div class="col-md-6">
+            <dx-text-box
+              label="Reference No"
+              labelMode="floating"
+              [(value)]="eosFormData.ChequeNo"
+              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
+              width="100%"
+            >
+              <dx-validator
+                validationGroup="eosForm"
+                *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+              >
+                <dxi-validation-rule
+                  type="required"
+                  message="Reference No is required"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
+          </div>
+          <div class="col-md-6">
+            <dx-date-box
+              label="Date"
+              labelMode="floating"
+              [(value)]="eosFormData.DueDate"
+              displayFormat="dd-MM-yyyy"
+              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
+              width="100%"
+            >
+              <dx-validator
+                validationGroup="eosForm"
+                *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+              >
+                <dxi-validation-rule
+                  type="required"
+                  message="Date is required"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-date-box>
+          </div>
         </div>
-        <div class="col-md-6">
-          <dx-date-box
-            label="Date"
-            labelMode="floating"
-            [(value)]="eosFormData.DueDate"
-            displayFormat="dd-MM-yyyy"
-            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-            width="100%"
-          >
-            <dx-validator *ngIf="isApproveMode">
-              <dxi-validation-rule
-                type="required"
-                message="Due Date is required"
-              ></dxi-validation-rule>
-            </dx-validator>
-          </dx-date-box>
-        </div>
-      </div>
+      </fieldset>
     </fieldset>
 
     <!-- Narration -->
@@ -507,7 +546,8 @@
         <dx-button
           text="Close"
           icon=""
-          stylingMode="contained"
+          type="normal"
+          stylingMode="outlined"
           (onClick)="handleClose()"
           class="me-2"
         ></dx-button>
@@ -516,8 +556,9 @@
           icon="save"
           type="default"
           stylingMode="contained"
+          validationGroup="eosForm"
           class="me-2"
-          (onClick)="onSave()"
+          (onClick)="onSave($event)"
           *ngIf="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
         ></dx-button>
         <dx-button
@@ -525,20 +566,21 @@
           icon="check"
           stylingMode="contained"
           type="default"
+          validationGroup="eosForm"
           class="me-2"
-          (onClick)="onVerify()"
+          (onClick)="onVerify($event)"
           *ngIf="isVerifyMode"
         ></dx-button>
         <dx-button
           text="Approve"
           icon="check"
           stylingMode="contained"
-          type="success"
+          type="default"
+          validationGroup="eosForm"
           class="me-2"
-          (onClick)="onApprove()"
+          (onClick)="onApprove($event)"
           *ngIf="isApproveMode"
         ></dx-button>
-
       </div>
     </div>
   </div>
