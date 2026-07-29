@@ -134,40 +134,7 @@ export class GrnComponent implements OnInit {
   isVerifyOpened: boolean;
   finID: any;
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = (cellInfo.data.STATUS || '').trim();
 
-    // Clean up existing content to avoid duplicates
-    while (cellElement.firstChild) {
-      cellElement.removeChild(cellElement.firstChild);
-    }
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag';
-    icon.style.fontSize = '18px';
-
-    // icon.style.color = status === 'Approved' ? 'green' : 'orange';
-    icon.style.color =
-      status === 'Approved'
-        ? '#10B981' // Approved
-        : status === 'Closed'
-          ? '#10B981'
-          : status === 'Verified'
-            ? '#0073D8' // Verified
-            : '#FFA500'; // Open
-    icon.title =
-      status === 'Approved'
-        ? 'Approved'
-        : status === 'Closed'
-          ? 'Closed'
-          : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
@@ -287,7 +254,7 @@ export class GrnComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   openGRNForm() {
     this.isGRNPopupVisible = true;
@@ -803,26 +770,25 @@ export class GrnComponent implements OnInit {
   }
 
   onEditingRow(event: any): void {
-    event.cancel = true; // stop default grid edit
+    event.cancel = true;
 
     const rowData = event.data;
     const grnId = rowData.ID;
     const status = rowData.STATUS;
 
-    this.grnId = grnId;
     this.selectedGrnId = grnId;
 
-    // Fetch full GRN data first
     this.service.selectGrnData(grnId).subscribe((res) => {
       this.selectedRowData = res;
-      this.cdr.detectChanges();
 
-      // If Approved → View only
-      if (status === 'Approved') {
+      if (
+        status === 'Verified' ||
+        status === 'Approved' ||
+        status === 'Closed' ||
+        status === 'Partial'
+      ) {
         this.isViewPopupOpened = true;
-      }
-      // Else → Verify
-      else {
+      } else {
         this.isVerifyPopupOpened = true;
       }
     });
@@ -1036,4 +1002,4 @@ export class GrnComponent implements OnInit {
   exports: [],
   declarations: [GrnComponent],
 })
-export class GrnModule {}
+export class GrnModule { }

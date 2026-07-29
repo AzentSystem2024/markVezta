@@ -215,7 +215,7 @@ export class PurchaseOrderComponent {
     private service: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
   sessionDetails() {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -382,47 +382,6 @@ export class PurchaseOrderComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag';
-    icon.style.fontSize = '18px';
-
-    // 🎨 Color logic
-    if (['Approved', 'Closed', 'Partial'].includes(status)) {
-      icon.style.color = '#5cac6fff';
-    } else if (['Verified'].includes(status)) {
-      icon.style.color = '#0073D8';
-    } else {
-      icon.style.color = '#FFA500';
-    }
-
-    // 🏷️ Title logic (FIXED)
-    switch (status) {
-      case 'Approved':
-        icon.title = 'Approved';
-        break;
-      case 'Closed':
-        icon.title = 'Closed';
-        break;
-      case 'Partial':
-        icon.title = 'Partially Completed';
-        break;
-      case 'Verified':
-        icon.title = 'Verified';
-        break;
-      default:
-        icon.title = 'Open';
-    }
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
   getStatusFilterData = [
     {
       text: 'Approved',
@@ -514,6 +473,7 @@ export class PurchaseOrderComponent {
   }
 
   onApproveClick = (e: any) => {
+    console.log("Approve Badge Clicked");
     const id = e.row.data.ID;
     const status = e.row.data.STATUS;
     this.isApprovePopupOpened = true;
@@ -539,25 +499,29 @@ export class PurchaseOrderComponent {
     const Id = event.data.ID;
     this.selectedPoId = Id;
     const status = event.data.STATUS;
+
     this.sessionDetails();
-    // this.isEditPopupOpened = true;
+
     this.service.selectPoData(Id).subscribe((res) => {
       this.selectedRowData = res;
+
       if (
+        status === 'Verified' ||
         status === 'Approved' ||
         status === 'Closed' ||
         status === 'Partial'
       ) {
-        // Open view popup
+        // Open View popup
         this.isViewPopupOpened = true;
       } else {
-        // Open edit popup
+        // Open Edit popup
         this.isEditPopupOpened = true;
       }
     });
   }
 
   onVerifyClick(e: any) {
+    console.log("Badge Clicked");
     const rowData = e.row.data;
     console.log(rowData, 'ROWDATA');
     const id = rowData.ID;
@@ -677,7 +641,7 @@ export class PurchaseOrderComponent {
         // ✅ SAME AS PRODUCTION JV
         this.filteredPOList = this.dataSource;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -1433,7 +1397,7 @@ export class PurchaseOrderComponent {
     intParam.value = invisibleIntParamValue;
   }
 
-  viewPdf(log: any) {}
+  viewPdf(log: any) { }
 }
 
 @NgModule({
@@ -1468,4 +1432,4 @@ export class PurchaseOrderComponent {
   declarations: [PurchaseOrderComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseOrderModule {}
+export class PurchaseOrderModule { }
