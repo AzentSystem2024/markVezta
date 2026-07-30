@@ -1849,4 +1849,4 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   declarations: [PurchaseOrderEditFormComponent],
   exports: [PurchaseOrderEditFormComponent],
 })
-export class PurchaseOrderEditFormModule {}
+export class PurchaseOrderEditFormModule { }

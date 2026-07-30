@@ -168,7 +168,7 @@ export class InvoiceRetailComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log('******************');
@@ -903,4 +903,4 @@ export class InvoiceRetailComponent {
   exports: [InvoiceRetailComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceRetailModule {}
+export class InvoiceRetailModule { }

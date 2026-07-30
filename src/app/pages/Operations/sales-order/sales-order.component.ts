@@ -72,7 +72,7 @@ export class SalesOrderComponent implements OnInit {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, 
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -140,7 +140,7 @@ export class SalesOrderComponent implements OnInit {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -209,7 +209,7 @@ export class SalesOrderComponent implements OnInit {
         // ✅ SAME AS PRODUCTION JV
         this.filteredSalesOrderList = this.salesOrderList;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -622,4 +622,4 @@ export class SalesOrderComponent implements OnInit {
   exports: [SalesOrderComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalesOrderModule {}
+export class SalesOrderModule { }

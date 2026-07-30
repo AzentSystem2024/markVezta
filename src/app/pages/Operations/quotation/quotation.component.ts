@@ -164,7 +164,7 @@ export class QuotationComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -289,26 +289,6 @@ export class QuotationComponent {
     };
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {
@@ -550,20 +530,42 @@ export class QuotationComponent {
 
   onEditQuotation(event: any) {
     event.cancel = true;
+
     const quotationId = event.data.ID;
     const status = event.data.TRANS_STATUS;
-    this.dataService
-      .selectSalesQuotation(quotationId)
-      .subscribe((response: any) => {
-        this.selectedQuotation = response.Data;
-        console.log(this.selectedQuotation, 'SELECTEDTROUT');
+
+    this.dataService.selectSalesQuotation(quotationId).subscribe((response: any) => {
+      this.selectedQuotation = response.Data;
+
+      if (status === 1) {
+        // Open document -> Edit mode
+        this.isReadOnlyQuotation = false;
         this.isEditQuotation = true;
-        this.isReadOnlyQuotation = status === 5;
-      });
+      } else {
+        // Verified & Approved -> View mode
+        this.isReadOnlyQuotation = true;
+        this.isViewQuotation = true;
+      }
+    });
   }
 
   onVerifyQuotation(event: any) {
     const rowData = event.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+
     console.log(rowData);
     const quotationId = rowData.ID;
     const transStatus = rowData.TRANS_STATUS;
@@ -745,4 +747,4 @@ export class QuotationComponent {
   exports: [QuotationComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class QuotationModule {}
+export class QuotationModule { }

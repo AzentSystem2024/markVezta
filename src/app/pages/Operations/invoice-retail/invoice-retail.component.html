@@ -190,6 +190,22 @@
         }"
       >
       </dxi-column>
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-approved': data.data.STATUS === 'Approved',
+              'flag-verified': data.data.STATUS === 'Verified',
+              'flag-pending':
+                data.data.STATUS !== 'Verified' &&
+                data.data.STATUS !== 'Approved' &&
+                data.data.STATUS !== 'Paid',
+            }"
+          >
+            {{ data.data.STATUS }}
+          </span>
+        </div>
+      </div>
 
       <dxi-column
         type="buttons"
