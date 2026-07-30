@@ -185,7 +185,7 @@
           <i
             *ngIf="canEdit"
             class="dx-icon dx-icon-edit"
-            title="Edit"
+            [title]="cellData.data.TRANS_STATUS === 1 ? 'Edit' : 'Details'"
             (click)="onEditQuotation({ data: cellData.data, cancel: false })"
           ></i>
 

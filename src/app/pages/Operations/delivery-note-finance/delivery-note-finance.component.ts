@@ -153,7 +153,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -275,28 +275,6 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
-  }
-
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    // icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
-    icon.style.color =
-      status === 'APPROVED'
-        ? '#10B981' // Approved
-        : status === 'VERIFIED'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
   }
 
   onDateRangeChanged(e: any) {
@@ -508,8 +486,15 @@ export class DeliveryNoteFinanceComponent implements OnInit {
       .selectDeliveryNoteFinance(deliveryId)
       .subscribe((response: any) => {
         this.selectedDelivery = response.Data; // FIX
-        this.isEditDelivery = true;
-        this.isReadOnlyDelivery = status === 'APPROVED';
+        if (status === 'OPEN') {
+          // Open document -> Edit mode
+          this.isReadOnlyDelivery = false;
+          this.isEditDelivery = true;
+        } else {
+          // Verified & Approved -> View mode
+          this.isReadOnlyDelivery = true;
+          this.isViewDelivery = true;
+        }
       });
   }
 
@@ -519,6 +504,21 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     console.log(rowData.STATUS, 'ROWDATAAAAAAAAAAA');
     const invoiceId = rowData.ID;
     const transStatus = rowData.STATUS;
+
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+
 
     this.isReadOnlyDelivery = transStatus === 'APPROVED';
 
@@ -649,4 +649,4 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   exports: [DeliveryNoteFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFinanceModule {}
+export class DeliveryNoteFinanceModule { }

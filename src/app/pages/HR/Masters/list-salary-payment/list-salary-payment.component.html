@@ -192,7 +192,7 @@
           <i
             *ngIf="canEdit || canView"
             class="dx-icon dx-icon-edit"
-            title="Edit"
+            [title]="cellData.data.TRANS_STATUS === 1 ? 'Edit' : 'Details'"
             (click)="
               onEditOrViewSalaryPayment({ data: cellData.data, cancel: false })
             "

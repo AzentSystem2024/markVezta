@@ -696,7 +696,7 @@ export class AdvanceComponent {
   }
 
   getEditActionTitle(row: any): string {
-    return this.canEdit && row.STATUS === 'Open' ? 'Edit' : 'View';
+    return this.canEdit && row.STATUS === 'Open' ? 'Edit' : 'Detail';
   }
 
   showDeleteAction(row: any): boolean {

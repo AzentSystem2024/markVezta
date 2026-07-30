@@ -179,6 +179,7 @@ export class UserEditFormComponent {
   isCountryDropdownOpen = false;
   isWhatsappDropdownOpen = false;
   whatsappCountryCode: string = '';
+  isAdminUser = false;
 
   constructor(
     private fb: FormBuilder,
@@ -270,6 +271,7 @@ export class UserEditFormComponent {
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.storeid = this.sessionData.Configuration[0].STORE_ID;
+    this.isAdminUser = this.sessionData.USER_ROLE_NAME === 'Administrator' || this.sessionData.USER_NAME === 'ADMIN';
     console.log(this.storeid);
   }
 
@@ -466,7 +468,7 @@ export class UserEditFormComponent {
     const exists = list.some(
       (user: any) =>
         (user.LOGIN_NAME || user.LoginName || '').trim().toLowerCase() ===
-          loginName && user.ID !== currentId,
+        loginName && user.ID !== currentId,
     );
 
     return !exists;
@@ -854,8 +856,14 @@ export class UserEditFormComponent {
       WHATSAPP_NO: whatsappCode + '-' + whatsappVal,
       Whatsapp: whatsappCode + '-' + whatsappVal,
       WHATSAPP: whatsappCode + '-' + whatsappVal,
+
+      IS_LOCKED: this.newUserData.IS_LOCKED,
+      LOCK_DATE_FROM: this.newUserData.LOCK_DATE_FROM,
+      LOCK_DATE_TO: this.newUserData.LOCK_DATE_TO,
+      LOCK_REASON: this.newUserData.LOCK_REASON
     };
 
+    console.log(payload)
     this.dataservice.Update_user_data(payload).subscribe((res: any) => {
       this.isEditPopupOpened = false;
       this.closeForm.emit();
@@ -902,4 +910,4 @@ export class UserEditFormComponent {
   declarations: [UserEditFormComponent],
   exports: [UserEditFormComponent],
 })
-export class UserEditFormModule {}
+export class UserEditFormModule { }

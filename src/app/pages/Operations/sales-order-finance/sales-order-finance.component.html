@@ -208,7 +208,7 @@
           <i
             *ngIf="canEdit"
             class="dx-icon dx-icon-edit"
-            title="Edit"
+            [title]="cellData.data.TRANS_STATUS === 1 ? 'Edit' : 'Details'"
             (click)="onEditSalesOrder({ data: cellData.data, cancel: false })"
           ></i>
 

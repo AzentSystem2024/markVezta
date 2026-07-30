@@ -734,7 +734,7 @@ export class StaffEOSComponent {
     }
 
     return row.STATUS === 'Verified' || row.STATUS === 'Left Service' || row.STATUS === 'Approved'
-      ? 'View'
+      ? 'Detail'
       : 'Edit';
   }
 

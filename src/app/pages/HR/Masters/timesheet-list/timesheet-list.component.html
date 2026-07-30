@@ -241,7 +241,7 @@
             *ngIf="canEdit || canView"
             class="dx-icon dx-icon-edit action-icon"
             [class.disabled]="isEditDisabled(cellData.data)"
-            title="Detail"
+            [title]="cellData.data.STATUS === 'Open' ? 'Edit' : 'Details'"
             (click)="openTimesheet(cellData.data)"
           >
           </i>

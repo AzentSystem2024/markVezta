@@ -144,7 +144,9 @@
             data.data.STATUS === 'Approved',
         }"
       >
-        {{ data.data.STATUS }}
+        {{
+          data.data.STATUS === "Left Service" ? "Approved" : data.data.STATUS
+        }}
       </span>
     </div>
 
