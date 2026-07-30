@@ -118,11 +118,6 @@ export class EosPaymentListComponent implements OnInit {
     onClick: () => this.toggleFilters(),
   };
 
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-    this.showFilterRow = this.isFilterOpened;
-  }
-
   // --- Data & State ---
   isLoading: boolean = false;
   eosPaymentList: any[] = [];
@@ -153,31 +148,34 @@ export class EosPaymentListComponent implements OnInit {
 
   eosFormData: any = {
     ID: null,
-    VoucherNo: '',
-    Date: new Date(),
-    EmployeeId: null,
-    EmployeeCode: '',
-    EmployeeName: '',
-    Reason: '',
-    DocNo: '',
-    JoinDate: null,
-    LastWorkingDay: null,
-    Days: 0,
-    TotalServiceDays: 0,
-    UnPaidLeave: 0,
-    PendingSalary: 0,
-    EOSAmount: 0,
-    UnPaidLeaveSalary: 0,
-    Additions: 0,
-    Deductions: 0,
-    NetAmount: 0,
-    Remarks: '',
-    Remarks2: '',
+    DOC_STATUS: 0,
+    DOC_NO: '',
+    VOUCHER_NO: '',
+    DOC_DATE: new Date(),
+    EMP_ID: null,
+    EMP_CODE: '',
+    EMP_NAME: '',
+    REASON_ID: '',
+    DOJ: null,
+    EOS_DATE: null,
+    WORKED_DAYS: 0,
+    TOTAL_SERVICE_DAYS: 0,
+    UNPAID_LEAVE: 0,
+    PENDING_SALARY: 0,
+    EOS_AMOUNT: 0,
+    LEAVE_AMOUNT: 0,
+    ADD_AMOUNT: 0,
+    DED_AMOUNT: 0,
+    NET_AMOUNT: 0,
+    REMARKS: '',
+    ADD_REMARKS: '',
+    DED_REMARKS: '',
     PAY_TYPE_ID: 1,
     PAY_HEAD_ID: null,
-    ChequeNo: '',
-    DueDate: new Date(),
-    Narration: '',
+    CHEQUE_NO: '',
+    CHEQUE_DATE: new Date(),
+    NARRATION: '',
+    STATUS: 'Open',
   };
 
   paymentModes = [
@@ -237,10 +235,19 @@ export class EosPaymentListComponent implements OnInit {
       this.canVerify = packingRights.CanVerify;
     }
 
+    this.loadAllDropdowns();
+    this.getEosPaymentList();
+  }
+
+  loadAllDropdowns() {
     this.EmployeeListDropDown();
     this.get_reson_dropdown();
     this.getLedgerCodeDropdown();
-    this.getEosPaymentList();
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.showFilterRow = this.isFilterOpened;
   }
 
   private getLedgerCodeDropdown() {
@@ -254,8 +261,6 @@ export class EosPaymentListComponent implements OnInit {
   }
 
   onReceiptModeChange(e: any) {
-    this.eosFormData.PAY_TYPE_ID = e.value;
-
     if (this.eosFormData.PAY_TYPE_ID === 1) {
       this.filteredLedgerList = this.ledgerList.filter(
         (item) => item.GROUP_ID === 13,
@@ -264,6 +269,7 @@ export class EosPaymentListComponent implements OnInit {
       this.filteredLedgerList = this.ledgerList.filter(
         (item) => item.GROUP_ID === 14,
       );
+      this.eosFormData.CHEQUE_DATE = new Date();
     } else if (this.eosFormData.PAY_TYPE_ID === 4) {
       this.filteredLedgerList = this.ledgerList.filter(
         (item) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
@@ -283,6 +289,7 @@ export class EosPaymentListComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
+        notify('Failed to load reason dropdown', 'error', 2000);
         console.error('Failed to load reason dropdown', err);
       },
     });
@@ -317,13 +324,22 @@ export class EosPaymentListComponent implements OnInit {
   }
 
   EmployeeListDropDown() {
+    this.isLoading = true;
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
       NAME: 'LEFT_EMP',
     };
-    this.dataService.getEmployeeDropDown(payload).subscribe((response: any) => {
-      this.OriginalEmployeeDropdown = response || [];
-      this.filterEmployeeDropdown();
+    this.dataService.getEmployeeDropDown(payload).subscribe({
+      next: (response: any) => {
+        this.OriginalEmployeeDropdown = response || [];
+        this.filterEmployeeDropdown();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        notify('Failed to load employee list', 'error', 2000);
+        console.error('Failed to load employee dropdown', err);
+      },
     });
   }
 
@@ -332,83 +348,95 @@ export class EosPaymentListComponent implements OnInit {
 
     // Create a Set of Employee IDs that are already present in the main list
     const existingEmpIds = new Set(
-      this.eosPaymentList.map((item: any) => item.EMP_ID || item.EmployeeId)
+      this.eosPaymentList.map((item: any) => item.EMP_ID || item.EmployeeId),
     );
 
     // Filter out employees already in the list, UNLESS they are the currently selected employee in the open popup
     this.EmployeeDropdown = this.OriginalEmployeeDropdown.filter(
       (emp: any) =>
-        !existingEmpIds.has(emp.ID) || emp.ID === this.eosFormData.EmployeeId
+        !existingEmpIds.has(emp.ID) || emp.ID === this.eosFormData.EMP_ID,
     );
+  }
+
+  mapApiResponseToFormData(res: any) {
+    if (!res) return;
+
+    // Exact mappings for the provided JSON structure
+    if (res.DOC_STATUS !== undefined && res.DOC_STATUS !== null)
+      this.eosFormData.DOC_STATUS = res.DOC_STATUS;
+    if (res.EOS_ID !== undefined && res.EOS_ID !== null)
+      this.eosFormData.EOS_ID = res.EOS_ID;
+
+    this.eosFormData.EMP_CODE =
+      res.EMP_CODE || res.EMP_NO || res.EmployeeCode || '';
+    this.eosFormData.EMP_NAME = res.EMP_NAME || res.EmployeeName || '';
+    this.eosFormData.REASON_ID = res.REASON_ID || res.Reason || '';
+
+    this.eosFormData.DOJ = res.DOJ
+      ? new Date(res.DOJ)
+      : res.JOIN_DATE
+        ? new Date(res.JOIN_DATE)
+        : res.JoinDate
+          ? new Date(res.JoinDate)
+          : null;
+
+    this.eosFormData.EOS_DATE = res.EOS_DATE
+      ? new Date(res.EOS_DATE)
+      : res.LAST_WORKING_DAY
+        ? new Date(res.LAST_WORKING_DAY)
+        : res.LastWorkingDay
+          ? new Date(res.LastWorkingDay)
+          : null;
+
+    this.eosFormData.WORKED_DAYS = res.WORKED_DAYS || res.DAYS || res.Days || 0;
+    this.eosFormData.TOTAL_SERVICE_DAYS =
+      res.WORKED_DAYS || res.TOTAL_SERVICE_DAYS || res.TotalServiceDays || 0;
+    this.eosFormData.UNPAID_LEAVE = res.UNPAID_LEAVE || res.UnPaidLeave || 0;
+
+    this.eosFormData.PENDING_SALARY =
+      res.PENDING_SALARY || res.PendingSalary || 0;
+    this.eosFormData.EOS_AMOUNT = res.EOS_AMOUNT || res.EOSAmount || 0;
+    this.eosFormData.LEAVE_AMOUNT =
+      res.LEAVE_AMOUNT || res.UnPaidLeaveSalary || 0;
+    this.eosFormData.ADD_AMOUNT = res.ADD_AMOUNT || res.Additions || 0;
+    this.eosFormData.DED_AMOUNT = res.DED_AMOUNT || res.Deductions || 0;
+    this.eosFormData.NET_AMOUNT = res.NET_AMOUNT || res.NetAmount || 0;
+
+    this.eosFormData.REMARKS = res.REMARKS || res.Remarks || '';
+    this.eosFormData.ADD_REMARKS = res.ADD_REMARKS || res.Remarks2 || '';
+    this.eosFormData.DED_REMARKS = res.DED_REMARKS || '';
+
+    this.eosFormData.DOC_NO = res.DOC_NO || this.eosFormData.DOC_NO || '';
+    this.eosFormData.VOUCHER_NO =
+      res.VOUCHER_NO || res.VoucherNo || this.eosFormData.VOUCHER_NO || '';
+
+    if (res.PAY_TYPE_ID) {
+      this.eosFormData.PAY_TYPE_ID = res.PAY_TYPE_ID;
+    }
+
+    if (res.PAY_HEAD_ID) this.eosFormData.PAY_HEAD_ID = res.PAY_HEAD_ID;
+
+    if (res.CHEQUE_NO) this.eosFormData.CHEQUE_NO = res.CHEQUE_NO;
+
+    if (res.CHEQUE_DATE)
+      this.eosFormData.CHEQUE_DATE = new Date(res.CHEQUE_DATE);
+
+    this.eosFormData.NARRATION = res.NARRATION || res.Narration || '';
   }
 
   onEmployeeSelectionChanged(e: any) {
     if (!e.value) return;
+
+    // Prevent fetching if this change was triggered programmatically (e.g. from onEditingStart)
+    if (!e.event) return;
 
     const payload = e.value;
 
     this.dataService.get_EOS_payment_details(payload).subscribe({
       next: (res: any) => {
         if (res) {
-          // If the API still returns the older camelCase fields for some reason, we coalesce.
-          // Otherwise, we strictly use the new uppercase fields provided by the user.
-          this.eosFormData.EmployeeCode =
-            res.EMP_CODE || res.EMP_NO || res.EmployeeCode;
-          this.eosFormData.EmployeeName = res.EMP_NAME || res.EmployeeName;
-          this.eosFormData.Reason = res.REASON_ID || res.Reason;
-          this.eosFormData.DocNo = res.DOC_NO || res.DocNo;
-          this.eosFormData.JoinDate = res.DOJ
-            ? new Date(res.DOJ)
-            : res.JOIN_DATE
-              ? new Date(res.JOIN_DATE)
-              : res.JoinDate
-                ? new Date(res.JoinDate)
-                : null;
-          this.eosFormData.LastWorkingDay = res.EOS_DATE
-            ? new Date(res.EOS_DATE)
-            : res.LAST_WORKING_DAY
-              ? new Date(res.LAST_WORKING_DAY)
-              : res.LastWorkingDay
-                ? new Date(res.LastWorkingDay)
-                : null;
-          this.eosFormData.Days = res.WORKED_DAYS || res.DAYS || res.Days || 0;
-          this.eosFormData.TotalServiceDays =
-            res.WORKED_DAYS ||
-            res.TOTAL_SERVICE_DAYS ||
-            res.TotalServiceDays ||
-            0;
-          this.eosFormData.UnPaidLeave =
-            res.UNPAID_LEAVE || res.UnPaidLeave || 0;
-
-          // Map uppercase fields from DB format
-          this.eosFormData.PendingSalary =
-            res.PENDING_SALARY || res.PendingSalary || 0;
-          this.eosFormData.EOSAmount = res.EOS_AMOUNT || res.EOSAmount || 0;
-          this.eosFormData.UnPaidLeaveSalary =
-            res.LEAVE_AMOUNT || res.UnPaidLeaveSalary || 0;
-          this.eosFormData.Additions = res.ADD_AMOUNT || res.Additions || 0;
-          this.eosFormData.Deductions = res.DED_AMOUNT || res.Deductions || 0;
-          this.eosFormData.NetAmount = res.NET_AMOUNT || res.NetAmount || 0;
-
-          this.eosFormData.Remarks = res.REMARKS || res.Remarks || '';
-          this.eosFormData.Remarks2 =
-            res.ADD_REMARKS || res.DED_REMARKS || res.Remarks2 || '';
-
-          if (res.VOUCHER_NO) this.eosFormData.VoucherNo = res.VOUCHER_NO;
-          if (res.DOC_DATE) this.eosFormData.Date = new Date(res.DOC_DATE);
-          if (res.PAY_TYPE_ID) {
-            this.eosFormData.PAY_TYPE_ID = res.PAY_TYPE_ID;
-            this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
-          } else if (res.PAYMENT_MODE) {
-            this.eosFormData.PAY_TYPE_ID = res.PAYMENT_MODE === 'Bank' ? 2 : 1;
-            this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
-          }
-          if (res.PAY_HEAD_ID || res.PAYMENT_ACCOUNT_ID)
-            this.eosFormData.PAY_HEAD_ID =
-              res.PAY_HEAD_ID || res.PAYMENT_ACCOUNT_ID;
-          if (res.CHEQUE_NO) this.eosFormData.ChequeNo = res.CHEQUE_NO;
-          if (res.CHEQUE_DATE)
-            this.eosFormData.DueDate = new Date(res.CHEQUE_DATE);
+          this.mapApiResponseToFormData(res);
+          if (res.DOC_DATE) this.eosFormData.DOC_DATE = new Date(res.DOC_DATE);
         }
       },
       error: (err: any) => {
@@ -423,71 +451,44 @@ export class EosPaymentListComponent implements OnInit {
     this.isApproveMode = false;
     this.isVerifyMode = false;
     this.resetForm();
-    this.EmployeeListDropDown();
+    this.loadAllDropdowns();
     this.popupVisible = true;
   }
 
   onEditingStart(e: any) {
-    this.EmployeeListDropDown();
     this.popupTitle = 'Edit EOS Payment';
     this.isReadOnlyMode = false;
     this.isApproveMode = false;
     this.isVerifyMode = false;
 
     const row = e.data;
-    this.eosFormData = {
-      ID: row.ID,
-      VoucherNo: row.VOUCHER_NO || row.VoucherNo,
-      Date: row.DOC_DATE
-        ? new Date(row.DOC_DATE)
-        : row.Date
-          ? new Date(row.Date)
-          : new Date(),
-      EmployeeId: row.EMP_ID || row.EmployeeId,
-      EmployeeCode: row.EMP_CODE || row.EMP_NO || row.EmployeeCode,
-      EmployeeName: row.EMP_NAME || row.EmployeeName,
-      Reason: row.REASON_ID || row.Reason,
-      DocNo: row.DOC_NO || row.DocNo,
-      JoinDate: row.DOJ
-        ? new Date(row.DOJ)
-        : row.JOIN_DATE
-          ? new Date(row.JOIN_DATE)
-          : row.JoinDate
-            ? new Date(row.JoinDate)
-            : null,
-      LastWorkingDay: row.EOS_DATE
-        ? new Date(row.EOS_DATE)
-        : row.LAST_WORKING_DAY
-          ? new Date(row.LAST_WORKING_DAY)
-          : row.LastWorkingDay
-            ? new Date(row.LastWorkingDay)
-            : null,
-      Days: row.WORKED_DAYS || row.DAYS || row.Days || 0,
-      TotalServiceDays:
-        row.WORKED_DAYS || row.TOTAL_SERVICE_DAYS || row.TotalServiceDays || 0,
-      UnPaidLeave: row.UNPAID_LEAVE || row.UnPaidLeave || 0,
-      PendingSalary: row.PENDING_SALARY || row.PendingSalary || 0,
-      EOSAmount: row.EOS_AMOUNT || row.EOSAmount || 0,
-      UnPaidLeaveSalary: row.LEAVE_AMOUNT || row.UnPaidLeaveSalary || 0,
-      Additions: row.ADD_AMOUNT || row.Additions || 0,
-      Deductions: row.DED_AMOUNT || row.Deductions || 0,
-      NetAmount: row.NET_AMOUNT || row.NetAmount || 0,
-      Remarks: row.REMARKS || row.Remarks || '',
-      Remarks2: row.ADD_REMARKS || row.DED_REMARKS || row.Remarks2 || '',
-      PAY_TYPE_ID:
-        row.PAY_TYPE_ID ||
-        (row.PAYMENT_MODE === 'Bank' || row.PaymentMode === 'Bank' ? 2 : 1),
-      PAY_HEAD_ID: row.PAY_HEAD_ID || row.PAYMENT_ACCOUNT_ID || row.Ledger,
-      ChequeNo: row.CHEQUE_NO || row.ChequeNo,
-      DueDate: row.CHEQUE_DATE
-        ? new Date(row.CHEQUE_DATE)
-        : row.DueDate
-          ? new Date(row.DueDate)
-          : null,
-      Narration: row.REMARKS || row.Narration || '',
-    };
+    const empId = row.EMP_ID || row.EmployeeId;
 
-    this.EmployeeListDropDown();
+    // Set core fields from the grid row
+    this.eosFormData.ID = row.ID;
+    this.eosFormData.DOC_NO = row.DOC_NO || '';
+    this.eosFormData.VOUCHER_NO = row.VOUCHER_NO || row.VoucherNo || '';
+    this.eosFormData.DOC_DATE = new Date();
+    this.eosFormData.STATUS = row.STATUS || 'Open';
+    this.eosFormData.EMP_ID = empId;
+
+    // Fetch the details from API
+    this.isLoading = true;
+    this.dataService.get_EOS_payment_details(empId).subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+        if (res) {
+          this.mapApiResponseToFormData(res);
+        }
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        notify('Failed to fetch EOS payment data', 'error', 2000);
+        console.error('Failed to fetch EOS payment data', err);
+      },
+    });
+
+    this.loadAllDropdowns();
     this.popupVisible = true;
   }
 
@@ -516,8 +517,8 @@ export class EosPaymentListComponent implements OnInit {
     // Emulate onEditingStart binding to map uppercase keys properly if needed
     this.onEditingStart({ data: data });
 
-    // Call the select API using the employee ID to fetch the details
-    this.onEmployeeSelectionChanged({ value: data.EMP_ID || data.EmployeeId });
+    // Call the select API using the employee ID to fetch the details is now handled inside onEditingStart
+    // this.onEmployeeSelectionChanged({ value: data.EMP_ID || data.EmployeeId });
 
     if (data.STATUS === 'Open') {
       this.popupTitle = 'Verify EOS Payment';
@@ -539,45 +540,45 @@ export class EosPaymentListComponent implements OnInit {
 
   buildFullPayload(): any {
     const selectedReason = this.reson_data.find(
-      (r: any) => r.ID === this.eosFormData.Reason,
+      (r: any) => r.ID === this.eosFormData.REASON_ID,
     );
 
     return {
       ID: this.eosFormData.ID || 0,
       DOC_STATUS: this.eosFormData.DOC_STATUS || 0,
-      DOC_NO: this.eosFormData.DocNo || '',
-      EOS_DATE: this.eosFormData.LastWorkingDay
-        ? new Date(this.eosFormData.LastWorkingDay).toISOString()
+      DOC_NO: this.eosFormData.DOC_NO || '',
+      VOUCHER_NO: this.eosFormData.VOUCHER_NO || '',
+      EOS_DATE: this.eosFormData.EOS_DATE
+        ? new Date(this.eosFormData.EOS_DATE).toISOString()
         : new Date().toISOString(),
       EOS_ID: this.eosFormData.EOS_ID || 0,
-      EMP_ID: this.eosFormData.EmployeeId || 0,
+      EMP_ID: this.eosFormData.EMP_ID || 0,
       REASON: selectedReason ? selectedReason.DESCRIPTION : '',
-      REASON_ID: this.eosFormData.Reason || 0,
+      REASON_ID: this.eosFormData.REASON_ID || 0,
       COMPANY_ID: this.selectedCompanyId || 0,
-      EMP_NO: this.eosFormData.EmployeeCode || '',
-      EMP_CODE: this.eosFormData.EmployeeCode || '',
-      EMP_NAME: this.eosFormData.EmployeeName || '',
-      WORKED_DAYS: this.eosFormData.Days || 0,
-      EOS_DOC_NO: this.eosFormData.EOS_DOC_NO || '',
-      DOJ: this.eosFormData.JoinDate
-        ? new Date(this.eosFormData.JoinDate).toISOString()
+      EMP_NO: this.eosFormData.EMP_CODE || '',
+      EMP_CODE: this.eosFormData.EMP_CODE || '',
+      EMP_NAME: this.eosFormData.EMP_NAME || '',
+      WORKED_DAYS: this.eosFormData.WORKED_DAYS || 0,
+      DOJ: this.eosFormData.DOJ
+        ? new Date(this.eosFormData.DOJ).toISOString()
         : new Date().toISOString(),
-      EOS_AMOUNT: this.eosFormData.EOSAmount || 0,
-      PENDING_SALARY: this.eosFormData.PendingSalary || 0,
-      LEAVE_AMOUNT: this.eosFormData.UnPaidLeaveSalary || 0,
-      ADD_AMOUNT: this.eosFormData.Additions || 0,
-      DED_AMOUNT: this.eosFormData.Deductions || 0,
-      ADD_REMARKS: this.eosFormData.Remarks2 || '',
+      EOS_AMOUNT: this.eosFormData.EOS_AMOUNT || 0,
+      PENDING_SALARY: this.eosFormData.PENDING_SALARY || 0,
+      LEAVE_AMOUNT: this.eosFormData.LEAVE_AMOUNT || 0,
+      ADD_AMOUNT: this.eosFormData.ADD_AMOUNT || 0,
+      DED_AMOUNT: this.eosFormData.DED_AMOUNT || 0,
+      ADD_REMARKS: this.eosFormData.ADD_REMARKS || '',
       DED_REMARKS: this.eosFormData.DED_REMARKS || '',
-      NET_AMOUNT: this.eosFormData.NetAmount || 0,
-      REMARKS: this.eosFormData.Remarks || '',
-      STATUS: this.eosFormData.Status || '',
-      PAY_HEAD_ID: this.eosFormData.PAY_HEAD_ID || 0,
-      PAY_TYPE_ID: this.eosFormData.PAY_TYPE_ID || 0,
-      NARRATION: this.eosFormData.Narration || '',
-      CHEQUE_NO: this.eosFormData.ChequeNo || '',
-      CHEQUE_DATE: this.eosFormData.DueDate
-        ? new Date(this.eosFormData.DueDate).toISOString()
+      NET_AMOUNT: this.eosFormData.NET_AMOUNT || 0,
+      REMARKS: this.eosFormData.REMARKS || '',
+      STATUS: this.eosFormData.STATUS || '',
+      PAY_HEAD_ID: this.eosFormData.PAY_HEAD_ID || null,
+      PAY_TYPE_ID: this.eosFormData.PAY_TYPE_ID || null,
+      NARRATION: this.eosFormData.NARRATION || '',
+      CHEQUE_NO: this.eosFormData.CHEQUE_NO || '',
+      CHEQUE_DATE: this.eosFormData.CHEQUE_DATE
+        ? new Date(this.eosFormData.CHEQUE_DATE).toISOString()
         : new Date().toISOString(),
     };
   }
@@ -588,9 +589,11 @@ export class EosPaymentListComponent implements OnInit {
       return;
     }
 
+    console.log('testinggggggg');
+
     const payload = this.buildFullPayload();
 
-    console.log("payload",payload)
+    console.log('payload', payload);
 
     const apiCall = payload.ID
       ? this.dataService.update_EOS_payment(payload)
@@ -654,32 +657,34 @@ export class EosPaymentListComponent implements OnInit {
   resetForm() {
     this.eosFormData = {
       ID: null,
-      VoucherNo: '',
-      Date: new Date(),
-      EmployeeId: null,
-      EmployeeCode: '',
-      EmployeeName: '',
-      Reason: '',
-      DocNo: '',
-      JoinDate: null,
-      LastWorkingDay: null,
-      Days: 0,
-      TotalServiceDays: 0,
-      UnPaidLeave: 0,
-      PendingSalary: 0,
-      EOSAmount: 0,
-      UnPaidLeaveSalary: 0,
-      Additions: 0,
-      Deductions: 0,
-      NetAmount: 0,
-      Remarks: '',
-      Remarks2: '',
+      DOC_STATUS: 0,
+      DOC_NO: '',
+      VOUCHER_NO: '',
+      DOC_DATE: new Date(),
+      EMP_ID: null,
+      EMP_CODE: '',
+      EMP_NAME: '',
+      REASON_ID: '',
+      DOJ: null,
+      EOS_DATE: null,
+      WORKED_DAYS: 0,
+      TOTAL_SERVICE_DAYS: 0,
+      UNPAID_LEAVE: 0,
+      PENDING_SALARY: 0,
+      EOS_AMOUNT: 0,
+      LEAVE_AMOUNT: 0,
+      ADD_AMOUNT: 0,
+      DED_AMOUNT: 0,
+      NET_AMOUNT: 0,
+      REMARKS: '',
+      ADD_REMARKS: '',
+      DED_REMARKS: '',
       PAY_TYPE_ID: 1,
-      PAY_HEAD_ID: '',
-      ChequeNo: '',
-      DueDate: null,
-      Narration: '',
-      Status: 'Open',
+      PAY_HEAD_ID: null,
+      CHEQUE_NO: '',
+      CHEQUE_DATE: new Date(),
+      NARRATION: '',
+      STATUS: 'Open',
     };
   }
 }

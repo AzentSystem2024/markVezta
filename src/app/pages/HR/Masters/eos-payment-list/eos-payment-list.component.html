@@ -1,3 +1,5 @@
+
+
 <div class="view-wrapper list-page">
   <div class="grid">
     <dx-data-grid
@@ -219,6 +221,19 @@
       </div>
     </dx-data-grid>
   </div>
+
+  <dx-load-panel
+  #loadPanel
+  shadingColor="rgba(0,0,0,0.4)"
+  [position]="{ of: '.grid' }"
+  container=".grid"
+  [(visible)]="isLoading"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="false"
+  [hideOnOutsideClick]="false"
+>
+</dx-load-panel>
 </div>
 
 <dx-popup
@@ -240,7 +255,7 @@
         <dx-text-box
           label="Voucher No"
           labelMode="floating"
-          [(value)]="eosFormData.VoucherNo"
+          [(value)]="eosFormData.VOUCHER_NO"
           [readOnly]="isReadOnlyMode"
           width="100%"
         ></dx-text-box>
@@ -249,7 +264,7 @@
         <dx-date-box
           label="Date"
           labelMode="floating"
-          [(value)]="eosFormData.Date"
+          [(value)]="eosFormData.DOC_DATE"
           displayFormat="dd-MM-yyyy"
           [readOnly]="isReadOnlyMode"
           width="100%"
@@ -266,7 +281,7 @@
           [dataSource]="EmployeeDropdown"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          [(value)]="eosFormData.EmployeeId"
+          [(value)]="eosFormData.EMP_ID"
           (onValueChanged)="onEmployeeSelectionChanged($event)"
           [readOnly]="isReadOnlyMode"
           [searchEnabled]="true"
@@ -291,7 +306,7 @@
           [dataSource]="reson_data"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          [(value)]="eosFormData.Reason"
+          [(value)]="eosFormData.REASON_ID"
           [readOnly]="isReadOnlyMode"
           [searchEnabled]="true"
           width="100%"
@@ -301,7 +316,7 @@
         <dx-text-box
           label="Doc No"
           labelMode="floating"
-          [(value)]="eosFormData.DocNo"
+          [(value)]="eosFormData.DOC_NO"
           [readOnly]="isReadOnlyMode"
           width="100%"
         ></dx-text-box>
@@ -316,7 +331,7 @@
           class="mb-2"
           label="Join Date"
           labelMode="floating"
-          [(value)]="eosFormData.JoinDate"
+          [(value)]="eosFormData.DOJ"
           displayFormat="dd-MM-yyyy"
           [readOnly]="true"
           width="100%"
@@ -325,7 +340,7 @@
           class="mb-2"
           label="Days"
           labelMode="floating"
-          [(value)]="eosFormData.Days"
+          [(value)]="eosFormData.WORKED_DAYS"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0"
@@ -334,7 +349,7 @@
           class="mb-2"
           label="Total Service (Days)"
           labelMode="floating"
-          [(value)]="eosFormData.TotalServiceDays"
+          [(value)]="eosFormData.TOTAL_SERVICE_DAYS"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0"
@@ -343,7 +358,7 @@
           class="mb-2"
           label="Unpaid Leave"
           labelMode="floating"
-          [(value)]="eosFormData.UnPaidLeave"
+          [(value)]="eosFormData.UNPAID_LEAVE"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0"
@@ -352,7 +367,7 @@
           class="mb-2"
           label="Additions"
           labelMode="floating"
-          [(value)]="eosFormData.Additions"
+          [(value)]="eosFormData.ADD_AMOUNT"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0.00"
@@ -361,7 +376,7 @@
           class="mb-2"
           label="Deductions"
           labelMode="floating"
-          [(value)]="eosFormData.Deductions"
+          [(value)]="eosFormData.DED_AMOUNT"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0.00"
@@ -370,7 +385,7 @@
           class="mb-2"
           label="Net Amount"
           labelMode="floating"
-          [(value)]="eosFormData.NetAmount"
+          [(value)]="eosFormData.NET_AMOUNT"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0.00"
@@ -383,7 +398,7 @@
           class="mb-2"
           label="Last working day"
           labelMode="floating"
-          [(value)]="eosFormData.LastWorkingDay"
+          [(value)]="eosFormData.EOS_DATE"
           displayFormat="dd-MM-yyyy"
           [readOnly]="isReadOnlyMode"
           width="100%"
@@ -393,7 +408,7 @@
           class="mb-2"
           label="Pending Salary"
           labelMode="floating"
-          [(value)]="eosFormData.PendingSalary"
+          [(value)]="eosFormData.PENDING_SALARY"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0.00"
@@ -403,7 +418,7 @@
           class="mb-2"
           label="EOS Amount"
           labelMode="floating"
-          [(value)]="eosFormData.EOSAmount"
+          [(value)]="eosFormData.EOS_AMOUNT"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0.00"
@@ -412,16 +427,24 @@
           class="mb-2"
           label="Unpaid Leave Salary"
           labelMode="floating"
-          [(value)]="eosFormData.UnPaidLeaveSalary"
+          [(value)]="eosFormData.LEAVE_AMOUNT"
           [readOnly]="isReadOnlyMode"
           width="100%"
           format="#,##0.00"
         ></dx-number-box>
         <dx-text-box
           class="mb-2"
-          label="Remarks"
+          label="Addition Remarks"
           labelMode="floating"
-          [(value)]="eosFormData.Remarks"
+          [(value)]="eosFormData.ADD_REMARKS"
+          [readOnly]="isReadOnlyMode"
+          width="100%"
+        ></dx-text-box>
+        <dx-text-box
+          class="mb-2"
+          label="Deduction Remarks"
+          labelMode="floating"
+          [(value)]="eosFormData.DED_REMARKS"
           [readOnly]="isReadOnlyMode"
           width="100%"
         ></dx-text-box>
@@ -436,8 +459,8 @@
       >
         Payment Details
       </legend>
-      <div class="row mb-2">
-        <div class="col-md-12 d-flex align-items-center mb-3">
+      <div class="row mb-2 align-items-center">
+        <div class="col-md-6 d-flex align-items-center">
           <label class="form-label text-dark me-3 mb-0" style="font-size: 14px"
             >Payment Mode:</label
           >
@@ -485,8 +508,8 @@
             <dx-text-box
               label="Reference No"
               labelMode="floating"
-              [(value)]="eosFormData.ChequeNo"
-              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
+              [(value)]="eosFormData.CHEQUE_NO"
+              [readOnly]="(isReadOnlyMode && !isApproveMode && !isVerifyMode) || eosFormData.PAY_TYPE_ID != 2"
               width="100%"
             >
               <dx-validator
@@ -502,11 +525,11 @@
           </div>
           <div class="col-md-6">
             <dx-date-box
-              label="Date"
+              label="Due Date"
               labelMode="floating"
-              [(value)]="eosFormData.DueDate"
+              [(value)]="eosFormData.CHEQUE_DATE"
               displayFormat="dd-MM-yyyy"
-              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
+              [readOnly]="(isReadOnlyMode && !isApproveMode && !isVerifyMode) || eosFormData.PAY_TYPE_ID != 2"
               width="100%"
             >
               <dx-validator
@@ -530,7 +553,7 @@
         <dx-text-box
           label="Narration"
           labelMode="floating"
-          [(value)]="eosFormData.Narration"
+          [(value)]="eosFormData.NARRATION"
           [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
           width="100%"
         ></dx-text-box>
