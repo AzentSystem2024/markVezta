@@ -255,7 +255,7 @@
             'flag-pending': data.data.STATUS === 'Pending',
           }"
         >
-          {{ data.data.STATUS }}
+          {{ data.data.STATUS === "Pending" ? "Open" : data.data.STATUS }}
         </span>
       </div>
       <div *dxTemplate="let cellData of 'actionTemplate'">
@@ -264,7 +264,7 @@
           <i
             *ngIf="canEdit || canView"
             class="dx-icon dx-icon-edit"
-            title="Edit"
+            [title]="cellData.data.STATUS === 'Pending' ? 'Edit' : 'Details'"
             (click)="
               onEditOrViewPayroll({ data: cellData.data, cancel: false })
             "

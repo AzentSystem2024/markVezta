@@ -150,13 +150,14 @@ export class DeliveryReturnComponent implements OnInit {
       .select_DeliveryRteurn_Data(id)
       .subscribe((response: any) => {
         this.DeliveryReturnData = response.Data;
-        });
+      });
   }
 
   get_DeliveryReturnList() {
+    const payload = {}
     this.dataservice.get_DeliveryRteurn_Data().subscribe((response: any) => {
       this.DeliveryReturnDatasource = response.Data;
-      });
+    });
   }
 
   handleClose() {
@@ -219,4 +220,4 @@ export class DeliveryReturnComponent implements OnInit {
   exports: [DeliveryReturnComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryReturnModule {}
+export class DeliveryReturnModule { }

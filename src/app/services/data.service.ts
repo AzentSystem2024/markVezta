@@ -6041,6 +6041,10 @@ The result can be exported to HTML or Markdown.`;
       STORE_ID: data.STORE_ID,
       EMAIL: data.EMAIL,
       IS_INACTIVE: data.IS_INACTIVE,
+      IS_LOCKED: data.IS_LOCKED,
+      LOCK_DATE_FROM: data.LOCK_DATE_FROM,
+      LOCK_DATE_TO: data.LOCK_DATE_TO,
+      LOCK_REASON: data.LOCK_REASON
     };
 
     return this.http.post(url, reqBody);

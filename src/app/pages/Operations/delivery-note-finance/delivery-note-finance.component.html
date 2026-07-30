@@ -164,8 +164,8 @@
       <dxi-column
         caption="Status"
         dataField="STATUS"
-        [width]="80"
-        [cellTemplate]="statusCellRender"
+        [width]="140"
+        cellTemplate="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
@@ -173,6 +173,29 @@
         }"
       >
       </dxi-column>
+
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-approved': data.data.STATUS === 'APPROVED',
+              'flag-verified': data.data.STATUS === 'VERIFIED',
+              'flag-pending':
+                data.data.STATUS !== 2 && data.data.STATUS !== 'APPROVED',
+            }"
+          >
+            {{
+              data.data.STATUS === "OPEN"
+                ? "Open"
+                : data.data.STATUS === "VERIFIED"
+                  ? "Verified"
+                  : data.data.STATUS === "APPROVED"
+                    ? "Approved"
+                    : "Unknown"
+            }}
+          </span>
+        </div>
+      </div>
 
       <dxi-column
         type="buttons"
@@ -183,98 +206,56 @@
       </dxi-column>
 
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit -->
-        <i
-          *ngIf="canEdit"
-          class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            cellData.data.STATUS === 'VERIFIED' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'VERIFIED' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Edit"
-          (click)="onEditDelivery({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Delete -->
-        <i
-          *ngIf="canDelete"
-          class="dx-icon dx-icon-trash"
-          [style.opacity]="
-            cellData.data.STATUS === 'VERIFIED' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'VERIFIED' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Delete"
-          (click)="onDeleteDelivery({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Verify -->
-        <span
-          *ngIf="
-            (cellData.data.STATUS === 'VERIFIED' && canApprove) ||
-            (cellData.data.STATUS !== 'VERIFIED' && canVerify)
-          "
-          style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            vertical-align: middle;
-          "
-          [title]="
-            cellData.data.STATUS === 'APPROVED'
-              ? 'Approved'
-              : cellData.data.STATUS === 'VERIFIED'
-                ? 'Approve'
-                : 'Verify'
-          "
-          (click)="onVerifyDeliveryNote({ row: { data: cellData.data } })"
-        >
-          <!-- Blue badge -->
+        <div class="action-icons">
+          <!-- Edit -->
           <i
-            class="fas fa-certificate"
-            [style.color]="
+            *ngIf="canEdit"
+            class="dx-icon dx-icon-edit"
+            [title]="cellData.data.STATUS === 'OPEN' ? 'Edit' : 'Details'"
+            (click)="onEditDelivery({ data: cellData.data, cancel: false })"
+          ></i>
+
+          <!-- Delete -->
+          <i
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            [style.opacity]="
+              cellData.data.STATUS === 'VERIFIED' ||
               cellData.data.STATUS === 'APPROVED'
-                ? '#10B981'
-                : cellData.data.STATUS === 'VERIFIED'
-                  ? '#0073D8'
-                  : '#FFA500'
+                ? '0.4'
+                : '1'
             "
-            style="font-size: 18px; position: absolute; top: 0; left: 0"
+            [style.pointer-events]="
+              cellData.data.STATUS === 'VERIFIED' ||
+              cellData.data.STATUS === 'APPROVED'
+                ? 'none'
+                : 'auto'
+            "
+            title="Delete"
+            (click)="onDeleteDelivery({ data: cellData.data, cancel: false })"
           ></i>
 
-          <!-- White tick -->
-          <i
-            class="fas fa-check"
-            style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
+          <!-- Verify -->
+          <span
+            *ngIf="
+              !(canEdit && !canVerify && !canApprove) &&
+              (canVerify || canApprove || cellData.data.STATUS === 'APPROVED')
             "
-          ></i>
-        </span>
+            class="verify-badge"
+            [ngClass]="{
+              'status-pending': cellData.data.STATUS === 'OPEN',
+              'status-verified': cellData.data.STATUS === 'VERIFIED',
+              'status-approved': cellData.data.STATUS === 'APPROVED',
+
+              disabled:
+                (cellData.data.STATUS === 'OPEN' && !canVerify) ||
+                (cellData.data.STATUS === 'VERIFIED' && !canApprove) ||
+                (cellData.data.STATUS === 'APPROVED' && canEdit),
+            }"
+            (click)="onVerifyDeliveryNote({ row: { data: cellData.data } })"
+          >
+          </span>
+        </div>
       </div>
       <dxo-summary>
         <dxi-total-item

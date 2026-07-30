@@ -203,7 +203,7 @@
               ? 'not-allowed'
               : 'pointer'
           "
-          title="Edit"
+          [title]="cellData.data.STATUS === 'Open' ? 'Edit' : 'Details'"
           (click)="onEditingRow({ data: cellData.data, cancel: false })"
         ></i>
         <!-- Delete -->
