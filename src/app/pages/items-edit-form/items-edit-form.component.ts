@@ -1086,35 +1086,74 @@ export class ItemsEditFormComponent implements OnInit {
     };
     // Call the service to update the items
     this.dataservice.updateItems(payload.ID, payload).subscribe(
-      (response) => {
-        if (response) {
+      (response: any) => {
+        if (response.flag === '1' || response.flag === 1) {
           notify(
             {
-              message: 'Item updated Successfully',
+              message: response.message || 'Item updated successfully',
               position: { at: 'top center', my: 'top center' },
             },
             'success',
           );
+
           this.closeForm();
           this.dataGrid.instance.refresh();
           this.store = '';
           this.Edit_Store = '';
-          // this.getItemList();
         } else {
           notify(
             {
-              message: 'Your Data Not Updated',
+              message: response.message || 'Item update failed',
               position: { at: 'top right', my: 'top right' },
             },
             'error',
+            3000,
           );
         }
       },
       (error) => {
-        console.error('Update failed:', error);
-        // Handle the error if needed, e.g., show an error message
+        notify(
+          {
+            message: 'An unexpected error occurred.',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+          3000,
+        );
+
+        console.error(error);
       },
     );
+    // this.dataservice.updateItems(payload.ID, payload).subscribe(
+    //   (response) => {
+    //     if (response) {
+    //       notify(
+    //         {
+    //           message: 'Item updated Successfully',
+    //           position: { at: 'top center', my: 'top center' },
+    //         },
+    //         'success',
+    //       );
+    //       this.closeForm();
+    //       this.dataGrid.instance.refresh();
+    //       this.store = '';
+    //       this.Edit_Store = '';
+    //       // this.getItemList();
+    //     } else {
+    //       notify(
+    //         {
+    //           message: 'Your Data Not Updated',
+    //           position: { at: 'top right', my: 'top right' },
+    //         },
+    //         'error',
+    //       );
+    //     }
+    //   },
+    //   (error) => {
+    //     console.error('Update failed:', error);
+    //     // Handle the error if needed, e.g., show an error message
+    //   },
+    // );
   }
 
   toNumber(value: any): number {

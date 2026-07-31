@@ -45,6 +45,7 @@
     "libphonenumber-js": "^1.13.9",
     "luxon": "^3.3.0",
     "medium-zoom": "^1.1.0",
+    "number-to-words": "^1.2.4",
     "pdfmake": "^0.2.20",
     "rxjs": "^7.8.1",
     "stream": "^0.0.2",
