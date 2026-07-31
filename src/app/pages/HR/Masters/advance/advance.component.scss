@@ -100,19 +100,6 @@
   background-color: #0056b3;
 }
 
-.flag-open {
-  color: orange;
-  // text-shadow: 0 0 1px black, 0 0 2px black;
-}
-
-.flag-verified {
-  color: orange;
-}
-
-.flag-approved {
-  color: green;
-}
-
 /* Adjust filter row height */
 ::ng-deep .dx-datagrid-filter-row {
   height: 45px !important;

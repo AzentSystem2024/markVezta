@@ -92,6 +92,7 @@ export class UserNewFormComponent {
     COMPANY_ID: [],
     Date_Format: '',
     Time_Format: '',
+
     // Decimal_Points:'',
     // Currency_Symbol:'',
   };
@@ -875,4 +876,4 @@ export class UserNewFormComponent {
   declarations: [UserNewFormComponent],
   exports: [UserNewFormComponent],
 })
-export class UserNewFormModule {}
+export class UserNewFormModule { }

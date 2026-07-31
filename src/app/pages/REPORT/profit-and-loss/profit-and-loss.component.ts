@@ -103,7 +103,7 @@ export class ProfitAndLossComponent {
     this.monthDataSource = this.dataservice.getMonths();
 
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
 
     const today = new Date();
     const SystemDate =
@@ -261,57 +261,57 @@ this.selectedmonth = currentMonth;
   // }
 
   get_DataSource() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-    FIN_ID: this.finID,
-    DATE_FROM: this.formatted_from_date,
-    DATE_TO: this.formatted_To_date,
-  };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.finID,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+    };
 
-  const payloadData = {
-    companyId: payload.COMPANY_ID,
-    finId: payload.FIN_ID,
-    dateFrom: payload.DATE_FROM,
-    dateTo: payload.DATE_TO,
-  };
+    const payloadData = {
+      companyId: payload.COMPANY_ID,
+      finId: payload.FIN_ID,
+      dateFrom: payload.DATE_FROM,
+      dateTo: payload.DATE_TO,
+    };
 
-  sessionStorage.removeItem('viewclickvalue');
-  sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
+    sessionStorage.removeItem('viewclickvalue');
+    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-  this.ProfitLossReport = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.Profit_Loss_Api(payload).subscribe({
-          next: (res: any) => {
-            const list = res.data || [];
+    this.ProfitLossReport = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.Profit_Loss_Api(payload).subscribe({
+            next: (res: any) => {
+              const list = res.data || [];
 
-            this.isEmptyDatagrid = list.length === 0;
+              this.isEmptyDatagrid = list.length === 0;
 
-            // Calculate net profit using the loaded data
-            this.calculateNetProfit(list);
+              // Calculate net profit using the loaded data
+              this.calculateNetProfit(list);
 
-            if (list.length === 0) {
-              notify({
-                message: 'No data available',
-                type: 'warning',
-                displayTime: 2000,
-                position: {
-                  at: 'top center',
-                  my: 'top center',
-                },
-              });
-            }
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
 
-            resolve(list);
-          },
-          error: () => {
-            this.isEmptyDatagrid = true;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(list);
+            },
+            error: () => {
+              this.isEmptyDatagrid = true;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   typeSorting = (a: string, b: string) => {
     const order = {
@@ -353,40 +353,41 @@ this.selectedmonth = currentMonth;
   //   });
   //   this.netProfit = revenue - expense;
   // }
-calculateNetProfit(data: any[]) {
-  let revenue = 0;
-  let expense = 0;
+  calculateNetProfit(data: any[]) {
+    let revenue = 0;
+    let expense = 0;
 
-  data.forEach((row) => {
-    const type = (row.TYPE_NAME || '').trim().toUpperCase();
-    const amount = Number(row.AMOUNT || 0);
+    data.forEach((row) => {
+      const type = (row.TYPE_NAME || '').trim().toUpperCase();
+      const amount = Number(row.AMOUNT || 0);
 
-    if (type === 'REVENUES') {
-      revenue += amount;
-    } else if (type === 'EXPENSES') {
-      expense += amount;
-    }
-  });
+      if (type === 'REVENUES') {
+        revenue += amount;
+      } else if (type === 'EXPENSES') {
+        expense += amount;
+      }
+    });
 
-  this.netProfit = revenue - expense;
-}
+    this.netProfit = revenue - expense;
+  }
   onCellPrepared(e: any) {
     if (
       e.rowType === 'totalFooter' &&
       e.column &&
       e.column.dataField === 'AMOUNT'
     ) {
-      const formatted = (Number(this.netProfit) || 0).toLocaleString(
-        undefined,
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        },
-      );
+      const amount = Number(this.netProfit) || 0;
+
+      const label = amount >= 0 ? 'Net Profit' : 'Net Loss';
+
+      const formatted = Math.abs(amount).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
       e.cellElement.innerHTML = `
       <div style="text-align: right; font-weight: bold; margin-top: 5px; padding-right: 20px;">
-        Net Profit: ${formatted}
+        ${label}: ${formatted}
       </div>
     `;
     }
@@ -415,4 +416,4 @@ calculateNetProfit(data: any[]) {
   exports: [],
   declarations: [ProfitAndLossComponent],
 })
-export class ProfitAndLossModule {}
+export class ProfitAndLossModule { }

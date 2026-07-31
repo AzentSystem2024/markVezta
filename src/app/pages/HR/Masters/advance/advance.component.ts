@@ -74,6 +74,8 @@ export class AdvanceComponent {
   canApprove: boolean = false;
   canVerify: boolean = false;
   canPrint: boolean = false;
+  SessioncanApprove: boolean = false;
+  SessioncanVerify: boolean = false;
 
   // 4. GLOBAL & SESSION INFO
   // ==========================================
@@ -285,6 +287,8 @@ export class AdvanceComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
+      this.SessioncanApprove = packingRights.CanApprove;
+      this.SessioncanVerify = packingRights.CanVerify;
     }
 
     this.get_Employee_dropdown();
@@ -409,7 +413,7 @@ export class AdvanceComponent {
         this.ledgerList = response?.Data || [];
         this.filterLedgerList();
       },
-      error: () => {},
+      error: () => { },
     });
   }
 
@@ -587,23 +591,6 @@ export class AdvanceComponent {
     return item ? item.DESCRIPTION : this.adv_type_name || 'Unknown Type';
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag';
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approved'
-        ? '#10B981'
-        : status === 'Verified'
-          ? '#0073D8'
-          : '#FFA500';
-    icon.title = status;
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-    cellElement.appendChild(icon);
-  }
 
   getStatusFlagClass(status: string): string {
     switch (status) {
@@ -700,11 +687,35 @@ export class AdvanceComponent {
     });
   }
 
+  showEditAction(row: any): boolean {
+    return this.canEdit;
+  }
+
+  isEditDisabled(row: any): boolean {
+    return false;
+  }
+
+  getEditActionTitle(row: any): string {
+    return this.canEdit && row.STATUS === 'Open' ? 'Edit' : 'Detail';
+  }
+
+  showDeleteAction(row: any): boolean {
+    return this.canDelete;
+  }
+
+  isDeleteDisabled(row: any): boolean {
+    return false;
+  }
+
   onEditStart(e: any) {
-    this.buttonText = 'Update';
+    const rowData = e?.data || e?.row?.data;
+    if (!rowData) return;
+
+    const canEditMode = this.canEdit && rowData.STATUS === 'Open';
+    this.buttonText = canEditMode ? 'Update' : 'View';
     this.isEditPopUp = true;
-    this.isEditReadOnly = false;
-    this.loadAdvanceDetails(e.data.TRANS_ID);
+    this.isEditReadOnly = !canEditMode;
+    this.loadAdvanceDetails(rowData.TRANS_ID);
   }
 
   onViewClick = (e: any) => {
@@ -714,6 +725,65 @@ export class AdvanceComponent {
     this.isEditPopUp = true;
     this.loadAdvanceDetails(e.row.data.TRANS_ID);
   };
+
+  onVerifyAction = (data: any) => {
+    const rowData = { row: { data }, cancel: false };
+
+    if (data.STATUS === 'Open' && this.canVerify) {
+      this.onVerifyClick(rowData);
+      return;
+    }
+
+    if (data.STATUS === 'Verified' && this.canApprove) {
+      this.onApproveClick(rowData);
+      return;
+    }
+
+    if (data.STATUS === 'Approved' && !this.canEdit) {
+      this.onViewClick(rowData);
+    }
+  };
+
+  isVerifyApproveDisabled(row: any): boolean {
+    if (row.STATUS === 'Open') {
+      return !this.canVerify;
+    }
+
+    if (row.STATUS === 'Verified') {
+      return !this.canApprove;
+    }
+
+    if (row.STATUS === 'Approved') {
+      return this.canEdit;
+    }
+
+    return true;
+  }
+
+  showVerifyApproveBadge(row: any): boolean {
+    const hasVerifyOrApprove = this.canVerify || this.canApprove;
+    if (!hasVerifyOrApprove) {
+      return false;
+    }
+
+    return row.STATUS === 'Open' || row.STATUS === 'Verified' || row.STATUS === 'Approved';
+  }
+
+  getVerifyApproveTitle(row: any): string {
+    if (row.STATUS === 'Open') {
+      return 'Verify';
+    }
+
+    if (row.STATUS === 'Verified') {
+      return 'Approve';
+    }
+
+    if (row.STATUS === 'Approved') {
+      return this.canEdit ? 'Approved' : 'View';
+    }
+
+    return '';
+  }
 
   onApproveClick = (e: any) => {
     e.cancel = true;
@@ -989,4 +1059,4 @@ export class AdvanceComponent {
   declarations: [AdvanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AdvanceModule {}
+export class AdvanceModule { }

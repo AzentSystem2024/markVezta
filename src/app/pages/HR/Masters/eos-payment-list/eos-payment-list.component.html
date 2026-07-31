@@ -18,10 +18,25 @@
     >
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">EOS Payments</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            EOS Payments
+          </div>
         </dxi-item>
 
-        <!-- <dxi-item widget="dxSelectBox" [options]="dateRangeOptions"></dxi-item> -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
         <dxi-item
           location="after"
@@ -30,11 +45,9 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
-        <dxi-item
-          location="after"
-          widget="dxButton"
-          [options]="searchButtonOptions"
-        ></dxi-item>
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
@@ -219,12 +232,25 @@
       </div>
     </dx-data-grid>
   </div>
+
+  <dx-load-panel
+    #loadPanel
+    shadingColor="rgba(0,0,0,0.4)"
+    [position]="{ of: '.grid' }"
+    container=".grid"
+    [(visible)]="isLoading"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="false"
+    [hideOnOutsideClick]="false"
+  >
+  </dx-load-panel>
 </div>
 
 <dx-popup
   [(visible)]="popupVisible"
   [width]="'70%'"
-  [height]="'100vh'"
+  [height]="'90vh'"
   [title]="popupTitle"
   [showCloseButton]="true"
   (onHiding)="handleClose()"
@@ -235,21 +261,27 @@
     style="padding-bottom: 50px"
   >
     <!-- Row 1: Voucher No & Date -->
-    <div class="row justify-content-between">
-      <div class="col-md-4 mb-2">
+    <div class="row mb-2 align-items-center">
+      <div class="col-md-2">
+        <label
+          class="form-label mb-0"
+          style="font-weight: bold; font-size: 13px"
+          >Voucher No</label
+        >
+      </div>
+      <div class="col-md-4">
         <dx-text-box
-          label="Voucher No"
-          labelMode="floating"
-          [(value)]="eosFormData.VoucherNo"
+          [(value)]="eosFormData.VOUCHER_NO"
           [readOnly]="isReadOnlyMode"
           width="100%"
         ></dx-text-box>
       </div>
-      <div class="col-md-4 mb-2">
+      <div class="col-md-3 text-end">
+        <label class="form-label mb-0" style="font-size: 13px">Date</label>
+      </div>
+      <div class="col-md-3">
         <dx-date-box
-          label="Date"
-          labelMode="floating"
-          [(value)]="eosFormData.Date"
+          [(value)]="eosFormData.DOC_DATE"
           displayFormat="dd-MM-yyyy"
           [readOnly]="isReadOnlyMode"
           width="100%"
@@ -258,15 +290,20 @@
     </div>
 
     <!-- Row 2: Employee -->
-    <div class="row">
-      <div class="col-md-12 mb-2">
+    <div class="row mb-2 align-items-center">
+      <div class="col-md-2">
+        <label
+          class="form-label mb-0"
+          style="font-weight: bold; font-size: 13px"
+          >Employee</label
+        >
+      </div>
+      <div class="col-md-10">
         <dx-select-box
-          label="Employee"
-          labelMode="floating"
           [dataSource]="EmployeeDropdown"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          [(value)]="eosFormData.EmployeeId"
+          [(value)]="eosFormData.EMP_ID"
           (onValueChanged)="onEmployeeSelectionChanged($event)"
           [readOnly]="isReadOnlyMode"
           [searchEnabled]="true"
@@ -283,25 +320,35 @@
     </div>
 
     <!-- Row 3: Reason & Doc No -->
-    <div class="row">
-      <div class="col-md-8 mb-2">
+    <div class="row mb-2 align-items-center">
+      <div class="col-md-2">
+        <label
+          class="form-label mb-0"
+          style="font-weight: bold; font-size: 13px"
+          >Reason</label
+        >
+      </div>
+      <div class="col-md-4">
         <dx-select-box
-          label="Reason"
-          labelMode="floating"
           [dataSource]="reson_data"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          [(value)]="eosFormData.Reason"
+          [(value)]="eosFormData.REASON_ID"
           [readOnly]="isReadOnlyMode"
           [searchEnabled]="true"
           width="100%"
         ></dx-select-box>
       </div>
-      <div class="col-md-4 mb-2">
+      <div class="col-md-3 text-end">
+        <label
+          class="form-label mb-0"
+          style="font-weight: bold; font-size: 13px"
+          >Doc No</label
+        >
+      </div>
+      <div class="col-md-3">
         <dx-text-box
-          label="Doc No"
-          labelMode="floating"
-          [(value)]="eosFormData.DocNo"
+          [(value)]="eosFormData.DOC_NO"
           [readOnly]="isReadOnlyMode"
           width="100%"
         ></dx-text-box>
@@ -312,134 +359,220 @@
     <div class="row">
       <!-- Left Column -->
       <div class="col-md-6">
-        <dx-date-box
-          class="mb-2"
-          label="Join Date"
-          labelMode="floating"
-          [(value)]="eosFormData.JoinDate"
-          displayFormat="dd-MM-yyyy"
-          [readOnly]="true"
-          width="100%"
-        ></dx-date-box>
-        <dx-number-box
-          class="mb-2"
-          label="Days"
-          labelMode="floating"
-          [(value)]="eosFormData.Days"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0"
-        ></dx-number-box>
-        <dx-number-box
-          class="mb-2"
-          label="Total Service (Days)"
-          labelMode="floating"
-          [(value)]="eosFormData.TotalServiceDays"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0"
-        ></dx-number-box>
-        <dx-number-box
-          class="mb-2"
-          label="Unpaid Leave"
-          labelMode="floating"
-          [(value)]="eosFormData.UnPaidLeave"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0"
-        ></dx-number-box>
-        <dx-number-box
-          class="mb-2"
-          label="Additions"
-          labelMode="floating"
-          [(value)]="eosFormData.Additions"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-        <dx-number-box
-          class="mb-2"
-          label="Deductions"
-          labelMode="floating"
-          [(value)]="eosFormData.Deductions"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-        <dx-number-box
-          class="mb-2"
-          label="Net Amount"
-          labelMode="floating"
-          [(value)]="eosFormData.NetAmount"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Join Date</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-date-box
+              [(value)]="eosFormData.DOJ"
+              displayFormat="dd-MM-yyyy"
+              [readOnly]="true"
+              width="100%"
+            ></dx-date-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px">Days</label>
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.WORKED_DAYS"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0"
+            ></dx-number-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label
+              class="form-label mb-0"
+              style="font-weight: bold; font-size: 13px"
+              >Total Service</label
+            >
+          </div>
+          <div class="col-md-6">
+            <dx-number-box
+              [(value)]="eosFormData.TOTAL_SERVICE_DAYS"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0"
+            ></dx-number-box>
+          </div>
+          <div class="col-md-2 p-0">
+            <span style="font-size: 13px">(Days)</span>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Un paid Leave</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.UNPAID_LEAVE"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0"
+            ></dx-number-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Additions</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.ADD_AMOUNT"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0.00"
+            ></dx-number-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Deductions</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.DED_AMOUNT"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0.00"
+            ></dx-number-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center mt-3">
+          <div class="col-md-4">
+            <label
+              class="form-label mb-0"
+              style="font-weight: bold; font-size: 13px"
+              >Net Amount</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.NET_AMOUNT"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0.00"
+            ></dx-number-box>
+          </div>
+        </div>
       </div>
 
       <!-- Right Column -->
       <div class="col-md-6">
-        <dx-date-box
-          class="mb-2"
-          label="Last working day"
-          labelMode="floating"
-          [(value)]="eosFormData.LastWorkingDay"
-          displayFormat="dd-MM-yyyy"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-        ></dx-date-box>
-
-        <dx-number-box
-          class="mb-2"
-          label="Pending Salary"
-          labelMode="floating"
-          [(value)]="eosFormData.PendingSalary"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-
-        <dx-number-box
-          class="mb-2"
-          label="EOS Amount"
-          labelMode="floating"
-          [(value)]="eosFormData.EOSAmount"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-        <dx-number-box
-          class="mb-2"
-          label="Unpaid Leave Salary"
-          labelMode="floating"
-          [(value)]="eosFormData.UnPaidLeaveSalary"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-        <dx-text-box
-          class="mb-2"
-          label="Remarks"
-          labelMode="floating"
-          [(value)]="eosFormData.Remarks"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-        ></dx-text-box>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Last working day</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-date-box
+              [(value)]="eosFormData.EOS_DATE"
+              displayFormat="dd-MM-yyyy"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+            ></dx-date-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Pending Salary</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.PENDING_SALARY"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0.00"
+            ></dx-number-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >EOS Amount</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.EOS_AMOUNT"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0.00"
+            ></dx-number-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Unpaid Leave Salary</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-number-box
+              [(value)]="eosFormData.LEAVE_AMOUNT"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+              format="#,##0.00"
+            ></dx-number-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Remarks</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-text-box
+              [(value)]="eosFormData.ADD_REMARKS"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+            ></dx-text-box>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Remarks</label
+            >
+          </div>
+          <div class="col-md-8">
+            <dx-text-box
+              [(value)]="eosFormData.DED_REMARKS"
+              [readOnly]="isReadOnlyMode"
+              width="100%"
+            ></dx-text-box>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Payment Details GroupBox -->
-    <fieldset class="border p-2 mt-1" style="border-radius: 5px">
-      <legend
-        class="float-none w-auto text-muted mb-0 px-2"
-        style="font-size: 14px"
-      >
+    <fieldset class="border p-2 mt-3" style="border-radius: 5px">
+      <legend class="float-none w-auto mb-0 px-2" style="font-size: 14px">
         Payment Details
       </legend>
-      <div class="row mb-2">
-        <div class="col-md-12 d-flex align-items-center mb-3">
-          <label class="form-label text-dark me-3 mb-0" style="font-size: 14px"
-            >Payment Mode:</label
+      <div class="row mb-2 align-items-center">
+        <div class="col-md-4 d-flex align-items-center">
+          <label class="form-label me-3 mb-0" style="font-size: 13px"
+            >Payment Mode</label
           >
           <dx-radio-group
             [items]="paymentModes"
@@ -451,10 +584,11 @@
             [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
           ></dx-radio-group>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8 d-flex align-items-center">
+          <label class="form-label me-3 mb-0" style="font-size: 13px"
+            >Ledger</label
+          >
           <dx-select-box
-            label="Ledger"
-            labelMode="floating"
             [dataSource]="filteredLedgerList"
             displayExpr="HEAD_NAME"
             valueExpr="HEAD_ID"
@@ -473,20 +607,27 @@
         </div>
       </div>
 
-      <fieldset class="border p-2 mt-2 mx-1" style="border-radius: 5px">
-        <legend
-          class="float-none w-auto text-muted mb-0 px-2"
-          style="font-size: 12px"
-        >
+      <fieldset
+        class="border p-2 mt-2 mx-1"
+        style="border-radius: 5px"
+        *ngIf="eosFormData.PAY_TYPE_ID == 2"
+      >
+        <legend class="float-none w-auto mb-0 px-2" style="font-size: 12px">
           Bank remittance details
         </legend>
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-6 d-flex align-items-center">
+            <label
+              class="form-label me-3 mb-0"
+              style="font-size: 13px; white-space: nowrap"
+              >Cheque No</label
+            >
             <dx-text-box
-              label="Reference No"
-              labelMode="floating"
-              [(value)]="eosFormData.ChequeNo"
-              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
+              [(value)]="eosFormData.CHEQUE_NO"
+              [readOnly]="
+                (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
+                eosFormData.PAY_TYPE_ID != 2
+              "
               width="100%"
             >
               <dx-validator
@@ -500,13 +641,19 @@
               </dx-validator>
             </dx-text-box>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 d-flex align-items-center">
+            <label
+              class="form-label me-3 mb-0"
+              style="font-size: 13px; white-space: nowrap"
+              >Due Date</label
+            >
             <dx-date-box
-              label="Date"
-              labelMode="floating"
-              [(value)]="eosFormData.DueDate"
+              [(value)]="eosFormData.CHEQUE_DATE"
               displayFormat="dd-MM-yyyy"
-              [readOnly]="isReadOnlyMode || eosFormData.PAY_TYPE_ID != 2"
+              [readOnly]="
+                (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
+                eosFormData.PAY_TYPE_ID != 2
+              "
               width="100%"
             >
               <dx-validator
@@ -525,12 +672,13 @@
     </fieldset>
 
     <!-- Narration -->
-    <div class="row mt-2 mb-2">
-      <div class="col-md-12">
+    <div class="row mt-3 mb-2 align-items-center">
+      <div class="col-md-2">
+        <label class="form-label mb-0" style="font-size: 13px">Narration</label>
+      </div>
+      <div class="col-md-10">
         <dx-text-box
-          label="Narration"
-          labelMode="floating"
-          [(value)]="eosFormData.Narration"
+          [(value)]="eosFormData.NARRATION"
           [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
           width="100%"
         ></dx-text-box>
@@ -539,12 +687,12 @@
 
     <!-- Footer Buttons -->
     <div
-      class="d-flex justify-content-end align-items-center p-2 border-top"
-      style="position: absolute; bottom: 0; left: 0; right: 0"
+      class="d-flex justify-content-end align-items-end p-2"
+      style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px"
     >
       <div class="d-flex me-2">
         <dx-button
-          text="Close"
+          text="Cancel"
           icon=""
           type="normal"
           stylingMode="outlined"
@@ -553,9 +701,9 @@
         ></dx-button>
         <dx-button
           text="Save"
-          icon="save"
+          icon=""
           type="default"
-          stylingMode="contained"
+          stylingMode="outlined"
           validationGroup="eosForm"
           class="me-2"
           (onClick)="onSave($event)"
@@ -563,8 +711,8 @@
         ></dx-button>
         <dx-button
           text="Verify"
-          icon="check"
-          stylingMode="contained"
+          icon=""
+          stylingMode="outlined"
           type="default"
           validationGroup="eosForm"
           class="me-2"
@@ -573,8 +721,8 @@
         ></dx-button>
         <dx-button
           text="Approve"
-          icon="check"
-          stylingMode="contained"
+          icon=""
+          stylingMode="outlined"
           type="default"
           validationGroup="eosForm"
           class="me-2"

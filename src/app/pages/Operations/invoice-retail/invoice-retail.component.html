@@ -181,8 +181,8 @@
       <dxi-column
         caption="Status"
         dataField="TRANS_STATUS"
-        [width]="80"
-        [cellTemplate]="statusCellRender"
+        [width]="140"
+        cellTemplate="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
           dataSource: getStatusFilterData,
@@ -190,6 +190,28 @@
         }"
       >
       </dxi-column>
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-approved': data.data.TRANS_STATUS === 5,
+              'flag-verified': data.data.TRANS_STATUS === 2,
+              'flag-pending':
+                data.data.TRANS_STATUS !== 2 && data.data.TRANS_STATUS !== 5,
+            }"
+          >
+            {{
+              data.data.TRANS_STATUS === 1
+                ? "Open"
+                : data.data.TRANS_STATUS === 2
+                  ? "Verified"
+                  : data.data.TRANS_STATUS === 5
+                    ? "Approved"
+                    : "Unknown"
+            }}
+          </span>
+        </div>
+      </div>
 
       <dxi-column
         type="buttons"
@@ -200,95 +222,56 @@
       </dxi-column>
 
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit -->
-        <i
-          *ngIf="canEdit"
-          class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Edit"
-          (click)="onEditInvoice({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Delete -->
-        <i
-          *ngIf="canDelete"
-          class="dx-icon dx-icon-trash"
-          [style.opacity]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.TRANS_STATUS === 2 || cellData.data.TRANS_STATUS === 5
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Delete"
-          (click)="onDeleteInvoice({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Verify -->
-        <span
-          *ngIf="
-            (cellData.data.TRANS_STATUS === 2 && canApprove) ||
-            (cellData.data.TRANS_STATUS !== 2 && canVerify) ||
-            cellData.data.TRANS_STATUS === 5
-          "
-          style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            vertical-align: middle;
-          "
-          [title]="
-            cellData.data.TRANS_STATUS === 5
-              ? 'Approved'
-              : cellData.data.TRANS_STATUS === 2
-                ? 'Approve'
-                : 'Verify'
-          "
-          (click)="onVerifyInvoice({ row: { data: cellData.data } })"
-        >
-          <!-- Blue badge -->
+        <div class="action-icons">
+          <!-- Edit -->
           <i
-            class="fas fa-certificate"
-            [style.color]="
+            *ngIf="canEdit"
+            class="dx-icon dx-icon-edit"
+            [title]="cellData.data.TRANS_STATUS === 1 ? 'Edit' : 'Details'"
+            (click)="onEditInvoice({ data: cellData.data, cancel: false })"
+          ></i>
+
+          <!-- Delete -->
+          <i
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            [style.opacity]="
+              cellData.data.TRANS_STATUS === 2 ||
               cellData.data.TRANS_STATUS === 5
-                ? '#10B981'
-                : cellData.data.TRANS_STATUS === 2
-                  ? '#0073D8'
-                  : '#FFA500'
+                ? '0.4'
+                : '1'
             "
-            style="font-size: 18px; position: absolute; top: 0; left: 0"
+            [style.pointer-events]="
+              cellData.data.TRANS_STATUS === 2 ||
+              cellData.data.TRANS_STATUS === 5
+                ? 'none'
+                : 'auto'
+            "
+            title="Delete"
+            (click)="onDeleteInvoice({ data: cellData.data, cancel: false })"
           ></i>
 
-          <!-- White tick -->
-          <i
-            class="fas fa-check"
-            style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
+          <!-- Verify -->
+          <span
+            *ngIf="
+              !(canEdit && !canVerify && !canApprove) &&
+              (canVerify || canApprove || cellData.data.TRANS_STATUS === 5)
             "
-          ></i>
-        </span>
+            class="verify-badge"
+            [ngClass]="{
+              'status-pending': cellData.data.TRANS_STATUS === 1,
+              'status-verified': cellData.data.TRANS_STATUS === 2,
+              'status-approved': cellData.data.TRANS_STATUS === 5,
+
+              disabled:
+                (cellData.data.TRANS_STATUS === 1 && !canVerify) ||
+                (cellData.data.TRANS_STATUS === 2 && !canApprove) ||
+                (cellData.data.TRANS_STATUS === 5 && canEdit),
+            }"
+            (click)="onVerifyInvoice({ row: { data: cellData.data } })"
+          >
+          </span>
+        </div>
       </div>
     </dx-data-grid>
   </div>

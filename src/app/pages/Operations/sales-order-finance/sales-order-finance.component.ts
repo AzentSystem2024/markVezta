@@ -133,7 +133,7 @@ export class SalesOrderFinanceComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -206,7 +206,7 @@ export class SalesOrderFinanceComponent {
         // ✅ SAME AS PRODUCTION JV
         this.filteredSalesOrderList = this.salesOrderList;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -275,31 +275,7 @@ export class SalesOrderFinanceComponent {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-statusCellRender(cellElement: any, cellInfo: any) {
-  const status = cellInfo.data.TRANS_STATUS;
 
-  const icon = document.createElement('i');
-  icon.className = 'fas fa-flag';
-  icon.style.fontSize = '18px';
-
-  // Same colors as the badge
-  if (status === 5) {
-    icon.style.color = '#10B981'; // Green
-    icon.title = 'APPROVED';
-  } else if (status === 2) {
-    icon.style.color = '#0073D8'; // Blue
-    icon.title = 'VERIFIED';
-  } else {
-    icon.style.color = '#FFA500'; // Orange
-    icon.title = 'OPEN';
-  }
-
-  icon.style.display = 'flex';
-  icon.style.justifyContent = 'center';
-  icon.style.alignItems = 'center';
-
-  cellElement.appendChild(icon);
-}
 
   getStatusFilterData = [
     {
@@ -530,9 +506,15 @@ statusCellRender(cellElement: any, cellInfo: any) {
     const status = event.data.TRANS_STATUS;
     this.dataService.selectSalesOrder(orderId).subscribe((response: any) => {
       this.selectedSalesOrder = response.Data;
-      console.log(this.selectedSalesOrder, 'SELECTEDTROUT');
-      this.isEditSalesOrder = true;
-      this.isReadOnlySalesOrder = status === 5;
+      if (status === 1) {
+        // Open document -> Edit mode
+        this.isReadOnlySalesOrder = false;
+        this.isEditSalesOrder = true;
+      } else {
+        // Verified & Approved -> View mode
+        this.isReadOnlySalesOrder = true;
+        this.isViewSalesOrder = true;
+      }
     });
   }
 
@@ -541,6 +523,21 @@ statusCellRender(cellElement: any, cellInfo: any) {
     const rowData = e.row.data;
     const orderId = rowData.ID;
     const status = rowData.TRANS_STATUS;
+
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
 
     this.isReadOnlySalesOrder = status === 5;
 
@@ -675,4 +672,4 @@ statusCellRender(cellElement: any, cellInfo: any) {
   exports: [SalesOrderFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalesOrderFinanceModule {}
+export class SalesOrderFinanceModule { }

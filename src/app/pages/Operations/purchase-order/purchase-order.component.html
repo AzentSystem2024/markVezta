@@ -153,105 +153,127 @@
     <dxi-column
       caption="Status"
       dataField="STATUS"
-      [cellTemplate]="statusCellRender"
+      cellTemplate="statusCellRender"
       [allowHeaderFiltering]="true"
       [headerFilter]="{
         dataSource: getStatusFilterData,
         encodeHtml: false,
       }"
-      width="80"
+      width="140"
       alignment="center"
     >
     </dxi-column>
+
+    <div *dxTemplate="let data of 'statusCellRender'">
+      <div style="text-align: center; width: 100%">
+        <span
+          [ngClass]="{
+            'flag-approved': data.data.STATUS === 'Approved',
+            'flag-verified': data.data.STATUS === 'Verified',
+            'flag-pending':
+              data.data.STATUS !== 'Verified' &&
+              data.data.STATUS !== 'Approved' &&
+              data.data.STATUS !== 'Paid',
+          }"
+        >
+          {{ data.data.STATUS }}
+        </span>
+      </div>
+    </div>
+
     <dxi-column caption="Actions" [width]="110" cellTemplate="actionTemplate">
     </dxi-column>
 
     <div *dxTemplate="let cellData of 'actionTemplate'">
-      <!-- Verify / Approve / View -->
-      <span
-        *ngIf="
-          canVerify ||
-          (canApprove && cellData.data.STATUS === 'Verified') ||
-          cellData.data.STATUS === 'Approved' ||
-          cellData.data.STATUS === 'Closed'
-        "
-        style="
-          position: relative;
-          display: inline-block;
-          width: 18px;
-          height: 18px;
-          margin-right: 12px;
-          margin-top: -4px;
-          cursor: pointer;
-          vertical-align: middle;
-        "
-        [title]="
-          cellData.data.STATUS === 'Approved' ||
-          cellData.data.STATUS === 'Closed' ||
-          cellData.data.STATUS === 'Partial'
-            ? 'View'
-            : cellData.data.STATUS === 'Verified'
-              ? 'Approve'
-              : 'Verify'
-        "
-        (click)="onVerifyClick({ row: { data: cellData.data } })"
-      >
-        <!-- Badge -->
+      <div class="action-icons">
+        <!-- Edit -->
         <i
-          class="fas fa-certificate"
-          [style.color]="
+          *ngIf="canEdit || canView"
+          class="dx-icon dx-icon-edit"
+          [style.opacity]="
+            ['Closed', 'Partial'].includes(cellData.data.STATUS) ? '0.4' : '1'
+          "
+          [style.pointer-events]="
+            ['Closed', 'Partial'].includes(cellData.data.STATUS)
+              ? 'none'
+              : 'auto'
+          "
+          [style.cursor]="
+            ['Closed', 'Partial'].includes(cellData.data.STATUS)
+              ? 'not-allowed'
+              : 'pointer'
+          "
+          [title]="cellData.data.STATUS === 'Open' ? 'Edit' : 'Details'"
+          (click)="onEditingRow({ data: cellData.data, cancel: false })"
+        ></i>
+        <!-- Delete -->
+        <i
+          *ngIf="canDelete"
+          class="dx-icon dx-icon-trash"
+          [style.opacity]="
+            ['Approved', 'Verified', 'Closed', 'Partial'].includes(
+              cellData.data.STATUS
+            )
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            ['Approved', 'Verified', 'Closed', 'Partial'].includes(
+              cellData.data.STATUS
+            )
+              ? 'none'
+              : 'auto'
+          "
+          [style.cursor]="
+            ['Approved', 'Verified', 'Closed', 'Partial'].includes(
+              cellData.data.STATUS
+            )
+              ? 'not-allowed'
+              : 'pointer'
+          "
+          title="Delete"
+          (click)="deletePOData({ data: cellData.data })"
+        ></i>
+
+        <!-- Verify / Approve / View -->
+        <span
+          *ngIf="
+            cellData.data.STATUS === 'Open' ||
+            cellData.data.STATUS === 'Verified' ||
             cellData.data.STATUS === 'Approved' ||
             cellData.data.STATUS === 'Closed' ||
             cellData.data.STATUS === 'Partial'
-              ? '#10B981'
+          "
+          class="verify-badge"
+          [ngClass]="{
+            'status-pending': cellData.data.STATUS === 'Open',
+            'status-verified': cellData.data.STATUS === 'Verified',
+            'status-approved':
+              cellData.data.STATUS === 'Approved' ||
+              cellData.data.STATUS === 'Closed' ||
+              cellData.data.STATUS === 'Partial',
+
+            disabled:
+              (cellData.data.STATUS === 'Open' && !canVerify) ||
+              (cellData.data.STATUS === 'Verified' && !canApprove) ||
+              (cellData.data.STATUS === 'Approved' && canEdit) ||
+              ((cellData.data.STATUS === 'Closed' ||
+                cellData.data.STATUS === 'Partial') &&
+                !canView),
+          }"
+          [title]="
+            cellData.data.STATUS === 'Approved' ||
+            cellData.data.STATUS === 'Closed' ||
+            cellData.data.STATUS === 'Partial'
+              ? 'View'
               : cellData.data.STATUS === 'Verified'
-                ? '#0073D8'
-                : '#FFA500'
+                ? 'Approve'
+                : 'Verify'
           "
-          style="font-size: 18px; position: absolute; top: 0; left: 0"
-        ></i>
-
-        <!-- Tick -->
-        <i
-          class="fas fa-check"
-          style="
-            color: white;
-            font-size: 7px;
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            pointer-events: none;
-          "
-        ></i>
-      </span>
-
-      <!-- Edit -->
-      <i
-        *ngIf="
-          canEdit &&
-          !['Approved', 'Verified', 'Closed', 'Partial'].includes(
-            cellData.data.STATUS
-          )
-        "
-        class="dx-icon dx-icon-edit"
-        style="cursor: pointer; margin-right: 10px"
-        title="Edit"
-        (click)="onEditingRow({ data: cellData.data, cancel: false })"
-      ></i>
-
-      <!-- Delete -->
-      <i
-        *ngIf="
-          canDelete &&
-          !['Approved', 'Verified', 'Closed', 'Partial'].includes(
-            cellData.data.STATUS
-          )
-        "
-        class="dx-icon dx-icon-trash"
-        style="cursor: pointer"
-        title="Delete"
-        (click)="deletePOData({ data: cellData.data })"
-      ></i>
+          (click)="onVerifyClick({ row: { data: cellData.data } })"
+        >
+        </span>
+      </div>
     </div>
   </dx-data-grid>
 

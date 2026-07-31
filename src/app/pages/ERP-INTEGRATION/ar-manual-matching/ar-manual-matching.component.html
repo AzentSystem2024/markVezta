@@ -4,6 +4,7 @@
     <dx-data-grid
       #receiptGrid
       [dataSource]="receiptData"
+      keyExpr="ReceiptDetailID"
       [showBorders]="true"
       class="grid theme-dependent mb-1"
       [rowAlternationEnabled]="true"
@@ -139,6 +140,7 @@
       #invoiceGrid
       class="grid theme-dependent"
       [dataSource]="invoiceData"
+      keyExpr="InvoiceID"
       [showBorders]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"

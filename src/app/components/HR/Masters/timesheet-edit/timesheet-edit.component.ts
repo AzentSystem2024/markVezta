@@ -114,7 +114,7 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
 
   // 2. Constructor & Lifecycle Hooks
   // =========================================================================
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) { }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -138,7 +138,8 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
 
       this.is_verify = this.isVerifyMode;
       this.is_approved = this.isApproveMode;
-      this.is_approve = this.isReadOnlyMode || this.isVerifyMode;
+      // this.is_approve = this.isReadOnlyMode || this.isVerifyMode;
+      this.is_approve = this.isReadOnlyMode;
 
       this.timesheetDetails = (
         this.timesheetFormData.TIMESHEET_DETAIL || []
@@ -853,4 +854,4 @@ export class TimesheetEditComponent implements OnInit, OnChanges {
   exports: [TimesheetEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetEditModule {}
+export class TimesheetEditModule { }

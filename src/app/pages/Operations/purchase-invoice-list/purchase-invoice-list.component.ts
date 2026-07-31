@@ -148,7 +148,7 @@ export class PurchaseInvoiceListComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -385,31 +385,6 @@ export class PurchaseInvoiceListComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approved'
-        ? '#10B981' // Approved
-        : status === 'Verified'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title =
-      status === 'Approved'
-        ? 'Approved'
-        : status === 'Verified'
-          ? 'Verified'
-          : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {
@@ -656,7 +631,7 @@ export class PurchaseInvoiceListComponent {
       console.log(res);
       this.selectedInvoice = res.Data;
       console.log(this.selectedInvoice, '==============select data====verify');
-      if (this.selectedInvoice.STATUS == 'Approved') {
+      if (this.selectedInvoice.STATUS === 'Approved') {
         this.buttonText = 'View Purchase  Invoice';
       } else if (this.selectedInvoice.STATUS == 'Open') {
         this.buttonText = 'Verify Purchase  Invoice';
@@ -690,20 +665,32 @@ export class PurchaseInvoiceListComponent {
   }
 
   onEditInvoice(event: any) {
-    console.log(event, 'event------------');
     event.cancel = true;
+
     const invoiceId = event.data.TRANS_ID;
     const transStatus = event.data.STATUS;
-    this.statusFinder = event.data.STATUS;
-    this.isVerifyInvoice = false;
+    this.statusFinder = transStatus;
 
     this.dataService
       .selectPurchaseInvoice(invoiceId)
       .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
 
-        this.isEditInvoiceReadOnly = transStatus === 'Approved'; //read-only if Approved
-        this.isEditInvoice = true;
+        // Open View popup for Verified and Approved
+        if (
+          transStatus === 'Verified' ||
+          transStatus === 'Approved' ||
+          transStatus === 'Closed' ||
+          transStatus === 'Partial'
+        ) {
+          this.buttonText = 'View Purchase Invoice';
+          this.isEditInvoiceReadOnly = true;
+          this.isVerifyInvoice = true;
+        } else {
+          // Open Edit popup for Open invoices
+          this.isEditInvoiceReadOnly = false;
+          this.isEditInvoice = true;
+        }
       });
   }
 
@@ -814,4 +801,4 @@ export class PurchaseInvoiceListComponent {
   exports: [PurchaseInvoiceListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseInvoiceListModule {}
+export class PurchaseInvoiceListModule { }

@@ -161,24 +161,24 @@
   color: #000;
 }
 
-.flag-orange {
-  color: #ffa500; /* or rgb(245, 240, 240) */
-}
+// .flag-orange {
+//   color: #ffa500; /* or rgb(245, 240, 240) */
+// }
 
-.flag-pending {
-  color: white; /* or rgb(245, 240, 240) */
-  text-shadow:
-    0 0 1px black,
-    0 0 2px black;
-}
+// .flag-pending {
+//   color: white; /* or rgb(245, 240, 240) */
+//   text-shadow:
+//     0 0 1px black,
+//     0 0 2px black;
+// }
 
-.flag-verified {
-  color: #0073d8;
-}
+// .flag-verified {
+//   color: #0073d8;
+// }
 
-.flag-approved {
-  color: #10b981;
-}
+// .flag-approved {
+//   color: #10b981;
+// }
 .year-button {
   width: 32px;
   height: 32px;
@@ -209,49 +209,49 @@
   outline-offset: 2px;
 }
 
-::ng-deep .blue-outline-btn.dx-button .dx-icon {
-  color: #ffa500 !important; /* blue icon */
+// ::ng-deep .blue-outline-btn.dx-button .dx-icon {
+//   color: #ffa500 !important; /* blue icon */
 
-  border-radius: 8px;
-}
-::ng-deep .blue-outline-btn.dx-button {
-  border: none !important; /* blue border */
-  color: #ffa500 !important;
-  background-color: #fff2d9 !important; /* blue text */
-}
-.blue-outline-btn.dx-button .dx-icon :hover {
-  color: #ffffff !important; /* blue icon */
+//   border-radius: 8px;
+// }
+// ::ng-deep .blue-outline-btn.dx-button {
+//   border: none !important; /* blue border */
+//   color: #ffa500 !important;
+//   background-color: #fff2d9 !important; /* blue text */
+// }
+// .blue-outline-btn.dx-button .dx-icon :hover {
+//   color: #ffffff !important; /* blue icon */
 
-  border-radius: 8px;
-}
-::ng-deep .blue-outline-btn.dx-button:hover {
-  border: none !important; /* blue border */
-  color: #ffffff !important;
-  background-color: #ffa500 !important; /* blue text */
-}
+//   border-radius: 8px;
+// }
+// ::ng-deep .blue-outline-btn.dx-button:hover {
+//   border: none !important; /* blue border */
+//   color: #ffffff !important;
+//   background-color: #ffa500 !important; /* blue text */
+// }
 
-.approved {
-  color: green !important;
-  font-weight: bold;
-}
+// .approved {
+//   color: green !important;
+//   font-weight: bold;
+// }
 
-.pending {
-  color: orange !important;
-  font-weight: bold;
-}
+// .pending {
+//   color: orange !important;
+//   font-weight: bold;
+// }
 
-.status-flag {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin: auto;
-}
+// .status-flag {
+//   display: inline-block;
+//   width: 12px;
+//   height: 12px;
+//   border-radius: 50%;
+//   margin: auto;
+// }
 
-.flag-approved {
-  background-color: green;
-}
+// .flag-approved {
+//   background-color: green;
+// }
 
-.flag-pending {
-  background-color: orange;
-}
+// .flag-pending {
+//   background-color: orange;
+// }

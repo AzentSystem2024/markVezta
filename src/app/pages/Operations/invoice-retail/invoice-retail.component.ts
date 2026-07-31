@@ -168,7 +168,7 @@ export class InvoiceRetailComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log('******************');
@@ -638,27 +638,6 @@ export class InvoiceRetailComponent {
     }, 0);
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
       if (e.data.TRANS_STATUS === 5) {
@@ -756,11 +735,17 @@ export class InvoiceRetailComponent {
       .subscribe((response: any) => {
         this.selectedInvoice = response.Data;
 
-        if (transStatus === 5) {
-          this.isViewInvoice = true;
-        } else {
+
+        if (transStatus === 1) {
+          // Open document -> Edit mode
+          this.isReadOnlyInvoice = false;
           this.isEditInvoice = true;
+        } else {
+          // Verified & Approved -> View mode
+          this.isReadOnlyInvoice = true;
+          this.isViewInvoice = true;
         }
+
       });
   }
 
@@ -771,6 +756,22 @@ export class InvoiceRetailComponent {
     const transStatus = rowData.TRANS_STATUS;
 
     this.isReadOnlyInvoice = transStatus === 5;
+
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+
 
     this.dataService
       .selectInvoiceRetail(invoiceId)
@@ -903,4 +904,4 @@ export class InvoiceRetailComponent {
   exports: [InvoiceRetailComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceRetailModule {}
+export class InvoiceRetailModule { }

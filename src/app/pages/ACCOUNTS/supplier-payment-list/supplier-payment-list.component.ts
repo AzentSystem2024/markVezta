@@ -61,7 +61,7 @@ export class SupplierPaymentListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter:boolean= true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -347,28 +347,6 @@ export class SupplierPaymentListComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    // icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
   getStatusFilterData = [
     {
       text: 'Approved',
@@ -563,12 +541,15 @@ export class SupplierPaymentListComponent {
       .subscribe((response: any) => {
         this.selectedReceipt = response.Data;
 
-        // Set a flag to determine if the form should be read-only
-        this.isEditReceipt = true;
-        this.isReadOnlyReceipt = transStatus === 5; // true if status is approved
-
-        // Navigate to form component or open the form popup (depending on your app)
-        console.log(this.selectedReceipt, 'SELECTED RECEIPT');
+        if (transStatus === 1) {
+          // Open document -> Edit mode
+          this.isReadOnlyReceipt = false;
+          this.isEditReceipt = true;
+        } else {
+          // Verified & Approved -> View mode
+          this.isReadOnlyReceipt = true;
+          this.isViewPayment = true;
+        }
       });
   }
 
@@ -580,6 +561,21 @@ export class SupplierPaymentListComponent {
     const transStatus = rowData.TRANS_STATUS;
 
     this.isReadOnlyPayment = transStatus === 5;
+
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
 
     this.dataService
       .selectSupplierPayment(invoiceId)
@@ -644,62 +640,62 @@ export class SupplierPaymentListComponent {
   // }
 
   onDeletePayment(event: any) {
-  if (event.data.TRANS_STATUS === 5) {
-    event.cancel = true;
-    notify('Customer Receipt cannot be deleted.', 'error', 2000);
-    return;
-  }
-
-  event.cancel = true; // prevent default delete immediately
-
-  const receiptId = event.data.TRANS_ID;
-
-  const result = confirm(
-    'Are you sure you want to delete this Supplier payment?',
-    'Confirm Delete'
-  );
-
-  result.then((dialogResult: boolean) => {
-    if (!dialogResult) {
-      return; // user clicked No
+    if (event.data.TRANS_STATUS === 5) {
+      event.cancel = true;
+      notify('Customer Receipt cannot be deleted.', 'error', 2000);
+      return;
     }
 
-    this.dataService.deleteSupplierPayment(receiptId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Receipt Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
+    event.cancel = true; // prevent default delete immediately
 
-          this.getSupplierPayments();
-        } else {
+    const receiptId = event.data.TRANS_ID;
+
+    const result = confirm(
+      'Are you sure you want to delete this Supplier payment?',
+      'Confirm Delete'
+    );
+
+    result.then((dialogResult: boolean) => {
+      if (!dialogResult) {
+        return; // user clicked No
+      }
+
+      this.dataService.deleteSupplierPayment(receiptId).subscribe(
+        (response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Receipt Deleted Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.getSupplierPayments();
+          } else {
+            notify(
+              {
+                message: 'Data not deleted',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        },
+        (error) => {
+          console.error('Delete error:', error);
+
           notify(
             {
-              message: 'Data not deleted',
+              message: 'Delete failed',
               position: { at: 'top right', my: 'top right' },
             },
             'error',
           );
-        }
-      },
-      (error) => {
-        console.error('Delete error:', error);
-
-        notify(
-          {
-            message: 'Delete failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error',
-        );
-      },
-    );
-  });
-}
+        },
+      );
+    });
+  }
 
   addSupplierPayment() {
     this.addSupllierPayment = true;
@@ -764,4 +760,4 @@ export class SupplierPaymentListComponent {
   exports: [SupplierPaymentListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierPaymentListModule {}
+export class SupplierPaymentListModule { }

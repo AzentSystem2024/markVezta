@@ -193,6 +193,40 @@
               </dx-validator>
             </dx-text-box>
           </div>
+
+          <div style="display: flex; align-items: center; gap: 15px">
+            <dx-check-box
+              text="Is Locked"
+              stylingMode="outlined"
+              hint="Is Locked"
+              [(value)]="newUserData.IS_LOCKED"
+              labelMode="floating"
+            >
+            </dx-check-box>
+          </div>
+
+          <div
+            *ngIf="newUserData.IS_LOCKED"
+            style="display: flex; gap: 15px; margin-top: 15px"
+          >
+            <dx-date-box
+              label="Date From"
+              labelMode="floating"
+              width="100%"
+              displayFormat="dd/MM/yyyy"
+              [(value)]="newUserData.LOCK_DATE_FROM"
+            >
+            </dx-date-box>
+
+            <dx-date-box
+              label="Date To"
+              labelMode="floating"
+              width="100%"
+              displayFormat="dd/MM/yyyy"
+              [(value)]="newUserData.LOCK_DATE_TO"
+            >
+            </dx-date-box>
+          </div>
         </div>
 
         <div class="form-column" style="flex: 2">
@@ -278,6 +312,23 @@
               hint="Inactive"
               labelMode="floating"
             ></dx-check-box>
+          </div>
+
+          <div *ngIf="newUserData.IS_LOCKED" style="margin-top: 15px">
+            <dx-text-box
+              label="Locked Reason"
+              hint="Locked Reason"
+              labelMode="floating"
+              [(value)]="newUserData.LOCK_REASON"
+            >
+              <dx-validator>
+                <dxi-validation-rule
+                  type="required"
+                  message="Reason is required"
+                >
+                </dxi-validation-rule>
+              </dx-validator>
+            </dx-text-box>
           </div>
         </div>
       </div>

@@ -156,12 +156,7 @@
         </dxi-item>
 
         <!-- Action Buttons -->
-        <dxi-item
-          *ngIf="canAdd"
-          location="after"
-          widget="dxButton"
-          [options]="addButtonOptions"
-        ></dxi-item>
+
         <dxi-item
           *ngIf="canVerify"
           location="after"
@@ -194,6 +189,12 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxi-column dataField="EMP_NO" caption="Employee No."></dxi-column>
@@ -208,6 +209,23 @@
         caption="Status"
         [cellTemplate]="statusCellRender"
       ></dxi-column>
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-paid': data.data.STATUS === 'Paid',
+              'flag-approved': data.data.STATUS === 'Approved',
+              'flag-verified': data.data.STATUS === 'Verified',
+              'flag-pending':
+                data.data.STATUS !== 'Verified' &&
+                data.data.STATUS !== 'Approved' &&
+                data.data.STATUS !== 'Paid',
+            }"
+          >
+            {{ data.data.STATUS }}
+          </span>
+        </div>
+      </div>
 
       <dxi-column
         type="buttons"
@@ -217,92 +235,48 @@
       ></dxi-column>
 
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit -->
-        <i
-          *ngIf="canEdit"
-          class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Edit"
-          (click)="onEditingStart({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Delete -->
-        <i
-          *ngIf="canDelete"
-          class="dx-icon dx-icon-trash"
-          [style.opacity]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Delete"
-          (click)="onDeleteTimesheet({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Verify / Approve -->
-        <span
-          *ngIf="SessioncanVerify"
-          style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            vertical-align: middle;
-          "
-          [title]="
-            cellData.data.STATUS === 'Approved'
-              ? 'Approved'
-              : cellData.data.STATUS === 'Verified'
-                ? 'Approve'
-                : 'Verify'
-          "
-          (click)="onVerifyAction(cellData.data)"
-        >
+        <div class="action-icons">
+          <!-- Edit -->
           <i
-            class="fas fa-certificate"
-            [style.color]="
-              cellData.data.STATUS === 'Approved'
-                ? '#10B981'
-                : cellData.data.STATUS === 'Verified'
-                  ? '#0073D8'
-                  : '#FFA500'
-            "
-            style="font-size: 18px; position: absolute; top: 0; left: 0"
-          ></i>
+            *ngIf="canEdit || canView"
+            class="dx-icon dx-icon-edit action-icon"
+            [class.disabled]="isEditDisabled(cellData.data)"
+            [title]="cellData.data.STATUS === 'Open' ? 'Edit' : 'Details'"
+            (click)="openTimesheet(cellData.data)"
+          >
+          </i>
+
+          <!-- Delete -->
           <i
-            class="fas fa-check"
-            style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash action-icon"
+            [class.disabled]="cellData.data.STATUS !== 'Open'"
+            title="Delete"
+            (click)="onDeleteTimesheet({ data: cellData.data, cancel: false })"
+          >
+          </i>
+          <!-- Verify / Approve -->
+          <span
+            *ngIf="showVerifyApproveBadge(cellData.data)"
+            class="verify-badge"
+            [ngClass]="{
+              'status-paid': cellData.data.STATUS === 'Paid',
+              'status-approved': cellData.data.STATUS === 'Approved',
+              'status-verified': cellData.data.STATUS === 'Verified',
+              'status-pending':
+                cellData.data.STATUS !== 'Verified' &&
+                cellData.data.STATUS !== 'Approved' &&
+                cellData.data.STATUS !== 'Paid',
+            }"
+            [class.disabled]="isVerifyApproveDisabled(cellData.data)"
+            [title]="getVerifyApproveTitle(cellData.data)"
+            (click)="
+              !isVerifyApproveDisabled(cellData.data) &&
+                onVerifyAction(cellData.data)
             "
-          ></i>
-        </span>
+          >
+          </span>
+        </div>
       </div>
     </dx-data-grid>
   </div>
@@ -355,7 +329,7 @@
     [existingTimesheets]="timesheetList"
     [isVerifyMode]="true"
     [isApproveMode]="false"
-    [isReadOnlyMode]="true"
+    [isReadOnlyMode]="false"
     (popupClosed)="handleClose()"
   ></app-timesheet-edit>
 </dx-popup>

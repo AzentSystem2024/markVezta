@@ -25,10 +25,6 @@
       [headerFilter]="{ visible: false }"
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
-      [selection]="{
-        mode: 'multiple',
-        showCheckBoxesMode: 'always',
-      }"
       [repaintChangesOnly]="true"
       (onEditingStart)="onEditOrViewPayroll($event)"
       (onRowRemoving)="onDeletePayroll($event)"
@@ -72,7 +68,18 @@
 
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Payroll</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Payroll
+          </div>
         </dxi-item>
 
         <dxi-item location="after">
@@ -138,6 +145,13 @@
           location="after"
           locateInMenu="auto"
           widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
         <dxi-item location="after">
@@ -148,12 +162,7 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
-        <dxi-item
-          location="after"
-          locateInMenu="auto"
-          widget="dxButton"
-          [options]="searchButtonOptions"
-        ></dxi-item>
+
         <dxi-item
           *ngIf="canAdd"
           location="after"
@@ -167,7 +176,7 @@
           widget="dxButton"
           [options]="approveButtonOptions"
         ></dxi-item> -->
-        <dxi-item
+        <!-- <dxi-item
           *ngIf="canVerify"
           location="after"
           widget="dxButton"
@@ -178,7 +187,7 @@
           location="after"
           widget="dxButton"
           [options]="approveButtonOptions"
-        ></dxi-item>
+        ></dxi-item> -->
       </dxo-toolbar>
 
       <dxi-column dataField="EMPLOYEE_NO" caption="Employee No."></dxi-column>
@@ -214,7 +223,7 @@
       >
       </dxi-column>
 
-      <div
+      <!-- <div
         *dxTemplate="let data of 'statusCellRender'"
         style="text-align: center; width: 100%"
       >
@@ -224,116 +233,86 @@
             data.data.STATUS === 'Paid'
               ? '#8B5CF6'
               : data.data.STATUS === 'Approved'
-              ? '#10B981'
-              : data.data.STATUS === 'Verified'
-                ? '#0073D8'
-                : '#FFA500'
+                ? '#10B981'
+                : data.data.STATUS === 'Verified'
+                  ? '#0073D8'
+                  : '#FFA500'
           "
           [attr.title]="data.data.STATUS"
           style="cursor: default"
         ></i>
-      </div>
+      </div> -->
 
-      <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit -->
-        <i
-          *ngIf="canEdit"
-          class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Edit"
-          (click)="onEditOrViewPayroll({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Delete -->
-        <i
-          *ngIf="canDelete"
-          class="dx-icon dx-icon-trash"
-          [style.opacity]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Delete"
-          (click)="onDeletePayroll({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Verify -->
+      <div
+        *dxTemplate="let data of 'statusCellRender'"
+        style="text-align: center; width: 100%"
+      >
         <span
-          *ngIf="canVerify"
-          style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            vertical-align: middle;
-          "
-          [title]="
-            cellData.data.STATUS === 'Paid'
-              ? 'Paid'
-              : cellData.data.STATUS === 'Approved'
-              ? 'Approved'
-              : cellData.data.STATUS === 'Verified'
-                ? 'Approve'
-                : 'Verify'
-          "
-          (click)="
-            onVerifyOrApproveIconClick({ data: cellData.data, cancel: false })
-          "
+          [ngClass]="{
+            'flag-paid': data.data.STATUS === 'Paid',
+            'flag-approved': data.data.STATUS === 'Approved',
+            'flag-verified': data.data.STATUS === 'Verified',
+            'flag-pending': data.data.STATUS === 'Pending',
+          }"
         >
-          <!-- Blue badge -->
+          {{ data.data.STATUS === "Pending" ? "Open" : data.data.STATUS }}
+        </span>
+      </div>
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <div class="action-icons">
+          <!-- Edit -->
           <i
-            class="fas fa-certificate"
-            [style.color]="
-              cellData.data.STATUS === 'Paid'
-                ? '#8B5CF6'
-                : cellData.data.STATUS === 'Approved'
-                ? '#10B981'
-                : cellData.data.STATUS === 'Verified'
-                  ? '#0073D8'
-                  : '#FFA500'
+            *ngIf="canEdit || canView"
+            class="dx-icon dx-icon-edit"
+            [title]="cellData.data.STATUS === 'Pending' ? 'Edit' : 'Details'"
+            (click)="
+              onEditOrViewPayroll({ data: cellData.data, cancel: false })
             "
-            style="font-size: 18px; position: absolute; top: 0; left: 0"
           ></i>
 
-          <!-- White tick -->
+          <!-- Delete -->
           <i
-            class="fas fa-check"
-            style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            [style.opacity]="cellData.data.STATUS !== 'Pending' ? '0.4' : '1'"
+            [style.pointer-events]="
+              cellData.data.STATUS !== 'Pending' ? 'none' : 'auto'
             "
-          ></i>
-        </span>
+            (click)="onDeletePayroll({ data: cellData.data, cancel: false })"
+          >
+          </i>
+
+          <!-- Verify -->
+          <span
+            *ngIf="canVerify || canApprove"
+            class="verify-badge"
+            [ngClass]="{
+              'status-paid': cellData.data.STATUS === 'Paid',
+              'status-approved': cellData.data.STATUS === 'Approved',
+              'status-verified': cellData.data.STATUS === 'Verified',
+              'status-pending': cellData.data.STATUS === 'Pending',
+            }"
+            [class.disabled]="
+              (cellData.data.STATUS === 'Approved' && canEdit) ||
+              (cellData.data.STATUS === 'Pending' && !canVerify) ||
+              (cellData.data.STATUS === 'Verified' && !canApprove) ||
+              (cellData.data.STATUS === 'Paid' && canEdit)
+            "
+            [title]="
+              cellData.data.STATUS === 'Paid'
+                ? 'Paid'
+                : cellData.data.STATUS === 'Approved'
+                  ? 'Approved'
+                  : cellData.data.STATUS === 'Verified'
+                    ? 'Approve'
+                    : 'Verify'
+            "
+            (click)="
+              onVerifyOrApproveIconClick({ data: cellData.data, cancel: false })
+            "
+          >
+          </span>
+        </div>
       </div>
     </dx-data-grid>
   </div>

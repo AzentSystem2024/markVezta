@@ -226,7 +226,7 @@ export class StaffEOSComponent {
       visible: (e: any) => this.canApprove && e.row.data.STATUS === 'Verified',
     },
   ];
-  isFilterOpened: boolean =false;
+  isFilterOpened: boolean = false;
 
   // CONSTRUCTOR
   // ==========================================
@@ -350,7 +350,7 @@ export class StaffEOSComponent {
 
   filterData(filterBy: string = 'all') {
     const data = this.allStaffEosData;
-    
+
     // On first load or when 'all' is selected, show all data without filtering
     if (filterBy === 'all' || this.initialLoad) {
       this.staffEosSource = data
@@ -363,7 +363,7 @@ export class StaffEOSComponent {
       this.initialLoad = false;
       return;
     }
-    
+
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalize to start of day
 
@@ -464,33 +464,6 @@ export class StaffEOSComponent {
     } catch (e) {
       return null;
     }
-  }
-
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status == null || status === ''
-        ? '#000000'
-        : status === 'Left Service'
-          ? '#237c20ff' // Left Service
-          : status === 'Verified'
-            ? '#0073D8' // Verified
-            : '#FFA500'; // Open
-    icon.title =
-      status == null || status === ''
-        ? 'No Status'
-        : status === 'Left Service'
-          ? 'Left Service'
-          : status === 'Verified'
-            ? 'Verified'
-            : 'Open';
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-    cellElement.appendChild(icon);
   }
 
   getStatusFlagClass(status: string): string {
@@ -755,6 +728,16 @@ export class StaffEOSComponent {
       });
   }
 
+  getEditActionTitle(row: any): string {
+    if (!row) {
+      return 'Edit';
+    }
+
+    return row.STATUS === 'Verified' || row.STATUS === 'Left Service' || row.STATUS === 'Approved'
+      ? 'Detail'
+      : 'Edit';
+  }
+
   onEditingStart(event: any) {
     this.all_workingdays = '0';
     event.cancel = true;
@@ -763,7 +746,11 @@ export class StaffEOSComponent {
     this.isLoading = true;
     this.dataService.select_Advance(id).subscribe({
       next: (res: any) => {
-        if (statusValue === 'Left Service') {
+        if (
+          statusValue === 'Verified' ||
+          statusValue === 'Left Service' ||
+          statusValue === 'Approved'
+        ) {
           this.isviewpopup = true;
         } else {
           this.editpopup = true;
@@ -775,6 +762,140 @@ export class StaffEOSComponent {
       },
     });
     this.select_Data_EOS(event);
+  }
+
+  // onVerifyAction(data: any): void {
+  //   if (!data) return;
+
+  //   if (data.STATUS === 'Open' && this.canVerify) {
+  //     this.onVerifyClick({ row: { data } });
+  //     return;
+  //   }
+
+  //   if (data.STATUS === 'Verified') {
+  //     this.editpopup = false;
+  //     this.verifypopup = false;
+  //     this.Approvepopup = false;
+  //     this.isviewpopup = false;
+
+  //     this.isLoading = true;
+  //     this.dataService.select_Api_eos(data.ID).subscribe({
+  //       next: (res: any) => {
+  //         this.selected_data = res;
+  //         this.select_Data_EOS({ data: { ID: data.ID } });
+  //         if (this.canApprove) {
+  //           this.Approvepopup = true;
+  //         } else {
+  //           this.verifypopup = true;
+  //         }
+  //         this.isLoading = false;
+  //       },
+  //       error: () => {
+  //         this.isLoading = false;
+  //       },
+  //     });
+  //     return;
+  //   }
+
+  //   if ((data.STATUS === 'Left Service' || data.STATUS === 'Approved') && !this.canEdit) {
+  //     this.editpopup = false;
+  //     this.verifypopup = false;
+  //     this.Approvepopup = false;
+  //     this.isviewpopup = false;
+
+  //     this.isLoading = true;
+  //     this.dataService.select_Api_eos(data.ID).subscribe({
+  //       next: (res: any) => {
+  //         this.selected_data = res;
+  //         this.isviewpopup = true;
+  //         this.isLoading = false;
+  //       },
+  //       error: () => {
+  //         this.isLoading = false;
+  //       },
+  //     });
+  //   }
+  // }
+
+  onVerifyAction(data: any): void {
+    if (!data) return;
+
+    this.editpopup = false;
+    this.verifypopup = false;
+    this.Approvepopup = false;
+    this.isviewpopup = false;
+
+    this.isLoading = true;
+
+    this.dataService.select_Api_eos(data.ID).subscribe({
+      next: (res: any) => {
+        this.selected_data = res;
+        this.select_Data_EOS({ data: { ID: data.ID } });
+
+        if (data.STATUS === 'Open') {
+          this.verifypopup = true;
+        }
+        else if (data.STATUS === 'Verified') {
+          this.Approvepopup = true;
+        }
+        else {
+          this.isviewpopup = true;
+        }
+
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  isVerifyApproveDisabled(row: any): boolean {
+    if (row.STATUS === 'Open') {
+      return !this.canVerify;
+    }
+
+    if (row.STATUS === 'Verified') {
+      return !(this.canVerify || this.canApprove || this.canEdit);
+    }
+
+    if (row.STATUS === 'Left Service' || row.STATUS === 'Approved') {
+      return this.canEdit;
+    }
+
+    return false;
+  }
+
+  showVerifyApproveBadge(row: any): boolean {
+    if (row.STATUS === 'Open') {
+      return this.canVerify || this.canEdit;
+    }
+
+    if (row.STATUS === 'Verified') {
+      return this.canVerify || this.canApprove || this.canEdit;
+    }
+
+    if (row.STATUS === 'Left Service' || row.STATUS === 'Approved') {
+      return true;
+    }
+
+    return false;
+  }
+
+  getVerifyApproveTitle(row: any): string {
+    if (row.STATUS === 'Open') {
+      return 'Verify';
+    }
+
+    if (row.STATUS === 'Verified') {
+      return this.canApprove ? 'Approve' : 'View';
+    }
+
+    if (row.STATUS === 'Left Service' || row.STATUS === 'Approved') {
+      return 'View';
+    }
+
+    return '';
   }
 
   Edit_EOS() {
@@ -1026,4 +1147,4 @@ export class StaffEOSComponent {
   declarations: [StaffEOSComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StaffEOSModule {}
+export class StaffEOSModule { }
