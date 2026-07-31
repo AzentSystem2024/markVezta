@@ -64,7 +64,7 @@ export class CustomerReceiptsComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter:boolean = true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -81,7 +81,25 @@ export class CustomerReceiptsComponent {
   ReceiptDataSource!: DataSource;
   receiptArray: any[] = [];
   receiptCount = 0;
+  formMode: 'edit' | 'verify' | 'approve' | 'view' = 'edit';
+  get popupTitle(): string {
+    switch (this.formMode) {
+      case 'edit':
+        return 'Update Customer Receipt';
 
+      case 'verify':
+        return 'Verify Customer Receipt';
+
+      case 'approve':
+        return 'Approve Customer Receipt';
+
+      case 'view':
+        return 'View Customer Receipt';
+
+      default:
+        return 'Customer Receipt';
+    }
+  }
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -134,7 +152,7 @@ export class CustomerReceiptsComponent {
   customerReciptList: any;
   selectedReceipt: any;
   isEditReceipt: boolean = false;
-  isVerifyReceipt:boolean = false;
+  isVerifyReceipt: boolean = false;
   isViewReceipt: boolean = false;
   filteredReceiptList: any;
 
@@ -328,27 +346,6 @@ export class CustomerReceiptsComponent {
     }
   }
 
-   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
   getStatusFilterData = [
     {
       text: 'Approved',
@@ -522,14 +519,38 @@ export class CustomerReceiptsComponent {
     }
   }
 
-  onVerifyInvoice(e:any){
+  onVerifyInvoice(e: any) {
     e.cancel = true;
+    const rowData = e.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
     const receiptId = e.row.data.TRANS_ID;
     const transStatus = e.row.data.TRANS_STATUS;
     this.dataService
       .selectCustomerReceipt(receiptId)
       .subscribe((response: any) => {
         this.selectedReceipt = response.Data;
+
+        // 👇 Set the mode here
+        if (transStatus === 1) {
+          this.formMode = 'verify';
+        } else if (transStatus === 2) {
+          this.formMode = 'approve';
+        } else if (transStatus === 5) {
+          this.formMode = 'view';
+        }
         this.isVerifyReceipt = true;
         this.isEditReceipt = false;
         this.isReadOnlyReceipt = transStatus === 5;
@@ -543,8 +564,18 @@ export class CustomerReceiptsComponent {
       .selectCustomerReceipt(receiptId)
       .subscribe((response: any) => {
         this.selectedReceipt = response.Data;
-        this.isEditReceipt = true;
-        this.isReadOnlyReceipt = transStatus === 5;
+        if (transStatus === 1) {
+          this.formMode = 'edit';
+          this.isEditReceipt = true;
+        } else if (transStatus === 2) {
+          this.formMode = 'view';
+          this.isVerifyReceipt = true;
+          this.isReadOnlyReceipt = true;
+        } else if (transStatus === 5) {
+          this.formMode = 'view';
+          this.isVerifyReceipt = true;
+          this.isReadOnlyReceipt = true;
+        }
       });
   }
 

@@ -55,7 +55,7 @@ export class ListMiscellaneousPaymentsComponent {
   showHeaderFilter: true;
   showFilterRow = true;
   isFilterOpened = false;
-  statusFinder:any;
+  statusFinder: any;
   miscPaymentsList: any;
   addMiscPopupOpened: boolean = false;
   editMiscPopupOpened: boolean = false;
@@ -150,77 +150,6 @@ export class ListMiscellaneousPaymentsComponent {
   isReadOnlyPayment: boolean;
   sessionData: any;
   selected_vat_id: any;
-
-   allActionButtons = [
-    {
-      name: 'edit',
-
-      hint: 'Edit',
-
-      icon: 'edit',
-
-      text: 'Edit',
-      visible: (e) => this.canEdit && e.row.data.TRANS_STATUS === 'Open' 
-    },
-
-    {
-      name: 'delete',
-
-      hint: 'Delete',
-
-      icon: 'trash',
-
-      text: 'Delete',
-
-      // onClick: (e) => this.onDeleteClick(e),
-
-      visible: (e) => e.row.data.TRANS_STATUS !== 'Approve' || e.row.data.TRANS_STATUS === 'Open' || e.row.data.TRANS_STATUS !== 'Verify' && this.canApprove,
-    },
-
-    {
-      hint: 'Verify',
-
-      icon: 'check',
-
-      text: 'Verify',
-
-      onClick: (e) => {
-        setTimeout(() => this.onVerifyClick(e));
-      },
-
-      visible: (e) =>
-        e.row.data.TRANS_STATUS !== 'Verify',
-    },
-
-    {
-      hint: 'Approve',
-
-      icon: 'check',
-
-      text: 'Approve',
-
-      onClick: (e) => {
-        setTimeout(() => this.onApproveClick(e));
-      },
-
-      visible: (e) => e.row.data.TRANS_STATUS === 'Verify',
-    },
-  ];
-
-
-      //===================Status flag=========================
-  getStatusFlagClass(status: string): string {
-    switch (status) {
-      case 'Open':
-        return 'flag-open'; // White or gray
-      case 'Verify':
-        return 'flag-verified'; // Orange
-      case 'Approve':
-        return 'flag-approved'; // Green
-      default:
-        return '';
-    }
-  }
 
   constructor(
     private dataService: DataService,
@@ -419,28 +348,6 @@ export class ListMiscellaneousPaymentsComponent {
       });
     }
   }
-
-   statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approve'
-        ? '#10B981' // Approved
-        : status === 'Verify'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'Approve' ? 'Approved' : status === 'Verify' ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
   getStatusFilterData = [
     {
       text: 'Approved',
@@ -621,29 +528,43 @@ export class ListMiscellaneousPaymentsComponent {
   }
 
 
-   // ============================Verify Popup function=========================================
+  // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
-    console.log(e,'event--------------')
-    
+    console.log(e, 'event--------------')
+
     e.cancel = true;
-  const transStatus = e.row.data.TRANS_STATUS;
-  this.statusFinder = e.row.data.TRANS_STATUS;
+    const transStatus = e.row.data.TRANS_STATUS;
+    this.statusFinder = e.row.data.TRANS_STATUS;
     const id = e.row.data.TRANS_ID;
-    console.log(id, '===================id');
+    const rowData = e.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
     this.dataService.selectMiscPayment(id).subscribe((res: any) => {
       console.log(res);
-      this.selectedmiscellaneousData = {...res};
+      this.selectedmiscellaneousData = { ...res };
       console.log(this.selectedmiscellaneousData, '==============select data====verify');
       // this.get_employes_details_value_select();
       this.isReadOnlyPayment = transStatus === 'Approve';
       this.editMiscPopupOpened = false
-    this.verifyMiscPopupOpened = true;
+      this.verifyMiscPopupOpened = true;
     });
   }
 
-   // ============================Approve Popup function=========================================
+  // ============================Approve Popup function=========================================
   onApproveClick(e: any): void {
-   
+
     e.cancel = true;
     const transStatus = e.row.data.TRANS_STATUS;
     this.statusFinder = e.row.data.TRANS_STATUS;
@@ -651,33 +572,42 @@ export class ListMiscellaneousPaymentsComponent {
     console.log(id, '===================id');
     this.dataService.selectMiscPayment(id).subscribe((res: any) => {
       console.log(res);
-      this.selectedmiscellaneousData = {...res};
+      this.selectedmiscellaneousData = { ...res };
       console.log(this.selectedmiscellaneousData, '==============select data====verify');
       // this.get_employes_details_value_select();
       this.isReadOnlyPayment = transStatus === 'Approve';
-       this.verifyMiscPopupOpened = true;
+      this.verifyMiscPopupOpened = true;
     });
   }
 
   onEditOrViewMiscPayment(e: any) {
-   
     e.cancel = true;
-    const miscId = e.data.TRANS_ID;
 
+    const miscId = e.data.TRANS_ID;
     const status = e.data.TRANS_STATUS;
-    this.MiscPaymentId = e.data.TRANS_ID;
+
+    this.MiscPaymentId = miscId;
     this.selectedMiscPayment = miscId;
+
     this.dataService.selectMiscPayment(miscId).subscribe({
       next: (response: any) => {
-        this.selectedmiscellaneousData = {...response};
+        this.selectedmiscellaneousData = { ...response };
 
-        
-        this.isReadOnlyPayment = status === 5;
-         this.editMiscPopupOpened = true;
+        if (status === 'Open') {
+          // Open document -> Edit
+          this.isReadOnlyPayment = false;
+          this.editMiscPopupOpened = true;
+        } else {
+          // Verified / Approved -> View form
+          this.isReadOnlyPayment = true;
+          this.statusFinder = 'Approve';   // makes mode='view'
+          this.editMiscPopupOpened = false;
+          this.verifyMiscPopupOpened = true;
+        }
       },
       error: (err) => {
-        console.error('Failed to fetch salary revision:', err);
-      },
+        console.error(err);
+      }
     });
   }
 

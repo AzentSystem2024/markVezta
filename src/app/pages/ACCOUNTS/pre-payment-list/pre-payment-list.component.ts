@@ -42,7 +42,7 @@ export class PrePaymentListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   @ViewChild('prePaymentAdd')
-prePaymentAdd!: PrePaymentAddComponent;
+  prePaymentAdd!: PrePaymentAddComponent;
 
   PrePaymentListDataSource: any[] = [];
   readonly allowedPageSizes: any = [10, 20, 'all'];
@@ -54,7 +54,7 @@ prePaymentAdd!: PrePaymentAddComponent;
   showHeaderFilter = true;
   addPrepaymentPopupOpened: boolean = false;
   editPrePaymentPopupOpened: boolean = false;
-  verifyPrePaymentPopupOpened : boolean = false;
+  verifyPrePaymentPopupOpened: boolean = false;
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
   canAdd = false;
@@ -91,27 +91,27 @@ prePaymentAdd!: PrePaymentAddComponent;
     this.get_PrePaymentList();
   }
 
- get popupTitle(): string {
-  switch (this.popupMode) {
-    case 'new':
-      return 'New PrePayment Invoice';
+  get popupTitle(): string {
+    switch (this.popupMode) {
+      case 'new':
+        return 'New PrePayment Invoice';
 
-    case 'edit':
-      return 'Edit PrePayment Invoice';
+      case 'edit':
+        return 'Edit PrePayment Invoice';
 
-    case 'verify':
-      return 'Verify PrePayment Invoice';
+      case 'verify':
+        return 'Verify PrePayment Invoice';
 
-    case 'approve':
-      return 'Approve PrePayment Invoice';
+      case 'approve':
+        return 'Approve PrePayment Invoice';
 
-    case 'view':
-      return 'View PrePayment Invoice';
+      case 'view':
+        return 'View PrePayment Invoice';
 
-    default:
-      return 'PrePayment Invoice';
+      default:
+        return 'PrePayment Invoice';
+    }
   }
-}
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -244,7 +244,7 @@ prePaymentAdd!: PrePaymentAddComponent;
     },
   ];
 
-   getStatusFilterData = [
+  getStatusFilterData = [
     {
       text: 'Approved',
       value: 'Approved',
@@ -255,18 +255,18 @@ prePaymentAdd!: PrePaymentAddComponent;
     },
   ];
 
-  onVerifyInvoice(e:any){
-     e.cancel = true;
+  onVerifyInvoice(e: any) {
+    e.cancel = true;
     console.log(e)
-     const status = e.row.data?.TRANS_STATUS?.trim();
-     if (status === 'Approved') {
-    this.popupMode = 'view';
-    this.isEditReadOnly = true;
-  } else if (status === 'Verify') {
-    this.popupMode = 'approve';
-  } else {
-    this.popupMode = 'verify';
-  }
+    const status = e.row.data?.TRANS_STATUS?.trim();
+    if (status === 'Approved') {
+      this.popupMode = 'view';
+      this.isEditReadOnly = true;
+    } else if (status === 'Verify') {
+      this.popupMode = 'approve';
+    } else {
+      this.popupMode = 'verify';
+    }
 
     // this.isEditReadOnly = status === 'Approved';
     this.editPrePaymentPopupOpened = false;
@@ -274,10 +274,10 @@ prePaymentAdd!: PrePaymentAddComponent;
     this.verifyselectPrePayment(e);
   }
 
-  onApproveInvoice(e:any){
-     e.cancel = true;
+  onApproveInvoice(e: any) {
+    e.cancel = true;
     console.log(e)
-     const status = e.row.data?.TRANS_STATUS?.trim();
+    const status = e.row.data?.TRANS_STATUS?.trim();
     this.isEditReadOnly = status === 'Approved';
     this.verifyPrePaymentPopupOpened = true;
     this.editPrePaymentPopupOpened = false;
@@ -288,13 +288,15 @@ prePaymentAdd!: PrePaymentAddComponent;
     event.cancel = true;
     const status = event.data?.TRANS_STATUS?.trim();
 
-    if (status === 'Approved') {
-    this.popupMode = 'view';
-    this.isEditReadOnly = true;
-  } else {
-    this.popupMode = 'edit';
-    this.isEditReadOnly = false;
-  }
+    if (status === 'Open') {
+      // Open document -> Edit mode
+      this.isEditReadOnly = false;
+      this.editPrePaymentPopupOpened = true;
+    } else {
+      // Verified & Approved -> View mode
+      this.isEditReadOnly = true;
+      this.editPrePaymentPopupOpened = false;
+    }
 
 
     // this.isEditReadOnly = status === 'Approved';
@@ -312,50 +314,45 @@ prePaymentAdd!: PrePaymentAddComponent;
   //    })
   // }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approved'
-        ? '#10B981' // Approved
-        : status === 'Verify'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'Verify' ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   verifyselectPrePayment(event: any) {
-  const rowData = event.row?.data || event.data;
+    const rowData = event.row?.data || event.data;
 
-  if (!rowData) {
-    console.log('No row data found', event);
-    return;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 'Open' && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 'Verified' && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 'Approved' && this.canEdit) {
+      return;
+    }
+
+    if (!rowData) {
+      console.log('No row data found', event);
+      return;
+    }
+
+    const id = rowData.TRANS_ID;
+
+    this.PrepaymentId = id;
+    this.selectprepayment = id;
+
+    console.log('Calling Select_PrePayment with ID:', id);
+
+    this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
+      this.selectedPrePayment = {
+        ...res.Data,
+        // TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved',
+      };
+      console.log(this.selectedPrePayment, "eerertrt====")
+    });
   }
-
-  const id = rowData.TRANS_ID;
-
-  this.PrepaymentId = id;
-  this.selectprepayment = id;
-
-  console.log('Calling Select_PrePayment with ID:', id);
-
-  this.dataservice.Select_PrePayment(id).subscribe((res: any) => {
-    this.selectedPrePayment = {
-      ...res.Data,
-      // TRANS_STATUS: res.Data.TRANS_STATUS === 'Approved',
-    };
-    console.log(this.selectedPrePayment,"eerertrt====")
-  });
-}
   selectPrePayment(event: any) {
     const id = event.data.TRANS_ID;
     this.PrepaymentId = event.data.TRANS_ID;
@@ -371,50 +368,50 @@ prePaymentAdd!: PrePaymentAddComponent;
     });
   }
 
- DeletePrePayment(e: any) {
-  const miscId = e.data.TRANS_ID;
-  e.cancel = true;
+  DeletePrePayment(e: any) {
+    const miscId = e.data.TRANS_ID;
+    e.cancel = true;
 
-  if (e.data.TRANS_STATUS === 5) {
-    notify('This Prepayment cannot be deleted.', 'error', 2000);
-    return;
-  }
-
-  confirm(
-    'Are you sure you want to delete this Prepayment?',
-    'Confirm Delete'
-  ).then((result) => {
-    if (result) {
-      this.dataservice.Delete_PrePayment(miscId).subscribe(
-        (response: any) => {
-          if (response) {
-            notify(
-              {
-                message: 'Prepayment Deleted Successfully',
-                position: { at: 'top center', my: 'top center' },
-              },
-              'success',
-            );
-
-            this.get_PrePaymentList();
-          } else {
-            notify(
-              {
-                message: 'Data not deleted',
-                position: { at: 'top right', my: 'top right' },
-              },
-              'error',
-            );
-          }
-        },
-        (error) => {
-          console.error('Delete error:', error);
-          notify('Error while deleting', 'error', 2000);
-        }
-      );
+    if (e.data.TRANS_STATUS === 5) {
+      notify('This Prepayment cannot be deleted.', 'error', 2000);
+      return;
     }
-  });
-}
+
+    confirm(
+      'Are you sure you want to delete this Prepayment?',
+      'Confirm Delete'
+    ).then((result) => {
+      if (result) {
+        this.dataservice.Delete_PrePayment(miscId).subscribe(
+          (response: any) => {
+            if (response) {
+              notify(
+                {
+                  message: 'Prepayment Deleted Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+
+              this.get_PrePaymentList();
+            } else {
+              notify(
+                {
+                  message: 'Data not deleted',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            console.error('Delete error:', error);
+            notify('Error while deleting', 'error', 2000);
+          }
+        );
+      }
+    });
+  }
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;

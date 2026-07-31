@@ -48,22 +48,6 @@
   gap: 12px;
   margin-bottom: 20px;
 }
-
-.flag-open {
-  color: white; /* or rgb(245, 240, 240) */
-  text-shadow:
-    0 0 1px black,
-    0 0 2px black;
-}
-
-.flag-verified {
-  color: orange;
-}
-
-.flag-approved {
-  color: green;
-}
-
 .button-container {
   display: flex;
   justify-content: flex-end;
