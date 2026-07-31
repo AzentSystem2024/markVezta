@@ -57,6 +57,7 @@ import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
+import { toWords } from 'number-to-words';
 
 @Component({
   selector: 'app-quotation-form',
@@ -1397,7 +1398,7 @@ export class QuotationFormComponent {
     // ======================================================
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Buyer Details', 12, 60);
+    doc.text('Seller Details', 12, 60);
 
     doc.setFont('helvetica', 'normal');
 
@@ -1420,7 +1421,7 @@ export class QuotationFormComponent {
     // ======================================================
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Seller Details', 140, 60);
+    doc.text('Buyer Details', 140, 60);
 
     doc.setFont('helvetica', 'normal');
 
@@ -1544,7 +1545,14 @@ export class QuotationFormComponent {
     // ======================================================
     // AMOUNT IN WORDS
     // ======================================================
+    const netAmount = Number(data.Data.NET_AMOUNT) || 0;
 
+    const amountInWords =
+      'AED ' +
+      toWords(Math.floor(netAmount)).replace(/\b\w/g, (char) =>
+        char.toUpperCase(),
+      ) +
+      ' Only';
     const amountY = (doc as any).lastAutoTable.finalY + 10;
 
     doc.setFont('helvetica', 'normal');
@@ -1553,7 +1561,9 @@ export class QuotationFormComponent {
     doc.text('Amount Chargeable (in words):', 60, amountY);
 
     doc.setTextColor(0, 102, 204);
-    doc.text('AED Three Thousand One Hundred Thirty Five Only', 120, amountY);
+    const amountText = doc.splitTextToSize(amountInWords, 70);
+
+    doc.text(amountText, 120, amountY);
 
     doc.setTextColor(0);
 
