@@ -130,6 +130,7 @@
                   placeholder="Select Department"
                   [searchEnabled]="true"
                   [(value)]="newItems.DEPT_ID"
+                  (onValueChanged)="onDepartmentChanged($event)"
                 >
                   <dx-validator>
                     <dxi-validation-rule
@@ -155,6 +156,7 @@
                   placeholder="Select Category"
                   [searchEnabled]="true"
                   [(value)]="newItems.CAT_ID"
+                  (onValueChanged)="onCategoryChanged($event)"
                 >
                   <dx-validator>
                     <dxi-validation-rule
@@ -172,7 +174,7 @@
                   label="Sub Category"
                   labelMode="floating"
                   [items]="subcatagory"
-                  displayExpr="SUBCAT_NAME"
+                  displayExpr="DESCRIPTION"
                   valueExpr="ID"
                   placeholder="Select Sub Category"
                   [searchEnabled]="true"
@@ -507,6 +509,7 @@
         #itemsGridRef
         [dataSource]="formItemsData.ITEM_ALIAS"
         [showBorders]="true"
+        (onEditorPreparing)="onAliasEditorPreparing($event)"
         [editing]="{
           mode: 'cell',
           allowUpdating: true,
@@ -624,10 +627,12 @@
           <div class="inventory-item">
             <label>Last Purchase Price:</label>
             <dx-number-box
+              class="highlight-readonly"
               [(value)]="newItems.PURCH_PRICE"
               [width]="200"
               [format]="'#,##0.00'"
               [inputAttr]="{ style: 'text-align: right;' }"
+              [readOnly]="true"
             ></dx-number-box>
           </div>
         </div>
@@ -690,7 +695,7 @@
           </div>
 
           <!-- History Container -->
-          <div class="history-container">
+          <!-- <div class="history-container">
             <div class="price-header">History</div>
             <div class="inventory-item">
               <label>Date Created:</label>
@@ -737,7 +742,7 @@
               ></dx-date-box>
             </div>
                       
-          </div>
+          </div> -->
         </div>
       </div>
     </dxi-tab>

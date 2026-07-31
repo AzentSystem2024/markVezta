@@ -688,3 +688,6 @@
     vertical-align: middle !important;
   }
 }
+:host ::ng-deep .supplier-grid .dx-data-row > td {
+  height: 14px !important;
+}

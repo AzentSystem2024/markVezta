@@ -313,12 +313,12 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     dataservice.getDepartmentData(department).subscribe((data) => {
       this.department = data;
     });
-    const subcategory = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getSubCategoryData(subcategory).subscribe((data) => {
-      this.subcatagory = data;
-    });
+    // const subcategory = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    // dataservice.getSubCategoryData(subcategory).subscribe((data) => {
+    //   this.subcatagory = data;
+    // });
     const vatClassPayload = {
       COMPANY_ID: this.selected_Company_id,
     };
@@ -329,13 +329,13 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });
-    const itemCategoryPayload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'ITEMCATEGORY',
-    };
-    dataservice.getDropdownData(itemCategoryPayload).subscribe((data) => {
-      this.catagory = data;
-    });
+    // const itemCategoryPayload = {
+    //   COMPANY_ID: this.selected_Company_id,
+    //   NAME: 'ITEMCATEGORY',
+    // };
+    // dataservice.getDropdownData(itemCategoryPayload).subscribe((data) => {
+    //   this.catagory = data;
+    // });
     const uomPayload = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'UOM',
@@ -561,6 +561,81 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     });
   }
 
+  onDepartmentChanged(event: any) {
+    this.newItems.DEPT_ID = event.value;
+
+    // Clear existing category selection
+    this.newItems.CAT_ID = 0;
+    this.catagory = [];
+
+    const itemCategoryPayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ITEMCATEGORY',
+      DEPT_ID: event.value, // Use the parameter expected by your API
+    };
+
+    this.dataservice.getDropdownData(itemCategoryPayload).subscribe((data) => {
+      this.catagory = data;
+    });
+  }
+
+  onCategoryChanged(event: any) {
+    this.newItems.CAT_ID = event.value;
+
+    // Clear previous subcategory
+    this.newItems.SUBCAT_ID = 0;
+    this.subcatagory = [];
+
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      CAT_ID: event.value, // Use the key expected by your API
+      NAME: 'SUBCATEGORY',
+    };
+
+    this.dataservice.getDropdownData(payload).subscribe((data) => {
+      this.subcatagory = data;
+    });
+  }
+
+  onAliasEditorPreparing(e: any) {
+    if (e.parentType === 'dataRow' && e.dataField === 'ALIAS') {
+      const defaultHandler = e.editorOptions.onEnterKey;
+
+      e.editorOptions.onEnterKey = () => {
+        if (defaultHandler) {
+          defaultHandler();
+        }
+
+        const grid = e.component;
+
+        grid.saveEditData();
+
+        setTimeout(() => {
+          grid.addRow();
+
+          setTimeout(() => {
+            const rows = grid.getVisibleRows();
+            const lastRow = rows[rows.length - 1];
+
+            if (lastRow) {
+              grid.editCell(lastRow.rowIndex, 'ALIAS');
+            }
+          }, 100);
+        }, 0);
+      };
+    }
+  }
+  onSupplierCellValueChanged(e: any) {
+    if (e.dataField === 'IS_PRIMARY' && e.value === true) {
+      this.datasource.forEach((item: any) => {
+        item.IS_PRIMARY = false;
+      });
+
+      e.data.IS_PRIMARY = true;
+
+      e.component.refresh();
+    }
+  }
   addDefaultSupplierRow() {
     const grid = this.supplierGrid?.instance;
 
@@ -925,6 +1000,22 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
               grid.editCell(rowIndex, 'SUPP_ID');
             }, 100);
           }, 0);
+        }
+      };
+    }
+
+    if (event.parentType === 'dataRow' && event.dataField === 'IS_PRIMARY') {
+      event.editorOptions.onValueChanged = (e: any) => {
+        // Update current row
+        event.component.cellValue(event.row.rowIndex, 'IS_PRIMARY', e.value);
+
+        if (e.value) {
+          // Uncheck all other rows
+          this.datasource.forEach((row: any, index: number) => {
+            if (index !== event.row.rowIndex) {
+              event.component.cellValue(index, 'IS_PRIMARY', false);
+            }
+          });
         }
       };
     }

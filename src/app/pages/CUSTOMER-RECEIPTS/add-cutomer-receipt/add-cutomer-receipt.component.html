@@ -317,6 +317,7 @@
               <div style="display: flex; gap: 10px">
                 <!-- Search Icon Button -->
                 <dx-button
+                  *ngIf="receiptMode === 'PDC'"
                   icon="search"
                   (onClick)="onSearchCheque()"
                   class="toolbar-icon-btn mt-2"

@@ -274,7 +274,7 @@
         dataType="number"
         alignment="right"
         [visible]="true"
-        caption="Delivery Out"
+        caption="Delivery Note"
       ></dxi-column>
       <dxi-column
         dataField="DELIVERY_RETURN_QTY"
@@ -319,7 +319,7 @@
       <dxi-column
         dataField="BALANCE_STOCK"
         dataType="number"
-        alignment="right" 
+        alignment="right"
         caption="Closing"
       ></dxi-column>
       <!-- <dxi-column dataField="SIZE" caption="Size"></dxi-column>
@@ -348,16 +348,17 @@
   </div> -->
 
   <div *dxTemplate="let data of 'title'">
-  <div class="custom-popup-title">
-    <span>{{ popupTitle }}</span>
+    <div class="custom-popup-title">
+      <span>{{ popupTitle }}</span>
 
-    <i
-      class="dx-icon dx-icon-close"
-      style="cursor:pointer; float:right;"
-      (click)="isPopupVisible = false">
-    </i>
+      <i
+        class="dx-icon dx-icon-close"
+        style="cursor: pointer; float: right"
+        (click)="isPopupVisible = false"
+      >
+      </i>
+    </div>
   </div>
-</div>
 
   <!-- GRN grid -->
   <dx-data-grid

@@ -1627,6 +1627,7 @@ export class SalesOrderFinancePopupFormComponent {
       DISC_PERCENT: 0,
       TAX_PERCENT: item.TAX_PERCENT || 0,
       REMARKS: '',
+      QTN_NO: item.QTN_NO,
     }));
 
     // 🔹 If Details is empty, initialize it

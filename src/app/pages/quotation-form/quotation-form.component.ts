@@ -513,22 +513,31 @@ export class QuotationFormComponent {
 
   getCustomerDetails() {
     if (!this.selectedCustomerId) return;
+
     const payload = { CUST_ID: this.selectedCustomerId };
 
     this.dataService.getCustomerDetailDeliveryNote(payload).subscribe({
       next: (response: any) => {
-        if (response && response.Flag === 1 && response.Data?.length) {
+        // Clear previous values first
+        this.quotationFormData.CONTACT_NAME = '';
+        this.quotationFormData.CONTACT_FAX = '';
+        this.quotationFormData.CONTACT_PHONE = '';
+        this.quotationFormData.CONTACT_MOBILE = '';
+        this.quotationFormData.CONTACT_EMAIL = '';
+        this.quotationFormData.SALESMAN_ID = null; // or 0
+
+        if (response?.Flag === 1 && response.Data?.length) {
           const details = response.Data[0];
 
-          // Bind API data into your form object
           this.quotationFormData.CONTACT_NAME = details.CONTACT_NAME;
           this.quotationFormData.CONTACT_FAX = details.CONTACT_FAX;
           this.quotationFormData.CONTACT_PHONE = details.CONTACT_PHONE;
           this.quotationFormData.CONTACT_MOBILE = details.CONTACT_MOBILE;
           this.quotationFormData.CONTACT_EMAIL = details.CONTACT_EMAIL;
+          this.quotationFormData.SALESMAN_ID = details.SALESMAN_ID;
         }
       },
-      error: (err) => console.error('API error:', err),
+      error: (err) => console.error(err),
     });
   }
 

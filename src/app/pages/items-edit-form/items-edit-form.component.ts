@@ -439,12 +439,12 @@ export class ItemsEditFormComponent implements OnInit {
     dataservice.getDepartmentData(department).subscribe((data) => {
       this.department = data;
     });
-    const subcategory = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getSubCategoryData(subcategory).subscribe((data) => {
-      this.subcatagory = data;
-    });
+    // const subcategory = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    // dataservice.getSubCategoryData(subcategory).subscribe((data) => {
+    //   this.subcatagory = data;
+    // });
     // dataservice.getBrandData().subscribe((data) => {
     //   this.brand = data;
     // });
@@ -469,13 +469,13 @@ export class ItemsEditFormComponent implements OnInit {
       }
       this.cdr.detectChanges();
     });
-    const category = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'ITEMCATEGORY',
-    };
-    dataservice.getDropdownData(category).subscribe((data) => {
-      this.catagory = data;
-    });
+    // const category = {
+    //   COMPANY_ID: this.selected_Company_id,
+    //   NAME: 'ITEMCATEGORY',
+    // };
+    // dataservice.getDropdownData(category).subscribe((data) => {
+    //   this.catagory = data;
+    // });
 
     dataservice.getItemsData().subscribe((data) => {
       this.items = data;
@@ -514,6 +514,35 @@ export class ItemsEditFormComponent implements OnInit {
     if (changes['itemData'] && this.itemData) {
       this.salePrice = this.itemData.SALE_PRICE;
       this.formItemsData = this.itemData;
+      const categoryPayload = {
+        COMPANY_ID: this.selected_Company_id,
+        NAME: 'ITEMCATEGORY',
+        DEPT_ID: this.itemData.DEPT_ID,
+      };
+
+      this.dataservice
+        .getDropdownData(categoryPayload)
+        .subscribe((data: any) => {
+          this.catagory = data;
+
+          // Keep the saved category selected
+          this.itemData.CAT_ID = Number(this.itemData.CAT_ID);
+
+          const subCategoryPayload = {
+            COMPANY_ID: this.selected_Company_id,
+            NAME: 'SUBCATEGORY',
+            CAT_ID: this.itemData.CAT_ID,
+          };
+
+          this.dataservice
+            .getDropdownData(subCategoryPayload)
+            .subscribe((subData: any) => {
+              this.subcatagory = subData;
+
+              // Keep the saved subcategory selected
+              this.itemData.SUBCAT_ID = Number(this.itemData.SUBCAT_ID);
+            });
+        });
       if (this.itemData.IMAGE_NAME) {
         this.imageSource = this.itemData.IMAGE_NAME; // Set the Base64 string to the imageSource
         this.textVisible = false; // Hide "Upload Image" text
@@ -601,6 +630,75 @@ export class ItemsEditFormComponent implements OnInit {
       console.log(this.store, '=======afte bindg');
     }
     this.sesstion_Details();
+  }
+  onAliasEditorPreparing(e: any) {
+    if (e.parentType === 'dataRow' && e.dataField === 'ALIAS') {
+      e.editorOptions.onEnterKey = () => {
+        const grid = e.component;
+
+        grid.saveEditData();
+
+        setTimeout(() => {
+          grid.addRow();
+
+          setTimeout(() => {
+            const rows = grid.getVisibleRows();
+            const lastRow = rows[rows.length - 1];
+
+            if (lastRow) {
+              grid.editCell(lastRow.rowIndex, 'ALIAS');
+            }
+          }, 100);
+        }, 0);
+      };
+    }
+  }
+  loadCategories(deptId: number) {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'ITEMCATEGORY',
+      DEPT_ID: deptId,
+    };
+
+    this.dataservice.getDropdownData(payload).subscribe((data: any) => {
+      this.catagory = data;
+    });
+  }
+
+  loadSubCategories(catId: number) {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'SUBCATEGORY',
+      CAT_ID: catId,
+    };
+
+    this.dataservice.getDropdownData(payload).subscribe((data: any) => {
+      this.subcatagory = data;
+    });
+  }
+
+  onDepartmentChanged(event: any) {
+    if (event.previousValue === undefined) {
+      // Initial binding - don't clear values
+      this.loadCategories(event.value);
+      return;
+    }
+
+    this.itemData.CAT_ID = null;
+    this.itemData.SUBCAT_ID = null;
+
+    this.loadCategories(event.value);
+  }
+
+  onCategoryChanged(event: any) {
+    if (event.previousValue === undefined) {
+      this.loadSubCategories(event.value);
+      return;
+    }
+
+    this.itemData.SUBCAT_ID = null;
+
+    this.loadSubCategories(event.value);
   }
   bindStoreData() {
     if (!this.store || !this.Edit_Store) return;
@@ -871,6 +969,23 @@ export class ItemsEditFormComponent implements OnInit {
             'CURRENCY',
             selectedSupplier.CURRENCY_CODE,
           );
+        }
+      };
+    }
+    if (event.parentType === 'dataRow' && event.dataField === 'IS_PRIMARY') {
+      event.editorOptions.onValueChanged = (e: any) => {
+        // Update current row
+        event.component.cellValue(event.row.rowIndex, 'IS_PRIMARY', e.value);
+
+        if (e.value) {
+          this.edit_Suplier.forEach((row: any, index: number) => {
+            if (index !== event.row.rowIndex) {
+              event.component.cellValue(index, 'IS_PRIMARY', false);
+            }
+          });
+
+          event.component.saveEditData();
+          event.component.refresh();
         }
       };
     }
