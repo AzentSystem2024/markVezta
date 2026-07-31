@@ -87,7 +87,7 @@
           [showColumnHeaders]="true"
           [columnAutoWidth]="true"
           [allowColumnResizing]="true"
-          [height]="'100%'"
+          [height]="'55vh'"
           [columnResizingMode]="'nextColumn'"
           [scrolling]="{ mode: 'virtual' }"
           rowAlternationInterval="2"
@@ -326,6 +326,7 @@
               <div style="display: flex; gap: 10px">
                 <!-- Search Icon Button -->
                 <dx-button
+                  *ngIf="receiptMode === 'PDC'"
                   icon="search"
                   class="toolbar-icon-btn mt-2"
                   (onClick)="onSearchCheque()"

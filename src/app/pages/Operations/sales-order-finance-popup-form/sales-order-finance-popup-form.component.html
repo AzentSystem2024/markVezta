@@ -102,7 +102,7 @@
                     label="Reference No."
                     labelMode="floating"
                     [width]="405"
-                    [readOnly]="true"
+                    [readOnly]="false"
                   ></dx-text-box>
                   <!-- <dx-select-box
                     [(value)]="salesOrderFormData.SUBDEALER_ID"
@@ -136,7 +136,7 @@
                     icon="plus"
                     stylingMode="outlined"
                     type="default"
-                    hint="New Row"
+                    hint="Add Items"
                     [elementAttr]="{ class: 'small-btn' }"
                     (onClick)="onAddItemClick()"
                     [disabled]="isReadOnlyMode"
@@ -158,6 +158,13 @@
             {{ data.rowIndex + 1 }}
           </div>
           <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
+          <dxi-column
+            dataField="QTN_NO"
+            caption="Qtn No"
+            [allowEditing]="false"
+            [width]="'auto'"
+          >
+          </dxi-column>
           <dxi-column
             dataField="ITEM_CODE"
             caption="Item Code"
@@ -469,7 +476,7 @@
   </div>
 </dx-popup>
 
-<dx-popup
+<!-- <dx-popup
   [(visible)]="quotationPopupOpened"
   [width]="'70vw'"
   [height]="'80vh'"
@@ -546,7 +553,7 @@
     ></dxi-column>
     <dxi-column dataField="status" caption="Status"></dxi-column>
   </dx-data-grid>
-</dx-popup>
+</dx-popup> -->
 
 <dx-popup
   [(visible)]="showAddItemPopup"
@@ -597,7 +604,7 @@
         [visible]="true"
         placeholder=" Search"
       ></dxo-search-panel>
-
+      <dxi-column dataField="QTN_NO" caption="Qtn No"></dxi-column>
       <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
       <dxi-column dataField="UOM" caption="UOM"></dxi-column>

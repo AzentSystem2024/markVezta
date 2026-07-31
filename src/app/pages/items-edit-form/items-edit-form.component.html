@@ -133,6 +133,7 @@
                       placeholder="Select Department"
                       [searchEnabled]="true"
                       [(value)]="itemData.DEPT_ID"
+                      (onValueChanged)="onDepartmentChanged($event)"
                     >
                       <dx-validator>
                         <dxi-validation-rule
@@ -158,13 +159,14 @@
                       placeholder="Select Category"
                       [searchEnabled]="true"
                       [(value)]="itemData.CAT_ID"
+                      (onValueChanged)="onCategoryChanged($event)"
                     >
-                      <dx-validator>
+                      <!-- <dx-validator>
                         <dxi-validation-rule
                           type="required"
                           message="This field is required"
                         ></dxi-validation-rule>
-                      </dx-validator>
+                      </dx-validator> -->
                     </dx-select-box>
                   </div>
                 </dxi-item>
@@ -175,18 +177,18 @@
                       label="Sub Category"
                       labelMode="floating"
                       [items]="subcatagory"
-                      displayExpr="SUBCAT_NAME"
+                      displayExpr="DESCRIPTION"
                       valueExpr="ID"
                       placeholder="Select Sub Category"
                       [searchEnabled]="true"
                       [(value)]="itemData.SUBCAT_ID"
                     >
-                      <dx-validator>
+                      <!-- <dx-validator>
                         <dxi-validation-rule
                           type="required"
                           message="This field is required"
                         ></dxi-validation-rule>
-                      </dx-validator>
+                      </dx-validator> -->
                     </dx-select-box>
                   </div>
                 </dxi-item>
@@ -519,10 +521,12 @@
                 [showBorders]="true"
                 [dataSource]="itemData.item_alias"
                 [searchEnabled]="true"
+                (onEditorPreparing)="onAliasEditorPreparing($event)"
               >
                 <dxo-editing
                   mode="cell"
                   [allowAdding]="true"
+                  [allowUpdating]="true"
                   [allowDeleting]="true"
                   newRowPosition="last"
                 >
@@ -639,11 +643,13 @@
               <div class="inventory-item">
                 <label>Last Purchase Price:</label>
                 <dx-number-box
+                  class="highlight-readonly"
                   [(value)]="itemData.PURCH_PRICE"
                   [format]="'#,##0.00'"
                   [inputAttr]="{ style: 'text-align: right;' }"
                   [readOnly]="false"
                   [width]="200"
+                  [readOnly]="true"
                 ></dx-number-box>
               </div>
             </div>
