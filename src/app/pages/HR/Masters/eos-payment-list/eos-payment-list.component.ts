@@ -261,18 +261,19 @@ export class EosPaymentListComponent implements OnInit {
   }
 
   onReceiptModeChange(e: any) {
+    this.eosFormData.PAY_TYPE_ID = Number(e.value);
+
     if (this.eosFormData.PAY_TYPE_ID === 1) {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item) => item.GROUP_ID === 13,
+        (item) => Number(item.GROUP_ID) === 13,
       );
     } else if (this.eosFormData.PAY_TYPE_ID === 2) {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item) => item.GROUP_ID === 14,
+        (item) => Number(item.GROUP_ID) === 14,
       );
-      this.eosFormData.CHEQUE_DATE = new Date();
     } else if (this.eosFormData.PAY_TYPE_ID === 4) {
       this.filteredLedgerList = this.ledgerList.filter(
-        (item) => item.GROUP_ID !== 13 && item.GROUP_ID !== 14,
+        (item) => Number(item.GROUP_ID) !== 13 && Number(item.GROUP_ID) !== 14,
       );
     } else {
       this.filteredLedgerList = [...this.ledgerList];
@@ -412,9 +413,11 @@ export class EosPaymentListComponent implements OnInit {
 
     if (res.PAY_TYPE_ID) {
       this.eosFormData.PAY_TYPE_ID = res.PAY_TYPE_ID;
-    }
+      this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
+    } 
 
-    if (res.PAY_HEAD_ID) this.eosFormData.PAY_HEAD_ID = res.PAY_HEAD_ID;
+    if (res.PAY_HEAD_ID)
+      this.eosFormData.PAY_HEAD_ID = Number(res.PAY_HEAD_ID);
 
     if (res.CHEQUE_NO) this.eosFormData.CHEQUE_NO = res.CHEQUE_NO;
 
