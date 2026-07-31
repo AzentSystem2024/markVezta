@@ -72,6 +72,7 @@ export class DeliveryReturnComponent implements OnInit {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  canVerify = false;
 
   addButtonOptions = {
     text: 'New',
@@ -91,6 +92,8 @@ export class DeliveryReturnComponent implements OnInit {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+  companyID: any;
+  vatTitle: any;
 
   constructor(
     private dataservice: DataService,
@@ -102,7 +105,35 @@ export class DeliveryReturnComponent implements OnInit {
   }
 
   ngOnInit() {
+
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+    const selectedCompany = userData.SELECTED_COMPANY;
+    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
+    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
+    }
     this.get_DeliveryReturnList();
+
   }
 
   addDeliveryReturn() {
@@ -154,8 +185,10 @@ export class DeliveryReturnComponent implements OnInit {
   }
 
   get_DeliveryReturnList() {
-    const payload = {}
-    this.dataservice.get_DeliveryRteurn_Data().subscribe((response: any) => {
+    const payload = {
+      COMPANY_ID: this.companyID
+    }
+    this.dataservice.get_DeliveryRteurn_Data(payload).subscribe((response: any) => {
       this.DeliveryReturnDatasource = response.Data;
     });
   }

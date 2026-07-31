@@ -328,6 +328,19 @@ export class LedgerStatementComponent implements OnInit {
             next: (res: any) => {
               const data = res?.data || [];
               this.ledgerSummaryData = data;
+
+              if (data.length > 0) {
+                const storeName = data[0].STORE_NAME;
+
+                const selectedStore = this.Store?.find(
+                  (x: any) => x.DESCRIPTION === storeName
+                );
+
+                if (selectedStore) {
+                  this.selectedStoreid = [selectedStore.ID];
+                  this.updateStoreHint();
+                }
+              }
               this.ledgerRowCount = data.length;
               resolve(data);
             },

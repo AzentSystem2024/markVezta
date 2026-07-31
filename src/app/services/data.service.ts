@@ -6485,9 +6485,9 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}dropdown`, payload);
   }
 
-  get_DeliveryRteurn_Data() {
+  get_DeliveryRteurn_Data(payload: any) {
     const getEndpoint = this.apiUrl + 'Delivery_Return/list';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, payload);
   }
 
   select_DeliveryRteurn_Data(id: any) {

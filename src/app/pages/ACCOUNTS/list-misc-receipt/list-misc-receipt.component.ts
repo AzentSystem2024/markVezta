@@ -145,77 +145,7 @@ export class ListMiscReceiptComponent {
   editMiscPopup: boolean = false;
   verifypopup: boolean = false;
   Approvepopup: boolean = false;
-
-  allActionButtons = [
-    {
-      name: 'edit',
-
-      hint: 'Edit',
-
-      icon: 'edit',
-
-      text: 'Edit',
-      visible: (e) => this.canEdit && e.row.data.TRANS_STATUS === 'Open'
-    },
-
-    {
-      name: 'delete',
-
-      hint: 'Delete',
-
-      icon: 'trash',
-
-      text: 'Delete',
-
-      // onClick: (e) => this.onDeleteClick(e),
-
-      visible: (e) => e.row.data.TRANS_STATUS !== 'Approve' || e.row.data.TRANS_STATUS === 'Open' || e.row.data.TRANS_STATUS !== 'Verify' && this.canApprove,
-    },
-
-    {
-      hint: 'Verify',
-
-      icon: 'check',
-
-      text: 'Verify',
-
-      onClick: (e) => {
-        setTimeout(() => this.onVerifyClick(e));
-      },
-
-      visible: (e) =>
-        e.row.data.TRANS_STATUS !== 'Verify',
-    },
-
-    {
-      hint: 'Approve',
-
-      icon: 'check',
-
-      text: 'Approve',
-
-      onClick: (e) => {
-        setTimeout(() => this.onApproveClick(e));
-      },
-
-      visible: (e) => e.row.data.TRANS_STATUS === 'Verify',
-    },
-  ];
-
-
-  //===================Status flag=========================
-  getStatusFlagClass(status: string): string {
-    switch (status) {
-      case 'Open':
-        return 'flag-open'; // White or gray
-      case 'Verify':
-        return 'flag-verified'; // Orange
-      case 'Approve':
-        return 'flag-approved'; // Green
-      default:
-        return '';
-    }
-  }
+  viewMiscPopup: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -366,6 +296,7 @@ export class ListMiscReceiptComponent {
   // ============================Verify Popup function=========================================
   onVerifyClick(e: any): void {
     e.cancel = true;
+    const rowData = e.row.data;
     const transStatus = e.row.data.TRANS_STATUS;
     const id = e.row.data.TRANS_ID;
     this.statusFinder = transStatus;
@@ -373,11 +304,25 @@ export class ListMiscReceiptComponent {
     this.selectedmiscellaneousData = null;
     this.verifypopup = false;
 
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
 
     this.dataService.selectMiscReceipt(id).subscribe({
       next: (res: any) => {
         this.selectedmiscellaneousData = { ...res.Data };
-        this.isReadOnlyPayment = transStatus === 'Approve';
+
+        // this.isReadOnlyPayment = transStatus === 'Approve';
         if (this.selectedmiscellaneousData.TRANS_STATUS == 2) {
           this.PopupTitle = 'Approve Miscellaneous Receipt '
         }
@@ -388,9 +333,9 @@ export class ListMiscReceiptComponent {
           this.PopupTitle = 'Verify Miscellaneous Receipt'
         }
         // open popup AFTER data arrives
-       setTimeout(() => {
-  this.verifypopup = true;
-});
+        setTimeout(() => {
+          this.verifypopup = true;
+        });
 
       },
       error: (err) => {
@@ -457,27 +402,6 @@ export class ListMiscReceiptComponent {
         },
       });
     }
-  }
-
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approve'
-        ? '#10B981' // Approved
-        : status === 'Verify'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'Approve' ? 'Approved' : status === 'Verify' ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
   }
 
   getStatusFilterData = [
@@ -669,8 +593,15 @@ export class ListMiscReceiptComponent {
       next: (response: any) => {
         this.selectedmiscellaneousData = { ...response.Data };
 
-        this.editMiscPopup = true;
-        this.isReadOnlyPayment = status === 'Approve';
+        if (status === 'Open') {
+          // Open document -> Edit mode
+          this.isReadOnlyPayment = false;
+          this.editMiscPopup = true;
+        } else {
+          // Verified & Approved -> View mode
+          this.isReadOnlyPayment = true;
+          this.viewMiscPopup = true
+        }
       },
       error: (err) => {
         console.error('Failed to fetch salary revision:', err);
@@ -729,6 +660,7 @@ export class ListMiscReceiptComponent {
     this.addMiscPopup = false;
     this.editMiscPopup = false;
     this.verifypopup = false;
+    this.viewMiscPopup = false;
     this.getMiscReceipts();
   }
 

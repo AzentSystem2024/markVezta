@@ -758,9 +758,48 @@ body {
   // padding-left: 10px;
 }
 
-.flag-pending,
-.flag-verified,
-.flag-approved,
+.flag-pending {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Same width for all */
+  height: 20px;
+  border-radius: 10px;
+  // color: #fff;
+  color: #bf7c00;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
+.flag-verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Same width for all */
+  height: 20px;
+  border-radius: 10px;
+  // color: #fff;
+  color: #0056a2;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
+.flag-approved {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Same width for all */
+  height: 20px;
+  border-radius: 10px;
+  // color: #fff;
+  color: #279543;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
 .flag-paid {
   display: inline-flex;
   align-items: center;
@@ -768,7 +807,8 @@ body {
   width: 80px; /* Same width for all */
   height: 20px;
   border-radius: 10px;
-  color: #fff;
+  // color: #fff;
+  color: #8b5cf6;
   font-size: 10px;
   font-weight: 600;
   text-transform: capitalize;
@@ -776,19 +816,23 @@ body {
 }
 
 .flag-pending {
-  background: #ffa500;
+  // background: #ffa500;
+  background: #fff2d9;
 }
 
 .flag-verified {
-  background: #0073d8;
+  // background: #0073d8;
+  background: #d9eaf9;
 }
 
 .flag-approved {
-  background: #10b981;
+  // background: #10b981;
+  background: #e1f7e6;
 }
 
 .flag-paid {
-  background: #8b5cf6;
+  // background: #8b5cf6;
+  background: #eee7fe;
 }
 
 .verify-badge {

@@ -164,7 +164,7 @@ export class PurchaseReturnDebitComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -331,25 +331,6 @@ export class PurchaseReturnDebitComponent {
     this.getpurchaseReturnList();
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {
@@ -545,9 +526,15 @@ export class PurchaseReturnDebitComponent {
       .selectPurchaseReturn(returnId)
       .subscribe((response: any) => {
         this.selectedPurchaseReturn = response;
-        console.log(this.selectedPurchaseReturn, 'SELECTEDTROUT');
-        this.isEditPurchaseReturn = true;
-        this.isReadOnlyPurchaseReturn = status === 5;
+        if (status === 1) {
+          // Open document -> Edit mode
+          this.isReadOnlyPurchaseReturn = false;
+          this.isEditPurchaseReturn = true;
+        } else {
+          // Verified & Approved -> View mode
+          this.isReadOnlyPurchaseReturn = true;
+          this.isViewInvoice = true;
+        }
       });
   }
 
@@ -556,6 +543,22 @@ export class PurchaseReturnDebitComponent {
 
     const invoiceId = rowData.TRANS_ID;
     const transStatus = rowData.TRANS_STATUS;
+
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+
 
     // Close all popups first
     this.handleClose();
@@ -693,4 +696,4 @@ export class PurchaseReturnDebitComponent {
   exports: [PurchaseReturnDebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PurchaseReturnDebitModule {}
+export class PurchaseReturnDebitModule { }

@@ -486,6 +486,7 @@ export class ItemsEditFormComponent implements OnInit {
     };
     dataservice.getDropdownData(costiingmethod).subscribe((data) => {
       this.costingMethodOptions = data;
+
     });
     const packing = {
       NAME: 'PACKING',
@@ -808,7 +809,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
-  onRowUpdated(e: any) {}
+  onRowUpdated(e: any) { }
 
   onParentItemChanged(event: any) {
     const selectedParentItem = event.selectedRowsData[0]; // Access the first selected item
@@ -1171,7 +1172,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.imageUploaded = true;
     }
   }
-  onFileChanged(event) {}
+  onFileChanged(event) { }
   onUploadStarted(event: any) {
     this.imageSource = '';
     this.progressVisible = true;
@@ -1192,7 +1193,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.progressVisible = false;
     this.progressValue = 0;
   }
-  onDropZoneLeave(event) {}
+  onDropZoneLeave(event) { }
   onDropZoneEnter({
     component,
     dropZoneElement,
@@ -1223,7 +1224,7 @@ export class ItemsEditFormComponent implements OnInit {
       }
     }
   }
-  openModal(event) {}
+  openModal(event) { }
   onDropZoneClick() {
     this.fileInput.nativeElement.click();
   }
@@ -1245,7 +1246,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.formClosed.emit();
   }
 
-  closeModal() {}
+  closeModal() { }
 
   clearImage() {
     this.imageSource = '';
@@ -1505,4 +1506,4 @@ export class ItemsEditFormComponent implements OnInit {
   declarations: [ItemsEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsEditFormModule {}
+export class ItemsEditFormModule { }

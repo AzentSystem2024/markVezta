@@ -154,7 +154,7 @@ export class SaleReturnComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -325,28 +325,6 @@ export class SaleReturnComponent {
     this.applyCustomDateFilter(); // your existing function
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    // icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-    icon.title = status === 5 ? 'Approved' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {
@@ -527,9 +505,15 @@ export class SaleReturnComponent {
     const status = event.data.TRANS_STATUS;
     this.dataService.selectSaleReturn(returnId).subscribe((response: any) => {
       this.selectedSaleReturn = response;
-      console.log(this.selectedSaleReturn, 'SELECTEDTROUT');
-      this.isEditSaleReturn = true;
-      this.isReadOnlySaleReturn = status === 5;
+      if (status === 1) {
+        // Open document -> Edit mode
+        this.isReadOnlySaleReturn = false;
+        this.isEditSaleReturn = true;
+      } else {
+        // Verified & Approved -> View mode
+        this.isReadOnlySaleReturn = true;
+        this.isViewSalesReturn = true;
+      }
     });
   }
 
@@ -539,7 +523,20 @@ export class SaleReturnComponent {
     const returnId = rowData.TRANS_ID;
     const status = rowData.TRANS_STATUS;
 
-    this.isReadOnlySaleReturn = status === 5;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
 
     this.dataService.selectSaleReturn(returnId).subscribe((response: any) => {
       this.selectedSaleReturn = response;
@@ -673,4 +670,4 @@ export class SaleReturnComponent {
   exports: [SaleReturnComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SaleReturnModule {}
+export class SaleReturnModule { }

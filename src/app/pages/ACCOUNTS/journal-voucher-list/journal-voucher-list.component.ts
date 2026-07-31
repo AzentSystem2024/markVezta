@@ -144,14 +144,14 @@ export class JournalVoucherListComponent {
   customEndDate: any = null;
   filteredJournalVoucherList:
     | {
-        billNo: string;
-        ledgerCode: string;
-        ledgerName: string;
-        particulars: string;
-        debitAmount: number;
-        creditAmount: number;
-        voucherDate: string;
-      }[]
+      billNo: string;
+      ledgerCode: string;
+      ledgerName: string;
+      particulars: string;
+      debitAmount: number;
+      creditAmount: number;
+      voucherDate: string;
+    }[]
     | undefined;
   isEditJournalVoucher: boolean = false;
   selectedJournalVoucher: any;
@@ -182,7 +182,7 @@ export class JournalVoucherListComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -383,28 +383,6 @@ export class JournalVoucherListComponent {
         },
       });
     }
-  }
-
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    // icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
   }
 
   handlePopupShown() {
@@ -776,4 +754,4 @@ export class JournalVoucherListComponent {
   exports: [JournalVoucherListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class JournalVoucherModule {}
+export class JournalVoucherModule { }
