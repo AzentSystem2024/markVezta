@@ -283,7 +283,7 @@ export class ProfitAndLossDimensionComponent {
 
         this.dataGrid.instance.refresh(); // force grid to recalc summaries
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -395,17 +395,18 @@ export class ProfitAndLossDimensionComponent {
       e.column &&
       e.column.dataField === 'AMOUNT'
     ) {
-      const formatted = (Number(this.netProfit) || 0).toLocaleString(
-        undefined,
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        },
-      );
+      const amount = Number(this.netProfit) || 0;
+
+      const label = amount >= 0 ? 'Net Profit' : 'Net Loss';
+
+      const formatted = Math.abs(amount).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
       e.cellElement.innerHTML = `
       <div style="text-align: right; font-weight: bold; margin-top: 5px; padding-right: 20px;">
-        Net Profit: ${formatted}
+        ${label}: ${formatted}
       </div>
     `;
     }
@@ -447,4 +448,4 @@ export class ProfitAndLossDimensionComponent {
   exports: [],
   declarations: [ProfitAndLossDimensionComponent],
 })
-export class ProfitAndLossDimensionModule {}
+export class ProfitAndLossDimensionModule { }
