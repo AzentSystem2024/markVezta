@@ -275,55 +275,6 @@ export class TransferOutInventoryComponent {
       });
   }
 
-  // statusCellRender(cellElement: any, cellInfo: any) {
-  //   const status = cellInfo.data.STATUS;
-
-  //   const icon = document.createElement('i');
-  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
-  //   icon.style.fontSize = '18px';
-  //   // icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
-  //   // icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
-  //   icon.style.color =
-  //     status === 'APPROVED'
-  //       ? '#10B981'
-  //       : status === 'VERIFY'
-  //         ? '#0073D8'
-  //         : '#FFA500';
-
-  //   icon.title =
-  //     status === 'APPROVED'
-  //       ? 'APPROVED'
-  //       : status === 'VERIFY'
-  //         ? 'VERIFY'
-  //         : 'OPEN';
-
-  //   icon.style.display = 'flex';
-  //   icon.style.justifyContent = 'center';
-  //   icon.style.alignItems = 'center';
-
-  //   cellElement.appendChild(icon);
-  // }
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'APPROVED'
-        ? '#10B981' // Approved
-        : status === 'VERIFY'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'APPROVED' ? 'Approved' : status === 'VERIFY' ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
 
   getStatusFilterData = [
     {
@@ -621,6 +572,17 @@ export class TransferOutInventoryComponent {
     this.buttonText = 'Update Transfer Out';
     this.isReadOnlyTrOut = false
     this.select_function(trOutId)
+    if (this.selected_Data_Status === 'OPEN') {
+      this.isReadOnlyTrOut = false;
+      this.StatusType = 'EditScreen';
+      this.buttonText = 'Update Transfer Out';
+    } else {
+      this.isReadOnlyTrOut = true;
+      this.StatusType = 'viewScreen';
+      this.buttonText = 'View Transfer Out';
+    }
+
+    this.isEditTransferOut = true;
   }
 
   select_function(trOutId: any) {
@@ -760,6 +722,21 @@ export class TransferOutInventoryComponent {
     e.cancel = true;
     const trOutId = e.row.data.TRANS_ID;
     this.selected_Data_Status = e.row.data.STATUS;
+    const rowData = e.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
     if (e.row.data.STATUS == 'APPROVED') {
       this.isReadOnlyTrOut = true;
       console.log(this.isReadOnlyTrOut, '================this.isReadOnlyTrOut===================')

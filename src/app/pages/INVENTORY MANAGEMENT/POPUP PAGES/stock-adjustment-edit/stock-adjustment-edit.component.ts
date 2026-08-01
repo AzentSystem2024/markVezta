@@ -194,13 +194,12 @@ export class StockAdjustmentEditComponent {
       this.selectedStatus = this.adjustmentFormData.STATUS;
       console.log(editable);
 
-      if (editable == 5) {
-        this.readOnlyTrue = true
-        this.approveValue = true
-      }
-      else {
-        this.readOnlyTrue = false
-        this.approveValue = false
+      if (this.status === 'viewScreen') {
+        this.readOnlyTrue = true;
+        this.approveValue = this.adjustmentFormData.STATUS == 5;
+      } else {
+        this.readOnlyTrue = false;
+        this.approveValue = false;
       }
       this.StoreIDData = this.adjustmentFormData.STORE_ID
 

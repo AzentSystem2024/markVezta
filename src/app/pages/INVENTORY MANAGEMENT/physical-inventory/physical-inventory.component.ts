@@ -254,41 +254,6 @@ export class PhysicalInventoryComponent {
         this.applyDateFilter();
       });
   }
-  // statusCellRender(cellElement: any, cellInfo: any) {
-  //   const status = cellInfo.data.TRANS_STATUS;
-
-  //   const icon = document.createElement('i');
-  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
-  //   icon.style.fontSize = '18px';
-  //   icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-  //   icon.title = status === 5 ? 'APPROVED' : 'OPEN';
-
-  //   icon.style.display = 'flex';
-  //   icon.style.justifyContent = 'center';
-  //   icon.style.alignItems = 'center';
-
-  //   cellElement.appendChild(icon);
-  // }
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
 
   getStatusFilterData = [
@@ -564,10 +529,19 @@ export class PhysicalInventoryComponent {
       .selectPhysicalInventory(orderId)
       .subscribe((response: any) => {
         this.selectedInventory = response.Data;
-        console.log(this.selectedInventory, 'SELECTEDTROUT');
+        if (status === 1) {
+          // Open document -> Edit
+          this.isReadOnlyInventory = false;
+          this.StatusType = 'Editscreen';
+          this.buttonText = 'Update Physical Inventory';
+        } else {
+          // Verified & Approved -> View
+          this.isReadOnlyInventory = true;
+          this.StatusType = 'viewScreen';
+          this.buttonText = 'View Physical Inventory';
+        }
+
         this.isEditInventory = true;
-        this.isReadOnlyInventory = status === 5;
-        this.buttonText = 'Edit Physical Inventory'
 
       });
   }
@@ -722,30 +696,57 @@ export class PhysicalInventoryComponent {
 
   onVerifyClick(e: any) {
     e.cancel = true;
-    const orderId = e.row.data.TRANS_ID;
-    const status = e.row.data.TRANS_STATUS;
-    this.StatusType = 'verifyscreen'
 
-    this.dataService
-      .selectPhysicalInventory(orderId)
+    const rowData = e.row.data;
+
+    // OPEN -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // VERIFIED -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // APPROVED -> If user has Edit privilege, badge is disabled
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+
+    const orderId = rowData.TRANS_ID;
+
+    this.dataService.selectPhysicalInventory(orderId)
       .subscribe((response: any) => {
-        this.selectedInventory = response.Data;
-        console.log(this.selectedInventory, 'SELECTEDTROUT');
-        this.isEditInventory = true;
-        this.isReadOnlyInventory = status === 5;
-        this.selected_Data = this.selectedInventory.STATUS
-        console.log(this.selected_Data, 'selected dataaaaaaaaaaaaaaaaaaa') // Check the value of selected_Data
-        if (this.selected_Data.STATUS == 1) {
-          this.buttonText = 'Verify Physical Inventory'
-        } else if (this.selected_Data.STATUS == 2) {
-          this.buttonText = 'Approve Physical Inventory'
-        } else if (this.selected_Data.STATUS == 5) {
-          this.buttonText = 'View Physical Inventory'
-        }
 
+        this.selectedInventory = response.Data;
+        this.isEditInventory = true;
+
+        switch (rowData.TRANS_STATUS) {
+
+          case 1:
+            // Verify
+            this.StatusType = 'VerifyScreen';
+            this.buttonText = 'Verify Physical Inventory';
+            this.isReadOnlyInventory = false;
+            break;
+
+          case 2:
+            // Approve
+            this.StatusType = 'ApprovalScreen';
+            this.buttonText = 'Approve Physical Inventory';
+            this.isReadOnlyInventory = false;
+            break;
+
+          case 5:
+            // View
+            this.StatusType = 'viewScreen';
+            this.buttonText = 'View Physical Inventory';
+            this.isReadOnlyInventory = true;
+            break;
+        }
       });
   }
-
 
 }
 @NgModule({

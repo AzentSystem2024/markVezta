@@ -277,42 +277,6 @@ export class TransferInInventoryComponent {
       });
   }
 
-  // statusCellRender(cellElement: any, cellInfo: any) {
-  //   const status = cellInfo.data.STATUS;
-
-  //   const icon = document.createElement('i');
-  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
-  //   icon.style.fontSize = '18px';
-  //   icon.style.color = status === 'APPROVED' ? '#5cac6fff' : '#d87f7fff';
-  //   icon.title = status === 'APPROVED' ? 'APPROVED' : 'OPEN';
-
-  //   icon.style.display = 'flex';
-  //   icon.style.justifyContent = 'center';
-  //   icon.style.alignItems = 'center';
-
-  //   cellElement.appendChild(icon);
-  // }
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'APPROVED'
-        ? '#10B981' // Approved
-        : status === 'VERIFY'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'APPROVED' ? 'Approved' : status === 'VERIFY' ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
   getStatusFilterData = [
     {
       text: 'Approved',
@@ -565,7 +529,15 @@ export class TransferInInventoryComponent {
       .selectTransferInForInventory(trInId)
       .subscribe((response: any) => {
         this.selectedTrIn = response;
-        console.log(this.selectedTrIn, 'SELECTEDTROUT');
+        if (this.selected_Data_Status === 'OPEN') {
+          this.isReadOnlyTrIn = false;
+          this.StatusType = 'EditScreen';
+          this.buttonText = 'Update Transfer In';
+        } else {
+          this.isReadOnlyTrIn = true;
+          this.StatusType = 'viewScreen';
+          this.buttonText = 'View Transfer In';
+        }
         this.isEditTransferIn = true;
         this.cdr.detectChanges();
       });
@@ -658,7 +630,21 @@ export class TransferInInventoryComponent {
     this.StatusType = 'verifyscreen'
     this.isReadOnlyTrIn = e.row.data.STATUS == 'APPROVED'
 
-    console.log(e, '==============event status============')
+    const rowData = e.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
     this.selected_Data_Status = e.row.data.STATUS;
     this.dataService
       .selectTransferInForInventory(trInId)

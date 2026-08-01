@@ -135,7 +135,7 @@ export class DebitComponent {
   isApproveDebitNote: boolean;
 
   popupTitle: string = '';
-popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
+  popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -162,7 +162,7 @@ popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -238,7 +238,7 @@ popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
         this.filteredJournalVoucherList = this.debitList;
         this.isEmptyDatagrid = this.debitList.length === 0;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -318,26 +318,6 @@ popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
     this.getDebitNoteList();
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {
@@ -548,23 +528,39 @@ popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
     this.selectedDN = debitId;
     const transStatus = e.row.data.TRANS_STATUS;
 
+    const rowData = e.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+
     this.dataService.selectDebitNote(debitId).subscribe((response: any) => {
       this.selectedDebitNote = response.Data;
-       if (transStatus === 5) {
-      this.popupMode = 'view';
-      this.popupTitle = 'View Debit Note';
-      this.isViewDebitNote = true;
+      if (transStatus === 5) {
+        this.popupMode = 'view';
+        this.popupTitle = 'View Debit Note';
+        this.isViewDebitNote = true;
 
-    } else if (transStatus === 2) {
-      this.popupMode = 'approve';
-      this.popupTitle = 'Approve Debit Note';
-      this.isApproveDebitNote = true;
+      } else if (transStatus === 2) {
+        this.popupMode = 'approve';
+        this.popupTitle = 'Approve Debit Note';
+        this.isApproveDebitNote = true;
 
-    } else {
-      this.popupMode = 'verify';
-      this.popupTitle = 'Verify Debit Note';
-      this.isVerifyDebitNote = true;
-    }
+      } else {
+        this.popupMode = 'verify';
+        this.popupTitle = 'Verify Debit Note';
+        this.isVerifyDebitNote = true;
+      }
     });
   }
 
@@ -577,15 +573,15 @@ popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
 
     this.dataService.selectDebitNote(debitId).subscribe((response: any) => {
       this.selectedDebitNote = response.Data;
-      if (transStatus === 5) {
-      this.popupMode = 'view';
-      this.popupTitle = 'View Debit Note';
-      this.isViewDebitNote = true;
-    } else {
-      this.popupMode = 'edit';
-      this.popupTitle = 'Edit Debit Note';
-      this.isEditDebitNote = true;
-    }
+      if (transStatus === 1) {
+        // Open document -> Edit mode
+        // this.isReadOnlyDebitNote = false;
+        this.isEditDebitNote = true;
+      } else {
+        // Verified & Approved -> View mode
+        // this.isReadOnlyDebitNote = true;
+        this.isViewDebitNote = true;
+      }
     });
   }
 
@@ -629,7 +625,7 @@ popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
 
   addDebitNote() {
     this.popupMode = 'new';
-  this.popupTitle = 'New Debit Note';
+    this.popupTitle = 'New Debit Note';
     this.isAddDebitNote = true;
     this.cdr.detectChanges();
   }
@@ -698,4 +694,4 @@ popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
   exports: [DebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DebitModule {}
+export class DebitModule { }
