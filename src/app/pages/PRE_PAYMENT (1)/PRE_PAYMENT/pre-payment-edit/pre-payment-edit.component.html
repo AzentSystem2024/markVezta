@@ -261,7 +261,7 @@
 
     <div class="total-expense">
       <dx-check-box
-         *ngIf="canApprove"
+        *ngIf="canApprove"
         [readOnly]="isReadOnly"
         text="Approve"
         [(value)]="PrePaymentFormData.TRANS_STATUS"
@@ -274,7 +274,7 @@
         [readOnly]="true"
         labelMode="floating"
         [format]="{ type: 'fixedPoint', precision: 2 }"
-         [(value)]="totalExpense"
+        [(value)]="totalExpense"
         [inputAttr]="{ style: 'text-align: right;' }"
       ></dx-number-box>
     </div>

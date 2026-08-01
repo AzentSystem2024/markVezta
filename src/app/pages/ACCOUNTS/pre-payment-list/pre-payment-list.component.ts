@@ -262,7 +262,7 @@ export class PrePaymentListComponent {
     if (status === 'Approved') {
       this.popupMode = 'view';
       this.isEditReadOnly = true;
-    } else if (status === 'Verify') {
+    } else if (status === 'Verified') {
       this.popupMode = 'approve';
     } else {
       this.popupMode = 'verify';
@@ -286,20 +286,19 @@ export class PrePaymentListComponent {
 
   onEditingStart(event: any) {
     event.cancel = true;
+
     const status = event.data?.TRANS_STATUS?.trim();
 
     if (status === 'Open') {
-      // Open document -> Edit mode
+      // Edit mode
+      this.popupMode = 'edit';
       this.isEditReadOnly = false;
-      this.editPrePaymentPopupOpened = true;
-    } else {
-      // Verified & Approved -> View mode
+    } else if (status === 'Verified' || status === 'Approved') {
+      // View mode
+      this.popupMode = 'view';
       this.isEditReadOnly = true;
-      this.editPrePaymentPopupOpened = false;
     }
 
-
-    // this.isEditReadOnly = status === 'Approved';
     this.editPrePaymentPopupOpened = true;
     this.selectPrePayment(event);
   }

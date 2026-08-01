@@ -585,6 +585,7 @@ export class CreditNoteListComponent {
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
+        console.log('Credit Note Details:', response.Data);
         this.selectedCreditNote = structuredClone(response.Data);
 
         if (transStatus === 5) {

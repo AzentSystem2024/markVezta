@@ -124,6 +124,7 @@ export class PrepaymentPostingListComponent {
     },
   ];
 
+
   selecte_prepayment_Data: any;
   isEditReadOnly: boolean = false;
   prepaymentpostingId: any;
@@ -264,14 +265,27 @@ export class PrepaymentPostingListComponent {
     e.cancel = true;
     this.isEditPopupPrepaymentPosting = true;
     this.selected_Data(e);
+
+
   }
 
   selected_Data(e: any) {
     const id = e.data.TRANS_ID;
     this.prepaymentpostingId = e.data.TRANS_ID;
     this.selectedprepaymentposting = id;
+    const status = e.data.TRANS_STATUS;
     this.dataservice.select_Prepayment_Posting(id).subscribe((Res: any) => {
       this.selecte_prepayment_Data = Res.Data;
+      if (status === 'Open') {
+        // Open document -> Edit mode
+        this.isEditReadOnly = false;
+        this.isEditPopupPrepaymentPosting = true;
+      } else {
+        // Verified & Approved -> View mode
+        this.isEditReadOnly = true;
+
+        // this.isViewQuotation = true;
+      }
     });
   }
   openPopup() {
@@ -414,15 +428,42 @@ export class PrepaymentPostingListComponent {
   }
   onVerifyClick(e: any) {
     e.cancel = true;
-    this.StatusType = 'verifyscreen'
+
+    const rowData = e.row.data;
+
+    // Open document -> Verify screen
+    if (rowData.TRANS_STATUS === 'Open') {
+      if (!this.canVerify) return;
+      this.StatusType = 'verifyscreen';
+    }
+
+    // Verified document -> Approve screen
+    else if (rowData.TRANS_STATUS === 'Verify') {
+      if (!this.canApprove) return;
+      this.StatusType = 'approvescreen';
+    }
+
+    // Approved
+    else if (rowData.TRANS_STATUS === 'Approved') {
+
+      // If user has Edit privilege, don't open from badge
+      if (this.canEdit) {
+        return;
+      }
+
+      // User has NO Edit privilege -> open View form
+      this.StatusType = 'Viewscreen';
+    }
+
 
     this.isEditPopupPrepaymentPosting = true;
-    const id = e.row.data.TRANS_ID;
-    this.prepaymentpostingId = e.row.data.TRANS_ID;
-    this.selectedprepaymentposting = id;
-    this.dataservice.select_Prepayment_Posting(id).subscribe((Res: any) => {
-      this.selecte_prepayment_Data = Res.Data;
-    });
+    this.selectedprepaymentposting = rowData.TRANS_ID;
+
+    this.dataservice
+      .select_Prepayment_Posting(rowData.TRANS_ID)
+      .subscribe((res: any) => {
+        this.selecte_prepayment_Data = res.Data;
+      });
   }
 
 
