@@ -278,6 +278,8 @@ export class LeaveSalaryPaymentComponent implements OnInit {
       this.leaveFormData.PAY_HEAD_ID = null;
     }
     if (this.leaveFormData.PAY_TYPE_ID === 1) {
+      this.leaveFormData.CHEQUE_NO = '';
+      this.leaveFormData.CHEQUE_DATE = new Date();
       this.filteredLedgerList = this.ledgerList.filter(
         (item) => Number(item.GROUP_ID) === 13,
       );
