@@ -236,6 +236,7 @@ import { ListMiscReceiptModule } from './pages/ACCOUNTS/list-misc-receipt/list-m
 import { AddMiscReceiptModule } from './components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
 import { AddSalaryPaymentModule } from './components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { ListSalaryPaymentModule } from './pages/HR/Masters/list-salary-payment/list-salary-payment.component';
+import { LeaveSalaryPaymentModule } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
 import { BoxProductionViewModule } from './components/HR/Masters/box-production-view/box-production-view.component';
 import { PaytimeEntryModule } from './pages/HR/Masters/paytime-entry/paytime-entry.component';
 import { PdcAddFormModule } from './components/HR/Masters/PDC/pdc-add-form/pdc-add-form.component';
@@ -433,6 +434,7 @@ import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-rep
 @NgModule({
   declarations: [AppComponent],
   imports: [
+    LeaveSalaryPaymentModule,
     DxTemplateModule,
     TaskListModule,
     BrowserModule,
