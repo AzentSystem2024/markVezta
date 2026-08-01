@@ -483,6 +483,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         ITEM_CODE: row.ITEM_CODE,
         REMARKS: row.REMARKS,
         DELIVERED_QUANTITY: row.QUANTITY || 0,
+        SO_NO: row.SO_NO || '',
       }));
 
     this.deliveryFormData.Details = [

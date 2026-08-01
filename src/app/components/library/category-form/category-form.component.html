@@ -46,11 +46,11 @@
             message="Category name is required"
           ></dxi-validation-rule>
 
-           <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateCategoryName"
-                message="Code already exists"
-              ></dxi-validation-rule>
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateCategoryName"
+            message="Code already exists"
+          ></dxi-validation-rule>
         </dx-validator>
       </dx-text-box>
     </dxi-item>
@@ -76,7 +76,7 @@
     </dxi-item>
   </dxi-item>
 
-  <dxi-item *ngIf="IsLedgerEnabled">
+  <!-- <dxi-item *ngIf="IsLedgerEnabled">
     <dx-select-box
       class="mt-3"
       [items]="item_Ledger_DropdownData"
@@ -93,5 +93,5 @@
         ></dxi-validation-rule>
       </dx-validator>
     </dx-select-box>
-  </dxi-item>
+  </dxi-item> -->
 </dx-form>
