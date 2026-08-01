@@ -560,12 +560,14 @@ export class JournalVoucherListComponent {
       .selectJournalVoucher(journalId)
       .subscribe((response: any) => {
         this.selectedJournalVoucher = response.Data;
-        if (transStatus === 5) {
-          // Open view popup
-          this.isViewJournalVoucher = true;
-        } else {
-          // Open edit popup
+        if (transStatus === 1) {
+          // Open document -> Edit mode
+          this.isReadOnlyJV = false;
           this.isEditJournalVoucher = true;
+        } else {
+          // Verified & Approved -> View mode
+          this.isReadOnlyJV = true;
+          this.isViewJournalVoucher = true;
         }
         console.log(
           this.selectedJournalVoucher,
@@ -581,6 +583,21 @@ export class JournalVoucherListComponent {
     const transStatus = rowData.TRANS_STATUS;
 
     this.isReadOnlyJV = transStatus === 5;
+
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
 
     this.dataService
       .selectJournalVoucher(invoiceId)

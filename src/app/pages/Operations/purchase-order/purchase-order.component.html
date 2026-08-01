@@ -168,12 +168,13 @@
       <div style="text-align: center; width: 100%">
         <span
           [ngClass]="{
+            'flag-paid': data.data.STATUS === 'Closed',
             'flag-approved': data.data.STATUS === 'Approved',
             'flag-verified': data.data.STATUS === 'Verified',
             'flag-pending':
               data.data.STATUS !== 'Verified' &&
               data.data.STATUS !== 'Approved' &&
-              data.data.STATUS !== 'Paid',
+              data.data.STATUS !== 'Closed',
           }"
         >
           {{ data.data.STATUS }}
@@ -190,19 +191,6 @@
         <i
           *ngIf="canEdit || canView"
           class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            ['Closed', 'Partial'].includes(cellData.data.STATUS) ? '0.4' : '1'
-          "
-          [style.pointer-events]="
-            ['Closed', 'Partial'].includes(cellData.data.STATUS)
-              ? 'none'
-              : 'auto'
-          "
-          [style.cursor]="
-            ['Closed', 'Partial'].includes(cellData.data.STATUS)
-              ? 'not-allowed'
-              : 'pointer'
-          "
           [title]="cellData.data.STATUS === 'Open' ? 'Edit' : 'Details'"
           (click)="onEditingRow({ data: cellData.data, cancel: false })"
         ></i>
@@ -246,18 +234,18 @@
           "
           class="verify-badge"
           [ngClass]="{
+            'flag-paid': cellData.data.STATUS === 'Closed',
             'status-pending': cellData.data.STATUS === 'Open',
             'status-verified': cellData.data.STATUS === 'Verified',
             'status-approved':
               cellData.data.STATUS === 'Approved' ||
-              cellData.data.STATUS === 'Closed' ||
               cellData.data.STATUS === 'Partial',
 
             disabled:
               (cellData.data.STATUS === 'Open' && !canVerify) ||
               (cellData.data.STATUS === 'Verified' && !canApprove) ||
               (cellData.data.STATUS === 'Approved' && canEdit) ||
-              ((cellData.data.STATUS === 'Closed' ||
+              (((cellData.data.STATUS === 'Closed' && canEdit) ||
                 cellData.data.STATUS === 'Partial') &&
                 !canView),
           }"

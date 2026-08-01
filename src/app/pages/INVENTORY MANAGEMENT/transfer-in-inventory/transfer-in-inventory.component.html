@@ -1,25 +1,60 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
-    <dx-data-grid #dataGrid noDataText="No data available" [width]="'100%'" [height]="'82vh'" [loadPanel]="{
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'82vh'"
+      [loadPanel]="{
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
         showPane: true,
-      }" class="grid theme-dependent" [dataSource]="filteredTrInList" [showBorders]="true" [showColumnLines]="true"
-      [showBorders]="true" [columnAutoWidth]="false" [wordWrapEnabled]="false" [rowAlternationEnabled]="true"
-      [allowColumnReordering]="true" [showColumnHeaders]="true" [columnAutoWidth]="true" [allowColumnResizing]="true"
-      [columnResizingMode]="'nextColumn'" [filterRow]="{ visible: false }" [headerFilter]="{ visible: false }"
-      [scrolling]="{ mode: 'virtual' }" rowAlternationInterval="2" [selection]="{ mode: 'single' }"
-      focusStateEnabled="false" (onToolbarPreparing)="onToolbarPreparing($event)"
-      (onEditingStart)="onEditTransferIn($event)" (onCellPrepared)="onCellPrepared($event)"
-      (onRowRemoving)="onDeleteTrIn($event)">
-      <dxo-editing mode="popup" [allowUpdating]="false" [allowDeleting]="false"></dxo-editing>
+      }"
+      class="grid theme-dependent"
+      [dataSource]="filteredTrInList"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showBorders]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onToolbarPreparing)="onToolbarPreparing($event)"
+      (onEditingStart)="onEditTransferIn($event)"
+      (onCellPrepared)="onCellPrepared($event)"
+      (onRowRemoving)="onDeleteTrIn($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="false"
+        [allowDeleting]="false"
+      ></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-pager [visible]="true" [allowedPageSizes]="allowedPageSizes" [displayMode]="displayMode"
-        [showPageSizeSelector]="showPageSizeSelector" [showInfo]="true" [showNavigationButtons]="true"></dxo-pager>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="virtual"></dxo-scrolling>
-      <dxo-filter-row [visible]="isFilterRowVisible" [applyFilter]="auto"></dxo-filter-row>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
       <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
@@ -34,40 +69,125 @@
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto" widget="dxButton" [options]="refreshButtonOptions"></dxi-item>
-        <dxi-item location="after" locateInMenu="auto" widget="dxButton" [visible]="canAdd"
-          [options]="addButtonOptions"></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [visible]="canAdd"
+          [options]="addButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
       <div *dxTemplate="let data of 'dateFilterTemplate'">
-        <dx-select-box [dataSource]="dateRanges" [displayExpr]="displayExpr" valueExpr="value"
-          [(value)]="selectedDateRange" (onValueChanged)="onDateRangeChanged($event)"
-          (onOpened)="attachItemClickHandler($event)" width="180">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="180"
+        >
           <div *dxTemplate="let item of 'item'">
             {{ item.value === "custom" ? "Custom" : item.label }}
           </div>
         </dx-select-box>
       </div>
-      <div *dxTemplate="let data of 'StoreFilterTemplate'" style="margin-bottom: 5px">
-        <dx-tag-box label="Store" labelMode="floating" displayExpr="DESCRIPTION" valueExpr="ID" [items]="Store"
-          [searchEnabled]="true" [(value)]="selectedStoreid" [showSelectionControls]="true" [showMultiTagOnly]="true"
-          [multiline]="false" [hint]="storeHint" [width]="200" (onValueChanged)="onStoreChanged($event)"></dx-tag-box>
+      <div
+        *dxTemplate="let data of 'StoreFilterTemplate'"
+        style="margin-bottom: 5px"
+      >
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Store"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [hint]="storeHint"
+          [width]="200"
+          (onValueChanged)="onStoreChanged($event)"
+        ></dx-tag-box>
       </div>
 
-      <dxi-column dataField="DOC_NO" caption="Transfer No." [allowEditing]="false" width="120"></dxi-column>
-      <dxi-column dataField="TRANSFER_DATE" caption="Transfer Date" [allowEditing]="false" dataType="date" width="120"
-        [format]="{ type: 'custom', formatter: formatDate }">
+      <dxi-column
+        dataField="DOC_NO"
+        caption="Transfer No."
+        [allowEditing]="false"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="TRANSFER_DATE"
+        caption="Transfer Date"
+        [allowEditing]="false"
+        dataType="date"
+        width="120"
+        [format]="{ type: 'custom', formatter: formatDate }"
+      >
       </dxi-column>
 
-      <dxi-column dataField="STORE_NAME" caption="Store" [allowEditing]="false"></dxi-column>
-      <dxi-column dataField="NET_AMOUNT" caption="Net amount" [allowEditing]="false" format="#,##0.00"
-        width="120"></dxi-column>
-      <dxi-column dataField="NARRATION" caption="Narration" [allowEditing]="false"></dxi-column>
-      <dxi-column caption="Status" dataField="STATUS" [width]="80" [cellTemplate]="statusCellRender"
-        [allowHeaderFiltering]="true" [headerFilter]="{
+      <dxi-column
+        dataField="STORE_NAME"
+        caption="Store"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        dataField="NET_AMOUNT"
+        caption="Net amount"
+        [allowEditing]="false"
+        format="#,##0.00"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="NARRATION"
+        caption="Narration"
+        [allowEditing]="false"
+      ></dxi-column>
+      <dxi-column
+        caption="Status"
+        dataField="STATUS"
+        [width]="140"
+        cellTemplate="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{
           dataSource: getStatusFilterData,
           encodeHtml: false,
-        }">
+        }"
+      >
       </dxi-column>
+
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-approved': data.data.STATUS === 'APPROVED',
+              'flag-verified': data.data.STATUS === 'VERIFY',
+              'flag-pending':
+                data.data.STATUS !== 'VERIFY' &&
+                data.data.STATUS !== 'APPROVED',
+            }"
+          >
+            {{
+              data.data.STATUS === "OPEN"
+                ? "Open"
+                : data.data.STATUS === "VERIFY"
+                  ? "Verified"
+                  : data.data.STATUS === "APPROVED"
+                    ? "Approved"
+                    : "Unknown"
+            }}
+          </span>
+        </div>
+      </div>
 
       <!-- <dxi-column
         caption="Actions"
@@ -75,101 +195,113 @@
         [width]="200"
         [buttons]="allButtons"
       ></dxi-column> -->
-      <dxi-column type="buttons" caption="Actions" [width]="140" cellTemplate="actionTemplate">
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="140"
+        cellTemplate="actionTemplate"
+      >
       </dxi-column>
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit -->
-        <i *ngIf="canEdit" class="dx-icon dx-icon-edit" [style.opacity]="
-            cellData.data.STATUS === 'VERIFY' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? '0.4'
-              : '1'
-          " [style.pointer-events]="
-            cellData.data.STATUS === 'VERIFY' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? 'none'
-              : 'auto'
-          " style="cursor: pointer; margin-right: 10px" title="Edit"
-          (click)="onEditTransferIn({ data: cellData.data, cancel: false })"></i>
+        <div class="action-icons">
+          <!-- Edit -->
+          <i
+            *ngIf="canEdit"
+            class="dx-icon dx-icon-edit"
+            [title]="cellData.data.STATUS === 'OPEN' ? 'Edit' : 'Details'"
+            (click)="onEditTransferIn({ data: cellData.data, cancel: false })"
+          ></i>
 
-        <!-- Delete -->
-        <i *ngIf="canDelete" class="dx-icon dx-icon-trash" [style.opacity]="
-            cellData.data.STATUS === 'VERIFY' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? '0.4'
-              : '1'
-          " [style.pointer-events]="
-            cellData.data.STATUS === 'VERIFY' ||
-            cellData.data.STATUS === 'APPROVED'
-              ? 'none'
-              : 'auto'
-          " style="cursor: pointer; margin-right: 10px" title="Delete"
-          (click)="onDeleteTrIn({ data: cellData.data, cancel: false })"></i>
-
-        <!-- Verify -->
-        <span *ngIf="
-            (cellData.data.TRANS_STATUS === 2 && canApprove) ||
-            (cellData.data.TRANS_STATUS !== 2 && canVerify)
-          " style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            vertical-align: middle;
-          " [title]="
-            cellData.data.STATUS === 'APPROVED'
-              ? 'Approved'
-              : cellData.data.STATUS === 'VERIFY'
-                ? 'Approve'
-                : 'Verify'
-          " (click)="onVerifyClick({ row: { data: cellData.data } })">
-          <!-- Blue badge -->
-          <i class="fas fa-certificate" [style.color]="
+          <!-- Delete -->
+          <i
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            [style.opacity]="
+              cellData.data.STATUS === 'VERIFY' ||
               cellData.data.STATUS === 'APPROVED'
-                ? '#10B981'
-                : cellData.data.STATUS === 'VERIFY'
-                  ? '#0073D8'
-                  : '#FFA500'
-            " style="font-size: 18px; position: absolute; top: 0; left: 0"></i>
+                ? '0.4'
+                : '1'
+            "
+            [style.pointer-events]="
+              cellData.data.STATUS === 'VERIFY' ||
+              cellData.data.STATUS === 'APPROVED'
+                ? 'none'
+                : 'auto'
+            "
+            title="Delete"
+            (click)="onDeleteTrIn({ data: cellData.data, cancel: false })"
+          ></i>
 
-          <!-- White tick -->
-          <i class="fas fa-check" style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
-            "></i>
-        </span>
+          <!-- Verify -->
+          <span
+            *ngIf="
+              !(canEdit && !canVerify && !canApprove) &&
+              (canVerify || canApprove || cellData.data.STATUS === 'APPROVED')
+            "
+            class="verify-badge"
+            [ngClass]="{
+              'status-pending': cellData.data.STATUS === 'OPEN',
+              'status-verified': cellData.data.STATUS === 'VERIFY',
+              'status-approved': cellData.data.STATUS === 'APPROVED',
+
+              disabled:
+                (cellData.data.STATUS === 'OPEN' && !canVerify) ||
+                (cellData.data.STATUS === 'VERIFY' && !canApprove) ||
+                (cellData.data.STATUS === 'APPROVED' && canEdit),
+            }"
+            (click)="onVerifyClick({ row: { data: cellData.data } })"
+          >
+          </span>
+        </div>
       </div>
     </dx-data-grid>
   </div>
 </div>
 
-<app-custom-date-popup [(visible)]="showCustomDatePopup" [startDate]="customStartDate" [endDate]="customEndDate"
-  (applyDates)="onCustomDateApplied($event)">
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
 </app-custom-date-popup>
 
-<dx-popup [(visible)]="isAddTransferIn" [width]="'70vw'" [height]="'90vh'" title=" New Transfer In"
-  (onHiding)="handleClose()">
+<dx-popup
+  [(visible)]="isAddTransferIn"
+  [width]="'70vw'"
+  [height]="'90vh'"
+  title=" New Transfer In"
+  (onHiding)="handleClose()"
+>
   <ng-container *ngIf="isAddTransferIn">
-    <app-transfer-in-inventory-form (popupClosed)="handleClose()"></app-transfer-in-inventory-form>
+    <app-transfer-in-inventory-form
+      (popupClosed)="handleClose()"
+    ></app-transfer-in-inventory-form>
   </ng-container>
 </dx-popup>
 
-<dx-popup [(visible)]="isEditTransferIn" [width]="'70vw'" [height]="'90vh'" [title]="buttonText"
-  (onHiding)="handleClose()" titleTemplate="popupTitle">
+<dx-popup
+  [(visible)]="isEditTransferIn"
+  [width]="'70vw'"
+  [height]="'90vh'"
+  [title]="buttonText"
+  (onHiding)="handleClose()"
+  titleTemplate="popupTitle"
+>
   <div *dxTemplate="let data of 'popupTitle'">
     <div class="popup-title-text">
       {{ buttonText }}
     </div>
   </div>
   <ng-container *ngIf="isEditTransferIn">
-    <app-transfer-in-inventory-form [isEditing]="true" [EditingResponseData]="selectedTrIn"
-      [isReadOnlyMode]="isReadOnlyTrIn" [ActionStatus]="StatusType" (popupClosed)="handleClose()" [status]="StatusType"
-      [selectedDocStatus]="selected_Data_Status"></app-transfer-in-inventory-form>
+    <app-transfer-in-inventory-form
+      [isEditing]="true"
+      [EditingResponseData]="selectedTrIn"
+      [isReadOnlyMode]="isReadOnlyTrIn"
+      [ActionStatus]="StatusType"
+      (popupClosed)="handleClose()"
+      [status]="StatusType"
+      [selectedDocStatus]="selected_Data_Status"
+    ></app-transfer-in-inventory-form>
   </ng-container>
 </dx-popup>

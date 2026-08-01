@@ -223,20 +223,26 @@ export class DepreciationListComponent {
     return `${day}/${month}/${year}`;
   }
 
-  getStatusFlagClass(Status: string): string {
-    return Status == '1' ? 'flag-oranged' : 'flag-green';
-  }
+
   //=========================Depreciation======================
   onEditDepreciation(event: any) {
     event.cancel = true;
-    this.EditDepreciationPopupVisible = true;
-    this.DepreciationAddComponent.Active_fixedasset_List();
+
+    const status = event.data.TRANS_STATUS;
     const id = event.data.TRANS_ID;
+
     this.DepreciationId = event.data.ID;
     this.selectedDepreciation = id;
-    this.StatusType = 'Editscreen'
+
+    if (status === '1') {
+      this.StatusType = 'Editscreen';
+    } else {
+      this.StatusType = 'viewScreen';
+    }
+
     this.dataService.select_Depreciation_Asset(id).subscribe((res: any) => {
       this.Selected_Depreciation_data = res.Data;
+      this.EditDepreciationPopupVisible = true;
     });
   }
   delete_Depreciation_Data(event: any) {
@@ -261,27 +267,6 @@ export class DepreciationListComponent {
     this.get_Depreciation_list();
   }
   Selected_Depreciation_data() { }
-  statusCellRender(cellElement: any, cellInfo: any) {
-    console.log(cellInfo, '==========cellInfo==============')
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === '5'
-        ? '#10B981' // Approved
-        : status === '2'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === '5' ? 'Approved' : status === '2' ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   onDateRangeChanged(e: any) {
     const today = new Date();
@@ -414,16 +399,35 @@ export class DepreciationListComponent {
   }
 
   onVerifyClick(e: any) {
-    this.EditDepreciationPopupVisible = true;
-    this.DepreciationAddComponent.Active_fixedasset_List();
-    const id = e.row.data.TRANS_ID;
-    this.DepreciationId = e.row.data.ID;
+    const rowData = e.row.data;
+
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === '1' && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === '2' && !this.canApprove) {
+      return;
+    }
+
+    const id = rowData.TRANS_ID;
+    this.DepreciationId = rowData.ID;
     this.selectedDepreciation = id;
-    this.StatusType = 'verifyscreen'
-    this.statusId = e.row.data.TRANS_STATUS
+    this.statusId = rowData.TRANS_STATUS;
+
+    // Decide which screen to open
+    if (rowData.TRANS_STATUS === '5') {
+      // Approved -> View Screen
+      this.StatusType = 'viewScreen';
+    } else {
+      // Open / Verified -> Verify Screen
+      this.StatusType = 'verifyscreen';
+    }
 
     this.dataService.select_Depreciation_Asset(id).subscribe((res: any) => {
       this.Selected_Depreciation_data = res.Data;
+      this.EditDepreciationPopupVisible = true;
     });
   }
 }

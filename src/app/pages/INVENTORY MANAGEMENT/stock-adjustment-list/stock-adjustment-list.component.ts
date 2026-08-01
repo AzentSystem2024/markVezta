@@ -353,45 +353,6 @@ export class StockAdjustmentListComponent {
     return `${month}/${day}/${year}`;
   }
 
-  // statusCellRender(cellElement: any, cellInfo: any) {
-  //   const status = cellInfo.data.TRANS_STATUS;
-
-  //   const icon = document.createElement('i');
-  //   icon.className = 'fas fa-flag'; // Font Awesome flag icon
-  //   icon.style.fontSize = '18px';
-  //   icon.style.color = status === 5 ? '#5cac6fff' : '#d87f7fff';
-  //   icon.title = status === 5 ? 'APPROVED' : 'OPEN';
-
-  //   icon.style.display = 'flex';
-  //   icon.style.justifyContent = 'center';
-  //   icon.style.alignItems = 'center';
-
-  //   cellElement.appendChild(icon);
-  // }
-
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
-
-
   delete_Data(e: any) {
     const id = e.data.ID;
     this.dataService.Delete_Stock_Adjustment_Data(id).subscribe((res: any) => {
@@ -433,13 +394,31 @@ export class StockAdjustmentListComponent {
 
   onEditStock(event: any) {
     event.cancel = true;
-    this.is_Edit_popup = true;
+
     const id = event.data.ID;
-    this.StatusType = 'Editscreen'
-    this.buttonText = 'Update Stock Adjustment'
+    const status = event.data.TRANS_STATUS;
+
     this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
+
       this.selected_Data = res.Data;
 
+      if (status === 1) {
+
+        // Open -> Edit
+        this.isReadOnlyMode = false;
+        this.StatusType = 'Editscreen';
+        this.buttonText = 'Update Stock Adjustment';
+
+      } else if (status === 2) {
+
+        // Verified -> View (Read Only)
+        this.isReadOnlyMode = true;
+        this.StatusType = 'viewScreen';
+        this.buttonText = 'View Stock Adjustment';
+
+      }
+
+      this.is_Edit_popup = true;
     });
   }
 
@@ -550,11 +529,19 @@ export class StockAdjustmentListComponent {
       console.log('==call This=======')
       console.log(this.selected_Data, '=====selected data==========')
       if (this.selected_Data.STATUS == 1) {
-        this.buttonText = 'Verify Stock Adjustment'
-      } else if (this.selected_Data.STATUS == 2) {
-        this.buttonText = 'Approve Stock Adjustment'
-      } else {
-        this.buttonText = 'View Stock Adjustment'
+        // Open -> Verify screen
+        this.StatusType = 'verifyscreen';
+        this.buttonText = 'Verify Stock Adjustment';
+      }
+      else if (this.selected_Data.STATUS == 2) {
+        // Verified -> Approve screen
+        this.StatusType = 'verifyscreen';
+        this.buttonText = 'Approve Stock Adjustment';
+      }
+      else if (this.selected_Data.STATUS == 5) {
+        // Approved -> View screen
+        this.StatusType = 'viewScreen';
+        this.buttonText = 'View Stock Adjustment';
       }
     });
 

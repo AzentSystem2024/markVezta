@@ -110,7 +110,7 @@
       [width]="150"
     ></dxi-column>
     <dxi-column dataField="ITEM_CODE" caption="Code" [width]="150"></dxi-column>
-    <!-- <dxi-column dataField="MATRIX_CODE" [visible]="ENABLE_Matrix_Code" caption="Matrix Code" [width]="150"></dxi-column> -->
+
     <dxi-column
       dataField="BARCODE"
       caption="Barcode"
@@ -376,55 +376,20 @@
       [visible]="false"
       [width]="150"
     ></dxi-column>
-    <!-- <dxi-column dataField="TYPE_ID" caption="Type" [width]="150">
-    <dxo-lookup
-      [dataSource]="itemtype"
-      displayExpr="DESCRIPTION"
-      valueExpr="ID"
-      [visible]="true"
-    >
-    </dxo-lookup> -->
+
     <!-- </dxi-column>  -->
     <dxi-column dataField="DEPT_NAME" caption="Department" [width]="150">
     </dxi-column>
-    <!-- <dxi-column dataField="CAT_ID" caption="Category" [width]="150">
-      <dxo-lookup
-        [dataSource]="catagory"
-        displayExpr="DESCRIPTION"
-        valueExpr="ID"
-        [visible]="true"
-      >
-      </dxo-lookup>
-    </dxi-column> -->
+
     <dxi-column dataField="CAT_NAME" caption="Category" [width]="150">
     </dxi-column>
     <dxi-column dataField="SUBCAT_NAME" caption="Subcategory" [width]="150">
-      <!-- <dxo-lookup
-        [dataSource]="subcatagory"
-        displayExpr="SUBCAT_NAME"
-        valueExpr="ID"
-        [visible]="true"
-      >
-      </dxo-lookup> -->
     </dxi-column>
     <dxi-column dataField="TYPE_NAME" caption="Type" [width]="150">
     </dxi-column>
     <dxi-column dataField="BRAND_NAME" caption="Brand" [width]="150">
     </dxi-column>
-    <!-- <dxi-column
-      dataField="BRAND_ID"
-      caption="Brand"
-      [visible]="true"
-      [width]="150"
-    >
-      <dxo-lookup
-        [dataSource]="brand"
-        displayExpr="DESCRIPTION"
-        valueExpr="ID"
-        [visible]="true"
-      >
-      </dxo-lookup>
-    </dxi-column> -->
+
     <dxi-column
       dataField="PARENT_ITEM_ID"
       caption="Parent Item"
@@ -447,6 +412,7 @@
     ></dxi-column>
   </dx-data-grid>
 </div>
+
 <form-popup
   *ngIf="isAddItemsPopupOpened"
   [(visible)]="isAddItemsPopupOpened"
@@ -454,7 +420,7 @@
   [height]="'100vh'"
   titleText="New Item"
   (save)="onClickSaveItems()"
-  (closeAndRefresh)="refreshItems()"
+  (closeAndRefresh)="refreshGrid()"
   [showApprove]="false"
 >
   <app-items-form></app-items-form>
