@@ -7281,4 +7281,50 @@ The result can be exported to HTML or Markdown.`;
   delete_EOS_payment(id: any) {
     return this.http.post(`${this.apiUrl}EOSPayment/delete/${id}`, {});
   }
+
+  // --- Leave Salary Payment APIs ---
+
+  get_leave_salary_list(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/list', payload);
+  }
+
+  get_leave_salary_employee_details(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/EmployeeDetails', payload);
+  }
+
+  get_leave_salary_vacation_list(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/VacationList', payload);
+  }
+
+  get_leave_salary_vacation_details(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/GetVacationDetails', payload);
+  }
+
+  add_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Insert', payload);
+  }
+
+  update_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Update', payload);
+  }
+
+  verify_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Verify', payload);
+  }
+
+  approve_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Approve', payload);
+  }
+
+  delete_leave_salary(id: any) {
+    return this.http.post(`${this.apiUrl}EmployeeLeaveSalary/delete/${id}`, {});
+  }
+
+  select_leave_salary(id: any) {
+    return this.http.post(`${this.apiUrl}EmployeeLeaveSalary/select/${id}`, {});
+  }
+
+  get_calculated_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Getleavesalary', payload);
+  }
 }
