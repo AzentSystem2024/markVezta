@@ -101,48 +101,36 @@
         cellTemplate="actionTemplate"
       ></dxi-column>
 
-      <div
-        *dxTemplate="let data of 'statusCellRender'"
-        style="text-align: center; width: 100%"
-      >
-        <i
-          class="fas fa-flag"
-          [style.color]="
-            data.data.STATUS_DESC === 'Paid'
-              ? '#8B5CF6'
-              : data.data.STATUS_DESC === 'Approved'
-                ? '#10B981'
-                : data.data.STATUS_DESC === 'Verified'
-                  ? '#0073D8'
-                  : '#FFA500'
-          "
-          [attr.title]="data.data.STATUS_DESC"
-          style="cursor: default"
-        ></i>
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-paid': data.data.STATUS_DESC === 'Paid',
+              'flag-approved': data.data.STATUS_DESC === 'Approved',
+              'flag-verified': data.data.STATUS_DESC === 'Verified',
+              'flag-pending':
+                data.data.STATUS_DESC !== 'Verified' &&
+                data.data.STATUS_DESC !== 'Approved' &&
+                data.data.STATUS_DESC !== 'Paid'
+            }"
+          >
+            {{ data.data.STATUS_DESC }}
+          </span>
+        </div>
       </div>
 
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit -->
+        <!-- Edit / View -->
         <i
-          *ngIf="canEdit"
+          *ngIf="canEdit || canView"
           class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            cellData.data.STATUS_DESC === 'Verified' ||
-            cellData.data.STATUS_DESC === 'Approved' ||
-            cellData.data.STATUS_DESC === 'Paid'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS_DESC === 'Verified' ||
-            cellData.data.STATUS_DESC === 'Approved' ||
-            cellData.data.STATUS_DESC === 'Paid'
-              ? 'none'
-              : 'auto'
-          "
           style="cursor: pointer; margin-right: 10px"
-          title="Edit"
-          (click)="onEditingStart({ data: cellData.data, cancel: false })"
+          [title]="cellData.data.STATUS_DESC === 'Open' ? 'Edit' : 'View'"
+          (click)="
+            cellData.data.STATUS_DESC === 'Open'
+              ? onEditingStart({ data: cellData.data, cancel: false })
+              : onVerifyClick({ row: { data: cellData.data } })
+          "
         ></i>
 
         <!-- Delete -->
@@ -170,13 +158,7 @@
 
         <!-- Verify -->
         <span
-          *ngIf="
-            (cellData.data.STATUS_DESC === 'Verified' && canApprove) ||
-            (cellData.data.STATUS_DESC !== 'Verified' &&
-              cellData.data.STATUS_DESC !== 'Approved' &&
-              cellData.data.STATUS_DESC !== 'Paid' &&
-              canVerify)
-          "
+          *ngIf="canVerify || canApprove"
           style="
             position: relative;
             display: inline-block;
@@ -186,16 +168,37 @@
             cursor: pointer;
             vertical-align: middle;
           "
+          [style.opacity]="
+            cellData.data.STATUS_DESC === 'Approved' ||
+            cellData.data.STATUS_DESC === 'Paid' ||
+            (cellData.data.STATUS_DESC === 'Verified' && !canApprove) ||
+            (cellData.data.STATUS_DESC === 'Open' && !canVerify)
+              ? '0.4'
+              : '1'
+          "
+          [style.pointer-events]="
+            cellData.data.STATUS_DESC === 'Approved' ||
+            cellData.data.STATUS_DESC === 'Paid' ||
+            (cellData.data.STATUS_DESC === 'Verified' && !canApprove) ||
+            (cellData.data.STATUS_DESC === 'Open' && !canVerify)
+              ? 'none'
+              : 'auto'
+          "
           [title]="
             cellData.data.STATUS_DESC === 'Verified' ? 'Approve' : 'Verify'
           "
           (click)="onVerifyClick({ row: { data: cellData.data } })"
         >
-          <!-- Blue badge -->
+          <!-- Badge -->
           <i
             class="fas fa-certificate"
             [style.color]="
-              cellData.data.STATUS_DESC === 'Verified' ? '#0073D8' : '#FFA500'
+              cellData.data.STATUS_DESC === 'Approved' ||
+              cellData.data.STATUS_DESC === 'Paid'
+                ? '#10B981'
+                : cellData.data.STATUS_DESC === 'Verified'
+                  ? '#0073D8'
+                  : '#FFA500'
             "
             style="font-size: 18px; position: absolute; top: 0; left: 0"
           ></i>
@@ -213,24 +216,6 @@
             "
           ></i>
         </span>
-
-        <!-- View -->
-        <i
-          *ngIf="
-            cellData.data.STATUS_DESC === 'Approved' ||
-            cellData.data.STATUS_DESC === 'Paid'
-          "
-          class="fas fa-eye"
-          style="
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 16px;
-            color: #6c757d;
-            vertical-align: middle;
-          "
-          title="View"
-          (click)="onVerifyClick({ row: { data: cellData.data } })"
-        ></i>
       </div>
     </dx-data-grid>
   </div>
