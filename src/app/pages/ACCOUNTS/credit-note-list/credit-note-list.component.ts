@@ -153,7 +153,7 @@ export class CreditNoteListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -227,7 +227,7 @@ export class CreditNoteListComponent {
         // ✅ single bind
         this.filteredInvoiceList = this.creditNotes;
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -345,26 +345,6 @@ export class CreditNoteListComponent {
     }
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.TRANS_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 5
-        ? '#10B981' // Approved
-        : status === 2
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 5 ? 'Approved' : status === 2 ? 'Verified' : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
 
   getStatusFilterData = [
     {
@@ -564,12 +544,14 @@ export class CreditNoteListComponent {
       .subscribe((response: any) => {
         this.selectedCreditNote = structuredClone(response.Data);
 
-        if (transStatus === 5) {
-          // Open view popup
-          this.isViewCreditNote = true;
-        } else {
-          // Open edit popup
+        if (transStatus === 1) {
+          // Open document -> Edit mode
+          // this.isReadOnlyQuotation = false;
           this.isEditCreditNote = true;
+        } else {
+          // Verified & Approved -> View mode
+          // this.isReadOnlyQuotation = true;
+          this.isViewCreditNote = true;
         }
 
         this.selectedCreditNoteForEdit = JSON.parse(
@@ -584,6 +566,21 @@ export class CreditNoteListComponent {
     this.CreditNoteid = e.row.data.TRANS_ID;
     this.selectedCredit = creditId;
     const transStatus = e.row.data.TRANS_STATUS;
+    const rowData = e.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
 
     this.dataService
       .selectCreditNote(this.CreditNoteid)
@@ -701,4 +698,4 @@ export class CreditNoteListComponent {
   exports: [CreditNoteListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CreditNoteListModule {}
+export class CreditNoteListModule { }

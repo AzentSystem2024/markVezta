@@ -110,14 +110,14 @@
         </dxi-item>
 
         <dxi-item>
-          <dx-date-box
+          <!-- <dx-date-box
             [width]="150"
             label="Date From"
             labelMode="floating"
             [displayFormat]="'dd-MM-yyyy'"
             [value]="formatted_from_date"
             (onValueChanged)="onFromDateChange($event)"
-          ></dx-date-box>
+          ></dx-date-box> -->
         </dxi-item>
 
         <dxi-item>
@@ -286,7 +286,7 @@
 <!-- =============================drildown========================= -->
 
 <dx-popup
-*ngIf="isViewInvoice"
+  *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'90vw'"
   [height]="'85vh'"

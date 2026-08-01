@@ -1349,6 +1349,13 @@ export class QuotationFormComponent {
       });
   }
 
+  formatAmount(value: any): string {
+    return Number(value || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
   async generatePDF(data: any) {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -1481,13 +1488,13 @@ export class QuotationFormComponent {
       item.ITEM_CODE,
       item.ITEM_NAME,
       item.UOM,
-      item.QUANTITY,
-      item.PRICE,
-      item.AMOUNT,
-      item.DISC_PERCENT,
-      item.AMOUNT,
-      item.TAX_PERCENT,
-      item.TOTAL_AMOUNT,
+      this.formatAmount(item.QUANTITY),
+      this.formatAmount(item.PRICE),
+      this.formatAmount(item.AMOUNT),
+      this.formatAmount(item.DISC_PERCENT),
+      this.formatAmount(item.AMOUNT),
+      this.formatAmount(item.TAX_PERCENT),
+      this.formatAmount(item.TOTAL_AMOUNT),
     ]);
 
     autoTable(doc, {
@@ -1545,14 +1552,28 @@ export class QuotationFormComponent {
     // ======================================================
     // AMOUNT IN WORDS
     // ======================================================
-    const netAmount = Number(data.Data.NET_AMOUNT) || 0;
+    // ======================================================
+    // AMOUNT IN WORDS
+    // ======================================================
 
-    const amountInWords =
-      'AED ' +
-      toWords(Math.floor(netAmount)).replace(/\b\w/g, (char) =>
-        char.toUpperCase(),
-      ) +
-      ' Only';
+    // Remove commas if NET_AMOUNT is a formatted string
+    const netAmount =
+      Number(String(data.Data.NET_AMOUNT).replace(/,/g, '')) || 0;
+
+    const dirhams = Math.floor(netAmount);
+    const fils = Math.round((netAmount - dirhams) * 100);
+
+    let amountInWords =
+      'AED ' + toWords(dirhams).replace(/\b\w/g, (char) => char.toUpperCase());
+
+    if (fils > 0) {
+      amountInWords +=
+        ' And ' +
+        toWords(fils).replace(/\b\w/g, (char) => char.toUpperCase()) +
+        ' Fils';
+    }
+
+    amountInWords += ' Only';
     const amountY = (doc as any).lastAutoTable.finalY + 10;
 
     doc.setFont('helvetica', 'normal');

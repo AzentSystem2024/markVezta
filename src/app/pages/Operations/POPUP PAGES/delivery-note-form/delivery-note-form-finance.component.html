@@ -56,7 +56,7 @@
                       label="Delivery No"
                       labelMode="floating"
                       [width]="200"
-                      [readOnly]="isReadOnlyMode"
+                      [readOnly]="true"
                     ></dx-text-box>
                   </div>
 
@@ -126,6 +126,8 @@
             caption="SODETAILID"
             [visible]="false"
           >
+          </dxi-column>
+          <dxi-column dataField="SO_NO" caption="SO No." [visible]="true">
           </dxi-column>
           <!-- <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column> -->
           <dxi-column

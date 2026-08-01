@@ -114,12 +114,12 @@ export class DepreciationEditComponent {
     this.selectedStatus = this.SelectDepreciationData.TRANS_STATUS;
 
 
-    if (this.SelectDepreciationData.TRANS_STATUS == '5') {
+    if (this.status === 'viewScreen') {
       this.readOnly = true;
       this.isEdit = false;
     } else {
-      this.isEdit = true;
       this.readOnly = false;
+      this.isEdit = true;
     }
   }
 
