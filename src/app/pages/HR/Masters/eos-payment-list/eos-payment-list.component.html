@@ -245,6 +245,7 @@
     class="eos-form-container"
     style="padding-bottom: 50px"
   >
+  <ng-container *ngIf="popupVisible">
     <!-- Row 1: Voucher No & Date -->
     <div class="row mb-2 align-items-center">
       <div class="col-md-2">
@@ -716,5 +717,6 @@
         ></dx-button>
       </div>
     </div>
+    </ng-container>
   </div>
 </dx-popup>
