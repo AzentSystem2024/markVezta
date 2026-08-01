@@ -234,6 +234,9 @@ export class ItemsEditFormComponent implements OnInit {
     MATRIX_CODE: '',
     ITEM_PROPERTY4: '',
     ITEM_PROPERTY5: '',
+    REFERENCE1: '',
+    REFERENCE2: '',
+    REFERENCE3: '',
     VAT_CLASS_ID: null,
     UNIT_ID: isNullOrEmptyString,
     PACKING_ID: '',
@@ -345,6 +348,9 @@ export class ItemsEditFormComponent implements OnInit {
   ITEM_PROPERTY3: any;
   ITEM_PROPERTY4: any;
   ITEM_PROPERTY5: any;
+  REFERENCE1: any;
+  REFERENCE2: any;
+  REFERENCE3: any;
   isParentItemDropdownOpen: boolean;
 
   constructor(
@@ -804,6 +810,10 @@ export class ItemsEditFormComponent implements OnInit {
     this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
+
+    this.REFERENCE1 = this.sessionData.GeneralSettings.REFERENCE1;
+    this.REFERENCE2 = this.sessionData.GeneralSettings.REFERENCE2;
+    this.REFERENCE3 = this.sessionData.GeneralSettings.REFERENCE3;
 
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;

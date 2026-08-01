@@ -43,12 +43,11 @@ import { DxRadioGroupModule } from 'devextreme-angular';
 import { AuthService, DataService } from 'src/app/services';
 import { DxFileUploaderModule, DxProgressBarModule } from 'devextreme-angular';
 import { DxButtonModule } from 'devextreme-angular';
-import { AnyARecord, DESTRUCTION } from 'dns';
-import { Row } from 'jspdf-autotable';
+
 import { EventEmitter } from '@angular/core';
 import { CountryServiceService } from 'src/app/services/country-service.service';
 import { ImageService } from 'src/app/services/image.service';
-import { Console } from 'console';
+
 import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-items-form',
@@ -63,12 +62,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('supplierGridRef')
   supplierGrid!: DxDataGridComponent;
-
-  //  priorities: string[] = ['Standard code', 'Tally code',];
-  //  priorities = [
-  //     { id: 1, name: 'Standard code' },
-  //     { id: 2, name: 'Tally code' }
-  //   ];
   selectedPriority: number = 1;
   selected_vat_id: any;
   isLoading: boolean = false;
@@ -206,6 +199,9 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   ITEM_PROPERTY3: any;
   ITEM_PROPERTY4: any;
   ITEM_PROPERTY5: any;
+  REFERENCE1: any;
+  REFERENCE2: any;
+  REFERENCE3: any;
   ENABLE_Matrix_Code: boolean;
   isParentItemDropdownOpen: boolean;
   selectedStoresMap: any;
@@ -423,6 +419,9 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     ITEM_PROPERTY3: 0,
     ITEM_PROPERTY4: 0,
     ITEM_PROPERTY5: 0,
+    REFERENCE1: '',
+    REFERENCE2: '',
+    REFERENCE3: '',
     COSTING_METHOD: null,
     REORDER_POINT: 0,
     UNIT_ID: null,
@@ -681,6 +680,10 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
     this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
 
+    this.REFERENCE1 = this.sessionData.GeneralSettings.REFERENCE1;
+    this.REFERENCE2 = this.sessionData.GeneralSettings.REFERENCE2;
+    this.REFERENCE3 = this.sessionData.GeneralSettings.REFERENCE3;
+
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
 
@@ -697,7 +700,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       (option) => option.ID !== this.selectedUom,
     );
   }
-  onSelectPackAdd(event: any) { }
 
   onUOMChange(event: any) {
     this.selectedUom = this.newItems.UNIT_ID;
@@ -705,14 +707,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
     this.filterDropdownOptions(); // Filter the options when the selection changes
   }
-  onPriorityChange(event: any) { }
-
-  // onParentItemChanged(e: any) {
-  //   if (e.selectedRowKeys.length > 0) {
-  //     this.newItems.PARENT_ITEM_ID = e.selectedRowKeys[0];
-  //     this.isParentItemDropdownOpen = false;  //  close dropdown
-  //   }
-  // }
 
   onUploaded(e: any) {
     const file = e.file;
@@ -731,13 +725,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     this.progressVisible = false;
     this.progressValue = 0;
   }
-  // onProgress(e: any) {
-  //   this.progressValue = (e.bytesLoaded / e.bytesTotal) * 100;
-  // }
-  // onUploadStarted(event: any) {
-  //   this.imageSource = '';
-  //   this.progressVisible = true;
-  // }
 
   onDropZoneClick() {
     this.fileInput.nativeElement.click();
@@ -831,8 +818,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       this.showSupplier = this.consignment;
     }
   }
-
-  // clearImage() {}
 
   calculateProfitMargin(): any {
     if (this.formItemsData.SALE_PRICE > 0 && this.formItemsData.COST > 0) {
@@ -1020,7 +1005,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       };
     }
   }
-  onRowClick(e: any) { }
 
   onRowInserted(event: any) {
     // const newRecordIsPrimary = event.data.IS_PRIMARY === true;
@@ -1051,18 +1035,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     // After updating IS_PRIMARY property, trigger change detection
     this.cdr.detectChanges();
   }
-
-  // onRowInsertedAlias(event: any) {
-  //   // Remove any existing empty objects from ITEM_ALIAS array
-  //   this.formItemsData.ITEM_ALIAS = this.formItemsData.ITEM_ALIAS.filter(
-  //     (alias) => alias.ALIAS.trim() !== ''
-  //   );
-
-  // Push the new object into ITEM_ALIAS array with ALIAS value
-  // this.formItemsData.ITEM_ALIAS.push({ ALIAS: event.data.ALIAS, ALIAS_TYPE_ID: this.selectedPriority   });
-
-  // }
-  onClickSaveSupplier() { }
 
   onRowUpdatedAlias(event: any) {
     // Find the index of the alias being updated
@@ -1113,9 +1085,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       },
     );
   }
-
-  // onItemSelected(event: any): void {
-  // }
 
   onItemSelected(event: any): void {
     // Get the selected item from the event's selectedRowsData
@@ -1249,4 +1218,4 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   exports: [ItemsFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsFormModule { }
+export class ItemsFormModule {}
