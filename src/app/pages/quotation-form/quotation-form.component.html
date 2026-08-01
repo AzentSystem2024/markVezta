@@ -252,6 +252,7 @@
                     [calculateCellValue]="calculateAmount"
                     dataType="number"
                     [format]="{ type: 'fixedPoint', precision: 2 }"
+                    [readOnly]="true"
                   ></dxi-column>
                   <dxi-column
                     dataField="TAX_PERCENT"
@@ -262,6 +263,7 @@
                         : ' Tax %'
                     "
                     dataType="number"
+                    [readOnly]="true"
                   ></dxi-column>
                   <dxi-column
                     dataField="TAX_AMOUNT"
