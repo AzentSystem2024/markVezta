@@ -261,7 +261,7 @@
 
     <div class="total-expense">
       <dx-check-box
-        *ngIf="canApprove"
+        *ngIf="mode === 'approve'"
         [readOnly]="isReadOnly"
         text="Approve"
         [(value)]="PrePaymentFormData.TRANS_STATUS"
