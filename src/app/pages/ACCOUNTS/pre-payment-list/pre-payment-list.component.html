@@ -256,6 +256,7 @@
 </div>
 
 <dx-popup
+  #editPopup
   [(visible)]="editPrePaymentPopupOpened"
   [width]="'50vw'"
   [height]="'auto'"
@@ -274,6 +275,7 @@
 </dx-popup>
 
 <dx-popup
+  #verifyPopup
   [(visible)]="verifyPrePaymentPopupOpened"
   [width]="'50vw'"
   [height]="'auto'"
@@ -286,7 +288,7 @@
     [isOpen]="verifyPrePaymentPopupOpened"
     [isReadOnly]="isEditReadOnly"
     (formClosed)="handleClose()"
-    [canApprove]="false"
+    [canApprove]="popupMode === 'approve'"
     [PrepaymentId]="selectprepayment"
     [verifyPrePaymentPopupOpened]="verifyPrePaymentPopupOpened"
   ></app-pre-payment-edit>

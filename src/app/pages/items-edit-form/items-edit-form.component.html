@@ -20,7 +20,6 @@
                           type="required"
                           message="This field is required"
                         ></dxi-validation-rule>
-                        
                       </dx-validator>
                     </dx-text-box>
                   </div>
@@ -110,7 +109,7 @@
                 <dxi-item>
                   <div *dxTemplate>
                     <dx-text-box
-                      label="POS Description"
+                      label="Short Name"
                       labelMode="floating"
                       [(value)]="itemData.POS_DESCRIPTION"
                       [maxLength]="45"
@@ -157,7 +156,6 @@
                       [(value)]="itemData.CAT_ID"
                       (onValueChanged)="onCategoryChanged($event)"
                     >
-                      
                     </dx-select-box>
                   </div>
                 </dxi-item>
@@ -174,7 +172,6 @@
                       [searchEnabled]="true"
                       [(value)]="itemData.SUBCAT_ID"
                     >
-                      
                     </dx-select-box>
                   </div>
                 </dxi-item>
@@ -259,11 +256,20 @@
 
               <!-- Row 8: UOM Options -->
               <dxi-item itemType="group" [colCount]="3">
+                <!-- Show Inactive checkbox only for Service Type = 2 -->
                 <dxi-item>
-                  <div
-                    *dxTemplate
-                    style="display: flex; align-items: center; height: 100%"
-                  >
+                  <div *dxTemplate>
+                    <dx-check-box
+                      text="Inactive"
+                      [(value)]="itemData.IS_INACTIVE"
+                    >
+                    </dx-check-box>
+                  </div>
+                </dxi-item>
+
+                <!-- Show Different UOM checkbox for all other service types -->
+                <dxi-item *ngIf="itemData.TYPE_ID != 2">
+                  <div *dxTemplate>
                     <dx-check-box
                       [(value)]="itemData.IS_DIFFERENT_UOM_PURCH"
                       text="Is Different UOM"
@@ -271,7 +277,6 @@
                     </dx-check-box>
                   </div>
                 </dxi-item>
-
                 <dxi-item *ngIf="itemData.IS_DIFFERENT_UOM_PURCH">
                   <dx-select-box
                     label="Purchase UOM"
@@ -497,7 +502,7 @@
                 <div *dxTemplate>
                   <dx-text-box
                     [visible]="REFERENCE1 && REFERENCE1 !== ''"
-                    label="{{REFERENCE1}}"
+                    label="{{ REFERENCE1 }}"
                     labelMode="floating"
                     [(value)]="itemData.REFERENCE1"
                     [maxLength]="100"
@@ -510,7 +515,7 @@
                 <div *dxTemplate>
                   <dx-text-box
                     [visible]="REFERENCE2 && REFERENCE2 !== ''"
-                    label="{{REFERENCE2}}"
+                    label="{{ REFERENCE2 }}"
                     labelMode="floating"
                     [(value)]="itemData.REFERENCE2"
                     [maxLength]="100"
@@ -523,7 +528,7 @@
                 <div *dxTemplate>
                   <dx-text-box
                     [visible]="REFERENCE3 && REFERENCE3 !== ''"
-                    label="{{REFERENCE3}}"
+                    label="{{ REFERENCE3 }}"
                     labelMode="floating"
                     [(value)]="itemData.REFERENCE3"
                     [maxLength]="100"
@@ -535,7 +540,7 @@
             </dxi-item>
           </dxi-item>
         </dxi-tab>
-        <dxi-tab title="Alias">
+        <dxi-tab title="Alias" *ngIf="itemData.TYPE_ID != 2">
           <dxi-item itemType="group" [colCount]="1">
             <dxi-item>
               <dx-data-grid
@@ -681,7 +686,7 @@
             </div>
 
             <!-- Right Containers (Inventory and History) -->
-            <div class="right-containers">
+            <div class="right-containers" *ngIf="itemData.TYPE_ID != 2">
               <!-- Inventory Container -->
               <div class="inventory-container">
                 <div class="price-header">Inventory</div>
@@ -778,7 +783,7 @@
           </div>
         </dxi-tab>
 
-        <dxi-tab title="Stores">
+        <dxi-tab title="Stores" *ngIf="itemData.TYPE_ID != 2">
           <dxi-item>
             <dx-data-grid
               class="grid theme-dependent stores-grid"
@@ -896,7 +901,7 @@
           </dxi-item>
         </dxi-tab>
 
-        <dxi-tab title="Special">
+        <dxi-tab title="Special" *ngIf="itemData.TYPE_ID != 2">
           <dxi-item itemType="group" [colSpan]="2">
             <div class="container">
               <!-- Special Container -->
@@ -1068,14 +1073,14 @@
                 <dxi-item>
                   <div class="price-header">Options</div>
                 </dxi-item>
-                <dxi-item>
+                <!-- <dxi-item>
                   <dx-check-box
                     text="Inactive"
                     [(value)]="itemData.IS_INACTIVE"
                     labelMode="floating"
                     style="margin-top: 20px"
                   ></dx-check-box>
-                </dxi-item>
+                </dxi-item> -->
                 <dxi-item>
                   <dx-check-box
                     text="Price On Transaction"
@@ -1117,7 +1122,10 @@
           </dxi-item>
         </dxi-tab>
 
-        <dxi-tab title="Supplier" *ngIf="showSupplierTab">
+        <dxi-tab
+          title="Supplier"
+          *ngIf="showSupplierTab && itemData.TYPE_ID != 2"
+        >
           <dxi-item>
             <dx-data-grid
               class="grid theme-dependent stores-grid"

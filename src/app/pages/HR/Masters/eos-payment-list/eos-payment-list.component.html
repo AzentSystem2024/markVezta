@@ -111,7 +111,7 @@
               'flag-pending':
                 data.data.STATUS !== 'Verified' &&
                 data.data.STATUS !== 'Approved' &&
-                data.data.STATUS !== 'Paid'
+                data.data.STATUS !== 'Paid',
             }"
           >
             {{ data.data.STATUS }}
@@ -120,100 +120,100 @@
       </div>
 
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit / View -->
-        <i
-          *ngIf="canEdit || canView"
-          class="dx-icon dx-icon-edit"
-          style="cursor: pointer; margin-right: 10px"
-          [title]="cellData.data.STATUS === 'Open' ? 'Edit' : 'View'"
-          (click)="
-            cellData.data.STATUS === 'Open'
-              ? onEditingStart({ data: cellData.data, cancel: false })
-              : onVerifyClick({ row: { data: cellData.data } })
-          "
-        ></i>
-
-        <!-- Delete -->
-        <i
-          *ngIf="canDelete"
-          class="dx-icon dx-icon-trash"
-          [style.opacity]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'Verified' ||
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Delete"
-          (click)="deleteData({ data: cellData.data, cancel: false })"
-        ></i>
-
-        <!-- Verify -->
-        <span
-          *ngIf="canVerify || canApprove"
-          style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            vertical-align: middle;
-          "
-          [style.opacity]="
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid' ||
-            (cellData.data.STATUS === 'Verified' && !canApprove) ||
-            (cellData.data.STATUS === 'Open' && !canVerify)
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.STATUS === 'Approved' ||
-            cellData.data.STATUS === 'Paid' ||
-            (cellData.data.STATUS === 'Verified' && !canApprove) ||
-            (cellData.data.STATUS === 'Open' && !canVerify)
-              ? 'none'
-              : 'auto'
-          "
-          [title]="cellData.data.STATUS === 'Verified' ? 'Approve' : 'Verify'"
-          (click)="onVerifyClick({ row: { data: cellData.data } })"
-        >
-          <!-- Badge -->
+        <div class="action-icons">
+          <!-- Edit / View -->
           <i
-            class="fas fa-certificate"
-            [style.color]="
+            *ngIf="canEdit || canView"
+            class="dx-icon dx-icon-edit"
+            [title]="cellData.data.STATUS === 'Open' ? 'Edit' : 'View'"
+            (click)="
+              cellData.data.STATUS === 'Open'
+                ? onEditingStart({ data: cellData.data, cancel: false })
+                : onVerifyClick({ row: { data: cellData.data } })
+            "
+          ></i>
+
+          <!-- Delete -->
+          <i
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            [style.opacity]="
+              cellData.data.STATUS === 'Verified' ||
               cellData.data.STATUS === 'Approved' ||
               cellData.data.STATUS === 'Paid'
-                ? '#10B981'
-                : cellData.data.STATUS === 'Verified'
-                  ? '#0073D8'
-                  : '#FFA500'
+                ? '0.4'
+                : '1'
             "
-            style="font-size: 18px; position: absolute; top: 0; left: 0"
+            [style.pointer-events]="
+              cellData.data.STATUS === 'Verified' ||
+              cellData.data.STATUS === 'Approved' ||
+              cellData.data.STATUS === 'Paid'
+                ? 'none'
+                : 'auto'
+            "
+            title="Delete"
+            (click)="deleteData({ data: cellData.data, cancel: false })"
           ></i>
 
-          <!-- White tick -->
-          <i
-            class="fas fa-check"
+          <!-- Verify -->
+          <span
+            *ngIf="canVerify || canApprove"
             style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
+              position: relative;
+              display: inline-block;
+              width: 18px;
+              height: 18px;
+              margin-left: 10px;
+              cursor: pointer;
+              vertical-align: middle;
             "
-          ></i>
-        </span>
+            [style.opacity]="
+              cellData.data.STATUS === 'Approved' ||
+              cellData.data.STATUS === 'Paid' ||
+              (cellData.data.STATUS === 'Verified' && !canApprove) ||
+              (cellData.data.STATUS === 'Open' && !canVerify)
+                ? '0.4'
+                : '1'
+            "
+            [style.pointer-events]="
+              cellData.data.STATUS === 'Approved' ||
+              cellData.data.STATUS === 'Paid' ||
+              (cellData.data.STATUS === 'Verified' && !canApprove) ||
+              (cellData.data.STATUS === 'Open' && !canVerify)
+                ? 'none'
+                : 'auto'
+            "
+            [title]="cellData.data.STATUS === 'Verified' ? 'Approve' : 'Verify'"
+            (click)="onVerifyClick({ row: { data: cellData.data } })"
+          >
+            <!-- Badge -->
+            <i
+              class="fas fa-certificate"
+              [style.color]="
+                cellData.data.STATUS === 'Approved' ||
+                cellData.data.STATUS === 'Paid'
+                  ? '#10B981'
+                  : cellData.data.STATUS === 'Verified'
+                    ? '#0073D8'
+                    : '#FFA500'
+              "
+              style="font-size: 18px; position: absolute; top: 0; left: 0"
+            ></i>
+
+            <!-- White tick -->
+            <i
+              class="fas fa-check"
+              style="
+                color: white;
+                font-size: 7px;
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                pointer-events: none;
+              "
+            ></i>
+          </span>
+        </div>
       </div>
     </dx-data-grid>
   </div>
@@ -245,478 +245,482 @@
     class="eos-form-container"
     style="padding-bottom: 50px"
   >
-  <ng-container *ngIf="popupVisible">
-    <!-- Row 1: Voucher No & Date -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-2">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Voucher No</label
-        >
-      </div>
-      <div class="col-md-4">
-        <dx-text-box
-          [(value)]="eosFormData.VOUCHER_NO"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-        ></dx-text-box>
-      </div>
-      <div class="col-md-3 text-end">
-        <label class="form-label mb-0" style="font-size: 13px">Date</label>
-      </div>
-      <div class="col-md-3">
-        <dx-date-box
-          [(value)]="eosFormData.DOC_DATE"
-          displayFormat="dd-MM-yyyy"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-        ></dx-date-box>
-      </div>
-    </div>
-
-    <!-- Row 2: Employee -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-2">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Employee</label
-        >
-      </div>
-      <div class="col-md-10">
-        <dx-select-box
-          [dataSource]="EmployeeDropdown"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="eosFormData.EMP_ID"
-          (onValueChanged)="onEmployeeSelectionChanged($event)"
-          [readOnly]="isReadOnlyMode"
-          [searchEnabled]="true"
-          width="100%"
-        >
-          <dx-validator validationGroup="eosForm">
-            <dxi-validation-rule
-              type="required"
-              message="Employee is required"
-            ></dxi-validation-rule>
-          </dx-validator>
-        </dx-select-box>
-      </div>
-    </div>
-
-    <!-- Row 3: Reason & Doc No -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-2">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Reason</label
-        >
-      </div>
-      <div class="col-md-4">
-        <dx-select-box
-          [dataSource]="reson_data"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="eosFormData.REASON_ID"
-          [readOnly]="isReadOnlyMode"
-          [searchEnabled]="true"
-          width="100%"
-        ></dx-select-box>
-      </div>
-      <div class="col-md-3 text-end">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Doc No</label
-        >
-      </div>
-      <div class="col-md-3">
-        <dx-text-box
-          [(value)]="eosFormData.DOC_NO"
-          [readOnly]="isReadOnlyMode"
-          width="100%"
-        ></dx-text-box>
-      </div>
-    </div>
-
-    <!-- Columns Section -->
-    <div class="row">
-      <!-- Left Column -->
-      <div class="col-md-6">
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Join Date</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-date-box
-              [(value)]="eosFormData.DOJ"
-              displayFormat="dd-MM-yyyy"
-              [readOnly]="true"
-              width="100%"
-            ></dx-date-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px">Days</label>
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.WORKED_DAYS"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0"
-            ></dx-number-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label
-              class="form-label mb-0"
-              style="font-weight: bold; font-size: 13px"
-              >Total Service</label
-            >
-          </div>
-          <div class="col-md-6">
-            <dx-number-box
-              [(value)]="eosFormData.TOTAL_SERVICE_DAYS"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0"
-            ></dx-number-box>
-          </div>
-          <div class="col-md-2 p-0">
-            <span style="font-size: 13px">(Days)</span>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Un paid Leave</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.UNPAID_LEAVE"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0"
-            ></dx-number-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Additions</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.ADD_AMOUNT"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0.00"
-            ></dx-number-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Deductions</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.DED_AMOUNT"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0.00"
-            ></dx-number-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center mt-3">
-          <div class="col-md-4">
-            <label
-              class="form-label mb-0"
-              style="font-weight: bold; font-size: 13px"
-              >Net Amount</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.NET_AMOUNT"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0.00"
-            ></dx-number-box>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right Column -->
-      <div class="col-md-6">
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Last working day</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-date-box
-              [(value)]="eosFormData.EOS_DATE"
-              displayFormat="dd-MM-yyyy"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-            ></dx-date-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Pending Salary</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.PENDING_SALARY"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0.00"
-            ></dx-number-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >EOS Amount</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.EOS_AMOUNT"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0.00"
-            ></dx-number-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Unpaid Leave Salary</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-number-box
-              [(value)]="eosFormData.LEAVE_AMOUNT"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-              format="#,##0.00"
-            ></dx-number-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Remarks</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-text-box
-              [(value)]="eosFormData.ADD_REMARKS"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-            ></dx-text-box>
-          </div>
-        </div>
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-4">
-            <label class="form-label mb-0" style="font-size: 13px"
-              >Remarks</label
-            >
-          </div>
-          <div class="col-md-8">
-            <dx-text-box
-              [(value)]="eosFormData.DED_REMARKS"
-              [readOnly]="isReadOnlyMode"
-              width="100%"
-            ></dx-text-box>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Payment Details GroupBox -->
-    <fieldset class="border p-2 mt-3" style="border-radius: 5px">
-      <legend class="float-none w-auto mb-0 px-2" style="font-size: 14px">
-        Payment Details
-      </legend>
+    <ng-container *ngIf="popupVisible">
+      <!-- Row 1: Voucher No & Date -->
       <div class="row mb-2 align-items-center">
-        <div class="col-md-4 d-flex align-items-center">
-          <label class="form-label me-3 mb-0" style="font-size: 13px"
-            >Payment Mode</label
+        <div class="col-md-2">
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Voucher No</label
           >
-          <dx-radio-group
-            [items]="paymentModes"
-            displayExpr="text"
-            valueExpr="id"
-            [value]="eosFormData.PAY_TYPE_ID"
-            (onValueChanged)="onReceiptModeChange($event)"
-            layout="horizontal"
-            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-          ></dx-radio-group>
         </div>
-        <div class="col-md-8 d-flex align-items-center">
-          <label class="form-label me-3 mb-0" style="font-size: 13px"
-            >Ledger</label
+        <div class="col-md-4">
+          <dx-text-box
+            [(value)]="eosFormData.VOUCHER_NO"
+            [readOnly]="isReadOnlyMode"
+            width="100%"
+          ></dx-text-box>
+        </div>
+        <div class="col-md-3 text-end">
+          <label class="form-label mb-0" style="font-size: 13px">Date</label>
+        </div>
+        <div class="col-md-3">
+          <dx-date-box
+            [(value)]="eosFormData.DOC_DATE"
+            displayFormat="dd-MM-yyyy"
+            [readOnly]="isReadOnlyMode"
+            width="100%"
+          ></dx-date-box>
+        </div>
+      </div>
+
+      <!-- Row 2: Employee -->
+      <div class="row mb-2 align-items-center">
+        <div class="col-md-2">
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Employee</label
           >
+        </div>
+        <div class="col-md-10">
           <dx-select-box
-            [dataSource]="filteredLedgerList"
-            displayExpr="HEAD_NAME"
-            valueExpr="HEAD_ID"
-            [(value)]="eosFormData.PAY_HEAD_ID"
-            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
+            [dataSource]="EmployeeDropdown"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="eosFormData.EMP_ID"
+            (onValueChanged)="onEmployeeSelectionChanged($event)"
+            [readOnly]="isReadOnlyMode"
             [searchEnabled]="true"
             width="100%"
           >
-            <dx-validator validationGroup="eosForm" *ngIf="isApproveMode">
+            <dx-validator validationGroup="eosForm">
               <dxi-validation-rule
                 type="required"
-                message="Ledger is required"
+                message="Employee is required"
               ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
       </div>
 
-      <fieldset
-        class="border p-2 mt-2 mx-1"
-        style="border-radius: 5px"
-        *ngIf="eosFormData.PAY_TYPE_ID == 2"
-      >
-        <legend class="float-none w-auto mb-0 px-2" style="font-size: 12px">
-          Bank remittance details
-        </legend>
-        <div class="row">
-          <div class="col-md-6 d-flex align-items-center">
-            <label
-              class="form-label me-3 mb-0"
-              style="font-size: 13px; white-space: nowrap"
-              >Cheque No</label
-            >
-            <dx-text-box
-              [(value)]="eosFormData.CHEQUE_NO"
-              [readOnly]="
-                (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
-                eosFormData.PAY_TYPE_ID != 2
-              "
-              width="100%"
-            >
-              <dx-validator
-                validationGroup="eosForm"
-                *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+      <!-- Row 3: Reason & Doc No -->
+      <div class="row mb-2 align-items-center">
+        <div class="col-md-2">
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Reason</label
+          >
+        </div>
+        <div class="col-md-4">
+          <dx-select-box
+            [dataSource]="reson_data"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="eosFormData.REASON_ID"
+            [readOnly]="isReadOnlyMode"
+            [searchEnabled]="true"
+            width="100%"
+          ></dx-select-box>
+        </div>
+        <div class="col-md-3 text-end">
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Doc No</label
+          >
+        </div>
+        <div class="col-md-3">
+          <dx-text-box
+            [(value)]="eosFormData.DOC_NO"
+            [readOnly]="isReadOnlyMode"
+            width="100%"
+          ></dx-text-box>
+        </div>
+      </div>
+
+      <!-- Columns Section -->
+      <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-6">
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Join Date</label
               >
-                <dxi-validation-rule
-                  type="required"
-                  message="Reference No is required"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-text-box>
+            </div>
+            <div class="col-md-8">
+              <dx-date-box
+                [(value)]="eosFormData.DOJ"
+                displayFormat="dd-MM-yyyy"
+                [readOnly]="true"
+                width="100%"
+              ></dx-date-box>
+            </div>
           </div>
-          <div class="col-md-6 d-flex align-items-center">
-            <label
-              class="form-label me-3 mb-0"
-              style="font-size: 13px; white-space: nowrap"
-              >Due Date</label
-            >
-            <dx-date-box
-              [(value)]="eosFormData.CHEQUE_DATE"
-              displayFormat="dd-MM-yyyy"
-              [readOnly]="
-                (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
-                eosFormData.PAY_TYPE_ID != 2
-              "
-              width="100%"
-            >
-              <dx-validator
-                validationGroup="eosForm"
-                *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Days</label
               >
-                <dxi-validation-rule
-                  type="required"
-                  message="Date is required"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-date-box>
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.WORKED_DAYS"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0"
+              ></dx-number-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label
+                class="form-label mb-0"
+                style="font-weight: bold; font-size: 13px"
+                >Total Service</label
+              >
+            </div>
+            <div class="col-md-6">
+              <dx-number-box
+                [(value)]="eosFormData.TOTAL_SERVICE_DAYS"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0"
+              ></dx-number-box>
+            </div>
+            <div class="col-md-2 p-0">
+              <span style="font-size: 13px">(Days)</span>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Un paid Leave</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.UNPAID_LEAVE"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0"
+              ></dx-number-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Additions</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.ADD_AMOUNT"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0.00"
+              ></dx-number-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Deductions</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.DED_AMOUNT"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0.00"
+              ></dx-number-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center mt-3">
+            <div class="col-md-4">
+              <label
+                class="form-label mb-0"
+                style="font-weight: bold; font-size: 13px"
+                >Net Amount</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.NET_AMOUNT"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0.00"
+              ></dx-number-box>
+            </div>
           </div>
         </div>
+
+        <!-- Right Column -->
+        <div class="col-md-6">
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Last working day</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-date-box
+                [(value)]="eosFormData.EOS_DATE"
+                displayFormat="dd-MM-yyyy"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+              ></dx-date-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Pending Salary</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.PENDING_SALARY"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0.00"
+              ></dx-number-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >EOS Amount</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.EOS_AMOUNT"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0.00"
+              ></dx-number-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Unpaid Leave Salary</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-number-box
+                [(value)]="eosFormData.LEAVE_AMOUNT"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+                format="#,##0.00"
+              ></dx-number-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Remarks</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-text-box
+                [(value)]="eosFormData.ADD_REMARKS"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+              ></dx-text-box>
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-md-4">
+              <label class="form-label mb-0" style="font-size: 13px"
+                >Remarks</label
+              >
+            </div>
+            <div class="col-md-8">
+              <dx-text-box
+                [(value)]="eosFormData.DED_REMARKS"
+                [readOnly]="isReadOnlyMode"
+                width="100%"
+              ></dx-text-box>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Details GroupBox -->
+      <fieldset class="border p-2 mt-3" style="border-radius: 5px">
+        <legend class="float-none w-auto mb-0 px-2" style="font-size: 14px">
+          Payment Details
+        </legend>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-4 d-flex align-items-center">
+            <label class="form-label me-3 mb-0" style="font-size: 13px"
+              >Payment Mode</label
+            >
+            <dx-radio-group
+              [items]="paymentModes"
+              displayExpr="text"
+              valueExpr="id"
+              [value]="eosFormData.PAY_TYPE_ID"
+              (onValueChanged)="onReceiptModeChange($event)"
+              layout="horizontal"
+              [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
+            ></dx-radio-group>
+          </div>
+          <div class="col-md-8 d-flex align-items-center">
+            <label class="form-label me-3 mb-0" style="font-size: 13px"
+              >Ledger</label
+            >
+            <dx-select-box
+              [dataSource]="filteredLedgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="eosFormData.PAY_HEAD_ID"
+              [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
+              [searchEnabled]="true"
+              width="100%"
+            >
+              <dx-validator validationGroup="eosForm" *ngIf="isApproveMode">
+                <dxi-validation-rule
+                  type="required"
+                  message="Ledger is required"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+          </div>
+        </div>
+
+        <fieldset
+          class="border p-2 mt-2 mx-1"
+          style="border-radius: 5px"
+          *ngIf="eosFormData.PAY_TYPE_ID == 2"
+        >
+          <legend class="float-none w-auto mb-0 px-2" style="font-size: 12px">
+            Bank remittance details
+          </legend>
+          <div class="row">
+            <div class="col-md-6 d-flex align-items-center">
+              <label
+                class="form-label me-3 mb-0"
+                style="font-size: 13px; white-space: nowrap"
+                >Cheque No</label
+              >
+              <dx-text-box
+                [(value)]="eosFormData.CHEQUE_NO"
+                [readOnly]="
+                  (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
+                  eosFormData.PAY_TYPE_ID != 2
+                "
+                width="100%"
+              >
+                <dx-validator
+                  validationGroup="eosForm"
+                  *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Reference No is required"
+                  ></dxi-validation-rule>
+                </dx-validator>
+              </dx-text-box>
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+              <label
+                class="form-label me-3 mb-0"
+                style="font-size: 13px; white-space: nowrap"
+                >Due Date</label
+              >
+              <dx-date-box
+                [(value)]="eosFormData.CHEQUE_DATE"
+                displayFormat="dd-MM-yyyy"
+                [readOnly]="
+                  (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
+                  eosFormData.PAY_TYPE_ID != 2
+                "
+                width="100%"
+              >
+                <dx-validator
+                  validationGroup="eosForm"
+                  *ngIf="isApproveMode && eosFormData.PAY_TYPE_ID == 2"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Date is required"
+                  ></dxi-validation-rule>
+                </dx-validator>
+              </dx-date-box>
+            </div>
+          </div>
+        </fieldset>
       </fieldset>
-    </fieldset>
 
-    <!-- Narration -->
-    <div class="row mt-3 mb-2 align-items-center">
-      <div class="col-md-2">
-        <label class="form-label mb-0" style="font-size: 13px">Narration</label>
+      <!-- Narration -->
+      <div class="row mt-3 mb-2 align-items-center">
+        <div class="col-md-2">
+          <label class="form-label mb-0" style="font-size: 13px"
+            >Narration</label
+          >
+        </div>
+        <div class="col-md-10">
+          <dx-text-box
+            [(value)]="eosFormData.NARRATION"
+            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
+            width="100%"
+          ></dx-text-box>
+        </div>
       </div>
-      <div class="col-md-10">
-        <dx-text-box
-          [(value)]="eosFormData.NARRATION"
-          [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-          width="100%"
-        ></dx-text-box>
-      </div>
-    </div>
 
-    <!-- Footer Buttons -->
-    <div
-      class="d-flex justify-content-end align-items-end p-2"
-      style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px"
-    >
-      <div class="d-flex me-2">
-        <dx-button
-          text="Cancel"
-          icon=""
-          type="normal"
-          stylingMode="outlined"
-          (onClick)="handleClose()"
-          class="me-2"
-        ></dx-button>
-        <dx-button
-          text="Save"
-          icon=""
-          type="default"
-          stylingMode="outlined"
-          validationGroup="eosForm"
-          class="me-2"
-          (onClick)="onSave($event)"
-          *ngIf="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
-        ></dx-button>
-        <dx-button
-          text="Verify"
-          icon=""
-          stylingMode="outlined"
-          type="default"
-          validationGroup="eosForm"
-          class="me-2"
-          (onClick)="onVerify($event)"
-          *ngIf="isVerifyMode"
-        ></dx-button>
-        <dx-button
-          text="Approve"
-          icon=""
-          stylingMode="outlined"
-          type="default"
-          validationGroup="eosForm"
-          class="me-2"
-          (onClick)="onApprove($event)"
-          *ngIf="isApproveMode"
-        ></dx-button>
+      <!-- Footer Buttons -->
+      <div
+        class="d-flex justify-content-end align-items-end p-2"
+        style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px"
+      >
+        <div class="d-flex me-2">
+          <dx-button
+            text="Cancel"
+            icon=""
+            type="normal"
+            stylingMode="outlined"
+            (onClick)="handleClose()"
+            class="me-2"
+          ></dx-button>
+          <dx-button
+            text="Save"
+            icon=""
+            type="default"
+            stylingMode="outlined"
+            validationGroup="eosForm"
+            class="me-2"
+            (onClick)="onSave($event)"
+            *ngIf="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
+          ></dx-button>
+          <dx-button
+            text="Verify"
+            icon=""
+            stylingMode="outlined"
+            type="default"
+            validationGroup="eosForm"
+            class="me-2"
+            (onClick)="onVerify($event)"
+            *ngIf="isVerifyMode"
+          ></dx-button>
+          <dx-button
+            text="Approve"
+            icon=""
+            stylingMode="outlined"
+            type="default"
+            validationGroup="eosForm"
+            class="me-2"
+            (onClick)="onApprove($event)"
+            *ngIf="isApproveMode"
+          ></dx-button>
+        </div>
       </div>
-    </div>
     </ng-container>
   </div>
 </dx-popup>
