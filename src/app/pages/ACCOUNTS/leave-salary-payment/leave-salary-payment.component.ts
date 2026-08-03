@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -52,43 +53,19 @@ export class LeaveSalaryPaymentComponent implements OnInit {
 
   // Toolbar options
   dateRanges = [
-    {
-      label: 'All',
-      value: 'all',
-    },
-    {
-      label: 'Today',
-      value: 'today',
-    },
-    {
-      label: 'Yesterday',
-      value: 'yesterday',
-    },
-    {
-      label: 'This Week',
-      value: 'week',
-    },
-    {
-      label: 'This Month',
-      value: 'month',
-    },
-    {
-      label: 'Custom',
-      value: 'custom',
-    },
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
   ];
-  selectedRange: string = 'all';
-  dateRangeOptions = {
-    dataSource: this.dateRanges,
-    displayExpr: 'label',
-    valueExpr: 'value',
-    value: this.selectedRange,
-    placeholder: 'Date Range',
-    onValueChanged: (e: any) => {
-      this.selectedRange = e.value;
-      this.getLeavePaymentList();
-    },
-  };
+
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup = false;
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -115,6 +92,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
      `;
     },
   };
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -124,6 +102,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     onClick: () => this.getLeavePaymentList(),
     text: '',
   };
+  
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -212,7 +191,9 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     STATUS_DESC: 'Open',
     TRANS_STATUS: 1,
   };
-  
+
+  isRevertingEmployee = false;
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -292,14 +273,133 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     }
   }
 
-  getLeavePaymentList() {
-    const fromDateStr = new Date().toISOString().split('T')[0]; // Adjust as needed
-    const toDateStr = new Date().toISOString().split('T')[0];
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+    if (e.value === 'custom') {
+      this.showCustomDatePopup = true;
+      return;
+    }
+    this.getLeavePaymentList(e.value);
+  }
+
+  applyCustomDateFilter() {
+    if (!(this.customStartDate && this.customEndDate)) return;
+    const fromLabel = this.formatAsDDMMYYYY(this.customStartDate);
+    const toLabel = this.formatAsDDMMYYYY(this.customEndDate);
+    this.dateRanges = this.dateRanges.map((opt) =>
+      opt.value === 'custom'
+        ? { ...opt, label: `${fromLabel} - ${toLabel}` }
+        : opt,
+    );
+    this.selectedDateRange = 'custom';
+    this.showCustomDatePopup = false;
+    this.getLeavePaymentList('custom');
+  }
+
+  private getDateRangePayload(range: string) {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+    switch (range) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+    }
+    return {
+      DATE_FROM: fromDate ? this.formatAsYYYYMMDD(fromDate) : null,
+      DATE_TO: toDate ? this.formatAsYYYYMMDD(toDate) : null,
+    };
+  }
+
+  private formatAsYYYYMMDD(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const dd = date.getDate().toString().padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private formatAsDDMMYYYY(date: Date): string {
+    const dd = date.getDate().toString().padStart(2, '0');
+    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} - ${to}`;
+    }
+    return item.label;
+  };
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component?._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+      if (innerList) {
+        innerList.off('itemClick');
+        innerList.on('itemClick', (clickEvent: any) => {
+          if (clickEvent.itemData.value === 'custom') {
+            this.customStartDate = null;
+            this.customEndDate = null;
+            this.showCustomDatePopup = true;
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
+
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+    this.applyCustomDateFilter();
+  }
+
+  getLeavePaymentList(range: string = this.selectedDateRange) {
+    const datePayload = this.getDateRangePayload(range);
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
-      DATE_FROM: fromDateStr,
-      // Hardcoded for demo, normally from date ranges
-      DATE_TO: toDateStr,
+      DATE_FROM: datePayload.DATE_FROM,
+      DATE_TO: datePayload.DATE_TO,
     };
     this.isLoading = true;
     if (this.dataGrid && this.dataGrid.instance) {
@@ -337,9 +437,64 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     });
   }
 
+  clearDependentFields() {
+    this.leaveFormData.LEAVE_CREDIT = 0;
+    this.leaveFormData.BASIC_PAY = 0;
+    this.leaveFormData.ALLOWANCES = 0;
+    this.leaveFormData.LEAVE_TYPE = 1;
+    this.leaveFormData.VACATION_ID = null;
+    this.leaveFormData.VACATION_DOC_NO = '';
+    this.leaveFormData.VACATION_DEPT_DATE = null;
+    this.leaveFormData.VACATION_DAYS = 0;
+    this.leaveFormData.VACATION_SALARY = 0;
+    this.leaveFormData.LEAVE_DAYS = 0;
+    this.leaveFormData.LEAVE_SALARY = 0;
+    this.leaveFormData.TOTAL_DAYS = 0;
+    this.leaveFormData.TOTAL_PAID = 0;
+    this.leaveFormData.PAY_TYPE_ID = 1;
+    this.leaveFormData.PAY_HEAD_ID = null;
+    this.leaveFormData.CHEQUE_NO = '';
+    this.leaveFormData.CHEQUE_DATE = new Date();
+    this.leaveFormData.NARRATION = '';
+  }
+
   onFetchEmployeeDetails(e?: any) {
+    if (this.isRevertingEmployee) {
+      this.isRevertingEmployee = false;
+      return;
+    }
     if (e && (!e.value || !e.event)) return;
     if (!this.leaveFormData.EMP_ID) return;
+
+    const hasEnteredData =
+      this.leaveFormData.LEAVE_DAYS > 0 ||
+      this.leaveFormData.PAY_HEAD_ID ||
+      this.leaveFormData.CHEQUE_NO ||
+      this.leaveFormData.NARRATION ||
+      (this.leaveFormData.LEAVE_TYPE === 2 && this.leaveFormData.VACATION_ID);
+
+    if (e && e.previousValue && hasEnteredData) {
+      confirm(
+        'Changing the employee will clear all entered fields. Are you sure?',
+        'Confirm',
+      ).then((res) => {
+        if (res) {
+          this.clearDependentFields();
+          this.fetchEmployeeData();
+        } else {
+          this.isRevertingEmployee = true;
+          this.leaveFormData.EMP_ID = e.previousValue;
+        }
+      });
+    } else {
+      if (e && e.previousValue) {
+        this.clearDependentFields();
+      }
+      this.fetchEmployeeData();
+    }
+  }
+
+  fetchEmployeeData() {
     this.isLoading = true;
     const payload = {
       EMP_ID: this.leaveFormData.EMP_ID,
@@ -354,9 +509,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
           this.leaveFormData.LEAVE_CREDIT = emp.LEAVE_CREDIT || 0;
           this.leaveFormData.BASIC_PAY = emp.BASIC_PAY || 0;
           this.leaveFormData.ALLOWANCES = emp.ALLOWANCES || 0;
-          // notify('Employee details fetched', 'success', 1000);
         }
-        // Fetch vacation list for the dropdown
         const vacPayload = {
           EMP_ID: this.leaveFormData.EMP_ID,
         };
@@ -460,19 +613,16 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     this.leaveFormData.TOTAL_PAID = vacSalary + leaveSalary;
   }
 
-  onLeaveDaysChanged(e: any) {
-    this.calculateTotals();
-
-    // Only process if it's a user action
-    if (!e || !e.event) return;
-    if (!this.leaveFormData.EMP_ID || !this.leaveFormData.LEAVE_DAYS) {
+  onTotalDaysChanged(e: any) {
+    if (!this.leaveFormData.EMP_ID || !this.leaveFormData.TOTAL_DAYS) {
       this.leaveFormData.LEAVE_SALARY = 0;
       this.calculateTotals();
       return;
     }
     const payload = {
       EMP_ID: this.leaveFormData.EMP_ID,
-      LEAVE_DAYS: this.leaveFormData.LEAVE_DAYS,
+      LEAVE_DAYS: this.leaveFormData.TOTAL_DAYS,
+      PAYMENT_DATE: this.formatAsYYYYMMDD(new Date()),
     };
     this.dataService.get_calculated_leave_salary(payload).subscribe({
       next: (res: any) => {
@@ -540,6 +690,19 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     if (res.CHEQUE_NO) this.leaveFormData.CHEQUE_NO = res.CHEQUE_NO;
     if (res.CHEQUE_DATE)
       this.leaveFormData.CHEQUE_DATE = new Date(res.CHEQUE_DATE);
+
+    if (this.leaveFormData.VACATION_ID) {
+      this.dataService.get_leave_salary_vacation_details({ VACATION_ID: this.leaveFormData.VACATION_ID }).subscribe({
+        next: (vacRes: any) => {
+          if (vacRes) {
+            const vac = Array.isArray(vacRes) && vacRes.length > 0 ? vacRes[0] : vacRes;
+            this.leaveFormData.VACATION_DOC_NO = vac.DOC_NO || vac.VACATION_DOC_NO;
+            this.leaveFormData.VACATION_DEPT_DATE = vac.DEPT_DATE ? new Date(vac.DEPT_DATE) : null;
+          }
+        },
+        error: () => {}
+      });
+    }
   }
 
   onEditingStart(e: any) {
@@ -796,6 +959,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     DxLoadPanelModule,
     DxRadioGroupModule,
     DxDropDownBoxModule,
+    CustomDatePopupModule,
   ],
   declarations: [LeaveSalaryPaymentComponent],
   exports: [LeaveSalaryPaymentComponent],
