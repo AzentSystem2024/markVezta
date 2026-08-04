@@ -540,7 +540,7 @@
             </dxi-item>
           </dxi-item>
         </dxi-tab>
-        <dxi-tab title="Alias" *ngIf="itemData.TYPE_ID != 2">
+        <dxi-tab title="Alias" *ngIf="!isServiceItem">
           <dxi-item itemType="group" [colCount]="1">
             <dxi-item>
               <dx-data-grid
@@ -594,6 +594,7 @@
                   [inputAttr]="{ style: 'text-align: right;' }"
                   [(value)]="itemData.COST"
                   [width]="200"
+                  [readOnly]="!hideCost"
                 ></dx-number-box>
               </div>
               <div class="inventory-item">
@@ -783,7 +784,7 @@
           </div>
         </dxi-tab>
 
-        <dxi-tab title="Stores" *ngIf="itemData.TYPE_ID != 2">
+        <dxi-tab title="Stores" *ngIf="!isServiceItem">
           <dxi-item>
             <dx-data-grid
               class="grid theme-dependent stores-grid"
@@ -901,7 +902,7 @@
           </dxi-item>
         </dxi-tab>
 
-        <dxi-tab title="Special" *ngIf="itemData.TYPE_ID != 2">
+        <dxi-tab title="Special" *ngIf="!isServiceItem">
           <dxi-item itemType="group" [colSpan]="2">
             <div class="container">
               <!-- Special Container -->
@@ -1122,10 +1123,7 @@
           </dxi-item>
         </dxi-tab>
 
-        <dxi-tab
-          title="Supplier"
-          *ngIf="showSupplierTab && itemData.TYPE_ID != 2"
-        >
+        <dxi-tab title="Supplier" *ngIf="!isServiceItem">
           <dxi-item>
             <dx-data-grid
               class="grid theme-dependent stores-grid"

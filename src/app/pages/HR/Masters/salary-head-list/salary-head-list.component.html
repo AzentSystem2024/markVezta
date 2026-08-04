@@ -54,11 +54,7 @@
       <dxo-scrolling mode="standard"></dxo-scrolling>
 
       <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
-      <dxo-export
-        [enabled]="true"
-        [formats]="['xlsx',]"
-      >
-      </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-header-filter
         [visible]="isFilterRowVisible"
         [search]="{ enabled: true }"
@@ -73,13 +69,18 @@
       ></dxo-search-panel>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="
-            font-weight: 600;
-            font-size: 20px;
-            margin-left: 12px;
-            padding: -3px;
-            margin-right: 3px;
-          ">Salary Head</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Salary Head
+          </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
@@ -97,11 +98,11 @@
           [options]="refreshButtonOptions"
         ></dxi-item>
 
-         <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
-      
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"
@@ -144,7 +145,6 @@
 
     <dx-popup
       [(visible)]="addSalaryHeadPopupOpened"
-      [width]="'90vw'"
       [height]="'auto'"
       title="Add Salary Head"
       (onHiding)="handleEditClose()"
@@ -158,7 +158,6 @@
 </div>
 <dx-popup
   [(visible)]="EditSalaryHeadPopupOpened"
-  [width]="'90vw'"
   [height]="'auto'"
   title="Edit Salary Head"
   (onHiding)="handleEditClose()"

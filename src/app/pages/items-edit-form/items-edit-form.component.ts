@@ -191,6 +191,15 @@ export class ItemsEditFormComponent implements OnInit {
   public costingMethodOptions: any[] = [];
   packing: any[] = [];
 
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  hideCost = false;
+
+
   item_alias: any[] = [
     {
       ALIAS: '',
@@ -215,6 +224,10 @@ export class ItemsEditFormComponent implements OnInit {
   selectedRowKeys: number[] = [];
   checkedStoreIDs: number[] = [];
   salePrice: any;
+
+  get isServiceItem(): boolean {
+    return this.itemData?.TYPE_ID === 2;
+  }
 
   formItemsData: any = {
     ID: '',
@@ -775,6 +788,25 @@ export class ItemsEditFormComponent implements OnInit {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+      this.hideCost = packingRights.HideCost;
+    }
+
     this.companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as { data: any };

@@ -526,5 +526,5 @@ export class ItemsListComponent implements OnInit {
   bootstrap: [ItemsListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsListModule {}
+export class ItemsListModule { }
 platformBrowserDynamic().bootstrapModule(ItemsListModule);
