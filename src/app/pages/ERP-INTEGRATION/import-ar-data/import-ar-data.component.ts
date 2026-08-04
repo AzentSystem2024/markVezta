@@ -21,6 +21,7 @@ import {
   DxPopupModule,
   DxTextBoxModule,
   DxValidatorModule,
+  DxRadioGroupModule,
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { DepartmentFormModule } from 'src/app/components/library/department-form/department-form.component';
@@ -52,6 +53,12 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
 
   uploadedFileName: string = '';
+  
+  isOverWrite: boolean = false;
+  overwriteOptions = [
+    { text: 'Import Only new records', value: false },
+    { text: 'Overwrite existing records', value: true },
+  ];
 
   importLogs: DataSource | null = null;
   arDataImportedList: any[] = [];
@@ -583,7 +590,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
       return;
     }
     const currentChunk = chunks[index];
-    this.srvce.import_AR_Data(batchNo, fileName, currentChunk).subscribe({
+    this.srvce.import_AR_Data(batchNo, fileName, currentChunk, this.isOverWrite).subscribe({
       next: (response: any) => {
         // API Success
         if (response?.flag === '1') {
@@ -752,6 +759,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
     ReactiveFormsModule,
     DxValidatorModule,
     DxLoadPanelModule,
+    DxRadioGroupModule,
   ],
   providers: [],
   declarations: [ImportArDataComponent],

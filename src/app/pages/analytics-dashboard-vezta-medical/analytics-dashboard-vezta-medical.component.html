@@ -3,18 +3,24 @@
     label="Date Range"
     labelMode="floating"
     valueExpr="value"
-    displayExpr="label"
+    [displayExpr]="displayExpr"
     [dataSource]="dateRanges"
     [searchEnabled]="true"
     [(value)]="selectedDateRange"
     (onValueChanged)="onDateRangeChange($event)"
+    (onOpened)="attachItemClickHandler($event)"
+    width="220"
   >
+    <!-- This controls the dropdown list rendering -->
+    <div *dxTemplate="let item of 'item'">
+      {{ item.value === "custom" ? "Custom" : item.label }}
+    </div>
   </dx-select-box>
 </div>
 
 <div class="view-wrapper">
   <div class="dashboard-wrapper">
-    <!-- Row 1: Facility Wise (Pie Chart) -->
+    <!-- Row 1: Facility Wise & Income Group -->
     <div class="dashboard-row">
       <div class="dashboard-card">
         <h6 class="card-title mt-2 mb-2">Facility Wise Revenue</h6>
@@ -42,11 +48,8 @@
           ></dxo-tooltip>
         </dx-pie-chart>
       </div>
-    </div>
 
-    <!-- Row 2: Income Group (Column Chart) -->
-    <div class="dashboard-row">
-      <div class="dashboard-card full-width">
+      <div class="dashboard-card">
         <h6 class="card-title mt-2 mb-2">Income Group Wise Revenue (Top 10)</h6>
         
         <dx-chart [dataSource]="incomeGroupData" palette="soft">
@@ -82,9 +85,9 @@
       </div>
     </div>
 
-    <!-- Row 3: Department Wise (Column Chart) -->
+    <!-- Row 2: Department Wise & Category Wise -->
     <div class="dashboard-row">
-      <div class="dashboard-card full-width">
+      <div class="dashboard-card">
         <h6 class="card-title mt-2 mb-2">Department Wise Revenue (Top 10)</h6>
         
         <dx-chart [dataSource]="departmentWiseData" palette="ocean">
@@ -118,11 +121,8 @@
           <dxo-legend [visible]="false"></dxo-legend>
         </dx-chart>
       </div>
-    </div>
 
-    <!-- Row 4: Category Wise (Column Chart) -->
-    <div class="dashboard-row">
-      <div class="dashboard-card full-width">
+      <div class="dashboard-card">
         <h6 class="card-title mt-2 mb-2">Category Wise Revenue (Top 10)</h6>
         
         <dx-chart [dataSource]="categoryWiseData" palette="pastel">
@@ -158,7 +158,7 @@
       </div>
     </div>
 
-    <!-- Row 5: Month Wise (Line Chart) -->
+    <!-- Row 3: Month Wise (Line Chart) -->
     <div class="dashboard-row">
       <div class="dashboard-card-Tender">
         <h6 class="card-title mt-2 mb-2">Month Wise Revenue (By Facility)</h6>
@@ -212,3 +212,10 @@
     
   </div>
 </div>
+
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="applyCustomDateFilter($event)"
+></app-custom-date-popup>

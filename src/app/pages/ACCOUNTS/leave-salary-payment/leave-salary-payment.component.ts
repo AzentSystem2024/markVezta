@@ -102,7 +102,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     onClick: () => this.getLeavePaymentList(),
     text: '',
   };
-  
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -691,16 +691,24 @@ export class LeaveSalaryPaymentComponent implements OnInit {
       this.leaveFormData.CHEQUE_DATE = new Date(res.CHEQUE_DATE);
 
     if (this.leaveFormData.VACATION_ID) {
-      this.dataService.get_leave_salary_vacation_details({ VACATION_ID: this.leaveFormData.VACATION_ID }).subscribe({
-        next: (vacRes: any) => {
-          if (vacRes) {
-            const vac = Array.isArray(vacRes) && vacRes.length > 0 ? vacRes[0] : vacRes;
-            this.leaveFormData.VACATION_DOC_NO = vac.DOC_NO || vac.VACATION_DOC_NO;
-            this.leaveFormData.VACATION_DEPT_DATE = vac.DEPT_DATE ? new Date(vac.DEPT_DATE) : null;
-          }
-        },
-        error: () => {}
-      });
+      this.dataService
+        .get_leave_salary_vacation_details({
+          VACATION_ID: this.leaveFormData.VACATION_ID,
+        })
+        .subscribe({
+          next: (vacRes: any) => {
+            if (vacRes) {
+              const vac =
+                Array.isArray(vacRes) && vacRes.length > 0 ? vacRes[0] : vacRes;
+              this.leaveFormData.VACATION_DOC_NO =
+                vac.DOC_NO || vac.VACATION_DOC_NO;
+              this.leaveFormData.VACATION_DEPT_DATE = vac.DEPT_DATE
+                ? new Date(vac.DEPT_DATE)
+                : null;
+            }
+          },
+          error: () => {},
+        });
     }
   }
 

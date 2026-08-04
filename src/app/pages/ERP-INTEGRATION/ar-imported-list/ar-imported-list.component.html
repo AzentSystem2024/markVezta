@@ -24,7 +24,9 @@
       *ngFor="let col of detailViewColumns"
       [dataField]="col"
       [caption]="col"
-      [visible]="col !== 'HeaderID' && col !== 'AcTranID' && col !== 'AcTransID'"
+      [visible]="
+        col !== 'HeaderID' && col !== 'AcTranID' && col !== 'AcTransID'
+      "
       [width]="col === 'Status' ? 'auto' : 150"
       [fixed]="col === 'FailureReason' || col === 'Status'"
       [fixedPosition]="'right'"
@@ -270,19 +272,31 @@
         [height]="'50vh'"
       >
         <dxi-column dataField="ErrorMessage" caption="Particulars"></dxi-column>
-        <dxi-column dataField="MissingCount" caption="Missing Count" alignment="center"></dxi-column>
-        <dxi-column caption="Download" cellTemplate="downloadTemplate" alignment="center" [width]="100"></dxi-column>
+        <dxi-column
+          dataField="MissingCount"
+          caption="Missing Count"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          caption="Download"
+          cellTemplate="downloadTemplate"
+          alignment="center"
+          [width]="100"
+        ></dxi-column>
 
         <div *dxTemplate="let cell of 'downloadTemplate'">
           <dx-button
-            *ngIf="hasMissingData(cell.data.Particular) && !cell.data.ErrorMessage?.toLowerCase().includes('mandatory')"
+            *ngIf="
+              hasMissingData(cell.data.Particular) &&
+              !cell.data.ErrorMessage?.toLowerCase().includes('mandatory') &&
+              !cell.data.ErrorMessage?.toLowerCase().includes('referencedocnumber')
+            "
             icon="export"
             type="normal"
             hint="Download Missing Data"
             (onClick)="downloadMissingParticulars(cell.data.Particular)"
           ></dx-button>
         </div>
-
       </dx-data-grid>
     </div>
   </dx-popup>
