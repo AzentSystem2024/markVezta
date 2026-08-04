@@ -203,7 +203,7 @@ import { BalanceSheetDimensionComponent } from './pages/ERP-INTEGRATION/balance-
 import { ARReportPageComponent } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
 import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-list.component';
 import { CustomerReceiptsComponent } from './pages/Operations/customer-receipts/customer-receipts.component';
-import { InvoiceTrOutComponent } from './pages/OPERATIONS/invoice-tr-out/invoice-tr-out.component';
+import { InvoiceTrOutComponent } from './pages/Operations/invoice-tr-out/invoice-tr-out.component';
 import { PurchaseInvoiceListComponent } from './pages/Operations/purchase-invoice-list/purchase-invoice-list.component';
 import { ARManualMatchingComponent } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
 import { TrialBalanceDimensionAdvanceComponent } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
@@ -217,10 +217,7 @@ import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchas
 import { TimesheetReportComponent } from './pages/HR/timesheet-report/timesheet-report.component';
 import { PayrollReportComponent } from './pages/REPORT/payroll-report/payroll-report.component';
 import { PayrollOtReportComponent } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
-import {
-  LeavelistComponent,
-  LeavelistModule,
-} from './pages/REPORT/leavelist/leavelist.component';
+import { LeavelistComponent } from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 import { EosPaymentListComponent } from './pages/HR/Masters/eos-payment-list/eos-payment-list.component';
 import { LeaveSalaryPaymentComponent } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
