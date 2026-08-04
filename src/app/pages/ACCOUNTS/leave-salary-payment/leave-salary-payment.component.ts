@@ -589,8 +589,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
               : null;
             this.leaveFormData.VACATION_DAYS =
               vac.VAC_DAYS || vac.VACATION_DAYS || 0;
-            this.leaveFormData.VACATION_SALARY =
-              vac.LS_PAYABLE || vac.VACATION_SALARY || 0;
+            this.leaveFormData.VACATION_SALARY = 0;
             this.calculateTotals();
           }
         },
@@ -608,9 +607,9 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     const vacDays = this.leaveFormData.VACATION_DAYS || 0;
     const leaveDays = this.leaveFormData.LEAVE_DAYS || 0;
     this.leaveFormData.TOTAL_DAYS = vacDays + leaveDays;
-    const vacSalary = this.leaveFormData.VACATION_SALARY || 0;
+    // const vacSalary = this.leaveFormData.VACATION_SALARY || 0;
     const leaveSalary = this.leaveFormData.LEAVE_SALARY || 0;
-    this.leaveFormData.TOTAL_PAID = vacSalary + leaveSalary;
+    this.leaveFormData.TOTAL_PAID = leaveSalary;
   }
 
   onTotalDaysChanged(e: any) {
