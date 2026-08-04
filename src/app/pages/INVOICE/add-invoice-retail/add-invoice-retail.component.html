@@ -20,15 +20,17 @@
         margin-right: 20px;
       "
     >
+      <!-- ROW 1 -->
       <div
         style="
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          gap: 10px;
+          margin-top: 15px;
         "
       >
-        <div style="display: flex; gap: 10px; margin-top: 15px">
+        <!-- Left -->
+        <div style="display: flex; gap: 10px">
           <dx-date-box
             label="Date"
             type="date"
@@ -44,32 +46,53 @@
             label="Doc No. *"
             labelMode="floating"
             [(value)]="invoiceFormData.DOC_NO"
-            [readOnly]="true"
             [width]="200"
+            [readOnly]="true"
           >
           </dx-text-box>
         </div>
-        <!--  -->
+
+        <!-- Right -->
+        <div style="display: flex; align-items: flex-end; gap: 8px">
+          <dx-select-box
+            [dataSource]="customerList"
+            [(value)]="invoiceFormData.CUSTOMER_ID"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [width]="300"
+            label="Customer"
+            labelMode="floating"
+            [readOnly]="isEditing"
+            (onValueChanged)="onCustomerChanged($event)"
+          >
+          </dx-select-box>
+
+          <dx-button
+            icon="plus"
+            stylingMode="contained"
+            type="default"
+            [visible]="!isReadOnlyMode"
+            (onClick)="onAddRow()"
+          >
+          </dx-button>
+        </div>
       </div>
+
+      <!-- ROW 2 -->
       <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 10px;
-          width: 100%;
-        "
+        style="display: flex; justify-content: space-between; margin-top: 10px"
       >
-        <!-- LEFT SIDE -->
+        <!-- Left -->
         <div style="display: flex; gap: 10px">
           <dx-text-box
             label="Reference No."
             labelMode="floating"
             [(value)]="invoiceFormData.REF_NO"
-            [readOnly]="isReadOnlyMode"
             [width]="200"
+            [readOnly]="isReadOnlyMode"
           >
           </dx-text-box>
+
           <dx-select-box
             [dataSource]="filteredStoreList"
             [(value)]="invoiceFormData.STORE_ID"
@@ -84,28 +107,43 @@
           </dx-select-box>
         </div>
 
-        <!-- RIGHT SIDE -->
+        <!-- Right -->
         <div style="display: flex; align-items: flex-end; gap: 8px">
-          <dx-select-box
-            [dataSource]="customerList"
-            [(value)]="invoiceFormData.CUSTOMER_ID"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [width]="370"
-            label="Customer"
+          <dx-text-box
+            [(value)]="invoiceFormData.SALESMAN"
+            [width]="300"
+            label="Salesman"
             labelMode="floating"
-            [readOnly]="isEditing"
+            [readOnly]="true"
           >
-          </dx-select-box>
+          </dx-text-box>
           <dx-button
-            icon="plus"
+            [width]="180"
+            class="blue-outline-btn"
+            (onClick)="openDeliveryNotePopup()"
+            [disabled]="!invoiceFormData.CUSTOMER_ID"
+          >
+            <div *dxTemplate="let data of 'content'">
+              <div style="display: flex; align-items: center; gap: 6px">
+                <span
+                  class="iconify"
+                  data-icon="mingcute:time-line"
+                  data-width="20"
+                  data-height="20"
+                ></span>
+                <span>Pending Deliveries</span>
+              </div>
+            </div>
+          </dx-button>
+          <!-- <dx-button
+            text="Delivery Note"
+            icon="selectall"
             stylingMode="contained"
             type="default"
             [visible]="!isReadOnlyMode"
-            (onClick)="onAddRow()"
-            hint="Add Row"
+            (onClick)="openDeliveryNotePopup()"
           >
-          </dx-button>
+          </dx-button> -->
         </div>
       </div>
     </div>
@@ -144,6 +182,14 @@
         >
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
+          <dxi-column
+            dataField="DN_NO"
+            caption="Delivery No"
+            [calculateCellValue]="getDeliveryNo"
+            [allowEditing]="false"
+            width="120"
+          >
+          </dxi-column>
           <dxi-column
             dataField="ITEM_ID"
             caption="Item ID"
@@ -218,6 +264,7 @@
           <dxi-column
             dataField="QTY_STOCK"
             caption="Stock Qty"
+            [calculateCellValue]="calculateStockQty"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -405,12 +452,16 @@
           #saveButtonRef
           [text]="
             isSaving
-              ? invoiceFormData.IS_APPROVED
-                ? 'Committing...'
-                : 'Saving...'
-              : invoiceFormData.IS_APPROVED
-                ? 'Save'
-                : 'Save'
+              ? isApproveMode
+                ? 'Approving...'
+                : isVerifyMode
+                  ? 'Verifying...'
+                  : 'Saving...'
+              : isApproveMode
+                ? 'Approve'
+                : isVerifyMode
+                  ? 'Verify'
+                  : 'Save'
           "
           [disabled]="isSaving"
           [visible]="!isReadOnlyMode"
@@ -430,3 +481,67 @@
     </div>
   </div>
 </dx-validation-group>
+
+<dx-popup
+  [(visible)]="pendingDeliveryPopupVisible"
+  [width]="900"
+  [height]="500"
+  title="Pending Deliveries"
+  [showCloseButton]="true"
+>
+  <dx-data-grid
+    #popupGridRef
+    [dataSource]="pendingDeliveryList"
+    keyExpr="DN_DETAIL_ID"
+    [showBorders]="true"
+    [selection]="{ mode: 'multiple' }"
+    (onSelectionChanged)="onPendingDeliverySelectionChanged($event)"
+    (onEditorPreparing)="onPendingDeliveryEditorPreparing($event)"
+  >
+    <dxo-toolbar>
+      <div
+        class="stacked-toolbar-group"
+        style="display: flex; flex-direction: column; gap: 2px"
+      ></div>
+      <dxi-item location="before" locateInMenu="auto"> </dxi-item>
+
+      <dxi-item location="after">
+        <div class="toolbar-button-wrapper">
+          <dx-button
+            text="Select Delivery"
+            icon="check"
+            type="default"
+            stylingMode="contained"
+            class="blue-outline-btn"
+            (onClick)="transferPendingDeliveries()"
+          ></dx-button>
+        </div>
+      </dxi-item>
+
+      <dxi-item location="after" locateInMenu="auto"> </dxi-item>
+    </dxo-toolbar>
+    <dxi-column dataField="DN_NO" caption="Delivery No" width="140">
+    </dxi-column>
+
+    <dxi-column dataField="DN_DATE" caption="Date" width="120"> </dxi-column>
+
+    <dxi-column dataField="ITEM_CODE" caption="Item Code"> </dxi-column>
+
+    <dxi-column dataField="DESCRIPTION" caption="Description"> </dxi-column>
+
+    <dxi-column dataField="TOTAL_PAIR_QTY" caption="Qty" alignment="right">
+    </dxi-column>
+
+    <dxi-column
+      dataField="PACK_PRICE"
+      caption="Price"
+      dataType="number"
+      format="#,##0.00"
+      alignment="right"
+    >
+    </dxi-column>
+
+    <dxi-column dataField="GST_PERC" caption="Tax %" alignment="right">
+    </dxi-column>
+  </dx-data-grid>
+</dx-popup>

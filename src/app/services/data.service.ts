@@ -5125,6 +5125,12 @@ The result can be exported to HTML or Markdown.`;
     relieving_date: any,
     days: any,
   ) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
+
     const reqBody = {
       USER_ID: user_id,
       STORE_ID: store_id,
@@ -5134,6 +5140,8 @@ The result can be exported to HTML or Markdown.`;
       REMARKS: remarks,
       RELIEVING_DATE: relieving_date,
       DAYS: days,
+      COMPANY_ID: company_id,
+      FIN_ID: fin_id,
     };
     return this.http.post(`${this.apiUrl}EmployeeEOS/save`, reqBody);
   }
@@ -5390,6 +5398,12 @@ The result can be exported to HTML or Markdown.`;
     Leave_salary_payable: any,
   ) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/save';
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
+
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5402,6 +5416,8 @@ The result can be exported to HTML or Markdown.`;
       EXPECT_RETURN: Expected_rejoin_date,
       REMARKS: Remarks,
       LS_PAYABLE: Leave_salary_payable,
+      COMPANY_ID: company_id,
+      FIN_ID: fin_id,
     };
     return this.http.post(getEndpoint, reqBody);
   }
@@ -6044,7 +6060,7 @@ The result can be exported to HTML or Markdown.`;
       IS_LOCKED: data.IS_LOCKED,
       LOCK_DATE_FROM: data.LOCK_DATE_FROM,
       LOCK_DATE_TO: data.LOCK_DATE_TO,
-      LOCK_REASON: data.LOCK_REASON
+      LOCK_REASON: data.LOCK_REASON,
     };
 
     return this.http.post(url, reqBody);
@@ -6800,6 +6816,9 @@ The result can be exported to HTML or Markdown.`;
   getItemsForStore(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/getstoreitem`, data);
   }
+  getPendingDeliveries(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/PendingDN`, data);
+  }
   saveRetailInvoice(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/insert`, data);
   }
@@ -6987,7 +7006,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // =========== import AR data API ==============
-  import_AR_Data(batchNo: any, FileName: any, FileData: any) {
+  import_AR_Data(batchNo: any, FileName: any, FileData: any, isOverWrite: boolean = false) {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -6996,6 +7015,7 @@ The result can be exported to HTML or Markdown.`;
       UserID: sessionData.USER_ID,
       BatchNo: batchNo,
       FileName: FileName,
+      isOverWrite: isOverWrite,
       data: FileData,
     };
     return this.http.post(`${this.apiUrl}ImportAR/import`, payload);
@@ -7350,5 +7370,9 @@ The result can be exported to HTML or Markdown.`;
 
   getImportMasterList(): Observable<any> {
     return this.http.post(`${this.apiUrl}ImportMaster/importmasterlist`,{});
+  }
+
+  getRevenueDashboardData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Dashboard/revenuedashboard`, payload);
   }
 }

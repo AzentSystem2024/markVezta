@@ -739,7 +739,9 @@ export class StaffEOSComponent {
       return 'Edit';
     }
 
-    return row.STATUS === 'Verified' || row.STATUS === 'Left Service' || row.STATUS === 'Approved'
+    return row.STATUS === 'Verified' ||
+      row.STATUS === 'Left Service' ||
+      row.STATUS === 'Approved'
       ? 'Detail'
       : 'Edit';
   }
@@ -840,11 +842,9 @@ export class StaffEOSComponent {
 
         if (data.STATUS === 'Open') {
           this.verifypopup = true;
-        }
-        else if (data.STATUS === 'Verified') {
+        } else if (data.STATUS === 'Verified') {
           this.Approvepopup = true;
-        }
-        else {
+        } else {
           this.isviewpopup = true;
         }
 
@@ -852,7 +852,7 @@ export class StaffEOSComponent {
       },
       error: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -1153,4 +1153,4 @@ export class StaffEOSComponent {
   declarations: [StaffEOSComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StaffEOSModule { }
+export class StaffEOSModule {}

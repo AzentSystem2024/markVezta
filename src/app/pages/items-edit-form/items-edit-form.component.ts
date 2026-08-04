@@ -505,7 +505,6 @@ export class ItemsEditFormComponent implements OnInit {
     };
     dataservice.getDropdownData(costiingmethod).subscribe((data) => {
       this.costingMethodOptions = data;
-
     });
     const packing = {
       NAME: 'PACKING',
@@ -851,7 +850,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
-  onRowUpdated(e: any) { }
+  onRowUpdated(e: any) {}
 
   onParentItemChanged(event: any) {
     const selectedParentItem = event.selectedRowsData[0]; // Access the first selected item
@@ -1083,26 +1082,41 @@ export class ItemsEditFormComponent implements OnInit {
         QTY_AVAILABLE: s.QTY_AVAILABLE,
         IS_SELECTED: true,
       }));
+    // const select_supplier = this.itemData.item_suppliers;
 
-    const select_supplier = this.itemData.item_suppliers;
+    // const convertedData: any[] = [];
 
-    const convertedData: any[] = [];
+    // select_supplier.forEach((item) => {
+    //   convertedData.push({
+    //     ID: 0,
+    //     SUPP_ID: item.SUPP_ID?.toString() || '',
+    //     REORDER_NO:
+    //       item.REORDER_NO !== null && item.REORDER_NO !== undefined
+    //         ? String(item.REORDER_NO)
+    //         : '',
+    //     COST: item.COST || 0,
+    //     IS_PRIMARY: item.IS_PRIMARY || false,
+    //     IS_CONSIGNMENT: item.IS_CONSIGNMENT || true,
+    //   });
+    // });
+    // Save any cell currently being edited
+    this.dataGrid.instance.saveEditData();
 
-    select_supplier.forEach((item) => {
-      convertedData.push({
-        ID: 0,
-        SUPP_ID: item.SUPP_ID?.toString() || '',
-        // REORDER_NO: item.REORDER_NO || '',
-        REORDER_NO:
-          item.REORDER_NO !== null && item.REORDER_NO !== undefined
-            ? String(item.REORDER_NO)
-            : '',
-
-        COST: item.COST || 0,
-        IS_PRIMARY: item.IS_PRIMARY || false,
-        IS_CONSIGNMENT: item.IS_CONSIGNMENT || true,
-      });
-    });
+    const convertedData = (this.edit_Suplier || []).map((item: any) => ({
+      // ID: item.ID || 0,
+      ID:
+        item.ID === '' || item.ID === null || item.ID === undefined
+          ? null
+          : Number(item.ID),
+      SUPP_ID: item.SUPP_ID,
+      REORDER_NO:
+        item.REORDER_NO !== null && item.REORDER_NO !== undefined
+          ? String(item.REORDER_NO)
+          : '',
+      COST: Number(item.COST || 0),
+      IS_PRIMARY: item.IS_PRIMARY ?? false,
+      IS_CONSIGNMENT: item.IS_CONSIGNMENT ?? false,
+    }));
 
     const itemAliasDAta = this.itemData.item_alias;
     const convertedAliasData: any[] = [];
@@ -1214,7 +1228,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.imageUploaded = true;
     }
   }
-  onFileChanged(event) { }
+  onFileChanged(event) {}
   onUploadStarted(event: any) {
     this.imageSource = '';
     this.progressVisible = true;
@@ -1235,7 +1249,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.progressVisible = false;
     this.progressValue = 0;
   }
-  onDropZoneLeave(event) { }
+  onDropZoneLeave(event) {}
   onDropZoneEnter({
     component,
     dropZoneElement,
@@ -1266,7 +1280,7 @@ export class ItemsEditFormComponent implements OnInit {
       }
     }
   }
-  openModal(event) { }
+  openModal(event) {}
   onDropZoneClick() {
     this.fileInput.nativeElement.click();
   }
@@ -1288,7 +1302,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.formClosed.emit();
   }
 
-  closeModal() { }
+  closeModal() {}
 
   clearImage() {
     this.imageSource = '';
@@ -1548,4 +1562,4 @@ export class ItemsEditFormComponent implements OnInit {
   declarations: [ItemsEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsEditFormModule { }
+export class ItemsEditFormModule {}

@@ -636,7 +636,9 @@ export class ARImportedListComponent {
       return;
     }
 
-    const transactionIDs = pendingRows.map((row: any) => row.HeaderID).join(',');
+    const transactionIDs = pendingRows
+      .map((row: any) => row.HeaderID)
+      .join(',');
 
     this.loadingMessage = 'Validating...';
     this.isLoading = true;
@@ -661,7 +663,7 @@ export class ARImportedListComponent {
         } else {
           this.filteredValidationGridData = [];
         }
-        
+
         this.isValidationPopupVisible = true;
       } else {
         notify(response?.message || 'Validation failed', 'error', 3000);
@@ -677,24 +679,32 @@ export class ARImportedListComponent {
   // ================= Validation Helpers =================
   updateValidationGrid() {
     const filteredErrors = this.allValidationErrors.filter(
-      (e) => e.TransactionType === this.selectedTransactionType
+      (e) => e.TransactionType === this.selectedTransactionType,
     );
 
     const map = new Map<string, any>();
-    filteredErrors.forEach(err => {
+    filteredErrors.forEach((err) => {
       const key = err.ErrorMessage;
       if (!map.has(key)) {
-        map.set(key, { ErrorMessage: key, MissingCount: 0, Particular: err.Particular });
+        map.set(key, {
+          ErrorMessage: key,
+          MissingCount: 0,
+          Particular: err.Particular,
+        });
       }
       const current = map.get(key);
-      current.MissingCount += (Number(err.ErrorCount) || 0);
+      current.MissingCount += Number(err.ErrorCount) || 0;
     });
 
     this.filteredValidationGridData = Array.from(map.values());
   }
 
   hasMissingData(particular: string): boolean {
-    return this.allMissingMasterData.some(x => x.Particular === particular);
+    return this.allMissingMasterData.some(
+      (x) =>
+        x.Particular === particular &&
+        x.TransactionType === this.selectedTransactionType,
+    );
   }
 
   onTransactionTypeChange(e: any) {
@@ -703,20 +713,30 @@ export class ARImportedListComponent {
   }
 
   async downloadMissingParticulars(particular: string) {
-    const missingValues = this.allMissingMasterData.filter(x => x.Particular === particular);
-    
+    const missingValues = this.allMissingMasterData.filter(
+      (x) =>
+        x.Particular === particular &&
+        x.TransactionType === this.selectedTransactionType,
+    );
+
     if (missingValues.length === 0) {
       notify('No missing values found for this particular.', 'info', 3000);
       return;
     }
 
     let masterKey = '';
-    
+
     if (['ApexTPACode', 'ApexInsuCode', 'ApexInstCode'].includes(particular)) {
       masterKey = 'Customer';
-    } else if (['ApexReportingDoctor', 'ApexReferringDoctor'].includes(particular)) {
+    } else if (
+      ['ApexReportingDoctor', 'ApexReferringDoctor'].includes(particular)
+    ) {
       masterKey = 'Clinician';
-    } else if (['ApexReportingDoctorDept', 'ApexReferringDoctorDept'].includes(particular)) {
+    } else if (
+      ['ApexReportingDoctorDept', 'ApexReferringDoctorDept'].includes(
+        particular,
+      )
+    ) {
       masterKey = 'Department';
     } else if (['Paymode'].includes(particular)) {
       masterKey = 'chartOfAccounts';
@@ -726,10 +746,10 @@ export class ARImportedListComponent {
 
     try {
       const response: any = await this.srvce.getImportMasterList().toPromise();
-      
+
       let headers: string[] = [];
       let templateColumns: any[] = [];
-      
+
       if (response && response[masterKey]) {
         templateColumns = response[masterKey];
         templateColumns.sort((a: any, b: any) => a.ID - b.ID);
@@ -739,24 +759,37 @@ export class ARImportedListComponent {
       }
 
       let csv = headers.join(',') + '\n';
-      
-      missingValues.forEach(row => {
-        const val = (row.NotFoundValue || '').toString();
-        
-        const rowData = headers.map((header, index) => {
-           let cellValue = '';
-           
-           if (masterKey === 'Clinician' && (header === 'ClinicianLicense' || header === 'ClinicianName')) cellValue = val;
-           else if (masterKey === 'Department' && header === 'Department') cellValue = val;
-           else if (masterKey === 'chartOfAccounts' && header === 'LedgerCode') cellValue = val;
-           else if (masterKey === 'Cpt' && header === 'CPTCode') cellValue = val;
-           else if (masterKey === 'Customer' && header === 'Particular') cellValue = particular;
-           else if (masterKey === 'Customer' && header === 'NotFoundValue') cellValue = val;
-           else if (index === 0 && masterKey === 'Customer' && headers[0] !== 'Particular') cellValue = val;
 
-           return `"${cellValue.replace(/"/g, '""')}"`;
+      missingValues.forEach((row) => {
+        const val = (row.NotFoundValue || '').toString();
+
+        const rowData = headers.map((header, index) => {
+          let cellValue = '';
+
+          if (
+            masterKey === 'Clinician' &&
+            (header === 'ClinicianLicense' || header === 'ClinicianName')
+          )
+            cellValue = val;
+          else if (masterKey === 'Department' && header === 'Department')
+            cellValue = val;
+          else if (masterKey === 'chartOfAccounts' && header === 'LedgerName')
+            cellValue = val;
+          else if (masterKey === 'Cpt' && header === 'CPTCode') cellValue = val;
+          else if (masterKey === 'Customer' && header === 'Particular')
+            cellValue = particular;
+          else if (masterKey === 'Customer' && header === 'NotFoundValue')
+            cellValue = val;
+          else if (
+            index === 0 &&
+            masterKey === 'Customer' &&
+            headers[0] !== 'Particular'
+          )
+            cellValue = val;
+
+          return `"${cellValue.replace(/"/g, '""')}"`;
         });
-        
+
         csv += rowData.join(',') + '\n';
       });
 

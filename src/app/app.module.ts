@@ -436,6 +436,7 @@ import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashb
   declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent],
   imports: [
     LeaveSalaryPaymentModule,
+    CustomDatePopupModule,
     DxTemplateModule,
     TaskListModule,
     BrowserModule,
