@@ -342,7 +342,10 @@ export class ItemsListComponent implements OnInit {
       items.UOM_PURCH = '';
     }
 
-    if (!items.ITEM_STORES || items.ITEM_STORES.length === 0) {
+    if (
+  items.TYPE_ID !== 2 &&
+  (!items.ITEM_STORES || items.ITEM_STORES.length === 0)
+)  {
       notify(
         {
           message: 'Please select at least one store',
