@@ -49,6 +49,7 @@ import { Router } from '@angular/router';
 import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import notify from 'devextreme/ui/notify';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-transfer-in-inventory',
@@ -204,6 +205,7 @@ export class TransferInInventoryComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
+    private exportService: ExportService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -287,6 +289,10 @@ export class TransferInInventoryComponent {
       value: 'OPEN',
     },
   ];
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Transfer In Inventory');
+  }
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
@@ -481,26 +487,13 @@ export class TransferInInventoryComponent {
     }
   }
 
-  onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'filter',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
-  }
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;

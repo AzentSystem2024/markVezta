@@ -49,6 +49,7 @@ import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/
 import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
 import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
 import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-transfer-out-inventory',
@@ -75,6 +76,25 @@ export class TransferOutInventoryComponent {
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -201,6 +221,7 @@ export class TransferOutInventoryComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
+    private exportService: ExportService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -275,6 +296,9 @@ export class TransferOutInventoryComponent {
       });
   }
 
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'TransferOutInventory');
+  }
 
   getStatusFilterData = [
     {
@@ -513,38 +537,6 @@ export class TransferOutInventoryComponent {
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-  }
-
-  onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'filter',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
-  }
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
 

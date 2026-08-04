@@ -69,7 +69,13 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Credit Note</div>
+          <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">Credit Note</div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
@@ -85,6 +91,11 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+         <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+        
         <dxi-item
           name="exportButton"
           location="after"
