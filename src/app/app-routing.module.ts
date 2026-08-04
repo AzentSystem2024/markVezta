@@ -224,6 +224,7 @@ import {
 import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 import { EosPaymentListComponent } from './pages/HR/Masters/eos-payment-list/eos-payment-list.component';
 import { LeaveSalaryPaymentComponent } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
+import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
 
 const routes: Routes = [
   {
@@ -288,6 +289,11 @@ const routes: Routes = [
       {
         path: 'analytics-dashboard',
         component: AnalyticsDashboardComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'vezta-dashboard',
+        component: AnalyticsDashboardVeztaMedicalComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1358,9 +1364,9 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path:'emp-leave-salary',
-        component:LeaveSalaryPaymentComponent,
-        canActivate:[AuthGuardService]
+        path: 'emp-leave-salary',
+        component: LeaveSalaryPaymentComponent,
+        canActivate: [AuthGuardService],
       },
       {
         path: '**',

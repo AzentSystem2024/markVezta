@@ -92,11 +92,37 @@ export class SideNavOuterToolbarComponent implements OnInit, OnDestroy {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    const isGST = sessionData?.GeneralSettings?.VAT_TITLE === 'GST';
-    const path = isGST ? 'mark-dashboard' : 'analytics-dashboard';
+
+    console.log('session data :', sessionData);
+    let vatTitle;
+    let appType;
+
+    try {
+      const genSettings = sessionData?.GeneralSettings || JSON.parse(sessionStorage.getItem('GeneralSettings') || 'null');
+      const genSettingsParsed = typeof genSettings === 'string' ? JSON.parse(genSettings) : genSettings;
+      vatTitle = genSettingsParsed?.VAT_TITLE;
+    } catch (e) {}
+
+    try {
+      const config =
+        sessionData?.Configuration ||
+        JSON.parse(sessionStorage.getItem('Configuration') || 'null');
+      const configParsed = typeof config === 'string' ? JSON.parse(config) : config;
+      appType = configParsed?.[0]?.APP_TYPE;
+
+      console.log("config data :",config)
+    } catch (e) {}
+
+    console.log("vat title :", vatTitle);
+    console.log('app Type :', appType);
+    
+    let path = 'analytics-dashboard';
+    if (vatTitle === 'GST') {
+      path = 'mark-dashboard';
+    } else if (vatTitle === 'VAT' && appType && appType.toLowerCase() === 'vezta') {
+      path = 'vezta-dashboard';
+    }
     const title = 'Home';
-    // let path = 'analytics-dashboard';
-    // let title = 'Home';
     this.tabs.push({
       title: title,
       path: path,

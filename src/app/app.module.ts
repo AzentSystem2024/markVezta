@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { DxSelectBoxModule, DxTemplateModule } from 'devextreme-angular';
+import { DxSelectBoxModule, DxTemplateModule, DxChartModule, DxPieChartModule } from 'devextreme-angular';
 import { AppComponent } from './app.component';
 import { SideNavOuterToolbarModule, SingleCardModule } from './layouts';
 import {
@@ -430,9 +430,10 @@ import {
   LeavelistModule
 } from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
+import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent],
   imports: [
     LeaveSalaryPaymentModule,
     DxTemplateModule,
@@ -448,6 +449,8 @@ import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-rep
     LoginFormModule,
     UnauthenticatedContentModule,
     DxSelectBoxModule,
+    DxChartModule,
+    DxPieChartModule,
     DenialListModule,
     AnalyticsDashboardModule,
     DxFormModule,
