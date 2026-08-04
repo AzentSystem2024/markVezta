@@ -24,6 +24,7 @@
     rowAlternationInterval="2"
     (onRowRemoved)="deleteData($event)"
     [showColumnLines]="true"
+    (onExporting)="onExporting($event)"
     [editing]="{ allowUpdating: true, allowDeleting: true }"
   >
     <dxo-editing
@@ -34,6 +35,7 @@
       <dxo-form [colCount]="1"> </dxo-form>
     </dxo-editing>
     <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
 
     <dxo-pager
       [visible]="true"
@@ -60,7 +62,7 @@
             margin-right: 3px;
           "
         >
-          Staff End of Service
+          Employee End of Service
         </div>
       </dxi-item>
 
@@ -83,6 +85,13 @@
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
       </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
 
       <dxi-item
         *ngIf="canAdd"
@@ -124,7 +133,7 @@
       caption="Status"
       dataField="STATUS"
       alignment="center"
-      [width]="'auto'"
+      [width]="'140'"
       cellTemplate="statusCellRender"
       [allowHeaderFiltering]="true"
       [headerFilter]="{

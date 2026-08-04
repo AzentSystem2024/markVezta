@@ -16,16 +16,18 @@
       showNavigationButtons: true,
     }"
     (onEditingStart)="onEditingStart($event)"
+    (onExporting)="onExporting($event)"
   >
-    <dxo-filter-row
+    <!-- <dxo-filter-row
       [visible]="showFilterRow"
       [applyFilter]="currentFilter"
-    ></dxo-filter-row>
+    ></dxo-filter-row> -->
 
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
       [visible]="true"
@@ -49,7 +51,18 @@
 
     <dxo-toolbar>
       <dxi-item location="before" locateInMenu="never">
-        <div class="grid-header">Department Group</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Departments Group
+        </div>
       </dxi-item>
 
       <dxi-item
@@ -57,14 +70,12 @@
         widget="dxButton"
         [options]="searchButtonOptions"
       ></dxi-item>
-
       <!-- Refresh -->
       <dxi-item
         location="after"
         widget="dxButton"
         [options]="refreshButtonOptions"
       ></dxi-item>
-
       <!-- Divider -->
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
@@ -116,15 +127,19 @@
         </dxi-validation-rule>
       </dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="STATUS" caption="Status" cellTemplate="statusCellTemplate"></dxi-column>
+    <dxi-column
+      dataField="STATUS"
+      caption="Status"
+      cellTemplate="statusCellTemplate"
+    ></dxi-column>
     <div *dxTemplate="let cellData of 'statusCellTemplate'">
-        <i
-          class="fas fa-flag"
-          [ngClass]="getStatusFlagClass(cellData.value)"
-          [attr.title]="cellData.value ? true : false"
-          style="margin-left: 10px; cursor: default"
-        ></i>
-      </div>
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value ? true : false"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+    </div>
   </dx-data-grid>
 </div>
 
@@ -138,20 +153,19 @@
   <dx-form class="plain-styled-form" [formGroup]="formsource">
     <dxi-item>
       <dx-text-box label="Code" labelMode="floating" formControlName="CODE">
-         <dx-validator>
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="Code is required"
+          ></dxi-validation-rule>
 
-              <dxi-validation-rule
-                type="required"
-                message="Code is required"
-              ></dxi-validation-rule>
-
-               <!--  Duplicate check -->
-              <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateDepartmentGroupCode"
-                message="Code already exists"
-              ></dxi-validation-rule>
-              </dx-validator>
+          <!--  Duplicate check -->
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateDepartmentGroupCode"
+            message="Code already exists"
+          ></dxi-validation-rule>
+        </dx-validator>
       </dx-text-box>
     </dxi-item>
 
@@ -161,20 +175,19 @@
         labelMode="floating"
         formControlName="DEPT_NAME"
       >
-       <dx-validator>
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="Department Group is required"
+          ></dxi-validation-rule>
 
-              <dxi-validation-rule
-                type="required"
-                message="Department Group is required"
-              ></dxi-validation-rule>
-
-               <!--  Duplicate check -->
-              <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateDepartmentGroupName"
-                message="Department Group already exists"
-              ></dxi-validation-rule>
-              </dx-validator>
+          <!--  Duplicate check -->
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateDepartmentGroupName"
+            message="Department Group already exists"
+          ></dxi-validation-rule>
+        </dx-validator>
       </dx-text-box>
     </dxi-item>
   </dx-form>
@@ -193,20 +206,19 @@
         labelMode="floating"
         [(value)]="editingRowData.CODE"
       >
-       <dx-validator>
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="Code is required"
+          ></dxi-validation-rule>
 
-              <dxi-validation-rule
-                type="required"
-                message="Code is required"
-              ></dxi-validation-rule>
-
-               <!--  Duplicate check -->
-              <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateDepartmentGroupCode"
-                message="Name already exists"
-              ></dxi-validation-rule>
-              </dx-validator>
+          <!--  Duplicate check -->
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateDepartmentGroupCode"
+            message="Name already exists"
+          ></dxi-validation-rule>
+        </dx-validator>
       </dx-text-box>
     </dxi-item>
 
@@ -216,20 +228,19 @@
         labelMode="floating"
         [(value)]="editingRowData.DESCRIPTION"
       >
-      <dx-validator>
+        <dx-validator>
+          <dxi-validation-rule
+            type="required"
+            message="Department Group is required"
+          ></dxi-validation-rule>
 
-              <dxi-validation-rule
-                type="required"
-                message="Department Group is required"
-              ></dxi-validation-rule>
-
-               <!--  Duplicate check -->
-              <dxi-validation-rule
-                type="custom"
-                [validationCallback]="validateDepartmentGroupName"
-                message="Department Group already exists"
-              ></dxi-validation-rule>
-              </dx-validator>
+          <!--  Duplicate check -->
+          <dxi-validation-rule
+            type="custom"
+            [validationCallback]="validateDepartmentGroupName"
+            message="Department Group already exists"
+          ></dxi-validation-rule>
+        </dx-validator>
       </dx-text-box>
     </dxi-item>
 

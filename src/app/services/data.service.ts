@@ -5125,6 +5125,12 @@ The result can be exported to HTML or Markdown.`;
     relieving_date: any,
     days: any,
   ) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
+
     const reqBody = {
       USER_ID: user_id,
       STORE_ID: store_id,
@@ -5134,6 +5140,8 @@ The result can be exported to HTML or Markdown.`;
       REMARKS: remarks,
       RELIEVING_DATE: relieving_date,
       DAYS: days,
+      COMPANY_ID: company_id,
+      FIN_ID: fin_id,
     };
     return this.http.post(`${this.apiUrl}EmployeeEOS/save`, reqBody);
   }
@@ -5390,6 +5398,12 @@ The result can be exported to HTML or Markdown.`;
     Leave_salary_payable: any,
   ) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/save';
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
+
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5402,6 +5416,8 @@ The result can be exported to HTML or Markdown.`;
       EXPECT_RETURN: Expected_rejoin_date,
       REMARKS: Remarks,
       LS_PAYABLE: Leave_salary_payable,
+      COMPANY_ID: company_id,
+      FIN_ID: fin_id,
     };
     return this.http.post(getEndpoint, reqBody);
   }
@@ -6990,7 +7006,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // =========== import AR data API ==============
-  import_AR_Data(batchNo: any, FileName: any, FileData: any) {
+  import_AR_Data(batchNo: any, FileName: any, FileData: any, isOverWrite: boolean = false) {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -6999,6 +7015,7 @@ The result can be exported to HTML or Markdown.`;
       UserID: sessionData.USER_ID,
       BatchNo: batchNo,
       FileName: FileName,
+      isOverWrite: isOverWrite,
       data: FileData,
     };
     return this.http.post(`${this.apiUrl}ImportAR/import`, payload);
@@ -7018,6 +7035,22 @@ The result can be exported to HTML or Markdown.`;
     };
 
     return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
+  }
+
+  // ========= VALIDATE SELECTED PENDING LIST ==========
+  validate_pending_rows(rowdata: any) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      CompanyID: sessionData.SELECTED_COMPANY.COMPANY_ID,
+      UserID: sessionData.USER_ID,
+      TransactionID: rowdata.HeaderID,
+      StoreID: sessionData.Configuration[0].STORE_ID,
+      FinID: sessionData.FINANCIAL_YEARS[0].FIN_ID,
+    };
+
+    return this.http.post(`${this.apiUrl}ImportAR/validate`, payload);
   }
 
   //============================customer type===============
@@ -7283,5 +7316,63 @@ The result can be exported to HTML or Markdown.`;
 
   delete_EOS_payment(id: any) {
     return this.http.post(`${this.apiUrl}EOSPayment/delete/${id}`, {});
+  }
+
+  // --- Leave Salary Payment APIs ---
+
+  get_leave_salary_list(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/list', payload);
+  }
+
+  get_leave_salary_employee_details(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/EmployeeDetails', payload);
+  }
+
+  get_leave_salary_vacation_list(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/VacationList', payload);
+  }
+
+  get_leave_salary_vacation_details(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/GetVacationDetails', payload);
+  }
+
+  add_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Insert', payload);
+  }
+
+  update_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Update', payload);
+  }
+
+  verify_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Verify', payload);
+  }
+
+  approve_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Approve', payload);
+  }
+
+  delete_leave_salary(id: any) {
+    return this.http.post(`${this.apiUrl}EmployeeLeaveSalary/delete/${id}`, {});
+  }
+
+  select_leave_salary(id: any) {
+    return this.http.post(`${this.apiUrl}EmployeeLeaveSalary/select/${id}`, {});
+  }
+
+  get_calculated_leave_salary(payload: any) {
+    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Getleavesalary', payload);
+  }
+
+  getValidationARData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}ImportAR/validate`, payload);
+  }
+
+  getImportMasterList(): Observable<any> {
+    return this.http.post(`${this.apiUrl}ImportMaster/importmasterlist`,{});
+  }
+
+  getRevenueDashboardData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}Dashboard/revenuedashboard`, payload);
   }
 }

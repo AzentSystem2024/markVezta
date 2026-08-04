@@ -102,12 +102,31 @@ export class PrepaymentPostingEditComponent {
       );
       console.log('Converted transDate:', this.transDate);
 
-      this.selectedStatus = this.selecteprepaymentData[0].TRANS_STATUS
-      if (this.selecteprepaymentData[0].TRANS_STATUS == 'Approved') {
-        this.approveValue = true;
+      this.selectedStatus = this.selecteprepaymentData[0].TRANS_STATUS;
+
+      // View mode (opened from Edit icon or Approved badge without Edit privilege)
+      if (this.status === 'Viewscreen') {
         this.isEditReadOnly = true;
-      } else {
-        this.approveValue = false;
+        this.approveValue = false;   // or true if you want the checkbox checked
+        return;
+      }
+
+      // Edit icon on Verified/Approved -> View
+      if (this.status === 'Editscreen') {
+        this.isEditReadOnly =
+          this.selectedStatus === 'Verify' ||
+          this.selectedStatus === 'Approved';
+      }
+
+      // Verify badge on Open -> Verify
+      else if (this.status === 'verifyscreen') {
+        this.isEditReadOnly = false;
+      }
+
+      // Verify badge on Verified -> Approve
+      else if (this.status === 'approvescreen') {
+        this.isEditReadOnly = false;
+        this.approveValue = true;   // if you want the Approve checkbox checked
       }
     }
   }

@@ -319,44 +319,6 @@ export class EmployeeLeaveComponent {
     return rowIndex + 1;
   };
 
-  statusCellRender = (cellElement: any, cellInfo: any) => {
-    const status = cellInfo.data.STATUS;
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag';
-    icon.style.fontSize = '18px';
-
-    switch (status) {
-      case 'Approved':
-        icon.style.color = '#10B981'; // Green
-        icon.title = 'Approved';
-        break;
-      case 'Verified':
-        icon.style.color = '#0073D8'; // Blue
-        icon.title = 'Verified';
-        break;
-      case 'Travelled':
-        icon.style.color = '#FFD700'; // Yellow
-        icon.title = 'Travelled';
-        break;
-      case 'Rejoined':
-        icon.style.color = '#8B4513'; // Brown
-        icon.title = 'Rejoined';
-        break;
-      case 'Left Service':
-        icon.style.color = '#DC2626'; // Red
-        icon.title = 'Left Service';
-        break;
-      default:
-        icon.style.color = '#FFA500'; // Open = Orange
-        icon.title = 'Open';
-    }
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-    cellElement.appendChild(icon);
-  };
-
   // EVENT HANDLERS (POPUP ACTIONS)
   // ==========================================
   onVerifyClick(e: any): void {
@@ -419,19 +381,18 @@ export class EmployeeLeaveComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_EmployeeLeave_Api(ID).subscribe((response: any) => {
-      if (
-        statusValue === 'Approved' ||
-        statusValue === 'Travelled' ||
-        statusValue === 'Rejoined' ||
-        statusValue === 'Left Service'
-      ) {
-        this.ViewPopup = true;
-      } else {
+      response.LEFT_REASON = Number(response.LEFT_REASON);
+      this.selectedData = response;
+      if (statusValue === 'Open' || statusValue === 'Pending') {
+        // Editable
         this.UpdateVacationPopup = true;
+      } else {
+        // View only
+        this.ViewPopup = true;
       }
     });
-    this.selectedStatusType = event.data.StatusType;
-    this.Select_EmployeeLeave(ID);
+    // this.selectedStatusType = event.data.StatusType;
+    // this.Select_EmployeeLeave(ID);
   }
 
   closePopup() {
@@ -571,6 +532,34 @@ export class EmployeeLeaveComponent {
     this.get_ExistingLeaveByEmployee();
   }
 
+
+  onStatusBadgeClick(data: any) {
+    switch (data.STATUS) {
+
+      case 'Open':
+      case 'Pending':
+        this.onVerifyClick({ row: { data } });
+        break;
+
+      case 'Verified':
+        this.onApproveClick({ row: { data } });
+        break;
+
+      case 'Approved':
+        this.onTravelClick({ row: { data } });
+        break;
+
+      case 'Travelled':
+        this.onRejoinClick({ row: { data } });
+        break;
+
+      case 'Rejoined':
+      case 'Left Service':
+        this.ViewPopup = true;
+        this.Select_EmployeeLeave(data.ID);
+        break;
+    }
+  }
   // DATA FETCHING & DROPDOWNS
   // ==========================================
   get_EmployeeLeaveList() {
@@ -605,9 +594,8 @@ export class EmployeeLeaveComponent {
   }
 
   get_EOS_Dropdown_List() {
-    const payload = { NAME: 'EOS_REASON' };
     this.dataservice
-      .get_EOS_Dropdown_Api(payload)
+      .Dropdown_EOS_reason(name)
       .subscribe((response: any) => {
         this.Left_service = response;
       });
@@ -1095,6 +1083,24 @@ export class EmployeeLeaveComponent {
       });
     });
   }
+
+  isBadgeDisabled(status: string): boolean {
+    switch (status) {
+      case 'Open':
+      case 'Pending':
+        return !this.canVerify;
+
+      case 'Verified':
+      case 'Approved':
+      case 'Travelled':
+      case 'Rejoined':
+      case 'Left Service':
+        return !this.canApprove;
+
+      default:
+        return true;
+    }
+  }
 }
 
 @NgModule({
@@ -1118,4 +1124,4 @@ export class EmployeeLeaveComponent {
   exports: [],
   declarations: [EmployeeLeaveComponent],
 })
-export class EmployeeLeaveModule {}
+export class EmployeeLeaveModule { }

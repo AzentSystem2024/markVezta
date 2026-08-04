@@ -24,6 +24,7 @@
       [selection]="{ mode: 'single' }"
       (onEditingStart)="onEditEmployee($event)"
       (onRowRemoving)="onDeleteEmployee($event)"
+      (onExporting)="onExporting($event)"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -41,7 +42,7 @@
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
       ></dxo-editing>
-      <!-- <dxi-item name="exportButton" ></dxi-item> -->
+
       <dxo-paging [pageSize]="25"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -59,12 +60,7 @@
       ></dxo-search-panel>
       <!-- <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row> -->
       <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
-      <dxo-export
-        [enabled]="true"
-        [allowExportSelectedData]="true"
-        [formats]="['xlsx', 'pdf']"
-      >
-      </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-header-filter
         [visible]="true"
         [search]="{ enabled: true }"
@@ -79,7 +75,18 @@
       ></dxo-search-panel>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Employee</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Employee
+          </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
@@ -96,6 +103,13 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
         <dxi-item
           name="exportButton"
           location="after"

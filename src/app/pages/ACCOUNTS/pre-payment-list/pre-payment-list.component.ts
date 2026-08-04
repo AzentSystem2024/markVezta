@@ -43,6 +43,10 @@ export class PrePaymentListComponent {
   dataGrid: DxDataGridComponent;
   @ViewChild('prePaymentAdd')
   prePaymentAdd!: PrePaymentAddComponent;
+  @ViewChild('verifyPopup', { static: false })
+  verifyPopup: any;
+  @ViewChild('editPopup', { static: false })
+  editPopup: any;
 
   PrePaymentListDataSource: any[] = [];
   readonly allowedPageSizes: any = [10, 20, 'all'];
@@ -257,20 +261,27 @@ export class PrePaymentListComponent {
 
   onVerifyInvoice(e: any) {
     e.cancel = true;
-    console.log(e)
+
     const status = e.row.data?.TRANS_STATUS?.trim();
+
     if (status === 'Approved') {
       this.popupMode = 'view';
       this.isEditReadOnly = true;
-    } else if (status === 'Verify') {
+    }
+    else if (status === 'Verified') {
       this.popupMode = 'approve';
-    } else {
+      this.isEditReadOnly = false;
+    }
+    else {
       this.popupMode = 'verify';
+      this.isEditReadOnly = false;
     }
 
-    // this.isEditReadOnly = status === 'Approved';
     this.editPrePaymentPopupOpened = false;
     this.verifyPrePaymentPopupOpened = true;
+    setTimeout(() => {
+      this.verifyPopup.instance.repaint();
+    });
     this.verifyselectPrePayment(e);
   }
 
@@ -286,21 +297,23 @@ export class PrePaymentListComponent {
 
   onEditingStart(event: any) {
     event.cancel = true;
+
     const status = event.data?.TRANS_STATUS?.trim();
 
     if (status === 'Open') {
-      // Open document -> Edit mode
+      // Edit mode
+      this.popupMode = 'edit';
       this.isEditReadOnly = false;
-      this.editPrePaymentPopupOpened = true;
-    } else {
-      // Verified & Approved -> View mode
+    } else if (status === 'Verified' || status === 'Approved') {
+      // View mode
+      this.popupMode = 'view';
       this.isEditReadOnly = true;
-      this.editPrePaymentPopupOpened = false;
     }
 
-
-    // this.isEditReadOnly = status === 'Approved';
     this.editPrePaymentPopupOpened = true;
+    setTimeout(() => {
+      this.editPopup.instance.repaint();
+    });
     this.selectPrePayment(event);
   }
 

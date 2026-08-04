@@ -152,13 +152,11 @@ export class ItemProperty3Component {
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addItemProperty3());
     },
-
     elementAttr: { class: 'add-button' },
+
     template: () => {
       return `
       <div class="add-btn-content">

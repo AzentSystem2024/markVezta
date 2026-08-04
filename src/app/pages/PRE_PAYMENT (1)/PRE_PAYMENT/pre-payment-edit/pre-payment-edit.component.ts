@@ -118,36 +118,39 @@ export class PrePaymentEditComponent {
   gstAmount: number = 0;
   netAmount: number = 0; // Calculated GST Amount
   transStatus: any;
+  @Input() approvePrePaymentPopupOpened: boolean = false;
   // isSaving = false;
 
   get popupTitle(): string {
-  if (this.isReadOnly) {
-    return 'View PrePayment Invoice';
+    if (this.isReadOnly) {
+      return 'View PrePayment Invoice';
+    }
+
+    if (this.verifyPrePaymentPopupOpened && this.transStatus === 'Open') {
+      return 'Verify PrePayment Invoice';
+    }
+
+    if (this.transStatus === 'Verified') {
+      return 'Approve PrePayment Invoice';
+    }
+
+    return 'Edit PrePayment Invoice';
   }
 
-  if (this.verifyPrePaymentPopupOpened && this.transStatus === 'Open') {
-    return 'Verify PrePayment Invoice';
+  @Input() mode: string = 'new';
+
+  get actionButtonText(): string {
+    switch (this.mode) {
+      case 'verify':
+        return 'Verify';
+
+      case 'approve':
+        return 'Approve';
+
+      default:
+        return 'Update';
+    }
   }
-
-  if (this.transStatus === 'Verify') {
-    return 'Approve PrePayment Invoice';
-  }
-
-  return 'Edit PrePayment Invoice';
-}
-
-get actionButtonText(): string {
-  if (this.verifyPrePaymentPopupOpened && this.transStatus === 'Open') {
-    return 'Verify';
-  }
-
-  if (this.transStatus === 'Verify') {
-    return 'Approve';
-  }
-
-  return 'Update';
-}
-
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
@@ -212,15 +215,29 @@ get actionButtonText(): string {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
+  convertToISO(dateValue: any): string {
+    if (!dateValue) return '';
 
-     convertToISO(dateStr: string): string {
-    // dateStr is in "DD/MM/YYYY"
-    const [day, month, year] = dateStr.split("/").map(Number);
+    // If it's already a Date object
+    if (dateValue instanceof Date) {
+      const y = dateValue.getFullYear();
+      const m = String(dateValue.getMonth() + 1).padStart(2, '0');
+      const d = String(dateValue.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
 
-    // Create JS Date (note: month is 0-based)
-    const date = new Date(year, month - 1, day +1);
+    // If it's a string like dd/MM/yyyy
+    if (typeof dateValue === 'string') {
+      const parts = dateValue.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
 
-    return date.toISOString();  // Converts to ISO string
+      // Already in ISO format
+      return dateValue;
+    }
+
+    return '';
   }
   // convertToISO(dateStr: any): string {
   //   if (!dateStr) return ''; //  Return empty if missing
@@ -279,7 +296,7 @@ get actionButtonText(): string {
     this.showGrid = true;
     this.generateSchedule();
     // this.totalExpense = this.PrePaymentFormData.EXPENSE_AMOUNT || 0; // Copy Amount to Total Expense
-      this.calculateTotalExpense();
+    this.calculateTotalExpense();
 
   }
 
@@ -352,11 +369,11 @@ get actionButtonText(): string {
     }
 
     this.ExpenseAmountDetails = schedule;
-      this.calculateTotalExpense();
+    this.calculateTotalExpense();
 
     this.showGrid = true;
     this.scheduleGenerated = true;
-    this.fieldChanged = false; 
+    this.fieldChanged = false;
   }
 
   onFieldChange() {
@@ -374,7 +391,7 @@ get actionButtonText(): string {
     if (column.dataField === 'HEAD_PERCENT') {
       data.HEAD_PERCENT = value;
     }
-     this.calculateTotalExpense();
+    this.calculateTotalExpense();
   }
 
   onSelectionChanged(e: any) {
@@ -507,11 +524,11 @@ get actionButtonText(): string {
   }
 
   calculateTotalExpense() {
-  this.totalExpense = (this.ExpenseAmountDetails || []).reduce(
-    (sum: number, item: any) => sum + (Number(item.DUE_AMOUNT) || 0),
-    0
-  );
-}
+    this.totalExpense = (this.ExpenseAmountDetails || []).reduce(
+      (sum: number, item: any) => sum + (Number(item.DUE_AMOUNT) || 0),
+      0
+    );
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -520,7 +537,7 @@ get actionButtonText(): string {
     ) {
       const data = changes['selectedPrePayment'].currentValue;
       console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa');
-      console.log(data.TRANS_STATUS,'===========statusss')
+      console.log(data.TRANS_STATUS, '===========statusss')
       this.transStatus = data.TRANS_STATUS
       console.log(this.transStatus)
       this.PrePaymentFormData = data;
@@ -531,7 +548,7 @@ get actionButtonText(): string {
         ...item,
         DUE_DATE: new Date(item.DUE_DATE), // Ensure it's a Date object
       }));
-this.calculateTotalExpense();
+      this.calculateTotalExpense();
       this.showGrid = true; // Ensure grid is shown
     }
     console.log(
@@ -545,7 +562,7 @@ this.calculateTotalExpense();
     const expenseAmount = Number(this.PrePaymentFormData.EXPENSE_AMOUNT);
     const totalExpense = Number(this.totalExpense);
 
-     if (expenseAmount !== totalExpense) {
+    if (expenseAmount !== totalExpense) {
       notify({
         message: 'Amount and Total Expense must be the same.',
         type: 'error',
@@ -556,7 +573,7 @@ this.calculateTotalExpense();
     }
 
 
-    this.isSaving = true;
+    // this.isSaving = true;
     const result = (this.ExpenseAmountDetails || []).map((item) => ({
       DUE_DATE: this.convertToISO(item.DUE_DATE),
       DUE_AMOUNT: item.DUE_AMOUNT,
@@ -583,11 +600,11 @@ this.calculateTotalExpense();
       NO_OF_DAYS: Number(this.PrePaymentFormData.NO_OF_DAYS) || null,
       EXPENSE_AMOUNT: Number(this.PrePaymentFormData.EXPENSE_AMOUNT) || null,
       NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
-  //     TRANS_STATUS: this.verifyPrePaymentPopupOpened 
-  // ? 2
-  // : this.PrePaymentFormData.TRANS_STATUS
-  //   ? 5
-  //   : 1,
+      //     TRANS_STATUS: this.verifyPrePaymentPopupOpened 
+      // ? 2
+      // : this.PrePaymentFormData.TRANS_STATUS
+      //   ? 5
+      //   : 1,
       STORE_ID: this.selectedstoreId,
       //  Map from the grid data source, not the form object
       PREPAY_DETAIL: result,
@@ -595,77 +612,77 @@ this.calculateTotalExpense();
 
     console.log('Payload to save PrePayment:', payload);
 
-const currentStatus = this.transStatus;
+    const currentStatus = this.transStatus;
 
-console.log(currentStatus,'current status')
-console.log(this.verifyPrePaymentPopupOpened,'verifyprepaymnetpopup')
-if (
-  this.verifyPrePaymentPopupOpened &&
-  currentStatus === 'Open'
-) {
-  confirm(
-    'Are you sure you want to verify this PrePayment?',
-    'Confirm Verification'
-  ).then((result) => {
-    if (result) {
-      this.dataservice.Verify_PrePayment(payload).subscribe(
-        (res: any) => {
+    console.log(currentStatus, 'current status')
+    console.log(this.verifyPrePaymentPopupOpened, 'verifyprepaymnetpopup')
+    if (
+      this.verifyPrePaymentPopupOpened &&
+      currentStatus === 'Open'
+    ) {
+      confirm(
+        'Are you sure you want to verify this PrePayment?',
+        'Confirm Verification'
+      ).then((result) => {
+        if (result) {
+          this.dataservice.Verify_PrePayment(payload).subscribe(
+            (res: any) => {
+              this.isSaving = false;
+
+              notify({
+                message: 'PrePayment Verified successfully',
+                type: 'success',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 500,
+              });
+
+              this.formClosed.emit();
+            },
+            (error) => {
+              this.isSaving = false;
+              notify('Error while verifying PrePayment', 'error', 2000);
+            }
+          );
+        } else {
           this.isSaving = false;
-
-          notify({
-            message: 'PrePayment Verified successfully',
-            type: 'success',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          });
-
-          this.formClosed.emit();
-        },
-        (error) => {
-          this.isSaving = false;
-          notify('Error while verifying PrePayment', 'error', 2000);
         }
-      );
-    } else {
-      this.isSaving = false;
+      });
+
+      return;
     }
-  });
 
-  return;
-}
+    else if (currentStatus === 'Verified' || this.PrePaymentFormData.TRANS_STATUS === true) {
+      confirm(
+        'Are you sure you want to approve this PrePayment?',
+        'Confirm Approval'
+      ).then((result) => {
+        if (result) {
+          this.dataservice.Approve_PrePayment(payload).subscribe(
+            (res: any) => {
+              this.isSaving = false;
 
-else if (currentStatus === 'Verify' || this.PrePaymentFormData.TRANS_STATUS === true) {
-  confirm(
-    'Are you sure you want to approve this PrePayment?',
-    'Confirm Approval'
-  ).then((result) => {
-    if (result) {
-      this.dataservice.Approve_PrePayment(payload).subscribe(
-        (res: any) => {
+              notify({
+                message: 'PrePayment Approved successfully',
+                type: 'success',
+                position: { at: 'top right', my: 'top right' },
+                displayTime: 500,
+              });
+
+              this.formClosed.emit();
+            },
+            (error) => {
+              this.isSaving = false;
+              notify('Error while approving PrePayment', 'error', 2000);
+            }
+          );
+        } else {
           this.isSaving = false;
-
-          notify({
-            message: 'PrePayment Approved successfully',
-            type: 'success',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          });
-          
-          this.formClosed.emit();
-        },
-        (error) => {
-          this.isSaving = false;
-          notify('Error while approving PrePayment', 'error', 2000);
         }
-      );
-    } else {
-      this.isSaving = false;
-    }
-  });
+      });
 
-  return;
-}
-else {
+      return;
+    }
+    else {
       this.dataservice.Update_PrePayment(payload).subscribe(
         (res: any) => {
           this.isSaving = false;
@@ -689,112 +706,112 @@ else {
     }
   }
 
-//   savePrePayment() {
-//   this.isSaving = true;
+  //   savePrePayment() {
+  //   this.isSaving = true;
 
-//   const result = (this.ExpenseAmountDetails || []).map((item) => ({
-//     DUE_DATE: this.convertToISO(item.DUE_DATE),
-//     DUE_AMOUNT: item.DUE_AMOUNT,
-//   }));
+  //   const result = (this.ExpenseAmountDetails || []).map((item) => ({
+  //     DUE_DATE: this.convertToISO(item.DUE_DATE),
+  //     DUE_AMOUNT: item.DUE_AMOUNT,
+  //   }));
 
-//   const payload = {
-//     TRANS_ID: this.PrePaymentFormData.TRANS_ID || 0,
-//     COMPANY_ID: this.selected_Company_id || null,
-//     FIN_ID: this.selected_fin_id || null,
-//     TRANS_TYPE: Number(this.PrePaymentFormData.TRANS_TYPE) || null,
-//     TRANS_DATE: this.formatToISO(this.PrePaymentFormData.TRANS_DATE),
-//     REF_NO: this.PrePaymentFormData.REF_NO || '',
-//     NARRATION: this.PrePaymentFormData.NARRATION || '',
-//     CREATE_USER_ID: this.selected_user_id || null,
-//     TAX_PERCENT: Number(this.PrePaymentFormData.TAX_PERCENT) || null,
-//     TAX_AMOUNT: Number(this.PrePaymentFormData.TAX_AMOUNT) || null,
-//     NET_AMOUNT: Number(this.PrePaymentFormData.NET_AMOUNT) || null,
-//     SUPP_ID: Number(this.PrePaymentFormData.SUPP_ID) || null,
-//     EXP_HEAD_ID: Number(this.PrePaymentFormData.EXP_HEAD_ID) || null,
-//     PREPAY_HEAD_ID: Number(this.PrePaymentFormData.PREPAY_HEAD_ID) || null,
-//     DATE_FROM: this.formatToISO(this.PrePaymentFormData.DATE_FROM),
-//     DATE_TO: this.formatToISO(this.PrePaymentFormData.DATE_TO),
-//     NO_OF_DAYS: Number(this.PrePaymentFormData.NO_OF_DAYS) || null,
-//     EXPENSE_AMOUNT: Number(this.PrePaymentFormData.EXPENSE_AMOUNT) || null,
-//     NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
-//     TRANS_STATUS: this.PrePaymentFormData.TRANS_STATUS ? 5 : 1,
-//     STORE_ID: this.selectedstoreId,
-//     PREPAY_DETAIL: result,
-//   };
+  //   const payload = {
+  //     TRANS_ID: this.PrePaymentFormData.TRANS_ID || 0,
+  //     COMPANY_ID: this.selected_Company_id || null,
+  //     FIN_ID: this.selected_fin_id || null,
+  //     TRANS_TYPE: Number(this.PrePaymentFormData.TRANS_TYPE) || null,
+  //     TRANS_DATE: this.formatToISO(this.PrePaymentFormData.TRANS_DATE),
+  //     REF_NO: this.PrePaymentFormData.REF_NO || '',
+  //     NARRATION: this.PrePaymentFormData.NARRATION || '',
+  //     CREATE_USER_ID: this.selected_user_id || null,
+  //     TAX_PERCENT: Number(this.PrePaymentFormData.TAX_PERCENT) || null,
+  //     TAX_AMOUNT: Number(this.PrePaymentFormData.TAX_AMOUNT) || null,
+  //     NET_AMOUNT: Number(this.PrePaymentFormData.NET_AMOUNT) || null,
+  //     SUPP_ID: Number(this.PrePaymentFormData.SUPP_ID) || null,
+  //     EXP_HEAD_ID: Number(this.PrePaymentFormData.EXP_HEAD_ID) || null,
+  //     PREPAY_HEAD_ID: Number(this.PrePaymentFormData.PREPAY_HEAD_ID) || null,
+  //     DATE_FROM: this.formatToISO(this.PrePaymentFormData.DATE_FROM),
+  //     DATE_TO: this.formatToISO(this.PrePaymentFormData.DATE_TO),
+  //     NO_OF_DAYS: Number(this.PrePaymentFormData.NO_OF_DAYS) || null,
+  //     EXPENSE_AMOUNT: Number(this.PrePaymentFormData.EXPENSE_AMOUNT) || null,
+  //     NO_OF_MONTHS: Number(this.PrePaymentFormData.NO_OF_MONTHS) || null,
+  //     TRANS_STATUS: this.PrePaymentFormData.TRANS_STATUS ? 5 : 1,
+  //     STORE_ID: this.selectedstoreId,
+  //     PREPAY_DETAIL: result,
+  //   };
 
-//   console.log('Payload:', payload);
+  //   console.log('Payload:', payload);
 
-//   // VERIFY
-//   if (this.verifyPrePaymentPopupOpened) {
-//     this.dataservice.Verify_PrePayment(payload).subscribe(
-//       (res: any) => {
-//         this.isSaving = false;
+  //   // VERIFY
+  //   if (this.verifyPrePaymentPopupOpened) {
+  //     this.dataservice.Verify_PrePayment(payload).subscribe(
+  //       (res: any) => {
+  //         this.isSaving = false;
 
-//         notify({
-//           message: 'PrePayment Verified successfully',
-//           type: 'success',
-//           position: { at: 'top right', my: 'top right' },
-//           displayTime: 500,
-//         });
+  //         notify({
+  //           message: 'PrePayment Verified successfully',
+  //           type: 'success',
+  //           position: { at: 'top right', my: 'top right' },
+  //           displayTime: 500,
+  //         });
 
-//         this.formClosed.emit();
-//       },
-//       (error) => {
-//         this.isSaving = false;
-//         notify('Error while verifying PrePayment', 'error', 2000);
-//         console.error(error);
-//       }
-//     );
+  //         this.formClosed.emit();
+  //       },
+  //       (error) => {
+  //         this.isSaving = false;
+  //         notify('Error while verifying PrePayment', 'error', 2000);
+  //         console.error(error);
+  //       }
+  //     );
 
-//     return;
-//   }
+  //     return;
+  //   }
 
-//   // APPROVE
-//   if (this.PrePaymentFormData.TRANS_STATUS === true) {
-//     this.dataservice.Approve_PrePayment(payload).subscribe(
-//       (res: any) => {
-//         this.isSaving = false;
+  //   // APPROVE
+  //   if (this.PrePaymentFormData.TRANS_STATUS === true) {
+  //     this.dataservice.Approve_PrePayment(payload).subscribe(
+  //       (res: any) => {
+  //         this.isSaving = false;
 
-//         notify({
-//           message: 'PrePayment Approved successfully',
-//           type: 'success',
-//           position: { at: 'top right', my: 'top right' },
-//           displayTime: 500,
-//         });
+  //         notify({
+  //           message: 'PrePayment Approved successfully',
+  //           type: 'success',
+  //           position: { at: 'top right', my: 'top right' },
+  //           displayTime: 500,
+  //         });
 
-//         this.formClosed.emit();
-//       },
-//       (error) => {
-//         this.isSaving = false;
-//         notify('Error while approving PrePayment', 'error', 2000);
-//         console.error(error);
-//       }
-//     );
+  //         this.formClosed.emit();
+  //       },
+  //       (error) => {
+  //         this.isSaving = false;
+  //         notify('Error while approving PrePayment', 'error', 2000);
+  //         console.error(error);
+  //       }
+  //     );
 
-//     return;
-//   }
+  //     return;
+  //   }
 
-//   // UPDATE
-//   this.dataservice.Update_PrePayment(payload).subscribe(
-//     (res: any) => {
-//       this.isSaving = false;
+  //   // UPDATE
+  //   this.dataservice.Update_PrePayment(payload).subscribe(
+  //     (res: any) => {
+  //       this.isSaving = false;
 
-//       notify({
-//         message: 'PrePayment Updated successfully',
-//         type: 'success',
-//         position: { at: 'top right', my: 'top right' },
-//         displayTime: 500,
-//       });
+  //       notify({
+  //         message: 'PrePayment Updated successfully',
+  //         type: 'success',
+  //         position: { at: 'top right', my: 'top right' },
+  //         displayTime: 500,
+  //       });
 
-//       this.formClosed.emit();
-//     },
-//     (error) => {
-//       this.isSaving = false;
-//       notify('Error while updating PrePayment', 'error', 2000);
-//       console.error(error);
-//     }
-//   );
-// }
+  //       this.formClosed.emit();
+  //     },
+  //     (error) => {
+  //       this.isSaving = false;
+  //       notify('Error while updating PrePayment', 'error', 2000);
+  //       console.error(error);
+  //     }
+  //   );
+  // }
 
   viewPdf(): void {
     this.isPdfPopupVisible = true;
@@ -975,4 +992,4 @@ else {
   exports: [PrePaymentEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PrePaymentEditModule {}
+export class PrePaymentEditModule { }

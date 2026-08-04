@@ -40,6 +40,7 @@ import { ViewPromotionWizardModule } from '../view-promotion-wizard/view-promoti
 import { filter } from 'rxjs/operators';
 import { ChangeDetectorRef } from '@angular/core';
 import { PromotionComponent, PromotionModule } from '../promotion/promotion.component';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-promotion-log',
@@ -113,18 +114,32 @@ export class PromotionLogComponent {
   canPrint = false;
   canVerify = false;
   StatusType: any;
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.onAddClick();
-      });
+      this.zone.run(() => this.onAddClick());
     },
     elementAttr: { class: 'add-button' },
 
@@ -217,6 +232,11 @@ export class PromotionLogComponent {
       value: 'Verified',
     },
   ];
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Promotion log');
+  }
+
   statusCellRender(cellElement: any, cellInfo: any) {
     console.log(cellInfo, '==========cellInfo==============')
     const status = cellInfo.data.Status;
@@ -250,6 +270,7 @@ export class PromotionLogComponent {
     private dataservice: DataService,
     private router: Router,
     private zone: NgZone,
+    private exportService: ExportService,
     private cdr: ChangeDetectorRef
 
   ) { }

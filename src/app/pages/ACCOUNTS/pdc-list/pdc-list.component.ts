@@ -424,36 +424,6 @@ export class PdcListComponent {
     return `${day}/${month}/${year}`;
   }
 
-  statusCellRender(cellElement: any, cellInfo: any) {
-    const status = cellInfo.data.ENTRY_STATUS;
-
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Closed'
-        ? '#EF4444'
-        : status === 'Approved'
-          ? '#10B981' // Approved
-          : status === 'Verified'
-            ? '#0073D8' // Verified
-            : '#FFA500'; // Open
-    icon.title =
-      status === 'Closed'
-        ? 'Closed'
-        : status === 'Approved'
-          ? 'Approved'
-          : status === 'Verified'
-            ? 'Verified'
-            : 'Open';
-
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
-
-    cellElement.appendChild(icon);
-  }
-
   private parseDateString(dateStr: string): Date {
     const [day, month, year] = dateStr
       .split('-')
@@ -678,20 +648,24 @@ export class PdcListComponent {
 
   onEditPDC(event: any) {
     event.cancel = true;
+
     const status = event.data?.ENTRY_STATUS?.trim();
-    if (status === 'Approved' || status === 'Closed') {
+
+    if (
+      status === 'Verified' ||
+      status === 'Approved' ||
+      status === 'Closed'
+    ) {
       this.setPopupMode('view');
       this.isEditReadOnly = true;
     } else {
       this.setPopupMode('edit');
       this.isEditReadOnly = false;
     }
-    //  this.isEditReadOnly =
-    // status === 'Approved' || status === 'Closed';
+
     this.editPDCPopupOpened = true;
     this.selected_PDC(event);
   }
-
   selectedVerify_PDC(event: any) {
     const id = event.row.data.ID;
     this.PDCid = id;
@@ -851,4 +825,4 @@ export class PdcListComponent {
   exports: [PdcListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PdcListModule {}
+export class PdcListModule { }

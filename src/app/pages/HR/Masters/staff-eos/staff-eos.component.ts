@@ -32,6 +32,7 @@ import { FormPopupModule, FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-staff-eos',
@@ -236,6 +237,7 @@ export class StaffEOSComponent {
     private ngZone: NgZone,
     private cdRef: ChangeDetectorRef,
     private router: Router,
+    private exportService: ExportService,
   ) {
     this.formSource = this.fb.group({
       id: [null],
@@ -332,6 +334,10 @@ export class StaffEOSComponent {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
+  }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Employee EOS');
   }
 
   getStaffEosData() {
@@ -733,7 +739,9 @@ export class StaffEOSComponent {
       return 'Edit';
     }
 
-    return row.STATUS === 'Verified' || row.STATUS === 'Left Service' || row.STATUS === 'Approved'
+    return row.STATUS === 'Verified' ||
+      row.STATUS === 'Left Service' ||
+      row.STATUS === 'Approved'
       ? 'Detail'
       : 'Edit';
   }
@@ -834,11 +842,9 @@ export class StaffEOSComponent {
 
         if (data.STATUS === 'Open') {
           this.verifypopup = true;
-        }
-        else if (data.STATUS === 'Verified') {
+        } else if (data.STATUS === 'Verified') {
           this.Approvepopup = true;
-        }
-        else {
+        } else {
           this.isviewpopup = true;
         }
 
@@ -846,7 +852,7 @@ export class StaffEOSComponent {
       },
       error: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -1147,4 +1153,4 @@ export class StaffEOSComponent {
   declarations: [StaffEOSComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StaffEOSModule { }
+export class StaffEOSModule {}

@@ -21,7 +21,12 @@
       [showInfo]="true"
       [showNavigationButtons]="true"
     ></dxo-pager>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
       <dxo-popup
         title="Edit {{ itemlabel }}"
         [showTitle]="true"
@@ -35,7 +40,18 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">{{ ITEM_PROPERTY3 }}</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          {{ ITEM_PROPERTY3 }}
+        </div>
       </dxi-item>
 
       <dxi-item
@@ -54,6 +70,14 @@
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
       </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
+
       <dxi-item
         location="after"
         widget="dxButton"

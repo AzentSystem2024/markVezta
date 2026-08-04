@@ -136,19 +136,19 @@ import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock
 import { DepreciationReportComponent } from './pages/Depreciation/depreciation-report/depreciation-report.component';
 import { FixedAssetRegisterComponent } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
 import { ChartOfAccountsFinanceComponent } from './pages/MASTER/Chart Of Accounts/chart-of-accounts-finance-lookup/chart-of-accounts-finance.component';
-import { GrnComponent } from './pages/OPERATIONS/grn/grn/grn.component';
-import { PurchaseOrderComponent } from './pages/OPERATIONS/purchase-order/purchase-order.component';
-import { DeliveryNoteComponent } from './pages/OPERATIONS/delivery-note/delivery-note.component';
-import { DeliveryNoteFinanceComponent } from './pages/OPERATIONS/delivery-note-finance/delivery-note-finance.component';
-import { QuotationComponent } from './pages/OPERATIONS/quotation/quotation.component';
-import { SalesOrderComponent } from './pages/OPERATIONS/sales-order/sales-order.component';
-import { ItemStorePricesComponent } from './pages/OPERATIONS/item-store-prices/item-store-prices.component';
-import { SalesOrderFinanceComponent } from './pages/OPERATIONS/sales-order-finance/sales-order-finance.component';
-import { PurchaseReturnDebitComponent } from './pages/OPERATIONS/purchase-return-debit/purchase-return-debit.component';
-import { ProductionJvListComponent } from './pages/OPERATIONS/production-jv-list/production-jv-list.component';
-import { SaleReturnComponent } from './pages/OPERATIONS/sale-return/sale-return.component';
-import { MiscellaneousInvoiceComponent } from './pages/OPERATIONS/miscellaneous-invoice/miscellaneous-invoice.component';
-import { MiscellaneousPurchaseComponent } from './pages/OPERATIONS/miscellaneous-purchase/miscellaneous-purchase.component';
+import { GrnComponent } from './pages/Operations/grn/grn/grn.component';
+import { PurchaseOrderComponent } from './pages/Operations/purchase-order/purchase-order.component';
+import { DeliveryNoteComponent } from './pages/Operations/delivery-note/delivery-note.component';
+import { DeliveryNoteFinanceComponent } from './pages/Operations/delivery-note-finance/delivery-note-finance.component';
+import { QuotationComponent } from './pages/Operations/quotation/quotation.component';
+import { SalesOrderComponent } from './pages/Operations/sales-order/sales-order.component';
+import { ItemStorePricesComponent } from './pages/Operations/item-store-prices/item-store-prices.component';
+import { SalesOrderFinanceComponent } from './pages/Operations/sales-order-finance/sales-order-finance.component';
+import { PurchaseReturnDebitComponent } from './pages/Operations/purchase-return-debit/purchase-return-debit.component';
+import { ProductionJvListComponent } from './pages/Operations/production-jv-list/production-jv-list.component';
+import { SaleReturnComponent } from './pages/Operations/sale-return/sale-return.component';
+import { MiscellaneousInvoiceComponent } from './pages/Operations/miscellaneous-invoice/miscellaneous-invoice.component';
+import { MiscellaneousPurchaseComponent } from './pages/Operations/miscellaneous-purchase/miscellaneous-purchase.component';
 import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
 import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 import { SalaryWPSComponent } from './pages/salary-wps/salary-wps.component';
@@ -156,7 +156,7 @@ import { PaySettingsComponent } from './pages/HR/Masters/pay-settings/pay-settin
 import { DepartmentMeComponent } from './pages/MASTER/department-me/department-me.component';
 import { ProfitAndLossBranchComponent } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { CustomerFinListComponent } from './pages/MASTER/customer-fin-list/customer-fin-list.component';
-import { MiscSalesInvoiceListComponent } from './pages/OPERATIONS/misc-sales-invoice-list/misc-sales-invoice-list.component';
+import { MiscSalesInvoiceListComponent } from './pages/Operations/misc-sales-invoice-list/misc-sales-invoice-list.component';
 import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-terms-list.component';
 import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
 import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
@@ -188,9 +188,9 @@ import { ZReportComponent } from './pages/REPORT/zreport/zreport.component';
 import { ItemStorePriceApproveComponent } from './pages/item-store-price-approve/item-store-price-approve.component';
 import { ImportArDataComponent } from './pages/ERP-INTEGRATION/import-ar-data/import-ar-data.component';
 import { InvoiceRetailComponent } from './pages/Operations//invoice-retail/invoice-retail.component';
-import { MiscPurchaseInvoiceComponent } from './pages/OPERATIONS/misc-purchase-invoice/misc-purchase-invoice.component';
-import { MiscellaneousSalesInvoiceComponent } from './pages/OPERATIONS/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
-import { SalesInvoiceRetailComponent } from './pages/OPERATIONS/sales-invoice-retail/sales-invoice-retail.component';
+import { MiscPurchaseInvoiceComponent } from './pages/Operations/misc-purchase-invoice/misc-purchase-invoice.component';
+import { MiscellaneousSalesInvoiceComponent } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
+import { SalesInvoiceRetailComponent } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
 import { ARImportedListComponent } from './pages/ERP-INTEGRATION/ar-imported-list/ar-imported-list.component';
 import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinician-master.component';
 import { CPTMasterComponent } from './pages/MASTER/cpt-master/cpt-master.component';
@@ -201,10 +201,10 @@ import { DenialListComponent } from './pages/MASTER/denial-list/denial-list.comp
 import { ProfitAndLossDimensionComponent } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionComponent } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageComponent } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
-import { InvoiceListComponent } from './pages/OPERATIONS/invoice-list/invoice-list.component';
-import { CustomerReceiptsComponent } from './pages/OPERATIONS/customer-receipts/customer-receipts.component';
-import { InvoiceTrOutComponent } from './pages/OPERATIONS/invoice-tr-out/invoice-tr-out.component';
-import { PurchaseInvoiceListComponent } from './pages/OPERATIONS/purchase-invoice-list/purchase-invoice-list.component';
+import { InvoiceListComponent } from './pages/Operations/invoice-list/invoice-list.component';
+import { CustomerReceiptsComponent } from './pages/Operations/customer-receipts/customer-receipts.component';
+import { InvoiceTrOutComponent } from './pages/Operations/invoice-tr-out/invoice-tr-out.component';
+import { PurchaseInvoiceListComponent } from './pages/Operations/purchase-invoice-list/purchase-invoice-list.component';
 import { ARManualMatchingComponent } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
 import { TrialBalanceDimensionAdvanceComponent } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
 import { LedgerStatementDimensionComponent } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
@@ -217,12 +217,11 @@ import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchas
 import { TimesheetReportComponent } from './pages/HR/timesheet-report/timesheet-report.component';
 import { PayrollReportComponent } from './pages/REPORT/payroll-report/payroll-report.component';
 import { PayrollOtReportComponent } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
-import {
-  LeavelistComponent,
-  LeavelistModule,
-} from './pages/REPORT/leavelist/leavelist.component';
+import { LeavelistComponent } from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 import { EosPaymentListComponent } from './pages/HR/Masters/eos-payment-list/eos-payment-list.component';
+import { LeaveSalaryPaymentComponent } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
+import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
 
 const routes: Routes = [
   {
@@ -287,6 +286,11 @@ const routes: Routes = [
       {
         path: 'analytics-dashboard',
         component: AnalyticsDashboardComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'vezta-dashboard',
+        component: AnalyticsDashboardVeztaMedicalComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1354,6 +1358,11 @@ const routes: Routes = [
       {
         path: 'finalsettlement-report',
         component: FinalSettlementReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'emp-leave-salary',
+        component: LeaveSalaryPaymentComponent,
         canActivate: [AuthGuardService],
       },
       {

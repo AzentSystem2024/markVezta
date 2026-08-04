@@ -124,16 +124,14 @@ export class PayrollListComponent {
   approveDisabled = true;
 
   addButtonOptions = {
-    text: 'New',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.zone.run(() => {
-        this.addPayroll();
-      });
+      this.zone.run(() => this.addPayroll());
     },
     elementAttr: { class: 'add-button' },
+
     template: () => {
       return `
       <div class="add-btn-content">

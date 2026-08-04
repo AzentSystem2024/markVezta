@@ -49,7 +49,11 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      >
         <dxo-popup
           title="Edit Department"
           [showTitle]="true"
@@ -79,7 +83,6 @@
           widget="dxButton"
           [options]="searchButtonOptions"
         ></dxi-item>
-
         <!-- Refresh -->
         <dxi-item
           location="after"

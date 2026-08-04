@@ -44,6 +44,7 @@ import { Router } from '@angular/router';
 import { StockAdjustmentEditModule } from '../POPUP PAGES/stock-adjustment-edit/stock-adjustment-edit.component';
 import notify from 'devextreme/ui/notify';
 import { StockAdjustmentAddModule } from '../POPUP PAGES/stock-adjustment-add/stock-adjustment-add.component';
+import { ExportService } from 'src/app/services/export.service';
 @Component({
   selector: 'app-stock-adjustment-list',
   templateUrl: './stock-adjustment-list.component.html',
@@ -83,19 +84,25 @@ export class StockAdjustmentListComponent {
   };
   selectedStoreid: any[] = []
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.AddStock_adustment();
-      });
+      this.zone.run(() => this.AddStock_adustment());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   isAddStock_adj: boolean = false;
   Stock_adjustment_list: any;
@@ -132,6 +139,7 @@ export class StockAdjustmentListComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
+    private exportService: ExportService,
   ) {
 
     if (this.selectedDateRange === 'today') {
@@ -273,6 +281,10 @@ export class StockAdjustmentListComponent {
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.store_dropdown()
+  }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Stock Adjustment');
   }
 
   // get_stock_adjustment_list() {
@@ -422,26 +434,13 @@ export class StockAdjustmentListComponent {
     });
   }
 
-  onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'filter',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
-  }
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;

@@ -815,6 +815,48 @@ body {
   box-sizing: border-box;
 }
 
+.flag-travelled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Same width for all */
+  height: 20px;
+  border-radius: 10px;
+  // color: #fff;
+  color: blue;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
+.flag-rejoin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Same width for all */
+  height: 20px;
+  border-radius: 10px;
+  // color: #fff;
+  color: yellow;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
+.flag-leftservice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Same width for all */
+  height: 20px;
+  border-radius: 10px;
+  // color: #fff;
+  color: red;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  box-sizing: border-box;
+}
 .flag-pending {
   // background: #ffa500;
   background: #fff2d9;
@@ -831,6 +873,20 @@ body {
 }
 
 .flag-paid {
+  // background: #8b5cf6;
+  background: #eee7fe;
+}
+
+.flag-leftservice {
+  // background: #8b5cf6;
+  background: #eee7fe;
+}
+
+.flag-travelled {
+  // background: #8b5cf6;
+  background: #eee7fe;
+}
+.flag-rejoin {
   // background: #8b5cf6;
   background: #eee7fe;
 }
@@ -882,8 +938,16 @@ body {
   color: #8b5cf6;
 }
 
+.verify-badge.status-travelled::before {
+  color: blue;
+}
+
+.verify-badge.status-rejoin::before {
+  color: yellow;
+}
+
 .verify-badge.status-leftservice::before {
-  color: rgb(18, 161, 5);
+  color: red;
 }
 
 .verify-badge.disabled {
@@ -1367,7 +1431,7 @@ body {
 }
 .add-button.dx-button.dx-button-default:hover {
   border-radius: 8px !important;
-  background-color: #0068c2 !important;
+  background-color: #005cad !important;
   color: #fff !important; /* text color */
 }
 .add-btn-content {

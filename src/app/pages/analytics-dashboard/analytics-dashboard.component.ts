@@ -42,7 +42,6 @@ import {
 } from 'devextreme-angular';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import notify from 'devextreme/ui/notify';
-
 type DashboardData =
   | SalesOrOpportunitiesByCategory
   | Sales
@@ -50,7 +49,6 @@ type DashboardData =
   | SalesByStateAndCity
   | null;
 type DataLoader = (startDate: string, endDate: string) => Observable<Object>;
-
 @Component({
   templateUrl: './analytics-dashboard.component.html',
   styleUrls: ['./analytics-dashboard.component.scss'],
@@ -58,32 +56,80 @@ type DataLoader = (startDate: string, endDate: string) => Observable<Object>;
 })
 export class AnalyticsDashboardComponent implements OnInit {
   dateRanges = [
-    { label: 'All', value: 'all' },
-    { label: 'Current Year', value: 'currentYear' },
-    { label: 'Current Month', value: 'currentMonth' },
-    { label: 'Today', value: 'today' },
-    { label: 'Last 7 Days', value: 'last7' },
-    { label: 'Last 15 Days', value: 'last15' },
-    { label: 'Last 30 Days', value: 'last30' },
-    { label: 'Custom', value: 'custom' },
+    {
+      label: 'All',
+      value: 'all',
+    },
+    {
+      label: 'Current Year',
+      value: 'currentYear',
+    },
+    {
+      label: 'Current Month',
+      value: 'currentMonth',
+    },
+    {
+      label: 'Today',
+      value: 'today',
+    },
+    {
+      label: 'Last 7 Days',
+      value: 'last7',
+    },
+    {
+      label: 'Last 15 Days',
+      value: 'last15',
+    },
+    {
+      label: 'Last 30 Days',
+      value: 'last30',
+    },
+    {
+      label: 'Custom',
+      value: 'custom',
+    },
   ];
-
-  chartSize = { width: window.innerWidth * 0.95 };
+  chartSize = {
+    width: window.innerWidth * 0.95,
+  };
 
   // Sales vs Returns
   salesComparison = [
-    { type: 'Sales', value: 150000 },
-    { type: 'Sales Return', value: 20000 },
-    { type: 'Net Sales', value: 130000 },
+    {
+      type: 'Sales',
+      value: 150000,
+    },
+    {
+      type: 'Sales Return',
+      value: 20000,
+    },
+    {
+      type: 'Net Sales',
+      value: 130000,
+    },
   ];
   opportunities: any = [];
-
   transactionsData = [
-    { period: 'Jan', value: 120 },
-    { period: 'Feb', value: 150 },
-    { period: 'Mar', value: 180 },
-    { period: 'Apr', value: 140 },
-    { period: 'May', value: 200 },
+    {
+      period: 'Jan',
+      value: 120,
+    },
+    {
+      period: 'Feb',
+      value: 150,
+    },
+    {
+      period: 'Mar',
+      value: 180,
+    },
+    {
+      period: 'Apr',
+      value: 140,
+    },
+    {
+      period: 'May',
+      value: 200,
+    },
   ];
   analyticsPanelItems = analyticsPanelItems;
   selectedDateRange: any;
@@ -119,10 +165,8 @@ export class AnalyticsDashboardComponent implements OnInit {
     '#0D9488',
     '#7DD3FC',
     '#475569',
-
     '#94A3B8',
   ];
-
   itemPalette: any[] = [];
   selected_Company_id: any;
   selected_fin_id: any;
@@ -148,21 +192,17 @@ export class AnalyticsDashboardComponent implements OnInit {
   totalCash = 0;
   totalFabPosCard = 0;
   sessiondata: any;
-
   constructor(private service: DataService) {
     this.sessiondata = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
     const sessionData = this.sessiondata;
-    console.log(sessionData);
     this.synch_pending_intervel =
       sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL;
     this.show_sync_reminder = sessionData.GeneralSettings.SHOW_SYNCH_REMINDER;
     const hours =
       Number(sessionData.GeneralSettings.SYNCH_PENDING_INTERVAL) / 60;
-
     this.buttonText = `List of stores not synchronized in last ${hours}  hours`;
-
     this.Get_SyncData();
     if (this.show_sync_reminder) {
       this.popupVisible = true;
@@ -170,15 +210,12 @@ export class AnalyticsDashboardComponent implements OnInit {
       this.popupVisible = false;
     }
   }
-
   selectionChange(dates: Dates) {
     this.loadData(dates.startDate, dates.endDate);
   }
-
   customizeSaleText(arg: { percentText: string }) {
     return arg.percentText;
   }
-
   loadData = (startDate: string, endDate: string) => {
     this.isLoading = true;
     const tasks: Observable<object>[] = [
@@ -194,25 +231,20 @@ export class AnalyticsDashboardComponent implements OnInit {
       ],
     ].map(([dataName, loader]: [string, DataLoader]) => {
       const loaderObservable = loader(startDate, endDate).pipe(share());
-
       loaderObservable.subscribe((result: DashboardData) => {
         this[dataName] = result;
       });
-
       return loaderObservable;
     });
-
     forkJoin(tasks).subscribe(() => {
       this.isLoading = false;
     });
   };
-
   ngOnInit(): void {
     const [startDate, endDate] = analyticsPanelItems[4].value.split('/');
     this.isLoading = false;
     // this.loadData(startDate, endDate);
     this.selectedDateRange = 'last30';
-
     this.onDateRangeChange({
       value: 'last30',
     });
@@ -223,41 +255,30 @@ export class AnalyticsDashboardComponent implements OnInit {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '',
     );
-
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
     this.startDate_of_Financial_year = sessionData.FINANCIAL_YEARS[0].DATE_FROM;
-    console.log(
-      this.startDate_of_Financial_year,
-      '================startDate_of_Financial_year=================',
-    );
-
     const sessionYear = sessionData.FINANCIAL_YEARS;
   }
   //--------------------date range selection----------------------------
 
   onDateRangeChange(e: any) {
     const today = new Date();
-
     switch (e.value) {
       case 'today':
         this.fromDate = new Date(today);
         this.toDate = new Date(today);
         break;
-
       case 'last7':
         this.fromDate = new Date(today);
         this.fromDate.setDate(today.getDate() - 6); // including today
         this.toDate = new Date(today);
         break;
-
       case 'last15':
         this.fromDate = new Date(today);
         this.fromDate.setDate(today.getDate() - 14);
         this.toDate = new Date(today);
         break;
-
       case 'last30':
         this.fromDate = new Date(today);
         this.fromDate.setDate(today.getDate() - 29);
@@ -269,13 +290,7 @@ export class AnalyticsDashboardComponent implements OnInit {
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(
-          this.fromDate,
-          this.toDate,
-          '================currentMonth=================',
-        );
         break;
-
       case 'currentYear':
         // January 1 of the current year
         this.fromDate = new Date(today.getFullYear(), 0, 1);
@@ -284,55 +299,39 @@ export class AnalyticsDashboardComponent implements OnInit {
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(
-          this.fromDate,
-          this.toDate,
-          '================currentMonth=================',
-        );
-
         break;
-
       case 'all':
         this.fromDate = new Date(this.startDate_of_Financial_year); // or your minimum date
         this.toDate = new Date(today); // or today
         break;
-
       case 'custom':
         this.showCustomDatePopup = true;
         // User will select fromDate and toDate manually.
         return;
     }
-
     this.getDashboardData();
   }
-
   dateChanged() {
     this.getDashboardData();
   }
-
   getDashboardData() {
     this.loadingVisible = true;
     const timeoutId = setTimeout(() => {
       this.loadingVisible = false;
       alert('Request timeout. Please try again.');
     }, 50000);
-
     this.sesstion_Details();
-
     const payload = {
       DATE_FROM: this.formatDate(this.fromDate),
       DATE_TO: this.formatDate(this.toDate),
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
     };
-
     this.service.Dashboard_Data_api(payload).subscribe(
       (res: any) => {
         clearTimeout(timeoutId);
         this.loadingVisible = false;
-
         this.gross_Sales_list = res?.data?.GrossSale || [];
-
         this.TopMovingItems_list = (res?.data?.TopMovingItems || []).map(
           (item: any) => ({
             ITEM_CODE: item.ITEM_CODE,
@@ -340,15 +339,10 @@ export class AnalyticsDashboardComponent implements OnInit {
             DESCRIPTION: item.DESCRIPTION,
           }),
         );
-
         this.TenderSummary_list = res?.data?.TenderSummary || [];
-
         this.generateTenderSeries();
-
         const allTenderKeys = this.seriesList.map((s: any) => s.valueField);
-
         this.storeinfo = (this.TenderSummary_list || []).map((store: any) => {
-          console.log(store, '----stores----');
           const tenderTypes = store?.TenderTypes || [];
           const obj: any = {
             store: store.STORE_NAME,
@@ -357,25 +351,18 @@ export class AnalyticsDashboardComponent implements OnInit {
               return sum + Number(tender?.AMOUNT || 0);
             }, 0),
           };
-
           allTenderKeys.forEach((key: string) => (obj[key] = 0));
-
           tenderTypes.forEach((t: any) => {
             obj[t.TENDER] = t.AMOUNT;
             obj.Total += Number(t.AMOUNT || 0);
           });
           // Total = Cash + FAB POS CARD
           obj.TOTAL = obj.Total;
-          console.log(obj.TOTAL);
           return obj;
         });
-
         const RevenuExpe = res?.data?.ProfitLoss;
-        console.log(RevenuExpe, '----------------RevenuExpe------------');
-
         const revenue = res?.data?.ProfitLoss?.Revenue || [];
         const expense = res?.data?.ProfitLoss?.Expense || [];
-
         const chartMap = new Map<string, any>();
 
         // Revenue
@@ -399,10 +386,7 @@ export class AnalyticsDashboardComponent implements OnInit {
             });
           }
         });
-
         this.chartData = Array.from(chartMap.values());
-        console.log(this.chartData, this.seriesList_profitAndLoss);
-
         this.seriesList_profitAndLoss = [
           {
             valueField: 'Revenue',
@@ -413,12 +397,6 @@ export class AnalyticsDashboardComponent implements OnInit {
             name: 'Expense',
           },
         ];
-
-        console.log(this.chartData);
-        console.log(this.seriesList_profitAndLoss);
-
-        console.log(this.chartData);
-        console.log(this.storeinfo, '');
       },
       (error) => {
         clearTimeout(timeoutId);
@@ -426,16 +404,19 @@ export class AnalyticsDashboardComponent implements OnInit {
         notify('Error occurred while loading data.', 'error', 3000);
       },
     );
-
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+      option.value === 'custom'
+        ? {
+            ...option,
+            label: 'Custom',
+          }
+        : option,
     );
   }
 
   // dynamically discovers tender types from the API response
   generateTenderSeries() {
     const tenders = new Set<string>();
-
     (this.TenderSummary_list || []).forEach((store: any) => {
       (store?.TenderTypes || []).forEach((t: any) => {
         if (t?.TENDER) {
@@ -443,7 +424,6 @@ export class AnalyticsDashboardComponent implements OnInit {
         }
       });
     });
-
     const palette = [
       '#10B981',
       '#4F46E5',
@@ -456,21 +436,16 @@ export class AnalyticsDashboardComponent implements OnInit {
       '#EAB308',
       '#64748B',
     ];
-
     this.seriesList = Array.from(tenders).map((tender, index) => ({
       valueField: tender,
       name: tender,
       color: palette[index % palette.length],
     }));
   }
-
   formatDate(date: Date): string {
     const year = date.getFullYear();
-
     const month = String(date.getMonth() + 1).padStart(2, '0');
-
     const day = String(date.getDate()).padStart(2, '0');
-
     return `${year}-${month}-${day}`;
   }
   customizeTooltip = (arg: any) => {
@@ -481,12 +456,7 @@ export class AnalyticsDashboardComponent implements OnInit {
   customizeLabel = (arg: any) => {
     return `${arg.value}`;
   };
-
   customizeChartTooltip(arg: any) {
-    console.log(
-      arg,
-      '=================customizeChartTooltip arg=================',
-    );
     return {
       text: `
       Item : ${arg.argumentText}
@@ -498,55 +468,41 @@ export class AnalyticsDashboardComponent implements OnInit {
   barChartcustomizeTooltip() {}
   MillioncustomizeLabel() {}
   onChartInitialized(e: any) {}
-
   customizeFunnelLabel = (arg: any) => {
     return `${arg.item.STORE_NAME}
 ${this.formatAmount(arg.value)}`;
   };
-
   formatAmount(value: number): string {
     if (value >= 1000000) {
       return (value / 1000000).toFixed(1) + 'M';
     }
-
     if (value >= 1000) {
       return (value / 1000).toFixed(1) + 'K';
     }
-
     return value.toString();
   }
-
   customizePoint = (pointInfo: any) => {
-    console.log('customizePoint fired', pointInfo);
-
     const index = this.TopMovingItems_list.findIndex(
       (x: any) => x.DESCRIPTION === pointInfo.argument,
     );
-
     return {
       color: this.colors[index % this.colors.length],
     };
   };
-
   formatNumber(value: number): string {
     if (value === null || value === undefined) {
       return '0';
     }
-
     return new Intl.NumberFormat('en-IN').format(value);
   }
-
   customizeCommonLabel = (pointInfo: any) => {
     return `${this.formatAmountTender(pointInfo.value)}`;
   };
-
   customizeCommonTooltip = (arg: any) => {
-    console.log(arg);
     return {
       text: `${arg.item.argument}${this.formatNumber(arg.value)}`,
     };
   };
-
   customizeCommonLabelFortopmovin = (pointInfo: any): string => {
     return `${pointInfo.value}`;
   };
@@ -554,7 +510,6 @@ ${this.formatAmount(arg.value)}`;
   //====================date range selection for custom date===========================
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
-
     if (e.value === 'custom') {
       this.showCustomDatePopup = true;
       return;
@@ -562,36 +517,34 @@ ${this.formatAmount(arg.value)}`;
 
     // reset custom label
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+      option.value === 'custom'
+        ? {
+            ...option,
+            label: 'Custom',
+          }
+        : option,
     );
-
     this.customStartDate = null;
     this.customEndDate = null;
-
     this.getDashboardData();
   }
-
   applyDateFilter() {
     const today = new Date();
-
     switch (this.selectedDateRange) {
       case 'today':
         this.fromDate = new Date(today);
         this.toDate = new Date(today);
         break;
-
       case 'last7':
         this.fromDate = new Date(today);
         this.fromDate.setDate(today.getDate() - 6);
         this.toDate = new Date(today);
         break;
-
       case 'last15':
         this.fromDate = new Date(today);
         this.fromDate.setDate(today.getDate() - 14);
         this.toDate = new Date(today);
         break;
-
       case 'last30':
         this.fromDate = new Date(today);
         this.fromDate.setDate(today.getDate() - 29);
@@ -603,13 +556,7 @@ ${this.formatAmount(arg.value)}`;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(
-          this.fromDate,
-          this.toDate,
-          '================currentMonth=================',
-        );
         break;
-
       case 'currentYear':
         // January 1 of the current year
         this.fromDate = new Date(today.getFullYear(), 0, 1);
@@ -618,82 +565,65 @@ ${this.formatAmount(arg.value)}`;
         // Today's date
         this.toDate = new Date(today);
         this.toDate.setHours(0, 0, 0, 0);
-        console.log(
-          this.fromDate,
-          this.toDate,
-          '================currentMonth=================',
-        );
-
         break;
-
       case 'all':
         this.fromDate = null;
         this.toDate = new Date(today);
         break;
-
       case 'custom':
         if (!this.fromDate || !this.toDate) {
           return;
         }
         break;
-
       default:
         return;
     }
-
     this.getDashboardData();
   }
-
   applyCustomDateFilter() {
     if (!this.customStartDate || !this.customEndDate) return;
-
     if (this.customStartDate > this.customEndDate) {
       alert('From date cannot be greater than To date');
       return;
     }
-
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
-
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom' ? { ...option, label: 'custom' } : option,
+      option.value === 'custom'
+        ? {
+            ...option,
+            label: 'custom',
+          }
+        : option,
     );
-
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
   }
-
   displayExpr = (item: any) => {
     if (!item) return '';
-
     if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
       const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
       const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
       return `${from} to ${to}`;
     }
-
     return item.label;
   };
-
   openCustomDatePopup() {
     this.customStartDate = null;
     this.customEndDate = null;
     this.showCustomDatePopup = true;
   }
-
   private formatAsDDMMYYYY(d: Date): string {
     const day = d.getDate().toString().padStart(2, '0');
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   }
-
   get customStartDateFormatted(): string {
     return this.customStartDate
       ? this.formatAsDDMMYYYY(new Date(this.customStartDate))
       : '';
   }
-
   get customEndDateFormatted(): string {
     return this.customEndDate
       ? this.formatAsDDMMYYYY(new Date(this.customEndDate))
@@ -708,11 +638,15 @@ ${this.formatAmount(arg.value)}`;
     // const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+      option.value === 'custom'
+        ? {
+            ...option,
+            label: 'Custom',
+          }
+        : option,
     );
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
-
     this.getDashboardData(); // your existing function
   }
   attachItemClickHandler(e: any) {
@@ -742,26 +676,18 @@ ${this.formatAmount(arg.value)}`;
           (item: any) =>
             Number(item.TIME_DIFFERENCE) > this.synch_pending_intervel,
         );
-
         this.listSyncData = pendingData.map((item: any, index: number) => ({
           ...item,
           SL_NO: index + 1,
           IsPending: true,
         }));
-
         this.notificationCount = this.listSyncData.length;
-
-        console.log('Pending Sync Data:', this.listSyncData);
-        console.log('Notification Count:', this.notificationCount);
       },
-      error: (err) => {
-        console.log(err);
-      },
+      error: (err) => {},
     });
   }
   onRowPrepared(e: any) {
     if (e.rowType !== 'data') return;
-
     if (e.data.IsPending) {
       e.rowElement.style.color = 'red';
       // e.rowElement.style.fontWeight = 'bold';
@@ -773,9 +699,7 @@ ${this.formatAmount(arg.value)}`;
     if (!cellInfo.value) {
       return '';
     }
-
     const date = new Date(cellInfo.value);
-
     return new Intl.DateTimeFormat('en-GB', {
       day: '2-digit',
       month: '2-digit',
@@ -789,7 +713,6 @@ ${this.formatAmount(arg.value)}`;
   // Tender amount formatting for chart labels and tooltips
   formatTenderAmount(value: number): string {
     const absValue = Math.abs(value);
-
     if (absValue >= 1_000_000_000) {
       return (value / 1_000_000_000).toFixed(2) + ' B';
     } else if (absValue >= 1_000_000) {
@@ -823,7 +746,6 @@ ${this.formatAmount(arg.value)}`;
   //===================gross claimed tender summary chart========================
   formatGrossSalesAmount(value: number): string {
     const absValue = Math.abs(value);
-
     if (absValue >= 1_000_000_000) {
       return (value / 1_000_000_000).toFixed(2) + ' B';
     } else if (absValue >= 1_000_000) {
@@ -840,13 +762,11 @@ ${this.formatAmount(arg.value)}`;
       text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
     };
   };
-
   customizeGrossSalesTooltip = (arg: any) => {
     return {
       text: `${arg.item.argument}: ${this.formatGrossSalesAmount(arg.value)}`,
     };
   };
-
   formatAmountTender(value: number): string {
     const absValue = Math.abs(value);
     if (absValue >= 1_000_000_000) {
@@ -862,7 +782,6 @@ ${this.formatAmount(arg.value)}`;
   // Tooltip - shows exact value only
   customizeTooltipTender = (pointInfo: any) => {
     const data = pointInfo.point.data;
-
     return {
       html: `
       <b>${data.store}</b><br/>
@@ -880,7 +799,6 @@ ${this.formatAmount(arg.value)}`;
   //=================
   customizeTotalLabel = (arg: any) => {
     const value = arg.value;
-
     if (value >= 1_000_000_000) {
       return (value / 1_000_000_000).toFixed(2) + ' B';
     } else if (value >= 1_000_000) {
@@ -888,10 +806,8 @@ ${this.formatAmount(arg.value)}`;
     } else if (value >= 1_000) {
       return (value / 1_000).toFixed(2) + ' K';
     }
-
     return value.toString();
   };
-
   customizeCommonLabelProfitandLoss = (arg: any) => {
     return new Intl.NumberFormat('en', {
       notation: 'compact',
@@ -915,16 +831,12 @@ ${this.formatAmount(arg.value)}`;
       ).format(arg.value)} AED`,
     };
   };
-
   customizeLabelTenderTotal = (pointInfo: any) => {
     const data = pointInfo.point.data;
-
     let total = 0;
-
     this.seriesList.forEach((series) => {
       total += Number(data[series.valueField] || 0);
     });
-
     return total.toLocaleString();
   };
   customizeAxisLabel = (arg: any) => {
@@ -932,21 +844,16 @@ ${this.formatAmount(arg.value)}`;
 
     // Split into two lines near the middle
     const words = text.split(' ');
-
     if (words.length <= 1) {
       return text;
     }
-
     const mid = Math.ceil(words.length / 2);
-
     return words.slice(0, mid).join(' ') + '\n' + words.slice(mid).join(' ');
   };
-
   customizeInsideLabel = (arg: any) => {
     return arg.valueText; // Shows 81, 13, etc.
   };
 }
-
 @NgModule({
   imports: [
     DxScrollViewModule,

@@ -66,7 +66,18 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Chart Of Accounts</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Chart Of Accounts
+          </div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
         <dxi-item
@@ -82,6 +93,11 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"
@@ -117,21 +133,18 @@
         fixedPosition="right"
       >
       </dxi-column>
-      <dxi-column type="buttons" [width]="120" fixed="true" fixedPosition="right">
+      <dxi-column
+        type="buttons"
+        [width]="120"
+        fixed="true"
+        fixedPosition="right"
+      >
+        <dxi-button name="edit" hint="Edit" [disabled]="isEditDisabled">
+        </dxi-button>
 
-      <dxi-button
-        name="edit"
-        hint="Edit"
-        [disabled]="isEditDisabled">
-      </dxi-button>
-
-      <dxi-button
-        name="delete"
-        hint="Delete"
-        [disabled]="isDeleteDisabled">
-      </dxi-button>
-
-    </dxi-column> 
+        <dxi-button name="delete" hint="Delete" [disabled]="isDeleteDisabled">
+        </dxi-button>
+      </dxi-column>
     </dx-data-grid>
   </div>
 </div>

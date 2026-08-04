@@ -63,7 +63,18 @@
       ></dxo-filter-row> -->
       <dxo-toolbar>
         <dxi-item location="before">
-          <h6>PDC</h6>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            PDC
+          </div>
         </dxi-item>
 
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
@@ -144,6 +155,12 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"
@@ -182,8 +199,8 @@
       <dxi-column
         dataField="ENTRY_STATUS"
         caption="Status"
-        [cellTemplate]="statusCellRender"
-        width="100  "
+        cellTemplate="statusCellRender"
+        width="140  "
         alignment="right"
         [headerFilter]="{
           dataSource: getStatusFilterData,
@@ -191,6 +208,24 @@
         }"
       >
       </dxi-column>
+
+      <div *dxTemplate="let data of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            [ngClass]="{
+              'flag-paid': data.data.ENTRY_STATUS === 'Closed',
+              'flag-approved': data.data.ENTRY_STATUS === 'Approved',
+              'flag-verified': data.data.ENTRY_STATUS === 'Verified',
+              'flag-pending':
+                data.data.ENTRY_STATUS !== 'Verified' &&
+                data.data.ENTRY_STATUS !== 'Approved' &&
+                data.data.ENTRY_STATUS !== 'Closed',
+            }"
+          >
+            {{ data.data.ENTRY_STATUS }}
+          </span>
+        </div>
+      </div>
 
       <dxi-column
         type="buttons"
@@ -201,107 +236,77 @@
       </dxi-column>
 
       <div *dxTemplate="let cellData of 'actionTemplate'">
-        <!-- Edit -->
-        <i
-          *ngIf="canEdit"
-          class="dx-icon dx-icon-edit"
-          [style.opacity]="
-            cellData.data.ENTRY_STATUS === 'Verified' ||
-            cellData.data.ENTRY_STATUS === 'Approved' ||
-            cellData.data.ENTRY_STATUS === 'Closed'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.ENTRY_STATUS === 'Verified' ||
-            cellData.data.ENTRY_STATUS === 'Approved' ||
-            cellData.data.ENTRY_STATUS === 'Closed'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Edit"
-          (click)="onEditPDC({ data: cellData.data, cancel: false })"
-        ></i>
+        <div class="action-icons">
+          <!-- Edit -->
+          <i
+            *ngIf="canEdit"
+            class="dx-icon dx-icon-edit"
+            [title]="cellData.data.ENTRY_STATUS === 'Open' ? 'Edit' : 'Details'"
+            (click)="onEditPDC({ data: cellData.data, cancel: false })"
+          ></i>
 
-        <!-- Delete -->
-        <i
-          *ngIf="canDelete"
-          class="dx-icon dx-icon-trash"
-          [style.opacity]="
-            cellData.data.ENTRY_STATUS === 'Verified' ||
-            cellData.data.ENTRY_STATUS === 'Approved' ||
-            cellData.data.ENTRY_STATUS === 'Closed'
-              ? '0.4'
-              : '1'
-          "
-          [style.pointer-events]="
-            cellData.data.ENTRY_STATUS === 'Verified' ||
-            cellData.data.ENTRY_STATUS === 'Approved' ||
-            cellData.data.ENTRY_STATUS === 'Closed'
-              ? 'none'
-              : 'auto'
-          "
-          style="cursor: pointer; margin-right: 10px"
-          title="Delete"
-          (click)="DeletePDC({ data: cellData.data, cancel: false })"
-        ></i>
+          <!-- Delete -->
+          <i
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            [style.opacity]="
+              cellData.data.ENTRY_STATUS === 'Verified' ||
+              cellData.data.ENTRY_STATUS === 'Approved' ||
+              cellData.data.ENTRY_STATUS === 'Closed'
+                ? '0.4'
+                : '1'
+            "
+            [style.pointer-events]="
+              cellData.data.ENTRY_STATUS === 'Verified' ||
+              cellData.data.ENTRY_STATUS === 'Approved' ||
+              cellData.data.ENTRY_STATUS === 'Closed'
+                ? 'none'
+                : 'auto'
+            "
+            title="Delete"
+            (click)="DeletePDC({ data: cellData.data, cancel: false })"
+          ></i>
 
-        <!-- Verify -->
-        <span
-          *ngIf="
-            cellData.data.ENTRY_STATUS === 'Closed' ||
-            (cellData.data.ENTRY_STATUS === 'Verified' && canApprove) ||
-            (cellData.data.ENTRY_STATUS !== 'Verified' && canVerify)
-          "
-          style="
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            vertical-align: middle;
-          "
-          [title]="
-            cellData.data.ENTRY_STATUS === 'Closed'
-              ? 'Closed'
-              : cellData.data.ENTRY_STATUS === 'Approved'
-                ? 'Approved'
+          <!-- Verify -->
+          <span
+            *ngIf="
+              !(canEdit && !canVerify && !canApprove) &&
+              (cellData.data.ENTRY_STATUS === 'Open' ||
+                cellData.data.ENTRY_STATUS === 'Verified' ||
+                cellData.data.ENTRY_STATUS === 'Approved' ||
+                cellData.data.ENTRY_STATUS === 'Closed' ||
+                cellData.data.ENTRY_STATUS === 'Partial')
+            "
+            class="verify-badge"
+            [ngClass]="{
+              'flag-paid': cellData.data.ENTRY_STATUS === 'Closed',
+              'status-pending': cellData.data.ENTRY_STATUS === 'Open',
+              'status-verified': cellData.data.ENTRY_STATUS === 'Verified',
+              'status-approved':
+                cellData.data.ENTRY_STATUS === 'Approved' ||
+                cellData.data.ENTRY_STATUS === 'Partial',
+
+              disabled:
+                (cellData.data.ENTRY_STATUS === 'Open' && !canVerify) ||
+                (cellData.data.ENTRY_STATUS === 'Verified' && !canApprove) ||
+                (cellData.data.ENTRY_STATUS === 'Approved' && canEdit) ||
+                (((cellData.data.ENTRY_STATUS === 'Closed' && canEdit) ||
+                  cellData.data.ENTRY_STATUS === 'Partial') &&
+                  !canView),
+            }"
+            [title]="
+              cellData.data.ENTRY_STATUS === 'Approved' ||
+              cellData.data.ENTRY_STATUS === 'Closed' ||
+              cellData.data.ENTRY_STATUS === 'Partial'
+                ? 'View'
                 : cellData.data.ENTRY_STATUS === 'Verified'
                   ? 'Approve'
                   : 'Verify'
-          "
-          (click)="onVerifyInvoice({ row: { data: cellData.data } })"
-        >
-          <!-- Blue badge -->
-          <i
-            class="fas fa-certificate"
-            [style.color]="
-              cellData.data.ENTRY_STATUS === 'Closed'
-                ? '#EF4444'
-                : cellData.data.ENTRY_STATUS === 'Approved'
-                  ? '#10B981'
-                  : cellData.data.ENTRY_STATUS === 'Verified'
-                    ? '#0073D8'
-                    : '#FFA500'
             "
-            style="font-size: 18px; position: absolute; top: 0; left: 0"
-          ></i>
-
-          <!-- White tick -->
-          <i
-            class="fas fa-check"
-            style="
-              color: white;
-              font-size: 7px;
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              pointer-events: none;
-            "
-          ></i>
-        </span>
+            (click)="onVerifyInvoice({ row: { data: cellData.data } })"
+          >
+          </span>
+        </div>
       </div>
     </dx-data-grid>
 
@@ -338,7 +343,7 @@
   <app-pdc-edit-form
     [selectedPDC]="selectedPDC"
     [isOpen]="editPDCPopupOpened"
-    [isReadOnly]="isEditReadOnly"
+    [isEditReadOnly]="isEditReadOnly"
     (formClosed)="handleClose()"
     [PDCid]="selectPDC"
     [canApprove]="canApprove"

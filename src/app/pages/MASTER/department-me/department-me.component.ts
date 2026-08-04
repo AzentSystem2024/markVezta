@@ -85,6 +85,17 @@ export class DepartmentMeComponent implements OnInit {
     onClick: () => this.toggleFilters(),
   };
 
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -94,6 +105,13 @@ export class DepartmentMeComponent implements OnInit {
     },
     text: '',
   };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.showDepartment();
+  }
 
   constructor(
     private dataservice: DataService,
@@ -106,29 +124,12 @@ export class DepartmentMeComponent implements OnInit {
     this.showDepartment();
   }
 
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.showDepartment();
-  }
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
 
   addDepartment() {
     this.isAddDepartmentPopupOpened = true;
     this.departmentComponent?.resetButton();
   }
-  
+
   onExporting(event: any) {
     this.exportService.onExporting(event, 'Department-list');
   }
@@ -198,7 +199,7 @@ export class DepartmentMeComponent implements OnInit {
         'error',
       );
       return;
-    } 
+    }
     // else if (isCodeDuplicate) {
     //   notify(
     //     {
@@ -320,11 +321,6 @@ export class DepartmentMeComponent implements OnInit {
 
     this.showDepartment();
   }
-
-  refresh = () => {
-    this.dataGrid?.instance.refresh();
-    this.showDepartment();
-  };
 }
 @NgModule({
   imports: [

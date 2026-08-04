@@ -66,7 +66,18 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">Items</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Items
+        </div>
       </dxi-item>
 
       <dxi-item location="after" locateInMenu="auto"> </dxi-item>
@@ -417,7 +428,7 @@
   *ngIf="isAddItemsPopupOpened"
   [(visible)]="isAddItemsPopupOpened"
   [width]="1000"
-  [height]="'100vh'"
+  [height]="'85vh'"
   titleText="New Item"
   (save)="onClickSaveItems()"
   (closeAndRefresh)="refreshGrid()"
@@ -431,7 +442,7 @@
   [(visible)]="isEditItemsPopupOpened"
   [width]="1200"
   [deferRendering]="false"
-  [height]="'100vh'"
+  [height]="'90vh'"
   title="Edit Item"
   [wrapperAttr]="{ class: 'edit-item-popup' }"
 >

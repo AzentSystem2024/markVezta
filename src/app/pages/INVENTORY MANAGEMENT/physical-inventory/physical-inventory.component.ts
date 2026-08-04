@@ -43,6 +43,7 @@ import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
 import { PhysicalInventoryFormModule } from '../POPUP PAGES/physical-inventory-form/physical-inventory-form.component';
 import { ThisReceiver } from '@angular/compiler';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-physical-inventory',
@@ -97,20 +98,46 @@ export class PhysicalInventoryComponent {
     text: '',
   };
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.openPrePopup();
-      });
+      this.zone.run(() => this.openPrePopup());
     },
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
+
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
 
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -146,6 +173,7 @@ export class PhysicalInventoryComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
+    private exportService: ExportService,
   ) { }
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -176,6 +204,11 @@ export class PhysicalInventoryComponent {
     this.getInventoryList();
     this.getDropdownList()
   }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Physical Inventory');
+  }
+
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     console.log(this.sessionData, '=================session data==========');
@@ -486,37 +519,6 @@ export class PhysicalInventoryComponent {
     }
   }
 
-  onToolbarPreparing(e: any) {
-    const toolbarItems = e.toolbarOptions.items;
-
-    // Avoid adding the button more than once
-    const alreadyAdded = toolbarItems.some(
-      (item: any) => item.name === 'toggleFilterButton',
-    );
-    if (!alreadyAdded) {
-      toolbarItems.splice(toolbarItems.length - 1, 0, {
-        widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
-        location: 'after',
-        options: {
-          icon: 'filter',
-          hint: 'Search Column',
-          onClick: () => this.toggleFilters(),
-        },
-      });
-    }
-  }
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
 
   onEditInventory(event: any) {
     console.log(event, 'eventttttttttttttt');

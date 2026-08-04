@@ -542,7 +542,9 @@ export class CreditNoteListComponent {
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
+        console.log('Credit Note Details:', response);
         this.selectedCreditNote = structuredClone(response.Data);
+        console.log('Credit Note Details:', this.selectedCreditNote);
 
         if (transStatus === 1) {
           // Open document -> Edit mode
@@ -585,6 +587,7 @@ export class CreditNoteListComponent {
     this.dataService
       .selectCreditNote(this.CreditNoteid)
       .subscribe((response: any) => {
+        console.log('Credit Note Details:', response.Data);
         this.selectedCreditNote = structuredClone(response.Data);
 
         if (transStatus === 5) {

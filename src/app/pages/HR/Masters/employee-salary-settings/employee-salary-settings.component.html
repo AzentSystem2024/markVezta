@@ -32,6 +32,7 @@
       [grouping]="{ autoExpandAll: false }"
       (onEditingStart)="onEditEmployee($event)"
       (onRowRemoving)="DeleteEmployeeSalarySettings($event)"
+      (onExporting)="onExporting($event)"
     >
       <dxo-editing
         mode="popup"
@@ -39,6 +40,7 @@
         [allowDeleting]="isDeleteAllowed"
       ></dxo-editing>
 
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -51,15 +53,19 @@
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-toolbar>
         <!-- TITLE -->
-        <dxi-item location="before" text="Employee Salary Settings"> </dxi-item>
-
-        <!-- FILTER SELECT BOX (STABLE) -->
-        <dxi-item
-          location="after"
-          locateInMenu="never"
-          widget="dxSelectBox"
-          [options]="filterSelectBoxOptions"
-        >
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Employee Salary Settings
+          </div>
         </dxi-item>
 
         <!-- SEARCH BUTTON -->
@@ -67,8 +73,7 @@
           location="after"
           widget="dxButton"
           [options]="searchButtonOptions"
-        >
-        </dxi-item>
+        ></dxi-item>
 
         <!-- REFRESH BUTTON -->
         <dxi-item
@@ -76,6 +81,11 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         >
+        </dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
         </dxi-item>
 
         <!-- EXPORT -->

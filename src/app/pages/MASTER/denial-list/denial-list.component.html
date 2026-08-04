@@ -24,24 +24,18 @@
     >
       <dxo-popup title="Edit Denial" [showTitle]="true"></dxo-popup>
       <dxo-form [colCount]="1">
-        <dxi-item
-          dataField="DenialCode"
-          editorType="dxTextBox"
-          caption="Code"
-        >
-
-        <dxi-validation-rule
+        <dxi-item dataField="DenialCode" editorType="dxTextBox" caption="Code">
+          <dxi-validation-rule
             type="required"
             message="Code is required"
           ></dxi-validation-rule>
 
           <dxi-validation-rule
-                type="async"
-                [validationCallback]="checkDuplicateDenial"
-                message="Denial already exists"
+            type="async"
+            [validationCallback]="checkDuplicateDenial"
+            message="Denial already exists"
           ></dxi-validation-rule>
-
-      </dxi-item>
+        </dxi-item>
 
         <dxi-item
           dataField="DenialTypeID"
@@ -50,17 +44,14 @@
           [editorOptions]="{
             displayExpr: 'DESCRIPTION',
             valueExpr: 'ID',
-            searchEnabled: true
+            searchEnabled: true,
           }"
         >
-
-        <dxi-validation-rule
+          <dxi-validation-rule
             type="required"
             message="Type is required"
-        ></dxi-validation-rule>
-          
-
-      </dxi-item>
+          ></dxi-validation-rule>
+        </dxi-item>
 
         <dxi-item
           dataField="DenialCategoryID"
@@ -69,16 +60,14 @@
           [editorOptions]="{
             displayExpr: 'DESCRIPTION',
             valueExpr: 'ID',
-            searchEnabled: true
+            searchEnabled: true,
           }"
         >
-
-        <dxi-validation-rule
+          <dxi-validation-rule
             type="required"
             message="Category is required"
-        ></dxi-validation-rule>
-
-      </dxi-item>
+          ></dxi-validation-rule>
+        </dxi-item>
 
         <dxi-item
           dataField="Description"
@@ -87,12 +76,11 @@
           [colSpan]="2"
           [editorOptions]="{ height: 160, maxHeight: 250 }"
         >
-        <dxi-validation-rule
+          <dxi-validation-rule
             type="required"
             message="Description is required"
-        ></dxi-validation-rule>
-
-      </dxi-item>
+          ></dxi-validation-rule>
+        </dxi-item>
       </dxo-form>
     </dxo-editing>
     <dxo-pager
@@ -110,32 +98,28 @@
     <dxo-header-filter [visible]="true"></dxo-header-filter>
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
     <dxo-search-panel [visible]="true" placeholder="Search"></dxo-search-panel>
-    <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="false"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">Denial</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Denial
+        </div>
       </dxi-item>
       <dxi-item
         location="after"
-        locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
+        [options]="searchButtonOptions"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
+
       <dxi-item
         location="after"
         locateInMenu="auto"
@@ -146,20 +130,20 @@
           icon: 'bi bi-arrow-clockwise',
           hint: 'refresh',
           onClick: refresh,
-          stylingMode: 'text'
+          stylingMode: 'text',
         }"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
       </dxi-item>
+
+      <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
         location="after"
-        cssClass="custom-export-button"
+        cssClass="export-btn"
       ></dxi-item>
-      <dxi-item location="after" locateInMenu="auto">
-        <div class="separator"></div>
-      </dxi-item>
       <dxi-item
         location="after"
         widget="dxButton"
