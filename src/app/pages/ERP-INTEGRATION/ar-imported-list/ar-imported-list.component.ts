@@ -93,8 +93,23 @@ export class ARImportedListComponent {
 
     elementAttr: { class: 'add-button' },
   };
+
+  ValidateButtonOptions = {
+    text: 'Validate',
+    icon: '',
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Validate AR Data',
+
+    onClick: () => {
+      this.validatePendingRows();
+    },
+
+    elementAttr: { class: 'add-button mx-2' },
+  };
   // ================= Progress Variables =================
   isProcessingRows: boolean = false;
+  progressMessage: string = 'Processing Pending Rows...';
   totalRequestCount: number = 0;
   completedRequestCount: number = 0;
   failedRequestCount: number = 0;
@@ -104,7 +119,15 @@ export class ARImportedListComponent {
   selectedJournalVoucher: any[] = [];
   selectedTransID: any;
 
+  isValidationPopupVisible: boolean = false;
+  transactionTypes: string[] = [];
+  selectedTransactionType: string = '';
+  allValidationErrors: any[] = [];
+  allMissingMasterData: any[] = [];
+  filteredValidationGridData: any[] = [];
+
   isLoading: boolean = false;
+  loadingMessage: string = 'Loading...';
 
   dateRanges = [
     { label: 'All', value: 'all' },
@@ -531,6 +554,7 @@ export class ARImportedListComponent {
 
     //  Initialize Counters
     this.isProcessingRows = true;
+    this.progressMessage = 'Processing Pending Rows...';
 
     this.totalRequestCount = pendingRows.length;
     this.completedRequestCount = 0;
@@ -590,6 +614,163 @@ export class ARImportedListComponent {
     //  Refresh Grid
     await new Promise((resolve) => setTimeout(resolve, 500));
     this.refreshGrid();
+  }
+
+  // ================= Validate Pending Rows =================
+  async validatePendingRows() {
+    // Selected Rows
+    const selectedRows = this.detailGrid?.instance.getSelectedRowsData();
+
+    if (!selectedRows || selectedRows.length === 0) {
+      notify('Please select rows', 'warning', 3000);
+      return;
+    }
+
+    // Pending Rows Only
+    const pendingRows = selectedRows.filter(
+      (x: any) => x.Status === 'Open' || x.Status === 'Failed',
+    );
+
+    if (pendingRows.length === 0) {
+      notify('Please select pending rows only', 'warning', 3000);
+      return;
+    }
+
+    const transactionIDs = pendingRows.map((row: any) => row.HeaderID).join(',');
+
+    this.loadingMessage = 'Validating...';
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    try {
+      const response: any = await this.srvce
+        .getValidationARData({ TransactionIDs: transactionIDs })
+        .toPromise();
+
+      this.isLoading = false;
+      this.loadingMessage = 'Loading...';
+
+      if (response?.flag === '1') {
+        this.transactionTypes = response.transactionTypes || [];
+        this.allValidationErrors = response.errors || [];
+        this.allMissingMasterData = response.notFoundValues || [];
+
+        if (this.transactionTypes.length > 0) {
+          this.selectedTransactionType = this.transactionTypes[0];
+          this.updateValidationGrid();
+        } else {
+          this.filteredValidationGridData = [];
+        }
+        
+        this.isValidationPopupVisible = true;
+      } else {
+        notify(response?.message || 'Validation failed', 'error', 3000);
+      }
+    } catch (error: any) {
+      this.isLoading = false;
+      console.error(error);
+      notify('Failed to validate AR data', 'error', 3000);
+    }
+    this.cdr.detectChanges();
+  }
+
+  // ================= Validation Helpers =================
+  updateValidationGrid() {
+    const filteredErrors = this.allValidationErrors.filter(
+      (e) => e.TransactionType === this.selectedTransactionType
+    );
+
+    const map = new Map<string, any>();
+    filteredErrors.forEach(err => {
+      const key = err.ErrorMessage;
+      if (!map.has(key)) {
+        map.set(key, { ErrorMessage: key, MissingCount: 0, Particular: err.Particular });
+      }
+      const current = map.get(key);
+      current.MissingCount += (Number(err.ErrorCount) || 0);
+    });
+
+    this.filteredValidationGridData = Array.from(map.values());
+  }
+
+  hasMissingData(particular: string): boolean {
+    return this.allMissingMasterData.some(x => x.Particular === particular);
+  }
+
+  onTransactionTypeChange(e: any) {
+    this.selectedTransactionType = e.value;
+    this.updateValidationGrid();
+  }
+
+  async downloadMissingParticulars(particular: string) {
+    const missingValues = this.allMissingMasterData.filter(x => x.Particular === particular);
+    
+    if (missingValues.length === 0) {
+      notify('No missing values found for this particular.', 'info', 3000);
+      return;
+    }
+
+    let masterKey = '';
+    
+    if (['ApexTPACode', 'ApexInsuCode', 'ApexInstCode'].includes(particular)) {
+      masterKey = 'Customer';
+    } else if (['ApexReportingDoctor', 'ApexReferringDoctor'].includes(particular)) {
+      masterKey = 'Clinician';
+    } else if (['ApexReportingDoctorDept', 'ApexReferringDoctorDept'].includes(particular)) {
+      masterKey = 'Department';
+    } else if (['Paymode'].includes(particular)) {
+      masterKey = 'chartOfAccounts';
+    } else if (['CPTCode'].includes(particular)) {
+      masterKey = 'Cpt';
+    }
+
+    try {
+      const response: any = await this.srvce.getImportMasterList().toPromise();
+      
+      let headers: string[] = [];
+      let templateColumns: any[] = [];
+      
+      if (response && response[masterKey]) {
+        templateColumns = response[masterKey];
+        templateColumns.sort((a: any, b: any) => a.ID - b.ID);
+        headers = templateColumns.map((col: any) => col.ColumnName);
+      } else {
+        headers = ['Particular', 'NotFoundValue'];
+      }
+
+      let csv = headers.join(',') + '\n';
+      
+      missingValues.forEach(row => {
+        const val = (row.NotFoundValue || '').toString();
+        
+        const rowData = headers.map((header, index) => {
+           let cellValue = '';
+           
+           if (masterKey === 'Clinician' && (header === 'ClinicianLicense' || header === 'ClinicianName')) cellValue = val;
+           else if (masterKey === 'Department' && header === 'Department') cellValue = val;
+           else if (masterKey === 'chartOfAccounts' && header === 'LedgerCode') cellValue = val;
+           else if (masterKey === 'Cpt' && header === 'CPTCode') cellValue = val;
+           else if (masterKey === 'Customer' && header === 'Particular') cellValue = particular;
+           else if (masterKey === 'Customer' && header === 'NotFoundValue') cellValue = val;
+           else if (index === 0 && masterKey === 'Customer' && headers[0] !== 'Particular') cellValue = val;
+
+           return `"${cellValue.replace(/"/g, '""')}"`;
+        });
+        
+        csv += rowData.join(',') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${masterKey || 'Missing'}_${particular}_Template.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download template', error);
+      notify('Failed to generate template.', 'error', 3000);
+    }
   }
 }
 @NgModule({
