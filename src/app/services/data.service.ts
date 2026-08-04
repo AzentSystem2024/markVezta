@@ -7017,6 +7017,22 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}ImportAR/process`, payload);
   }
 
+  // ========= VALIDATE SELECTED PENDING LIST ==========
+  validate_pending_rows(rowdata: any) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      CompanyID: sessionData.SELECTED_COMPANY.COMPANY_ID,
+      UserID: sessionData.USER_ID,
+      TransactionID: rowdata.HeaderID,
+      StoreID: sessionData.Configuration[0].STORE_ID,
+      FinID: sessionData.FINANCIAL_YEARS[0].FIN_ID,
+    };
+
+    return this.http.post(`${this.apiUrl}ImportAR/validate`, payload);
+  }
+
   //============================customer type===============
   customer_type_drp(item: any) {
     const reqBody = item;
@@ -7326,5 +7342,13 @@ The result can be exported to HTML or Markdown.`;
 
   get_calculated_leave_salary(payload: any) {
     return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Getleavesalary', payload);
+  }
+
+  getValidationARData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}ImportAR/validate`, payload);
+  }
+
+  getImportMasterList(): Observable<any> {
+    return this.http.post(`${this.apiUrl}ImportMaster/importmasterlist`,{});
   }
 }

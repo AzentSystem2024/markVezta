@@ -136,6 +136,13 @@
       <dxi-item
         location="after"
         widget="dxButton"
+        [options]="ValidateButtonOptions"
+      >
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
         [options]="ReProcessButtonOptions"
       >
       </dxi-item>
@@ -188,7 +195,7 @@
     [shading]="true"
     [hideOnOutsideClick]="false"
     shadingColor="rgba(0,0,0,0.4)"
-    message="Loading..."
+    [message]="loadingMessage"
   >
   </dx-load-panel>
 
@@ -200,7 +207,7 @@
     [shading]="true"
     [hideOnOutsideClick]="false"
     shadingColor="rgba(0,0,0,0.4)"
-    message="Processing Pending Rows..."
+    [message]="progressMessage"
   >
     <div *dxTemplate="let data of 'content'">
       <div class="text-center">
@@ -232,4 +239,51 @@
       </div>
     </div>
   </dx-load-panel>
+
+  <!-- Validation Popup -->
+  <dx-popup
+    [(visible)]="isValidationPopupVisible"
+    [width]="'70vw'"
+    [height]="'70vh'"
+    title="Validation Summary"
+    [showCloseButton]="true"
+  >
+    <div *dxTemplate="let data of 'content'" class="p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+          <dx-select-box
+            [dataSource]="transactionTypes"
+            [(value)]="selectedTransactionType"
+            (onValueChanged)="onTransactionTypeChange($event)"
+            width="200"
+            label="Transaction Type"
+            labelMode="floating"
+          ></dx-select-box>
+        </div>
+      </div>
+
+      <dx-data-grid
+        [dataSource]="filteredValidationGridData"
+        [showBorders]="true"
+        [rowAlternationEnabled]="true"
+        [columnAutoWidth]="true"
+        [height]="'50vh'"
+      >
+        <dxi-column dataField="ErrorMessage" caption="Particulars"></dxi-column>
+        <dxi-column dataField="MissingCount" caption="Missing Count" alignment="center"></dxi-column>
+        <dxi-column caption="Download" cellTemplate="downloadTemplate" alignment="center" [width]="100"></dxi-column>
+
+        <div *dxTemplate="let cell of 'downloadTemplate'">
+          <dx-button
+            *ngIf="hasMissingData(cell.data.Particular) && !cell.data.ErrorMessage?.toLowerCase().includes('mandatory')"
+            icon="export"
+            type="normal"
+            hint="Download Missing Data"
+            (onClick)="downloadMissingParticulars(cell.data.Particular)"
+          ></dx-button>
+        </div>
+
+      </dx-data-grid>
+    </div>
+  </dx-popup>
 </div>

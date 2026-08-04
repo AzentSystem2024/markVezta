@@ -52,7 +52,7 @@ import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sa
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import notify from 'devextreme/ui/notify';
-import { AddSalesInvoiceRetailModule } from '../../OPERATIONS/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
 
 
 @Component({

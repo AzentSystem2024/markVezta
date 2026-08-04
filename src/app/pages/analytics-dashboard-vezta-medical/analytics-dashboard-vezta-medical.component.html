@@ -1,0 +1,214 @@
+<div class="d-flex filter-container mt-2">
+  <dx-select-box
+    label="Date Range"
+    labelMode="floating"
+    valueExpr="value"
+    displayExpr="label"
+    [dataSource]="dateRanges"
+    [searchEnabled]="true"
+    [(value)]="selectedDateRange"
+    (onValueChanged)="onDateRangeChange($event)"
+  >
+  </dx-select-box>
+</div>
+
+<div class="view-wrapper">
+  <div class="dashboard-wrapper">
+    <!-- Row 1: Facility Wise (Pie Chart) -->
+    <div class="dashboard-row">
+      <div class="dashboard-card">
+        <h6 class="card-title mt-2 mb-2">Facility Wise Revenue</h6>
+        
+        <dx-pie-chart
+          id="facilityPie"
+          [dataSource]="facilityWiseData"
+          palette="bright"
+        >
+          <dxi-series
+            argumentField="facility"
+            valueField="revenue"
+          >
+            <dxo-label [visible]="true" [customizeText]="customizePieLabel">
+              <dxo-connector [visible]="true"></dxo-connector>
+            </dxo-label>
+          </dxi-series>
+          <dxo-legend
+            horizontalAlignment="center"
+            verticalAlignment="bottom"
+          ></dxo-legend>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeTooltip"
+          ></dxo-tooltip>
+        </dx-pie-chart>
+      </div>
+    </div>
+
+    <!-- Row 2: Income Group (Column Chart) -->
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Income Group Wise Revenue (Top 10)</h6>
+        
+        <dx-chart [dataSource]="incomeGroupData" palette="soft">
+          <dxo-argument-axis>
+            <dxo-label
+              [rotationAngle]="-45"
+              overlappingBehavior="rotate"
+              [customizeText]="customizeAxisLabel"
+            ></dxo-label>
+          </dxo-argument-axis>
+          <dxi-value-axis>
+            <dxo-label [customizeText]="customizeValueAxisLabel"></dxo-label>
+          </dxi-value-axis>
+          <dxi-series
+            argumentField="group"
+            valueField="revenue"
+            type="bar"
+            name="Revenue"
+            color="#0ea5e9"
+          >
+            <dxo-label
+              [visible]="true"
+              position="inside"
+              [customizeText]="customizeLabel"
+            ></dxo-label>
+          </dxi-series>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeTooltip"
+          ></dxo-tooltip>
+          <dxo-legend [visible]="false"></dxo-legend>
+        </dx-chart>
+      </div>
+    </div>
+
+    <!-- Row 3: Department Wise (Column Chart) -->
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Department Wise Revenue (Top 10)</h6>
+        
+        <dx-chart [dataSource]="departmentWiseData" palette="ocean">
+          <dxo-argument-axis>
+            <dxo-label
+              [rotationAngle]="-45"
+              overlappingBehavior="rotate"
+              [customizeText]="customizeAxisLabel"
+            ></dxo-label>
+          </dxo-argument-axis>
+          <dxi-value-axis>
+            <dxo-label [customizeText]="customizeValueAxisLabel"></dxo-label>
+          </dxi-value-axis>
+          <dxi-series
+            argumentField="department"
+            valueField="revenue"
+            type="bar"
+            name="Revenue"
+            color="#8b5cf6"
+          >
+            <dxo-label
+              [visible]="true"
+              position="inside"
+              [customizeText]="customizeLabel"
+            ></dxo-label>
+          </dxi-series>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeTooltip"
+          ></dxo-tooltip>
+          <dxo-legend [visible]="false"></dxo-legend>
+        </dx-chart>
+      </div>
+    </div>
+
+    <!-- Row 4: Category Wise (Column Chart) -->
+    <div class="dashboard-row">
+      <div class="dashboard-card full-width">
+        <h6 class="card-title mt-2 mb-2">Category Wise Revenue (Top 10)</h6>
+        
+        <dx-chart [dataSource]="categoryWiseData" palette="pastel">
+          <dxo-argument-axis>
+            <dxo-label
+              [rotationAngle]="-45"
+              overlappingBehavior="rotate"
+              [customizeText]="customizeAxisLabel"
+            ></dxo-label>
+          </dxo-argument-axis>
+          <dxi-value-axis>
+            <dxo-label [customizeText]="customizeValueAxisLabel"></dxo-label>
+          </dxi-value-axis>
+          <dxi-series
+            argumentField="category"
+            valueField="revenue"
+            type="bar"
+            name="Revenue"
+            color="#ec4899"
+          >
+            <dxo-label
+              [visible]="true"
+              position="inside"
+              [customizeText]="customizeLabel"
+            ></dxo-label>
+          </dxi-series>
+          <dxo-tooltip
+            [enabled]="true"
+            [customizeTooltip]="customizeTooltip"
+          ></dxo-tooltip>
+          <dxo-legend [visible]="false"></dxo-legend>
+        </dx-chart>
+      </div>
+    </div>
+
+    <!-- Row 5: Month Wise (Line Chart) -->
+    <div class="dashboard-row">
+      <div class="dashboard-card-Tender">
+        <h6 class="card-title mt-2 mb-2">Month Wise Revenue (By Facility)</h6>
+        
+        <div class="chart-wrapper">
+          <dx-chart
+            id="monthWiseChart"
+            [dataSource]="monthWiseData"
+            palette="Material"
+          >
+            <dxo-argument-axis>
+              <dxo-label
+                [rotationAngle]="-45"
+                overlappingBehavior="rotate"
+              ></dxo-label>
+            </dxo-argument-axis>
+            <dxi-value-axis>
+              <dxo-label [customizeText]="customizeValueAxisLabel"></dxo-label>
+            </dxi-value-axis>
+            
+            <dxo-common-series-settings
+              argumentField="month"
+              type="line"
+            >
+              <dxo-point [visible]="true"></dxo-point>
+            </dxo-common-series-settings>
+            
+            <dxi-series
+              *ngFor="let s of monthWiseSeries"
+              [valueField]="s.valueField"
+              [name]="s.name"
+            >
+            </dxi-series>
+
+            <dxo-legend
+              verticalAlignment="bottom"
+              horizontalAlignment="center"
+              itemTextPosition="right"
+            >
+            </dxo-legend>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeLineTooltip"
+            >
+            </dxo-tooltip>
+          </dx-chart>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
