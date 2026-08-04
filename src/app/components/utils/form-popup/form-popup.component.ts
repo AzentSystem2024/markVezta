@@ -67,10 +67,11 @@ export class FormPopupComponent {
 
   @Output() cancel = new EventEmitter();
 
+  @Input() showSave: boolean = true;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Input() showApprove: boolean = true; // default: visible
   dataGrid!: DxDataGridComponent;
-  constructor(protected screen: ScreenService) {}
+  constructor(protected screen: ScreenService) { }
 
   isValid() {
     return this.validationGroup.instance.validate().isValid;
@@ -123,4 +124,4 @@ export class FormPopupComponent {
   declarations: [FormPopupComponent],
   exports: [FormPopupComponent],
 })
-export class FormPopupModule {}
+export class FormPopupModule { }

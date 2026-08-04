@@ -32,6 +32,7 @@
           </div>
         </dxi-item>
 
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
           location="after"
           widget="dxButton"
@@ -57,6 +58,23 @@
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
+        >
+          <!-- This controls the dropdown list rendering -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
 
       <dxo-paging [pageSize]="10"></dxo-paging>
 
@@ -111,7 +129,7 @@
               'flag-pending':
                 data.data.STATUS_DESC !== 'Verified' &&
                 data.data.STATUS_DESC !== 'Approved' &&
-                data.data.STATUS_DESC !== 'Paid'
+                data.data.STATUS_DESC !== 'Paid',
             }"
           >
             {{ data.data.STATUS_DESC }}
@@ -248,425 +266,447 @@
     style="padding-bottom: 50px"
   >
     <ng-container *ngIf="popupVisible">
-    <!-- Row 1: Voucher No & Date -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-2">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Voucher No</label
-        >
-      </div>
-      <div class="col-md-4">
-        <dx-text-box
-          [(value)]="leaveFormData.VOUCHER_NO"
-          [readOnly]="true"
-          width="100%"
-        ></dx-text-box>
-      </div>
-      <div class="col-md-3 text-end">
-        <label class="form-label mb-0" style="font-size: 13px">Date</label>
-      </div>
-      <div class="col-md-3">
-        <dx-date-box
-          [(value)]="leaveFormData.TRANS_DATE"
-          displayFormat="dd-MM-yyyy"
-          [readOnly]="true"
-          width="100%"
-        ></dx-date-box>
-      </div>
-    </div>
-
-    <!-- Row 2: Employee -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-2">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Employee*</label
-        >
-      </div>
-      <div class="col-md-10 d-flex gap-2">
-        <dx-select-box
-          [dataSource]="EmployeeDropdown"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="leaveFormData.EMP_ID"
-          (onValueChanged)="onFetchEmployeeDetails($event)"
-          [readOnly]="isReadOnlyMode || !!leaveFormData.TRANS_ID"
-          [searchEnabled]="true"
-          style="flex: 1"
-          placeholder="Select Employee"
-        >
-          <dx-validator validationGroup="leaveForm">
-            <dxi-validation-rule
-              type="required"
-              message="Employee is required"
-            ></dxi-validation-rule>
-          </dx-validator>
-        </dx-select-box>
-      </div>
-    </div>
-
-    <!-- Row 3: Leave Credit, Basic Pay, Allowances -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-2">
-        <label class="form-label mb-0" style="font-size: 13px"
-          >Leave Credit</label
-        >
-      </div>
-      <div class="col-md-2">
-        <dx-number-box
-          [(value)]="leaveFormData.LEAVE_CREDIT"
-          [readOnly]="true"
-          width="100%"
-          format="#,##0"
-        ></dx-number-box>
-      </div>
-      <div class="col-md-2 text-end">
-        <label class="form-label mb-0" style="font-size: 13px">Basic Pay</label>
-      </div>
-      <div class="col-md-2">
-        <dx-number-box
-          [(value)]="leaveFormData.BASIC_PAY"
-          [readOnly]="true"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-      </div>
-      <div class="col-md-2 text-end">
-        <label class="form-label mb-0" style="font-size: 13px"
-          >Allowances</label
-        >
-      </div>
-      <div class="col-md-2">
-        <dx-number-box
-          [(value)]="leaveFormData.ALLOWANCES"
-          [readOnly]="true"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-      </div>
-    </div>
-
-    <!-- Row 4: Radio group for leave type and select vacation button -->
-    <div class="row mb-2 align-items-center mt-3">
-      <div class="col-md-8 d-flex align-items-center gap-3">
-        <dx-radio-group
-          [items]="leaveTypeOptions"
-          displayExpr="text"
-          valueExpr="id"
-          [(value)]="leaveFormData.LEAVE_TYPE"
-          (onValueChanged)="onLeaveTypeChange($event)"
-          layout="horizontal"
-          [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-        ></dx-radio-group>
-        <dx-button
-          text="Select Vacation"
-          (onClick)="onSelectVacationClick()"
-          [disabled]="
-            leaveFormData.LEAVE_TYPE !== 2 ||
-            (isReadOnlyMode && !isVerifyMode && !isApproveMode) ||
-            !leaveFormData.EMP_ID
-          "
-        ></dx-button>
-      </div>
-    </div>
-
-    <!-- Vacation details GroupBox -->
-    <fieldset
-      class="border p-2 mt-2 mb-3"
-      style="border-radius: 5px"
-      [style.opacity]="leaveFormData.LEAVE_TYPE === 2 ? 1 : 0.5"
-    >
-      <legend class="float-none w-auto mb-0 px-2" style="font-size: 13px">
-        Vacation details
-      </legend>
-      <div class="row">
-        <div class="col-md-3">
-          <dx-text-box
-            [(value)]="leaveFormData.VACATION_DOC_NO"
-            [readOnly]="true"
-            width="100%"
-            label="Doc. No"
-            labelMode="floating"
-          ></dx-text-box>
-        </div>
-        <div class="col-md-3">
-          <dx-date-box
-            [(value)]="leaveFormData.VACATION_DEPT_DATE"
-            displayFormat="dd-MM-yyyy"
-            [readOnly]="true"
-            width="100%"
-            label="Departure Date"
-            labelMode="floating"
-          ></dx-date-box>
-        </div>
-        <div class="col-md-3">
-          <dx-number-box
-            [(value)]="leaveFormData.VACATION_DAYS"
-            [readOnly]="true"
-            width="100%"
-            format="#,##0"
-            label="Vacation Days"
-            labelMode="floating"
-          ></dx-number-box>
-        </div>
-        <div class="col-md-3">
-          <dx-number-box
-            [(value)]="leaveFormData.VACATION_SALARY"
-            [readOnly]="true"
-            width="100%"
-            format="#,##0.00"
-            label="Vacation Salary"
-            labelMode="floating"
-          ></dx-number-box>
-        </div>
-      </div>
-    </fieldset>
-
-    <!-- Row 5: Leave days encashed and Leave Salary -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-3">
-        <label class="form-label mb-0" style="font-size: 13px"
-          >Leave days Encashed</label
-        >
-      </div>
-      <div class="col-md-3 d-flex align-items-center gap-2">
-        <dx-number-box
-          [(value)]="leaveFormData.LEAVE_DAYS"
-          (onValueChanged)="onLeaveDaysChanged($event)"
-          [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-          width="100%"
-          format="#,##0"
-        ></dx-number-box>
-        <span style="font-size: 12px; white-space: nowrap"
-          >(Other than vacation days)</span
-        >
-      </div>
-      <div class="col-md-3 text-end">
-        <label class="form-label mb-0" style="font-size: 13px"
-          >Leave Salary</label
-        >
-      </div>
-      <div class="col-md-3">
-        <dx-number-box
-          [(value)]="leaveFormData.LEAVE_SALARY"
-          (onValueChanged)="calculateTotals()"
-          [readOnly]="true"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-      </div>
-    </div>
-
-    <!-- Row 6: Total Days and Total Amount -->
-    <div class="row mb-2 align-items-center">
-      <div class="col-md-3">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Total Days</label
-        >
-      </div>
-      <div class="col-md-3">
-        <dx-number-box
-          [(value)]="leaveFormData.TOTAL_DAYS"
-          [readOnly]="true"
-          width="100%"
-          format="#,##0"
-        ></dx-number-box>
-      </div>
-      <div class="col-md-3 text-end">
-        <label
-          class="form-label mb-0"
-          style="font-weight: bold; font-size: 13px"
-          >Total Amount</label
-        >
-      </div>
-      <div class="col-md-3">
-        <dx-number-box
-          [(value)]="leaveFormData.TOTAL_PAID"
-          [readOnly]="true"
-          width="100%"
-          format="#,##0.00"
-        ></dx-number-box>
-      </div>
-    </div>
-
-    <!-- Payment Details GroupBox -->
-    <fieldset class="border p-2 mt-3" style="border-radius: 5px">
-      <legend class="float-none w-auto mb-0 px-2" style="font-size: 14px">
-        Payment Details
-      </legend>
+      <!-- Row 1: Voucher No & Date -->
       <div class="row mb-2 align-items-center">
         <div class="col-md-2">
-          <label class="form-label mb-0" style="font-size: 13px"
-            >Payment Mode</label
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Voucher No</label
           >
         </div>
         <div class="col-md-4">
-          <dx-radio-group
-            [items]="paymentModes"
-            displayExpr="text"
-            valueExpr="id"
-            [(value)]="leaveFormData.PAY_TYPE_ID"
-            (onValueChanged)="onReceiptModeChange($event)"
-            layout="horizontal"
-            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-          ></dx-radio-group>
+          <dx-text-box
+            [(value)]="leaveFormData.VOUCHER_NO"
+            [readOnly]="true"
+            width="100%"
+          ></dx-text-box>
+        </div>
+        <div class="col-md-3 text-end">
+          <label class="form-label mb-0" style="font-size: 13px">Date</label>
+        </div>
+        <div class="col-md-3">
+          <dx-date-box
+            [(value)]="leaveFormData.TRANS_DATE"
+            displayFormat="dd-MM-yyyy"
+            [readOnly]="true"
+            width="100%"
+          ></dx-date-box>
         </div>
       </div>
+
+      <!-- Row 2: Employee -->
       <div class="row mb-2 align-items-center">
         <div class="col-md-2">
-          <label class="form-label mb-0" style="font-size: 13px"
-            >Payment Ac</label
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Employee*</label
           >
         </div>
         <div class="col-md-10 d-flex gap-2">
           <dx-select-box
-            [dataSource]="filteredLedgerList"
-            displayExpr="HEAD_NAME"
-            valueExpr="HEAD_ID"
-            [(value)]="leaveFormData.PAY_HEAD_ID"
-            [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
+            [dataSource]="EmployeeDropdown"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="leaveFormData.EMP_ID"
+            (onValueChanged)="onFetchEmployeeDetails($event)"
+            [readOnly]="isReadOnlyMode || !!leaveFormData.TRANS_ID"
             [searchEnabled]="true"
             style="flex: 1"
+            placeholder="Select Employee"
           >
-            <dx-validator validationGroup="leaveForm" *ngIf="isApproveMode">
+            <dx-validator validationGroup="leaveForm">
               <dxi-validation-rule
                 type="required"
-                message="Ledger is required"
+                message="Employee is required"
               ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
       </div>
 
+      <!-- Row 3: Leave Credit, Basic Pay, Allowances -->
+      <div class="row mb-2 align-items-center">
+        <div class="col-md-2">
+          <label class="form-label mb-0" style="font-size: 13px"
+            >Leave Credit</label
+          >
+        </div>
+        <div class="col-md-2">
+          <dx-number-box
+            [(value)]="leaveFormData.LEAVE_CREDIT"
+            [readOnly]="true"
+            width="100%"
+            format="#,##0"
+          ></dx-number-box>
+        </div>
+        <div class="col-md-2 text-end">
+          <label class="form-label mb-0" style="font-size: 13px"
+            >Basic Pay</label
+          >
+        </div>
+        <div class="col-md-2">
+          <dx-number-box
+            [(value)]="leaveFormData.BASIC_PAY"
+            [readOnly]="true"
+            width="100%"
+            format="#,##0.00"
+          ></dx-number-box>
+        </div>
+        <div class="col-md-2 text-end">
+          <label class="form-label mb-0" style="font-size: 13px"
+            >Allowances</label
+          >
+        </div>
+        <div class="col-md-2">
+          <dx-number-box
+            [(value)]="leaveFormData.ALLOWANCES"
+            [readOnly]="true"
+            width="100%"
+            format="#,##0.00"
+          ></dx-number-box>
+        </div>
+      </div>
+
+      <!-- Row 4: Radio group for leave type and select vacation button -->
+      <div class="row mb-2 align-items-center mt-3">
+        <div class="col-md-8 d-flex align-items-center gap-3">
+          <dx-radio-group
+            [items]="leaveTypeOptions"
+            displayExpr="text"
+            valueExpr="id"
+            [(value)]="leaveFormData.LEAVE_TYPE"
+            (onValueChanged)="onLeaveTypeChange($event)"
+            layout="horizontal"
+            [readOnly]="
+              (isReadOnlyMode && !isVerifyMode && !isApproveMode) ||
+              !leaveFormData.EMP_ID
+            "
+          ></dx-radio-group>
+          <dx-button
+            text="Select Vacation"
+            (onClick)="onSelectVacationClick()"
+            [disabled]="
+              leaveFormData.LEAVE_TYPE !== 2 ||
+              (isReadOnlyMode && !isVerifyMode && !isApproveMode) ||
+              !leaveFormData.EMP_ID
+            "
+          ></dx-button>
+        </div>
+      </div>
+
+      <!-- Vacation details GroupBox -->
       <fieldset
-        class="border p-2 mt-2 mx-1"
+        class="border p-2 mt-2 mb-3"
         style="border-radius: 5px"
-        [style.opacity]="leaveFormData.PAY_TYPE_ID == 2 ? 1 : 0.5"
+        [style.opacity]="leaveFormData.LEAVE_TYPE === 2 ? 1 : 0.5"
       >
-        <legend class="float-none w-auto mb-0 px-2" style="font-size: 12px">
-          Bank remittance details
+        <legend class="float-none w-auto mb-0 px-2" style="font-size: 13px">
+          Vacation details
         </legend>
         <div class="row">
-          <div class="col-md-6 d-flex align-items-center">
-            <label
-              class="form-label me-3 mb-0"
-              style="font-size: 13px; white-space: nowrap"
-              >Cheque No</label
-            >
+          <div class="col-md-4">
             <dx-text-box
-              [(value)]="leaveFormData.CHEQUE_NO"
-              [readOnly]="
-                (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
-                leaveFormData.PAY_TYPE_ID != 2
-              "
+              [(value)]="leaveFormData.VACATION_DOC_NO"
+              [readOnly]="true"
               width="100%"
-            >
-              <dx-validator
-                validationGroup="leaveForm"
-                *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID == 2"
-              >
-                <dxi-validation-rule
-                  type="required"
-                  message="Reference No is required"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-text-box>
+              label="Doc. No"
+              labelMode="floating"
+            ></dx-text-box>
           </div>
-          <div class="col-md-6 d-flex align-items-center">
-            <label
-              class="form-label me-3 mb-0"
-              style="font-size: 13px; white-space: nowrap"
-              >Due Date</label
-            >
+          <div class="col-md-4">
             <dx-date-box
-              [(value)]="leaveFormData.CHEQUE_DATE"
+              [(value)]="leaveFormData.VACATION_DEPT_DATE"
               displayFormat="dd-MM-yyyy"
-              [readOnly]="
-                (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
-                leaveFormData.PAY_TYPE_ID != 2
-              "
+              [readOnly]="true"
               width="100%"
-            >
-              <dx-validator
-                validationGroup="leaveForm"
-                *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID == 2"
-              >
-                <dxi-validation-rule
-                  type="required"
-                  message="Date is required"
-                ></dxi-validation-rule>
-              </dx-validator>
-            </dx-date-box>
+              label="Departure Date"
+              labelMode="floating"
+            ></dx-date-box>
           </div>
+          <div class="col-md-4">
+            <dx-number-box
+              [(value)]="leaveFormData.VACATION_DAYS"
+              [readOnly]="true"
+              width="100%"
+              format="#,##0"
+              label="Vacation Days"
+              labelMode="floating"
+            ></dx-number-box>
+          </div>
+          <!-- <div class="col-md-3">
+            <dx-number-box
+              [(value)]="leaveFormData.VACATION_SALARY"
+              [readOnly]="true"
+              width="100%"
+              format="#,##0.00"
+              label="Vacation Salary"
+              labelMode="floating"
+            ></dx-number-box>
+          </div> -->
         </div>
       </fieldset>
-    </fieldset>
 
-    <!-- Narration -->
-    <div class="row mt-3 mb-2 align-items-center">
-      <div class="col-md-2">
-        <label class="form-label mb-0" style="font-size: 13px">Narration</label>
+      <!-- Row 5: Leave days encashed and Leave Salary -->
+      <div class="row mb-2 align-items-center">
+        <div class="col-md-3">
+          <label class="form-label mb-0" style="font-size: 13px"
+            >Leave days Encashed</label
+          >
+        </div>
+        <div class="col-md-4 d-flex align-items-center gap-2">
+          <dx-number-box
+            [(value)]="leaveFormData.LEAVE_DAYS"
+            (onValueChanged)="calculateTotals()"
+            [readOnly]="
+              (isReadOnlyMode && !isVerifyMode && !isApproveMode) ||
+              !leaveFormData.EMP_ID
+            "
+            width="100%"
+            format="#,##0"
+          ></dx-number-box>
+          <span style="font-size: 12px; white-space: nowrap"
+            >(Other than vacation days)</span
+          >
+        </div>
+        <!-- <div class="col-md-3 text-end">
+          <label class="form-label mb-0" style="font-size: 13px"
+            >Leave Salary</label
+          >
+        </div> 
+       <div class="col-md-3">
+          <dx-number-box
+            [(value)]="leaveFormData.LEAVE_SALARY"
+            (onValueChanged)="calculateTotals()"
+            [readOnly]="true"
+            width="100%"
+            format="#,##0.00"
+          ></dx-number-box>
+        </div> -->
       </div>
-      <div class="col-md-10">
-        <dx-text-box
-          [(value)]="leaveFormData.NARRATION"
-          [readOnly]="isReadOnlyMode && !isVerifyMode && !isApproveMode"
-          width="100%"
-        ></dx-text-box>
-      </div>
-    </div>
 
-    <!-- Footer Buttons -->
-    <div
-      class="d-flex justify-content-end align-items-end p-2"
-      style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px"
-    >
-      <div class="d-flex me-2">
-        <dx-button
-          text="Cancel"
-          icon=""
-          type="normal"
-          stylingMode="outlined"
-          (onClick)="handleClose()"
-          class="me-2"
-        ></dx-button>
-        <dx-button
-          [text]="leaveFormData.TRANS_ID ? 'Update' : 'Save'"
-          icon=""
-          type="default"
-          stylingMode="outlined"
-          validationGroup="leaveForm"
-          class="me-2"
-          (onClick)="onSave($event)"
-          *ngIf="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
-        ></dx-button>
-        <dx-button
-          text="Verify"
-          icon=""
-          stylingMode="outlined"
-          type="default"
-          validationGroup="leaveForm"
-          class="me-2"
-          (onClick)="onVerify($event)"
-          *ngIf="isVerifyMode"
-        ></dx-button>
-        <dx-button
-          text="Approve"
-          icon=""
-          stylingMode="outlined"
-          type="default"
-          validationGroup="leaveForm"
-          class="me-2"
-          (onClick)="onApprove($event)"
-          *ngIf="isApproveMode"
-        ></dx-button>
+      <!-- Row 6: Total Days and Total Amount -->
+      <div class="row mb-2 align-items-center">
+        <div class="col-md-3">
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Total Days</label
+          >
+        </div>
+        <div class="col-md-3">
+          <dx-number-box
+            [(value)]="leaveFormData.TOTAL_DAYS"
+            (onValueChanged)="onTotalDaysChanged($event)"
+            [readOnly]="true"
+            width="100%"
+            format="#,##0"
+          ></dx-number-box>
+        </div>
+        <div class="col-md-3 text-end">
+          <label
+            class="form-label mb-0"
+            style="font-weight: bold; font-size: 13px"
+            >Total Amount</label
+          >
+        </div>
+        <div class="col-md-3">
+          <dx-number-box
+            [(value)]="leaveFormData.TOTAL_PAID"
+            [readOnly]="true"
+            width="100%"
+            format="#,##0.00"
+          ></dx-number-box>
+        </div>
       </div>
-    </div>
+
+      <!-- Payment Details GroupBox -->
+      <fieldset class="border p-2 mt-3" style="border-radius: 5px">
+        <legend class="float-none w-auto mb-0 px-2" style="font-size: 14px">
+          Payment Details
+        </legend>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-2">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Payment Mode</label
+            >
+          </div>
+          <div class="col-md-4">
+            <dx-radio-group
+              [items]="paymentModes"
+              displayExpr="text"
+              valueExpr="id"
+              [(value)]="leaveFormData.PAY_TYPE_ID"
+              (onValueChanged)="onReceiptModeChange($event)"
+              layout="horizontal"
+              [readOnly]="
+                (isReadOnlyMode && !isVerifyMode && !isApproveMode) ||
+                !leaveFormData.EMP_ID
+              "
+            ></dx-radio-group>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-md-2">
+            <label class="form-label mb-0" style="font-size: 13px"
+              >Payment Ac</label
+            >
+          </div>
+          <div class="col-md-10 d-flex gap-2">
+            <dx-select-box
+              [dataSource]="filteredLedgerList"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              [(value)]="leaveFormData.PAY_HEAD_ID"
+              [readOnly]="
+                (isReadOnlyMode && !isVerifyMode && !isApproveMode) ||
+                !leaveFormData.EMP_ID
+              "
+              [searchEnabled]="true"
+              style="flex: 1"
+            >
+              <dx-validator validationGroup="leaveForm" *ngIf="isApproveMode">
+                <dxi-validation-rule
+                  type="required"
+                  message="Ledger is required"
+                ></dxi-validation-rule>
+              </dx-validator>
+            </dx-select-box>
+          </div>
+        </div>
+
+        <fieldset
+          class="border p-2 mt-2 mx-1"
+          style="border-radius: 5px"
+          [style.opacity]="leaveFormData.PAY_TYPE_ID == 2 ? 1 : 0.5"
+        >
+          <legend class="float-none w-auto mb-0 px-2" style="font-size: 12px">
+            Bank remittance details
+          </legend>
+          <div class="row">
+            <div class="col-md-6 d-flex align-items-center">
+              <label
+                class="form-label me-3 mb-0"
+                style="font-size: 13px; white-space: nowrap"
+                >Cheque No</label
+              >
+              <dx-text-box
+                [(value)]="leaveFormData.CHEQUE_NO"
+                [readOnly]="
+                  (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
+                  leaveFormData.PAY_TYPE_ID != 2 ||
+                  !leaveFormData.EMP_ID
+                "
+                width="100%"
+              >
+                <dx-validator
+                  validationGroup="leaveForm"
+                  *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID == 2"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Reference No is required"
+                  ></dxi-validation-rule>
+                </dx-validator>
+              </dx-text-box>
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+              <label
+                class="form-label me-3 mb-0"
+                style="font-size: 13px; white-space: nowrap"
+                >Due Date</label
+              >
+              <dx-date-box
+                [(value)]="leaveFormData.CHEQUE_DATE"
+                displayFormat="dd-MM-yyyy"
+                [readOnly]="
+                  (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
+                  leaveFormData.PAY_TYPE_ID != 2 ||
+                  !leaveFormData.EMP_ID
+                "
+                width="100%"
+              >
+                <dx-validator
+                  validationGroup="leaveForm"
+                  *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID == 2"
+                >
+                  <dxi-validation-rule
+                    type="required"
+                    message="Date is required"
+                  ></dxi-validation-rule>
+                </dx-validator>
+              </dx-date-box>
+            </div>
+          </div>
+        </fieldset>
+      </fieldset>
+
+      <!-- Narration -->
+      <div class="row mt-3 mb-2 align-items-center">
+        <div class="col-md-2">
+          <label class="form-label mb-0" style="font-size: 13px"
+            >Narration</label
+          >
+        </div>
+        <div class="col-md-10">
+          <dx-text-box
+            [(value)]="leaveFormData.NARRATION"
+            [readOnly]="
+              (isReadOnlyMode && !isVerifyMode && !isApproveMode) ||
+              !leaveFormData.EMP_ID
+            "
+            width="100%"
+          ></dx-text-box>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div
+        class="d-flex justify-content-end align-items-end p-2"
+        style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px"
+      >
+        <div class="d-flex me-2">
+          <dx-button
+            text="Cancel"
+            icon=""
+            type="normal"
+            stylingMode="outlined"
+            (onClick)="handleClose()"
+            class="me-2"
+          ></dx-button>
+          <dx-button
+            [text]="leaveFormData.TRANS_ID ? 'Update' : 'Save'"
+            icon=""
+            type="default"
+            stylingMode="outlined"
+            validationGroup="leaveForm"
+            class="me-2"
+            (onClick)="onSave($event)"
+            *ngIf="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
+          ></dx-button>
+          <dx-button
+            text="Verify"
+            icon=""
+            stylingMode="outlined"
+            type="default"
+            validationGroup="leaveForm"
+            class="me-2"
+            (onClick)="onVerify($event)"
+            *ngIf="isVerifyMode"
+          ></dx-button>
+          <dx-button
+            text="Approve"
+            icon=""
+            stylingMode="outlined"
+            type="default"
+            validationGroup="leaveForm"
+            class="me-2"
+            (onClick)="onApprove($event)"
+            *ngIf="isApproveMode"
+          ></dx-button>
+        </div>
+      </div>
     </ng-container>
   </div>
 </dx-popup>
@@ -688,7 +728,11 @@
       height="35vh"
       (onSelectionChanged)="onVacationSelected($event)"
     >
-      <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
+      <dxi-column
+        dataField="DOC_NO"
+        caption="Doc No"
+        alignment="left"
+      ></dxi-column>
       <dxi-column
         dataField="DEPT_DATE"
         caption="Departure Date"
@@ -696,12 +740,12 @@
         format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column dataField="VAC_DAYS" caption="Days"></dxi-column>
-      <dxi-column
+      <!-- <dxi-column
         dataField="VACATION_SALARY"
         caption="Vacation Salary"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
+      ></dxi-column> -->
     </dx-data-grid>
     <div class="d-flex justify-content-end mt-3">
       <dx-button
@@ -717,3 +761,11 @@
     </div>
   </div>
 </dx-popup>
+
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>

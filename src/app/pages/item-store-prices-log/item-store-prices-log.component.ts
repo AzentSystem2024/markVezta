@@ -298,61 +298,64 @@ export class ItemStorePricesLogComponent {
         });
       });
   }
-  statusCellRender(cellElement: any, cellInfo: any) {
-    console.log(cellInfo, '==========cellInfo==============')
-    const status = cellInfo.data.Status;
 
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color =
-      status === 'Approved'
-        ? '#10B981' // Approved
-        : status === 'Verified'
-          ? '#0073D8' // Verified
-          : '#FFA500'; // Open
-    icon.title = status === 'Approved' ? 'Approved' : status === 'verified' ? 'Verified' : 'Open';
 
-    icon.style.display = 'flex';
-    icon.style.justifyContent = 'center';
-    icon.style.alignItems = 'center';
+  selectWorksheetById(worksheetId: number, action: 'edit' | 'approve' | 'view' | 'verify') {
+    this.dataservice.selectWorksheetForPrice(worksheetId).subscribe((response: any) => {
 
-    cellElement.appendChild(icon);
-  }
+      const ws = this.logList.find((x: any) => x.ID === response.ID);
 
-  selectWorksheetById(worksheetId: number) {
-    if (!worksheetId) {
-      console.warn('Invalid worksheet ID');
-      return;
-    }
-    this.dataservice
-      .selectWorksheetForPrice(worksheetId)
-      .subscribe((response: any) => {
-        const ws = this.logList.find(
-          (worksheet: any) => worksheet.ID == response.ID,
-        );
-        this.status = ws.Status;
-        this.selectedWorksheetData = { ...response, status: this.status };
-        this.dataservice.setWorksheetData(this.selectedWorksheetData);
+      this.status = ws.Status;
+      this.selectedWorksheetData = {
+        ...response,
+        status: this.status
+      };
 
-        if (this.status == 'Approved') {
-          this.goToView(worksheetId);
-        }
-        if (this.status == 'Verified') {
-          this.router.navigate(['/item-store-prices-edit'], {
-            state: {
-              worksheetData: this.selectedWorksheetData,
-            },
-          });
-        }
+      this.dataservice.setWorksheetData(this.selectedWorksheetData);
+
+      // Open document
+      if (this.status === 'Open') {
         this.router.navigate(['/change-price-edit'], {
-          state: {
-            worksheetData: this.selectedWorksheetData,
-          },
+          state: { worksheetData: this.selectedWorksheetData }
         });
-      });
-  }
+        return;
+      }
 
+      // Approved document
+      if (this.status === 'Approved') {
+        this.router.navigate(['/change-price-view'], {
+          state: { worksheetData: this.selectedWorksheetData }
+        });
+        return;
+      }
+      // Verified document
+      if (this.status === 'Verified') {
+
+        // User only has edit privilege
+        if (action === 'edit' && this.canEdit) {
+          this.router.navigate(['/change-price-view'], {
+            state: {
+              worksheetData: this.selectedWorksheetData
+            }
+          });
+          return;
+        }
+
+        // User has approve privilege
+        if (action === 'approve' && this.canApprove) {
+          this.router.navigate(['/item-store-price-approve'], {
+            state: {
+              worksheetData: this.selectedWorksheetData
+            }
+          });
+          return;
+        }
+
+
+
+      }
+    });
+  }
   goToView(worksheetId: number) {
     if (!worksheetId) {
       console.warn('Invalid worksheet ID');
@@ -649,7 +652,7 @@ export class ItemStorePricesLogComponent {
     event.cancel = true; // Prevent the default editing action
     const selectedId = event.data.ID; // Get the selected row ID
     if (selectedId) {
-      this.selectWorksheetById(selectedId);
+      this.selectWorksheetById(selectedId, 'edit');
       // this.router.navigate(['/item-store-properties']);
     } else {
       console.warn('No valid row ID selected');

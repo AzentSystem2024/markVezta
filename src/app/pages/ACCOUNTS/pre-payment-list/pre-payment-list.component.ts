@@ -43,6 +43,10 @@ export class PrePaymentListComponent {
   dataGrid: DxDataGridComponent;
   @ViewChild('prePaymentAdd')
   prePaymentAdd!: PrePaymentAddComponent;
+  @ViewChild('verifyPopup', { static: false })
+  verifyPopup: any;
+  @ViewChild('editPopup', { static: false })
+  editPopup: any;
 
   PrePaymentListDataSource: any[] = [];
   readonly allowedPageSizes: any = [10, 20, 'all'];
@@ -257,20 +261,27 @@ export class PrePaymentListComponent {
 
   onVerifyInvoice(e: any) {
     e.cancel = true;
-    console.log(e)
+
     const status = e.row.data?.TRANS_STATUS?.trim();
+
     if (status === 'Approved') {
       this.popupMode = 'view';
       this.isEditReadOnly = true;
-    } else if (status === 'Verified') {
+    }
+    else if (status === 'Verified') {
       this.popupMode = 'approve';
-    } else {
+      this.isEditReadOnly = false;
+    }
+    else {
       this.popupMode = 'verify';
+      this.isEditReadOnly = false;
     }
 
-    // this.isEditReadOnly = status === 'Approved';
     this.editPrePaymentPopupOpened = false;
     this.verifyPrePaymentPopupOpened = true;
+    setTimeout(() => {
+      this.verifyPopup.instance.repaint();
+    });
     this.verifyselectPrePayment(e);
   }
 
@@ -300,6 +311,9 @@ export class PrePaymentListComponent {
     }
 
     this.editPrePaymentPopupOpened = true;
+    setTimeout(() => {
+      this.editPopup.instance.repaint();
+    });
     this.selectPrePayment(event);
   }
 
