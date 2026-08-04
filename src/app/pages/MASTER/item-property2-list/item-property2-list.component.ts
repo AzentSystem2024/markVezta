@@ -147,18 +147,25 @@ export class ItemProperty2ListComponent {
   }
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-
     onClick: () => {
-      // Run inside Angular's zone
       this.ngZone.run(() => this.addItemProperty2());
     },
-
     elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
   };
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));

@@ -40,6 +40,7 @@ import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
 import { Router } from '@angular/router';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-list-salary-payment',
@@ -98,6 +99,10 @@ export class ListSalaryPaymentComponent {
   };
   addMiscPaymentPopup: boolean = false;
 
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Salary Payment');
+  }
+
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -134,6 +139,7 @@ export class ListSalaryPaymentComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private router: Router,
+    private exportService: ExportService,
   ) { }
 
   ngOnInit() {

@@ -16,6 +16,7 @@
       (onCellPrepared)="onCellPrepared($event)"
       [keyExpr]="'ID'"
       [selection]="{ mode: 'single' }"
+      (onExporting)="onExporting($event)"
     >
       <dxo-scrolling
         mode="standard"
@@ -30,12 +31,30 @@
         [visible]="true"
         [highlightCaseSensitive]="false"
       ></dxo-search-panel>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Store Properties Log</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Store Properties Log
+          </div>
         </dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
         <dxi-item
           location="after"
@@ -43,9 +62,22 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
         <dxi-item
+          name="exportButton"
           location="after"
-          locateInMenu="auto"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
           widget="dxButton"
           [options]="addButtonOptions"
         >

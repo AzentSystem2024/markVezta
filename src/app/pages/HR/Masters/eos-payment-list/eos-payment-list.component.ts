@@ -30,6 +30,7 @@ import {
   DxLoadPanelModule,
   DxRadioGroupModule,
 } from 'devextreme-angular';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-eos-payment-list',
@@ -118,6 +119,11 @@ export class EosPaymentListComponent implements OnInit {
     onClick: () => this.toggleFilters(),
   };
 
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'EOS Payment');
+  }
+
   // --- Data & State ---
   isLoading: boolean = false;
   eosPaymentList: any[] = [];
@@ -204,7 +210,8 @@ export class EosPaymentListComponent implements OnInit {
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+    private exportService: ExportService,
+  ) { }
 
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
@@ -256,7 +263,7 @@ export class EosPaymentListComponent implements OnInit {
         this.ledgerList = response?.Data || [];
         this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
       },
-      error: () => {},
+      error: () => { },
     });
   }
 
@@ -414,7 +421,7 @@ export class EosPaymentListComponent implements OnInit {
     if (res.PAY_TYPE_ID) {
       this.eosFormData.PAY_TYPE_ID = res.PAY_TYPE_ID;
       this.onReceiptModeChange({ value: this.eosFormData.PAY_TYPE_ID });
-    } 
+    }
 
     if (res.PAY_HEAD_ID)
       this.eosFormData.PAY_HEAD_ID = Number(res.PAY_HEAD_ID);
@@ -715,4 +722,4 @@ export class EosPaymentListComponent implements OnInit {
   declarations: [EosPaymentListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EosPaymentListModule {}
+export class EosPaymentListModule { }

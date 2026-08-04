@@ -224,18 +224,7 @@
             [style.opacity]="
               isBadgeDisabled(cellData.data.STATUS) ? '0.4' : '1'
             "
-            (click)="
-              cellData.data.STATUS === 'Rejoined' ||
-              cellData.data.STATUS === 'Left Service'
-                ? onEditingStart({ data: cellData.data, cancel: false })
-                : cellData.data.STATUS === 'Travelled'
-                  ? onRejoinClick({ row: { data: cellData.data } })
-                  : cellData.data.STATUS === 'Approved'
-                    ? onTravelClick({ row: { data: cellData.data } })
-                    : cellData.data.STATUS === 'Verified'
-                      ? onApproveClick({ row: { data: cellData.data } })
-                      : onVerifyClick({ row: { data: cellData.data } })
-            "
+            (click)="onStatusBadgeClick(cellData.data)"
           >
           </span>
         </div>

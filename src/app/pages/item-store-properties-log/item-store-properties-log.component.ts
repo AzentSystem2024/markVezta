@@ -42,6 +42,7 @@ import { WorksheetService } from 'src/app/services/worksheet.service';
 import { ItemStorePropertiesEditModule } from '../item-store-properties-edit/item-store-properties-edit.component';
 import { EditItemStorePropertyModule } from 'src/app/pop-up/operations/edit-item-store-property/edit-item-store-property.component';
 import { ChangeDetectorRef } from '@angular/core';
+import { ExportService } from 'src/app/services/export.service';
 @Component({
   selector: 'app-item-store-properties-log',
   templateUrl: './item-store-properties-log.component.html',
@@ -73,17 +74,11 @@ export class ItemStorePropertiesLogComponent implements OnInit {
   canVerify = false;
   StatusType: any
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.onAddClick();
-      });
+      this.zone.run(() => this.onAddClick());
     },
     elementAttr: { class: 'add-button' },
 
@@ -163,11 +158,36 @@ export class ItemStorePropertiesLogComponent implements OnInit {
 
     },
   ];
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Item Change Property Log');
+  }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
   constructor(
     private dataservice: DataService,
     private router: Router,
     private zone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private exportService: ExportService,
 
   ) { }
 

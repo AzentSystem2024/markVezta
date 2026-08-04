@@ -32,6 +32,7 @@
       focusStateEnabled="false"
       (onEditingStart)="onEditOrViewSalaryPayment($event)"
       (onRowRemoving)="onDeleteSalaryPayment($event)"
+      (onExporting)="onExporting($event)"
       (onToolbarPreparing)="onToolbarPreparing($event)"
     >
       <dxo-column-chooser
@@ -67,12 +68,7 @@
       <!-- <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel> -->
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
-      <dxo-export
-        [enabled]="true"
-        [allowExportSelectedData]="true"
-        [formats]="['xlsx', 'pdf']"
-      >
-      </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-header-filter
         [visible]="true"
         [search]="{ enabled: true }"
@@ -96,14 +92,23 @@
         </dxi-item>
 
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
         ></dxi-item>
 
         <dxi-item

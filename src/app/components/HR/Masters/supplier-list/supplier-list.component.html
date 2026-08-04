@@ -22,7 +22,18 @@
 
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">Supplier</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Supplier
+        </div>
       </dxi-item>
 
       <!-- <dxi-item location="after" locateInMenu="auto">
@@ -136,7 +147,6 @@
     </dxi-column>
   </dx-data-grid>
 
-  
   <form-popup
     [(visible)]="isAddSupplierPopupOpened"
     [width]="1000"

@@ -34,6 +34,7 @@ import { CommonModule } from '@angular/common';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
 import { Router } from '@angular/router';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-advance',
@@ -154,8 +155,45 @@ export class AdvanceComponent {
 
   // 7. GRID ACTION BUTTON CONFIGURATIONS
   // ==========================================
+
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_advance_list();
+  }
+
   addButtonOptions = {
-    text: 'New',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
@@ -163,21 +201,18 @@ export class AdvanceComponent {
       this.ngZone.run(() => this.add_pop());
     },
     elementAttr: { class: 'add-button' },
+
     template: () => {
       return `
       <div class="add-btn-content">
-        <span class="iconify" data-icon="formkit:add" data-width="20" data-height="20"></span>
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
         <span class="add-text">New</span>
       </div>
     `;
     },
-  };
-
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    onClick: () => this.refreshGrid(),
-    text: '',
   };
 
   allButtons = [
@@ -243,6 +278,7 @@ export class AdvanceComponent {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private exportService: ExportService,
   ) {
     this.formSource = this.fb.group({
       Id: [null],
@@ -477,15 +513,6 @@ export class AdvanceComponent {
     });
   }
 
-  // 10. EVENT HANDLERS & ACTIONS
-  // ==========================================
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh();
-      this.get_advance_list();
-    }
-  }
-
   refreshData() {
     this.dataGrid.instance.refresh();
   }
@@ -494,6 +521,10 @@ export class AdvanceComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Salary Advance');
+  }
 
   onDateRangeChange(event: any) {
     const selected = event.value;
@@ -589,20 +620,6 @@ export class AdvanceComponent {
   getAdvanceTypeName(id: any): string {
     const item = this.ADVANCETYPE_VALUE.find((x) => x.ID === id);
     return item ? item.DESCRIPTION : this.adv_type_name || 'Unknown Type';
-  }
-
-
-  getStatusFlagClass(status: string): string {
-    switch (status) {
-      case 'Open':
-        return 'flag-open';
-      case 'Verified':
-        return 'flag-verified';
-      case 'Approved':
-        return 'flag-approved';
-      default:
-        return '';
-    }
   }
 
   // 12. CALCULATIONS

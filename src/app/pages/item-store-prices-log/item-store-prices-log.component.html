@@ -18,6 +18,7 @@
       (onCellPrepared)="onCellPrepared($event)"
       [keyExpr]="'ID'"
       [selection]="{ mode: 'single' }"
+      (onExporting)="onExporting($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -28,6 +29,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-scrolling
         mode="standard"
         columnRenderingMode="virtual"
@@ -45,7 +47,18 @@
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Change Item Price</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Change Item Price
+          </div>
         </dxi-item>
         <dxi-item
           location="after"
@@ -63,10 +76,16 @@
           <div class="toolbar-divider"></div>
         </dxi-item>
 
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item
           *ngIf="canAdd"
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>

@@ -29,6 +29,7 @@ import {
   EmployeeSalarySettingsAddModule,
 } from '../../../../components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 import { EmployeeSalarySettingsEditModule } from '../../../../components/HR/Masters/employee-salary-settings-edit/employee-salary-settings-edit.component';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-employee-salary-settings',
@@ -80,7 +81,8 @@ export class EmployeeSalarySettingsComponent implements OnInit {
     private dataservice: DataService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+    private exportService: ExportService,
+  ) { }
 
   // ==================== Lifecycle Hooks ====================
   ngOnInit() {
@@ -179,27 +181,33 @@ export class EmployeeSalarySettingsComponent implements OnInit {
     text: '',
   };
 
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
-    visible: !this.canAdd,
     hint: 'Add new entry',
     onClick: () => {
       this.ngZone.run(() => this.addEmployee());
     },
     elementAttr: { class: 'add-button' },
+
     template: () => {
       return `
-       <div class="add-btn-content">
-         <span class="iconify"
-               data-icon="formkit:add"
-               data-width="20"
-               data-height="20"></span>
-         <span class="add-text">New</span>
-       </div>
-     `;
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
     },
   };
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Employee Salary Settings');
+  }
+
 
   // ==================== Event Handlers ====================
   isEditAllowed = (e: any) => {
@@ -346,4 +354,4 @@ export class EmployeeSalarySettingsComponent implements OnInit {
   exports: [EmployeeSalarySettingsComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeSalarySettingsModule {}
+export class EmployeeSalarySettingsModule { }

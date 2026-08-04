@@ -14,6 +14,7 @@
       (onEditingStart)="openEditingStart($event)"
       (onRowRemoving)="onRowRemoving($event)"
       [selection]="{ mode: 'single' }"
+      (onExporting)="onExporting($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -24,6 +25,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-filter-row
@@ -42,8 +44,8 @@
       ></dxo-scrolling>
       <dxo-editing
         mode="popup"
-        [allowUpdating]="true"
-        [allowDeleting]="true"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
       <dxo-search-panel
         [visible]="true"
@@ -53,18 +55,47 @@
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Promotion</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Promotion
+          </div>
         </dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
         <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item
           *ngIf="canAdd"
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
         >

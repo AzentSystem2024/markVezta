@@ -1,4 +1,4 @@
-import { Component, ViewChild, NgModule } from '@angular/core';
+import { Component, ViewChild, NgModule, NgZone } from '@angular/core';
 import {
   DxButtonModule,
   DxDataGridModule,
@@ -57,23 +57,53 @@ export class DenialListComponent {
       }),
   });
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-plus-circle-fill',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    onClick: () => this.addDenial(),
+    onClick: () => {
+      this.ngZone.run(() => this.addDenial());
+    },
     elementAttr: { class: 'add-button' },
-  };
 
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
   isFilterRowVisible: boolean = false;
 
   GridSource: any;
   currentPathName: string = '';
   initialized: boolean = false;
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private ngZone: NgZone,) {
     this.getDenial_DropDown();
   }
 
@@ -244,4 +274,4 @@ export class DenialListComponent {
   exports: [],
   declarations: [DenialListComponent],
 })
-export class DenialListModule {}
+export class DenialListModule { }

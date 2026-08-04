@@ -56,8 +56,7 @@
       <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
       <dxo-export
         [enabled]="true"
-        [allowExportSelectedData]="true"
-        [formats]="['xlsx', 'pdf']"
+        [formats]="['xlsx',]"
       >
       </dxo-export>
       <dxo-header-filter
@@ -74,7 +73,13 @@
       ></dxo-search-panel>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="font-size: 20px">Salary Head</div>
+          <div class="grid-header" style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          ">Salary Head</div>
         </dxi-item>
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
 
@@ -91,6 +96,12 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+         <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+      
         <dxi-item
           name="exportButton"
           location="after"

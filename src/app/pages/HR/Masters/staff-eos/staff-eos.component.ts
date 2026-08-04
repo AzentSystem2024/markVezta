@@ -32,6 +32,7 @@ import { FormPopupModule, FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-staff-eos',
@@ -236,6 +237,7 @@ export class StaffEOSComponent {
     private ngZone: NgZone,
     private cdRef: ChangeDetectorRef,
     private router: Router,
+    private exportService: ExportService,
   ) {
     this.formSource = this.fb.group({
       id: [null],
@@ -332,6 +334,10 @@ export class StaffEOSComponent {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
+  }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Employee EOS');
   }
 
   getStaffEosData() {

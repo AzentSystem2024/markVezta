@@ -57,7 +57,18 @@
     <dxo-filter-builder [allowHierarchicalFields]="true"> </dxo-filter-builder>
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">Purchase Order</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Purchase Order
+        </div>
       </dxi-item>
       <!-- <dxi-item location="after">
         <div *dxTemplate="let data of 'storeTemplate'">
@@ -92,15 +103,16 @@
         [options]="refreshButtonOptions"
       ></dxi-item>
 
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
       <dxi-item
         name="exportButton"
         location="after"
         cssClass="export-btn"
       ></dxi-item>
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
 
       <dxi-item
         *ngIf="canAdd"
