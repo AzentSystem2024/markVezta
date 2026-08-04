@@ -49,6 +49,7 @@ import { CountryServiceService } from 'src/app/services/country-service.service'
 import { ImageService } from 'src/app/services/image.service';
 
 import notify from 'devextreme/ui/notify';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-items-form',
   templateUrl: './items-form.component.html',
@@ -207,6 +208,13 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   selectedStoresMap: any;
   selected_Company_id: any;
   companyId: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
+  hideCost: any;
 
   constructor(
     private dataservice: DataService,
@@ -214,6 +222,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     private imageService: ImageService,
     private cdr: ChangeDetectorRef,
     private countryFlagService: CountryServiceService,
+    private router: Router,
   ) {
     this.sesstion_Details();
     this.selectedPriority = 1;
@@ -548,6 +557,25 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+      this.hideCost = packingRights.HideCost;
+    }
     this.showItems();
     this.sesstion_Details();
 
@@ -1218,4 +1246,4 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   exports: [ItemsFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsFormModule { }
+export class ItemsFormModule {}
