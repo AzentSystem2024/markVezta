@@ -63,7 +63,18 @@
       ></dxo-filter-row> -->
       <dxo-toolbar>
         <dxi-item location="before">
-          <h6>PDC</h6>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            PDC
+          </div>
         </dxi-item>
 
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
@@ -144,6 +155,12 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"

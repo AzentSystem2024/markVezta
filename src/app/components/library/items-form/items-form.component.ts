@@ -1218,4 +1218,4 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   exports: [ItemsFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsFormModule {}
+export class ItemsFormModule { }

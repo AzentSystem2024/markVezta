@@ -48,21 +48,23 @@
     </dxo-export>
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">CPT Master</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          CPT Master
+        </div>
       </dxi-item>
       <dxi-item
         location="after"
-        locateInMenu="auto"
-        showText="inMenu"
         widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-
-          elementAttr: { class: 'commonButtons' },
-        }"
+        [options]="searchButtonOptions"
       ></dxi-item>
       <dxi-item
         location="after"
@@ -78,11 +80,18 @@
         }"
       ></dxi-item>
 
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
         location="after"
-        cssClass="custom-export-button"
+        cssClass="export-btn"
       ></dxi-item>
+
       <dxi-item
         location="after"
         widget="dxButton"

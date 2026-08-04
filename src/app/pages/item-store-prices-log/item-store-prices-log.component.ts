@@ -39,6 +39,7 @@ import { filter } from 'rxjs/operators';
 import { FormTextboxModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
 import { DataService } from 'src/app/services';
+import { ExportService } from 'src/app/services/export.service';
 interface CustomButton {
   hint?: string;
   icon?: string;
@@ -143,18 +144,13 @@ export class ItemStorePricesLogComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-    // onClick: () => this.addCreditNote(),
     onClick: () => {
-      this.zone.run(() => {
-        this.onAddClick();
-      });
+      this.zone.run(() => this.onAddClick());
     },
     elementAttr: { class: 'add-button' },
 
@@ -196,6 +192,7 @@ export class ItemStorePricesLogComponent {
     private dataservice: DataService,
     private router: Router,
     private zone: NgZone,
+    private exportService: ExportService,
   ) { }
 
   ngOnInit() {
@@ -235,6 +232,11 @@ export class ItemStorePricesLogComponent {
     this.currencyFormt = sessionStorage.getItem('currencyFormat');
     this.getLoglist();
   }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Item Change Price Log');
+  }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed

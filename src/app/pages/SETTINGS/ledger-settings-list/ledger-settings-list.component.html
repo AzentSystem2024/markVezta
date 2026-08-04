@@ -9,7 +9,7 @@
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
-        showPane: true
+        showPane: true,
       }"
       class="grid theme-dependent"
       [dataSource]="ledgerList"
@@ -34,11 +34,10 @@
     >
       <dxo-editing
         mode="cell"
-       [allowUpdating]="canEdit"
-       [allowDeleting]="canDelete"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
       ></dxo-editing>
 
-      
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -66,7 +65,18 @@
       ></dxo-filter-row>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Ledger Mapping</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Ledger Mapping
+          </div>
         </dxi-item>
         <dxi-item
           location="after"
@@ -77,7 +87,6 @@
         <dxi-item
           *ngIf="canAdd"
           location="after"
-          locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
         ></dxi-item>
@@ -93,15 +102,15 @@
       </dxi-column>
 
       <dxi-column type="buttons">
-  <dxi-button name="edit"></dxi-button>
+        <dxi-button name="edit"></dxi-button>
 
-  <dxi-button
-            *ngIf="canDelete"
-    icon="trash"
-    hint="Clear Ledger"
-    [onClick]="clearLedger"
-  ></dxi-button>
-</dxi-column>
+        <dxi-button
+          *ngIf="canDelete"
+          icon="trash"
+          hint="Clear Ledger"
+          [onClick]="clearLedger"
+        ></dxi-button>
+      </dxi-column>
     </dx-data-grid>
   </div>
 </div>

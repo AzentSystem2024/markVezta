@@ -97,19 +97,14 @@ export class ListMiscReceiptComponent {
     text: '',
   };
   addButtonOptions = {
-    text: 'New',
-    // icon: 'bi bi-file-earmark-plus',
-
-    // icon: 'add',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
     onClick: () => {
-      this.ngZone.run(() => {
-        this.addMiscReceipt(); // show your popup here
-      });
+      this.ngZone.run(() => this.addMiscReceipt());
     },
     elementAttr: { class: 'add-button' },
+
     template: () => {
       return `
       <div class="add-btn-content">
@@ -122,6 +117,7 @@ export class ListMiscReceiptComponent {
     `;
     },
   };
+
   addMiscPaymentPopup: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },

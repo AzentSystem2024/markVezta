@@ -14,19 +14,15 @@
     [width]="'100%'"
     [columnAutoWidth]="true"
   >
-  <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
 
-  <dxo-export
-      [enabled]="true"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-search-panel
       [visible]="true"
       placeholder="Data Search"
     ></dxo-search-panel>
 
-  <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
       [visible]="true"
       [allowedPageSizes]="allowedPageSizes"
@@ -36,57 +32,66 @@
       [showNavigationButtons]="true"
     ></dxo-pager>
 
-  <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
-  </dxo-editing>
-  <dxo-toolbar>
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
+    </dxo-editing>
+    <dxo-toolbar>
+      <!-- Title -->
+      <dxi-item location="before">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Import Items Template
+        </div>
+      </dxi-item>
 
-  <!-- Title -->
-  <dxi-item location="before">
-    <div class="grid-header">Import Items Template</div>
-  </dxi-item>
+      <!-- Filter Toggle -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
 
-  <!-- Filter Toggle -->
-  <dxi-item
-    location="after"
-    widget="dxButton"
-    [options]="searchButtonOptions"
-  ></dxi-item>
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
 
-  <!-- Refresh -->
-  <dxi-item
-    location="after"
-    widget="dxButton"
-    [options]="refreshButtonOptions"
-  ></dxi-item>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
-  <!-- Divider -->
-  <dxi-item location="after">
-    <div class="toolbar-divider"></div>
-  </dxi-item>
+      <!-- Export -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
 
-  <!-- Export -->
-  <dxi-item
-    name="exportButton"
-    location="after"
-    cssClass="export-btn"
-  ></dxi-item>
+      <!-- Add Button (Styled) -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+        [visible]="canAdd"
+      ></dxi-item>
+    </dxo-toolbar>
 
-  <!-- Add Button (Styled) -->
-  <dxi-item
-    location="after"
-    widget="dxButton"
-    [options]="addButtonOptions"
-    [visible]="canAdd"
-  ></dxi-item>
-
-</dxo-toolbar>
-
-  <dxi-column dataField="TEMPLATE_NAME" caption="Template Name"></dxi-column>
-  <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
-  
-  
-
-
+    <dxi-column dataField="TEMPLATE_NAME" caption="Template Name"></dxi-column>
+    <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
   </dx-data-grid>
   <form-popup
     [(visible)]="isPopupOpened"
@@ -96,16 +101,17 @@
     [height]="700"
     [width]="700"
   >
-  <app-import-item-template-form></app-import-item-template-form>
-    
+    <app-import-item-template-form></app-import-item-template-form>
   </form-popup>
   <dx-popup
-  [(visible)]="isEditPopupOpened"
-  title="Edit Import Item Template"
-  [height]="700"
-  [width]="700"
+    [(visible)]="isEditPopupOpened"
+    title="Edit Import Item Template"
+    [height]="700"
+    [width]="700"
   >
-  <app-import-item-template-edit-form [formdata]="selectedRowData" (closeForm)="CloseEditForm()"></app-import-item-template-edit-form>
-</dx-popup>
-
-  </div>
+    <app-import-item-template-edit-form
+      [formdata]="selectedRowData"
+      (closeForm)="CloseEditForm()"
+    ></app-import-item-template-edit-form>
+  </dx-popup>
+</div>

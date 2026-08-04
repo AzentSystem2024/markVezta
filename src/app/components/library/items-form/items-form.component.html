@@ -679,11 +679,11 @@
         </div>
 
         <!-- Right Containers (Inventory and History) -->
-        <div class="right-containers" *ngIf="newItems.TYPE_ID != 2">
+        <div class="right-containers">
           <!-- Inventory Container -->
-          <div class="inventory-container">
+          <div class="inventory-container" *ngIf="newItems.TYPE_ID != 2">
             <div class="price-header">Inventory</div>
-            <dxi-item itemType="group" [colCount]="2">
+            <dxi-item [colCount]="2">
               <div class="inventory-item">
                 <label>On Hand Quantity:</label>
                 <dx-text-box

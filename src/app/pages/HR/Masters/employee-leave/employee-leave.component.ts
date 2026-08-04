@@ -381,6 +381,8 @@ export class EmployeeLeaveComponent {
     const ID = event.data.ID;
 
     this.dataservice.Select_EmployeeLeave_Api(ID).subscribe((response: any) => {
+      response.LEFT_REASON = Number(response.LEFT_REASON);
+      this.selectedData = response;
       if (statusValue === 'Open' || statusValue === 'Pending') {
         // Editable
         this.UpdateVacationPopup = true;
@@ -389,8 +391,8 @@ export class EmployeeLeaveComponent {
         this.ViewPopup = true;
       }
     });
-    this.selectedStatusType = event.data.StatusType;
-    this.Select_EmployeeLeave(ID);
+    // this.selectedStatusType = event.data.StatusType;
+    // this.Select_EmployeeLeave(ID);
   }
 
   closePopup() {
@@ -530,6 +532,34 @@ export class EmployeeLeaveComponent {
     this.get_ExistingLeaveByEmployee();
   }
 
+
+  onStatusBadgeClick(data: any) {
+    switch (data.STATUS) {
+
+      case 'Open':
+      case 'Pending':
+        this.onVerifyClick({ row: { data } });
+        break;
+
+      case 'Verified':
+        this.onApproveClick({ row: { data } });
+        break;
+
+      case 'Approved':
+        this.onTravelClick({ row: { data } });
+        break;
+
+      case 'Travelled':
+        this.onRejoinClick({ row: { data } });
+        break;
+
+      case 'Rejoined':
+      case 'Left Service':
+        this.ViewPopup = true;
+        this.Select_EmployeeLeave(data.ID);
+        break;
+    }
+  }
   // DATA FETCHING & DROPDOWNS
   // ==========================================
   get_EmployeeLeaveList() {

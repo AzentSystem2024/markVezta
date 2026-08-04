@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   NgModule,
+  NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -57,6 +58,7 @@ export class CPTMasterComponent {
   isAddFormPopupOpened: boolean = false;
   isEditFormPopupOpened: boolean = false;
   selectedCptMaster: any;
+  isFilterOpened = false;
 
   dataSource = new DataSource<any>({
     load: () =>
@@ -67,24 +69,56 @@ export class CPTMasterComponent {
         });
       }),
   });
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
-  addButtonOptions: any;
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+
 
   isFilterRowVisible: boolean = false;
   currentPathName: string = '';
   initialized: boolean = false;
 
-  constructor(private dataService: DataService) {
-    this.addButtonOptions = {
-      text: 'New',
-      icon: 'bi bi-plus-circle',
-      type: 'default',
-      stylingMode: 'contained',
-      hint: 'Add new entry',
-      onClick: () => this.show_new_Form(), // use your actual method here
-      elementAttr: { class: 'add-button' },
-    };
+  constructor(private dataService: DataService, private ngZone: NgZone,) {
+
   }
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.show_new_Form());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
 
   //=========================show new popup=========================
   show_new_Form() {
@@ -323,4 +357,4 @@ export class CPTMasterComponent {
   exports: [],
   declarations: [CPTMasterComponent],
 })
-export class CPTMasterModule {}
+export class CPTMasterModule { }

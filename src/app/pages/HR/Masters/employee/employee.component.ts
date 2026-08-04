@@ -39,6 +39,7 @@ import { DataService } from 'src/app/services';
 import { EmployeeEditFormFormModule } from '../../../../components/HR/Masters/employee-edit-form/employee-edit-form.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-employee',
@@ -62,6 +63,7 @@ export class EmployeeComponent implements OnInit {
   editEmployeePopupOpened: boolean = false;
   isLoading: boolean = false;
   isFilterRowVisible: boolean = false;
+  selected_Company_id: any;
   canAdd = false;
   canEdit = false;
   canView = false;
@@ -94,33 +96,38 @@ export class EmployeeComponent implements OnInit {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
+
 
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
     text: '',
   };
 
-  selected_Company_id: any;
+
 
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private exportService: ExportService,
   ) {
     // this.isLoading = false;
   }
 
   onExporting(event: any) {
-    const fileName = 'Credit_Note';
-    this.dataservice.exportDataGrid(event, fileName);
+    this.exportService.onExporting(event, 'eos');
   }
+
 
   formatDates(cellData: any): string {
     if (!cellData) return '';
@@ -214,7 +221,7 @@ export class EmployeeComponent implements OnInit {
     this.GridSource.filter();
   }
 
-  onAddClick() {}
+  onAddClick() { }
 
   addEmployee() {
     this.addEmployeePopupOpened = true;
@@ -333,4 +340,4 @@ export class EmployeeComponent implements OnInit {
   exports: [EmployeeComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeModule {}
+export class EmployeeModule { }

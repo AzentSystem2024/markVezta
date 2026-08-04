@@ -183,7 +183,7 @@ export class EOSComponent {
   }
 
   onExporting(event: any) {
-    this.exportService.onExporting(event, 'Department-list');
+    this.exportService.onExporting(event, 'eos');
   }
 
   refresh = () => {

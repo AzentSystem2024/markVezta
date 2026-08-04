@@ -15,7 +15,10 @@
       [height]="'calc(100vh - 150px)'"
       [scrolling]="{ mode: 'virtual' }"
       [selection]="{ mode: 'single' }"
+      (onExporting)="onExporting($event)"
     >
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -48,6 +51,13 @@
         <dxi-item location="after">
           <div class="toolbar-divider"></div>
         </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"

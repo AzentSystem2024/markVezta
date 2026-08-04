@@ -22,6 +22,7 @@ import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import { DepartmentComponent } from '../department/department.component';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-department-group',
@@ -57,19 +58,26 @@ export class DepartmentGroupComponent {
   canPrint = false;
 
   addButtonOptions = {
-    text: 'New',
-    icon: 'bi bi-file-earmark-plus',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Add new entry',
-
     onClick: () => {
       this.ngZone.run(() => this.addDepartment());
     },
-
     elementAttr: { class: 'add-button' },
-  };
 
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -78,15 +86,34 @@ export class DepartmentGroupComponent {
     onClick: () => this.toggleFilters(),
   };
 
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => {
-      this.ngZone.run(() => this.get_Department_List());
+      this.ngZone.run(() => this.refreshGrid());
     },
     text: '',
   };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_Department_List();
+  }
+
   isFilterOpened: boolean = false;
   sessionData: any;
   COMPANY_ID: any;
@@ -96,6 +123,7 @@ export class DepartmentGroupComponent {
     private fb: FormBuilder,
     private dataservice: DataService,
     private ngZone: NgZone,
+    private exportService: ExportService,
     private router: Router,
   ) {
     this.formsource = this.fb.group({
@@ -127,25 +155,6 @@ export class DepartmentGroupComponent {
     this.sesstion_Details();
     this.get_Department_List();
   }
-
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh();
-    }
-    this.get_Department_List();
-  }
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
-
   addDepartment() {
     this.AddDepartmentPopup = true;
   }
@@ -162,9 +171,9 @@ export class DepartmentGroupComponent {
     this.Select_Department(event);
   }
 
-  refresh = () => {
-    this.dataGrid?.instance.refresh();
-  };
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'department-group');
+  }
 
   formatStatus(data: any) {
     return data.IS_INACTIVE ? 'Active' : 'Inactive';
@@ -237,7 +246,7 @@ export class DepartmentGroupComponent {
     const isDuplicate = this.Department.some((data: any) => {
       return (
         data.DEPT_NAME?.toLowerCase().trim() ===
-          DEPT_NAME?.toLowerCase().trim() ||
+        DEPT_NAME?.toLowerCase().trim() ||
         data.CODE?.toLowerCase().trim() === CODE?.toLowerCase().trim()
       );
     });
@@ -259,7 +268,7 @@ export class DepartmentGroupComponent {
     if (CODE && DEPT_NAME) {
       this.dataservice
         .Insert_Department_Group_Api(CODE, DEPT_NAME, IS_INACTIVE, COMPANY_ID)
-        .subscribe((response:any) => {
+        .subscribe((response: any) => {
           if (response.flag === '1') {
             notify(
               {
@@ -377,48 +386,48 @@ export class DepartmentGroupComponent {
     const ID = event.data.ID;
     this.dataservice
       .Delete_Department_Group_Api(ID)
-      .subscribe((response: any) => {});
+      .subscribe((response: any) => { });
   }
 
   validateDepartmentGroupCode = (e: any): boolean => {
-  const value = (e.value || '').trim().toLowerCase();
+    const value = (e.value || '').trim().toLowerCase();
 
-  if (!value || !this.Department?.length) return true;
+    if (!value || !this.Department?.length) return true;
 
-  // edit popup row id
-  const currentId =
-    this.editingRowData?.ID || null;
+    // edit popup row id
+    const currentId =
+      this.editingRowData?.ID || null;
 
-  return !this.Department.some((item: any) => {
-    const code = (item.CODE || '').trim().toLowerCase();
+    return !this.Department.some((item: any) => {
+      const code = (item.CODE || '').trim().toLowerCase();
 
-    return code === value && item.ID !== currentId;
-  });
-};
+      return code === value && item.ID !== currentId;
+    });
+  };
 
-validateDepartmentGroupName = (e: any): boolean => {
-  const value = (e.value || '').trim().toLowerCase();
+  validateDepartmentGroupName = (e: any): boolean => {
+    const value = (e.value || '').trim().toLowerCase();
 
-  if (!value || !this.Department?.length) return true;
+    if (!value || !this.Department?.length) return true;
 
-  const currentId =
-    this.editingRowData?.ID || null;
+    const currentId =
+      this.editingRowData?.ID || null;
 
-  return !this.Department.some((item: any) => {
-    const name =
-      (item.DEPT_NAME || item.DESCRIPTION || '')
-        .trim()
-        .toLowerCase();
+    return !this.Department.some((item: any) => {
+      const name =
+        (item.DEPT_NAME || item.DESCRIPTION || '')
+          .trim()
+          .toLowerCase();
 
-    return name === value && item.ID !== currentId;
-  });
-};
+      return name === value && item.ID !== currentId;
+    });
+  };
 
-getStatusFlagClass(status: any): string {
-  return status?.toLowerCase() === 'active'
-    ? 'green-flag'
-    : 'red-flag';
-}
+  getStatusFlagClass(status: any): string {
+    return status?.toLowerCase() === 'active'
+      ? 'green-flag'
+      : 'red-flag';
+  }
 }
 @NgModule({
   imports: [
@@ -438,4 +447,4 @@ getStatusFlagClass(status: any): string {
   exports: [],
   declarations: [DepartmentGroupComponent],
 })
-export class DepartmentGroupModule {}
+export class DepartmentGroupModule { }

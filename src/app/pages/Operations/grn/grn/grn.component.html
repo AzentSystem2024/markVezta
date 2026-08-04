@@ -30,12 +30,7 @@
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
-    <dxo-export
-      [enabled]="true"
-      [allowExportSelectedData]="true"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <!-- <dxo-pager
             [visible]="true"
             [allowedPageSizes]="allowedPageSizes"
@@ -48,7 +43,18 @@
     <!-- </dxo-editing> -->
     <dxo-toolbar>
       <dxi-item location="before">
-        <div class="grid-header">Goods Receipt Note</div>
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          Goods Receipt Note
+        </div>
       </dxi-item>
       <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
       <dxi-item

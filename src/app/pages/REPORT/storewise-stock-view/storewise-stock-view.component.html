@@ -23,7 +23,7 @@
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -177,7 +177,17 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-        <dxi-item name="exportButton"></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping

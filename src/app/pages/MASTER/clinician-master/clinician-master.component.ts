@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule, OnInit, ViewChild } from '@angular/core';
+import { Component, NgModule, NgZone, OnInit, ViewChild } from '@angular/core';
 import {
   DxButtonModule,
   DxDataGridComponent,
@@ -57,6 +57,7 @@ export class ClinicianMasterComponent {
   auto: string = 'auto';
 
   showSearchBar: boolean = false;
+  isFilterOpened = false;
 
   dataSource = new DataSource<any>({
     load: () =>
@@ -126,7 +127,25 @@ export class ClinicianMasterComponent {
     },
   ];
 
-  addButtonOptions: any;
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
 
   isFilterRowVisible: boolean = false;
   selectedClinician: any;
@@ -134,18 +153,33 @@ export class ClinicianMasterComponent {
   constructor(
     private dataService: DataService,
     private route: ActivatedRoute,
+    private ngZone: NgZone,
   ) {
-    this.addButtonOptions = {
-      text: 'New',
-      icon: 'bi bi-plus-circle',
-      type: 'default',
-      stylingMode: 'contained',
-      hint: 'Add new entry',
-      // disabled: !this.menuPrevilage.CanAdd,
-      onClick: () => this.show_new__Form(),
-      elementAttr: { class: 'add-button' },
-    };
+
   }
+
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.ngZone.run(() => this.show_new__Form());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
 
   openEditingStart(event: any) {
     event.cancel = true;
@@ -477,4 +511,4 @@ export class ClinicianMasterComponent {
   exports: [],
   declarations: [ClinicianMasterComponent],
 })
-export class ClinicianMasterModule {}
+export class ClinicianMasterModule { }
