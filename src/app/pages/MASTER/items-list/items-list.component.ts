@@ -64,9 +64,11 @@ interface ItemAlias {
 })
 export class ItemsListComponent implements OnInit {
   // @ViewChild and @Output
-  @ViewChild('editButtonTemplate', { static: true }) editButtonTemplate: TemplateRef<any>;
+  @ViewChild('editButtonTemplate', { static: true })
+  editButtonTemplate: TemplateRef<any>;
   @ViewChild(ItemsFormComponent) itemsComponent: ItemsFormComponent;
-  @ViewChild(DxDataGridComponent, { static: true }) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('editForm', { static: false }) editFormComponent: any;
 
@@ -206,6 +208,7 @@ export class ItemsListComponent implements OnInit {
     onClick: () => this.ngZone.run(() => this.refreshGrid()),
     text: '',
   };
+  hideCost: any;
 
   constructor(
     private dataservice: DataService,
@@ -220,7 +223,9 @@ export class ItemsListComponent implements OnInit {
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
-    const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -234,6 +239,7 @@ export class ItemsListComponent implements OnInit {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.hideCost = packingRights.HideCost;
     }
 
     this.sesstion_Details();
@@ -243,14 +249,17 @@ export class ItemsListComponent implements OnInit {
   }
 
   sesstion_Details(): void {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     if (this.sessionData?.GeneralSettings) {
       this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
       this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
       this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
       this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
       this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-      this.ENABLE_Matrix_Code = this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
+      this.ENABLE_Matrix_Code =
+        this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     }
     this.selected_Company_id = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
   }
@@ -334,20 +343,48 @@ export class ItemsListComponent implements OnInit {
     }
 
     if (!items.ITEM_STORES || items.ITEM_STORES.length === 0) {
-      notify({ message: 'Please select at least one store', position: { at: 'top right', my: 'top right' } }, 'error', 4000);
+      notify(
+        {
+          message: 'Please select at least one store',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        4000,
+      );
       return;
     }
 
     if (items.COSTING_METHOD == 0 || items.COSTING_METHOD === '') {
-      notify({ message: 'Please select a Costing Method is Null', position: { at: 'top right', my: 'top right' } }, 'error', 4000);
+      notify(
+        {
+          message: 'Please select a Costing Method is Null',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'error',
+        4000,
+      );
       return;
     }
 
     this.dataservice.postItems(items).subscribe((response: any) => {
       if (response?.flag === '0') {
-        notify({ message: response.message || 'Operation failed', position: { at: 'top right', my: 'top right' } }, 'error', 4000);
+        notify(
+          {
+            message: response.message || 'Operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+          4000,
+        );
       } else {
-        notify({ message: 'Data inserted successfully', position: { at: 'top right', my: 'top right' } }, 'success', 4000);
+        notify(
+          {
+            message: 'Data inserted successfully',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+          4000,
+        );
         this.dataGrid.instance.refresh();
         this.showItems();
         this.isAddItemsPopupOpened = false;
@@ -359,7 +396,9 @@ export class ItemsListComponent implements OnInit {
     if (!this.store || !Array.isArray(this.store)) return;
 
     this.combinedStores = this.store.map((store) => {
-      const selectedStore = this.item_stores.find((s) => s.STORE_ID === store.ID.toString());
+      const selectedStore = this.item_stores.find(
+        (s) => s.STORE_ID === store.ID.toString(),
+      );
       const isSelected = !!selectedStore;
 
       return {
@@ -394,20 +433,34 @@ export class ItemsListComponent implements OnInit {
 
     this.dataservice.removeItems(id, selectedRow).subscribe({
       next: () => {
-        notify({ message: 'Delete operation successful', position: { at: 'top right', my: 'top right' } }, 'success');
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'success',
+        );
         this.dataGrid.instance.refresh();
         this.showItems();
       },
       error: () => {
-        notify({ message: 'Delete operation failed', position: { at: 'top right', my: 'top right' } }, 'error');
-      }
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+        );
+      },
     });
   }
 
   onRowRemovedAlias(event: any): void {
     const removedAlias = event.data;
     if (this.item_alias) {
-      this.item_alias = this.item_alias.filter((alias) => alias.ALIAS !== removedAlias.ALIAS);
+      this.item_alias = this.item_alias.filter(
+        (alias) => alias.ALIAS !== removedAlias.ALIAS,
+      );
     }
   }
 
@@ -417,7 +470,9 @@ export class ItemsListComponent implements OnInit {
       this.selectedItemData.item_alias = [];
     }
 
-    const exists = this.selectedItemData.item_alias.some((alias: any) => alias.ALIAS === newAlias.ALIAS);
+    const exists = this.selectedItemData.item_alias.some(
+      (alias: any) => alias.ALIAS === newAlias.ALIAS,
+    );
     if (!exists) {
       this.selectedItemData.item_alias.push(newAlias);
       this.newAliasArray = [...this.selectedItemData.item_alias];

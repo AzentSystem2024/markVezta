@@ -136,6 +136,10 @@ export class AddInvoiceRetailComponent {
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
   storeList: { ID: any; DESCRIPTION: any }[];
   inclVAT: any;
+  pendingDeliveryPopupVisible = false;
+  pendingDeliveryList: any[] = [];
+  // invoiceMode: 'MANUAL' | 'DELIVERY' = 'MANUAL';
+  selectedDeliveryRows: any[] = [];
   constructor(private dataService: DataService) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
@@ -659,27 +663,26 @@ export class AddInvoiceRetailComponent {
 
     return Number(total.toFixed(2));
   }
-  // calculateTotal = (rowData: any) => {
-  //   // if (this.isReadOnlyMode) {
-  //   //   return rowData?.TOTAL_AMOUNT ?? 0;
-  //   // }
-  //   const amount = this.calculateAmount(rowData);
 
-  //   const discPerc = Number(rowData?.DISC_PERC) || 0;
-  //   const discount = (amount * discPerc) / 100;
-
-  //   const taxableAmount = amount - discount;
-
-  //   const tax = (taxableAmount * (rowData?.TAX_PERC || 0)) / 100;
-
-  //   return taxableAmount + tax;
-  // };
   validateQuantity = (e: any) => {
+    if (e.data?.SOURCE === 'DELIVERY') {
+      return true;
+    }
+
     const enteredQty = Number(e.value) || 0;
     const stockQty = Number(e.data?.QTY_STOCK) || 0;
 
     return enteredQty <= stockQty;
   };
+  // validateQuantity = (e: any) => {
+  //   if (this.invoiceMode === 'DELIVERY') {
+  //     return true;
+  //   }
+  //   const enteredQty = Number(e.value) || 0;
+  //   const stockQty = Number(e.data?.QTY_STOCK) || 0;
+
+  //   return enteredQty <= stockQty;
+  // };
   getCustomerOrUnitLst() {
     console.log('getCustomer called');
     const payload = {
@@ -729,9 +732,10 @@ export class AddInvoiceRetailComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
-    const data = this.EditingResponseData; // full object
+    const data = this.EditingResponseData;
     const Details = data.Details || [];
-    console.log(Details, 'DETAILSSSSSSSSSSSSSSSSS');
+
+    console.log(Details, 'DETAILS');
 
     const customerId =
       data.CUSTOMER_ID != null && data.CUSTOMER_ID !== 0
@@ -749,7 +753,7 @@ export class AddInvoiceRetailComponent {
       data.PARTY_DESC ||
       '';
 
-    // PATCH HEADER
+    // Header
     this.invoiceFormData = {
       ...this.invoiceFormData,
       ...data,
@@ -757,77 +761,339 @@ export class AddInvoiceRetailComponent {
       CUSTOMER_ID: customerId,
       REF_NO: data.REF_NO,
       DOC_NO: data.SALE_NO || data.DOC_NO,
+      SALESMAN: data.SALESMAN || data.SALESMAN_NAME || '',
     };
 
-    // Ensure customerList includes customerId so dx-select-box binds immediately
+    // Customer
     if (customerId) {
       if (!this.customerList) {
         this.customerList = [];
       }
+
       const exists = this.customerList.some((c: any) => c.ID == customerId);
+
       if (!exists) {
-        this.customerList = [
-          ...this.customerList,
-          { ID: customerId, DESCRIPTION: customerName || String(customerId) },
-        ];
+        this.customerList.push({
+          ID: customerId,
+          DESCRIPTION: customerName || String(customerId),
+        });
       }
     }
 
-    // Pre-fill itemsMap from details so item code and description load INSTANTLY without waiting for API
+    // Lookup data
+    this.itemsMap.clear();
+
     Details.forEach((item: any) => {
-      if (item && item.ITEM_ID != null) {
-        const itemCode =
-          item.ITEM_CODE ||
-          (typeof item.ITEM_ID === 'string' ? item.ITEM_ID : '');
-        const itemDesc = item.DESCRIPTION || item.ITEM_NAME || '';
+      if (item.ITEM_ID != null) {
         this.itemsMap.set(item.ITEM_ID, {
           ITEM_ID: item.ITEM_ID,
-          ITEM_CODE: itemCode || String(item.ITEM_ID),
-          DESCRIPTION: itemDesc || String(item.ITEM_ID),
+          ITEM_CODE:
+            item.ITEM_CODE ||
+            (typeof item.ITEM_ID === 'string'
+              ? item.ITEM_ID
+              : String(item.ITEM_ID)),
+          DESCRIPTION:
+            item.DESCRIPTION || item.ITEM_NAME || String(item.ITEM_ID),
           UOM: item.UOM,
           PRICE: item.PRICE,
-          QTY_STOCK: item.QTY_STOCK || item.QUANTITY || 0,
           TAX_PERC: item.TAX_PERC || item.VAT_PERC || 0,
+          QTY_STOCK: item.QTY_STOCK || 0,
         });
       }
     });
 
-    // PATCH GRID
+    // Grid
     this.invoiceFormData.Details = Details.map((item: any) => ({
       ...item,
+
+      // Delivery info
+      DN_DETAIL_ID: item.DN_DETAIL_ID,
+      DN_NO: item.DN_NO,
+
+      // IMPORTANT
+      SOURCE: item.DN_DETAIL_ID || item.DN_NO ? 'DELIVERY' : 'MANUAL',
+
       ITEM_ID: item.ITEM_ID,
-      ITEM_CODE: item.ITEM_ID, // lookup valueExpr uses ITEM_ID
-      DESCRIPTION: item.ITEM_ID, // lookup valueExpr uses ITEM_ID
+
+      ITEM_CODE: item.ITEM_ID,
+      DESCRIPTION: item.ITEM_ID,
+
       HSN_CODE: item.HSN_CODE,
       UOM: item.UOM,
+
       PRICE: item.PRICE,
       QUANTITY: item.QUANTITY,
+
       AMOUNT: item.AMOUNT,
       TAX_PERC: item.TAX_PERC,
       DISC_PERC: item.DISC_PERC,
       DISC_AMT: item.DISC_AMT,
       TAX_AMOUNT: item.TAX_AMOUNT,
       TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+
       CUSTOMER_ID: customerId,
-      QTY_STOCK: item.QTY_STOCK || item.QUANTITY || 0,
+
+      // Stock Qty only for manual rows
+      QTY_STOCK:
+        item.DN_DETAIL_ID || item.DN_NO
+          ? 0
+          : item.QTY_STOCK || item.QUANTITY || 0,
     }));
 
-    // refresh grid
     setTimeout(() => {
       this.itemsGridRef?.instance?.option(
         'dataSource',
         this.invoiceFormData.Details,
       );
+
       this.itemsGridRef?.instance?.refresh();
     }, 50);
   }
+
+  // isEditDataAvailable() {
+  //   if (!this.isEditing || !this.EditingResponseData) return;
+
+  //   const data = this.EditingResponseData;
+  //   const Details = data.Details || [];
+
+  //   // Determine invoice mode
+  //   this.invoiceMode = Details.some((x: any) => x.DN_DETAIL_ID || x.DN_NO)
+  //     ? 'DELIVERY'
+  //     : 'MANUAL';
+
+  //   console.log(Details, 'DETAILS');
+
+  //   const customerId =
+  //     data.CUSTOMER_ID != null && data.CUSTOMER_ID !== 0
+  //       ? data.CUSTOMER_ID
+  //       : data.CUST_ID != null && data.CUST_ID !== 0
+  //         ? data.CUST_ID
+  //         : data.PARTY_NAME && !isNaN(Number(data.PARTY_NAME))
+  //           ? Number(data.PARTY_NAME)
+  //           : 0;
+
+  //   const customerName =
+  //     data.CUSTOMER_NAME ||
+  //     data.CUST_NAME ||
+  //     data.PARTY_NAME ||
+  //     data.PARTY_DESC ||
+  //     '';
+
+  //   // Patch Header
+  //   this.invoiceFormData = {
+  //     ...this.invoiceFormData,
+  //     ...data,
+  //     TRANS_DATE: this.convertToDate(data.TRANS_DATE),
+  //     CUSTOMER_ID: customerId,
+  //     REF_NO: data.REF_NO,
+  //     DOC_NO: data.SALE_NO || data.DOC_NO,
+  //     SALESMAN: data.SALESMAN || data.SALESMAN_NAME || '',
+  //   };
+
+  //   // Ensure customer exists in dropdown
+  //   if (customerId) {
+  //     if (!this.customerList) {
+  //       this.customerList = [];
+  //     }
+
+  //     const exists = this.customerList.some((c: any) => c.ID == customerId);
+
+  //     if (!exists) {
+  //       this.customerList = [
+  //         ...this.customerList,
+  //         {
+  //           ID: customerId,
+  //           DESCRIPTION: customerName || String(customerId),
+  //         },
+  //       ];
+  //     }
+  //   }
+
+  //   // Populate items map for lookup
+  //   this.itemsMap.clear();
+
+  //   Details.forEach((item: any) => {
+  //     if (item && item.ITEM_ID != null) {
+  //       this.itemsMap.set(item.ITEM_ID, {
+  //         ITEM_ID: item.ITEM_ID,
+  //         ITEM_CODE:
+  //           item.ITEM_CODE ||
+  //           (typeof item.ITEM_ID === 'string'
+  //             ? item.ITEM_ID
+  //             : String(item.ITEM_ID)),
+  //         DESCRIPTION:
+  //           item.DESCRIPTION || item.ITEM_NAME || String(item.ITEM_ID),
+  //         UOM: item.UOM,
+  //         PRICE: item.PRICE,
+  //         QTY_STOCK:
+  //           this.invoiceMode === 'MANUAL'
+  //             ? item.QTY_STOCK || item.QUANTITY || 0
+  //             : 0,
+  //         TAX_PERC: item.TAX_PERC || item.VAT_PERC || 0,
+  //       });
+  //     }
+  //   });
+
+  //   // Patch Grid
+  //   this.invoiceFormData.Details = Details.map((item: any) => ({
+  //     ...item,
+
+  //     DN_DETAIL_ID: item.DN_DETAIL_ID,
+  //     DN_NO: item.DN_NO,
+
+  //     ITEM_ID: item.ITEM_ID,
+
+  //     // Lookup columns
+  //     ITEM_CODE: item.ITEM_ID,
+  //     DESCRIPTION: item.ITEM_ID,
+
+  //     HSN_CODE: item.HSN_CODE,
+  //     UOM: item.UOM,
+
+  //     PRICE: item.PRICE,
+  //     QUANTITY: item.QUANTITY,
+
+  //     AMOUNT: item.AMOUNT,
+  //     TAX_PERC: item.TAX_PERC,
+  //     DISC_PERC: item.DISC_PERC,
+  //     DISC_AMT: item.DISC_AMT,
+  //     TAX_AMOUNT: item.TAX_AMOUNT,
+  //     TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+
+  //     CUSTOMER_ID: customerId,
+
+  //     // Hide stock quantity for Delivery invoices
+  //     QTY_STOCK:
+  //       this.invoiceMode === 'MANUAL'
+  //         ? item.QTY_STOCK || item.QUANTITY || 0
+  //         : 0,
+  //   }));
+
+  //   // Refresh Grid
+  //   setTimeout(() => {
+  //     this.itemsGridRef?.instance?.option(
+  //       'dataSource',
+  //       this.invoiceFormData.Details,
+  //     );
+
+  //     this.itemsGridRef?.instance?.refresh();
+  //   }, 50);
+  // }
+
+  // isEditDataAvailable() {
+  //   if (!this.isEditing || !this.EditingResponseData) return;
+
+  //   const data = this.EditingResponseData; // full object
+  //   const Details = data.Details || [];
+
+  //   console.log(Details, 'DETAILSSSSSSSSSSSSSSSSS');
+
+  //   const customerId =
+  //     data.CUSTOMER_ID != null && data.CUSTOMER_ID !== 0
+  //       ? data.CUSTOMER_ID
+  //       : data.CUST_ID != null && data.CUST_ID !== 0
+  //         ? data.CUST_ID
+  //         : data.PARTY_NAME && !isNaN(Number(data.PARTY_NAME))
+  //           ? Number(data.PARTY_NAME)
+  //           : 0;
+
+  //   const customerName =
+  //     data.CUSTOMER_NAME ||
+  //     data.CUST_NAME ||
+  //     data.PARTY_NAME ||
+  //     data.PARTY_DESC ||
+  //     '';
+
+  //   // PATCH HEADER
+  //   this.invoiceFormData = {
+  //     ...this.invoiceFormData,
+  //     ...data,
+  //     TRANS_DATE: this.convertToDate(data.TRANS_DATE),
+  //     CUSTOMER_ID: customerId,
+  //     REF_NO: data.REF_NO,
+  //     DOC_NO: data.SALE_NO || data.DOC_NO,
+  //   };
+
+  //   // Ensure customerList includes customerId so dx-select-box binds immediately
+  //   if (customerId) {
+  //     if (!this.customerList) {
+  //       this.customerList = [];
+  //     }
+  //     const exists = this.customerList.some((c: any) => c.ID == customerId);
+  //     if (!exists) {
+  //       this.customerList = [
+  //         ...this.customerList,
+  //         { ID: customerId, DESCRIPTION: customerName || String(customerId) },
+  //       ];
+  //     }
+  //   }
+
+  //   // Pre-fill itemsMap from details so item code and description load INSTANTLY without waiting for API
+  //   Details.forEach((item: any) => {
+  //     if (item && item.ITEM_ID != null) {
+  //       const itemCode =
+  //         item.ITEM_CODE ||
+  //         (typeof item.ITEM_ID === 'string' ? item.ITEM_ID : '');
+  //       const itemDesc = item.DESCRIPTION || item.ITEM_NAME || '';
+  //       this.itemsMap.set(item.ITEM_ID, {
+  //         ITEM_ID: item.ITEM_ID,
+  //         ITEM_CODE: itemCode || String(item.ITEM_ID),
+  //         DESCRIPTION: itemDesc || String(item.ITEM_ID),
+  //         UOM: item.UOM,
+  //         PRICE: item.PRICE,
+  //         QTY_STOCK: item.QTY_STOCK || item.QUANTITY || 0,
+  //         TAX_PERC: item.TAX_PERC || item.VAT_PERC || 0,
+  //       });
+  //     }
+  //   });
+
+  //   // PATCH GRID
+  //   this.invoiceFormData.Details = Details.map((item: any) => ({
+  //     ...item,
+  //     ITEM_ID: item.ITEM_ID,
+  //     ITEM_CODE: item.ITEM_ID, // lookup valueExpr uses ITEM_ID
+  //     DESCRIPTION: item.ITEM_ID, // lookup valueExpr uses ITEM_ID
+  //     HSN_CODE: item.HSN_CODE,
+  //     UOM: item.UOM,
+  //     PRICE: item.PRICE,
+  //     QUANTITY: item.QUANTITY,
+  //     AMOUNT: item.AMOUNT,
+  //     TAX_PERC: item.TAX_PERC,
+  //     DISC_PERC: item.DISC_PERC,
+  //     DISC_AMT: item.DISC_AMT,
+  //     TAX_AMOUNT: item.TAX_AMOUNT,
+  //     TOTAL_AMOUNT: item.TOTAL_AMOUNT,
+  //     CUSTOMER_ID: customerId,
+  //     QTY_STOCK: item.QTY_STOCK || item.QUANTITY || 0,
+  //   }));
+
+  //   // refresh grid
+  //   setTimeout(() => {
+  //     this.itemsGridRef?.instance?.option(
+  //       'dataSource',
+  //       this.invoiceFormData.Details,
+  //     );
+  //     this.itemsGridRef?.instance?.refresh();
+  //   }, 50);
+  // }
   convertToDate(dateStr: string): Date {
     if (!dateStr) return new Date();
 
     const [day, month, year] = dateStr.split('-');
     return new Date(+year, +month - 1, +day);
   }
+
+  getDeliveryNo = (row: any) => {
+    return row.SOURCE === 'DELIVERY' ? row.DN_NO : '';
+  };
   onEditorPreparing(e: any) {
+    if (
+      e.parentType === 'dataRow' &&
+      (e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION') &&
+      e.row?.data?.SOURCE === 'DELIVERY'
+    ) {
+      e.editorOptions.readOnly = true;
+    }
     if (
       e.dataField === 'ITEM_CODE' ||
       e.dataField === 'DESCRIPTION' ||
@@ -1113,6 +1379,10 @@ export class AddInvoiceRetailComponent {
       DISC_PERC: 0,
       DISC_AMT: 0,
       CUSTOMER_ID: this.invoiceFormData.CUSTOMER_ID,
+      SOURCE: 'MANUAL',
+
+      DN_NO: '',
+      DN_DETAIL_ID: null,
     };
 
     this.invoiceFormData.Details = [...rows, newRow];
@@ -1144,6 +1414,10 @@ export class AddInvoiceRetailComponent {
       }, 150); // ⬅️ THIS is the real fix
     }, 0);
   }
+
+  calculateStockQty = (row: any) => {
+    return row.SOURCE === 'DELIVERY' ? '' : row.QTY_STOCK;
+  };
   moveNextCell(field: string, rowIndex: number, grid: any) {
     if (field === 'ITEM_CODE') {
       grid.editCell(rowIndex, 'DESCRIPTION');
@@ -1188,6 +1462,167 @@ export class AddInvoiceRetailComponent {
     if (e.rowType === 'data' && e.data?.isInvalid) {
       e.rowElement.classList.add('invalid-row');
     }
+  }
+
+  onCustomerChanged(e: any): void {
+    this.invoiceFormData.CUSTOMER_ID = e.value;
+
+    if (!e.value) {
+      this.invoiceFormData.SALESMAN = '';
+      return;
+    }
+
+    this.getInvoiceSalesman(e.value);
+  }
+
+  getInvoiceSalesman(customerId: number): void {
+    const payload = {
+      CUSTOMER_ID: customerId,
+    };
+
+    this.dataService.getInvoiceSalesman(payload).subscribe({
+      next: (res: any) => {
+        if (Array.isArray(res) && res.length > 0) {
+          this.invoiceFormData.SALESMAN = res[0].EMP_NAME;
+          // If you also need the employee ID later:
+          // this.invoiceFormData.SALESMAN_ID = res[0].ID;
+        } else {
+          this.invoiceFormData.SALESMAN = '';
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.invoiceFormData.SALESMAN = '';
+      },
+    });
+  }
+  onPendingDeliverySelectionChanged(e: any) {
+    this.selectedDeliveryRows = e.selectedRowsData.filter(
+      (x: any) => !x.IS_TRANSFERRED,
+    );
+  }
+  openDeliveryNotePopup(): void {
+    if (!this.invoiceFormData.CUSTOMER_ID) {
+      notify('Please select a customer first.', 'warning', 3000);
+      return;
+    }
+
+    this.getPendingDeliveries();
+  }
+
+  getPendingDeliveries(): void {
+    const payload = {
+      CUST_ID: this.invoiceFormData.CUSTOMER_ID,
+      COMPANY_ID: this.selectedCompanyId,
+    };
+
+    this.dataService.getPendingDeliveries(payload).subscribe({
+      next: (res: any) => {
+        if (res.flag === 1) {
+          // this.pendingDeliveryList = res.Data || [];
+          const transferredIds = new Set(
+            this.invoiceFormData.Details.filter(
+              (x: any) => x.SOURCE === 'DELIVERY',
+            ).map((x: any) => x.DN_DETAIL_ID),
+          );
+
+          this.pendingDeliveryList = (res.Data || []).map((item: any) => ({
+            ...item,
+            IS_TRANSFERRED: transferredIds.has(item.DN_DETAIL_ID),
+          }));
+
+          this.pendingDeliveryPopupVisible = true;
+
+          setTimeout(() => {
+            this.preSelectTransferredDeliveries();
+          }, 100);
+        } else {
+          notify(res.Message, 'warning', 3000);
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        notify('Unable to load pending deliveries.', 'error', 3000);
+      },
+    });
+  }
+
+  onPendingDeliveryEditorPreparing(e: any) {
+    if (
+      e.parentType === 'dataRow' &&
+      e.command === 'select' &&
+      e.row?.data?.IS_TRANSFERRED
+    ) {
+      e.editorOptions.disabled = true;
+    }
+  }
+
+  preSelectTransferredDeliveries() {
+    if (!this.popupGridRef?.instance) return;
+
+    const selectedKeys = this.invoiceFormData.Details.filter(
+      (x: any) => x.SOURCE === 'DELIVERY',
+    ).map((x: any) => x.DN_DETAIL_ID);
+
+    this.popupGridRef.instance.selectRows(selectedKeys, false);
+  }
+
+  transferPendingDeliveries() {
+    if (this.selectedDeliveryRows.length === 0) {
+      notify('Please select at least one delivery.', 'warning', 3000);
+      return;
+    }
+
+    // this.invoiceMode = 'DELIVERY';
+
+    const deliveryRows = this.selectedDeliveryRows.map((x) => ({
+      ITEM_ID: x.ITEM_ID,
+      ITEM_CODE: x.ITEM_CODE,
+      DESCRIPTION: x.DESCRIPTION,
+
+      QUANTITY: x.TOTAL_PAIR_QTY,
+      PRICE: x.PACK_PRICE,
+      TAX_PERC: x.GST_PERC,
+
+      QTY_STOCK: 0,
+
+      DISC_PERC: 0,
+      DISC_AMT: 0,
+      AMOUNT: 0,
+      TAX_AMOUNT: 0,
+      TOTAL_AMOUNT: 0,
+
+      DN_DETAIL_ID: x.DN_DETAIL_ID,
+      DN_NO: x.DN_NO,
+
+      SOURCE: 'DELIVERY',
+    }));
+
+    // Remove all empty manual rows (initial row or newly added empty row)
+    this.invoiceFormData.Details = this.invoiceFormData.Details.filter(
+      (row: any) => !(row.SOURCE === 'MANUAL' && this.isRowEmpty(row)),
+    );
+
+    // If the initial row doesn't have SOURCE, remove that too
+    this.invoiceFormData.Details = this.invoiceFormData.Details.filter(
+      (row: any) =>
+        !(this.isRowEmpty(row) && (!row.SOURCE || row.SOURCE === 'MANUAL')),
+    );
+
+    // Append selected delivery rows
+    this.invoiceFormData.Details.push(...deliveryRows);
+
+    this.itemsGridRef.instance.option(
+      'dataSource',
+      this.invoiceFormData.Details,
+    );
+    this.itemsGridRef.instance.refresh();
+
+    this.selectedDeliveryRows = [];
+
+    this.popupGridRef?.instance?.clearSelection();
+
+    this.pendingDeliveryPopupVisible = false;
   }
 
   saveInvoice() {
@@ -1278,12 +1713,18 @@ export class AddInvoiceRetailComponent {
     this.isSaving = true;
 
     // const grid = this.itemsGridRef.instance;
-
+    console.log('invoiceFormData.Details', this.invoiceFormData.Details);
+    console.log('grid.getVisibleRows()', grid.getVisibleRows());
+    console.log("grid.option('dataSource')", grid.option('dataSource'));
     const allRows = grid.getVisibleRows().map((r: any) => r.data);
 
     const validDetails = allRows.filter(
-      (item: any) => item.ITEM_CODE && item.QUANTITY > 0,
+      (item: any) =>
+        (item.ITEM_ID > 0 || item.DN_DETAIL_ID > 0) && item.QUANTITY > 0,
     );
+
+    console.log('validDetails', validDetails);
+    console.log('Details before payload', this.invoiceFormData.Details);
 
     if (validDetails.length === 0) {
       this.isSaving = false;
@@ -1325,6 +1766,10 @@ export class AddInvoiceRetailComponent {
     this.invoiceFormData.NET_AMOUNT = net;
     this.invoiceFormData.DISCOUNT_AMOUNT = discamt;
     this.invoiceFormData.Details = validDetails;
+    console.log(
+      'Details after assigning validDetails',
+      this.invoiceFormData.Details,
+    );
     this.invoiceFormData.PARTY_NAME = String(this.invoiceFormData.CUSTOMER_ID);
 
     this.invoiceFormData.TRANS_DATE = this.formatDateOnly(
@@ -1339,7 +1784,7 @@ export class AddInvoiceRetailComponent {
     const payload = {
       ...this.invoiceFormData,
     };
-
+    console.log('Final Payload', payload);
     console.log('SAVE/UPDATE/APPROVE PAYLOAD', payload);
 
     //API DECISION LOGIC
@@ -1772,6 +2217,15 @@ export class AddInvoiceRetailComponent {
   }
 
   cancel() {
+    this.pendingDeliveryPopupVisible = false;
+    this.selectedDeliveryRows = [];
+    this.pendingDeliveryList = [];
+
+    this.isEditing = false;
+    this.isReadOnlyMode = false;
+    this.isVerifyMode = false;
+    this.isApproveMode = false;
+
     this.popupClosed.emit();
   }
 }

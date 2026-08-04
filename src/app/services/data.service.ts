@@ -6044,7 +6044,7 @@ The result can be exported to HTML or Markdown.`;
       IS_LOCKED: data.IS_LOCKED,
       LOCK_DATE_FROM: data.LOCK_DATE_FROM,
       LOCK_DATE_TO: data.LOCK_DATE_TO,
-      LOCK_REASON: data.LOCK_REASON
+      LOCK_REASON: data.LOCK_REASON,
     };
 
     return this.http.post(url, reqBody);
@@ -6799,6 +6799,9 @@ The result can be exported to HTML or Markdown.`;
   }
   getItemsForStore(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/getstoreitem`, data);
+  }
+  getPendingDeliveries(data: any) {
+    return this.http.post(`${this.apiUrl}SalesInvoice/PendingDN`, data);
   }
   saveRetailInvoice(data: any) {
     return this.http.post(`${this.apiUrl}SalesInvoice/insert`, data);
