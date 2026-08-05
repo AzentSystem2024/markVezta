@@ -13,6 +13,7 @@
       [columnAutoWidth]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
+      [grouping]="{ autoExpandAll: true }"
       [remoteOperations]="false"
       [scrolling]="{ mode: 'virtual' }"
       (onCellPrepared)="onCellPrepared($event)"
@@ -162,6 +163,7 @@
         caption="Category"
         dataType="string"
         sortOrder="asc"
+        [groupIndex]="0"
         [sortingMethod]="typeSorting"
         width="180"
       ></dxi-column>
@@ -171,6 +173,7 @@
         caption="Group"
         alignment="left"
         dataType="number"
+        [groupIndex]="1"
         width="180"
       ></dxi-column>
 

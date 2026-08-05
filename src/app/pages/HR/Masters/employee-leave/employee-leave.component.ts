@@ -889,6 +889,62 @@ export class EmployeeLeaveComponent {
   }
 
   Travel_Data() {
+
+    if (!this.selectedData.IS_TICKET) {
+      notify(
+        {
+          message: 'Please mark the employee as travelled.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'warning'
+      );
+      return;
+    }
+
+    if (!this.selectedData.TRAVELLED_DATE) {
+      notify(
+        {
+          message: 'Please select the travelled date.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'warning'
+      );
+      return;
+    }
+
+    const travelledDate = new Date(this.selectedData.TRAVELLED_DATE);
+    const departureDate = new Date(this.selectedData.DEPT_DATE);
+    const rejoinDate = new Date(this.selectedData.REJOIN_DATE);
+
+    // Travelled date should not be before departure date
+    if (travelledDate < departureDate) {
+      notify(
+        {
+          message: 'Travelled date cannot be earlier than the departure date.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'warning'
+      );
+      return;
+    }
+
+
+    // Travelled date should not be after rejoin date
+    if (this.selectedData.REJOIN_DATE && travelledDate > rejoinDate) {
+      notify(
+        {
+          message: 'Travelled date cannot be later than the rejoin date.',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'warning'
+      );
+      return;
+    }
+
     const User_Id = sessionStorage.getItem('UserId');
     const Store_Id = sessionStorage.getItem('StoreId');
     const ID = this.selectedData.ID;
@@ -930,6 +986,17 @@ export class EmployeeLeaveComponent {
   }
 
   Rejoin_Data() {
+    if (!this.selectedStatusType) {
+      notify(
+        {
+          message: 'Please select a status (Rejoined or Left Service).',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 2000,
+        },
+        'warning'
+      );
+      return;
+    }
     this.selectedData.STATUS = this.selectedStatusType;
 
     if (
