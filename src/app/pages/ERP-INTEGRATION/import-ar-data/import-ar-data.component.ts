@@ -22,6 +22,7 @@ import {
   DxTextBoxModule,
   DxValidatorModule,
   DxRadioGroupModule,
+  DxSelectBoxModule,
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { DepartmentFormModule } from 'src/app/components/library/department-form/department-form.component';
@@ -31,6 +32,7 @@ import notify from 'devextreme/ui/notify';
 import { alert } from 'devextreme/ui/dialog';
 import DataSource from 'devextreme/data/data_source';
 import CustomStore from 'devextreme/data/custom_store';
+import { text } from 'stream/consumers';
 @Component({
   selector: 'app-import-ar-data',
   templateUrl: './import-ar-data.component.html',
@@ -51,9 +53,20 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   currentFilter: string = 'auto';
   isPopupVisible: boolean = false;
   isLoading: boolean = false;
+  hasInvalidRows: boolean = false;
+
+  // ================= Validation State Variables =================
+  isValidationPopupVisible: boolean = false;
+  isErrorDetailsPopupVisible: boolean = false;
+  transactionTypes: any[] = [];
+  selectedTransactionType: string = '';
+  allValidationErrors: any[] = [];
+  allMissingMasterData: any[] = [];
+  filteredValidationGridData: any[] = [];
+  errorDetailsGridData: any[] = [];
 
   uploadedFileName: string = '';
-  
+
   isOverWrite: boolean = false;
   overwriteOptions = [
     { text: 'Import Only new records', value: false },
@@ -104,6 +117,18 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   detailViewColumns: any[] = [];
   isDetailsPopupVisible: boolean = false;
   clickedRowID: any;
+
+  // ================= Validation Button Config =================
+  ValidateButtonOptions: any = {
+    icon: '',
+    text: 'Validate',
+    hint: 'Validate',
+    type: 'default',
+    stylingMode: 'contained',
+    onClick: () => {
+      this.validatePendingRows();
+    },
+  };
 
   constructor(
     private ngZone: NgZone,
@@ -344,6 +369,8 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
         // ================= Convert Values Based On Column Type =================
         excelData.forEach((row: any) => {
+          let hasApexTransNo = false;
+
           Object.keys(row).forEach((key: string) => {
             const originalKey = key;
 
@@ -352,6 +379,16 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
             const columnType = columnTypeMap[lowerKey];
 
             let value = row[originalKey];
+
+            if (lowerKey === 'apextransactionnumber') {
+              if (
+                value !== null &&
+                value !== undefined &&
+                value.toString().trim() !== ''
+              ) {
+                hasApexTransNo = true;
+              }
+            }
 
             // ================= Empty Value Handling =================
             if (
@@ -465,7 +502,17 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
               row[`${originalKey}_API`] = apiDate;
             }
           });
+
+          row.isValid = hasApexTransNo;
         });
+
+        // ================= Sort Invalid Rows To Top =================
+        excelData.sort((a: any, b: any) => {
+          if (a.isValid === b.isValid) return 0;
+          return a.isValid ? 1 : -1;
+        });
+
+        this.hasInvalidRows = excelData.some((row: any) => !row.isValid);
 
         // ================= Bind Grid Data =================
         this.Imported_Ar_DataSource = excelData;
@@ -473,7 +520,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
         // ================= Dynamic Columns =================
         if (excelData.length > 0) {
           this.gridColumns = Object.keys(excelData[0])
-            .filter((key) => !key.endsWith('_API'))
+            .filter((key) => !key.endsWith('_API') && key !== 'isValid')
             .map((key) => ({
               dataField: key,
               caption: key,
@@ -531,8 +578,11 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     // ================= Prepare API Payload =================
-    const payloadData = this.Imported_Ar_DataSource.map((row: any) => {
+    const payloadData = this.Imported_Ar_DataSource.filter(
+      (row: any) => row.isValid !== false,
+    ).map((row: any) => {
       const newRow = { ...row };
+      delete newRow.isValid;
 
       // ================= Convert Verified Field =================
       if (newRow.Verified === 1 || newRow.Verified === '1') {
@@ -590,25 +640,27 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
       return;
     }
     const currentChunk = chunks[index];
-    this.srvce.import_AR_Data(batchNo, fileName, currentChunk, this.isOverWrite).subscribe({
-      next: (response: any) => {
-        // API Success
-        if (response?.flag === '1') {
-          // Upload next chunk
-          this.uploadChunkData(chunks, batchNo, fileName, index + 1);
-        }
-        // Stop Complete Process If Any Chunk Failed
-        else {
-          notify(response?.message || 'Data import failed', 'error', 4000);
+    this.srvce
+      .import_AR_Data(batchNo, fileName, currentChunk, this.isOverWrite)
+      .subscribe({
+        next: (response: any) => {
+          // API Success
+          if (response?.flag === '1') {
+            // Upload next chunk
+            this.uploadChunkData(chunks, batchNo, fileName, index + 1);
+          }
+          // Stop Complete Process If Any Chunk Failed
+          else {
+            notify(response?.message || 'Data import failed', 'error', 4000);
+            return;
+          }
+        },
+        error: (error: any) => {
+          notify('Error while importing data', 'error', 4000);
+          this.isLoading = false;
           return;
-        }
-      },
-      error: (error: any) => {
-        notify('Error while importing data', 'error', 4000);
-        this.isLoading = false;
-        return;
-      },
-    });
+        },
+      });
   }
 
   showImportDetails(rowData: any) {
@@ -743,6 +795,245 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  // ================= Validation Logic =================
+  async validatePendingRows() {
+    if (!this.importDetailViewData || this.importDetailViewData.length === 0) {
+      notify('No valid data available', 'warning', 3000);
+      return;
+    }
+
+    const distinctHeaderIds = [
+      ...new Set(this.importDetailViewData.map((item: any) => item.HeaderID)),
+    ]
+      .filter((id) => id !== undefined && id !== null && id !== '')
+      .join(',');
+
+    console.log('distinctHeaderIds', distinctHeaderIds);
+
+    if (!distinctHeaderIds) {
+      notify('No valid header selected', 'warning', 3000);
+      return;
+    }
+
+    this.isLoading = true;
+
+    try {
+      const response: any = await this.srvce
+        .getValidationARData({ TransactionIDs: distinctHeaderIds })
+        .toPromise();
+
+      this.isLoading = false;
+
+      if (response?.flag === '1') {
+        this.transactionTypes = response.transactionTypes || [];
+        this.allValidationErrors = response.errors || [];
+        this.allMissingMasterData = response.notFoundValues || [];
+
+        if (
+          this.allValidationErrors.length === 0 &&
+          this.allMissingMasterData.length === 0
+        ) {
+          notify('Validation successful', 'success', 3000);
+        } else {
+          if (this.transactionTypes.length > 0) {
+            this.selectedTransactionType = this.transactionTypes[0];
+            this.updateValidationGrid();
+          } else {
+            this.filteredValidationGridData = [];
+          }
+
+          this.isValidationPopupVisible = true;
+        }
+      } else {
+        notify(response?.message || 'Validation failed', 'error', 3000);
+      }
+    } catch (error: any) {
+      this.isLoading = false;
+      console.error(error);
+      notify('Failed to validate AR data', 'error', 3000);
+    }
+  }
+
+  updateValidationGrid() {
+    const filteredErrors = this.allValidationErrors.filter(
+      (e) => e.TransactionType === this.selectedTransactionType,
+    );
+
+    const map = new Map<string, any>();
+    filteredErrors.forEach((err) => {
+      const key = err.ErrorMessage;
+      if (!map.has(key)) {
+        map.set(key, {
+          ErrorMessage: key,
+          MissingCount: 0,
+          AffectedRowsCount: 0,
+          Particular: err.Particular,
+          BatchNo: err.BatchNo,
+          TransactionType: err.TransactionType,
+        });
+      }
+      const current = map.get(key);
+      current.MissingCount += Number(err.ErrorCount) || 0;
+      current.AffectedRowsCount += Number(err.AffectedRowsCount) || 0;
+    });
+
+    this.filteredValidationGridData = Array.from(map.values());
+  }
+
+  async viewErrorDetails(cellData: any) {
+    const payload = {
+      BatchNo: cellData.BatchNo,
+      TransactionType: cellData.TransactionType,
+      Particular: cellData.Particular,
+    };
+
+    this.isLoading = true;
+
+    try {
+      const response: any = await this.srvce
+        .getARErrorData(payload)
+        .toPromise();
+
+      this.isLoading = false;
+
+      if (response?.flag === '1') {
+        this.errorDetailsGridData = (response.data || []).map((item: any) => {
+          if (item.hasOwnProperty('Verified')) {
+            item.Verified = item.Verified ? 'True' : 'False';
+          }
+          delete item.HeaderID;
+          delete item.TransactionID;
+          delete item.DataID;
+          return item;
+        });
+        this.isErrorDetailsPopupVisible = true;
+      } else {
+        notify(
+          response?.message || 'Failed to load error details',
+          'error',
+          3000,
+        );
+      }
+    } catch (error: any) {
+      this.isLoading = false;
+      console.error(error);
+      notify('Failed to fetch error details', 'error', 3000);
+    }
+  }
+
+  hasMissingData(particular: string): boolean {
+    return this.allMissingMasterData.some(
+      (x) =>
+        x.Particular === particular &&
+        x.TransactionType === this.selectedTransactionType,
+    );
+  }
+
+  onTransactionTypeChange(e: any) {
+    this.selectedTransactionType = e.value;
+    this.updateValidationGrid();
+  }
+
+  async downloadMissingParticulars(particular: string) {
+    const missingValues = this.allMissingMasterData.filter(
+      (x) =>
+        x.Particular === particular &&
+        x.TransactionType === this.selectedTransactionType,
+    );
+
+    if (missingValues.length === 0) {
+      notify('No missing values found for this particular.', 'info', 3000);
+      return;
+    }
+
+    let masterKey = '';
+
+    if (['ApexTPACode', 'ApexInsuCode', 'ApexInstCode'].includes(particular)) {
+      masterKey = 'Customer';
+    } else if (
+      ['ApexReportingDoctor', 'ApexReferringDoctor'].includes(particular)
+    ) {
+      masterKey = 'Clinician';
+    } else if (
+      ['ApexReportingDoctorDept', 'ApexReferringDoctorDept'].includes(
+        particular,
+      )
+    ) {
+      masterKey = 'Department';
+    } else if (['Paymode'].includes(particular)) {
+      masterKey = 'chartOfAccounts';
+    } else if (['CPTCode'].includes(particular)) {
+      masterKey = 'Cpt';
+    }
+
+    try {
+      const response: any = await this.srvce.getImportMasterList().toPromise();
+
+      let headers: string[] = [];
+      let templateColumns: any[] = [];
+
+      if (response && response[masterKey]) {
+        templateColumns = response[masterKey];
+        templateColumns.sort((a: any, b: any) => a.ID - b.ID);
+        headers = templateColumns.map((col: any) => col.ColumnName);
+      } else {
+        headers = ['Particular', 'NotFoundValue'];
+      }
+
+      let csv = headers.join(',') + '\n';
+
+      missingValues.forEach((row) => {
+        const val = (row.NotFoundValue || '').toString();
+
+        const rowData = headers.map((header, index) => {
+          let cellValue = '';
+
+          if (header === 'Particular') cellValue = particular;
+          else if (header === 'NotFoundValue') cellValue = val;
+          else if (
+            masterKey === 'Clinician' &&
+            (header === 'ClinicianLicense' || header === 'ClinicianName')
+          )
+            cellValue = val;
+          else if (masterKey === 'Department' && header === 'Department')
+            cellValue = val;
+          else if (masterKey === 'chartOfAccounts' && header === 'LedgerName')
+            cellValue = val;
+          else if (masterKey === 'Cpt' && header === 'CPTCode') cellValue = val;
+          else if (
+            index === 0 &&
+            masterKey === 'Customer' &&
+            headers[0] !== 'Particular'
+          )
+            cellValue = val;
+
+          return `"${cellValue.replace(/"/g, '""')}"`;
+        });
+
+        csv += rowData.join(',') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${masterKey || 'Missing'}_${particular}_Template.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download template', error);
+      notify('Failed to generate template.', 'error', 3000);
+    }
+  }
+
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data.isValid === false) {
+      e.rowElement.style.backgroundColor = '#ffe6e6';
+      e.rowElement.title =
+        'ApexTransactionNumber is missing. This row will not be imported.';
+    }
+  }
 }
 @NgModule({
   imports: [
@@ -760,6 +1051,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
     DxValidatorModule,
     DxLoadPanelModule,
     DxRadioGroupModule,
+    DxSelectBoxModule,
   ],
   providers: [],
   declarations: [ImportArDataComponent],

@@ -139,10 +139,11 @@
         [dataSource]="Imported_Ar_DataSource"
         [columns]="gridColumns"
         [showBorders]="true"
-        [rowAlternationEnabled]="true"
+        [rowAlternationEnabled]="false"
         [allowColumnResizing]="true"
         [allowColumnReordering]="true"
         [height]="'calc(100% - 70px)'"
+        (onRowPrepared)="onRowPrepared($event)"
       >
         <dxo-filter-row
           [visible]="false"
@@ -209,6 +210,7 @@
             type="button"
             class="btn btn-success popup-btn"
             (click)="saveImportedData()"
+            [disabled]="hasInvalidRows"
           >
             <i class="bi bi-save me-1"></i>
             Save
@@ -255,6 +257,15 @@
         >
         </dxi-column>
 
+        <dxo-toolbar>
+          <dxi-item
+            location="after"
+            widget="dxButton"
+            [options]="ValidateButtonOptions"
+          >
+          </dxi-item>
+        </dxo-toolbar>
+
         <dxo-filter-row [visible]="false" applyFilter="auto"></dxo-filter-row>
 
         <dxo-header-filter [visible]="true">
@@ -299,4 +310,104 @@
     message="Loading ..."
   >
   </dx-load-panel>
+
+  <!-- Validation Popup -->
+  <dx-popup
+    [(visible)]="isValidationPopupVisible"
+    [width]="'70vw'"
+    [height]="'70vh'"
+    title="Validation Summary"
+    [showCloseButton]="true"
+  >
+    <div *dxTemplate="let data of 'content'" class="p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+          <dx-select-box
+            [dataSource]="transactionTypes"
+            [(value)]="selectedTransactionType"
+            (onValueChanged)="onTransactionTypeChange($event)"
+            width="200"
+            label="Transaction Type"
+            labelMode="floating"
+          ></dx-select-box>
+        </div>
+      </div>
+
+      <dx-data-grid
+        [dataSource]="filteredValidationGridData"
+        [showBorders]="true"
+        [rowAlternationEnabled]="true"
+        [columnAutoWidth]="true"
+        [height]="'50vh'"
+        (onRowDblClick)="viewErrorDetails($event.data)"
+      >
+        <dxi-column dataField="ErrorMessage" caption="Particulars"></dxi-column>
+        <dxi-column
+          dataField="MissingCount"
+          caption="Missing Count"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          dataField="AffectedRowsCount"
+          caption="Rows Count"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          caption="Download"
+          cellTemplate="downloadTemplate"
+          alignment="center"
+          [width]="100"
+        ></dxi-column>
+
+        <div *dxTemplate="let cell of 'downloadTemplate'">
+          <dx-button
+            *ngIf="
+              hasMissingData(cell.data.Particular) &&
+              !cell.data.ErrorMessage?.toLowerCase().includes('mandatory') &&
+              !cell.data.ErrorMessage?.toLowerCase().includes(
+                'referencedocnumber'
+              )
+            "
+            icon="export"
+            type="normal"
+            hint="Download Missing Data"
+            (onClick)="downloadMissingParticulars(cell.data.Particular)"
+          ></dx-button>
+        </div>
+      </dx-data-grid>
+    </div>
+  </dx-popup>
+
+  <!-- Error Details Popup -->
+  <dx-popup
+    [(visible)]="isErrorDetailsPopupVisible"
+    [width]="'90vw'"
+    [height]="'90vh'"
+    title="Error Details"
+    [showCloseButton]="true"
+  >
+    <div *dxTemplate="let data of 'content'" class="p-1">
+      <dx-data-grid
+        [dataSource]="errorDetailsGridData"
+        [showBorders]="true"
+        [rowAlternationEnabled]="true"
+        [columnAutoWidth]="false"
+        [columnWidth]="150"
+        [allowColumnResizing]="true"
+        [height]="'80vh'"
+      >
+        <dxo-scrolling
+          mode="virtual"
+          rowRenderingMode="virtual"
+        ></dxo-scrolling>
+        <dxo-paging [pageSize]="20"></dxo-paging>
+        <dxo-pager
+          [visible]="true"
+          [showPageSizeSelector]="true"
+          [allowedPageSizes]="[10, 20, 50, 100]"
+          [showInfo]="true"
+        ></dxo-pager>
+      </dx-data-grid>
+    </div>
+  </dx-popup>
 </div>

@@ -66,6 +66,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   selectedPriority: number = 1;
   selected_vat_id: any;
   isLoading: boolean = false;
+
   toolbarItems = [
     {
       widget: 'dxButton',
@@ -103,6 +104,14 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   selectedFile: File = null;
   imageBase64: any = '';
   isPopupVisible: boolean = false;
+
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  hideCost = false;
 
   formData = {
     COMPONENT_ITEM_ID: '',
@@ -208,21 +217,14 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   selectedStoresMap: any;
   selected_Company_id: any;
   companyId: any;
-  canAdd: any;
-  canEdit: any;
-  canDelete: any;
-  canPrint: any;
-  canView: any;
-  canApprove: any;
-  hideCost: any;
 
   constructor(
     private dataservice: DataService,
     authservice: AuthService,
     private imageService: ImageService,
     private cdr: ChangeDetectorRef,
-    private countryFlagService: CountryServiceService,
     private router: Router,
+    private countryFlagService: CountryServiceService,
   ) {
     this.sesstion_Details();
     this.selectedPriority = 1;
@@ -485,6 +487,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   };
 
   newItems = this.formItemsData;
+
   // getNewItems = () => ({
 
   //   ...this.newItems,
@@ -557,10 +560,11 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.showItems();
+    this.sesstion_Details();
+
     const currentUrl = this.router.url;
-    const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
+    const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -576,9 +580,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       this.canApprove = packingRights.CanApprove;
       this.hideCost = packingRights.HideCost;
     }
-    this.showItems();
-    this.sesstion_Details();
-
     // this.loadImageFromLocalStorage();
   }
 
@@ -1246,4 +1247,4 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   exports: [ItemsFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsFormModule {}
+export class ItemsFormModule { }

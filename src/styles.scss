@@ -823,7 +823,7 @@ body {
   height: 20px;
   border-radius: 10px;
   // color: #fff;
-  color: blue;
+  color: #b45309;
   font-size: 10px;
   font-weight: 600;
   text-transform: capitalize;
@@ -837,7 +837,7 @@ body {
   height: 20px;
   border-radius: 10px;
   // color: #fff;
-  color: yellow;
+  color: #008080;
   font-size: 10px;
   font-weight: 600;
   text-transform: capitalize;
@@ -851,7 +851,7 @@ body {
   height: 20px;
   border-radius: 10px;
   // color: #fff;
-  color: red;
+  color: #fe4a49;
   font-size: 10px;
   font-weight: 600;
   text-transform: capitalize;
@@ -879,16 +879,16 @@ body {
 
 .flag-leftservice {
   // background: #8b5cf6;
-  background: #eee7fe;
+  background: #ffe4e4;
 }
 
 .flag-travelled {
   // background: #8b5cf6;
-  background: #eee7fe;
+  background: #f4e5da;
 }
 .flag-rejoin {
   // background: #8b5cf6;
-  background: #eee7fe;
+  background: #d9ecec;
 }
 
 .verify-badge {
@@ -923,15 +923,15 @@ body {
 
 /* Flag colors */
 .verify-badge.status-pending::before {
-  color: #ffa500;
+  color: #bf7c00;
 }
 
 .verify-badge.status-verified::before {
-  color: #0073d8;
+  color: #0056a2;
 }
 
 .verify-badge.status-approved::before {
-  color: #10b981;
+  color: #279543;
 }
 
 .verify-badge.status-paid::before {
@@ -939,15 +939,15 @@ body {
 }
 
 .verify-badge.status-travelled::before {
-  color: blue;
+  color: #b45309;
 }
 
 .verify-badge.status-rejoin::before {
-  color: yellow;
+  color: #008080;
 }
 
 .verify-badge.status-leftservice::before {
-  color: red;
+  color: #fe4a49;
 }
 
 .verify-badge.disabled {

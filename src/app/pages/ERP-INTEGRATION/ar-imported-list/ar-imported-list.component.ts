@@ -125,6 +125,8 @@ export class ARImportedListComponent {
   allValidationErrors: any[] = [];
   allMissingMasterData: any[] = [];
   filteredValidationGridData: any[] = [];
+  isErrorDetailsPopupVisible: boolean = false;
+  errorDetailsGridData: any[] = [];
 
   isLoading: boolean = false;
   loadingMessage: string = 'Loading...';
@@ -137,7 +139,7 @@ export class ARImportedListComponent {
     { label: 'Custom', value: 'custom' },
   ];
 
-  selectedDateRange: any = 'last7';
+  selectedDateRange: any = 'all';
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup: boolean = false;
@@ -657,14 +659,21 @@ export class ARImportedListComponent {
         this.allValidationErrors = response.errors || [];
         this.allMissingMasterData = response.notFoundValues || [];
 
-        if (this.transactionTypes.length > 0) {
-          this.selectedTransactionType = this.transactionTypes[0];
-          this.updateValidationGrid();
+        if (
+          this.allValidationErrors.length === 0 &&
+          this.allMissingMasterData.length === 0
+        ) {
+          notify('Validation successful', 'success', 3000);
         } else {
-          this.filteredValidationGridData = [];
-        }
+          if (this.transactionTypes.length > 0) {
+            this.selectedTransactionType = this.transactionTypes[0];
+            this.updateValidationGrid();
+          } else {
+            this.filteredValidationGridData = [];
+          }
 
-        this.isValidationPopupVisible = true;
+          this.isValidationPopupVisible = true;
+        }
       } else {
         notify(response?.message || 'Validation failed', 'error', 3000);
       }
@@ -689,14 +698,64 @@ export class ARImportedListComponent {
         map.set(key, {
           ErrorMessage: key,
           MissingCount: 0,
+          AffectedRowsCount: 0,
           Particular: err.Particular,
+          BatchNo: err.BatchNo,
+          TransactionType: err.TransactionType,
         });
       }
       const current = map.get(key);
       current.MissingCount += Number(err.ErrorCount) || 0;
+      current.AffectedRowsCount += Number(err.AffectedRowsCount) || 0;
     });
 
     this.filteredValidationGridData = Array.from(map.values());
+  }
+
+  // ================= View Error Details =================
+  async viewErrorDetails(cellData: any) {
+    const payload = {
+      BatchNo: cellData.BatchNo,
+      TransactionType: cellData.TransactionType,
+      Particular: cellData.Particular,
+    };
+
+    this.loadingMessage = 'Loading error details...';
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    try {
+      const response: any = await this.srvce
+        .getARErrorData(payload)
+        .toPromise();
+
+      this.isLoading = false;
+      this.loadingMessage = 'Loading...';
+
+      if (response?.flag === '1') {
+        this.errorDetailsGridData = (response.data || []).map((item: any) => {
+          if (item.hasOwnProperty('Verified')) {
+            item.Verified = item.Verified ? 'True' : 'False';
+          }
+          delete item.HeaderID;
+          delete item.TransactionID;
+          delete item.DataID;
+          return item;
+        });
+        this.isErrorDetailsPopupVisible = true;
+      } else {
+        notify(
+          response?.message || 'Failed to load error details',
+          'error',
+          3000,
+        );
+      }
+    } catch (error: any) {
+      this.isLoading = false;
+      console.error(error);
+      notify('Failed to fetch error details', 'error', 3000);
+    }
+    this.cdr.detectChanges();
   }
 
   hasMissingData(particular: string): boolean {
@@ -766,7 +825,9 @@ export class ARImportedListComponent {
         const rowData = headers.map((header, index) => {
           let cellValue = '';
 
-          if (
+          if (header === 'Particular') cellValue = particular;
+          else if (header === 'NotFoundValue') cellValue = val;
+          else if (
             masterKey === 'Clinician' &&
             (header === 'ClinicianLicense' || header === 'ClinicianName')
           )
@@ -776,10 +837,6 @@ export class ARImportedListComponent {
           else if (masterKey === 'chartOfAccounts' && header === 'LedgerName')
             cellValue = val;
           else if (masterKey === 'Cpt' && header === 'CPTCode') cellValue = val;
-          else if (masterKey === 'Customer' && header === 'Particular')
-            cellValue = particular;
-          else if (masterKey === 'Customer' && header === 'NotFoundValue')
-            cellValue = val;
           else if (
             index === 0 &&
             masterKey === 'Customer' &&

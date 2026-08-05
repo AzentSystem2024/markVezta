@@ -1,4 +1,6 @@
-<div class="d-flex align-items-center justify-content-end filter-container mt-2 pe-3">
+<div
+  class="d-flex align-items-center justify-content-end filter-container mt-2 pe-3"
+>
   <dx-select-box
     label="Date Range"
     labelMode="floating"
@@ -23,17 +25,14 @@
     <!-- Row 1: Facility Wise & Income Group -->
     <div class="dashboard-row">
       <div class="dashboard-card">
-        <h6 class="card-title mt-2 mb-2">Facility Wise Revenue</h6>
-        
+        <h6 class="card-title mt-2 mb-2">Branch Wise Revenue</h6>
+
         <dx-pie-chart
           id="facilityPie"
           [dataSource]="facilityWiseData"
           palette="bright"
         >
-          <dxi-series
-            argumentField="facility"
-            valueField="revenue"
-          >
+          <dxi-series argumentField="facility" valueField="revenue">
             <dxo-label [visible]="true" [customizeText]="customizePieLabel">
               <dxo-connector [visible]="true"></dxo-connector>
             </dxo-label>
@@ -51,7 +50,7 @@
 
       <div class="dashboard-card">
         <h6 class="card-title mt-2 mb-2">Income Group Wise Revenue (Top 10)</h6>
-        
+
         <dx-chart [dataSource]="incomeGroupData" palette="soft">
           <dxo-argument-axis>
             <dxo-label
@@ -89,7 +88,7 @@
     <div class="dashboard-row">
       <div class="dashboard-card">
         <h6 class="card-title mt-2 mb-2">Department Wise Revenue (Top 10)</h6>
-        
+
         <dx-chart [dataSource]="departmentWiseData" palette="ocean">
           <dxo-argument-axis>
             <dxo-label
@@ -124,7 +123,7 @@
 
       <div class="dashboard-card">
         <h6 class="card-title mt-2 mb-2">Category Wise Revenue (Top 10)</h6>
-        
+
         <dx-chart [dataSource]="categoryWiseData" palette="pastel">
           <dxo-argument-axis>
             <dxo-label
@@ -161,8 +160,8 @@
     <!-- Row 3: Month Wise (Line Chart) -->
     <div class="dashboard-row">
       <div class="dashboard-card-Tender">
-        <h6 class="card-title mt-2 mb-2">Month Wise Revenue (By Facility)</h6>
-        
+        <h6 class="card-title mt-2 mb-2">Month Wise Revenue</h6>
+
         <div class="chart-wrapper">
           <dx-chart
             id="monthWiseChart"
@@ -178,14 +177,11 @@
             <dxi-value-axis>
               <dxo-label [customizeText]="customizeValueAxisLabel"></dxo-label>
             </dxi-value-axis>
-            
-            <dxo-common-series-settings
-              argumentField="month"
-              type="line"
-            >
+
+            <dxo-common-series-settings argumentField="month" type="line">
               <dxo-point [visible]="true"></dxo-point>
             </dxo-common-series-settings>
-            
+
             <dxi-series
               *ngFor="let s of monthWiseSeries"
               [valueField]="s.valueField"
@@ -209,7 +205,6 @@
         </div>
       </div>
     </div>
-    
   </div>
 </div>
 
