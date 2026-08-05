@@ -51,6 +51,7 @@ import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { DataService } from 'src/app/services';
 import { ExportService } from 'src/app/services/export.service';
+import { DeliveryNoteFormFinanceModule } from '../../Operations/POPUP PAGES/delivery-note-form/delivery-note-form-finance.component';
 
 @Component({
   selector: 'app-stock-movement-report',
@@ -159,6 +160,7 @@ export class StockMovementReportComponent {
   storeHint: string = '';
   Store: any;
   showZeroStock: boolean = false;
+  appType: any;
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
@@ -182,11 +184,18 @@ export class StockMovementReportComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
-     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-  this.selectedmonth = currentMonth;
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
+    const userDataString = localStorage.getItem('userData');
+    console.log('userData', userDataString);
+    if (!userDataString) return;
+
+    const userData = JSON.parse(userDataString);
+    console.log(userData.Configuration[0].APP_TYPE, 'CONFIGURATION');
+    this.appType = userData.Configuration[0].APP_TYPE;
     this.sesstion_Details();
     this.get_Item_Dropdown();
     this.store_dropdown();
@@ -234,7 +243,7 @@ export class StockMovementReportComponent {
   //================Month value change ===================
   onMonthValueChanged(e: any) {
     this.selectedmonth = e.value ?? '';
-    if (this.selectedmonth === ''|| this.selectedmonth === null) {
+    if (this.selectedmonth === '' || this.selectedmonth === null) {
       this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
       this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
     } else {
@@ -295,25 +304,25 @@ export class StockMovementReportComponent {
     grid.endUpdate();
   }
 
-   store_dropdown() {
+  store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
   }
 
-    updateStoreHint() {
+  updateStoreHint() {
     if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
       this.storeHint = 'No store selected';
       return;
     }
 
-    const selectedNames = this.Store
-      .filter(x => this.selectedStoreid.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
 
     this.storeHint = selectedNames.join(', ');
     this.getStockMovement();
@@ -379,7 +388,7 @@ export class StockMovementReportComponent {
       DATE_FROM: this.selected_from_date,
       DATE_TO: this.selected_To_date,
       ITEM_TYPE: this.selected_item_Id || 0,
-      STORE_ID:this.selectedStoreid.join(','),
+      STORE_ID: this.selectedStoreid.join(','),
       FIN_ID: this.finID,
     };
     this.dataService.StockMovement_Api(payload).subscribe({
@@ -387,12 +396,12 @@ export class StockMovementReportComponent {
         // this.StockMovementDatasource = res.data || [];
         this.allStockMovementData = res.data || [];
 
-this.StockMovementDatasource = [...this.allStockMovementData];
+        this.StockMovementDatasource = [...this.allStockMovementData];
 
-// Apply checkbox filter if already checked
-if (this.showZeroStock) {
-  this.filterZeroStock();
-}
+        // Apply checkbox filter if already checked
+        if (this.showZeroStock) {
+          this.filterZeroStock();
+        }
 
         //  FORCE GRID REFRESH
         grid?.refresh();
@@ -887,24 +896,51 @@ if (this.showZeroStock) {
 
         break;
       }
-
       case 'delivery': {
-        this.selectedDelivery = id; //  Purchase Return uses TRANS_ID
-        const status = row.TRANS_STATUS; // same as your original logic
+        const deliveryId = row.TRANS_ID;
+        if (!deliveryId) return;
 
-        // reset popup first
+        const userData = JSON.parse(
+          sessionStorage.getItem('savedUserData') || '{}',
+        );
+        const appType = userData.Configuration[0].APP_TYPE;
+
         this.isEditDelivery = false;
 
-        this.dataService.selectDeliveryNote(id).subscribe((response: any) => {
+        const request$ =
+          appType === 'VEZTA'
+            ? this.dataService.selectDeliveryNoteFinance(deliveryId)
+            : this.dataService.selectDeliveryNote(deliveryId);
+
+        request$.subscribe((response: any) => {
           this.selectedDelivery = response.Data;
           this.isReadOnlyDelivery = true;
-
-          //  open existing Purchase Return popup
           this.isEditDelivery = true;
         });
 
         break;
       }
+      // case 'delivery': {
+      //   const deliveryId = row.TRANS_ID;
+      //   if (!deliveryId) return;
+      //   this.selectedDelivery = id; //  Purchase Return uses TRANS_ID
+      //   const status = row.TRANS_STATUS; // same as your original logic
+
+      //   // reset popup first
+      //   this.isEditDelivery = false;
+
+      //   this.dataService
+      //     .selectDeliveryNote(deliveryId)
+      //     .subscribe((response: any) => {
+      //       this.selectedDelivery = response.Data;
+      //       this.isReadOnlyDelivery = true;
+
+      //       //  open existing Purchase Return popup
+      //       this.isEditDelivery = true;
+      //     });
+
+      //   break;
+      // }
       case 'saleReturn': {
         const returnId = row.TRANS_ID; // Sale Return uses TRANS_ID
         const status = row.TRANS_STATUS;
@@ -960,33 +996,33 @@ if (this.showZeroStock) {
   }
 
   filterZeroStock() {
-  this.StockMovementDatasource = this.allStockMovementData.filter(item =>
+    this.StockMovementDatasource = this.allStockMovementData.filter(
+      (item) =>
+        (Number(item.GRN_QTY) || 0) !== 0 ||
+        (Number(item.PURCHASE_RETURN_QTY) || 0) !== 0 ||
+        (Number(item.PRODUCTION_QTY) || 0) !== 0 ||
+        (Number(item.CONSUMPTION_QTY) || 0) !== 0 ||
+        (Number(item.DELIVERY_QTY) || 0) !== 0 ||
+        (Number(item.DELIVERY_RETURN_QTY) || 0) !== 0 ||
+        (Number(item.SALE_QTY) || 0) !== 0 ||
+        (Number(item.SALE_RETURN_QTY) || 0) !== 0 ||
+        (Number(item.ADJUSTED) || 0) !== 0 ||
+        (Number(item.TRANSFER_OUT_QTY) || 0) !== 0 ||
+        (Number(item.TRANSFER_IN_QTY) || 0) !== 0,
 
-    (Number(item.GRN_QTY) || 0) !== 0 ||
-    (Number(item.PURCHASE_RETURN_QTY) || 0) !== 0 ||
-    (Number(item.PRODUCTION_QTY) || 0) !== 0 ||
-    (Number(item.CONSUMPTION_QTY) || 0) !== 0 ||
-    (Number(item.DELIVERY_QTY) || 0) !== 0 ||
-    (Number(item.DELIVERY_RETURN_QTY) || 0) !== 0 ||
-    (Number(item.SALE_QTY) || 0) !== 0 ||
-    (Number(item.SALE_RETURN_QTY) || 0) !== 0 ||
-    (Number(item.ADJUSTED) || 0) !== 0 ||
-    (Number(item.TRANSFER_OUT_QTY) || 0) !== 0 ||
-    (Number(item.TRANSFER_IN_QTY) || 0) !== 0
-
-    // Don't include OPENING_QTY and BALANCE_STOCK
-  );
-}
-
-onShowZeroStockChanged(e: any) {
-  this.showZeroStock = e.value;
-
-  if (this.showZeroStock) {
-    this.filterZeroStock();
-  } else {
-    this.StockMovementDatasource = [...this.allStockMovementData];
+      // Don't include OPENING_QTY and BALANCE_STOCK
+    );
   }
-}
+
+  onShowZeroStockChanged(e: any) {
+    this.showZeroStock = e.value;
+
+    if (this.showZeroStock) {
+      this.filterZeroStock();
+    } else {
+      this.StockMovementDatasource = [...this.allStockMovementData];
+    }
+  }
 
   handleClose() {
     //  Close main details popup
@@ -1065,6 +1101,7 @@ onShowZeroStockChanged(e: any) {
     SaleReturnFormModule,
     DeliveryNoteFormModule,
     ViewInvoiceModule,
+    DeliveryNoteFormFinanceModule,
   ],
   providers: [],
   declarations: [StockMovementReportComponent],

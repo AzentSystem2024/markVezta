@@ -62,17 +62,14 @@
 
                   <!-- Row 2 : DN No + New Field -->
                   <div style="display: flex; gap: 1px">
-                    <dx-select-box
-                      [(value)]="deliveryFormData.SALESMAN_ID"
-                      [dataSource]="salesman"
-                      displayExpr="DESCRIPTION"
-                      valueExpr="ID"
+                    <dx-text-box
+                      [(value)]="deliveryFormData.SALESMAN_NAME"
                       [width]="410"
                       label="Salesman"
                       labelMode="floating"
-                      [readOnly]="isReadOnlyMode"
+                      [readOnly]="true"
                     >
-                    </dx-select-box>
+                    </dx-text-box>
 
                     <dx-text-box
                       [(value)]="deliveryFormData.REF_NO"
@@ -98,7 +95,7 @@
                     [width]="375"
                     label="Customer *"
                     labelMode="floating"
-                    [readOnly]="isReadOnlyMode"
+                    [readOnly]="isReadOnlyMode || isEditing"
                     (onValueChanged)="customerChanged($event)"
                   >
                   </dx-select-box>
@@ -164,8 +161,13 @@
             [allowEditing]="false"
           ></dxi-column> -->
           <dxi-column
+            dataField="QTY_STOCK"
+            caption="Stock Qty"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
             dataField="QUANTITY"
-            caption="Quantity"
+            caption="Order Qty"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -178,7 +180,7 @@
               {
                 type: 'custom',
                 validationCallback: validateQtyIssued,
-                message: 'Delivery Qty cannot be greater than Qty Available',
+                message: 'Delivery Qty cannot be greater than Stocks Qty',
               },
             ]"
           >
@@ -373,6 +375,7 @@
     <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Descriptiom"></dxi-column>
     <dxi-column dataField="UOM" caption="UOM"></dxi-column>
+    <dxi-column dataField="QTY_STOCK" caption="Stock Qty"></dxi-column>
     <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
     <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
   </dx-data-grid>

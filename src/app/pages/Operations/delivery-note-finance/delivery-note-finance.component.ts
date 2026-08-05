@@ -153,7 +153,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -479,7 +479,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   onEditDelivery(event: any) {
     event.cancel = true;
 
-    const deliveryId = event.data.ID;
+    const deliveryId = event.data.TRANS_ID;
     const status = event.data.STATUS;
 
     this.dataService
@@ -518,7 +518,6 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     if (rowData.TRANS_STATUS === 5 && this.canEdit) {
       return;
     }
-
 
     this.isReadOnlyDelivery = transStatus === 'APPROVED';
 
@@ -649,4 +648,4 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   exports: [DeliveryNoteFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFinanceModule { }
+export class DeliveryNoteFinanceModule {}

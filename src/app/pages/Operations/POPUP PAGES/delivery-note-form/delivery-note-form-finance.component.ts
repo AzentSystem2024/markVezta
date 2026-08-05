@@ -262,11 +262,14 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
       DN_TYPE: data.DN_TYPE,
       DN_NO: data.DN_NO,
       COMPANY_NAME: data.COMPANY_NAME,
+      SALESMAN_NAME: data.SALESMAN_NAME,
 
       // ✅ GRID DATA BINDING
       Details: (data.Details || []).map((row: any) => ({
         ...row,
-        DELIVERED_QUANTITY: row.DELIVERED_QUANTITY ?? row.QUANTITY ?? 0,
+        // DELIVERED_QUANTITY: row.DELIVERED_QUANTITY ?? row.QUANTITY ?? 0,
+        DELIVERED_QUANTITY: row.DELIVERED_QUANTITY ?? 0,
+        QTY_STOCK: row.QTY_STOCK ?? 0,
         SO_DETAIL_ID: row.SO_DETAIL_ID ?? 0,
       })),
     };
@@ -379,6 +382,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
           this.deliveryFormData.CONTACT_PHONE = details.CONTACT_PHONE ?? '';
           this.deliveryFormData.CONTACT_MOBILE = details.CONTACT_MOBILE ?? '';
           this.deliveryFormData.CONTACT_EMAIL = details.CONTACT_EMAIL ?? '';
+          this.deliveryFormData.SALESMAN_NAME = details.SALESMAN_NAME ?? '';
           // this.deliveryFormData.CONTACT_NAME = details.CONTACT_NAME;
           // this.deliveryFormData.CONTACT_FAX = details.CONTACT_FAX;
           // this.deliveryFormData.CONTACT_PHONE = details.CONTACT_PHONE;
@@ -477,12 +481,13 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         DESCRIPTION: row.DESCRIPTION || '',
         UOM: row.UOM || '',
         QUANTITY: row.QUANTITY || 0,
+        QTY_STOCK: row.QTY_STOCK ?? 0,
         SO_DETAIL_ID: row.SO_DETAIL_ID || row.ID || 0,
         PACKING_ID: row.PACKING_ID || 0,
         ITEM_ID: row.ITEM_ID,
         ITEM_CODE: row.ITEM_CODE,
         REMARKS: row.REMARKS,
-        DELIVERED_QUANTITY: row.QUANTITY || 0,
+        DELIVERED_QUANTITY: 0,
         SO_NO: row.SO_NO || '',
       }));
 
@@ -573,14 +578,14 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
 
   validateDeliveredQuantity = (options: any): boolean => {
     const deliveredQty = Number(options.value);
-    const quantity = Number(options.data.QUANTITY);
+    const quantity = Number(options.data.QTY_STOCK);
 
     return deliveredQty <= quantity;
   };
 
   validateQtyIssued = (options: any) => {
     const delivered = Number(options.value);
-    const ordered = Number(options.data.QUANTITY);
+    const ordered = Number(options.data.QTY_STOCK);
 
     return delivered <= ordered;
   };
@@ -635,13 +640,13 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         isValid = false;
         return;
       }
-      if (item.DELIVERED_QUANTITY > item.QUANTITY) {
+      if (item.DELIVERED_QUANTITY > item.QTY_STOCK) {
         notify(
           `Row ${
             index + 1
-          }: Delivered Quantity cannot exceed Ordered Quantity (${
-            item.QUANTITY
-          }).`,
+          }: Delivered Quantity cannot exceed Stock Quantity (${item.QTY_STOCK}).`,
+          'warning',
+          3000,
         );
         isValid = false;
         return;
