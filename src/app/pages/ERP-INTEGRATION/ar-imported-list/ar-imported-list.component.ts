@@ -665,13 +665,7 @@ export class ARImportedListComponent {
         ) {
           notify('Validation successful', 'success', 3000);
         } else {
-          if (this.transactionTypes.length > 0) {
-            this.selectedTransactionType = this.transactionTypes[0];
-            this.updateValidationGrid();
-          } else {
-            this.filteredValidationGridData = [];
-          }
-
+          this.updateValidationGrid();
           this.isValidationPopupVisible = true;
         }
       } else {
@@ -687,16 +681,12 @@ export class ARImportedListComponent {
 
   // ================= Validation Helpers =================
   updateValidationGrid() {
-    const filteredErrors = this.allValidationErrors.filter(
-      (e) => e.TransactionType === this.selectedTransactionType,
-    );
-
     const map = new Map<string, any>();
-    filteredErrors.forEach((err) => {
-      const key = err.ErrorMessage;
+    this.allValidationErrors.forEach((err) => {
+      const key = `${err.TransactionType}_${err.ErrorMessage}`;
       if (!map.has(key)) {
         map.set(key, {
-          ErrorMessage: key,
+          ErrorMessage: err.ErrorMessage,
           MissingCount: 0,
           AffectedRowsCount: 0,
           Particular: err.Particular,
@@ -758,24 +748,19 @@ export class ARImportedListComponent {
     this.cdr.detectChanges();
   }
 
-  hasMissingData(particular: string): boolean {
+  hasMissingData(particular: string, transactionType: string): boolean {
     return this.allMissingMasterData.some(
       (x) =>
         x.Particular === particular &&
-        x.TransactionType === this.selectedTransactionType,
+        x.TransactionType === transactionType,
     );
   }
 
-  onTransactionTypeChange(e: any) {
-    this.selectedTransactionType = e.value;
-    this.updateValidationGrid();
-  }
-
-  async downloadMissingParticulars(particular: string) {
+  async downloadMissingParticulars(particular: string, transactionType: string) {
     const missingValues = this.allMissingMasterData.filter(
       (x) =>
         x.Particular === particular &&
-        x.TransactionType === this.selectedTransactionType,
+        x.TransactionType === transactionType,
     );
 
     if (missingValues.length === 0) {

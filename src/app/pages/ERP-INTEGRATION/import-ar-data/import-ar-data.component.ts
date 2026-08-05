@@ -53,6 +53,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   currentFilter: string = 'auto';
   isPopupVisible: boolean = false;
   isLoading: boolean = false;
+  loadingMessage: string = 'Loading ...';
   hasInvalidRows: boolean = false;
 
   // ================= Validation State Variables =================
@@ -816,6 +817,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.loadingMessage = 'Validating...';
     this.isLoading = true;
 
     try {
@@ -824,6 +826,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
         .toPromise();
 
       this.isLoading = false;
+      this.loadingMessage = 'Loading ...';
 
       if (response?.flag === '1') {
         this.transactionTypes = response.transactionTypes || [];
@@ -836,13 +839,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
         ) {
           notify('Validation successful', 'success', 3000);
         } else {
-          if (this.transactionTypes.length > 0) {
-            this.selectedTransactionType = this.transactionTypes[0];
-            this.updateValidationGrid();
-          } else {
-            this.filteredValidationGridData = [];
-          }
-
+          this.updateValidationGrid();
           this.isValidationPopupVisible = true;
         }
       } else {
@@ -850,22 +847,19 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
       }
     } catch (error: any) {
       this.isLoading = false;
+      this.loadingMessage = 'Loading ...';
       console.error(error);
       notify('Failed to validate AR data', 'error', 3000);
     }
   }
 
   updateValidationGrid() {
-    const filteredErrors = this.allValidationErrors.filter(
-      (e) => e.TransactionType === this.selectedTransactionType,
-    );
-
     const map = new Map<string, any>();
-    filteredErrors.forEach((err) => {
-      const key = err.ErrorMessage;
+    this.allValidationErrors.forEach((err) => {
+      const key = `${err.TransactionType}_${err.ErrorMessage}`;
       if (!map.has(key)) {
         map.set(key, {
-          ErrorMessage: key,
+          ErrorMessage: err.ErrorMessage,
           MissingCount: 0,
           AffectedRowsCount: 0,
           Particular: err.Particular,
@@ -922,24 +916,19 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
     }
   }
 
-  hasMissingData(particular: string): boolean {
+  hasMissingData(particular: string, transactionType: string): boolean {
     return this.allMissingMasterData.some(
       (x) =>
         x.Particular === particular &&
-        x.TransactionType === this.selectedTransactionType,
+        x.TransactionType === transactionType,
     );
   }
 
-  onTransactionTypeChange(e: any) {
-    this.selectedTransactionType = e.value;
-    this.updateValidationGrid();
-  }
-
-  async downloadMissingParticulars(particular: string) {
+  async downloadMissingParticulars(particular: string, transactionType: string) {
     const missingValues = this.allMissingMasterData.filter(
       (x) =>
         x.Particular === particular &&
-        x.TransactionType === this.selectedTransactionType,
+        x.TransactionType === transactionType,
     );
 
     if (missingValues.length === 0) {
