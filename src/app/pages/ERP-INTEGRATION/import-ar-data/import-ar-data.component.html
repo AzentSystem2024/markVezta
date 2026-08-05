@@ -139,10 +139,11 @@
         [dataSource]="Imported_Ar_DataSource"
         [columns]="gridColumns"
         [showBorders]="true"
-        [rowAlternationEnabled]="true"
+        [rowAlternationEnabled]="false"
         [allowColumnResizing]="true"
         [allowColumnReordering]="true"
         [height]="'calc(100% - 70px)'"
+        (onRowPrepared)="onRowPrepared($event)"
       >
         <dxo-filter-row
           [visible]="false"
@@ -209,6 +210,7 @@
             type="button"
             class="btn btn-success popup-btn"
             (click)="saveImportedData()"
+            [disabled]="hasInvalidRows"
           >
             <i class="bi bi-save me-1"></i>
             Save
