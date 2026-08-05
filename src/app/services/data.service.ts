@@ -5378,9 +5378,9 @@ The result can be exported to HTML or Markdown.`;
 
   //===================Employee Leave========================
   //=================get Leave Type===================
-  get_EmployeeLeave_Api() {
+  get_EmployeeLeave_Api(payload: any = {}) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/list';
-    return this.http.post(getEndpoint, {});
+    return this.http.post(getEndpoint, payload);
   }
 
   //===============Add Api=========================

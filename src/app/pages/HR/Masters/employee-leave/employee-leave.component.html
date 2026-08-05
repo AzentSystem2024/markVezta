@@ -73,6 +73,8 @@
           </div>
         </dxi-item>
 
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+
         <dxi-item
           location="after"
           widget="dxButton"
@@ -106,7 +108,22 @@
         ></dxi-item>
       </dxo-toolbar>
 
-      <!-- <dxi-column dataField="SlNo" [width]="80" caption="Sl.No" [allowEditing]="false" [allowFiltering]="false"  alignment="left"  [allowHeaderFiltering]="false"></dxi-column> -->
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="250"
+        >
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
+
       <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
       <dxi-column
         dataField="DATE"
@@ -1559,3 +1576,11 @@
     </dxi-item>
   </dx-form>
 </form-popup>
+
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>

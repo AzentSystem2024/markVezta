@@ -27,6 +27,7 @@ import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import { confirm } from 'devextreme/ui/dialog';
+import { CustomDatePopupModule } from "src/app/custom-date-popup/custom-date-popup.component";
 
 @Component({
   selector: 'app-employee-leave',
@@ -47,6 +48,20 @@ export class EmployeeLeaveComponent {
   showHeaderFilter = true;
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
+
+  // Date Filter variables
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup = false;
 
   AddVacationPopup = false;
   UpdateVacationPopup = false;
@@ -249,6 +264,24 @@ export class EmployeeLeaveComponent {
   // LIFECYCLE HOOKS
   // ==========================================
   ngOnInit(): void {
+    const today = new Date();
+    this.selectedDateRange = 'today';
+
+    this.COMPANY_ID = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    ).SELECTED_COMPANY.COMPANY_ID;
+    this.StoreId = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    ).STORE_ID;
+    this.UserId = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    ).USER_ID;
+
+    this.get_LeaveType_Dropdown_List();
+    this.get_EmployeeLeaveList();
+    this.get_Employee_Dropdown_List();
+    this.get_EOS_Dropdown_List();
+    
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -563,7 +596,14 @@ export class EmployeeLeaveComponent {
   // DATA FETCHING & DROPDOWNS
   // ==========================================
   get_EmployeeLeaveList() {
-    this.dataservice.get_EmployeeLeave_Api().subscribe((res: any) => {
+    const dates = this.getDateRangePayload();
+    const payload = {
+      COMPANY_ID: this.COMPANY_ID,
+      DATE_FROM: dates.DATE_FROM,
+      DATE_TO: dates.DATE_TO
+    };
+
+    this.dataservice.get_EmployeeLeave_Api(payload).subscribe((res: any) => {
       if (res && res.data) {
         this.EmployeeLeaveDatasource = res.data.map(
           (item: any, index: any) => ({
@@ -573,6 +613,134 @@ export class EmployeeLeaveComponent {
         );
       }
     });
+  }
+
+  // DATE FILTER METHODS
+  // ==========================================
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+    if (e.value === 'custom') {
+      this.customStartDate = null;
+      this.customEndDate = null;
+      this.showCustomDatePopup = true;
+    } else {
+      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
+      if (customOpt) {
+        customOpt.label = 'Custom';
+      }
+      this.get_EmployeeLeaveList();
+    }
+  }
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+      if (innerList) {
+        innerList.off('itemClick');
+        innerList.on('itemClick', (clickEvent: any) => {
+          const clickedValue = clickEvent.itemData.value;
+          if (clickedValue === 'custom') {
+            this.customStartDate = null;
+            this.customEndDate = null;
+            this.showCustomDatePopup = true;
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
+
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    const fromLabel = this.formatAsDDMMYYYY(new Date(e.start));
+    const toLabel = this.formatAsDDMMYYYY(new Date(e.end));
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        : option,
+    );
+
+    this.showCustomDatePopup = false;
+    this.get_EmployeeLeaveList();
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} to ${to}`;
+    }
+    return item.label;
+  };
+
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  private formatDateForApi(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private getDateRangePayload(): { DATE_FROM: string | null; DATE_TO: string | null; } {
+    const today = new Date();
+    let fromDate: Date | null = null;
+    let toDate: Date | null = null;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last7':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last15':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 14);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last30':
+        fromDate = new Date();
+        fromDate.setDate(today.getDate() - 29);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date();
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case 'all':
+        return { DATE_FROM: null, DATE_TO: null };
+      case 'custom':
+        if (this.customStartDate && this.customEndDate) {
+          fromDate = new Date(this.customStartDate);
+          fromDate.setHours(0, 0, 0, 0);
+          toDate = new Date(this.customEndDate);
+          toDate.setHours(23, 59, 59, 999);
+        }
+        break;
+    }
+
+    return {
+      DATE_FROM: fromDate ? this.formatDateForApi(fromDate) : null,
+      DATE_TO: toDate ? this.formatDateForApi(toDate) : null,
+    };
   }
 
   get_LeaveType_Dropdown_List() {
@@ -1186,7 +1354,8 @@ export class EmployeeLeaveComponent {
     DxPopupModule,
     CommonModule,
     DxTextBoxModule,
-  ],
+    CustomDatePopupModule
+],
   providers: [],
   exports: [],
   declarations: [EmployeeLeaveComponent],
