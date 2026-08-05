@@ -270,11 +270,17 @@
         [rowAlternationEnabled]="true"
         [columnAutoWidth]="true"
         [height]="'50vh'"
+        (onRowDblClick)="viewErrorDetails($event.data)"
       >
         <dxi-column dataField="ErrorMessage" caption="Particulars"></dxi-column>
         <dxi-column
           dataField="MissingCount"
           caption="Missing Count"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          dataField="AffectedRowsCount"
+          caption="Rows Count"
           alignment="center"
         ></dxi-column>
         <dxi-column
@@ -289,7 +295,9 @@
             *ngIf="
               hasMissingData(cell.data.Particular) &&
               !cell.data.ErrorMessage?.toLowerCase().includes('mandatory') &&
-              !cell.data.ErrorMessage?.toLowerCase().includes('referencedocnumber')
+              !cell.data.ErrorMessage?.toLowerCase().includes(
+                'referencedocnumber'
+              )
             "
             icon="export"
             type="normal"
@@ -297,6 +305,39 @@
             (onClick)="downloadMissingParticulars(cell.data.Particular)"
           ></dx-button>
         </div>
+      </dx-data-grid>
+    </div>
+  </dx-popup>
+
+  <!-- Error Details Popup -->
+  <dx-popup
+    [(visible)]="isErrorDetailsPopupVisible"
+    [width]="'90vw'"
+    [height]="'90vh'"
+    title="Error Details"
+    [showCloseButton]="true"
+  >
+    <div *dxTemplate="let data of 'content'" class="p-1">
+      <dx-data-grid
+        [dataSource]="errorDetailsGridData"
+        [showBorders]="true"
+        [rowAlternationEnabled]="true"
+        [columnAutoWidth]="false"
+        [columnWidth]="150"
+        [allowColumnResizing]="true"
+        [height]="'80vh'"
+      >
+        <dxo-scrolling
+          mode="virtual"
+          rowRenderingMode="virtual"
+        ></dxo-scrolling>
+        <dxo-paging [pageSize]="20"></dxo-paging>
+        <dxo-pager
+          [visible]="true"
+          [showPageSizeSelector]="true"
+          [allowedPageSizes]="[10, 20, 50, 100]"
+          [showInfo]="true"
+        ></dxo-pager>
       </dx-data-grid>
     </div>
   </dx-popup>

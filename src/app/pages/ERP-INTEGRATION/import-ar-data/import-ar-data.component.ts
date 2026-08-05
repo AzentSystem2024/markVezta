@@ -51,9 +51,10 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
   currentFilter: string = 'auto';
   isPopupVisible: boolean = false;
   isLoading: boolean = false;
+  hasInvalidRows: boolean = false;
 
   uploadedFileName: string = '';
-  
+
   isOverWrite: boolean = false;
   overwriteOptions = [
     { text: 'Import Only new records', value: false },
@@ -344,6 +345,8 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
         // ================= Convert Values Based On Column Type =================
         excelData.forEach((row: any) => {
+          let hasApexTransNo = false;
+
           Object.keys(row).forEach((key: string) => {
             const originalKey = key;
 
@@ -352,6 +355,16 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
             const columnType = columnTypeMap[lowerKey];
 
             let value = row[originalKey];
+
+            if (lowerKey === 'apextransactionnumber') {
+              if (
+                value !== null &&
+                value !== undefined &&
+                value.toString().trim() !== ''
+              ) {
+                hasApexTransNo = true;
+              }
+            }
 
             // ================= Empty Value Handling =================
             if (
@@ -465,7 +478,17 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
               row[`${originalKey}_API`] = apiDate;
             }
           });
+
+          row.isValid = hasApexTransNo;
         });
+
+        // ================= Sort Invalid Rows To Top =================
+        excelData.sort((a: any, b: any) => {
+          if (a.isValid === b.isValid) return 0;
+          return a.isValid ? 1 : -1;
+        });
+
+        this.hasInvalidRows = excelData.some((row: any) => !row.isValid);
 
         // ================= Bind Grid Data =================
         this.Imported_Ar_DataSource = excelData;
@@ -473,7 +496,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
         // ================= Dynamic Columns =================
         if (excelData.length > 0) {
           this.gridColumns = Object.keys(excelData[0])
-            .filter((key) => !key.endsWith('_API'))
+            .filter((key) => !key.endsWith('_API') && key !== 'isValid')
             .map((key) => ({
               dataField: key,
               caption: key,
@@ -531,8 +554,11 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     // ================= Prepare API Payload =================
-    const payloadData = this.Imported_Ar_DataSource.map((row: any) => {
+    const payloadData = this.Imported_Ar_DataSource.filter(
+      (row: any) => row.isValid !== false,
+    ).map((row: any) => {
       const newRow = { ...row };
+      delete newRow.isValid;
 
       // ================= Convert Verified Field =================
       if (newRow.Verified === 1 || newRow.Verified === '1') {
@@ -590,25 +616,27 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
       return;
     }
     const currentChunk = chunks[index];
-    this.srvce.import_AR_Data(batchNo, fileName, currentChunk, this.isOverWrite).subscribe({
-      next: (response: any) => {
-        // API Success
-        if (response?.flag === '1') {
-          // Upload next chunk
-          this.uploadChunkData(chunks, batchNo, fileName, index + 1);
-        }
-        // Stop Complete Process If Any Chunk Failed
-        else {
-          notify(response?.message || 'Data import failed', 'error', 4000);
+    this.srvce
+      .import_AR_Data(batchNo, fileName, currentChunk, this.isOverWrite)
+      .subscribe({
+        next: (response: any) => {
+          // API Success
+          if (response?.flag === '1') {
+            // Upload next chunk
+            this.uploadChunkData(chunks, batchNo, fileName, index + 1);
+          }
+          // Stop Complete Process If Any Chunk Failed
+          else {
+            notify(response?.message || 'Data import failed', 'error', 4000);
+            return;
+          }
+        },
+        error: (error: any) => {
+          notify('Error while importing data', 'error', 4000);
+          this.isLoading = false;
           return;
-        }
-      },
-      error: (error: any) => {
-        notify('Error while importing data', 'error', 4000);
-        this.isLoading = false;
-        return;
-      },
-    });
+        },
+      });
   }
 
   showImportDetails(rowData: any) {
@@ -741,6 +769,14 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
         e.cellElement.style.color = '#ff2929';
         e.cellElement.style.fontWeight = '600';
       }
+    }
+  }
+
+  onRowPrepared(e: any) {
+    if (e.rowType === 'data' && e.data.isValid === false) {
+      e.rowElement.style.backgroundColor = '#ffe6e6';
+      e.rowElement.title =
+        'ApexTransactionNumber is missing. This row will not be imported.';
     }
   }
 }
