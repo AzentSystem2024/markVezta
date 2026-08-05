@@ -8,3 +8,4 @@ export const environment = {
   // apiUrl: 'http://financeapi.advanceworldgroup.net/api/'
   // apiUrl: 'http://veztaapi.diligenzit.com/api/',
 };
+

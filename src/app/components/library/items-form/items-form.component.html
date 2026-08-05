@@ -587,7 +587,6 @@
             <dx-number-box
               [(value)]="newItems.COST"
               [width]="200"
-              [readOnly]="!hideCost"
               [format]="'#,##0.00'"
               [readOnly]="hideCost"
               [inputAttr]="{ style: 'text-align: right;' }"
@@ -1777,6 +1776,7 @@
               [(value)]="newItems.COST"
               [width]="200"
               [format]="'#,##0.00'"
+              [readOnly]="hideCost"
               [inputAttr]="{ style: 'text-align: right;' }"
             ></dx-number-box>
           </div>

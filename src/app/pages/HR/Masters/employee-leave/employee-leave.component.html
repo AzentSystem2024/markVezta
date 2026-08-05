@@ -155,7 +155,7 @@
                       ? "Approved"
                       : data.data.STATUS === "Verified"
                         ? "Verified"
-                        : "Pending"
+                        : "Open"
             }}
           </span>
         </div>
@@ -812,6 +812,7 @@
   [(visible)]="TravelPopup"
   titleText="Employee Vacation"
   (save)="Travel_Data()"
+  width="700px"
   [showApprove]="false"
 >
   <dx-form id="form">
@@ -1059,6 +1060,7 @@
   [(visible)]="RejoinPopup"
   titleText="REJOIN/LEFT SERVICE Vacation"
   [showApprove]="false"
+  width="700px"
   (save)="Rejoin_Data()"
 >
   <dx-form id="form">
@@ -1316,6 +1318,7 @@
   [showApprove]="false"
   [showSave]="false"
   (save)="View_Data()"
+  width="700px"
 >
   <dx-form id="form" [readOnly]="true">
     <dxi-item itemType="group" [colCount]="2" [colSpan]="2">

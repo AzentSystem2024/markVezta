@@ -1046,7 +1046,12 @@ export class ItemsEditFormComponent implements OnInit {
       return;
     }
 
-    if (!this.selectedRowKeys || this.selectedRowKeys.length === 0) {
+    const isServiceItem = Number(this.itemData.TYPE_ID) === 2;
+
+    if (
+  !isServiceItem &&
+  (!this.selectedRowKeys || this.selectedRowKeys.length === 0)
+) {
       notify(
         {
           message: 'Please select at least one store',
@@ -1082,25 +1087,13 @@ export class ItemsEditFormComponent implements OnInit {
         QTY_AVAILABLE: s.QTY_AVAILABLE,
         IS_SELECTED: true,
       }));
-    // const select_supplier = this.itemData.item_suppliers;
 
-    // const convertedData: any[] = [];
-
-    // select_supplier.forEach((item) => {
-    //   convertedData.push({
-    //     ID: 0,
-    //     SUPP_ID: item.SUPP_ID?.toString() || '',
-    //     REORDER_NO:
-    //       item.REORDER_NO !== null && item.REORDER_NO !== undefined
-    //         ? String(item.REORDER_NO)
-    //         : '',
-    //     COST: item.COST || 0,
-    //     IS_PRIMARY: item.IS_PRIMARY || false,
-    //     IS_CONSIGNMENT: item.IS_CONSIGNMENT || true,
-    //   });
-    // });
+      console.log(storeData)
+   
     // Save any cell currently being edited
-    this.dataGrid.instance.saveEditData();
+    if (this.dataGrid?.instance) {
+  this.dataGrid.instance.saveEditData();
+}
 
     const convertedData = (this.edit_Suplier || []).map((item: any) => ({
       // ID: item.ID || 0,
@@ -1117,7 +1110,7 @@ export class ItemsEditFormComponent implements OnInit {
       IS_PRIMARY: item.IS_PRIMARY ?? false,
       IS_CONSIGNMENT: item.IS_CONSIGNMENT ?? false,
     }));
-
+    console.log(convertedData)
     const itemAliasDAta = this.itemData.item_alias;
     const convertedAliasData: any[] = [];
 
@@ -1134,6 +1127,10 @@ export class ItemsEditFormComponent implements OnInit {
     const payload = {
       ...this.itemData,
       item_stores: storeData || this.itemData.item_stores,
+  //     item_stores:
+  // Number(this.itemData.TYPE_ID) === 2
+  //   ? this.itemData.item_stores
+  //   : storeData,
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
@@ -1141,6 +1138,7 @@ export class ItemsEditFormComponent implements OnInit {
       SALE_PRICE: this.salePrice,
       COST: this.itemData.COST ?? 0,
     };
+    console.log(payload)
     // Call the service to update the items
     this.dataservice.updateItems(payload.ID, payload).subscribe(
       (response: any) => {
