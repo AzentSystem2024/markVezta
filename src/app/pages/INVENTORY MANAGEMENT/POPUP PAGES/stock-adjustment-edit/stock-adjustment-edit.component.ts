@@ -55,8 +55,10 @@ import notify from 'devextreme/ui/notify';
 export class StockAdjustmentEditComponent {
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
   @Input() EditingResponseData: any = {};
-  @Input() status: any
+  @Input() status: any;
 
   @Output() popupClosed = new EventEmitter<void>();
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -131,7 +133,7 @@ export class StockAdjustmentEditComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     // this.isEditDataAvailable();
@@ -201,7 +203,7 @@ export class StockAdjustmentEditComponent {
         this.readOnlyTrue = false;
         this.approveValue = false;
       }
-      this.StoreIDData = this.adjustmentFormData.STORE_ID
+      this.StoreIDData = this.adjustmentFormData.STORE_ID;
 
       // this.readOnlyTrue=
       // if (editable == 5) {
@@ -211,7 +213,7 @@ export class StockAdjustmentEditComponent {
       //   this.readOnlyTrue = false;
       //   this.approveValue = false;
       // }
-      console.log(this.status)
+      console.log(this.status);
     }
   }
   onSelectItems() {
@@ -270,11 +272,9 @@ export class StockAdjustmentEditComponent {
       COMPANY_ID: this.companyID,
       NAME: 'REASON',
     };
-    this.dataService
-      .getDropdownData(payload)
-      .subscribe((response: any) => {
-        this.reasons = response;
-      });
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.reasons = response;
+    });
   }
   getStoreDropdown() {
     const payload = {
@@ -325,8 +325,8 @@ export class StockAdjustmentEditComponent {
       this.items = res.Data;
     });
   }
-  onPopupHiding() { }
-  updateNetAmount(event: any) { }
+  onPopupHiding() {}
+  updateNetAmount(event: any) {}
 
   UpdateStockAdjustment() {
     console.log(this.adjustmentFormData);
@@ -412,9 +412,7 @@ export class StockAdjustmentEditComponent {
           notify('Approval cancelled.', 'info', 2000);
         }
       });
-    }
-
-    else if (this.status == 'verifyscreen') {
+    } else if (this.status == 'verifyscreen') {
       confirm(
         'It will Verify . Are you sure you want to Verify?',
         'Confirm Verify',
@@ -451,8 +449,7 @@ export class StockAdjustmentEditComponent {
           notify('Verify cancelled.', 'info', 2000);
         }
       });
-    }
-    else {
+    } else {
       this.dataService
         .Update_Stock_Adjustment_Data(payload)
         .subscribe((res: any) => {
@@ -470,6 +467,46 @@ export class StockAdjustmentEditComponent {
     }
   }
   onEditorPreparing(event: any) {
+    if (event.dataField === 'NEW_QTY') {
+      event.editorOptions = event.editorOptions || {};
+
+      event.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      event.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      if (event) {
+        event.editorOptions.showSpinButtons = false;
+      }
+
+      event.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === event.row?.data,
+          );
+
+          setTimeout(() => {
+            // existing logic untouched
+          }, 50);
+        }
+      };
+    }
     const rowData = event.row.data;
 
     console.log('Updated row:', rowData);
@@ -510,13 +547,10 @@ export class StockAdjustmentEditComponent {
     } else if (this.status == 'verifyscreen') {
       if (this.selectedStatus == 1) {
         return 'Verify';
-
       } else {
         return 'Approve';
-
       }
-    }
-    else {
+    } else {
       return 'Approve';
     }
   }
@@ -558,4 +592,4 @@ export class StockAdjustmentEditComponent {
   exports: [StockAdjustmentEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentEditModule { }
+export class StockAdjustmentEditModule {}
