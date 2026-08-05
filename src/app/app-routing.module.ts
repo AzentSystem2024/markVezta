@@ -223,6 +223,8 @@ import { EosPaymentListComponent } from './pages/HR/Masters/eos-payment-list/eos
 import { LeaveSalaryPaymentComponent } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
 import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
 import { RefundComponent } from './pages/Operations/Deposit/refund/refund.component';
+import { SupplierwiseSalesComponent } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
+import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/supplierwise-stock.component';
 
 const routes: Routes = [
   {
@@ -1369,6 +1371,16 @@ const routes: Routes = [
       {
         path: 'deposit-refund',
         component: RefundComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'supp-wise-sales',
+        component: SupplierwiseSalesComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'supp-wise-stock',
+        component: SupplierwiseStockComponent,
         canActivate: [AuthGuardService],
       },
       {

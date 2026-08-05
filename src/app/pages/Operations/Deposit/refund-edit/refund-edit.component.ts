@@ -176,7 +176,7 @@ export class RefundEditComponent {
       this.getCompanyListDropdown();
 
       this.mainInvoiceGridList = firstReceipt.REC_DETAIL || [];
-      this.selectedDistributorId = Number(firstReceipt.DISTRIBUTOR_ID);
+      this.selectedDistributorId = Number(firstReceipt.CUSTOMER_ID);
 
       // NOW call invoice list
       this.getInvoiceList();
