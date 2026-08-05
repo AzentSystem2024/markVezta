@@ -2,68 +2,74 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 86vh;
+      height: 80vh;
       display: flex;
       flex-direction: column;
 
       box-sizing: border-box;
     "
   >
-    <div class="salary-grid-wrapper" style="padding: 0 10px">
+    <div
+      class="salary-grid-wrapper"
+      style="
+        padding: 10px 15px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      "
+    >
+      <!-- Header Fields Row -->
       <div
+        class="form-header-row"
         style="
           display: flex;
-          gap: 10px;
-          margin-bottom: 5px;
-          justify-content: flex-end;
+          gap: 20px;
+          align-items: center;
+          margin-bottom: 15px;
         "
-      ></div>
+      >
+        <dx-text-box
+          [(value)]="paymentFormData.DOC_NO"
+          label="Payment No"
+          labelMode="floating"
+          [width]="200"
+          [readOnly]="true"
+        ></dx-text-box>
 
-      <div class="grid-container">
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            gap: 15px;
-          "
-        >
-          <!-- Left side -->
-          <div style="display: flex; flex-direction: column; gap: 10px">
-            <dx-text-box
-              [(value)]="paymentFormData.DOC_NO"
-              label="Payment No"
-              labelMode="floating"
-              [width]="220"
-              [readOnly]="true"
-            ></dx-text-box>
+        <dx-select-box
+          [(value)]="paymentFormData.SUPP_ID"
+          [dataSource]="supplierList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [width]="350"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+          label="Supplier"
+          labelMode="floating"
+          (onValueChanged)="onSupplierChanged($event)"
+          style="flex: 1; max-width: 400px"
+        ></dx-select-box>
 
-            <dx-select-box
-              [(value)]="paymentFormData.SUPP_ID"
-              [dataSource]="supplierList"
-              displayExpr="DESCRIPTION"
-              valueExpr="ID"
-              [width]="320"
-              [searchEnabled]="true"
-              [showClearButton]="true"
-              label="Supplier"
-              labelMode="floating"
-              (onValueChanged)="onSupplierChanged($event)"
-            ></dx-select-box>
-          </div>
+        <dx-date-box
+          [(value)]="paymentFormData.TRANS_DATE"
+          label="Date"
+          labelMode="floating"
+          displayFormat="dd-MM-yyyy"
+          type="date"
+          [width]="200"
+        ></dx-date-box>
+      </div>
 
-          <!-- Right side -->
-          <dx-date-box
-            [(value)]="paymentFormData.TRANS_DATE"
-            label="Date"
-            labelMode="floating"
-            displayFormat="dd-MM-yyyy"
-            type="date"
-            [width]="220"
-          ></dx-date-box>
-        </div>
-
+      <!-- Grid Section (Flex: 1 to fill available space) -->
+      <div
+        class="grid-section"
+        style="
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-height: 200px;
+        "
+      >
         <dx-data-grid
           #itemsGridRef
           [dataSource]="pendingInvoicelist"
@@ -77,10 +83,10 @@
           [headerFilter]="{ visible: true, allowSearch: true }"
           [allowColumnReordering]="true"
           [showColumnHeaders]="true"
-          [columnAutoWidth]="true"
           [allowColumnResizing]="true"
           [columnResizingMode]="'nextColumn'"
           rowAlternationInterval="2"
+          [height]="'100%'"
           [selection]="{
             mode: 'multiple',
             showCheckBoxesMode: 'always',
@@ -97,34 +103,25 @@
             [allowDeleting]="false"
           ></dxo-editing>
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
-          <dxo-filter-builder [allowHierarchicalFields]="true">
-          </dxo-filter-builder>
+          <dxo-filter-builder
+            [allowHierarchicalFields]="true"
+          ></dxo-filter-builder>
 
           <dxi-column
             dataField="DOC_NO"
             caption="Doc No"
             [allowEditing]="false"
           ></dxi-column>
-          <!-- <dxi-column
-            dataField="INVOICE_NO"
-            caption="Inv No"
-            [width]="100"
-            [allowEditing]="true"
-          >
-          </dxi-column> -->
-
           <dxi-column
             dataField="PURCH_DATE"
             caption="Date"
             [allowEditing]="false"
           ></dxi-column>
-
           <dxi-column
             dataField="SUPP_INV_NO"
             caption="Supplier Invoice No"
             [allowEditing]="false"
           ></dxi-column>
-
           <dxi-column
             dataField="NET_AMOUNT"
             caption="Inv Amount"
@@ -132,11 +129,6 @@
             [width]="120"
             [format]="{ type: 'fixedPoint', precision: 2 }"
           ></dxi-column>
-          <!-- <dxi-column
-            dataField="SETTLED_TILL_DATE"
-            caption="Settled Till Date"
-            [allowEditing]="true"
-          ></dxi-column> -->
           <dxi-column
             dataField="PENDING_AMOUNT"
             caption="Balance"
@@ -168,22 +160,26 @@
               valueFormat="#,##0.00"
               displayFormat="Total: {0}"
               alignment="right"
-            >
-            </dxi-total-item>
-
+            ></dxi-total-item>
             <dxi-total-item
               column="RECEIVED_AMOUNT"
               summaryType="sum"
               valueFormat="#,##0.00"
               displayFormat="Total: {0}"
               alignment="right"
-            >
-            </dxi-total-item>
+            ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
 
         <!-- Fill Amount Button below grid -->
-        <div style="display: flex; justify-content: flex-end; margin-top: 5px">
+        <div
+          style="
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+            margin-bottom: 5px;
+          "
+        >
           <dx-button
             text="Fill Amount"
             hint="Fill Amount"
@@ -194,158 +190,124 @@
             (onClick)="onFillAmountClick()"
           ></dx-button>
         </div>
-        <!-- Two-column box: Bank Details (left) and Receipt Details (right) -->
-        <div
-          class="bordered-grid"
-          style="
-            margin-top: 10px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-          "
-        >
-          <!-- Row: Two columns side by side -->
-          <div style="display: flex; justify-content: space-between; gap: 5px">
-            <!-- Left: Receipt Details -->
-            <div style="flex: 1">
-              <div class="section-label">Payment Details</div>
+      </div>
 
-              <dx-radio-group
-                [items]="['Cash', 'Bank', 'PDC']"
-                layout="horizontal"
-                label="Mode"
-                labelMode="floating"
-                [width]="'100%'"
-                (onValueChanged)="onReceiptModeChange($event)"
-              ></dx-radio-group>
-
-              <div class="dropdown-row">
-                <dx-select-box
-                  [dataSource]="filteredLedgerList"
-                  [(value)]="paymentFormData.PAY_HEAD_ID"
-                  displayExpr="HEAD_NAME"
-                  valueExpr="HEAD_ID"
-                  label="Ledger"
-                  labelMode="floating"
-                  [searchEnabled]="true"
-                  [width]="'100%'"
-                  style="margin-top: 2px"
-                  (onValueChanged)="onLedgerChanged($event)"
-                ></dx-select-box>
-              </div>
-            </div>
-
-            <!-- Right: Bank Remittance Details -->
-            <div style="flex: 1">
-              <!-- Dimmed or highlighted section label -->
-              <div
-                class="section-label"
-                [ngStyle]="{
-                  color: receiptMode === 'Bank' ? 'inherit' : '#888',
-                }"
-              >
-                Bank Remittance Details
-              </div>
-
-              <!-- Cheque No & Due Date -->
-              <div style="display: flex; gap: 10px">
-                <!-- Search Icon Button -->
-                <dx-button
-                  *ngIf="receiptMode === 'PDC'"
-                  icon="search"
-                  stylingMode="outlined"
-                  type="default"
-                  (onClick)="onSearchCheque()"
-                  style="width: 40px; align-self: flex-end"
-                  [disabled]="
-                    !(receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
-                  "
-                ></dx-button>
-
-                <!-- Cheque No -->
-                <dx-text-box
-                  [(value)]="paymentFormData.CHEQUE_NO"
-                  label="Reference No"
-                  labelMode="floating"
-                  [width]="'60%'"
-                  [disabled]="
-                    !(
-                      receiptMode === 'Bank' ||
-                      (receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
-                    )
-                  "
-                ></dx-text-box>
-
-                <!-- Due Date -->
-                <dx-date-box
-                  [(value)]="paymentFormData.CHEQUE_DATE"
-                  label="Due Date"
-                  labelMode="floating"
-                  type="date"
-                  displayFormat="dd-MM-yyyy"
-                  [width]="'40%'"
-                  [disabled]="
-                    !(
-                      receiptMode === 'Bank' ||
-                      (receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
-                    )
-                  "
-                ></dx-date-box>
-              </div>
-
-              <!-- Bank Name -->
-              <dx-text-box
-                [(value)]="paymentFormData.BANK_NAME"
-                label="Bank Name"
-                labelMode="floating"
-                [width]="'100%'"
-                style="margin-top: 8px"
-                [disabled]="
-                  !(
-                    receiptMode === 'Bank' ||
-                    (receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
-                  )
-                "
-              ></dx-text-box>
-            </div>
+      <!-- Details Section -->
+      <div class="payment-details-card">
+        <!-- Headers -->
+        <div style="display: flex; gap: 10px">
+          <div class="section-label" style="flex: 1">Payment Details</div>
+          <div
+            class="section-label"
+            style="flex: 1"
+            [ngClass]="{ dimmed: receiptMode !== 'Bank' }"
+          >
+            Bank Remittance Details
           </div>
+        </div>
 
-          <!-- Narration (non-PDC modes: full width) -->
-          <div *ngIf="receiptMode !== 'PDC'">
+        <!-- Row 1: Radio & Ref/Date -->
+        <div style="display: flex; gap: 10px; align-items: flex-end">
+          <div style="flex: 1; margin-bottom: 2px">
+            <dx-radio-group
+              [items]="['Cash', 'Bank', 'PDC']"
+              layout="horizontal"
+              [width]="'100%'"
+              (onValueChanged)="onReceiptModeChange($event)"
+            ></dx-radio-group>
+          </div>
+          <div style="flex: 1; display: flex; gap: 10px; align-items: flex-end">
+            <dx-button
+              *ngIf="receiptMode === 'PDC'"
+              icon="search"
+              stylingMode="outlined"
+              type="default"
+              (onClick)="onSearchCheque()"
+              style="width: 45px; height: 35px"
+              [disabled]="
+                !(receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
+              "
+            ></dx-button>
+            <dx-text-box
+              [(value)]="paymentFormData.CHEQUE_NO"
+              label="Reference No"
+              labelMode="floating"
+              style="flex: 1"
+              [disabled]="
+                !(
+                  receiptMode === 'Bank' ||
+                  (receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
+                )
+              "
+            ></dx-text-box>
+            <dx-date-box
+              [(value)]="paymentFormData.CHEQUE_DATE"
+              label="Due Date"
+              labelMode="floating"
+              type="date"
+              displayFormat="dd-MM-yyyy"
+              style="width: 150px"
+              [disabled]="
+                !(
+                  receiptMode === 'Bank' ||
+                  (receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
+                )
+              "
+            ></dx-date-box>
+          </div>
+        </div>
+
+        <!-- Row 2: Ledger & Bank Name -->
+        <div style="display: flex; gap: 10px">
+          <div style="flex: 1">
+            <dx-select-box
+              [dataSource]="filteredLedgerList"
+              [(value)]="paymentFormData.PAY_HEAD_ID"
+              displayExpr="HEAD_NAME"
+              valueExpr="HEAD_ID"
+              label="Ledger"
+              labelMode="floating"
+              [searchEnabled]="true"
+              [width]="'100%'"
+              (onValueChanged)="onLedgerChanged($event)"
+            ></dx-select-box>
+          </div>
+          <div style="flex: 1">
+            <dx-text-box
+              [(value)]="paymentFormData.BANK_NAME"
+              label="Bank Name"
+              labelMode="floating"
+              [width]="'100%'"
+              [disabled]="
+                !(
+                  receiptMode === 'Bank' ||
+                  (receiptMode === 'PDC' && paymentFormData.PAY_HEAD_ID)
+                )
+              "
+            ></dx-text-box>
+          </div>
+        </div>
+
+        <!-- Narration Row -->
+        <div class="narration-row" style="display: flex; gap: 10px">
+          <div style="flex: 1">
             <dx-text-box
               [(value)]="paymentFormData.NARRATION"
               label="Narration"
               labelMode="floating"
               [width]="'100%'"
-              style="margin-top: 2px"
             ></dx-text-box>
           </div>
-          <div
-            *ngIf="receiptMode === 'PDC'"
-            style="display: flex; gap: 5px; margin-top: 2px"
-          >
-            <!-- Left column (Narration same width as Ledger) -->
-            <div style="flex: 1">
-              <dx-text-box
-                [(value)]="paymentFormData.NARRATION"
-                label="Narration"
-                labelMode="floating"
-                [width]="'100%'"
-              ></dx-text-box>
-            </div>
-
-            <!-- Right column (Amount same width as Bank Remittance side) -->
-            <div style="flex: 1">
-              <dx-number-box
-                [(value)]="paymentFormData.AMOUNT"
-                label="Amount"
-                labelMode="floating"
-                [format]="{ type: 'fixedPoint', precision: 2 }"
-                [width]="'100%'"
-              ></dx-number-box>
-            </div>
+          <div style="flex: 1" *ngIf="receiptMode === 'PDC'">
+            <dx-number-box
+              [(value)]="paymentFormData.AMOUNT"
+              label="Amount"
+              labelMode="floating"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+              [width]="'100%'"
+            ></dx-number-box>
           </div>
+          <div style="flex: 1" *ngIf="receiptMode !== 'PDC'"></div>
         </div>
       </div>
     </div>

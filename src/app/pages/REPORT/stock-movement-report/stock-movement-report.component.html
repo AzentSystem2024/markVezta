@@ -1095,7 +1095,37 @@
 </dx-popup>
 
 <!-- .....................................DELIVERY NOTE................................. -->
+
 <dx-popup
+  [(visible)]="isEditDelivery"
+  [width]="'80vw'"
+  [height]="'90vh'"
+  title="Delivery Note"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isEditDelivery">
+    <!-- VEZTA -->
+    <app-delivery-note-form-finance
+      *ngIf="appType === 'VEZTA'"
+      [isEditing]="true"
+      [EditingResponseData]="selectedDelivery"
+      [isReadOnlyMode]="isReadOnlyDelivery"
+      (popupClosed)="handleClose()"
+    >
+    </app-delivery-note-form-finance>
+
+    <!-- Other Applications -->
+    <app-delivery-note-form
+      *ngIf="appType !== 'VEZTA'"
+      [isEditing]="true"
+      [EditingResponseData]="selectedDelivery"
+      [isReadOnlyMode]="isReadOnlyDelivery"
+      (popupClosed)="handleClose()"
+    >
+    </app-delivery-note-form>
+  </ng-container>
+</dx-popup>
+<!-- <dx-popup
   [(visible)]="isEditDelivery"
   [width]="'80vw'"
   [height]="'90vh'"
@@ -1110,4 +1140,4 @@
       (popupClosed)="handleClose()"
     ></app-delivery-note-form>
   </ng-container>
-</dx-popup>
+</dx-popup> -->

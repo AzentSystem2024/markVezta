@@ -88,7 +88,7 @@
   display: flex;
   justify-content: flex-end;
   padding: 4px 10px 0 10px;
-  margin-top: -30px; /* ⬅ increased from -6px to -10px */
+  margin-top: 10px; /* fixed spacing issue touching the details card */
 }
 
 .popup-footer {
@@ -151,4 +151,27 @@
 .customer-select {
   margin-top: 10px !important;
   display: block;
+}
+
+.payment-details-card {
+  @include toolbar-panel();
+  background-color: var(--details-panel-bg, #fafafa) !important;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+
+  .section-label {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--texteditor-label-color, #444);
+    margin-bottom: 4px;
+
+    &.dimmed {
+      opacity: 0.5;
+    }
+  }
 }
