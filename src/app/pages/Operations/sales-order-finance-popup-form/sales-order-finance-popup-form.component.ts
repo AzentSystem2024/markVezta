@@ -99,6 +99,7 @@ export class SalesOrderFinancePopupFormComponent {
     WAREHOUSE: 2,
     TOTAL_QTY: 0,
     IS_APPROVED: false,
+    REF_NO: '',
     Details: [
       // {
       //   PACKING_ID: 0,
@@ -177,6 +178,7 @@ export class SalesOrderFinancePopupFormComponent {
   isSaving = false;
   supplierItems: any;
   apiVatPerc: number;
+  popupGridLoading = false;
   isItemAlreadySelected = (item: any): boolean => {
     return this.salesOrderFormData.Details?.some(
       (d: any) => d.ITEM_ID === item.ITEM_ID,
@@ -1424,6 +1426,7 @@ export class SalesOrderFinancePopupFormComponent {
       QTN_ID: this.salesOrderFormData.QTN_ID,
       SALESMAN_ID: this.salesOrderFormData.SALESMAN_ID,
       NET_AMOUNT: netAmount,
+      REF_NO: this.salesOrderFormData.REF_NO,
       // Details: validDetails.map((d: any) => ({
       Details: validDetails.map((row: any, index: number) => {
         const grossAmount = this.calculateGrossAmount(row);

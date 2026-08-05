@@ -34,11 +34,12 @@
       (onCellPrepared)="onCellPrepared($event)"
       (onRowRemoving)="onDeleteSalesOrder($event)"
     >
-      <!-- <dxo-editing
+      <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
-      ></dxo-editing> -->
+        [confirmDelete]="true"
+      ></dxo-editing>
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="false"

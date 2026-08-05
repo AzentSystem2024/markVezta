@@ -43,7 +43,7 @@ import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services';
 import { DeliveryNoteFormFinanceModule } from '../POPUP PAGES/delivery-note-form/delivery-note-form-finance.component';
-
+import { confirm } from 'devextreme/ui/dialog';
 @Component({
   selector: 'app-delivery-note-finance',
   templateUrl: './delivery-note-finance.component.html',
@@ -153,7 +153,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -479,7 +479,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   onEditDelivery(event: any) {
     event.cancel = true;
 
-    const deliveryId = event.data.ID;
+    const deliveryId = event.data.TRANS_ID;
     const status = event.data.STATUS;
 
     this.dataService
@@ -502,7 +502,7 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     console.log(event, 'event=========================');
     const rowData = event.row.data;
     console.log(rowData.STATUS, 'ROWDATAAAAAAAAAAA');
-    const invoiceId = rowData.ID;
+    const invoiceId = rowData.TRANS_ID;
     const transStatus = rowData.STATUS;
 
     if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
@@ -518,7 +518,6 @@ export class DeliveryNoteFinanceComponent implements OnInit {
     if (rowData.TRANS_STATUS === 5 && this.canEdit) {
       return;
     }
-
 
     this.isReadOnlyDelivery = transStatus === 'APPROVED';
 
@@ -545,18 +544,23 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   }
 
   onDeleteDelivery(event: any) {
-    const deliveryId = event.data.ID;
-    const status = event.data.STATUS;
     if (event.data.STATUS === 'APPROVED') {
-      event.cancel = true;
       notify('This cannot be deleted.', 'error', 2000);
       return;
     }
-    event.cancel = true;
-    // Call your delete API
-    this.dataService.deleteDeliveryNote(deliveryId).subscribe(
-      (response: any) => {
-        if (response) {
+
+    const result = confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    );
+
+    result.then((dialogResult: boolean) => {
+      if (!dialogResult) {
+        return;
+      }
+
+      this.dataService.deleteDeliveryNote(event.data.ID).subscribe({
+        next: () => {
           notify(
             {
               message: 'Deleted Successfully',
@@ -564,24 +568,56 @@ export class DeliveryNoteFinanceComponent implements OnInit {
             },
             'success',
           );
-          this.getDeliveryNotes();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
-    );
+
+          this.zone.run(() => {
+            this.getDeliveryNotes();
+          });
+        },
+        error: () => {
+          notify('Delete failed!', 'error', 2000);
+        },
+      });
+    });
   }
+
+  // onDeleteDelivery(event: any) {
+  //   const deliveryId = event.data.ID;
+  //   const status = event.data.STATUS;
+  //   if (event.data.STATUS === 'APPROVED') {
+  //     event.cancel = true;
+  //     notify('This cannot be deleted.', 'error', 2000);
+  //     return;
+  //   }
+  //   event.cancel = true;
+  //   // Call your delete API
+  //   this.dataService.deleteDeliveryNote(deliveryId).subscribe(
+  //     (response: any) => {
+  //       if (response) {
+  //         notify(
+  //           {
+  //             message: 'Deleted Successfully',
+  //             position: { at: 'top center', my: 'top center' },
+  //           },
+  //           'success',
+  //         );
+  //         this.getDeliveryNotes();
+  //         // this.dataGrid.instance.refresh();
+  //       } else {
+  //         notify(
+  //           {
+  //             message: 'Your Data Not deleted',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'error',
+  //         );
+  //       }
+  //       // or whatever method you use to refresh `employeeList`
+  //     },
+  //     (error) => {
+  //       console.error('Error deleting employee:', error);
+  //     },
+  //   );
+  // }
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
@@ -649,4 +685,4 @@ export class DeliveryNoteFinanceComponent implements OnInit {
   exports: [DeliveryNoteFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFinanceModule { }
+export class DeliveryNoteFinanceModule {}

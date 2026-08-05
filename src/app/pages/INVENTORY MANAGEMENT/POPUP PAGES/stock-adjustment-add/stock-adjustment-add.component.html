@@ -2,6 +2,7 @@
   <div class="salary-grid-wrapper">
     <div class="grid-container">
       <dx-data-grid
+        #itemsGridRef
         [dataSource]="adjustmentFormData.Details"
         [showBorders]="true"
         [showColumnLines]="true"
@@ -135,10 +136,11 @@
           dataField="NEW_QTY"
           caption="New Stock"
           [allowEditing]="true"
+          dataType="number"
         ></dxi-column>
         <dxi-column
           dataField="ADJ_QTY"
-          caption="Adjustment Stock"
+          caption="Adjusted Stock"
           [allowEditing]="false"
           dataType="number"
         ></dxi-column>
@@ -229,7 +231,11 @@
       [columnResizingMode]="'nextColumn'"
       [scrolling]="{ mode: 'virtual' }"
       rowAlternationInterval="2"
+      keyExpr="ITEM_ID"
+      [selectedRowKeys]="selectedItemKeys"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+      (onEditorPreparing)="onPopupEditorPreparing($event)"
+      (onCellPrepared)="onPopupCellPrepared($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -280,14 +286,23 @@
         caption="New Stock"
         [visible]="false"
       ></dxi-column>
-      <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
+      <dxi-column
+        dataField="ITEM_CODE"
+        caption="Item Code"
+        width="150"
+      ></dxi-column>
 
-      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Description"
+        width="250"
+      ></dxi-column>
       <dxi-column
         dataField="COST"
         caption="cost"
         [visible]="!hidecost"
       ></dxi-column>
+      <dxi-column dataField="STOCK_QTY" caption="Quantity"></dxi-column>
     </dx-data-grid>
   </div>
 </dx-popup>

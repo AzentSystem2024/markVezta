@@ -42,7 +42,7 @@ import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { SalesOrderFinancePopupFormModule } from '../sales-order-finance-popup-form/sales-order-finance-popup-form.component';
-
+import { confirm } from 'devextreme/ui/dialog';
 @Component({
   selector: 'app-sales-order-finance',
   templateUrl: './sales-order-finance.component.html',
@@ -133,7 +133,7 @@ export class SalesOrderFinanceComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -206,7 +206,7 @@ export class SalesOrderFinanceComponent {
         // ✅ SAME AS PRODUCTION JV
         this.filteredSalesOrderList = this.salesOrderList;
       },
-      error: () => { },
+      error: () => {},
       complete: () => {
         grid?.endCustomLoading();
       },
@@ -274,8 +274,6 @@ export class SalesOrderFinanceComponent {
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   }
-
-
 
   getStatusFilterData = [
     {
@@ -562,44 +560,75 @@ export class SalesOrderFinanceComponent {
   }
 
   onDeleteSalesOrder(event: any) {
-    const orderId = event.data.ID;
-    const status = event.data.TRANS_STATUS;
     if (event.data.TRANS_STATUS === 5) {
-      event.cancel = true;
       notify('This cannot be deleted.', 'error', 2000);
       return;
     }
-    event.cancel = true;
-    console.log(orderId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
-    // Call your delete API
-    this.dataService.deleteSalesOrder(orderId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.getsalesOrderList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
+
+    const result = confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
     );
+
+    result.then((dialogResult: boolean) => {
+      if (!dialogResult) {
+        return;
+      }
+
+      this.dataService.deleteSalesOrder(event.data.ID).subscribe({
+        next: () => {
+          notify('Deleted Successfully', 'success', 2000);
+          // this.getsalesOrderList();
+          this.zone.run(() => {
+            this.getsalesOrderList();
+          });
+        },
+        error: () => {
+          notify('Delete failed!', 'error', 2000);
+        },
+      });
+    });
   }
+
+  // onDeleteSalesOrder(event: any) {
+  //   const orderId = event.data.ID;
+  //   const status = event.data.TRANS_STATUS;
+  //   if (event.data.TRANS_STATUS === 5) {
+  //     event.cancel = true;
+  //     notify('This cannot be deleted.', 'error', 2000);
+  //     return;
+  //   }
+  //   event.cancel = true;
+  //   console.log(orderId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
+  //   // Call your delete API
+  //   this.dataService.deleteSalesOrder(orderId).subscribe(
+  //     (response: any) => {
+  //       if (response) {
+  //         notify(
+  //           {
+  //             message: 'Deleted Successfully',
+  //             position: { at: 'top center', my: 'top center' },
+  //           },
+  //           'success',
+  //         );
+  //         this.getsalesOrderList();
+  //         // this.dataGrid.instance.refresh();
+  //       } else {
+  //         notify(
+  //           {
+  //             message: 'Your Data Not deleted',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'error',
+  //         );
+  //       }
+  //       // or whatever method you use to refresh `employeeList`
+  //     },
+  //     (error) => {
+  //       console.error('Error deleting employee:', error);
+  //     },
+  //   );
+  // }
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
@@ -672,4 +701,4 @@ export class SalesOrderFinanceComponent {
   exports: [SalesOrderFinanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalesOrderFinanceModule { }
+export class SalesOrderFinanceModule {}
