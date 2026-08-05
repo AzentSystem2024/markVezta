@@ -5477,6 +5477,12 @@ The result can be exported to HTML or Markdown.`;
     Left_reason: any,
   ) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/update';
+
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5490,6 +5496,8 @@ The result can be exported to HTML or Markdown.`;
       EXPECT_RETURN: Expected_rejoin_date,
       REMARKS: Remarks,
       LS_PAYABLE: Leave_salary_payable,
+      COMPANY_ID: company_id,
+      FIN_ID: fin_id,
       IS_TICKET: Is_ticket,
       LAST_REJOIN_DATE: Rejoin_date,
       TRAVELLED_DATE: Travelled_date,
@@ -5525,6 +5533,12 @@ The result can be exported to HTML or Markdown.`;
     Left_reason: any,
   ) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/verify';
+
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5545,6 +5559,8 @@ The result can be exported to HTML or Markdown.`;
       ACTUAL_DAYS: null,
       DEDUCT_DAYS: null,
       LEFT_REASON: null,
+      COMPANY_ID: company_id,
+      FIN_ID: fin_id,
     };
 
     return this.http.post(getEndpoint, reqBody);
@@ -5573,6 +5589,11 @@ The result can be exported to HTML or Markdown.`;
     Left_reason: any,
   ) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/approve';
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+    const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
     const reqBody = {
       USER_ID: User_Id,
       STORE_ID: Store_Id,
@@ -5593,6 +5614,8 @@ The result can be exported to HTML or Markdown.`;
       ACTUAL_DAYS: null,
       DEDUCT_DAYS: null,
       LEFT_REASON: null,
+      COMPANY_ID: company_id,
+      FIN_ID: fin_id,
     };
 
     return this.http.post(getEndpoint, reqBody);
@@ -7369,7 +7392,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getImportMasterList(): Observable<any> {
-    return this.http.post(`${this.apiUrl}ImportMaster/importmasterlist`,{});
+    return this.http.post(`${this.apiUrl}ImportMaster/importmasterlist`, {});
   }
 
   getRevenueDashboardData(payload: any): Observable<any> {
