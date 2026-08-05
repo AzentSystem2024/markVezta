@@ -431,9 +431,14 @@ import {
 } from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
+import { RefundComponent, RefundModule } from './pages/Operations/Deposit/refund/refund.component';
+import { RefundAddComponent, RefundAddModule } from './pages/Operations/Deposit/refund-add/refund-add.component';
+import { RefundEditComponent, RefundEditModule } from './pages/Operations/Deposit/refund-edit/refund-edit.component';
+import { SupplierwiseSalesComponent, SupplierwiseSalesModule } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
+import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/supplierwise-stock.component';
 
 @NgModule({
-  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent],
+  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent, SupplierwiseStockComponent,],
   imports: [
     LeaveSalaryPaymentModule,
     CustomDatePopupModule,
@@ -858,6 +863,10 @@ import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashb
     PayrollOtReportModule,
     LeavelistModule,
     FinalSettlementReportModule,
+    RefundModule,
+    RefundAddModule,
+    RefundEditModule,
+    SupplierwiseSalesModule
   ],
 
   providers: [
@@ -872,4 +881,4 @@ import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashb
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

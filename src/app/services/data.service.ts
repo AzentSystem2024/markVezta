@@ -7402,4 +7402,40 @@ The result can be exported to HTML or Markdown.`;
   getRevenueDashboardData(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Dashboard/revenuedashboard`, payload);
   }
+
+  //DEPOSIT/REFUND
+  insertRefundDeposit(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}CustReceipts_Subtype/insert`, data);
+  }
+
+  updateRefundDeposit(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}CustReceipts_Subtype/update`, data);
+  }
+
+  verifyRefundDeposit(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}CustReceipts_Subtype/verify`, data);
+  }
+
+  commitRefundDeposit(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}CustReceipts_Subtype/commit`, data);
+  }
+
+  getRefundDeposit(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}CustReceipts_Subtype/list`, data);
+  }
+
+  selectRefundDeposit(items: any) {
+    const data = items;
+    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtype/select`, data);
+  }
+
+  deleteRefundDeposit(items: any) {
+    const data = items;
+    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtyp/delete`, data);
+  }
 }

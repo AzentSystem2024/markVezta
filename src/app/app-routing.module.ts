@@ -222,6 +222,7 @@ import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-
 import { EosPaymentListComponent } from './pages/HR/Masters/eos-payment-list/eos-payment-list.component';
 import { LeaveSalaryPaymentComponent } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
 import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
+import { RefundComponent } from './pages/Operations/Deposit/refund/refund.component';
 
 const routes: Routes = [
   {
@@ -1366,6 +1367,11 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'deposit-refund',
+        component: RefundComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: '**',
         redirectTo: 'login',
         pathMatch: 'full',
@@ -1381,4 +1387,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
