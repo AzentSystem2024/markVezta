@@ -280,7 +280,17 @@
         <dxi-item widget="dxButton" [options]="refreshButtonOptions">
         </dxi-item>
 
-        <dxi-item name="exportButton"></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->

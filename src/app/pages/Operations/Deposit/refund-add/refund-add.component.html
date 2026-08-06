@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 100%;
+      height: 50vh;
       display: flex;
       flex-direction: column;
 
@@ -78,13 +78,13 @@
             >
             </dx-radio-group>
 
-            <dx-text-box
+            <dx-number-box
               [(value)]="receiprtFormData.NET_AMOUNT"
               label="Amount"
               labelMode="floating"
               [width]="180"
               alignment="right"
-            ></dx-text-box>
+            ></dx-number-box>
           </div>
         </div>
       </div>

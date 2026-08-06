@@ -585,6 +585,7 @@ export class RefundComponent {
         this.selectedReceipt = response.Data;
         if (transStatus === 1) {
           this.formMode = 'edit';
+          this.isReadOnlyReceipt = false;
           this.isEditReceipt = true;
         } else if (transStatus === 2) {
           this.formMode = 'view';
