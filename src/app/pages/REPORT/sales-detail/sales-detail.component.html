@@ -267,12 +267,9 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
-
-    <dxo-group-panel [visible]="true"></dxo-group-panel>
-      <dxo-grouping
-    [contextMenuEnabled]="true"
-    [autoExpandAll]="false">
-  </dxo-grouping>
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+      <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
+      </dxo-grouping>
 
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
@@ -296,12 +293,26 @@
         <dxi-item widget="dxButton" [options]="refreshButtonOptions">
         </dxi-item>
 
-        <dxi-item name="exportButton"></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
-       <dxi-column dataField="SALE_NO" caption="Sale no."  [groupIndex]="0"></dxi-column>
-        <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
+      <dxi-column
+        dataField="SALE_NO"
+        caption="Sale no."
+        [groupIndex]="0"
+      ></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column
         dataField="SALE_DATE"
         caption="Sale Date"
@@ -325,14 +336,8 @@
       <dxi-column dataField="CAT_NAME" caption="Category"></dxi-column>
       <dxi-column dataField="SUBCAT_NAME" caption="SubCategory"></dxi-column>
       <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
-      <dxi-column
-        dataField="CUSTOM1_NAME"
-        caption="ItemProperty1"
-      ></dxi-column>
-      <dxi-column
-        dataField="CUSTOM2_NAME"
-        caption="ItemProperty2"
-      ></dxi-column>
+      <dxi-column dataField="CUSTOM1_NAME" caption="ItemProperty1"></dxi-column>
+      <dxi-column dataField="CUSTOM2_NAME" caption="ItemProperty2"></dxi-column>
       <dxi-column dataField="DISCOUNT" caption="Discount(AED)"></dxi-column>
       <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
       <dxi-column dataField="DISC_REASON" caption="Reason"></dxi-column>

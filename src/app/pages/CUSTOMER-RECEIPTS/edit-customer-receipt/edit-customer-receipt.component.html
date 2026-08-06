@@ -57,16 +57,26 @@
         </div>
 
         <!-- Right -->
-        <dx-date-box
-          [(value)]="receiprtFormData.REC_DATE"
-          label="Date"
-          labelMode="floating"
-          displayFormat="dd-MM-yyyy"
-          type="date"
-          [width]="180"
-          [readOnly]="true"
-        >
-        </dx-date-box>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <dx-date-box
+            [(value)]="receiprtFormData.REC_DATE"
+            label="Date"
+            labelMode="floating"
+            displayFormat="dd-MM-yyyy"
+            type="date"
+            [width]="180"
+            [readOnly]="true"
+          >
+          </dx-date-box>
+
+          <dx-text-box
+            [(value)]="receiprtFormData.REF_NO"
+            label="Reference No"
+            labelMode="floating"
+            [width]="200"
+          >
+          </dx-text-box>
+        </div>
       </div>
       <div
         class="grid-container"
