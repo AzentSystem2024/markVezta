@@ -105,13 +105,22 @@
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
                 </div>
-                <div style="margin-top: -4px; text-align: left; display: flex; gap: 5px">
+                <div
+                  style="
+                    margin-top: -4px;
+                    text-align: left;
+                    display: flex;
+                    gap: 5px;
+                  "
+                >
                   <dx-button
                     [width]="200"
                     stylingMode="contained"
                     class="blue-contained-btn"
                     (onClick)="onAddItems()"
-                    [disabled]="!transferOutFormData.DEST_STORE_ID || isReadOnlyMode"
+                    [disabled]="
+                      !transferOutFormData.DEST_STORE_ID || isReadOnlyMode
+                    "
                   >
                     <div *dxTemplate="let data of 'content'">
                       <span
@@ -202,7 +211,7 @@
             <dx-text-box
               #narrationRef
               [(value)]="transferOutFormData.NARRATION"
-              label="Narration"
+              label="Remarks"
               labelMode="floating"
               class="narration-box"
               [readOnly]="isReadOnlyMode"
