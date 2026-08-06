@@ -7448,6 +7448,24 @@ The result can be exported to HTML or Markdown.`;
 
   deleteRefundDeposit(items: any) {
     const data = items;
-    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtyp/delete`, data);
+    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtype/delete`, data);
+  }
+
+  //supplierwise report
+  SupplierwiseSales_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'SalesReport/SuppWiseSales';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //supplierwise stock
+  SupplierwiseStock_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSales';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //departmentwise profit and loss
+  DepartmentwiseProfitAndLoss_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'AC_Report/Deptwiseprofitloss';
+    return this.http.post(getEndpoint, payload);
   }
 }

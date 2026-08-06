@@ -436,9 +436,10 @@ import { RefundAddComponent, RefundAddModule } from './pages/Operations/Deposit/
 import { RefundEditComponent, RefundEditModule } from './pages/Operations/Deposit/refund-edit/refund-edit.component';
 import { SupplierwiseSalesComponent, SupplierwiseSalesModule } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
 import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/supplierwise-stock.component';
+import { ProfitLossDepartmentwiseComponent, ProfitLossDepartmentwiseModule } from './pages/REPORT/profit-loss-departmentwise/profit-loss-departmentwise.component';
 
 @NgModule({
-  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent, SupplierwiseStockComponent,],
+  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent,],
   imports: [
     LeaveSalaryPaymentModule,
     CustomDatePopupModule,
@@ -866,7 +867,8 @@ import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/su
     RefundModule,
     RefundAddModule,
     RefundEditModule,
-    SupplierwiseSalesModule
+    SupplierwiseSalesModule,
+    ProfitLossDepartmentwiseModule,
   ],
 
   providers: [
