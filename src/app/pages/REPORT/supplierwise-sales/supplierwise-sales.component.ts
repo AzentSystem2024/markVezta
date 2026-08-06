@@ -60,7 +60,7 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./supplierwise-sales.component.scss']
 })
 export class SupplierwiseSalesComponent {
- @ViewChild(DxDataGridComponent, { static: true })
+  @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   JournalBookDataSource: DataSource; // ONLY for dx-data-grid
   journalBookArray: any[] = []; // ONLY for logic / checks
@@ -208,7 +208,7 @@ export class SupplierwiseSalesComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -436,7 +436,7 @@ this.selectedmonth = currentMonth;
       STORE_ID: this.selectedStoreid?.length
         ? this.selectedStoreid.join(',') // FINAL FIX
         : '',
-      CUST_ID:
+      SUPP_ID:
         this.selectedCustomer != null ? String(this.selectedCustomer) : '',
       SALE_TYPE:
         this.selectedSaletype != null ? Number(this.selectedSaletype) : 0,
@@ -468,7 +468,7 @@ this.selectedmonth = currentMonth;
     this.JournalBookDataSource = new DataSource({
       load: () =>
         new Promise((resolve) => {
-          this.dataService.ItemwiseSales_Report(payload).subscribe({
+          this.dataService.SupplierwiseSales_Report(payload).subscribe({
             next: (res: any) => {
               const list = res?.data || [];
 
@@ -526,7 +526,7 @@ this.selectedmonth = currentMonth;
         showInColumn: 'QUANTITY',
         alignment: 'right',
       },
-       {
+      {
         name: 'totalDr',
         column: 'GROSS_AMOUNT',
         summaryType: 'sum',
@@ -535,7 +535,7 @@ this.selectedmonth = currentMonth;
         showInColumn: 'GROSS_AMOUNT',
         alignment: 'right',
       },
-       {
+      {
         name: 'totalDr',
         column: 'VAT_AMOUNT',
         summaryType: 'sum',
@@ -724,7 +724,7 @@ this.selectedmonth = currentMonth;
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: 'CUSTOMER',
+      NAME: 'SUPPLIER',
     };
     this.dataService.Common_Dropdown(payload).subscribe((response: any) => {
       this.distributorList = response;

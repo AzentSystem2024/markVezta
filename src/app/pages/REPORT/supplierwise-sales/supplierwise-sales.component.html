@@ -93,7 +93,7 @@
         <!-- Customer (smaller width) -->
         <dxi-item [colSpan]="1">
           <dx-select-box
-            label="Customer"
+            label="Supplier"
             labelMode="floating"
             [(value)]="selectedCustomer"
             [dataSource]="distributorList"
@@ -254,14 +254,11 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+      <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
+      </dxo-grouping>
 
-     <dxo-group-panel [visible]="true"></dxo-group-panel>
-     <dxo-grouping
-      [contextMenuEnabled]="true"
-    [autoExpandAll]="false">
-  </dxo-grouping>
-
-  <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
         [visible]="true"
@@ -275,7 +272,7 @@
       <!-- ================= TOOLBAR ================= -->
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Itemwise Sales</div>
+          <div class="grid-header">Supplierwise Sales</div>
         </dxi-item>
 
         <dxi-item widget="dxButton" [options]="searchButtonOptions"> </dxi-item>
@@ -283,12 +280,31 @@
         <dxi-item widget="dxButton" [options]="refreshButtonOptions">
         </dxi-item>
 
-        <dxi-item name="exportButton"></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
-       <dxi-column dataField="ITEM_CODE" caption="Item" [groupIndex]="0"></dxi-column>
-       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
+      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
+      <dxi-column dataField="CAT_NAME" caption="Category"></dxi-column>
+      <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
+      <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+
+      <dxi-column
+        dataField="ITEM_CODE"
+        caption="Item"
+        [groupIndex]="0"
+      ></dxi-column>
+      <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
       <dxi-column
         dataField="SALE_DATE"
         caption="Date"
@@ -298,18 +314,7 @@
       </dxi-column>
       <dxi-column dataField="SALE_NO" caption="Invoice No"></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
-      <dxi-column dataField="SALE_TYPE_NAME" caption="Sale Type"></dxi-column>
-      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
-       <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
-      <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
-      <dxi-column dataField="CAT_NAME" caption="Category"></dxi-column>
-      <dxi-column dataField="SUBCAT_NAME" caption="Subcategory"></dxi-column>
-      <dxi-column dataField="BRAND_NAME" caption="Brand"></dxi-column>
-      <dxi-column dataField="CUSTOM1_NAME" caption="ItemProperty1"></dxi-column>
-      <dxi-column dataField="CUSTOM2_NAME" caption="ItemProperty2"></dxi-column>
-      <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
-
-
+      <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
       <dxi-column
         dataField="PRICE"
         caption="Price(AED)"
@@ -318,14 +323,6 @@
       >
       </dxi-column>
       <dxi-column
-        dataField="DISCOUNT"
-        caption="Discount"
-        alignment="right"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      >
-      </dxi-column>
-      <dxi-column dataField="DISC_REASON" caption="Reason"></dxi-column>
-     <dxi-column
         dataField="GROSS_AMOUNT"
         caption="Excl.VAT Amount(AED)"
         alignment="right"
@@ -347,9 +344,6 @@
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
-      <dxi-column dataField="SALESMAN" caption="Salesman"></dxi-column>
-      <dxi-column dataField="COMMISSION" caption="Commission"></dxi-column>
-
       <dxi-column *ngIf="journalBookCount > 0" type="buttons" [width]="100">
         <dxi-button
           icon="eyeopen"
@@ -379,5 +373,3 @@
   ></app-add-invoice-retail>
   <!-- </ng-container> -->
 </dx-popup>
-
-
