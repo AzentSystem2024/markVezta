@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { DataService } from 'src/app/services/data.service';
 
 @Component({
@@ -7,19 +8,16 @@ import { DataService } from 'src/app/services/data.service';
   styleUrls: ['./analytics-dashboard-vezta-medical.component.scss'],
 })
 export class AnalyticsDashboardVeztaMedicalComponent implements OnInit {
-  dateRanges = [
-    { label: 'All', value: 'all' },
-    { label: 'Today', value: 'today' },
-    { label: 'Last 7 Days', value: 'last7' },
-    { label: 'Last 15 Days', value: 'last15' },
-    { label: 'Last 30 Days', value: 'last30' },
-    { label: 'Custom', value: 'custom' },
-  ];
-  selectedDateRange: string = 'all';
+  selectedYear: number | null = null;
+  selectedMonth: any = '';
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[] = [];
 
-  customStartDate: any = null;
-  customEndDate: any = null;
-  showCustomDatePopup = false;
+  fromDate: any = null;
+  toDate: any = null;
+
+  branchList: any[] = [];
+  selectedBranches: any[] = [];
 
   // Dummy Data for Dashboards
   facilityWiseData: any[] = [];
@@ -28,11 +26,63 @@ export class AnalyticsDashboardVeztaMedicalComponent implements OnInit {
   categoryWiseData: any[] = [];
   monthWiseData: any[] = [];
   monthWiseSeries: any[] = [];
+  branchTotalData: any[] = [];
+  branchTotalSeries: any[] = [];
 
-  constructor(private srvce: DataService) {}
+  chartToggleOptions = [
+    { id: 'month', text: 'Branch Chart (Month Wise)' },
+    { id: 'total', text: 'Total Revenue' },
+  ];
+  selectedChartToggle: string = 'month';
+
+  constructor(private srvce: DataService) {
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2020; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+
+    this.monthDataSource = this.srvce.getMonths();
+    // const currentMonth = new Date().getMonth();
+    this.selectedMonth = '';
+  }
 
   ngOnInit(): void {
+    const today = new Date();
+
+    if (this.selectedYear) {
+      if (this.selectedMonth === '') {
+        this.fromDate = new Date(this.selectedYear, 0, 1);
+        this.toDate =
+          this.selectedYear === today.getFullYear()
+            ? today
+            : new Date(this.selectedYear, 11, 31);
+      } else {
+        this.fromDate = new Date(this.selectedYear, this.selectedMonth, 1);
+        this.toDate = new Date(this.selectedYear, this.selectedMonth + 1, 0);
+      }
+    }
+
+    this.getBranches();
     this.loadDashboardData();
+  }
+
+  getBranches(): void {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const companyId = sessionData.SELECTED_COMPANY?.COMPANY_ID || 1;
+
+    this.srvce
+      .getDropdownData({ NAME: 'STORE', COMPANY_ID: companyId })
+      .subscribe({
+        next: (response: any) => {
+          this.branchList = response;
+        },
+        error: (err) => {
+          console.error('Failed to load branches', err);
+        },
+      });
   }
 
   loadDashboardData(): void {
@@ -41,12 +91,14 @@ export class AnalyticsDashboardVeztaMedicalComponent implements OnInit {
     );
     const companyId = sessionData.SELECTED_COMPANY?.COMPANY_ID || 1;
 
-    const dates = this.getDateRangeValues(this.selectedDateRange);
-
-    const payload = {
+    const payload: any = {
       COMPANY_ID: companyId,
-      DATE_FROM: dates.fromDate,
-      DATE_TO: dates.toDate,
+      DATE_FROM: this.formatAsYYYYMMDD(this.fromDate),
+      DATE_TO: this.formatAsYYYYMMDD(this.toDate),
+      BRANCH_ID:
+        this.selectedBranches && this.selectedBranches.length > 0
+          ? this.selectedBranches.join(',')
+          : '',
     };
 
     this.srvce.getRevenueDashboardData(payload).subscribe({
@@ -123,6 +175,42 @@ export class AnalyticsDashboardVeztaMedicalComponent implements OnInit {
               }),
             );
           }
+
+          // Map Branch Total Revenue
+          if (data.BranchTotalRevenue) {
+            const transformedData: any[] = [];
+            const facilitiesSet = new Set<string>();
+
+            // Group by Month_Name
+            const groupedByMonth = data.BranchTotalRevenue.reduce(
+              (acc: any, curr: any) => {
+                const monthKey = `${curr.MONTH_NAME} ${curr.YEAR}`;
+                if (!acc[monthKey]) {
+                  acc[monthKey] = {
+                    month: monthKey,
+                    _sortOrder: curr.YEAR * 100 + curr.MONTH_NO,
+                  };
+                }
+                const facility = curr.FACILITY;
+                facilitiesSet.add(facility);
+                acc[monthKey][facility] = curr.REVENUE;
+                return acc;
+              },
+              {},
+            );
+
+            this.branchTotalData = Object.values(groupedByMonth).sort(
+              (a: any, b: any) => a._sortOrder - b._sortOrder,
+            );
+
+            // Build series based on distinct facilities
+            this.branchTotalSeries = Array.from(facilitiesSet).map(
+              (facility) => ({
+                valueField: facility,
+                name: facility,
+              }),
+            );
+          }
         }
       },
       error: (err) => {
@@ -131,125 +219,43 @@ export class AnalyticsDashboardVeztaMedicalComponent implements OnInit {
     });
   }
 
-  onDateRangeChange(e: any): void {
-    this.selectedDateRange = e.value;
-    if (e.value === 'custom') {
-      this.showCustomDatePopup = true;
-      return;
-    }
-    this.loadDashboardData();
-  }
-
-  getDateRangeValues(range: string) {
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedMonth = '';
+    const currentYear = new Date().getFullYear();
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let to = new Date();
-    to.setHours(23, 59, 59, 999);
-
-    let from = new Date(today);
-
-    switch (range) {
-      case 'all':
-        from = new Date(2000, 0, 1);
-        break;
-
-      case 'today':
-        break; // already set
-      case 'last7':
-        from = new Date(today);
-        from.setDate(today.getDate() - 6);
-        break;
-      case 'last15':
-        from = new Date(today);
-        from.setDate(today.getDate() - 14);
-        break;
-      case 'last30':
-        from = new Date(today);
-        from.setDate(today.getDate() - 29);
-        break;
-      case 'custom':
-        if (this.customStartDate && this.customEndDate) {
-          from = new Date(this.customStartDate);
-          from.setHours(0, 0, 0, 0);
-          to = new Date(this.customEndDate);
-          to.setHours(23, 59, 59, 999);
-        }
-        break;
-    }
-
-    return { fromDate: from.toISOString(), toDate: to.toISOString() };
-  }
-
-  displayExpr = (item: any) => {
-    if (!item) return '';
-
-    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
-      const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
-      const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
-      return `${fromLabel} to ${toLabel}`;
-    }
-
-    return item.label;
-  };
-
-  attachItemClickHandler(e: any) {
-    setTimeout(() => {
-      const popup = e.component._popup;
-      const innerList =
-        popup && popup.$content().find('.dx-list').dxList('instance');
-      if (innerList) {
-        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
-        innerList.on('itemClick', (clickEvent: any) => {
-          const clickedValue = clickEvent.itemData.value;
-          if (clickedValue === 'custom') {
-            this.openCustomDatePopup();
-            e.component.close();
-          }
-        });
+    if (this.selectedYear === currentYear) {
+      this.fromDate = new Date(this.selectedYear, 0, 1);
+      this.toDate = today;
+    } else {
+      if (this.selectedYear) {
+        this.fromDate = new Date(this.selectedYear, 0, 1);
+        this.toDate = new Date(this.selectedYear, 11, 31);
       }
-    }, 0);
-  }
-
-  openCustomDatePopup() {
-    this.customStartDate = null;
-    this.customEndDate = null;
-    this.showCustomDatePopup = true;
-  }
-
-  applyCustomDateFilter(event?: any) {
-    if (event) {
-      this.customStartDate = event.start;
-      this.customEndDate = event.end;
     }
-
-    if (!this.customStartDate || !this.customEndDate) return;
-
-    if (this.customStartDate > this.customEndDate) {
-      alert('From date cannot be greater than To date');
-      return;
-    }
-
-    const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
-    const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
-
-    this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom'
-        ? { ...option, label: `${fromLabel} - ${toLabel}` }
-        : option,
-    );
-
-    this.selectedDateRange = 'custom';
-    this.showCustomDatePopup = false;
-
-    this.loadDashboardData();
   }
 
-  private formatAsDDMMYYYY(d: Date): string {
-    const day = d.getDate().toString().padStart(2, '0');
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
+  onMonthValueChanged(e: any) {
+    this.selectedMonth = e.value ?? '';
+    if (this.selectedYear) {
+      if (this.selectedMonth === '') {
+        this.fromDate = new Date(this.selectedYear, 0, 1);
+        this.toDate = new Date(this.selectedYear, 11, 31);
+      } else {
+        this.fromDate = new Date(this.selectedYear, this.selectedMonth, 1);
+        this.toDate = new Date(this.selectedYear, this.selectedMonth + 1, 0);
+      }
+    }
+  }
+
+  private formatAsYYYYMMDD(d: any): string {
+    if (!d) return '';
+    const dateObj = new Date(d);
+    if (isNaN(dateObj.getTime())) return '';
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const year = dateObj.getFullYear();
+    return `${year}-${month}-${day}`;
   }
 
   formatAmount(value: number): string {
@@ -278,6 +284,12 @@ export class AnalyticsDashboardVeztaMedicalComponent implements OnInit {
   customizeLineTooltip = (arg: any) => {
     return {
       text: `${arg.seriesName}: ${this.formatAmount(arg.value)}`,
+    };
+  };
+
+  customizeLineTooltipTotal = (arg: any) => {
+    return {
+      text: `${arg.argumentText}: ${this.formatAmount(arg.value)}`,
     };
   };
 

@@ -1,23 +1,69 @@
 <div
   class="d-flex align-items-center justify-content-end filter-container mt-2 pe-3"
 >
-  <dx-select-box
-    label="Date Range"
+  <dx-tag-box
+    label="Branch"
     labelMode="floating"
-    valueExpr="value"
-    [displayExpr]="displayExpr"
-    [dataSource]="dateRanges"
+    [dataSource]="branchList"
+    displayExpr="DESCRIPTION"
+    valueExpr="ID"
+    [(value)]="selectedBranches"
     [searchEnabled]="true"
-    [(value)]="selectedDateRange"
-    (onValueChanged)="onDateRangeChange($event)"
-    (onOpened)="attachItemClickHandler($event)"
-    width="220"
-  >
-    <!-- This controls the dropdown list rendering -->
-    <div *dxTemplate="let item of 'item'">
-      {{ item.value === "custom" ? "Custom" : item.label }}
-    </div>
-  </dx-select-box>
+    [showSelectionControls]="true"
+    applyValueMode="useButtons"
+    [multiline]="false"
+    width="300"
+  ></dx-tag-box>
+
+  <dx-select-box
+    labelMode="floating"
+    labelLocation="left"
+    label="Year"
+    [width]="130"
+    [(value)]="selectedYear"
+    [dataSource]="years"
+    (onValueChanged)="onYearChanged($event)"
+    placeholder="Year"
+  ></dx-select-box>
+
+  <dx-select-box
+    labelMode="floating"
+    labelLocation="left"
+    label="Month"
+    [dataSource]="monthDataSource"
+    displayExpr="name"
+    valueExpr="value"
+    [(value)]="selectedMonth"
+    (onValueChanged)="onMonthValueChanged($event)"
+    [dropDownOptions]="{ width: 'auto' }"
+    width="130"
+  ></dx-select-box>
+
+  <dx-date-box
+    label="From Date"
+    labelMode="floating"
+    type="date"
+    displayFormat="dd/MM/yyyy"
+    [(value)]="fromDate"
+    width="150"
+  ></dx-date-box>
+
+  <dx-date-box
+    label="To Date"
+    labelMode="floating"
+    type="date"
+    displayFormat="dd/MM/yyyy"
+    [(value)]="toDate"
+    width="150"
+  ></dx-date-box>
+
+  <dx-button
+    text="Apply"
+    type="default"
+    stylingMode="contained"
+    (onClick)="loadDashboardData()"
+    class="ms-1"
+  ></dx-button>
 </div>
 
 <div class="view-wrapper">
@@ -157,13 +203,26 @@
       </div>
     </div>
 
-    <!-- Row 3: Month Wise (Line Chart) -->
+    <!-- Row 3: Month Wise & Branch Total (Line Chart) -->
     <div class="dashboard-row">
       <div class="dashboard-card-Tender">
-        <h6 class="card-title mt-2 mb-2">Month Wise Revenue</h6>
+        <div
+          class="d-flex justify-content-between align-items-center mt-2 mb-2"
+        >
+          <h6 class="card-title m-0">Month Wise Revenue</h6>
+          <dx-radio-group
+            [items]="chartToggleOptions"
+            displayExpr="text"
+            valueExpr="id"
+            layout="horizontal"
+            [(value)]="selectedChartToggle"
+          ></dx-radio-group>
+        </div>
 
         <div class="chart-wrapper">
+          <!-- Month Wise Chart -->
           <dx-chart
+            *ngIf="selectedChartToggle === 'month'"
             id="monthWiseChart"
             [dataSource]="monthWiseData"
             palette="Material"
@@ -202,15 +261,50 @@
             >
             </dxo-tooltip>
           </dx-chart>
+
+          <!-- Branch Total Chart -->
+          <dx-chart
+            *ngIf="selectedChartToggle === 'total'"
+            id="branchTotalChart"
+            [dataSource]="branchTotalData"
+            palette="Material"
+          >
+            <dxo-argument-axis>
+              <dxo-label
+                [rotationAngle]="-45"
+                overlappingBehavior="rotate"
+              ></dxo-label>
+            </dxo-argument-axis>
+            <dxi-value-axis>
+              <dxo-label [customizeText]="customizeValueAxisLabel"></dxo-label>
+            </dxi-value-axis>
+
+            <dxo-common-series-settings argumentField="month" type="line">
+              <dxo-point [visible]="true"></dxo-point>
+            </dxo-common-series-settings>
+
+            <dxi-series
+              *ngFor="let s of branchTotalSeries"
+              [valueField]="s.valueField"
+              [name]="s.name"
+            >
+            </dxi-series>
+
+            <dxo-legend
+              verticalAlignment="bottom"
+              horizontalAlignment="center"
+              itemTextPosition="right"
+            >
+            </dxo-legend>
+
+            <dxo-tooltip
+              [enabled]="true"
+              [customizeTooltip]="customizeLineTooltip"
+            >
+            </dxo-tooltip>
+          </dx-chart>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<app-custom-date-popup
-  [(visible)]="showCustomDatePopup"
-  [startDate]="customStartDate"
-  [endDate]="customEndDate"
-  (applyDates)="applyCustomDateFilter($event)"
-></app-custom-date-popup>

@@ -1,6 +1,15 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { DxSelectBoxModule, DxTemplateModule, DxChartModule, DxPieChartModule } from 'devextreme-angular';
+import {
+  DxSelectBoxModule,
+  DxTemplateModule,
+  DxChartModule,
+  DxPieChartModule,
+  DxTagBoxModule,
+  DxRadioGroupModule,
+  DxDateBoxModule,
+  DxButtonModule
+} from 'devextreme-angular';
 import { AppComponent } from './app.component';
 import { SideNavOuterToolbarModule, SingleCardModule } from './layouts';
 import {
@@ -393,53 +402,30 @@ import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/
 import { ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
-import {
-  ARManualMatchingModule
-} from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
+import { ARManualMatchingModule } from './pages/ERP-INTEGRATION/ar-manual-matching/ar-manual-matching.component';
 import { LedgerStatementDimensionModule } from './pages/REPORT/ledger-statement-dimension/ledger-statement-dimension.component';
 import { TrialBalanceDimensionAdvanceModule } from './pages/REPORT/trial-balance-dimension-advance/trial-balance-dimension-advance.component';
-import {
-  BarcodePrintModule
-} from './pages/barcode-print/barcode-print.component';
+import { BarcodePrintModule } from './pages/barcode-print/barcode-print.component';
 import { TrialBalanceBranchWiseModule } from './pages/REPORT/trial-balance-branch-wise/trial-balance-branch-wise.component';
-import {
-  DistrictModule
-} from './pages/district/district.component';
-import {
-  DistrictFormModule
-} from './pages/district-form/district-form.component';
-import {
-  DashboardMarkModule
-} from './pages/dashboard-mark/dashboard-mark.component';
-import {
-  PurchaseReportModule
-} from './pages/REPORT/purchase-report/purchase-report.component';
-import {
-  ItemwisePurchaseReportModule
-} from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
-import {
-  TimesheetReportModule
-} from './pages/HR/timesheet-report/timesheet-report.component';
-import {
-  PayrollReportModule
-} from './pages/REPORT/payroll-report/payroll-report.component';
-import {
-  PayrollOtReportModule
-} from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
-import {
-  LeavelistModule
-} from './pages/REPORT/leavelist/leavelist.component';
+import { DistrictModule } from './pages/district/district.component';
+import { DistrictFormModule } from './pages/district-form/district-form.component';
+import { DashboardMarkModule } from './pages/dashboard-mark/dashboard-mark.component';
+import { PurchaseReportModule } from './pages/REPORT/purchase-report/purchase-report.component';
+import { ItemwisePurchaseReportModule } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
+import { TimesheetReportModule } from './pages/HR/timesheet-report/timesheet-report.component';
+import { PayrollReportModule } from './pages/REPORT/payroll-report/payroll-report.component';
+import { PayrollOtReportModule } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
+import { LeavelistModule } from './pages/REPORT/leavelist/leavelist.component';
 import { FinalSettlementReportModule } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
-import { RefundComponent, RefundModule } from './pages/Operations/Deposit/refund/refund.component';
-import { RefundAddComponent, RefundAddModule } from './pages/Operations/Deposit/refund-add/refund-add.component';
-import { RefundEditComponent, RefundEditModule } from './pages/Operations/Deposit/refund-edit/refund-edit.component';
-import { SupplierwiseSalesComponent, SupplierwiseSalesModule } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
-import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/supplierwise-stock.component';
-import { ProfitLossDepartmentwiseComponent, ProfitLossDepartmentwiseModule } from './pages/REPORT/profit-loss-departmentwise/profit-loss-departmentwise.component';
+import { RefundModule } from './pages/Operations/Deposit/refund/refund.component';
+import { RefundAddModule } from './pages/Operations/Deposit/refund-add/refund-add.component';
+import { RefundEditModule } from './pages/Operations/Deposit/refund-edit/refund-edit.component';
+import { SupplierwiseSalesModule } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
+import { ProfitLossDepartmentwiseModule } from './pages/REPORT/profit-loss-departmentwise/profit-loss-departmentwise.component';
 
 @NgModule({
-  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent,],
+  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent],
   imports: [
     LeaveSalaryPaymentModule,
     CustomDatePopupModule,
@@ -456,6 +442,10 @@ import { ProfitLossDepartmentwiseComponent, ProfitLossDepartmentwiseModule } fro
     LoginFormModule,
     UnauthenticatedContentModule,
     DxSelectBoxModule,
+    DxTagBoxModule,
+    DxDateBoxModule,
+    DxButtonModule,
+    DxRadioGroupModule,
     DxChartModule,
     DxPieChartModule,
     DenialListModule,
@@ -883,4 +873,4 @@ import { ProfitLossDepartmentwiseComponent, ProfitLossDepartmentwiseModule } fro
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

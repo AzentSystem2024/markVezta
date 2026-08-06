@@ -253,6 +253,25 @@
         >
         </dxi-column>
 
+        <dxo-summary>
+          <ng-container *ngFor="let col of detailViewColumns">
+            <dxi-total-item
+              *ngIf="
+                col.toLowerCase().includes('amt') ||
+                col.toLowerCase().includes('amount')
+              "
+              [column]="col"
+              summaryType="sum"
+              displayFormat="{0}"
+              [valueFormat]="{
+                type: 'fixedPoint',
+                precision: 2,
+                useGrouping: true,
+              }"
+            ></dxi-total-item>
+          </ng-container>
+        </dxo-summary>
+
         <dxo-toolbar>
           <dxi-item
             location="after"
