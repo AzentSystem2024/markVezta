@@ -258,6 +258,24 @@
               ></dx-button>
               <dx-button
                 [text]="
+                  selectedDocStatus == 'VERIFY' || isApproved
+                    ? 'Approve'
+                    : selectedDocStatus == 'OPEN' &&
+                        ActionStatus == 'VerifyScreen'
+                      ? 'Verify'
+                      : isEditing
+                        ? 'Update'
+                        : 'Save'
+                "
+                (onClick)="saveTransferOut()"
+                stylingMode="contained"
+                type="default"
+                [width]="120"
+                [visible]="!isReadOnlyMode"
+              >
+              </dx-button>
+              <!-- <dx-button
+                [text]="
                   isReadOnlyMode
                     ? 'PDF'
                     : selectedDocStatus == 'VERIFY' || isApproved
@@ -273,7 +291,7 @@
                 stylingMode="contained"
                 type="default"
                 [width]="120"
-              ></dx-button>
+              ></dx-button> -->
             </div>
           </div>
         </div>
