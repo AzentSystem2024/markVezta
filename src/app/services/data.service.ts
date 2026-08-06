@@ -7421,7 +7421,7 @@ The result can be exported to HTML or Markdown.`;
 
   commitRefundDeposit(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}CustReceipts_Subtype/commit`, data);
+    return this.http.post(`${this.apiUrl}CustReceipts_Subtype/Approve`, data);
   }
 
   getRefundDeposit(items: any): Observable<any> {
