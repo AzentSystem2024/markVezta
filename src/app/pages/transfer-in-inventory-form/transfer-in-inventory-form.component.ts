@@ -60,9 +60,9 @@ import autoTable from 'jspdf-autotable';
 })
 export class TransferInInventoryFormComponent {
   @Input() isEditing: boolean = false;
-  @Input() status: any
+  @Input() status: any;
 
-  @Input() selectedDocStatus: any
+  @Input() selectedDocStatus: any;
 
   @Input() EditingResponseData: any;
   @Input() isReadOnlyMode: boolean = false;
@@ -124,14 +124,14 @@ export class TransferInInventoryFormComponent {
   storename: any;
   hideCost: any;
   IS_HQ_App: boolean = false;
-  StoreIDData: any
-  transferstores: any[] = []
+  StoreIDData: any;
+  transferstores: any[] = [];
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.isEditDataAvailable();
@@ -179,9 +179,15 @@ export class TransferInInventoryFormComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
     const data = this.EditingResponseData;
-    console.log(this.selectedDocStatus, '=================selectedDocStatus=================')
-    console.log(this.status, '========================statsu type=======================')
-    this.StoreIDData = data.STORE_ID
+    console.log(
+      this.selectedDocStatus,
+      '=================selectedDocStatus=================',
+    );
+    console.log(
+      this.status,
+      '========================statsu type=======================',
+    );
+    this.StoreIDData = data.STORE_ID;
     this.transferInFormData = {
       TRANS_ID: data.TRANS_ID,
       // ID: data.ID,
@@ -234,25 +240,49 @@ export class TransferInInventoryFormComponent {
       STORE_ID: this.selectedStoreId,
       COMPANY_ID: this.companyID,
     };
-    this.dataService
-      .getItemDetailsForTrInInventory(payload)
-      .subscribe((response: any) => {
-        this.items = response.data;
-        console.log(response, 'RESPONSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
+
+    // Wait until the popup/grid is rendered
+    setTimeout(() => {
+      this.popupGridRef?.instance.beginCustomLoading('Loading...');
+
+      this.dataService.getItemDetailsForTrInInventory(payload).subscribe({
+        next: (response: any) => {
+          this.items = response.data;
+          console.log(response, 'RESPONSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
+
+          this.popupGridRef?.instance.endCustomLoading();
+        },
+        error: (err) => {
+          console.error(err);
+          this.popupGridRef?.instance.endCustomLoading();
+          notify('Failed to load items.', 'error', 3000);
+        },
       });
+    }, 0);
   }
+
+  // getItemsList() {
+  //   const payload = {
+  //     STORE_ID: this.selectedStoreId,
+  //     COMPANY_ID: this.companyID,
+  //   };
+  //   this.dataService
+  //     .getItemDetailsForTrInInventory(payload)
+  //     .subscribe((response: any) => {
+  //       this.items = response.data;
+  //       console.log(response, 'RESPONSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
+  //     });
+  // }
   getStoreDropdown() {
     const payload = {
       COMPANY_ID: this.companyID,
-      NAME: 'STORE'
-    }
+      NAME: 'STORE',
+    };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.transferstores = response;
       if (this.IS_HQ_App) {
         // 🔹 HQ App → show only store with ID = 1
         this.stores = response.filter((item: any) => item.ID === 1);
-
-
       } else {
         // 🔹 Not HQ → show all stores
         this.stores = response;
@@ -269,8 +299,8 @@ export class TransferInInventoryFormComponent {
   getReasonsDropdown() {
     const payload = {
       COMPANY_ID: this.companyID,
-      NAME: 'REASON'
-    }
+      NAME: 'REASON',
+    };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
     });
@@ -278,8 +308,8 @@ export class TransferInInventoryFormComponent {
   getDepartmentsDropdown() {
     const payload = {
       COMPANY_ID: this.companyID,
-      NAME: 'DEPT'
-    }
+      NAME: 'DEPT',
+    };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.departments = response;
     });
@@ -290,8 +320,9 @@ export class TransferInInventoryFormComponent {
     console.log(selectedRows, 'SELECTED ROWS');
 
     if (selectedRows && selectedRows.length > 0) {
-
-      const transferId = selectedRows.map((row: any) => row.TRANSFER_ID).join(',') //  get transfer id
+      const transferId = selectedRows
+        .map((row: any) => row.TRANSFER_ID)
+        .join(','); //  get transfer id
       console.log(transferId, 'Selected Transfer IDs');
 
       // Call API instead of manually pushing rows
@@ -301,11 +332,10 @@ export class TransferInInventoryFormComponent {
           console.log(res, 'API response');
 
           if (res?.data && res.data.length > 0) {
-
             //  Clear existing valid rows if needed
             this.transferInFormData.DETAILS =
               this.transferInFormData.DETAILS.filter(
-                (item) => item.BARCODE !== '' && item.DESCRIPTION !== '',
+                (item: any) => item.BARCODE !== '' && item.DESCRIPTION !== '',
               );
 
             //  Set ISSUE_ID
@@ -344,7 +374,6 @@ export class TransferInInventoryFormComponent {
               }
             });
 
-
             // this.recalculateNetAmount();
           }
         });
@@ -360,7 +389,7 @@ export class TransferInInventoryFormComponent {
     this.popupClosed.emit();
   }
 
-  onPopupHiding() { }
+  onPopupHiding() {}
 
   private formatDateLocal(date: any): string | null {
     if (!date) return null;
@@ -436,7 +465,9 @@ export class TransferInInventoryFormComponent {
   }
 
   calculateNetAmount(rowData: any) {
-    return (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY_RECEIVED) || 0);
+    return (
+      (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY_RECEIVED) || 0)
+    );
   }
 
   onEditorPrepared(e: any) {
@@ -446,7 +477,6 @@ export class TransferInInventoryFormComponent {
       });
     }
   }
-
 
   updateNetAmount(editingRowIndex?: number, newValue?: number) {
     this.transferInFormData.NET_AMOUNT = 0;
@@ -466,7 +496,6 @@ export class TransferInInventoryFormComponent {
 
     this.netamount = this.transferInFormData.NET_AMOUNT;
   }
-
 
   onSummaryCalculate(e: any) {
     if (e.name === 'netAmount') {
@@ -559,9 +588,10 @@ export class TransferInInventoryFormComponent {
             });
           }
         });
-      } else if
-
-        (this.selectedDocStatus == 'OPEN' && this.status == 'VerifyScreen') {
+      } else if (
+        this.selectedDocStatus == 'OPEN' &&
+        this.status == 'VerifyScreen'
+      ) {
         // UPDATE API
         confirm(
           'Are you sure you want to approve this transfer?',
@@ -1180,12 +1210,10 @@ export class TransferInInventoryFormComponent {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
-      }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${
+      months[date.getMonth()]
+    }-${date.getFullYear().toString().slice(-2)}`;
   }
-
-
-
 }
 
 @NgModule({
@@ -1228,4 +1256,4 @@ export class TransferInInventoryFormComponent {
   exports: [TransferInInventoryFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferInInventoryFormModule { }
+export class TransferInInventoryFormModule {}

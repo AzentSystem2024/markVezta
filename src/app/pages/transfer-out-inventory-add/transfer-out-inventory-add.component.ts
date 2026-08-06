@@ -293,7 +293,6 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       .getItemDetailsForInventory(payload)
       .subscribe((response: any) => {
         this.items = response.Data;
-        console.log(response, 'RESPONSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
       });
   }
 
