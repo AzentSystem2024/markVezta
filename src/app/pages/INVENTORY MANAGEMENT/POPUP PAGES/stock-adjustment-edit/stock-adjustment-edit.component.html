@@ -34,6 +34,7 @@
                     [(value)]="adjustmentFormData.ADJ_DATE"
                     [width]="200"
                     displayFormat="dd-MM-yyyy"
+                    [readOnly]="true"
                   ></dx-date-box>
                   <dx-text-box
                     [(value)]="adjustmentFormData.ADJ_NO"
@@ -52,7 +53,7 @@
                     valueExpr="ID"
                     [width]="405"
                     [searchEnabled]="true"
-                    [readOnly]="readOnlyTrue"
+                    [readOnly]="readOnlyTrue || selectedStatus === 5"
                     label="Reason"
                     labelMode="floating"
                   ></dx-select-box>
@@ -71,7 +72,7 @@
                   [searchEnabled]="true"
                   label="Store"
                   labelMode="floating"
-                  [readOnly]="readOnlyTrue"
+                  [readOnly]="readOnlyTrue || selectedStatus === 5"
                 >
                 </dx-select-box>
                 <div style="margin-top: 2px; text-align: left">
@@ -79,7 +80,7 @@
                     text="Add Items"
                     icon="event"
                     type="default"
-                    [visible]="!readOnlyTrue"
+                    [visible]="!readOnlyTrue && selectedStatus !== 5"
                     [width]="200"
                     stylingMode="outlined"
                     class="blue-outline-btn"
@@ -108,6 +109,7 @@
             dataField="COST"
             [visible]="canApprove"
             caption="Cost"
+            format="#,##0.00"
             [allowEditing]="false"
             [visible]="!hidecost"
           ></dxi-column>
@@ -119,11 +121,11 @@
           <dxi-column
             dataField="NEW_QTY"
             caption="New Stock"
-            [allowEditing]="!readOnlyTrue"
+            [allowEditing]="selectedStatus !== 5"
           ></dxi-column>
           <dxi-column
             dataField="ADJ_QTY"
-            caption="Adjustment Stock"
+            caption="Adjusted Stock"
             dataType="number"
             [allowEditing]="false"
           ></dxi-column>
@@ -149,7 +151,7 @@
               label="Narration"
               labelMode="floating"
               class="narration-box"
-              [readOnly]="readOnlyTrue"
+              [readOnly]="selectedStatus === 5"
             >
             </dx-text-box>
           </div>
@@ -172,7 +174,7 @@
               [(value)]="approveValue"
               text="Approve"
               labelMode="floating"
-              [readOnly]="readOnlyTrue"
+              [readOnly]="selectedStatus === 5"
               class="narration-box"
             >
             </dx-check-box>
@@ -190,10 +192,18 @@
               [text]="getButtonText()"
               (onClick)="UpdateStockAdjustment()"
               stylingMode="contained"
-              [visible]="!readOnlyTrue"
+              [visible]="!readOnlyTrue && selectedStatus !== 5"
               type="default"
             >
             </dx-button>
+            <!-- <dx-button
+              [text]="getButtonText()"
+              (onClick)="UpdateStockAdjustment()"
+              stylingMode="contained"
+              [visible]="!readOnlyTrue"
+              type="default"
+            >
+            </dx-button> -->
           </div>
         </div>
       </div>
@@ -281,6 +291,7 @@
       <dxi-column
         dataField="COST"
         caption="Cost"
+        format="#,##0.00"
         [visible]="!hidecost"
       ></dxi-column>
     </dx-data-grid>

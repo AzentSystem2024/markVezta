@@ -370,7 +370,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
         // ================= Convert Values Based On Column Type =================
         excelData.forEach((row: any) => {
-          let hasApexTransNo = false;
+          let hasHISTransNo = false;
 
           Object.keys(row).forEach((key: string) => {
             const originalKey = key;
@@ -381,13 +381,13 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
             let value = row[originalKey];
 
-            if (lowerKey === 'apextransactionnumber') {
+            if (lowerKey === 'histransactionnumber') {
               if (
                 value !== null &&
                 value !== undefined &&
                 value.toString().trim() !== ''
               ) {
-                hasApexTransNo = true;
+                hasHISTransNo = true;
               }
             }
 
@@ -504,7 +504,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
             }
           });
 
-          row.isValid = hasApexTransNo;
+          row.isValid = hasHISTransNo;
         });
 
         // ================= Sort Invalid Rows To Top =================
@@ -938,14 +938,14 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
 
     let masterKey = '';
 
-    if (['ApexTPACode', 'ApexInsuCode', 'ApexInstCode'].includes(particular)) {
+    if (['HISTPACode', 'HISInsuCode', 'HISInstCode'].includes(particular)) {
       masterKey = 'Customer';
     } else if (
-      ['ApexReportingDoctor', 'ApexReferringDoctor'].includes(particular)
+      ['HISReportingDoctor', 'HISReferringDoctor'].includes(particular)
     ) {
       masterKey = 'Clinician';
     } else if (
-      ['ApexReportingDoctorDept', 'ApexReferringDoctorDept'].includes(
+      ['HISReportingDoctorDept', 'HISReferringDoctorDept'].includes(
         particular,
       )
     ) {
@@ -1020,7 +1020,7 @@ export class ImportArDataComponent implements OnInit, OnDestroy {
     if (e.rowType === 'data' && e.data.isValid === false) {
       e.rowElement.style.backgroundColor = '#ffe6e6';
       e.rowElement.title =
-        'ApexTransactionNumber is missing. This row will not be imported.';
+        'HISTransactionNumber is missing. This row will not be imported.';
     }
   }
 }

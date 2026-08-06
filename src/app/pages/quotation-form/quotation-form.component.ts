@@ -1371,7 +1371,7 @@ export class QuotationFormComponent {
       'assets/images/image16.png',
     );
 
-    doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 35);
+    doc.addImage(logoBase64, 'PNG', 10, headerY, 30, 35);
 
     // --- Title
     doc.setFont('helvetica', 'bold');
@@ -1384,101 +1384,159 @@ export class QuotationFormComponent {
     // RIGHT HEADER DETAILS
     // ======================================================
 
-    doc.setFontSize(10);
+    doc.setFontSize(9);
 
+    const rightLabelX = 135;
+    const rightColonX = 160;
+    const rightValueX = 164;
+
+    doc.setTextColor(90, 110, 130);
     doc.setFont('helvetica', 'normal');
+    doc.text('Quotation No', rightLabelX, 15);
+    doc.text(':', rightColonX, 15);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${data.Data.QTN_NO || ''}`, rightValueX, 15);
 
-    doc.text('Quotation No :', 135, 15);
+    doc.setTextColor(90, 110, 130);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Reference No', rightLabelX, 22);
+    doc.text(':', rightColonX, 22);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${data.Data.REF_NO || ''}`, rightValueX, 22);
 
-    doc.text(`${data.Data.QTN_NO}`, 195, 15, { align: 'right' });
-
-    doc.text('Reference No :', 135, 22);
-
-    doc.text(`${data.Data.REF_NO}`, 195, 22, { align: 'right' });
-
-    doc.text('Date :', 135, 29);
-
-    doc.text(`${data.Data.QTN_DATE}`, 195, 29, { align: 'right' });
+    doc.setTextColor(90, 110, 130);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Date', rightLabelX, 29);
+    doc.text(':', rightColonX, 29);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${data.Data.QTN_DATE || ''}`, rightValueX, 29);
 
     // ======================================================
     // BUYER DETAILS
     // ======================================================
 
+    const leftLabelX = 10;
+    const leftColonX = 35;
+    const leftValueX = 39;
+
     doc.setFont('helvetica', 'bold');
-    doc.text('Seller Details', 12, 60);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Seller Details', leftLabelX, 60);
 
     doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Store', leftLabelX, 67);
+    doc.text(':', leftColonX, 67);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${data.Data.ADDRESS1 || ''}`, leftValueX, 67);
 
-    doc.text('Store:', 12, 67);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Salesman', leftLabelX, 74);
+    doc.text(':', leftColonX, 74);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${data.Data.PHONE || ''}`, leftValueX, 74);
 
-    // doc.text(
-    //   `${data.Data.ADDRESS1}`,
-    //   38,
-    //   67
-    // );
-
-    doc.text('Salesman:', 12, 74);
-    // doc.text(`${data.Data.PHONE}`, 38, 74);
-
-    doc.text('Tel:', 12, 83);
-    // doc.text(`${data.Data.GST_NO}`, 38, 83);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Tel', leftLabelX, 81);
+    doc.text(':', leftColonX, 81);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${data.Data.GST_NO || ''}`, leftValueX, 81);
 
     // ======================================================
     // SELLER DETAILS
     // ======================================================
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Buyer Details', 140, 60);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Buyer Details', rightLabelX, 60);
 
     doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Name', rightLabelX, 67);
+    doc.text(':', rightColonX, 67);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    const customerName = doc.splitTextToSize(data.Data.CUST_NAME || '', 30);
+    doc.text(customerName, rightValueX, 67);
 
-    doc.text('Name:', 140, 67);
+    let currentY =
+      67 + (customerName.length > 1 ? (customerName.length - 1) * 4 : 0);
 
-    const customerName = doc.splitTextToSize(data.Data.CUST_NAME, 35);
-    doc.text(customerName, 165, 67);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Contact Name', rightLabelX, currentY + 7);
+    doc.text(':', rightColonX, currentY + 7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${data.Data.CONTACT_NAME || ''}`, rightValueX, currentY + 7);
 
-    doc.text('Contact Name:', 140, 80);
-    doc.text(`${data.Data.CONTACT_NAME}`, 165, 80);
-
-    doc.text('Tel:', 140, 87);
-    // doc.text(`${data.Data.ZIP}`, 165, 83);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 110, 130);
+    doc.text('Tel', rightLabelX, currentY + 14);
+    doc.text(':', rightColonX, currentY + 14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${data.Data.ZIP || ''}`, rightValueX, currentY + 14);
 
     // ======================================================
     // QUOTATION INFO TABLE (Ship Method / Payment / Currency)
     // ======================================================
 
-    autoTable(doc, {
-      startY: 95,
-      head: [
-        [
-          'Ship Method',
-          'Payment Terms',
-          'Currency',
-          'Remark (If any)',
-          'Validity',
-        ],
-      ],
-      body: [
-        [
-          data.Data.DELIVERY_TERM_NAME,
-          data.Data.PAY_TERM_NAME,
-          data.Data.CURRENCY || '',
-          data.Data.NARRATION || '',
-          `${data.Data.VALID_DAYS} days`,
-        ],
-      ],
-      theme: 'grid',
-      styles: {
-        fontSize: 8,
-        halign: 'center',
-        valign: 'middle',
-      },
-      headStyles: {
-        fillColor: [210, 225, 240],
-        textColor: 0,
-        fontStyle: 'bold',
-      },
-    });
+    let termsColumns: any[] = [];
+    let termsDataRow: any[] = [];
+
+    if (data.Data.DELIVERY_TERM_NAME) {
+      termsColumns.push('Ship Method');
+      termsDataRow.push(data.Data.DELIVERY_TERM_NAME);
+    }
+    if (data.Data.PAY_TERM_NAME) {
+      termsColumns.push('Payment Terms');
+      termsDataRow.push(data.Data.PAY_TERM_NAME);
+    }
+    if (data.Data.CURRENCY) {
+      termsColumns.push('Currency');
+      termsDataRow.push(data.Data.CURRENCY);
+    }
+    if (data.Data.NARRATION) {
+      termsColumns.push('Remark (If any)');
+      termsDataRow.push(data.Data.NARRATION);
+    }
+    if (data.Data.VALID_DAYS) {
+      termsColumns.push('Validity');
+      termsDataRow.push(`${data.Data.VALID_DAYS} days`);
+    }
+
+    let itemTableStartY = 95;
+
+    if (termsColumns.length > 0) {
+      autoTable(doc, {
+        startY: 95,
+        head: [termsColumns],
+        body: [termsDataRow],
+        theme: 'plain',
+        margin: { left: 10, right: 10 },
+        tableWidth: 190,
+        styles: {
+          fontSize: 8,
+          halign: 'center',
+          valign: 'middle',
+        },
+        headStyles: {
+          fillColor: [217, 234, 249],
+          textColor: 0,
+          fontStyle: 'bold',
+        },
+      });
+      itemTableStartY = (doc as any).lastAutoTable.finalY + 8;
+    }
 
     // ======================================================
     // ITEM DETAILS TABLE
@@ -1498,7 +1556,7 @@ export class QuotationFormComponent {
     ]);
 
     autoTable(doc, {
-      startY: (doc as any).lastAutoTable.finalY + 10,
+      startY: itemTableStartY,
       head: [
         [
           'Item Code',
@@ -1510,7 +1568,7 @@ export class QuotationFormComponent {
           'Disc(%)',
           'Taxable',
           'Tax(%)',
-          'Total Price',
+          'Total Price (AED)',
         ],
       ],
       body: itemRows,
@@ -1519,33 +1577,77 @@ export class QuotationFormComponent {
           '',
           'TOTAL',
           '',
-          data.Data.Details.reduce(
-            (sum: number, item: any) => sum + item.QUANTITY,
-            0,
+          this.formatAmount(
+            data.Data.Details.reduce(
+              (sum: number, item: any) => sum + item.QUANTITY,
+              0,
+            ),
           ),
           '',
-          data.Data.GROSS_AMOUNT,
+          this.formatAmount(data.Data.GROSS_AMOUNT),
           '',
           '',
           '',
-          data.Data.NET_AMOUNT,
+          this.formatAmount(data.Data.NET_AMOUNT),
         ],
       ],
-      theme: 'grid',
+      theme: 'plain',
+      margin: { left: 10, right: 10 },
+      tableWidth: 190,
       styles: {
         fontSize: 8,
         cellPadding: 2,
-        halign: 'center',
+        valign: 'middle',
+        lineWidth: 0,
+      },
+      columnStyles: {
+        0: { cellWidth: 20, halign: 'left' },
+        1: { cellWidth: 32, halign: 'left' },
+        2: { cellWidth: 12, halign: 'left' },
+        3: { cellWidth: 17, halign: 'right' },
+        4: { cellWidth: 15, halign: 'right' },
+        5: { cellWidth: 19, halign: 'right' },
+        6: { cellWidth: 14, halign: 'right' },
+        7: { cellWidth: 20, halign: 'right' },
+        8: { cellWidth: 15, halign: 'right' },
+        9: { cellWidth: 26, halign: 'right' },
       },
       headStyles: {
-        fillColor: [210, 225, 240],
+        fillColor: [217, 234, 249],
         textColor: 0,
         fontStyle: 'bold',
+      },
+      alternateRowStyles: {
+        fillColor: [249, 249, 249],
       },
       footStyles: {
         fontStyle: 'bold',
-        fillColor: [255, 255, 255],
+        fillColor: 255,
         textColor: 0,
+      },
+      didParseCell: function (dataHook: any) {
+        if (dataHook.section === 'head') {
+          if (dataHook.column.index >= 3 && dataHook.column.index <= 9) {
+            dataHook.cell.styles.halign = 'right';
+          } else {
+            dataHook.cell.styles.halign = 'left';
+          }
+        } else if (dataHook.section === 'foot') {
+          dataHook.cell.styles.fontSize = 9;
+
+          if (dataHook.column.index === 1) {
+            dataHook.cell.styles.halign = 'center';
+          } else if (dataHook.column.index >= 3 && dataHook.column.index <= 9) {
+            dataHook.cell.styles.halign = 'right';
+          }
+        }
+      },
+      willDrawCell: function (dataHook: any) {
+        if (dataHook.section === 'foot' && dataHook.column.index === 0) {
+          doc.setDrawColor(0);
+          doc.setLineWidth(0.3);
+          doc.line(10, dataHook.cell.y, 200, dataHook.cell.y);
+        }
       },
     });
 
@@ -1564,7 +1666,8 @@ export class QuotationFormComponent {
     const fils = Math.round((netAmount - dirhams) * 100);
 
     let amountInWords =
-      'AED ' + toWords(dirhams).replace(/\b\w/g, (char) => char.toUpperCase());
+      toWords(dirhams).replace(/\b\w/g, (char) => char.toUpperCase()) +
+      ' Dirhams';
 
     if (fils > 0) {
       amountInWords +=
@@ -1573,18 +1676,14 @@ export class QuotationFormComponent {
         ' Fils';
     }
 
-    amountInWords += ' Only';
-    const amountY = (doc as any).lastAutoTable.finalY + 10;
+    amountInWords = 'Amount in Words: ' + amountInWords + ' Only';
+    const amountY = (doc as any).lastAutoTable.finalY + 8;
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(90, 110, 130);
 
-    doc.text('Amount Chargeable (in words):', 60, amountY);
-
-    doc.setTextColor(0, 102, 204);
-    const amountText = doc.splitTextToSize(amountInWords, 70);
-
-    doc.text(amountText, 120, amountY);
+    doc.text(amountInWords, 10, amountY);
 
     doc.setTextColor(0);
 

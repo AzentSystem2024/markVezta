@@ -82,7 +82,7 @@ export class StockAdjustmentListComponent {
     onClick: () => this.refreshGrid(),
     text: '',
   };
-  selectedStoreid: any[] = []
+  selectedStoreid: any[] = [];
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -110,8 +110,8 @@ export class StockAdjustmentListComponent {
   is_Edit_popup: boolean = false;
   selectedTrOut: any;
   isReadOnlyMode: boolean = false;
-  canVerify: boolean = false
-  StatusType: any
+  canVerify: boolean = false;
+  StatusType: any;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'Last 7 Days', value: 'last7' },
@@ -141,7 +141,6 @@ export class StockAdjustmentListComponent {
     private zone: NgZone,
     private exportService: ExportService,
   ) {
-
     if (this.selectedDateRange === 'today') {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -160,7 +159,7 @@ export class StockAdjustmentListComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     console.log('Parsed ObjectData:', menuResponse);
-    this.sessionData_tax()
+    this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuGroups);
 
@@ -178,7 +177,6 @@ export class StockAdjustmentListComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
-
     }
     this.sessionData_tax();
     this.get_stock_adjustment_list();
@@ -196,13 +194,15 @@ export class StockAdjustmentListComponent {
       DATE_TO: datePayload.DATE_TO,
     };
     // Use Date objects for filtering
-    this.dataService.List_Stock_Adjustment_Data(payload).subscribe((res: any) => {
-      const allData = res.Data;
-      this.filteredStockList = allData.filter((item: any) => {
-        const itemDate = new Date(item.ADJ_DATE);
-        return itemDate >= start && itemDate <= end;
+    this.dataService
+      .List_Stock_Adjustment_Data(payload)
+      .subscribe((res: any) => {
+        const allData = res.Data;
+        this.filteredStockList = allData.filter((item: any) => {
+          const itemDate = new Date(item.ADJ_DATE);
+          return itemDate >= start && itemDate <= end;
+        });
       });
-    });
 
     const customOption = this.dateRanges.find((dr) => dr.value === 'custom');
     if (customOption) {
@@ -276,11 +276,13 @@ export class StockAdjustmentListComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
 
-    this.store_dropdown()
+    this.store_dropdown();
   }
 
   onExporting(event: any) {
@@ -328,35 +330,37 @@ export class StockAdjustmentListComponent {
       DATE_TO: datePayload.DATE_TO,
     };
 
-    this.dataService.List_Stock_Adjustment_Data(payload).subscribe((res: any) => {
-      const allData = res.Data;
-      const dateField = 'ADJ_DATE';
+    this.dataService
+      .List_Stock_Adjustment_Data(payload)
+      .subscribe((res: any) => {
+        const allData = res.Data;
+        const dateField = 'ADJ_DATE';
 
-      let dateFilteredData: any[];
+        let dateFilteredData: any[];
 
-      //    Step 1: Date filter
-      if (this.selectedDateRange === 'all') {
-        dateFilteredData = allData;
-      } else {
-        const start = new Date(this.startDate);
-        const end = new Date(this.EndDate);
-        end.setHours(23, 59, 59, 999);
+        //    Step 1: Date filter
+        if (this.selectedDateRange === 'all') {
+          dateFilteredData = allData;
+        } else {
+          const start = new Date(this.startDate);
+          const end = new Date(this.EndDate);
+          end.setHours(23, 59, 59, 999);
 
-        dateFilteredData = allData.filter((item: any) => {
-          const itemDate = new Date(item[dateField]);
-          return itemDate >= start && itemDate <= end;
-        });
-      }
+          dateFilteredData = allData.filter((item: any) => {
+            const itemDate = new Date(item[dateField]);
+            return itemDate >= start && itemDate <= end;
+          });
+        }
 
-      //    Step 2: Store filter
-      if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-        this.filteredStockList = dateFilteredData;
-      } else {
-        this.filteredStockList = dateFilteredData.filter((item: any) =>
-          this.selectedStoreid.includes(Number(item.STORE_ID)) //    IMPORTANT
-        );
-      }
-    });
+        //    Step 2: Store filter
+        if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+          this.filteredStockList = dateFilteredData;
+        } else {
+          this.filteredStockList = dateFilteredData.filter(
+            (item: any) => this.selectedStoreid.includes(Number(item.STORE_ID)), //    IMPORTANT
+          );
+        }
+      });
   }
   formatDate(date: Date): string {
     const month = date.getMonth() + 1; // Months are 0-based
@@ -411,28 +415,50 @@ export class StockAdjustmentListComponent {
     const status = event.data.TRANS_STATUS;
 
     this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
-
       this.selected_Data = res.Data;
 
       if (status === 1) {
-
-        // Open -> Edit
         this.isReadOnlyMode = false;
         this.StatusType = 'Editscreen';
         this.buttonText = 'Update Stock Adjustment';
-
       } else if (status === 2) {
-
-        // Verified -> View (Read Only)
         this.isReadOnlyMode = true;
         this.StatusType = 'viewScreen';
         this.buttonText = 'View Stock Adjustment';
-
+      } else if (status === 5) {
+        this.isReadOnlyMode = true;
+        this.StatusType = 'viewScreen';
+        this.buttonText = 'View Stock Adjustment';
       }
 
       this.is_Edit_popup = true;
     });
   }
+
+  // onEditStock(event: any) {
+  //   event.cancel = true;
+
+  //   const id = event.data.ID;
+  //   const status = event.data.TRANS_STATUS;
+
+  //   this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
+  //     this.selected_Data = res.Data;
+
+  //     if (status === 1) {
+  //       // Open -> Edit
+  //       this.isReadOnlyMode = false;
+  //       this.StatusType = 'Editscreen';
+  //       this.buttonText = 'Update Stock Adjustment';
+  //     } else if (status === 2) {
+  //       // Verified -> View (Read Only)
+  //       this.isReadOnlyMode = true;
+  //       this.StatusType = 'viewScreen';
+  //       this.buttonText = 'View Stock Adjustment';
+  //     }
+
+  //     this.is_Edit_popup = true;
+  //   });
+  // }
 
   searchButtonOptions = {
     icon: 'search',
@@ -504,7 +530,6 @@ export class StockAdjustmentListComponent {
   }
 
   onStoreChanged(e: any) {
-
     console.log('Selected store IDs:', this.selectedStoreid);
 
     this.get_stock_adjustment_list(); //    re-fetch + apply both filters
@@ -512,49 +537,70 @@ export class StockAdjustmentListComponent {
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selectedCompanyId
-    }
+      COMPANY_ID: this.selectedCompanyId,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
   }
+
   onVerifyClick(e: any) {
-    console.log(e, '----event----')
-    this.is_Edit_popup = true;
     const id = e.row.data.ID;
-    this.StatusType = 'verifyscreen'
+
     this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
+      console.log('STATUS:', res.Data.STATUS);
+      console.log('buttonText before:', this.buttonText);
+
       this.selected_Data = res.Data;
-      console.log('==call This=======')
-      console.log(this.selected_Data, '=====selected data==========')
+
       if (this.selected_Data.STATUS == 1) {
-        // Open -> Verify screen
         this.StatusType = 'verifyscreen';
         this.buttonText = 'Verify Stock Adjustment';
-      }
-      else if (this.selected_Data.STATUS == 2) {
-        // Verified -> Approve screen
+      } else if (this.selected_Data.STATUS == 2) {
         this.StatusType = 'verifyscreen';
         this.buttonText = 'Approve Stock Adjustment';
-      }
-      else if (this.selected_Data.STATUS == 5) {
-        // Approved -> View screen
+      } else if (this.selected_Data.STATUS == 5) {
         this.StatusType = 'viewScreen';
         this.buttonText = 'View Stock Adjustment';
       }
+      console.log('buttonText after:', this.buttonText);
+      this.is_Edit_popup = true;
     });
-
-
-
   }
+  // onVerifyClick(e: any) {
+  //   console.log(e, '----event----')
+  //   this.is_Edit_popup = true;
+  //   const id = e.row.data.ID;
+  //   this.StatusType = 'verifyscreen'
+  //   this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
+  //     this.selected_Data = res.Data;
+  //     console.log('==call This=======')
+  //     console.log(this.selected_Data, '=====selected data==========')
+  //     if (this.selected_Data.STATUS == 1) {
+  //       // Open -> Verify screen
+  //       this.StatusType = 'verifyscreen';
+  //       this.buttonText = 'Verify Stock Adjustment';
+  //     }
+  //     else if (this.selected_Data.STATUS == 2) {
+  //       // Verified -> Approve screen
+  //       this.StatusType = 'verifyscreen';
+  //       this.buttonText = 'Approve Stock Adjustment';
+  //     }
+  //     else if (this.selected_Data.STATUS == 5) {
+  //       // Approved -> View screen
+  //       this.StatusType = 'viewScreen';
+  //       this.buttonText = 'View Stock Adjustment';
+  //     }
+  //   });
+
+  // }
   onverifyClick(e: any) {
-    console.log(e, '----event----')
+    console.log(e, '----event----');
     this.is_Edit_popup = true;
     const id = e.row.data.ID;
-    this.StatusType = 'verifyscreen'
+    this.StatusType = 'verifyscreen';
     this.dataService.select_Stock_Adjustment_Data(id).subscribe((res: any) => {
       this.selected_Data = res.Data;
-
     });
   }
 }
@@ -592,11 +638,11 @@ export class StockAdjustmentListComponent {
     DxoSummaryModule,
     StockAdjustmentEditModule,
     StockAdjustmentAddModule,
-    DxTagBoxModule
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [StockAdjustmentListComponent],
   exports: [StockAdjustmentListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentListModule { }
+export class StockAdjustmentListModule {}
