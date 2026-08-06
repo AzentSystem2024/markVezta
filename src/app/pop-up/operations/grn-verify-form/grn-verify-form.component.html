@@ -215,6 +215,7 @@
     <dxi-column
       dataField="UNIT_COST"
       caption="UNIT COST"
+      [visible]="!hideCost"
       [allowEditing]="false"
       alignment="right"
       [format]="{ type: 'fixedPoint', precision: 2 }"

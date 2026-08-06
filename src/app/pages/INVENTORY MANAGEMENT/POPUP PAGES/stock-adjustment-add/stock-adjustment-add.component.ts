@@ -108,10 +108,11 @@ export class StockAdjustmentAddComponent {
   IS_HQ_App: boolean = false;
   StoreIDData: any;
   selectedItemKeys: number[] = [];
+  Department: any;
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) {}
+  ) { }
   ngOnInit() {
     this.isEditDataAvailable();
     this.get_item_list_Data();
@@ -156,6 +157,7 @@ export class StockAdjustmentAddComponent {
       // this.getItemsList();
     }
     this.getStoreDropdown();
+    this.department_dropdown();
     this.getReasonsDropdown();
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete, this.canApprove);
@@ -215,10 +217,20 @@ export class StockAdjustmentAddComponent {
     console.log(this.adjustmentFormData.Details, '======================');
   }
 
+  department_dropdown() {
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Department = res;
+    });
+  }
+
   getReasonsDropdown() {
     const payload = {
       COMPANY_ID: this.companyID,
-      NAME: 'REASON',
+      NAME: 'REASONS',
     };
     console.log(payload);
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
@@ -281,7 +293,7 @@ export class StockAdjustmentAddComponent {
     this.isPopupVisible = true;
 
     const payload = {
-      STORE_ID: this.StoreIDData,
+      STORE_ID: Number(this.adjustmentFormData.STORE_ID),
     };
 
     // Wait for the popup grid to render
@@ -348,9 +360,9 @@ export class StockAdjustmentAddComponent {
       }
     }
   }
-  onPopupHiding() {}
+  onPopupHiding() { }
 
-  updateNetAmount(event: any) {}
+  updateNetAmount(event: any) { }
 
   SaveStockAdjustment() {
     console.log(this.adjustmentFormData);
@@ -359,10 +371,10 @@ export class StockAdjustmentAddComponent {
 
     const transformed = ITEM_Details.map((item) => ({
       COMPANY_ID: this.companyID,
-      STORE_ID: this.StoreIDData,
+      STORE_ID: this.adjustmentFormData.STORE_ID,
       ADJ_ID: 0,
       NET_AMOUNT: 0,
-
+      DEPT_ID: this.adjustmentFormData.DEPT_ID,
       REASON_ID: this.adjustmentFormData.REASON_ID,
       ITEM_ID: item.ITEM_ID, // map from old
       COST: item.COST,
@@ -383,7 +395,7 @@ export class StockAdjustmentAddComponent {
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
       NET_AMOUNT: this.totalAmount,
-      STORE_ID: this.storeFromSession,
+      // STORE_ID: this.storeFromSession,
       Details: transformed,
     };
     console.log(payload);
@@ -511,9 +523,9 @@ export class StockAdjustmentAddComponent {
     this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
   }
 
-  onSelectPackAdd(e: any) {}
+  onSelectPackAdd(e: any) { }
 
-  onEditPackUpdate(e: any) {}
+  onEditPackUpdate(e: any) { }
 
   onCellValueChanged(e: any) {
     console.log(e, '===============pppppppppp==============  ');
@@ -567,4 +579,4 @@ export class StockAdjustmentAddComponent {
   exports: [StockAdjustmentAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentAddModule {}
+export class StockAdjustmentAddModule { }

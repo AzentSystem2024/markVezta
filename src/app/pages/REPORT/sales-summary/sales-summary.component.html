@@ -52,7 +52,6 @@
             labelMode="floating"
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
-            
             (onValueChanged)="onToDateChange($event)"
           >
           </dx-date-box>
@@ -163,11 +162,9 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
-     <dxo-group-panel [visible]="true"></dxo-group-panel>
-     <dxo-grouping
-      [contextMenuEnabled]="true"
-    [autoExpandAll]="false">
-  </dxo-grouping>
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+      <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
+      </dxo-grouping>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -190,11 +187,25 @@
         <dxi-item widget="dxButton" [options]="refreshButtonOptions">
         </dxi-item>
 
-        <dxi-item name="exportButton"></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
-       <dxi-column dataField="Store" caption="Store" [groupIndex]="0"></dxi-column>
+      <dxi-column
+        dataField="Store"
+        caption="Store"
+        [groupIndex]="0"
+      ></dxi-column>
       <dxi-column
         dataField="Date"
         caption="Date"
@@ -206,7 +217,11 @@
       <dxi-column dataField="Invoice No" caption="Invoice No"></dxi-column>
       <dxi-column dataField="Customer" caption="Customer"></dxi-column>
       <dxi-column dataField="Invoice Type" caption="Invoice Type"></dxi-column>
-      <dxi-column dataField="Discount" caption="Discount" [visible]="false"></dxi-column>
+      <dxi-column
+        dataField="Discount"
+        caption="Discount"
+        [visible]="false"
+      ></dxi-column>
       <dxi-column dataField="Exempted" caption="Exempted(AED)"></dxi-column>
       <dxi-column
         caption="Excl.VAT Total(AED)"

@@ -130,10 +130,11 @@ export class StockAdjustmentEditComponent {
   IS_HQ_App: boolean = false;
   selectedStatus: any;
   StoreIDData: any;
+  Department: any;
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     // this.isEditDataAvailable();
@@ -176,6 +177,7 @@ export class StockAdjustmentEditComponent {
     }
     this.getStoreDropdown();
     this.getReasonsDropdown();
+    this.department_dropdown();
     console.log('packingRights', packingRights);
     console.log(this.canAdd, this.canEdit, this.canDelete);
     // this.items = [];
@@ -268,10 +270,21 @@ export class StockAdjustmentEditComponent {
     console.log(this.adjustmentFormData.Details, '======================');
   }
 
+  department_dropdown() {
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Department = res;
+    });
+  }
+
+
   getReasonsDropdown() {
     const payload = {
       COMPANY_ID: this.companyID,
-      NAME: 'REASON',
+      NAME: 'REASONS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
@@ -357,17 +370,17 @@ export class StockAdjustmentEditComponent {
   //     this.items = res.Data;
   //   });
   // }
-  onPopupHiding() {}
-  updateNetAmount(event: any) {}
+  onPopupHiding() { }
+  updateNetAmount(event: any) { }
 
   UpdateStockAdjustment() {
     console.log(this.adjustmentFormData);
     const ITEM_Details = this.adjustmentFormData.Details;
     console.log(ITEM_Details);
 
-    const transformed = ITEM_Details.map((item) => ({
+    const transformed = ITEM_Details.map((item: any) => ({
       COMPANY_ID: this.companyID,
-      STORE_ID: this.storeFromSession,
+      // STORE_ID: this.storeFromSession,
       ADJ_ID: 0,
       NET_AMOUNT: 0,
       REASON_ID: 0,
@@ -387,7 +400,8 @@ export class StockAdjustmentEditComponent {
       ...this.adjustmentFormData,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
-      STORE_ID: this.storeFromSession,
+      STORE_ID: this.adjustmentFormData.STORE_ID,
+      DEPT_ID: this.adjustmentFormData.DEPT_ID,
       Details: transformed,
     };
     console.log(payload);
@@ -624,4 +638,4 @@ export class StockAdjustmentEditComponent {
   exports: [StockAdjustmentEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentEditModule {}
+export class StockAdjustmentEditModule { }

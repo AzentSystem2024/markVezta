@@ -105,13 +105,22 @@
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
                 </div>
-                <div style="margin-top: -4px; text-align: left; display: flex; gap: 5px">
+                <div
+                  style="
+                    margin-top: -4px;
+                    text-align: left;
+                    display: flex;
+                    gap: 5px;
+                  "
+                >
                   <dx-button
                     [width]="200"
                     stylingMode="contained"
                     class="blue-contained-btn"
                     (onClick)="onAddItems()"
-                    [disabled]="!transferOutFormData.DEST_STORE_ID || isReadOnlyMode"
+                    [disabled]="
+                      !transferOutFormData.DEST_STORE_ID || isReadOnlyMode
+                    "
                   >
                     <div *dxTemplate="let data of 'content'">
                       <span
@@ -202,7 +211,7 @@
             <dx-text-box
               #narrationRef
               [(value)]="transferOutFormData.NARRATION"
-              label="Narration"
+              label="Remarks"
               labelMode="floating"
               class="narration-box"
               [readOnly]="isReadOnlyMode"
@@ -249,6 +258,24 @@
               ></dx-button>
               <dx-button
                 [text]="
+                  selectedDocStatus == 'VERIFY' || isApproved
+                    ? 'Approve'
+                    : selectedDocStatus == 'OPEN' &&
+                        ActionStatus == 'VerifyScreen'
+                      ? 'Verify'
+                      : isEditing
+                        ? 'Update'
+                        : 'Save'
+                "
+                (onClick)="saveTransferOut()"
+                stylingMode="contained"
+                type="default"
+                [width]="120"
+                [visible]="!isReadOnlyMode"
+              >
+              </dx-button>
+              <!-- <dx-button
+                [text]="
                   isReadOnlyMode
                     ? 'PDF'
                     : selectedDocStatus == 'VERIFY' || isApproved
@@ -264,7 +291,7 @@
                 stylingMode="contained"
                 type="default"
                 [width]="120"
-              ></dx-button>
+              ></dx-button> -->
             </div>
           </div>
         </div>

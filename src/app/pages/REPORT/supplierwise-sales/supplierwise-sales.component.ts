@@ -528,6 +528,15 @@ export class SupplierwiseSalesComponent {
       },
       {
         name: 'totalDr',
+        column: 'PRICE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'PRICE',
+        alignment: 'right',
+      },
+      {
+        name: 'totalDr',
         column: 'GROSS_AMOUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
@@ -557,6 +566,13 @@ export class SupplierwiseSalesComponent {
     groupItems: [
       {
         column: 'QUANTITY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'PRICE',
         summaryType: 'sum',
         displayFormat: '{0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },

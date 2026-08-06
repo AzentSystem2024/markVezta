@@ -103,13 +103,22 @@
                     [readOnly]="isReadOnlyMode"
                   ></dx-select-box>
                 </div>
-                <div style="margin-top: -4px; text-align: left; display: flex; gap: 5px">
+                <div
+                  style="
+                    margin-top: -4px;
+                    text-align: left;
+                    display: flex;
+                    gap: 5px;
+                  "
+                >
                   <dx-button
                     [width]="200"
                     stylingMode="contained"
                     class="blue-contained-btn"
                     (onClick)="onAddItems()"
-                    [disabled]="!transferInFormData.ORIGIN_STORE_ID || isReadOnlyMode"
+                    [disabled]="
+                      !transferInFormData.ORIGIN_STORE_ID || isReadOnlyMode
+                    "
                   >
                     <div *dxTemplate="let data of 'content'">
                       <span
@@ -145,6 +154,8 @@
             dataField="COST"
             caption="Unit Cost"
             [allowEditing]="false"
+            dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"
             [visible]="!hideCost"
           ></dxi-column>
 
@@ -349,6 +360,8 @@
       <dxi-column
         dataField="TRANSFER_DATE"
         caption="Transfer Date"
+        dataType="date"
+        format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column dataField="SOURCE_STORE" caption="Source store"></dxi-column>
       <dxi-column
