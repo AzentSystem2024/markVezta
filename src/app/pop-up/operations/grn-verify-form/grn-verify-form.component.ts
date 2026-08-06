@@ -8,6 +8,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -175,10 +176,18 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   showNavButtons = true;
   currency: any;
   PONO: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
+  hideCost: any;
 
   constructor(
     private service: DataService,
     private ref: ChangeDetectorRef,
+    private router: Router,
   ) {
     const settingsData = sessionStorage.getItem('settings');
     const data = settingsData ? JSON.parse(settingsData) : null;
@@ -1195,6 +1204,25 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+      this.hideCost = packingRights.HideCost;
+    }
 
     this.currency = userData.GeneralSettings.SYMBOL;
     console.log(this.currency, 'CURRENCYYYYYYYYYYYYYYYYYY');

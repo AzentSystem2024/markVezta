@@ -89,23 +89,6 @@
       </div>
     </dxi-item>
 
-    <!-- <dxi-item [colSpan]="2">
-      <div *dxTemplate>
-        <dx-number-box
-        label="CPT Fixed Quantity"
-        [(value)]="newCptMasterData.FixedQuantity"
-        [width]="160"
-        [height]="40"
-        labelMode="floating"
-        [showSpinButtons]="false"
-        [min]="0"
-        [step]="0.01"
-         format="#0.00"
-      >
-      </dx-number-box>
-      </div>
-    </dxi-item> -->
-
     <dxi-item [colSpan]="2">
       <div *dxTemplate>
         <dx-select-box
@@ -128,6 +111,67 @@
         </dx-select-box>
       </div>
     </dxi-item>
+
+    <dxi-item [colSpan]="2">
+      <div *dxTemplate>
+        <dx-text-box
+          label="Service Code"
+          [(value)]="newCptMasterData.ServiceCode"
+          [height]="40"
+          labelMode="floating"
+        >
+        </dx-text-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item [colSpan]="2">
+      <div *dxTemplate>
+        <dx-select-box
+          label="Service Category"
+          [(value)]="newCptMasterData.ServiceCategoryID"
+          [height]="40"
+          labelMode="floating"
+          [items]="serviceCategory_DropDownData"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [searchEnabled]="true"
+        >
+        </dx-select-box>
+      </div>
+    </dxi-item>
+
+    <dxi-item [colSpan]="2">
+      <div *dxTemplate>
+        <dx-select-box
+          label="VAT Class"
+          [(value)]="newCptMasterData.VATClassID"
+          [height]="40"
+          labelMode="floating"
+          [items]="vatClass_DropDownData"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [searchEnabled]="true"
+        >
+        </dx-select-box>
+      </div>
+    </dxi-item>
+
+    <!-- <dxi-item [colSpan]="2">
+      <div *dxTemplate>
+        <dx-number-box
+        label="CPT Fixed Quantity"
+        [(value)]="newCptMasterData.FixedQuantity"
+        [width]="160"
+        [height]="40"
+        labelMode="floating"
+        [showSpinButtons]="false"
+        [min]="0"
+        [step]="0.01"
+         format="#0.00"
+      >
+      </dx-number-box>
+      </div>
+    </dxi-item> -->
 
     <dxi-item itemType="empty" [colSpan]="6"></dxi-item>
     <dxi-item itemType="empty" [colSpan]="6"></dxi-item>

@@ -58,6 +58,8 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
   CostTypeDataSource: any;
   CostBucketDataSource: any;
   ClinicianDataSource: any;
+  serviceCategory_DropDownData: any;
+  vatClass_DropDownData: any;
   Facility_DataSource: any[] = [];
   Facility_Value: any;
   facilityDataMap: { [facilityId: string]: any[] } = {};
@@ -72,6 +74,9 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
     DepartmentID: '',
     CPTDepartmentID: '',
     CostDepartmentID: '',
+    ServiceCode: '',
+    ServiceCategoryID: '',
+    VATClassID: '',
     CostDriveID: 0,
     FixedQuantity: 0,
     IsDifferentCPTDepartment: 0,
@@ -100,6 +105,8 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
     this.getCostDepartment_DropDown();
     this.getCpt_DropDown();
     this.getCostDrive_DropDown();
+    this.getServiceCategory_DropDown();
+    this.getVatClass_DropDown();
   }
 
   async ngOnInit() {
@@ -210,10 +217,6 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
     } else {
       this.selectedLedgerIds = [];
     }
-
-    /* ===============================
-     ✅ FINAL LOG (REAL FINAL VALUE)
-     =============================== */
   }
 
   getClinicianRole_DropDown() {
@@ -223,10 +226,6 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
   }
 
   onAddRowClick = () => {
-    // const result = this.facilityValidator?.instance?.validate();
-    // if (!result?.isValid) {
-    //   return;
-    // }
     this.dataGrid.instance.addRow();
   };
 
@@ -272,6 +271,38 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
     });
   }
 
+  getServiceCategory_DropDown() {
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const SELECTED_COMPANY = JSON.parse(savedUserData);
+      const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+      const COMPANY_ID = companyid.COMPANY_ID;
+      const payload = {
+        NAME: 'ITEM CATEGORY',
+        COMPANY_ID: COMPANY_ID || 1,
+      };
+      this.dataService.getDropdownData(payload).subscribe((data) => {
+        this.serviceCategory_DropDownData = data;
+      });
+    }
+  }
+
+  getVatClass_DropDown() {
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const SELECTED_COMPANY = JSON.parse(savedUserData);
+      const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+      const COMPANY_ID = companyid.COMPANY_ID;
+      const payload = {
+        NAME: 'VAT_CLASS',
+        COMPANY_ID: COMPANY_ID || 1,
+      };
+      this.dataService.getDropdownData(payload).subscribe((data) => {
+        this.vatClass_DropDownData = data;
+      });
+    }
+  }
+
   // =============== facility dropdown used row marking ========
   onFacilityRowPrepared(e: any) {
     if (e.rowType === 'data') {
@@ -290,7 +321,6 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
     }
   }
 
- 
   onDepartmentChanged(e: any) {
     const selectedDeptId = e.value;
 
@@ -470,6 +500,9 @@ export class CptMasterEditFormComponent implements OnChanges, OnInit {
       DepartmentID: null,
       CPTDepartmentID: null,
       CostDepartmentID: null,
+      ServiceCode: '',
+      ServiceCategoryID: '',
+      VATClassID: '',
       data: [],
     };
 

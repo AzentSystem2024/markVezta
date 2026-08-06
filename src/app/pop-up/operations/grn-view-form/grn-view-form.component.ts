@@ -12,6 +12,7 @@ import {
   DomSanitizer,
   SafeResourceUrl,
 } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -169,11 +170,19 @@ export class GrnViewFormComponent {
   newGrnData = this.grnData;
   getNewGrnData = () => ({ ...this.newGrnData });
   currency: any;
+  canAdd: any;
+  canEdit: any;
+  canDelete: any;
+  canPrint: any;
+  canView: any;
+  canApprove: any;
+  hideCost: any;
 
   constructor(
     private service: DataService,
     private ref: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
+    private router: Router,
   ) {
     this.today = new Date();
     const settingsData = sessionStorage.getItem('settings');
@@ -588,6 +597,25 @@ export class GrnViewFormComponent {
   }
 
   ngOnInit(): void {
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .flatMap((menu: any) => menu.Children || [])
+      .find((child: any) => child.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+      this.hideCost = packingRights.HideCost;
+    }
     console.log('GRNVIEWWWWWWWWWWWWWWWWWWW');
     const userDataString = localStorage.getItem('userData');
     const userData = JSON.parse(

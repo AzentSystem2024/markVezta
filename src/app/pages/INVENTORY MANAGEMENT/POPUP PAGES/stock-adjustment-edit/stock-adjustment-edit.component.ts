@@ -365,7 +365,7 @@ export class StockAdjustmentEditComponent {
     const ITEM_Details = this.adjustmentFormData.Details;
     console.log(ITEM_Details);
 
-    const transformed = ITEM_Details.map((item) => ({
+    const transformed = ITEM_Details.map((item: any) => ({
       COMPANY_ID: this.companyID,
       STORE_ID: this.storeFromSession,
       ADJ_ID: 0,
