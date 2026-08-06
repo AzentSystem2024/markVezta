@@ -192,6 +192,7 @@ export class StockAdjustmentEditComponent {
       console.log(this.EditingResponseData);
       console.log(this.adjustmentFormData);
       this.selecte_Date_Details = this.adjustmentFormData.Details;
+      this.selectedStatus = this.adjustmentFormData.STATUS;
       const editable = this.adjustmentFormData.STATUS;
       this.selectedStatus = this.adjustmentFormData.STATUS;
       console.log(editable);
@@ -308,23 +309,54 @@ export class StockAdjustmentEditComponent {
   cancel() {
     this.popupClosed.emit();
   }
+
   onAddItems() {
     if (!this.adjustmentFormData.STORE_ID) {
       notify('Please select a store to add items', 'error');
       return;
     }
+
     this.isPopupVisible = true;
 
     const payload = {
       STORE_ID: this.adjustmentFormData.STORE_ID,
     };
 
-    console.log(payload);
-    this.dataService.Get_item_list(payload).subscribe((res: any) => {
-      console.log(res);
-      this.items = res.Data;
-    });
+    // Wait until the popup grid is rendered
+    setTimeout(() => {
+      this.popupGridRef?.instance.beginCustomLoading('Loading...');
+
+      this.dataService.Get_item_list(payload).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          this.items = res.Data;
+
+          this.popupGridRef?.instance.endCustomLoading();
+        },
+        error: () => {
+          this.popupGridRef?.instance.endCustomLoading();
+          notify('Failed to load items', 'error');
+        },
+      });
+    }, 0);
   }
+  // onAddItems() {
+  //   if (!this.adjustmentFormData.STORE_ID) {
+  //     notify('Please select a store to add items', 'error');
+  //     return;
+  //   }
+  //   this.isPopupVisible = true;
+
+  //   const payload = {
+  //     STORE_ID: this.adjustmentFormData.STORE_ID,
+  //   };
+
+  //   console.log(payload);
+  //   this.dataService.Get_item_list(payload).subscribe((res: any) => {
+  //     console.log(res);
+  //     this.items = res.Data;
+  //   });
+  // }
   onPopupHiding() {}
   updateNetAmount(event: any) {}
 

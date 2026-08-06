@@ -279,20 +279,50 @@ export class StockAdjustmentAddComponent {
 
   onAddItems() {
     this.isPopupVisible = true;
+
     const payload = {
       STORE_ID: this.StoreIDData,
     };
 
-    console.log(payload);
-    this.dataService.Get_item_list(payload).subscribe((res: any) => {
-      console.log(res);
-      this.items = res.Data;
+    // Wait for the popup grid to render
+    setTimeout(() => {
+      this.popupGridRef?.instance.beginCustomLoading('Loading...');
 
-      this.selectedItemKeys = this.adjustmentFormData.Details.map(
-        (item: any) => item.ITEM_ID,
-      );
-    });
+      this.dataService.Get_item_list(payload).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          this.items = res.Data;
+
+          this.selectedItemKeys = this.adjustmentFormData.Details.map(
+            (item: any) => item.ITEM_ID,
+          );
+
+          this.popupGridRef?.instance.endCustomLoading();
+        },
+        error: () => {
+          this.popupGridRef?.instance.endCustomLoading();
+          notify('Failed to load items', 'error');
+        },
+      });
+    }, 0);
   }
+
+  // onAddItems() {
+  //   this.isPopupVisible = true;
+  //   const payload = {
+  //     STORE_ID: this.StoreIDData,
+  //   };
+
+  //   console.log(payload);
+  //   this.dataService.Get_item_list(payload).subscribe((res: any) => {
+  //     console.log(res);
+  //     this.items = res.Data;
+
+  //     this.selectedItemKeys = this.adjustmentFormData.Details.map(
+  //       (item: any) => item.ITEM_ID,
+  //     );
+  //   });
+  // }
 
   onPopupEditorPreparing(e: any) {
     if (e.parentType === 'dataRow' && e.command === 'select') {
