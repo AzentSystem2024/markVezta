@@ -141,6 +141,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   insideCustomers: any;
   outsideCustomers: any;
   customerList: any;
+  showActualStockQty: boolean;
 
   constructor(
     private dataService: DataService,
@@ -242,7 +243,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     // ✅ EditingResponseData IS ALREADY DATA
     const data = this.EditingResponseData;
     console.log(data, 'DATA IN DELIVERY EDIT');
-
+    this.showActualStockQty = data.STATUS === 'APPROVED';
     this.deliveryFormData = {
       ID: data.ID,
       COMPANY_ID: data.COMPANY_ID || this.companyID,
@@ -362,10 +363,22 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
   }
 
   customerChanged(event: any) {
+    if (this.selectedCustomerId !== event.value) {
+      this.deliveryFormData.Details = [];
+      this.deliveryFormData.TOTAL_QTY = 0;
+      this.itemsGridRef?.instance.refresh();
+    }
+
     this.selectedCustomerId = event.value;
     this.getCustomerDetails();
     this.getSalesOrderList();
   }
+
+  // customerChanged(event: any) {
+  //   this.selectedCustomerId = event.value;
+  //   this.getCustomerDetails();
+  //   this.getSalesOrderList();
+  // }
 
   getCustomerDetails() {
     if (!this.selectedCustomerId) return;
@@ -464,7 +477,14 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     const selectedRows = this.quotationGrid.instance.getSelectedRowsData();
 
     if (selectedRows.length === 0) {
-      alert('Please select at least one sales order.');
+      notify(
+        {
+          message: 'Please select at least one sales order.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning',
+        3000,
+      );
       return;
     }
 
@@ -624,6 +644,7 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
     }
 
     let isValid = true;
+    let hasExcessQuantity = false;
 
     this.deliveryFormData.Details.forEach((item: any, index: number) => {
       if (!item.ITEM_ID && !item.SO_DETAIL_ID && !item.QUANTITY) {
@@ -651,93 +672,70 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
         isValid = false;
         return;
       }
+      if (item.DELIVERED_QUANTITY > item.QUANTITY) {
+        hasExcessQuantity = true;
+      }
     });
 
     if (!isValid) return;
-    const formatDate = (date: any): string => {
-      if (!date) return '';
-      const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      return `${year}-${month}-${day}`;
-    };
-    // Prepare Payload
-    const payload = {
-      ...this.deliveryFormData,
-      COMPANY_ID: this.companyID,
-      STORE_ID: this.storeFromSession,
-      FIN_ID: this.finID,
-      USER_ID: this.userID,
-      DN_DATE: formatDate(this.deliveryFormData.DN_DATE),
-      Details: (this.deliveryFormData.Details || []).map((item: any) => ({
-        ITEM_ID: item.ITEM_ID,
-        REMARKS: item.REMARKS,
-        DELIVERED_QUANTITY: item.DELIVERED_QUANTITY,
-        SO_DETAIL_ID: item.SO_DETAIL_ID || 0,
-        PACKING_ID: item.PACKING_ID || 0,
-        UOM: item.UOM,
-      })),
-    };
 
-    console.log('Final Payload:', payload);
-    if (this.isEditing && this.deliveryFormData.ID) {
-      payload.ID = this.deliveryFormData.ID;
-    }
+    const executeSave = () => {
+      const formatDate = (date: any): string => {
+        if (!date) return '';
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${year}-${month}-${day}`;
+      };
+      // Prepare Payload
+      const payload = {
+        ...this.deliveryFormData,
+        COMPANY_ID: this.companyID,
+        STORE_ID: this.storeFromSession,
+        FIN_ID: this.finID,
+        USER_ID: this.userID,
+        DN_DATE: formatDate(this.deliveryFormData.DN_DATE),
+        Details: (this.deliveryFormData.Details || []).map((item: any) => ({
+          ITEM_ID: item.ITEM_ID,
+          REMARKS: item.REMARKS,
+          DELIVERED_QUANTITY: item.DELIVERED_QUANTITY,
+          SO_DETAIL_ID: item.SO_DETAIL_ID || 0,
+          PACKING_ID: item.PACKING_ID || 0,
+          UOM: item.UOM,
+        })),
+      };
 
-    if (this.isVerifyMode) {
-      const result = confirm(
-        'Are you sure you want to verify this Delivery Note?',
-        'Confirm Verify',
-      );
+      console.log('Final Payload:', payload);
+      if (this.isEditing && this.deliveryFormData.ID) {
+        payload.ID = this.deliveryFormData.ID;
+      }
 
-      result.then((dialogResult: boolean) => {
-        if (dialogResult) {
-          this.dataService.verifyDeliveryNoteFin(payload).subscribe({
-            next: () => {
-              notify('Delivery Note Verified!', 'success', 2000);
-              this.popupClosed.emit();
-            },
-            error: () => {
-              notify('Verification failed!', 'error', 3000);
-            },
-          });
-        }
-      });
+      if (this.isVerifyMode) {
+        const result = confirm(
+          'Are you sure you want to verify this Delivery Note?',
+          'Confirm Verify',
+        );
 
-      return; // <-- IMPORTANT
-    }
+        result.then((dialogResult: boolean) => {
+          if (dialogResult) {
+            this.dataService.verifyDeliveryNoteFin(payload).subscribe({
+              next: () => {
+                notify('Delivery Note Verified!', 'success', 2000);
+                this.popupClosed.emit();
+              },
+              error: () => {
+                notify('Verification failed!', 'error', 3000);
+              },
+            });
+          }
+        });
 
-    // ================= APPROVE =================
-    if (this.isApproveMode) {
-      const result = confirm(
-        'Are you sure you want to approve this Delivery Note?',
-        'Confirm Approval',
-      );
+        return; // <-- IMPORTANT
+      }
 
-      result.then((dialogResult: boolean) => {
-        if (dialogResult) {
-          this.dataService.approveDeliveryNoteFin(payload).subscribe({
-            next: () => {
-              notify('Delivery Note Approved!', 'success', 2000);
-              this.popupClosed.emit();
-            },
-            error: () => {
-              notify('Approval failed!', 'error', 3000);
-            },
-          });
-        }
-      });
-
-      return;
-    }
-
-    // Decide API call based on mode
-    // Decide API call logic
-    if (this.isEditing) {
-      // EDIT MODE
-      if (this.deliveryFormData.IS_APPROVED) {
-        // ✔️ APPROVE existing DN
+      // ================= APPROVE =================
+      if (this.isApproveMode) {
         const result = confirm(
           'Are you sure you want to approve this Delivery Note?',
           'Confirm Approval',
@@ -750,52 +748,104 @@ export class DeliveryNoteFormFinanceComponent implements OnInit {
                 notify('Delivery Note Approved!', 'success', 2000);
                 this.popupClosed.emit();
               },
-              error: () => notify('Approval failed!', 'error', 3000),
-            });
-          }
-        });
-      } else {
-        // ✔️ UPDATE existing DN
-        this.dataService.updateDeliveryNoteFin(payload).subscribe({
-          next: () => {
-            notify('Delivery Note Updated!', 'success', 2000);
-            this.popupClosed.emit();
-          },
-          error: () => notify('Update failed!', 'error', 3000),
-        });
-      }
-    } else {
-      // ADD MODE
-      if (this.deliveryFormData.IS_APPROVED) {
-        // ✔️ Confirm before saving as Approved
-        const result = confirm(
-          'Are you sure you want to save this Delivery Note as Approved?',
-          'Confirm Save',
-        );
-
-        result.then((dialogResult: boolean) => {
-          if (dialogResult) {
-            this.dataService.saveDeliveryNoteFin(payload).subscribe({
-              next: () => {
-                notify('Delivery Note Saved & Approved!', 'success', 2000);
-                this.ngZone.run(() => {
-                  this.popupClosed.emit();
-                });
+              error: () => {
+                notify('Approval failed!', 'error', 3000);
               },
-              error: () => notify('Save failed!', 'error', 3000),
             });
           }
         });
-      } else {
-        // ✔️ Save normally without approval
-        this.dataService.saveDeliveryNoteFin(payload).subscribe({
-          next: () => {
-            notify('Delivery Note Saved!', 'success', 2000);
-            this.popupClosed.emit();
-          },
-          error: () => notify('Save failed!', 'error', 3000),
-        });
+
+        return;
       }
+
+      // Decide API call based on mode
+      // Decide API call logic
+      if (this.isEditing) {
+        // EDIT MODE
+        if (this.deliveryFormData.IS_APPROVED) {
+          // ✔️ APPROVE existing DN
+          const result = confirm(
+            'Are you sure you want to approve this Delivery Note?',
+            'Confirm Approval',
+          );
+
+          result.then((dialogResult: boolean) => {
+            if (dialogResult) {
+              this.dataService.approveDeliveryNoteFin(payload).subscribe({
+                next: () => {
+                  notify('Delivery Note Approved!', 'success', 2000);
+                  // this.popupClosed.emit();
+                  this.ngZone.run(() => {
+                    this.popupClosed.emit();
+                  });
+                },
+                error: () => notify('Approval failed!', 'error', 3000),
+              });
+            }
+          });
+        } else {
+          // ✔️ UPDATE existing DN
+          this.dataService.updateDeliveryNoteFin(payload).subscribe({
+            next: () => {
+              notify('Delivery Note Updated!', 'success', 2000);
+              // this.popupClosed.emit();
+              this.ngZone.run(() => {
+                this.popupClosed.emit();
+              });
+            },
+            error: () => notify('Update failed!', 'error', 3000),
+          });
+        }
+      } else {
+        // ADD MODE
+        if (this.deliveryFormData.IS_APPROVED) {
+          // ✔️ Confirm before saving as Approved
+          const result = confirm(
+            'Are you sure you want to save this Delivery Note as Approved?',
+            'Confirm Save',
+          );
+
+          result.then((dialogResult: boolean) => {
+            if (dialogResult) {
+              this.dataService.saveDeliveryNoteFin(payload).subscribe({
+                next: () => {
+                  notify('Delivery Note Saved & Approved!', 'success', 2000);
+                  this.ngZone.run(() => {
+                    this.popupClosed.emit();
+                  });
+                },
+                error: () => notify('Save failed!', 'error', 3000),
+              });
+            }
+          });
+        } else {
+          // ✔️ Save normally without approval
+          this.dataService.saveDeliveryNoteFin(payload).subscribe({
+            next: () => {
+              notify('Delivery Note Saved!', 'success', 2000);
+              // this.popupClosed.emit();
+              this.ngZone.run(() => {
+                this.popupClosed.emit();
+              });
+            },
+            error: () => notify('Save failed!', 'error', 3000),
+          });
+        }
+      }
+    };
+
+    if (hasExcessQuantity) {
+      const result = confirm(
+        'Delivered quantity is greater than order quantity for one or more items. Do you want to continue?',
+        'Confirm Save',
+      );
+      result.then((dialogResult: boolean) => {
+        if (dialogResult) {
+          executeSave();
+        }
+      });
+    } else {
+      executeSave();
     }
   }
 

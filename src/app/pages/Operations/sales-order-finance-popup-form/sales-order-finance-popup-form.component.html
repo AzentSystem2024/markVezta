@@ -98,7 +98,7 @@
                   "
                 >
                   <dx-text-box
-                    [(value)]="salesOrderFormData.ADDRESS"
+                    [(value)]="salesOrderFormData.REF_NO"
                     label="Reference No."
                     labelMode="floating"
                     [width]="405"
@@ -219,6 +219,7 @@
             [calculateCellValue]="calculateAmount"
             dataType="number"
             [format]="{ type: 'fixedPoint', precision: 2 }"
+            [readOnly]="true"
           ></dxi-column>
           <dxi-column
             dataField="DISC_PERCENT"
@@ -586,6 +587,14 @@
       (onSelectionChanged)="onSelectionChanged($event)"
       (onCellPrepared)="onPopupCellPrepared($event)"
     >
+      <dxo-load-panel
+        [enabled]="true"
+        [showPane]="true"
+        [showIndicator]="true"
+        [text]="'Loading...'"
+        [shading]="true"
+      >
+      </dxo-load-panel>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -608,7 +617,11 @@
       <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
       <dxi-column dataField="UOM" caption="UOM"></dxi-column>
-      <dxi-column dataField="PRICE" caption="Price"></dxi-column>
+      <dxi-column
+        dataField="PRICE"
+        caption="Price"
+        format="#,##0.00"
+      ></dxi-column>
       <dxi-column dataField="QUANTITY" caption="Quantiy"></dxi-column>
     </dx-data-grid>
     <div class="form-popup-buttons-container">

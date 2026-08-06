@@ -12,10 +12,10 @@
         showPane: true,
       }"
       class="grid theme-dependent"
-      [dataSource]="filteredSalesOrderList"
+      [dataSource]="ReceiptDataSource"
       [showBorders]="true"
+      [showRowLines]="true"
       [showColumnLines]="true"
-      [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
@@ -30,16 +30,15 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
-      (onEditingStart)="onEditSalesOrder($event)"
+      (onEditingStart)="onEditReceiptNote($event)"
+      (onRowRemoving)="onDeleteReceiptNote($event)"
       (onCellPrepared)="onCellPrepared($event)"
-      (onRowRemoving)="onDeleteSalesOrder($event)"
     >
-      <dxo-editing
+      <!-- <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
         [allowDeleting]="canDelete"
-        [confirmDelete]="true"
-      ></dxo-editing>
+      ></dxo-editing> -->
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="false"
@@ -56,7 +55,7 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
-      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-filter-row
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
@@ -79,9 +78,11 @@
               margin-right: 3px;
             "
           >
-            Sales Order
+            Deposit/Refund
           </div>
         </dxi-item>
+
+        <dxi-item location="after" template="transTypeTemplate"></dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
           location="after"
@@ -114,6 +115,19 @@
           [options]="addButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'transTypeTemplate'">
+        <dx-select-box
+          [dataSource]="transactionTypes"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="selectedTransType"
+          width="140"
+          (onValueChanged)="onTransTypeChanged($event)"
+        >
+        </dx-select-box>
+      </div>
+
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
           [dataSource]="dateRanges"
@@ -124,53 +138,37 @@
           (onOpened)="attachItemClickHandler($event)"
           width="220"
         >
+          <!-- This controls the dropdown list rendering -->
           <div *dxTemplate="let item of 'item'">
             {{ item.value === "custom" ? "Custom" : item.label }}
           </div>
         </dx-select-box>
       </div>
-      <dxi-column
-        dataField="SO_NO"
-        caption="Sales Order No."
-        [allowEditing]="false"
-        width="120"
-      ></dxi-column>
-      <dxi-column
-        dataField="SO_DATE"
-        caption="Date"
-        [allowEditing]="false"
-        dataType="date"
-        width="120"
-        [format]="{ type: 'custom', formatter: formatDate }"
-      >
-      </dxi-column>
 
+      <dxi-column dataField="DOC_NO" caption="Receipt No"></dxi-column>
       <dxi-column
-        dataField="CUSTOMER_NAME"
-        caption="Customer"
+        dataField="REC_DATE"
+        caption="Date"
+        dataType="date"
         [allowEditing]="false"
+        format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column
-        dataField="DELIVERY_ADDRESS"
-        caption="Delivery Address"
-        [allowEditing]="false"
-      ></dxi-column>
-      <dxi-column
-        dataField="TOTAL_QTY"
-        caption="Quantity"
-        [allowEditing]="false"
-      ></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer"></dxi-column>
+      <!-- <dxi-column dataField="PAY_TYPE_NAME" caption="Payment Type"></dxi-column> -->
       <dxi-column
         dataField="NET_AMOUNT"
         caption="Net Amount"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
-      <dxi-column
-        dataField="REMARKS"
-        caption="Narration"
-        [allowEditing]="false"
-      ></dxi-column>
+      <!-- <dxi-column
+        dataField="RECEIVED_AMOUNT"
+        caption="Received Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column> -->
+      <dxi-column dataField="NARRATION" caption="Narration"></dxi-column>
+
       <dxi-column
         caption="Status"
         dataField="TRANS_STATUS"
@@ -181,6 +179,8 @@
           dataSource: getStatusFilterData,
           encodeHtml: false,
         }"
+        [fixed]="true"
+        fixedPosition="right"
       >
       </dxi-column>
 
@@ -214,6 +214,7 @@
         cellTemplate="actionTemplate"
       >
       </dxi-column>
+
       <div *dxTemplate="let cellData of 'actionTemplate'">
         <div class="action-icons">
           <!-- Edit -->
@@ -221,7 +222,7 @@
             *ngIf="canEdit"
             class="dx-icon dx-icon-edit"
             [title]="cellData.data.TRANS_STATUS === 1 ? 'Edit' : 'Details'"
-            (click)="onEditSalesOrder({ data: cellData.data, cancel: false })"
+            (click)="onEditReceiptNote({ data: cellData.data, cancel: false })"
           ></i>
 
           <!-- Delete -->
@@ -241,7 +242,9 @@
                 : 'auto'
             "
             title="Delete"
-            (click)="onDeleteSalesOrder({ data: cellData.data, cancel: false })"
+            (click)="
+              onDeleteReceiptNote({ data: cellData.data, cancel: false })
+            "
           ></i>
 
           <!-- Verify -->
@@ -251,13 +254,6 @@
               (canVerify || canApprove || cellData.data.TRANS_STATUS === 5)
             "
             class="verify-badge"
-            [title]="
-              cellData.data.TRANS_STATUS === 5
-                ? 'Approved'
-                : cellData.data.TRANS_STATUS === 2
-                  ? 'Approve'
-                  : 'Verify'
-            "
             [ngClass]="{
               'status-pending': cellData.data.TRANS_STATUS === 1,
               'status-verified': cellData.data.TRANS_STATUS === 2,
@@ -268,7 +264,7 @@
                 (cellData.data.TRANS_STATUS === 2 && !canApprove) ||
                 (cellData.data.TRANS_STATUS === 5 && canEdit),
             }"
-            (click)="onVerifySalesOrder({ row: { data: cellData.data } })"
+            (click)="onVerifyInvoice({ row: { data: cellData.data } })"
           >
           </span>
         </div>
@@ -277,99 +273,56 @@
   </div>
 </div>
 
-<!-- ========== sales order adding form ========== -->
 <dx-popup
-  [(visible)]="isAddSalesOrder"
-  [width]="'85vw'"
-  [height]="'95vh'"
-  title="Sales Order"
+  [(visible)]="isAddCustomerReceipt"
+  [width]="'80vw'"
+  [height]="'70vh'"
+  title="New Deposit/Refund"
   (onHiding)="handleClose()"
 >
-  <ng-container *ngIf="isAddSalesOrder">
-    <app-sales-order-finance-popup-form
-      (popupClosed)="handleClose()"
-      [canApprove]="canApprove"
-    ></app-sales-order-finance-popup-form>
-  </ng-container>
-</dx-popup>
-
-<!-- ========== sales order modifying form ========== -->
-<dx-popup
-  [(visible)]="isEditSalesOrder"
-  [width]="'90vw'"
-  [height]="'95vh'"
-  title="Sales Order"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isEditSalesOrder">
-    <app-sales-order-finance-popup-form
-      [isEditing]="true"
-      [EditingResponseData]="selectedSalesOrder"
-      [isReadOnlyMode]="isReadOnlySalesOrder"
-      (popupClosed)="handleClose()"
-      [canApprove]="canApprove"
-    ></app-sales-order-finance-popup-form>
-  </ng-container>
-</dx-popup>
-
-<dx-popup
-  *ngIf="isVerifySalesOrder"
-  [(visible)]="isVerifySalesOrder"
-  [width]="'95vw'"
-  [height]="'100vh'"
-  [title]="
-    selectedSalesOrder?.TRANS_STATUS === 2
-      ? 'Approve Sales Order'
-      : 'Verify Sales Order'
-  "
-  (popupClosed)="handleClose()"
->
-  <app-sales-order-finance-popup-form
-    [isEditing]="true"
-    [EditingResponseData]="selectedSalesOrder"
-    [isVerifyMode]="selectedSalesOrder?.TRANS_STATUS !== 2"
-    [isApproveMode]="selectedSalesOrder?.TRANS_STATUS === 2"
+  <app-refund-add
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
-  >
-  </app-sales-order-finance-popup-form>
+  ></app-refund-add>
 </dx-popup>
 
 <dx-popup
-  *ngIf="isApproveSalesOrder"
-  [(visible)]="isApproveSalesOrder"
-  [width]="'95vw'"
-  [height]="'100vh'"
-  title="Approve Invoice"
+  [(visible)]="isEditReceipt"
+  [width]="'80vw'"
+  [height]="'70vh'"
+  [title]="popupTitle"
   (onHiding)="handleClose()"
 >
-  <app-sales-order-finance-popup-form
-    [isEditing]="true"
-    [EditingResponseData]="selectedSalesOrder"
-    [isApproveMode]="true"
-    (popupClosed)="handleClose()"
-    [canApprove]="canApprove"
-  >
-  </app-sales-order-finance-popup-form>
-</dx-popup>
-
-<dx-popup
-  [(visible)]="isViewSalesOrder"
-  [width]="'90vw'"
-  [height]="'95vh'"
-  title="Sales Order"
-  (onHiding)="handleClose()"
->
-  <ng-container *ngIf="isViewSalesOrder">
-    <app-sales-order-finance-popup-form
-      [isEditing]="true"
-      [EditingResponseData]="selectedSalesOrder"
-      [isReadOnlyMode]="isReadOnlySalesOrder"
+  <ng-container *ngIf="isEditReceipt">
+    <app-refund-edit
+      [receiprtFormData]="selectedReceipt"
+      [isReadOnlyMode]="isReadOnlyReceipt"
       (popupClosed)="handleClose()"
       [canApprove]="canApprove"
-    ></app-sales-order-finance-popup-form>
+      [mode]="formMode"
+    ></app-refund-edit>
   </ng-container>
 </dx-popup>
+
+<dx-popup
+  [(visible)]="isVerifyReceipt"
+  [width]="'80vw'"
+  [height]="'70vh'"
+  [title]="popupTitle"
+  (onHiding)="handleClose()"
+>
+  <ng-container *ngIf="isVerifyReceipt">
+    <app-refund-edit
+      [receiprtFormData]="selectedReceipt"
+      [isReadOnlyMode]="isReadOnlyReceipt"
+      (popupClosed)="handleClose()"
+      [canApprove]="canApprove"
+      [mode]="formMode"
+      [isVerifyReceipt]="isVerifyReceipt"
+    ></app-refund-edit>
+  </ng-container>
+</dx-popup>
+
 <app-custom-date-popup
   [(visible)]="showCustomDatePopup"
   [startDate]="customStartDate"

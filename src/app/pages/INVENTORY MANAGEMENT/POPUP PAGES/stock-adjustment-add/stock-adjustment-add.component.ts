@@ -55,7 +55,8 @@ export class StockAdjustmentAddComponent {
   popupGridRef!: DxDataGridComponent;
   @ViewChild('validationGroup', { static: false })
   validationGroup!: DxValidationGroupComponent;
-
+  @ViewChild('itemsGridRef', { static: false })
+  itemsGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
   @Input() EditingResponseData: any = {};
   @Input() isEditing: boolean = false;
@@ -106,10 +107,11 @@ export class StockAdjustmentAddComponent {
   hidecost: any;
   IS_HQ_App: boolean = false;
   StoreIDData: any;
+  selectedItemKeys: number[] = [];
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) { }
+  ) {}
   ngOnInit() {
     this.isEditDataAvailable();
     this.get_item_list_Data();
@@ -219,11 +221,9 @@ export class StockAdjustmentAddComponent {
       NAME: 'REASON',
     };
     console.log(payload);
-    this.dataService
-      .getDropdownData(payload)
-      .subscribe((response: any) => {
-        this.reasons = response;
-      });
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.reasons = response;
+    });
   }
   getStoreDropdown() {
     const payload = {
@@ -278,21 +278,79 @@ export class StockAdjustmentAddComponent {
   }
 
   onAddItems() {
-
     this.isPopupVisible = true;
+
     const payload = {
       STORE_ID: this.StoreIDData,
     };
 
-    console.log(payload);
-    this.dataService.Get_item_list(payload).subscribe((res: any) => {
-      console.log(res);
-      this.items = res.Data;
-    });
-  }
-  onPopupHiding() { }
+    // Wait for the popup grid to render
+    setTimeout(() => {
+      this.popupGridRef?.instance.beginCustomLoading('Loading...');
 
-  updateNetAmount(event: any) { }
+      this.dataService.Get_item_list(payload).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          this.items = res.Data;
+
+          this.selectedItemKeys = this.adjustmentFormData.Details.map(
+            (item: any) => item.ITEM_ID,
+          );
+
+          this.popupGridRef?.instance.endCustomLoading();
+        },
+        error: () => {
+          this.popupGridRef?.instance.endCustomLoading();
+          notify('Failed to load items', 'error');
+        },
+      });
+    }, 0);
+  }
+
+  // onAddItems() {
+  //   this.isPopupVisible = true;
+  //   const payload = {
+  //     STORE_ID: this.StoreIDData,
+  //   };
+
+  //   console.log(payload);
+  //   this.dataService.Get_item_list(payload).subscribe((res: any) => {
+  //     console.log(res);
+  //     this.items = res.Data;
+
+  //     this.selectedItemKeys = this.adjustmentFormData.Details.map(
+  //       (item: any) => item.ITEM_ID,
+  //     );
+  //   });
+  // }
+
+  onPopupEditorPreparing(e: any) {
+    if (e.parentType === 'dataRow' && e.command === 'select') {
+      const exists = this.adjustmentFormData.Details.some(
+        (item: any) => item.ITEM_ID === e.row.data.ITEM_ID,
+      );
+
+      if (exists) {
+        e.editorOptions.disabled = true;
+      }
+    }
+  }
+
+  onPopupCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'select') {
+      const exists = this.adjustmentFormData.Details.some(
+        (item: any) => item.ITEM_ID === e.data.ITEM_ID,
+      );
+
+      if (exists) {
+        e.cellElement.style.pointerEvents = 'none';
+        e.cellElement.style.opacity = '0.5';
+      }
+    }
+  }
+  onPopupHiding() {}
+
+  updateNetAmount(event: any) {}
 
   SaveStockAdjustment() {
     console.log(this.adjustmentFormData);
@@ -396,6 +454,46 @@ export class StockAdjustmentAddComponent {
     console.log(this.adjustmentFormData, '================edit==============');
   }
   onEditorPreparing(event: any) {
+    if (event.dataField === 'NEW_QTY') {
+      event.editorOptions = event.editorOptions || {};
+
+      event.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      event.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      if (event) {
+        event.editorOptions.showSpinButtons = false;
+      }
+
+      event.editorOptions.onKeyDown = (event: any) => {
+        if (event.event.key === 'Enter') {
+          const grid = this.itemsGridRef?.instance;
+          const visibleRows = grid.getVisibleRows();
+
+          const rowIndex = visibleRows.findIndex(
+            (r) => r?.data === event.row?.data,
+          );
+
+          setTimeout(() => {
+            // existing logic untouched
+          }, 50);
+        }
+      };
+    }
     const rowData = event.row.data;
     // calculate adj_qty only for this row
     rowData.ADJ_QTY = rowData.NEW_QTY - rowData.STOCK_QTY;
@@ -413,9 +511,9 @@ export class StockAdjustmentAddComponent {
     this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
   }
 
-  onSelectPackAdd(e: any) { }
+  onSelectPackAdd(e: any) {}
 
-  onEditPackUpdate(e: any) { }
+  onEditPackUpdate(e: any) {}
 
   onCellValueChanged(e: any) {
     console.log(e, '===============pppppppppp==============  ');
@@ -469,4 +567,4 @@ export class StockAdjustmentAddComponent {
   exports: [StockAdjustmentAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentAddModule { }
+export class StockAdjustmentAddModule {}

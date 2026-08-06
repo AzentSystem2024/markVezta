@@ -1297,8 +1297,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     let y = 35;
 
     const labelX = 135;
-    const colonX = 160;
-    const valueX = 165;
+    const colonX = 153;
+    const valueX = 157;
 
     const yPos: any = {};
 
@@ -1335,7 +1335,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.text(':', colonX, y);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text('', valueX, y);
+    doc.text(data.SUPP_VAT_NO || '', valueX, y);
     yPos.suppVat = y;
 
     // STORE VAT
@@ -1396,12 +1396,12 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     // =========================
 
     const rLabelX = 10;
-    const rColonX = 42;
-    const rValueX = 48;
+    const rColonX = 35;
+    const rValueX = 39;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(90, 110, 130);
     // ship to → align with Store VAT row
-    doc.text('ship to', rLabelX, yPos.storeVat);
+    doc.text('Ship To', rLabelX, yPos.storeVat);
     doc.text(':', rColonX, yPos.storeVat);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
@@ -1422,7 +1422,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(90, 110, 130);
     doc.text('Contact No', rLabelX, yPos.address);
-
+    doc.text(':', rColonX, yPos.address);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
     doc.text(data.CONTACT_MOBILE || '', rValueX, yPos.address);
@@ -1433,68 +1433,79 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
     let tableStartY = yPos.address + 10;
 
-    const termsColumns = [
-      'Ship Method',
-      'Payment Terms',
-      'Currency',
-      'Delivery Date',
-      'Remarks (If any)',
-    ];
+    let termsColumns: any[] = [];
+    let termsDataRow: any[] = [];
 
-    const termsData = [
-      [
-        data.DELIVERY_TERM || '',
-        data.PAY_TERM || '',
-        data.CURRENCY_NAME || '',
-        this.formatDateToDDMMYYYY(data.DELIVERY_DATE) || '',
-        data.NARRATION || '',
-      ],
-    ];
+    if (data.DELIVERY_TERM) {
+      termsColumns.push('Ship Method');
+      termsDataRow.push(data.DELIVERY_TERM);
+    }
+    if (data.PAY_TERM) {
+      termsColumns.push('Payment Terms');
+      termsDataRow.push(data.PAY_TERM);
+    }
+    if (data.CURRENCY_NAME) {
+      termsColumns.push('Currency');
+      termsDataRow.push(data.CURRENCY_NAME);
+    }
+    if (data.DELIVERY_DATE) {
+      const formattedDate = this.formatDateToDDMMYYYY(data.DELIVERY_DATE);
+      if (
+        formattedDate &&
+        formattedDate !== '01/01/1' &&
+        !formattedDate.includes('0001')
+      ) {
+        termsColumns.push('Delivery Date');
+        termsDataRow.push(formattedDate);
+      }
+    }
+    if (data.NARRATION) {
+      termsColumns.push('Remarks (If any)');
+      termsDataRow.push(data.NARRATION);
+    }
 
-    autoTable(doc, {
-      startY: tableStartY,
-      head: [termsColumns],
-      body: termsData,
-      theme: 'plain',
+    let itemTableStartY = tableStartY;
 
-      // ADD THIS (IMPORTANT)
-      margin: { left: 10, right: 10 }, // reduce margins → table becomes wider
+    if (termsColumns.length > 0) {
+      const termsData = [termsDataRow];
 
-      tableWidth: 190, // or 'wrap' (see below)
+      autoTable(doc, {
+        startY: tableStartY,
+        head: [termsColumns],
+        body: termsData,
+        theme: 'plain',
+        margin: { left: 10, right: 10 },
+        tableWidth: 190,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2,
+          valign: 'middle',
+          halign: 'center',
+          lineWidth: 0,
+        },
+        headStyles: {
+          fontStyle: 'bold',
+          fillColor: [217, 234, 249],
+          textColor: 0,
+          lineWidth: 0,
+        },
+        bodyStyles: {
+          lineWidth: 0,
+        },
+      });
 
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        valign: 'middle',
-        halign: 'center',
-        lineWidth: 0,
-      },
-
-      headStyles: {
-        fontStyle: 'bold',
-        fillColor: [217, 234, 249],
-        textColor: 0,
-        lineWidth: 0,
-      },
-
-      bodyStyles: {
-        lineWidth: 0,
-      },
-    });
-
-    const itemTableStartY = (doc as any).lastAutoTable.finalY + 8;
+      itemTableStartY = (doc as any).lastAutoTable.finalY + 8;
+    }
 
     const itemColumns = [
       'Item Code',
       'Description',
-
       'Qty',
       'Unit Price',
-      // 'Discount %',
       'Taxable(Amt)',
       'VAT(%)',
       'VAT(Amt)',
-      'Total Price',
+      'Total Price (AED)',
     ];
 
     const itemData = data.PoDetails.map((item: any) => {
@@ -1562,6 +1573,18 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       startY: itemTableStartY,
       head: [itemColumns],
       body: itemData,
+      foot: [
+        [
+          '',
+          'Total',
+          String(totalQty),
+          '',
+          this.formatAmount(totalTaxable),
+          '',
+          this.formatAmount(totalVat),
+          this.formatAmount(totalPrice),
+        ],
+      ],
 
       theme: 'plain',
 
@@ -1577,45 +1600,14 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       },
 
       columnStyles: {
-        0: {
-          cellWidth: 28,
-          halign: 'left',
-        },
-
-        1: {
-          cellWidth: 42,
-          halign: 'left',
-        },
-
-        2: {
-          cellWidth: 18,
-          halign: 'center',
-        },
-
-        3: {
-          cellWidth: 22,
-          halign: 'center',
-        },
-
-        4: {
-          cellWidth: 24,
-          halign: 'center',
-        },
-
-        5: {
-          cellWidth: 16,
-          halign: 'center',
-        },
-
-        6: {
-          cellWidth: 24,
-          halign: 'center',
-        },
-
-        7: {
-          cellWidth: 24,
-          halign: 'center',
-        },
+        0: { cellWidth: 28, halign: 'left' },
+        1: { cellWidth: 42, halign: 'left' },
+        2: { cellWidth: 18, halign: 'right' },
+        3: { cellWidth: 22, halign: 'right' },
+        4: { cellWidth: 24, halign: 'right' },
+        5: { cellWidth: 16, halign: 'right' },
+        6: { cellWidth: 24, halign: 'right' },
+        7: { cellWidth: 24, halign: 'right' },
       },
 
       headStyles: {
@@ -1628,42 +1620,54 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       bodyStyles: {
         lineWidth: 0,
       },
-    });
 
-    // =========================
-    // TOTAL SECTION
-    // =========================
+      alternateRowStyles: {
+        fillColor: [249, 249, 249],
+      },
+
+      footStyles: {
+        fontStyle: 'bold',
+        textColor: 0,
+        fillColor: 255, // white background
+      },
+
+      didParseCell: function (dataHook: any) {
+        if (dataHook.section === 'head') {
+          if (dataHook.column.index >= 2 && dataHook.column.index <= 7) {
+            dataHook.cell.styles.halign = 'right';
+          }
+        } else if (dataHook.section === 'foot') {
+          dataHook.cell.styles.fontSize = 9;
+
+          if (dataHook.column.index === 1) {
+            dataHook.cell.styles.halign = 'center';
+          } else if (dataHook.column.index >= 2 && dataHook.column.index <= 7) {
+            dataHook.cell.styles.halign = 'right';
+          }
+        }
+      },
+
+      willDrawCell: function (dataHook: any) {
+        // Draw a single continuous top border line before the footer is rendered
+        if (dataHook.section === 'foot' && dataHook.column.index === 0) {
+          doc.setDrawColor(0);
+          doc.setLineWidth(0.3);
+          doc.line(10, dataHook.cell.y, 200, dataHook.cell.y);
+        }
+      },
+    });
 
     const finalY = (doc as any).lastAutoTable.finalY;
 
-    // top line
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.3);
+    // Amount in Words
+    if (totalPrice > 0) {
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(9);
+      doc.setTextColor(90, 110, 130);
+      const amountInWords = `Amount in Words: ${this.numberToWords(totalPrice)} Only`;
+      doc.text(amountInWords, 10, finalY + 8);
+    }
 
-    doc.line(10, finalY + 3, 200, finalY + 3);
-
-    // totals
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-
-    doc.text('Total', 55, finalY + 10);
-
-    doc.text(String(totalQty), 95, finalY + 10, {
-      align: 'center',
-    });
-
-    doc.text(this.formatAmount(totalTaxable), 138, finalY + 10, {
-      align: 'center',
-    });
-
-    doc.text(this.formatAmount(totalVat), 170, finalY + 10, {
-      align: 'center',
-    });
-
-    doc.text(this.formatAmount(totalPrice), 198, finalY + 10, {
-      align: 'center',
-    });
     // =========================
     // FOOTER COMPANY DETAILS
     // =========================
@@ -1711,6 +1715,78 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     // OPEN PDF
     // =========================
     doc.output('dataurlnewwindow');
+  }
+
+  numberToWords(amount: number): string {
+    const a = [
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen',
+    ];
+    const b = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety',
+    ];
+
+    const numToWords = (n: number): string => {
+      if (n < 20) return a[n];
+      if (n < 100)
+        return b[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + a[n % 10] : '');
+      if (n < 1000)
+        return (
+          a[Math.floor(n / 100)] +
+          ' Hundred' +
+          (n % 100 !== 0 ? ' and ' + numToWords(n % 100) : '')
+        );
+      if (n < 1000000)
+        return (
+          numToWords(Math.floor(n / 1000)) +
+          ' Thousand' +
+          (n % 1000 !== 0 ? ' ' + numToWords(n % 1000) : '')
+        );
+      if (n < 1000000000)
+        return (
+          numToWords(Math.floor(n / 1000000)) +
+          ' Million' +
+          (n % 1000000 !== 0 ? ' ' + numToWords(n % 1000000) : '')
+        );
+      return '';
+    };
+
+    const dirhams = Math.floor(amount);
+    const fils = Math.round((amount - dirhams) * 100);
+
+    let result = numToWords(dirhams) + ' Dirhams';
+    if (fils > 0) {
+      result += (dirhams > 0 ? ' and ' : '') + numToWords(fils) + ' Fils';
+    }
+
+    return result ? result.trim() : 'Zero Dirhams';
   }
 
   formatDateToDDMMYYYY(dateString: any): string {

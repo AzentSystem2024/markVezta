@@ -161,6 +161,12 @@
             [allowEditing]="false"
           ></dxi-column> -->
           <dxi-column
+            *ngIf="showActualStockQty"
+            dataField="ACTUAL_STOCK_QTY"
+            caption="Actual Qty"
+            [allowEditing]="false"
+          ></dxi-column>
+          <dxi-column
             dataField="QTY_STOCK"
             caption="Stock Qty"
             [allowEditing]="false"
@@ -188,14 +194,19 @@
 
           <dxo-summary>
             <dxi-total-item
+              column="QTY_STOCK"
+              summaryType="sum"
+              displayFormat="{0}"
+            ></dxi-total-item>
+            <dxi-total-item
               column="QUANTITY"
               summaryType="sum"
-              displayFormat="Total Qty: {0}"
+              displayFormat="{0}"
             ></dxi-total-item>
             <dxi-total-item
               column="DELIVERED_QUANTITY"
               summaryType="sum"
-              displayFormat="Total Qty: {0}"
+              displayFormat="{0}"
             ></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
