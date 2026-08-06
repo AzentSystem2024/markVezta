@@ -12,6 +12,7 @@
     (onExporting)="onExporting($event)"
     (onRowRemoving)="onRowRemoving($event)"
     (onEditingStart)="openEditingStart($event)"
+    [showColumnLines]="true"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-editing
