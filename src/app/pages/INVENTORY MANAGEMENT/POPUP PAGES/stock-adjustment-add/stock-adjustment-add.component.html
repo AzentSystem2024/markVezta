@@ -68,21 +68,41 @@
 
           <dxi-item location="after" locateInMenu="auto">
             <div class="stacked-toolbar-group">
-              <dx-select-box
-                [(value)]="StoreIDData"
-                [dataSource]="stores"
-                displayExpr="DESCRIPTION"
-                valueExpr="ID"
-                [width]="'100%'"
-                [searchEnabled]="true"
-                label="Store"
-                labelMode="floating"
-                ><dx-validator>
-                  <dxi-validation-rule
-                    type="required"
-                    message="Store is required"
-                  ></dxi-validation-rule> </dx-validator
-              ></dx-select-box>
+              <div style="display: flex; gap: 10px; margin-bottom: 5px">
+                <dx-select-box
+                  [(value)]="adjustmentFormData.STORE_ID"
+                  [dataSource]="stores"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [searchEnabled]="true"
+                  label="Store/Branch"
+                  labelMode="floating"
+                  ><dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="Store is required"
+                    ></dxi-validation-rule> </dx-validator
+                ></dx-select-box>
+
+                <!-- Department -->
+                <dx-select-box
+                  [(value)]="adjustmentFormData.DEPT_ID"
+                  [dataSource]="Department"
+                  displayExpr="DESCRIPTION"
+                  valueExpr="ID"
+                  [width]="200"
+                  [searchEnabled]="true"
+                  label="Department"
+                  labelMode="floating"
+                >
+                  <dx-validator>
+                    <dxi-validation-rule
+                      type="required"
+                      message="Department is required"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-select-box>
+              </div>
               <div style="margin-top: 2px; text-align: left">
                 <dx-button
                   text="Add Items"
