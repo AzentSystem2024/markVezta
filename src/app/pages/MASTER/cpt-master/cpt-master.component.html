@@ -9,12 +9,21 @@
     [allowColumnReordering]="true"
     [rowAlternationEnabled]="true"
     rowAlternationInterval="2"
+    [showColumnLines]="true"
     (onExporting)="onExporting($event)"
     (onRowRemoving)="onRowRemoving($event)"
     (onEditingStart)="openEditingStart($event)"
-    [showColumnLines]="true"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="[10, 20, 'all']"
+      displayMode="full"
+      [showPageSizeSelector]="true"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+
     <dxo-editing
       mode="popup"
       [allowUpdating]="true"
@@ -24,29 +33,27 @@
     >
       <dxo-popup title="Edit CPT data" [showTitle]="true"></dxo-popup>
     </dxo-editing>
-    <dxo-pager
-      [visible]="true"
-      [allowedPageSizes]="allowedPageSizes"
-      [displayMode]="displayMode"
-      [showPageSizeSelector]="showPageSizeSelector"
-      [showInfo]="showInfo"
-      [showNavigationButtons]="showNavButtons"
-    >
-    </dxo-pager>
+
     <dxo-load-panel [showPane]="false"></dxo-load-panel>
     <dxo-sorting mode="multiple"></dxo-sorting>
-    <dxo-header-filter [visible]="isFilterRowVisible">
+
+    <dxo-header-filter [visible]="isFilterOpened">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
-    <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+    <dxo-filter-row [visible]="isFilterOpened"></dxo-filter-row>
+
     <dxo-scrolling mode="virtual"></dxo-scrolling>
-    <dxo-search-panel [visible]="true" placeholder=" Search"></dxo-search-panel>
+    <dxo-search-panel
+      [visible]="true"
+      placeholder="Search..."
+    ></dxo-search-panel>
+
     <dxo-export
       [enabled]="true"
       [allowExportSelectedData]="false"
       [formats]="['xlsx']"
-    >
-    </dxo-export>
+    ></dxo-export>
+
     <dxo-toolbar>
       <dxi-item location="before">
         <div
@@ -55,18 +62,19 @@
             font-weight: 600;
             font-size: 20px;
             margin-left: 12px;
-            padding: -3px;
             margin-right: 3px;
           "
         >
           CPT Master
         </div>
       </dxi-item>
+
       <dxi-item
         location="after"
         widget="dxButton"
         [options]="searchButtonOptions"
       ></dxi-item>
+
       <dxi-item
         location="after"
         locateInMenu="auto"
@@ -81,12 +89,10 @@
         }"
       ></dxi-item>
 
-      <!-- Divider -->
       <dxi-item location="after">
         <div class="toolbar-divider"></div>
       </dxi-item>
 
-      <!-- Export (built-in, kept) -->
       <dxi-item
         name="exportButton"
         location="after"
@@ -99,6 +105,8 @@
         [options]="addButtonOptions"
       ></dxi-item>
     </dxo-toolbar>
+
+    <!-- Data Columns -->
     <dxi-column dataField="CPTCode" caption="Code"></dxi-column>
     <dxi-column dataField="CPTName" caption="Name"></dxi-column>
     <dxi-column dataField="Description" caption="Description"></dxi-column>
@@ -107,11 +115,6 @@
     <dxi-column dataField="Department" caption="Department"></dxi-column>
     <dxi-column dataField="CPTDepartment" caption="Sub Department"></dxi-column>
     <dxi-column dataField="CostDepartment" caption="Cost Center"></dxi-column>
-    <!-- <dxi-column
-      dataField="FixedQuantity"
-      caption="Fixed Quantity"
-      [format]="{ formatter: fixedQtyFormat }"
-    ></dxi-column> -->
   </dx-data-grid>
 
   <!-- ============ add new cpt data ============ -->
@@ -120,8 +123,8 @@
     [(visible)]="isAddFormPopupOpened"
     (save)="onClickSaveNewCptType()"
     titleText="New CPT Master"
-    [height]="'auto'"
-    [width]="'700'"
+    height="auto"
+    width="700"
     (clear)="resetCptForm()"
     [customValidate]="validateCptForm"
     [showApprove]="false"
@@ -137,8 +140,8 @@
     [(visible)]="isEditFormPopupOpened"
     (save)="onClickUpdateNewCptType()"
     titleText="Edit CPT Master"
-    [height]="'auto'"
-    [width]="'700'"
+    height="auto"
+    width="700"
     (clear)="clearEditForm()"
     [customValidate]="validateCptEditForm"
     [showApprove]="false"
