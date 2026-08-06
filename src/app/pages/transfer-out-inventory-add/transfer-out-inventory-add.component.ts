@@ -6,6 +6,8 @@ import {
   NgModule,
   NgZone,
   Output,
+  SimpleChanges,
+  OnChanges,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -57,11 +59,11 @@ import autoTable from 'jspdf-autotable';
   templateUrl: './transfer-out-inventory-add.component.html',
   styleUrls: ['./transfer-out-inventory-add.component.scss'],
 })
-export class TransferOutInventoryAddComponent {
+export class TransferOutInventoryAddComponent implements OnChanges {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() selectedDocStatus: any;
-  @Input() isReadOnlyMode: any
+  @Input() isReadOnlyMode: any;
   @Input() ActionStatus: any = {};
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(AddInvoiceComponent) addInvoiceComp!: AddInvoiceComponent;
@@ -116,7 +118,7 @@ export class TransferOutInventoryAddComponent {
   companyID: any;
   storename: any;
   netamount: any;
-  StoreIDData: any
+  StoreIDData: any;
   IS_HQ_App: boolean = false;
   transferstores: any[] = [];
   selectedStoreId: any;
@@ -124,12 +126,11 @@ export class TransferOutInventoryAddComponent {
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
-  ) { }
+  ) {}
 
   ngOnInit() {
     console.log('--------------Status-------------:', this.ActionStatus);
     console.log(this.isReadOnlyMode, 'READONLYMODE');
-    this.isEditDataAvailable();
 
     // always fetch fresh number when popup opens
 
@@ -175,7 +176,14 @@ export class TransferOutInventoryAddComponent {
     // this.items = [];
     // this.addEmptyRow();
   }
-
+  ngOnChanges(changes: SimpleChanges) {
+    if (
+      changes['EditingResponseData'] &&
+      changes['EditingResponseData'].currentValue
+    ) {
+      this.isEditDataAvailable();
+    }
+  }
   onRowInserted(e: any) {
     // Assign SL_NO as the row count
     e.data.SL_NO = this.transferOutFormData.DETAILS.length;
@@ -208,6 +216,12 @@ export class TransferOutInventoryAddComponent {
     this.transferOutFormData.DETAILS.forEach((row: any, index: number) => {
       row.SL_NO = index + 1;
     });
+
+    this.transferOutFormData.DETAILS = [...this.transferOutFormData.DETAILS];
+
+    setTimeout(() => {
+      this.itemsGridRef?.instance.refresh();
+    });
     console.log('Bound transferOutFormData:', this.transferOutFormData);
   }
 
@@ -231,8 +245,8 @@ export class TransferOutInventoryAddComponent {
   getStoreDropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.companyID
-    }
+      COMPANY_ID: this.companyID,
+    };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.transferstores = response;
 
@@ -240,8 +254,6 @@ export class TransferOutInventoryAddComponent {
         // 🔹 HQ App → show only store with ID = 1
         this.stores = response.filter((item: any) => item.ID === 1);
         this.StoreIDData = 1;
-
-
       } else {
         // 🔹 Not HQ → show all stores
         this.stores = response;
@@ -252,8 +264,8 @@ export class TransferOutInventoryAddComponent {
   getReasonsDropdown() {
     const payload = {
       NAME: 'REASON',
-      COMPANY_ID: this.companyID
-    }
+      COMPANY_ID: this.companyID,
+    };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
     });
@@ -261,8 +273,8 @@ export class TransferOutInventoryAddComponent {
   getDepartmentsDropdown() {
     const payload = {
       NAME: 'DEPT',
-      COMPANY_ID: this.companyID
-    }
+      COMPANY_ID: this.companyID,
+    };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.departments = response;
     });
@@ -289,7 +301,7 @@ export class TransferOutInventoryAddComponent {
     this.isPopupVisible = true; // open popup
   }
 
-  onPopupHiding() { }
+  onPopupHiding() {}
 
   onSelectItems() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
@@ -510,8 +522,11 @@ export class TransferOutInventoryAddComponent {
 
     // ---------- EDIT MODE ----------
     if (this.isEditing) {
-      console.log(this.selectedDocStatus, '==========')
-      if (this.selectedDocStatus == 'VERIFY' || this.transferOutFormData.IS_APPROVED) {
+      console.log(this.selectedDocStatus, '==========');
+      if (
+        this.selectedDocStatus == 'VERIFY' ||
+        this.transferOutFormData.IS_APPROVED
+      ) {
         // APPROVE API
         confirm(
           'Are you sure you want to approve this transfer?',
@@ -540,9 +555,10 @@ export class TransferOutInventoryAddComponent {
             });
           }
         });
-      }
-      else if (this.selectedDocStatus == 'OPEN' && this.ActionStatus == 'VerifyScreen') {
-
+      } else if (
+        this.selectedDocStatus == 'OPEN' &&
+        this.ActionStatus == 'VerifyScreen'
+      ) {
         confirm(
           'Are you sure you want to Verify this transfer?',
           'Confirm Verify',
@@ -570,10 +586,7 @@ export class TransferOutInventoryAddComponent {
             });
           }
         });
-
-
-      }
-      else {
+      } else {
         // UPDATE API
         this.dataService.updateTransferOutForInventory(payload).subscribe({
           next: (res: any) => {
@@ -667,8 +680,9 @@ export class TransferOutInventoryAddComponent {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
-      }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${
+      months[date.getMonth()]
+    }-${date.getFullYear().toString().slice(-2)}`;
   }
 
   openPDF() {
@@ -684,8 +698,8 @@ export class TransferOutInventoryAddComponent {
 
   getBase64ImageFromURL(url: string): Promise<string> {
     return fetch(url)
-      .then(res => res.blob())
-      .then(blob => {
+      .then((res) => res.blob())
+      .then((blob) => {
         return new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result as string);
@@ -706,7 +720,9 @@ export class TransferOutInventoryAddComponent {
     const headerY = 10;
 
     // --- Logo placeholder (replace with addImage if needed)
-    const logoBase64 = await this.getBase64ImageFromURL('assets/images/image16.png');
+    const logoBase64 = await this.getBase64ImageFromURL(
+      'assets/images/image16.png',
+    );
 
     doc.addImage(logoBase64, 'PNG', 15, headerY, 35, 50);
 
@@ -739,8 +755,8 @@ export class TransferOutInventoryAddComponent {
       `NARRATION: ${data.NARRATION || ''}`,
     ];
 
-    const rightMargin = 20;   // distance from right edge
-    const maxWidth = 70;      // width of text block
+    const rightMargin = 20; // distance from right edge
+    const maxWidth = 70; // width of text block
 
     let y = headerY + 5;
 
@@ -921,4 +937,4 @@ export class TransferOutInventoryAddComponent {
   exports: [TransferOutInventoryAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferOutInventoryAddModule { }
+export class TransferOutInventoryAddModule {}
