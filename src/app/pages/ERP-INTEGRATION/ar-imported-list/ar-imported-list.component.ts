@@ -49,7 +49,7 @@ export class ARImportedListComponent {
   showFilterRow: boolean = false;
   currentFilter: string = 'auto';
 
-  importDataList: DataSource | null = null;
+  importDataList: any[] = [];
   detailViewColumns: any[] = [];
 
   // Store all detail data
@@ -304,7 +304,7 @@ export class ARImportedListComponent {
   }
 
   // ====== Fetch Import data list =======
-  fetch_Full_import_list() {
+  async fetch_Full_import_list() {
     //  Common Formatter
     const formatData = (data: any[] = []) => {
       return data.map((item: any) => {
@@ -349,45 +349,36 @@ export class ARImportedListComponent {
       });
     };
 
-    // DataSource
-    this.importDataList = new DataSource({
-      store: new CustomStore({
-        key: 'HeaderID',
+    try {
+      const { fromDate, toDate } = this.getDateRange();
 
-        load: async () => {
-          try {
-            const { fromDate, toDate } = this.getDateRange();
+      const payload = {
+        DATE_FROM: fromDate,
+        DATE_TO: toDate,
+      };
+      const response: any = await this.srvce
+        .import_AR_Full_List(payload)
+        .toPromise();
 
-            const payload = {
-              DATE_FROM: fromDate,
-              DATE_TO: toDate,
-            };
-            const response: any = await this.srvce
-              .import_AR_Full_List(payload)
-              .toPromise();
+      // Header Data
+      const headerData = formatData(response?.header || []);
 
-            // Header Data
-            const headerData = formatData(response?.header || []);
+      // Detail Data
+      this.importDetailData = formatData(response?.detail || []);
 
-            // Detail Data
-            this.importDetailData = formatData(response?.detail || []);
+      // Dynamic Detail Columns
+      this.detailsDataColumns = Object.keys(
+        this.importDetailData?.[0] || {},
+      );
 
-            // Dynamic Detail Columns
-            this.detailsDataColumns = Object.keys(
-              this.importDetailData?.[0] || {},
-            );
+      // Dynamic Header Columns
+      this.detailViewColumns = Object.keys(headerData?.[0] || {});
 
-            // Dynamic Header Columns
-            this.detailViewColumns = Object.keys(headerData?.[0] || {});
-
-            return headerData;
-          } catch (error) {
-            console.error(error);
-            return [];
-          }
-        },
-      }),
-    });
+      this.importDataList = headerData;
+    } catch (error) {
+      console.error(error);
+      this.importDataList = [];
+    }
   }
 
   // ================= Row Expanding =================
