@@ -135,7 +135,6 @@
       <!-- Grid -->
       <dx-data-grid
         #dataGrid
-        class="grid theme-dependent"
         [dataSource]="Imported_Ar_DataSource"
         [columns]="gridColumns"
         [showBorders]="true"
@@ -234,11 +233,8 @@
     <div *dxTemplate="let data of 'content'">
       <dx-data-grid
         #detailGrid
-        class="grid theme-dependent"
         [dataSource]="importDetailViewData"
         [showBorders]="true"
-        [columnAutoWidth]="true"
-        [allowColumnResizing]="true"
         [allowColumnReordering]="true"
         [rowAlternationEnabled]="true"
         [height]="'100%'"
@@ -250,7 +246,7 @@
           *ngFor="let col of detailViewColumns"
           [dataField]="col"
           [caption]="col"
-          [visible]="col !== 'ID'"
+          [visible]="col !== 'ID' && col !== 'HeaderID'"
           width="150"
           [fixed]="col === 'FailureReason' || col === 'Status'"
           [fixedPosition]="'right'"

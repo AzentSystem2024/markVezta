@@ -69,6 +69,9 @@ export class CptMasterNewFormComponent implements OnInit {
     DepartmentID: '',
     CPTDepartmentID: '',
     CostDepartmentID: '',
+    ServiceCode: '',
+    ServiceCategoryID: '',
+    VATClassID: '',
     FixedQuantity: 0,
     CostDriveID: 0,
     IsDifferentCPTDepartment: 0,
@@ -83,6 +86,8 @@ export class CptMasterNewFormComponent implements OnInit {
   Costdepartment_DropDownData: any;
   CptType_DropDownData: any;
   CostDrive_DropDownData: any;
+  serviceCategory_DropDownData: any;
+  vatClass_DropDownData: any;
   Facility_DataSource: any[] = [];
   Facility_Value: any;
   ClinicianRVUDataSource: any[] = [];
@@ -119,6 +124,8 @@ export class CptMasterNewFormComponent implements OnInit {
     this.getCpt_DropDown();
     this.getCostDrive_DropDown();
     this.getClinicianRole_DropDown();
+    this.getServiceCategory_DropDown();
+    this.getVatClass_DropDown();
   }
 
   async ngOnInit() {
@@ -267,6 +274,38 @@ export class CptMasterNewFormComponent implements OnInit {
     });
   }
 
+  getServiceCategory_DropDown() {
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const SELECTED_COMPANY = JSON.parse(savedUserData);
+      const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+      const COMPANY_ID = companyid.COMPANY_ID;
+      const payload = {
+        NAME: 'ITEM CATEGORY',
+        COMPANY_ID: COMPANY_ID || 1,
+      };
+      this.dataService.getDropdownData(payload).subscribe((data) => {
+        this.serviceCategory_DropDownData = data;
+      });
+    }
+  }
+
+  getVatClass_DropDown() {
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const SELECTED_COMPANY = JSON.parse(savedUserData);
+      const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+      const COMPANY_ID = companyid.COMPANY_ID;
+      const payload = {
+        NAME: 'VAT_CLASS',
+        COMPANY_ID: COMPANY_ID || 1,
+      };
+      this.dataService.getDropdownData(payload).subscribe((data) => {
+        this.vatClass_DropDownData = data;
+      });
+    }
+  }
+
   checkDuplicateCPTCode = (params: any): Promise<boolean> => {
     const inputValue = params.value?.toLowerCase().trim();
 
@@ -317,6 +356,9 @@ export class CptMasterNewFormComponent implements OnInit {
       DepartmentID: null,
       CPTDepartmentID: null,
       CostDepartmentID: null,
+      ServiceCode: '',
+      ServiceCategoryID: '',
+      VATClassID: '',
       IsDifferentCPTDepartment: 0,
       // IsDifferentLedger: 0,
       CPTEncounterDepartments: [],
@@ -334,6 +376,9 @@ export class CptMasterNewFormComponent implements OnInit {
       DepartmentID: '',
       CPTDepartmentID: '',
       CostDepartmentID: '',
+      ServiceCode: '',
+      ServiceCategoryID: '',
+      VATClassID: '',
       CostDriveID: 0,
       FixedQuantity: 0,
       IsDifferentCPTDepartment: 0,

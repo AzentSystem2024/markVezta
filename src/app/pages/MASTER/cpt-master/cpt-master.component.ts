@@ -1,12 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  NgModule,
-  NgZone,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import {
   DxDataGridModule,
   DxButtonModule,
@@ -17,11 +10,9 @@ import {
   DxDataGridComponent,
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
-// import { ReportService } from 'src/app/services/Report-data.service';
 import notify from 'devextreme/ui/notify';
 
 import DataSource from 'devextreme/data/data_source';
-import { ActivatedRoute, Router } from '@angular/router';
 import { DataService } from 'src/app/services';
 import {
   CptMasterEditFormComponent,
@@ -39,6 +30,7 @@ import {
   providers: [DataService],
 })
 export class CPTMasterComponent {
+  // ================= ViewChild Declarations =================
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
 
@@ -48,27 +40,37 @@ export class CPTMasterComponent {
   @ViewChild(CptMasterEditFormComponent, { static: false })
   CptEditFormComponent!: CptMasterEditFormComponent;
 
-  //========Variables for Pagination ====================
+  // ================= Pagination & Display Configurations =================
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
-  showPageSizeSelector = true;
-  showInfo = true;
-  showNavButtons = true;
-  facilityGroupDatasource: any;
+  showPageSizeSelector: boolean = true;
+  showInfo: boolean = true;
+  showNavButtons: boolean = true;
+
+  // ================= State Variables =================
+  initialized: boolean = false;
+  isFilterOpened: boolean = false;
+  isFilterRowVisible: boolean = false;
   isAddFormPopupOpened: boolean = false;
   isEditFormPopupOpened: boolean = false;
-  selectedCptMaster: any;
-  isFilterOpened = false;
 
+  // ================= Data & Selection =================
+  currentPathName: string = '';
+  selectedCptMaster: any;
+  facilityGroupDatasource: any;
+
+  // ================= Data Sources =================
   dataSource = new DataSource<any>({
     load: () =>
       new Promise((resolve, reject) => {
         this.dataService.get_CptMaster_List().subscribe({
-          next: (response: any) => resolve(response.data), // Resolve with the data
-          error: (error: any) => reject(error.message), // Reject with the error message
+          next: (response: any) => resolve(response.data),
+          error: (error: any) => reject(error.message),
         });
       }),
   });
+
+  // ================= Toolbar Configurations =================
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -76,27 +78,6 @@ export class CPTMasterComponent {
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
-
-
-
-  isFilterRowVisible: boolean = false;
-  currentPathName: string = '';
-  initialized: boolean = false;
-
-  constructor(private dataService: DataService, private ngZone: NgZone,) {
-
-  }
 
   addButtonOptions = {
     type: 'default',
@@ -106,7 +87,6 @@ export class CPTMasterComponent {
       this.ngZone.run(() => this.show_new_Form());
     },
     elementAttr: { class: 'add-button' },
-
     template: () => {
       return `
       <div class="add-btn-content">
@@ -120,14 +100,39 @@ export class CPTMasterComponent {
     },
   };
 
-  //=========================show new popup=========================
-  show_new_Form() {
-    this.isAddFormPopupOpened = true;
+  constructor(
+    private dataService: DataService,
+    private ngZone: NgZone,
+  ) {}
+
+  // ================= Toolbar Action Methods =================
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    const grid = this.dataGrid?.instance;
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
+
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
   };
 
+  show_new_Form() {
+    this.isAddFormPopupOpened = true;
+  }
+
+  refresh = () => {
+    this.dataGrid?.instance?.refresh();
+  };
+
+  onExporting(event: any) {
+    const fileName = 'Cpt_master';
+    this.dataService.exportDataGrid(event, fileName);
+  }
+
+  // ================= Grid Action Methods =================
   openEditingStart(event: any) {
     event.cancel = true;
     const ID = event.data.ID;
@@ -138,7 +143,37 @@ export class CPTMasterComponent {
     });
   }
 
-  //======= Add data ==========
+  onRowRemoving(event: any) {
+    event.cancel = true;
+    const SelectedRow = event.key;
+
+    this.dataService.Remove_CptMaster_Row_Data(SelectedRow.ID).subscribe({
+      next: () => {
+        notify(
+          {
+            message: 'Delete operation successful',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          },
+          'success',
+        );
+        event.component.refresh();
+        this.dataGrid.instance.refresh();
+      },
+      error: () => {
+        notify(
+          {
+            message: 'Delete operation failed',
+            position: { at: 'top right', my: 'top right' },
+            displayTime: 500,
+          },
+          'error',
+        );
+      },
+    });
+  }
+
+  // ================= Form Save / Update Methods =================
   onClickSaveNewCptType = async () => {
     if (!this.CptNewFormComponent) {
       console.error('Child component not available');
@@ -159,6 +194,9 @@ export class CPTMasterComponent {
       DepartmentID,
       CPTDepartmentID,
       CostDepartmentID,
+      ServiceCode,
+      ServiceCategoryID,
+      VATClassID,
       CostDriveID,
       FixedQuantity,
       IsDifferentCPTDepartment,
@@ -178,6 +216,9 @@ export class CPTMasterComponent {
         DepartmentID,
         CPTDepartmentID,
         CostDepartmentID,
+        ServiceCode,
+        ServiceCategoryID,
+        VATClassID,
         CostDriveID,
         FixedQuantity,
         IsDifferentCPTDepartment,
@@ -187,20 +228,21 @@ export class CPTMasterComponent {
         data,
       )
       .subscribe((response: any) => {
-        if (response) {
+        if (response && response.flag === '1') {
           this.dataGrid.instance.refresh();
           notify(
             {
-              message: `New Cpt Master Saved Successfully`,
+              message: response.message || `New Cpt Master Saved Successfully`,
               position: { at: 'top right', my: 'top right' },
             },
             'success',
           );
+          this.isAddFormPopupOpened = false;
           this.CptNewFormComponent.clearForm();
         } else {
           notify(
             {
-              message: `Your Data Not Saved`,
+              message: response?.message || `Your Data Not Saved`,
               position: { at: 'top right', my: 'top right' },
             },
             'error',
@@ -209,7 +251,6 @@ export class CPTMasterComponent {
       });
   };
 
-  //======= Update data ==========
   onClickUpdateNewCptType = () => {
     this.CptEditFormComponent.newCptMasterData.selectedLedgerID =
       this.CptEditFormComponent.ledgerMode === 1
@@ -226,6 +267,9 @@ export class CPTMasterComponent {
       DepartmentID,
       CPTDepartmentID,
       CostDepartmentID,
+      ServiceCode,
+      ServiceCategoryID,
+      VATClassID,
       CostDriveID,
       FixedQuantity,
       IsDifferentCPTDepartment,
@@ -246,6 +290,9 @@ export class CPTMasterComponent {
         DepartmentID,
         CPTDepartmentID,
         CostDepartmentID,
+        ServiceCode,
+        ServiceCategoryID,
+        VATClassID,
         CostDriveID,
         FixedQuantity,
         IsDifferentCPTDepartment,
@@ -255,20 +302,21 @@ export class CPTMasterComponent {
         data,
       )
       .subscribe((response: any) => {
-        if (response) {
+        if (response && response.flag === '1') {
           this.dataGrid.instance.refresh();
           notify(
             {
-              message: `Cpt Master Updated Successfully`,
+              message: response.message || `Cpt Master Updated Successfully`,
               position: { at: 'top right', my: 'top right' },
             },
             'success',
           );
+          this.isEditFormPopupOpened = false;
           this.resetCptForm();
         } else {
           notify(
             {
-              message: `Your Data Not Updated`,
+              message: response?.message || `Your Data Not Updated`,
               position: { at: 'top right', my: 'top right' },
             },
             'error',
@@ -277,35 +325,7 @@ export class CPTMasterComponent {
       });
   };
 
-  //====================Row Data Deleting========================
-  onRowRemoving(event: any) {
-    event.cancel = true;
-    let SelectedRow = event.key;
-    this.dataService.Remove_CptMaster_Row_Data(SelectedRow.ID).subscribe(() => {
-      try {
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'success',
-        );
-      } catch (error) {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-            displayTime: 500,
-          },
-          'error',
-        );
-      }
-      event.component.refresh();
-      this.dataGrid.instance.refresh();
-    });
-  }
-
+  // ================= Helper & Validation Methods =================
   fixedQtyFormat = (value: any) => {
     if (value === 0 || value === '0' || value == null) {
       return '';
@@ -313,22 +333,12 @@ export class CPTMasterComponent {
     return Number(value).toFixed(2);
   };
 
-  //========================Export data ==========================
-  onExporting(event: any) {
-    const fileName = 'Cpt_master';
-    this.dataService.exportDataGrid(event, fileName);
-  }
-
-  //=================== Page refreshing==========================
-  refresh = () => {
-    this.dataGrid.instance.refresh();
-  };
   resetCptForm() {
-    this.CptNewFormComponent.clearForm();
+    this.CptNewFormComponent?.clearForm();
   }
 
   clearEditForm() {
-    this.CptEditFormComponent.clearForm();
+    this.CptEditFormComponent?.clearForm();
   }
 
   validateCptForm = (): boolean => {
@@ -339,12 +349,12 @@ export class CPTMasterComponent {
     return this.CptEditFormComponent?.validateForm();
   };
 }
+
 @NgModule({
   imports: [
     CommonModule,
     DxDataGridModule,
     DxButtonModule,
-    DxDataGridModule,
     DxDropDownButtonModule,
     DxSelectBoxModule,
     DxTextBoxModule,
@@ -357,4 +367,4 @@ export class CPTMasterComponent {
   exports: [],
   declarations: [CPTMasterComponent],
 })
-export class CPTMasterModule { }
+export class CPTMasterModule {}

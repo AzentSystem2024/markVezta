@@ -225,6 +225,7 @@ import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashb
 import { RefundComponent } from './pages/Operations/Deposit/refund/refund.component';
 import { SupplierwiseSalesComponent } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
 import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/supplierwise-stock.component';
+import { ProfitLossDepartmentwiseComponent } from './pages/REPORT/profit-loss-departmentwise/profit-loss-departmentwise.component';
 
 const routes: Routes = [
   {
@@ -1381,6 +1382,11 @@ const routes: Routes = [
       {
         path: 'supp-wise-stock',
         component: SupplierwiseStockComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'departmentwise-profitandloss',
+        component: ProfitLossDepartmentwiseComponent,
         canActivate: [AuthGuardService],
       },
       {

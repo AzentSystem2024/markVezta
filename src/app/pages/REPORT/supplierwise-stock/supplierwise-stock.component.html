@@ -1,1 +1,144 @@
-<p>supplierwise-stock works!</p>
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'82vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true,
+      }"
+      class="grid theme-dependent"
+      [dataSource]="stockViewList"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+    >
+      <!-- <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing> -->
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-scrolling mode="virtual"></dxo-scrolling>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right:  3px;
+            "
+          >
+            Stock View
+          </div>
+        </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto">
+          <!-- <dx-select-box
+            [width]="200"
+            label="Type"
+            labelMode="floating"
+            [items]="ItemList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="selected_item_Id"
+            (onValueChanged)="onItemIdChange($event)"
+            [searchEnabled]="true"
+          >
+          </dx-select-box> -->
+        </dxi-item>
+        <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
+        <!-- <dxi-item widget="dxButton" [options]="filterButtonOptions"></dxi-item> -->
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+      </dxo-toolbar>
+      <dxi-column dataField="DEPARTMENT" caption="Department"></dxi-column>
+      <dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
+      <dxi-column dataField="BRAND" caption="Brand"></dxi-column>
+      <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
+      <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
+      <dxi-column dataField="STORE" caption="Store"></dxi-column>
+      <dxi-column
+        dataField="ITEM_DESCRIPTION"
+        caption="Description"
+      ></dxi-column>
+      <dxi-column dataField="CURRENT_STOCK" caption="Stock"></dxi-column>
+      <dxo-summary>
+        <dxi-total-item
+          column="CURRENT_STOCK"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          alignment="right"
+        >
+        </dxi-total-item>
+      </dxo-summary>
+    </dx-data-grid>
+  </div>
+</div>

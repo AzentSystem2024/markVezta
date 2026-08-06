@@ -243,6 +243,9 @@ export class DataService {
     DepartmentID: any,
     CPTDepartmentID: any,
     CostDepartmentID: any,
+    ServiceCode: any,
+    ServiceCategoryID: any,
+    VATClassID: any,
     CostDriveID: any,
     FixedQuantity: any,
     IsDifferentCPTDepartment: any,
@@ -261,6 +264,9 @@ export class DataService {
       DepartmentID: DepartmentID,
       CPTDepartmentID: CPTDepartmentID,
       CostDepartmentID: CostDepartmentID,
+      ServiceCode: ServiceCode,
+      ServiceCategoryID: ServiceCategoryID,
+      VATClassID: VATClassID,
       CostDriveID: CostDriveID,
       FixedQuantity: FixedQuantity,
       IsDifferentCPTDepartment: IsDifferentCPTDepartment == 1 ? true : false,
@@ -284,6 +290,9 @@ export class DataService {
     DepartmentID: any,
     CPTDepartmentID: any,
     CostDepartmentID: any,
+    ServiceCode: any,
+    ServiceCategoryID: any,
+    VATClassID: any,
     CostDriveID: any,
     FixedQuantity: any,
     IsDifferentCPTDepartment: any,
@@ -324,6 +333,9 @@ export class DataService {
       DepartmentID: finalDepartmentID,
       CPTDepartmentID: finalCPTDepartmentID,
       CostDepartmentID: CostDepartmentID,
+      ServiceCode: ServiceCode,
+      ServiceCategoryID: ServiceCategoryID,
+      VATClassID: VATClassID,
       CostDriveID: CostDriveID,
       FixedQuantity: FixedQuantity,
       IsDifferentCPTDepartment: IsDifferentCPTDepartment == 1 ? true : false,
@@ -7436,6 +7448,24 @@ The result can be exported to HTML or Markdown.`;
 
   deleteRefundDeposit(items: any) {
     const data = items;
-    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtyp/delete`, data);
+    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtype/delete`, data);
+  }
+
+  //supplierwise report
+  SupplierwiseSales_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'SalesReport/SuppWiseSales';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //supplierwise stock
+  SupplierwiseStock_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSales';
+    return this.http.post(getEndpoint, payload);
+  }
+
+  //departmentwise profit and loss
+  DepartmentwiseProfitAndLoss_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'AC_Report/Deptwiseprofitloss';
+    return this.http.post(getEndpoint, payload);
   }
 }
