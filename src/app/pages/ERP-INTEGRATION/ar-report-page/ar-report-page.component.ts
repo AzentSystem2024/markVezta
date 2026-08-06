@@ -41,7 +41,7 @@ export class ARReportPageComponent implements OnInit {
 
   isFilterRowVisible: boolean = false;
 
-  Ar_Report_DataSource: DataSource<any> | undefined;
+  Ar_Report_DataSource!: DataSource<any>;
   isEmptyDatagrid: boolean = true;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];

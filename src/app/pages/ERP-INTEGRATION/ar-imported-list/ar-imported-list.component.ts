@@ -770,14 +770,14 @@ export class ARImportedListComponent {
 
     let masterKey = '';
 
-    if (['ApexTPACode', 'ApexInsuCode', 'ApexInstCode'].includes(particular)) {
+    if (['HISTPACode', 'HISInsuCode', 'HISInstCode'].includes(particular)) {
       masterKey = 'Customer';
     } else if (
-      ['ApexReportingDoctor', 'ApexReferringDoctor'].includes(particular)
+      ['HISReportingDoctor', 'HISReferringDoctor'].includes(particular)
     ) {
       masterKey = 'Clinician';
     } else if (
-      ['ApexReportingDoctorDept', 'ApexReferringDoctorDept'].includes(
+      ['HISReportingDoctorDept', 'HISReferringDoctorDept'].includes(
         particular,
       )
     ) {
