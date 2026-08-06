@@ -134,7 +134,7 @@ export class StockAdjustmentEditComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     // this.isEditDataAvailable();
@@ -150,6 +150,7 @@ export class StockAdjustmentEditComponent {
     console.log('Parsed ObjectData==================:', menuResponse);
     console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
+    console.log(this.userID, 'USERIDINSTOCKADJ');
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
@@ -280,7 +281,6 @@ export class StockAdjustmentEditComponent {
     });
   }
 
-
   getReasonsDropdown() {
     const payload = {
       COMPANY_ID: this.companyID,
@@ -370,8 +370,8 @@ export class StockAdjustmentEditComponent {
   //     this.items = res.Data;
   //   });
   // }
-  onPopupHiding() { }
-  updateNetAmount(event: any) { }
+  onPopupHiding() {}
+  updateNetAmount(event: any) {}
 
   UpdateStockAdjustment() {
     console.log(this.adjustmentFormData);
@@ -402,6 +402,7 @@ export class StockAdjustmentEditComponent {
       FIN_ID: this.finID,
       STORE_ID: this.adjustmentFormData.STORE_ID,
       DEPT_ID: this.adjustmentFormData.DEPT_ID,
+      USER_ID: this.userID,
       Details: transformed,
     };
     console.log(payload);
@@ -638,4 +639,4 @@ export class StockAdjustmentEditComponent {
   exports: [StockAdjustmentEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentEditModule { }
+export class StockAdjustmentEditModule {}
