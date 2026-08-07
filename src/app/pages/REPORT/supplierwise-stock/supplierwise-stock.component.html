@@ -84,20 +84,40 @@
           </div>
         </dxi-item>
 
-        <dxi-item location="after" locateInMenu="auto">
-          <!-- <dx-select-box
-            [width]="200"
-            label="Type"
+        <dxi-item>
+          <dx-select-box
+            label="Supplier"
             labelMode="floating"
-            [items]="ItemList"
+            [(value)]="selectedSupplier"
+            [dataSource]="distributorList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
-            [(value)]="selected_item_Id"
-            (onValueChanged)="onItemIdChange($event)"
+            width="200px"
             [searchEnabled]="true"
+            (onValueChanged)="onSupplierChange()"
           >
-          </dx-select-box> -->
+          </dx-select-box>
         </dxi-item>
+
+        <dxi-item location="after" locateInMenu="auto">
+          <dx-tag-box
+            label="Store"
+            labelMode="floating"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [items]="Store"
+            [(value)]="selectedStoreid"
+            [searchEnabled]="true"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [width]="200"
+            [showSelectionControls]="true"
+            (onValueChanged)="updateStoreHint()"
+          >
+          </dx-tag-box>
+        </dxi-item>
+
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <!-- <dxi-item widget="dxButton" [options]="filterButtonOptions"></dxi-item> -->
         <dxi-item
@@ -130,7 +150,7 @@
       <dxi-column dataField="BRAND" caption="Brand"></dxi-column>
       <dxi-column dataField="SUPP_NAME" caption="Supplier"></dxi-column>
       <dxi-column dataField="ITEM_CODE" caption="Item Code"></dxi-column>
-      <dxi-column dataField="STORE" caption="Store"></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column
         dataField="ITEM_DESCRIPTION"
         caption="Description"

@@ -7459,7 +7459,7 @@ The result can be exported to HTML or Markdown.`;
 
   //supplierwise stock
   SupplierwiseStock_Report(payload: any) {
-    const getEndpoint = this.apiUrl + 'SalesReport/ItemWiseSales';
+    const getEndpoint = this.apiUrl + 'ItemStockRpt/suppitemstockrpt';
     return this.http.post(getEndpoint, payload);
   }
 

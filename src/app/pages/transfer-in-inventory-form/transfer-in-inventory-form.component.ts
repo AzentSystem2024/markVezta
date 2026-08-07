@@ -131,7 +131,7 @@ export class TransferInInventoryFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.isEditDataAvailable();
@@ -299,7 +299,7 @@ export class TransferInInventoryFormComponent {
   getReasonsDropdown() {
     const payload = {
       COMPANY_ID: this.companyID,
-      NAME: 'REASON',
+      NAME: 'REASONS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.reasons = response;
@@ -389,7 +389,7 @@ export class TransferInInventoryFormComponent {
     this.popupClosed.emit();
   }
 
-  onPopupHiding() {}
+  onPopupHiding() { }
 
   private formatDateLocal(date: any): string | null {
     if (!date) return null;
@@ -1210,9 +1210,8 @@ export class TransferInInventoryFormComponent {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${
-      months[date.getMonth()]
-    }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
+      }-${date.getFullYear().toString().slice(-2)}`;
   }
 }
 
@@ -1256,4 +1255,4 @@ export class TransferInInventoryFormComponent {
   exports: [TransferInInventoryFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferInInventoryFormModule {}
+export class TransferInInventoryFormModule { }

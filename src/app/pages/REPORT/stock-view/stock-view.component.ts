@@ -41,6 +41,8 @@ import {
 import { StockMovementReportComponent } from '../stock-movement-report/stock-movement-report.component';
 import { DataService } from '../../../services';
 import { Router } from '@angular/router';
+import notify from 'devextreme/ui/notify';
+import DataSource from 'devextreme/data/data_source';
 
 @Component({
   selector: 'app-stock-view',
@@ -71,6 +73,8 @@ export class StockViewComponent {
   companyID: any;
   fin_id: any;
   finID: any;
+  storeHint: string = '';
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -88,6 +92,8 @@ export class StockViewComponent {
     onClick: () => this.toggleFilters(),
   };
   stockViewList: any;
+  Store: any;
+  selectedStoreid: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -105,7 +111,7 @@ export class StockViewComponent {
     if (this.fin_id.length) {
       this.finID = this.fin_id[0].FIN_ID;
     }
-    
+
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
 
@@ -124,10 +130,11 @@ export class StockViewComponent {
 
     this.getStockViewList();
     this.sessionData_tax();
+    this.store_dropdown();
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || " ");
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.companyID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(this.companyID)
@@ -150,14 +157,66 @@ export class StockViewComponent {
     }
   }
 
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
+    this.getStockViewList();
+  }
+
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.companyID
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
 
   getStockViewList() {
     const payload = {
       FIN_ID: this.finID,
-      COMPANY_ID : this.companyID
+      STORE_ID: this.selectedStoreid?.length
+        ? this.selectedStoreid.join(',') // FINAL FIX
+        : '',
     };
-    this.dataService.getStockViewList(payload).subscribe((response: any) => {
-      this.stockViewList = response.Data;
+    this.stockViewList = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getStockViewList(payload).subscribe({
+            next: (response: any) => {
+              const list = response?.Data || [];
+
+              this.stockViewList = list;
+
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
+
+              resolve(list);
+            },
+            error: () => {
+              this.stockViewList = [];
+              resolve([]);
+            },
+          });
+        }),
     });
   }
 }

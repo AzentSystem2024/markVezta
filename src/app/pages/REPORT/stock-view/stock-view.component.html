@@ -85,19 +85,24 @@
         </dxi-item>
 
         <dxi-item location="after" locateInMenu="auto">
-          <!-- <dx-select-box
-            [width]="200"
-            label="Type"
+          <dx-tag-box
+            label="Store"
             labelMode="floating"
-            [items]="ItemList"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
-            [(value)]="selected_item_Id"
-            (onValueChanged)="onItemIdChange($event)"
+            [items]="Store"
+            [(value)]="selectedStoreid"
             [searchEnabled]="true"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [width]="200"
+            [showSelectionControls]="true"
+            (onValueChanged)="updateStoreHint()"
           >
-          </dx-select-box> -->
+          </dx-tag-box>
         </dxi-item>
+
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
         <!-- <dxi-item widget="dxButton" [options]="filterButtonOptions"></dxi-item> -->
         <dxi-item
@@ -113,6 +118,11 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"
@@ -125,6 +135,7 @@
         dataField="ITEM_DESCRIPTION"
         caption="Description"
       ></dxi-column>
+      <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
       <dxi-column dataField="DEPARTMENT" caption="Department"></dxi-column>
       <dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
       <dxi-column dataField="SUB_CATEGORY" caption="Sub Category"></dxi-column>
