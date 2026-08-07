@@ -1,5 +1,78 @@
 <div class="salary-grid-wrapper">
   <div class="grid-container">
+    <div class="custom-toolbar" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+      <div class="toolbar-left" style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div class="stacked-toolbar-group" style="display: flex; gap: 8px;">
+          <dx-date-box
+            class="custom-select-box"
+            label="Salary Month"
+            [labelMode]="'floating'"
+            [(value)]="payRollData.MONTH"
+            [readOnly]="true"
+            displayFormat="MMMM yyyy"
+            [calendarOptions]="{
+              maxZoomLevel: 'year',
+              minZoomLevel: 'century',
+            }"
+          ></dx-date-box>
+          <dx-text-box
+            class="custom-text-box"
+            [placeholder]="'Employee '"
+            label="Employee"
+            [labelMode]="'floating'"
+            [(value)]="payRollData.EMPLOYEE_NAME"
+            [width]="200"
+            [readOnly]="true"
+          ></dx-text-box>
+        </div>
+        
+        <div class="stacked-toolbar-group basic-salary-container">
+          <dx-number-box
+            class="basic-salary-box"
+            [showClearButton]="true"
+            label="Basic Salary"
+            [labelMode]="'floating'"
+            [(value)]="payRollData.BASIC_SALARY"
+            [width]="180"
+            [readOnly]="true"
+            format="#,##0.00"
+            [inputAttr]="{ style: 'text-align: right;' }"
+          ></dx-number-box>
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <dx-text-box
+              [placeholder]="'Worked Days'"
+              label="Worked Days"
+              [labelMode]="'floating'"
+              [(value)]="payRollData.WORKED_DAYS"
+              [width]="139"
+              [readOnly]="true"
+            ></dx-text-box>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <dx-number-box
+              [placeholder]="'OT Hours'"
+              [label]="'OT Hours'"
+              [labelMode]="'floating'"
+              [(value)]="payRollData.OT_HOURS"
+              [width]="139"
+              [readOnly]="is_approve"
+            ></dx-number-box>
+            <dx-button class="mt-2"
+              *ngIf="!is_approve"
+              icon="plus"
+              type="default"
+              stylingMode="contained"
+              (onClick)="addNewRow()"
+            ></dx-button>
+          </div>
+        </div>
+      </div>
+    </div>
     <dx-data-grid
       #itemsGridRef
       [dataSource]="payRollData.PAY_DETAILS"
@@ -31,80 +104,6 @@
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-filter-builder [allowHierarchicalFields]="true">
       </dxo-filter-builder>
-      <dxo-toolbar>
-        <dxi-item location="before" locateInMenu="auto">
-          <div class="stacked-toolbar-group">
-            <dx-date-box
-              class="custom-select-box"
-              label="Salary Month"
-              [labelMode]="'floating'"
-              [(value)]="payRollData.MONTH"
-              [readOnly]="true"
-              displayFormat="MMMM yyyy"
-              [calendarOptions]="{
-                maxZoomLevel: 'year',
-                minZoomLevel: 'century',
-              }"
-            ></dx-date-box>
-            <dx-text-box
-              class="custom-text-box"
-              [placeholder]="'Employee '"
-              label="Employee"
-              [labelMode]="'floating'"
-              [(value)]="payRollData.EMPLOYEE_NAME"
-              [width]="200"
-              [readOnly]="true"
-            ></dx-text-box>
-          </div>
-        </dxi-item>
-        <dxi-item location="before" locateInMenu="auto">
-          <div class="stacked-toolbar-group basic-salary-container">
-            <dx-number-box
-              class="basic-salary-box"
-              [showClearButton]="true"
-              label="Basic Salary"
-              [labelMode]="'floating'"
-              [(value)]="payRollData.BASIC_SALARY"
-              [width]="180"
-              [readOnly]="true"
-              format="#,##0.00"
-              [inputAttr]="{ style: 'text-align: right;' }"
-            ></dx-number-box>
-          </div>
-        </dxi-item>
-
-        <dxi-item location="after" locateInMenu="auto">
-          <div style="display: flex; flex-direction: column; gap: 8px">
-            <div style="display: flex; align-items: center; gap: 8px">
-              <dx-text-box
-                [placeholder]="'Worked Days'"
-                label="Worked Days"
-                [labelMode]="'floating'"
-                [(value)]="payRollData.WORKED_DAYS"
-                [width]="139"
-                [readOnly]="true"
-              ></dx-text-box>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px">
-              <dx-number-box
-                [placeholder]="'OT Hours'"
-                [label]="'OT Hours'"
-                [labelMode]="'floating'"
-                [(value)]="payRollData.OT_HOURS"
-                [width]="139"
-                [readOnly]="is_approve"
-              ></dx-number-box>
-              <dx-button class="mt-2"
-                *ngIf="!is_approve"
-                icon="plus"
-                type="default"
-                stylingMode="contained"
-                (onClick)="addNewRow()"
-              ></dx-button>
-            </div>
-          </div>
-        </dxi-item>
-      </dxo-toolbar>
       <dxi-column
         dataField="SNO"
         caption="Sl No"
