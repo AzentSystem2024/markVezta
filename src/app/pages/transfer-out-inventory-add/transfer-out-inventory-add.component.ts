@@ -122,6 +122,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
   IS_HQ_App: boolean = false;
   transferstores: any[] = [];
   selectedStoreId: any;
+  StoreId: any;
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -285,9 +286,15 @@ export class TransferOutInventoryAddComponent implements OnChanges {
     this.getItemsList();
   }
 
+  onStoreValueChanged(e: any) {
+  this.StoreId = e.value;
+  this.getItemsList();
+}
+
   getItemsList() {
     const payload = {
-      STORE_ID: this.selectedStoreId,
+      // STORE_ID: this.selectedStoreId,
+      STORE_ID: this.StoreId,
     };
     this.dataService
       .getItemDetailsForInventory(payload)
