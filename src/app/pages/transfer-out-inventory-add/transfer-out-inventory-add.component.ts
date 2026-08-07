@@ -127,7 +127,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log('--------------Status-------------:', this.ActionStatus);
@@ -264,7 +264,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
 
   getReasonsDropdown() {
     const payload = {
-      NAME: 'REASON',
+      NAME: 'REASONS',
       COMPANY_ID: this.companyID,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
@@ -287,9 +287,9 @@ export class TransferOutInventoryAddComponent implements OnChanges {
   }
 
   onStoreValueChanged(e: any) {
-  this.StoreId = e.value;
-  this.getItemsList();
-}
+    this.StoreId = e.value;
+    this.getItemsList();
+  }
 
   getItemsList() {
     const payload = {
@@ -307,7 +307,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
     this.isPopupVisible = true; // open popup
   }
 
-  onPopupHiding() {}
+  onPopupHiding() { }
 
   onSelectItems() {
     const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
@@ -686,9 +686,8 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       'Nov',
       'Dec',
     ];
-    return `${date.getDate().toString().padStart(2, '0')}-${
-      months[date.getMonth()]
-    }-${date.getFullYear().toString().slice(-2)}`;
+    return `${date.getDate().toString().padStart(2, '0')}-${months[date.getMonth()]
+      }-${date.getFullYear().toString().slice(-2)}`;
   }
 
   openPDF() {
@@ -943,4 +942,4 @@ export class TransferOutInventoryAddComponent implements OnChanges {
   exports: [TransferOutInventoryAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferOutInventoryAddModule {}
+export class TransferOutInventoryAddModule { }

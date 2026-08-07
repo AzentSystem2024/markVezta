@@ -41,6 +41,8 @@ import {
 import { StockMovementReportComponent } from '../stock-movement-report/stock-movement-report.component';
 import { DataService } from '../../../services';
 import { Router } from '@angular/router';
+import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-supplierwise-stock',
@@ -53,7 +55,7 @@ export class SupplierwiseStockComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter: boolean = true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -71,6 +73,8 @@ export class SupplierwiseStockComponent {
   companyID: any;
   fin_id: any;
   finID: any;
+  storeHint: string = '';
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -88,6 +92,10 @@ export class SupplierwiseStockComponent {
     onClick: () => this.toggleFilters(),
   };
   stockViewList: any;
+  Store: any;
+  selectedStoreid: any;
+  distributorList: any;
+  selectedSupplier: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -124,10 +132,12 @@ export class SupplierwiseStockComponent {
 
     this.getStockViewList();
     this.sessionData_tax();
+    this.store_dropdown();
+    this.getSupplierOrUnitLst();
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || " ");
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.companyID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
     console.log(this.companyID)
@@ -150,14 +160,81 @@ export class SupplierwiseStockComponent {
     }
   }
 
+  getSupplierOrUnitLst() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'SUPPLIER',
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((response: any) => {
+      this.distributorList = response;
+    });
+  }
+
+  onSupplierChange() {
+    this.getStockViewList();
+  }
+
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
+    this.getStockViewList();
+  }
+
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
 
   getStockViewList() {
     const payload = {
       FIN_ID: this.finID,
-      COMPANY_ID: this.companyID
+      STORE_ID: this.selectedStoreid?.length
+        ? this.selectedStoreid.join(',') // FINAL FIX
+        : '',
+      SUPP_ID: this.selectedSupplier != null ? Number(this.selectedSupplier) : 0,
     };
-    this.dataService.SupplierwiseStock_Report(payload).subscribe((response: any) => {
-      this.stockViewList = response.Data;
+    this.stockViewList = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.SupplierwiseStock_Report(payload).subscribe({
+            next: (response: any) => {
+              const list = response?.Data || [];
+
+              this.stockViewList = list;
+
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
+
+              resolve(list);
+            },
+            error: () => {
+              this.stockViewList = [];
+              resolve([]);
+            },
+          });
+        }),
     });
   }
 }
