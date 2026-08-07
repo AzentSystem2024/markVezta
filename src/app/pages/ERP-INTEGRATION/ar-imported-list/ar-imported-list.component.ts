@@ -367,14 +367,23 @@ export class ARImportedListComponent {
       this.importDetailData = formatData(response?.detail || []);
 
       // Dynamic Detail Columns
-      this.detailsDataColumns = Object.keys(
-        this.importDetailData?.[0] || {},
-      );
+      this.detailsDataColumns = Object.keys(this.importDetailData?.[0] || {});
 
       // Dynamic Header Columns
       this.detailViewColumns = Object.keys(headerData?.[0] || {});
 
       this.importDataList = headerData;
+
+      // Update detail data map for already expanded rows to ensure their data gets refreshed
+      if (this.expandedRowKeys.length > 0) {
+        this.expandedRowKeys.forEach((headerID) => {
+          this.detailDataMap[headerID] = this.importDetailData.filter(
+            (x: any) => x.HeaderID === headerID,
+          );
+        });
+        // create a new object reference to trigger change detection for the map
+        this.detailDataMap = { ...this.detailDataMap };
+      }
     } catch (error) {
       console.error(error);
       this.importDataList = [];
@@ -606,6 +615,7 @@ export class ARImportedListComponent {
     );
     //  Refresh Grid
     await new Promise((resolve) => setTimeout(resolve, 500));
+    await this.fetch_Full_import_list();
     this.refreshGrid();
   }
 
@@ -742,16 +752,17 @@ export class ARImportedListComponent {
   hasMissingData(particular: string, transactionType: string): boolean {
     return this.allMissingMasterData.some(
       (x) =>
-        x.Particular === particular &&
-        x.TransactionType === transactionType,
+        x.Particular === particular && x.TransactionType === transactionType,
     );
   }
 
-  async downloadMissingParticulars(particular: string, transactionType: string) {
+  async downloadMissingParticulars(
+    particular: string,
+    transactionType: string,
+  ) {
     const missingValues = this.allMissingMasterData.filter(
       (x) =>
-        x.Particular === particular &&
-        x.TransactionType === transactionType,
+        x.Particular === particular && x.TransactionType === transactionType,
     );
 
     if (missingValues.length === 0) {
@@ -768,9 +779,7 @@ export class ARImportedListComponent {
     ) {
       masterKey = 'Clinician';
     } else if (
-      ['HISReportingDoctorDept', 'HISReferringDoctorDept'].includes(
-        particular,
-      )
+      ['HISReportingDoctorDept', 'HISReferringDoctorDept'].includes(particular)
     ) {
       masterKey = 'Department';
     } else if (['Paymode'].includes(particular)) {

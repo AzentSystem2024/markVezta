@@ -39,30 +39,36 @@
     <dxo-master-detail [enabled]="true" template="detailTemplate">
     </dxo-master-detail>
 
-    <div class="ms-4" *dxTemplate="let masterData of 'detailTemplate'">
-      <dx-data-grid
-        [dataSource]="detailDataMap[masterData.key] || []"
-        noDataText="No details available"
-        [showBorders]="true"
-        [columnAutoWidth]="false"
-        [rowAlternationEnabled]="true"
-        [height]="
-          (detailDataMap[masterData.key]?.length || 0) < 5 ? 'auto' : 200
-        "
-        (onCellPrepared)="onCellPrepared($event)"
-      >
-        <dxi-column
-          *ngFor="let col of detailsDataColumns"
-          [dataField]="col"
-          [caption]="col"
-          [visible]="col !== 'HeaderID'"
-          [width]="col === 'FailureReason' || col === 'Status' ? 'auto' : 150"
-          [fixed]="col === 'FailureReason' || col === 'Status'"
-          [fixedPosition]="'right'"
-          [alignment]="col === 'Status' ? 'center' : 'left'"
+    <div
+      class="master-detail-flow-container"
+      *dxTemplate="let masterData of 'detailTemplate'"
+    >
+      <div class="flow-arrow"></div>
+      <div class="detail-grid-container">
+        <dx-data-grid
+          [dataSource]="detailDataMap[masterData.key] || []"
+          noDataText="No details available"
+          [showBorders]="true"
+          [columnAutoWidth]="false"
+          [rowAlternationEnabled]="true"
+          [height]="
+            (detailDataMap[masterData.key]?.length || 0) < 5 ? 'auto' : 200
+          "
+          (onCellPrepared)="onCellPrepared($event)"
         >
-        </dxi-column>
-      </dx-data-grid>
+          <dxi-column
+            *ngFor="let col of detailsDataColumns"
+            [dataField]="col"
+            [caption]="col"
+            [visible]="col !== 'HeaderID'"
+            [width]="col === 'FailureReason' || col === 'Status' ? 'auto' : 150"
+            [fixed]="col === 'FailureReason' || col === 'Status'"
+            [fixedPosition]="'right'"
+            [alignment]="col === 'Status' ? 'center' : 'left'"
+          >
+          </dxi-column>
+        </dx-data-grid>
+      </div>
     </div>
 
     <!-- ================= Filter ================= -->

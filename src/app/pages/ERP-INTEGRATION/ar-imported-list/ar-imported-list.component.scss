@@ -80,3 +80,41 @@
 .dx-select-checkbox[aria-label="Select row"] {
   pointer-events: auto;
 }
+::ng-deep {
+  .dx-datagrid .dx-master-detail-row > .dx-master-detail-cell {
+    padding: 10px 10px 15px 20px !important;
+    position: relative;
+  }
+
+  .master-detail-flow-container {
+    position: relative;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: #fff;
+    padding: 5px;
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .flow-arrow {
+    position: absolute;
+    left: -20px;
+    top: -15px;
+    width: 20px;
+    height: 30px;
+    border-left: 2px solid #03b12b;
+    border-bottom: 2px solid #03b12b;
+    border-bottom-left-radius: 6px;
+  }
+
+  .flow-arrow::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    bottom: -6px;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid #03b12b;
+  }
+}
