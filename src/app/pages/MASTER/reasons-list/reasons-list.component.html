@@ -162,7 +162,7 @@
 <form-popup
   [(visible)]="isAddReasonsPopupOpened"
   [width]="800"
-  [height]="550"
+  [height]="480"
   (save)="onClickSaveReasons()"
   titleText="New Reasons"
   [showApprove]="false"
@@ -173,15 +173,12 @@
 <form-popup
   [(visible)]="isEditReasonsPopupOpened"
   [width]="800"
-  [height]="550"
+  [height]="480"
   (save)="onClickSaveReasons()"
   titleText="Edit Reasons"
   [showApprove]="false"
 >
-  <app-reasons-form
-    #editForm
-    [formData]="selected_Data"
-  ></app-reasons-form>
+  <app-reasons-form #editForm [formData]="selected_Data"></app-reasons-form>
 </form-popup>
 
 <!-- <dx-popup

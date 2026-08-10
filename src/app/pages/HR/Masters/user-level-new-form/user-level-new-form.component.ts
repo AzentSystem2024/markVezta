@@ -55,6 +55,13 @@ export class UserLevelNewFormComponent implements OnInit, OnChanges {
   isLoading: boolean = false;
   isAdministrator = false;
 
+  //========Variables for Pagination ====================
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showInfo = true;
+
+
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,

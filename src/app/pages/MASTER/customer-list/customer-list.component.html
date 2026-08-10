@@ -21,7 +21,11 @@
 
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
     <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
-    <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete">
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
       <dxo-popup
         title="Edit Customer"
         [showTitle]="true"
@@ -406,7 +410,7 @@
     [(visible)]="isAddCustomerPopupOpened"
     [showApprove]="false"
     [width]="900"
-    [height]="'100vh'"
+    [height]="'95vh'"
     titleText="New Customer"
     (cancel)="onCancelCustomer()"
     (save)="onClickSaveCustomer()"
@@ -417,7 +421,7 @@
   <form-popup
     [(visible)]="isEditCustomerPopupOpened"
     [width]="950"
-    [height]="'100vh'"
+    [height]="'95vh'"
     titleText="Edit Customers"
     [showApprove]="false"
     (save)="onClickUpdateCustomer()"

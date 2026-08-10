@@ -1,14 +1,9 @@
-
-
-
-
-.plain-styled-form{
+.plain-styled-form {
   margin-top: 15px;
 }
-.address-container{
+.address-container {
   margin-top: 15px;
 }
-
 
 .address-form {
   .dx-texteditor {
@@ -40,8 +35,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 15px;
-   margin-top: 28px;
-   
+  margin-top: 28px;
 }
 
 .address-card {
@@ -50,7 +44,9 @@
   border-radius: 12px;
   padding: 15px 20px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .address-card:hover {
@@ -72,6 +68,36 @@
 .save-btn {
   display: flex;
   justify-content: flex-end; /* Aligns button to right */
-  margin-top: 20px;          /* Adds space above */
-  margin-bottom: 20px;       /* Adds space below (before cards) */
+  margin-top: 20px; /* Adds space above */
+  margin-bottom: 20px; /* Adds space below (before cards) */
+}
+
+::ng-deep .innert-tab .dx-tabs {
+  background: transparent !important;
+  border: none !important;
+}
+
+::ng-deep .innert-tab .dx-tab {
+  background: transparent !important;
+  border: none !important;
+  color: #555;
+}
+
+::ng-deep .innert-tab .dx-tab:hover {
+  background: transparent !important;
+}
+
+::ng-deep .innert-tab .dx-tab.dx-state-hover {
+  background: transparent !important;
+}
+
+::ng-deep .innert-tab .dx-tab.dx-tab-selected {
+  background: transparent !important;
+  color: #1976d2; /* or inherit */
+  border: none !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .innert-tab .dx-tabs-wrapper {
+  background: transparent !important;
 }

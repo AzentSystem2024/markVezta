@@ -4,7 +4,7 @@
       <!-- User Details Form in Two Columns -->
       <div
         class="user-details"
-        style="display: flex; flex-wrap: wrap; gap: 20px"
+        style="display: flex; flex-wrap: wrap; gap: 20px; padding-top: 10px"
       >
         <div class="form-column" style="flex: 2">
           <dx-text-box
@@ -39,8 +39,8 @@
                   options: {
                     icon:
                       passwordMode === 'password'
-                        ? 'fas fa-eye'
-                        : 'fas fa-eye-slash',
+                        ? 'fas fa-eye-slash'
+                        : 'fas fa-eye',
                     stylingMode: 'text',
                     onClick: togglePasswordVisibility,
                   },
@@ -125,7 +125,7 @@
             </dx-text-box>
           </div>
 
-          <div style="display: flex; margin-top: 15px">
+          <div style="display: flex">
             <dx-drop-down-box
               label="Code *"
               labelMode="floating"
