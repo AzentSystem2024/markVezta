@@ -89,6 +89,19 @@ export class TransferOutInventoryAddComponent implements OnChanges {
   isSaving: boolean = false;
   items: any[] = [];
 
+  get shouldShowApproveCheckbox(): boolean {
+    const currentStatus = (this.status || '').toString().toLowerCase();
+    const currentActionStatus = (this.ActionStatus || '').toString().toLowerCase();
+    const currentDocStatus = (this.selectedDocStatus || '').toString().toUpperCase();
+
+    if (currentDocStatus === 'VERIFY') return false;
+    if (currentStatus === 'approvescreen') return false;
+    if (currentStatus === 'verifyscreen') return false;
+    if (currentActionStatus === 'approve') return false;
+
+    return true;
+  }
+
   deleteRow = (e: any) => {
     const rowData = e.row.data;
     const index = this.transferOutFormData.DETAILS.findIndex(
@@ -762,6 +775,39 @@ export class TransferOutInventoryAddComponent implements OnChanges {
                 this.isSaving = false;
                 console.error('verifyTransferOutForInventory error:', err);
                 notify('Something went wrong while Verify.', 'error', 3000);
+              },
+            });
+          } else {
+            this.isSaving = false;
+          }
+        });
+      } else if (this.transferOutFormData.IS_APPROVED) {
+        // CONFIRM → APPROVE API
+        confirm(
+          'Are you sure you want to approve this transfer?',
+          'Confirm Approval',
+        ).then((result) => {
+          if (result) {
+            this.dataService.approveTransferOutForInventory(payload).subscribe({
+              next: (res: any) => {
+                if (res.flag === 1) {
+                  notify('Transfer approved successfully!', 'success', 3000);
+                  this.ngZone.run(() => {
+                    this.popupClosed.emit();
+                  });
+                } else {
+                  this.isSaving = false;
+                  notify(
+                    'Error approving transfer: ' + res.message,
+                    'error',
+                    3000,
+                  );
+                }
+              },
+              error: (err) => {
+                this.isSaving = false;
+                console.error('Approve error:', err);
+                notify('Something went wrong while approving.', 'error', 3000);
               },
             });
           } else {
