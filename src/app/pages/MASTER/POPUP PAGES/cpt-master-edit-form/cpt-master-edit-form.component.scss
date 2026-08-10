@@ -25,4 +25,15 @@
   padding-left: 130px;
 }
 
+::ng-deep .dx-form {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
 
+::ng-deep .dx-layout-manager .dx-field-item {
+  padding-bottom: 4px !important;
+}
+
+::ng-deep .dx-layout-manager .dx-field-item:last-child {
+  padding-bottom: 0 !important;
+}

@@ -18,7 +18,7 @@
       [allowColumnReordering]="true"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -131,19 +131,22 @@
           </dx-date-box>
         </dxi-item>
 
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item>
           <dx-button
             class="mt-2"
             text="Apply"
             type="default"
-            icon="todo"
             stylingMode="contained"
             (onClick)="get_DataSource()"
           >
           </dx-button>
         </dxi-item>
-
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping
