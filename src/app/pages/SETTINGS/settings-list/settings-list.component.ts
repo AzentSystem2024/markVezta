@@ -113,6 +113,13 @@ export class SettingsListComponent {
     // this.getCreditNotes();
   }
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
   //================api for Serial number validation=================
 
   Doc_serial_no() {

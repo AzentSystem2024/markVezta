@@ -104,7 +104,8 @@ export class ProfitAndLossDimensionComponent {
     this.selectedYear = currentYear;
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
-
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+    this.selectedmonth = currentMonth;
     const today = new Date();
     const SystemDate =
       today.getFullYear() +

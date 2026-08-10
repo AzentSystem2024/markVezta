@@ -7,38 +7,35 @@
     (onRowRemoving)="onRowRemoving($event)"
     (onRowUpdating)="onRowUpdating($event)"
     [showBorders]="true"
-      [allowColumnReordering]="true"
-      [allowColumnResizing]="true"
-      (onExporting)="onExporting($event)"
-      [showBorders]="true"
-      [columnAutoWidth]="false"
-      [wordWrapEnabled]="false"
-      [rowAlternationEnabled]="true"
-      [allowColumnReordering]="true"
-      [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
-      [allowColumnResizing]="true"
-      [columnResizingMode]="'nextColumn'"
-      [headerFilter]="{ visible: false }"
-      [scrolling]="{ mode: 'virtual' }"
-      rowAlternationInterval="2"
-      [selection]="{ mode: 'single' }"
-      focusStateEnabled="false"
-      [height]="'82vh'"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    (onExporting)="onExporting($event)"
+    [showBorders]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+    [headerFilter]="{ visible: false }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+    focusStateEnabled="false"
+    [height]="'82vh'"
+    [showColumnLines]="true"
   >
-     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+    <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 
-<dxo-export
-      [enabled]="true"
-      [formats]="['xlsx']"
-    >
-    </dxo-export>
-    
-     <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+
+    <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
       [visible]="true"
       [allowedPageSizes]="allowedPageSizes"
@@ -47,7 +44,7 @@
       [showInfo]="true"
       [showNavigationButtons]="true"
     ></dxo-pager>
-  
+
     <dxo-editing
       mode="popup"
       [allowUpdating]="canEdit"
@@ -61,32 +58,31 @@
         [height]="250"
       ></dxo-popup>
       <dxo-form [colCount]="1">
-      <dxi-item
-        dataField="CODE"
-        editorType="dxTextBox"
-        [editorOptions]="{
-          label: 'Code',
-          labelMode: 'floating'
-        }"
-      >
-
-      <dxo-label [visible]="false"></dxo-label>
-      </dxi-item>
-      <dxi-item
-        dataField="DESCRIPTION"
-        editorType="dxTextBox"
-        [editorOptions]="{
-          label: 'Description',
-          labelMode: 'floating'
-        }"
-      >
-      <dxo-label [visible]="false"></dxo-label>
-      </dxi-item>
-    </dxo-form>
+        <dxi-item
+          dataField="CODE"
+          editorType="dxTextBox"
+          [editorOptions]="{
+            label: 'Code',
+            labelMode: 'floating',
+          }"
+        >
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
+        <dxi-item
+          dataField="DESCRIPTION"
+          editorType="dxTextBox"
+          [editorOptions]="{
+            label: 'Description',
+            labelMode: 'floating',
+          }"
+        >
+          <dxo-label [visible]="false"></dxo-label>
+        </dxi-item>
+      </dxo-form>
     </dxo-editing>
 
     <dxo-toolbar>
-       <dxi-item location="before" locateInMenu="never">
+      <dxi-item location="before" locateInMenu="never">
         <div
           class="grid-header"
           style="
@@ -107,7 +103,7 @@
         [options]="searchButtonOptions"
       ></dxi-item>
 
-       <!-- Refresh -->
+      <!-- Refresh -->
       <dxi-item
         location="after"
         widget="dxButton"
@@ -125,14 +121,13 @@
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
-   
-        <dxi-item
+
+      <dxi-item
         location="after"
         widget="dxButton"
         [options]="addButtonOptions"
         [visible]="canAdd"
       ></dxi-item>
-     
     </dxo-toolbar>
     <dxi-column dataField="CODE" caption="Code">
       <dxi-validation-rule
@@ -157,9 +152,9 @@
       <dxi-validation-rule
         type="required"
         message="Description is required"
-    ></dxi-validation-rule>
+      ></dxi-validation-rule>
 
-    <!--  Duplicate validation -->
+      <!--  Duplicate validation -->
       <dxi-validation-rule
         type="custom"
         [validationCallback]="validateGridDeliveryDescription"
