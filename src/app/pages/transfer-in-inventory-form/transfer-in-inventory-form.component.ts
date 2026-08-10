@@ -61,6 +61,7 @@ import autoTable from 'jspdf-autotable';
 export class TransferInInventoryFormComponent {
   @Input() isEditing: boolean = false;
   @Input() status: any;
+  @Input() ActionStatus: any;
 
   @Input() selectedDocStatus: any;
 
@@ -86,7 +87,49 @@ export class TransferInInventoryFormComponent {
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
   isPopupVisible: boolean = false;
+  isPopupGridLoading: boolean = false;
+  isSaving: boolean = false;
   items: any[] = [];
+
+  getSaveButtonText(): string {
+    if (this.isReadOnlyMode) {
+      return 'PDF';
+    }
+
+    if (this.isSaving) {
+      if (
+        this.selectedDocStatus === 'VERIFY' ||
+        this.ActionStatus === 'Approve'
+      ) {
+        return 'Approving...';
+      }
+      if (this.selectedDocStatus === 'OPEN' && this.status === 'VerifyScreen') {
+        return 'Verifying...';
+      }
+      if (this.isEditing) {
+        return this.transferInFormData.IS_APPROVED
+          ? 'Committing...'
+          : 'Updating...';
+      }
+      return this.transferInFormData.IS_APPROVED
+        ? 'Committing...'
+        : 'Saving...';
+    }
+
+    if (
+      this.selectedDocStatus === 'VERIFY' ||
+      this.ActionStatus === 'Approve'
+    ) {
+      return 'Approve';
+    }
+    if (this.selectedDocStatus === 'OPEN' && this.status === 'VerifyScreen') {
+      return 'Verify';
+    }
+    if (this.isEditing) {
+      return this.transferInFormData.IS_APPROVED ? 'Update & Commit' : 'Update';
+    }
+    return this.transferInFormData.IS_APPROVED ? 'Save & Commit' : 'Save';
+  }
   // itemsForInventory: any[] = [];
   barcodeList: any;
   canAdd: any;
@@ -126,6 +169,7 @@ export class TransferInInventoryFormComponent {
   IS_HQ_App: boolean = false;
   StoreIDData: any;
   transferstores: any[] = [];
+  selectedTransferIds: any[] = [];
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -236,29 +280,42 @@ export class TransferInInventoryFormComponent {
   }
 
   getItemsList() {
+    if (!this.selectedStoreId) return;
+
     const payload = {
       STORE_ID: this.selectedStoreId,
       COMPANY_ID: this.companyID,
     };
 
-    // Wait until the popup/grid is rendered
-    setTimeout(() => {
-      this.popupGridRef?.instance.beginCustomLoading('Loading...');
+    this.items = [];
+    this.isPopupGridLoading = true;
+    this.popupGridRef?.instance?.beginCustomLoading(
+      'Loading Pending Transfers...',
+    );
 
-      this.dataService.getItemDetailsForTrInInventory(payload).subscribe({
-        next: (response: any) => {
-          this.items = response.data;
-          console.log(response, 'RESPONSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
-
-          this.popupGridRef?.instance.endCustomLoading();
-        },
-        error: (err) => {
-          console.error(err);
-          this.popupGridRef?.instance.endCustomLoading();
-          notify('Failed to load items.', 'error', 3000);
-        },
-      });
-    }, 0);
+    this.dataService.getItemDetailsForTrInInventory(payload).subscribe({
+      next: (response: any) => {
+        const rawData = response?.data || [];
+        // Sort items by TRANSFER_DATE descending (newest first)
+        this.items = rawData.sort((a: any, b: any) => {
+          const dateA = new Date(
+            a.TRANSFER_DATE || a.REC_DATE || a.DOC_DATE || 0,
+          ).getTime();
+          const dateB = new Date(
+            b.TRANSFER_DATE || b.REC_DATE || b.DOC_DATE || 0,
+          ).getTime();
+          return dateB - dateA;
+        });
+        this.isPopupGridLoading = false;
+        this.popupGridRef?.instance?.endCustomLoading();
+      },
+      error: (err) => {
+        console.error(err);
+        this.isPopupGridLoading = false;
+        this.popupGridRef?.instance?.endCustomLoading();
+        notify('Failed to load items.', 'error', 3000);
+      },
+    });
   }
 
   // getItemsList() {
@@ -279,21 +336,56 @@ export class TransferInInventoryFormComponent {
       NAME: 'STORE',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.transferstores = response;
+      this.transferstores = response || [];
       if (this.IS_HQ_App) {
         // 🔹 HQ App → show only store with ID = 1
-        this.stores = response.filter((item: any) => item.ID === 1);
+        this.stores = (response || []).filter((item: any) => item.ID === 1);
       } else {
         // 🔹 Not HQ → show all stores
-        this.stores = response;
+        this.stores = response || [];
+      }
+
+      // Auto-bind Store dropdown if it contains only 1 store value or session store
+      if (this.stores && this.stores.length === 1 && !this.StoreIDData) {
+        this.StoreIDData = this.stores[0].ID;
+      } else if (this.storeFromSession && !this.StoreIDData) {
+        this.StoreIDData = this.storeFromSession;
+      }
+
+      // Auto-bind Issued from dropdown if it contains only 1 store value
+      if (
+        this.transferstores &&
+        this.transferstores.length === 1 &&
+        !this.transferInFormData.ORIGIN_STORE_ID
+      ) {
+        const singleStoreId = this.transferstores[0].ID;
+        this.transferInFormData.ORIGIN_STORE_ID = singleStoreId;
+        this.selectedStoreId = singleStoreId;
+        this.getItemsList();
       }
     });
   }
 
   onStoreChange(e: any) {
-    this.selectedStoreId = e.value;
-    console.log('Selected Store ID:', this.selectedStoreId);
-    this.getItemsList();
+    if (this.selectedStoreId !== e.value) {
+      this.selectedTransferIds = [];
+      if (
+        this.transferInFormData.DETAILS &&
+        this.transferInFormData.DETAILS.length > 0
+      ) {
+        this.transferInFormData.DETAILS = [];
+        this.transferInFormData.ISSUE_ID = 0;
+        this.transferInFormData.NET_AMOUNT = 0;
+        notify(
+          'Origin store changed. Loaded grid items have been cleared.',
+          'info',
+          3000,
+        );
+      }
+      this.selectedStoreId = e.value;
+      console.log('Selected Store ID:', this.selectedStoreId);
+      this.getItemsList();
+    }
   }
 
   getReasonsDropdown() {
@@ -316,74 +408,162 @@ export class TransferInInventoryFormComponent {
   }
 
   onSelectItems() {
-    const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+    const selectedRows = this.popupGridRef?.instance?.getSelectedRowsData();
     console.log(selectedRows, 'SELECTED ROWS');
 
-    if (selectedRows && selectedRows.length > 0) {
-      const transferId = selectedRows
-        .map((row: any) => row.TRANSFER_ID)
-        .join(','); //  get transfer id
-      console.log(transferId, 'Selected Transfer IDs');
+    // Close popup immediately upon clicking Select Items
+    this.isPopupVisible = false;
 
-      // Call API instead of manually pushing rows
-      this.dataService
-        .getItemsforTransferIn(transferId, this.companyID)
-        .subscribe((res: any) => {
-          console.log(res, 'API response');
-
-          if (res?.data && res.data.length > 0) {
-            //  Clear existing valid rows if needed
-            this.transferInFormData.DETAILS =
-              this.transferInFormData.DETAILS.filter(
-                (item: any) => item.BARCODE !== '' && item.DESCRIPTION !== '',
-              );
-
-            //  Set ISSUE_ID
-            if (!this.transferInFormData.ISSUE_ID && res.data[0].ISSUE_ID) {
-              this.transferInFormData.ISSUE_ID = res.data[0].ISSUE_ID;
-            }
-
-            //  Map API response → grid (like PO)
-            res.data.forEach((item: any) => {
-              const exists = this.transferInFormData.DETAILS.some(
-                (d) => d.BARCODE === item.BARCODE,
-              );
-
-              if (!exists) {
-                const qty = Number(item.QUANTITY_ISSUED) || 0;
-                const cost = Number(item.COST) || 0;
-
-                this.transferInFormData.DETAILS.push({
-                  SL_NO: this.transferInFormData.DETAILS.length + 1,
-                  ISSUE_DETAIL_ID: item.ISSUE_DETAIL_ID,
-                  ISSUE_ID: item.ISSUE_ID,
-                  ITEM_ID: item.ITEM_ID,
-                  BARCODE: item.BARCODE,
-                  DESCRIPTION: item.DESCRIPTION,
-                  UOM: item.UOM,
-                  COST: cost,
-                  QUANTITY_AVAILABLE: item.QUANTITY_AVAILABLE,
-                  QUANTITY_ISSUED: qty,
-                  QUANTITY_RECEIVED: 0,
-                  BATCH_NO: '0',
-                  EXPIRY_DATE: new Date(),
-
-                  // IMPORTANT
-                  netAmount: cost * qty,
-                });
-              }
-            });
-
-            // this.recalculateNetAmount();
-          }
-        });
+    // If no row is selected (or user unchecks all), clear grid details
+    if (!selectedRows || selectedRows.length === 0) {
+      this.selectedTransferIds = [];
+      this.transferInFormData.DETAILS = [];
+      this.transferInFormData.ISSUE_ID = 0;
+      this.transferInFormData.NET_AMOUNT = 0;
+      this.netamount = 0;
+      return;
     }
 
-    this.isPopupVisible = false; // close popup
+    const selectedTransferIds = selectedRows
+      .map((row: any) => row.TRANSFER_ID || row.ID)
+      .filter(Boolean);
+    this.selectedTransferIds = selectedTransferIds;
+
+    const docNoMap = new Map<any, string>();
+    selectedRows.forEach((r: any) => {
+      const id = r.TRANSFER_ID || r.ID;
+      const no =
+        r.TRANSFER_NO || r.DOC_NO || r.TRANSFER_CODE || r.TRANS_NO || '';
+      if (id) docNoMap.set(id, no);
+      if (r.ISSUE_ID) docNoMap.set(r.ISSUE_ID, no);
+    });
+
+    const transferIdStr = selectedTransferIds.join(',');
+
+    // Store existing QUANTITY_RECEIVED values keyed by BARCODE to preserve user edits
+    const existingQtyMap = new Map<string, number>();
+    (this.transferInFormData.DETAILS || []).forEach((item: any) => {
+      if (item.BARCODE && Number(item.QUANTITY_RECEIVED) > 0) {
+        existingQtyMap.set(item.BARCODE, Number(item.QUANTITY_RECEIVED));
+      }
+    });
+
+    // Show loading spinner on main grid while fetching and binding items
+    setTimeout(() => {
+      this.itemsGridRef?.instance?.beginCustomLoading('Loading Items...');
+    }, 0);
+
+    this.dataService
+      .getItemsforTransferIn(transferIdStr, this.companyID, this.selectedStoreId)
+      .subscribe({
+        next: (res: any) => {
+          if (res?.data) {
+            const newDetails: any[] = [];
+
+            if (res.data.length > 0 && res.data[0].ISSUE_ID) {
+              this.transferInFormData.ISSUE_ID = res.data[0].ISSUE_ID;
+            } else {
+              this.transferInFormData.ISSUE_ID = 0;
+            }
+
+            res.data.forEach((item: any) => {
+              const qtyIssued = Number(item.QUANTITY_ISSUED) || 0;
+              const cost = Number(item.COST) || 0;
+              const savedQty = existingQtyMap.get(item.BARCODE) || 0;
+              const transferNo =
+                item.TRANSFER_NO ||
+                item.DOC_NO ||
+                item.ISSUE_NO ||
+                docNoMap.get(item.TRANSFER_ID) ||
+                docNoMap.get(item.ISSUE_ID) ||
+                '';
+
+              newDetails.push({
+                SL_NO: newDetails.length + 1,
+                TRANSFER_NO: transferNo,
+                TRANSFER_ID: item.TRANSFER_ID || item.ISSUE_ID,
+                ISSUE_DETAIL_ID: item.ISSUE_DETAIL_ID,
+                ISSUE_ID: item.ISSUE_ID,
+                ITEM_ID: item.ITEM_ID,
+                BARCODE: item.BARCODE,
+                DESCRIPTION: item.DESCRIPTION,
+                UOM: item.UOM,
+                COST: cost,
+                QUANTITY_AVAILABLE: item.QUANTITY_AVAILABLE,
+                QUANTITY_ISSUED: qtyIssued,
+                QUANTITY_RECEIVED: savedQty,
+                BATCH_NO: '0',
+                EXPIRY_DATE: new Date(),
+                netAmount: cost * savedQty,
+              });
+            });
+
+            // Replace grid details with items belonging ONLY to selected transfer documents
+            this.transferInFormData.DETAILS = newDetails;
+            this.updateNetAmount();
+
+            setTimeout(() => {
+              this.itemsGridRef?.instance?.refresh();
+              this.itemsGridRef?.instance?.endCustomLoading();
+            }, 100);
+          } else {
+            this.itemsGridRef?.instance?.endCustomLoading();
+          }
+        },
+        error: (err) => {
+          this.itemsGridRef?.instance?.endCustomLoading();
+          console.error('Error fetching items for transfer:', err);
+          notify(
+            'Failed to fetch items for selected transfers.',
+            'error',
+            3000,
+          );
+        },
+      });
   }
 
   onAddItems() {
     this.isPopupVisible = true;
+
+    // Pre-select rows in popup grid matching currently loaded documents
+    setTimeout(() => {
+      if (this.popupGridRef?.instance) {
+        if (this.isPopupGridLoading) {
+          this.popupGridRef.instance.beginCustomLoading(
+            'Loading Pending Transfers...',
+          );
+        } else {
+          this.popupGridRef.instance.endCustomLoading();
+
+          let keysToSelect: any[] = [];
+          if (this.selectedTransferIds && this.selectedTransferIds.length > 0) {
+            keysToSelect = [...this.selectedTransferIds];
+          } else if (
+            this.transferInFormData.DETAILS &&
+            this.transferInFormData.DETAILS.length > 0
+          ) {
+            const loadedIds = new Set(
+              this.transferInFormData.DETAILS.map(
+                (d: any) => d.TRANSFER_ID || d.ISSUE_ID,
+              ).filter(Boolean),
+            );
+            keysToSelect = (this.items || [])
+              .filter(
+                (item: any) =>
+                  loadedIds.has(item.TRANSFER_ID) ||
+                  loadedIds.has(item.ISSUE_ID),
+              )
+              .map((item: any) => item.TRANSFER_ID || item.ID);
+          }
+
+          if (keysToSelect.length > 0) {
+            this.popupGridRef.instance.selectRows(keysToSelect, false);
+          } else {
+            this.popupGridRef.instance.clearSelection();
+          }
+        }
+      }
+    }, 150);
   }
   cancel() {
     this.popupClosed.emit();
@@ -464,17 +644,61 @@ export class TransferInInventoryFormComponent {
     }
   }
 
-  calculateNetAmount(rowData: any) {
-    return (
-      (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY_RECEIVED) || 0)
+  onRowValidating(e: any) {
+    let rowData: any = {};
+    if (e.component && e.key !== undefined) {
+      const rowIndex = e.component.getRowIndexByKey(e.key);
+      if (rowIndex >= 0 && e.component.getVisibleRows()[rowIndex]) {
+        rowData = e.component.getVisibleRows()[rowIndex].data || {};
+      }
+    }
+    if (!rowData || Object.keys(rowData).length === 0) {
+      rowData = e.oldData || e.data || {};
+    }
+
+    const data = { ...rowData, ...e.newData };
+
+    const issued = Number(
+      data.QUANTITY_ISSUED ??
+      data.QTY_ISSUED ??
+      data.QUANTITY_AVAILABLE ??
+      data.QUANTITY ??
+      0,
     );
+    const received = Number(data.QUANTITY_RECEIVED ?? data.QTY_RECEIVED ?? 0);
+
+    if (received > issued) {
+      e.isValid = false;
+      e.errorText = 'Qty Received cannot be greater than Qty Issued';
+    } else {
+      e.isValid = true;
+      e.errorText = '';
+    }
   }
+
+  calculateNetAmount = (rowData: any) => {
+    const val =
+      (Number(rowData.COST) || 0) * (Number(rowData.QUANTITY_RECEIVED) || 0);
+    return Number(val.toFixed(2));
+  };
 
   onEditorPrepared(e: any) {
     if (e.parentType === 'dataRow' && e.dataField === 'QUANTITY_RECEIVED') {
       setTimeout(() => {
         e.editorElement.querySelector('input')?.focus(); // 👈 focus actual input
       });
+    }
+  }
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.dataField === 'QUANTITY_RECEIVED') {
+      e.cellElement.classList.add('editable-qty-cell');
+      const val = Number(e.value) || 0;
+      if (val <= 0) {
+        e.cellElement.classList.add('invalid-zero-qty-cell');
+      } else {
+        e.cellElement.classList.remove('invalid-zero-qty-cell');
+      }
     }
   }
 
@@ -517,11 +741,19 @@ export class TransferInInventoryFormComponent {
   saveTransferIn() {
     // 1. Validate required fields
     if (!this.transferInFormData.ORIGIN_STORE_ID) {
-      notify('Please select a store', 'error');
+      notify('Please select Issued from store', 'error');
+      return;
+    }
+    if (!this.StoreIDData) {
+      notify('Please select a Store', 'error');
+      return;
+    }
+    if (!this.transferInFormData.DEPT_ID) {
+      notify('Please select a Department', 'error');
       return;
     }
     if (!this.transferInFormData.REASON_ID) {
-      notify('Please select a reason', 'error');
+      notify('Please select a Reason', 'error');
       return;
     }
     if (
@@ -529,6 +761,30 @@ export class TransferInInventoryFormComponent {
       this.transferInFormData.DETAILS.length === 0
     ) {
       notify('Please add at least one item', 'error');
+      return;
+    }
+
+    // Check if any row has Qty Received as 0
+    const zeroQtyIndex = this.transferInFormData.DETAILS.findIndex(
+      (item: any) => (Number(item.QUANTITY_RECEIVED) || 0) <= 0,
+    );
+
+    if (zeroQtyIndex !== -1) {
+      const item = this.transferInFormData.DETAILS[zeroQtyIndex];
+      notify(
+        `Qty Received cannot be 0 for item: ${item.DESCRIPTION || item.BARCODE}`,
+        'error',
+        3500,
+      );
+
+      const gridInstance = this.itemsGridRef?.instance;
+      if (gridInstance) {
+        setTimeout(() => {
+          gridInstance.focus(
+            gridInstance.getCellElement(zeroQtyIndex, 'QUANTITY_RECEIVED'),
+          );
+        }, 50);
+      }
       return;
     }
 
@@ -555,6 +811,8 @@ export class TransferInInventoryFormComponent {
 
     console.log('Final payload:', payload);
 
+    this.isSaving = true;
+
     // ============================================================
     // ------------------ UPDATED APPROVAL LOGIC -------------------
     // ============================================================
@@ -574,6 +832,7 @@ export class TransferInInventoryFormComponent {
                   notify('Transfer approved successfully!', 'success', 3000);
                   this.popupClosed.emit();
                 } else {
+                  this.isSaving = false;
                   notify(
                     'Error approving transfer: ' + result.message,
                     'error',
@@ -582,10 +841,13 @@ export class TransferInInventoryFormComponent {
                 }
               },
               error: (err) => {
+                this.isSaving = false;
                 console.error('Approve error:', err);
                 notify('Something went wrong while approving.', 'error', 3000);
               },
             });
+          } else {
+            this.isSaving = false;
           }
         });
       } else if (
@@ -594,7 +856,7 @@ export class TransferInInventoryFormComponent {
       ) {
         // UPDATE API
         confirm(
-          'Are you sure you want to approve this transfer?',
+          'Are you sure you want to verify this transfer?',
           'Confirm verify',
         ).then((res) => {
           if (res) {
@@ -604,6 +866,7 @@ export class TransferInInventoryFormComponent {
                   notify('Transfer verify successfully!', 'success', 3000);
                   this.popupClosed.emit();
                 } else {
+                  this.isSaving = false;
                   notify(
                     'Error verify transfer: ' + result.message,
                     'error',
@@ -612,10 +875,43 @@ export class TransferInInventoryFormComponent {
                 }
               },
               error: (err) => {
+                this.isSaving = false;
                 console.error('verify error:', err);
                 notify('Something went wrong while verify.', 'error', 3000);
               },
             });
+          } else {
+            this.isSaving = false;
+          }
+        });
+      } else if (this.transferInFormData.IS_APPROVED) {
+        confirm(
+          'Are you sure you want to approve this transfer?',
+          'Confirm Approval',
+        ).then((res) => {
+          if (res) {
+            this.dataService.approveTransferInForInventory(payload).subscribe({
+              next: (result: any) => {
+                if (result.Flag === 1) {
+                  notify('Transfer approved successfully!', 'success', 3000);
+                  this.popupClosed.emit();
+                } else {
+                  this.isSaving = false;
+                  notify(
+                    'Error approving transfer: ' + result.message,
+                    'error',
+                    3000,
+                  );
+                }
+              },
+              error: (err) => {
+                this.isSaving = false;
+                console.error('Approve error:', err);
+                notify('Something went wrong while approving.', 'error', 3000);
+              },
+            });
+          } else {
+            this.isSaving = false;
           }
         });
       } else {
@@ -625,6 +921,7 @@ export class TransferInInventoryFormComponent {
               notify('Transfer updated successfully!', 'success', 3000);
               this.popupClosed.emit();
             } else {
+              this.isSaving = false;
               notify(
                 'Error updating transfer: ' + result.message,
                 'error',
@@ -633,6 +930,7 @@ export class TransferInInventoryFormComponent {
             }
           },
           error: (err) => {
+            this.isSaving = false;
             console.error('Update error:', err);
             notify('Something went wrong while updating.', 'error', 3000);
           },
@@ -661,6 +959,7 @@ export class TransferInInventoryFormComponent {
                   );
                   this.popupClosed.emit();
                 } else {
+                  this.isSaving = false;
                   notify(
                     'Error saving transfer: ' + result.message,
                     'error',
@@ -669,10 +968,13 @@ export class TransferInInventoryFormComponent {
                 }
               },
               error: (err) => {
+                this.isSaving = false;
                 console.error('Save error:', err);
                 notify('Something went wrong while saving.', 'error', 3000);
               },
             });
+          } else {
+            this.isSaving = false;
           }
         });
       } else {
@@ -683,10 +985,12 @@ export class TransferInInventoryFormComponent {
               notify('Transfer saved successfully!', 'success', 3000);
               this.popupClosed.emit();
             } else {
+              this.isSaving = false;
               notify('Error saving transfer: ' + result.message, 'error', 3000);
             }
           },
           error: (err) => {
+            this.isSaving = false;
             console.error('Save error:', err);
             notify('Something went wrong while saving.', 'error', 3000);
           },

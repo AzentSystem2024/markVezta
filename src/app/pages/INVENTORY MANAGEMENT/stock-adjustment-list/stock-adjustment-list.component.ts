@@ -557,7 +557,7 @@ export class StockAdjustmentListComponent {
         this.StatusType = 'verifyscreen';
         this.buttonText = 'Verify Stock Adjustment';
       } else if (this.selected_Data.STATUS == 2) {
-        this.StatusType = 'verifyscreen';
+        this.StatusType = 'ApproveScreen';
         this.buttonText = 'Approve Stock Adjustment';
       } else if (this.selected_Data.STATUS == 5) {
         this.StatusType = 'viewScreen';
@@ -645,4 +645,4 @@ export class StockAdjustmentListComponent {
   exports: [StockAdjustmentListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentListModule {}
+export class StockAdjustmentListModule { }

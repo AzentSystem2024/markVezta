@@ -85,14 +85,15 @@
   width: 100%;
   max-width: 240px;
   height: 170px;
-  background-color: rgb(183 183 183 / 10%);
+  background-color: rgba(52, 152, 219, 0.08);
+  border-radius: 8px;
   border-width: 2px;
   border-style: dashed;
   padding: 10px;
-  border-color: var(--dx-color-border);
+  border-color: #3498db;
 }
 
-::ng-deep #dropzone-external > * {
+::ng-deep #dropzone-external>* {
   pointer-events: none;
 }
 
@@ -101,7 +102,7 @@
   border-color: var(--dx-color-primary);
 }
 
-::ng-deep .widget-container > span {
+::ng-deep .widget-container>span {
   font-size: 22px;
   font-weight: bold;
   // margin-bottom: 16px;
@@ -112,7 +113,7 @@
   max-height: 100%;
 }
 
-::ng-deep #dropzone-text > span {
+::ng-deep #dropzone-text>span {
   font-weight: 100;
   opacity: 0.5;
 }
@@ -282,14 +283,18 @@
 }
 
 ::ng-deep .highlight-readonly .dx-texteditor-input {
-  background-color: var(--readOnly) !important; /* Soft distinct background */
+  background-color: var(--readOnly) !important;
+  /* Soft distinct background */
   font-weight: 600 !important;
-  color: #0d47a1 !important; /* Stand-out text color */
+  color: #0d47a1 !important;
+  /* Stand-out text color */
 }
 
 ::ng-deep .highlight-readonly {
-  border: 1px solid #90caf9 !important; /* Light blue border */
-  border-top: none !important; /* Remove top border */
+  border: 1px solid #90caf9 !important;
+  /* Light blue border */
+  border-top: none !important;
+  /* Remove top border */
   border-radius: 4px;
 }
 
@@ -578,8 +583,9 @@
    so they ONLY affect the New Items Form — not any other page.
    ───────────────────────────────────────────────────────────────────────────── */
 :host {
+
   /* Empty grid cell non-breaking space */
-  ::ng-deep .dx-data-grid .dx-row > td:empty::after {
+  ::ng-deep .dx-data-grid .dx-row>td:empty::after {
     content: "\00a0";
     display: block;
   }
@@ -591,10 +597,8 @@
 
   /* DataGrid header styles */
   ::ng-deep .dx-datagrid-headers {
-    background-color: var(
-      --card-bg-color,
-      rgba(128, 128, 128, 0.06)
-    ) !important;
+    background-color: var(--card-bg-color,
+        rgba(128, 128, 128, 0.06)) !important;
     border-bottom: 1px solid rgba(128, 128, 128, 0.25) !important;
 
     .dx-datagrid-text-content {
@@ -613,9 +617,9 @@
 
   ::ng-deep .dx-datagrid-rowsview .dx-row,
   ::ng-deep .dx-datagrid-rowsview .dx-data-row,
-  ::ng-deep .dx-datagrid-rowsview .dx-data-row > td,
-  ::ng-deep .dx-datagrid-rowsview .dx-data-row > td.dx-command-select,
-  ::ng-deep .dx-datagrid-rowsview .dx-data-row > td.dx-editor-cell {
+  ::ng-deep .dx-datagrid-rowsview .dx-data-row>td,
+  ::ng-deep .dx-datagrid-rowsview .dx-data-row>td.dx-command-select,
+  ::ng-deep .dx-datagrid-rowsview .dx-data-row>td.dx-editor-cell {
     height: 34px !important;
     min-height: 34px !important;
     max-height: 34px !important;
@@ -679,7 +683,7 @@
   }
 
   ::ng-deep .dx-datagrid-headers .dx-header-row,
-  ::ng-deep .dx-datagrid-headers .dx-header-row > td {
+  ::ng-deep .dx-datagrid-headers .dx-header-row>td {
     padding-top: 4px !important;
     padding-bottom: 4px !important;
     height: 34px !important;
@@ -688,6 +692,7 @@
     vertical-align: middle !important;
   }
 }
-:host ::ng-deep .supplier-grid .dx-data-row > td {
+
+:host ::ng-deep .supplier-grid .dx-data-row>td {
   height: 14px !important;
 }

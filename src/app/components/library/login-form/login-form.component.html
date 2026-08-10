@@ -1,55 +1,35 @@
 <div class="login-wrapper">
-  <form class="login-form" (submit)="onSubmit($event)">
+  <form class="login-form" (submit)="onSubmit($event)" *ngIf="!is2FAState">
     <div class="logo">
       <!-- <h1 class="brand-title">MMARK</h1> -->
-      <img
-        src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png"
-        alt="MMARK Logo"
-        class="brand-logo"
-        height="50px"
-      />
+      <img src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png" alt="MMARK Logo"
+        class="brand-logo" height="50px" />
 
       <p class="subtitle">LOG IN TO YOUR ACCOUNT</p>
     </div>
 
     <!-- Username -->
-    <dx-text-box
-      [(value)]="formData.LOGIN_NAME"
-      [disabled]="loading"
-      placeholder="Username"
-      stylingMode="outlined"
-      mode="text"
-      (onValueChanged)="onUsernameChange($event)"
-      [buttons]="[
+    <dx-text-box [(value)]="formData.LOGIN_NAME" [disabled]="loading" placeholder="Username" stylingMode="outlined"
+      mode="text" (onValueChanged)="onUsernameChange($event)" [buttons]="[
         {
           name: 'user',
           location: 'before',
           options: { icon: 'user', stylingMode: 'text', tabIndex: -1 },
         },
-      ]"
-    >
+      ]">
       <div *dxTemplate="let data of 'before'">
         <i class="dx-icon dx-icon-user"></i>
       </div>
     </dx-text-box>
-    <dx-validator
-      [validationRules]="[
+    <dx-validator [validationRules]="[
         { type: 'required', message: 'Username is required' },
-      ]"
-    >
+      ]">
     </dx-validator>
 
     <!-- Password -->
     <!-- Password -->
-    <dx-text-box
-      [(value)]="formData.PASSWORD"
-      [disabled]="loading"
-      placeholder="Password"
-      stylingMode="outlined"
-      [inputAttr]="{ autocomplete: 'new-password' }"
-      [mode]="passwordMode"
-      style="margin-top: 16px"
-      [buttons]="[
+    <dx-text-box [(value)]="formData.PASSWORD" [disabled]="loading" placeholder="Password" stylingMode="outlined"
+      [inputAttr]="{ autocomplete: 'new-password' }" [mode]="passwordMode" style="margin-top: 16px" [buttons]="[
         {
           name: 'user',
           location: 'before',
@@ -65,8 +45,7 @@
             onClick: togglePasswordVisibility,
           },
         },
-      ]"
-    >
+      ]">
       <!-- Lock icon before input -->
       <div *dxTemplate="let data of 'before'">
         <i class="dx-icon dx-icon-lock lockicon"></i>
@@ -84,46 +63,26 @@
         ></i>
       </div> -->
     </dx-text-box>
-    <dx-validator
-      [validationRules]="[
+    <dx-validator [validationRules]="[
         { type: 'required', message: 'Password is required' },
-      ]"
-    >
+      ]">
     </dx-validator>
 
     <!-- Company -->
-    <dx-select-box
-      [(value)]="formData.COMPANY_ID"
-      [dataSource]="CompanyList"
-      displayExpr="COMPANY_NAME"
-      valueExpr="COMPANY_ID"
-      placeholder="Select Company"
-      stylingMode="outlined"
-      style="margin-top: 16px"
-    >
-      <dx-validator
-        [validationRules]="[
+    <dx-select-box [(value)]="formData.COMPANY_ID" [dataSource]="CompanyList" displayExpr="COMPANY_NAME"
+      valueExpr="COMPANY_ID" placeholder="Select Company" stylingMode="outlined" style="margin-top: 16px">
+      <dx-validator [validationRules]="[
           { type: 'required', message: 'Company Name is required' },
-        ]"
-      ></dx-validator>
+        ]"></dx-validator>
     </dx-select-box>
 
     <!-- Financial Year -->
-    <dx-select-box
-      [(value)]="formData.FINANCIAL_YEAR_ID"
-      [dataSource]="finacialYearList"
-      displayExpr="DESCRIPTION"
-      valueExpr="ID"
-      placeholder="Select Financial Year"
-      stylingMode="outlined"
-      style="margin-top: 16px"
-    >
+    <dx-select-box [(value)]="formData.FINANCIAL_YEAR_ID" [dataSource]="finacialYearList" displayExpr="DESCRIPTION"
+      valueExpr="ID" placeholder="Select Financial Year" stylingMode="outlined" style="margin-top: 16px">
     </dx-select-box>
-    <dx-validator
-      [validationRules]="[
+    <dx-validator [validationRules]="[
         { type: 'required', message: 'Financial Year is required' },
-      ]"
-    >
+      ]">
     </dx-validator>
 
     <div class="reset-link">
@@ -134,19 +93,9 @@
       <!-- > -->
     </div>
     <!-- Submit Button -->
-    <dx-button
-      type="default"
-      width="100%"
-      cssClass="btn-sign-in"
-      [useSubmitBehavior]="true"
-      style="margin-top: 30px"
-    >
+    <dx-button type="default" width="100%" cssClass="btn-sign-in" [useSubmitBehavior]="true" style="margin-top: 30px">
       <ng-container *ngIf="loading; else notLoading">
-        <dx-load-indicator
-          width="24px"
-          height="24px"
-          [visible]="true"
-        ></dx-load-indicator>
+        <dx-load-indicator width="24px" height="24px" [visible]="true"></dx-load-indicator>
       </ng-container>
       <ng-template #notLoading>LOG IN</ng-template>
     </dx-button>
@@ -157,6 +106,72 @@
 
     <div class="error-message" *ngIf="errorMessage" style="margin-top: 10px">
       * {{ errorMessage }}
+    </div>
+  </form>
+
+  <!-- 2FA SECTION -->
+  <form class="login-form" (submit)="onVerifyOTP($event)" *ngIf="is2FAState">
+    <div class="logo">
+      <img src="../../../../assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png" alt="MMARK Logo"
+        class="brand-logo" height="50px" />
+      <p class="subtitle">TWO-FACTOR AUTHENTICATION</p>
+    </div>
+    <div *ngIf="isSetup2FA" class="text-center mb-2">
+      <h5 style="margin-bottom: 4px;">Set up 2FA</h5>
+      <p style="margin-bottom: 4px; font-size: 13px;">Scan this QR code with {{ mfaProvider }} Authenticator:</p>
+      <img *ngIf="qrCodeUrl" [src]="qrCodeUrl" alt="QR Code" width="120" height="120"
+        style="width: 120px; height: 120px; max-width: 100%; display: block; margin: 0 auto;" />
+      <p class="mt-1" style="font-size: 12px; margin-bottom: 2px;">Or configure manually using this key:</p>
+      <div class="p-1 mb-1"
+        style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; font-size: 14px; letter-spacing: 2px; word-break: break-all;">
+        <strong>{{manualEntryKey}}</strong>
+      </div>
+    </div>
+
+    <div>
+      <div *ngIf="!isSetup2FA" class="text-center mb-2">
+        <h5>Two-Factor Authentication</h5>
+        <p style="margin-bottom: 10px; line-height: 1.5;">Enter the 6-digit code from your Authenticator Application.
+        </p>
+        <a href="javascript:void(0)" (click)="onGenerateNewQRClick()" style="text-decoration: none; font-size: 13px;">
+          Generate New QR
+        </a>
+      </div>
+      <div *ngIf="isSetup2FA" class="text-center mb-2 mt-2">
+        <p style="font-size: 13px; margin-bottom: 0;">Enter the 6-digit code below to verify:</p>
+      </div>
+
+      <dx-form [disabled]="loading" [showColonAfterLabel]="true" [showRequiredMark]="false">
+        <dxi-item>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <input *ngFor="let digit of [0, 1, 2, 3, 4, 5]; let i = index" id="otp-{{i}}" type="text"
+              inputmode="numeric" autocomplete="one-time-code" maxlength="6" [value]="otpDigits[i]"
+              (input)="onOtpInput(i, $event)" (keydown)="onOtpKeyDown(i, $event)" [disabled]="loading"
+              style="width: 44px; height: 44px; text-align: center; font-size: 20px; font-weight: bold; border: 1px solid #ced4da; border-radius: 4px;" />
+          </div>
+        </dxi-item>
+
+        <dxi-item itemType="button" class="mt-3">
+          <dxo-button-options width="100%" [height]="'44px'" type="default" cssClass="btn-sign-in"
+            [useSubmitBehavior]="true" [template]="'verifyTemplate'">
+          </dxo-button-options>
+        </dxi-item>
+
+        <ng-container *dxTemplate="let item of 'verifyTemplate'">
+          <span class="dx-button-text">
+            <ng-container *ngIf="loading; else notLoadingOTP">
+              <dx-load-indicator width="24px" height="24px" [visible]="true"></dx-load-indicator>
+            </ng-container>
+            <ng-template #notLoadingOTP>Verify & Login</ng-template>
+          </span>
+        </ng-container>
+      </dx-form>
+    </div>
+
+    <div class="mt-2 text-center" style="margin-top: 15px;">
+      <a href="javascript:void(0)" (click)="is2FAState = false" style="text-decoration: none; font-size: 13px;">
+        Back to Login
+      </a>
     </div>
   </form>
 </div>

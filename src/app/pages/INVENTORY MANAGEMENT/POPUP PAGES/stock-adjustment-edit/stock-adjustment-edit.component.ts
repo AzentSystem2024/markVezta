@@ -71,7 +71,47 @@ export class StockAdjustmentEditComponent {
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
   isPopupVisible: boolean = false;
+  isPopupGridLoading: boolean = false;
+  isSaving: boolean = false;
   items: any[] = [];
+  selectedItemKeys: number[] = [];
+
+  deleteRow = (e: any) => {
+    const rowData = e.row.data;
+    const targetId = rowData.ITEM_ID || rowData.ID;
+    const index = this.adjustmentFormData.Details.findIndex(
+      (item: any) =>
+        (item.ITEM_ID || item.ID) === targetId || item.ITEM_CODE === rowData.ITEM_CODE,
+    );
+    if (index !== -1) {
+      this.adjustmentFormData.Details.splice(index, 1);
+      this.adjustmentFormData.Details.forEach((row: any, i: number) => {
+        row.SL_NO = i + 1;
+      });
+      this.adjustmentFormData.Details = [...this.adjustmentFormData.Details];
+      this.selectedItemKeys = this.adjustmentFormData.Details.map(
+        (item: any) => item.ITEM_ID || item.ID,
+      );
+    }
+  };
+
+  getSaveButtonText(): string {
+    if (this.readOnlyTrue || this.selectedStatus === 5) {
+      return 'PDF';
+    }
+
+    if (this.isSaving) {
+      if (this.selectedStatus === 2 || this.approveValue) {
+        return 'Committing...';
+      }
+      return 'Updating...';
+    }
+
+    if (this.selectedStatus === 2 || this.approveValue) {
+      return 'Update & Commit';
+    }
+    return 'Update';
+  }
   // itemsForInventory: any[] = [];
   readOnlyTrue: boolean = false;
   barcodeList: any;
@@ -134,7 +174,7 @@ export class StockAdjustmentEditComponent {
   constructor(
     private dataService: DataService,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     // this.isEditDataAvailable();
@@ -207,6 +247,9 @@ export class StockAdjustmentEditComponent {
         this.readOnlyTrue = false;
         this.approveValue = false;
       }
+      this.selectedItemKeys = (this.adjustmentFormData.Details || []).map(
+        (item: any) => item.ITEM_ID || item.ID,
+      );
       this.StoreIDData = this.adjustmentFormData.STORE_ID;
 
       // this.readOnlyTrue=
@@ -221,54 +264,61 @@ export class StockAdjustmentEditComponent {
     }
   }
   onSelectItems() {
-    const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
-    console.log(selectedRows);
+    const selectedRows = this.popupGridRef?.instance?.getSelectedRowsData() || [];
+    const selectedItemIds = selectedRows.map((r: any) => r.ITEM_ID || r.ID);
 
-    if (selectedRows && selectedRows.length > 0) {
-      selectedRows.forEach((row) => {
-        const exists = this.adjustmentFormData.Details.some(
-          (item) => item.ITEM_CODE === row.ITEM_CODE,
-        );
+    // 1. Keep items that are currently selected in the popup grid
+    const updatedDetails = this.adjustmentFormData.Details.filter((existingItem: any) =>
+      selectedItemIds.includes(existingItem.ITEM_ID || existingItem.ID),
+    );
 
-        if (!exists) {
-          let adjQty = 0;
-          let amount = 0;
+    // 2. Add newly selected items from popup
+    selectedRows.forEach((row: any) => {
+      const rowItemId = row.ITEM_ID || row.ID;
+      const exists = updatedDetails.some(
+        (item: any) => (item.ITEM_ID || item.ID) === rowItemId,
+      );
 
-          // ✅ calculate only if NEW_QTY has a value
-          if (
-            row.NEW_QTY !== null &&
-            row.NEW_QTY !== undefined &&
-            row.NEW_QTY !== ''
-          ) {
-            adjQty = row.NEW_QTY - (row.STOCK_QTY || 0);
-            amount = adjQty * (row.COST || 0);
-          }
+      if (!exists) {
+        let adjQty = 0;
+        let amount = 0;
 
-          const detailItem = {
-            SL_NO: this.adjustmentFormData.Details.length + 1,
-            ITEM_ID: row.ITEM_ID,
-            ITEM_CODE: row.ITEM_CODE,
-            ITEM_NAME: row.DESCRIPTION,
-            COST: row.COST,
-            STOCK_QTY: row.STOCK_QTY,
-            NEW_QTY: row.NEW_QTY || null, // keep null if not entered
-            ADJ_QTY: adjQty,
-            AMOUNT: amount,
-          };
-
-          this.adjustmentFormData.Details.push(detailItem);
+        if (
+          row.NEW_QTY !== null &&
+          row.NEW_QTY !== undefined &&
+          row.NEW_QTY !== ''
+        ) {
+          adjQty = row.NEW_QTY - (row.STOCK_QTY || 0);
+          amount = adjQty * (row.COST || 0);
         }
-      });
 
-      // refresh for DevExtreme grid
-      this.adjustmentFormData.Details = [...this.adjustmentFormData.Details];
+        const detailItem = {
+          SL_NO: updatedDetails.length + 1,
+          ITEM_ID: rowItemId,
+          ITEM_CODE: row.ITEM_CODE,
+          DESCRIPTION: row.DESCRIPTION || row.ITEM_NAME,
+          ITEM_NAME: row.ITEM_NAME || row.DESCRIPTION,
+          COST: row.COST || 0,
+          STOCK_QTY: row.STOCK_QTY || 0,
+          NEW_QTY: row.NEW_QTY || null,
+          ADJ_QTY: adjQty,
+          AMOUNT: amount,
+        };
 
-      // clear popup selection
-      this.popupGridRef.instance.clearSelection();
-      this.isPopupVisible = false;
-    }
+        updatedDetails.push(detailItem);
+      }
+    });
 
-    console.log(this.adjustmentFormData.Details, '======================');
+    // Re-index SL_NO
+    updatedDetails.forEach((row: any, index: number) => {
+      row.SL_NO = index + 1;
+    });
+
+    this.adjustmentFormData.Details = [...updatedDetails];
+    this.selectedItemKeys = this.adjustmentFormData.Details.map(
+      (item: any) => item.ITEM_ID || item.ID,
+    );
+    this.isPopupVisible = false;
   }
 
   department_dropdown() {
@@ -297,104 +347,177 @@ export class StockAdjustmentEditComponent {
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       if (this.IS_HQ_App) {
-        // 🔹 HQ App → show only store with ID = 1
-        this.stores = response.filter((item: any) => item.ID === 1);
+        this.stores = (response || []).filter((item: any) => item.ID === 1);
       } else {
-        // 🔹 Not HQ → show all stores
-        this.stores = response;
+        this.stores = response || [];
+        if (this.stores && this.stores.length === 1 && !this.adjustmentFormData.STORE_ID) {
+          this.adjustmentFormData.STORE_ID = this.stores[0].ID;
+        }
       }
     });
   }
+
   get_item_list_Data() {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    console.log('Parsed ObjectData==================:', menuResponse);
-    console.log(menuResponse.GeneralSettings.ENABLE_MATRIX_CODE);
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
-    const menuGroups = menuResponse.MenuGroups || [];
-    console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
-    console.log(this.storeFromSession);
   }
   cancel() {
     this.popupClosed.emit();
   }
 
+  private storeItemsCache: { [key: string]: any[] } = {};
+
   onAddItems() {
-    if (!this.adjustmentFormData.STORE_ID) {
-      notify('Please select a store to add items', 'error');
+    const storeId = Number(this.adjustmentFormData.STORE_ID);
+    if (!storeId) {
+      notify('Please select a Store', 'error');
       return;
     }
 
     this.isPopupVisible = true;
 
+    if (this.storeItemsCache[storeId]) {
+      this.items = this.storeItemsCache[storeId];
+      this.selectedItemKeys = (this.adjustmentFormData.Details || []).map(
+        (item: any) => item.ITEM_ID || item.ID,
+      );
+      return;
+    }
+
+    this.isPopupGridLoading = true;
+
     const payload = {
-      STORE_ID: this.adjustmentFormData.STORE_ID,
+      STORE_ID: storeId,
     };
 
-    // Wait until the popup grid is rendered
     setTimeout(() => {
       this.popupGridRef?.instance.beginCustomLoading('Loading...');
 
       this.dataService.Get_item_list(payload).subscribe({
         next: (res: any) => {
-          console.log(res);
-          this.items = res.Data;
-
+          let list = res?.Data || [];
+          if (Array.isArray(list)) {
+            list = [...list].sort((a: any, b: any) => (b.ID || 0) - (a.ID || 0));
+          }
+          this.storeItemsCache[storeId] = list;
+          this.items = list;
+          this.selectedItemKeys = (this.adjustmentFormData.Details || []).map(
+            (item: any) => item.ITEM_ID || item.ID,
+          );
+          this.isPopupGridLoading = false;
           this.popupGridRef?.instance.endCustomLoading();
         },
         error: () => {
+          this.isPopupGridLoading = false;
           this.popupGridRef?.instance.endCustomLoading();
           notify('Failed to load items', 'error');
         },
       });
     }, 0);
   }
-  // onAddItems() {
-  //   if (!this.adjustmentFormData.STORE_ID) {
-  //     notify('Please select a store to add items', 'error');
-  //     return;
-  //   }
-  //   this.isPopupVisible = true;
 
-  //   const payload = {
-  //     STORE_ID: this.adjustmentFormData.STORE_ID,
-  //   };
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.dataField === 'NEW_QTY') {
+      const val = e.data?.NEW_QTY;
+      if (val === null || val === undefined || val === '' || isNaN(Number(val))) {
+        e.cellElement.classList.add('required-qty-cell');
+      } else {
+        e.cellElement.classList.add('editable-qty-cell');
+      }
+    }
+  }
 
-  //   console.log(payload);
-  //   this.dataService.Get_item_list(payload).subscribe((res: any) => {
-  //     console.log(res);
-  //     this.items = res.Data;
-  //   });
-  // }
-  onPopupHiding() {}
-  updateNetAmount(event: any) {}
+  onPopupEditorPreparing(e: any) {
+    if (e.parentType === 'dataRow' && e.command === 'select') {
+      const exists = this.adjustmentFormData.Details.some(
+        (item: any) => item.ITEM_ID === e.row.data.ITEM_ID,
+      );
+
+      if (exists) {
+        e.editorOptions.disabled = true;
+      }
+    }
+  }
+
+  onPopupCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'select') {
+      const exists = this.adjustmentFormData.Details.some(
+        (item: any) => item.ITEM_ID === e.data.ITEM_ID,
+      );
+
+      if (exists) {
+        e.cellElement.style.pointerEvents = 'none';
+        e.cellElement.style.opacity = '0.5';
+      }
+    }
+  }
+  onPopupHiding() { }
+  updateNetAmount(event: any) { }
 
   UpdateStockAdjustment() {
-    console.log(this.adjustmentFormData);
+    if (!this.adjustmentFormData.STORE_ID) {
+      notify('Please select a Store', 'error');
+      return;
+    }
+    if (!this.adjustmentFormData.DEPT_ID) {
+      notify('Please select a Department', 'error');
+      return;
+    }
+    if (!this.adjustmentFormData.REASON_ID) {
+      notify('Please select a Reason', 'error');
+      return;
+    }
+    if (
+      !this.adjustmentFormData.Details ||
+      this.adjustmentFormData.Details.length === 0
+    ) {
+      notify('Please add at least one item', 'error');
+      return;
+    }
+
+    const invalidIndex = this.adjustmentFormData.Details.findIndex(
+      (item: any) =>
+        item.NEW_QTY === null ||
+        item.NEW_QTY === undefined ||
+        item.NEW_QTY === '' ||
+        isNaN(Number(item.NEW_QTY)),
+    );
+
+    if (invalidIndex !== -1) {
+      const invalidItem = this.adjustmentFormData.Details[invalidIndex];
+      this.itemsGridRef?.instance?.focus(
+        this.itemsGridRef?.instance?.getCellElement(invalidIndex, 'NEW_QTY'),
+      );
+      this.itemsGridRef?.instance?.editCell(invalidIndex, 'NEW_QTY');
+      notify(
+        `Please enter New Stock for item: ${invalidItem.DESCRIPTION || invalidItem.ITEM_NAME || invalidItem.ITEM_CODE || ''}`,
+        'error',
+        3000,
+      );
+      return;
+    }
+
     const ITEM_Details = this.adjustmentFormData.Details;
-    console.log(ITEM_Details);
 
     const transformed = ITEM_Details.map((item: any) => ({
       COMPANY_ID: this.companyID,
-      // STORE_ID: this.storeFromSession,
       ADJ_ID: 0,
       NET_AMOUNT: 0,
       REASON_ID: 0,
-      ITEM_ID: item.ITEM_ID, // map from old
+      ITEM_ID: item.ITEM_ID,
       COST: item.COST,
-      STOCK_QTY: item.STOCK_QTY, // rename
-      NEW_QTY: Number(item.NEW_QTY), // ensure number
+      STOCK_QTY: item.STOCK_QTY,
+      NEW_QTY: Number(item.NEW_QTY),
       ADJ_QTY: item.ADJ_QTY,
       AMOUNT: item.AMOUNT,
-      BATCH_NO: '', // default placeholder
-      EXPIRY_DATE: this.selecte_Date_Details.EXPIRY_DATE, // current date-time
+      BATCH_NO: '',
+      EXPIRY_DATE: this.selecte_Date_Details?.EXPIRY_DATE || new Date().toISOString(),
     }));
-
-    console.log(transformed);
 
     const payload = {
       ...this.adjustmentFormData,
@@ -405,23 +528,9 @@ export class StockAdjustmentEditComponent {
       USER_ID: this.userID,
       Details: transformed,
     };
-    console.log(payload);
 
-    if (!this.storeFromSession) {
-      notify('Please select a store ', 'error');
-      return;
-    }
-    if (!this.adjustmentFormData.REASON_ID) {
-      notify('Please select a reason', 'error');
-      return;
-    }
-    if (
-      !this.adjustmentFormData.Details ||
-      this.adjustmentFormData.Details.length === 0
-    ) {
-      notify('Please add at least one item', 'error');
-      return;
-    }
+    this.isSaving = true;
+
     if (this.selectedStatus == 2 || this.approveValue) {
       confirm(
         'It will approve and commit. Are you sure you want to commit?',
@@ -430,86 +539,72 @@ export class StockAdjustmentEditComponent {
         if (result) {
           this.dataService
             .Approve_Stock_Adjustment_Data(payload)
-            .subscribe((res: any) => {
-              console.log('Approved & Committed:', res);
-              if (res.Flag == '1') {
-                notify(
-                  {
-                    message: 'Advance approved and committed successfully',
-                    position: { at: 'top right', my: 'top right' },
-                    displayTime: 500,
-                  },
-                  'success',
-                );
-                this.popupClosed.emit();
-              } else {
-                notify(
-                  {
-                    message: res.Message || 'insert failed',
-                    position: { at: 'top right', my: 'top right' },
-                    displayTime: 500,
-                  },
-                  'error',
-                );
-              }
-
-              // this.resetFormAfterUpdate();
+            .subscribe({
+              next: (res: any) => {
+                if (res.Flag == '1') {
+                  notify('Stock Adjustment approved and committed successfully', 'success', 3000);
+                  this.popupClosed.emit();
+                } else {
+                  this.isSaving = false;
+                  notify(res.Message || 'Commit failed', 'error', 3000);
+                }
+              },
+              error: (err: any) => {
+                this.isSaving = false;
+                console.error('Approve error:', err);
+                notify('Something went wrong while approving.', 'error', 3000);
+              },
             });
         } else {
-          notify('Approval cancelled.', 'info', 2000);
+          this.isSaving = false;
         }
       });
     } else if (this.status == 'verifyscreen') {
       confirm(
-        'It will Verify . Are you sure you want to Verify?',
+        'It will Verify. Are you sure you want to Verify?',
         'Confirm Verify',
       ).then((result) => {
         if (result) {
           this.dataService
             .Verify_Stock_Adjustment_Data(payload)
-            .subscribe((res: any) => {
-              console.log('Verify :', res);
-              if (res.Flag == '1') {
-                notify(
-                  {
-                    message: 'Stock Adjustment Verify  successfully',
-                    position: { at: 'top right', my: 'top right' },
-                    displayTime: 500,
-                  },
-                  'success',
-                );
-                this.popupClosed.emit();
-              } else {
-                notify(
-                  {
-                    message: res.Message || 'insert failed',
-                    position: { at: 'top right', my: 'top right' },
-                    displayTime: 500,
-                  },
-                  'error',
-                );
-              }
-
-              // this.resetFormAfterUpdate();
+            .subscribe({
+              next: (res: any) => {
+                if (res.Flag == '1') {
+                  notify('Stock Adjustment verified successfully', 'success', 3000);
+                  this.popupClosed.emit();
+                } else {
+                  this.isSaving = false;
+                  notify(res.Message || 'Verify failed', 'error', 3000);
+                }
+              },
+              error: (err: any) => {
+                this.isSaving = false;
+                console.error('Verify error:', err);
+                notify('Something went wrong while verifying.', 'error', 3000);
+              },
             });
         } else {
-          notify('Verify cancelled.', 'info', 2000);
+          this.isSaving = false;
         }
       });
     } else {
       this.dataService
         .Update_Stock_Adjustment_Data(payload)
-        .subscribe((res: any) => {
-          console.log(res);
-          notify(
-            {
-              message: ' Stock Adjustment Updated successfully',
-              position: { at: 'top right', my: 'top right' },
-              displayTime: 1000,
-            },
-            'success',
-          );
-          this.popupClosed.emit();
+        .subscribe({
+          next: (res: any) => {
+            if (res.Flag == '1' || res.Flag == 1) {
+              notify('Stock Adjustment updated successfully', 'success', 3000);
+              this.popupClosed.emit();
+            } else {
+              this.isSaving = false;
+              notify(res.Message || 'Update failed', 'error', 3000);
+            }
+          },
+          error: (err: any) => {
+            this.isSaving = false;
+            console.error('Update error:', err);
+            notify('Something went wrong while updating.', 'error', 3000);
+          },
         });
     }
   }
@@ -639,4 +734,4 @@ export class StockAdjustmentEditComponent {
   exports: [StockAdjustmentEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockAdjustmentEditModule {}
+export class StockAdjustmentEditModule { }

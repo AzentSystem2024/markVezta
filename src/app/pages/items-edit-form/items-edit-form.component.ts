@@ -1,3 +1,4 @@
+
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -850,7 +851,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
-  onRowUpdated(e: any) {}
+  onRowUpdated(e: any) { }
 
   onParentItemChanged(event: any) {
     const selectedParentItem = event.selectedRowsData[0]; // Access the first selected item
@@ -1049,9 +1050,9 @@ export class ItemsEditFormComponent implements OnInit {
     const isServiceItem = Number(this.itemData.TYPE_ID) === 2;
 
     if (
-  !isServiceItem &&
-  (!this.selectedRowKeys || this.selectedRowKeys.length === 0)
-) {
+      !isServiceItem &&
+      (!this.selectedRowKeys || this.selectedRowKeys.length === 0)
+    ) {
       notify(
         {
           message: 'Please select at least one store',
@@ -1088,12 +1089,12 @@ export class ItemsEditFormComponent implements OnInit {
         IS_SELECTED: true,
       }));
 
-      console.log(storeData)
-   
+    console.log(storeData)
+
     // Save any cell currently being edited
     if (this.dataGrid?.instance) {
-  this.dataGrid.instance.saveEditData();
-}
+      this.dataGrid.instance.saveEditData();
+    }
 
     const convertedData = (this.edit_Suplier || []).map((item: any) => ({
       // ID: item.ID || 0,
@@ -1127,10 +1128,10 @@ export class ItemsEditFormComponent implements OnInit {
     const payload = {
       ...this.itemData,
       item_stores: storeData || this.itemData.item_stores,
-  //     item_stores:
-  // Number(this.itemData.TYPE_ID) === 2
-  //   ? this.itemData.item_stores
-  //   : storeData,
+      //     item_stores:
+      // Number(this.itemData.TYPE_ID) === 2
+      //   ? this.itemData.item_stores
+      //   : storeData,
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
@@ -1226,7 +1227,7 @@ export class ItemsEditFormComponent implements OnInit {
       this.imageUploaded = true;
     }
   }
-  onFileChanged(event) {}
+  onFileChanged(event) { }
   onUploadStarted(event: any) {
     this.imageSource = '';
     this.progressVisible = true;
@@ -1247,7 +1248,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.progressVisible = false;
     this.progressValue = 0;
   }
-  onDropZoneLeave(event) {}
+  onDropZoneLeave(event) { }
   onDropZoneEnter({
     component,
     dropZoneElement,
@@ -1278,7 +1279,7 @@ export class ItemsEditFormComponent implements OnInit {
       }
     }
   }
-  openModal(event) {}
+  openModal(event) { }
   onDropZoneClick() {
     this.fileInput.nativeElement.click();
   }
@@ -1300,7 +1301,7 @@ export class ItemsEditFormComponent implements OnInit {
     this.formClosed.emit();
   }
 
-  closeModal() {}
+  closeModal() { }
 
   clearImage() {
     this.imageSource = '';
@@ -1433,6 +1434,18 @@ export class ItemsEditFormComponent implements OnInit {
     this.selectedItemId = null;
   }
 
+
+  onSupplierCellValueChanged(e: any) {
+    if (e.dataField === 'IS_PRIMARY' && e.value === true) {
+      this.edit_Suplier.forEach((item: any) => {
+        item.IS_PRIMARY = false;
+      });
+      e.data.IS_PRIMARY = true;
+      e.component.refresh();
+    } else if (e.dataField === 'IS_PRIMARY' && e.value === false) {
+      e.data.IS_PRIMARY = false;
+    }
+  }
   onRowUpdatedStore(e: any) {
     const index = this.store.findIndex((item: any) => item.ID === e.data.ID);
 
@@ -1560,4 +1573,7 @@ export class ItemsEditFormComponent implements OnInit {
   declarations: [ItemsEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ItemsEditFormModule {}
+export class ItemsEditFormModule { }
+
+
+

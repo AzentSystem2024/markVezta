@@ -930,8 +930,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}TransferIn/gettrout`, payload);
   }
 
-  public getItemsforTransferIn(id: any, companyId: any): Observable<any> {
-    const reqBodyData = { TRANSFER_ID: id, COMPANY_ID: companyId };
+  public getItemsforTransferIn(id: any, companyId: any, storeId: any): Observable<any> {
+    const reqBodyData = { TRANSFER_ID: id, COMPANY_ID: companyId, STORE_ID: storeId };
     return this.http.post(`${this.apiUrl}TransferIn/getitem`, reqBodyData);
   }
 
@@ -7467,5 +7467,23 @@ The result can be exported to HTML or Markdown.`;
   DepartmentwiseProfitAndLoss_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'AC_Report/Deptwiseprofitloss';
     return this.http.post(getEndpoint, payload);
+  }
+
+
+
+  get2FASetupInfo(tempToken: string) {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${tempToken}`);
+    return this.http.get(`${this.apiUrl}Employee/setup-2fa`, { headers });
+  }
+
+  verify2FA(tempToken: string, pin: string, secretKey: string, companyId: number, financialYearId: number) {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${tempToken}`);
+    return this.http.post(`${this.apiUrl}Employee/verify-login-2fa`, {
+      TempToken: tempToken,
+      Code: pin,
+      SecretKey: secretKey,
+      CompanyId: companyId,
+      FinancialYearId: financialYearId
+    }, { headers });
   }
 }
