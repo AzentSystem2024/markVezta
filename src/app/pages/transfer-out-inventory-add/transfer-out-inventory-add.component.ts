@@ -63,6 +63,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
   @Input() isEditing: boolean = false;
   @Input() EditingResponseData: any;
   @Input() selectedDocStatus: any;
+  @Input() status: any;
   @Input() isReadOnlyMode: any;
   @Input() ActionStatus: any = {};
   @Output() popupClosed = new EventEmitter<void>();
@@ -84,7 +85,83 @@ export class TransferOutInventoryAddComponent implements OnChanges {
   isFilterRowVisible: boolean = false;
   auto: string = 'auto';
   isPopupVisible: boolean = false;
+  isPopupGridLoading: boolean = false;
+  isSaving: boolean = false;
   items: any[] = [];
+
+  deleteRow = (e: any) => {
+    const rowData = e.row.data;
+    const index = this.transferOutFormData.DETAILS.findIndex(
+      (item: any) => item.BARCODE === rowData.BARCODE,
+    );
+    if (index !== -1) {
+      this.transferOutFormData.DETAILS.splice(index, 1);
+      this.transferOutFormData.DETAILS.forEach((row: any, i: number) => {
+        row.SL_NO = i + 1;
+      });
+      this.transferOutFormData.DETAILS = [...this.transferOutFormData.DETAILS];
+      this.updateNetAmount();
+    }
+  };
+
+  getSaveButtonText(): string {
+    if (this.isReadOnlyMode) {
+      return 'PDF';
+    }
+
+    if (this.isSaving) {
+      if (
+        this.selectedDocStatus === 'VERIFY' ||
+        this.ActionStatus === 'Approve'
+      ) {
+        return 'Approving...';
+      }
+      if (
+        this.selectedDocStatus === 'OPEN' &&
+        (this.status === 'VerifyScreen' || this.ActionStatus === 'VerifyScreen')
+      ) {
+        return 'Verifying...';
+      }
+      if (this.isEditing) {
+        return this.transferOutFormData.IS_APPROVED
+          ? 'Committing...'
+          : 'Updating...';
+      }
+      return this.transferOutFormData.IS_APPROVED
+        ? 'Committing...'
+        : 'Saving...';
+    }
+
+    if (
+      this.selectedDocStatus === 'VERIFY' ||
+      this.ActionStatus === 'Approve'
+    ) {
+      return 'Approve';
+    }
+    if (
+      this.selectedDocStatus === 'OPEN' &&
+      (this.status === 'VerifyScreen' || this.ActionStatus === 'VerifyScreen')
+    ) {
+      return 'Verify';
+    }
+    if (this.isEditing) {
+      return this.transferOutFormData.IS_APPROVED
+        ? 'Update & Commit'
+        : 'Update';
+    }
+    return this.transferOutFormData.IS_APPROVED ? 'Save & Commit' : 'Save';
+  }
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.dataField === 'QUANTITY') {
+      const val = Number(e.value) || 0;
+      if (val <= 0) {
+        e.cellElement.classList.add('invalid-zero-qty-cell');
+      } else {
+        e.cellElement.classList.add('editable-qty-cell');
+      }
+    }
+  }
   // itemsForInventory: any[] = [];
   barcodeList: any;
   canAdd: any;
@@ -249,7 +326,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       COMPANY_ID: this.companyID,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.transferstores = response;
+      this.transferstores = response || [];
 
       if (this.IS_HQ_App) {
         // 🔹 HQ App → show only store with ID = 1
@@ -257,7 +334,20 @@ export class TransferOutInventoryAddComponent implements OnChanges {
         this.StoreIDData = 1;
       } else {
         // 🔹 Not HQ → show all stores
-        this.stores = response;
+        this.stores = response || [];
+        if (this.stores && this.stores.length === 1 && !this.StoreIDData) {
+          this.StoreIDData = this.stores[0].ID;
+          this.onStoreValueChanged({ value: this.StoreIDData });
+        }
+      }
+
+      if (
+        this.transferstores &&
+        this.transferstores.length === 1 &&
+        !this.transferOutFormData.DEST_STORE_ID
+      ) {
+        this.transferOutFormData.DEST_STORE_ID = this.transferstores[0].ID;
+        this.onStoreChange({ value: this.transferOutFormData.DEST_STORE_ID });
       }
     });
   }
@@ -293,35 +383,54 @@ export class TransferOutInventoryAddComponent implements OnChanges {
 
   getItemsList() {
     const payload = {
-      // STORE_ID: this.selectedStoreId,
-      STORE_ID: this.StoreId,
+      STORE_ID: this.StoreId || this.StoreIDData,
+      FIN_ID: this.finID
     };
-    this.dataService
-      .getItemDetailsForInventory(payload)
-      .subscribe((response: any) => {
-        this.items = response.Data;
-      });
+    this.isPopupGridLoading = true;
+    this.popupGridRef?.instance?.beginCustomLoading('Loading Items...');
+
+    this.dataService.getItemDetailsForInventory(payload).subscribe({
+      next: (response: any) => {
+        let list = response?.Data || [];
+        if (Array.isArray(list)) {
+          list = [...list].sort((a: any, b: any) => (b.ID || 0) - (a.ID || 0));
+        }
+        this.items = list;
+        this.isPopupGridLoading = false;
+        this.popupGridRef?.instance?.endCustomLoading();
+      },
+      error: () => {
+        this.isPopupGridLoading = false;
+        this.popupGridRef?.instance?.endCustomLoading();
+      },
+    });
   }
 
   onAddItems() {
     this.isPopupVisible = true; // open popup
+    if (this.isPopupGridLoading) {
+      setTimeout(() => {
+        this.popupGridRef?.instance?.beginCustomLoading('Loading Items...');
+      }, 50);
+    }
   }
 
   onPopupHiding() { }
 
   onSelectItems() {
-    const selectedRows = this.popupGridRef.instance.getSelectedRowsData();
+    const selectedRows = this.popupGridRef?.instance?.getSelectedRowsData();
+    this.isPopupVisible = false;
 
     if (selectedRows && selectedRows.length > 0) {
       // remove any empty placeholder rows
       this.transferOutFormData.DETAILS =
         this.transferOutFormData.DETAILS.filter(
-          (item) => item.BARCODE !== '' && item.DESCRIPTION !== '',
+          (item: any) => item.BARCODE !== '' && item.DESCRIPTION !== '',
         );
 
-      selectedRows.forEach((row) => {
+      selectedRows.forEach((row: any) => {
         const exists = this.transferOutFormData.DETAILS.some(
-          (item) => item.BARCODE === row.BARCODE,
+          (item: any) => item.BARCODE === row.BARCODE,
         );
         if (!exists) {
           this.transferOutFormData.DETAILS.push({
@@ -338,8 +447,8 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       });
 
       this.transferOutFormData.DETAILS = [...this.transferOutFormData.DETAILS];
-      this.popupGridRef.instance.clearSelection();
-      this.isPopupVisible = false;
+      this.popupGridRef?.instance?.clearSelection();
+      this.updateNetAmount();
     }
   }
 
@@ -473,6 +582,30 @@ export class TransferOutInventoryAddComponent implements OnChanges {
     return issued <= available;
   };
 
+  onRowValidating(e: any) {
+    let rowData = e.oldData;
+    if (!rowData) {
+      const grid = e.component;
+      const rowIndex = grid.getRowIndexByKey(e.key);
+      rowData = grid.getVisibleRows()[rowIndex]?.data || {};
+    }
+
+    const data = { ...rowData, ...e.newData };
+
+    const available = Number(
+      data.QUANTITY_AVAILABLE ?? data.QTY_AVAILABLE ?? 0,
+    );
+    const issued = Number(data.QUANTITY ?? data.QTY_ISSUED ?? 0);
+
+    if (issued > available) {
+      e.isValid = false;
+      e.errorText = 'Qty Issued cannot be greater than Qty Available';
+    } else {
+      e.isValid = true;
+      e.errorText = '';
+    }
+  }
+
   private formatDateLocal(date: any): string | null {
     if (!date) return null;
     const d = new Date(date);
@@ -484,12 +617,20 @@ export class TransferOutInventoryAddComponent implements OnChanges {
 
   saveTransferOut() {
     // 1. Validate required fields
+    if (!this.StoreIDData) {
+      notify('Please select a Store', 'error');
+      return;
+    }
     if (!this.transferOutFormData.DEST_STORE_ID) {
-      notify('Please select a store to transfer to', 'error');
+      notify('Please select a Transfer To store', 'error');
+      return;
+    }
+    if (!this.transferOutFormData.DEPT_ID) {
+      notify('Please select a Department', 'error');
       return;
     }
     if (!this.transferOutFormData.REASON_ID) {
-      notify('Please select a reason', 'error');
+      notify('Please select a Reason', 'error');
       return;
     }
     if (
@@ -497,6 +638,30 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       this.transferOutFormData.DETAILS.length === 0
     ) {
       notify('Please add at least one item', 'error');
+      return;
+    }
+
+    // Check zero quantity
+    const zeroQtyIndex = this.transferOutFormData.DETAILS.findIndex(
+      (item: any) => (Number(item.QUANTITY) || 0) <= 0,
+    );
+
+    if (zeroQtyIndex !== -1) {
+      const item = this.transferOutFormData.DETAILS[zeroQtyIndex];
+      notify(
+        `Qty Issued cannot be 0 for item: ${item.DESCRIPTION || item.BARCODE}`,
+        'error',
+        3500,
+      );
+
+      const gridInstance = this.itemsGridRef?.instance;
+      if (gridInstance) {
+        setTimeout(() => {
+          gridInstance.focus(
+            gridInstance.getCellElement(zeroQtyIndex, 'QUANTITY'),
+          );
+        }, 50);
+      }
       return;
     }
 
@@ -508,7 +673,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
         0,
       );
 
-    // 3. Create payload (unchanged)
+    // 3. Create payload
     const payload = {
       ...this.transferOutFormData,
       TRANSFER_DATE: this.formatDateLocal(
@@ -522,6 +687,8 @@ export class TransferOutInventoryAddComponent implements OnChanges {
 
     console.log('Final payload:', payload);
 
+    this.isSaving = true;
+
     // ============================================================
     // ------------------ UPDATED APPROVAL LOGIC -------------------
     // ============================================================
@@ -531,7 +698,8 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       console.log(this.selectedDocStatus, '==========');
       if (
         this.selectedDocStatus == 'VERIFY' ||
-        this.transferOutFormData.IS_APPROVED
+        this.ActionStatus == 'Approve' ||
+        this.status == 'ApproveScreen'
       ) {
         // APPROVE API
         confirm(
@@ -547,6 +715,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
                     this.popupClosed.emit();
                   });
                 } else {
+                  this.isSaving = false;
                   notify(
                     'Error approving transfer: ' + res.message,
                     'error',
@@ -555,15 +724,18 @@ export class TransferOutInventoryAddComponent implements OnChanges {
                 }
               },
               error: (err) => {
+                this.isSaving = false;
                 console.error('Approve error:', err);
                 notify('Something went wrong while approving.', 'error', 3000);
               },
             });
+          } else {
+            this.isSaving = false;
           }
         });
       } else if (
         this.selectedDocStatus == 'OPEN' &&
-        this.ActionStatus == 'VerifyScreen'
+        (this.ActionStatus == 'VerifyScreen' || this.status == 'VerifyScreen')
       ) {
         confirm(
           'Are you sure you want to Verify this transfer?',
@@ -578,6 +750,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
                     this.popupClosed.emit();
                   });
                 } else {
+                  this.isSaving = false;
                   notify(
                     'Error Verify transfer: ' + res.message,
                     'error',
@@ -586,10 +759,13 @@ export class TransferOutInventoryAddComponent implements OnChanges {
                 }
               },
               error: (err) => {
+                this.isSaving = false;
                 console.error('verifyTransferOutForInventory error:', err);
                 notify('Something went wrong while Verify.', 'error', 3000);
               },
             });
+          } else {
+            this.isSaving = false;
           }
         });
       } else {
@@ -600,10 +776,12 @@ export class TransferOutInventoryAddComponent implements OnChanges {
               notify('Transfer updated successfully!', 'success', 3000);
               this.popupClosed.emit();
             } else {
+              this.isSaving = false;
               notify('Error updating transfer: ' + res.message, 'error', 3000);
             }
           },
           error: (err) => {
+            this.isSaving = false;
             console.error('Update error:', err);
             notify('Something went wrong while updating.', 'error', 3000);
           },
@@ -635,6 +813,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
                     this.popupClosed.emit();
                   });
                 } else {
+                  this.isSaving = false;
                   notify(
                     'Error saving transfer: ' + res.message,
                     'error',
@@ -643,10 +822,13 @@ export class TransferOutInventoryAddComponent implements OnChanges {
                 }
               },
               error: (err) => {
+                this.isSaving = false;
                 console.error('Save error:', err);
                 notify('Something went wrong while saving.', 'error', 3000);
               },
             });
+          } else {
+            this.isSaving = false;
           }
         });
       } else {
@@ -658,10 +840,12 @@ export class TransferOutInventoryAddComponent implements OnChanges {
               this.getTransferNo();
               this.popupClosed.emit();
             } else {
+              this.isSaving = false;
               notify('Error saving transfer: ' + res.message, 'error', 3000);
             }
           },
           error: (err) => {
+            this.isSaving = false;
             console.error('Save error:', err);
             notify('Something went wrong while saving.', 'error', 3000);
           },

@@ -50,6 +50,7 @@ import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/
 import notify from 'devextreme/ui/notify';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { ExportService } from 'src/app/services/export.service';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-transfer-in-inventory',
@@ -76,7 +77,7 @@ export class TransferInInventoryComponent {
   canPrint = false;
   sessionData: any;
   selected_vat_id: any;
-  Store: any = []
+  Store: any = [];
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -111,8 +112,8 @@ export class TransferInInventoryComponent {
   selecteTrOut: any;
   isEditTransferOut: boolean = false;
   selectedTrOut: any;
-  selectedStoreid: any
-  canVerify: boolean = false
+  selectedStoreid: any;
+  canVerify: boolean = false;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -141,25 +142,19 @@ export class TransferInInventoryComponent {
       name: 'edit',
       onClick: (e: any) => this.onEditTransferIn(e),
       visible: (e: any) => {
-
-        return this.canEdit &&
-          (
-            e.row.data.STATUS === 'OPEN'
-          )
-      }
-
+        return this.canEdit && e.row.data.STATUS === 'OPEN';
+      },
     },
     {
       name: 'delete',
       visible: (e: any) => {
         const status = e.row.data.STATUS;
 
-        return this.canDelete &&
-          (
-            (e.row.data.STATUS == 'OPEN') || (status === 'VERIFIED' && this.canApprove)
-
-          )
-
+        return (
+          this.canDelete &&
+          (e.row.data.STATUS == 'OPEN' ||
+            (status === 'VERIFIED' && this.canApprove))
+        );
       },
     },
     {
@@ -177,11 +172,11 @@ export class TransferInInventoryComponent {
       text: 'Approve',
       onClick: (e: any) => this.onApproveClick(e),
       visible: (e: any) => {
-        return this.canApprove &&
-          (
-            e.row.data.STATUS === 'VERIFIED' || (this.canVerify ? false : e.row.data.STATUS === 'OPEN')
-          )
-
+        return (
+          this.canApprove &&
+          (e.row.data.STATUS === 'VERIFIED' ||
+            (this.canVerify ? false : e.row.data.STATUS === 'OPEN'))
+        );
       },
     },
     {
@@ -191,11 +186,8 @@ export class TransferInInventoryComponent {
       onClick: (e: any) => this.onViewClick(e),
       visible: (e: any) =>
         this.canView &&
-        (
-          e.row.data.STATUS === 'APPROVED' ||
-          (e.row.data.STATUS === 'VERIFIED' && !this.canApprove)
-        )
-
+        (e.row.data.STATUS === 'APPROVED' ||
+          (e.row.data.STATUS === 'VERIFIED' && !this.canApprove)),
     },
   ];
   selected_Data_Status: any;
@@ -206,8 +198,8 @@ export class TransferInInventoryComponent {
     private router: Router,
     private zone: NgZone,
     private exportService: ExportService,
-    private cdr: ChangeDetectorRef
-  ) { }
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -232,19 +224,17 @@ export class TransferInInventoryComponent {
       this.canView = packingRights.CanView;
       this.canApprove = packingRights.CanApprove;
       this.canVerify = packingRights.CanVerify;
-
     }
     this.getTransferInList();
-
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
-
-
 
   getTransferInList(dateRange: string = this.selectedDateRange) {
     // const datePayload = this.getDateRangePayload(dateRange);
@@ -311,7 +301,6 @@ export class TransferInInventoryComponent {
     }
   }
 
-
   applyDateFilter() {
     if (!this.selectedDateRange || !this.transferInList) {
       this.dateFilteredList = [...this.transferInList];
@@ -376,7 +365,7 @@ export class TransferInInventoryComponent {
       .map((s: any) => s.DESCRIPTION);
 
     this.filteredTrInList = this.dateFilteredList.filter((item: any) =>
-      selectedNames.includes(item.STORE_NAME)
+      selectedNames.includes(item.STORE_NAME),
     );
   }
   applyCustomDateFilter() {
@@ -512,12 +501,12 @@ export class TransferInInventoryComponent {
 
   onEditTransferIn(event: any) {
     event.cancel = true;
-    console.log(event, '==================event=====================')
+    console.log(event, '==================event=====================');
     const trInId = event.data.TRANS_ID;
     this.selected_Data_Status = event.data.STATUS;
-    this.StatusType = 'Editscreen'
-    this.isReadOnlyTrIn = false
-    this.buttonText = 'Update Transfer In'
+    this.StatusType = 'Editscreen';
+    this.isReadOnlyTrIn = false;
+    this.buttonText = 'Edit Transfer In';
     this.dataService
       .selectTransferInForInventory(trInId)
       .subscribe((response: any) => {
@@ -525,7 +514,7 @@ export class TransferInInventoryComponent {
         if (this.selected_Data_Status === 'OPEN') {
           this.isReadOnlyTrIn = false;
           this.StatusType = 'EditScreen';
-          this.buttonText = 'Update Transfer In';
+          this.buttonText = 'Edit Transfer In';
         } else {
           this.isReadOnlyTrIn = true;
           this.StatusType = 'viewScreen';
@@ -539,44 +528,93 @@ export class TransferInInventoryComponent {
   onDeleteTrIn(event: any) {
     const trInId = event.data.TRANSFER_ID;
     const status = event.data.STATUS;
-    if (event.data.STATUS === 'APPROVED') {
-      event.cancel = true;
+
+    event.cancel = true;
+
+    if (status === 'APPROVED') {
       notify('This cannot be deleted.', 'error', 2000);
       return;
     }
-    event.cancel = true;
-    console.log(trInId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
-    // Call your delete API
-    this.dataService.deleteTrInForInventory(trInId).subscribe(
-      (response: any) => {
-        if (response) {
-          notify(
-            {
-              message: 'Deleted Successfully',
-              position: { at: 'top center', my: 'top center' },
-            },
-            'success',
-          );
-          this.getTransferInList();
-          // this.dataGrid.instance.refresh();
-        } else {
-          notify(
-            {
-              message: 'Your Data Not deleted',
-              position: { at: 'top right', my: 'top right' },
-            },
-            'error',
-          );
-        }
-        // or whatever method you use to refresh `employeeList`
-      },
-      (error) => {
-        console.error('Error deleting employee:', error);
-      },
-    );
+
+    confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    ).then((result: boolean) => {
+      if (!result) {
+        return;
+      }
+
+      this.dataService.deleteTrInForInventory(trInId).subscribe(
+        (response: any) => {
+          if (response) {
+            notify(
+              {
+                message: 'Deleted Successfully',
+                position: { at: 'top center', my: 'top center' },
+              },
+              'success',
+            );
+
+            this.getTransferInList();
+          } else {
+            notify(
+              {
+                message: 'Your Data Not deleted',
+                position: { at: 'top right', my: 'top right' },
+              },
+              'error',
+            );
+          }
+        },
+        (error) => {
+          console.error('Error deleting transfer in:', error);
+          notify('Error while deleting data.', 'error', 3000);
+        },
+      );
+    });
   }
 
-  onCellPrepared(event: any) { }
+  // onDeleteTrIn(event: any) {
+  //   const trInId = event.data.TRANSFER_ID;
+  //   const status = event.data.STATUS;
+  //   if (event.data.STATUS === 'APPROVED') {
+  //     event.cancel = true;
+  //     notify('This cannot be deleted.', 'error', 2000);
+  //     return;
+  //   }
+  //   event.cancel = true;
+  //   console.log(trInId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
+  //   // Call your delete API
+  //   this.dataService.deleteTrInForInventory(trInId).subscribe(
+  //     (response: any) => {
+  //       if (response) {
+  //         notify(
+  //           {
+  //             message: 'Deleted Successfully',
+  //             position: { at: 'top center', my: 'top center' },
+  //           },
+  //           'success',
+  //         );
+  //         this.getTransferInList();
+  //         // this.dataGrid.instance.refresh();
+  //       } else {
+  //         notify(
+  //           {
+  //             message: 'Your Data Not deleted',
+  //             position: { at: 'top right', my: 'top right' },
+  //           },
+  //           'error',
+  //         );
+  //       }
+  //       // or whatever method you use to refresh `employeeList`
+  //     },
+  //     (error) => {
+  //       console.error('Error deleting employee:', error);
+  //     },
+  //   );
+  // }
+
+  onCellPrepared(event: any) {}
 
   handleClose() {
     this.isAddTransferIn = false;
@@ -593,8 +631,8 @@ export class TransferInInventoryComponent {
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
@@ -616,12 +654,11 @@ export class TransferInInventoryComponent {
         this.isEditTransferIn = true;
         this.cdr.detectChanges();
       });
-
   }
   onVerifyClick(e: any) {
     const trInId = e.row.data.TRANS_ID;
-    this.StatusType = 'verifyscreen'
-    this.isReadOnlyTrIn = e.row.data.STATUS == 'APPROVED'
+    this.StatusType = 'verifyscreen';
+    this.isReadOnlyTrIn = e.row.data.STATUS == 'APPROVED';
 
     const rowData = e.row.data;
     // Open document -> Verify privilege required
@@ -646,17 +683,12 @@ export class TransferInInventoryComponent {
         console.log(this.selectedTrIn, 'SELECTEDTROUT');
         this.isEditTransferIn = true;
         if (this.isReadOnlyTrIn) {
-
           this.StatusType = 'viewScreen';
           this.buttonText = 'View Transfer In';
-
         } else if (this.selected_Data_Status === 'OPEN') {
-
           this.StatusType = 'VerifyScreen';
           this.buttonText = 'Verify Transfer In';
-
         } else if (this.selected_Data_Status === 'VERIFY') {
-
           this.StatusType = 'ApprovalScreen';
           this.buttonText = 'Approve Transfer In';
         }
@@ -674,13 +706,8 @@ export class TransferInInventoryComponent {
         this.isEditTransferIn = true;
         this.cdr.detectChanges();
       });
-
   }
 }
-
-
-
-
 
 @NgModule({
   imports: [
@@ -719,11 +746,11 @@ export class TransferInInventoryComponent {
     TransferOutInventoryAddModule,
     TransferInInventoryFormModule,
     CustomDatePopupModule,
-    DxTagBoxModule
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [TransferInInventoryComponent],
   exports: [TransferInInventoryComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TransferInInventoryModule { }
+export class TransferInInventoryModule {}

@@ -334,9 +334,10 @@
 
 <dx-popup
   [(visible)]="isAddTransferOut"
-  [width]="'75vw'"
-  [height]="'90vh'"
+  [width]="'90vw'"
+  [height]="'100vh'"
   title=" New Transfer Out"
+  [showCloseButton]="true"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddTransferOut">
@@ -348,23 +349,19 @@
 
 <dx-popup
   [(visible)]="isEditTransferOut"
-  [width]="'75vw'"
-  [height]="'90vh'"
+  [width]="'90vw'"
+  [height]="'100vh'"
   [title]="buttonText"
+  [showCloseButton]="true"
   (onHiding)="handleClose()"
-  titleTemplate="popupTitle"
 >
-  <div *dxTemplate="let data of 'popupTitle'">
-    <div class="popup-title-text">
-      {{ buttonText }}
-    </div>
-  </div>
   <ng-container *ngIf="isEditTransferOut">
     <app-transfer-out-inventory-add
       [isEditing]="true"
       [EditingResponseData]="selectedTrOut"
       [isReadOnlyMode]="isReadOnlyTrOut"
       [ActionStatus]="StatusType"
+      [status]="StatusType"
       (popupClosed)="handleClose()"
       [selectedDocStatus]="selected_Data_Status"
     ></app-transfer-out-inventory-add>

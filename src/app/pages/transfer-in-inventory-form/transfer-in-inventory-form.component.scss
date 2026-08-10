@@ -1,206 +1,173 @@
-// @use "../../../../../variables.scss" as *;
 @use "../../../variables.scss" as *;
 @use "sass:math";
 
 :host {
-  --side-panel-toolbar-height: 80px;
-
   width: 100%;
-  display: contents;
-  overflow: auto;
-}
-
-.view-wrapper {
-  .grid {
-    .name-template {
-      .position {
-        font-size: 12px;
-        color: var(--texteditor-label-color);
-      }
-    }
-
-    ::ng-deep & {
-      .dx-datagrid-header-panel {
-        padding: 0 var(--content-padding);
-      }
-
-      .dx-toolbar {
-        margin-bottom: 0;
-        padding: var(--toolbar-margin-bottom) 0;
-      }
-
-      .dx-datagrid-content .dx-row {
-        cursor: pointer;
-      }
-    }
-
-    .grid-header {
-      @include header();
-    }
-  }
-
-  user-panel {
-    display: inherit;
-  }
-}
-
-/* Main wrapper */
-.invoice-wrapper {
-  height: auto; /* let it shrink to fit content */
-  max-height: 90vh; /* optional: prevent overflowing outside screen */
-  overflow-y: visible; /* no internal scrollbar */
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-/* Toolbar fixes */
-::ng-deep .salary-grid-wrapper .dx-datagrid .dx-toolbar {
-  min-height: 80px;
-  align-items: center;
-  z-index: 2;
-  position: relative;
-}
-
-::ng-deep
-  .salary-grid-wrapper
-  .dx-datagrid
-  .dx-toolbar
-  .dx-toolbar-items-container {
-  height: 100%;
-  padding: 0 20px !important;
-}
-
-/* Header fix */
-::ng-deep .salary-grid-wrapper .dx-datagrid-headers {
-  margin-top: 0;
-}
-
-::ng-deep .stacked-toolbar-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 50px;
-}
-
-/* Buttons container */
-.form-popup-buttons-container {
-  display: flex;
-  justify-content: flex-end;
-  padding: 4px 10px 0 10px;
-  margin-top: -10px;
-}
-
-.popup-footer {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* Data grid borders */
-::ng-deep .dx-data-grid .dx-row > td,
-::ng-deep .dx-data-grid .dx-header-row > td {
-  border-right: 1px solid #ccc !important;
-  border-bottom: 1px solid #ccc !important;
-}
-
-::ng-deep .dx-data-grid .dx-header-row > td {
-  background-color: #f9f9f9;
-}
-
-::ng-deep .dx-data-grid .dx-row > td:empty::after {
-  content: "\00a0";
   display: block;
 }
 
-/* Select alignment */
-::ng-deep .align-select .dx-texteditor {
-  height: 28px !important;
-  line-height: 28px !important;
+.transfer-inventory-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 4px;
+  box-sizing: border-box;
 }
 
-::ng-deep .align-select .dx-texteditor-input {
-  padding-top: 4px !important;
-  padding-bottom: 4px !important;
-  font-size: 13px;
+/* Document Details Header Card */
+.transfer-header-card {
+  background-color: var(--base-bg, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color, rgba(128, 128, 128, 0.2));
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
 }
 
+.header-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px 14px;
+  align-items: center;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field-item {
+  width: 100%;
+
+  ::ng-deep .dx-texteditor {
+    margin-bottom: 0 !important;
+  }
+
+  &.action-field {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+}
+
+/* Primary Add Items Button */
+::ng-deep .add-items-btn {
+  &.dx-button {
+    background: linear-gradient(135deg, #0073d8, #005cad) !important;
+    border: none !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    height: 38px !important;
+    box-shadow: 0 2px 6px rgba(0, 115, 216, 0.25);
+    transition: all 0.2s ease;
+
+    .dx-button-content {
+      padding: 0 12px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #005cad, #004585) !important;
+      box-shadow: 0 4px 10px rgba(0, 115, 216, 0.35);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+/* Custom Data Grid Styling (Theme-aware for Light & Dark mode) */
+::ng-deep .custom-retail-grid {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(128, 128, 128, 0.2)) !important;
+
+  /* Header Row Styling */
+  .dx-datagrid-headers {
+    background-color: var(--sub-header-bg, rgba(0, 115, 216, 0.08)) !important;
+    border-bottom: 1px solid var(--border-color, rgba(128, 128, 128, 0.2)) !important;
+
+    .dx-header-row > td {
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      color: var(--text-color, inherit) !important;
+      border-right: 1px solid var(--border-color, rgba(128, 128, 128, 0.15)) !important;
+      vertical-align: middle !important;
+      padding: 8px 10px !important;
+    }
+  }
+
+  /* Data Row Styling */
+  .dx-datagrid-rowsview .dx-row > td {
+    border-right: 1px solid var(--border-color, rgba(128, 128, 128, 0.12)) !important;
+    border-bottom: 1px solid var(--border-color, rgba(128, 128, 128, 0.12)) !important;
+    vertical-align: middle !important;
+    font-size: 13px;
+  }
+
+  /* Editable Cell (Qty Received) Highlight - Theme Aware */
+  .editable-qty-cell {
+    background-color: rgba(0, 115, 216, 0.09) !important;
+    color: var(--dx-color-primary, #0073d8) !important;
+    font-weight: 600 !important;
+  }
+
+  /* Summary Row Styling */
+  .dx-datagrid-summary-item {
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    color: var(--text-color, inherit) !important;
+  }
+}
+
+.narration-container {
+  max-width: 450px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* Footer Section */
 .form-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 10px;
-  gap: 20px;
-  flex-wrap: wrap; /* ensures responsive layout */
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 8px;
+  padding-bottom: 4px;
 }
 
-.footer-left {
-  flex: 1;
-}
-
-.narration-box {
-  width: 70%;
-}
-
-.footer-right {
+.footer-actions-right {
   display: flex;
-  flex-direction: column; /* checkbox above buttons */
-  align-items: flex-start;
-  gap: 8px; /* spacing between checkbox and buttons */
-}
-
-.footer-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.approve-checkbox {
-  margin-bottom: 5px;
-}
-
-::ng-deep .blue-contained-btn.dx-button .dx-icon {
-  color: #ffff !important; /* blue icon */
-
-  border-radius: 8px;
-}
-::ng-deep .blue-contained-btn.dx-button {
-  border: none !important; /* blue border */
-  color: #ffff !important;
-  background-color: #0073d8 !important; /* blue text */
-}
-.blue-contained-btn.dx-button .dx-icon :hover {
-  color: #ffff !important; /* blue icon */
-
-  border-radius: 8px;
-}
-::ng-deep .blue-contained-btn.dx-button:hover {
-  border: none !important; /* blue border */
-  color: #ffff !important;
-  background-color: #005cad !important; /* blue text */
-}
-
-.right-align-textbox .dx-texteditor-input {
-  text-align: right !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
 }
 
 .select-item-btn {
   background-color: #00a100;
-  color: #ffff;
+  color: #ffffff;
 }
 ::ng-deep .select-item-btn .dx-icon {
   color: white !important;
 }
-::ng-deep .select-item-btn :hover {
+::ng-deep .select-item-btn:hover {
   background-color: #008d00;
-  color: #ffff !important;
+  color: #ffffff !important;
 }
 
-/* Hover state - icon */
-::ng-deep .select-item-btn .dx-button.dx-state-hover .dx-icon {
-  color: white !important;
-}
-
-/* Hover state - text (optional) */
-::ng-deep .select-item-btn .dx-icon {
-  color: white !important;
+::ng-deep .dx-datagrid .invalid-zero-qty-cell {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #dc2626 !important;
+  font-weight: bold;
 }

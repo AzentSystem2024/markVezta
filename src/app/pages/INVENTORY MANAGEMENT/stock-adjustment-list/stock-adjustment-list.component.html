@@ -1,60 +1,25 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
-    <dx-data-grid
-      #dataGrid
-      noDataText="No data available"
-      [width]="'100%'"
-      [height]="'75vh'"
-      [loadPanel]="{
+    <dx-data-grid #dataGrid noDataText="No data available" [width]="'100%'" [height]="'75vh'" [loadPanel]="{
         enabled: true,
         text: 'Loading...',
         showIndicator: true,
         showPane: true,
-      }"
-      class="grid theme-dependent"
-      [dataSource]="filteredStockList"
-      [showBorders]="true"
-      [showColumnLines]="true"
-      [showBorders]="true"
-      [columnAutoWidth]="false"
-      [wordWrapEnabled]="false"
-      [rowAlternationEnabled]="true"
-      [allowColumnReordering]="true"
-      [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
-      [allowColumnResizing]="true"
-      [columnResizingMode]="'nextColumn'"
-      [filterRow]="{ visible: false }"
-      [headerFilter]="{ visible: false }"
-      [scrolling]="{ mode: 'standard' }"
-      rowAlternationInterval="2"
-      [selection]="{ mode: 'single' }"
-      focusStateEnabled="false"
-      (onEditingStart)="onEditStock($event)"
-      (onExporting)="onExporting($event)"
-      (onRowRemoving)="delete_Data($event)"
-    >
-      <dxo-editing
-        mode="popup"
-        [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
-      ></dxo-editing>
+      }" class="grid theme-dependent" [dataSource]="filteredStockList" [showBorders]="true" [showColumnLines]="true"
+      [showBorders]="true" [columnAutoWidth]="false" [wordWrapEnabled]="false" [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true" [showColumnHeaders]="true" [columnAutoWidth]="true" [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'" [filterRow]="{ visible: false }" [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'standard' }" rowAlternationInterval="2" [selection]="{ mode: 'single' }"
+      focusStateEnabled="false" (onEditingStart)="onEditStock($event)" (onExporting)="onExporting($event)"
+      (onRowRemoving)="delete_Data($event)">
+      <dxo-editing mode="popup" [allowUpdating]="canEdit" [allowDeleting]="canDelete"></dxo-editing>
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-pager
-        [visible]="true"
-        [allowedPageSizes]="allowedPageSizes"
-        [displayMode]="displayMode"
-        [showPageSizeSelector]="showPageSizeSelector"
-        [showInfo]="true"
-        [showNavigationButtons]="true"
-      ></dxo-pager>
+      <dxo-pager [visible]="true" [allowedPageSizes]="allowedPageSizes" [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector" [showInfo]="true" [showNavigationButtons]="true"></dxo-pager>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
+      <dxo-filter-row [visible]="isFilterRowVisible" [applyFilter]="auto"></dxo-filter-row>
       <dxo-header-filter [visible]="isFilterOpened">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
@@ -63,194 +28,104 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div
-            class="grid-header"
-            style="
+          <div class="grid-header" style="
               font-weight: 600;
               font-size: 20px;
               margin-left: 12px;
               padding: -3px;
               margin-right: 3px;
-            "
-          >
+            ">
             Stock Adjustment
           </div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item location="after" template="StoreFilterTemplate"></dxi-item>
-        <dxi-item
-          location="after"
-          widget="dxButton"
-          [options]="searchButtonOptions"
-        ></dxi-item>
-        <dxi-item
-          location="after"
-          locateInMenu="auto"
-          widget="dxButton"
-          [options]="refreshButtonOptions"
-        ></dxi-item>
+        <dxi-item location="after" widget="dxButton" [options]="searchButtonOptions"></dxi-item>
+        <dxi-item location="after" locateInMenu="auto" widget="dxButton" [options]="refreshButtonOptions"></dxi-item>
         <!-- Divider -->
         <dxi-item location="after">
           <div class="toolbar-divider"></div>
         </dxi-item>
 
         <!-- Export (built-in, kept) -->
-        <dxi-item
-          name="exportButton"
-          location="after"
-          cssClass="export-btn"
-        ></dxi-item>
-        <dxi-item
-          location="after"
-          widget="dxButton"
-          [visible]="canAdd"
-          [options]="addButtonOptions"
-        ></dxi-item>
+        <dxi-item name="exportButton" location="after" cssClass="export-btn"></dxi-item>
+        <dxi-item location="after" widget="dxButton" [visible]="canAdd" [options]="addButtonOptions"></dxi-item>
       </dxo-toolbar>
       <div *dxTemplate="let data of 'dateFilterTemplate'">
-        <dx-select-box
-          [dataSource]="dateRanges"
-          displayExpr="label"
-          valueExpr="value"
-          [(value)]="selectedDateRange"
-          (onValueChanged)="onDateRangeChanged($event)"
-          width="250"
-        >
+        <dx-select-box [dataSource]="dateRanges" displayExpr="label" valueExpr="value" [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)" width="250">
           <div *dxTemplate="let item of 'item'">
             {{ item.value === "custom" ? "Custom" : item.label }}
           </div>
         </dx-select-box>
       </div>
-      <div
-        *dxTemplate="let data of 'StoreFilterTemplate'"
-        style="margin-bottom: 5px"
-      >
-        <dx-tag-box
-          label="Store"
-          labelMode="floating"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [items]="Store"
-          [searchEnabled]="true"
-          [(value)]="selectedStoreid"
-          [showSelectionControls]="true"
-          [showMultiTagOnly]="true"
-          [multiline]="false"
-          [width]="200"
-          (onValueChanged)="onStoreChanged($event)"
-        ></dx-tag-box>
+      <div *dxTemplate="let data of 'StoreFilterTemplate'" style="margin-bottom: 5px">
+        <dx-tag-box label="Store" labelMode="floating" displayExpr="DESCRIPTION" valueExpr="ID" [items]="Store"
+          [searchEnabled]="true" [(value)]="selectedStoreid" [showSelectionControls]="true" [showMultiTagOnly]="true"
+          [multiline]="false" [width]="200" (onValueChanged)="onStoreChanged($event)"></dx-tag-box>
       </div>
-      <dxi-column
-        dataField="ADJ_NO"
-        caption="Doc No."
-        [allowEditing]="false"
-        width="100"
-      ></dxi-column>
-      <dxi-column
-        dataField="ADJ_DATE"
-        caption="Doc Date"
-        [allowEditing]="false"
-        dataType="date"
-        format="dd/MM/yyyy"
-      >
+      <dxi-column dataField="ADJ_NO" caption="Doc No." [allowEditing]="false" width="100"></dxi-column>
+      <dxi-column dataField="ADJ_DATE" caption="Doc Date" [allowEditing]="false" dataType="date" format="dd/MM/yyyy">
       </dxi-column>
 
-      <dxi-column
-        dataField="STORE_NAME"
-        caption=" Store"
-        [allowEditing]="false"
-      ></dxi-column>
-      <dxi-column
-        dataField="REASON_DESCRIPTION"
-        caption="Reason"
-        [allowEditing]="false"
-      ></dxi-column>
-      <dxi-column
-        dataField="NARRATION"
-        caption="Narration"
-        [allowEditing]="false"
-      ></dxi-column>
-      <dxi-column
-        caption="Status"
-        dataField="TRANS_STATUS"
-        [width]="140"
-        cellTemplate="statusCellRender"
-        [allowHeaderFiltering]="true"
-        [headerFilter]="{
+      <dxi-column dataField="STORE_NAME" caption=" Store" [allowEditing]="false"></dxi-column>
+      <dxi-column dataField="REASON_DESCRIPTION" caption="Reason" [allowEditing]="false"></dxi-column>
+      <dxi-column dataField="NARRATION" caption="Narration" [allowEditing]="false"></dxi-column>
+      <dxi-column caption="Status" dataField="TRANS_STATUS" [width]="140" cellTemplate="statusCellRender"
+        [allowHeaderFiltering]="true" [headerFilter]="{
           dataSource: getStatusFilterData,
           encodeHtml: false,
-        }"
-      >
+        }">
       </dxi-column>
 
       <div *dxTemplate="let data of 'statusCellRender'">
         <div style="text-align: center; width: 100%">
-          <span
-            [ngClass]="{
+          <span [ngClass]="{
               'flag-approved': data.data.TRANS_STATUS === 5,
               'flag-verified': data.data.TRANS_STATUS === 2,
               'flag-pending':
                 data.data.TRANS_STATUS !== 2 && data.data.TRANS_STATUS !== 5,
-            }"
-          >
+            }">
             {{
-              data.data.TRANS_STATUS === 1
-                ? "Open"
-                : data.data.TRANS_STATUS === 2
-                  ? "Verified"
-                  : data.data.TRANS_STATUS === 5
-                    ? "Approved"
-                    : "Unknown"
+            data.data.TRANS_STATUS === 1
+            ? "Open"
+            : data.data.TRANS_STATUS === 2
+            ? "Verified"
+            : data.data.TRANS_STATUS === 5
+            ? "Approved"
+            : "Unknown"
             }}
           </span>
         </div>
       </div>
       <!-- <dxi-column type="buttons" [buttons]="gridButtons"> </dxi-column> -->
-      <dxi-column
-        type="buttons"
-        caption="Actions"
-        [width]="140"
-        cellTemplate="actionTemplate"
-      >
+      <dxi-column type="buttons" caption="Actions" [width]="140" cellTemplate="actionTemplate">
       </dxi-column>
       <div *dxTemplate="let cellData of 'actionTemplate'">
         <div class="action-icons">
           <!-- Edit -->
-          <i
-            *ngIf="canEdit"
-            class="dx-icon dx-icon-edit"
+          <i *ngIf="canEdit" class="dx-icon dx-icon-edit"
             [title]="cellData.data.TRANS_STATUS === 1 ? 'Edit' : 'Details'"
-            (click)="onEditStock({ data: cellData.data, cancel: false })"
-          ></i>
+            (click)="onEditStock({ data: cellData.data, cancel: false })"></i>
 
           <!-- Delete -->
-          <i
-            *ngIf="canDelete"
-            class="dx-icon dx-icon-trash"
-            [style.opacity]="
+          <i *ngIf="canDelete" class="dx-icon dx-icon-trash" [style.opacity]="
               cellData.data.TRANS_STATUS === 2 ||
               cellData.data.TRANS_STATUS === 5
                 ? '0.4'
                 : '1'
-            "
-            [style.pointer-events]="
+            " [style.pointer-events]="
               cellData.data.TRANS_STATUS === 2 ||
               cellData.data.TRANS_STATUS === 5
                 ? 'none'
                 : 'auto'
-            "
-            title="Delete"
-            (click)="delete_Data({ data: cellData.data, cancel: false })"
-          ></i>
+            " title="Delete" (click)="delete_Data({ data: cellData.data, cancel: false })"></i>
 
           <!-- Verify -->
-          <span
-            *ngIf="
+          <span *ngIf="
               !(canEdit && !canVerify && !canApprove) &&
               (canVerify || canApprove || cellData.data.TRANS_STATUS === 5)
-            "
-            class="verify-badge"
-            [ngClass]="{
+            " class="verify-badge" [ngClass]="{
               'status-pending': cellData.data.TRANS_STATUS === 1,
               'status-verified': cellData.data.TRANS_STATUS === 2,
               'status-approved': cellData.data.TRANS_STATUS === 5,
@@ -259,9 +134,7 @@
                 (cellData.data.TRANS_STATUS === 1 && !canVerify) ||
                 (cellData.data.TRANS_STATUS === 2 && !canApprove) ||
                 (cellData.data.TRANS_STATUS === 5 && canEdit),
-            }"
-            (click)="onVerifyClick({ row: { data: cellData.data } })"
-          >
+            }" (click)="onVerifyClick({ row: { data: cellData.data } })">
           </span>
         </div>
       </div>
@@ -269,84 +142,36 @@
   </div>
 </div>
 
-<dx-popup
-  [(visible)]="showCustomDatePopup"
-  [showTitle]="true"
-  title="Select Dates"
-  [width]="350"
-  [height]="250"
-  [dragEnabled]="false"
->
+<dx-popup [(visible)]="showCustomDatePopup" [showTitle]="true" title="Select Dates" [width]="350" [height]="250"
+  [dragEnabled]="false">
   <div>
-    <div
-      style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px"
-    >
-      <dx-date-box
-        [(value)]="customStartDate"
-        type="date"
-        width="250"
-        displayFormat="dd/MM/yyyy"
-        placeholder="From Date"
-        label="From Date"
-        labelMode="floating"
-      >
+    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px">
+      <dx-date-box [(value)]="customStartDate" type="date" width="250" displayFormat="dd/MM/yyyy"
+        placeholder="From Date" label="From Date" labelMode="floating">
       </dx-date-box>
 
-      <dx-date-box
-        [(value)]="customEndDate"
-        type="date"
-        width="250"
-        displayFormat="dd/MM/yyyy"
-        placeholder="To Date"
-        label="To Date"
-        labelMode="floating"
-      >
+      <dx-date-box [(value)]="customEndDate" type="date" width="250" displayFormat="dd/MM/yyyy" placeholder="To Date"
+        label="To Date" labelMode="floating">
       </dx-date-box>
     </div>
 
     <div class="button-container">
-      <dx-button
-        text="Apply"
-        type="default"
-        (onClick)="applyCustomDateFilter()"
-      ></dx-button>
+      <dx-button text="Apply" type="default" (onClick)="applyCustomDateFilter()"></dx-button>
     </div>
   </div>
 </dx-popup>
 
-<dx-popup
-  [(visible)]="isAddStock_adj"
-  [width]="'75vw'"
-  [height]="'85vh'"
-  title=" New Stock Adjustment"
-  (onHiding)="handleClose()"
->
+<dx-popup [(visible)]="isAddStock_adj" [width]="'90vw'" [height]="'100vh'" title=" New Stock Adjustment"
+  [showCloseButton]="true" (onHiding)="handleClose()">
   <ng-container *ngIf="isAddStock_adj">
-    <app-stock-adjustment-add
-      (popupClosed)="handleClose()"
-    ></app-stock-adjustment-add>
+    <app-stock-adjustment-add (popupClosed)="handleClose()"></app-stock-adjustment-add>
   </ng-container>
 </dx-popup>
 
-<dx-popup
-  [(visible)]="is_Edit_popup"
-  [width]="'90vw'"
-  [height]="'85vh'"
-  [title]="buttonText"
-  (onHiding)="handleClose()"
-  titleTemplate="popupTitle"
->
-  <div *dxTemplate="let data of 'popupTitle'">
-    <div class="popup-title-text">
-      {{ buttonText }}
-    </div>
-  </div>
+<dx-popup [(visible)]="is_Edit_popup" [width]="'90vw'" [height]="'100vh'" [title]="buttonText" [showCloseButton]="true"
+  (onHiding)="handleClose()">
   <ng-container *ngIf="is_Edit_popup">
-    <app-stock-adjustment-edit
-      [isEditing]="true"
-      [EditingResponseData]="selected_Data"
-      (popupClosed)="handleClose()"
-      [status]="StatusType"
-    ></app-stock-adjustment-edit>
+    <app-stock-adjustment-edit [isEditing]="true" [EditingResponseData]="selected_Data" (popupClosed)="handleClose()"
+      [status]="StatusType"></app-stock-adjustment-edit>
   </ng-container>
 </dx-popup>

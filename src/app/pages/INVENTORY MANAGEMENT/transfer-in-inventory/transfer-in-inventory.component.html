@@ -299,9 +299,10 @@
 
 <dx-popup
   [(visible)]="isAddTransferIn"
-  [width]="'70vw'"
-  [height]="'90vh'"
+  [width]="'90vw'"
+  [height]="'100vh'"
   title=" New Transfer In"
+  [showCloseButton]="true"
   (onHiding)="handleClose()"
 >
   <ng-container *ngIf="isAddTransferIn">
@@ -313,17 +314,12 @@
 
 <dx-popup
   [(visible)]="isEditTransferIn"
-  [width]="'70vw'"
-  [height]="'90vh'"
+  [width]="'90vw'"
+  [height]="'100vh'"
   [title]="buttonText"
+  [showCloseButton]="true"
   (onHiding)="handleClose()"
-  titleTemplate="popupTitle"
 >
-  <div *dxTemplate="let data of 'popupTitle'">
-    <div class="popup-title-text">
-      {{ buttonText }}
-    </div>
-  </div>
   <ng-container *ngIf="isEditTransferIn">
     <app-transfer-in-inventory-form
       [isEditing]="true"

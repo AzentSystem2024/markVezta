@@ -75,3 +75,17 @@
   font-weight: 600;
   word-break: break-word;
 }
+
+::ng-deep .dx-popup-title .dx-toolbar-label {
+  max-width: none !important;
+  text-overflow: unset !important;
+  overflow: visible !important;
+  font-size: 18px !important;
+  font-weight: 600;
+}
+
+::ng-deep .dx-popup-title .dx-item-content {
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
