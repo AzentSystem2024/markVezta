@@ -1,4 +1,9 @@
-<dx-form [(formData)]="districtFormData" [colCount]="1" labelLocation="top">
+<dx-form
+  [(formData)]="districtFormData"
+  [colCount]="1"
+  labelLocation="top"
+  labelMode="floating"
+>
   <!-- District Name -->
   <dxi-item
     dataField="DISTRICT_NAME"
@@ -12,7 +17,7 @@
   </dxi-item>
 
   <!-- Country -->
-  <dxi-item [label]="{ text: 'Country' }">
+  <dxi-item>
     <div *dxTemplate>
       <dx-select-box
         [searchEnabled]="true"
@@ -22,6 +27,8 @@
         valueExpr="ID"
         [displayExpr]="countryDisplay"
         (onValueChanged)="onCountryChanged($event)"
+        label="Counrty"
+        labelMode="floating"
       >
         <div *dxTemplate="let data of 'item'">
           <img [src]="data.FLAG_URL" width="20" style="margin-right: 8px" />
@@ -59,6 +66,5 @@
   >
   </dx-button>
 
-  <dx-button text="Save" type="default" icon="save" (onClick)="saveDistrict()">
-  </dx-button>
+  <dx-button text="Save" type="default" (onClick)="saveDistrict()"> </dx-button>
 </div>

@@ -2,17 +2,30 @@
   <div class="view-wrapper topDiv d-flex mb-2 mt-0">
     <div class="headDiv">
       <div class="inputBox">
-        <dx-text-box [(value)]="UserLevelValue" label="Enter User Role *" labelMode="floating"
-          validationMessagePosition="right">
+        <dx-text-box
+          [(value)]="UserLevelValue"
+          label="Enter User Role *"
+          labelMode="floating"
+          validationMessagePosition="right"
+        >
           <dx-validator *ngIf="isErrorVisible">
-            <dxi-validation-rule type="required" message="user level is required"></dxi-validation-rule>
+            <dxi-validation-rule
+              type="required"
+              message="user level is required"
+            ></dxi-validation-rule>
           </dx-validator>
         </dx-text-box>
       </div>
       <div class="inputBox">
-        <dx-select-box [(value)]="CopiedUserLevelValue" [items]="userRoles" label="Copy User Role" labelMode="floating"
-          [showClearButton]="true" validationMessagePosition="right"
-          (onValueChanged)="onUserRoleCopySelectionChange($event)">
+        <dx-select-box
+          [(value)]="CopiedUserLevelValue"
+          [items]="userRoles"
+          label="Copy User Role"
+          labelMode="floating"
+          [showClearButton]="true"
+          validationMessagePosition="right"
+          (onValueChanged)="onUserRoleCopySelectionChange($event)"
+        >
         </dx-select-box>
       </div>
     </div>
@@ -21,114 +34,250 @@
   <div class="tabs-demo view-wrapper">
     <div class="widget-container">
       <div>
-        <dx-tabs #withIconAndText [width]="width" [selectedIndex]="selectedTab" [scrollByContent]="scrollByContent"
-          [showNavButtons]="showNavButtons" [dataSource]="MenuDatasource" [orientation]="orientations"
-          [stylingMode]="stylingMode" [iconPosition]="iconPosition" (onItemClick)="onTabClick($event)">
+        <dx-tabs
+          #withIconAndText
+          [width]="width"
+          [selectedIndex]="selectedTab"
+          [scrollByContent]="scrollByContent"
+          [showNavButtons]="showNavButtons"
+          [dataSource]="MenuDatasource"
+          [orientation]="orientations"
+          [stylingMode]="stylingMode"
+          [iconPosition]="iconPosition"
+          (onItemClick)="onTabClick($event)"
+          [elementAttr]="{ class: 'userlevel-tabs' }"
+        >
         </dx-tabs>
-        <dx-data-grid #dataGrid *ngIf="!isLoading && selectedTabData?.length" class="grid theme-dependent mt-3"
-          noDataText="" [height]="'65vh'" [dataSource]="selectedTabData" [allowColumnResizing]="true"
-          [allowColumnReordering]="true" [rowAlternationEnabled]="true" [hoverStateEnabled]="true"
-          rowAlternationInterval="2" keyExpr="MenuId" (onEditorPreparing)="onEditorPreparing($event)"
-          (onSelectionChanged)="onSelectionChanged($event)" [selectedRowKeys]="selectedRows[selectedTab]">
-
-          <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="false">
+        <dx-data-grid
+          #dataGrid
+          *ngIf="!isLoading && selectedTabData?.length"
+          class="grid theme-dependent mt-3"
+          noDataText=""
+          [height]="'65vh'"
+          [dataSource]="selectedTabData"
+          [allowColumnResizing]="true"
+          [allowColumnReordering]="true"
+          [rowAlternationEnabled]="true"
+          [hoverStateEnabled]="true"
+          rowAlternationInterval="2"
+          keyExpr="MenuId"
+          (onEditorPreparing)="onEditorPreparing($event)"
+          (onSelectionChanged)="onSelectionChanged($event)"
+          [selectedRowKeys]="selectedRows[selectedTab]"
+        >
+          <dxo-editing
+            mode="cell"
+            [allowUpdating]="true"
+            [allowAdding]="false"
+            [allowDeleting]="false"
+          >
           </dxo-editing>
 
-          <dxo-selection mode="multiple" showCheckBoxesMode="always"></dxo-selection>
-          <dxi-column dataField="MenuName" caption="Menu List" [allowEditing]="false"></dxi-column>
+          <dxo-pager
+            [visible]="true"
+            [allowedPageSizes]="allowedPageSizes"
+            [displayMode]="displayMode"
+            [showPageSizeSelector]="showPageSizeSelector"
+            [showInfo]="showInfo"
+            [showNavigationButtons]="showNavButtons"
+          >
+          </dxo-pager>
 
+          <dxo-selection
+            mode="multiple"
+            showCheckBoxesMode="always"
+          ></dxo-selection>
+          <dxi-column
+            dataField="MenuName"
+            caption="Menu List"
+            [allowEditing]="false"
+          ></dxi-column>
 
-
-          <dxi-column dataField="CanAdd" caption="Add" [width]="80" dataType="boolean" [allowEditing]="true"
-            headerCellTemplate="addHeader" [allowSorting]="false" [showEditorAlways]="true">
+          <dxi-column
+            dataField="CanAdd"
+            caption="Add"
+            [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            headerCellTemplate="addHeader"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+          >
           </dxi-column>
           <div *dxTemplate="let data of 'addHeader'">
-            <div style="display:flex; flex-direction:column; align-items:center;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center"
+            >
               <span>Add</span>
 
-              <dx-check-box [(value)]="selectAllAdd" (onValueChanged)="toggleColumn('CanAdd', $event.value)">
+              <dx-check-box
+                [(value)]="selectAllAdd"
+                (onValueChanged)="toggleColumn('CanAdd', $event.value)"
+              >
               </dx-check-box>
             </div>
           </div>
 
-          <dxi-column dataField="CanEdit" caption="Modify" [width]="80" dataType="boolean" [allowEditing]="true"
-            [allowSorting]="false" [showEditorAlways]="true" headerCellTemplate="editHeader">
+          <dxi-column
+            dataField="CanEdit"
+            caption="Modify"
+            [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+            headerCellTemplate="editHeader"
+          >
           </dxi-column>
           <div *dxTemplate="let data of 'editHeader'">
-            <div style="display:flex; flex-direction:column; align-items:center;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center"
+            >
               <span>Modify</span>
 
-              <dx-check-box [(value)]="selectAllEdit" (onValueChanged)="toggleColumn('CanEdit', $event.value)">
+              <dx-check-box
+                [(value)]="selectAllEdit"
+                (onValueChanged)="toggleColumn('CanEdit', $event.value)"
+              >
               </dx-check-box>
             </div>
           </div>
 
-          <dxi-column dataField="CanVerify" caption="Verify" [width]="80" dataType="boolean" [allowEditing]="true"
-            [allowSorting]="false" [showEditorAlways]="true" headerCellTemplate="verifyHeader">
+          <dxi-column
+            dataField="CanVerify"
+            caption="Verify"
+            [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+            headerCellTemplate="verifyHeader"
+          >
           </dxi-column>
 
           <div *dxTemplate="let data of 'verifyHeader'">
-            <div style="display:flex; flex-direction:column; align-items:center;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center"
+            >
               <span>Verify</span>
 
-              <dx-check-box [(value)]="selectAllVerify" (onValueChanged)="toggleColumn('CanVerify', $event.value)">
+              <dx-check-box
+                [(value)]="selectAllVerify"
+                (onValueChanged)="toggleColumn('CanVerify', $event.value)"
+              >
               </dx-check-box>
             </div>
           </div>
 
-          <dxi-column dataField="CanApprove" caption="Approve" [width]="90" dataType="boolean" [allowEditing]="true"
-            [allowSorting]="false" [showEditorAlways]="true" headerCellTemplate="approveHeader">
+          <dxi-column
+            dataField="CanApprove"
+            caption="Approve"
+            [width]="90"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+            headerCellTemplate="approveHeader"
+          >
           </dxi-column>
           <div *dxTemplate="let data of 'approveHeader'">
-            <div style="display:flex; flex-direction:column; align-items:center;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center"
+            >
               <span>Approve</span>
 
-              <dx-check-box [(value)]="selectAllApprove" (onValueChanged)="toggleColumn('CanApprove', $event.value)">
+              <dx-check-box
+                [(value)]="selectAllApprove"
+                (onValueChanged)="toggleColumn('CanApprove', $event.value)"
+              >
               </dx-check-box>
             </div>
           </div>
 
-          <dxi-column dataField="CanDelete" caption="Delete" [width]="80" dataType="boolean" [allowEditing]="true"
-            [allowSorting]="false" [showEditorAlways]="true" headerCellTemplate="deleteHeader">
+          <dxi-column
+            dataField="CanDelete"
+            caption="Delete"
+            [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+            headerCellTemplate="deleteHeader"
+          >
           </dxi-column>
           <div *dxTemplate="let data of 'deleteHeader'">
-            <div style="display:flex; flex-direction:column; align-items:center;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center"
+            >
               <span>Delete</span>
 
-              <dx-check-box [(value)]="selectAllDelete" (onValueChanged)="toggleColumn('CanDelete', $event.value)">
+              <dx-check-box
+                [(value)]="selectAllDelete"
+                (onValueChanged)="toggleColumn('CanDelete', $event.value)"
+              >
               </dx-check-box>
             </div>
           </div>
 
-          <dxi-column dataField="HideCost" caption="HideCost" [width]="80" dataType="boolean" [allowEditing]="true"
-            [allowSorting]="false" [showEditorAlways]="true" headerCellTemplate="hideCostHeader">
+          <dxi-column
+            dataField="HideCost"
+            caption="HideCost"
+            [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+            headerCellTemplate="hideCostHeader"
+          >
           </dxi-column>
           <div *dxTemplate="let data of 'hideCostHeader'">
-            <div style="display:flex; flex-direction:column; align-items:center;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center"
+            >
               <span>Hide Cost</span>
 
-              <dx-check-box [(value)]="selectAllHideCost" (onValueChanged)="toggleColumn('HideCost', $event.value)">
+              <dx-check-box
+                [(value)]="selectAllHideCost"
+                (onValueChanged)="toggleColumn('HideCost', $event.value)"
+              >
               </dx-check-box>
             </div>
           </div>
 
-          <dxi-column dataField="CanPrint" caption="Print" [width]="80" dataType="boolean" [allowEditing]="true"
-            [allowSorting]="false" [showEditorAlways]="true" headerCellTemplate="printHeader">
+          <dxi-column
+            dataField="CanPrint"
+            caption="Print"
+            [width]="80"
+            dataType="boolean"
+            [allowEditing]="true"
+            [allowSorting]="false"
+            [showEditorAlways]="true"
+            headerCellTemplate="printHeader"
+          >
           </dxi-column>
           <div *dxTemplate="let data of 'printHeader'">
-            <div style="display:flex; flex-direction:column; align-items:center;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center"
+            >
               <span>Print</span>
 
-              <dx-check-box [(value)]="selectAllPrint" (onValueChanged)="toggleColumn('CanPrint', $event.value)">
+              <dx-check-box
+                [(value)]="selectAllPrint"
+                (onValueChanged)="toggleColumn('CanPrint', $event.value)"
+              >
               </dx-check-box>
             </div>
           </div>
-
         </dx-data-grid>
       </div>
     </div>
-    <dx-load-panel [visible]="isLoading" [showPane]="true" [shading]="true" [closeOnOutsideClick]="false"
-      message="Loading menu...">
+    <dx-load-panel
+      [visible]="isLoading"
+      [showPane]="true"
+      [shading]="true"
+      [closeOnOutsideClick]="false"
+      message="Loading menu..."
+    >
     </dx-load-panel>
   </div>
 </div>

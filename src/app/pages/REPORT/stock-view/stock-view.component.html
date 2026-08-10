@@ -30,12 +30,12 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
+      [groupPanel]="{ visible: true }"
+      [grouping]="{ autoExpandAll: true }"
     >
-      <!-- <dxo-editing
-        mode="popup"
-        [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
-      ></dxo-editing> -->
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+      <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
+      </dxo-grouping>
       <dxo-export
         [enabled]="true"
         [allowExportSelectedData]="false"

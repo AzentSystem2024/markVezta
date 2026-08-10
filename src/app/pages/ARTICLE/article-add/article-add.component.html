@@ -269,9 +269,8 @@
             >
               <input type="file" (change)="onImageSelected($event)" hidden />
               <div class="placeholder-box">
-                Drag & Drop Image Here<br />
-                or<br />
-                <strong>Click to Upload</strong>
+                <i class="bi bi-cloud-upload upload-icon"></i>
+                <strong>Upload Image</strong>
               </div>
             </label>
 
@@ -365,7 +364,7 @@
             [showBorders]="true"
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
-            [height]="'69vh'"
+            [height]="'63vh'"
             (onSelectionChanged)="onAttachRowSelected($event)"
           >
             <dxo-editing

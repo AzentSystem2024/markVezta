@@ -92,7 +92,7 @@ export class StoresListComponent implements OnInit {
     private exportService: ExportService,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -138,8 +138,8 @@ export class StoresListComponent implements OnInit {
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag';
-    icon.style.fontSize = '18px';
-    icon.style.color = status === true ? '#10B981' : '#FFA500';
+    icon.style.fontSize = '14px';
+    icon.style.color = status === true ? 'green' : 'red';
     icon.title = status === true ? 'Active' : 'Inactive';
 
     icon.style.display = 'flex';
@@ -211,9 +211,9 @@ export class StoresListComponent implements OnInit {
       const duplicate = this.storesArray.some(
         (store: any) =>
           store.CODE.toLowerCase().trim() ===
-            storeData.CODE.toLowerCase().trim() ||
+          storeData.CODE.toLowerCase().trim() ||
           store.STORE_NAME.toLowerCase().trim() ===
-            storeData.STORE_NAME.toLowerCase().trim(),
+          storeData.STORE_NAME.toLowerCase().trim(),
       );
 
       if (duplicate) {
@@ -327,7 +327,7 @@ export class StoresListComponent implements OnInit {
       (store: any) =>
         store.CODE.toLowerCase() === payload.CODE.toLowerCase().trim() ||
         store.STORE_NAME.toLowerCase() ===
-          payload.STORE_NAME.toLowerCase().trim(),
+        payload.STORE_NAME.toLowerCase().trim(),
     );
 
     if (duplicate) {
@@ -462,4 +462,4 @@ export class StoresListComponent implements OnInit {
   exports: [],
   declarations: [StoresListComponent],
 })
-export class StoresListModule {}
+export class StoresListModule { }

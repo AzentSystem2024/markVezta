@@ -90,11 +90,11 @@
   height: 55px;
   display: flex;
   align-items: center;
-  gap: 16px;          // spacing between controls
+  gap: 16px; // spacing between controls
 }
 
 .inputBox {
-  flex: 1;            // both take equal width
+  flex: 1; // both take equal width
   min-width: 0;
   padding: 0;
 }
@@ -122,4 +122,31 @@
 
 .header-checkbox .dx-checkbox {
   margin-top: 4px;
+}
+
+::ng-deep .userlevel-tabs {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+::ng-deep .userlevel-tabs .dx-tab {
+  background: transparent !important;
+  border: none !important;
+  color: #555;
+  padding: 12px 18px;
+  transition: none;
+}
+
+::ng-deep .userlevel-tabs .dx-tab:hover {
+  background: transparent !important;
+}
+
+::ng-deep .userlevel-tabs .dx-tab.dx-tab-selected {
+  background: transparent !important;
+  color: #1976d2;
+  font-weight: 600;
+  border-bottom: 2px solid #1976d2 !important;
+}
+
+::ng-deep .userlevel-tabs .dx-tabs-wrapper {
+  border-bottom: 1px solid #e5e5e5;
 }

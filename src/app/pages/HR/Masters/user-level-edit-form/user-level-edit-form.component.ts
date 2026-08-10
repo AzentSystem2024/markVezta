@@ -49,6 +49,12 @@ export class UserLevelEditFormComponent implements OnInit, OnChanges {
   clearData: any;
   isAdministrator = false;
 
+  //========Variables for Pagination ====================
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showInfo = true;
+
   constructor(
     private fb: FormBuilder,
     private dataservice: DataService,

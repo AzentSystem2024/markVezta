@@ -76,6 +76,10 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           name="exportButton"
           location="after"
@@ -129,7 +133,7 @@
   [(visible)]="isEditVatclassPopupOpened"
   title="Edit GST Class"
   [width]="800"
-  [height]="'80vh'"
+  [height]="'auto'"
 >
   <app-vat-class-edit
     [selectedData]="selected_data"
