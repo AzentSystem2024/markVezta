@@ -471,6 +471,7 @@ export class TransferInInventoryComponent {
   }
 
   refreshGrid() {
+    this.getTransferInList();
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }

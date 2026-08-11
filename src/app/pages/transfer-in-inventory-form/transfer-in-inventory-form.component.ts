@@ -233,7 +233,7 @@ export class TransferInInventoryFormComponent {
       this.status,
       '========================statsu type=======================',
     );
-    this.StoreIDData = data.STORE_ID;
+    this.StoreIDData = data.ORIGIN_STORE_ID;
     this.transferInFormData = {
       TRANS_ID: data.TRANS_ID,
       DOC_NO: data.DOC_NO || data.TRANSFER_NO || '',
@@ -242,7 +242,7 @@ export class TransferInInventoryFormComponent {
         : data.TRANSFER_DATE
           ? new Date(data.TRANSFER_DATE)
           : null,
-      ORIGIN_STORE_ID: data.ORIGIN_STORE_ID,
+      ORIGIN_STORE_ID: data.STORE_ID,
       REASON_ID: data.REASON_ID,
       DEPT_ID: data.DEPT_ID,
       DETAILS: data.DETAILS ? [...data.DETAILS] : [],
@@ -804,7 +804,8 @@ export class TransferInInventoryFormComponent {
       USER_ID: this.userID,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
-      STORE_ID: this.StoreIDData,
+      ORIGIN_STORE_ID: this.StoreIDData,
+      STORE_ID: this.transferInFormData.ORIGIN_STORE_ID,
       ISSUE_DETAIL_ID:
         this.transferInFormData.DETAILS.length > 0
           ? this.transferInFormData.DETAILS[0].ISSUE_DETAIL_ID

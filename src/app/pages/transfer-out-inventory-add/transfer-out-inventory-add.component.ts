@@ -289,13 +289,13 @@ export class TransferOutInventoryAddComponent implements OnChanges {
     if (!this.isEditing || !this.EditingResponseData) return;
 
     const data = this.EditingResponseData;
-    this.StoreIDData = data.STORE_ID; // pre-select store in dropdown
+    this.StoreIDData = data.DEST_STORE_ID; // pre-select store in dropdown
 
     this.transferOutFormData = {
       TRANS_ID: data.TRANS_ID,
       // ID: data.ID,
       TRANSFER_DATE: data.TRANSFER_DATE ? new Date(data.TRANSFER_DATE) : null,
-      DEST_STORE_ID: data.DEST_STORE_ID,
+      DEST_STORE_ID: data.STORE_ID,
       REASON_ID: data.REASON_ID,
       DEPT_ID: data.DEPT_ID,
       DETAILS: data.DETAILS ? [...data.DETAILS] : [],
@@ -396,7 +396,8 @@ export class TransferOutInventoryAddComponent implements OnChanges {
 
   getItemsList() {
     const payload = {
-      STORE_ID: this.StoreId || this.StoreIDData,
+      // STORE_ID: this.StoreId || this.StoreIDData,
+      STORE_ID: this.selectedStoreId,
       FIN_ID: this.finID
     };
     this.isPopupGridLoading = true;
@@ -695,7 +696,8 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       USER_ID: this.userID,
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
-      STORE_ID: this.StoreIDData,
+      DEST_STORE_ID: this.StoreIDData,
+      STORE_ID: this.transferOutFormData.DEST_STORE_ID,
     };
 
     console.log('Final payload:', payload);

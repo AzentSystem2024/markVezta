@@ -142,10 +142,19 @@
           </dx-check-box>
 
           <dx-button text="Cancel" (onClick)="cancel()" stylingMode="outlined" type="normal"></dx-button>
-
-          <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving"
+<dx-button
+  *ngIf="!isReadOnlyMode"
+  #saveButtonRef
+  [text]="getSaveButtonText()"
+  [disabled]="isSaving"
+  (onClick)="saveTransferIn()"
+  stylingMode="contained"
+  type="default"
+  [width]="165">
+</dx-button>
+          <!-- <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving"
             (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()" stylingMode="contained" type="default"
-            [width]="165"></dx-button>
+            [width]="165"></dx-button> -->
         </div>
       </div>
     </div>

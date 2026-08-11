@@ -826,7 +826,9 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       maximumFractionDigits: 2,
     });
 
-    return symbol ? `${symbol} ${formattedValue}` : formattedValue;
+    return symbol === this.menuResponse?.GeneralSettings?.SYMBOL
+      ? formattedValue
+      : `${symbol} ${formattedValue}`;
   };
 
   openFile(base64Data: string, fileName: string) {
@@ -1891,4 +1893,4 @@ function numberToWordsIndianNumber(num: number) {
   declarations: [PurchaseOrderViewFormComponent],
   exports: [PurchaseOrderViewFormComponent],
 })
-export class PurchaseOrderViewFormModule {}
+export class PurchaseOrderViewFormModule { }

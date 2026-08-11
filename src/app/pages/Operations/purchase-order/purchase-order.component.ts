@@ -973,42 +973,59 @@ export class PurchaseOrderComponent {
     data.PoDetails = poDetails;
 
     // API CALL (already correct with finalize)
-    this.service
-      .savePoData(data)
-      .pipe(
-        finalize(() => {
-          this.isSaving = false; // ✅ ALWAYS RESET
-        }),
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res.message === 'Success' && res.flag === 1) {
-            notify(
-              {
-                message: data.IS_APPROVED
-                  ? 'Data Saved & Approved Successfully'
-                  : 'Data Saved Successfully',
-              },
-              'success',
-            );
+    const executeSave = () => {
+      this.service
+        .savePoData(data)
+        .pipe(
+          finalize(() => {
+            this.isSaving = false; // ✅ ALWAYS RESET
+          }),
+        )
+        .subscribe({
+          next: (res: any) => {
+            if (res.message === 'Success' && res.flag === 1) {
+              notify(
+                {
+                  message: data.IS_APPROVED
+                    ? 'Data Saved & Approved Successfully'
+                    : 'Data Saved Successfully',
+                },
+                'success',
+              );
 
-            this.refreshPo = true;
-            setTimeout(() => (this.refreshPo = false), 0);
+              this.refreshPo = true;
+              setTimeout(() => (this.refreshPo = false), 0);
 
-            this.dataGrid.instance.refresh();
-            this.isAddPopupOpened = false;
+              this.dataGrid.instance.refresh();
+              this.isAddPopupOpened = false;
 
-            this.poNewForm?.resetForm();
-            this.poNewForm?.getDocNo();
-            this.getPurchaseOrderList();
-          } else {
-            notify({ message: 'Your Data Not Saved' }, 'error');
-          }
-        },
-        error: () => {
-          notify({ message: 'Server error while saving data' }, 'error');
-        },
+              this.poNewForm?.resetForm();
+              this.poNewForm?.getDocNo();
+              this.getPurchaseOrderList();
+            } else {
+              notify({ message: 'Your Data Not Saved' }, 'error');
+            }
+          },
+          error: () => {
+            notify({ message: 'Server error while saving data' }, 'error');
+          },
+        });
+    };
+
+    if (this.isApproved) {
+      confirm(
+        'Are you sure you want to approve this Purchase Order?',
+        'Confirm Approval',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          executeSave();
+        } else {
+          this.isSaving = false;
+        }
       });
+    } else {
+      executeSave();
+    }
   }
 
   UpdatePurchaseOrder() {

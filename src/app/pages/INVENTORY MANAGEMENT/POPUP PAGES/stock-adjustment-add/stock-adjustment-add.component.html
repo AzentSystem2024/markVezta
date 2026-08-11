@@ -67,7 +67,7 @@
           allowAdding: false,
           allowUpdating: true,
           allowDeleting: true,
-        }" (onEditorPreparing)="onEditorPreparing($event)" (onCellPrepared)="onCellPrepared($event)"
+        }" (onCellValueChanged)="onCellValueChanged($event)" (onEditorPreparing)="onEditorPreparing($event)" (onCellPrepared)="onCellPrepared($event)"
         class="custom-retail-grid">
         <dxo-load-panel [showPane]="false"></dxo-load-panel>
 
@@ -104,9 +104,9 @@
         </dxi-column>
 
         <dxo-summary>
-          <dxi-total-item column="ADJ_QTY" summaryType="sum" valueFormat="#,##0.00" displayFormat="Net Adj Qty: {0}"
+          <dxi-total-item column="ADJ_QTY" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
             alignment="right"></dxi-total-item>
-          <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="Net Amt: {0}"
+          <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
             alignment="right"></dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
