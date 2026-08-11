@@ -197,7 +197,9 @@ export class TransferInInventoryFormComponent {
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
       .find((menu) => menu.Path === '/transfer-in-inventory');
-    this.getTransferNo();
+    if (!this.isEditing) {
+      this.getTransferNo();
+    }
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
       this.canEdit = packingRights.CanEdit;
@@ -234,7 +236,7 @@ export class TransferInInventoryFormComponent {
     this.StoreIDData = data.STORE_ID;
     this.transferInFormData = {
       TRANS_ID: data.TRANS_ID,
-      // ID: data.ID,
+      DOC_NO: data.DOC_NO || data.TRANSFER_NO || '',
       REC_DATE: data.REC_DATE
         ? new Date(data.REC_DATE)
         : data.TRANSFER_DATE
