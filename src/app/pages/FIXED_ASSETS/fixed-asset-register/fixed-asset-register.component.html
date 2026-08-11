@@ -23,13 +23,13 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -82,7 +82,6 @@
           name="exportButton"
           location="after"
           cssClass="export-btn"
-          style="margin-top: 8px"
         ></dxi-item>
 
         <dxi-item>

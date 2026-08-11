@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 86vh;
+      height: 76vh;
       display: flex;
       flex-direction: column;
 
@@ -366,18 +366,6 @@
             ></dx-text-box>
           </div>
         </div>
-        <dx-check-box
-          *ngIf="!isEditing && !isReadOnlyMode && canApprove"
-          [(value)]="miscFormData.IS_APPROVED"
-          text="Approve"
-          style="margin-top: 10px"
-        ></dx-check-box>
-        <dx-check-box
-          *ngIf="isEditing && !isReadOnlyMode && canApprove"
-          [(value)]="isApproved"
-          text="Approve"
-          style="margin-top: 10px"
-        ></dx-check-box>
       </div>
     </div>
   </div>
@@ -396,6 +384,20 @@
       hint="View PDF"
     >
     </dx-button> -->
+
+    <dx-check-box
+      *ngIf="!isEditing && !isReadOnlyMode && canApprove"
+      [(value)]="miscFormData.IS_APPROVED"
+      text="Approve"
+      style="margin-top: 10px"
+    ></dx-check-box>
+    <dx-check-box
+      *ngIf="isEditing && !isReadOnlyMode && canApprove"
+      [(value)]="isApproved"
+      text="Approve"
+      style="margin-top: 10px"
+    ></dx-check-box>
+
     <dx-button
       text="Cancel"
       stylingMode="outlined"

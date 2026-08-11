@@ -2,7 +2,7 @@
   <div
     class="invoice-wrapper"
     style="
-      height: 50vh;
+      height: auto;
       display: flex;
       flex-direction: column;
 
@@ -36,38 +36,39 @@
               [(value)]="receiprtFormData.REF_NO"
               label="Reference No"
               labelMode="floating"
-              [width]="150"
+              [width]="200"
             >
             </dx-text-box>
           </div>
-
-          <dx-select-box
-            [(value)]="selectedDistributorId"
-            [dataSource]="distributorList"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [width]="320"
-            [searchEnabled]="true"
-            [showClearButton]="true"
-            label="Customer *"
-            labelMode="floating"
-            (onValueChanged)="onCustomerChanged($event)"
-          >
-          </dx-select-box>
+          <div style="display: flex; gap: 10px">
+            <dx-select-box
+              [(value)]="selectedDistributorId"
+              [dataSource]="distributorList"
+              displayExpr="DESCRIPTION"
+              valueExpr="ID"
+              [width]="200"
+              [searchEnabled]="true"
+              [showClearButton]="true"
+              label="Customer *"
+              labelMode="floating"
+              (onValueChanged)="onCustomerChanged($event)"
+            >
+            </dx-select-box>
+            <dx-date-box
+              [(value)]="receiprtFormData.REC_DATE"
+              label="Date"
+              labelMode="floating"
+              displayFormat="dd-MM-yyyy"
+              type="date"
+              [width]="200"
+              [readOnly]="true"
+            >
+            </dx-date-box>
+          </div>
         </div>
 
         <!-- Right -->
         <div style="display: flex; flex-direction: column; gap: 10px">
-          <dx-date-box
-            [(value)]="receiprtFormData.REC_DATE"
-            label="Date"
-            labelMode="floating"
-            displayFormat="dd-MM-yyyy"
-            type="date"
-            [width]="180"
-            [readOnly]="true"
-          >
-          </dx-date-box>
           <div style="display: flex; align-items: center; gap: 10px">
             <dx-radio-group
               [items]="transactionTypes"
@@ -82,7 +83,7 @@
               [(value)]="receiprtFormData.NET_AMOUNT"
               label="Amount"
               labelMode="floating"
-              [width]="180"
+              [width]="300"
               alignment="right"
             ></dx-number-box>
           </div>

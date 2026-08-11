@@ -27,7 +27,7 @@
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
 
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -199,7 +199,11 @@
       <dxi-column dataField="DocumentType" caption="Document Type"></dxi-column>
       <dxi-column dataField="VoucherNo" caption="Voucher No"></dxi-column>
       <dxi-column dataField="Particulars" caption="Particulars"></dxi-column>
-      <dxi-column dataField="Remarks" caption="Remarks" [width]="300"></dxi-column>
+      <dxi-column
+        dataField="Remarks"
+        caption="Remarks"
+        [width]="300"
+      ></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column
@@ -382,7 +386,6 @@
       (popupClosed)="handleClose()"
     ></app-add-misc-receipt>
   </ng-container>
-  
 </dx-popup>
 
 <!-- Prepayment -->
@@ -775,7 +778,7 @@
   title="Payroll"
   (onHiding)="handleClose()"
 >
-  <app-payroll-view-report  
+  <app-payroll-view-report
     [payroll]="selectedPayroll"
     (popupClosed)="handleClose()"
   ></app-payroll-view-report>

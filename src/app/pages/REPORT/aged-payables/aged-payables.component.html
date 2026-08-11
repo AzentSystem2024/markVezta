@@ -22,7 +22,7 @@
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -31,7 +31,7 @@
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -123,19 +123,21 @@
           ></dx-select-box>
         </dxi-item>
 
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item>
           <dx-button
             text="Apply"
             type="default"
-            icon="todo"
             stylingMode="contained"
-            class="mt-2"
             (onClick)="get_DataSource()"
           >
           </dx-button>
         </dxi-item>
-
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping

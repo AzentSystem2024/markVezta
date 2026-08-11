@@ -270,7 +270,7 @@
 <dx-popup
   [(visible)]="addMiscPaymentPopup"
   [width]="'75vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="New Miscellaneous Payment"
   (onHiding)="handleClose()"
 >
@@ -285,7 +285,7 @@
 <dx-popup
   [(visible)]="editMiscPopupOpened"
   [width]="'75vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="Edit Miscellaneous Payment"
   (onHiding)="handleClose()"
 >
@@ -305,7 +305,7 @@
 <dx-popup
   [(visible)]="verifyMiscPopupOpened"
   [width]="'75vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   [title]="
     statusFinder === 'Verify'
       ? 'Approve Miscellaneous Payment'

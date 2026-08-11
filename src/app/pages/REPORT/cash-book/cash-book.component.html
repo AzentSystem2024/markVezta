@@ -16,7 +16,6 @@
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
@@ -25,7 +24,7 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [summary]="summaryColumnsData"
       [summary.calculateCustomSummary]="
         summaryColumnsData.calculateCustomSummary
@@ -39,7 +38,7 @@
         [allowUpdating]="true"
       ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -65,7 +64,7 @@
           </div>
         </dxi-item>
 
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
@@ -78,7 +77,7 @@
           ></dx-select-box>
         </dxi-item>
 
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
@@ -93,7 +92,7 @@
           </dx-select-box>
         </dxi-item>
 
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-date-box
             [width]="150"
             label="From Date"
@@ -104,7 +103,7 @@
           >
           </dx-date-box>
         </dxi-item>
-        <dxi-item>
+        <dxi-item style="margin-bottom: 6px">
           <dx-date-box
             [width]="150"
             label="To Date"
@@ -115,9 +114,13 @@
           >
           </dx-date-box>
         </dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item>
           <dx-button
             text="Apply"
@@ -127,7 +130,6 @@
           >
           </dx-button>
         </dxi-item>
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
       <dxo-sorting mode="none"></dxo-sorting>

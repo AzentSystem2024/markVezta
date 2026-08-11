@@ -143,18 +143,21 @@
         label="Period From"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
+        width="auto"
         [(value)]="PrePaymentFormData.DATE_FROM"
         (onValueChanged)="updatePeriodTo()"
       ></dx-date-box>
       <dx-number-box
         label="No.Month"
         labelMode="floating"
+        width="140"
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
       <dx-number-box
         label="No.Days"
         labelMode="floating"
+        width="120"
         [(value)]="PrePaymentFormData.NO_OF_DAYS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
@@ -162,14 +165,16 @@
         label="Period To"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
+        width="auto"
         [(value)]="PrePaymentFormData.DATE_TO"
         [readOnly]="true"
       ></dx-date-box>
       <dx-button
-        icon="bi bi-calendar fs-5"
-        hint="generateSchedule"
-        stylingMode="text"
+        text="Generate"
+        stylingMode="contained"
+        type="normal"
         class="calendar-btn"
+        width="auto"
         (onClick)="showGrid = true"
         (onClick)="onCalendarClick()"
       ></dx-button>
