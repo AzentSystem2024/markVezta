@@ -125,7 +125,7 @@ export class OpeningBalanceComponent {
       type: 'default',
       stylingMode: 'contained',
       hint: 'Add Row',
-      elementAttr: { class: 'add-button' },
+      elementAttr: { class: 'plus-button' },
 
       onClick: () => this.addNewManualRow(), // ✅ Arrow function preserves `this`
     };

@@ -405,14 +405,27 @@ export class PackingEditComponent {
       this.isArticleFieldsDisabled = true;
 
 
+      // if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
+      //   this.PackingData.UNIT_ID = incomingData.Units[0].UNIT_ID; //  SINGLE VALUE
+      // } else if (incomingData.UNIT_ID) {
+      //   this.PackingData.UNIT_ID = incomingData.UNIT_ID;
+      // } else {
+      //   this.PackingData.UNIT_ID = null;
+      // }
+
       if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
-        this.PackingData.UNIT_ID = incomingData.Units[0].UNIT_ID; //  SINGLE VALUE
-      } else if (incomingData.UNIT_ID) {
+        this.PackingData.UNIT_ID = incomingData.Units.map(
+          (unit: any) => unit.UNIT_ID
+        );
+      } else if (Array.isArray(incomingData.UNIT_ID)) {
         this.PackingData.UNIT_ID = incomingData.UNIT_ID;
+      } else if (incomingData.UNIT_ID) {
+        this.PackingData.UNIT_ID = [incomingData.UNIT_ID];
       } else {
-        this.PackingData.UNIT_ID = null;
+        this.PackingData.UNIT_ID = [];
       }
 
+      console.log(this.PackingData.UNIT_ID);
       console.log('UNIT_ID after bind:', this.PackingData.UNIT_ID);
 
       if (

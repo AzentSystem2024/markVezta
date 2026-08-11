@@ -143,21 +143,18 @@
         label="Period From"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
-        width="150"
         [(value)]="PrePaymentFormData.DATE_FROM"
         (onValueChanged)="updatePeriodTo()"
       ></dx-date-box>
       <dx-number-box
         label="No.Month"
         labelMode="floating"
-        width="120"
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
       <dx-number-box
         label="No.Days"
         labelMode="floating"
-        width="120"
         [(value)]="PrePaymentFormData.NO_OF_DAYS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
@@ -165,7 +162,6 @@
         label="Period To"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
-        width="150"
         [(value)]="PrePaymentFormData.DATE_TO"
         [readOnly]="true"
       ></dx-date-box>
@@ -253,7 +249,7 @@
       ></dx-number-box>
     </div>
     <div
-    *ngIf="canApprove"
+      *ngIf="canApprove"
       style="
         margin: 4px 0 8px 0;
         display: flex;
@@ -261,7 +257,6 @@
         justify-content: flex-end;
         gap: 10px;
       "
-      
     >
       <dx-check-box
         text="Approve"

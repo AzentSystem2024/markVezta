@@ -159,20 +159,20 @@ export class ChartOfAccountsFinanceComponent implements OnInit {
   }
 
   isEditDisabled = (e: any): boolean => {
-  return !(
-    this.canEdit &&
-    e.row?.data?.IS_DIRECT === true &&
-    e.row?.data?.IS_SYS_HEAD === false
-  );
-};
+    return !(
+      this.canEdit &&
+      e.row?.data?.IS_DIRECT === true &&
+      e.row?.data?.IS_SYS_HEAD === false
+    );
+  };
 
-isDeleteDisabled = (e: any): boolean => {
-  return !(
-    this.canDelete &&
-    e.row?.data?.IS_DIRECT === true &&
-    e.row?.data?.IS_SYS_HEAD === false
-  );
-};
+  isDeleteDisabled = (e: any): boolean => {
+    return !(
+      this.canDelete &&
+      e.row?.data?.IS_DIRECT === true &&
+      e.row?.data?.IS_SYS_HEAD === false
+    );
+  };
 
   getFilterButtonOptions() {
     return {
@@ -277,8 +277,8 @@ isDeleteDisabled = (e: any): boolean => {
 
     const icon = document.createElement('i');
     icon.className = 'fas fa-flag'; // Font Awesome flag icon
-    icon.style.fontSize = '18px';
-    icon.style.color = status === 'ACTIVE' ? '#5cac6fff' : '#d87f7fff';
+    icon.style.fontSize = '14px';
+    icon.style.color = status === 'ACTIVE' ? 'green' : 'red';
     icon.title = status === 'ACTIVE' ? 'Active' : 'Inactive';
 
     icon.style.display = 'flex';

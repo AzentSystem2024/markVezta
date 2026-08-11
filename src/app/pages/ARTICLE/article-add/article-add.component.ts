@@ -925,15 +925,15 @@ export class ArticleAddComponent {
       return;
     }
     //  SUPPLIER VALIDATION
-    if (!this.selectedMaterialUnitId) {
-      notify({
-        message: 'Please select a Supplier.',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      return;
-    }
+    // if (!this.selectedMaterialUnitId) {
+    //   notify({
+    //     message: 'Please select a Supplier.',
+    //     type: 'warning',
+    //     displayTime: 3000,
+    //     position: { at: 'top right', my: 'top right' },
+    //   });
+    //   return;
+    // }
 
     if (
       !this.selectedProductionUnitId ||
