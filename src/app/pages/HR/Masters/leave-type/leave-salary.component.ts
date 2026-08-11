@@ -103,6 +103,8 @@ export class LeaveSalaryComponent {
     },
   };
 
+
+
   // CONSTRUCTOR
   // ==========================================
   constructor(
@@ -234,7 +236,7 @@ export class LeaveSalaryComponent {
     const isDuplicate = this.LeaveType.some((data: any) => {
       return (
         data.DESCRIPTION?.toLowerCase().trim() ===
-          DESCRIPTION?.toLowerCase().trim() ||
+        DESCRIPTION?.toLowerCase().trim() ||
         data.CODE?.toLowerCase().trim() === CODE?.toLowerCase().trim()
       );
     });
@@ -299,7 +301,7 @@ export class LeaveSalaryComponent {
       if (data.ID === ID) return false;
       return (
         (data.DESCRIPTION?.toLowerCase() || '') ===
-          (DESCRIPTION?.trim().toLowerCase() || '') ||
+        (DESCRIPTION?.trim().toLowerCase() || '') ||
         (data.CODE?.toLowerCase() || '') === (CODE?.trim().toLowerCase() || '')
       );
     });
@@ -420,4 +422,4 @@ export class LeaveSalaryComponent {
   exports: [],
   declarations: [LeaveSalaryComponent],
 })
-export class LeaveSalaryModule {}
+export class LeaveSalaryModule { }

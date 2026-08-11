@@ -23,7 +23,7 @@
       [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -32,7 +32,7 @@
       [loadPanel]="{ enabled: false, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -109,57 +109,46 @@
         </dxi-item>
 
         <dxi-item>
-      <dx-tag-box
-  label="Store"
-  labelMode="floating"
-  displayExpr="DESCRIPTION"
-  valueExpr="ID"
-  [items]="Store"
-  [searchEnabled]="true"
-  [(value)]="selectedStoreid"
-  [showSelectionControls]="true"
-  [maxDisplayedTags]="100"
-  [showMultiTagOnly]="true"
-  [multiline]="false"
-  [hint]="storeHint"
-  [width]="200"
-  (onValueChanged)="updateStoreHint()"
-></dx-tag-box>
-    </dxi-item>
-
-        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
-        <dxi-item location="after" locateInMenu="auto">
-          <dx-button
-            text="Apply"
-            type="default"
-            icon="todo"
-            stylingMode="contained"
-            (onClick)="get_DataSource()"
-          >
-          </dx-button>
-        </dxi-item>
-        <!-- <dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
+          <dx-tag-box
+            label="Store"
+            labelMode="floating"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [items]="Store"
+            [searchEnabled]="true"
+            [(value)]="selectedStoreid"
+            [showSelectionControls]="true"
+            [maxDisplayedTags]="100"
+            [showMultiTagOnly]="true"
+            [multiline]="false"
+            [hint]="storeHint"
+            [width]="200"
+            (onValueChanged)="updateStoreHint()"
+          ></dx-tag-box>
         </dxi-item>
 
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            class="mt-2"
-            (onClick)="get_DataSource()"
-          >
-          </dx-button>
-        </dxi-item> -->
         <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item location="after">
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="get_DataSource()"
+          >
+          </dx-button>
+        </dxi-item>
+
+        <!-- <dxi-item
           location="after"
           locateInMenu="auto"
           widget="dxButton"
           [options]="refreshButtonOptions"
-        ></dxi-item>
-        <dxi-item name="exportButton"></dxi-item>
+        ></dxi-item> -->
       </dxo-toolbar>
 
       <dxo-grouping
@@ -212,16 +201,16 @@
         alignment="left"
         dataType="number"
       ></dxi-column> -->
-     <dxi-column
-  *ngFor="let col of dynamicColumns"
-  [dataField]="col.dataField"
-  [caption]="col.caption"
-  alignment="right"
-  dataType="number"
-  format="#,##0.00"
-  [width]="100"
->
-</dxi-column>
+      <dxi-column
+        *ngFor="let col of dynamicColumns"
+        [dataField]="col.dataField"
+        [caption]="col.caption"
+        alignment="right"
+        dataType="number"
+        format="#,##0.00"
+        [width]="100"
+      >
+      </dxi-column>
       <dxi-column
         dataField="StoreAmounts.TOTAL"
         caption="Total"
@@ -240,7 +229,11 @@
         >
         </dxi-group-item>
 
-        <dxi-total-item column="StoreAmounts.TOTAL" summaryType="sum" displayFormat="">
+        <dxi-total-item
+          column="StoreAmounts.TOTAL"
+          summaryType="sum"
+          displayFormat=""
+        >
         </dxi-total-item>
       </dxo-summary>
 
@@ -259,4 +252,3 @@
     </dx-data-grid>
   </div>
 </div>
-

@@ -127,7 +127,7 @@
 
         <dxi-item location="after">
           <dx-select-box
-            label="Entry Date between"
+            label="Entry Date"
             labelMode="floating"
             [dataSource]="entryDateRanges"
             [displayExpr]="displayEntryDateExpr"
@@ -312,7 +312,7 @@
 
     <dx-popup
       [(visible)]="addPDCPopupOpened"
-      [width]="'60vw'"
+      [width]="'50vw'"
       [height]="'auto'"
       [title]="popupTitle"
       (onHiding)="handleClose()"
@@ -330,7 +330,7 @@
 <dx-popup
   [(visible)]="editPDCPopupOpened"
   [width]="'50vw'"
-  [height]="'90vh'"
+  [height]="'auto'"
   title="Edit PDC"
   (onHiding)="handleClose()"
   titleTemplate="popupTitle"
@@ -354,7 +354,7 @@
 <dx-popup
   [(visible)]="VerifyPDCPopupOpened"
   [width]="'50vw'"
-  [height]="'90vh'"
+  [height]="'auto'"
   [title]="popupTitle"
   (onHiding)="handleClose()"
   [popupMode]="popupMode"

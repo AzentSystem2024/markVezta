@@ -113,6 +113,10 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     onClick: () => this.toggleFilters(),
   };
 
+  onExporting(event: any) {
+    const fileName = 'Leave Salary Payment';
+    this.dataService.exportDataGrid(event, fileName);
+  }
   // --- Data & State ---
   isLoading: boolean = false;
   leavePaymentList: any[] = [];
@@ -198,7 +202,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
-  ) {}
+  ) { }
   ngOnInit() {
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -249,7 +253,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
           value: this.leaveFormData.PAY_TYPE_ID,
         });
       },
-      error: () => {},
+      error: () => { },
     });
   }
 
@@ -433,7 +437,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
         this.OriginalEmployeeDropdown = response || [];
         this.EmployeeDropdown = [...this.OriginalEmployeeDropdown];
       },
-      error: (err) => {},
+      error: (err) => { },
     });
   }
 
@@ -707,7 +711,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
                 : null;
             }
           },
-          error: () => {},
+          error: () => { },
         });
     }
   }
@@ -945,7 +949,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     setTimeout(() => {
       try {
         validationEngine.resetGroup('leaveForm');
-      } catch (e) {}
+      } catch (e) { }
     }, 0);
   }
 }
@@ -972,4 +976,4 @@ export class LeaveSalaryPaymentComponent implements OnInit {
   exports: [LeaveSalaryPaymentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LeaveSalaryPaymentModule {}
+export class LeaveSalaryPaymentModule { }

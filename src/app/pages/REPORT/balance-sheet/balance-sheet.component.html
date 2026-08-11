@@ -22,19 +22,19 @@
       (onContentReady)="onContentReady($event)"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
       (onExporting)="onExporting($event)"
-       [loadPanel]="{
-    enabled: true,
-    text: 'Loading...'
-  }"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+      }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -121,33 +121,20 @@
           >
           </dx-date-box>
         </dxi-item>
-        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
-        <dxi-item location="after" locateInMenu="auto">
-          <dx-button
-            text="Apply"
-            type="default"
-            icon="todo"
-            stylingMode="contained"
-            (onClick)="get_DataSource()"
-          >
-          </dx-button>
-        </dxi-item>
-        <!-- <dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
         <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-        <dxi-item>
           <dx-button
             text="Apply"
             type="default"
             stylingMode="contained"
-            class="mt-2"
             (onClick)="get_DataSource()"
           >
           </dx-button>
-        </dxi-item> -->
-
-        <dxi-item name="exportButton"></dxi-item>
+        </dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping

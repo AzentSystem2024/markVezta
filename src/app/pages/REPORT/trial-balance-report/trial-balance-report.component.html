@@ -20,7 +20,7 @@
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"
       [headerFilter]="{ visible: false }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -29,7 +29,7 @@
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -124,11 +124,16 @@
 ></dx-tag-box>
     </dxi-item> -->
         <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
-        <dxi-item location="after" locateInMenu="auto">
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item location="after">
           <dx-button
             text="Apply"
             type="default"
-            icon="todo"
             stylingMode="contained"
             (onClick)="get_DataSource()"
           >
@@ -162,7 +167,6 @@
           elementAttr: { class: 'commonButtons' }
         }"
       ></dxi-item> -->
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping
@@ -189,20 +193,44 @@
         dataField="SubGroup"
         caption="Sub Group"
         alignment="left"
-         width="150"
+        width="150"
         dataType="number"
       ></dxi-column>
-      <dxi-column dataField="Category" caption="Category"  width="150"></dxi-column>
-      <dxi-column dataField="LedgerCode" caption="Ledger Code"  width="120"></dxi-column>
-      <dxi-column dataField="LedgerName" caption="Ledger Name"  width="250"></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store/Branch"  width="120"></dxi-column>
-      <dxi-column dataField="DEPT_NAME" caption="Department"  width="120"></dxi-column>
-      <dxi-column caption="Opening Balance" cssClass="opening-header"  width="130">
+      <dxi-column
+        dataField="Category"
+        caption="Category"
+        width="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="LedgerCode"
+        caption="Ledger Code"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="LedgerName"
+        caption="Ledger Name"
+        width="250"
+      ></dxi-column>
+      <dxi-column
+        dataField="STORE_NAME"
+        caption="Store/Branch"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="DEPT_NAME"
+        caption="Department"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        caption="Opening Balance"
+        cssClass="opening-header"
+        width="130"
+      >
         <dxi-column
           dataField="OpeningBalanceDebit"
           caption="Debit"
           cssClass="opening-sub-header"
-           width="130"
+          width="130"
           [allowEditing]="false"
           alignment="right"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
@@ -211,7 +239,7 @@
         <dxi-column
           dataField="OpeningBalanceCredit"
           caption="Credit"
-           width="130"
+          width="130"
           cssClass="opening-sub-header"
           alignment="center"
           alignment="right"
@@ -221,13 +249,17 @@
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="During the Period" cssClass="DuringPeriod-header"  width="130">
+      <dxi-column
+        caption="During the Period"
+        cssClass="DuringPeriod-header"
+        width="130"
+      >
         <dxi-column
           dataField="DuringThePeriodDebit"
           caption="Debit"
           alignment="right"
           cssClass="DuringPeriod-sub-header"
-           width="130"
+          width="130"
           [allowEditing]="false"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
@@ -238,14 +270,18 @@
           alignment="center"
           cssClass="DuringPeriod-sub-header"
           alignment="right"
-           width="130"
+          width="130"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
         >
         </dxi-column>
       </dxi-column>
 
-      <dxi-column caption="Closing Balance" cssClass="closing-header"  width="130">
+      <dxi-column
+        caption="Closing Balance"
+        cssClass="closing-header"
+        width="130"
+      >
         <dxi-column
           dataField="ClosingBalanceDebit"
           caption="Debit"
@@ -261,7 +297,7 @@
           caption="Credit"
           cssClass="closing-sub-header"
           alignment="right"
-           width="130"
+          width="130"
           [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
           dataType="number"
         >

@@ -79,7 +79,7 @@ export class LedgerSettingsListComponent {
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
-    hint: 'Add new entry',
+    hint: 'save',
     onClick: () => {
       this.ngZone.run(() => this.saveLedgerSettings());
     },
@@ -88,11 +88,7 @@ export class LedgerSettingsListComponent {
     template: () => {
       return `
       <div class="add-btn-content">
-        <span class="iconify"
-              data-icon="formkit:add"
-              data-width="20"
-              data-height="20"></span>
-        <span class="add-text">New</span>
+        <span class="add-text">Save</span>
       </div>
     `;
     },

@@ -119,3 +119,24 @@
   content: "\00a0"; /* non-breaking space */
   display: block;
 }
+
+::ng-deep .plus-button {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  padding: 0 !important;
+}
+
+::ng-deep .plus-button .dx-button-content {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 !important;
+}
+
+::ng-deep .plus-button .dx-icon {
+  font-size: 14px;
+  margin: 0 !important;
+  position: static !important;
+  transform: none !important;
+}

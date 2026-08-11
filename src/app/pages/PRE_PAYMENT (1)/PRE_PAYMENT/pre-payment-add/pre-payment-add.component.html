@@ -143,14 +143,14 @@
         label="Period From"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
-        width="150"
+        width="auto"
         [(value)]="PrePaymentFormData.DATE_FROM"
         (onValueChanged)="updatePeriodTo()"
       ></dx-date-box>
       <dx-number-box
         label="No.Month"
         labelMode="floating"
-        width="120"
+        width="140"
         [(value)]="PrePaymentFormData.NO_OF_MONTHS"
         (onValueChanged)="updatePeriodTo()"
       ></dx-number-box>
@@ -165,15 +165,16 @@
         label="Period To"
         displayFormat="dd/MM/yyyy"
         labelMode="floating"
-        width="150"
+        width="auto"
         [(value)]="PrePaymentFormData.DATE_TO"
         [readOnly]="true"
       ></dx-date-box>
       <dx-button
-        icon="bi bi-calendar fs-5"
-        hint="generateSchedule"
-        stylingMode="text"
+        text="Generate"
+        stylingMode="contained"
+        type="normal"
         class="calendar-btn"
+        width="auto"
         (onClick)="showGrid = true"
         (onClick)="onCalendarClick()"
       ></dx-button>
@@ -253,7 +254,7 @@
       ></dx-number-box>
     </div>
     <div
-    *ngIf="canApprove"
+      *ngIf="canApprove"
       style="
         margin: 4px 0 8px 0;
         display: flex;
@@ -261,7 +262,6 @@
         justify-content: flex-end;
         gap: 10px;
       "
-      
     >
       <dx-check-box
         text="Approve"

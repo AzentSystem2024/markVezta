@@ -69,13 +69,18 @@
       </dxo-filter-builder>
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header" style="
-            font-weight: 600;
-            font-size: 20px;
-            margin-left: 12px;
-            padding: -3px;
-            margin-right: 3px;
-          ">Credit Note</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Credit Note
+          </div>
         </dxi-item>
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
         <dxi-item
@@ -91,11 +96,11 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item>
-         <!-- Divider -->
+        <!-- Divider -->
         <dxi-item location="after">
           <div class="toolbar-divider"></div>
         </dxi-item>
-        
+
         <dxi-item
           name="exportButton"
           location="after"
@@ -260,7 +265,7 @@
 <dx-popup
   [(visible)]="isAddCreditNote"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="New Credit Note"
   (onHiding)="handleClose()"
 >
@@ -289,7 +294,7 @@
 <dx-popup
   [(visible)]="isEditCreditNote"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="Update Credit Note"
   (onHiding)="handleClose()"
 >
@@ -305,7 +310,7 @@
 <dx-popup
   [(visible)]="isVerifyCreditNote"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="Verify Credit Note"
   (onHiding)="handleClose()"
 >
@@ -322,7 +327,7 @@
 <dx-popup
   [(visible)]="isApproveCreditNote"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="Approve Credit Note"
   (onHiding)="handleClose()"
 >
@@ -339,7 +344,7 @@
 <dx-popup
   [(visible)]="isViewCreditNote"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="View Credit Note"
   (onHiding)="handleClose()"
 >

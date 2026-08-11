@@ -18,9 +18,8 @@
 }
 
 .period-row dx-number-box {
-  width: 33%;   /* all same fixed width */
+  width: 33%; /* all same fixed width */
 }
-
 
 .fixed-footer {
   display: flex;
@@ -31,8 +30,7 @@
 
 .total-expense {
   display: flex;
-  justify-content: flex-start; /* moves number box to the right */
-  padding-right: 1rem; /* optional: small spacing from form edge */
+  justify-content: flex-end; /* moves number box to the right */
 }
 
 .section-title {
@@ -42,10 +40,26 @@
   color: #333;
 }
 
-.calendar-btn {
-  margin-top: 10px; /* adjust as needed */
+::ng-deep .calendar-btn.dx-button {
+  background-color: #dceeff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #0d63b8 !important;
+  min-width: 120px;
+  height: 32px;
+  margin-top: 6px !important;
 }
 
-.calendar-btn .dx-icon {
-  font-size: 1.5rem; /* increase icon size */
+::ng-deep .calendar-btn.dx-button .dx-button-content {
+  padding: 0 20px;
+}
+
+::ng-deep .calendar-btn.dx-button .dx-button-text {
+  color: #0d63b8 !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+::ng-deep .calendar-btn.dx-button:hover {
+  background-color: #dceeff !important;
 }

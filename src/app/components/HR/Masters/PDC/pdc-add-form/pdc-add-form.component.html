@@ -18,14 +18,16 @@
       displayFormat="dd-MM-yyyy"
     ></dx-date-box>
 
-    <dx-radio-group
-      [items]="priorities"
-      [value]="selectedType"
-      layout="horizontal"
-      stylingMode="outlined"
-      displayExpr="name"
-      (onValueChanged)="onPriorityChanged($event)"
-    ></dx-radio-group>
+    <div>
+      <dx-radio-group
+        [items]="priorities"
+        [value]="selectedType"
+        layout="horizontal"
+        stylingMode="outlined"
+        displayExpr="name"
+        (onValueChanged)="onPriorityChanged($event)"
+      ></dx-radio-group>
+    </div>
   </div>
 
   <!-- Row 2: Beneficiary Type -->

@@ -25,13 +25,13 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -40,16 +40,6 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <!-- <dxo-toolbar>
-        <dxi-item location="before">
-          <div
-            class="grid-header"
-            style="font-weight: 600; font-size: 20px; margin-left: 12px"
-          >
-            Trial Balance
-          </div>
-        </dxi-item>
-      </dxo-toolbar> -->
 
       <dxo-toolbar>
         <dxi-item location="before">
@@ -131,9 +121,13 @@
           >
           </dx-date-box>
         </dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
         <dxi-item>
           <dx-button
             text="Apply"
@@ -143,21 +137,6 @@
           >
           </dx-button>
         </dxi-item>
-
-        <!-- <dxi-item
-        location="after"
-        locateInMenu="auto"
-        showText="inMenu"
-        widget="dxButton"
-        [options]="{
-          icon: isFilterRowVisible ? 'filter' : 'filter',
-          hint: isFilterRowVisible ? 'Hide Filter Row' : 'Show Filter Row',
-          onClick: toggleFilterRow,
-          stylingMode: 'text',
-          elementAttr: { class: 'commonButtons' }
-        }"
-      ></dxi-item> -->
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping

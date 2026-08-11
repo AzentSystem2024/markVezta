@@ -229,17 +229,17 @@
     hint="View PDF"
   >
   </dx-button> -->
-  <dx-check-box
-    [text]="isReadOnly ? 'Approved' : 'Approve'"
-    [(value)]="isApproved"
-    [width]="'auto'"
-    [disabled]="isApproveDisabled || isReadOnly"
-    style="margin-left: 10px"
-  ></dx-check-box>
 </div>
 
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
+    <dx-check-box
+      [text]="isReadOnly ? 'Approved' : 'Approve'"
+      [(value)]="isApproved"
+      [width]="'auto'"
+      [disabled]="isApproveDisabled || isReadOnly"
+      style="margin-left: 10px"
+    ></dx-check-box>
     <dx-button
       text="Cancel"
       (onClick)="cancel()"
