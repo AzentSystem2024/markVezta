@@ -106,9 +106,9 @@
         </dxi-column>
 
         <dxo-summary>
-          <dxi-total-item column="ADJ_QTY" summaryType="sum" valueFormat="#,##0.00" displayFormat="Net Adj Qty: {0}"
+          <dxi-total-item column="ADJ_QTY" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
             alignment="right"></dxi-total-item>
-          <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="Net Amt: {0}"
+          <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
             alignment="right"></dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
@@ -129,8 +129,18 @@
 
           <dx-button text="Cancel" (onClick)="cancel()" stylingMode="outlined" type="normal"></dx-button>
 
-          <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving"
-            (onClick)="UpdateStockAdjustment()" stylingMode="contained" type="default" [width]="165"></dx-button>
+          <!-- <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving"
+            (onClick)="UpdateStockAdjustment()" stylingMode="contained" type="default" [width]="165"></dx-button> -->
+            <dx-button
+  *ngIf="!readOnlyTrue"
+  #saveButtonRef
+  [text]="getSaveButtonText()"
+  [disabled]="isSaving"
+  (onClick)="UpdateStockAdjustment()"
+  stylingMode="contained"
+  type="default"
+  [width]="165">
+</dx-button>
         </div>
       </div>
     </div>

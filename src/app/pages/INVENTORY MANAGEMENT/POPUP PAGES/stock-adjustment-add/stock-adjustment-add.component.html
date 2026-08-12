@@ -132,6 +132,7 @@
           allowUpdating: true,
           allowDeleting: true,
         }"
+        (onCellValueChanged)="onCellValueChanged($event)"
         (onEditorPreparing)="onEditorPreparing($event)"
         (onCellPrepared)="onCellPrepared($event)"
         class="custom-retail-grid"
@@ -231,14 +232,14 @@
             column="ADJ_QTY"
             summaryType="sum"
             valueFormat="#,##0.00"
-            displayFormat="Net Adj Qty: {0}"
+            displayFormat="{0}"
             alignment="right"
           ></dxi-total-item>
           <dxi-total-item
             column="AMOUNT"
             summaryType="sum"
             valueFormat="#,##0.00"
-            displayFormat="Net Amt: {0}"
+            displayFormat="{0}"
             alignment="right"
           ></dxi-total-item>
         </dxo-summary>

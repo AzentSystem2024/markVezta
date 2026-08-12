@@ -536,82 +536,212 @@ export class StockAdjustmentAddComponent {
     };
     console.log(this.adjustmentFormData, '================edit==============');
   }
+
   onEditorPreparing(event: any) {
-    if (event.dataField === 'NEW_QTY') {
-      event.editorOptions = event.editorOptions || {};
+  if (event.dataField !== 'NEW_QTY') {
+    return;
+  }
 
-      event.editorOptions.elementAttr = {
-        style: `
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
-      `,
-      };
+  event.editorOptions = event.editorOptions || {};
 
-      event.editorOptions.inputAttr = {
-        style: `
-        height: 100%;
-        padding: 0 4px;
-        box-sizing: border-box;
-      `,
-      };
+  event.editorOptions.elementAttr = {
+    style: `
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    `,
+  };
 
-      if (event) {
-        event.editorOptions.showSpinButtons = false;
-      }
+  event.editorOptions.inputAttr = {
+    style: `
+      height: 100%;
+      padding: 0 4px;
+      box-sizing: border-box;
+    `,
+  };
 
-      event.editorOptions.onKeyDown = (event: any) => {
-        if (event.event.key === 'Enter') {
-          const grid = this.itemsGridRef?.instance;
-          const visibleRows = grid.getVisibleRows();
+  event.editorOptions.showSpinButtons = false;
 
-          const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === event.row?.data,
-          );
+  // IMPORTANT: Calculate when NEW_QTY changes
+  event.editorOptions.onValueChanged = (args: any) => {
 
-          setTimeout(() => {
-            // existing logic untouched
-          }, 50);
-        }
-      };
-    }
-    const rowData = event.row.data;
-    // calculate adj_qty only for this row
-    rowData.ADJ_QTY = rowData.NEW_QTY - rowData.STOCK_QTY;
-    console.log('Updated row:', rowData);
-    rowData.AMOUNT = rowData.ADJ_QTY * rowData.COST;
-    rowData.REASON_ID = this.adjustmentFormData.REASON_ID;
-    // 🔥 calculate total amount across all rows
+    const row = event.row.data;
+
+    const stockQty = Number(row.STOCK_QTY) || 0;
+    const newQty = Number(args.value) || 0;
+    const cost = Number(row.COST) || 0;
+
+    // Calculate adjusted quantity
+    const adjQty = newQty - stockQty;
+
+    // Calculate amount
+    const amount = adjQty * cost;
+
+    // Update row
+    row.NEW_QTY = newQty;
+    row.ADJ_QTY = adjQty;
+    row.AMOUNT = amount;
+
+    // Update total amount
     this.totalAmount = this.adjustmentFormData.Details.reduce(
-      (sum, item) => sum + (item.AMOUNT || 0),
-      0,
+      (sum: number, item: any) => {
+        return sum + (Number(item.AMOUNT) || 0);
+      },
+      0
     );
 
-    console.log('Updated row:', rowData);
-    console.log('Total Amount:', this.totalAmount);
     this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
-  }
+
+    console.log('Stock Qty:', stockQty);
+    console.log('New Qty:', newQty);
+    console.log('Adjusted Qty:', adjQty);
+    console.log('Cost:', cost);
+    console.log('Amount:', amount);
+    console.log('Total Amount:', this.totalAmount);
+
+    // Refresh the grid
+    event.component.refresh();
+  };
+
+  // Keep your Enter key logic
+  event.editorOptions.onKeyDown = (keyEvent: any) => {
+    if (keyEvent.event.key === 'Enter') {
+
+      const grid = this.itemsGridRef?.instance;
+
+      if (!grid) {
+        return;
+      }
+
+      const visibleRows = grid.getVisibleRows();
+
+      const rowIndex = visibleRows.findIndex(
+        (r: any) => r?.data === event.row?.data
+      );
+
+      setTimeout(() => {
+        // Keep your existing Enter navigation logic here
+      }, 50);
+    }
+  };
+}
+  // onEditorPreparing(event: any) {
+  //   if (event.dataField === 'NEW_QTY') {
+  //     event.editorOptions = event.editorOptions || {};
+
+  //     event.editorOptions.elementAttr = {
+  //       style: `
+  //       height: 100%;
+  //       margin: 0;
+  //       padding: 0;
+  //       display: flex;
+  //       align-items: center;
+  //     `,
+  //     };
+
+  //     event.editorOptions.inputAttr = {
+  //       style: `
+  //       height: 100%;
+  //       padding: 0 4px;
+  //       box-sizing: border-box;
+  //     `,
+  //     };
+
+  //     if (event) {
+  //       event.editorOptions.showSpinButtons = false;
+  //     }
+
+  //     event.editorOptions.onKeyDown = (event: any) => {
+  //       if (event.event.key === 'Enter') {
+  //         const grid = this.itemsGridRef?.instance;
+  //         const visibleRows = grid.getVisibleRows();
+
+  //         const rowIndex = visibleRows.findIndex(
+  //           (r) => r?.data === event.row?.data,
+  //         );
+
+  //         setTimeout(() => {
+  //           // existing logic untouched
+  //         }, 50);
+  //       }
+  //     };
+  //   }
+  //   // const rowData = event.row.data;
+  //   // // calculate adj_qty only for this row
+  //   // rowData.ADJ_QTY = rowData.NEW_QTY - rowData.STOCK_QTY;
+  //   // console.log('Updated row:', rowData);
+  //   // rowData.AMOUNT = rowData.ADJ_QTY * rowData.COST;
+  //   // rowData.REASON_ID = this.adjustmentFormData.REASON_ID;
+  //   // // 🔥 calculate total amount across all rows
+  //   // this.totalAmount = this.adjustmentFormData.Details.reduce(
+  //   //   (sum, item) => sum + (item.AMOUNT || 0),
+  //   //   0,
+  //   // );
+
+  //   // console.log('Updated row:', rowData);
+  //   // console.log('Total Amount:', this.totalAmount);
+  //   // this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
+  // }
 
   onSelectPackAdd(e: any) { }
 
   onEditPackUpdate(e: any) { }
 
   onCellValueChanged(e: any) {
-    console.log(e, '===============pppppppppp==============  ');
+  // console.log('Cell Value Changed:', e);
 
-    const row = e.row.data;
+  // if (e.dataField !== 'NEW_QTY') {
+  //   return;
+  // }
 
-    // calculate Adjustment Stock
-    row.ADJ_QTY = (row.NEW_QTY || 0) - (row.STOCK_QTY || row.STOCK_QTY || 0);
+  // const row = e.data;
 
-    // calculate Amount also
-    row.AMOUNT = (row.ADJ_QTY || 0) * (row.COST || 0);
+  // const stockQty = Number(row.STOCK_QTY) || 0;
+  // const newQty = Number(e.value) || 0;
+  // const cost = Number(row.COST) || 0;
 
-    // force UI refresh
-    e.component.refresh(true);
-  }
+  // // Calculate adjusted stock
+  // row.ADJ_QTY = newQty - stockQty;
+
+  // // Calculate amount
+  // row.AMOUNT = row.ADJ_QTY * cost;
+
+  // // Update total amount
+  // this.totalAmount = this.adjustmentFormData.Details.reduce(
+  //   (sum: number, item: any) => {
+  //     return sum + (Number(item.AMOUNT) || 0);
+  //   },
+  //   0
+  // );
+
+  // this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
+
+  // console.log('Stock:', stockQty);
+  // console.log('New Qty:', newQty);
+  // console.log('Adjusted Qty:', row.ADJ_QTY);
+  // console.log('Amount:', row.AMOUNT);
+  // console.log('Total Amount:', this.totalAmount);
+
+  // // Refresh grid so summary updates
+  // e.component.refresh();
+}
+
+  // onCellValueChanged(e: any) {
+  //   console.log(e, '===============pppppppppp==============  ');
+
+  //   const row = e.row.data;
+
+  //   // calculate Adjustment Stock
+  //   row.ADJ_QTY = (row.NEW_QTY || 0) - (row.STOCK_QTY || row.STOCK_QTY || 0);
+
+  //   // calculate Amount also
+  //   row.AMOUNT = (row.ADJ_QTY || 0) * (row.COST || 0);
+
+  //   // force UI refresh
+  //   e.component.refresh(true);
+  // }
 }
 @NgModule({
   imports: [

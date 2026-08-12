@@ -304,15 +304,20 @@
             stylingMode="outlined"
             type="normal"
           ></dx-button>
-
           <dx-button
+            *ngIf="!isReadOnlyMode"
             #saveButtonRef
             [text]="getSaveButtonText()"
             [disabled]="isSaving"
-            (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()"
+            (onClick)="saveTransferIn()"
             stylingMode="contained"
             type="default"
-          ></dx-button>
+            [width]="165"
+          >
+          </dx-button>
+          <!-- <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving"
+            (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()" stylingMode="contained" type="default"
+            [width]="165"></dx-button> -->
         </div>
       </div>
     </div>
