@@ -31,7 +31,7 @@
       <dx-text-box
         label="Reference No"
         labelMode="floating"
-        [width]="200"
+        [width]="230"
         [(value)]="newPoData.REF_NO"
       >
       </dx-text-box>
@@ -41,7 +41,7 @@
       <dx-select-box
         label="Supplier"
         labelMode="floating"
-        [width]="320"
+        [width]="350"
         placeholder="Select Supplier"
         [items]="SupplierList"
         displayExpr="DESCRIPTION"
@@ -62,7 +62,7 @@
             : 'Location'
         "
         labelMode="floating"
-        [width]="320"
+        [width]="350"
         [placeholder]="
           menuResponse?.GeneralSettings?.STORE_TITLE === 'STORE'
             ? 'Store'

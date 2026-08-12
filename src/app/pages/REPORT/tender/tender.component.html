@@ -168,7 +168,7 @@
       <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
       </dxo-grouping>
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -181,12 +181,28 @@
       <!-- ================= TOOLBAR ================= -->
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Tender Report</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Tender Report
+          </div>
         </dxi-item>
 
         <dxi-item widget="dxButton" [options]="searchButtonOptions"> </dxi-item>
 
         <dxi-item widget="dxButton" [options]="refreshButtonOptions">
+        </dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
         </dxi-item>
 
         <dxi-item
