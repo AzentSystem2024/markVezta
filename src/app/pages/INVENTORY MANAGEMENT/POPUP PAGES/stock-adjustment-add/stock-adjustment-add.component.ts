@@ -44,6 +44,7 @@ import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-stock-adjustment-add',
@@ -124,6 +125,7 @@ export class StockAdjustmentAddComponent {
     CREDIT_HEAD_ID: 0,
     NET_AMOUNT: 0,
     NARRATION: '',
+    IS_APPROVED: false,
     Details: [],
   };
 
@@ -492,6 +494,18 @@ export class StockAdjustmentAddComponent {
       Details: transformed,
     };
 
+    if (this.adjustmentFormData.IS_APPROVED) {
+      confirm('This will approve the stock adjustment. Continue?', 'Confirm Approval').then((dialogResult: boolean) => {
+        if (dialogResult) {
+          this.executeSaveStockAdjustment(payload);
+        }
+      });
+    } else {
+      this.executeSaveStockAdjustment(payload);
+    }
+  }
+
+  executeSaveStockAdjustment(payload: any) {
     this.isSaving = true;
 
     this.dataService

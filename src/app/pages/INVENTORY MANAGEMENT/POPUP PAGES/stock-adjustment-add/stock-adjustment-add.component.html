@@ -120,6 +120,7 @@
       <!-- Footer Area -->
       <div class="form-footer">
         <div class="footer-actions-right">
+          <dx-check-box *ngIf="canApprove" text="Approve" [(value)]="adjustmentFormData.IS_APPROVED" class="me-3"></dx-check-box>
           <dx-button text="Cancel" (onClick)="cancel()" stylingMode="outlined" type="normal"></dx-button>
 
           <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving" (onClick)="SaveStockAdjustment()"

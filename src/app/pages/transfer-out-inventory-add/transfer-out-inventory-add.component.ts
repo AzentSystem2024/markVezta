@@ -450,6 +450,7 @@ export class TransferOutInventoryAddComponent implements OnChanges {
           this.transferOutFormData.DETAILS.push({
             SL_NO: this.transferOutFormData.DETAILS.length + 1,
             ITEM_ID: row.ID,
+            ITEM_CODE: row.ITEM_CODE,
             BARCODE: row.BARCODE,
             DESCRIPTION: row.DESCRIPTION,
             UOM: row.UOM,
