@@ -74,7 +74,7 @@
               margin-right: 3px;
             "
           >
-            Transfer Out
+            Transfer Out Inventory
           </div>
         </dxi-item>
 
@@ -335,7 +335,7 @@
 <dx-popup
   [(visible)]="isAddTransferOut"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title=" New Transfer Out"
   [showCloseButton]="true"
   (onHiding)="handleClose()"
@@ -350,7 +350,7 @@
 <dx-popup
   [(visible)]="isEditTransferOut"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   [title]="buttonText"
   [showCloseButton]="true"
   (onHiding)="handleClose()"

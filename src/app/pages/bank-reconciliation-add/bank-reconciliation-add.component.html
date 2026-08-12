@@ -104,7 +104,11 @@
           </dx-date-box>
         </dxi-item>
 
-        <dxi-item itemType="simple" verticalAlignment="center">
+        <dxi-item
+          itemType="simple"
+          verticalAlignment="center"
+          cssClass="show-btn-item"
+        >
           <dx-button
             text="Show"
             stylingMode="contained"
@@ -113,6 +117,10 @@
             (onClick)="Getdata()"
           >
           </dx-button>
+        </dxi-item>
+
+        <dxi-item location="after">
+          <div style="width: 20px"></div>
         </dxi-item>
 
         <dxi-item>

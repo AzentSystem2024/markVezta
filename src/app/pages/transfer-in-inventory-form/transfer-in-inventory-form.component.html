@@ -5,65 +5,132 @@
       <div class="header-grid">
         <!-- Field 1: Date -->
         <div class="field-item">
-          <dx-date-box [(value)]="transferInFormData.REC_DATE" label="Date" labelMode="floating"
-            displayFormat="dd-MM-yyyy" [readOnly]="true" width="100%"></dx-date-box>
+          <dx-date-box
+            [(value)]="transferInFormData.REC_DATE"
+            label="Date"
+            labelMode="floating"
+            displayFormat="dd-MM-yyyy"
+            [readOnly]="true"
+            width="100%"
+          ></dx-date-box>
         </div>
 
         <!-- Field 2: Transfer No -->
         <div class="field-item">
-          <dx-text-box [(value)]="transferInFormData.DOC_NO" label="Transfer No" labelMode="floating" [readOnly]="true"
-            [readOnly]="isReadOnlyMode" width="100%"></dx-text-box>
+          <dx-text-box
+            [(value)]="transferInFormData.DOC_NO"
+            label="Transfer No"
+            labelMode="floating"
+            [readOnly]="true"
+            [readOnly]="isReadOnlyMode"
+            width="100%"
+          ></dx-text-box>
         </div>
 
         <!-- Field 3: Issued From (Origin Store) -->
         <div class="field-item">
-          <dx-select-box [(value)]="transferInFormData.ORIGIN_STORE_ID" [dataSource]="transferstores"
-            displayExpr="DESCRIPTION" valueExpr="ID" [searchEnabled]="true" label="Issued from" labelMode="floating"
-            (onValueChanged)="onStoreChange($event)" [readOnly]="isReadOnlyMode || isEditing" width="100%">
+          <dx-select-box
+            [(value)]="transferInFormData.ORIGIN_STORE_ID"
+            [dataSource]="transferstores"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Issued from"
+            labelMode="floating"
+            (onValueChanged)="onStoreChange($event)"
+            [readOnly]="isReadOnlyMode || isEditing"
+            width="100%"
+          >
             <dx-validator>
-              <dxi-validation-rule type="required" message="Issued from store is required"></dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Issued from store is required"
+              ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
 
         <!-- Field 4: Department -->
         <div class="field-item">
-          <dx-select-box [(value)]="transferInFormData.DEPT_ID" [dataSource]="departments" displayExpr="DESCRIPTION"
-            valueExpr="ID" [searchEnabled]="true" label="Department" labelMode="floating" [readOnly]="isReadOnlyMode"
-            width="100%">
+          <dx-select-box
+            [(value)]="transferInFormData.DEPT_ID"
+            [dataSource]="departments"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Department"
+            labelMode="floating"
+            [readOnly]="isReadOnlyMode"
+            width="100%"
+          >
             <dx-validator>
-              <dxi-validation-rule type="required" message="Department is required"></dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Department is required"
+              ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
 
         <!-- Field 5: Reason -->
         <div class="field-item">
-          <dx-select-box [(value)]="transferInFormData.REASON_ID" [dataSource]="reasons" displayExpr="DESCRIPTION"
-            valueExpr="ID" [searchEnabled]="true" label="Reason" labelMode="floating" [readOnly]="isReadOnlyMode"
-            width="100%">
+          <dx-select-box
+            [(value)]="transferInFormData.REASON_ID"
+            [dataSource]="reasons"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Reason"
+            labelMode="floating"
+            [readOnly]="isReadOnlyMode"
+            width="100%"
+          >
             <dx-validator>
-              <dxi-validation-rule type="required" message="Reason is required"></dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Reason is required"
+              ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
 
         <!-- Field 6: Store -->
         <div class="field-item">
-          <dx-select-box [(value)]="StoreIDData" [dataSource]="stores" displayExpr="DESCRIPTION" valueExpr="ID"
-            [searchEnabled]="true" label="Store" labelMode="floating" width="100%">
+          <dx-select-box
+            [(value)]="StoreIDData"
+            [dataSource]="stores"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Store"
+            labelMode="floating"
+            width="100%"
+          >
             <dx-validator>
-              <dxi-validation-rule type="required" message="Store is required"></dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Store is required"
+              ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
 
         <!-- Field 7: Add Items Action Button -->
         <div class="field-item action-field" *ngIf="!isReadOnlyMode">
-          <dx-button stylingMode="contained" class="add-items-btn" (onClick)="onAddItems()"
-            [disabled]="!transferInFormData.ORIGIN_STORE_ID || isReadOnlyMode" width="100%">
+          <dx-button
+            stylingMode="contained"
+            class="add-items-btn"
+            (onClick)="onAddItems()"
+            [disabled]="!transferInFormData.ORIGIN_STORE_ID || isReadOnlyMode"
+            width="100%"
+          >
             <div *dxTemplate="let data of 'content'" class="btn-content">
-              <span class="iconify me-2" data-icon="formkit:add" data-width="18" data-height="18"></span>
+              <span
+                class="iconify me-2"
+                data-icon="formkit:add"
+                data-width="18"
+                data-height="18"
+              ></span>
               <span class="add-text">Add Items</span>
             </div>
           </dx-button>
@@ -73,109 +140,249 @@
 
     <!-- Data Grid Container -->
     <div class="grid-container">
-      <dx-data-grid #itemsGridRef [dataSource]="transferInFormData.DETAILS" [showBorders]="true"
-        [showColumnLines]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true" [allowColumnReordering]="true"
-        [allowColumnResizing]="true" [height]="'54vh'" [columnResizingMode]="'nextColumn'"
-        [scrolling]="{ mode: 'virtual' }" rowAlternationInterval="2" [selection]="{ mode: 'single' }" [editing]="{
+      <dx-data-grid
+        #itemsGridRef
+        [dataSource]="transferInFormData.DETAILS"
+        [showBorders]="true"
+        [showColumnLines]="true"
+        [columnAutoWidth]="true"
+        [rowAlternationEnabled]="true"
+        [allowColumnReordering]="true"
+        [allowColumnResizing]="true"
+        [height]="'54vh'"
+        [columnResizingMode]="'nextColumn'"
+        [scrolling]="{ mode: 'virtual' }"
+        rowAlternationInterval="2"
+        [selection]="{ mode: 'single' }"
+        [editing]="{
           mode: 'cell',
           allowAdding: false,
           allowUpdating: true,
           allowDeleting: !isReadOnlyMode,
-        }" (onEditorPreparing)="onEditorPreparing($event)" (onRowInserted)="onRowInserted($event)"
-        (onEditorPrepared)="onEditorPrepared($event)" (onCellPrepared)="onCellPrepared($event)"
-        (onRowValidating)="onRowValidating($event)" class="custom-retail-grid">
+        }"
+        (onEditorPreparing)="onEditorPreparing($event)"
+        (onRowInserted)="onRowInserted($event)"
+        (onEditorPrepared)="onEditorPrepared($event)"
+        (onCellPrepared)="onCellPrepared($event)"
+        (onRowValidating)="onRowValidating($event)"
+        class="custom-retail-grid"
+      >
         <dxo-load-panel [showPane]="false"></dxo-load-panel>
 
-        <dxi-column dataField="SL_NO" caption="Sl No" alignment="center" [width]="70"></dxi-column>
-        <dxi-column dataField="TRANSFER_NO" caption="Transfer No" alignment="center" [width]="120"
-          [allowEditing]="false"></dxi-column>
+        <dxi-column
+          dataField="SL_NO"
+          caption="Sl No"
+          alignment="center"
+          [width]="70"
+        ></dxi-column>
+        <dxi-column
+          dataField="TRANSFER_NO"
+          caption="Transfer No"
+          alignment="center"
+          [width]="120"
+          [allowEditing]="false"
+        ></dxi-column>
         <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
 
-        <dxi-column dataField="BARCODE" caption="Barcode" alignment="center" [width]="130"></dxi-column>
+        <dxi-column
+          dataField="BARCODE"
+          caption="Barcode"
+          alignment="center"
+          [width]="130"
+        ></dxi-column>
 
-        <dxi-column dataField="DESCRIPTION" caption="Description" [allowEditing]="false"></dxi-column>
+        <dxi-column
+          dataField="DESCRIPTION"
+          caption="Description"
+          [allowEditing]="false"
+        ></dxi-column>
 
-        <dxi-column dataField="UOM" caption="UOM" alignment="center" [width]="90" [allowEditing]="false"></dxi-column>
+        <dxi-column
+          dataField="UOM"
+          caption="UOM"
+          alignment="center"
+          [width]="90"
+          [allowEditing]="false"
+        ></dxi-column>
 
-        <dxi-column dataField="COST" caption="Unit Cost" alignment="right" [allowEditing]="false" dataType="number"
-          [format]="{ type: 'fixedPoint', precision: 2 }" [visible]="!hideCost" [width]="120"></dxi-column>
+        <dxi-column
+          dataField="COST"
+          caption="Unit Cost"
+          alignment="right"
+          [allowEditing]="false"
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+          [visible]="!hideCost"
+          [width]="120"
+        ></dxi-column>
 
-        <dxi-column dataField="QUANTITY_ISSUED" caption="Qty Issued" alignment="center" [allowEditing]="false"
-          [width]="120"></dxi-column>
+        <dxi-column
+          dataField="QUANTITY_ISSUED"
+          caption="Qty Issued"
+          alignment="center"
+          [allowEditing]="false"
+          [width]="120"
+        ></dxi-column>
 
-        <dxi-column dataField="QUANTITY_RECEIVED" caption="Qty Received" alignment="center"
-          [allowEditing]="!isReadOnlyMode" [width]="130" [validationRules]="[
+        <dxi-column
+          dataField="QUANTITY_RECEIVED"
+          caption="Qty Received"
+          alignment="center"
+          [allowEditing]="!isReadOnlyMode"
+          [width]="130"
+          [validationRules]="[
             { type: 'required', message: 'Quantity is required' },
-          ]"></dxi-column>
+          ]"
+        ></dxi-column>
 
-        <dxi-column dataField="netAmount" caption="Total Cost" alignment="right" dataType="number"
-          [format]="{ type: 'fixedPoint', precision: 2 }" [allowEditing]="false" [visible]="!hideCost"
-          [calculateCellValue]="calculateNetAmount" [width]="130"></dxi-column>
+        <dxi-column
+          dataField="netAmount"
+          caption="Total Cost"
+          alignment="right"
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+          [allowEditing]="false"
+          [visible]="!hideCost"
+          [calculateCellValue]="calculateNetAmount"
+          [width]="130"
+        ></dxi-column>
 
         <dxo-summary>
-          <dxi-total-item column="QUANTITY_RECEIVED" summaryType="sum" valueFormat="#,##0.00"
-            displayFormat="NetQty: {0}" alignment="right"></dxi-total-item>
-          <dxi-total-item column="netAmount" summaryType="sum" valueFormat="#,##0.00" displayFormat="NetAmt: {0}"
-            alignment="right"></dxi-total-item>
+          <dxi-total-item
+            column="QUANTITY_RECEIVED"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="NetQty: {0}"
+            alignment="right"
+          ></dxi-total-item>
+          <dxi-total-item
+            column="netAmount"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="NetAmt: {0}"
+            alignment="right"
+          ></dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
 
       <!-- Narration Row -->
       <div class="narration-container">
-        <dx-text-box [(value)]="transferInFormData.NARRATION" label="Narration" labelMode="floating"
-          [readOnly]="isReadOnlyMode" width="100%"></dx-text-box>
+        <dx-text-box
+          [(value)]="transferInFormData.NARRATION"
+          label="Narration"
+          labelMode="floating"
+          [readOnly]="isReadOnlyMode"
+          width="100%"
+        ></dx-text-box>
       </div>
 
       <!-- Footer Area -->
       <div class="form-footer">
         <div class="footer-actions-right">
-          <dx-check-box *ngIf="
+          <dx-check-box
+            *ngIf="
               selectedDocStatus !== 'VERIFY' &&
               status !== 'ApproveScreen' &&
               status !== 'VerifyScreen' &&
               status !== 'verifyscreen' &&
               ActionStatus !== 'Approve'
-            " [value]="isReadOnlyMode ? true : transferInFormData.IS_APPROVED" (valueChange)="
+            "
+            [value]="isReadOnlyMode ? true : transferInFormData.IS_APPROVED"
+            (valueChange)="
               !isReadOnlyMode ? (transferInFormData.IS_APPROVED = $event) : null
-            " [text]="isReadOnlyMode ? 'Approved' : 'Approve'" [readOnly]="isReadOnlyMode" stylingMode="outlined"
-            class="approve-checkbox">
+            "
+            [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+            [readOnly]="isReadOnlyMode"
+            stylingMode="outlined"
+            class="approve-checkbox"
+          >
           </dx-check-box>
 
-          <dx-button text="Cancel" (onClick)="cancel()" stylingMode="outlined" type="normal"></dx-button>
+          <dx-button
+            text="Cancel"
+            (onClick)="cancel()"
+            stylingMode="outlined"
+            type="normal"
+          ></dx-button>
 
-          <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving"
-            (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()" stylingMode="contained" type="default"
-            [width]="165"></dx-button>
+          <dx-button
+            #saveButtonRef
+            [text]="getSaveButtonText()"
+            [disabled]="isSaving"
+            (onClick)="isReadOnlyMode ? openPDF() : saveTransferIn()"
+            stylingMode="contained"
+            type="default"
+          ></dx-button>
         </div>
       </div>
     </div>
   </div>
 </dx-validation-group>
 
-<dx-popup [(visible)]="isPopupVisible" [width]="800" [height]="500" [showTitle]="true" title="Items"
-  [dragEnabled]="true" [closeOnOutsideClick]="true" (onHiding)="onPopupHiding()">
+<dx-popup
+  [(visible)]="isPopupVisible"
+  [width]="800"
+  [height]="500"
+  [showTitle]="true"
+  title="Items"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  (onHiding)="onPopupHiding()"
+>
   <div *dxTemplate="let data of 'content'">
-    <dx-data-grid #popupGridRef keyExpr="TRANSFER_ID" [dataSource]="items" [showBorders]="true" [showRowLines]="true"
-      [showColumnLines]="true" [columnAutoWidth]="false" [wordWrapEnabled]="false" [rowAlternationEnabled]="true"
-      [headerFilter]="{ visible: true, allowSearch: true }" [allowColumnReordering]="true" [showColumnHeaders]="true"
-      [columnAutoWidth]="true" [allowColumnResizing]="true" [height]="'60vh'" [columnResizingMode]="'nextColumn'"
-      [scrolling]="{ mode: 'virtual' }" rowAlternationInterval="2"
-      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }">
+    <dx-data-grid
+      #popupGridRef
+      keyExpr="TRANSFER_ID"
+      [dataSource]="items"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [height]="'60vh'"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+    >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-pager [visible]="true" [allowedPageSizes]="allowedPageSizes" [displayMode]="displayMode"
-        [showPageSizeSelector]="showPageSizeSelector" [showInfo]="true" [showNavigationButtons]="true"></dxo-pager>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row [visible]="isFilterRowVisible" [applyFilter]="auto"></dxo-filter-row>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
 
       <dxo-toolbar>
-        <div class="stacked-toolbar-group" style="display: flex; flex-direction: column; gap: 2px"></div>
+        <div
+          class="stacked-toolbar-group"
+          style="display: flex; flex-direction: column; gap: 2px"
+        ></div>
         <dxi-item location="before" locateInMenu="auto"> </dxi-item>
 
         <dxi-item location="after">
           <div class="toolbar-button-wrapper">
-            <dx-button text="Select Items" icon="check" stylingMode="contained" (onClick)="onSelectItems()"
-              class="select-item-btn"></dx-button>
+            <dx-button
+              text="Select Items"
+              icon="check"
+              stylingMode="contained"
+              (onClick)="onSelectItems()"
+              class="select-item-btn"
+            ></dx-button>
           </div>
         </dxi-item>
 
@@ -183,10 +390,19 @@
       </dxo-toolbar>
       <dxi-column dataField="TRANSFER_NO" caption="TransferNo."></dxi-column>
 
-      <dxi-column dataField="TRANSFER_DATE" caption="Transfer Date" dataType="date" format="dd-MM-yyyy" sortOrder="desc"
-        [sortIndex]="0"></dxi-column>
+      <dxi-column
+        dataField="TRANSFER_DATE"
+        caption="Transfer Date"
+        dataType="date"
+        format="dd-MM-yyyy"
+        sortOrder="desc"
+        [sortIndex]="0"
+      ></dxi-column>
       <dxi-column dataField="SOURCE_STORE" caption="Source store"></dxi-column>
-      <dxi-column dataField="DESTINATION_STORE" caption="Destination store"></dxi-column>
+      <dxi-column
+        dataField="DESTINATION_STORE"
+        caption="Destination store"
+      ></dxi-column>
       <!-- <dxi-column
         dataField="QUANTITY_AVAILABLE"
         caption="Qty Available"

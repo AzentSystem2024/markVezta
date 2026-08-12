@@ -202,7 +202,7 @@
     text="Select All"
     >
   </dx-check-box> -->
-    <div class="dx-field-label" style="margin-left: -10px">
+    <div class="dx-field-label" style="margin-left: -50px">
       Records: {{ recordsCount }}
     </div>
     <!-- <dx-number-box 
@@ -231,7 +231,7 @@
     labelMode="floating"
     [(value)]="DepreciationPayload.NARRATION"
   ></dx-text-box>
-  <dxi-item>
+  <dxi-item style="display: flex; justify-content: flex-end">
     <dx-check-box
       *ngIf="canApprove"
       [(value)]="approveValue"

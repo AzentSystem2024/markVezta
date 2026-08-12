@@ -265,7 +265,7 @@
 <dx-popup
   [(visible)]="isAddSaleReturn"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="Sale Return"
   (onHiding)="handleClose()"
 >
@@ -278,7 +278,7 @@
 <dx-popup
   [(visible)]="isEditSaleReturn"
   [width]="'90vw'"
-  [height]="'100vh'"
+  [height]="'auto'"
   title="Sale Return"
   (onHiding)="handleClose()"
 >
@@ -296,8 +296,8 @@
 <dx-popup
   *ngIf="isVerifySalesReturn"
   [(visible)]="isVerifySalesReturn"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  [width]="'90vw'"
+  [height]="'auto'"
   title="Verify Sales Return"
   (popupClosed)="handleClose()"
 >
@@ -315,8 +315,8 @@
 <dx-popup
   *ngIf="isApproveSalesReturn"
   [(visible)]="isApproveSalesReturn"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  [width]="'90vw'"
+  [height]="'auto'"
   title="Approve Sales Return"
   (popupClosed)="handleClose()"
 >
@@ -334,8 +334,8 @@
 <dx-popup
   *ngIf="isViewSalesReturn"
   [(visible)]="isViewSalesReturn"
-  [width]="'95vw'"
-  [height]="'100vh'"
+  [width]="'90vw'"
+  [height]="'auto'"
   title="Sales Return"
   (onHiding)="handleClose()"
 >

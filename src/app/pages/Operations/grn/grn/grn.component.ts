@@ -70,7 +70,7 @@ export class GrnComponent implements OnInit {
   displayMode: any = 'full';
   showPageSizeSelector = true;
   width: any = '90vw';
-  height: any = '100vh';
+  height: any = 'auto';
   grnDataSource: any;
   isEditPopupOpened: boolean = false;
   isVerifyPopupOpened: boolean = false;

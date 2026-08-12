@@ -223,9 +223,23 @@
 
   .small-btn {
     font-size: 12px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    margin-top: 10px !important; /* moves the button downward */
+    height: 30px !important;
+    width: 19px !important;
+    margin-top: 8px !important; /* moves the button downward */
+  }
+  ::ng-deep .small-btn .dx-button-content {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+  }
+  ::ng-deep .small-btn .dx-icon {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    transform: translateX(-2px);
+    font-size: 14px !important; /* Try 12px or 10px if needed */
   }
 }
 @media print {
