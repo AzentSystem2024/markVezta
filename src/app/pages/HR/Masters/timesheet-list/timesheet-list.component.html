@@ -289,6 +289,7 @@
   height="auto"
   title="New Timesheet"
   (onHiding)="handleClose()"
+  [wrapperAttr]="{ class: 'timesheet-popup' }"
 >
   <app-timesheet-add
     *ngIf="addTimesheetPopupOpened"
@@ -304,6 +305,7 @@
   width="95vw"
   height="auto"
   (onHiding)="handleClose()"
+  [wrapperAttr]="{ class: 'timesheet-popup' }"
 >
   <app-timesheet-edit
     *ngIf="editTimesheetPopupOpened"
@@ -322,6 +324,7 @@
   width="95vw"
   height="auto"
   (onHiding)="handleClose()"
+  [wrapperAttr]="{ class: 'timesheet-popup' }"
 >
   <app-timesheet-edit
     *ngIf="verifyTimesheetPopupOpened"
@@ -340,6 +343,7 @@
   height="auto"
   title="Approve Timesheet"
   (onHiding)="handleClose()"
+  [wrapperAttr]="{ class: 'timesheet-popup' }"
 >
   <app-timesheet-edit
     *ngIf="approveTimesheetPopupOpened"
@@ -358,6 +362,7 @@
   width="95vw"
   height="auto"
   (onHiding)="handleClose()"
+  [wrapperAttr]="{ class: 'timesheet-popup' }"
 >
   <app-timesheet-edit
     *ngIf="viewTimesheetPopupOpened"
