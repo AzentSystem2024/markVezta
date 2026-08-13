@@ -23,13 +23,13 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-      [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -64,8 +64,8 @@
             Timesheet Report
           </div>
         </dxi-item>
-       
-         <!-- Buttons -->
+
+        <!-- Buttons -->
         <dxi-item location="after">
           <ng-template dxTemplate>
             <div
@@ -140,7 +140,7 @@
             </div>
           </ng-template>
         </dxi-item>
-    
+
         <dxi-item>
           <dx-select-box
             [width]="200"
@@ -155,9 +155,11 @@
           </dx-select-box>
         </dxi-item>
 
-        <dxi-item location="after" style="margin-bottom: 3px">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
 
         <dxi-item>
           <dx-button
@@ -168,8 +170,6 @@
           >
           </dx-button>
         </dxi-item>
-
-        <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping
@@ -185,7 +185,6 @@
         [applyFilter]="auto"
       ></dxo-filter-row>
 
-     
       <dxi-column
         dataField="TS_MONTH"
         caption="Month"
@@ -193,7 +192,6 @@
         format="yyyy MMMM"
       ></dxi-column>
 
-    
       <dxi-column
         dataField="EMP_CODE"
         caption="Emp.Code"
@@ -232,15 +230,13 @@
         dataType="number"
       ></dxi-column>
 
-
-<dxi-column
+      <dxi-column
         dataField="ADDITIONS"
         caption="Additions"
         dataType="number"
       ></dxi-column>
 
-
-<dxi-column
+      <dxi-column
         dataField="DEDUCT_DAYS"
         caption="Deductions"
         dataType="number"
@@ -251,8 +247,6 @@
         caption="Absenti Days"
         dataType="number"
       ></dxi-column>
-
     </dx-data-grid>
   </div>
 </div>
-

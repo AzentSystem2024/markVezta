@@ -50,8 +50,8 @@
     ></dxo-pager>
     <dxo-editing
       mode="popup"
-      [allowUpdating]="isUpdateAllowed"
-      [allowDeleting]="isDeleteAllowed"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
     >
       <dxo-popup
         title="Edit EOS"

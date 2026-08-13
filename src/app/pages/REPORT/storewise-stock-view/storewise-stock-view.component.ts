@@ -128,7 +128,7 @@ export class StorewiseStockViewComponent {
     // this.get_DataSource();
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.get_DataSource();
   }
 
@@ -250,6 +250,7 @@ export class StorewiseStockViewComponent {
       .map(x => x.DESCRIPTION);
 
     this.storeHint = selectedNames.join(', ');
+    this.get_DataSource();
   }
 
   updateItemHint() {
@@ -263,6 +264,7 @@ export class StorewiseStockViewComponent {
       .map(x => x.DESCRIPTION);
 
     this.itemHint = selectedNames.join(', ');
+    this.get_DataSource();
   }
   store_dropdown() {
     const payload = {

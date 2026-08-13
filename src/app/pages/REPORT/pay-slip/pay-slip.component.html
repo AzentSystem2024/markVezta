@@ -13,7 +13,18 @@
     >
       <dxo-toolbar>
         <dxi-item location="before">
-          <div class="grid-header">Pay Slip</div>
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right:  3px;
+            "
+          >
+            Pay Slip
+          </div>
         </dxi-item>
 
         <dxi-item>
@@ -50,7 +61,6 @@
           <dx-button
             class="ms-4 mt-2"
             text="Apply"
-            icon="todo"
             stylingMode="contained"
             type="default"
             (onClick)="getPaySlip()"

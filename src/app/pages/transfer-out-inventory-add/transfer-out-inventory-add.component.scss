@@ -28,7 +28,29 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px 14px;
-  align-items: center;
+}
+
+.header-grid-second {
+  display: grid;
+  grid-template-columns: 1.3fr 1.3fr auto;
+  gap: 4px 14px;
+  margin-top: 4px;
+  align-items: end;
+}
+
+.action-field {
+  justify-self: end;
+}
+
+::ng-deep .add-items-btn.dx-button {
+  width: 120px !important;
+}
+
+.header-grid {
+  // display: grid;
+  // grid-template-columns: repeat(4, 1fr);
+  // gap: 4px 14px;
+  // align-items: center;
 
   @media (max-width: 992px) {
     grid-template-columns: repeat(2, 1fr);
@@ -63,6 +85,9 @@
     height: 38px !important;
     box-shadow: 0 2px 6px rgba(0, 115, 216, 0.25);
     transition: all 0.2s ease;
+    width: 120px !important;
+    min-width: 120px !important;
+    height: 38px !important;
 
     .dx-button-content {
       padding: 0 12px !important;
@@ -82,7 +107,6 @@
 .btn-content {
   display: flex;
   align-items: center;
-  gap: 6px;
   font-weight: 600;
   font-size: 14px;
   color: #ffffff;
@@ -138,22 +162,27 @@
   margin-top: 4px;
 }
 
-/* Footer Section */
 .form-footer {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
   margin-top: 8px;
-  padding-bottom: 4px;
 }
 
 .footer-actions-right {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   gap: 14px;
 }
 
+.footer-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.approve-checkbox {
+  align-self: flex-end; /* Right-align checkbox */
+}
 .select-item-btn {
   background-color: #00a100;
   color: #ffffff;

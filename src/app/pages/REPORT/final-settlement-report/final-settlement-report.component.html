@@ -32,8 +32,7 @@
         [allowUpdating]="true"
       ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
-     
-      
+
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
@@ -52,24 +51,27 @@
         </dxi-item>
 
         <dxi-item>
-             <dx-select-box
-                [placeholder]="'Employee'"
-        label="Employee"
-        [items]="EmployeeDropdown"
-        valueExpr="ID"
-        displayExpr="DESCRIPTION"
-        [(value)]="selectedEmployeeId"
-        [searchEnabled]="true"
-        [showClearButton]="true"
-        [labelMode]="'floating'"
-        width="200"
-              >
-              </dx-select-box>
+          <dx-select-box
+            [placeholder]="'Employee'"
+            label="Employee"
+            [items]="EmployeeDropdown"
+            valueExpr="ID"
+            displayExpr="DESCRIPTION"
+            [(value)]="selectedEmployeeId"
+            [searchEnabled]="true"
+            [showClearButton]="true"
+            [labelMode]="'floating'"
+            width="200"
+          >
+          </dx-select-box>
         </dxi-item>
 
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
+
         <dxi-item>
           <dx-button
             text="Apply"
@@ -79,7 +81,6 @@
           >
           </dx-button>
         </dxi-item>
-        <dxi-item name="exportButton" class="export-btn"></dxi-item>
       </dxo-toolbar>
 
       <dxo-sorting mode="none"></dxo-sorting>
@@ -103,21 +104,11 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
-     
 
-         <dxi-column
-        dataField="Description"
-       [caption]="headerCaption"
-        width="70%">
-    </dxi-column>
+      <dxi-column dataField="Description" [caption]="headerCaption" width="70%">
+      </dxi-column>
 
-    <dxi-column
-        dataField="Value"
-        caption=""
-        alignment="right">
-    </dxi-column>
-
+      <dxi-column dataField="Value" caption="" alignment="right"> </dxi-column>
     </dx-data-grid>
   </div>
 </div>
-
