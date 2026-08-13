@@ -28,18 +28,9 @@
 
         <!-- Field 3: Store -->
         <div class="field-item">
-          <dx-select-box
-            [(value)]="StoreIDData"
-            [dataSource]="stores"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [searchEnabled]="true"
-            label="Store"
-            labelMode="floating"
-            (onValueChanged)="onStoreValueChanged($event)"
-            [readOnly]="isReadOnlyMode || isEditing"
-            width="100%"
-          >
+          <dx-select-box [(value)]="StoreIDData" [dataSource]="stores" displayExpr="DESCRIPTION" valueExpr="ID"
+            [searchEnabled]="true" label="Destination Store" labelMode="floating" (onValueChanged)="onStoreValueChanged($event)"
+            [readOnly]="isReadOnlyMode || isEditing" width="100%">
             <dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -97,18 +88,9 @@
 
         <!-- Field 6: Transfer To -->
         <div class="field-item">
-          <dx-select-box
-            [(value)]="transferOutFormData.DEST_STORE_ID"
-            [dataSource]="transferstores"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [searchEnabled]="true"
-            label="Transfer To"
-            labelMode="floating"
-            (onValueChanged)="onStoreChange($event)"
-            [readOnly]="isReadOnlyMode"
-            width="100%"
-          >
+          <dx-select-box [(value)]="transferOutFormData.DEST_STORE_ID" [dataSource]="transferstores"
+            displayExpr="DESCRIPTION" valueExpr="ID" [searchEnabled]="true" label="Transfer From" labelMode="floating"
+            (onValueChanged)="onStoreChange($event)" [readOnly]="isReadOnlyMode" width="100%">
             <dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -258,20 +240,10 @@
         </dxi-column>
 
         <dxo-summary>
-          <dxi-total-item
-            column="QUANTITY"
-            summaryType="sum"
-            valueFormat="#,##0.00"
-            displayFormat="NetQty: {0}"
-            alignment="right"
-          ></dxi-total-item>
-          <dxi-total-item
-            column="netAmount"
-            summaryType="sum"
-            valueFormat="#,##0.00"
-            displayFormat="NetAmt: {0}"
-            alignment="right"
-          ></dxi-total-item>
+          <dxi-total-item column="QUANTITY" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
+            alignment="right"></dxi-total-item>
+          <dxi-total-item column="netAmount" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
+            alignment="right"></dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
 
@@ -388,6 +360,7 @@
           </div>
         </dxi-item>
       </dxo-toolbar>
+      <dxi-column dataField="ITEM_CODE" caption="Item Code" [width]="140" alignment="center"></dxi-column>
 
       <dxi-column
         dataField="BARCODE"

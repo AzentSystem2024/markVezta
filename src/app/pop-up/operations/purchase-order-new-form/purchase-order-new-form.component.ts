@@ -406,7 +406,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const payload = {
       SUPP_ID: this.newPoData.SUPP_ID,
       COMPANY_ID: this.companyID,
-      STORE_ID: this.newPoData.STORE_ID,
+      STORE_ID: this.newPoData.STORE_ID || this.storeID,
     };
 
     this.service.getSupplierItemsData(payload).subscribe((res) => {
@@ -1017,6 +1017,9 @@ export class PurchaseOrderNewFormComponent implements OnInit {
         this.newPoData.STORE_ID = configStore.STORE_ID;
       } else {
         this.filteredStoreList = this.StoreList; // ✅ NOW WORKS
+        if (this.storeID && !this.newPoData.STORE_ID) {
+          this.newPoData.STORE_ID = this.storeID;
+        }
       }
     });
   }
