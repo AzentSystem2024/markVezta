@@ -41,12 +41,12 @@
                   "
                 >
                   <!-- Row 1 : Date -->
-                  <div style="display: flex; gap: 1px">
+                  <div style="display: flex; gap: 4px">
                     <dx-date-box
                       [(value)]="deliveryFormData.DN_DATE"
                       label="Date"
                       labelMode="floating"
-                      [width]="200"
+                      width="400"
                       displayFormat="dd-MM-yyyy"
                       [readOnly]="true"
                     ></dx-date-box>
@@ -55,16 +55,31 @@
                       [(value)]="deliveryFormData.DN_NO"
                       label="Delivery No"
                       labelMode="floating"
-                      [width]="200"
                       [readOnly]="true"
+                      width="400"
                     ></dx-text-box>
+
+                    <!-- <div style="margin-bottom: 6px"> -->
+                    <dx-select-box
+                      [(value)]="deliveryFormData.CUST_ID"
+                      [dataSource]="customer"
+                      displayExpr="DESCRIPTION"
+                      valueExpr="ID"
+                      label="Customer *"
+                      labelMode="floating"
+                      [readOnly]="isReadOnlyMode || isEditing"
+                      (onValueChanged)="customerChanged($event)"
+                      width="400"
+                    >
+                    </dx-select-box>
+                    <!-- </div> -->
                   </div>
 
                   <!-- Row 2 : DN No + New Field -->
-                  <div style="display: flex; gap: 1px">
+                  <div style="display: flex; gap: 4px">
                     <dx-text-box
                       [(value)]="deliveryFormData.SALESMAN_NAME"
-                      [width]="410"
+                      [width]="350"
                       label="Salesman"
                       labelMode="floating"
                       [readOnly]="true"
@@ -75,34 +90,39 @@
                       [(value)]="deliveryFormData.REF_NO"
                       label="Reference No"
                       labelMode="floating"
-                      [width]="200"
+                      [width]="350"
                       [readOnly]="isReadOnlyMode"
                     ></dx-text-box>
+
+                    <dxi-item
+                      location="after"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                      "
+                    >
+                      <dx-button
+                        text="Pending SO"
+                        icon="event"
+                        stylingMode="outlined"
+                        class="blue-outline-btn"
+                        [disabled]="isReadOnlyMode"
+                        (onClick)="addSalesOrder()"
+                        [width]="200"
+                      ></dx-button>
+                    </dxi-item>
                   </div>
                 </div>
               </div>
             </dxi-item>
 
-            <dxi-item location="after" locateInMenu="auto">
-              <div class="stacked-toolbar-group">
-                <!-- Row 1 : Button -->
-                <div style="margin-bottom: 6px">
-                  <dx-select-box
-                    [(value)]="deliveryFormData.CUST_ID"
-                    [dataSource]="customer"
-                    displayExpr="DESCRIPTION"
-                    valueExpr="ID"
-                    [width]="375"
-                    label="Customer *"
-                    labelMode="floating"
-                    [readOnly]="isReadOnlyMode || isEditing"
-                    (onValueChanged)="customerChanged($event)"
-                  >
-                  </dx-select-box>
-                </div>
+            <!-- <dxi-item location="after" locateInMenu="auto"> -->
+            <!-- <div class="stacked-toolbar-group"> -->
+            <!-- Row 1 : Button -->
 
-                <!-- Row 2 : Customer -->
-                <div style="display: flex; align-items: center">
+            <!-- Row 2 : Customer -->
+            <!-- <div style="display: flex; align-items: center">
                   <dx-button
                     text="Pending SO"
                     icon="event"
@@ -112,9 +132,9 @@
                     (onClick)="addSalesOrder()"
                     [width]="375"
                   ></dx-button>
-                </div>
-              </div>
-            </dxi-item>
+                </div> -->
+            <!-- </div> -->
+            <!-- </dxi-item> -->
           </dxo-toolbar>
 
           <!-- <dxi-column caption="Sl No" [allowEditing]="false"> </dxi-column> -->
