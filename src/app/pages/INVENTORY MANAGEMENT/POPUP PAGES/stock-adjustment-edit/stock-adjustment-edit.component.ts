@@ -234,6 +234,13 @@ export class StockAdjustmentEditComponent {
       this.adjustmentFormData = this.EditingResponseData;
       console.log(this.EditingResponseData);
       console.log(this.adjustmentFormData);
+      
+      if (this.adjustmentFormData.Details && this.adjustmentFormData.Details.length > 0) {
+        this.adjustmentFormData.Details.forEach((item: any, i: number) => {
+          item.SL_NO = i + 1;
+        });
+      }
+
       this.selecte_Date_Details = this.adjustmentFormData.Details;
       this.selectedStatus = this.adjustmentFormData.STATUS;
       const editable = this.adjustmentFormData.STATUS;

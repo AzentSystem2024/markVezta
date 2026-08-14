@@ -548,6 +548,13 @@ export class StockAdjustmentAddComponent {
       NET_AMOUNT: data.NET_AMOUNT,
       STORE_ID: data.STORE_ID,
     };
+
+    if (this.adjustmentFormData.Details && this.adjustmentFormData.Details.length > 0) {
+      this.adjustmentFormData.Details.forEach((item: any, i: number) => {
+        item.SL_NO = i + 1;
+      });
+    }
+
     console.log(this.adjustmentFormData, '================edit==============');
   }
 
