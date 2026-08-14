@@ -721,6 +721,7 @@ export class PhysicalInventoryFormComponent {
       USER_ID: this.userID,
       NARRATION: this.inventoryFormData.NARRATION || '',
       STATUS: 1, // 1 = Active
+      IS_APPROVED: this.isApproved || false,
       Details: this.inventoryFormData.Details.map((item: any) => ({
         ITEM_ID: item.ITEM_ID || 0,
         ITEM_CODE: item.ITEM_CODE || '',
@@ -787,10 +788,8 @@ export class PhysicalInventoryFormComponent {
 
       // ================= SAVE =================
       if (!this.isEditing) {
-
         apiCall = this.dataService.savePhysicalInventory(payload);
-        successMessage = 'Inventory saved successfully!';
-
+        successMessage = this.isApproved ? 'Inventory saved and approved successfully!' : 'Inventory saved successfully!';
       }
 
       // ================= APPROVE =================
@@ -802,7 +801,7 @@ export class PhysicalInventoryFormComponent {
       }
 
       // ================= VERIFY =================
-      else if (this.status === 'verifyscreen') {
+      else if (this.status === 'verifyscreen' || this.status === 'VerifyScreen') {
 
         apiCall = this.dataService.VerifyPhysicalInventory(payload);
         successMessage = 'Inventory verified successfully!';
@@ -856,11 +855,19 @@ export class PhysicalInventoryFormComponent {
 
     };
 
-    // 5️⃣ Ask for confirmation before approving
-    if (this.isEditing && this.isApproved) {
+    if (this.selectedStatus == 2 || this.isApproved) {
       confirm(
         'Are you sure you want to approve this inventory?',
         'Confirm Approval',
+      ).then((dialogResult) => {
+        if (dialogResult) {
+          proceedWithSave();
+        }
+      });
+    } else if (this.status === 'verifyscreen' || this.status === 'VerifyScreen') {
+      confirm(
+        'Are you sure you want to verify this inventory?',
+        'Confirm Verification',
       ).then((dialogResult) => {
         if (dialogResult) {
           proceedWithSave();

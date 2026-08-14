@@ -96,9 +96,13 @@ export class StockAdjustmentEditComponent {
   };
 
   getSaveButtonText(): string {
-    // if (this.readOnlyTrue || this.selectedStatus === 5) {
-    //   return 'PDF';
-    // }
+    if (this.status === 'verifyscreen') {
+      return this.isSaving ? 'Verifying...' : 'Verify';
+    }
+
+    if (this.status === 'ApproveScreen' || this.status === 'Approve') {
+      return this.isSaving ? 'Approving...' : 'Approve';
+    }
 
     if (this.isSaving) {
       if (this.selectedStatus === 2 || this.approveValue) {

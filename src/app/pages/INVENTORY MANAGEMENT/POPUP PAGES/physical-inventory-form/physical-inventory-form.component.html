@@ -206,11 +206,17 @@
                     "
                   >
                     <dx-check-box
-                      *ngIf="canApprove"
+                      *ngIf="
+                        canApprove &&
+                        status !== 'ApproveScreen' &&
+                        status !== 'ApprovalScreen' &&
+                        status !== 'Approve' &&
+                        status !== 'verifyscreen' &&
+                        status !== 'VerifyScreen'
+                      "
                       [(value)]="isApproved"
                       text="Approve"
                       [readOnly]="isReadOnlyMode"
-                      [disabled]="!isEditing"
                     ></dx-check-box>
 
                     <div style="display: flex; gap: 10px">

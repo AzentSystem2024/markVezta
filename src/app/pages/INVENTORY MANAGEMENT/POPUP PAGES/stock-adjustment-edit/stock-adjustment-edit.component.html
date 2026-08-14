@@ -270,7 +270,8 @@
               *ngIf="
                 selectedStatus !== 5 &&
                 status !== 'ApproveScreen' &&
-                status !== 'Approve'
+                status !== 'Approve' &&
+                status !== 'verifyscreen'
               "
               [value]="approveValue"
               (valueChange)="approveValue = $event"
