@@ -32,7 +32,7 @@
       [loadPanel]="{ enabled: false, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -126,7 +126,7 @@
           ></dx-tag-box>
         </dxi-item> -->
 
-        <!-- <dxi-item>
+        <dxi-item>
           <dx-tag-box
             label="Store"
             labelMode="floating"
@@ -143,7 +143,7 @@
             [width]="200"
             (onValueChanged)="updateStoreHint()"
           ></dx-tag-box>
-        </dxi-item> -->
+        </dxi-item>
 
         <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
         <!-- <dxi-item location="after" locateInMenu="auto">
@@ -205,7 +205,7 @@
 
       <dxi-column
         dataField="CODE"
-        caption="Code"
+        caption="Item Code"
         dataType="string"
         sortOrder="asc"
         [sortingMethod]="typeSorting"

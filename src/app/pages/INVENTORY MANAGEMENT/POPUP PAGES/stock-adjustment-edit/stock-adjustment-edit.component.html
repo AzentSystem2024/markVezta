@@ -5,54 +5,113 @@
       <div class="header-grid">
         <!-- Field 1: Date -->
         <div class="field-item">
-          <dx-date-box [(value)]="adjustmentFormData.ADJ_DATE" label="Date" labelMode="floating"
-            displayFormat="dd-MM-yyyy" [readOnly]="true" width="100%"></dx-date-box>
+          <dx-date-box
+            [(value)]="adjustmentFormData.ADJ_DATE"
+            label="Date"
+            labelMode="floating"
+            displayFormat="dd-MM-yyyy"
+            [readOnly]="true"
+            width="100%"
+          ></dx-date-box>
         </div>
 
         <!-- Field 2: Doc No -->
         <div class="field-item">
-          <dx-text-box [(value)]="adjustmentFormData.ADJ_NO" label="Doc No" labelMode="floating" [readOnly]="true"
-            width="100%"></dx-text-box>
+          <dx-text-box
+            [(value)]="adjustmentFormData.ADJ_NO"
+            label="Doc No"
+            labelMode="floating"
+            [readOnly]="true"
+            width="100%"
+          ></dx-text-box>
         </div>
 
         <!-- Field 3: Store/Branch -->
         <div class="field-item">
-          <dx-select-box [(value)]="adjustmentFormData.STORE_ID" [dataSource]="stores" displayExpr="DESCRIPTION"
-            valueExpr="ID" [searchEnabled]="true" label="Store/Branch" labelMode="floating"
-            [readOnly]="readOnlyTrue || selectedStatus === 5" width="100%">
+          <dx-select-box
+            [(value)]="adjustmentFormData.STORE_ID"
+            [dataSource]="stores"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Store/Branch"
+            labelMode="floating"
+            [readOnly]="readOnlyTrue || selectedStatus === 5"
+            width="100%"
+          >
             <dx-validator>
-              <dxi-validation-rule type="required" message="Store is required"></dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Store is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+      </div>
+
+      <div class="header-grid-second">
+        <!-- Field 5: Reason -->
+        <div class="field-item">
+          <dx-select-box
+            [(value)]="adjustmentFormData.REASON_ID"
+            [dataSource]="reasons"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Reason"
+            labelMode="floating"
+            [readOnly]="readOnlyTrue || selectedStatus === 5"
+            width="100%"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Reason is required"
+              ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
 
         <!-- Field 4: Department -->
         <div class="field-item">
-          <dx-select-box [(value)]="adjustmentFormData.DEPT_ID" [dataSource]="Department" displayExpr="DESCRIPTION"
-            valueExpr="ID" [searchEnabled]="true" label="Department" labelMode="floating"
-            [readOnly]="readOnlyTrue || selectedStatus === 5" width="100%">
+          <dx-select-box
+            [(value)]="adjustmentFormData.DEPT_ID"
+            [dataSource]="Department"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Department"
+            labelMode="floating"
+            [readOnly]="readOnlyTrue || selectedStatus === 5"
+            width="100%"
+          >
             <dx-validator>
-              <dxi-validation-rule type="required" message="Department is required"></dxi-validation-rule>
-            </dx-validator>
-          </dx-select-box>
-        </div>
-
-        <!-- Field 5: Reason -->
-        <div class="field-item">
-          <dx-select-box [(value)]="adjustmentFormData.REASON_ID" [dataSource]="reasons" displayExpr="DESCRIPTION"
-            valueExpr="ID" [searchEnabled]="true" label="Reason" labelMode="floating"
-            [readOnly]="readOnlyTrue || selectedStatus === 5" width="100%">
-            <dx-validator>
-              <dxi-validation-rule type="required" message="Reason is required"></dxi-validation-rule>
+              <dxi-validation-rule
+                type="required"
+                message="Department is required"
+              ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </div>
 
         <!-- Field 6: Add Items Action Button -->
-        <div class="field-item action-field" *ngIf="!readOnlyTrue && selectedStatus !== 5">
-          <dx-button stylingMode="contained" class="add-items-btn" (onClick)="onAddItems()" width="100%">
+        <div
+          class="field-item action-field"
+          *ngIf="!readOnlyTrue && selectedStatus !== 5"
+        >
+          <dx-button
+            stylingMode="contained"
+            class="add-items-btn"
+            (onClick)="onAddItems()"
+            width="100%"
+          >
             <div *dxTemplate="let data of 'content'" class="btn-content">
-              <span class="iconify me-2" data-icon="formkit:add" data-width="18" data-height="18"></span>
+              <span
+                class="iconify me-2"
+                data-icon="formkit:add"
+                data-width="18"
+                data-height="18"
+              ></span>
               <span class="add-text">Add Items</span>
             </div>
           </dx-button>
@@ -62,85 +121,185 @@
 
     <!-- Data Grid Container -->
     <div class="grid-container">
-      <dx-data-grid #itemsGridRef [dataSource]="adjustmentFormData.Details" [showBorders]="true"
-        [showColumnLines]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true" [allowColumnReordering]="true"
-        [allowColumnResizing]="true" [height]="'54vh'" [columnResizingMode]="'nextColumn'"
-        [scrolling]="{ mode: 'virtual' }" rowAlternationInterval="2" [editing]="{
+      <dx-data-grid
+        #itemsGridRef
+        [dataSource]="adjustmentFormData.Details"
+        [showBorders]="true"
+        [showColumnLines]="true"
+        [columnAutoWidth]="true"
+        [rowAlternationEnabled]="true"
+        [allowColumnReordering]="true"
+        [allowColumnResizing]="true"
+        [height]="'54vh'"
+        [columnResizingMode]="'nextColumn'"
+        [scrolling]="{ mode: 'virtual' }"
+        rowAlternationInterval="2"
+        [editing]="{
           mode: 'cell',
           allowAdding: false,
           allowUpdating: !readOnlyTrue && selectedStatus !== 5,
           allowDeleting: !readOnlyTrue && selectedStatus !== 5,
-        }" (onEditorPreparing)="onEditorPreparing($event)" (onCellPrepared)="onCellPrepared($event)"
-        class="custom-retail-grid">
+        }"
+        (onEditorPreparing)="onEditorPreparing($event)"
+        (onCellPrepared)="onCellPrepared($event)"
+        class="custom-retail-grid"
+      >
         <dxo-load-panel [showPane]="false"></dxo-load-panel>
 
-        <dxi-column dataField="SL_NO" caption="Sl No" alignment="center" [allowEditing]="false" [width]="70"></dxi-column>
+        <dxi-column
+          dataField="SL_NO"
+          caption="Sl No"
+          alignment="center"
+          [width]="70"
+        ></dxi-column>
         <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
 
-        <dxi-column dataField="ITEM_CODE" caption="Item Code" alignment="center" [width]="130"
-          [allowEditing]="false"></dxi-column>
+        <dxi-column
+          dataField="ITEM_CODE"
+          caption="Item Code"
+          alignment="center"
+          [width]="130"
+          [allowEditing]="false"
+        ></dxi-column>
 
-        <dxi-column dataField="ITEM_NAME" caption="Description" [allowEditing]="false"></dxi-column>
+        <dxi-column
+          dataField="ITEM_NAME"
+          caption="Description"
+          [allowEditing]="false"
+        ></dxi-column>
 
-        <dxi-column dataField="COST" caption="Cost" alignment="right" [allowEditing]="false" dataType="number"
-          [format]="{ type: 'fixedPoint', precision: 2 }" [visible]="!hidecost" [width]="120"></dxi-column>
+        <dxi-column
+          dataField="COST"
+          caption="Cost"
+          alignment="right"
+          [allowEditing]="false"
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+          [visible]="!hidecost"
+          [width]="120"
+        ></dxi-column>
 
-        <dxi-column dataField="STOCK_QTY" caption="Current Stock" alignment="center" [allowEditing]="false"
-          [width]="120"></dxi-column>
+        <dxi-column
+          dataField="STOCK_QTY"
+          caption="Current Stock"
+          alignment="center"
+          [allowEditing]="false"
+          [width]="120"
+        ></dxi-column>
 
-        <dxi-column dataField="NEW_QTY" caption="New Stock" alignment="center" dataType="number"
-          [allowEditing]="!readOnlyTrue && selectedStatus !== 5" [width]="120" [validationRules]="[
-            { type: 'required', message: 'New Stock is required' }
-          ]"></dxi-column>
+        <dxi-column
+          dataField="NEW_QTY"
+          caption="New Stock"
+          alignment="center"
+          dataType="number"
+          [allowEditing]="!readOnlyTrue && selectedStatus !== 5"
+          [width]="120"
+          [validationRules]="[
+            { type: 'required', message: 'New Stock is required' },
+          ]"
+        ></dxi-column>
 
-        <dxi-column dataField="ADJ_QTY" caption="Adjusted Stock" alignment="center" dataType="number"
-          [allowEditing]="false" [width]="120"></dxi-column>
+        <dxi-column
+          dataField="ADJ_QTY"
+          caption="Adjusted Stock"
+          alignment="center"
+          dataType="number"
+          [allowEditing]="false"
+          [width]="120"
+        ></dxi-column>
 
-        <dxi-column dataField="AMOUNT" caption="Amount" alignment="right" dataType="number"
-          [format]="{ type: 'fixedPoint', precision: 2 }" [allowEditing]="false" [visible]="!hidecost"
-          [width]="130"></dxi-column>
+        <dxi-column
+          dataField="AMOUNT"
+          caption="Amount"
+          alignment="right"
+          dataType="number"
+          [format]="{ type: 'fixedPoint', precision: 2 }"
+          [allowEditing]="false"
+          [visible]="!hidecost"
+          [width]="130"
+        ></dxi-column>
 
         <!-- Delete Action Column -->
-        <dxi-column type="buttons" [width]="60" alignment="center" *ngIf="!readOnlyTrue && selectedStatus !== 5">
-          <dxi-button icon="trash" hint="Delete" [onClick]="deleteRow"></dxi-button>
+        <dxi-column
+          type="buttons"
+          [width]="60"
+          alignment="center"
+          *ngIf="!readOnlyTrue && selectedStatus !== 5"
+        >
+          <dxi-button
+            icon="trash"
+            hint="Delete"
+            [onClick]="deleteRow"
+          ></dxi-button>
         </dxi-column>
 
         <dxo-summary>
-          <dxi-total-item column="ADJ_QTY" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
-            alignment="right"></dxi-total-item>
-          <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
-            alignment="right"></dxi-total-item>
+          <dxi-total-item
+            column="ADJ_QTY"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="{0}"
+            alignment="right"
+          ></dxi-total-item>
+          <dxi-total-item
+            column="AMOUNT"
+            summaryType="sum"
+            valueFormat="#,##0.00"
+            displayFormat="{0}"
+            alignment="right"
+          ></dxi-total-item>
         </dxo-summary>
       </dx-data-grid>
 
       <!-- Narration Row -->
       <div class="narration-container">
-        <dx-text-box [(value)]="adjustmentFormData.NARRATION" label="Narration" labelMode="floating"
-          [readOnly]="readOnlyTrue || selectedStatus === 5" width="100%"></dx-text-box>
+        <dx-text-box
+          [(value)]="adjustmentFormData.NARRATION"
+          label="Narration"
+          labelMode="floating"
+          [readOnly]="readOnlyTrue || selectedStatus === 5"
+          width="100%"
+        ></dx-text-box>
       </div>
 
       <!-- Footer Area -->
       <div class="form-footer">
         <div class="footer-actions-right">
-          <dx-check-box *ngIf="selectedStatus !== 5 && status !== 'ApproveScreen' && status !== 'Approve'"
-            [value]="approveValue" (valueChange)="approveValue = $event" text="Approve"
-            [readOnly]="readOnlyTrue || selectedStatus === 5" stylingMode="outlined" class="approve-checkbox">
-          </dx-check-box>
+          <div class="footer-buttons">
+            <dx-check-box
+              *ngIf="
+                selectedStatus !== 5 &&
+                status !== 'ApproveScreen' &&
+                status !== 'Approve'
+              "
+              [value]="approveValue"
+              (valueChange)="approveValue = $event"
+              text="Approve"
+              [readOnly]="readOnlyTrue || selectedStatus === 5"
+              stylingMode="outlined"
+              class="approve-checkbox"
+            >
+            </dx-check-box>
 
-          <dx-button text="Cancel" (onClick)="cancel()" stylingMode="outlined" type="normal"></dx-button>
-
+            <dx-button
+              text="Cancel"
+              (onClick)="cancel()"
+              stylingMode="outlined"
+              type="normal"
+            ></dx-button>
+          </div>
           <!-- <dx-button #saveButtonRef [text]="getSaveButtonText()" [disabled]="isSaving"
             (onClick)="UpdateStockAdjustment()" stylingMode="contained" type="default" [width]="165"></dx-button> -->
-            <dx-button
-  *ngIf="!readOnlyTrue"
-  #saveButtonRef
-  [text]="getSaveButtonText()"
-  [disabled]="isSaving"
-  (onClick)="UpdateStockAdjustment()"
-  stylingMode="contained"
-  type="default"
-  [width]="165">
-</dx-button>
+          <dx-button
+            *ngIf="!readOnlyTrue"
+            #saveButtonRef
+            [text]="getSaveButtonText()"
+            [disabled]="isSaving"
+            (onClick)="UpdateStockAdjustment()"
+            stylingMode="contained"
+            type="default"
+          >
+          </dx-button>
         </div>
       </div>
     </div>
@@ -148,35 +307,98 @@
 </dx-validation-group>
 
 <!-- Select Items Popup -->
-<dx-popup [(visible)]="isPopupVisible" [width]="850" [height]="550" [showTitle]="true"
-  title="Select Stock Adjustment Items" [dragEnabled]="true" [closeOnOutsideClick]="true" (onHiding)="onPopupHiding()">
+<dx-popup
+  [(visible)]="isPopupVisible"
+  [width]="850"
+  [height]="550"
+  [showTitle]="true"
+  title="Select Stock Adjustment Items"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="true"
+  (onHiding)="onPopupHiding()"
+>
   <div *dxTemplate="let data of 'content'">
-    <dx-data-grid #popupGridRef [dataSource]="items" [showBorders]="true" [showRowLines]="true" [showColumnLines]="true"
-      [columnAutoWidth]="true" [rowAlternationEnabled]="true" [headerFilter]="{ visible: true, allowSearch: true }"
-      [allowColumnReordering]="true" [showColumnHeaders]="true" [allowColumnResizing]="true" [height]="'60vh'"
-      [columnResizingMode]="'nextColumn'" [scrolling]="{ mode: 'virtual' }" rowAlternationInterval="2" keyExpr="ITEM_ID"
-      [(selectedRowKeys)]="selectedItemKeys" [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }">
+    <dx-data-grid
+      #popupGridRef
+      [dataSource]="items"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true, allowSearch: true }"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [allowColumnResizing]="true"
+      [height]="'60vh'"
+      [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      keyExpr="ITEM_ID"
+      [(selectedRowKeys)]="selectedItemKeys"
+      [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
+    >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-pager [visible]="true" [allowedPageSizes]="allowedPageSizes" [displayMode]="displayMode"
-        [showPageSizeSelector]="showPageSizeSelector" [showInfo]="true" [showNavigationButtons]="true"></dxo-pager>
-      <dxo-load-panel [showPane]="true" [visible]="isPopupGridLoading" text="Loading items..."></dxo-load-panel>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel
+        [showPane]="true"
+        [visible]="isPopupGridLoading"
+        text="Loading items..."
+      ></dxo-load-panel>
 
-      <dxo-filter-row [visible]="isFilterRowVisible" [applyFilter]="auto"></dxo-filter-row>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
 
       <dxo-toolbar>
         <dxi-item location="after">
           <div class="toolbar-button-wrapper">
-            <dx-button text="Select Items" icon="check" (onClick)="onSelectItems()" class="select-item-btn"></dx-button>
+            <dx-button
+              text="Select Items"
+              icon="check"
+              (onClick)="onSelectItems()"
+              class="select-item-btn"
+            ></dx-button>
           </div>
         </dxi-item>
       </dxo-toolbar>
 
-      <dxi-column dataField="BARCODE" caption="Barcode" [width]="140" alignment="center"></dxi-column>
+      <dxi-column
+        dataField="BARCODE"
+        caption="Barcode"
+        [width]="140"
+        alignment="center"
+      ></dxi-column>
       <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
-      <dxi-column dataField="UOM" caption="UOM" [width]="90" alignment="center"></dxi-column>
-      <dxi-column dataField="COST" caption="Unit Cost" dataType="number" alignment="right" [visible]="!hidecost"
-        [width]="120" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
-      <dxi-column dataField="STOCK_QTY" caption="Current Stock" alignment="center" [width]="130"></dxi-column>
+      <dxi-column
+        dataField="UOM"
+        caption="UOM"
+        [width]="90"
+        alignment="center"
+      ></dxi-column>
+      <dxi-column
+        dataField="COST"
+        caption="Unit Cost"
+        dataType="number"
+        alignment="right"
+        [visible]="!hidecost"
+        [width]="120"
+        [format]="{ type: 'fixedPoint', precision: 2 }"
+      ></dxi-column>
+      <dxi-column
+        dataField="STOCK_QTY"
+        caption="Current Stock"
+        alignment="center"
+        [width]="130"
+      ></dxi-column>
     </dx-data-grid>
   </div>
 </dx-popup>

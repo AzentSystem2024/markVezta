@@ -152,3 +152,16 @@
   color: #ffffff !important;
   background-color: #ffa500 !important; /* blue text */
 }
+.cancel-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-popup-buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 12px;
+}

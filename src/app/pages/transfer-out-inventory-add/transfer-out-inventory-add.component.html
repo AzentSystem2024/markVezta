@@ -61,7 +61,9 @@
             </dx-validator>
           </dx-select-box>
         </div>
+      </div>
 
+      <div class="header-grid-second">
         <!-- Field 5: Reasons -->
         <div class="field-item">
           <dx-select-box
@@ -105,7 +107,7 @@
             class="add-items-btn"
             (onClick)="onAddItems()"
             [disabled]="!transferOutFormData.DEST_STORE_ID || isReadOnlyMode"
-            width="100%"
+            [width]="120"
           >
             <div *dxTemplate="let data of 'content'" class="btn-content">
               <span
@@ -264,28 +266,29 @@
       <!-- Footer Area -->
       <div class="form-footer">
         <div class="footer-actions-right">
-          <dx-check-box
-            *ngIf="shouldShowApproveCheckbox"
-            [value]="isReadOnlyMode ? true : transferOutFormData.IS_APPROVED"
-            (valueChange)="
-              !isReadOnlyMode
-                ? (transferOutFormData.IS_APPROVED = $event)
-                : null
-            "
-            [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
-            [readOnly]="isReadOnlyMode"
-            stylingMode="outlined"
-            class="approve-checkbox"
-          >
-          </dx-check-box>
+          <div class="footer-buttons">
+            <dx-check-box
+              *ngIf="shouldShowApproveCheckbox"
+              [value]="isReadOnlyMode ? true : transferOutFormData.IS_APPROVED"
+              (valueChange)="
+                !isReadOnlyMode
+                  ? (transferOutFormData.IS_APPROVED = $event)
+                  : null
+              "
+              [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+              [readOnly]="isReadOnlyMode"
+              stylingMode="outlined"
+              class="approve-checkbox"
+            >
+            </dx-check-box>
 
-          <dx-button
-            text="Cancel"
-            (onClick)="cancel()"
-            stylingMode="outlined"
-            type="normal"
-          ></dx-button>
-
+            <dx-button
+              text="Cancel"
+              (onClick)="cancel()"
+              stylingMode="outlined"
+              type="normal"
+            ></dx-button>
+          </div>
           <dx-button
           *ngIf="!isReadOnlyMode"
             #saveButtonRef

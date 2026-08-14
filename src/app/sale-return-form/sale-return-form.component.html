@@ -311,7 +311,7 @@
         </div>
 
         <div class="form-popup-buttons-container">
-          <div class="approve-container">
+          <div class="cancel-group">
             <div class="approve-container" *ngIf="canApprove">
               <dx-check-box
                 [value]="
@@ -328,32 +328,31 @@
               >
               </dx-check-box>
             </div>
-          </div>
-          <div class="popup-footer">
+            <!-- <div class="popup-footer"> -->
             <dx-button
               text="Cancel"
               stylingMode="outlined"
               type="normal"
               (onClick)="cancel()"
             ></dx-button>
-            <dx-button
-              *ngIf="!isReadOnlyMode"
-              #saveButtonRef
-              [text]="
-                isSaving
-                  ? salesReturnFormData.IS_APPROVED
-                    ? 'Saving...'
-                    : 'Saving...'
-                  : salesReturnFormData.IS_APPROVED
-                    ? 'Save'
-                    : 'Save'
-              "
-              [disabled]="isSaving"
-              (onClick)="saveSaleReturn()"
-              stylingMode="contained"
-              type="default"
-            ></dx-button>
           </div>
+          <dx-button
+            *ngIf="!isReadOnlyMode"
+            #saveButtonRef
+            [text]="
+              isSaving
+                ? salesReturnFormData.IS_APPROVED
+                  ? 'Saving...'
+                  : 'Saving...'
+                : salesReturnFormData.IS_APPROVED
+                  ? 'Save'
+                  : 'Save'
+            "
+            [disabled]="isSaving"
+            (onClick)="saveSaleReturn()"
+            stylingMode="contained"
+            type="default"
+          ></dx-button>
         </div>
       </div>
     </div>

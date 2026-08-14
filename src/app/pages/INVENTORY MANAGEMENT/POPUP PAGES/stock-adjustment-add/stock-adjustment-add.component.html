@@ -46,6 +46,29 @@
             </dx-validator>
           </dx-select-box>
         </div>
+      </div>
+
+      <div class="header-grid-second">
+        <!-- Field 5: Reason -->
+        <div class="field-item">
+          <dx-select-box
+            [(value)]="adjustmentFormData.REASON_ID"
+            [dataSource]="reasons"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [searchEnabled]="true"
+            label="Reason"
+            labelMode="floating"
+            width="100%"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Reason is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
 
         <!-- Field 4: Department -->
         <div class="field-item">
@@ -63,27 +86,6 @@
               <dxi-validation-rule
                 type="required"
                 message="Department is required"
-              ></dxi-validation-rule>
-            </dx-validator>
-          </dx-select-box>
-        </div>
-
-        <!-- Field 5: Reason -->
-        <div class="field-item">
-          <dx-select-box
-            [(value)]="adjustmentFormData.REASON_ID"
-            [dataSource]="reasons"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [searchEnabled]="true"
-            label="Reason"
-            labelMode="floating"
-            width="100%"
-          >
-            <dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="Reason is required"
               ></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
@@ -264,15 +266,20 @@
       <!-- Footer Area -->
       <div class="form-footer">
         <div class="footer-actions-right">
-          <dx-check-box *ngIf="canApprove" text="Approve" [(value)]="adjustmentFormData.IS_APPROVED" class="me-3"></dx-check-box>
-          <dx-button text="Cancel" (onClick)="cancel()" stylingMode="outlined" type="normal"></dx-button>
-          <dx-button
-            text="Cancel"
-            (onClick)="cancel()"
-            stylingMode="outlined"
-            type="normal"
-          ></dx-button>
-
+          <div class="footer-buttons">
+            <dx-check-box
+              *ngIf="canApprove"
+              text="Approve"
+              [(value)]="adjustmentFormData.IS_APPROVED"
+              class="me-3"
+            ></dx-check-box>
+            <dx-button
+              text="Cancel"
+              (onClick)="cancel()"
+              stylingMode="outlined"
+              type="normal"
+            ></dx-button>
+          </div>
           <dx-button
             #saveButtonRef
             [text]="getSaveButtonText()"

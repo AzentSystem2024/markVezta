@@ -28,8 +28,17 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px 14px;
-  align-items: center;
+}
 
+.header-grid-second {
+  display: grid;
+  grid-template-columns: 1.3fr 1.3fr auto;
+  gap: 4px 14px;
+  margin-top: 4px;
+  align-items: end;
+}
+
+.header-grid {
   @media (max-width: 992px) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -82,12 +91,10 @@
 .btn-content {
   display: flex;
   align-items: center;
-  gap: 6px;
   font-weight: 600;
   font-size: 14px;
   color: #ffffff;
 }
-
 /* Custom Data Grid Styling (Theme-aware for Light & Dark mode) */
 ::ng-deep .custom-retail-grid {
   border-radius: 8px;
@@ -138,20 +145,26 @@
   margin-top: 4px;
 }
 
-/* Footer Section */
 .form-footer {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
   margin-top: 8px;
-  padding-bottom: 4px;
 }
 
 .footer-actions-right {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   gap: 14px;
+}
+
+.footer-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.approve-checkbox {
+  align-self: flex-end; /* Right-align checkbox */
 }
 
 .select-item-btn {

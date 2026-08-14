@@ -8,7 +8,9 @@
   display: contents;
   overflow: auto;
 }
-
+::ng-deep .timesheet-popup .dx-popup-content {
+  overflow: hidden !important;
+}
 .view-wrapper {
   .grid {
     .name-template {

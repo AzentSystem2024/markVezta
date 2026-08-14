@@ -230,7 +230,7 @@
     [(visible)]="isAddPopUp"
     titleText="  Staff End of Service"
     [width]="600"
-    [height]="550"
+    height="auto"
     [dragEnabled]="true"
     [showApprove]="false"
     (save)="Add_EOS()"
@@ -358,7 +358,7 @@
     [(visible)]="editpopup"
     title="Staff End of Service"
     [width]="600"
-    [height]="550"
+    height="auto"
     [dragEnabled]="true"
     (cancel)="closeButton()"
   >
@@ -501,7 +501,7 @@
     [(visible)]="verifypopup"
     title="staff End of Service"
     [width]="600"
-    [height]="550"
+    height="auto"
     [dragEnabled]="true"
     (cancel)="close()"
   >
@@ -635,7 +635,7 @@
     (onHiding)="closeButton()"
     title="staff End of Service"
     [width]="600"
-    [height]="550"
+    height="auto"
     [dragEnabled]="true"
     (save)="Approve_EOS()"
     (cancel)="close()"
@@ -768,7 +768,7 @@
     [(visible)]="isviewpopup"
     title="Staff End of Service"
     [width]="600"
-    [height]="550"
+    height="auto"
   >
     <dx-form id="form">
       <dxi-item itemType="group" [colCount]="2" [colSpan]="2">

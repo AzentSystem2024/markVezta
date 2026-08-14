@@ -430,9 +430,17 @@
             [(value)]="invoiceFormData.IS_APPROVED"
             [visible]="!isReadOnlyMode && !isApproveMode && !isVerifyMode"
           ></dx-check-box>
+
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            type="normal"
+            (onClick)="cancel()"
+          ></dx-button>
         </div>
 
         <dx-button
+          class="save-btn"
           #saveButtonRef
           text="PDF"
           [visible]="isReadOnlyMode || invoiceFormData.IS_APPROVED"
@@ -443,13 +451,7 @@
         ></dx-button>
 
         <dx-button
-          text="Cancel"
-          stylingMode="outlined"
-          type="normal"
-          (onClick)="cancel()"
-        ></dx-button>
-
-        <dx-button
+          class="save-btn"
           #saveButtonRef
           [text]="
             isSaving

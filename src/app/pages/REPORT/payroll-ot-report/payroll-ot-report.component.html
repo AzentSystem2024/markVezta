@@ -47,7 +47,7 @@
           </div>
         </dxi-item>
 
-        <dxi-item style="margin-bottom: 6px">
+        <dxi-item>
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
@@ -60,7 +60,7 @@
           ></dx-select-box>
         </dxi-item>
 
-        <dxi-item style="margin-bottom: 6px">
+        <dxi-item>
           <dx-select-box
             labelMode="floating"
             labelLocation="left"
@@ -127,9 +127,12 @@
           </dx-select-box>
         </dxi-item>
 
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
+
         <dxi-item>
           <dx-button
             text="Apply"
@@ -139,7 +142,6 @@
           >
           </dx-button>
         </dxi-item>
-        <dxi-item name="exportButton" class="export-btn"></dxi-item>
       </dxo-toolbar>
 
       <dxo-sorting mode="none"></dxo-sorting>
