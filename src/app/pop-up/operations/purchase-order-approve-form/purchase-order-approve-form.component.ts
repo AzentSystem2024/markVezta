@@ -67,7 +67,7 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
   }
 
   width = '97vw';
-  height = '420px';
+  height = '60vh';
   tabs = [
     { text: 'Header' },
     { text: 'Detail' },
@@ -557,7 +557,7 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
     this.loadPurchaseOrders(itemId);
   }
 
-    sessionDetails() {
+  sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     console.log(
@@ -569,11 +569,11 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
       this.GST_PERC,
       '===========selected GST PERC==================='
     );
-     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   loadPurchaseOrders(itemId: string) {
-    this.service.getLast5PoItemsList(itemId,this.selected_Company_id).subscribe((data: any[]) => {
+    this.service.getLast5PoItemsList(itemId, this.selected_Company_id).subscribe((data: any[]) => {
       // Filter out records where PO_NO matches this.newPOData.PO_NO
       this.purchaseOrders = data
         .filter((po) => po.PO_NO !== this.newPoData.PO_NO)
@@ -799,4 +799,4 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
   declarations: [PurchaseOrderApproveFormComponent],
   exports: [PurchaseOrderApproveFormComponent],
 })
-export class PurchaseOrderApproveFormModule {}
+export class PurchaseOrderApproveFormModule { }

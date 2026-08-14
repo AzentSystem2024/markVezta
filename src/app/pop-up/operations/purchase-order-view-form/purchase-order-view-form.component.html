@@ -62,6 +62,7 @@
   [elementAttr]="{ class: 'po-tabs' }"
   [orientation]="orientations"
   [stylingMode]="stylingMode"
+  height=""
 >
 </dx-tabs>
 
@@ -313,7 +314,7 @@
     class="data-grid"
     [dataSource]="savedItems"
     [width]="'85vw'"
-    [height]="'50vh'"
+    [height]="'60vh'"
     (onRowUpdated)="updateAmount($event)"
     [rowAlternationEnabled]="true"
     [showColumnLines]="true"
@@ -794,7 +795,7 @@
 
 <div class="form-popup-buttons-container">
   <div class="popup-footer">
-    <!-- <dx-button
+    <dx-button
       icon="fas fa-file-pdf"
       text="PDF"
       type="normal"
@@ -803,6 +804,6 @@
       (onClick)="viewPdfDMGT()"
       hint="View PDF"
     >
-    </dx-button> -->
+    </dx-button>
   </div>
 </div>
