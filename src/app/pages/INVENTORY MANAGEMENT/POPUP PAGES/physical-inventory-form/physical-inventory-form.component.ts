@@ -740,47 +740,7 @@ export class PhysicalInventoryFormComponent {
     if (this.isEditing && this.inventoryFormData.ID) {
       payload.ID = this.inventoryFormData.ID;
     }
-    // 🔄 API call to save inventory
-    // const proceedWithSave = () => {
-    //   const apiCall = (this.isEditing ||this.seletedStatus==2)
-    //     ? this.isApproved
-    //       ? this.dataService.approvePhysicalInventory(payload) // ✅ Approve API
-    //       : this.dataService.updatePhysicalInventory(payload) // ✅ Update API
-    //     : this.dataService.savePhysicalInventory(payload); // ✅ Insert API
-
-    //   apiCall.subscribe({
-    //     next: (response: any) => {
-    //       if (response.Flag === '1') {
-    //         const message =
-    //           response.Message ||
-    //           (this.isApproved
-    //             ? 'Inventory approved successfully!'
-    //             : this.isEditing
-    //               ? 'Inventory updated successfully!'
-    //               : 'Inventory saved successfully!');
-
-    //         notify(message, 'success', 2000);
-
-    //         // Emit popup close or navigate
-    //         this.popupClosed?.emit?.();
-    //         this.getVoucherNo();
-    //         // if (!this.isEditing && !this.isApproved) {
-    //         // ✅ call your voucher number API
-    //         // }
-    //       } else {
-    //         notify(
-    //           response.Message || 'Failed to save inventory',
-    //           'error',
-    //           2000,
-    //         );
-    //       }
-    //     },
-    //     error: (err) => {
-    //       console.error('Error saving inventory:', err);
-    //       notify('An error occurred while saving inventory.', 'error', 3000);
-    //     },
-    //   });
-    // };
+ 
     const proceedWithSave = () => {
 
       let apiCall;

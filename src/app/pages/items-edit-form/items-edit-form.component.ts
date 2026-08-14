@@ -631,12 +631,35 @@ export class ItemsEditFormComponent implements OnInit {
         this.edit_Suplier = [...this.edit_Suplier];
       }
 
-      this.Edit_Store = this.itemData.item_stores || [];
+      const rawStores =
+        this.itemData.item_stores ||
+        this.itemData.ITEM_STORES ||
+        this.itemData.item_store ||
+        this.itemData.ItemStores ||
+        this.itemData.itemStores ||
+        [];
+
+      this.Edit_Store = (Array.isArray(rawStores) ? rawStores : []).map((x: any) => {
+        const storeId = Number(x.STORE_ID ?? x.store_id ?? x.StoreId ?? x.ID);
+        const isSelected =
+          x.IS_SELECTED === true ||
+          x.IS_SELECTED === 1 ||
+          x.IS_SELECTED === 'true' ||
+          x.IS_SELECTED === '1' ||
+          x.IS_SELECTED === undefined;
+
+        return {
+          ...x,
+          STORE_ID: storeId,
+          IS_SELECTED: isSelected,
+        };
+      });
 
       // ✅ selection based on ID where IS_SELECTED is true
-      this.selectedRowKeys = this.Edit_Store.filter(
-        (x: any) => x.IS_SELECTED,
-      ).map((x: any) => x.STORE_ID);
+      this.selectedRowKeys = this.Edit_Store
+        .filter((x: any) => x.IS_SELECTED)
+        .map((x: any) => Number(x.STORE_ID))
+        .filter((id: number) => !isNaN(id));
 
       console.log(this.Edit_Store, '===========edit store================');
       console.log(
@@ -724,23 +747,36 @@ export class ItemsEditFormComponent implements OnInit {
 
     // 🔹 Merge store + edit data
     this.store = this.store.map((storeItem: any) => {
+      const storeId = Number(storeItem.ID);
       const matched = this.Edit_Store.find(
-        (x: any) => x.STORE_ID === storeItem.ID,
+        (x: any) => Number(x.STORE_ID ?? x.ID) === storeId,
       );
 
-      return matched ? { ...storeItem, ...matched } : storeItem;
+      return matched
+        ? {
+            ...storeItem,
+            ...matched,
+            ID: storeId, // Keep storeItem.ID so keyExpr="ID" in dx-data-grid matches
+            STORE_ID: storeId,
+          }
+        : storeItem;
     });
 
     // 🔹 Set selected keys (only selected ones)
     this.selectedRowKeys = [
-      ...this.Edit_Store.filter((x: any) => x.IS_SELECTED).map(
-        (x: any) => x.STORE_ID,
-      ),
+      ...this.Edit_Store.filter(
+        (x: any) =>
+          x.IS_SELECTED !== false &&
+          x.IS_SELECTED !== 0 &&
+          x.IS_SELECTED !== 'false' &&
+          x.IS_SELECTED !== '0',
+      ).map((x: any) => Number(x.STORE_ID ?? x.ID)),
     ];
 
     // 🔹 Force UI refresh (important)
     this.store = [...this.store];
     this.selectedRowKeys = [...this.selectedRowKeys];
+    this.cdr.detectChanges();
   }
   onPriceChange(event: any) {
     const newPrice = event.value;
