@@ -78,8 +78,8 @@ export class PurchaseOrderComponent {
   isApprovePopupOpened: boolean = false;
   isViewPopupOpened: boolean = false;
   isPrintPopupOpened: boolean = false;
-  width: any = '90vw';
-  height: any = 'auto';
+  width: any = '92vw';
+  height: any = '92vh';
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;

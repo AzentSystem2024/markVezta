@@ -1,6 +1,6 @@
 <div
   class="pono-date"
-  style="display: flex; margin-top: 10px; margin-bottom: 10px"
+  style="display: flex; margin-top: 2px; margin-bottom: 4px"
 >
   <dx-text-box
     label="PO NO."
@@ -221,7 +221,7 @@
     </div>
     <div class="termsncondition-container">
       <span class="section-title">Terms&Condition</span>
-      <div style="display: flex; margin-bottom: 10px">
+      <div style="display: flex; margin-bottom: 0px">
         <div class="Shipment-details" style="flex: 1">
           <dx-text-box
             label="Shipment Method"
@@ -261,28 +261,27 @@
         </div>
       </div>
     </div>
-    <dx-text-box
-      label="Notes"
-      labelMode="floating"
-      placeholder="Notes"
-      [(value)]="newPoData.NOTES"
-      [readOnly]="true"
-    >
-    </dx-text-box>
-    <dx-text-box
-      label="Remark"
-      labelMode="floating"
-      placeholder="Narration"
-      [(value)]="newPoData.NARRATION"
-      [readOnly]="true"
-    >
-    </dx-text-box>
-    <div>
+    <div class="bottom-fields-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 6px;">
+      <dx-text-box
+        label="Notes"
+        labelMode="floating"
+        placeholder="Notes"
+        [(value)]="newPoData.NOTES"
+        [readOnly]="true"
+      >
+      </dx-text-box>
+      <dx-text-box
+        label="Remark"
+        labelMode="floating"
+        placeholder="Narration"
+        [(value)]="newPoData.NARRATION"
+        [readOnly]="true"
+      >
+      </dx-text-box>
       <dx-select-box
         label="Issued by"
         labelMode="floating"
         placeholder="Issued by"
-        [width]="465"
         [items]="employeeList"
         displayExpr="DESCRIPTION"
         valueExpr="ID"
@@ -290,31 +289,22 @@
         [readOnly]="true"
       >
       </dx-select-box>
-      <!-- <dx-text-box
-        label="Issued by"
-        labelMode="floating"
-        placeholder="Issued by"
-        [width]="465"
-        [(value)]="newPoData.ISSUED_EMP_ID"
-      >
-      </dx-text-box> -->
     </div>
   </div>
 </div>
 
 <div *ngIf="selectedTabIndex === 1">
   <div
-    style="display: flex; justify-content: space-between; margin-bottom: 10px"
+    style="display: flex; justify-content: space-between; margin-bottom: 6px; margin-top: 4px;"
   >
     <span class="section-sub-title">Items</span>
   </div>
   <dx-data-grid
-    [columnAutoWidth]="true"
     [showBorders]="true"
-    class="data-grid"
+    class="custom-data-grid"
     [dataSource]="savedItems"
-    [width]="'85vw'"
-    [height]="'60vh'"
+    width="100%"
+    [height]="'48vh'"
     (onRowUpdated)="updateAmount($event)"
     [rowAlternationEnabled]="true"
     [showColumnLines]="true"
@@ -323,7 +313,6 @@
     [columnResizingMode]="'widget'"
     (onRowClick)="onRowClick($event)"
     (onCellPrepared)="highlightEditableColumns($event)"
-    class="custom-data-grid"
   >
     <dxi-column
       caption="Item Id"
@@ -705,10 +694,8 @@
     <dx-data-grid
       [dataSource]="uploadedFiles"
       [showBorders]="true"
-      [height]="'60vh'"
-      [showBorders]="true"
+      [height]="'48vh'"
       [showColumnLines]="true"
-      [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"
@@ -756,10 +743,8 @@
       [showBorders]="true"
       [columnAutoWidth]="true"
       [dataSource]="poHistoryList"
-      height="60vh"
-      [showBorders]="true"
+      [height]="'48vh'"
       [showColumnLines]="true"
-      [showBorders]="true"
       [columnAutoWidth]="false"
       [wordWrapEnabled]="false"
       [rowAlternationEnabled]="true"

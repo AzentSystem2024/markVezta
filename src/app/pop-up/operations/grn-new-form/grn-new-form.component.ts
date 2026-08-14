@@ -492,19 +492,67 @@ export class GrnNewFormComponent implements OnInit {
 
   onStoreValueChanged(e: any) {
     const storeid = e.value;
-    this.service
-      .getPendingPo(storeid, this.supplierId, this.selected_Company_id)
-      .subscribe((res: any) => {
-        this.poList = res.data;
-        this.isLocalCurrency = this.poList.IS_LOCAL_CURRENCY;
-        console.log(this.poList, 'ISLOCALCURRENCYYYYYYYY');
-        this.filteredPOList = [...this.poList];
-      });
+
+    // Clear grid items and selection
+    this.poDetails = [];
+    this.selectedPONo = null;
+    this.newGrnData.PO_ID = 0;
+    this.newGrnData.PO_NO = '';
+    this.demoArray = [];
+    this.updatedItems = [];
+    this.landedCost = [];
+    this.costingMethodDataGrid = [];
+    this.newGrnData.GRN_Cost = [];
+    this.newGrnData.GRNDetails = [];
+    this.newGrnData.GRN_Item_Cost = [];
+    this.newGrnData.NET_AMOUNT = 0;
+    this.newGrnData.SUPP_GROSS_AMOUNT = 0;
+    this.newGrnData.SUPP_NET_AMOUNT = 0;
+    this.totalQuantity = 0;
+    this.totalNetAmount = 0;
+    this.LocalNetAmount = 0;
+    this.formattedNetAmount = '0.00';
+    this.formattedLocalNetAmount = '0.00';
+
+    if (storeid) {
+      this.service
+        .getPendingPo(storeid, this.supplierId, this.selected_Company_id)
+        .subscribe((res: any) => {
+          this.poList = res?.data || [];
+          this.isLocalCurrency = this.poList?.IS_LOCAL_CURRENCY;
+          console.log(this.poList, 'ISLOCALCURRENCYYYYYYYY');
+          this.filteredPOList = [...this.poList];
+        });
+    } else {
+      this.poList = [];
+      this.filteredPOList = [];
+    }
   }
 
   onSupplierValueChanged(e: any) {
     const supplierid = e.value;
     this.supplierId = supplierid;
+
+    // Clear grid items and selection
+    this.poDetails = [];
+    this.selectedPONo = null;
+    this.newGrnData.PO_ID = 0;
+    this.newGrnData.PO_NO = '';
+    this.demoArray = [];
+    this.updatedItems = [];
+    this.landedCost = [];
+    this.costingMethodDataGrid = [];
+    this.newGrnData.GRN_Cost = [];
+    this.newGrnData.GRNDetails = [];
+    this.newGrnData.GRN_Item_Cost = [];
+    this.newGrnData.NET_AMOUNT = 0;
+    this.newGrnData.SUPP_GROSS_AMOUNT = 0;
+    this.newGrnData.SUPP_NET_AMOUNT = 0;
+    this.totalQuantity = 0;
+    this.totalNetAmount = 0;
+    this.LocalNetAmount = 0;
+    this.formattedNetAmount = '0.00';
+    this.formattedLocalNetAmount = '0.00';
 
     if (!this.newGrnData.STORE_ID) return;
 
@@ -515,7 +563,7 @@ export class GrnNewFormComponent implements OnInit {
         this.selected_Company_id,
       )
       .subscribe((res: any) => {
-        this.poList = res.data;
+        this.poList = res?.data || [];
         this.filteredPOList = [...this.poList];
       });
   }

@@ -538,6 +538,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     const payload = {
       SUPP_ID: this.newPoData.SUPP_ID,
       COMPANY_ID: this.selected_Company_id,
+      STORE_ID: this.newPoData.STORE_ID,
     };
     this.service.getSupplierItemsData(payload).subscribe((res) => {
       this.supplierItems = res;

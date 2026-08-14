@@ -1,7 +1,7 @@
 <div class="card-container">
   <div
     class="pono-date"
-    style="display: flex; width: 100%; margin-top: 10px; margin-bottom: 10px"
+    style="display: flex; width: 100%; margin-top: 2px; margin-bottom: 4px"
   >
     <dx-text-box
       label="PO NO."
@@ -402,44 +402,41 @@
         </div>
       </div>
     </div>
-    <dx-text-box
-      label="Notes"
-      labelMode="floating"
-      placeholder="Notes"
-      [(value)]="newPoData.NOTES"
-    >
-    </dx-text-box>
-    <dx-text-box
-      label="Remark"
-      labelMode="floating"
-      placeholder="Narration"
-      [(value)]="newPoData.NARRATION"
-    >
-    </dx-text-box>
-    <div>
-      <div class="responsive-select-box" style="width: 50%; max-width: 465px">
-        <dx-select-box
-          label="Issued by"
-          labelMode="floating"
-          placeholder="Issued by"
-          [width]="'auto'"
-          [items]="employeeList"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [(value)]="newPoData.ISSUED_EMP_ID"
-        >
-        </dx-select-box>
-      </div>
+    <div class="bottom-fields-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 6px;">
+      <dx-text-box
+        label="Notes"
+        labelMode="floating"
+        placeholder="Notes"
+        [(value)]="newPoData.NOTES"
+      >
+      </dx-text-box>
+      <dx-text-box
+        label="Remark"
+        labelMode="floating"
+        placeholder="Narration"
+        [(value)]="newPoData.NARRATION"
+      >
+      </dx-text-box>
+      <dx-select-box
+        label="Issued by"
+        labelMode="floating"
+        placeholder="Issued by"
+        [items]="employeeList"
+        displayExpr="DESCRIPTION"
+        valueExpr="ID"
+        [(value)]="newPoData.ISSUED_EMP_ID"
+      >
+      </dx-select-box>
     </div>
   </div>
 </div>
 
 <div *ngIf="selectedTabIndex === 1">
   <div
-    style="display: flex; justify-content: space-between; margin-bottom: 10px"
+    style="display: flex; justify-content: space-between; margin-bottom: 6px; margin-top: 4px;"
   >
     <span class="section-sub-title">Items</span>
-    <div class="add-button">
+    <div class="add-button" style="margin-right: 0px;">
       <dx-button
         icon="plus"
         hint="Add item"
@@ -452,12 +449,11 @@
   </div>
   <dx-data-grid
     #itemsGridRef
-    [columnAutoWidth]="true"
     [showBorders]="true"
-    class="data-grid"
+    class="custom-data-grid"
     [dataSource]="savedItems"
-    [width]="'85vw'"
-    [height]="'60vh'"
+    width="100%"
+    [height]="'48vh'"
     (onRowUpdated)="updateAmount($event)"
     [rowAlternationEnabled]="true"
     [showColumnLines]="true"
@@ -465,7 +461,6 @@
     [columnAutoWidth]="true"
     [columnResizingMode]="'widget'"
     (onRowExpanding)="onRowClick($event)"
-    class="custom-data-grid"
     (onContentReady)="onContentReady($event)"
     (onEditorPreparing)="onEditorPreparing($event)"
     (onRowRemoved)="onRowRemoved($event)"

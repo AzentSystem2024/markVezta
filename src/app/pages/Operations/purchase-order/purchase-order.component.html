@@ -378,7 +378,7 @@
     [(visible)]="isViewPopupOpened"
     title="View Purchase Order"
     [width]="width"
-    [height]="auto"
+    [height]="height"
   >
     <app-purchase-order-view-form
       [formdata]="selectedRowData"
@@ -389,12 +389,6 @@
       (netViewQuantityChange)="netViewQuantity = $event"
       (showSupplierAmount)="showSupplierAmount = $event"
     ></app-purchase-order-view-form>
-    <dxi-toolbar-item toolbar="bottom" location="center">
-      <div
-        class="form-popup-buttons-container"
-        [class.flex-buttons]="width <= 360"
-      ></div>
-    </dxi-toolbar-item>
   </dx-popup>
 
   <dx-popup

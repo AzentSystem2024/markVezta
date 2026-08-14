@@ -1,32 +1,16 @@
 .details-container {
   display: flex;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
-
-// .supplier-details,
-// .shipping-details {
-//   flex: 1;
-//   border-radius: 8px;
-//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-//   background-color: var(--base-bg);
-//   padding: 10px;
-//   margin-left: 0; /* Default for the first item */
-// }
-
-// .shipping-details {
-//   margin-left: 10px; /* For the second column */
-// }
 
 /* Keep the common look */
 .supplier-details,
 .shipping-details {
   flex: 1;
   border-radius: 8px;
-  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  // background-color: var(--base-bg);
   border: 1px solid var(--border-color);
-  padding: 10px;
+  padding: 6px 10px;
   margin-left: 0;
 }
 
@@ -39,7 +23,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   column-gap: 15px;
-  row-gap: 1px;
+  row-gap: 0;
   align-items: start; /* prevents field stretching */
 }
 
@@ -52,38 +36,31 @@
   grid-column: span 2;
 }
 
-/* Shipping remains single column */
-// .shipping-details {
-//   margin-left: 10px; /* For the second column */
-// }
-
 .section-title {
-  font-size: 16px;
-  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
   display: block;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
 }
 
 .section-sub-title {
   font-size: 14px;
   opacity: 0.7;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .po-title {
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   display: block;
 }
 
 .termsncondition-container {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   border-radius: 8px;
-  // background-color: var(--base-bg);
-  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border-color);
-  padding: 10px;
+  padding: 6px 10px;
   margin-left: 0; /* Default for the first item */
 }
 

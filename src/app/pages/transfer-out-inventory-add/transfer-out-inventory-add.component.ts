@@ -339,15 +339,21 @@ export class TransferOutInventoryAddComponent implements OnChanges {
       COMPANY_ID: this.companyID,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.transferstores = response || [];
+      const allStores = response || [];
+
+      // 🔹 Always show all stores in Destination Store dropdown
+      this.stores = allStores;
 
       if (this.IS_HQ_App) {
-        // 🔹 HQ App → show only store with ID = 1
-        this.stores = response.filter((item: any) => item.ID === 1);
-        this.StoreIDData = 1;
+        // 🔹 HQ App → show only store with ID = 1 for Transfer From dropdown
+        this.transferstores = allStores.filter((item: any) => item.ID === 1);
+        if (!this.transferOutFormData.DEST_STORE_ID) {
+          this.transferOutFormData.DEST_STORE_ID = 1;
+          this.onStoreChange({ value: 1 });
+        }
       } else {
-        // 🔹 Not HQ → show all stores
-        this.stores = response || [];
+        // 🔹 Not HQ → show all stores for Transfer From dropdown
+        this.transferstores = allStores;
         if (this.stores && this.stores.length === 1 && !this.StoreIDData) {
           this.StoreIDData = this.stores[0].ID;
           this.onStoreValueChanged({ value: this.StoreIDData });
