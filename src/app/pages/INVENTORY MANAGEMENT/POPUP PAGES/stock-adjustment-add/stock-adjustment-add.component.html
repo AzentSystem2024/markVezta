@@ -145,7 +145,9 @@
           dataField="SL_NO"
           caption="Sl No"
           alignment="center"
+          [allowEditing]="false"
           [width]="70"
+          cellTemplate="slNoTemplate"
         ></dxi-column>
         <dxi-column
           dataField="MATRIX_CODE"
@@ -245,6 +247,10 @@
             alignment="right"
           ></dxi-total-item>
         </dxo-summary>
+
+        <div *dxTemplate="let data of 'slNoTemplate'">
+          {{ data.rowIndex + 1 }}
+        </div>
       </dx-data-grid>
 
       <!-- Narration Row -->

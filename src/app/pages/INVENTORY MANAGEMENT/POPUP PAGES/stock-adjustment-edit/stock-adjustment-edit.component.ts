@@ -96,9 +96,13 @@ export class StockAdjustmentEditComponent {
   };
 
   getSaveButtonText(): string {
-    // if (this.readOnlyTrue || this.selectedStatus === 5) {
-    //   return 'PDF';
-    // }
+    if (this.status === 'verifyscreen') {
+      return this.isSaving ? 'Verifying...' : 'Verify';
+    }
+
+    if (this.status === 'ApproveScreen' || this.status === 'Approve') {
+      return this.isSaving ? 'Approving...' : 'Approve';
+    }
 
     if (this.isSaving) {
       if (this.selectedStatus === 2 || this.approveValue) {
@@ -234,6 +238,13 @@ export class StockAdjustmentEditComponent {
       this.adjustmentFormData = this.EditingResponseData;
       console.log(this.EditingResponseData);
       console.log(this.adjustmentFormData);
+      
+      if (this.adjustmentFormData.Details && this.adjustmentFormData.Details.length > 0) {
+        this.adjustmentFormData.Details.forEach((item: any, i: number) => {
+          item.SL_NO = i + 1;
+        });
+      }
+
       this.selecte_Date_Details = this.adjustmentFormData.Details;
       this.selectedStatus = this.adjustmentFormData.STATUS;
       const editable = this.adjustmentFormData.STATUS;

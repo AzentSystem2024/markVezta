@@ -497,6 +497,7 @@ export class TransferInInventoryFormComponent {
                 BATCH_NO: '0',
                 EXPIRY_DATE: new Date(),
                 netAmount: cost * savedQty,
+                ITEM_CODE: item.ITEM_CODE,
               });
             });
 

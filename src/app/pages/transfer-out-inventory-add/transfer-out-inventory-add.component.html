@@ -161,7 +161,12 @@
           [width]="70"
         ></dxi-column>
         <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
-
+<dxi-column
+          dataField="ITEM_CODE"
+          caption="Item Code"
+          alignment="center"
+          [width]="130"
+        ></dxi-column>
         <dxi-column
           dataField="BARCODE"
           caption="Barcode"
@@ -285,10 +290,11 @@
             ></dx-button>
           </div>
           <dx-button
+          *ngIf="!isReadOnlyMode"
             #saveButtonRef
             [text]="getSaveButtonText()"
             [disabled]="isSaving"
-            (onClick)="isReadOnlyMode ? openPDF() : saveTransferOut()"
+            (onClick)="saveTransferOut()"
             stylingMode="contained"
             type="default"
           ></dx-button>
