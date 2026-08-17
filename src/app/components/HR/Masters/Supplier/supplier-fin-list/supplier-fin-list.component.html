@@ -48,6 +48,10 @@
         widget="dxButton"
         [options]="refreshButtonOptions"
       ></dxi-item>
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
 
       <!-- Export (built-in, kept) -->
       <dxi-item
@@ -55,10 +59,7 @@
         location="after"
         cssClass="toolbar-icon-btn export-btn"
       ></dxi-item>
-      <!-- Divider -->
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
+
       <!-- Add -->
       <dxi-item
         location="after"
@@ -133,7 +134,7 @@
     [(visible)]="isAddSupplierPopupOpened"
     [showApprove]="false"
     [width]="'90vw'"
-    [height]="'90vh'"
+    [height]="'auto'"
     (save)="onClickSaveSupplier()"
     titleText="New Supplier"
     (cancel)="onCancelSupplier()"
@@ -148,7 +149,7 @@
   <dx-popup
     [(visible)]="isEditSupplierPopupOpened"
     [width]="'90vw'"
-    [height]="'90vh'"
+    [height]="'auto'"
     [showTitle]="true"
     title="Edit Supplier"
   >
