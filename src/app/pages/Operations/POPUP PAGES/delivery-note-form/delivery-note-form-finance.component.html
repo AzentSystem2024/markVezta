@@ -100,17 +100,29 @@
                         display: flex;
                         align-items: center;
                         justify-content: flex-end;
+                        margin-left: auto;
+                        margin-top: auto;
                       "
                     >
                       <dx-button
                         text="Pending SO"
-                        icon="event"
-                        stylingMode="outlined"
+                        stylingMode="contained"
                         class="blue-outline-btn"
                         [disabled]="isReadOnlyMode"
                         (onClick)="addSalesOrder()"
                         [width]="200"
-                      ></dx-button>
+                      >
+                        <span
+                          *dxTemplate="let data of 'content'"
+                          class="pending-so-content"
+                        >
+                          <span
+                            class="iconify"
+                            data-icon="mingcute:time-line"
+                          ></span>
+                          <span>Pending SO</span>
+                        </span></dx-button
+                      >
                     </dxi-item>
                   </div>
                 </div>
