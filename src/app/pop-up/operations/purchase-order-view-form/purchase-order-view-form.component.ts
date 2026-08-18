@@ -174,6 +174,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   logoImg: string;
   PoID: any;
   expandedRowKey: null;
+  appType: any;
 
   constructor(
     private service: DataService,
@@ -366,6 +367,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       this.menuResponse.GeneralSettings.STORE_TITLE,
     );
     this.vatTitle = this.menuResponse.GeneralSettings.VAT_TITLE;
+    this.appType = this.menuResponse.Configuration[0].APP_TYPE
+    console.log(this.appType,"APPTYPE")
     this.storeOrLocation = this.menuResponse.GeneralSettings.STORE_TITLE;
     // this.sessionData_tax()
     const menuGroups = this.menuResponse.MenuGroups || [];
@@ -1247,7 +1250,16 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     doc.output('dataurlnewwindow');
   }
   async loadLogo() {
-    const response = await fetch('assets/images/dmgt_logo.jpeg');
+    let logoPath = 'assets/images/dmgt_logo.jpeg';
+    if (this.appType === 'MARK') {
+      logoPath = 'assets/images/logo (dark).png';
+    } else if (this.appType === 'VEZTA') {
+      logoPath = 'assets/images/logo.png';
+    } else if (this.appType === 'DMGT') {
+      logoPath = 'assets/images/dmgt_logo.jpeg';
+    }
+
+    const response = await fetch(logoPath);
     const blob = await response.blob();
 
     return new Promise<string>((resolve) => {
@@ -1286,8 +1298,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     // LOGO (RIGHT)
     // =========================
     if (this.logoImg && this.logoImg.startsWith('data:image')) {
-      // doc.addImage(this.logoImg, 'JPEG', pageWidth - 45, 10, 30, 22);
-      doc.addImage(this.logoImg, 'JPEG', 10, 8, 35, 40);
+      const imgFormat = this.logoImg.includes('png') ? 'PNG' : 'JPEG';
+      doc.addImage(this.logoImg, imgFormat, 10, 8, 35, 40);
     }
 
     // =========================

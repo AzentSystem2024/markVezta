@@ -522,7 +522,13 @@ export class PhysicalInventoryFormComponent {
         return;
       }
 
-      const payload = { BarCodes: barcodes };
+      const payload = {
+        BarCodes: barcodes,
+        STORE_ID:
+          this.StoreIDData ||
+          this.inventoryFormData?.STORE_ID ||
+          this.storeFromSession,
+      };
 
       this.dataService.getItemsForInventoryExcelUpload(payload).subscribe(
         (response: any) => {
