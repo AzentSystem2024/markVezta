@@ -94,7 +94,23 @@
 .popup-footer {
   display: flex;
   gap: 10px;
+  align-items: flex-end;
 }
+
+/* Approve above Cancel */
+.approve-cancel-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.approve-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 ::ng-deep .dx-data-grid .dx-row > td,
 ::ng-deep .dx-data-grid .dx-header-row > td {
   border-right: 1px solid #ccc !important;

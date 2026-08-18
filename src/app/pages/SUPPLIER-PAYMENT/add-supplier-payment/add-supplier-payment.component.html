@@ -315,19 +315,23 @@
 </dx-validation-group>
 
 <div class="form-popup-buttons-container">
-  <div class="approve-container" *ngIf="canApprove">
-    <dx-check-box
-      text="Approve"
-      [(value)]="paymentFormData.IS_APPROVED"
-    ></dx-check-box>
-  </div>
   <div class="popup-footer">
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      (onClick)="handleCancel()"
-      type="normal"
-    ></dx-button>
+    <!-- Approve + Cancel column -->
+    <div class="approve-cancel-group">
+      <div class="approve-container" *ngIf="canApprove">
+        <dx-check-box
+          text="Approve"
+          [(value)]="paymentFormData.IS_APPROVED"
+        ></dx-check-box>
+      </div>
+      <!-- Cancel -->
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        (onClick)="handleCancel()"
+        type="normal"
+      ></dx-button>
+    </div>
     <dx-button
       #saveButtonRef
       [text]="
@@ -344,14 +348,6 @@
       type="default"
       (onClick)="saveReceipt()"
     ></dx-button>
-
-    <!-- <dx-button
-      #saveButtonRef
-      [text]="paymentFormData.IS_APPROVED ? 'Commit' : 'Save'"
-      stylingMode="contained"
-      type="default"
-      (onClick)="saveReceipt()"
-    ></dx-button> -->
   </div>
 </div>
 
