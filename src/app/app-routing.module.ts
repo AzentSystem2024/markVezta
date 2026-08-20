@@ -226,6 +226,7 @@ import { RefundComponent } from './pages/Operations/Deposit/refund/refund.compon
 import { SupplierwiseSalesComponent } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
 import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/supplierwise-stock.component';
 import { ProfitLossDepartmentwiseComponent } from './pages/REPORT/profit-loss-departmentwise/profit-loss-departmentwise.component';
+import { EmailSettingComponent } from './email-setting/email-setting.component';
 
 const routes: Routes = [
   {
@@ -1388,6 +1389,11 @@ const routes: Routes = [
         path: 'departmentwise-profitandloss',
         component: ProfitLossDepartmentwiseComponent,
         canActivate: [AuthGuardService],
+      },
+      {
+        path: 'email-settings',
+        component: EmailSettingComponent,
+        // canActivate: [AuthGuardService],
       },
       {
         path: '**',

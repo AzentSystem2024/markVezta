@@ -115,6 +115,8 @@ export class DataService {
     return this.http.post(`${this.apiUrl}accountGroup/Insert`, data);
   }
 
+
+
   selectAccountHead(id: number) {
     return this.http.post<any>(`${this.apiUrl}accountHead/select/` + id, {});
   }
@@ -7485,5 +7487,23 @@ The result can be exported to HTML or Markdown.`;
       CompanyId: companyId,
       FinancialYearId: financialYearId
     }, { headers });
+  }
+
+
+
+  //----------------------EMAIL-SETTINGS-------------------------------//
+  getEmailSettings(): Observable<any> {
+    return this.http.post(`${this.apiUrl}EmailSettings/list`, {});
+  }
+    insertEmailSettings(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}EmailSettings/insert`, data);
+  }
+
+  selectEmailSettings(id: number) {
+      return this.http.post<any>(`${this.apiUrl}EmailSettings/select/` + id, {});
+  }
+
+  updateEmailSettings(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}EmailSettings/update`, data);
   }
 }

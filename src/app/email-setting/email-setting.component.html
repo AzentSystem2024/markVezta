@@ -1,0 +1,226 @@
+<div class="view-wrapper list-page">
+    <div class="grid-container">
+        <dx-data-grid
+      #dataGrid
+      noDataText="No data available"
+      [width]="'100%'"
+      [height]="'82vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true,
+      }"
+      class="grid theme-dependent"
+      [dataSource]="emailDataSource"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      [allowColumnReordering]="true"
+      [showColumnHeaders]="true"
+      [columnAutoWidth]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'nextColumn'"
+      [filterRow]="{ visible: false }"
+      [headerFilter]="{ visible: false }"
+      [scrolling]="{ mode: 'virtual' }"
+      rowAlternationInterval="2"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      [scrolling]="{ mode: 'virtual' }"
+      (onEditingStart)="onEditEmailSetting($event)"
+    >
+    <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-header-filter [visible]="isFilterOpened">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-filter-builder [allowHierarchicalFields]="true">
+      </dxo-filter-builder>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Email Settings
+          </div>
+        </dxi-item>
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
+        >
+          <!-- This controls the dropdown list rendering -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
+
+      <!-- Data Columns -->
+      <dxi-column
+        dataField="TYPE_NAME"
+        caption="Email Type"
+      >
+       
+      </dxi-column>
+
+      <dxi-column
+        dataField="SENDER_ID"
+        caption="Sender ID"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="SENDER_NAME"
+        caption="Sender Name"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="SMTP_HOST"
+        caption="SMTP Host"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="SMTP_PORT"
+        caption="SMTP Port"
+        alignment="center"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="RECEIVER_ID"
+        caption="Receiver ID"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="EMAIL_SUBJECT"
+        caption="Subject"
+      ></dxi-column>
+
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="100"
+        cellTemplate="actionTemplate"
+      >
+      </dxi-column>
+
+      <div *dxTemplate="let cellData of 'actionTemplate'">
+        <div class="action-icons">
+          <!-- Edit -->
+          <i
+            *ngIf="canEdit"
+            class="dx-icon dx-icon-edit"
+            title="Edit"
+            (click)="onEditEmailSetting({ data: cellData.data, cancel: false })"
+          ></i>
+        </div>
+      </div>
+    </dx-data-grid>
+  </div>
+</div>
+<dx-popup
+  *ngIf="isAddSettings"
+  [(visible)]="isAddSettings"
+  [width]="'90vw'"
+  [height]="'95vh'"
+  title="Email Settings"
+  (onHiding)="handleClose()"
+>
+  <app-email-setting-form
+    [isEditing]="false"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  ></app-email-setting-form>
+</dx-popup>
+<dx-popup
+  *ngIf="isEditSettings"
+  [(visible)]="isEditSettings"
+  [width]="'90vw'"
+  [height]="'95vh'"
+  title="Edit Email Settings"
+  (onHiding)="handleClose()"
+>
+  <app-email-setting-form
+    [isEditing]="true"
+    [EditingResponseData]="selectedEmailSetting"
+    (popupClosed)="handleClose()"
+    [canApprove]="canApprove"
+  ></app-email-setting-form>
+</dx-popup>
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>
