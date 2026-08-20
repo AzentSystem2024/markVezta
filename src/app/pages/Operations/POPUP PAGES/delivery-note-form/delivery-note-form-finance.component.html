@@ -179,7 +179,7 @@
           ></dxi-column> -->
           <dxi-column
             dataField="REMARKS"
-            caption="Remarks"
+            caption="Narration"
             [allowEditing]="false"
           ></dxi-column>
           <dxi-column
@@ -250,7 +250,7 @@
             <dx-text-box
               #narrationRef
               [(value)]="deliveryFormData.NARRATION"
-              label="Remarks"
+              label="Narration"
               labelMode="floating"
               class="narration-box"
               [readOnly]="isReadOnlyMode"
@@ -420,6 +420,6 @@
     <dxi-column dataField="UOM" caption="UOM"></dxi-column>
     <dxi-column dataField="QTY_STOCK" caption="Stock Qty"></dxi-column>
     <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
-    <dxi-column dataField="REMARKS" caption="Remarks"></dxi-column>
+    <dxi-column dataField="REMARKS" caption="Narration"></dxi-column>
   </dx-data-grid>
 </dx-popup>

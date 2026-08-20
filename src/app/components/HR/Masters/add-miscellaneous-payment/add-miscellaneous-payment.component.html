@@ -385,25 +385,27 @@
     >
     </dx-button> -->
 
-    <dx-check-box
-      *ngIf="!isEditing && !isReadOnlyMode && canApprove"
-      [(value)]="miscFormData.IS_APPROVED"
-      text="Approve"
-      style="margin-top: 10px"
-    ></dx-check-box>
-    <dx-check-box
-      *ngIf="isEditing && !isReadOnlyMode && canApprove"
-      [(value)]="isApproved"
-      text="Approve"
-      style="margin-top: 10px"
-    ></dx-check-box>
+    <div class="approve-cancel-group">
+      <dx-check-box
+        *ngIf="!isEditing && !isReadOnlyMode && canApprove"
+        [(value)]="miscFormData.IS_APPROVED"
+        text="Approve"
+        style="margin-top: 10px"
+      ></dx-check-box>
+      <dx-check-box
+        *ngIf="isEditing && !isReadOnlyMode && canApprove"
+        [(value)]="isApproved"
+        text="Approve"
+        style="margin-top: 10px"
+      ></dx-check-box>
 
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      type="normal"
-      (onClick)="cancel()"
-    ></dx-button>
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        type="normal"
+        (onClick)="cancel()"
+      ></dx-button>
+    </div>
     <dx-button
       *ngIf="mode !== 'view'"
       #saveButtonRef
