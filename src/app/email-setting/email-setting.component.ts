@@ -13,6 +13,8 @@ import { exportDataGrid } from 'devextreme/excel_exporter';
 import saveAs from 'file-saver';
 import DataSource from 'devextreme/data/data_source';
 import { EmailSettingFormModule } from '../email-setting-form/email-setting-form.component';
+import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
   selector: 'app-email-setting',
@@ -177,6 +179,48 @@ export class EmailSettingComponent {
         this.isEditSettings = true;
         this.cdr.detectChanges();
       });
+  }
+
+    onDeleteSettings(event: any) {
+   
+
+    event.cancel = true;
+
+    confirm(
+      'Are you sure you want to delete this record?',
+      'Confirm Delete',
+    ).then((dialogResult: boolean) => {
+      if (dialogResult) {
+        const emailTypeId = event.data.EMAIL_TYPE;
+
+        this.dataService.deleteEmailSettings(emailTypeId).subscribe(
+          (response: any) => {
+            if (response) {
+              notify(
+                {
+                  message: 'Email Settings Deleted Successfully',
+                  position: { at: 'top center', my: 'top center' },
+                },
+                'success',
+              );
+
+              this.getEmailSettingsList();
+            } else {
+              notify(
+                {
+                  message: 'Your Data Not deleted',
+                  position: { at: 'top right', my: 'top right' },
+                },
+                'error',
+              );
+            }
+          },
+          (error) => {
+            console.error('Error deleting invoice:', error);
+          },
+        );
+      }
+    });
   }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;

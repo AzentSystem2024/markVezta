@@ -1,8 +1,8 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, NgModule, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { DxSelectBoxModule, DxTextAreaModule, DxDateBoxModule, DxFormModule, DxTextBoxModule, DxCheckBoxModule, DxRadioGroupModule, DxFileUploaderModule, DxDataGridModule, DxButtonModule, DxValidatorModule, DxProgressBarModule, DxPopupModule, DxDropDownBoxModule, DxToolbarModule, DxTabPanelModule, DxTabsModule, DxNumberBoxModule } from 'devextreme-angular';
-import { DxoItemModule, DxoFormItemModule, DxoLookupModule, DxiItemModule, DxiGroupModule, DxoSummaryModule } from 'devextreme-angular/ui/nested';
+import { DxSelectBoxModule, DxTextAreaModule, DxDateBoxModule, DxFormModule, DxTextBoxModule, DxCheckBoxModule, DxRadioGroupModule, DxFileUploaderModule, DxDataGridModule, DxButtonModule, DxValidatorModule, DxValidationGroupModule, DxProgressBarModule, DxPopupModule, DxDropDownBoxModule, DxToolbarModule, DxTabPanelModule, DxTabsModule, DxNumberBoxModule } from 'devextreme-angular';
+import { DxoItemModule, DxoFormItemModule, DxoLookupModule, DxiItemModule, DxiGroupModule, DxoSummaryModule, DxiButtonModule } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../components';
 import { AddInvoiceRetailComponent } from '../pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
 import { DataService } from '../services';
@@ -18,7 +18,11 @@ export class EmailSettingFormComponent implements OnInit {
   @Input() isEditing: boolean = false;
   @Input() canApprove: boolean = false;
   @Input() EditingResponseData: any;
+  @Input() existingSettings: any[] = [];
   @Output() popupClosed = new EventEmitter<void>();
+
+  existingSettingsList: any[] = [];
+  originalEmailType: any = null;
 
   emailTypeList: any[] = [];
   emailType: any = null;
@@ -32,23 +36,124 @@ export class EmailSettingFormComponent implements OnInit {
   subject: string = '';
   receiverId: string = '';
   messageBody: string = '';
+  isTestingEmail: boolean = false;
+
+  isPasswordVisible: boolean = false;
+  isConfirmPasswordVisible: boolean = false;
+
+  passwordButtonOptions: any = {
+    icon: 'eyeopen',
+    stylingMode: 'text',
+    hint: 'Toggle password visibility',
+    onClick: () => {
+      this.isPasswordVisible = !this.isPasswordVisible;
+      this.passwordButtonOptions = {
+        ...this.passwordButtonOptions,
+        icon: this.isPasswordVisible ? 'eyeclose' : 'eyeopen',
+      };
+    },
+  };
+
+  confirmPasswordButtonOptions: any = {
+    icon: 'eyeopen',
+    stylingMode: 'text',
+    hint: 'Toggle password visibility',
+    onClick: () => {
+      this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible;
+      this.confirmPasswordButtonOptions = {
+        ...this.confirmPasswordButtonOptions,
+        icon: this.isConfirmPasswordVisible ? 'eyeclose' : 'eyeopen',
+      };
+    },
+  };
 
   constructor(private dataService: DataService) {}
 
+  passwordComparison = () => {
+    return this.password;
+  };
+
+  get isPasswordMatching(): boolean {
+    return Boolean(this.password && this.confirmPassword && this.password === this.confirmPassword);
+  }
+
+  validateEmailTypeNotDuplicate = (e: any) => {
+    const selectedTypeId = e.value;
+    if (!selectedTypeId) return true;
+
+    if (this.isEditing && this.originalEmailType != null && String(this.originalEmailType) === String(selectedTypeId)) {
+      return true;
+    }
+
+    const duplicate = (this.existingSettingsList || []).find((item: any) => {
+      const itemTypeId = item.EMAIL_TYPE ?? item.TYPE_ID ?? item.ID;
+      return itemTypeId != null && String(itemTypeId) === String(selectedTypeId);
+    });
+
+    if (duplicate) {
+      const typeObj = (this.emailTypeList || []).find((t: any) => String(t.ID) === String(selectedTypeId));
+      const typeName = typeObj?.DESCRIPTION || duplicate.TYPE_NAME || typeObj?.NAME || 'selected type';
+      e.rule.message = `already created settings for '${typeName}'`;
+      return false;
+    }
+
+    return true;
+  };
+
+  validateReceiverEmails = (e: any) => {
+    const rawValue = (e.value || '').trim();
+    if (!rawValue) return true;
+
+    const emails = rawValue.split(',').map((email: string) => email.trim());
+
+    for (const email of emails) {
+      if (!email) {
+        e.rule.message = 'Please remove extra or trailing commas between email addresses';
+        return false;
+      }
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    for (const email of emails) {
+      if (!emailRegex.test(email)) {
+        e.rule.message = `'${email}' is not a valid email address`;
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   ngOnInit() {
     this.getEmailTypeDropdown();
+    this.loadExistingSettings();
     this.isEditDataAvailable();
+  }
+
+  loadExistingSettings() {
+    if (this.existingSettings && this.existingSettings.length > 0) {
+      this.existingSettingsList = this.existingSettings;
+    } else {
+      this.dataService.getEmailSettings().subscribe({
+        next: (response: any) => {
+          const list = response?.DataList || response?.Data || response?.data || (Array.isArray(response) ? response : []);
+          this.existingSettingsList = list;
+        },
+        error: (err) => console.error('Error loading existing email settings:', err)
+      });
+    }
   }
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
     const data = this.EditingResponseData;
     this.emailType = data.EMAIL_TYPE ?? null;
+    this.originalEmailType = this.emailType;
     this.senderId = data.SENDER_ID ?? '';
     this.enableSsl = Boolean(data.ENABLE_SSL);
     this.senderName = data.SENDER_NAME ?? '';
     this.password = data.SENDER_PASSWORD || data.PASSWORD || '';
-    this.confirmPassword = this.password;
+    this.confirmPassword = '';
     this.smtpHost = data.SMTP_HOST ?? '';
     this.smtpPort = data.SMTP_PORT ? String(data.SMTP_PORT) : '';
     this.subject = data.EMAIL_SUBJECT || data.SUBJECT || '';
@@ -66,23 +171,28 @@ export class EmailSettingFormComponent implements OnInit {
     })
   }
 
-  onSave() {
-    if (!this.emailType) {
-      notify('Please select an Email Type', 'warning', 2000);
-      return;
+  onSave(validationGroup?: any) {
+    if (validationGroup) {
+      const result = validationGroup.instance.validate();
+      if (!result.isValid) {
+        return;
+      }
     }
 
-    if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
-      notify('Password and Confirm Password do not match', 'error', 2000);
-      return;
-    }
+    const cleanReceiverId = this.receiverId
+      ? this.receiverId
+          .split(',')
+          .map((email: string) => email.trim())
+          .filter(Boolean)
+          .join(',')
+      : '';
 
     const payload: any = {
       EMAIL_TYPE: this.emailType,
       SENDER_ID: this.senderId,
       SENDER_NAME: this.senderName,
       SENDER_PASSWORD: this.password,
-      RECEIVER_ID: this.receiverId,
+      RECEIVER_ID: cleanReceiverId,
       EMAIL_SUBJECT: this.subject,
       EMAIL_CONTENT: this.messageBody,
       SMTP_PORT: Number(this.smtpPort) || 0,
@@ -117,6 +227,63 @@ export class EmailSettingFormComponent implements OnInit {
     }
   }
 
+  onTestEmail(validationGroup?: any) {
+    if (validationGroup) {
+      const result = validationGroup.instance.validate();
+      if (!result.isValid) {
+        return;
+      }
+    }
+
+    if (!this.enableSsl) {
+      notify('Please enable SSL to test email', 'warning', 2000);
+      return;
+    }
+
+    const cleanReceiverId = this.receiverId
+      ? this.receiverId
+          .split(',')
+          .map((email: string) => email.trim())
+          .filter(Boolean)
+          .join(',')
+      : '';
+
+    const payload: any = {
+      EMAIL_TYPE: this.emailType,
+      SENDER_ID: this.senderId,
+      SENDER_NAME: this.senderName,
+      SENDER_PASSWORD: this.password,
+      RECEIVER_ID: cleanReceiverId,
+      EMAIL_SUBJECT: this.subject,
+      EMAIL_CONTENT: this.messageBody,
+      SMTP_PORT: Number(this.smtpPort) || 0,
+      SMTP_HOST: this.smtpHost,
+      ENABLE_SSL: true,
+    };
+
+    console.log('Test Email Payload:', payload);
+    this.isTestingEmail = true;
+    this.dataService.testEmail(payload).subscribe({
+      next: (response: any) => {
+        this.isTestingEmail = false;
+        notify(
+          response?.Message || response?.message || 'Test email sent successfully',
+          'success',
+          2000,
+        );
+      },
+      error: (error: any) => {
+        this.isTestingEmail = false;
+        console.error('Error sending test email:', error);
+        notify(
+          error?.error?.Message || error?.error?.message || 'Failed to send test email',
+          'error',
+          2000,
+        );
+      },
+    });
+  }
+
   onCancel() {
     this.popupClosed.emit();
   }
@@ -139,6 +306,7 @@ export class EmailSettingFormComponent implements OnInit {
     DxoFormItemModule,
     DxoLookupModule,
     DxValidatorModule,
+    DxValidationGroupModule,
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
@@ -149,6 +317,7 @@ export class EmailSettingFormComponent implements OnInit {
     DxTabPanelModule,
     DxTabsModule,
     DxiGroupModule,
+    DxiButtonModule,
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,

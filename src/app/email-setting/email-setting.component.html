@@ -32,6 +32,7 @@
       focusStateEnabled="false"
       [scrolling]="{ mode: 'virtual' }"
       (onEditingStart)="onEditEmailSetting($event)"
+      (onRowRemoving)="onDeleteSettings($event)"
     >
     <dxo-editing
         mode="popup"
@@ -183,6 +184,14 @@
             title="Edit"
             (click)="onEditEmailSetting({ data: cellData.data, cancel: false })"
           ></i>
+
+          <!-- Delete -->
+          <i
+            *ngIf="canDelete"
+            class="dx-icon dx-icon-trash"
+            title="Delete"
+            (click)="onDeleteSettings({ data: cellData.data, cancel: false })"
+          ></i>
         </div>
       </div>
     </dx-data-grid>
@@ -198,6 +207,7 @@
 >
   <app-email-setting-form
     [isEditing]="false"
+    [existingSettings]="settingsArray"
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
   ></app-email-setting-form>
@@ -213,6 +223,7 @@
   <app-email-setting-form
     [isEditing]="true"
     [EditingResponseData]="selectedEmailSetting"
+    [existingSettings]="settingsArray"
     (popupClosed)="handleClose()"
     [canApprove]="canApprove"
   ></app-email-setting-form>

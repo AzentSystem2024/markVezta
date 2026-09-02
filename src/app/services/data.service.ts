@@ -7506,4 +7506,12 @@ The result can be exported to HTML or Markdown.`;
   updateEmailSettings(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/update`, data);
   }
+
+    deleteEmailSettings(id: number) {
+    return this.http.post<any>(`${this.apiUrl}EmailSettings/delete/` + id, {});
+  }
+
+    testEmail(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}EmailSettings/TestMail`, data);
+  }
 }
