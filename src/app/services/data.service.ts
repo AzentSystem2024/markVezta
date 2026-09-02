@@ -7514,4 +7514,8 @@ The result can be exported to HTML or Markdown.`;
     testEmail(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/TestMail`, data);
   }
+  
+  sendEmailWithAttachment(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}EmailSettings/SendEmailWithAttachment`, formData);
+  }
 }

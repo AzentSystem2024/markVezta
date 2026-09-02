@@ -640,13 +640,62 @@
     </div>
     
     <dxi-toolbar-item toolbar="bottom" location="after">
-      <dx-button
-        text="Print"
-        icon="print"
-        type="default"
-        stylingMode="contained"
-        (onClick)="printPdf()"
-      ></dx-button>
+      <div style="display: flex; gap: 10px;">
+        <dx-button text="Print" icon="print" type="default" stylingMode="contained" (onClick)="printPdf()"></dx-button>
+        <dx-button text="Send" icon="email" type="success" stylingMode="contained" (onClick)="sendPdf()"></dx-button>
+      </div>
     </dxi-toolbar-item>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isEmailPopupVisible"
+  title="Send Email"
+  [width]="'50vw'"
+  [height]="'auto'"
+  [showCloseButton]="true"
+>
+  <div class="popup-content" style="padding: 10px;">
+    <div style="margin-bottom: 15px;">
+      <label>Receivers (Select Multiple):</label>
+      <dx-tag-box
+        [items]="emailReceivers"
+        [(value)]="selectedEmails"
+        placeholder="Select Receivers..."
+        [searchEnabled]="true"
+        [showSelectionControls]="true"
+        [multiline]="false">
+      </dx-tag-box>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label>Subject:</label>
+      <dx-text-box [(value)]="emailSubject" [readOnly]="true"></dx-text-box>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label>Body:</label>
+      <dx-text-area [(value)]="emailBody" [height]="120" [readOnly]="true"></dx-text-area>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label>Attachment:</label>
+      <div>
+        <i class="dx-icon-doc" style="font-size: 18px; margin-right: 5px;"></i>
+        <span>{{ selectedTemplate || 'PurchaseInvoice' }}.pdf</span>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
+      <dx-button text="Send" icon="email" type="success" stylingMode="contained" [disabled]="isSendingEmail" (onClick)="sendEmailConfirm()">
+        <div *dxTemplate="let data of 'content'">
+          <i *ngIf="isSendingEmail" class="dx-icon-refresh dx-icon-spin" style="margin-right: 5px;"></i>
+          <i *ngIf="!isSendingEmail" class="dx-icon-email" style="margin-right: 5px;"></i>
+          <span *ngIf="isSendingEmail">Sending...</span>
+          <span *ngIf="!isSendingEmail">Send</span>
+        </div>
+      </dx-button>
+      <dx-button text="Cancel" type="danger" stylingMode="outlined" (onClick)="isEmailPopupVisible = false"></dx-button>
+    </div>
   </div>
 </dx-popup>

@@ -31,6 +31,7 @@ import {
   DxTabPanelModule,
   DxPopupModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import { FormTextboxModule } from 'src/app/components';
 import { PurchaseOrderVerifyFormComponent } from '../purchase-order-verify-form/purchase-order-verify-form.component';
@@ -132,6 +133,15 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   pdfPreviewUrl: SafeResourceUrl | null = null;
   isLoadingPdf: boolean = false;
   pdfBlobUrl: string = '';
+  currentPdfBlob: Blob | null = null;
+
+  isEmailPopupVisible: boolean = false;
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  isSendingEmail: boolean = false;
+  emailSettingsData: any = null;
 
   fileDetails: any = {
     DOC_ID: '',
@@ -1307,10 +1317,19 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.isLoadingPdf = true;
     
     const poNo = this.formdata?.DOC_NO || this.formdata?.PO_NO || '';
+    
+    if (!this.poId || this.poId === 0) {
+      alert("Please save the document before generating a preview.");
+      this.isPreviewPopupVisible = false;
+      this.isLoadingPdf = false;
+      return;
+    }
+
     const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?poId=${this.poId}&poNo=${encodeURIComponent(poNo)}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
         const objectUrl = URL.createObjectURL(blob);
         this.pdfBlobUrl = objectUrl;
         this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
@@ -1346,9 +1365,65 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   }
 
   sendPdf(): void {
-    // Stub for send functionality
-    console.log("Send PDF triggered");
-    alert("Send functionality is not fully implemented yet.");
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+    
+    // Purchase Order Email Type ID is 17
+    this.service.selectEmailSettings(17).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSettingsData = res.Data;
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      alert("Please select at least one recipient.");
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      alert("No PDF generated to attach.");
+      return;
+    }
+
+    this.isSendingEmail = true;
+    
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject);
+    formData.append('Body', this.emailBody);
+    formData.append('EmailType', '17'); 
+    
+    const fileName = `${this.selectedTemplate || 'PurchaseOrder'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    
+    this.service.sendEmailWithAttachment(formData).subscribe((res: any) => {
+      this.isSendingEmail = false;
+      if (res && res.flag === 1) {
+        alert("Email sent successfully!");
+        this.isEmailPopupVisible = false;
+      } else {
+        alert("Failed to send email: " + (res?.Message || "Unknown error"));
+      }
+    }, (error) => {
+      this.isSendingEmail = false;
+      console.error("Email send error", error);
+      alert("Error sending email.");
+    });
   }
 
   closePdfPreview(): void {
@@ -1356,6 +1431,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     if (this.pdfBlobUrl) {
       URL.revokeObjectURL(this.pdfBlobUrl);
       this.pdfBlobUrl = '';
+      this.currentPdfBlob = null;
       this.pdfPreviewUrl = null;
     }
   }
@@ -1987,6 +2063,7 @@ function numberToWordsIndianNumber(num: number) {
     DxTabPanelModule,
     DxPopupModule,
     DxButtonModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [PurchaseOrderViewFormComponent],
