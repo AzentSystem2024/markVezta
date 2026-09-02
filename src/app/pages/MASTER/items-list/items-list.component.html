@@ -26,6 +26,10 @@
     [headerFilter]="{ visible: true }"
     [scrolling]="{ mode: 'virtual' }"
     rowAlternationInterval="2"
+    [columnFixing]="{
+      enabled: true,
+      texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+    }"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-header-filter [visible]="true">

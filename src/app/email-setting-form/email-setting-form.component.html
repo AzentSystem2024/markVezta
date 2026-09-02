@@ -1,0 +1,160 @@
+<div class="mail-settings-wrapper">
+  <!-- Email Type Row -->
+  <div class="top-row">
+    <div class="form-row">
+      <label class="section-title">Email Type</label>
+      <div class="dropdown-group">
+        <dx-select-box
+          [dataSource]="emailTypeList"
+          [(value)]="emailType"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [searchEnabled]="true"
+          [width]="380"
+          placeholder="Select Email Type"
+        ></dx-select-box>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Settings Card Box -->
+  <div class="settings-card">
+    <!-- Sender ID Row -->
+    <div class="form-row">
+      <div class="field-col flex-1">
+        <label class="field-label">Sender ID</label>
+        <dx-text-box
+          [(value)]="senderId"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'off' }"
+          placeholder="Enter Sender ID"
+        ></dx-text-box>
+      </div>
+      <div class="checkbox-col">
+        <dx-check-box
+          [(value)]="enableSsl"
+          text="Enable SSL"
+        ></dx-check-box>
+      </div>
+    </div>
+
+    <!-- Sender Name Row -->
+    <div class="form-row">
+      <div class="field-col full-width">
+        <label class="field-label">Sender Name</label>
+        <dx-text-box
+          [(value)]="senderName"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'off', readonly: false }"
+          placeholder="Enter Sender Name"
+        ></dx-text-box>
+      </div>
+    </div>
+
+    <!-- Password and Confirm Password Row -->
+    <div class="form-row two-cols">
+      <div class="field-col half-width">
+        <label class="field-label">Password</label>
+        <dx-text-box
+          mode="password"
+          [(value)]="password"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'new-password' }"
+          placeholder="Enter Password"
+        ></dx-text-box>
+      </div>
+      <div class="field-col half-width right-col">
+        <label class="field-label right-label">Confirm Password</label>
+        <dx-text-box
+          mode="password"
+          [(value)]="confirmPassword"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'new-password' }"
+          placeholder="Confirm Password"
+        ></dx-text-box>
+      </div>
+    </div>
+
+    <!-- SMTP Host and SMTP Port Row -->
+    <div class="form-row two-cols">
+      <div class="field-col half-width">
+        <label class="field-label">SMTP Host</label>
+        <dx-text-box
+          [(value)]="smtpHost"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'off' }"
+          placeholder="Enter SMTP Host"
+        ></dx-text-box>
+      </div>
+      <div class="field-col half-width right-col">
+        <label class="field-label right-label">SMTP Port</label>
+        <dx-text-box
+          [(value)]="smtpPort"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'off' }"
+          placeholder="Enter SMTP Port"
+        ></dx-text-box>
+      </div>
+    </div>
+
+    <!-- Subject Row -->
+    <div class="form-row">
+      <div class="field-col full-width">
+        <label class="field-label">Subject</label>
+        <dx-text-box
+          [(value)]="subject"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'off' }"
+          placeholder="Enter Subject"
+        ></dx-text-box>
+      </div>
+    </div>
+
+    <!-- Receiver ID Row -->
+    <div class="form-row">
+      <div class="field-col full-width">
+        <label class="field-label">Receiver ID</label>
+        <dx-text-box
+          [(value)]="receiverId"
+          class="field-input"
+          [inputAttr]="{ autocomplete: 'off' }"
+          placeholder="Enter Receiver ID"
+        ></dx-text-box>
+      </div>
+    </div>
+
+    <!-- Message Body Row -->
+    <div class="form-row align-top">
+      <div class="field-col full-width align-top">
+        <label class="field-label">Message Body</label>
+        <dx-text-area
+          [height]="120"
+          [(value)]="messageBody"
+          class="field-input"
+          placeholder="Enter Message Body"
+        ></dx-text-area>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Action Buttons Bar -->
+  <div class="mail-settings-footer">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      class="cancel-btn"
+      [width]="110"
+      (onClick)="onCancel()"
+    ></dx-button>
+    <dx-button
+      [text]="isEditing ? 'Update' : 'Save'"
+      stylingMode="contained"
+      type="default"
+      class="save-btn"
+      [width]="110"
+      (onClick)="onSave()"
+    ></dx-button>
+  </div>
+</div>

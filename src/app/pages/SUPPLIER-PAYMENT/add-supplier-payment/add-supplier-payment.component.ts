@@ -174,7 +174,7 @@ export class AddSupplierPaymentComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
@@ -350,7 +350,7 @@ export class AddSupplierPaymentComponent {
         if (event.event.key === 'Enter') {
           const visibleRows = grid.getVisibleRows();
           const rowIndex = visibleRows.findIndex(
-            (r) => r?.data === e.row?.data,
+            (r: any) => r?.data === e.row?.data,
           );
 
           setTimeout(() => {
@@ -937,4 +937,4 @@ export class AddSupplierPaymentComponent {
   exports: [AddSupplierPaymentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddSupplierPaymentModule {}
+export class AddSupplierPaymentModule { }

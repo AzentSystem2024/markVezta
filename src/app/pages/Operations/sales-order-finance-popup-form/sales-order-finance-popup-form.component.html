@@ -290,36 +290,34 @@
                 [width]="400"
                 class="narration-box"
               ></dx-text-box>
-              <!-- <dx-select-box
-                [(value)]="salesOrderFormData.WAREHOUSE"
-                [dataSource]="warehouse"
-                displayExpr="WAREHOUSE_NAME"
-                valueExpr="ID"
-                [width]="400"
-                [searchEnabled]="true"
-                label="Warehouse"
-                labelMode="floating"
-                [readOnly]="isReadOnlyMode"
-              ></dx-select-box> -->
             </div>
 
             <div class="footer-right">
-              <div class="approve-container" *ngIf="canApprove">
-                <dx-check-box
-                  [value]="
-                    isReadOnlyMode ? true : salesOrderFormData.IS_APPROVED
-                  "
-                  (valueChange)="
-                    !isReadOnlyMode
-                      ? (salesOrderFormData.IS_APPROVED = $event)
-                      : null
-                  "
-                  [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
-                  [readOnly]="isReadOnlyMode"
+              <!-- Approve + Cancel -->
+              <div class="approve-cancel-group">
+                <div class="approve-container" *ngIf="canApprove">
+                  <dx-check-box
+                    [value]="
+                      isReadOnlyMode ? true : salesOrderFormData.IS_APPROVED
+                    "
+                    (valueChange)="
+                      !isReadOnlyMode
+                        ? (salesOrderFormData.IS_APPROVED = $event)
+                        : null
+                    "
+                    [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
+                    [readOnly]="isReadOnlyMode"
+                    stylingMode="outlined"
+                    [visible]="!isVerifyMode || !isApproveMode"
+                  >
+                  </dx-check-box>
+                </div>
+                <dx-button
+                  text="Cancel"
+                  (onClick)="cancel()"
                   stylingMode="outlined"
-                  [visible]="!isVerifyMode || !isApproveMode"
-                >
-                </dx-check-box>
+                  type="normal"
+                ></dx-button>
               </div>
               <!-- <dx-check-box
                 *ngIf="isEditing && !isReadOnlyMode"
@@ -375,6 +373,18 @@
                 type="default"
               ></dx-button>
             </div>
+
+            <!-- 🔹 Row 2: Remarks (left) + Buttons (right) -->
+            <!-- <div class="footer-row">
+            <div class="footer-left">
+             
+            </div>
+
+            <div class="footer-right footer-actions">
+             
+
+            </div>
+          </div> -->
           </div>
         </div>
       </div>
