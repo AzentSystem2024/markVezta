@@ -133,32 +133,41 @@
     ></dx-text-box>
   </div>
 
-  <div style="margin-bottom: 1.5rem" *ngIf="canApprove">
-    <dx-check-box text="Approve" [(value)]="PDCFormData.ENTRY_STATUS">
-    </dx-check-box>
-  </div>
+  <div
+    style="
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    "
+  >
+    <div *ngIf="canApprove">
+      <dx-check-box text="Approve" [(value)]="PDCFormData.ENTRY_STATUS">
+      </dx-check-box>
+    </div>
 
-  <!-- Footer: Buttons -->
-  <div style="display: flex; justify-content: flex-end; gap: 10px">
-    <dx-button
-      text="Cancel"
-      type="normal"
-      stylingMode="outlined"
-      (onClick)="cancel()"
-    ></dx-button>
-    <dx-button
-      [text]="
-        popupMode === 'new'
-          ? 'Save'
-          : popupMode === 'verify'
-            ? 'Verify'
-            : popupMode === 'approve'
-              ? 'Approve'
-              : 'Update'
-      "
-      type="default"
-      (onClick)="savePDC()"
-    >
-    </dx-button>
+    <!-- Footer: Buttons -->
+    <div style="display: flex; justify-content: flex-end; gap: 10px">
+      <dx-button
+        text="Cancel"
+        type="normal"
+        stylingMode="outlined"
+        (onClick)="cancel()"
+      ></dx-button>
+      <dx-button
+        [text]="
+          popupMode === 'new'
+            ? 'Save'
+            : popupMode === 'verify'
+              ? 'Verify'
+              : popupMode === 'approve'
+                ? 'Approve'
+                : 'Update'
+        "
+        type="default"
+        (onClick)="savePDC()"
+      >
+      </dx-button>
+    </div>
   </div>
 </div>

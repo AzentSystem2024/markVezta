@@ -35,7 +35,15 @@
         </div>
 
         <!-- Buttons -->
-        <div *ngIf="showSave" style="display: flex; gap: 10px; margin-top: 4px">
+        <div style="display: flex; gap: 10px; margin-top: 4px">
+          <dx-button
+            *ngIf="showPrint"
+            text="Print"
+            stylingMode="contained"
+            type="default"
+            (onClick)="printClick.emit()"
+          ></dx-button>
+
           <dx-button
             text="Cancel"
             stylingMode="outlined"
@@ -47,7 +55,7 @@
             [text]="isSaveDisabled ? 'Disabled' : saveButtonText"
             stylingMode="contained"
             type="default"
-            *ngIf="!isSaveDisabled"
+            *ngIf="showSave && !isSaveDisabled"
             [icon]="isSaveDisabled ? 'spin' : ''"
             (onClick)="onSaveClick()"
           ></dx-button>

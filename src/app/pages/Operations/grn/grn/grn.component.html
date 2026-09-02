@@ -277,6 +277,8 @@
   [width]="width"
   [(isApproved)]="isApproved"
   [showApprove]="canApprove"
+  [showPrint]="selectedRowData?.STATUS === 'Approved' || selectedRowData?.STATUS === 'Closed'"
+  (printClick)="PrintGrn()"
   (save)="editGrnData()"
 >
   <app-grn-verify-form
@@ -316,20 +318,24 @@
   ></app-grn-verify-form>
 </form-popup>
 
-<dx-popup
-  *ngIf="isViewPopupOpened"
-  [(visible)]="isViewPopupOpened"
-  title="View Goods Receipt Note"
-  [height]="'auto'"
-  [width]="width"
->
-  <app-grn-verify-form
-    [formdata]="selectedRowData"
-    [isReadOnly]="true"
-    (closePopup)="isViewPopupOpened = false"
-    [isViewMode]="true"
-  ></app-grn-verify-form>
-</dx-popup>
+  <form-popup
+    *ngIf="isViewPopupOpened"
+    [(visible)]="isViewPopupOpened"
+    titleText="View Goods Receipt Note"
+    [height]="'auto'"
+    [width]="width"
+    [showSave]="false"
+    [showApprove]="false"
+    [showPrint]="true"
+    (printClick)="PrintGrn()"
+  >
+    <app-grn-verify-form
+      [formdata]="selectedRowData"
+      [isReadOnly]="true"
+      (closePopup)="isViewPopupOpened = false"
+      [isViewMode]="true"
+    ></app-grn-verify-form>
+  </form-popup>
 <!-- <dx-popup
   [(visible)]="isViewPopupOpened"
   title="View Goods Receipt Note"
@@ -353,8 +359,8 @@
     <dx-select-box
       [(value)]="selectedTemplate"
       [dataSource]="templateList"
-      displayExpr="TEMPLATE_NAME"
-      valueExpr="TEMPLATE_NAME"
+      displayExpr="name"
+      valueExpr="name"
       placeholder="Select a template"
       [searchEnabled]="true"
     ></dx-select-box>
@@ -365,11 +371,11 @@
       >
         <dx-button
           style="margin-top: 30px"
-          text="Print"
+          text="Preview"
           type="default"
           stylingMode="contained"
           [width]="'100px'"
-          (onClick)="applyTemplate()"
+          (onClick)="previewSelectedTemplate()"
         ></dx-button>
       </div>
     </dxi-toolbar-item>
@@ -377,23 +383,31 @@
 </dx-popup>
 
 <dx-popup
-  [(visible)]="showReportDesigner"
-  title="Print Goods Receipt Note"
-  [height]="'100vh'"
-  [width]="width"
+  [(visible)]="isPreviewPopupVisible"
+  title="Preview Goods Receipt Note"
+  [height]="'80vh'"
+  [width]="'80vw'"
   [showCloseButton]="true"
-  *ngIf="flag"
+  (onHiding)="closePdfPreview()"
 >
-  <div>
-    <dx-report-viewer [reportUrl]="reportName" height="800px">
-      <dxrv-request-options
-        [invokeAction]="getDesignerModelAction"
-        [host]="host"
-      ></dxrv-request-options>
-      <dxrv-callbacks
-        (ParametersInitialized)="OnParametersInitialized($event)"
-      ></dxrv-callbacks>
-    </dx-report-viewer>
+  <div class="popup-content" style="height: 100%; display: flex; flex-direction: column;">
+    <!-- Loader -->
+    <div *ngIf="isLoadingPdf" style="text-align: center; padding: 20px; flex: 1;">
+      <i class="dx-icon-refresh" style="font-size: 24px;"></i> Loading preview...
+    </div>
+
+    <!-- PDF Viewer Iframe -->
+    <div *ngIf="pdfPreviewUrl && !isLoadingPdf" style="flex: 1; min-height: 0;">
+      <iframe [src]="pdfPreviewUrl" style="width: 100%; height: 100%; border: 1px solid #ddd;"></iframe>
+    </div>
+
+    <!-- Custom Action Buttons -->
+    <div *ngIf="pdfPreviewUrl && !isLoadingPdf" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
+      <dx-button text="Print" icon="print" type="default" stylingMode="contained" (onClick)="printPdf()"></dx-button>
+      <dx-button text="Download" icon="download" type="default" stylingMode="outlined" (onClick)="downloadPdf()"></dx-button>
+      <dx-button text="Send" icon="email" type="success" stylingMode="contained" (onClick)="sendPdf()"></dx-button>
+      <dx-button text="Close" type="danger" stylingMode="text" (onClick)="closePdfPreview()"></dx-button>
+    </div>
   </div>
 </dx-popup>
 

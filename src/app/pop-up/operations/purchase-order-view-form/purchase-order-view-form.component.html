@@ -792,3 +792,62 @@
     </dx-button>
   </div>
 </div>
+
+<dx-popup
+  [(visible)]="isTemplatePopupVisible"
+  title="Choose Template"
+  [height]="'auto'"
+  [width]="'30vw'"
+  [showCloseButton]="true"
+>
+  <div class="popup-content">
+    <dx-select-box
+      [(value)]="selectedTemplate"
+      [dataSource]="templateList"
+      displayExpr="name"
+      valueExpr="name"
+      placeholder="Select a template"
+      [searchEnabled]="true"
+    ></dx-select-box>
+    <dxi-toolbar-item toolbar="bottom" location="center">
+      <div class="form-popup-buttons-container" style="display: flex; justify-content: center; margin-top: 30px;">
+        <dx-button
+          text="Preview"
+          type="default"
+          stylingMode="contained"
+          [width]="'150px'"
+          (onClick)="previewSelectedTemplate()"
+        ></dx-button>
+      </div>
+    </dxi-toolbar-item>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isPreviewPopupVisible"
+  title="Preview Purchase Order"
+  [height]="'80vh'"
+  [width]="'80vw'"
+  [showCloseButton]="true"
+  (onHiding)="closePdfPreview()"
+>
+  <div class="popup-content" style="height: 100%; display: flex; flex-direction: column;">
+    <!-- Loader -->
+    <div *ngIf="isLoadingPdf" style="text-align: center; padding: 20px; flex: 1;">
+      <i class="dx-icon-refresh" style="font-size: 24px;"></i> Loading preview...
+    </div>
+
+    <!-- PDF Viewer Iframe -->
+    <div *ngIf="pdfPreviewUrl && !isLoadingPdf" style="flex: 1; min-height: 0;">
+      <iframe [src]="pdfPreviewUrl" style="width: 100%; height: 100%; border: 1px solid #ddd;"></iframe>
+    </div>
+
+    <!-- Custom Action Buttons -->
+    <div *ngIf="pdfPreviewUrl && !isLoadingPdf" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
+      <dx-button text="Print" icon="print" type="default" stylingMode="contained" (onClick)="printPdf()"></dx-button>
+      <dx-button text="Download" icon="download" type="default" stylingMode="outlined" (onClick)="downloadPdf()"></dx-button>
+      <dx-button text="Send" icon="email" type="success" stylingMode="contained" (onClick)="sendPdf()"></dx-button>
+      <dx-button text="Close" type="danger" stylingMode="text" (onClick)="closePdfPreview()"></dx-button>
+    </div>
+  </div>
+</dx-popup>
