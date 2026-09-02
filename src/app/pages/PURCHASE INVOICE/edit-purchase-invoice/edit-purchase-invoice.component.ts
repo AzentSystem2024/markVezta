@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -1695,7 +1696,7 @@ export class EditPurchaseInvoiceComponent {
   }
 
   getTemplateList() {
-    this.http.get<any[]>('http://localhost:5266/api/Reports').subscribe({
+    this.http.get<any[]>(environment.apiUrl + 'Reports').subscribe({
       next: (data) => {
         // Category 19 is for Purchase Invoice
         this.templateList = data.filter((t: any) => t.categoryId === 19);
@@ -1720,7 +1721,7 @@ export class EditPurchaseInvoiceComponent {
     const invId = this.purchaseInvoiceFormData?.ID || 0;
     
     // Using the endpoint and passing invoiceId
-    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?invoiceId=${invId}`;
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?invoiceId=${invId}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {

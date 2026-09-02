@@ -12,6 +12,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -1112,7 +1113,7 @@ export class SalesOrderFinancePopupFormComponent {
   }
 
   getTemplateList() {
-    this.http.get<any[]>('http://localhost:5266/api/Reports').subscribe({
+    this.http.get<any[]>(environment.apiUrl + 'Reports').subscribe({
       next: (data) => {
         this.templateList = data.filter((t: any) => t.categoryId === 11);
         if (this.templateList.length > 0) {
@@ -1133,7 +1134,7 @@ export class SalesOrderFinancePopupFormComponent {
     
     const soId = this.salesOrderFormData?.ID || 0;
     
-    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?salesOrderId=${soId}`;
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?salesOrderId=${soId}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {

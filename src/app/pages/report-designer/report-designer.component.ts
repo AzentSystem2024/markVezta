@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DxReportDesignerModule, DxReportDesignerComponent } from 'devexpress-reporting-angular';
 import { DxDataGridModule, DxPopupModule, DxSelectBoxModule, DxButtonModule, DxTextBoxModule, DxDropDownButtonModule } from 'devextreme-angular';
+import { environment } from 'src/environments/environment';
 
 export enum ReportType {
     SaleQuotation = 10,
@@ -230,7 +231,7 @@ export enum ReportType {
 export class ReportDesignerComponent implements OnInit {
   @ViewChild('reportDesigner', { static: false }) designer!: DxReportDesignerComponent;
   
-  apiHost = 'http://localhost:5266';
+  apiHost = environment.apiUrl.replace(/\/api\/?$/i, '');
   reportTemplates: any[] = [];
   
   isNewPopupVisible = false;

@@ -39,6 +39,7 @@ import jsPDF from 'jspdf';
 import autoTable, { ThemeType, UserOptions } from 'jspdf-autotable';
 import CountryList from 'country-list-with-dial-code-and-flag';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-purchase-order-view-form',
@@ -1280,7 +1281,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     });
   }
   fetchTemplates() {
-    fetch('http://localhost:5266/api/Reports')
+    fetch(environment.apiUrl + 'Reports')
       .then(res => res.json())
       .then(data => {
         // Category 17 is for Purchase Order
@@ -1306,7 +1307,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.isLoadingPdf = true;
     
     const poNo = this.formdata?.DOC_NO || this.formdata?.PO_NO || '';
-    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?poId=${this.poId}&poNo=${encodeURIComponent(poNo)}`;
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?poId=${this.poId}&poNo=${encodeURIComponent(poNo)}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {

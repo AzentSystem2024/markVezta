@@ -5,6 +5,8 @@
     "types": ["node", "xlsx"],
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
+
+    
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,

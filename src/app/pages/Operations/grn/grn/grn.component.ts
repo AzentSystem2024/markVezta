@@ -9,6 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { environment } from 'src/environments/environment';
 import {
   DevexpressReportingModule,
   DxReportViewerComponent,
@@ -941,7 +942,7 @@ export class GrnComponent implements OnInit {
   }
 
   getTemplateList() {
-    this.http.get<any[]>('http://localhost:5266/api/Reports').subscribe({
+    this.http.get<any[]>(environment.apiUrl + 'Reports').subscribe({
       next: (data) => {
         // Category 18 is for Goods Receipt Note
         this.templateList = data.filter((t: any) => t.categoryId === 18);
@@ -966,7 +967,7 @@ export class GrnComponent implements OnInit {
     const grnId = this.selectedRowData?.ID || this.selectedGrnId || this.grnId || 0;
     
     // Using the same endpoint but passing GRN id/no
-    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?grnId=${grnId}&poNo=${encodeURIComponent(grnNo)}`;
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?grnId=${grnId}&poNo=${encodeURIComponent(grnNo)}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {
