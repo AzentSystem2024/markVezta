@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import {
   ChangeDetectorRef,
   Component,
@@ -7,7 +8,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   DevexpressReportingModule,
   DxReportViewerComponent,
@@ -79,6 +80,10 @@ export class GrnComponent implements OnInit {
   isViewPopupOpened: boolean = false;
   showTemplatePopup: boolean = false;
   showReportDesigner: boolean = false;
+  isPreviewPopupVisible: boolean = false;
+  isLoadingPdf: boolean = false;
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  pdfBlobUrl: string = '';
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
   selectedTemplate: any;
@@ -254,6 +259,8 @@ export class GrnComponent implements OnInit {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private sanitizer: DomSanitizer,
+    private http: HttpClient
   ) { }
 
   openGRNForm() {
@@ -929,48 +936,87 @@ export class GrnComponent implements OnInit {
   }
 
   PrintGrn() {
+    this.getTemplateList();
     this.showTemplatePopup = true;
   }
 
   getTemplateList() {
-    this.service.getTemplateList(this.doc).subscribe((res: any) => {
-      this.templateList = res.data;
-      const defaultTemplate = this.templateList.find(
-        (item: any) => item.IS_DEFAULT === true,
-      );
-      if (defaultTemplate) {
-        this.selectedTemplate = defaultTemplate.TEMPLATE_NAME;
-      } else {
-        // Handle the case where no default template is found
-        this.selectedTemplate = null;
+    this.http.get<any[]>('http://localhost:5266/api/Reports').subscribe({
+      next: (data) => {
+        // Category 18 is for Goods Receipt Note
+        this.templateList = data.filter((t: any) => t.categoryId === 18);
+        if (this.templateList.length > 0) {
+          this.selectedTemplate = this.templateList[0].name;
+        } else {
+          this.selectedTemplate = null;
+        }
+      },
+      error: (err) => console.error('Error fetching templates:', err)
+    });
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.showTemplatePopup = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+    
+    // For GRN we use doc no or ID
+    const grnNo = this.selectedRowData?.DOC_NO || this.selectedRowData?.GRN_NO || '';
+    const grnId = this.selectedRowData?.ID || this.selectedGrnId || this.grnId || 0;
+    
+    // Using the same endpoint but passing GRN id/no
+    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?grnId=${grnId}&poNo=${encodeURIComponent(grnNo)}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        this.isLoadingPdf = false;
       }
     });
   }
 
-  applyTemplate() {
-    this.flag = false;
-    if (this.selectedTemplate) {
-      this.flag = true;
-      console.log('Selected Template:', this.selectedTemplate);
-
-      this.reportName = this.selectedTemplate;
-      this.viewer.bindingSender.OpenReport(
-        this.reportName + '&parameter1=' + this.grnId,
-      );
-      this.showTemplatePopup = false; // Close the popup after applying
-      this.showReportDesigner = true;
-    } else {
-      alert('Please select a template before applying');
-    }
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
   }
 
-  OnParametersInitialized(event: any) {
-    var invisibleIntParamValue = 42;
-    var intParam = event.args.ActualParametersInfo.filter(
-      (x: any) => x.parameterDescriptor.name == 'intParam',
-    )[0];
-    intParam.value = invisibleIntParamValue;
-    console.log(intParam, 'intparam');
+  downloadPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = this.pdfBlobUrl;
+    a.download = `${this.selectedTemplate || 'GoodsReceiptNote'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  sendPdf(): void {
+    // Stub for send functionality
+    console.log("Send PDF triggered");
+    alert("Send functionality is not fully implemented yet.");
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = '';
+      this.pdfPreviewUrl = null;
+    }
   }
 }
 @NgModule({

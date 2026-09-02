@@ -13,6 +13,7 @@ import {
   UnauthenticatedContentComponent,
 } from './layouts';
 import { AnalyticsDashboardComponent } from './pages/analytics-dashboard/analytics-dashboard.component';
+import { ReportDesignerComponent } from './pages/report-designer/report-designer.component';
 import { AppResetPasswordComponent } from './pages/reset-password-form/reset-password-form.component';
 import { DepartmentListComponent } from './pages/MASTER/item-department-list/department-list.component';
 import { CountryListComponent } from './pages/country-list/country-list.component';
@@ -1390,6 +1391,12 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'report-designer',
+        component: ReportDesignerComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+
         path: '**',
         redirectTo: 'login',
         pathMatch: 'full',

@@ -435,6 +435,14 @@
               </div>
               <div style="display: flex; gap: 8px">
                 <dx-button
+                  *ngIf="purchaseInvoiceFormData.STATUS === 'Approved' || purchaseInvoiceFormData.STATUS === 'Closed'"
+                  text="Print"
+                  (onClick)="PrintInvoice()"
+                  stylingMode="contained"
+                  type="default"
+                  class="blue-btn"
+                ></dx-button>
+                <dx-button
                   text="Cancel"
                   (onClick)="cancel()"
                   stylingMode="outlined"
@@ -576,5 +584,69 @@
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
     </dx-data-grid>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="showTemplatePopup"
+  title="Choose Template"
+  [height]="'30vh'"
+  [width]="'30vw'"
+  [showCloseButton]="true"
+>
+  <div class="popup-content">
+    <dx-select-box
+      [(value)]="selectedTemplate"
+      [dataSource]="templateList"
+      displayExpr="name"
+      valueExpr="name"
+      placeholder="Select a template"
+      [searchEnabled]="true"
+    ></dx-select-box>
+    <dxi-toolbar-item toolbar="bottom" location="after">
+      <div
+        class="form-popup-buttons-container"
+      >
+        <dx-button
+          style="margin-top: 30px"
+          text="Preview"
+          type="default"
+          stylingMode="contained"
+          [width]="'100px'"
+          (onClick)="previewSelectedTemplate()"
+        ></dx-button>
+      </div>
+    </dxi-toolbar-item>
+  </div>
+</dx-popup>
+
+<dx-popup
+  [(visible)]="isPreviewPopupVisible"
+  title="Preview Purchase Invoice"
+  [height]="'80vh'"
+  [width]="'80vw'"
+  [showCloseButton]="true"
+  (onHiding)="closePdfPreview()"
+>
+  <div class="popup-content" style="height: 100%; display: flex; flex-direction: column;">
+    <!-- Loader -->
+    <div *ngIf="isLoadingPdf" style="text-align: center; padding: 20px; flex: 1;">
+      <i class="dx-icon-refresh" style="font-size: 24px;"></i> Loading preview...
+    </div>
+
+    <!-- PDF Viewer Iframe -->
+    <div *ngIf="pdfPreviewUrl && !isLoadingPdf" style="flex: 1; min-height: 0;">
+      <iframe [src]="pdfPreviewUrl" style="width: 100%; height: 100%; border: 1px solid #ddd;"></iframe>
+    </div>
+    
+    <dxi-toolbar-item toolbar="bottom" location="after">
+      <dx-button
+        text="Print"
+        icon="print"
+        type="default"
+        stylingMode="contained"
+        (onClick)="printPdf()"
+      ></dx-button>
+    </dxi-toolbar-item>
   </div>
 </dx-popup>

@@ -68,7 +68,9 @@ export class FormPopupComponent {
   @Output() cancel = new EventEmitter();
 
   @Input() showSave: boolean = true;
+  @Input() showPrint: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() printClick = new EventEmitter<void>();
   @Input() showApprove: boolean = true; // default: visible
   dataGrid!: DxDataGridComponent;
   constructor(protected screen: ScreenService) { }

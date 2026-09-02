@@ -8,6 +8,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import {
   BrowserModule,
   DomSanitizer,
@@ -121,6 +122,15 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
+  
+  templateList: any[] = [];
+  isTemplatePopupVisible: boolean = false;
+  isPreviewPopupVisible: boolean = false;
+  selectedTemplate: string | null = null;
+  
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  isLoadingPdf: boolean = false;
+  pdfBlobUrl: string = '';
 
   fileDetails: any = {
     DOC_ID: '',
@@ -180,6 +190,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     private service: DataService,
     private sanitizer: DomSanitizer,
     private router: Router,
+    private http: HttpClient
   ) {
     const settingsData = sessionStorage.getItem('settings');
     this.settingsData = settingsData ? JSON.parse(settingsData) : null;
@@ -1268,12 +1279,86 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
       reader.readAsDataURL(blob);
     });
   }
+  fetchTemplates() {
+    fetch('http://localhost:5266/api/Reports')
+      .then(res => res.json())
+      .then(data => {
+        // Category 17 is for Purchase Order
+        this.templateList = data.filter((t: any) => t.categoryId === 17);
+      })
+      .catch(err => console.error('Error fetching templates:', err));
+  }
+
   viewPdfDMGT(): void {
-    console.log('PDFFFFFFFFFF');
-    this.service.selectPoData(this.PoID).subscribe((res) => {
-      this.generatePoPdf(res);
+    if (this.templateList.length === 0) {
+      this.fetchTemplates();
+    }
+    this.pdfPreviewUrl = null;
+    this.pdfBlobUrl = '';
+    this.selectedTemplate = null;
+    this.isTemplatePopupVisible = true;
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.isTemplatePopupVisible = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+    
+    const poNo = this.formdata?.DOC_NO || this.formdata?.PO_NO || '';
+    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?poId=${this.poId}&poNo=${encodeURIComponent(poNo)}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        this.isLoadingPdf = false;
+      }
     });
   }
+
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
+  }
+
+  downloadPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = this.pdfBlobUrl;
+    a.download = `${this.selectedTemplate || 'PurchaseOrder'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  sendPdf(): void {
+    // Stub for send functionality
+    console.log("Send PDF triggered");
+    alert("Send functionality is not fully implemented yet.");
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = '';
+      this.pdfPreviewUrl = null;
+    }
+  }
+
   formatAmount(value: any): string {
     return Number(value || 0).toLocaleString('en-IN', {
       minimumFractionDigits: 2,
@@ -1883,6 +1968,7 @@ function numberToWordsIndianNumber(num: number) {
 @NgModule({
   imports: [
     BrowserModule,
+    HttpClientModule,
     DxSelectBoxModule,
     DxTextAreaModule,
     DxDateBoxModule,

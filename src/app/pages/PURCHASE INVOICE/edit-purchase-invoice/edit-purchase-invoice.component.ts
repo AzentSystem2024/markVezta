@@ -9,7 +9,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -120,7 +121,15 @@ export class EditPurchaseInvoiceComponent {
   is_default: any;
   Currency_Code: any;
 
-  constructor(private dataService: DataService) {
+  showTemplatePopup: boolean = false;
+  isPreviewPopupVisible: boolean = false;
+  templateList: any[] = [];
+  selectedTemplate: string | null = null;
+  isLoadingPdf: boolean = false;
+  pdfBlobUrl: string | null = null;
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  
+  constructor(private dataService: DataService, private http: HttpClient, private sanitizer: DomSanitizer) {
     const userDataString = localStorage.getItem('userData');
     // if (userDataString) {
     const userData = JSON.parse(userDataString);
@@ -1678,6 +1687,73 @@ export class EditPurchaseInvoiceComponent {
     }
 
     return convert(Math.floor(amount)) + ' Rupees Only';
+  }
+
+  PrintInvoice() {
+    this.getTemplateList();
+    this.showTemplatePopup = true;
+  }
+
+  getTemplateList() {
+    this.http.get<any[]>('http://localhost:5266/api/Reports').subscribe({
+      next: (data) => {
+        // Category 19 is for Purchase Invoice
+        this.templateList = data.filter((t: any) => t.categoryId === 19);
+        if (this.templateList.length > 0) {
+          this.selectedTemplate = this.templateList[0].name;
+        } else {
+          this.selectedTemplate = null;
+        }
+      },
+      error: (err) => console.error('Error fetching templates:', err)
+    });
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.showTemplatePopup = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+    
+    // For Purchase Invoice we use doc no or ID
+    const invNo = this.purchaseInvoiceFormData?.DOC_NO || '';
+    const invId = this.purchaseInvoiceFormData?.ID || 0;
+    
+    // Using the endpoint and passing invoiceId
+    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?invoiceId=${invId}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        this.isLoadingPdf = false;
+      }
+    });
+  }
+
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+    };
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = null;
+    }
+    this.pdfPreviewUrl = null;
   }
 
   cancel() {

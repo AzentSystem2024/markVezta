@@ -10,7 +10,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -101,16 +102,6 @@ export class SalesOrderFinancePopupFormComponent {
     IS_APPROVED: false,
     REF_NO: '',
     Details: [
-      // {
-      //   PACKING_ID: 0,
-      //   BRAND_ID: 0,
-      //   ARTICLE_TYPE: 0,
-      //   CATEGORY_ID: 0,
-      //   ART_NO: 0,
-      //   COLOR_ID: 0,
-      //   CONTENT: '',
-      //   QUANTITY: 0,
-      // },
     ],
   };
   artNoCache: { [categoryId: string]: any[] } = {};
@@ -127,7 +118,6 @@ export class SalesOrderFinancePopupFormComponent {
   canDelete: any;
   canPrint: any;
   canView: any;
-  // canApprove: any;
   items: any;
   popupVisible: boolean = false;
   selectedTab = 0;
@@ -144,7 +134,6 @@ export class SalesOrderFinancePopupFormComponent {
   selectedColor: any;
   catSizeList: any;
   isCutsizePopupVisible: boolean;
-  // cutsizeValues: { size: number; value: any }[] = [];
   cutsizeValues: any[] = [];
   selectedItems = [];
   cutsizeInputs: {};
@@ -184,10 +173,20 @@ export class SalesOrderFinancePopupFormComponent {
       (d: any) => d.ITEM_ID === item.ITEM_ID,
     );
   };
+  showTemplatePopup: boolean = false;
+  isPreviewPopupVisible: boolean = false;
+  templateList: any[] = [];
+  selectedTemplate: string | null = null;
+  isLoadingPdf: boolean = false;
+  pdfBlobUrl: string | null = null;
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private http: HttpClient,
+    private sanitizer: DomSanitizer,
     private ngZone: NgZone,
   ) {}
 
@@ -219,24 +218,14 @@ export class SalesOrderFinancePopupFormComponent {
       this.canApprove = packingRights.CanApprove;
     }
     if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
-      // this.getItemsList();
     } else {
-      // this.getItemsList();
     }
     this.updateTotalQty();
     this.getListOfItemsInColumn();
-    // if (
-    //   !this.salesOrderFormData.Details ||
-    //   this.salesOrderFormData.Details.length === 0
-    // ) {
-    //   this.salesOrderFormData.Details = [];
-    // }
     this.getDealerDropdown();
     if (!this.isEditing) {
       this.getSalesOrderNo();
     }
-    // this.getWarehouseDropdown();
-    // always fetch fresh number when popup opens
 
     this.isEditDataAvailable();
   }
@@ -266,7 +255,6 @@ export class SalesOrderFinancePopupFormComponent {
 
       const response = this.EditingResponseData;
 
-      // Map backend fields → grid fields
       const mappedDetails = Array.isArray(response.Details)
         ? response.Details.map((item: any) => ({
             ITEM_CODE: item.ITEM_CODE || 0,
@@ -293,7 +281,6 @@ export class SalesOrderFinancePopupFormComponent {
 
       console.log('Final mapped SalesOrderFormData:', this.salesOrderFormData);
 
-      //  Bind details to the grid
       setTimeout(() => {
         if (this.itemsGridRef && this.itemsGridRef.instance) {
           this.salesOrderFormData.Details = mappedDetails;
@@ -301,7 +288,6 @@ export class SalesOrderFinancePopupFormComponent {
         }
       }, 300);
 
-      // Populate dropdown chains for first row of Details
       const firstRow = mappedDetails[0];
       if (firstRow) {
         const brandId = firstRow.ITEM;
@@ -312,13 +298,11 @@ export class SalesOrderFinancePopupFormComponent {
 
         console.log(' Populating dropdowns for edit mode:', firstRow);
 
-        // Load TYPE list
         this.dataService
           .getTypeList({ BRAND_ID: String(brandId) })
           .subscribe((typeRes: any) => {
             this.typeList = typeRes.Data || [];
 
-            // Load CATEGORY list
             this.dataService
               .getCatList({
                 BRAND_ID: String(brandId),
@@ -327,7 +311,6 @@ export class SalesOrderFinancePopupFormComponent {
               .subscribe((catRes: any) => {
                 this.catList = catRes.Data || [];
 
-                // Load ARTNO list
                 this.dataService
                   .getArtNoList({
                     BRAND_ID: String(brandId),
@@ -337,7 +320,6 @@ export class SalesOrderFinancePopupFormComponent {
                   .subscribe((artRes: any) => {
                     this.artNoList = artRes.Data || [];
 
-                    // Load COLOR list
                     this.dataService
                       .getCatColorList({
                         BRAND_ID: String(brandId),
@@ -348,7 +330,6 @@ export class SalesOrderFinancePopupFormComponent {
                       .subscribe((colorRes: any) => {
                         this.colorList = colorRes.Data || [];
 
-                        // Load PACKING list
                         this.dataService
                           .getPackings({
                             BRAND_ID: String(brandId),
@@ -370,7 +351,6 @@ export class SalesOrderFinancePopupFormComponent {
           });
       }
 
-      // Populate dependent dropdowns (Dealer, Address)
       if (this.salesOrderFormData.CUST_ID) {
         this.onDealerChanged({ value: this.salesOrderFormData.CUST_ID });
       }
@@ -386,7 +366,6 @@ export class SalesOrderFinancePopupFormComponent {
     }
   }
 
-  //Get first column's dropdown list
 
   getListOfItemsInColumn() {
     this.dataService.getItemsColumnList().subscribe((response: any) => {
@@ -419,16 +398,11 @@ export class SalesOrderFinancePopupFormComponent {
       next: (response: any) => {
         this.typeList = response.Data || [];
         this.isDescriptionLoading = false;
-        // Move focus to the next cell ("TYPE") after loading completes
-        // setTimeout(() => {
-        //   grid.editCell(rowIndex, 'TYPE');
-        // }, 100);
         if (e.dataField === 'ITEM') {
           e.editorOptions.onKeyDown = (event: any) => {
             if (event.event.key === 'Enter') {
               const grid = e.component;
               const rowIndex = e.row.rowIndex;
-              // Move focus to the "ledgerCode" column in the same row
               setTimeout(() => {
                 grid.focus(grid.getCellElement(rowIndex, 'TYPE'));
               });
@@ -447,7 +421,7 @@ export class SalesOrderFinancePopupFormComponent {
 
       if (isSelected) {
         e.cellElement.style.pointerEvents = 'none';
-        e.cellElement.style.opacity = '0.5'; // optional UI effect
+        e.cellElement.style.opacity = '0.5';
       }
     }
   }
@@ -494,7 +468,7 @@ export class SalesOrderFinancePopupFormComponent {
     const gridRow = this.itemsGridRef?.instance;
     const rowIndex = event.rowIndex;
     const rowKey = event?.row?.key;
-    const rowData = event?.row?.data; // 🔹 get current row object
+    const rowData = event?.row?.data;
 
     this.selectedCategory = e.value;
     console.log(this.selectedCategory, 'selectedCategoryyyyyyyyyyyyyyy');
@@ -523,11 +497,9 @@ export class SalesOrderFinancePopupFormComponent {
         setTimeout(() => {
           grid.editCell(rowIndex, 'ARTNO');
         }, 100);
-        // 🔹 Assign at both row level & component level
         if (rowData) rowData.artNoList = artNoList;
         this.artNoList = artNoList;
 
-        // 🔹 Force refresh so new lookup values appear
         if (grid && rowKey != null) {
           grid.repaint();
         }
@@ -545,7 +517,6 @@ export class SalesOrderFinancePopupFormComponent {
     const rowKey = event?.row?.key;
     this.selectedArtNo = e.value;
     console.log(this.selectedArtNo, 'selecteddescription');
-    // this.selectedColor = null;
     gridRow.cellValue(rowIndex, 'COLOR', null);
     gridRow.cellValue(rowIndex, 'PACKING', null);
     gridRow.cellValue(rowIndex, 'CONTENT', '');
@@ -579,7 +550,7 @@ export class SalesOrderFinancePopupFormComponent {
   }
 
   onColorValueChanged(e: any, event?: any) {
-    const grid = event?.component; // Reference to dx-data-grid
+    const grid = event?.component;
     const rowKey = event?.row?.key;
     const gridRow = this.itemsGridRef?.instance;
     const rowIndex = event.rowIndex;
@@ -631,7 +602,6 @@ export class SalesOrderFinancePopupFormComponent {
     const selectedPackingId = {
       PACKING_ID: this.selectedPackingID,
     };
-    // Get the selected PACKING description text
     const selectedPackingText = this.packingList.find(
       (p) => p.ARTICLE_ID === e.value,
     )?.DESCRIPTION;
@@ -659,21 +629,16 @@ export class SalesOrderFinancePopupFormComponent {
       this.selectedPacking &&
       this.selectedPacking.toUpperCase().includes('CUTSIZE')
     ) {
-      // Initialize your cutsize grid values before showing popup
       this.prepareCutsizeValues(this.selectedPacking);
 
-      // Show popup
       this.showCutsizePopup();
     } else {
       this.isCutsizePopupVisible = false;
-      const grid = event.component; // dx-data-grid instance
+      const grid = event.component;
       grid.cellValue(rowIndex, 'CONTENT', this.combination);
     }
 
-    // this.isDescriptionLoading = true;
 
-    // Example API call if needed
-    // this.dataService.getSomething(payload).subscribe(...);
   }
 
   calculateGrossAmount = (rowData: any) => {
@@ -682,18 +647,15 @@ export class SalesOrderFinancePopupFormComponent {
     return qty * price;
   };
 
-  // Calculate Amount after Discount
   calculateAmount = (rowData: any) => {
     const gross = Number(this.calculateGrossAmount(rowData)) || 0;
 
     const discountPercent = Number(rowData.DISC_PERCENT);
 
-    // ONLY apply discount if > 0
     if (discountPercent > 0) {
       const discountValue = (gross * discountPercent) / 100;
       return gross - discountValue;
     }
-    // Otherwise ignore discount completely
     return gross;
   };
   calculateVatAmount = (rowData: any) => {
@@ -712,7 +674,6 @@ export class SalesOrderFinancePopupFormComponent {
     if (e.dataField === 'DISC_PERCENT') {
       e.editorOptions = e.editorOptions || {};
 
-      // Let the editor inherit row height naturally (no fixed height)
       e.editorOptions.elementAttr = {
         style: `
         height: 100%;
@@ -723,7 +684,6 @@ export class SalesOrderFinancePopupFormComponent {
       `,
       };
 
-      // Make sure the input fits snugly inside
       e.editorOptions.inputAttr = {
         style: `
         height: 100%;
@@ -732,7 +692,6 @@ export class SalesOrderFinancePopupFormComponent {
       `,
       };
 
-      // Remove spin buttons to prevent layout changes
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
@@ -750,198 +709,33 @@ export class SalesOrderFinancePopupFormComponent {
         }
       };
     }
-    // const grid = e.component;
-    // const row = e.row?.data;
-    // const rowIndex = e.row?.rowIndex;
-    // const field = e.dataField;
-    // if (e.parentType !== 'dataRow') return;
-    // /** ---------------------- Common Style & Height ---------------------- */
-    // const uniformFields = [
-    //   'ITEM',
-    //   'TYPE',
-    //   'CATEGORY',
-    //   'ARTNO',
-    //   'COLOR',
-    //   'PACKING',
-    //   'CONTENT',
-    //   'QTY',
-    // ];
-    // if (uniformFields.includes(field)) {
-    //   e.editorOptions = {
-    //     ...e.editorOptions,
-    //     elementAttr: {
-    //       style:
-    //         'height: 100%; display: flex; align-items: center; padding: 0;',
-    //     },
-    //     inputAttr: {
-    //       style: 'height: 100%; padding: 0 4px; box-sizing: border-box;',
-    //     },
-    //   };
-    //   if (e.editorName === 'dxNumberBox') {
-    //     e.editorOptions.showSpinButtons = false;
-    //   }
-    // }
-    // /** ---------------------- Auto-height Dropdowns ---------------------- */
-    // const dropdownFields = [
-    //   'ITEM',
-    //   'TYPE',
-    //   'CATEGORY',
-    //   'COLOR',
-    //   'ARTNO',
-    //   'PACKING',
-    // ];
-    // if (dropdownFields.includes(field)) {
-    //   e.editorOptions.dropDownOptions = {
-    //     onContentReady: (args: any) => {
-    //       const content =
-    //         args.component?.contentElement?.() || args.component?.content();
-    //       const list = content?.querySelector('.dx-list');
-    //       if (!list) return;
-    //       const h = Math.min(list.scrollHeight, 180);
-    //       content.style.height = `${h}px`;
-    //       content.style.overflowY =
-    //         list.scrollHeight > 180 ? 'auto' : 'visible';
-    //     },
-    //   };
-    // }
-    // /** ---------------------- QTY Logic ---------------------- */
-    // if (field === 'QTY') {
-    //   e.editorOptions.onValueChanged = (args: any) => {
-    //     e.setCellValue(e.row.data, args.value);
-    //     if (args.value > 0) {
-    //       setTimeout(() => {
-    //         const rows = grid.getVisibleRows();
-    //         const hasEmpty = rows.some((r: any) => !r.data.ITEM);
-    //         if (!hasEmpty) {
-    //           const store = grid.getDataSource().store();
-    //           store.push([{ type: 'insert', data: {} }]);
-    //           grid.refresh().then(() => {
-    //             grid.editCell(rows.length, 'ITEM');
-    //           });
-    //         }
-    //       }, 100);
-    //     }
-    //   };
-    // }
-    // /** ---------------------- Dropdown Change Logic ---------------------- */
-    // const fieldHandlers = {
-    //   ITEM: (args: any) => this.onItemValueChanged(args, e.row),
-    //   TYPE: (args: any) => this.onTypeValueChanged(args, e.row),
-    //   CATEGORY: (args: any) => this.onCategoryValueChanged(args, e),
-    //   ARTNO: (args: any) => this.onArtNoValueChanged(args, e.row),
-    //   COLOR: (args: any) => this.onColorValueChanged(args, e.row),
-    //   PACKING: (args: any) => this.onPackingValueChanged(args, e),
-    // };
-    // if (fieldHandlers[field]) {
-    //   e.editorOptions.value = row?.[field];
-    //   e.editorOptions.onValueChanged = (args: any) => {
-    //     e.setValue(args.value);
-    //     grid.cellValue(e.row.key, field, args.value);
-    //     fieldHandlers[field](args);
-    //   };
-    // }
-    // /** ---------------------- Lazy Dropdown Fetch ---------------------- */
-    // const fetchMap: Record<string, any> = {
-    //   ARTNO: this.dataService.getArtNoList.bind(this.dataService),
-    //   COLOR: this.dataService.getCatColorList.bind(this.dataService),
-    //   PACKING: this.dataService.getPackings.bind(this.dataService),
-    // };
-    // if (fetchMap[field]) {
-    //   e.editorOptions.dataSource = row?.[`${field.toLowerCase()}List`] || [];
-    //   e.editorOptions.onOpened = (args: any) => {
-    //     const editor = args.component;
-    //     editor.option('dataSource', []); // Clear stale data
-    //     const payload = {
-    //       BRAND_ID: String(row.ITEM),
-    //       ARTICLE_TYPE: String(row.TYPE),
-    //       CATEGORY_ID: String(row.CATEGORY),
-    //       ARTNO_ID: String(row.ARTNO),
-    //       COLOR: String(row.COLOR),
-    //     };
-    //     fetchMap[field](payload).subscribe({
-    //       next: (res: any) => {
-    //         const list = res.Data || [];
-    //         row[`${field.toLowerCase()}List`] = list;
-    //         editor.option('dataSource', list);
-    //       },
-    //       error: (err: any) =>
-    //         console.error(`Error loading ${field} list:`, err),
-    //     });
-    //   };
-    // }
-    // /** ---------------------- CONTENT Focus-in Popup ---------------------- */
-    // if (field === 'CONTENT') {
-    //   e.editorOptions.readOnly = true;
-    //   e.editorOptions.onFocusIn = () => {
-    //     const packing = e.row.data?.PACKING || '';
-    //     // only if PACKING has 'CUTSIZE'
-    //     if (packing?.toUpperCase().includes('CUTSIZE')) {
-    //       this.cutsizeRowIndex = e.row.rowIndex;
-    //       this.cutsizeRowKey = e.row.key;
-    //       console.log(this.packingList);
-    //       console.log(packing);
-    //       this.selectedPackingID = this.packingList.find(
-    //         (p) => p.DESCRIPTION === packing,
-    //       )?.ARTICLE_ID;
-    //       const selectedPackingId = {
-    //         PACKING_ID: this.selectedPackingID,
-    //       };
-    //       this.dataService
-    //         .getPairQty(selectedPackingId)
-    //         .subscribe((response: any) => {
-    //           this.totalRequiredQty = response.Data[0].PAIR_QTY;
-    //           console.log(' Total Required Qty:', this.totalRequiredQty);
-    //         });
-    //       // prepare the popup data again — same logic as in onPackingValueChanged
-    //       this.prepareCutsizeValues(packing);
-    //       // show popup
-    //       this.isCutsizePopupVisible = true;
-    //     }
-    //   };
-    // }
-    // /** ---------------------- SIZE Logic ---------------------- */
-    // if (field === 'SIZE') {
-    //   e.editorOptions.onValueChanged = (args: any) => {
-    //     this.cutsizeRowIndex = rowIndex;
-    //     e.setValue(args.value);
-    //     grid.cellValue(e.row.key, 'SIZE', args.value);
-    //     this.onSizeValueChanged(args);
-    //   };
-    // }
   }
 
   itemCellTemplate = (container: any, options: any) => {
-    // Show the value from the data row
     container.textContent = options.data.ITEM || '';
   };
 
   typeCellTemplate = (container: any, options: any) => {
-    // Show the value from the data row
     container.textContent = options.data.TYPE || '';
   };
 
   categoryCellTemplate = (container: any, options: any) => {
-    // Show the value from the data row
     container.textContent = options.data.CATEGORY || '';
   };
 
   artNoCellTemplate = (container: any, options: any) => {
-    // Show the value from the data row
     container.textContent = options.data.ARTNO || '';
   };
 
   colorCellTemplate = (container: any, options: any) => {
-    // Show the value from the data row
     container.textContent = options.data.COLOR || '';
   };
 
   packingCellTemplate = (container: any, options: any) => {
-    // Show the value from the data row
     container.textContent = options.data.PACKING || '';
   };
 
   prepareCutsizeValues(packingText: string) {
-    // Try to extract range like "10X15"
     const match = packingText.match(/(\d+)\s*[Xx]\s*(\d+)/);
 
     if (match) {
@@ -953,7 +747,6 @@ export class SalesOrderFinancePopupFormComponent {
         value: null,
       }));
     } else {
-      // Default structure if no range found
       this.cutsizeValues = [
         { size: 1, value: null },
         { size: 2, value: null },
@@ -989,7 +782,7 @@ export class SalesOrderFinancePopupFormComponent {
     if (this.totalQty === 0) {
       this.totalErrorMessage = 'Total Qty cannot be 0.';
     } else {
-      this.totalErrorMessage = ''; // Clear any previous error
+      this.totalErrorMessage = '';
     }
   }
 
@@ -997,11 +790,10 @@ export class SalesOrderFinancePopupFormComponent {
     this.totalErrorMessage = '';
     console.log('Popup triggered');
     this.isCutsizePopupVisible = true;
-    this.cdr.detectChanges(); // force UI update if using OnPush
+    this.cdr.detectChanges();
   }
 
   validateTotalQty = () => {
-    // Trigger validation every time grid updates
     if (this.totalQty !== this.totalRequiredQty) {
       if (this.totalQty < this.totalRequiredQty) {
         this.validationMessage = 'Total Qty is less than Total Required Qty.';
@@ -1027,7 +819,6 @@ export class SalesOrderFinancePopupFormComponent {
     if (e.dataField === 'quantity') {
       e.editorOptions = e.editorOptions || {};
 
-      // Let the editor inherit row height naturally (no fixed height)
       e.editorOptions.elementAttr = {
         style: `
         height: 100%;
@@ -1038,7 +829,6 @@ export class SalesOrderFinancePopupFormComponent {
       `,
       };
 
-      // Make sure the input fits snugly inside
       e.editorOptions.inputAttr = {
         style: `
         height: 100%;
@@ -1047,13 +837,11 @@ export class SalesOrderFinancePopupFormComponent {
       `,
       };
 
-      // Remove spin buttons to prevent layout changes
       if (e.editorName === 'dxNumberBox') {
         e.editorOptions.showSpinButtons = false;
       }
     }
 
-    // Validation logic refinement — other logic untouched
     if (e.dataField === 'quantity' && e.parentType === 'dataRow') {
       e.editorOptions.onValueChanged = (args: any) => {
         e.setValue(args.value);
@@ -1068,7 +856,6 @@ export class SalesOrderFinancePopupFormComponent {
 
         this.totalQty = total;
 
-        //  Updated validation logic
         if (this.totalQty !== this.totalRequiredQty) {
           this.isTotalQtyValid = false;
           if (this.totalQty < this.totalRequiredQty) {
@@ -1083,7 +870,6 @@ export class SalesOrderFinancePopupFormComponent {
           this.validationMessage = '';
         }
 
-        //  Force UI refresh so the validation message updates immediately
         this.cdr.detectChanges();
 
         console.log('Total Quantity:', this.totalQty);
@@ -1093,11 +879,9 @@ export class SalesOrderFinancePopupFormComponent {
 
   onCellValueChanged(e: any) {
     if (e.column.dataField === 'quantity') {
-      // Update the actual array value manually
       const rowIndex = e.row.rowIndex;
       this.cutsizeValues[rowIndex].quantity = e.value;
 
-      // Now recalculate total
       this.updateTotalQty();
     }
   }
@@ -1112,14 +896,12 @@ export class SalesOrderFinancePopupFormComponent {
   }
 
   saveCutsizeDetails() {
-    // Validate total quantity
     if (this.totalQty !== this.totalRequiredQty) {
       this.totalErrorMessage = ' Total Qty must match Total Required Qty.';
       console.warn(this.totalErrorMessage);
       return;
     }
 
-    // Filter and build new content string cleanly
     const pairs = this.cutsizeValues
       .filter((r: any) => r.size && r.quantity != null && r.quantity !== '')
       .map((r: any) => `${r.size}*${r.quantity}`);
@@ -1127,27 +909,22 @@ export class SalesOrderFinancePopupFormComponent {
     const newContent = pairs.join(', ');
     console.log(' New cutsize content:', newContent);
 
-    // Update the grid row cleanly
     if (this.cutsizeRowIndex !== null && this.cutsizeRowIndex >= 0) {
       const grid = this.itemsGridRef.instance;
       const visibleRows = grid.getVisibleRows();
       const rowData = visibleRows[this.cutsizeRowIndex]?.data;
 
       if (rowData) {
-        //  Step 1: Reset previous content completely
         rowData.CONTENT = '';
 
-        // Step 2: Apply only new clean string
         rowData.CONTENT = newContent;
 
-        //  Step 3: Push the updated object back to the grid store
-        const rowKey = grid.keyOf(rowData); //  get the correct row key
+        const rowKey = grid.keyOf(rowData);
         grid
           .getDataSource()
           .store()
           .push([{ type: 'update', key: rowKey, data: rowData }]);
 
-        //  Step 4: Refresh visible grid to reflect changes
         grid.refresh();
 
         console.log(
@@ -1161,7 +938,6 @@ export class SalesOrderFinancePopupFormComponent {
       console.warn('No valid Cutsize row index found.');
     }
 
-    // Close popup
     this.isCutsizePopupVisible = false;
   }
 
@@ -1189,12 +965,11 @@ export class SalesOrderFinancePopupFormComponent {
   }
 
   onDealerChanged(e: any) {
-    const selectedDealerId = e.value; // this gives the selected dealer's ID
+    const selectedDealerId = e.value;
     this.dealerID = selectedDealerId;
     console.log('Selected Dealer ID:', selectedDealerId);
 
     if (selectedDealerId) {
-      // this.getDeliveryAddressDropdown(selectedDealerId);
       this.getSubDealer(selectedDealerId);
       this.getWarehouseList(selectedDealerId);
     }
@@ -1228,7 +1003,6 @@ export class SalesOrderFinancePopupFormComponent {
       if (this.warehouse.length > 0) {
         this.salesOrderFormData.WAREHOUSE = this.warehouse[0].ID;
       } else {
-        // Clear if no data found
         this.salesOrderFormData.WAREHOUSE = null;
       }
     });
@@ -1244,17 +1018,13 @@ export class SalesOrderFinancePopupFormComponent {
       this.deliveryAddress = response || [];
       console.log(this.deliveryAddress, '===============delivery address');
       if (this.deliveryAddress.length > 0) {
-        // Automatically bind first delivery address
         const firstAddress = this.deliveryAddress[0];
         this.salesOrderFormData.DELIVERY_ADDRESS = firstAddress.Id;
 
-        // Optional: If you want to auto-fill address text as well
         this.salesOrderFormData.ADDRESS = firstAddress.DELIVERYADDRESS;
 
-        // Optionally trigger any change logic if needed
         this.onDeliveryAddressChanged({ value: firstAddress.Id });
       } else {
-        // No addresses found — clear the field
         this.salesOrderFormData.DELIVERY_ADDRESS = null;
         this.salesOrderFormData.ADDRESS = '';
       }
@@ -1279,10 +1049,9 @@ export class SalesOrderFinancePopupFormComponent {
   onAddItemClick() {
     if (!this.salesOrderFormData?.CUST_ID) {
       notify('Please select a Customer before adding items.', 'warning', 2500);
-      return; //  stop here
+      return;
     }
 
-    //  Supplier selected → proceed
     this.showAddItemPopup = true;
 
     console.log(this.salesOrderFormData.CUST_ID, 'selected customer id');
@@ -1307,7 +1076,6 @@ export class SalesOrderFinancePopupFormComponent {
 
       this.applyGstModeToItems();
 
-      // Refresh grid so columns + values update
       setTimeout(() => {
         this.itemsGridRef?.instance?.refresh();
       }, 0);
@@ -1337,12 +1105,69 @@ export class SalesOrderFinancePopupFormComponent {
     );
   }
 
-  // calculateTotalQuantity(): number {
-  //   return this.salesOrderFormData.Details.reduce(
-  //     (sum: number, item: any) => sum + (Number(item.QTY) || 0),
-  //     0,
-  //   );
-  // }
+
+  PrintSalesOrder() {
+    this.getTemplateList();
+    this.showTemplatePopup = true;
+  }
+
+  getTemplateList() {
+    this.http.get<any[]>('http://localhost:5266/api/Reports').subscribe({
+      next: (data) => {
+        this.templateList = data.filter((t: any) => t.categoryId === 11);
+        if (this.templateList.length > 0) {
+          this.selectedTemplate = this.templateList[0].name;
+        } else {
+          this.selectedTemplate = null;
+        }
+      },
+      error: (err) => console.error('Error fetching templates:', err)
+    });
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.showTemplatePopup = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+    
+    const soId = this.salesOrderFormData?.ID || 0;
+    
+    const url = `http://localhost:5266/api/Reports/${encodeURIComponent(this.selectedTemplate)}/export?salesOrderId=${soId}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        this.isLoadingPdf = false;
+      }
+    });
+  }
+
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+    };
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = null;
+    }
+    this.pdfPreviewUrl = null;
+  }
 
   cancel() {
     this.popupClosed.emit();
@@ -1366,7 +1191,6 @@ export class SalesOrderFinancePopupFormComponent {
   }
 
   saveSalesOrder() {
-    // --- Basic validation ---
     if (!this.salesOrderFormData.CUST_ID) {
       notify('Please select a Dealer before saving.', 'warning', 2000);
       return;
@@ -1380,7 +1204,6 @@ export class SalesOrderFinancePopupFormComponent {
       return;
     }
 
-    // --- Filter valid rows ---
     const validDetails = this.salesOrderFormData.Details.filter((d: any) => {
       return d.ITEM || d.PRICE || d.UOM || d.TAX_PERCENT;
     });
@@ -1394,13 +1217,11 @@ export class SalesOrderFinancePopupFormComponent {
       return;
     }
 
-    // --- Total Qty ---
     const totalQty = validDetails.reduce(
       (sum: number, d: any) => sum + (Number(d.STOCK_QTY) || 0),
       0,
     );
 
-    // --- Format date (yyyy-MM-dd) ---
     const formatDate = (date: Date): string => {
       const year = date.getFullYear();
       const month = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -1409,7 +1230,6 @@ export class SalesOrderFinancePopupFormComponent {
     };
     const netAmount =
       this.itemsGridRef?.instance?.getTotalSummaryValue('TOTAL_AMOUNT') || 0;
-    // --- Build payload ---
     const payload: any = {
       COMPANY_ID: this.companyID,
       FIN_ID: this.finID,
@@ -1427,7 +1247,6 @@ export class SalesOrderFinancePopupFormComponent {
       SALESMAN_ID: this.salesOrderFormData.SALESMAN_ID,
       NET_AMOUNT: netAmount,
       REF_NO: this.salesOrderFormData.REF_NO,
-      // Details: validDetails.map((d: any) => ({
       Details: validDetails.map((row: any, index: number) => {
         const grossAmount = this.calculateGrossAmount(row);
         const amount = this.calculateAmount(row);
@@ -1450,19 +1269,16 @@ export class SalesOrderFinancePopupFormComponent {
       }),
     };
 
-    // --- Add ID for update ---
     if (this.salesOrderFormData.ID) {
       payload.ID = this.salesOrderFormData.ID;
     }
 
     console.log('Final payload before saving/updating:', payload);
 
-    // --- Determine which API to call ---
     let apiCall;
     let message = '';
 
     if (this.isEditing && this.salesOrderFormData.IS_APPROVED) {
-      // Confirm approval before calling API
       const result = confirm(
         'Are you sure you want to approve this Sales Order?',
         'Confirm Approval',
@@ -1471,7 +1287,6 @@ export class SalesOrderFinancePopupFormComponent {
       result.then((dialogResult) => {
         if (dialogResult) {
           this.isSaving = true;
-          // User confirmed → call approve API
           apiCall = this.dataService.approveSalesOrder(payload);
           message = 'Sales Order approved successfully!';
           this.callApi(apiCall, message);
@@ -1480,10 +1295,9 @@ export class SalesOrderFinancePopupFormComponent {
         }
       });
 
-      return; // stop further execution
+      return;
     }
 
-    // --- Verify Mode ---
     if (this.isVerifyMode) {
       const result = confirm(
         'Are you sure you want to verify this Sales Order?',
@@ -1506,7 +1320,6 @@ export class SalesOrderFinancePopupFormComponent {
       return;
     }
 
-    // --- Approve Mode ---
     if (this.isApproveMode) {
       const result = confirm(
         'Are you sure you want to approve this Sales Order?',
@@ -1541,7 +1354,6 @@ export class SalesOrderFinancePopupFormComponent {
     }
 
     if (this.salesOrderFormData.IS_APPROVED) {
-      // Show confirmation before insert
       const result = confirm(
         'Are you sure you want to save and approve this Sales Order?',
         'Confirm Save & Approve',
@@ -1549,7 +1361,6 @@ export class SalesOrderFinancePopupFormComponent {
 
       result.then((dialogResult) => {
         if (dialogResult) {
-          //  Run API inside Angular zone
           this.ngZone.run(() => {
             this.isSaving = true;
             this.callApi(
@@ -1563,7 +1374,6 @@ export class SalesOrderFinancePopupFormComponent {
       });
     } else {
       this.isSaving = true;
-      // Normal save (no confirmation)
       this.callApi(
         this.dataService.saveSalesOrder(payload),
         'Sales Order saved successfully!',
@@ -1571,7 +1381,6 @@ export class SalesOrderFinancePopupFormComponent {
     }
   }
 
-  // --- Reusable helper for all API calls ---
   private callApi(apiCall: any, successMessage: string) {
     apiCall.subscribe({
       next: (response: any) => {
@@ -1584,7 +1393,7 @@ export class SalesOrderFinancePopupFormComponent {
         }
       },
       error: (err: any) => {
-        this.isSaving = false; // STOP loading
+        this.isSaving = false;
         console.error('API failed:', err);
 
         notify(
@@ -1603,15 +1412,9 @@ export class SalesOrderFinancePopupFormComponent {
   }
 
   onCancelNewData() {
-    // this.resetForm();
-    // reset validation state
-    this.salesOrderFormData = {}; // or a default object with empty values
-    // this.savedItems = [];
-    // this.isSupplierTouched = false;
-    // this.isSupplierValid = true;
+    this.salesOrderFormData = {};
     this.supplierItemsGrid?.instance?.clearSelection();
-    // this.resetForm();        // optional: clear form data
-    this.showAddItemPopup = false; //  close popup
+    this.showAddItemPopup = false;
   }
 
   saveSelectedData() {
@@ -1633,23 +1436,19 @@ export class SalesOrderFinancePopupFormComponent {
       QTN_NO: item.QTN_NO,
     }));
 
-    // 🔹 If Details is empty, initialize it
     if (!this.salesOrderFormData.Details) {
       this.salesOrderFormData.Details = [];
     }
 
-    // 🔹 Push new items
     this.salesOrderFormData.Details = [
       ...this.salesOrderFormData.Details,
       ...mappedItems,
     ];
 
-    // 🔹 Refresh grid
     setTimeout(() => {
       this.itemsGridRef?.instance?.refresh();
     }, 0);
 
-    // 🔹 Close popup
     this.showAddItemPopup = false;
 
     notify('Items added successfully.', 'success', 2000);
