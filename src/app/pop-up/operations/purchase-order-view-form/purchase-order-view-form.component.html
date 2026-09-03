@@ -861,6 +861,11 @@
 >
   <div class="popup-content" style="padding: 10px;">
     <div style="margin-bottom: 15px;">
+      <label>Sender:</label>
+      <dx-text-box [(value)]="emailSender" [readOnly]="true"></dx-text-box>
+    </div>
+
+    <div style="margin-bottom: 15px;">
       <label>Receivers (Select Multiple):</label>
       <dx-tag-box
         [items]="emailReceivers"

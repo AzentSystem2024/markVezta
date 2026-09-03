@@ -136,6 +136,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
   currentPdfBlob: Blob | null = null;
 
   isEmailPopupVisible: boolean = false;
+  emailSender: string = '';
   emailReceivers: string[] = [];
   selectedEmails: string[] = [];
   emailSubject: string = '';
@@ -1366,6 +1367,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
 
   sendPdf(): void {
     this.isEmailPopupVisible = true;
+    this.emailSender = '';
     this.emailReceivers = [];
     this.selectedEmails = [];
     this.emailSubject = '';
@@ -1376,6 +1378,7 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.service.selectEmailSettings(17).subscribe((res: any) => {
       if (res && res.Data) {
         this.emailSettingsData = res.Data;
+        this.emailSender = res.Data.SENDER_ID || '';
         this.emailSubject = res.Data.EMAIL_SUBJECT || '';
         this.emailBody = res.Data.EMAIL_CONTENT || '';
         if (res.Data.RECEIVER_ID) {
@@ -1404,8 +1407,8 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     const formData = new FormData();
     formData.append('To', toEmail);
     formData.append('Bcc', bccEmails);
-    formData.append('Subject', this.emailSubject);
-    formData.append('Body', this.emailBody);
+    formData.append('Subject', this.emailSubject || ' ');
+    formData.append('Body', this.emailBody || ' ');
     formData.append('EmailType', '17'); 
     
     const fileName = `${this.selectedTemplate || 'PurchaseOrder'}.pdf`;
