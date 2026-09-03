@@ -9,6 +9,9 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -23,12 +26,14 @@ import {
   DxValidatorModule,
   DxProgressBarModule,
   DxPopupModule,
+  DxTagBoxModule,
+  DxLoadIndicatorModule,
   DxDropDownBoxModule,
   DxToolbarModule,
   DxTabPanelModule,
   DxTabsModule,
   DxNumberBoxModule,
-  DxDataGridComponent,
+  DxDataGridComponent
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -44,8 +49,6 @@ import { SaleReturnFormComponent } from 'src/app/sale-return-form/sale-return-fo
 import { DataService } from 'src/app/services';
 import { confirm } from 'devextreme/ui/dialog';
 import dxSelectBox from 'devextreme/ui/select_box';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import CustomStore from 'devextreme/data/custom_store';
 import DataSource from 'devextreme/data/data_source';
 import { tap, of, throwError, catchError, shareReplay, Observable } from 'rxjs';
@@ -56,6 +59,21 @@ import { tap, of, throwError, catchError, shareReplay, Observable } from 'rxjs';
   styleUrls: ['./add-invoice-retail.component.scss'],
 })
 export class AddInvoiceRetailComponent {
+
+  // PDF Preview & Email Variables
+  isPreviewPopupVisible: boolean = false;
+  selectedTemplate: string = '';
+  templateList: any[] = [];
+  isLoadingPdf: boolean = false;
+  pdfBlobUrl: string | null = null;
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  currentPdfBlob: Blob | null = null;
+  isEmailPopupVisible: boolean = false;
+  emailReceivers: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  isSendingEmail: boolean = false;
+  availableUsers: any[] = [];
   @ViewChild('popupGridRef', { static: false }) popupGridRef: any;
   @ViewChild('itemsGridRef', { static: false })
   itemsGridRef!: DxDataGridComponent;
@@ -140,7 +158,7 @@ export class AddInvoiceRetailComponent {
   pendingDeliveryList: any[] = [];
   // invoiceMode: 'MANUAL' | 'DELIVERY' = 'MANUAL';
   selectedDeliveryRows: any[] = [];
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService, private http: HttpClient, private sanitizer: DomSanitizer) {}
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
     if (this.isEditing && this.EditingResponseData) {
@@ -1879,341 +1897,138 @@ export class AddInvoiceRetailComponent {
   }
 
   openPDF() {
-    console.log('Open PDF clicked');
-    const returnId = this.EditingResponseData.TRANS_ID;
-    // Example:
-    this.dataService.selectInvoiceRetail(returnId).subscribe((res: any) => {
-      this.generatePDF(res);
-    });
+    if (!this.EditingResponseData?.TRANS_ID) {
+      alert("Please save the invoice first.");
+      return;
+    }
+    this.isPreviewPopupVisible = true;
+    this.fetchTemplates();
   }
 
-  getBase64ImageFromURL(url: string): Promise<string> {
-    return fetch(url)
-      .then((res) => res.blob())
-      .then((blob) => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      });
-  }
-
-  async generatePDF(data: any) {
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    // ============================================================
-    // 1) HEADER (LOGO + TITLE + RIGHT DETAILS)
-    // ============================================================
-
-    const headerY = 10;
-
-    // --- Logo placeholder (replace with addImage if needed)
-    const logoBase64 = await this.getBase64ImageFromURL(
-      'assets/images/image16.png',
-    );
-
-    doc.addImage(logoBase64, 'PNG', 15, headerY, 30, 40);
-
-    // --- Title
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.text('SALES INVOICE', pageWidth / 2, headerY + 25, {
-      align: 'center',
-    });
-
-    // ======================================================
-    // RIGHT HEADER DETAILS
-    // ======================================================
-
-    doc.setFontSize(10);
-
-    doc.setFont('helvetica', 'normal');
-
-    doc.text('Invoice No :', 135, 15);
-
-    doc.text(`${data.Data.SALE_NO}`, 195, 15, { align: 'right' });
-
-    doc.text('Reference No :', 135, 22);
-
-    doc.text(`${data.Data.REF_NO}`, 195, 22, { align: 'right' });
-
-    doc.text('Date :', 135, 29);
-
-    doc.text(`${data.Data.TRANS_DATE}`, 195, 29, { align: 'right' });
-
-    // ======================================================
-    // SELLER DETAILS
-    // ======================================================
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('Seller Details', 12, 60);
-
-    doc.setFont('helvetica', 'normal');
-
-    doc.text('Address', 12, 67);
-
-    doc.text(`${data.Data.ADDRESS1}`, 38, 67);
-
-    doc.text('Tel', 12, 74);
-    doc.text(`${data.Data.PHONE}`, 38, 74);
-
-    doc.text('TRN', 12, 83);
-    doc.text(`${data.Data.GST_NO}`, 38, 83);
-
-    // ======================================================
-    // BUYER DETAILS
-    // ======================================================
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('Buyer Details', 140, 60);
-
-    doc.setFont('helvetica', 'normal');
-
-    doc.text('Address', 140, 67);
-
-    doc.text(`${data.Data.CUST_ADDRESS1} ${data.Data.CITY}`, 165, 67);
-
-    doc.text('Tel', 140, 74);
-    doc.text(`${data.Data.CUST_PHONE}`, 165, 74);
-
-    doc.text('TRN', 140, 83);
-    doc.text(`${data.Data.ZIP}`, 165, 83);
-
-    // ======================================================
-    // TABLE
-    // ======================================================
-
-    const details = data?.Data?.Details || [];
-
-    const tableData = details.map((item: any) => [
-      item.ITEM_CODE || '',
-      item.DESCRIPTION || '',
-      item.UOM || '',
-      item.COST || 0,
-      item.QUANTITY || 0,
-      item.AMOUNT || 0,
-      item.DISC_AMT || 0,
-      item.TAX_AMOUNT || 0,
-      item.TOTAL_AMOUNT || 0,
-    ]);
-
-    autoTable(doc, {
-      startY: 110,
-
-      head: [
-        [
-          'Item Code',
-          'Description',
-          'UOM',
-          'Cost',
-          'Qty',
-          'Amount',
-          'Dis(amt)',
-          'VAT(amt)',
-          'Total Price',
-        ],
-      ],
-
-      body: tableData,
-
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-      },
-
-      headStyles: {
-        fillColor: [220, 230, 242],
-        textColor: 0,
-        fontStyle: 'bold',
-      },
-
-      theme: 'plain',
-
-      didDrawCell: (data1) => {
-        if (data1.section === 'head') {
-          doc.setDrawColor(220);
-          doc.rect(
-            data1.cell.x,
-            data1.cell.y,
-            data1.cell.width,
-            data1.cell.height,
-          );
+  fetchTemplates() {
+    fetch(environment.apiUrl + 'Reports')
+      .then(res => res.json())
+      .then(data => {
+        // Category 12 is for Sales Invoice (or 3 as we set before)
+        this.templateList = data.filter((t: any) => t.categoryId === 12 || t.categoryId === 3);
+        if (this.templateList.length > 0) {
+            this.selectedTemplate = this.templateList[0].name;
         }
-      },
-    });
-
-    // ======================================================
-    // TOTAL SECTION
-    // ======================================================
-
-    const totalQty = details.reduce(
-      (sum: number, item: any) => sum + Number(item.QUANTITY || 0),
-      0,
-    );
-
-    const totalAmount = details.reduce(
-      (sum: number, item: any) => sum + Number(item.AMOUNT || 0),
-      0,
-    );
-
-    const totalDiscount = details.reduce(
-      (sum: number, item: any) => sum + Number(item.DISC_AMT || 0),
-      0,
-    );
-
-    const totalVat = details.reduce(
-      (sum: number, item: any) => sum + Number(item.TAX_AMOUNT || 0),
-      0,
-    );
-
-    const totalPrice = details.reduce(
-      (sum: number, item: any) => sum + Number(item.TOTAL_AMOUNT || 0),
-      0,
-    );
-
-    const finalY = (doc as any).lastAutoTable.finalY + 15;
-
-    doc.setDrawColor(200);
-    doc.line(12, finalY - 5, 198, finalY - 5);
-
-    doc.setFont('helvetica', 'bold');
-
-    doc.text('TOTAL', 45, finalY + 5);
-
-    doc.text(`${totalQty}`, 112, finalY + 5);
-
-    doc.text(`${totalAmount.toFixed(2)}`, 132, finalY + 5);
-
-    doc.text(`${totalDiscount.toFixed(2)}`, 152, finalY + 5);
-
-    doc.text(`${totalVat.toFixed(2)}`, 172, finalY + 5);
-
-    doc.text(`${totalPrice.toFixed(2)}`, 198, finalY + 5, {
-      align: 'right',
-    });
-
-    // ======================================================
-    // AMOUNT IN WORDS
-    // ======================================================
-
-    doc.setFont('helvetica', 'normal');
-
-    doc.text(`Amount Chargeable (in words):`, 55, finalY + 20);
-
-    doc.setTextColor(0, 102, 204);
-
-    doc.setFont('helvetica', 'bold');
-
-    doc.text(`AED ${this.convertNumberToWords(totalPrice)}`, 108, finalY + 20);
-
-    // ======================================================
-    // PAYMENT INSTRUCTIONS
-    // ======================================================
-
-    const paymentY = 230;
-
-    doc.setTextColor(0, 0, 0);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-
-    doc.text('Payment Instructions', 12, paymentY);
-
-    // LEFT LABELS
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-
-    doc.text('Bank Name:', 12, paymentY + 12);
-    doc.text('Account Name:', 12, paymentY + 20);
-    doc.text('Account #:', 12, paymentY + 28);
-    doc.text('SWIFT/BIC:', 12, paymentY + 36);
-
-    // VALUES
-    doc.text('Global Commercial Bank', 55, paymentY + 12);
-
-    doc.text('Vezta V1.0 Enterprises', 55, paymentY + 20);
-
-    doc.text('1234 5678 9012', 55, paymentY + 28);
-
-    doc.text('GCBKUS33XXX', 55, paymentY + 36);
-
-    // CONTACT
-    doc.text('Tel:8908765432   |   Mob:8908765432', 12, paymentY + 48);
-
-    doc.text('Email: info@gmail.com   |   www.company.com', 12, paymentY + 56);
-
-    // THANK YOU MESSAGE
-    doc.setFont('helvetica', 'italic');
-
-    doc.text('Thank you for your business!', 145, paymentY + 56);
-
-    // ============================================================
-    // 3) OPEN PDF
-    // ============================================================
-
-    doc.output('dataurlnewwindow');
+        this.fetchPdf();
+      })
+      .catch(err => console.error('Error fetching templates:', err));
   }
 
-  convertNumberToWords(num: number): string {
-    if (num === 0) return 'Zero';
+  onTemplateSelected(e: any) {
+    this.selectedTemplate = e.value;
+    this.fetchPdf();
+  }
 
-    const a = [
-      '',
-      'One',
-      'Two',
-      'Three',
-      'Four',
-      'Five',
-      'Six',
-      'Seven',
-      'Eight',
-      'Nine',
-      'Ten',
-      'Eleven',
-      'Twelve',
-      'Thirteen',
-      'Fourteen',
-      'Fifteen',
-      'Sixteen',
-      'Seventeen',
-      'Eighteen',
-      'Nineteen',
-    ];
+  fetchPdf(): void {
+    const id = this.EditingResponseData?.TRANS_ID;
+    if (!id) return;
+    
+    this.isLoadingPdf = true;
+    this.pdfPreviewUrl = null;
+    
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?invoiceId=${id}`;
+    
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        this.currentPdfBlob = blob;
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        this.isLoadingPdf = false;
+      }
+    });
+  }
 
-    const b = [
-      '',
-      '',
-      'Twenty',
-      'Thirty',
-      'Forty',
-      'Fifty',
-      'Sixty',
-      'Seventy',
-      'Eighty',
-      'Ninety',
-    ];
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.contentWindow?.print();
+  }
 
-    const inWords = (n: number, suffix: string): string => {
-      if (n === 0) return '';
-      if (n < 20) return a[n] + ' ' + suffix + ' ';
-      return b[Math.floor(n / 10)] + ' ' + a[n % 10] + ' ' + suffix + ' ';
-    };
+  selectedEmails: any = [];
+  
+  sendPdf(): void {
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    
+    this.dataService.selectEmailSettings(19).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
 
-    let str = '';
+  confirmSendEmail(): void {
+    if (this.selectedEmails.length === 0) {
+      alert("Please select at least one recipient.");
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      alert("No PDF generated to attach.");
+      return;
+    }
+    
+    this.isSendingEmail = true;
+    
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject);
+    formData.append('Body', this.emailBody);
+    
+    const id = this.EditingResponseData?.TRANS_ID;
+    formData.append('DocumentId', id.toString());
+    formData.append('EmailType', '19'); // Placeholder for Sales Invoice
+    
+    const fileName = `${this.selectedTemplate || 'SalesInvoice'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    
+    this.http.post(`${environment.apiUrl}EmailSettings/send-with-attachment`, formData).subscribe({
+      next: (res: any) => {
+        notify('Email sent successfully!', 'success', 3000);
+        this.isEmailPopupVisible = false;
+        this.isSendingEmail = false;
+        this.selectedEmails = [];
+      },
+      error: (err) => {
+        console.error(err);
+        notify('Failed to send email', 'error', 3000);
+        this.isSendingEmail = false;
+      }
+    });
+  }
 
-    str += inWords(Math.floor(num / 10000000), 'Crore');
-    str += inWords(Math.floor((num / 100000) % 100), 'Lakh');
-    str += inWords(Math.floor((num / 1000) % 100), 'Thousand');
-    str += inWords(Math.floor((num / 100) % 10), 'Hundred');
-
-    if (num > 100 && num % 100 > 0) str += 'and ';
-
-    str += inWords(num % 100, '');
-
-    return str.trim();
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = null;
+      this.currentPdfBlob = null;
+    }
+    this.pdfPreviewUrl = null;
   }
 
   cancel() {

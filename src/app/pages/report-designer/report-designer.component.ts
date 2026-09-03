@@ -6,6 +6,7 @@ import { DxDataGridModule, DxPopupModule, DxSelectBoxModule, DxButtonModule, DxT
 import { environment } from 'src/environments/environment';
 
 export enum ReportType {
+    SalesInvoice = 12,
     SaleQuotation = 10,
     SalesOrder = 11,
     PurchaseOrder = 17,
@@ -251,6 +252,7 @@ export class ReportDesignerComponent implements OnInit {
   actionItems = ['Edit', 'Rename', 'Delete'];
 
   reportTypeOptions = [
+    { name: "Sales Invoice", value: ReportType.SalesInvoice },
     { name: 'Sale Quotation', value: ReportType.SaleQuotation },
     { name: 'Sales Order', value: ReportType.SalesOrder },
     { name: 'Purchase Order', value: ReportType.PurchaseOrder },

@@ -540,3 +540,100 @@
     </dxi-column>
   </dx-data-grid>
 </dx-popup>
+
+<!-- ==============================================
+     PDF PREVIEW & TEMPLATE SELECTION POPUP
+     ============================================== -->
+<dx-popup
+  [(visible)]="isPreviewPopupVisible"
+  [width]="900"
+  [height]="'90vh'"
+  title="PDF Preview"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [resizeEnabled]="true"
+  (onHiding)="closePdfPreview()"
+>
+  <div class="popup-content" style="display: flex; flex-direction: column; height: 100%;">
+    
+    <div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end;">
+      <dx-select-box
+        [items]="templateList"
+          displayExpr="name"
+          valueExpr="name"
+        [(value)]="selectedTemplate"
+        label="Select Template"
+        labelMode="floating"
+        [width]="250"
+        (onValueChanged)="onTemplateSelected($event)"
+      ></dx-select-box>
+      
+      <div style="display: flex; gap: 10px;">
+        <dx-button text="Print" icon="print" type="default" stylingMode="contained" (onClick)="printPdf()"></dx-button>
+        <dx-button text="Send" icon="email" type="success" stylingMode="contained" (onClick)="sendPdf()"></dx-button>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoadingPdf" style="text-align: center; padding: 20px; flex: 1;">
+      <dx-load-indicator [visible]="true"></dx-load-indicator>
+      <p style="margin-top: 10px;">Loading PDF preview...</p>
+    </div>
+
+    <!-- PDF Viewer Iframe -->
+    <div *ngIf="pdfPreviewUrl && !isLoadingPdf" style="flex: 1; min-height: 0;">
+      <iframe [src]="pdfPreviewUrl" style="width: 100%; height: 100%; border: 1px solid #ddd;"></iframe>
+    </div>
+    
+  </div>
+</dx-popup>
+
+<!-- ==============================================
+     EMAIL POPUP
+     ============================================== -->
+<dx-popup
+  [(visible)]="isEmailPopupVisible"
+  [width]="500"
+  [height]="'auto'"
+  title="Send Email"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+>
+  <div class="popup-content" style="display: flex; flex-direction: column; gap: 15px;">
+    
+    <div style="font-size: 14px; margin-bottom: 5px;">
+      <strong>Sending:</strong> <span>{{ selectedTemplate || 'SalesInvoice' }}.pdf</span>
+    </div>
+
+    <dx-tag-box
+      [items]="emailReceivers"
+      [(value)]="selectedEmails"
+      label="To (Email Addresses)"
+      labelMode="floating"
+      [searchEnabled]="true"
+      [showSelectionControls]="true"
+      [multiline]="false"
+      placeholder="Select or type email addresses..."
+    >
+    </dx-tag-box>
+
+    <dx-text-box
+      [(value)]="emailSubject"
+      label="Subject"
+      labelMode="floating"
+    ></dx-text-box>
+
+    <dx-text-area
+      [(value)]="emailBody"
+      label="Body"
+      labelMode="floating"
+      [height]="150"
+    ></dx-text-area>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+      <dx-button text="Cancel" type="normal" stylingMode="outlined" (onClick)="isEmailPopupVisible = false"></dx-button>
+      <dx-button text="Send Email" type="success" stylingMode="contained" icon="email" (onClick)="confirmSendEmail()" [disabled]="!emailReceivers || emailReceivers.length === 0 || isSendingEmail"></dx-button>
+    </div>
+
+  </div>
+</dx-popup>
