@@ -9,6 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import notify from 'devextreme/ui/notify';
 import {
   BrowserModule,
   DomSanitizer,
@@ -1417,15 +1418,15 @@ export class PurchaseOrderViewFormComponent implements OnChanges {
     this.service.sendEmailWithAttachment(formData).subscribe((res: any) => {
       this.isSendingEmail = false;
       if (res && res.flag === 1) {
-        alert("Email sent successfully!");
+        notify("Email sent successfully!", 'success', 3000);
         this.isEmailPopupVisible = false;
       } else {
-        alert("Failed to send email: " + (res?.Message || "Unknown error"));
+        notify("Failed to send email: " + (res?.Message || "Unknown error"), 'error', 4000);
       }
     }, (error) => {
       this.isSendingEmail = false;
       console.error("Email send error", error);
-      alert("Error sending email.");
+      notify("Error sending email.", 'error', 4000);
     });
   }
 
