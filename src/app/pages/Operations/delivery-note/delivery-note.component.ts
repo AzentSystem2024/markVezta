@@ -56,7 +56,7 @@ export class DeliveryNoteComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
-  displayMode: any = 'full';
+  displayMode: any = 'full';                  
   showPageSizeSelector = true;
   showHeaderFilter: true;
   showFilterRow = true;
