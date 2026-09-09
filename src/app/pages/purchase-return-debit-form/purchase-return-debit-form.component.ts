@@ -29,6 +29,7 @@ import {
   DxTextBoxModule,
   DxToolbarModule,
   DxValidatorModule,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
 import { FormsModule } from '@angular/forms';
@@ -52,6 +53,9 @@ import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { HttpClient } from '@angular/common/http';
+import { DomSanitizer } from '@angular/platform-browser';
+import { environment } from 'src/environments/environment';
 import { confirm } from 'devextreme/ui/dialog';
 
 @Component({
@@ -110,7 +114,6 @@ export class PurchaseReturnDebitFormComponent {
     NARRATION: '',
     CURRENCY_SYMBOL: '',
     IS_APPROVED: false,
-    // RET_NO: '',
     VEHICLE_NO: '',
     ROUND_OFF: false,
     PurchDetail: [
@@ -138,6 +141,22 @@ export class PurchaseReturnDebitFormComponent {
       },
     ],
   };
+
+  showTemplatePopup: boolean = false;
+  templateList: any[] = [];
+  selectedTemplate: any = null;
+  isPreviewPopupVisible: boolean = false;
+  isLoadingPdf: boolean = false;
+  pdfPreviewUrl: any = null;
+  pdfBlobUrl: string | null = null;
+  currentPdfBlob: Blob | null = null;
+  isEmailPopupVisible: boolean = false;
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  emailSettingsData: any = null;
+  isSendingEmail: boolean = false;
   selectedSupplierId: any;
   pendingList: any;
   companyList: any[];
@@ -173,6 +192,8 @@ export class PurchaseReturnDebitFormComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private ngZone: NgZone,
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -250,7 +271,6 @@ export class PurchaseReturnDebitFormComponent {
     // IMPORTANT: Reset grid before binding
     this.mainGridData = [];
     this.cdr.detectChanges();
-    this.purchaseReturnFormData.IS_APPROVED = false;
     // Map grid rows
     this.mainGridData = (data.PurchDetail || []).map((item: any) => {
       // COMBINE GST FOR UI (EDIT MODE)
@@ -1562,6 +1582,143 @@ export class PurchaseReturnDebitFormComponent {
 
     return convert(Math.floor(amount)) + ' Rupees Only';
   }
+
+  printReport() {
+    this.getTemplateList();
+    this.showTemplatePopup = true;
+  }
+
+  getTemplateList() {
+    this.http.get<any[]>(environment.apiUrl + 'Reports').subscribe({
+      next: (data) => {
+        // Assume Category 20 is for Purchase Return
+        this.templateList = data.filter((t: any) => t.categoryId === 20 || t.categoryName?.includes('Purchase Return'));
+        if (this.templateList.length > 0) {
+          this.selectedTemplate = this.templateList[0].name;
+        } else {
+          // Fallback to all if empty
+          this.templateList = data;
+          if (this.templateList.length > 0) this.selectedTemplate = this.templateList[0].name;
+          else this.selectedTemplate = null;
+        }
+      },
+      error: (err) => console.error('Error fetching templates:', err)
+    });
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.showTemplatePopup = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+    
+    // For Purchase Return we use TRANS_ID
+    const invId = this.purchaseReturnFormData?.TRANS_ID || 0;
+    
+    if (!invId || invId === 0) {
+      notify("Please save the document before generating a preview.", 'warning', 3000);
+      this.isPreviewPopupVisible = false;
+      this.isLoadingPdf = false;
+      return;
+    }
+    
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?invoiceId=${invId}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        notify("Failed to load PDF preview.", 'error', 3000);
+        this.isLoadingPdf = false;
+      }
+    });
+  }
+
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+    };
+  }
+
+  sendPdf(): void {
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+    
+    // Attempt Email Type ID 20 for Purchase Return
+    this.dataService.selectEmailSettings(20).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSettingsData = res.Data;
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      notify("Please select at least one recipient.", 'warning', 3000);
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      notify("No PDF generated to attach.", 'warning', 3000);
+      return;
+    }
+
+    this.isSendingEmail = true;
+    
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject || ' ');
+    formData.append('Body', this.emailBody || ' ');
+    formData.append('EmailType', '20'); 
+    
+    const fileName = `${this.selectedTemplate || 'PurchaseReturn'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    
+    this.dataService.sendEmailWithAttachment(formData).subscribe((res: any) => {
+      this.isSendingEmail = false;
+      // As requested, any 200 OK response means the email was sent successfully.
+      notify("Email sent successfully!", 'success', 3000);
+      this.isEmailPopupVisible = false;
+    }, (error) => {
+      this.isSendingEmail = false;
+      console.error("Email send error", error);
+      notify("Error sending email.", 'error', 3000);
+    });
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = null;
+      this.currentPdfBlob = null;
+    }
+    this.pdfPreviewUrl = null;
+  }
 }
 
 @NgModule({
@@ -1595,6 +1752,7 @@ export class PurchaseReturnDebitFormComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [PurchaseReturnDebitFormComponent],
