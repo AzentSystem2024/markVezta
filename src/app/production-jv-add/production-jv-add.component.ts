@@ -115,7 +115,10 @@ export class ProductionJvAddComponent {
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
-  ) {}
+  ) {
+    this.sesstion_Details();
+    this.get_ProductDropdown();
+  }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -162,7 +165,7 @@ export class ProductionJvAddComponent {
   }
 
   //==================== Production Qty Change Handler ===================//
-  onProductionQtyChange() {}
+  onProductionQtyChange() { }
 
   onProductChange(e: any) {
     const selectedProductId = e.value;
@@ -190,7 +193,7 @@ export class ProductionJvAddComponent {
     //
   }
 
-  onRowRemoved(e: any) {}
+  onRowRemoved(e: any) { }
 
   onEditorPreparing(e: any) {
     if (e.dataField === 'USED_QTY') {
@@ -515,8 +518,13 @@ export class ProductionJvAddComponent {
   }
 
   get_ProductDropdown() {
+    const payload = {
+      NAME: 'ARTICLE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    console.log('Payload for Product Dropdown:', payload);
     this.dataservice
-      .getDropdownDataforProduct('ARTICLE')
+      .getDropdownDataforProduct(payload)
       .subscribe((response: any) => {
         console.log('Article Dropdown Data:', response);
         this.Article = response;
@@ -802,4 +810,4 @@ export class ProductionJvAddComponent {
   exports: [ProductionJvAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ProductionJvAddModule {}
+export class ProductionJvAddModule { }

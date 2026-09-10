@@ -140,6 +140,7 @@ export class PackingAddComponent {
   selectedItems: any[] = [];
   ItemListDataSource: any[] = [];
   Default_company_Type: any;
+  isHoStore: boolean;
 
   //===================dummy datasource of =========================
   constructor(private dataService: DataService) {
@@ -289,7 +290,8 @@ export class PackingAddComponent {
       color: this.PackingData.COLOR,
       categoryID: this.PackingData.CATEGORY_ID,
       // unitID: this.selectedProductionUnitId,
-      // COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: this.selected_Company_id,
+      COMPANY_TYPE: String(this.Default_company_Type)
     };
 
     const ArtvalidationResult = this.ArtnoValidationGroup?.instance?.validate();
@@ -596,6 +598,11 @@ export class PackingAddComponent {
   }
 
   AddData() {
+    // HO STORE => Production Unit is optional
+    this.isHoStore =
+      this.Default_company_Type?.toString().trim().toUpperCase() ===
+      '0';
+
     //  Validate main form
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
@@ -611,8 +618,7 @@ export class PackingAddComponent {
         ? [this.PackingData.UNIT_ID]
         : [];
 
-    //  hard validation
-    if (!selectedUnits.length) {
+    if (!this.isHoStore && !selectedUnits.length) {
       notify(
         {
           message: 'Please select at least one Unit',
@@ -621,6 +627,7 @@ export class PackingAddComponent {
         },
         'warning',
       );
+
       return;
     }
 

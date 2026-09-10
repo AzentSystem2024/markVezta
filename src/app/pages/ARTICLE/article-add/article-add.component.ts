@@ -856,6 +856,24 @@ export class ArticleAddComponent {
 
   saveArticle() {
     // Validate mandatory fields
+
+    const isHoStore =
+      this.Default_company_Type?.toString().trim().toUpperCase() === '0';
+    console.log('Company Type:', this.Default_company_Type);
+    console.log(
+      'Normalized Company Type:',
+      this.Default_company_Type?.toString().trim().toUpperCase()
+    );
+
+    const unitsPayload =
+      Array.isArray(this.selectedProductionUnitId)
+        ? this.selectedProductionUnitId.map((id: any) => ({
+          UNIT_ID: id,
+        }))
+        : this.selectedProductionUnitId
+          ? [{ UNIT_ID: this.selectedProductionUnitId }]
+          : [];
+
     if (!this.articleData.ART_NO) {
       notify({
         message: 'Please enter the Article Number.',
@@ -935,10 +953,14 @@ export class ArticleAddComponent {
     //   return;
     // }
 
+    // Production Unit is mandatory for companies other than HO STORE
     if (
-      !this.selectedProductionUnitId ||
-      (Array.isArray(this.selectedProductionUnitId) &&
-        this.selectedProductionUnitId.length === 0)
+      this.Default_company_Type?.toString().trim().toUpperCase() !== '0' &&
+      (
+        !this.selectedProductionUnitId ||
+        (Array.isArray(this.selectedProductionUnitId) &&
+          this.selectedProductionUnitId.length === 0)
+      )
     ) {
       notify({
         message: 'Please select Production Unit.',
@@ -948,6 +970,19 @@ export class ArticleAddComponent {
       });
       return;
     }
+    // if (
+    //   !this.selectedProductionUnitId ||
+    //   (Array.isArray(this.selectedProductionUnitId) &&
+    //     this.selectedProductionUnitId.length === 0)
+    // ) {
+    //   notify({
+    //     message: 'Please select Production Unit.',
+    //     type: 'warning',
+    //     displayTime: 3000,
+    //     position: { at: 'top right', my: 'top right' },
+    //   });
+    //   return;
+    // }
 
     if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
       notify({
@@ -1094,9 +1129,10 @@ export class ArticleAddComponent {
           Components: this.selectedComponentArticles.map((item: any) => ({
             COMPONENT_ARTICLE_ID: item.ID,
           })),
-          Units: Array.isArray(this.selectedProductionUnitId)
-            ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))
-            : [{ UNIT_ID: this.selectedProductionUnitId }],
+          // Units: Array.isArray(this.selectedProductionUnitId)
+          //   ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))
+          //   : [{ UNIT_ID: this.selectedProductionUnitId }],
+          Units: unitsPayload,
           SUPPLIER_ID: this.selectedMaterialUnitId,
           DESCRIPTION: this.articleData.DESCRIPTION,
           IMAGE_NAME: this.imagePreview ? this.imagePreview.toString() : null,
