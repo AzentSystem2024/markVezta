@@ -716,9 +716,9 @@ export class ArticleEditComponent {
       };
 
       const payload = {
-        COMPANY_ID: this.selected_Company_id,
+        // COMPANY_ID: this.selected_Company_id,
         NAME: 'PRODUCTION_UNITS',
-        COMPANY_TYPE: this.Default_company_Type
+        // COMPANY_TYPE: this.Default_company_Type
       };
       this.dataService.getDropdownData(payload).subscribe((res) => {
         this.produCtionUnits = res;
