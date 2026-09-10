@@ -3455,7 +3455,7 @@ export class DataService {
   }
 
   public getDropdownDataforProduct(type: any): Observable<any> {
-    const reqBodyData = { name: type };
+    const reqBodyData = type;
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
@@ -7495,23 +7495,23 @@ The result can be exported to HTML or Markdown.`;
   getEmailSettings(): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/list`, {});
   }
-    insertEmailSettings(data: any): Observable<any> {
+  insertEmailSettings(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/insert`, data);
   }
 
   selectEmailSettings(id: number) {
-      return this.http.post<any>(`${this.apiUrl}EmailSettings/select/` + id, {});
+    return this.http.post<any>(`${this.apiUrl}EmailSettings/select/` + id, {});
   }
 
   updateEmailSettings(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/update`, data);
   }
 
-    deleteEmailSettings(id: number) {
+  deleteEmailSettings(id: number) {
     return this.http.post<any>(`${this.apiUrl}EmailSettings/delete/` + id, {});
   }
 
-    testEmail(data: any): Observable<any> {
+  testEmail(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/TestMail`, data);
   }
   

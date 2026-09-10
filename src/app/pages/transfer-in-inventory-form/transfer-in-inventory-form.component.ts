@@ -170,6 +170,7 @@ export class TransferInInventoryFormComponent {
   StoreIDData: any;
   transferstores: any[] = [];
   selectedTransferIds: any[] = [];
+  selectedPopupRowKeys: any[] = [];
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -299,7 +300,7 @@ export class TransferInInventoryFormComponent {
       next: (response: any) => {
         const rawData = response?.data || [];
         // Sort items by TRANSFER_DATE descending (newest first)
-        this.items = rawData.sort((a: any, b: any) => {
+        const sorted = rawData.sort((a: any, b: any) => {
           const dateA = new Date(
             a.TRANSFER_DATE || a.REC_DATE || a.DOC_DATE || 0,
           ).getTime();
@@ -308,6 +309,12 @@ export class TransferInInventoryFormComponent {
           ).getTime();
           return dateB - dateA;
         });
+
+        // Assign a unique row ID so every row is uniquely selectable
+        this.items = sorted.map((item: any, index: number) => ({
+          ...item,
+          _ROW_ID: `row_${index + 1}`,
+        }));
         this.isPopupGridLoading = false;
         this.popupGridRef?.instance?.endCustomLoading();
       },
@@ -371,6 +378,7 @@ export class TransferInInventoryFormComponent {
   onStoreChange(e: any) {
     if (this.selectedStoreId !== e.value) {
       this.selectedTransferIds = [];
+      this.selectedPopupRowKeys = [];
       if (
         this.transferInFormData.DETAILS &&
         this.transferInFormData.DETAILS.length > 0
@@ -419,6 +427,7 @@ export class TransferInInventoryFormComponent {
     // If no row is selected (or user unchecks all), clear grid details
     if (!selectedRows || selectedRows.length === 0) {
       this.selectedTransferIds = [];
+      this.selectedPopupRowKeys = [];
       this.transferInFormData.DETAILS = [];
       this.transferInFormData.ISSUE_ID = 0;
       this.transferInFormData.NET_AMOUNT = 0;
@@ -426,9 +435,15 @@ export class TransferInInventoryFormComponent {
       return;
     }
 
-    const selectedTransferIds = selectedRows
-      .map((row: any) => row.TRANSFER_ID || row.ID)
-      .filter(Boolean);
+    this.selectedPopupRowKeys = selectedRows.map((row: any) => row._ROW_ID);
+
+    const selectedTransferIds = Array.from(
+      new Set(
+        selectedRows
+          .map((row: any) => row.TRANSFER_ID || row.ID)
+          .filter(Boolean),
+      ),
+    );
     this.selectedTransferIds = selectedTransferIds;
 
     const docNoMap = new Map<any, string>();
@@ -528,6 +543,16 @@ export class TransferInInventoryFormComponent {
   onAddItems() {
     this.isPopupVisible = true;
 
+    // Ensure items are assigned _ROW_ID if loaded prior
+    if (this.items && this.items.length > 0) {
+      this.items = this.items.map((item: any, index: number) => ({
+        ...item,
+        _ROW_ID: item._ROW_ID || `row_${index + 1}_${item.TRANSFER_ID || item.ID || ''}`,
+      }));
+    } else if (this.selectedStoreId) {
+      this.getItemsList();
+    }
+
     // Pre-select rows in popup grid matching currently loaded documents
     setTimeout(() => {
       if (this.popupGridRef?.instance) {
@@ -539,8 +564,11 @@ export class TransferInInventoryFormComponent {
           this.popupGridRef.instance.endCustomLoading();
 
           let keysToSelect: any[] = [];
-          if (this.selectedTransferIds && this.selectedTransferIds.length > 0) {
-            keysToSelect = [...this.selectedTransferIds];
+          if (
+            this.selectedPopupRowKeys &&
+            this.selectedPopupRowKeys.length > 0
+          ) {
+            keysToSelect = [...this.selectedPopupRowKeys];
           } else if (
             this.transferInFormData.DETAILS &&
             this.transferInFormData.DETAILS.length > 0
@@ -556,7 +584,7 @@ export class TransferInInventoryFormComponent {
                   loadedIds.has(item.TRANSFER_ID) ||
                   loadedIds.has(item.ISSUE_ID),
               )
-              .map((item: any) => item.TRANSFER_ID || item.ID);
+              .map((item: any) => item._ROW_ID);
           }
 
           if (keysToSelect.length > 0) {

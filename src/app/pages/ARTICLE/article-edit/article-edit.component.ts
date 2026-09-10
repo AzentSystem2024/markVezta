@@ -824,7 +824,7 @@ export class ArticleEditComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     console.log(sessionData, '=================session data==========');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.Default_company_Type = sessionData.SELECTED_COMPANY.COMPANY_TYPE;
@@ -838,6 +838,75 @@ export class ArticleEditComponent {
   updateArticle() {
     if (!this.articleData) {
       console.warn('No article data to update');
+      return;
+    }
+
+
+    if (!this.articleData.ART_NO) {
+      notify({
+        message: 'Please enter the Article Number.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
+    if (!this.articleData.COLOR) {
+      notify({
+        message: 'Please select the Color.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
+    if (!this.articleData.PRICE) {
+      notify({
+        message: 'Please select the Price.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
+    if (!this.articleData.CATEGORY_ID) {
+      notify({
+        message: 'Please select a Category.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
+
+    if (!this.articleData.PACK_QTY) {
+      notify({
+        message: 'Please select the Packing Qty.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
+    if (
+      this.Default_company_Type?.toString().trim().toUpperCase() !== '0' &&
+      (
+        !this.articleData.UNIT_ID ||
+        (Array.isArray(this.articleData.UNIT_ID) &&
+          this.articleData.UNIT_ID.length === 0)
+      )
+    ) {
+      notify({
+        message: 'Please select Production Unit.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
       return;
     }
 
@@ -862,6 +931,15 @@ export class ArticleEditComponent {
       return;
     }
 
+    if (!this.articleData.ARTICLE_TYPE) {
+      notify({
+        message: 'Please select a Type.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
 
     const rows = this.itemsGridRef?.instance
       ?.getVisibleRows()
@@ -1067,7 +1145,7 @@ export class ArticleEditComponent {
     const price = this.articleData.PRICE ?? '';
 
     const categoryName =
-      this.categoryList?.find(c => c.ID === this.selectedCategoryId)
+      this.categoryList?.find(c => c.ID === this.articleData.CATEGORY_ID)
         ?.DESCRIPTION || '';
 
     // Build exact format
