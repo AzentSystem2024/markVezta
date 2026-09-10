@@ -123,7 +123,7 @@ export class SupplierListComponent implements OnInit {
   }
 
   showSupplier() {
-    this.dataservice.getSupplierData().subscribe((response) => {
+    this.dataservice.getSupplierData({COMPANY_ID: 1}).subscribe((response) => {
       this.supplier = response;
     });
   }
@@ -206,7 +206,8 @@ export class SupplierListComponent implements OnInit {
         currencyIdNumber,
         PAY_TERM_ID,
         VAT_RULE_ID,
-        Supplier_cost,
+        false,
+        Supplier_cost
       )
       .subscribe((response) => {
         if (response) {
@@ -265,28 +266,7 @@ export class SupplierListComponent implements OnInit {
       VAT_RULE_ID,
     } = selectedRow;
 
-    this.dataservice
-      .removeSupplier(
-        ID,
-        SUPP_CODE,
-        SUPP_NAME,
-        ADDRESS1,
-        ADDRESS2,
-        ADDRESS3,
-        ZIP,
-        STATE_ID,
-        CITY,
-        COUNTRY_ID,
-        PHONE,
-        EMAIL,
-        MOBILE_NO,
-        NOTES,
-        FAX_NO,
-        VAT_REGNO,
-        CURRENCY_ID,
-        PAY_TERM_ID,
-        VAT_RULE_ID,
-      )
+    this.dataservice.removeSupplier(ID)
       .subscribe(() => {
         try {
           // Your delete logic here

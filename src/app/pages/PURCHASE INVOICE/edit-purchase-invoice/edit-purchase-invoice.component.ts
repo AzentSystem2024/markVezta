@@ -32,6 +32,7 @@ import {
   DxTabsModule,
   DxNumberBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -129,6 +130,15 @@ export class EditPurchaseInvoiceComponent {
   isLoadingPdf: boolean = false;
   pdfBlobUrl: string | null = null;
   pdfPreviewUrl: SafeResourceUrl | null = null;
+  currentPdfBlob: Blob | null = null;
+
+  isEmailPopupVisible: boolean = false;
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  isSendingEmail: boolean = false;
+  emailSettingsData: any = null;
   
   constructor(private dataService: DataService, private http: HttpClient, private sanitizer: DomSanitizer) {
     const userDataString = localStorage.getItem('userData');
@@ -1720,11 +1730,19 @@ export class EditPurchaseInvoiceComponent {
     const invNo = this.purchaseInvoiceFormData?.DOC_NO || '';
     const invId = this.purchaseInvoiceFormData?.ID || 0;
     
+    if (!invId || invId === 0) {
+      alert("Please save the document before generating a preview.");
+      this.isPreviewPopupVisible = false;
+      this.isLoadingPdf = false;
+      return;
+    }
+    
     // Using the endpoint and passing invoiceId
     const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?invoiceId=${invId}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
         const objectUrl = URL.createObjectURL(blob);
         this.pdfBlobUrl = objectUrl;
         this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
@@ -1748,11 +1766,74 @@ export class EditPurchaseInvoiceComponent {
     };
   }
 
+  sendPdf(): void {
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+    
+    // Purchase Invoice Email Type ID is 19
+    this.dataService.selectEmailSettings(19).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSettingsData = res.Data;
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      alert("Please select at least one recipient.");
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      alert("No PDF generated to attach.");
+      return;
+    }
+
+    this.isSendingEmail = true;
+    
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject);
+    formData.append('Body', this.emailBody);
+    formData.append('EmailType', '19'); 
+    
+    const fileName = `${this.selectedTemplate || 'PurchaseInvoice'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    
+    this.dataService.sendEmailWithAttachment(formData).subscribe((res: any) => {
+      this.isSendingEmail = false;
+      if (res && res.flag === 1) {
+        alert("Email sent successfully!");
+        this.isEmailPopupVisible = false;
+      } else {
+        alert("Failed to send email: " + (res?.Message || "Unknown error"));
+      }
+    }, (error) => {
+      this.isSendingEmail = false;
+      console.error("Email send error", error);
+      alert("Error sending email.");
+    });
+  }
+
   closePdfPreview(): void {
     this.isPreviewPopupVisible = false;
     if (this.pdfBlobUrl) {
       URL.revokeObjectURL(this.pdfBlobUrl);
       this.pdfBlobUrl = null;
+      this.currentPdfBlob = null;
     }
     this.pdfPreviewUrl = null;
   }
@@ -1809,6 +1890,7 @@ export class EditPurchaseInvoiceComponent {
     AddJournalVoucharModule,
     EditJournalVoucherModule,
     ViewJournalVoucherModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [EditPurchaseInvoiceComponent],
