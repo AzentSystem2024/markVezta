@@ -31,6 +31,7 @@ import {
   DxTabsModule,
   DxNumberBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -48,6 +49,9 @@ import { TransferInInventoryFormComponent } from '../transfer-in-inventory-form/
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
+import { HttpClient } from '@angular/common/http';
+import { DomSanitizer } from '@angular/platform-browser';
+import { environment } from 'src/environments/environment';
 import CustomStore from 'devextreme/data/custom_store';
 import DataSource from 'devextreme/data/data_source';
 import ArrayStore from 'devextreme/data/array_store';
@@ -180,11 +184,30 @@ export class QuotationFormComponent {
   itemDataCache: Map<string, any[]> = new Map();
   storeId: any;
 
+  // --- PDF / Print flow ---
+  showTemplatePopup: boolean = false;
+  templateList: any[] = [];
+  selectedTemplate: any = null;
+  isPreviewPopupVisible: boolean = false;
+  isLoadingPdf: boolean = false;
+  pdfPreviewUrl: any = null;
+  pdfBlobUrl: string | null = null;
+  currentPdfBlob: Blob | null = null;
+  isEmailPopupVisible: boolean = false;
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  emailSettingsData: any = null;
+  isSendingEmail: boolean = false;
+
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private http: HttpClient,
+    private sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit() {
@@ -1326,6 +1349,138 @@ export class QuotationFormComponent {
   //   });
   // }
 
+  printReport() {
+    this.getTemplateList();
+    this.showTemplatePopup = true;
+  }
+
+  getTemplateList() {
+    this.http.get<any[]>(environment.apiUrl + 'Reports').subscribe({
+      next: (data) => {
+        // Category for Quotation — filter by categoryId 4 or name match
+        const filtered = data.filter((t: any) => t.categoryId === 4 || t.name?.toLowerCase().includes('quotation'));
+        this.templateList = filtered.length > 0 ? filtered : data;
+        if (this.templateList.length > 0) this.selectedTemplate = this.templateList[0].name;
+        else this.selectedTemplate = null;
+      },
+      error: (err) => console.error('Error fetching templates:', err)
+    });
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.showTemplatePopup = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+
+    const invId = this.quotationFormData?.ID || this.quotationFormData?.TRANS_ID || 0;
+    if (!invId || invId === 0) {
+      notify('Please save the document before generating a preview.', 'warning', 3000);
+      this.isPreviewPopupVisible = false;
+      this.isLoadingPdf = false;
+      return;
+    }
+
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?quotationId=${invId}`;
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        notify('Failed to load PDF preview.', 'error', 3000);
+        this.isLoadingPdf = false;
+      }
+    });
+  }
+
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+    };
+  }
+
+  downloadPdf(): void {
+    if (!this.currentPdfBlob) return;
+    const a = document.createElement('a');
+    a.href = this.pdfBlobUrl!;
+    a.download = `${this.selectedTemplate || 'Quotation'}.pdf`;
+    a.click();
+  }
+
+  sendPdf(): void {
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+    this.dataService.selectEmailSettings(4).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSettingsData = res.Data;
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      notify('Please select at least one recipient.', 'warning', 3000);
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      notify('No PDF generated to attach.', 'warning', 3000);
+      return;
+    }
+    this.isSendingEmail = true;
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject || ' ');
+    formData.append('Body', this.emailBody || ' ');
+    formData.append('EmailType', '4');
+    const fileName = `${this.selectedTemplate || 'Quotation'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    this.dataService.sendEmailWithAttachment(formData).subscribe({
+      next: () => {
+        this.isSendingEmail = false;
+        notify('Email sent successfully!', 'success', 3000);
+        this.isEmailPopupVisible = false;
+      },
+      error: (error) => {
+        this.isSendingEmail = false;
+        console.error('Email send error', error);
+        notify('Error sending email.', 'error', 3000);
+      }
+    });
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = null;
+      this.currentPdfBlob = null;
+    }
+    this.pdfPreviewUrl = null;
+  }
+
   printQuotation() {
     console.log('Open PDF clicked');
     const returnId = this.EditingResponseData.ID;
@@ -1787,6 +1942,7 @@ export class QuotationFormComponent {
     DxoSummaryModule,
     DxTabPanelModule,
     DxTabsModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [QuotationFormComponent],
