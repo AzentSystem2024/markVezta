@@ -1,4 +1,13 @@
 ::ng-deep .form-popup {
+  .dx-popup-content {
+    padding: 8px 16px !important;
+    overflow-y: hidden !important;
+  }
+
+  .dx-tabpanel-container {
+    margin-bottom: 0 !important;
+  }
+
   /* Toolbar center takes full width */
   .dx-toolbar-center {
     width: 100%;
