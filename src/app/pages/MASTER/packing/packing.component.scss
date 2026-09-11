@@ -53,3 +53,18 @@
 .flag-green {
   color: green;
 }
+
+::ng-deep .packing-popup {
+  .dx-popup-content {
+    padding: 10px 16px 10px 16px !important;
+    overflow-y: hidden !important;
+  }
+
+  .dx-tabs {
+    margin-bottom: 6px !important;
+  }
+
+  .dx-tabpanel-container {
+    margin-bottom: 0 !important;
+  }
+}

@@ -449,10 +449,9 @@
 </form-popup>
 
 <dx-popup
-  *ngIf="isEditItemsPopupOpened"
+  *ngIf="isEditItemsPopupOpened && selectedItemData"
   [(visible)]="isEditItemsPopupOpened"
   [width]="1000"
-  [deferRendering]="false"
   [height]="'100vh'"
   title="Edit Item"
   [wrapperAttr]="{ class: 'edit-item-popup' }"

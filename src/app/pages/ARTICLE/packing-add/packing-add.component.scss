@@ -1,10 +1,24 @@
+:host ::ng-deep .dx-popup-wrapper .dx-overlay-content {
+  max-height: 95vh !important;
+  height: 92vh !important;
+}
+
+:host ::ng-deep .dx-popup-content {
+  padding: 8px 16px 10px 16px !important;
+  overflow-y: hidden !important;
+}
+
+::ng-deep .form-tabs .dx-tabs {
+  margin-bottom: 6px !important;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; /* 2 columns for fields, 1 for image/grid */
   gap: 8px 12px;
-  margin-bottom: 16px;
+  margin-bottom: 6px;
+  margin-top: 14px;
   align-items: start;
-  margin-top: 16px;
 }
 
 .form-field {
@@ -16,10 +30,10 @@
 /* Image + Grid column on right */
 .image-grid-wrapper {
   grid-column: 3;
-  grid-row: 1 / span 10; /* Adjust to fit height */
+  grid-row: 1 / span 10;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
 
 .image-field {
@@ -56,34 +70,36 @@
 ::ng-deep .dx-selectbox {
   margin: 0 !important;
   padding: 0 !important;
-  height: 36px !important;
+  height: 34px !important;
+}
+
+::ng-deep .dx-tagbox {
+  min-height: 34px !important;
+  height: auto !important;
 }
 
 ::ng-deep .dx-texteditor-input {
   height: 100% !important;
-  line-height: 20px !important;
-  padding: 6px 10px !important;
+  line-height: 18px !important;
+  padding: 4px 8px !important;
 }
 
 /* Additional UI Layouts */
 .checkbox-container {
   grid-column: span 2;
   display: flex;
-  gap: 10px;
-  margin-top: 16px;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 8px 16px;
+  margin-top: 4px;
 }
 
 .form-popup-buttons-container {
   display: flex;
   justify-content: flex-end;
-  padding: 10px;
-  margin-top: -12px;
-}
-
-.popup-footer {
-  display: flex;
-  gap: 10px;
+  padding: 6px 10px;
+  margin-top: -8px;
 }
 
 .with-buttons {
@@ -104,8 +120,9 @@
 }
 
 .popup-content {
-  padding: 16px;
+  padding: 12px;
 }
+
 ::ng-deep .dx-datagrid-rowsview .dx-row > td {
   border-right: 1px solid #ccc !important;
 }
@@ -126,7 +143,7 @@
 }
 
 .form-field-with-buttons dx-text-box {
-  flex: 1; /* Take all available space */
+  flex: 1;
 }
 
 .component-with-buttons {
@@ -155,30 +172,14 @@
   grid-column: span 2;
 }
 
-// .checkbox-container {
-//   display: flex;
-//   justify-content: flex-start;
-//   align-items: center;
-//   flex-wrap: wrap;
-//   gap: 24px;
-//   padding-left: 4px;
-// }
-
-.checkbox-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: flex-start; /* Align all rows to the left */
-}
-
 .row {
   display: flex;
   align-items: center;
-  gap: 24px; /* spacing between elements on the same row */
+  gap: 24px;
 }
 
 .supplier-box {
-  min-width: 350px;
+  min-width: 220px;
 }
 
 .combination {
@@ -192,8 +193,8 @@
 }
 
 ::ng-deep .fixed-footer {
-  padding: 8px 20px 8px; /* tighter than before */
-  margin-top: 4px; /* reduced top gap */
+  padding: 4px 0 0 0;
+  margin-top: 2px;
 }
 
 /* Right aligned buttons */
@@ -201,10 +202,8 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 10px;
 }
 
-/* Optional: shift footer slightly right (replaces margin-left:60%) */
 ::ng-deep .right-footer {
   width: 100%;
 }
@@ -212,7 +211,7 @@
 /* Common button size */
 ::ng-deep .popup-footer .dx-button {
   min-width: 90px;
-  height: 36px;
+  height: 34px;
   font-size: 14px;
   border-radius: 6px;
 }
@@ -230,9 +229,9 @@
   border-color: #0d6efd;
   color: #ffffff;
 }
-/* Force new row before Standard Price */
+
 .standard-pack-row {
-  grid-column-start: 1; /* start new row */
+  grid-column-start: 1;
 }
 
 .reset-btn {
@@ -240,7 +239,7 @@
   border-color: #ffc3c3 !important;
 }
 
-::ng-deep.reset-btn:hover {
+::ng-deep .reset-btn:hover {
   color: #ff2c2c !important;
   background-color: #ffc3c3 !important;
 }

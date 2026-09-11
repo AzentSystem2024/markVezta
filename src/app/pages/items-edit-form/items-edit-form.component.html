@@ -1,6 +1,6 @@
 <div class="edit-form-container">
   <dx-validation-group #validationGroup>
-    <dx-form class="plain-styled-form" [(visible)]="popupVisible" *ngIf="itemData.TYPE_ID != 2">
+    <dx-form class="plain-styled-form" [(visible)]="popupVisible" *ngIf="itemData && itemData.TYPE_ID != 2">
       <dxi-item itemType="tabbed">
         <dxi-tab title="General" class="tab-style">
           <dxi-item itemType="group" [colCount]="3" class="tab-style">
@@ -720,7 +720,7 @@
       </dxi-item>
     </dx-form>
 
-    <dx-form *ngIf="itemData.TYPE_ID == 2" class="plain-styled-form" [(visible)]="popupVisible">
+    <dx-form *ngIf="itemData && itemData.TYPE_ID == 2" class="plain-styled-form" [(visible)]="popupVisible">
       <dxi-item itemType="tabbed">
         <dxi-tab title="General" class="tab-style">
           <dxi-item itemType="group" [colCount]="3" class="tab-style">

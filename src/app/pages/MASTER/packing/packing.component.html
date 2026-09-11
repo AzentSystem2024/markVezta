@@ -136,8 +136,9 @@
 
 <dx-popup
   [(visible)]="addPackingPopupVisible"
-  [width]="'80vw'"
-  [height]="'auto'"
+  [width]="'82vw'"
+  [height]="'92vh'"
+  [wrapperAttr]="{ class: 'packing-popup' }"
   title="New Packing"
   (onHiding)="handleClose()"
 >
@@ -146,8 +147,9 @@
 
 <dx-popup
   [(visible)]="editPackPopupOpened"
-  [width]="'80vw'"
-  [height]="'auto'"
+  [width]="'82vw'"
+  [height]="'92vh'"
+  [wrapperAttr]="{ class: 'packing-popup' }"
   title="Update Packing"
   (onHiding)="handleClose()"
 >

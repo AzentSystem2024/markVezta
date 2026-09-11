@@ -409,7 +409,7 @@
           [dataSource]="PackingEntriesData"
           [showBorders]="true"
           [editing]="{ mode: 'cell', allowUpdating: true }"
-          [height]="'30vh'"
+          [height]="'240px'"
           [width]="'100%'"
           (onRowUpdated)="onQuantityChanged()"
           [sorting]="{ mode: 'single' }"
@@ -428,7 +428,6 @@
             [allowEditing]="false"
             dataField="SIZE"
             caption="Size"
-            sortOrder="asc"
             alignment="center"
             dataType="number"
           ></dxi-column>
@@ -592,20 +591,18 @@
   </dxi-item>
 </dx-tab-panel>
 <div class="fixed-footer popup-footer right-footer">
-  <div class="popup-footer">
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      (onClick)="closePopup()"
-      type="normal"
-    ></dx-button>
-    <dx-button
-      text="Update"
-      stylingMode="contained"
-      type="default"
-      (onClick)="UpdateData()"
-    ></dx-button>
-  </div>
+  <dx-button
+    text="Cancel"
+    stylingMode="outlined"
+    (onClick)="closePopup()"
+    type="normal"
+  ></dx-button>
+  <dx-button
+    text="Update"
+    stylingMode="contained"
+    type="default"
+    (onClick)="UpdateData()"
+  ></dx-button>
 </div>
 
 <dx-popup
