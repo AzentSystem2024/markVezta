@@ -6,7 +6,21 @@
           <dxi-item itemType="group" [colCount]="3" class="tab-style">
             <!-- LEFT 2 COLUMNS -->
             <dxi-item itemType="group" [colCount]="2" [colSpan]="2" cssClass="flat-group">
-              <!-- Row 1: Item Type & Inactive -->
+              <!-- Row 1: Company (aligning across both columns) -->
+              <dxi-item [colSpan]="2" [visible]="isCompanyDropdownVisible">
+                <div *dxTemplate style="margin-bottom: 2px">
+                  <dx-tag-box label="Company *" displayExpr="COMPANY_NAME" [searchEnabled]="true" [items]="company_list"
+                    labelMode="floating" valueExpr="COMPANY_ID" placeholder="Select Company" [(value)]="selectedCompanyIds"
+                    [showSelectionControls]="true" [showDropDownButton]="true" [showClearButton]="true" [multiline]="false"
+                    (onValueChanged)="onCompanyChanged($event)" [width]="'100%'">
+                    <dx-validator>
+                      <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+                    </dx-validator>
+                  </dx-tag-box>
+                </div>
+              </dxi-item>
+
+              <!-- Row 2: Item Type & Inactive -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Item Type *" displayExpr="DESCRIPTION" [searchEnabled]="true" [items]="itemtype"
@@ -712,7 +726,21 @@
           <dxi-item itemType="group" [colCount]="3" class="tab-style">
             <!-- LEFT 2 COLUMNS -->
             <dxi-item itemType="group" [colCount]="2" [colSpan]="2" cssClass="flat-group">
-              <!-- Row 1: Item Type & Inactive -->
+              <!-- Row 1: Company (aligning across both columns) -->
+              <dxi-item [colSpan]="2" [visible]="isCompanyDropdownVisible">
+                <div *dxTemplate style="margin-bottom: 2px">
+                  <dx-tag-box label="Company *" displayExpr="COMPANY_NAME" [searchEnabled]="true" [items]="company_list"
+                    labelMode="floating" valueExpr="COMPANY_ID" placeholder="Select Company" [(value)]="selectedCompanyIds"
+                    [showSelectionControls]="true" [showDropDownButton]="true" [showClearButton]="true" [multiline]="false"
+                    (onValueChanged)="onCompanyChanged($event)" [width]="'100%'">
+                    <dx-validator>
+                      <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+                    </dx-validator>
+                  </dx-tag-box>
+                </div>
+              </dxi-item>
+
+              <!-- Row 2: Item Type & Inactive -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Item Type *" displayExpr="DESCRIPTION" [searchEnabled]="true" [items]="itemtype"

@@ -287,10 +287,19 @@ export class ItemsListComponent implements OnInit {
   }
 
   showItems(): void {
+    if (!this.selected_Company_id) {
+      const sessionData = JSON.parse(
+        sessionStorage.getItem('savedUserData') || '{}',
+      );
+      this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    }
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.ItemsDataSource = new DataSource({
       load: () =>
         new Promise((resolve) => {
-          this.dataservice.getItemsData().subscribe({
+          this.dataservice.getItemsData(payload).subscribe({
             next: (response: any) => {
               const data = response?.data || [];
               this.itemsArray = data;
@@ -326,6 +335,12 @@ export class ItemsListComponent implements OnInit {
 
   onClickSaveItems(): void {
     const items = this.itemsComponent.getNewItems();
+
+    if (Array.isArray(items.COMPANY_ID)) {
+      items.COMPANY_ID = items.COMPANY_ID.join(',');
+    } else if (items.COMPANY_ID !== null && items.COMPANY_ID !== undefined) {
+      items.COMPANY_ID = String(items.COMPANY_ID);
+    }
 
     if (items.ITEM_ALIAS && items.ITEM_ALIAS.length > 0) {
       items.ITEM_ALIAS = items.ITEM_ALIAS.filter(
@@ -518,7 +533,8 @@ export class ItemsListComponent implements OnInit {
       this.startDate = new Date(todayStr);
       this.EndDate = new Date(todayStr);
     } else if (this.selectedDateRange === 'all') {
-      this.dataservice.getItemsData().subscribe((res: any) => {
+      const payload = { COMPANY_ID: this.selected_Company_id };
+      this.dataservice.getItemsData(payload).subscribe((res: any) => {
         this.itemsArray = res.data;
       });
     } else if (this.selectedDateRange === 'last7') {
@@ -546,7 +562,8 @@ export class ItemsListComponent implements OnInit {
   }
 
   applyCustomDateFilter(): void {
-    this.dataservice.getItemsData().subscribe((res: any) => {
+    const payload = { COMPANY_ID: this.selected_Company_id };
+    this.dataservice.getItemsData(payload).subscribe((res: any) => {
       this.itemsArray = res.data;
       this.selectedDateRange = 'custom';
       this.showCustomDatePopup = false;

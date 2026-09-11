@@ -3321,8 +3321,8 @@ export class DataService {
   }
 
   //items
-  getItemsData(): any {
-    return this.http.post(`${this.apiUrl}items/list`, {});
+  getItemsData(data: any = {}): any {
+    return this.http.post(`${this.apiUrl}items/list`, data || {});
   }
 
   public postItems(items: any) {
