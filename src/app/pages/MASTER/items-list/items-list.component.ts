@@ -510,8 +510,8 @@ export class ItemsListComponent implements OnInit {
 
     this.dataservice.selectItems(itemId).subscribe((response: any) => {
       this.selectedItemData = JSON.parse(JSON.stringify(response));
+      this.isEditItemsPopupOpened = true;
     });
-    this.isEditItemsPopupOpened = true;
   }
 
   handleFormClosed(): void {
