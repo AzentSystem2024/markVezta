@@ -27,6 +27,8 @@ import {
   DxDataGridComponent,
   DxCheckBoxModule,
   DxDateBoxModule,
+  DxTagBoxModule,
+  DxTextAreaModule,
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
 import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
@@ -96,6 +98,15 @@ export class GrnComponent implements OnInit {
   host = 'http://localhost:49834/';
   grnId: any;
   flag: boolean = false;
+
+  isEmailPopupVisible: boolean = false;
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  emailSettingsData: any = null;
+  isSendingEmail: boolean = false;
+  currentPdfBlob: Blob | null = null;
   @ViewChild(DxReportViewerComponent, { static: false })
   viewer!: DxReportViewerComponent;
 
@@ -961,16 +972,17 @@ export class GrnComponent implements OnInit {
     this.showTemplatePopup = false;
     this.isPreviewPopupVisible = true;
     this.isLoadingPdf = true;
-    
+
     // For GRN we use doc no or ID
     const grnNo = this.selectedRowData?.DOC_NO || this.selectedRowData?.GRN_NO || '';
     const grnId = this.selectedRowData?.ID || this.selectedGrnId || this.grnId || 0;
-    
+
     // Using the same endpoint but passing GRN id/no
     const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?grnId=${grnId}&poNo=${encodeURIComponent(grnNo)}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
         const objectUrl = URL.createObjectURL(blob);
         this.pdfBlobUrl = objectUrl;
         this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
@@ -1006,9 +1018,57 @@ export class GrnComponent implements OnInit {
   }
 
   sendPdf(): void {
-    // Stub for send functionality
-    console.log("Send PDF triggered");
-    alert("Send functionality is not fully implemented yet.");
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+    this.service.selectEmailSettings(18).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSettingsData = res.Data;
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      notify('Please select at least one recipient.', 'warning', 3000);
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      notify('No PDF generated to attach.', 'warning', 3000);
+      return;
+    }
+    this.isSendingEmail = true;
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject || ' ');
+    formData.append('Body', this.emailBody || ' ');
+    formData.append('EmailType', '18');
+    const fileName = `${this.selectedTemplate || 'GoodsReceiptNote'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    this.service.sendEmailWithAttachment(formData).subscribe({
+      next: () => {
+        this.isSendingEmail = false;
+        notify('Email sent successfully!', 'success', 3000);
+        this.isEmailPopupVisible = false;
+      },
+      error: (error) => {
+        this.isSendingEmail = false;
+        console.error('Email send error', error);
+        notify('Error sending email.', 'error', 3000);
+      }
+    });
   }
 
   closePdfPreview(): void {
@@ -1017,6 +1077,7 @@ export class GrnComponent implements OnInit {
       URL.revokeObjectURL(this.pdfBlobUrl);
       this.pdfBlobUrl = '';
       this.pdfPreviewUrl = null;
+      this.currentPdfBlob = null;
     }
   }
 }
@@ -1044,6 +1105,8 @@ export class GrnComponent implements OnInit {
     GrnViewFormModule,
     DxDateBoxModule,
     CustomDatePopupModule,
+    DxTagBoxModule,
+    DxTextAreaModule,
   ],
   providers: [],
   exports: [],

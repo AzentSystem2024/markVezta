@@ -1203,11 +1203,11 @@ export class SalesOrderFinancePopupFormComponent {
 
   sendEmailConfirm(): void {
     if (this.selectedEmails.length === 0) {
-      alert("Please select at least one recipient.");
+      notify("Please select at least one recipient.", "warning", 3000);
       return;
     }
     if (!this.currentPdfBlob) {
-      alert("No PDF generated to attach.");
+      notify("No PDF generated to attach.", "warning", 3000);
       return;
     }
 
@@ -1226,18 +1226,21 @@ export class SalesOrderFinancePopupFormComponent {
     const fileName = `${this.selectedTemplate || 'SalesOrder'}.pdf`;
     formData.append('Attachment', this.currentPdfBlob, fileName);
     
-    this.dataService.sendEmailWithAttachment(formData).subscribe((res: any) => {
-      this.isSendingEmail = false;
-      if (res && res.flag === 1) {
-        alert("Email sent successfully!");
-        this.isEmailPopupVisible = false;
-      } else {
-        alert("Failed to send email: " + (res?.Message || "Unknown error"));
+    this.dataService.sendEmailWithAttachment(formData).subscribe({
+      next: (res: any) => {
+        this.isSendingEmail = false;
+        if (res && res.flag === 1) {
+          notify("Email sent successfully!", "success", 3000);
+          this.isEmailPopupVisible = false;
+        } else {
+          notify("Failed to send email: " + (res?.Message || "Unknown error"), "error", 3000);
+        }
+      },
+      error: (error) => {
+        this.isSendingEmail = false;
+        console.error("Email send error", error);
+        notify("Error sending email.", "error", 3000);
       }
-    }, (error) => {
-      this.isSendingEmail = false;
-      console.error("Email send error", error);
-      alert("Error sending email.");
     });
   }
 
