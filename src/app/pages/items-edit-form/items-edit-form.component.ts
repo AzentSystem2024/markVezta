@@ -36,6 +36,7 @@ import {
   DxValidationGroupComponent,
   DxValidationGroupModule,
   DxValidatorModule,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import { FormPopupModule, FormTextboxModule } from 'src/app/components';
 import {
@@ -81,6 +82,9 @@ export class ItemsEditFormComponent implements OnInit {
   selected_Company_id: any;
   companyId: any;
   selectedStoresMap: any;
+  company_list: any[] = [];
+  selectedCompanyIds: any[] = [];
+  isCompanyDropdownVisible: boolean = false;
 
   get buttonContainerHtml() {
     return `
@@ -655,7 +659,7 @@ export class ItemsEditFormComponent implements OnInit {
         };
       });
 
-      // ✅ selection based on ID where IS_SELECTED is true
+      // 🔹 selection based on ID where IS_SELECTED is true
       this.selectedRowKeys = this.Edit_Store
         .filter((x: any) => x.IS_SELECTED)
         .map((x: any) => Number(x.STORE_ID))
@@ -670,6 +674,30 @@ export class ItemsEditFormComponent implements OnInit {
       this.bindStoreData(); // ✅ call here
 
       console.log(this.store, '=======afte bindg');
+
+      const compIdVal = this.itemData?.COMPANY_ID;
+      if (compIdVal !== null && compIdVal !== undefined && compIdVal !== '') {
+        if (Array.isArray(compIdVal)) {
+          this.selectedCompanyIds = compIdVal.map((id: any) =>
+            isNaN(Number(id)) ? id : Number(id),
+          );
+        } else if (typeof compIdVal === 'string') {
+          this.selectedCompanyIds = compIdVal
+            .split(',')
+            .map((id: string) => id.trim())
+            .filter((id: string) => id !== '')
+            .map((id: string) => (isNaN(Number(id)) ? id : Number(id)));
+        } else if (typeof compIdVal === 'number') {
+          this.selectedCompanyIds = [compIdVal];
+        }
+      } else {
+        const defaultCompId =
+          this.selected_Company_id ||
+          this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+        if (defaultCompId) {
+          this.selectedCompanyIds = [Number(defaultCompId) || defaultCompId];
+        }
+      }
     }
     this.sesstion_Details();
   }
@@ -844,6 +872,22 @@ export class ItemsEditFormComponent implements OnInit {
     }
 
     this.companyId = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    const companyType =
+      menuResponse?.SELECTED_COMPANY?.COMPANY_TYPE ??
+      sessionData?.SELECTED_COMPANY?.COMPANY_TYPE;
+    this.isCompanyDropdownVisible =
+      String(companyType) === '0' || Number(companyType) === 0;
+
+    if (!this.company_list || this.company_list.length === 0) {
+      this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
+        this.company_list = (res?.Data || []).map((c: any) => ({
+          ...c,
+          COMPANY_ID: c.COMPANY_ID || c.ID,
+          COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
+        }));
+      });
+    }
+
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as { data: any };
     if (state?.data) {
@@ -886,6 +930,26 @@ export class ItemsEditFormComponent implements OnInit {
     this.ENABLE_Matrix_Code =
       this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    const companyType = this.sessionData?.SELECTED_COMPANY?.COMPANY_TYPE;
+    this.isCompanyDropdownVisible =
+      String(companyType) === '0' || Number(companyType) === 0;
+
+    if (!this.company_list || this.company_list.length === 0) {
+      this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
+        this.company_list = (res?.Data || []).map((c: any) => ({
+          ...c,
+          COMPANY_ID: c.COMPANY_ID || c.ID,
+          COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
+        }));
+      });
+    }
+  }
+
+  onCompanyChanged(event: any) {
+    this.selectedCompanyIds = event.value || [];
+    if (this.itemData) {
+      this.itemData.COMPANY_ID = this.selectedCompanyIds.join(',');
+    }
   }
   onRowUpdated(e: any) { }
 
@@ -1160,6 +1224,25 @@ export class ItemsEditFormComponent implements OnInit {
       });
     });
 
+    let finalCompanyId = '';
+    if (
+      this.selectedCompanyIds &&
+      Array.isArray(this.selectedCompanyIds) &&
+      this.selectedCompanyIds.length > 0
+    ) {
+      finalCompanyId = this.selectedCompanyIds
+        .filter((id: any) => id !== null && id !== undefined && id !== '')
+        .join(',');
+    } else if (this.itemData?.COMPANY_ID) {
+      if (Array.isArray(this.itemData.COMPANY_ID)) {
+        finalCompanyId = this.itemData.COMPANY_ID.join(',');
+      } else {
+        finalCompanyId = String(this.itemData.COMPANY_ID);
+      }
+    } else {
+      finalCompanyId = String(this.selected_Company_id || '');
+    }
+
     const items = this.itemData; // Adjust if needed based on your form structure
     const payload = {
       ...this.itemData,
@@ -1171,7 +1254,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: finalCompanyId,
       SALE_PRICE: this.salePrice,
       COST: this.itemData.COST ?? 0,
     };
@@ -1603,6 +1686,7 @@ export class ItemsEditFormComponent implements OnInit {
     DxDropDownBoxModule,
     DxNumberBoxModule,
     DxValidationGroupModule,
+    DxTagBoxModule,
   ],
   providers: [],
   exports: [ItemsEditFormComponent],

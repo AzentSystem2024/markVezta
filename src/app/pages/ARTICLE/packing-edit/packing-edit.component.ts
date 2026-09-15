@@ -195,7 +195,7 @@ export class PackingEditComponent {
   getDropdownLists() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: 'PRODUCTION_UNITS',
+      NAME: 'PACKING_PRODUCTION_UNITS',
       COMPANY_TYPE: this.Default_company_Type
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {

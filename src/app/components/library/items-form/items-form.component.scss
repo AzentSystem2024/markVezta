@@ -15,9 +15,7 @@
 /* Ensures the form scales properly */
 .plain-styled-form {
   width: 100%;
-  /* Makes the form stretch to the container */
   max-width: 100%;
-  /* Prevents overflowing the container */
 }
 
 /* Handle smaller screens using media queries */
@@ -84,7 +82,7 @@
 ::ng-deep #dropzone-external {
   width: 100%;
   max-width: 240px;
-  height: 170px;
+  height: 150px;
   background-color: rgba(52, 152, 219, 0.08);
   border-radius: 8px;
   border-width: 2px;
@@ -551,23 +549,6 @@
   color: red;
   font-weight: bolder;
   cursor: pointer;
-}
-
-.custom-field {
-  margin-bottom: 0px !important;
-  padding-bottom: 0px !important;
-}
-
-.dx-field-item-content {
-  padding: 2px 0 !important;
-}
-
-.dx-texteditor-input {
-  height: 24px !important;
-}
-
-::ng-deep .field-spacing {
-  margin-bottom: 16px;
 }
 
 .custom-checkbox .dx-checkbox-icon {

@@ -127,7 +127,8 @@
    ───────────────────────────────────────────────────────────────────────────── */
 ::ng-deep .edit-item-popup {
   .dx-popup-content {
-    padding: 10px 16px !important;
+    padding: 8px 16px !important;
+    overflow-y: hidden !important;
   }
 
   /* Remove extra bottom margin from tabpanel container */

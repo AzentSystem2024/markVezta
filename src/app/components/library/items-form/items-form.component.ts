@@ -24,6 +24,7 @@ import {
   DxPopupModule,
   DxTabPanelModule,
   DxTabsModule,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import { DxoItemModule } from 'devextreme-angular/ui/nested';
 import { DxoFormItemModule } from 'devextreme-angular/ui/nested';
@@ -121,6 +122,9 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     QUANTITY: null,
   };
 
+  company_list: any[] = [];
+  selectedCompanyIds: any[] = [];
+  isCompanyDropdownVisible: boolean = false;
   ITEM_ALIAS: any[] = [{ ALIAS: '', ALIAS_TYPE_ID: this.selectedPriority }];
   url: any;
   items: any[] = [];
@@ -376,6 +380,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   ALias_list: any;
 
   formItemsData: any = {
+    COMPANY_ID: null,
     ITEM_CODE: '',
     BARCODE: '',
     DESCRIPTION: '',
@@ -535,9 +540,21 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       mappedStores = [];
     }
 
+    let compIds: any = this.selectedCompanyIds;
+    if (!compIds || (Array.isArray(compIds) && compIds.length === 0)) {
+      compIds = this.newItems.COMPANY_ID || this.selected_Company_id || this.companyId || (this.sessionData?.SELECTED_COMPANY?.COMPANY_ID ?? '');
+    }
+
+    let finalCompanyId = '';
+    if (Array.isArray(compIds)) {
+      finalCompanyId = compIds.filter((id: any) => id !== null && id !== undefined && id !== '').join(',');
+    } else if (compIds !== null && compIds !== undefined) {
+      finalCompanyId = String(compIds);
+    }
+
     return {
       ...this.newItems,
-      COMPANY_ID: this.selected_Company_id,
+      COMPANY_ID: finalCompanyId,
       UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
 
       ITEM_STORES: mappedStores,
@@ -555,6 +572,15 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     };
   };
 
+  onCompanyChanged(event: any) {
+    this.selectedCompanyIds = event.value || [];
+    if (Array.isArray(this.selectedCompanyIds)) {
+      this.newItems.COMPANY_ID = this.selectedCompanyIds.join(',');
+    } else {
+      this.newItems.COMPANY_ID = this.selectedCompanyIds ? String(this.selectedCompanyIds) : '';
+    }
+  }
+
   ngOnInit() {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -565,6 +591,8 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
     const currentUrl = this.router.url;
     const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const companyType = menuResponse?.SELECTED_COMPANY?.COMPANY_TYPE ?? sessionData?.SELECTED_COMPANY?.COMPANY_TYPE;
+    this.isCompanyDropdownVisible = String(companyType) === '0' || Number(companyType) === 0;
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -697,27 +725,46 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.company_list = this.sessionData?.Companies || [];
 
-    this.ITEM_PROPERTY1 = this.sessionData.GeneralSettings.ITEM_PROPERTY1;
+    const defaultCompId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    if (defaultCompId && (!this.selectedCompanyIds || this.selectedCompanyIds.length === 0)) {
+      this.selectedCompanyIds = [defaultCompId];
+      this.newItems.COMPANY_ID = String(defaultCompId);
+    }
 
-    this.ITEM_PROPERTY2 = this.sessionData.GeneralSettings.ITEM_PROPERTY2;
+    if (!this.company_list || this.company_list.length === 0) {
+      this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
+        this.company_list = (res?.Data || []).map((c: any) => ({
+          ...c,
+          COMPANY_ID: c.COMPANY_ID || c.ID,
+          COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
+        }));
+      });
+    }
 
-    this.ITEM_PROPERTY3 = this.sessionData.GeneralSettings.ITEM_PROPERTY3;
+    this.ITEM_PROPERTY1 = this.sessionData?.GeneralSettings?.ITEM_PROPERTY1;
+    this.ITEM_PROPERTY2 = this.sessionData?.GeneralSettings?.ITEM_PROPERTY2;
+    this.ITEM_PROPERTY3 = this.sessionData?.GeneralSettings?.ITEM_PROPERTY3;
+    this.ITEM_PROPERTY4 = this.sessionData?.GeneralSettings?.ITEM_PROPERTY4;
+    this.ITEM_PROPERTY5 = this.sessionData?.GeneralSettings?.ITEM_PROPERTY5;
 
-    this.ITEM_PROPERTY4 = this.sessionData.GeneralSettings.ITEM_PROPERTY4;
-
-    this.ITEM_PROPERTY5 = this.sessionData.GeneralSettings.ITEM_PROPERTY5;
-
-    this.REFERENCE1 = this.sessionData.GeneralSettings.REFERENCE1;
-    this.REFERENCE2 = this.sessionData.GeneralSettings.REFERENCE2;
-    this.REFERENCE3 = this.sessionData.GeneralSettings.REFERENCE3;
+    this.REFERENCE1 = this.sessionData?.GeneralSettings?.REFERENCE1;
+    this.REFERENCE2 = this.sessionData?.GeneralSettings?.REFERENCE2;
+    this.REFERENCE3 = this.sessionData?.GeneralSettings?.REFERENCE3;
 
     this.ENABLE_Matrix_Code =
-      this.sessionData.GeneralSettings.ENABLE_MATRIX_CODE;
+      this.sessionData?.GeneralSettings?.ENABLE_MATRIX_CODE;
 
-    this.selected_vat_id = this.sessionData.VAT_ID;
-    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_vat_id = this.sessionData?.VAT_ID;
+    this.selected_Company_id = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.companyId = this.selected_Company_id;
+    const companyType = this.sessionData?.SELECTED_COMPANY?.COMPANY_TYPE;
+    this.isCompanyDropdownVisible = String(companyType) === '0' || Number(companyType) === 0;
+    if (this.newItems) {
+      this.newItems.COMPANY_ID = this.selected_Company_id;
+    }
   }
 
   onInitNewRowAlias(e: any) {
@@ -1241,6 +1288,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     DxDropDownBoxModule,
     DxTabPanelModule,
     DxTabsModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [ItemsFormComponent],

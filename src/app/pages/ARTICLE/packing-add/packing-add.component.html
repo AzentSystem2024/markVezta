@@ -416,7 +416,7 @@
           [dataSource]="articleSizeData"
           [showBorders]="true"
           [editing]="{ mode: 'cell', allowUpdating: true }"
-          [height]="'30vh'"
+          [height]="'240px'"
           [width]="'100%'"
           (onRowUpdated)="onQuantityChanged()"
           (onEditorPreparing)="onEditorPreparing($event)"
@@ -601,20 +601,18 @@
 </dx-tab-panel>
 
 <div class="fixed-footer popup-footer right-footer">
-  <div class="popup-footer">
-    <dx-button
-      text="Cancel"
-      stylingMode="outlined"
-      (onClick)="closePopup()"
-      type="normal"
-    ></dx-button>
-    <dx-button
-      text="Save"
-      stylingMode="contained"
-      type="default"
-      (onClick)="AddData()"
-    ></dx-button>
-  </div>
+  <dx-button
+    text="Cancel"
+    stylingMode="outlined"
+    (onClick)="closePopup()"
+    type="normal"
+  ></dx-button>
+  <dx-button
+    text="Save"
+    stylingMode="contained"
+    type="default"
+    (onClick)="AddData()"
+  ></dx-button>
 </div>
 
 <dx-popup

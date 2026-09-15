@@ -439,7 +439,7 @@
   *ngIf="isAddItemsPopupOpened"
   [(visible)]="isAddItemsPopupOpened"
   [width]="'1000'"
-  [height]="'95vh'"
+  [height]="'100vh'"
   titleText="New Item"
   (save)="onClickSaveItems()"
   (closeAndRefresh)="refreshGrid()"
@@ -449,10 +449,9 @@
 </form-popup>
 
 <dx-popup
-  *ngIf="isEditItemsPopupOpened"
+  *ngIf="isEditItemsPopupOpened && selectedItemData"
   [(visible)]="isEditItemsPopupOpened"
   [width]="1000"
-  [deferRendering]="false"
   [height]="'100vh'"
   title="Edit Item"
   [wrapperAttr]="{ class: 'edit-item-popup' }"
