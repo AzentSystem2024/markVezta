@@ -540,15 +540,13 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       mappedStores = [];
     }
 
-    let compIds: any = this.selectedCompanyIds;
-    if (!compIds || (Array.isArray(compIds) && compIds.length === 0)) {
-      compIds = this.newItems.COMPANY_ID || this.selected_Company_id || this.companyId || (this.sessionData?.SELECTED_COMPANY?.COMPANY_ID ?? '');
-    }
-
+    let compIds: any = this.selectedCompanyIds || [];
     let finalCompanyId = '';
     if (Array.isArray(compIds)) {
-      finalCompanyId = compIds.filter((id: any) => id !== null && id !== undefined && id !== '').join(',');
-    } else if (compIds !== null && compIds !== undefined) {
+      finalCompanyId = compIds
+        .filter((id: any) => id !== null && id !== undefined && id !== '' && id !== 0 && id !== '0')
+        .join(',');
+    } else if (compIds !== null && compIds !== undefined && compIds !== 0 && compIds !== '0') {
       finalCompanyId = String(compIds);
     }
 
@@ -729,10 +727,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     this.company_list = this.sessionData?.Companies || [];
 
     const defaultCompId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
-    if (defaultCompId && (!this.selectedCompanyIds || this.selectedCompanyIds.length === 0)) {
-      this.selectedCompanyIds = [defaultCompId];
-      this.newItems.COMPANY_ID = String(defaultCompId);
-    }
 
     if (!this.company_list || this.company_list.length === 0) {
       this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
