@@ -676,27 +676,30 @@ export class ItemsEditFormComponent implements OnInit {
       console.log(this.store, '=======afte bindg');
 
       const compIdVal = this.itemData?.COMPANY_ID;
-      if (compIdVal !== null && compIdVal !== undefined && compIdVal !== '') {
+      if (
+        compIdVal !== null &&
+        compIdVal !== undefined &&
+        compIdVal !== '' &&
+        compIdVal !== 0 &&
+        compIdVal !== '0' &&
+        compIdVal !== 'null' &&
+        compIdVal !== 'undefined'
+      ) {
         if (Array.isArray(compIdVal)) {
-          this.selectedCompanyIds = compIdVal.map((id: any) =>
-            isNaN(Number(id)) ? id : Number(id),
-          );
+          this.selectedCompanyIds = compIdVal
+            .filter((id: any) => id !== null && id !== undefined && id !== '' && id !== 0 && id !== '0' && id !== 'null')
+            .map((id: any) => (isNaN(Number(id)) ? id : Number(id)));
         } else if (typeof compIdVal === 'string') {
           this.selectedCompanyIds = compIdVal
             .split(',')
             .map((id: string) => id.trim())
-            .filter((id: string) => id !== '')
+            .filter((id: string) => id !== '' && id !== '0' && id !== 'null' && id !== 'undefined')
             .map((id: string) => (isNaN(Number(id)) ? id : Number(id)));
         } else if (typeof compIdVal === 'number') {
           this.selectedCompanyIds = [compIdVal];
         }
       } else {
-        const defaultCompId =
-          this.selected_Company_id ||
-          this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
-        if (defaultCompId) {
-          this.selectedCompanyIds = [Number(defaultCompId) || defaultCompId];
-        }
+        this.selectedCompanyIds = [];
       }
     }
     this.sesstion_Details();
@@ -782,11 +785,11 @@ export class ItemsEditFormComponent implements OnInit {
 
       return matched
         ? {
-            ...storeItem,
-            ...matched,
-            ID: storeId, // Keep storeItem.ID so keyExpr="ID" in dx-data-grid matches
-            STORE_ID: storeId,
-          }
+          ...storeItem,
+          ...matched,
+          ID: storeId, // Keep storeItem.ID so keyExpr="ID" in dx-data-grid matches
+          STORE_ID: storeId,
+        }
         : storeItem;
     });
 
@@ -880,11 +883,15 @@ export class ItemsEditFormComponent implements OnInit {
 
     if (!this.company_list || this.company_list.length === 0) {
       this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
-        this.company_list = (res?.Data || []).map((c: any) => ({
-          ...c,
-          COMPANY_ID: c.COMPANY_ID || c.ID,
-          COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
-        }));
+        this.company_list = (res?.Data || []).map((c: any) => {
+          const rawId = c.COMPANY_ID !== undefined && c.COMPANY_ID !== null ? c.COMPANY_ID : c.ID;
+          return {
+            ...c,
+            COMPANY_ID: !isNaN(Number(rawId)) ? Number(rawId) : rawId,
+            COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
+          };
+        });
+        this.cdr.detectChanges();
       });
     }
 
@@ -936,11 +943,15 @@ export class ItemsEditFormComponent implements OnInit {
 
     if (!this.company_list || this.company_list.length === 0) {
       this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
-        this.company_list = (res?.Data || []).map((c: any) => ({
-          ...c,
-          COMPANY_ID: c.COMPANY_ID || c.ID,
-          COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
-        }));
+        this.company_list = (res?.Data || []).map((c: any) => {
+          const rawId = c.COMPANY_ID !== undefined && c.COMPANY_ID !== null ? c.COMPANY_ID : c.ID;
+          return {
+            ...c,
+            COMPANY_ID: !isNaN(Number(rawId)) ? Number(rawId) : rawId,
+            COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
+          };
+        });
+        this.cdr.detectChanges();
       });
     }
   }
@@ -1231,16 +1242,10 @@ export class ItemsEditFormComponent implements OnInit {
       this.selectedCompanyIds.length > 0
     ) {
       finalCompanyId = this.selectedCompanyIds
-        .filter((id: any) => id !== null && id !== undefined && id !== '')
+        .filter((id: any) => id !== null && id !== undefined && id !== '' && id !== 0 && id !== '0')
         .join(',');
-    } else if (this.itemData?.COMPANY_ID) {
-      if (Array.isArray(this.itemData.COMPANY_ID)) {
-        finalCompanyId = this.itemData.COMPANY_ID.join(',');
-      } else {
-        finalCompanyId = String(this.itemData.COMPANY_ID);
-      }
     } else {
-      finalCompanyId = String(this.selected_Company_id || '');
+      finalCompanyId = '';
     }
 
     const items = this.itemData; // Adjust if needed based on your form structure

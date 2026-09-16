@@ -9,13 +9,11 @@
               <!-- Row 1: Company (aligning across both columns) -->
               <dxi-item [colSpan]="2" [visible]="isCompanyDropdownVisible">
                 <div *dxTemplate style="margin-bottom: 2px">
-                  <dx-tag-box label="Company *" displayExpr="COMPANY_NAME" [searchEnabled]="true" [items]="company_list"
-                    labelMode="floating" valueExpr="COMPANY_ID" placeholder="Select Company" [(value)]="selectedCompanyIds"
-                    [showSelectionControls]="true" [showDropDownButton]="true" [showClearButton]="true" [multiline]="false"
-                    (onValueChanged)="onCompanyChanged($event)" [width]="'100%'">
-                    <dx-validator>
-                      <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
-                    </dx-validator>
+                  <dx-tag-box label="Company" displayExpr="COMPANY_NAME" [searchEnabled]="true" [items]="company_list"
+                    labelMode="floating" valueExpr="COMPANY_ID" placeholder="Select Company"
+                    [(value)]="selectedCompanyIds" [showSelectionControls]="true" [showDropDownButton]="true"
+                    [showClearButton]="true" [multiline]="false" (onValueChanged)="onCompanyChanged($event)"
+                    [width]="'100%'">
                   </dx-tag-box>
                 </div>
               </dxi-item>
@@ -34,13 +32,13 @@
               </dxi-item>
 
               <dxi-item>
-                <div *dxTemplate style="margin-bottom: 2px; margin-top: 10px">
+                <div *dxTemplate style="margin-bottom: 2px; margin-top: 6px">
                   <dx-check-box text="Inactive" [(value)]="itemData.IS_INACTIVE">
                   </dx-check-box>
                 </div>
               </dxi-item>
 
-              <!-- Row 2: Item Code & BarCode -->
+              <!-- Row 3: Item Code & BarCode -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Item Code *" labelMode="floating" [(value)]="itemData.ITEM_CODE">
@@ -61,7 +59,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 3: Description -->
+              <!-- Row 4: Description -->
               <dxi-item [colSpan]="2">
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Description *" [(value)]="itemData.DESCRIPTION" labelMode="floating"
@@ -73,7 +71,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 4: POS Description & Department -->
+              <!-- Row 5: POS Description & Department -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Short Name" labelMode="floating" [(value)]="itemData.POS_DESCRIPTION"
@@ -93,7 +91,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 5: Category & Sub Category -->
+              <!-- Row 6: Category & Sub Category -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Category" labelMode="floating" [items]="catagory" displayExpr="DESCRIPTION"
@@ -112,7 +110,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 6: Brand & Item Tax -->
+              <!-- Row 7: Brand & Item Tax -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Brand" labelMode="floating" [items]="brand" displayExpr="DESCRIPTION"
@@ -133,7 +131,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 7: Unit of Measure & HSN Code -->
+              <!-- Row 8: Unit of Measure & HSN Code -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Unit of Measure *" labelMode="floating" [items]="uom" displayExpr="DESCRIPTION"
@@ -153,7 +151,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 8: Item Property 1 & Reference 1 -->
+              <!-- Row 9: Item Property 1 & Reference 1 -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box [searchEnabled]="true" label="{{ itemlabel1 }}" [items]="itemprop1"
@@ -175,14 +173,14 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 9: Item Property 2 & Reference 2 -->
+              <!-- Row 10: Item Property 2 & Reference 2 -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="{{ itemlabel2 }}" [items]="itemprop2" [searchEnabled]="true"
                     displayExpr="DESCRIPTION" valueExpr="ID" placeholder="Select {{ ITEM_PROPERTY2 }}" [label]="
                       ITEM_PROPERTY2 && ITEM_PROPERTY2 !== ''
                         ? ITEM_PROPERTY2
-                        : itemlabel1
+                        : itemlabel2
                     " labelMode="floating" [(value)]="itemData.ITEM_PROPERTY2" [width]="'100%'">
                   </dx-select-box>
                 </div>
@@ -196,14 +194,14 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 10: Item Property 3 & Reference 3 -->
+              <!-- Row 11: Item Property 3 & Reference 3 -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="{{ itemlabel3 }}" [items]="itemprop3" [searchEnabled]="true"
                     displayExpr="DESCRIPTION" valueExpr="ID" placeholder="Select {{ ITEM_PROPERTY3 }}" [label]="
                       ITEM_PROPERTY3 && ITEM_PROPERTY3 !== ''
                         ? ITEM_PROPERTY3
-                        : itemlabel1
+                        : itemlabel3
                     " labelMode="floating" [(value)]="itemData.ITEM_PROPERTY3" [width]="'100%'">
                   </dx-select-box>
                 </div>
@@ -217,7 +215,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 11: Notes -->
+              <!-- Row 12: Notes -->
               <dxi-item [colSpan]="2">
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Notes" labelMode="floating" [(value)]="itemData.LONG_DESCRIPTION"></dx-text-box>
@@ -228,7 +226,7 @@
             <!-- RIGHT COLUMN (Image & Properties) -->
             <dxi-item itemType="group" [colCount]="1">
               <dxi-item>
-                <div class="widget-container flex-box" style="margin-bottom: 2px">
+                <div class="widget-container flex-box" style="position: relative; max-width: 240px; margin: 0 auto;">
                   <div id="dropzone-external" class="flex-box" [ngClass]="isDropZoneActive ? 'dropzone-active' : null"
                     (click)="onDropZoneClick()" style="
                       padding: 0;
@@ -269,7 +267,7 @@
               </dxi-item>
 
               <dxi-item>
-                <div *dxTemplate style="margin-bottom: 2px; margin-left: 60px">
+                <div *dxTemplate style="margin-bottom: 2px; margin-left: 30px">
                   <dx-check-box [(value)]="itemData.IS_DIFFERENT_UOM_PURCH" text="Is Different UOM"
                     style="margin-top: 10px">
                   </dx-check-box>
@@ -277,7 +275,7 @@
               </dxi-item>
 
               <dxi-item *ngIf="itemData.IS_DIFFERENT_UOM_PURCH">
-                <div *dxTemplate style="margin-bottom: 2px">
+                <div *dxTemplate style="margin-bottom: 2px; margin-left: 30px">
                   <dx-select-box label="Purchase UOM" labelMode="floating" [items]="filteredDropdownOptions"
                     displayExpr="DESCRIPTION" valueExpr="DESCRIPTION" [searchEnabled]="true"
                     placeholder="Choose an option" [(value)]="itemData.UOM_PURCH">
@@ -286,7 +284,7 @@
               </dxi-item>
 
               <dxi-item *ngIf="itemData.IS_DIFFERENT_UOM_PURCH">
-                <div *dxTemplate style="margin-bottom: 2px">
+                <div *dxTemplate style="margin-bottom: 2px; margin-left: 30px">
                   <dx-text-box label="Conversion Quantity" [(value)]="itemData.UOM_MULTPLE" labelMode="floating"
                     placeholder="Conversion Quantity" [disabled]="!itemData.IS_DIFFERENT_UOM_PURCH">
                   </dx-text-box>
@@ -729,13 +727,11 @@
               <!-- Row 1: Company (aligning across both columns) -->
               <dxi-item [colSpan]="2" [visible]="isCompanyDropdownVisible">
                 <div *dxTemplate style="margin-bottom: 2px">
-                  <dx-tag-box label="Company *" displayExpr="COMPANY_NAME" [searchEnabled]="true" [items]="company_list"
-                    labelMode="floating" valueExpr="COMPANY_ID" placeholder="Select Company" [(value)]="selectedCompanyIds"
-                    [showSelectionControls]="true" [showDropDownButton]="true" [showClearButton]="true" [multiline]="false"
-                    (onValueChanged)="onCompanyChanged($event)" [width]="'100%'">
-                    <dx-validator>
-                      <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
-                    </dx-validator>
+                  <dx-tag-box label="Company" displayExpr="COMPANY_NAME" [searchEnabled]="true" [items]="company_list"
+                    labelMode="floating" valueExpr="COMPANY_ID" placeholder="Select Company"
+                    [(value)]="selectedCompanyIds" [showSelectionControls]="true" [showDropDownButton]="true"
+                    [showClearButton]="true" [multiline]="false" (onValueChanged)="onCompanyChanged($event)"
+                    [width]="'100%'">
                   </dx-tag-box>
                 </div>
               </dxi-item>
@@ -754,13 +750,13 @@
               </dxi-item>
 
               <dxi-item>
-                <div *dxTemplate style="margin-bottom: 2px; margin-top: 10px">
+                <div *dxTemplate style="margin-bottom: 2px; margin-top: 6px">
                   <dx-check-box text="Inactive" [(value)]="itemData.IS_INACTIVE">
                   </dx-check-box>
                 </div>
               </dxi-item>
 
-              <!-- Row 2: Item Code & BarCode -->
+              <!-- Row 3: Item Code & BarCode -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Item Code *" labelMode="floating" [(value)]="itemData.ITEM_CODE">
@@ -781,7 +777,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 3: Description -->
+              <!-- Row 4: Description -->
               <dxi-item [colSpan]="2">
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Description *" [(value)]="itemData.DESCRIPTION" labelMode="floating"
@@ -793,7 +789,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 4: POS Description & Department -->
+              <!-- Row 5: POS Description & Department -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Short Name" labelMode="floating" [(value)]="itemData.POS_DESCRIPTION"
@@ -813,7 +809,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 5: Category & Sub Category -->
+              <!-- Row 6: Category & Sub Category -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Category" labelMode="floating" [items]="catagory" displayExpr="DESCRIPTION"
@@ -832,7 +828,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 6: Brand & Item Tax -->
+              <!-- Row 7: Brand & Item Tax -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Brand" labelMode="floating" [items]="brand" displayExpr="DESCRIPTION"
@@ -853,7 +849,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 7: Unit of Measure & HSN Code -->
+              <!-- Row 8: Unit of Measure & HSN Code -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="Unit of Measure *" labelMode="floating" [items]="uom" displayExpr="DESCRIPTION"
@@ -873,7 +869,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 8: Item Property 1 & Reference 1 -->
+              <!-- Row 9: Item Property 1 & Reference 1 -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box [searchEnabled]="true" label="{{ itemlabel1 }}" [items]="itemprop1"
@@ -895,14 +891,14 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 9: Item Property 2 & Reference 2 -->
+              <!-- Row 10: Item Property 2 & Reference 2 -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="{{ itemlabel2 }}" [items]="itemprop2" [searchEnabled]="true"
                     displayExpr="DESCRIPTION" valueExpr="ID" placeholder="Select {{ ITEM_PROPERTY2 }}" [label]="
                       ITEM_PROPERTY2 && ITEM_PROPERTY2 !== ''
                         ? ITEM_PROPERTY2
-                        : itemlabel1
+                        : itemlabel2
                     " labelMode="floating" [(value)]="itemData.ITEM_PROPERTY2" [width]="'100%'">
                   </dx-select-box>
                 </div>
@@ -916,14 +912,14 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 10: Item Property 3 & Reference 3 -->
+              <!-- Row 11: Item Property 3 & Reference 3 -->
               <dxi-item>
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-select-box label="{{ itemlabel3 }}" [items]="itemprop3" [searchEnabled]="true"
                     displayExpr="DESCRIPTION" valueExpr="ID" placeholder="Select {{ ITEM_PROPERTY3 }}" [label]="
                       ITEM_PROPERTY3 && ITEM_PROPERTY3 !== ''
                         ? ITEM_PROPERTY3
-                        : itemlabel1
+                        : itemlabel3
                     " labelMode="floating" [(value)]="itemData.ITEM_PROPERTY3" [width]="'100%'">
                   </dx-select-box>
                 </div>
@@ -937,7 +933,7 @@
                 </div>
               </dxi-item>
 
-              <!-- Row 11: Notes -->
+              <!-- Row 12: Notes -->
               <dxi-item [colSpan]="2">
                 <div *dxTemplate style="margin-bottom: 2px">
                   <dx-text-box label="Notes" labelMode="floating" [(value)]="itemData.LONG_DESCRIPTION"></dx-text-box>
@@ -948,7 +944,7 @@
             <!-- RIGHT COLUMN (Image & Properties) -->
             <dxi-item itemType="group" [colCount]="1">
               <dxi-item>
-                <div class="widget-container flex-box" style="margin-bottom: 2px">
+                <div class="widget-container flex-box" style="position: relative; max-width: 240px; margin: 0 auto;">
                   <div id="dropzone-external" class="flex-box" [ngClass]="isDropZoneActive ? 'dropzone-active' : null"
                     (click)="onDropZoneClick()" style="
                       padding: 0;

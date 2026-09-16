@@ -144,7 +144,6 @@ export class CustomerFormComponent {
 
 
     ngOnInit(): void {
-    this.get_Country_Dropdown_List();
     this.getDealerDropDown();
     this.getPaymentTerms();
     this.showCountry();
@@ -350,11 +349,7 @@ export class CustomerFormComponent {
     });
   }
 
-  get_Country_Dropdown_List() {
-    this.service.getCountryWithFlags().subscribe((response: any) => {
-      this.CountryDropdownData = response;
-    });
-  }
+
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();

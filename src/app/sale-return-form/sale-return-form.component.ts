@@ -6,9 +6,13 @@ import {
   NgModule,
   Output,
   ViewChild,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -29,6 +33,7 @@ import {
   DxTabsModule,
   DxNumberBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -145,7 +150,39 @@ export class SaleReturnFormComponent {
   isHQApp: any;
   filteredStoreList: { ID: any; DESCRIPTION: any }[];
   storeList: { ID: any; DESCRIPTION: any }[];
-  constructor(private dataService: DataService) {}
+
+  // Email and Print State Variables
+  showTemplatePopup = false;
+  templates: any[] = [];
+  selectedTemplate: any;
+  pdfBlobUrl: any = '';
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  isPreviewPopupVisible = false;
+  isLoadingPdf = false;
+  currentPdfBlob: Blob | null = null;
+
+  isEmailPopupVisible = false;
+  isSendingEmail = false;
+  emailSettingsData: any;
+  emailSubject = '';
+  emailBody = '';
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  ccEmails: string[] = [];
+
+  constructor(
+    private dataService: DataService,
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
+  ) {}
+
+  ngOnChanges(changes: any) {
+    if (changes['EditingResponseData'] && changes['EditingResponseData'].currentValue) {
+      if (this.isEditing) {
+        this.isEditDataAvailable();
+      }
+    }
+  }
 
   ngOnInit() {
     console.log(this.isVerifyMode, 'ISVERIFYMODE');
@@ -196,9 +233,6 @@ export class SaleReturnFormComponent {
     }
     this.getCustomerOrUnitLst();
     this.sessionData_tax();
-    setTimeout(() => {
-      this.isEditDataAvailable();
-    }, 300);
 
     const imagePath = 'assets/markLogo.jpg';
     this.convertToBase64(imagePath).then((base64) => {
@@ -1374,6 +1408,152 @@ export class SaleReturnFormComponent {
       e.rowElement.style.pointerEvents = 'none';
     }
   }
+
+  // ==============================================
+  // PRINT / EMAIL LOGIC
+  // ==============================================
+
+  getTemplates(): void {
+    // 26 is the category ID for Sales Return
+    this.dataService.getTemplateList(26).subscribe({
+      next: (res: any) => {
+        this.templates = res || [];
+        this.showTemplatePopup = true;
+      },
+      error: (error: any) => {
+        console.error('Error fetching templates', error);
+        notify('Failed to load templates.', 'error', 3000);
+      }
+    });
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) {
+      notify('Please select a template.', 'warning', 3000);
+      return;
+    }
+    this.showTemplatePopup = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+
+    // Use current ID or NO
+    const retNo = this.salesReturnFormData?.RET_NO || this.retNo || '';
+    const retId = this.salesReturnFormData?.RET_ID || this.salesReturnFormData?.TRANS_ID || this.salesReturnFormData?.ID || 0;
+
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?retId=${retId}&retNo=${encodeURIComponent(retNo)}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (error: any) => {
+        console.error('PDF fetch error:', error);
+        this.isLoadingPdf = false;
+        notify('Failed to generate PDF.', 'error', 3000);
+      }
+    });
+  }
+
+  printPdf(): void {
+    if (this.pdfBlobUrl) {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = this.pdfBlobUrl;
+      document.body.appendChild(iframe);
+      iframe.contentWindow?.print();
+    }
+  }
+
+  downloadPdf(): void {
+    if (this.pdfBlobUrl) {
+      const a = document.createElement('a');
+      a.href = this.pdfBlobUrl;
+      a.download = `${this.selectedTemplate || 'SalesReturn'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }
+
+  sendPdf(): void {
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+
+    this.dataService.selectEmailSettings(26).subscribe((res: any) => {
+      if (res && res.length > 0) {
+        this.emailSettingsData = res[0];
+        this.emailSubject = this.emailSettingsData.EMAIL_SUBJECT || '';
+        this.emailBody = this.emailSettingsData.EMAIL_CONTENT || '';
+        
+        if (this.emailSettingsData.RECEIVER_ID) {
+          const receivers = this.emailSettingsData.RECEIVER_ID.split(',').map((email: string) => email.trim());
+          this.emailReceivers = receivers;
+          this.selectedEmails = receivers;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      notify('Please select at least one recipient.', 'warning', 3000);
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      notify('No PDF generated to attach.', 'warning', 3000);
+      return;
+    }
+    this.isSendingEmail = true;
+    
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject || ' ');
+    formData.append('Body', this.emailBody || ' ');
+    formData.append('EmailType', '26');
+    
+    const fileName = `${this.selectedTemplate || 'SalesReturn'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    
+    this.dataService.sendEmailWithAttachment(formData).subscribe({
+      next: (res: any) => {
+        this.isSendingEmail = false;
+        if (res && res.flag === 1) {
+          notify('Email sent successfully!', 'success', 3000);
+          this.isEmailPopupVisible = false;
+        } else {
+          notify('Failed to send email: ' + (res?.Message || 'Unknown error'), 'error', 3000);
+        }
+      },
+      error: (error: any) => {
+        this.isSendingEmail = false;
+        console.error('Email send error', error);
+        notify('Error sending email.', 'error', 3000);
+      }
+    });
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = '';
+      this.pdfPreviewUrl = null;
+      this.currentPdfBlob = null;
+    }
+  }
+
 }
 
 @NgModule({
@@ -1407,6 +1587,7 @@ export class SaleReturnFormComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [SaleReturnFormComponent],

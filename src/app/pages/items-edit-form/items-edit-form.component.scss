@@ -88,18 +88,52 @@
    so they ONLY affect the Items Edit Form — not any other page.
    ───────────────────────────────────────────────────────────────────────────── */
 .edit-form-container {
+  width: 100%;
+
+  /* Prevent negative margin overlap while giving floating labels proper clearance */
+  ::ng-deep .dx-form.plain-styled-form {
+    .dx-layout-manager .dx-field-item {
+      padding-top: 3px !important;
+      padding-bottom: 3px !important;
+      margin-top: 0 !important;
+    }
+
+    .dx-field-item:not(.dx-field-item-has-group):not(.dx-field-item-has-tabs):not(.dx-first-row):not(.dx-label-v-align) {
+      padding-top: 3px !important;
+      margin-top: 0 !important;
+    }
+  }
+
+  .inactive-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    min-height: 38px;
+    padding-top: 14px;
+    padding-left: 4px;
+  }
+
+  .uom-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
 
   /* Dropzone — match items-form dimensions exactly */
   ::ng-deep #dropzone-external {
     width: 100%;
     max-width: 240px;
-    height: 170px;
+    height: 150px;
     background-color: rgba(52, 152, 219, 0.08);
     border-radius: 8px;
     border-width: 2px;
     border-style: dashed;
     padding: 10px;
     border-color: #3498db;
+    margin: 0 auto;
   }
 
   ::ng-deep #dropzone-external>* {
