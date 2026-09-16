@@ -402,11 +402,21 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     this.getSupplierByid();
   }
 
+  onStoreChanged(e: any) {
+    this.newPoData.STORE_ID = e.value;
+    if (this.vatTitle !== 'GST') {
+      this.getStoreOrCompanyByid();
+    }
+    if (this.newPoData.SUPP_ID) {
+      this.getSupplierByid();
+    }
+  }
+
   getSupplierByid() {
     const payload = {
       SUPP_ID: this.newPoData.SUPP_ID,
       COMPANY_ID: this.companyID,
-      STORE_ID: this.newPoData.STORE_ID || this.storeID,
+      STORE_ID: this.newPoData.STORE_ID !== null && this.newPoData.STORE_ID !== undefined && this.newPoData.STORE_ID !== '' ? this.newPoData.STORE_ID : this.storeID,
     };
 
     this.service.getSupplierItemsData(payload).subscribe((res) => {

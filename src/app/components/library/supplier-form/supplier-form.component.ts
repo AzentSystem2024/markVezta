@@ -107,39 +107,100 @@ export class SupplierFormComponent implements OnInit {
 
   constructor(
     private service: DataService,
-    authservice: AuthService,
+    private authservice: AuthService,
   ) {
-    this.stateLabel = authservice.getsettingsData().STATE_LABEL;
-    this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
-    this.countryCode = authservice.getsettingsData().DEFAULT_COUNTRY_CODE;
+    this.stateLabel = authservice.getsettingsData()?.STATE_LABEL;
+    this.countryCode = authservice.getsettingsData()?.DEFAULT_COUNTRY_CODE;
+    this.DEFAULT_COUNTRY_CODE = authservice.getsettingsData()?.DEFAULT_COUNTRY_CODE;
 
     this.get_Country_Dropdown_List();
     this.get_State_Dropdown_List();
     this.get_PaymentTerms_Dropdown_List();
     this.sesstion_Details();
     this.sessionData_tax();
+    if (this.isCurrencyAccepted) {
+      const defCur = this.getDefaultCurrencyId();
+      if (defCur !== null && defCur !== undefined) {
+        this.newSupplier.CURRENCY_ID = defCur;
+      }
+    }
     service.getCountryWithFlags().subscribe((data) => {
       this.countryCodes = data;
     });
   }
   newSupplier = this.formSupplierData;
 
-  getNewSupplierData = () => ({
-    ...this.newSupplier,
-    MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
-    PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
-    IS_DEFAULT_CURRENCY: this.isCurrencyAccepted,
-  });
+  getDefaultCurrencyId(): any {
+    const settingsStr = sessionStorage.getItem('settings');
+    if (settingsStr) {
+      try {
+        const settings = JSON.parse(settingsStr);
+        if (settings && settings.CURRENCY_ID !== undefined && settings.CURRENCY_ID !== null && settings.CURRENCY_ID !== '') {
+          return settings.CURRENCY_ID;
+        }
+      } catch (e) {}
+    }
+
+    const savedUserStr = sessionStorage.getItem('savedUserData') || localStorage.getItem('userData');
+    if (savedUserStr) {
+      try {
+        const savedUser = JSON.parse(savedUserStr);
+        if (savedUser?.GeneralSettings?.CURRENCY_ID !== undefined && savedUser?.GeneralSettings?.CURRENCY_ID !== null && savedUser?.GeneralSettings?.CURRENCY_ID !== '') {
+          return savedUser.GeneralSettings.CURRENCY_ID;
+        }
+        if (savedUser?.CURRENCY_ID !== undefined && savedUser?.CURRENCY_ID !== null && savedUser?.CURRENCY_ID !== '') {
+          return savedUser.CURRENCY_ID;
+        }
+        if (savedUser?.Configuration?.[0]?.CURRENCY_ID !== undefined && savedUser?.Configuration?.[0]?.CURRENCY_ID !== null && savedUser?.Configuration?.[0]?.CURRENCY_ID !== '') {
+          return savedUser.Configuration[0].CURRENCY_ID;
+        }
+        if (savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== undefined && savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== null && savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== '') {
+          return savedUser.SELECTED_COMPANY.CURRENCY_ID;
+        }
+      } catch (e) {}
+    }
+
+    const authSettings = this.authservice?.getsettingsData?.();
+    if (authSettings && authSettings.CURRENCY_ID !== undefined && authSettings.CURRENCY_ID !== null && authSettings.CURRENCY_ID !== '') {
+      return authSettings.CURRENCY_ID;
+    }
+
+    return null;
+  }
+
+  getNewSupplierData = () => {
+    let currencyId = this.newSupplier.CURRENCY_ID;
+    if (this.isCurrencyAccepted) {
+      const defCur = this.getDefaultCurrencyId();
+      if (defCur !== null && defCur !== undefined && defCur !== '') {
+        currencyId = defCur;
+      }
+    }
+
+    return {
+      ...this.newSupplier,
+      CURRENCY_ID: currencyId,
+      MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,
+      PHONE: this.countryCodePhone + '-' + this.PhoneNumber,
+      IS_DEFAULT_CURRENCY: this.isCurrencyAccepted,
+    };
+  };
 
   toggleCurrencyDropdown(checked: boolean) {
     this.isCurrencyAccepted = checked;
     if (checked) {
+      const defCur = this.getDefaultCurrencyId();
+      if (defCur !== null && defCur !== undefined) {
+        this.newSupplier.CURRENCY_ID = defCur;
+      }
       // Clear selection when disabled
       this.formSupplierData.Supplier_cost = [];
 
       if (this.landedCostGrid) {
         this.landedCostGrid.instance.clearSelection();
       }
+    } else {
+      this.newSupplier.CURRENCY_ID = '';
     }
   }
 
@@ -164,6 +225,7 @@ export class SupplierFormComponent implements OnInit {
       FAX_NO: '',
       VAT_RULE_ID: this.newSupplier.VAT_RULE_ID,
       SUPP_CAT_ID: 0,
+      CURRENCY_ID: this.isCurrencyAccepted ? (this.getDefaultCurrencyId() ?? '') : '',
     };
 
     this.newSupplier.ADDRESS2 = '';
@@ -313,6 +375,13 @@ export class SupplierFormComponent implements OnInit {
     this.getStateDropDown();
     this.getCurrency();
     this.getCurrency_Dropdown();
+
+    if (this.isCurrencyAccepted) {
+      const defCur = this.getDefaultCurrencyId();
+      if (defCur !== null && defCur !== undefined) {
+        this.newSupplier.CURRENCY_ID = defCur;
+      }
+    }
 
     // this.newSupplier.VAT_RULE_ID = '1';
     console.log(

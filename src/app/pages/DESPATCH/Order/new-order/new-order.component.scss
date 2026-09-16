@@ -1,0 +1,33 @@
+@use "../../../../../variables.scss" as *;
+
+:host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
+.view-wrapper {
+  padding: 10px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.form-container {
+  width: 100%;
+  margin: 0 auto;
+  height: 80vh
+}
+
+.section-card {
+  background-color: var(--base-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 15px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.grid-section,
+.bottom-section,
+.action-section {
+  margin-top: 15px;
+}

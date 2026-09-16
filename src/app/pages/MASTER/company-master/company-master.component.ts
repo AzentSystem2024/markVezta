@@ -37,8 +37,10 @@ import DataSource from 'devextreme/data/data_source';
   styleUrls: ['./company-master.component.scss'],
 })
 export class CompanyMasterComponent {
-  @ViewChild('formValidationGroup')
-  formValidationGroup: DxValidationGroupComponent;
+  @ViewChild('addValidationGroup')
+  addValidationGroup: DxValidationGroupComponent;
+  @ViewChild('editValidationGroup')
+  editValidationGroup: DxValidationGroupComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
@@ -83,24 +85,23 @@ export class CompanyMasterComponent {
     private cdr: ChangeDetectorRef,
   ) {
     this.formsource = this.fb.group({
-      //  ID :[null, Validators.required],
-      CompanyType: ['', Validators.required],
-      CompanyTypeName: ['', Validators.required],
-      Code: [null, Validators.required],
-      CompanyName: [null, Validators.required],
-      FirstAddress: ['', Validators.required],
-      SecondAddress: ['', Validators.required],
-      ThirdAddress: ['', Validators.required],
-      ContactName: ['', Validators.required],
-      Mobile: ['', Validators.required],
-      Telephone: ['', Validators.required],
-      WhatsApp: ['', Validators.required],
-      Email: ['', [Validators.required, Validators.email]],
+      CompanyType: [null, Validators.required],
+      CompanyTypeName: [''],
+      Code: ['', Validators.required],
+      CompanyName: ['', Validators.required],
+      FirstAddress: [''],
+      SecondAddress: [''],
+      ThirdAddress: [''],
+      ContactName: [''],
+      Mobile: [''],
+      Telephone: [''],
+      WhatsApp: [''],
+      Email: [''],
       Inactive: [false],
-      STATE_ID: ['', Validators.required],
-      PAN: ['', Validators.required],
-      CIN: ['', Validators.required],
-      GSTNo: ['', Validators.required],
+      STATE_ID: [null, Validators.required],
+      PAN: [''],
+      CIN: [''],
+      GSTNo: [''],
     });
     this.get_Company_List();
     this.get_Company_Dropdown_List();
@@ -109,10 +110,6 @@ export class CompanyMasterComponent {
       this.countryCodes = data;
     });
   }
-
-  // getStatusFlagClass(IS_INACTIVE: boolean): string {
-  //   return IS_INACTIVE ? 'flag-red' : 'flag-green';
-  // }
 
   getStatusFlagClass(IS_INACTIVE: boolean): string {
     return IS_INACTIVE ? 'flag-red' : 'flag-green';
@@ -222,37 +219,79 @@ export class CompanyMasterComponent {
     return emailRegex.test(value);
   };
 
-  onAddPopupClose() {
+  onAddPopupHidden() {
+    this.addValidationGroup?.instance?.reset();
     this.selectedCompanyType = null;
+    this.countryCodephone = null;
+    this.countryCodemobile = null;
+    this.countryCodewhatsapp = null;
+    this.Phone_limit = undefined;
+    this.mobile_limit = undefined;
+    this.whatsapp_limit = undefined;
+    this.formsource.reset({
+      CompanyType: null,
+      CompanyTypeName: '',
+      Code: '',
+      CompanyName: '',
+      FirstAddress: '',
+      SecondAddress: '',
+      ThirdAddress: '',
+      ContactName: '',
+      Mobile: '',
+      Telephone: '',
+      WhatsApp: '',
+      Email: '',
+      Inactive: false,
+      STATE_ID: null,
+      PAN: '',
+      CIN: '',
+      GSTNo: '',
+    });
+  }
+
+  onEditPopupHidden() {
+    this.editValidationGroup?.instance?.reset();
+    this.selectedCompanyType = null;
+    this.state = null;
+    this.editingRowData = {};
   }
 
   addCompany() {
+    this.formsource.reset({
+      CompanyType: null,
+      CompanyTypeName: '',
+      Code: '',
+      CompanyName: '',
+      FirstAddress: '',
+      SecondAddress: '',
+      ThirdAddress: '',
+      ContactName: '',
+      Mobile: '',
+      Telephone: '',
+      WhatsApp: '',
+      Email: '',
+      Inactive: false,
+      STATE_ID: null,
+      PAN: '',
+      CIN: '',
+      GSTNo: '',
+    });
+    this.selectedCompanyType = null;
+    this.countryCodephone = null;
+    this.countryCodemobile = null;
+    this.countryCodewhatsapp = null;
+    this.Phone_limit = undefined;
+    this.mobile_limit = undefined;
+    this.whatsapp_limit = undefined;
     this.addPopup = true;
 
     setTimeout(() => {
-      this.formValidationGroup?.instance?.reset();
-
-      this.formsource.reset({
-        Inactive: '',
-        Code: '',
-        CompanyName: '',
-      });
-
-      // ✅ remove validators when opening
-      this.formsource.get('Code')?.clearValidators();
-      this.formsource.get('CompanyName')?.clearValidators();
-      this.formsource.get('CompanyType')?.clearValidators();
-      this.formsource.updateValueAndValidity();
+      this.addValidationGroup?.instance?.reset();
     });
   }
   closePop() {
     this.addPopup = false;
     this.editPopup = false;
-    this.selectedCompanyType = [];
-    this.formsource.reset();
-    setTimeout(() => {
-      this.formValidationGroup?.instance?.reset();
-    });
   }
 
   //===============get Dropdown List=======================
@@ -264,7 +303,6 @@ export class CompanyMasterComponent {
 
   onCompanyTypeChanged(event: any) {
     this.selectedCompanyType = event.value;
-    this.get_Company_Dropdown_List();
   }
 
   onStateChanged(event: any) {
@@ -277,7 +315,7 @@ export class CompanyMasterComponent {
     this.selectData(event);
     this.editPopup = true;
     setTimeout(() => {
-      this.formValidationGroup?.instance?.reset();
+      this.editValidationGroup?.instance?.reset();
     });
   }
 
@@ -311,8 +349,8 @@ export class CompanyMasterComponent {
   }
 
   addData() {
-    const validationResult = this.formValidationGroup.instance.validate();
-    if (!validationResult.isValid) {
+    const validationResult = this.addValidationGroup?.instance?.validate();
+    if (!validationResult || !validationResult.isValid) {
       return;
     }
 
@@ -342,7 +380,7 @@ export class CompanyMasterComponent {
     const GSTNo = this.formsource.get('GSTNo')?.value || '';
     const CIN = this.formsource.get('CIN')?.value || '';
 
-    // ---------------- DUPLICATE CHECK (FIXED) ----------------
+    // ---------------- DUPLICATE CHECK ----------------
     const newCode = Company_code.toLowerCase();
     const newName = Company_name.toLowerCase();
 
@@ -373,10 +411,10 @@ export class CompanyMasterComponent {
       ADDRESS2: Second_address,
       ADDRESS3: Third_address,
       CONTACT_NAME: Contact_name,
-      PHONE: Phone_no,
-      MOBILE: Mobile_no,
+      PHONE: this.countryCodephone && Phone_no ? `${this.countryCodephone}-${Phone_no}` : Phone_no,
+      MOBILE: this.countryCodemobile && Mobile_no ? `${this.countryCodemobile}-${Mobile_no}` : Mobile_no,
       EMAIL: Email,
-      WHATSAPP: WhatsApp_no,
+      WHATSAPP: this.countryCodewhatsapp && WhatsApp_no ? `${this.countryCodewhatsapp}-${WhatsApp_no}` : WhatsApp_no,
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: false,
       STATE_ID: STATE_ID,
@@ -400,11 +438,8 @@ export class CompanyMasterComponent {
             'success',
           );
 
-          // Close popup ONLY after success
+          // Close popup smoothly without clearing form while visible
           this.addPopup = false;
-          this.editPopup = false;
-
-          this.formsource.reset();
           this.get_Company_List();
         },
         (error) => {
@@ -425,43 +460,67 @@ export class CompanyMasterComponent {
   }
 
   selectData(event: any) {
-    const ID = event?.data?.ID; // use lowercase `data`, not `Data`
+    const ID = event?.data?.ID;
 
     if (ID !== undefined) {
       this.dataservice.Select_CompanyList_Api(ID).subscribe((response: any) => {
-        const data = response.Data;
+        const data = response?.Data || {};
         this.selectedData = response;
         this.editingRowData = { ...data };
+
         // 🔹 PHONE split
         if (data.PHONE) {
           const phoneParts = data.PHONE.split('-');
-          this.countryCodephone = phoneParts[0]; // +971
-          this.editingRowData.PHONE = phoneParts[1]; // 578674589
+          if (phoneParts.length > 1) {
+            this.countryCodephone = phoneParts[0];
+            this.editingRowData.PHONE = phoneParts.slice(1).join('-');
+          } else {
+            this.countryCodephone = null;
+            this.editingRowData.PHONE = data.PHONE;
+          }
+          if (this.countryCodephone) {
+            this.onCountrycodeChangePhone({ value: this.countryCodephone });
+          }
+        } else {
+          this.countryCodephone = null;
         }
 
         // 🔹 MOBILE split
         if (data.MOBILE) {
           const mobileParts = data.MOBILE.split('-');
-          this.countryCodemobile = mobileParts[0];
-          this.editingRowData.MOBILE = mobileParts[1];
+          if (mobileParts.length > 1) {
+            this.countryCodemobile = mobileParts[0];
+            this.editingRowData.MOBILE = mobileParts.slice(1).join('-');
+          } else {
+            this.countryCodemobile = null;
+            this.editingRowData.MOBILE = data.MOBILE;
+          }
+          if (this.countryCodemobile) {
+            this.onCountrycodeChangeMobile({ value: this.countryCodemobile });
+          }
+        } else {
+          this.countryCodemobile = null;
         }
 
         // 🔹 WHATSAPP split
         if (data.WHATSAPP) {
           const whatsappParts = data.WHATSAPP.split('-');
-          this.countryCodewhatsapp = whatsappParts[0];
-          this.editingRowData.WHATSAPP = whatsappParts[1];
+          if (whatsappParts.length > 1) {
+            this.countryCodewhatsapp = whatsappParts[0];
+            this.editingRowData.WHATSAPP = whatsappParts.slice(1).join('-');
+          } else {
+            this.countryCodewhatsapp = null;
+            this.editingRowData.WHATSAPP = data.WHATSAPP;
+          }
+          if (this.countryCodewhatsapp) {
+            this.onCountrycodeChangeWhatsapp({ value: this.countryCodewhatsapp });
+          }
+        } else {
+          this.countryCodewhatsapp = null;
         }
 
-        this.formsource.patchValue({
-          CompanyTypeName: data.COMPANY_TYPE || 0,
-          STATE_ID: data.STATE_ID,
-        });
-
-        this.formsource.patchValue({
-          CompanyTypeName: response.Data.COMPANY_TYPE || 0,
-          STATE_ID: response.Data.STATE_ID,
-        });
+        this.selectedCompanyType = data.COMPANY_TYPE || null;
+        this.state = data.STATE_ID || null;
       });
     } else {
       console.warn('No ID found in selected row event:', event);
@@ -469,26 +528,52 @@ export class CompanyMasterComponent {
   }
 
   editData() {
-    const validationResult = this.formValidationGroup?.instance?.validate();
+    const validationResult = this.editValidationGroup?.instance?.validate();
+    if (!validationResult || !validationResult.isValid) {
+      return;
+    }
+
     const Id = this.editingRowData.ID;
-    const Company_code = this.editingRowData.COMPANY_CODE;
-    const Company_name = this.editingRowData.COMPANY_NAME;
-    const First_address = this.editingRowData.ADDRESS1;
-    const Second_address = this.editingRowData.ADDRESS2;
-    const Third_address = this.editingRowData.ADDRESS3;
-    const Contact_name = this.editingRowData.CONTACT_NAME;
-    const Phone_no = this.editingRowData.PHONE;
-    const Mobile_no = this.editingRowData.MOBILE;
-    const Email = this.editingRowData.EMAIL;
-    const WhatsApp_no = this.editingRowData.WHATSAPP;
+    const Company_code = this.editingRowData.COMPANY_CODE?.toString().trim() || '';
+    const Company_name = this.editingRowData.COMPANY_NAME?.toString().trim() || '';
+    const First_address = this.editingRowData.ADDRESS1 || '';
+    const Second_address = this.editingRowData.ADDRESS2 || '';
+    const Third_address = this.editingRowData.ADDRESS3 || '';
+    const Contact_name = this.editingRowData.CONTACT_NAME || '';
+    const Phone_no = this.editingRowData.PHONE?.toString().trim() || '';
+    const Mobile_no = this.editingRowData.MOBILE?.toString().trim() || '';
+    const Email = this.editingRowData.EMAIL?.toString().trim() || '';
+    const WhatsApp_no = this.editingRowData.WHATSAPP?.toString().trim() || '';
     const Company_type = this.selectedCompanyType;
     const STATE_ID = this.state;
-    const PAN = this.editingRowData.PAN_NO;
-    const GSTNo = this.editingRowData.GST_NO;
-    const CIN = this.editingRowData.CIN;
+    const PAN = this.editingRowData.PAN_NO || '';
+    const GSTNo = this.editingRowData.GST_NO || '';
+    const CIN = this.editingRowData.CIN || '';
+    const Is_Inactive = !!this.editingRowData.IS_INACTIVE;
 
-    // const Company_type = this.editingRowData.COMPANY_TYPE;
-    const Is_Inactive = this.editingRowData.IS_INACTIVE;
+    // ---------------- DUPLICATE CHECK ----------------
+    const newCode = Company_code.toLowerCase();
+    const newName = Company_name.toLowerCase();
+
+    const isDuplicate = this.companyList?.some((data: any) => {
+      if (data.ID === Id) return false;
+      const existingCode = data.COMPANY_CODE?.toString().trim().toLowerCase();
+      const existingName = data.COMPANY_NAME?.toString().trim().toLowerCase();
+
+      return existingCode === newCode || existingName === newName;
+    });
+
+    if (isDuplicate) {
+      notify(
+        {
+          message: 'Company Code or Company Name already exists',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1000,
+        },
+        'error',
+      );
+      return;
+    }
 
     const payload = {
       ID: Id,
@@ -498,16 +583,15 @@ export class CompanyMasterComponent {
       ADDRESS2: Second_address,
       ADDRESS3: Third_address,
       CONTACT_NAME: Contact_name,
-      PHONE: this.countryCodephone
-        ? `${this.countryCodephone}-${Phone_no || ''}`
+      PHONE: this.countryCodephone && Phone_no
+        ? `${this.countryCodephone}-${Phone_no}`
         : Phone_no,
-
-      MOBILE: this.countryCodemobile
-        ? `${this.countryCodemobile}-${Mobile_no || ''}`
+      MOBILE: this.countryCodemobile && Mobile_no
+        ? `${this.countryCodemobile}-${Mobile_no}`
         : Mobile_no,
       EMAIL: Email,
-      WHATSAPP: this.countryCodewhatsapp
-        ? `${this.countryCodewhatsapp}-${WhatsApp_no || ''}`
+      WHATSAPP: this.countryCodewhatsapp && WhatsApp_no
+        ? `${this.countryCodewhatsapp}-${WhatsApp_no}`
         : WhatsApp_no,
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: Is_Inactive,
@@ -531,9 +615,8 @@ export class CompanyMasterComponent {
             'success',
           );
 
-          this.formsource.reset();
-          this.get_Company_List();
           this.editPopup = false;
+          this.get_Company_List();
         },
         (error) => {
           this.isSaving = false; // ✅ STOP loading
@@ -594,51 +677,60 @@ export class CompanyMasterComponent {
   }
 
   onCountrycodeChangePhone(e: any) {
+    if (!e?.value) {
+      this.Phone_limit = undefined;
+      return;
+    }
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+      if (res?.Data?.[0]?.MOBILE_DIGITS) {
+        this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+      }
     });
   }
   onCountrycodeChangeWhatsapp(e: any) {
+    if (!e?.value) {
+      this.whatsapp_limit = undefined;
+      return;
+    }
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.whatsapp_limit = Number(res.Data[0].MOBILE_DIGITS);
+      if (res?.Data?.[0]?.MOBILE_DIGITS) {
+        this.whatsapp_limit = Number(res.Data[0].MOBILE_DIGITS);
+      }
     });
   }
   onCountrycodeChangeMobile(e: any) {
+    if (!e?.value) {
+      this.mobile_limit = undefined;
+      return;
+    }
     const payload = {
       COUNTRY_CODE: e.value,
     };
     this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+      if (res?.Data?.[0]?.MOBILE_DIGITS) {
+        this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+      }
     });
   }
   validateMobileLength = (e: any): boolean => {
-    const value = e.value;
-
-    // ✅ Skip validation if empty
-    if (!value) return true;
-
+    const value = (e.value || '').toString().trim();
+    if (!value || !this.mobile_limit) return true;
     return value.length === this.mobile_limit;
   };
   validatePhoneLength = (e: any): boolean => {
-    const value = e.value;
-
-    // ✅ Skip validation if empty
-    if (!value) return true;
-
+    const value = (e.value || '').toString().trim();
+    if (!value || !this.Phone_limit) return true;
     return value.length === this.Phone_limit;
   };
   validateWhatsAppLength = (e: any): boolean => {
-    const value = e.value;
-
-    // ✅ Skip validation if empty
-    if (!value) return true;
-
+    const value = (e.value || '').toString().trim();
+    if (!value || !this.whatsapp_limit) return true;
     return value.length === this.whatsapp_limit;
   };
   countryDisplay(item: any) {

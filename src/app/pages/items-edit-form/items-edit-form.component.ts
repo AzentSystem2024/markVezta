@@ -676,27 +676,30 @@ export class ItemsEditFormComponent implements OnInit {
       console.log(this.store, '=======afte bindg');
 
       const compIdVal = this.itemData?.COMPANY_ID;
-      if (compIdVal !== null && compIdVal !== undefined && compIdVal !== '') {
+      if (
+        compIdVal !== null &&
+        compIdVal !== undefined &&
+        compIdVal !== '' &&
+        compIdVal !== 0 &&
+        compIdVal !== '0' &&
+        compIdVal !== 'null' &&
+        compIdVal !== 'undefined'
+      ) {
         if (Array.isArray(compIdVal)) {
-          this.selectedCompanyIds = compIdVal.map((id: any) =>
-            isNaN(Number(id)) ? id : Number(id),
-          );
+          this.selectedCompanyIds = compIdVal
+            .filter((id: any) => id !== null && id !== undefined && id !== '' && id !== 0 && id !== '0' && id !== 'null')
+            .map((id: any) => (isNaN(Number(id)) ? id : Number(id)));
         } else if (typeof compIdVal === 'string') {
           this.selectedCompanyIds = compIdVal
             .split(',')
             .map((id: string) => id.trim())
-            .filter((id: string) => id !== '')
+            .filter((id: string) => id !== '' && id !== '0' && id !== 'null' && id !== 'undefined')
             .map((id: string) => (isNaN(Number(id)) ? id : Number(id)));
         } else if (typeof compIdVal === 'number') {
           this.selectedCompanyIds = [compIdVal];
         }
       } else {
-        const defaultCompId =
-          this.selected_Company_id ||
-          this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
-        if (defaultCompId) {
-          this.selectedCompanyIds = [Number(defaultCompId) || defaultCompId];
-        }
+        this.selectedCompanyIds = [];
       }
     }
     this.sesstion_Details();
@@ -782,11 +785,11 @@ export class ItemsEditFormComponent implements OnInit {
 
       return matched
         ? {
-            ...storeItem,
-            ...matched,
-            ID: storeId, // Keep storeItem.ID so keyExpr="ID" in dx-data-grid matches
-            STORE_ID: storeId,
-          }
+          ...storeItem,
+          ...matched,
+          ID: storeId, // Keep storeItem.ID so keyExpr="ID" in dx-data-grid matches
+          STORE_ID: storeId,
+        }
         : storeItem;
     });
 
@@ -880,11 +883,15 @@ export class ItemsEditFormComponent implements OnInit {
 
     if (!this.company_list || this.company_list.length === 0) {
       this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
-        this.company_list = (res?.Data || []).map((c: any) => ({
-          ...c,
-          COMPANY_ID: c.COMPANY_ID || c.ID,
-          COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
-        }));
+        this.company_list = (res?.Data || []).map((c: any) => {
+          const rawId = c.COMPANY_ID !== undefined && c.COMPANY_ID !== null ? c.COMPANY_ID : c.ID;
+          return {
+            ...c,
+            COMPANY_ID: !isNaN(Number(rawId)) ? Number(rawId) : rawId,
+            COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
+          };
+        });
+        this.cdr.detectChanges();
       });
     }
 
@@ -936,11 +943,15 @@ export class ItemsEditFormComponent implements OnInit {
 
     if (!this.company_list || this.company_list.length === 0) {
       this.dataservice.get_CompanyList_Api().subscribe((res: any) => {
-        this.company_list = (res?.Data || []).map((c: any) => ({
-          ...c,
-          COMPANY_ID: c.COMPANY_ID || c.ID,
-          COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
-        }));
+        this.company_list = (res?.Data || []).map((c: any) => {
+          const rawId = c.COMPANY_ID !== undefined && c.COMPANY_ID !== null ? c.COMPANY_ID : c.ID;
+          return {
+            ...c,
+            COMPANY_ID: !isNaN(Number(rawId)) ? Number(rawId) : rawId,
+            COMPANY_NAME: c.COMPANY_NAME || c.NAME || c.DESCRIPTION,
+          };
+        });
+        this.cdr.detectChanges();
       });
     }
   }
@@ -948,7 +959,9 @@ export class ItemsEditFormComponent implements OnInit {
   onCompanyChanged(event: any) {
     this.selectedCompanyIds = event.value || [];
     if (this.itemData) {
-      this.itemData.COMPANY_ID = this.selectedCompanyIds.join(',');
+      this.itemData.COMPANY_ID = Array.isArray(this.selectedCompanyIds)
+        ? this.selectedCompanyIds
+        : (this.selectedCompanyIds ? [this.selectedCompanyIds] : []);
     }
   }
   onRowUpdated(e: any) { }
@@ -1224,23 +1237,16 @@ export class ItemsEditFormComponent implements OnInit {
       });
     });
 
-    let finalCompanyId = '';
-    if (
-      this.selectedCompanyIds &&
-      Array.isArray(this.selectedCompanyIds) &&
-      this.selectedCompanyIds.length > 0
-    ) {
-      finalCompanyId = this.selectedCompanyIds
-        .filter((id: any) => id !== null && id !== undefined && id !== '')
-        .join(',');
-    } else if (this.itemData?.COMPANY_ID) {
-      if (Array.isArray(this.itemData.COMPANY_ID)) {
-        finalCompanyId = this.itemData.COMPANY_ID.join(',');
-      } else {
-        finalCompanyId = String(this.itemData.COMPANY_ID);
-      }
+    const rawCompIds: any = this.selectedCompanyIds;
+    let finalCompanyIds: any[] = [];
+    if (Array.isArray(rawCompIds) && rawCompIds.length > 0) {
+      finalCompanyIds = rawCompIds
+        .filter((id: any) => id !== null && id !== undefined && id !== '' && String(id) !== '0')
+        .map((id: any) => (!isNaN(Number(id)) ? Number(id) : id));
+    } else if (rawCompIds !== null && rawCompIds !== undefined && String(rawCompIds) !== '0' && String(rawCompIds) !== '') {
+      finalCompanyIds = [!isNaN(Number(rawCompIds)) ? Number(rawCompIds) : rawCompIds];
     } else {
-      finalCompanyId = String(this.selected_Company_id || '');
+      finalCompanyIds = [];
     }
 
     const items = this.itemData; // Adjust if needed based on your form structure
@@ -1254,7 +1260,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
-      COMPANY_ID: finalCompanyId,
+      COMPANY_ID: finalCompanyIds,
       SALE_PRICE: this.salePrice,
       COST: this.itemData.COST ?? 0,
     };

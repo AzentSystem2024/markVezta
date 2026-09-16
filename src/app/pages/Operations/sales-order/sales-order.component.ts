@@ -7,7 +7,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -28,6 +30,7 @@ import {
   DxTabsModule,
   DxNumberBoxModule,
   DxDataGridComponent,
+  DxTagBoxModule,
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -136,10 +139,30 @@ export class SalesOrderComponent implements OnInit {
   isAddSalesOrder: boolean;
   companyID: any;
 
+  showTemplatePopup: boolean = false;
+  templateList: any[] = [];
+  selectedTemplate: any;
+  isPreviewPopupVisible: boolean = false;
+  isLoadingPdf: boolean = false;
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  pdfBlobUrl: string | null = null;
+  currentPdfBlob: Blob | null = null;
+  selectedRowData: any = null;
+
+  isEmailPopupVisible: boolean = false;
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  emailSettingsData: any = null;
+  isSendingEmail: boolean = false;
+
   constructor(
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
+    private sanitizer: DomSanitizer,
+    private http: HttpClient
   ) { }
 
   ngOnInit() {
@@ -581,6 +604,142 @@ export class SalesOrderComponent implements OnInit {
 
     this.applyCustomDateFilter(); // your existing function
   }
+
+  onPrintClick = (e: any) => {
+    this.selectedRowData = e.row.data;
+    this.getTemplates();
+    this.showTemplatePopup = true;
+  };
+
+  getTemplates(): void {
+    // Sales order category ID is 11
+    this.dataService.getTemplateList(11).subscribe({
+      next: (res: any) => {
+        if (res && res.Data) {
+          this.templateList = res.Data;
+          if (this.templateList.length > 0) {
+            this.selectedTemplate = this.templateList[0].name;
+          } else {
+            this.selectedTemplate = null;
+          }
+        }
+      },
+      error: (err) => console.error('Error fetching templates:', err)
+    });
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.showTemplatePopup = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+
+    const soId = this.selectedRowData?.ID || 0;
+
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?salesOrderId=${soId}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        this.isLoadingPdf = false;
+      }
+    });
+  }
+
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
+  }
+
+  downloadPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = this.pdfBlobUrl;
+    a.download = `${this.selectedTemplate || 'SalesOrder'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  sendPdf(): void {
+    this.isEmailPopupVisible = true;
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+    
+    // Sales Order Email Type ID is 11
+    this.dataService.selectEmailSettings(11).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSettingsData = res.Data;
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      notify('Please select at least one recipient.', 'warning', 3000);
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      notify('No PDF generated to attach.', 'warning', 3000);
+      return;
+    }
+    this.isSendingEmail = true;
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject || ' ');
+    formData.append('Body', this.emailBody || ' ');
+    formData.append('EmailType', '11');
+    const fileName = `${this.selectedTemplate || 'SalesOrder'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, fileName);
+    this.dataService.sendEmailWithAttachment(formData).subscribe({
+      next: () => {
+        this.isSendingEmail = false;
+        notify('Email sent successfully!', 'success', 3000);
+        this.isEmailPopupVisible = false;
+      },
+      error: (error) => {
+        this.isSendingEmail = false;
+        console.error('Email send error', error);
+        notify('Error sending email.', 'error', 3000);
+      }
+    });
+  }
+
+  closePdfPreview(): void {
+    this.isPreviewPopupVisible = false;
+    if (this.pdfBlobUrl) {
+      URL.revokeObjectURL(this.pdfBlobUrl);
+      this.pdfBlobUrl = null;
+      this.pdfPreviewUrl = null;
+      this.currentPdfBlob = null;
+    }
+  }
 }
 
 @NgModule({
@@ -616,6 +775,7 @@ export class SalesOrderComponent implements OnInit {
     DxoSummaryModule,
     SalesOrderFormModule,
     CustomDatePopupModule,
+    DxTagBoxModule,
   ],
   providers: [],
   declarations: [SalesOrderComponent],
