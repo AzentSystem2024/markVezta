@@ -1,0 +1,249 @@
+<div class="view-wrapper">
+  <div class="form-container">
+    <div class="section-card">
+      <div class="row mb-3">
+        <!-- Row 1: Dealer & Date -->
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+          <dx-select-box
+            [dataSource]="dealers"
+            displayExpr="name"
+            valueExpr="id"
+            label="Dealer"
+            labelMode="floating"
+            [value]="selectedDealerId"
+            (onValueChanged)="onDealerChanged($event)"
+            [searchEnabled]="true"
+          ></dx-select-box>
+        </div>
+        <div class="col-12 col-md-6">
+          <dx-date-box
+            [(value)]="currentDate"
+            type="datetime"
+            displayFormat="dd/MM/yyyy hh:mm:ss a"
+            label="Date"
+            labelMode="floating"
+            [readOnly]="true"
+            width="100%"
+          ></dx-date-box>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <!-- Row 2: Subdealer & Warehouse -->
+        <div class="col-12 col-md-6 mb-3 mb-md-0 d-flex gap-3 align-items-center">
+          <dx-check-box
+            text="Subdealer"
+            [(value)]="hasSubdealer"
+            (onValueChanged)="hasSubdealerChanged($event)"
+          ></dx-check-box>
+          
+          <dx-select-box
+            *ngIf="hasSubdealer"
+            [dataSource]="filteredSubdealers"
+            displayExpr="name"
+            valueExpr="id"
+            label="Sub Dealer"
+            labelMode="floating"
+            [(value)]="selectedSubdealerId"
+            [searchEnabled]="true"
+            noDataText="No subdealers for selected dealer"
+            class="flex-grow-1"
+          ></dx-select-box>
+        </div>
+        <div class="col-12 col-md-6">
+          <dx-select-box
+            [dataSource]="filteredWarehouses"
+            displayExpr="name"
+            valueExpr="id"
+            label="Warehouse"
+            labelMode="floating"
+            [(value)]="selectedWarehouseId"
+            [searchEnabled]="true"
+            noDataText="No warehouses found"
+          ></dx-select-box>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Row 3: Delivery Address & Full Address -->
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+          <dx-select-box
+            [dataSource]="filteredDeliveryAddresses"
+            displayExpr="name"
+            valueExpr="id"
+            label="Delivery Address"
+            labelMode="floating"
+            [value]="selectedDeliveryAddressId"
+            (onValueChanged)="onDeliveryAddressChanged($event)"
+            [searchEnabled]="true"
+            noDataText="No addresses found"
+          ></dx-select-box>
+        </div>
+        <div class="col-12 col-md-6 d-flex align-items-center">
+          <span
+            style="
+              font-size: 13px;
+              font-weight: 500;
+              margin-right: 10px;
+              color: var(--texteditor-label-color);
+            "
+            >Address:
+          </span>
+          <span
+            style="
+              font-size: 13px;
+              font-weight: bold;
+              text-transform: uppercase;
+            "
+            >{{ fullAddressText }}</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card mt-2">
+      <div class="grid-section">
+        <dx-data-grid
+          [dataSource]="orderItems"
+          [showBorders]="true"
+          [showRowLines]="true"
+          [showColumnLines]="true"
+          [columnAutoWidth]="true"
+          [allowColumnResizing]="true"
+          class="grid theme-dependent"
+          [height]="'35vh'"
+          (onRowInserted)="onRowInserted($event)"
+        >
+          <dxo-editing
+            mode="cell"
+            [allowUpdating]="true"
+            [allowAdding]="true"
+            [allowDeleting]="true"
+          ></dxo-editing>
+
+          <dxi-column
+            caption="#"
+            cellTemplate="indexTemplate"
+            [width]="50"
+            alignment="center"
+          ></dxi-column>
+          <div *dxTemplate="let data of 'indexTemplate'">
+            {{ data.rowIndex + 1 }}
+          </div>
+
+          <dxi-column
+            dataField="itemId"
+            caption="Item"
+            [setCellValue]="setItemValue"
+          >
+            <dxo-lookup
+              [dataSource]="items"
+              displayExpr="name"
+              valueExpr="id"
+            ></dxo-lookup>
+          </dxi-column>
+
+          <dxi-column
+            dataField="typeId"
+            caption="Type"
+            [setCellValue]="setTypeValue"
+          >
+            <dxo-lookup
+              [dataSource]="getFilteredTypes"
+              displayExpr="name"
+              valueExpr="id"
+            ></dxo-lookup>
+          </dxi-column>
+
+          <dxi-column
+            dataField="categoryId"
+            caption="Category"
+            [setCellValue]="setCategoryValue"
+          >
+            <dxo-lookup
+              [dataSource]="getFilteredCategories"
+              displayExpr="name"
+              valueExpr="id"
+            ></dxo-lookup>
+          </dxi-column>
+
+          <dxi-column
+            dataField="artNoId"
+            caption="Art No"
+            [setCellValue]="setArtNoValue"
+          >
+            <dxo-lookup
+              [dataSource]="getFilteredArtNos"
+              displayExpr="name"
+              valueExpr="id"
+            ></dxo-lookup>
+          </dxi-column>
+
+          <dxi-column dataField="colorId" caption="Color">
+            <dxo-lookup
+              [dataSource]="getFilteredColors"
+              displayExpr="name"
+              valueExpr="id"
+            ></dxo-lookup>
+          </dxi-column>
+
+          <dxi-column dataField="packingId" caption="Packing">
+            <dxo-lookup
+              [dataSource]="packingMasterList"
+              displayExpr="name"
+              valueExpr="id"
+            ></dxo-lookup>
+          </dxi-column>
+
+          <dxi-column
+            dataField="content"
+            caption="Content"
+            [allowEditing]="false"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="qty"
+            caption="Qty"
+            dataType="number"
+            [width]="80"
+          ></dxi-column>
+
+          <dxo-summary>
+            <dxi-total-item
+              column="content"
+              displayFormat="Total"
+            ></dxi-total-item>
+            <dxi-total-item
+              column="qty"
+              summaryType="sum"
+              displayFormat="{0}"
+            ></dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+      </div>
+
+      <div class="bottom-section mt-4">
+        <div class="row">
+          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <dx-text-area
+              [(value)]="remarks"
+              label="Remarks"
+              labelMode="floating"
+              [height]="70"
+            ></dx-text-area>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-section mt-3 d-flex justify-content-end gap-2">
+        <dx-button text="Save" type="default" (onClick)="onSave()"></dx-button>
+        <dx-button
+          text="Submit"
+          type="default"
+          stylingMode="contained"
+          (onClick)="onSubmit()"
+        ></dx-button>
+      </div>
+    </div>
+  </div>
+</div>
