@@ -953,6 +953,16 @@ export class ArticleAddComponent {
     //   return;
     // }
 
+    if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
+      notify({
+        message: 'Please select at least one size.',
+        type: 'warning',
+        displayTime: 3000,
+        position: { at: 'top right', my: 'top right' },
+      });
+      return;
+    }
+
     // Production Unit is mandatory for companies other than HO STORE
     if (
       this.Default_company_Type?.toString().trim().toUpperCase() !== '0' &&
@@ -984,15 +994,7 @@ export class ArticleAddComponent {
     //   return;
     // }
 
-    if (!this.selectedSizeRowData || this.selectedSizeRowData.length === 0) {
-      notify({
-        message: 'Please select at least one size.',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      return;
-    }
+
 
     const rows =
       this.itemsGridRef?.instance?.getVisibleRows().map((r: any) => r.data) ||
@@ -1120,8 +1122,9 @@ export class ArticleAddComponent {
           CREATED_DATE: formatDate(this.articleData.CREATED_DATE),
           CATEGORY_ID: this.selectedCategoryId,
           ARTICLE_TYPE: this.selectedTypeId,
+          COMPANY_TYPE: this.Default_company_Type || '',
           BRAND_ID: this.selectedBrandId || 0,
-          // COMPANY_ID: this.selected_Company_id,
+          COMPANY_ID: this.selected_Company_id || 0,
           // UNIT_ID: this.selectedProductionUnitId,
           // COMPONENT_ARTICLE_ID: this.articleData.IS_COMPONENT
           //   ? 0

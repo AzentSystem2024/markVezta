@@ -83,7 +83,7 @@ export class PackingEditComponent {
   categoryList: any;
   typeList: any;
   brandList: any;
-  produCtionUnits: any;
+  produCtionUnits: any[] = [];
   materialUnits: any;
   articleSizeData: any;
   shouldShowGrid: boolean = false;
@@ -113,10 +113,10 @@ export class PackingEditComponent {
   selectedItems: any[] = [];
   ItemListDataSource: any[] = [];
   Default_company_Type: any;
+  isHoStore: boolean;
 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
-    this.getDropdownLists();
 
     const payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -198,8 +198,26 @@ export class PackingEditComponent {
       NAME: 'PACKING_PRODUCTION_UNITS',
       COMPANY_TYPE: this.Default_company_Type
     };
-    this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      this.produCtionUnits = response;
+    // this.dataService.getDropdownData(payload).subscribe((response: any) => {
+    //   this.produCtionUnits = response;
+    // });
+    this.dataService.getDropdownData(payload).subscribe({
+      next: (response: any) => {
+        console.log('Production Units Response:', response);
+
+        this.produCtionUnits = Array.isArray(response)
+          ? [...response]
+          : [];
+
+        console.log(
+          'Production Units after binding:',
+          this.produCtionUnits
+        );
+      },
+      error: (error) => {
+        console.error('Production Unit API Error:', error);
+        this.produCtionUnits = [];
+      }
     });
     const payload1 = {
       COMPANY_ID: this.selected_Company_id,
@@ -404,7 +422,6 @@ export class PackingEditComponent {
       console.log(this.totalQuantity);
       this.isArticleFieldsDisabled = true;
 
-
       // if (Array.isArray(incomingData.Units) && incomingData.Units.length) {
       //   this.PackingData.UNIT_ID = incomingData.Units[0].UNIT_ID; //  SINGLE VALUE
       // } else if (incomingData.UNIT_ID) {
@@ -547,7 +564,7 @@ export class PackingEditComponent {
       '========packing entries data=========',
     );
 
-    this.getDropdownLists();
+
   }
 
   private normalizeDateOnly(value: any): string {
@@ -570,6 +587,10 @@ export class PackingEditComponent {
   }
 
   UpdateData() {
+    // HO STORE => Production Unit is optional
+    this.isHoStore =
+      this.Default_company_Type?.toString().trim().toUpperCase() ===
+      '0';
     // const payload = this.PackingData;
     const validationResult = this.formValidationGroup?.instance?.validate();
 
@@ -588,7 +609,7 @@ export class PackingEditComponent {
         : [];
 
     //  hard validation
-    if (!selectedUnits.length) {
+    if (!this.isHoStore && !selectedUnits.length) {
       notify(
         {
           message: 'Please select at least one Unit',
@@ -652,6 +673,8 @@ export class PackingEditComponent {
     const payload = {
       ...this.PackingData,
       COMBINATION: combinationToUse,
+      COMPANY_ID: this.selected_Company_id,
+      COMPANY_TYPE: this.Default_company_Type,
       PAIR_QTY: this.totalQuantity,
       STD_PRICE: finalStdPrice,
       STD_PRICE_EFFECT_FROM: finalStdEffectFrom,

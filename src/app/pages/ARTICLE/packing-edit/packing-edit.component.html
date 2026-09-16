@@ -194,12 +194,15 @@
             [(value)]="PackingData.UNIT_ID"
             [showSelectionControls]="true"
             [hint]="selectedUnitsHint"
-            ><dx-validator>
+            [readOnly]="false"
+            [disabled]="false"
+          >
+            <!-- <dx-validator>
               <dxi-validation-rule
                 type="required"
                 message="This field is required"
               ></dxi-validation-rule>
-            </dx-validator>
+            </dx-validator> -->
           </dx-tag-box>
         </dx-validation-group>
       </div>
