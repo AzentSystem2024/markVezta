@@ -959,7 +959,9 @@ export class ItemsEditFormComponent implements OnInit {
   onCompanyChanged(event: any) {
     this.selectedCompanyIds = event.value || [];
     if (this.itemData) {
-      this.itemData.COMPANY_ID = this.selectedCompanyIds.join(',');
+      this.itemData.COMPANY_ID = Array.isArray(this.selectedCompanyIds)
+        ? this.selectedCompanyIds
+        : (this.selectedCompanyIds ? [this.selectedCompanyIds] : []);
     }
   }
   onRowUpdated(e: any) { }
@@ -1235,17 +1237,16 @@ export class ItemsEditFormComponent implements OnInit {
       });
     });
 
-    let finalCompanyId = '';
-    if (
-      this.selectedCompanyIds &&
-      Array.isArray(this.selectedCompanyIds) &&
-      this.selectedCompanyIds.length > 0
-    ) {
-      finalCompanyId = this.selectedCompanyIds
-        .filter((id: any) => id !== null && id !== undefined && id !== '' && id !== 0 && id !== '0')
-        .join(',');
+    const rawCompIds: any = this.selectedCompanyIds;
+    let finalCompanyIds: any[] = [];
+    if (Array.isArray(rawCompIds) && rawCompIds.length > 0) {
+      finalCompanyIds = rawCompIds
+        .filter((id: any) => id !== null && id !== undefined && id !== '' && String(id) !== '0')
+        .map((id: any) => (!isNaN(Number(id)) ? Number(id) : id));
+    } else if (rawCompIds !== null && rawCompIds !== undefined && String(rawCompIds) !== '0' && String(rawCompIds) !== '') {
+      finalCompanyIds = [!isNaN(Number(rawCompIds)) ? Number(rawCompIds) : rawCompIds];
     } else {
-      finalCompanyId = '';
+      finalCompanyIds = [];
     }
 
     const items = this.itemData; // Adjust if needed based on your form structure
@@ -1259,7 +1260,7 @@ export class ItemsEditFormComponent implements OnInit {
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
       UOM_PURCH: this.selectedData,
-      COMPANY_ID: finalCompanyId,
+      COMPANY_ID: finalCompanyIds,
       SALE_PRICE: this.salePrice,
       COST: this.itemData.COST ?? 0,
     };

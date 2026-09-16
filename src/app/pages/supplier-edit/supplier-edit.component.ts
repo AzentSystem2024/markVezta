@@ -190,8 +190,51 @@ export class SupplierEditComponent {
     console.log(this.DEFAULT_COUNTRY_CODE, 'DEFAULT_COUNTRY_CODE');
   }
 
+  getDefaultCurrencyId(): any {
+    const settingsStr = sessionStorage.getItem('settings');
+    if (settingsStr) {
+      try {
+        const settings = JSON.parse(settingsStr);
+        if (settings && settings.CURRENCY_ID !== undefined && settings.CURRENCY_ID !== null && settings.CURRENCY_ID !== '') {
+          return settings.CURRENCY_ID;
+        }
+      } catch (e) {}
+    }
+
+    const savedUserStr = sessionStorage.getItem('savedUserData') || localStorage.getItem('userData');
+    if (savedUserStr) {
+      try {
+        const savedUser = JSON.parse(savedUserStr);
+        if (savedUser?.GeneralSettings?.CURRENCY_ID !== undefined && savedUser?.GeneralSettings?.CURRENCY_ID !== null && savedUser?.GeneralSettings?.CURRENCY_ID !== '') {
+          return savedUser.GeneralSettings.CURRENCY_ID;
+        }
+        if (savedUser?.CURRENCY_ID !== undefined && savedUser?.CURRENCY_ID !== null && savedUser?.CURRENCY_ID !== '') {
+          return savedUser.CURRENCY_ID;
+        }
+        if (savedUser?.Configuration?.[0]?.CURRENCY_ID !== undefined && savedUser?.Configuration?.[0]?.CURRENCY_ID !== null && savedUser?.Configuration?.[0]?.CURRENCY_ID !== '') {
+          return savedUser.Configuration[0].CURRENCY_ID;
+        }
+        if (savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== undefined && savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== null && savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== '') {
+          return savedUser.SELECTED_COMPANY.CURRENCY_ID;
+        }
+      } catch (e) {}
+    }
+
+    return null;
+  }
+
   toggleCurrencyDropdown(checked: boolean) {
     this.isCurrencyAccepted = checked;
+    if (checked) {
+      const defCur = this.getDefaultCurrencyId();
+      if (defCur !== null && defCur !== undefined && this.supplierData) {
+        this.supplierData.CURRENCY_ID = defCur;
+      }
+    } else {
+      if (this.supplierData) {
+        this.supplierData.CURRENCY_ID = '';
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -415,8 +458,16 @@ export class SupplierEditComponent {
   }
 
   updateSupplier() {
+    let currencyId = this.supplierData.CURRENCY_ID;
+    if (this.isCurrencyAccepted) {
+      const defCur = this.getDefaultCurrencyId();
+      if (defCur !== null && defCur !== undefined && defCur !== '') {
+        currencyId = defCur;
+      }
+    }
     const payload = {
       ...this.supplierData,
+      CURRENCY_ID: currencyId,
       SUPP_CAT_ID: this.Supplier_Category,
       PURCH_TYPE: this.purchType,
       MOBILE_NO: this.countryCode + '-' + this.Supplier_mobile,

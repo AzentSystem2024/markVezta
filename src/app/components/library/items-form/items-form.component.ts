@@ -540,19 +540,21 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       mappedStores = [];
     }
 
-    let compIds: any = this.selectedCompanyIds || [];
-    let finalCompanyId = '';
-    if (Array.isArray(compIds)) {
-      finalCompanyId = compIds
-        .filter((id: any) => id !== null && id !== undefined && id !== '' && id !== 0 && id !== '0')
-        .join(',');
-    } else if (compIds !== null && compIds !== undefined && compIds !== 0 && compIds !== '0') {
-      finalCompanyId = String(compIds);
+    const rawCompIds: any = this.selectedCompanyIds;
+    let finalCompanyIds: any[] = [];
+    if (Array.isArray(rawCompIds) && rawCompIds.length > 0) {
+      finalCompanyIds = rawCompIds
+        .filter((id: any) => id !== null && id !== undefined && id !== '' && String(id) !== '0')
+        .map((id: any) => (!isNaN(Number(id)) ? Number(id) : id));
+    } else if (rawCompIds !== null && rawCompIds !== undefined && String(rawCompIds) !== '0' && String(rawCompIds) !== '') {
+      finalCompanyIds = [!isNaN(Number(rawCompIds)) ? Number(rawCompIds) : rawCompIds];
+    } else {
+      finalCompanyIds = [];
     }
 
     return {
       ...this.newItems,
-      COMPANY_ID: finalCompanyId,
+      COMPANY_ID: finalCompanyIds,
       UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
 
       ITEM_STORES: mappedStores,
@@ -572,11 +574,9 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
   onCompanyChanged(event: any) {
     this.selectedCompanyIds = event.value || [];
-    if (Array.isArray(this.selectedCompanyIds)) {
-      this.newItems.COMPANY_ID = this.selectedCompanyIds.join(',');
-    } else {
-      this.newItems.COMPANY_ID = this.selectedCompanyIds ? String(this.selectedCompanyIds) : '';
-    }
+    this.newItems.COMPANY_ID = Array.isArray(this.selectedCompanyIds)
+      ? this.selectedCompanyIds
+      : (this.selectedCompanyIds ? [this.selectedCompanyIds] : []);
   }
 
   ngOnInit() {
