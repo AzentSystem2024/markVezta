@@ -228,6 +228,8 @@ import { SupplierwiseSalesComponent } from './pages/REPORT/supplierwise-sales/su
 import { SupplierwiseStockComponent } from './pages/REPORT/supplierwise-stock/supplierwise-stock.component';
 import { ProfitLossDepartmentwiseComponent } from './pages/REPORT/profit-loss-departmentwise/profit-loss-departmentwise.component';
 import { EmailSettingComponent } from './email-setting/email-setting.component';
+import { NewOrderComponent } from './pages/DESPATCH/Order/new-order/new-order.component';
+import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
 
 const routes: Routes = [
   {
@@ -1397,7 +1399,16 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-
+        path: 'order-new',
+        component: NewOrderComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'order-view',
+        component: OrderViewComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'email-settings',
         component: EmailSettingComponent,
         // canActivate: [AuthGuardService],
@@ -1418,4 +1429,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

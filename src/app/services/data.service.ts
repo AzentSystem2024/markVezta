@@ -3460,7 +3460,7 @@ export class DataService {
   }
 
   public getDropdownDataforBoxProduct(type: any): Observable<any> {
-    const reqBodyData = { name: type };
+    const reqBodyData = type;
     return this.http.post(`${this.apiUrl}dropdown/`, reqBodyData);
   }
 
@@ -7514,7 +7514,7 @@ The result can be exported to HTML or Markdown.`;
   testEmail(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/TestMail`, data);
   }
-  
+
   sendEmailWithAttachment(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/SendEmailWithAttachment`, formData);
   }

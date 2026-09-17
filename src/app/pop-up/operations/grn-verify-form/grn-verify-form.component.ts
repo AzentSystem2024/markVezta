@@ -411,7 +411,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
       ).toFixed(2);
 
       updatedRow.UNIT_COST = (
-        Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
+        Number(updatedRow.AMOUNT || 0) / Number(receivedQty || 0)
       ).toFixed(2);
 
       updatedRow.COST = updatedRow.UNIT_COST;
@@ -430,15 +430,15 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
           UNIT_COST:
             Number(receivedQty || 0) > 0
               ? (
-                  Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
-                ).toFixed(2)
+                Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
+              ).toFixed(2)
               : '0.00',
 
           COST:
             Number(receivedQty || 0) > 0
               ? (
-                  Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
-                ).toFixed(2)
+                Number(updatedRow.SUPP_AMOUNT || 0) / Number(receivedQty || 0)
+              ).toFixed(2)
               : '0.00',
         };
 
@@ -510,7 +510,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         // Ensure QUANTITY is greater than zero to avoid division by zero
         if (Number(item.QUANTITY) > 0) {
           item.UNIT_COST = (
-            Number(item.PO_TAXABLE_AMOUNT || 0) / Number(item.QUANTITY || 0)
+            Number(item.SUPP_AMOUNT || 0) / Number(item.QUANTITY || 0)
           ).toFixed(2);
 
           item.COST = item.UNIT_COST;
@@ -1309,11 +1309,10 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
           ? cost.IS_LOCAL_CURRENCY
             ? this.localCurrencySymbol
             : this.currencySymbol
-          : `${
-              cost.IS_LOCAL_CURRENCY
-                ? this.localCurrencySymbol
-                : this.currencySymbol
-            } %`,
+          : `${cost.IS_LOCAL_CURRENCY
+            ? this.localCurrencySymbol
+            : this.currencySymbol
+          } %`,
 
         RATE: cost.VALUE,
       }));
@@ -1332,15 +1331,15 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
         UNIT_COST:
           Number(item.QUANTITY || 0) > 0
             ? (
-                Number(item.SUPP_AMOUNT || 0) / Number(item.QUANTITY || 0)
-              ).toFixed(2)
+              Number(item.AMOUNT || 0) / Number(item.QUANTITY || 0)
+            ).toFixed(2)
             : '0.00',
 
         COST:
           Number(item.QUANTITY || 0) > 0
             ? (
-                Number(item.SUPP_AMOUNT || 0) / Number(item.QUANTITY || 0)
-              ).toFixed(2)
+              Number(item.SUPP_AMOUNT || 0) / Number(item.QUANTITY || 0)
+            ).toFixed(2)
             : '0.00',
       }));
 
@@ -1724,4 +1723,4 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
   declarations: [GrnVerifyFormComponent],
   exports: [GrnVerifyFormComponent],
 })
-export class GrnVerifyFormModule {}
+export class GrnVerifyFormModule { }

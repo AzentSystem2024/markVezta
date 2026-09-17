@@ -119,7 +119,7 @@ export class BoxproductionJvAddComponent {
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -129,7 +129,7 @@ export class BoxproductionJvAddComponent {
   }
 
   //==================== Production Qty Change Handler ===================//
-  onProductionQtyChange() {}
+  onProductionQtyChange() { }
 
   onProductChange(e: any) {
     const selectedProductId = e.value;
@@ -155,7 +155,7 @@ export class BoxproductionJvAddComponent {
     //
   }
 
-  onRowRemoved(e: any) {}
+  onRowRemoved(e: any) { }
 
   onEditorPreparing(e: any) {
     if (e.dataField === 'USED_QTY') {
@@ -421,8 +421,12 @@ export class BoxproductionJvAddComponent {
   }
 
   get_ProductDropdown() {
+    const payload = {
+      NAME: 'PACKINGLIST',
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataservice
-      .getDropdownDataforBoxProduct('PACKINGLIST')
+      .getDropdownDataforBoxProduct(payload)
       .subscribe((response: any) => {
         this.Article = response;
       });
@@ -652,7 +656,7 @@ export class BoxproductionJvAddComponent {
       this.itemsGrid.instance.refresh();
     }
     this.getPendingNo();
-this.productionJVFormData.PRODUCTION_DATE = new Date();
+    this.productionJVFormData.PRODUCTION_DATE = new Date();
   }
 }
 @NgModule({
@@ -702,4 +706,4 @@ this.productionJVFormData.PRODUCTION_DATE = new Date();
   exports: [BoxproductionJvAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class BoxproductionJvAddModule {}
+export class BoxproductionJvAddModule { }
