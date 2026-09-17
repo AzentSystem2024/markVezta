@@ -675,7 +675,7 @@ export class ItemsEditFormComponent implements OnInit {
 
       console.log(this.store, '=======afte bindg');
 
-      const compIdVal = this.itemData?.COMPANY_ID;
+      const compIdVal = this.itemData?.item_companies || this.itemData?.COMPANY_ID;
       if (
         compIdVal !== null &&
         compIdVal !== undefined &&
@@ -959,7 +959,7 @@ export class ItemsEditFormComponent implements OnInit {
   onCompanyChanged(event: any) {
     this.selectedCompanyIds = event.value || [];
     if (this.itemData) {
-      this.itemData.COMPANY_ID = Array.isArray(this.selectedCompanyIds)
+      this.itemData.item_companies = Array.isArray(this.selectedCompanyIds)
         ? this.selectedCompanyIds
         : (this.selectedCompanyIds ? [this.selectedCompanyIds] : []);
     }
@@ -1249,6 +1249,29 @@ export class ItemsEditFormComponent implements OnInit {
       finalCompanyIds = [];
     }
 
+    const loggedInCompanyId =
+      this.selected_Company_id ||
+      this.companyId ||
+      JSON.parse(sessionStorage.getItem('savedUserData') || '{}')?.SELECTED_COMPANY?.COMPANY_ID;
+
+    if (
+      loggedInCompanyId !== null &&
+      loggedInCompanyId !== undefined &&
+      String(loggedInCompanyId) !== '0' &&
+      String(loggedInCompanyId) !== ''
+    ) {
+      const loggedInId = !isNaN(Number(loggedInCompanyId))
+        ? Number(loggedInCompanyId)
+        : loggedInCompanyId;
+      if (!finalCompanyIds.includes(loggedInId)) {
+        finalCompanyIds.push(loggedInId);
+      }
+    }
+
+    const singleCompId = loggedInCompanyId
+      ? (!isNaN(Number(loggedInCompanyId)) ? Number(loggedInCompanyId) : loggedInCompanyId)
+      : (this.companyId || this.selected_Company_id || null);
+
     const items = this.itemData; // Adjust if needed based on your form structure
     const payload = {
       ...this.itemData,
@@ -1259,8 +1282,9 @@ export class ItemsEditFormComponent implements OnInit {
       //   : storeData,
       item_suppliers: convertedData,
       item_alias: convertedAliasData,
+      item_companies: finalCompanyIds,
       UOM_PURCH: this.selectedData,
-      COMPANY_ID: finalCompanyIds,
+      COMPANY_ID: singleCompId,
       SALE_PRICE: this.salePrice,
       COST: this.itemData.COST ?? 0,
     };
