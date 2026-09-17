@@ -1,249 +1,485 @@
 <div class="view-wrapper">
   <div class="form-container">
-    <div class="section-card">
-      <div class="row mb-3">
-        <!-- Row 1: Dealer & Date -->
-        <div class="col-12 col-md-6 mb-3 mb-md-0">
-          <dx-select-box
-            [dataSource]="dealers"
-            displayExpr="name"
-            valueExpr="id"
-            label="Dealer"
-            labelMode="floating"
-            [value]="selectedDealerId"
-            (onValueChanged)="onDealerChanged($event)"
-            [searchEnabled]="true"
-          ></dx-select-box>
-        </div>
-        <div class="col-12 col-md-6">
-          <dx-date-box
-            [(value)]="currentDate"
-            type="datetime"
-            displayFormat="dd/MM/yyyy hh:mm:ss a"
-            label="Date"
-            labelMode="floating"
-            [readOnly]="true"
-            width="100%"
-          ></dx-date-box>
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <!-- Row 2: Subdealer & Warehouse -->
-        <div class="col-12 col-md-6 mb-3 mb-md-0 d-flex gap-3 align-items-center">
-          <dx-check-box
-            text="Subdealer"
-            [(value)]="hasSubdealer"
-            (onValueChanged)="hasSubdealerChanged($event)"
-          ></dx-check-box>
-          
-          <dx-select-box
-            *ngIf="hasSubdealer"
-            [dataSource]="filteredSubdealers"
-            displayExpr="name"
-            valueExpr="id"
-            label="Sub Dealer"
-            labelMode="floating"
-            [(value)]="selectedSubdealerId"
-            [searchEnabled]="true"
-            noDataText="No subdealers for selected dealer"
-            class="flex-grow-1"
-          ></dx-select-box>
-        </div>
-        <div class="col-12 col-md-6">
-          <dx-select-box
-            [dataSource]="filteredWarehouses"
-            displayExpr="name"
-            valueExpr="id"
-            label="Warehouse"
-            labelMode="floating"
-            [(value)]="selectedWarehouseId"
-            [searchEnabled]="true"
-            noDataText="No warehouses found"
-          ></dx-select-box>
-        </div>
-      </div>
-
-      <div class="row">
-        <!-- Row 3: Delivery Address & Full Address -->
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
-          <dx-select-box
-            [dataSource]="filteredDeliveryAddresses"
-            displayExpr="name"
-            valueExpr="id"
-            label="Delivery Address"
-            labelMode="floating"
-            [value]="selectedDeliveryAddressId"
-            (onValueChanged)="onDeliveryAddressChanged($event)"
-            [searchEnabled]="true"
-            noDataText="No addresses found"
-          ></dx-select-box>
-        </div>
-        <div class="col-12 col-md-6 d-flex align-items-center">
-          <span
-            style="
-              font-size: 13px;
-              font-weight: 500;
-              margin-right: 10px;
-              color: var(--texteditor-label-color);
-            "
-            >Address:
-          </span>
-          <span
-            style="
-              font-size: 13px;
-              font-weight: bold;
-              text-transform: uppercase;
-            "
-            >{{ fullAddressText }}</span
-          >
-        </div>
-      </div>
-    </div>
-
-    <div class="section-card mt-2">
-      <div class="grid-section">
-        <dx-data-grid
-          [dataSource]="orderItems"
-          [showBorders]="true"
-          [showRowLines]="true"
-          [showColumnLines]="true"
-          [columnAutoWidth]="true"
-          [allowColumnResizing]="true"
-          class="grid theme-dependent"
-          [height]="'35vh'"
-          (onRowInserted)="onRowInserted($event)"
+    <div class="row h-100">
+      <!-- LEFT PANEL -->
+      <div class="col-12 col-lg-7 left-panel mb-4 mb-lg-0">
+        <div
+          class="card shadow-sm h-100 border-0 radius-12 p-4 text-center d-flex flex-column"
         >
-          <dxo-editing
-            mode="cell"
-            [allowUpdating]="true"
-            [allowAdding]="true"
-            [allowDeleting]="true"
-          ></dxo-editing>
-
-          <dxi-column
-            caption="#"
-            cellTemplate="indexTemplate"
-            [width]="50"
-            alignment="center"
-          ></dxi-column>
-          <div *dxTemplate="let data of 'indexTemplate'">
-            {{ data.rowIndex + 1 }}
+          <!-- Tabs -->
+          <div class="d-flex mb-4 bg-light rounded-pill p-1">
+            <button
+              class="btn flex-fill rounded-pill fw-bold"
+              [class.btn-white]="activeTab === 'dealer'"
+              [class.shadow-sm]="activeTab === 'dealer'"
+              [class.text-muted]="activeTab !== 'dealer'"
+              (click)="setActiveTab('dealer')"
+            >
+              Dealer
+            </button>
+            <button
+              class="btn flex-fill rounded-pill fw-bold text-muted"
+              [class.btn-white]="activeTab === 'subdealer'"
+              [class.shadow-sm]="activeTab === 'subdealer'"
+              [class.text-muted]="activeTab !== 'subdealer'"
+              (click)="setActiveTab('subdealer')"
+            >
+              Sub Dealer
+            </button>
           </div>
 
-          <dxi-column
-            dataField="itemId"
-            caption="Item"
-            [setCellValue]="setItemValue"
-          >
-            <dxo-lookup
-              [dataSource]="items"
-              displayExpr="name"
-              valueExpr="id"
-            ></dxo-lookup>
-          </dxi-column>
-
-          <dxi-column
-            dataField="typeId"
-            caption="Type"
-            [setCellValue]="setTypeValue"
-          >
-            <dxo-lookup
-              [dataSource]="getFilteredTypes"
-              displayExpr="name"
-              valueExpr="id"
-            ></dxo-lookup>
-          </dxi-column>
-
-          <dxi-column
-            dataField="categoryId"
-            caption="Category"
-            [setCellValue]="setCategoryValue"
-          >
-            <dxo-lookup
-              [dataSource]="getFilteredCategories"
-              displayExpr="name"
-              valueExpr="id"
-            ></dxo-lookup>
-          </dxi-column>
-
-          <dxi-column
-            dataField="artNoId"
-            caption="Art No"
-            [setCellValue]="setArtNoValue"
-          >
-            <dxo-lookup
-              [dataSource]="getFilteredArtNos"
-              displayExpr="name"
-              valueExpr="id"
-            ></dxo-lookup>
-          </dxi-column>
-
-          <dxi-column dataField="colorId" caption="Color">
-            <dxo-lookup
-              [dataSource]="getFilteredColors"
-              displayExpr="name"
-              valueExpr="id"
-            ></dxo-lookup>
-          </dxi-column>
-
-          <dxi-column dataField="packingId" caption="Packing">
-            <dxo-lookup
-              [dataSource]="packingMasterList"
-              displayExpr="name"
-              valueExpr="id"
-            ></dxo-lookup>
-          </dxi-column>
-
-          <dxi-column
-            dataField="content"
-            caption="Content"
-            [allowEditing]="false"
-          ></dxi-column>
-
-          <dxi-column
-            dataField="qty"
-            caption="Qty"
-            dataType="number"
-            [width]="80"
-          ></dxi-column>
-
-          <dxo-summary>
-            <dxi-total-item
-              column="content"
-              displayFormat="Total"
-            ></dxi-total-item>
-            <dxi-total-item
-              column="qty"
-              summaryType="sum"
-              displayFormat="{0}"
-            ></dxi-total-item>
-          </dxo-summary>
-        </dx-data-grid>
-      </div>
-
-      <div class="bottom-section mt-4">
-        <div class="row">
-          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-            <dx-text-area
-              [(value)]="remarks"
-              label="Remarks"
-              labelMode="floating"
-              [height]="70"
-            ></dx-text-area>
+          <!-- Search / Dropdown -->
+          <div class="mb-4 text-start">
+            <dx-select-box
+              [dataSource]="currentDistributors"
+              displayExpr="NAME"
+              valueExpr="ID"
+              [(value)]="selectedDealerId"
+              [placeholder]="
+                isLoadingDealers
+                  ? 'Loading...'
+                  : activeTab === 'dealer'
+                    ? 'Search Dealer'
+                    : 'Search Sub Dealer'
+              "
+              [disabled]="isLoadingDealers"
+              [searchEnabled]="true"
+              class="rounded-input"
+            ></dx-select-box>
           </div>
+
+          <!-- Action Buttons -->
+          <button
+            class="btn btn-info text-white rounded-3 py-3 mb-3 fw-bold shadow-sm"
+            [disabled]="!selectedDealerId"
+            (click)="openNewOrder()"
+          >
+            <i class="dx-icon dx-icon-add me-2"></i> New Order
+          </button>
+          <button
+            class="btn btn-light-info text-dark rounded-3 py-3 mb-3 fw-bold"
+          >
+            <i class="dx-icon dx-icon-eye me-2"></i> View Order
+          </button>
         </div>
       </div>
 
-      <div class="action-section mt-3 d-flex justify-content-end gap-2">
-        <dx-button text="Save" type="default" (onClick)="onSave()"></dx-button>
-        <dx-button
-          text="Submit"
-          type="default"
-          stylingMode="contained"
-          (onClick)="onSubmit()"
-        ></dx-button>
+      <!-- RIGHT PANEL (CART) -->
+      <div class="col-12 col-lg-5 right-panel">
+        <div class="card shadow-sm h-100 border-0 radius-12 d-flex flex-column">
+          <!-- Cart Header -->
+          <div
+            class="cart-header p-3 border-bottom d-flex justify-content-between align-items-center"
+          >
+            <h5 class="m-0 fw-bold d-flex align-items-center">Cart</h5>
+            <span
+              class="badge bg-light-info text-info fs-6 px-3 py-2 rounded-pill"
+              >Total Pair : {{ getCartTotalPairs() }}</span
+            >
+          </div>
+
+          <!-- Cart Items Container -->
+          <div class="cart-items p-3 flex-grow-1 overflow-auto">
+            <!-- Empty State -->
+            <div
+              *ngIf="cartItems.length === 0"
+              class="text-center text-muted mt-5"
+            >
+              <i class="dx-icon dx-icon-cart fs-1 mb-3 text-light"></i>
+              <p>Your cart is empty</p>
+            </div>
+
+            <!-- Item Card -->
+            <div
+              *ngFor="let item of cartItems"
+              class="cart-item-card border rounded-3 p-3 mb-3 bg-white"
+            >
+              <div class="row g-0">
+                <div class="col-6">
+                  <h5 class="fw-bold mb-1">{{ getArtNoName(item.artNoId) }}</h5>
+                  <div class="text-muted fw-bold mb-2">
+                    {{ getCategoryName(item.categoryId) }}
+                  </div>
+
+                  <div class="d-flex align-items-center mt-3">
+                    <span class="me-2 text-muted small fw-bold">COLOR</span>
+                    <div
+                      class="color-circle"
+                      [style.backgroundColor]="getColor(item.colorId)?.hex"
+                    ></div>
+                  </div>
+                </div>
+
+                <div class="col-6 text-end">
+                  <div class="text-info fw-bold mb-2">
+                    {{ getItemTotalPairs(item) }}
+                  </div>
+                  <!-- Note: Usually this is item total, but mockup shows 90 on item level too, mapping to the total badge maybe. I'll just show item total pairs -->
+                  <table
+                    class="table table-sm table-borderless m-0 ms-auto w-75"
+                    style="font-size: 0.85rem"
+                  >
+                    <thead>
+                      <tr>
+                        <th class="text-muted text-end pb-0">Case</th>
+                        <th class="text-muted text-end pb-0">Qty</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let size of getCartActiveSizes(item)">
+                        <td class="text-end py-0">
+                          {{ size.description }}
+                        </td>
+                        <td class="text-end py-0 fw-bold">{{ size.qty }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="row g-2 mt-3">
+                <div class="col-6">
+                  <button
+                    class="btn btn-light-danger text-danger w-100 rounded-3 fw-bold py-2"
+                    (click)="removeCartItem(item.id)"
+                  >
+                    <i class="dx-icon dx-icon-trash me-1"></i> Remove
+                  </button>
+                </div>
+                <div class="col-6">
+                  <button
+                    class="btn btn-light-secondary text-primary w-100 rounded-3 fw-bold py-2"
+                    (click)="editCartItem(item)"
+                  >
+                    <i class="dx-icon dx-icon-edit me-1"></i> Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cart Footer -->
+          <div class="cart-footer p-3 border-top">
+            <button
+              class="btn btn-info text-white w-100 rounded-3 py-3 fw-bold fs-5 shadow-sm"
+              (click)="submitOrder()"
+              [disabled]="cartItems.length === 0"
+            >
+              SUBMIT
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- POPUP MODAL FOR NEW / EDIT ORDER -->
+<dx-popup
+  [visible]="isPopupVisible"
+  [width]="500"
+  [height]="'auto'"
+  [showTitle]="false"
+  [dragEnabled]="false"
+  [closeOnOutsideClick]="true"
+  (onHidden)="closePopup()"
+  wrapperAttr="class: 'order-popup-wrapper'"
+  contentTemplate="popupContent"
+>
+  <div
+    *dxTemplate="let data of 'popupContent'"
+    class="d-flex flex-column h-100"
+  >
+    <!-- Popup Header -->
+    <div
+      class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3"
+    >
+      <h5 class="fw-bold m-0 text-primary">
+        {{ isEditMode ? "Edit Order" : "New Order" }}
+      </h5>
+      <i
+        class="dx-icon dx-icon-close fs-4 cursor-pointer text-muted hover-danger"
+        (click)="closePopup()"
+      ></i>
+    </div>
+
+    <!-- Popup Content Scrollable -->
+    <div class="flex-grow-1 overflow-auto pe-2 popup-body">
+      <div class="row g-3 mb-4">
+        <!-- Image Placeholder -->
+        <div class="col-4">
+          <div
+            class="bg-light rounded-3 w-100 d-flex align-items-center justify-content-center image-placeholder"
+            style="aspect-ratio: 1/1; overflow: hidden"
+          >
+            <img
+              *ngIf="
+                currentEditingItem.artNoId &&
+                getArtNoImage(currentEditingItem.artNoId)
+              "
+              [src]="getArtNoImage(currentEditingItem.artNoId)"
+              alt="Product Image"
+              class="img-fluid rounded-3 w-100 h-100"
+              style="object-fit: cover"
+            />
+            <i
+              *ngIf="
+                !currentEditingItem.artNoId ||
+                !getArtNoImage(currentEditingItem.artNoId)
+              "
+              class="dx-icon dx-icon-image text-muted fs-1"
+            ></i>
+          </div>
+        </div>
+
+        <!-- Selectors -->
+        <div class="col-8">
+          <dx-select-box
+            [dataSource]="categories"
+            displayExpr="name"
+            valueExpr="id"
+            [(value)]="currentEditingItem.categoryId"
+            (onValueChanged)="onCategoryChange($event)"
+            placeholder="Select Category"
+            class="mb-2 rounded-input bg-light-blue"
+          ></dx-select-box>
+
+          <dx-select-box
+            [dataSource]="artNos"
+            [(value)]="currentEditingItem.artNoId"
+            (onValueChanged)="onArtNoChange($event)"
+            (onInput)="onArtNoInput($event)"
+            [placeholder]="isLoadingArtNos ? 'Loading...' : 'Search Art No'"
+            [disabled]="isLoadingArtNos || !currentEditingItem.categoryId"
+            [searchEnabled]="true"
+            class="rounded-input bg-light"
+          ></dx-select-box>
+        </div>
+      </div>
+
+      <!-- Color Selection -->
+      <div class="mb-4">
+        <div class="fw-bold mb-2">
+          Color :
+          <span class="text-uppercase">{{
+            getColor(currentEditingItem.colorId)?.name || "None"
+          }}</span>
+        </div>
+        <div class="d-flex gap-2">
+          <div
+            *ngFor="let color of colors"
+            class="color-picker-circle"
+            [style.backgroundColor]="color.hex"
+            [class.selected]="currentEditingItem.colorId === color.id"
+            (click)="selectColor(color.id)"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Sizes Grid -->
+      <div class="mt-2">
+        <div class="fw-bold fs-6 mb-3">
+          Total Quantity: {{ getCurrentItemTotalQty() }}
+        </div>
+
+        <!-- Sizes Loading State -->
+        <div
+          *ngIf="isLoadingSizes"
+          class="d-flex flex-column justify-content-center align-items-center text-muted bg-light rounded border"
+          style="height: 320px"
+        >
+          <div
+            class="spinner-border text-primary me-2"
+            role="status"
+            style="width: 1.5rem; height: 1.5rem"
+          >
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <div class="mt-2">Loading details...</div>
+        </div>
+
+        <div class="size-list rounded border" *ngIf="!isLoadingSizes">
+          <dx-data-grid
+            [dataSource]="currentEditingItem.sizes"
+            [showBorders]="false"
+            [showColumnHeaders]="true"
+            [hoverStateEnabled]="true"
+            height="320px"
+            class="size-data-grid"
+          >
+            <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+            <dxi-column
+              dataField="description"
+              caption="Size(inch)"
+              cellTemplate="sizeInfoTemplate"
+            ></dxi-column>
+            <dxi-column
+              dataField="qty"
+              caption="Quantity"
+              alignment="center"
+              [width]="150"
+              cellTemplate="qtyTemplate"
+            ></dxi-column>
+
+            <!-- Template for Size Info -->
+            <div *dxTemplate="let data of 'sizeInfoTemplate'">
+              <div
+                class="fw-bold text-dark d-flex align-items-center"
+                style="white-space: normal"
+              >
+                {{ data.data.description }}
+                <span class="text-danger ms-1" *ngIf="data.data.pairQty">
+                  ({{ data.data.pairQty }})
+                </span>
+              </div>
+              <div
+                class="text-muted mt-1"
+                style="font-size: 0.75rem; white-space: normal"
+                *ngIf="data.data.combination"
+              >
+                {{ data.data.combination }}
+              </div>
+            </div>
+
+            <!-- Template for Quantity Controls -->
+            <div *dxTemplate="let data of 'qtyTemplate'">
+              <div
+                class="qty-control d-flex align-items-center justify-content-center gap-2"
+              >
+                <button
+                  class="btn btn-info btn-sm rounded-1 text-white fw-bold d-flex align-items-center justify-content-center"
+                  style="width: 32px; height: 32px"
+                  (click)="decrementSize(data.data.sizeId)"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  class="form-control text-center bg-white border fw-bold p-0"
+                  style="width: 45px; height: 32px"
+                  [value]="data.data.qty"
+                  (input)="onMainQtyInput(data.data, $event)"
+                  (blur)="onMainQtyBlur(data.data, $event)"
+                />
+                <button
+                  class="btn btn-info btn-sm rounded-1 text-white fw-bold d-flex align-items-center justify-content-center"
+                  style="width: 32px; height: 32px"
+                  (click)="incrementSize(data.data.sizeId)"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </dx-data-grid>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popup Footer -->
+    <div class="mt-4 pt-3 bg-white border-top d-flex justify-content-end gap-2">
+      <button
+        class="btn btn-secondary px-4 py-2 rounded-3 fw-bold shadow-sm"
+        (click)="closePopup()"
+      >
+        Cancel
+      </button>
+      <button
+        class="btn btn-info text-white px-4 py-2 rounded-3 fw-bold shadow-sm"
+        (click)="saveToCart()"
+      >
+        {{ isEditMode ? "UPDATE CART" : "ADD TO CART" }}
+      </button>
+    </div>
+  </div>
+</dx-popup>
+
+<!-- Cut Size Popup -->
+<dx-popup
+  [width]="600"
+  [height]="'auto'"
+  [showTitle]="true"
+  [title]="'Cut Size (' + currentCutSize?.description + ')'"
+  [dragEnabled]="false"
+  [hideOnOutsideClick]="false"
+  [(visible)]="isCutSizePopupVisible"
+  (onHidden)="closeCutSizePopup()"
+>
+  <div *dxTemplate="let data of 'content'">
+    <div class="cut-size-modal-content">
+      <div
+        class="d-flex justify-content-between align-items-center mb-2 px-3 py-2 rounded"
+        style="background-color: #e1f5fe"
+      >
+        <span class="fw-bold">Size</span>
+        <span class="fw-bold"
+          >Quantity (<span class="text-danger">{{ getCutSizeTotal() }}</span> /
+          <span class="text-danger">{{ currentCutSize?.pairQty }}</span
+          >)</span
+        >
+      </div>
+
+      <div class="size-rows" style="max-height: 400px; overflow-y: auto">
+        <div
+          class="d-flex justify-content-between align-items-center py-2 px-3 border-bottom"
+          *ngFor="let s of currentCutSize?.availableSizes"
+        >
+          <span>{{ s }}"</span>
+          <div
+            class="qty-control d-flex align-items-center justify-content-center gap-2"
+          >
+            <button
+              class="btn btn-sm rounded-1 text-white fw-bold d-flex align-items-center justify-content-center border-0"
+              style="width: 32px; height: 32px"
+              [style.backgroundColor]="
+                (currentCutSizeQuantities[s] || 0) === 0 ? '#d1ecf1' : '#17a2b8'
+              "
+              [disabled]="(currentCutSizeQuantities[s] || 0) === 0"
+              (click)="decrementCutSizeQty(s)"
+            >
+              -
+            </button>
+            <input
+              type="text"
+              class="form-control text-center bg-white border fw-bold p-0"
+              style="width: 45px; height: 32px"
+              [value]="currentCutSizeQuantities[s] || 0"
+              (input)="onCutSizeQtyInput(s, $event)"
+              (blur)="onCutSizeQtyBlur(s, $event)"
+            />
+            <button
+              class="btn btn-sm rounded-1 text-white fw-bold d-flex align-items-center justify-content-center border-0"
+              style="width: 32px; height: 32px"
+              [style.backgroundColor]="
+                getCutSizeTotal() >= (currentCutSize?.pairQty || 0)
+                  ? '#d1ecf1'
+                  : '#17a2b8'
+              "
+              [disabled]="getCutSizeTotal() >= (currentCutSize?.pairQty || 0)"
+              (click)="incrementCutSizeQty(s)"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between gap-2 mt-4">
+        <button
+          class="btn border fw-bold"
+          style="background-color: #f1f3f5; color: #495057; width: 48%"
+          (click)="closeCutSizePopup()"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn btn-info text-white fw-bold"
+          style="width: 48%"
+          (click)="saveCutSize()"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</dx-popup>

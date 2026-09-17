@@ -6534,7 +6534,6 @@ The result can be exported to HTML or Markdown.`;
 
   //DROPDOWN ITEM
   Item_Dropdown(payload: any) {
-    // const reqbody = { NAME: 'PARENTITEM' };
     return this.http.post(`${this.apiUrl}dropdown`, payload);
   }
 
@@ -7517,5 +7516,18 @@ The result can be exported to HTML or Markdown.`;
 
   sendEmailWithAttachment(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/SendEmailWithAttachment`, formData);
+  }
+
+  // --- New Order API Methods ---
+  getNewOrderArtNo(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetArtNo`, payload);
+  }
+
+  getNewOrderArtColor(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetArtColor`, payload);
+  }
+
+  getNewOrderArtNoDetails(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetArtNoDetails`, payload);
   }
 }

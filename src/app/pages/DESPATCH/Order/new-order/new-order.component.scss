@@ -1,33 +1,97 @@
-@use "../../../../../variables.scss" as *;
-
 :host {
   display: block;
   height: 100%;
-  overflow: hidden;
+  background-color: #f8f9fa; /* slightly gray background for the whole page */
 }
 
 .view-wrapper {
-  padding: 10px;
+  padding: 20px;
   height: 100%;
   overflow-y: auto;
 }
 
 .form-container {
   width: 100%;
-  margin: 0 auto;
-  height: 80vh
+  height: 80vh;
 }
 
-.section-card {
-  background-color: var(--base-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 15px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+/* Common utilities */
+.radius-12 { border-radius: 12px; }
+.cursor-pointer { cursor: pointer; }
+
+/* Custom Colors */
+.text-info { color: #3db8d9 !important; }
+.bg-info, .btn-info { background-color: #3db8d9 !important; border-color: #3db8d9 !important; color: white !important;}
+.btn-info:hover { background-color: #2da1c0 !important; border-color: #2da1c0 !important; }
+
+.bg-light-blue { background-color: #eaf6fc !important; }
+.btn-light-info { background-color: #d8f1f8 !important; color: #2c3e50 !important; border: none; }
+.bg-light-info { background-color: #eaf6fc !important; color: #3db8d9 !important; }
+
+.btn-light-danger { background-color: #fee2e2 !important; color: #ef4444 !important; border: none; }
+.btn-light-secondary { background-color: #f1f5f9 !important; color: #3db8d9 !important; border: none; }
+
+.btn-white { background-color: #ffffff !important; color: #000000 !important; }
+
+/* DevExtreme overrides */
+::ng-deep .rounded-input .dx-texteditor-input {
+  border-radius: 8px;
+  padding: 10px 15px;
+}
+::ng-deep .rounded-input.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  border-radius: 8px 0 0 8px;
+}
+::ng-deep .dx-texteditor.dx-editor-outlined {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
-.grid-section,
-.bottom-section,
-.action-section {
-  margin-top: 15px;
+
+
+/* Color Circle */
+.color-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid #ccc;
+}
+
+.color-picker-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+.color-picker-circle:hover {
+  transform: scale(1.1);
+}
+
+.color-picker-circle.selected {
+  border-color: #3db8d9;
+  box-shadow: 0 0 0 2px rgba(61, 184, 217, 0.3);
+}
+
+/* Popup specific */
+::ng-deep .order-popup-wrapper .dx-popup-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-body {
+  /* hide scrollbar for cleaner look */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+.popup-body::-webkit-scrollbar { 
+  display: none; /* WebKit */
+}
+
+.qty-control input {
+  box-shadow: none !important;
+  outline: none !important;
 }

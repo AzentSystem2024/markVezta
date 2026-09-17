@@ -30,7 +30,6 @@ export class EmailSettingFormComponent implements OnInit {
   enableSsl: boolean = false;
   senderName: string = '';
   password: string = '';
-  confirmPassword: string = '';
   smtpHost: string = '';
   smtpPort: string = '';
   subject: string = '';
@@ -39,7 +38,6 @@ export class EmailSettingFormComponent implements OnInit {
   isTestingEmail: boolean = false;
 
   isPasswordVisible: boolean = false;
-  isConfirmPasswordVisible: boolean = false;
 
   passwordButtonOptions: any = {
     icon: 'eyeopen',
@@ -54,28 +52,7 @@ export class EmailSettingFormComponent implements OnInit {
     },
   };
 
-  confirmPasswordButtonOptions: any = {
-    icon: 'eyeopen',
-    stylingMode: 'text',
-    hint: 'Toggle password visibility',
-    onClick: () => {
-      this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible;
-      this.confirmPasswordButtonOptions = {
-        ...this.confirmPasswordButtonOptions,
-        icon: this.isConfirmPasswordVisible ? 'eyeclose' : 'eyeopen',
-      };
-    },
-  };
-
   constructor(private dataService: DataService) {}
-
-  passwordComparison = () => {
-    return this.password;
-  };
-
-  get isPasswordMatching(): boolean {
-    return Boolean(this.password && this.confirmPassword && this.password === this.confirmPassword);
-  }
 
   validateEmailTypeNotDuplicate = (e: any) => {
     const selectedTypeId = e.value;
@@ -153,7 +130,6 @@ export class EmailSettingFormComponent implements OnInit {
     this.enableSsl = Boolean(data.ENABLE_SSL);
     this.senderName = data.SENDER_NAME ?? '';
     this.password = data.SENDER_PASSWORD || data.PASSWORD || '';
-    this.confirmPassword = '';
     this.smtpHost = data.SMTP_HOST ?? '';
     this.smtpPort = data.SMTP_PORT ? String(data.SMTP_PORT) : '';
     this.subject = data.EMAIL_SUBJECT || data.SUBJECT || '';

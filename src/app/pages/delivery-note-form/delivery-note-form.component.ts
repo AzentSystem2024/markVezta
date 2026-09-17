@@ -220,10 +220,7 @@ export class DeliveryNoteFormComponent {
     this.getOutsideCustomerList();
     this.getCustomerOrUnitLst();
     this.getPendingNo();
-    // Load edit data first
-    // this.isEditDataAvailable();
 
-    // ADD MODE → show one empty row
     if (
       !this.isEditing &&
       (!this.deliveryFormData.Details ||
@@ -239,57 +236,7 @@ export class DeliveryNoteFormComponent {
     });
   }
 
-  // ngOnInit() {
-  //   const currentUrl = this.router.url;
 
-  //   const menuResponse = JSON.parse(
-  //     sessionStorage.getItem('savedUserData') || '{}',
-  //   );
-  //   this.userID = menuResponse.USER_ID;
-  //   this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-  //   this.companyID = menuResponse.Companies[0].COMPANY_ID;
-  //   const menuGroups = menuResponse.MenuGroups || [];
-  //   this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
-  //   const packingRights = menuGroups
-  //     .flatMap((group: any) => group.Menus)
-  //     .find((menu: any) => menu.Path === currentUrl);
-  //   this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
-  //   if (packingRights) {
-  //     this.canAdd = packingRights.CanAdd;
-  //     this.canEdit = packingRights.CanEdit;
-  //     this.canDelete = packingRights.CanDelete;
-  //     this.canPrint = packingRights.CanPrint;
-  //     this.canView = packingRights.canView;
-  //     this.canApprove = packingRights.CanApprove;
-  //   }
-  //   if (menuResponse.GeneralSettings.ENABLE_MATRIX_CODE == true) {
-  //     // this.getItemsList();
-  //   } else {
-  //     // this.getItemsList();
-  //   }
-  //   this.getStoreDropdown();
-  //   if (!this.isEditing && this.deliveryFormData.Details.length === 0) {
-  //     this.addEmptyRow();
-  //   }
-  //   this.sessionData_tax();
-  //   this.getSalesmanDropdown();
-  //   this.getCustomerDropdown();
-  //   this.getDeliveryNo();
-  //   this.isEditDataAvailable();
-  //   if (
-  //     !this.isEditing &&
-  //     (!this.deliveryFormData.Details ||
-  //       this.deliveryFormData.Details.length === 0)
-  //   ) {
-  //     this.deliveryFormData.Details = [{}];
-  //   }
-  //   const imagePath = 'assets/markLogo.jpg';
-  //   this.convertToBase64(imagePath).then((base64) => {
-  //     this.logoBase64 = base64;
-  //   });
-  //   // this.items = [];
-  //   // this.addEmptyRow();
-  // }
 
   private async convertToBase64(path: string): Promise<string> {
     const response = await fetch(path);
@@ -308,13 +255,11 @@ export class DeliveryNoteFormComponent {
       COMPANY_ID: this.selectedCompanyId,
     };
     this.dataService.getDocNo(payload).subscribe((response: any) => {
-      // this.pendingNo = response.PAYMENT_NO;
       this.deliveryFormData.DN_NO = response.DOC_NO;
     });
   }
 
   sessionData_tax() {
-    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
@@ -322,7 +267,6 @@ export class DeliveryNoteFormComponent {
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) return;
 
-    // ✅ EditingResponseData IS ALREADY DATA
     const data = this.EditingResponseData;
 
     this.deliveryFormData = {
@@ -345,18 +289,7 @@ export class DeliveryNoteFormComponent {
       DN_NO: data.DN_NO,
       COMPANY_NAME: data.COMPANY_NAME,
 
-      // ✅ GRID DATA BINDING
-//       Details: (data.Details || []).map((row: any) => {
-//   const item = this.itemsList.store.data.find(
-//     (x: any) => x.DESCRIPTION === row.ITEM_CODE
-//   );
 
-//   return {
-//     ...row,
-//     ITEM_ID: item?.ID,
-//     ITEM_CODE: item?.ID
-//   };
-// }),
 
 Details: (data.Details || []).map((row: any) => ({
   ...row,
@@ -457,18 +390,14 @@ Details: (data.Details || []).map((row: any) => ({
   typeChanged(e: any) {
     const selectedType = e.value;
 
-    // ✔️ Set DN_TYPE based on selected radio
     this.deliveryFormData.DN_TYPE = selectedType;
 
     if (selectedType === 1) {
-      // Transfer Out → Inside Customers
       this.getInsideCustomerList();
     } else if (selectedType === 2) {
-      // Delivery Note → Outside Customers
       this.getOutsideCustomerList();
     }
 
-    // Reset customer after type change
     this.deliveryFormData.CUST_ID = null;
   }
 
@@ -480,20 +409,11 @@ Details: (data.Details || []).map((row: any) => ({
       });
   }
 
-  // getItemsofDelivery() {
-  //   const payload = {
-  //     NAME: 'ITEMS',
-  //   };
-  //   this.dataService.getDropdownData(payload).subscribe((response: any) => {
-  //     this.itemsList = response;
-  //   });
-  // }
   getItemsofDelivery() {
     const payload = {
       name: 'ITEMS',
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
-      // this.itemsList = response;
       this.itemsList = {
         store: {
           type: 'array',
@@ -530,7 +450,6 @@ Details: (data.Details || []).map((row: any) => ({
     const payload = {
       ITEM_ID: itemId,
       COMPANY_ID: this.selectedCompanyId,
-      // CUSTOMER_ID: this.deliveryFormData.CUSTOMER_ID,
     };
 
     this.dataService
@@ -547,7 +466,6 @@ Details: (data.Details || []).map((row: any) => ({
 
         if (rowIndex === -1) return;
 
-        //  UPDATE VALUES
         grid.cellValue(rowIndex, 'ITEM_ID', data.ITEM_ID);
         grid.cellValue(rowIndex, 'ITEM_CODE', data.ITEM_ID);
         grid.cellValue(rowIndex, 'DESCRIPTION', data.DESCRIPTION);
@@ -558,15 +476,12 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
         grid.cellValue(rowIndex, 'QUANTITY', data.QUANTITY);
 
-        //  FORCE UI UPDATE
         setTimeout(() => {
           grid.repaintRows([rowIndex]);
 
-          // NOW MOVE TO QUANTITY (AFTER DATA IS READY)
           setTimeout(() => {
             grid.editCell(rowIndex, 'QUANTITY');
 
-            //  focus input
             setTimeout(() => {
               const cell = grid.getCellElement(rowIndex, 'QUANTITY');
               const input = cell?.querySelector('input');
@@ -612,7 +527,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
         if (response && response.Flag === 1 && response.Data?.length) {
           const details = response.Data[0];
 
-          // Bind API data into your form object
           this.deliveryFormData.CONTACT_NAME = details.CONTACT_NAME;
           this.deliveryFormData.CONTACT_FAX = details.CONTACT_FAX;
           this.deliveryFormData.CONTACT_PHONE = details.CONTACT_PHONE;
@@ -660,7 +574,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
       return;
     }
 
-    // Map each selected row into the DETAILS format
     this.deliveryFormData.Details = selectedRows.map((row: any) => ({
       ID: row.ID,
       BRAND: row.BRAND || '',
@@ -675,15 +588,9 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
       PACKING_ID: row.PACKING_ID || 0,
     }));
 
-    // Optionally store all SO_DETAIL_IDs as an array
-    // this.deliveryFormData.SO_DETAIL_IDs = selectedRows.map(
-    //   (r: any) => r.SO_DETAIL_ID
-    // );
 
-    // Refresh main grid after update
     this.itemsGridRef.instance.refresh();
 
-    // Close popup
     this.salesOrderPopupOpened = false;
   }
 
@@ -745,7 +652,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
           );
 
           setTimeout(() => {
-            // existing logic untouched
           }, 50);
         }
       };
@@ -761,9 +667,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
       const grid = this.itemsGridRef?.instance;
 
-      // ============================
-      // DROPDOWN
-      // ============================
       if (e.dataField === 'ITEM_CODE' || e.dataField === 'DESCRIPTION') {
         e.editorName = 'dxSelectBox';
 
@@ -787,10 +690,8 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
           }
 
           if (e.dataField === 'ITEM_CODE') {
-            // args.value is ID
             this.getItemsData(args.value, e.row.data);
           } else {
-            // Find ID from description
             const item = this.itemsDescriptionList.store.data.find(
               (x: any) => x.DESCRIPTION === args.value,
             );
@@ -802,9 +703,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
         };
       }
 
-      // ============================
-      // MAIN KEY HANDLING
-      // ============================
       e.editorOptions.onKeyDown = (event: any) => {
         if (event.event.key !== 'Enter') return;
 
@@ -815,7 +713,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
         const editor = event.component;
 
-        // DROPDOWN
         if (e.editorName === 'dxSelectBox') {
           event.event.preventDefault();
 
@@ -827,7 +724,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
             if (selectedItem) {
               editor.option('value', selectedItem.ID);
 
-              // Call API immediately
               this.getItemsData(selectedItem.ID, e.row.data);
             }
 
@@ -843,9 +739,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
           return;
         }
 
-        // ============================
-        // QUANTITY (UNCHANGED - YOUR WORKING CODE)
-        // ============================
         if (e.dataField === 'QUANTITY') {
           event.event.preventDefault();
 
@@ -862,7 +755,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
             const isLastRow = rowIndex === visibleRows.length - 1;
 
             if (isLastRow) {
-              // Add new row
               this.deliveryFormData.Details.push({
                 ITEM_ID: 0,
                 ITEM_CODE: '',
@@ -895,9 +787,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
           return;
         }
 
-        // ============================
-        // ✅ DISC_PERC (ONLY NEW ADDITION)
-        // ============================
         if (e.dataField === 'DISC_PERC') {
           event.event.preventDefault();
 
@@ -916,23 +805,19 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
             const isLastRow = rowIndex === visibleRows.length - 1;
 
             if (isLastRow) {
-              // ✅ call your function
-              // this.onAddRow();
 
-              // 🔥 FORCE FOCUS (IMPORTANT)
               setTimeout(() => {
                 const newRowIndex = this.deliveryFormData.Details.length - 1;
 
                 grid.editCell(newRowIndex, 'ITEM_CODE');
 
-                // optional: focus input
                 setTimeout(() => {
                   const cell = grid.getCellElement(newRowIndex, 'ITEM_CODE');
                   const input = cell?.querySelector('input');
                   input?.focus();
                   input?.select();
                 }, 50);
-              }, 100); // ⬅️ must be slightly higher
+              }, 100);
             } else {
               grid.editCell(rowIndex + 1, 'ITEM_CODE');
             }
@@ -1014,15 +899,12 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
   };
 
   saveDeliveryNote() {
-    // Map Distributor to Customer
     this.deliveryFormData.CUST_ID = this.deliveryFormData.DISTRIBUTOR_ID;
-    // Customer validation
     if (!this.deliveryFormData.CUST_ID || this.deliveryFormData.CUST_ID === 0) {
       notify('Please select a customer.', 'warning', 3000);
       return;
     }
 
-    // Item validation
     if (
       !this.deliveryFormData.Details ||
       this.deliveryFormData.Details.length === 0
@@ -1055,13 +937,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
       return;
     }
 
-    // if (
-    //   !this.deliveryFormData.QUANTITY ||
-    //   this.deliveryFormData.QUANTITY === 0
-    // ) {
-    //   notify('Please enter a quantity.', 'warning', 3000);
-    //   return;
-    // }
 
     const formatDate = (date: any): string => {
       if (!date) return '';
@@ -1106,7 +981,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
       payload.ID = this.deliveryFormData.ID;
     }
 
-    // EDIT
     if (this.isEditing) {
       if (this.deliveryFormData.IS_APPROVED) {
         confirm(
@@ -1138,7 +1012,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
       }
     }
 
-    // ADD
     else {
       const saveData = () => {
         this.dataService.saveDeliveryNote(payload).subscribe({
@@ -1175,7 +1048,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
   }
 
   openPDF() {
-    // Call your PDF API or open a URL
     const returnId = this.EditingResponseData.ID;
     this.dataService.selectDeliveryNote(returnId).subscribe((res: any) => {
       this.generatePDF(res.Data);
@@ -1188,9 +1060,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     const pageHeight = doc.internal.pageSize.height;
     let y = 10;
 
-    // ======================================================
-    // LOGO LEFT TOP
-    // ======================================================
     const logoX = 18,
       logoY = 12,
       logoW = 30,
@@ -1199,47 +1068,33 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     doc.rect(logoX, logoY, logoW, logoH, 'F');
     doc.addImage(this.logoBase64, 'jpg', logoX, logoY, logoW, logoH);
 
-    // ===============================================
-    // SALES INVOICE HEADING (Centered between logo & reference block)
-    // ===============================================
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
 
-    // compute a centered X between left logo and right reference area
-    const leftEdge = 10 + logoW; // end of logo box
-    const rightEdge = pageWidth - 80; // start of reference block
+    const leftEdge = 10 + logoW;
+    const rightEdge = pageWidth - 80;
     const centerX = (leftEdge + rightEdge) / 2;
 
     doc.text('DELIVERY NOTE', centerX, y + 25, { align: 'center' });
 
-    // ======================================================
-    // RIGHT-TOP HEADER (Debit Note Info)
-    // ======================================================
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
 
-    const refX = pageWidth - 65; // moved 15mm right
+    const refX = pageWidth - 65;
 
     doc.text(`Invoice No : ${''}`, refX, y + 5);
     doc.text(`Reference No : ${data.REF_NO || ''}`, refX, y + 11);
     doc.text(`Date: ${data.DN_DATE || ''}`, refX, y + 17);
 
-    // doc.text(`Dated : ${data[0].SALE_DATE || ""}`, pageWidth - 80, y + 23);
 
     y += 33;
 
-    // ===============================================
-    // HORIZONTAL LINE ABOVE SELLER + CUSTOMER BLOCKS
-    // ===============================================
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
-    doc.line(10, y, pageWidth - 10, y); // full width line
+    doc.line(10, y, pageWidth - 10, y);
 
-    y += 5; // small spacing
+    y += 5;
 
-    // ======================================================
-    // BLUE SELLER BOX (LEFT)
-    // ======================================================
     const blueX = 10;
     const blueY = y;
     const blueW = 100;
@@ -1265,9 +1120,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     );
     doc.text(`E-Mail : ${data.EMAIL || ''}`, blueX + 3, blueY + 38);
 
-    // ======================================================
-    // CONSIGNEE (RIGHT SIDE)
-    // ======================================================
     const shipX = 115;
     const shipY = y;
 
@@ -1288,9 +1140,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
     y += 48;
 
-    // ======================================================
-    // BUYER (BILL TO)
-    // ======================================================
     const billX = 115;
     const billY = y;
 
@@ -1311,9 +1160,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
     y += 50;
 
-    // ======================================================
-    // TABLE — SAME FORMAT AS IMAGE
-    // ======================================================
     const tableColumns = ['Item Code', 'Description', 'UOM', 'Quantity'];
 
     const totalQty = data.Details.reduce(
@@ -1326,24 +1172,19 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
     data.Details.forEach((item: any, index: number) => {
       tableRows.push([
-        // index + 1,
         item.ITEM_CODE || '',
         item.DESCRIPTION || '',
         item.UOM || '',
         item.QUANTITY?.toFixed(2) || '',
       ]);
     });
-    // Move y to bottom of Bill-to block
     y = y + 2;
 
-    // ===============================
-    // HORIZONTAL LINE LIKE THE FIGURE
-    // ===============================
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
-    doc.line(10, y, pageWidth - 10, y); // Full width horizontal line
+    doc.line(10, y, pageWidth - 10, y);
 
-    y += 5; // small gap before table
+    y += 5;
     (doc as any).autoTable({
       startY: y,
       head: [tableColumns],
@@ -1358,44 +1199,37 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
         halign: 'center',
       },
       footStyles: {
-        fillColor: [230, 230, 230], // same color as header
+        fillColor: [230, 230, 230],
         textColor: 0,
         fontStyle: 'bold',
         halign: 'right',
       },
       columnStyles: {
-        5: { halign: 'right' }, // Amount column
-        9: { halign: 'right' }, // Total column
+        5: { halign: 'right' },
+        9: { halign: 'right' },
       },
     });
 
     y = (doc as any).lastAutoTable.finalY + 12;
 
-    // ============================================================
-    // FOOTER – GST SUMMARY + TOTALS (LIKE generatePDF)
-    // ============================================================
 
     const footStartY = y + 3;
 
-    // ---------------- LEFT GST SUMMARY ----------------
     let lx = 15;
     let ly = footStartY;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
 
-    // Header
     doc.text('GST %', lx, ly);
     doc.text('Taxable Value', lx + 22, ly);
     doc.text('Integrated Tax', lx + 55, ly);
     doc.text('Total Tax Amount', lx + 95, ly);
 
-    // Sub headers
     doc.setFontSize(8);
     doc.text('Rate', lx + 55, ly + 5);
     doc.text('Amount', lx + 72, ly + 5);
 
-    // Values
     ly += 12;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
@@ -1411,14 +1245,12 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     doc.text(gstAmount.toFixed(2), lx + 72, ly);
     doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-    // Total row
     ly += 10;
     doc.setFont('helvetica', 'bold');
     doc.text(taxable.toFixed(2), lx + 22, ly);
     doc.text(gstAmount.toFixed(2), lx + 72, ly);
     doc.text(gstAmount.toFixed(2), lx + 95, ly);
 
-    // ---------------- RIGHT TOTAL SUMMARY ----------------
     let rx = pageWidth - 65;
     let ry = footStartY;
 
@@ -1449,7 +1281,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     doc.text(':', colonX, ry);
     doc.text(Number(data.NET_AMOUNT).toFixed(2), valueX, ry);
 
-    // ---------------- REVERSE CHARGE ----------------
     let wordsY = ry + 15;
 
     doc.setFont('helvetica', 'bold');
@@ -1458,7 +1289,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     doc.setFont('helvetica', 'normal');
     doc.text('No', 150, wordsY);
 
-    // ---------------- AMOUNT IN WORDS ----------------
     wordsY += 10;
 
     doc.setFont('helvetica', 'bold');
@@ -1471,7 +1301,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
       wordsY,
     );
 
-    // ---------------- DECLARATION & REMARK ----------------
     let blockY = wordsY + 15;
 
     doc.setFont('helvetica', 'bold');
@@ -1482,12 +1311,6 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
     doc.setFont('helvetica', 'normal');
     doc.text(data.REF_NO || '', 40, blockY);
-    // ======================================================
-    // RETURN PDF
-    // ======================================================
-    // const pdfBlob = doc.output('blob');
-    // const pdfUrl = URL.createObjectURL(pdfBlob);
-    // return this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
     doc.output('dataurlnewwindow');
   }
 }

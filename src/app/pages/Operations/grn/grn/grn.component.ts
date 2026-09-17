@@ -65,7 +65,6 @@ import { confirm } from 'devextreme/ui/dialog';
   styleUrls: ['./grn.component.scss'],
 })
 export class GrnComponent implements OnInit {
-  // list.component.ts
   @ViewChild(GrnNewFormComponent) GrnNewFormComponent: GrnNewFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
@@ -157,37 +156,14 @@ export class GrnComponent implements OnInit {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
-    this.applyCustomDateFilter(); // your existing function
+    this.applyCustomDateFilter();
   }
 
-  // customButtons = [
-  //   // {
-  //   //   hint: 'Verify',
-  //   //   icon: 'check',
-  //   //   text: 'Verify',
-  //   //   onClick: (e) => this.onVerifyClick(e),
-  //   //   visible: (e) => e.row.data.STATUS!=='Verified' && e.row.data.STATUS!=='Approved',
-  //   // },
-  //   {
-  //     hint: 'Approve',
-  //     icon: 'check',
-  //     text: 'Approve',
-  //     onClick: (e) => this.onApproveClick(e),
-  //     visible: (e) => e.row.data.STATUS !== 'Approved',
-  //   },
-  //   {
-  //     hint: 'View',
-  //     icon: 'detailslayout', // You can change this to an appropriate icon
-  //     text: 'View',
-  //     onClick: (e) => this.onViewClick(e),
-  //     visible: (e) => e.row.data.STATUS === 'Approved',
-  //   },
-  // ];
 
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilterRow(),
   };
   addButtonOptions = {
@@ -223,32 +199,15 @@ export class GrnComponent implements OnInit {
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-      // Or reload data from API if needed
       this.getGrnLogData();
     }
   }
-  // allButtonsEditDelete = [
-  //   {
-  //     name: 'edit',
-  //     visible: (e: any) =>
-  //       e.row.data.STATUS === 'Approved'
-  //         ? true // show icon for approved → opens view popup
-  //         : this.canEdit && e.row.data.STATUS == 'Open',
-  //   },
-  //   {
-  //     name: 'delete',
-  //     visible: (e: any) =>
-  //       this.canDelete &&
-  //       e.row.data.STATUS !== 'Approved' &&
-  //       e.row.data.STATUS !== 'Verified',
-  //   },
-  // ];
   allButtonsEditDelete = [
     {
       name: 'edit',
       visible: (e: any) =>
         e.row.data.STATUS === 'Approved'
-          ? true // show icon for approved → opens view popup
+          ? true
           : this.canEdit && e.row.data.STATUS == 'Open',
     },
     {
@@ -303,7 +262,6 @@ export class GrnComponent implements OnInit {
     const data = this.grnNewForm.getNewGrnData();
     data.IS_APPROVED = this.isApproved;
     data.FIN_ID = this.finID;
-    // ✅ Confirmation for Verify / Approve
     const actionMessage = this.isVerifyMode
       ? 'Are you sure you want to verify this GRN?'
       : data.IS_APPROVED
@@ -324,7 +282,7 @@ export class GrnComponent implements OnInit {
       .saveGrnData(data)
       .pipe(
         finalize(() => {
-          this.isSaving = false; //  ALWAYS executes (success/error/cancel)
+          this.isSaving = false;
         }),
       )
       .subscribe({
@@ -370,40 +328,13 @@ export class GrnComponent implements OnInit {
         },
       });
   }
-  // updateGrnData() {
-  //   const data = this.grnEditForm.getNewGrnData();
-  //   console.log(data, 'grn upated data');
 
-  //   this.service.updateGrnData(data).subscribe((res) => {
-  //     console.log('data updated', res);
-  //     if (res.Message === 'Success' && res.Flag === 1) {
-  //       notify(
-  //         {
-  //           message: 'Data Updated Successfully',
-  //           position: { at: 'top center', my: 'top center' },
-  //         },
-  //         'success',
-  //       );
 
-  //       this.isEditPopupOpened = false;
-  //       this.getGrnLogData();
-  //     } else {
-  //       notify(
-  //         {
-  //           message: 'Your Data Not Updated',
-  //           position: { at: 'top right', my: 'top right' },
-  //         },
-  //         'error',
-  //       );
-  //     }
-  //   });
-  // }
 
   async editGrnData() {
     const data = this.grnVerifyForm.getNewGrnData();
     console.log(data, 'grn verified data');
     data.FIN_ID = this.finID;
-    //  Confirmation only for Approve
     if (this.isApproved === true) {
       const confirmed = await confirm(
         'Are you sure you want to approve this GRN?',
@@ -418,9 +349,7 @@ export class GrnComponent implements OnInit {
     this.service.updateGrnData(data).subscribe((res) => {
       console.log('data verified', res);
 
-      //  Step 1: Update success
       if (res.Message === 'Success') {
-        //  Step 2: If approved → call approve API
         if (this.isApproved === true) {
           this.service.approveGrnData(data).subscribe((approveRes) => {
             console.log('data approved', approveRes);
@@ -448,7 +377,6 @@ export class GrnComponent implements OnInit {
             }
           });
         }
-        //  Step 3: Only verification
         else {
           notify(
             {
@@ -462,7 +390,6 @@ export class GrnComponent implements OnInit {
           this.isVerifyPopupOpened = false;
         }
       }
-      //  Update failed
       else {
         notify(
           {
@@ -490,13 +417,10 @@ export class GrnComponent implements OnInit {
       this.service.verifyGrnData(data).subscribe((res) => {
         console.log('data verified', res);
 
-        // Step 1: Update success
         if (res.Message === 'Success') {
-          // Step 2: If approved → call approve API
           if (this.isApproved === true) {
           }
 
-          // Step 3: Only verification
           else {
             notify(
               {
@@ -511,7 +435,6 @@ export class GrnComponent implements OnInit {
           }
         }
 
-        // Update failed
         else {
           notify(
             {
@@ -562,13 +485,12 @@ export class GrnComponent implements OnInit {
 
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    // this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
   getGrnLogData() {
     const grid = this.dataGrid?.instance;
-    grid?.beginCustomLoading('Loading...'); // ✅ START LOADING
+    grid?.beginCustomLoading('Loading...');
 
     const datePayload = this.getDateRangePayload();
 
@@ -582,7 +504,7 @@ export class GrnComponent implements OnInit {
       .getGrnLogData(payload)
       .pipe(
         finalize(() => {
-          grid?.endCustomLoading(); // ✅ ALWAYS STOP LOADING
+          grid?.endCustomLoading();
         }),
       )
       .subscribe((res: any) => {
@@ -590,19 +512,8 @@ export class GrnComponent implements OnInit {
       });
   }
 
-  // getGrnLogData() {
-  //   const datePayload = this.getDateRangePayload();
 
-  //   const payload = {
-  //     COMPANY_ID: this.selectedCompanyId,
-  //     DATE_FROM: datePayload.DATE_FROM,
-  //     DATE_TO: datePayload.DATE_TO,
-  //   };
 
-  //   this.service.getGrnLogData(payload).subscribe((res: any) => {
-  //     this.grnDataSource = res.grnheader;
-  //   });
-  // }
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
@@ -612,11 +523,9 @@ export class GrnComponent implements OnInit {
       return;
     }
 
-    // reset custom dates
     this.customStartDate = null;
     this.customEndDate = null;
 
-    // reset label back to "Custom"
     this.dateRanges = this.dateRanges.map((opt) =>
       opt.value === 'custom' ? { ...opt, label: 'Custom' } : opt,
     );
@@ -635,7 +544,6 @@ export class GrnComponent implements OnInit {
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    // 🔑 EXACT SAME LOGIC AS CREDIT NOTE
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} - ${toLabel}` }
@@ -645,7 +553,6 @@ export class GrnComponent implements OnInit {
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
 
-    // reload grid
     this.getGrnLogData();
   }
 
@@ -727,12 +634,12 @@ export class GrnComponent implements OnInit {
         popup && popup.$content().find('.dx-list').dxList('instance');
 
       if (innerList) {
-        innerList.off('itemClick'); // avoid duplicate handlers
+        innerList.off('itemClick');
         innerList.on('itemClick', (clickEvent: any) => {
           const clickedValue = clickEvent.itemData.value;
 
           if (clickedValue === 'custom') {
-            this.openCustomDatePopup(); // same behavior as Credit Note
+            this.openCustomDatePopup();
             e.component.close();
           }
         });
@@ -820,22 +727,18 @@ export class GrnComponent implements OnInit {
     const invoiceId = rowData.ID;
     const transStatus = rowData.STATUS;
 
-    // this.isReadOnlyInvoice = transStatus === 5;
 
     this.service.selectGrnData(invoiceId).subscribe((response: any) => {
       this.selectedRowData = response;
 
-      // APPROVED -> OPEN VIEW PAGE
       if (transStatus === 'Approved' || transStatus === 'Closed') {
         this.isViewPopupOpened = true;
       }
 
-      // VERIFIED -> OPEN APPROVE PAGE
       else if (transStatus === 'Verified') {
         this.isApprovePopupOpened = true;
       }
 
-      // OPEN VERIFY PAGE
       else {
         this.isVerifyOpened = true;
       }
@@ -865,10 +768,6 @@ export class GrnComponent implements OnInit {
     });
   };
 
-  // deleteGrnData(event: any) {
-  //   const ID = event.data.ID;
-  //   this.service.deleteGrnData(ID).subscribe((response: any) => {});
-  // }
   async deleteGrnData(event: any) {
     const confirmed = await confirm(
       'Are you sure you want to delete this GRN?',
@@ -892,7 +791,6 @@ export class GrnComponent implements OnInit {
             'success',
           );
           this.getGrnLogData();
-          // this.dataGrid.instance.refresh();
         } else {
           notify(
             {
@@ -902,7 +800,6 @@ export class GrnComponent implements OnInit {
             'error',
           );
         }
-        // or whatever method you use to refresh `employeeList`
       },
       (error) => {
         console.error('Error deleting GRN :', error);
@@ -916,32 +813,28 @@ export class GrnComponent implements OnInit {
 
     const date = new Date(celldate);
 
-    // Format the date using the user's system locale
-    const formattedDate = date.toLocaleDateString(); // Formats according to the user's system date format
+    const formattedDate = date.toLocaleDateString();
 
-    return formattedDate; // Return only the date part
+    return formattedDate;
   }
 
   ClearFormData() {
     this.isSaving = false;
     if (this.grnNewForm) {
-      this.grnNewForm.clearForm(); // call ONCE
+      this.grnNewForm.clearForm();
     }
 
     this.isGRNPopupVisible = false;
     this.isApproved = false;
 
-    // Reset arrays only
     this.grnNewForm.newGrnData.GRNDetails = [];
     this.grnNewForm.newGrnData.GRN_Item_Cost = [];
     this.grnNewForm.newGrnData.GRN_Cost = [];
 
-    // Reset totals only
     this.grnNewForm.newGrnData.NET_AMOUNT = 0;
     this.grnNewForm.newGrnData.SUPP_NET_AMOUNT = 0;
     this.grnNewForm.newGrnData.TOTAL_COST = 0;
 
-    // Reset helpers
     this.grnNewForm.poDetails = [];
     this.grnNewForm.formattedNetAmount = '';
     this.grnNewForm.formattedLocalNetAmount = '';
@@ -955,7 +848,6 @@ export class GrnComponent implements OnInit {
   getTemplateList() {
     this.http.get<any[]>(environment.apiUrl + 'Reports').subscribe({
       next: (data) => {
-        // Category 18 is for Goods Receipt Note
         this.templateList = data.filter((t: any) => t.categoryId === 18);
         if (this.templateList.length > 0) {
           this.selectedTemplate = this.templateList[0].name;
@@ -973,11 +865,9 @@ export class GrnComponent implements OnInit {
     this.isPreviewPopupVisible = true;
     this.isLoadingPdf = true;
 
-    // For GRN we use doc no or ID
     const grnNo = this.selectedRowData?.DOC_NO || this.selectedRowData?.GRN_NO || '';
     const grnId = this.selectedRowData?.ID || this.selectedGrnId || this.grnId || 0;
 
-    // Using the same endpoint but passing GRN id/no
     const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?grnId=${grnId}&poNo=${encodeURIComponent(grnNo)}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({

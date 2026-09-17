@@ -119,16 +119,12 @@ export class PurchaseOrderComponent {
   title = 'DXReportDesignerSample';
   id = 1;
 
-  // getDesignerModelAction: any = `WebDocumentViewer/Invoke/`;
   getViewModelAction: any;
   poId: any;
 
   poDetails: any;
 
-  // reportName = 'Report';
 
-  // The backend application URL.
-  // host = 'http://localhost:49834/';
   showReportDesigner: boolean = false;
 
   showHeaderFilter: boolean = true;
@@ -141,7 +137,7 @@ export class PurchaseOrderComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -198,7 +194,7 @@ export class PurchaseOrderComponent {
   selectedDateRange: string = 'today';
   customStartDate: any = null;
   customEndDate: any = null;
-  showCustomDatePopup = false;
+  showCustomDatePopup = false
   filteredPOList: any;
   isSaving = false;
   selectedStoreId: any;
@@ -273,19 +269,18 @@ export class PurchaseOrderComponent {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
 
-    this.applyCustomDateFilter(); // your existing function
+    this.applyCustomDateFilter();
   }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+      this.dataGrid.instance.refresh();
       this.getPurchaseOrderList();
     }
   }
   onStoreChanged(e: any) {
     this.selectedStoreId = e.value;
 
-    // 🔥 Reload list with selected store
     this.getPurchaseOrderList();
   }
   private getDateRange(): { fromDate: string | null; toDate: string | null } {
@@ -354,7 +349,7 @@ export class PurchaseOrderComponent {
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+    const grid = this.dataGrid?.instance;
 
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
@@ -364,14 +359,13 @@ export class PurchaseOrderComponent {
   onToolbarPreparing(e: any) {
     const toolbarItems = e.toolbarOptions.items;
 
-    // Avoid adding the button more than once
     const alreadyAdded = toolbarItems.some(
       (item: any) => item.name === 'toggleFilterButton',
     );
     if (!alreadyAdded) {
       toolbarItems.splice(toolbarItems.length - 1, 0, {
         widget: 'dxButton',
-        name: 'toggleFilterButton', // custom name to avoid duplicates
+        name: 'toggleFilterButton',
         location: 'after',
         options: {
           icon: 'search',
@@ -406,7 +400,6 @@ export class PurchaseOrderComponent {
       hint: 'Verify',
       icon: 'check',
       text: 'Verify',
-      // onClick: (e) => this.onVerifyClick(e),
       visible: (e: any) =>
         e.row.data.STATUS !== 'Verified' && e.row.data.STATUS !== 'Approved',
     },
@@ -420,9 +413,8 @@ export class PurchaseOrderComponent {
     },
     {
       hint: 'View',
-      icon: 'detailslayout', // You can change this to an appropriate icon
+      icon: 'detailslayout',
       text: 'View',
-      // onClick: (e) => this.onViewClick(e),
       visible: (e: any) => e.row.data.STATUS === 'Approved',
     },
   ];
@@ -433,7 +425,6 @@ export class PurchaseOrderComponent {
       icon: 'check',
       text: 'Verify',
       template: 'verifyTemplate',
-      // onClick: (e) => this.onVerifyClick(e),
       visible: (e: any) =>
         e.row.data.STATUS !== 'Verified' && e.row.data.STATUS !== 'Approved',
     },
@@ -442,12 +433,10 @@ export class PurchaseOrderComponent {
       visible: (e: any) => {
         const status = e.row.data.STATUS;
 
-        // Always allow view (edit icon) for these statuses
         if (['Approved', 'Closed', 'Partial'].includes(status)) {
           return true;
         }
 
-        // Allow edit only if Open + permission
         return this.canEdit && status === 'Open';
       },
     },
@@ -466,9 +455,9 @@ export class PurchaseOrderComponent {
   initializePrintTemplateData() {
     this.printTemplateData = [
       { type: 'main-header', data: 'Purchase Order' },
-      { type: 'header', data: [] }, // Example header
-      { type: 'grid', data: [] }, // Ensure the 'grid' type exists
-      { type: 'footer', data: 'Thank you for your business!' }, // Example footer
+      { type: 'header', data: [] },
+      { type: 'grid', data: [] },
+      { type: 'footer', data: 'Thank you for your business!' },
     ];
   }
 
@@ -511,10 +500,8 @@ export class PurchaseOrderComponent {
         status === 'Closed' ||
         status === 'Partial'
       ) {
-        // Open View popup
         this.isViewPopupOpened = true;
       } else {
-        // Open Edit popup
         this.isEditPopupOpened = true;
       }
     });
@@ -530,7 +517,6 @@ export class PurchaseOrderComponent {
     this.service.selectPoData(id).subscribe((res) => {
       this.selectedRowData = res;
 
-      // APPROVED -> VIEW
       if (
         status === 'Approved' ||
         status === 'Closed' ||
@@ -540,7 +526,6 @@ export class PurchaseOrderComponent {
         return;
       }
 
-      // VERIFIED -> APPROVE
       if (status === 'Verified') {
         this.isApproved = true;
         this.isVerifyMode = false;
@@ -549,7 +534,6 @@ export class PurchaseOrderComponent {
         return;
       }
 
-      // OPEN -> VERIFY
       this.isVerifyMode = true;
 
       this.isVerifyPopupOpened = true;
@@ -579,13 +563,11 @@ export class PurchaseOrderComponent {
       } else {
         this.filteredStoreList = this.storeList;
 
-        // default select first store
         if (!this.selectedStoreId && this.storeList?.length) {
           this.selectedStoreId = this.storeList[0].ID;
         }
       }
 
-      // 🔥 Load data AFTER store is ready
       this.getPurchaseOrderList();
     });
   }
@@ -614,7 +596,6 @@ export class PurchaseOrderComponent {
                 const parts = item.PO_DATE.split('T')[0].split('-');
 
                 if (parts[0].length === 2) {
-                  // dd-MM-yyyy
                   const day = Number(parts[0]);
                   const month = Number(parts[1]) - 1;
                   const year = Number(parts[2]);
@@ -638,7 +619,6 @@ export class PurchaseOrderComponent {
             return numB - numA;
           });
 
-        // ✅ SAME AS PRODUCTION JV
         this.filteredPOList = this.dataSource;
       },
       error: () => { },
@@ -656,7 +636,6 @@ export class PurchaseOrderComponent {
       return;
     }
 
-    // reset custom label
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom' ? { ...option, label: 'Custom' } : option,
     );
@@ -673,12 +652,12 @@ export class PurchaseOrderComponent {
       return;
     }
     if (this.selectedDateRange === 'all') {
-      this.filteredPOList = this.dataSource; // show full list
+      this.filteredPOList = this.dataSource;
       return;
     }
     const today = new Date();
     let startDate: Date;
-    const endDate = new Date(); // today
+    const endDate = new Date();
 
     switch (this.selectedDateRange) {
       case 'today':
@@ -745,7 +724,7 @@ export class PurchaseOrderComponent {
   private parseDateString(dateStr: string): Date {
     if (!dateStr || typeof dateStr !== 'string') {
       console.warn('Invalid date string:', dateStr);
-      return new Date('Invalid'); // or new Date(0) if you want a fallback
+      return new Date('Invalid');
     }
 
     const [day, month, year] = dateStr
@@ -797,7 +776,7 @@ export class PurchaseOrderComponent {
       const innerList =
         popup && popup.$content().find('.dx-list').dxList('instance');
       if (innerList) {
-        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
+        innerList.off('itemClick');
         innerList.on('itemClick', (clickEvent: any) => {
           const clickedValue = clickEvent.itemData.value;
           if (clickedValue === 'custom') {
@@ -827,8 +806,8 @@ export class PurchaseOrderComponent {
 
   onTemplateReorder(event: any): void {
     const movedItem = this.printTemplateData[event.fromIndex];
-    this.printTemplateData.splice(event.fromIndex, 1); // Remove item from original position
-    this.printTemplateData.splice(event.toIndex, 0, movedItem); // Insert item at new position
+    this.printTemplateData.splice(event.fromIndex, 1);
+    this.printTemplateData.splice(event.toIndex, 0, movedItem);
   }
 
   ClosePrintPopup() {
@@ -844,7 +823,6 @@ export class PurchaseOrderComponent {
   }
 
   onClickSaveNewData() {
-    // Prevent double click
     if (this.isSaving) {
       return;
     }
@@ -852,12 +830,10 @@ export class PurchaseOrderComponent {
     this.isSaving = true;
 
     const data = this.poNewForm.getNewPoData();
-    // Combine country code + mobile before save
 
     const suppCode = this.poNewForm.supplierCountryCode?.replace('+', '');
     const contactCode = this.poNewForm.shippingCountryCode?.replace('+', '');
 
-    // SUPPLIER MOBILE
     if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
       data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
     }
@@ -867,7 +843,6 @@ export class PurchaseOrderComponent {
     }
     data.IS_APPROVED = this.isApproved;
     data.FIN_ID = this.finId;
-    // ✅ VALIDATIONS (ONLY FIX: added isSaving reset)
     if (!data.STORE_ID) {
       notify(
         {
@@ -876,7 +851,7 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      this.isSaving = false; // ✅ FIX
+      this.isSaving = false;
       return;
     }
 
@@ -888,7 +863,7 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      this.isSaving = false; // ✅ FIX
+      this.isSaving = false;
       return;
     }
 
@@ -900,7 +875,7 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      this.isSaving = false; // ✅ FIX
+      this.isSaving = false;
       return;
     }
 
@@ -912,7 +887,7 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      this.isSaving = false; // ✅ FIX
+      this.isSaving = false;
       return;
     }
 
@@ -927,11 +902,10 @@ export class PurchaseOrderComponent {
         },
         'error',
       );
-      this.isSaving = false; // ✅ FIX
+      this.isSaving = false;
       return;
     }
 
-    // 🔁 EXISTING LOGIC (unchanged)
     const poDetails = this.poNewForm.poData.PoDetails.map((item: any) => {
       if (this.poNewForm.isInterState) {
         return {
@@ -950,7 +924,6 @@ export class PurchaseOrderComponent {
         SGST: item.SGST,
       };
     });
-    // PRICE VALIDATION
     const invalidPriceItem = data.PoDetails.find(
       (item: any) =>
         item.SUPP_PRICE === null ||
@@ -972,13 +945,12 @@ export class PurchaseOrderComponent {
     }
     data.PoDetails = poDetails;
 
-    // API CALL (already correct with finalize)
     const executeSave = () => {
       this.service
         .savePoData(data)
         .pipe(
           finalize(() => {
-            this.isSaving = false; // ✅ ALWAYS RESET
+            this.isSaving = false;
           }),
         )
         .subscribe({
@@ -1029,12 +1001,10 @@ export class PurchaseOrderComponent {
   }
 
   UpdatePurchaseOrder() {
-    if (this.isSaving) return; // prevent double click
+    if (this.isSaving) return;
     this.isSaving = true;
     const data = this.poEditForm.getNewPoData();
     data.FIN_ID = this.finId;
-    // Combine country code + mobile (EDIT)
-    // convert mobile before API
     this.poEditForm.preparePoDetailsForSubmit();
     const suppCode = (this.poEditForm.supplierCountryCode || '+91').replace(
       '+',
@@ -1045,12 +1015,10 @@ export class PurchaseOrderComponent {
       '',
     );
 
-    // SUPPLIER MOBILE
     if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
       data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
     }
 
-    // CONTACT MOBILE
     if (data.CONTACT_MOBILE && !data.CONTACT_MOBILE.includes('-')) {
       data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
     }
@@ -1058,7 +1026,7 @@ export class PurchaseOrderComponent {
     data.PoDetails = [...this.poEditForm.poData.PoDetails];
     data.PoDetails = data.PoDetails.map((item: any) => ({
       ...item,
-      PRICE: item.SUPP_PRICE, // IMPORTANT
+      PRICE: item.SUPP_PRICE,
     }));
     const invalidPriceItem = data.PoDetails.find(
       (item: any) =>
@@ -1080,18 +1048,16 @@ export class PurchaseOrderComponent {
       return;
     }
     if (this.isApproved) {
-      // 🔹 Show confirmation dialog before approving
       confirm(
         'Are you sure you want to approve this Purchase Order?',
         'Confirm Approval',
       ).then((dialogResult) => {
         if (dialogResult) {
-          // User confirmed → call approve API
           this.service
             .ApprovePoData(data)
             .pipe(
               finalize(() => {
-                this.isSaving = false; //reset loader
+                this.isSaving = false;
               }),
             )
             .subscribe((res) => {
@@ -1166,8 +1132,6 @@ export class PurchaseOrderComponent {
       if (dialogResult) {
         const data = this.poEditForm.getNewPoData();
         data.FIN_ID = this.finId;
-        // Combine country code + mobile
-        // convert mobile before API
         this.poEditForm.preparePoDetailsForSubmit();
 
         const suppCode = (this.poEditForm.supplierCountryCode || '+91').replace(
@@ -1179,12 +1143,10 @@ export class PurchaseOrderComponent {
           this.poEditForm.shippingCountryCode || '+91'
         ).replace('+', '');
 
-        // SUPPLIER MOBILE
         if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
           data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
         }
 
-        // CONTACT MOBILE
         if (data.CONTACT_MOBILE && !data.CONTACT_MOBILE.includes('-')) {
           data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
         }
@@ -1215,7 +1177,6 @@ export class PurchaseOrderComponent {
           return;
         }
 
-        // VERIFY API ONLY
         this.service.verifyPoData(data).subscribe((res) => {
           if (res) {
             notify(
@@ -1252,7 +1213,6 @@ export class PurchaseOrderComponent {
       if (dialogResult) {
         const data = this.poEditForm.getNewPoData();
         data.FIN_ID = this.finId;
-        // convert mobile before API
         this.poEditForm.preparePoDetailsForSubmit();
 
         const suppCode = (this.poEditForm.supplierCountryCode || '+91').replace(
@@ -1264,17 +1224,14 @@ export class PurchaseOrderComponent {
           this.poEditForm.shippingCountryCode || '+91'
         ).replace('+', '');
 
-        // SUPPLIER MOBILE
         if (data.SUPP_MOBILE && !data.SUPP_MOBILE.includes('-')) {
           data.SUPP_MOBILE = `${suppCode}-${data.SUPP_MOBILE}`;
         }
 
-        // CONTACT MOBILE
         if (data.CONTACT_MOBILE && !data.CONTACT_MOBILE.includes('-')) {
           data.CONTACT_MOBILE = `${contactCode}-${data.CONTACT_MOBILE}`;
         }
 
-        // PRICE MAPPING
         data.PoDetails = [...this.poEditForm.poData.PoDetails];
         data.PoDetails = data.PoDetails.map((item: any) => ({
           ...item,
@@ -1377,31 +1334,22 @@ export class PurchaseOrderComponent {
 
     const date = new Date(celldate);
 
-    // Format the date using the user's system locale
-    const formattedDate = date.toLocaleDateString(); // Formats according to the user's system date format
+    const formattedDate = date.toLocaleDateString();
 
-    return formattedDate; // Return only the date part
+    return formattedDate;
   }
 
   applyTemplate() {
     this.flag = false;
     if (this.selectedTemplate) {
       this.flag = true;
-      // this.reportName = this.selectedTemplate;
-      // this.viewer.bindingSender.OpenReport(
-      //   this.reportName + '&parameter1=' + this.poId
-      // );
-      this.showTemplatePopup = false; // Close the popup after applying
+      this.showTemplatePopup = false;
       this.showReportDesigner = true;
     } else {
       alert('Please select a template before applying');
     }
   }
 
-  //   OnParametersInitialized(event: any) {
-  //     var parameterValue = 12345;
-  //     event.args.Parameters.filter(function (p: any) { return p.Key == "parameter4"; })[0].Value = parameterValue;
-  //     // }
   clearData() {
     this.poNewForm.close();
   }
@@ -1435,8 +1383,6 @@ export class PurchaseOrderComponent {
     PurchaseOrderViewFormModule,
     DxDraggableModule,
     DxSortableModule,
-    // DevexpressReportingModule,
-    // DxReportViewerModule,
     DxSelectBoxModule,
     DxDataGridModule,
     PurchaseOrderEditFormModule,
