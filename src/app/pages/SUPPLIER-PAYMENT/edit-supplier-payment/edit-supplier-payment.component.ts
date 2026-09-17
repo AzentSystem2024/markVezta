@@ -233,6 +233,16 @@ export class EditSupplierPaymentComponent {
       console.log(this.paymentFormData, 'PAYMENTFORMDATA');
       this.voucherNo = this.paymentData[0].DOC_NO;
       console.log(this.voucherNo, 'VOUCHERNOOOOOOOOOOOOOO');
+
+      if (
+        this.paymentFormData?.TRANS_STATUS === 5 ||
+        this.paymentFormData?.TRANS_STATUS === 'Approve' ||
+        this.paymentFormData?.TRANS_STATUS === 'Approved' ||
+        this.readOnlyMode
+      ) {
+        this.isReadOnlyMode = true;
+      }
+
       setTimeout(() => {
         this.itemsGridRef?.instance.refresh();
       }, 0);
@@ -241,7 +251,25 @@ export class EditSupplierPaymentComponent {
       // this.mainGridData = [...(this.paymentFormData.PAY_DETAIL || [])];
 
       if (this.paymentFormData.PAY_DATE) {
-        this.paymentDate = this.formatDateToYMD(this.paymentFormData.PAY_DATE);
+        if (typeof this.paymentFormData.PAY_DATE === 'string') {
+          if (this.paymentFormData.PAY_DATE.includes('-')) {
+            const parts = this.paymentFormData.PAY_DATE.split('-');
+            if (parts[0].length === 4) {
+              this.paymentFormData.PAY_DATE = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+            } else {
+              this.paymentFormData.PAY_DATE = new Date(+parts[2], +parts[1] - 1, +parts[0]);
+            }
+          } else {
+            this.paymentFormData.PAY_DATE = new Date(this.paymentFormData.PAY_DATE);
+          }
+        }
+        if (
+          this.paymentFormData.PAY_DATE instanceof Date &&
+          !isNaN(this.paymentFormData.PAY_DATE.getTime())
+        ) {
+          const p = this.paymentFormData.PAY_DATE;
+          this.paymentDate = `${p.getFullYear()}-${String(p.getMonth() + 1).padStart(2, '0')}-${String(p.getDate()).padStart(2, '0')}`;
+        }
       }
       console.log(this.paymentDate, 'PAYMENTDATEEEEEEEEE');
       console.log(this.paymentFormData.PDC_AMOUNT, 'PDCAMOUNTTTTTTTTTTTTTTTTT');
@@ -883,6 +911,13 @@ export class EditSupplierPaymentComponent {
       return;
     }
 
+    if (this.paymentFormData.PAY_DATE) {
+      const pDate = new Date(this.paymentFormData.PAY_DATE);
+      if (!isNaN(pDate.getTime())) {
+        this.paymentDate = `${pDate.getFullYear()}-${String(pDate.getMonth() + 1).padStart(2, '0')}-${String(pDate.getDate()).padStart(2, '0')}`;
+      }
+    }
+
     if (!this.paymentDate) {
       notify('Please select payment date.', 'warning', 3000);
       return;
@@ -1091,4 +1126,4 @@ export class EditSupplierPaymentComponent {
   exports: [EditSupplierPaymentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditSupplierPaymentModule {}
+export class EditSupplierPaymentModule { }

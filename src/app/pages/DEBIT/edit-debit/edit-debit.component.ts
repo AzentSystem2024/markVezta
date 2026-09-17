@@ -1036,8 +1036,10 @@ export class EditDebitComponent {
                   // GST_PERC: Number(item.GST_PERC) || 0,
                   GST_PERC: Number(item.GST_ID) || 0,
                   GST_AMOUNT: gstAmount,
-                  CGST: Number(item.CGST) || 0,
-                  SGST: Number(item.SGST) || 0,
+                  // CGST: Number(item.CGST) || 0,
+                  // SGST: Number(item.SGST) || 0,
+                  CGST: 0,
+                  SGST: 0,
                   REMARKS: item.particulars || '',
                 };
               }),
@@ -1130,8 +1132,10 @@ export class EditDebitComponent {
                   GST_PERC: Number(item.GST_ID) || 0,
                   GST_AMOUNT: gstAmount,
                   REMARKS: item.particulars || '',
-                  CGST: item.CGST || 0,
-                  SGST: item.SGST || 0,
+                  // CGST: item.CGST || 0,
+                  // SGST: item.SGST || 0,
+                  CGST: 0,
+                  SGST: 0
                 };
               }),
           };
@@ -1219,8 +1223,10 @@ export class EditDebitComponent {
               GST_PERC: Number(item.GST_ID) || 0,
               GST_AMOUNT: gstAmount,
               REMARKS: item.particulars || '',
-              CGST: item.CGST || 0,
-              SGST: item.SGST || 0,
+              // CGST: item.CGST || 0,
+              // SGST: item.SGST || 0,
+              CGST: 0,
+              SGST: 0
             };
           }),
       };
@@ -1282,7 +1288,7 @@ export class EditDebitComponent {
     return amount + gst;
   };
 
-  onRoundOffChange() {}
+  onRoundOffChange() { }
 
   getGstDisplayValue = (row: any) => {
     const percent = row.GST_PERC ?? 0;
@@ -1332,4 +1338,4 @@ export class EditDebitComponent {
   exports: [EditDebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditDebitModule {}
+export class EditDebitModule { }

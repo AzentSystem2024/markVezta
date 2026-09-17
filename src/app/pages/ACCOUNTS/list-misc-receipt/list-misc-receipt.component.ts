@@ -155,18 +155,31 @@ export class ListMiscReceiptComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     const menuGroups = menuResponse.MenuGroups || [];
-    const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+    const allMenus: any[] = [];
+    menuGroups.forEach((group: any) => {
+      (group.Menus || []).forEach((menu: any) => {
+        allMenus.push(menu);
+        if (menu.Children && Array.isArray(menu.Children)) {
+          allMenus.push(...menu.Children);
+        }
+      });
+    });
+
+    const packingRights = allMenus.find(
+      (menu: any) =>
+        menu.Path === currentUrl ||
+        (menu.Path && currentUrl.endsWith(menu.Path)) ||
+        (menu.Path && currentUrl.includes(menu.Path)),
+    );
 
     if (packingRights) {
-      this.canAdd = packingRights.CanAdd;
-      this.canEdit = packingRights.CanEdit;
-      this.canDelete = packingRights.CanDelete;
-      this.canVerify = packingRights.CanVerify;
-      this.canPrint = packingRights.CanPrint;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.CanApprove;
+      this.canAdd = !!(packingRights.CanAdd ?? packingRights.canAdd);
+      this.canEdit = !!(packingRights.CanEdit ?? packingRights.canEdit);
+      this.canDelete = !!(packingRights.CanDelete ?? packingRights.canDelete);
+      this.canVerify = !!(packingRights.CanVerify ?? packingRights.canVerify);
+      this.canPrint = !!(packingRights.CanPrint ?? packingRights.canPrint);
+      this.canView = !!(packingRights.canView ?? packingRights.CanView);
+      this.canApprove = !!(packingRights.CanApprove ?? packingRights.canApprove);
     }
 
     this.getMiscReceipts();
@@ -296,21 +309,17 @@ export class ListMiscReceiptComponent {
     const transStatus = e.row.data.TRANS_STATUS;
     const id = e.row.data.TRANS_ID;
     this.statusFinder = transStatus;
+    this.selectedMiscReceipt = id;
+    this.MiscReceiptId = id;
     // reset previous data
     this.selectedmiscellaneousData = null;
     this.verifypopup = false;
 
-    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
-      return;
-    }
-
-    // Verified document -> Approve privilege required
-    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
-      return;
-    }
-
     // Approved document -> If user has Edit privilege, do nothing
-    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+    if (
+      (rowData.TRANS_STATUS === 5 || rowData.TRANS_STATUS === 'Approve') &&
+      this.canEdit
+    ) {
       return;
     }
 
@@ -318,25 +327,27 @@ export class ListMiscReceiptComponent {
       next: (res: any) => {
         this.selectedmiscellaneousData = { ...res.Data };
 
-        // this.isReadOnlyPayment = transStatus === 'Approve';
-        if (this.selectedmiscellaneousData.TRANS_STATUS == 2) {
-          this.PopupTitle = 'Approve Miscellaneous Receipt '
-        }
-        else if (this.selectedmiscellaneousData.TRANS_STATUS == 5) {
-          this.PopupTitle = 'View Miscellaneous Receipt '
-        }
-        else {
-          this.PopupTitle = 'Verify Miscellaneous Receipt'
+        const currentStatus =
+          this.selectedmiscellaneousData.TRANS_STATUS ?? transStatus;
+
+        if (currentStatus == 2 || currentStatus === 'Verify') {
+          this.PopupTitle = 'Approve Miscellaneous Receipt ';
+          this.isReadOnlyPayment = false;
+        } else if (currentStatus == 5 || currentStatus === 'Approve') {
+          this.PopupTitle = 'View Miscellaneous Receipt ';
+          this.isReadOnlyPayment = true;
+        } else {
+          this.PopupTitle = 'Verify Miscellaneous Receipt';
+          this.isReadOnlyPayment = false;
         }
         // open popup AFTER data arrives
         setTimeout(() => {
           this.verifypopup = true;
         });
-
       },
       error: (err) => {
         console.error('Error loading verify data:', err);
-      }
+      },
     });
   }
 

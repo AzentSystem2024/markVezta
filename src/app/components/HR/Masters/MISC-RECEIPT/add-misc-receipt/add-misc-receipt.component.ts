@@ -269,6 +269,14 @@ export class AddMiscReceiptComponent {
     this.miscFormData.TRANS_ID = data.TRANS_ID;
     this.miscFormData.PAY_HEAD_ID = data.PAY_HEAD_ID;
     this.miscFormData.DEPT_ID = data.DEPT_ID ? Number(data.DEPT_ID) : null;
+
+    if (
+      data.TRANS_STATUS === 5 ||
+      data.TRANS_STATUS === 'Approve' ||
+      data.TRANS_STATUS === 'Approved'
+    ) {
+      this.isReadOnlyMode = true;
+    }
   }
 
   onAddNewRow() { }
