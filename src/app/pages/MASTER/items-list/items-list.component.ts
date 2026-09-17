@@ -336,10 +336,16 @@ export class ItemsListComponent implements OnInit {
   onClickSaveItems(): void {
     const items = this.itemsComponent.getNewItems();
 
-    if (Array.isArray(items.COMPANY_ID)) {
-      items.COMPANY_ID = items.COMPANY_ID.join(',');
-    } else if (items.COMPANY_ID !== null && items.COMPANY_ID !== undefined) {
-      items.COMPANY_ID = String(items.COMPANY_ID);
+    if (!Array.isArray(items.item_companies)) {
+      if (typeof items.item_companies === 'string' && items.item_companies.trim()) {
+        items.item_companies = items.item_companies.split(',')
+          .map((id: string) => Number(id.trim()))
+          .filter((id: number) => !isNaN(id));
+      } else if (items.item_companies !== null && items.item_companies !== undefined && items.item_companies !== '' && items.item_companies !== 0) {
+        items.item_companies = [Number(items.item_companies)];
+      } else {
+        items.item_companies = [];
+      }
     }
 
     if (items.ITEM_ALIAS && items.ITEM_ALIAS.length > 0) {

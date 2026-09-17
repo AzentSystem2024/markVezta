@@ -293,7 +293,8 @@ export class ArticleEditComponent {
 
   getItems() {
     const payload = {
-      NAME: "GETITEM"
+      NAME: "GETITEM",
+      COMPANY_ID: this.selected_Company_id
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       console.log(response)
@@ -1003,6 +1004,8 @@ export class ArticleEditComponent {
       PACK_QTY: this.articleData.PACK_QTY || 0,
       PART_NO: this.articleData.PART_NO || '',
       ALIAS_NO: this.articleData.ALIAS_NO || '',
+      COMPANY_TYPE: this.Default_company_Type || '',
+      COMPANY_ID: this.selected_Company_id || 0,
       // UNIT_ID: this.articleData.UNIT_ID || 0,
       Units: Array.isArray(this.selectedProductionUnitId)
         ? this.selectedProductionUnitId.map((id: any) => ({ UNIT_ID: id }))
