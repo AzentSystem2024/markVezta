@@ -293,7 +293,8 @@ export class ArticleEditComponent {
 
   getItems() {
     const payload = {
-      NAME: "GETITEM"
+      NAME: "GETITEM",
+      COMPANY_ID: this.selected_Company_id
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       console.log(response)

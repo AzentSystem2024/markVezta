@@ -252,6 +252,7 @@ export class ArticleAddComponent {
   getItems() {
     const payload = {
       NAME: 'GETITEM',
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.itemsList = response;

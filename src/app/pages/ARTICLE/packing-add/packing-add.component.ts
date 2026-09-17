@@ -278,6 +278,7 @@ export class PackingAddComponent {
   getItems() {
     const payload = {
       NAME: 'GETPACKINGITEM',
+      COMPANY_ID: this.selected_Company_id,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.itemsList = response;
