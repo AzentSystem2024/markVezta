@@ -187,6 +187,7 @@ export class StockViewComponent {
       STORE_ID: this.selectedStoreid?.length
         ? this.selectedStoreid.join(',') // FINAL FIX
         : '',
+      COMPANY_ID: this.companyID,
     };
     this.stockViewList = new DataSource({
       load: () =>
