@@ -1,4 +1,11 @@
-import { Component, OnInit, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  NgModule,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { DataService } from 'src/app/services/data.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -7,229 +14,697 @@ import {
   DxDateBoxModule,
   DxDataGridModule,
   DxTextAreaModule,
-  DxButtonModule
+  DxButtonModule,
+  DxPopupModule,
+  DxTextBoxModule,
 } from 'devextreme-angular';
-
+export interface SizeConfig {
+  id: string;
+  name: string;
+  packQty: number; // the (30) in red
+  description: string;
+}
+export interface CartItem {
+  id: number;
+  categoryId: number | null;
+  artNoId: any;
+  colorId: string | null;
+  imageUrl?: string;
+  packingType: string;
+  sizes: any[];
+}
 @Component({
   selector: 'app-new-order',
   templateUrl: './new-order.component.html',
-  styleUrls: ['./new-order.component.scss']
+  styleUrls: ['./new-order.component.scss'],
 })
 export class NewOrderComponent implements OnInit {
-  currentDate: any = new Date();
-  
-  // Checkboxes
-  hasSubdealer: boolean = false;
+  // Navigation tabs
+  activeTab: 'dealer' | 'subdealer' = 'dealer';
+  searchQuery: string = '';
 
-  // Selected values
-  selectedDealerId: number | null = null;
-  selectedSubdealerId: number | null = null;
-  selectedDeliveryAddressId: number | null = null;
-  selectedWarehouseId: number | null = null;
-  remarks: string = '';
-  
-  fullAddressText: string = '';
+  // Modal State
+  isPopupVisible = false;
+  isEditMode = false;
 
-  // Dummy Data
-  dealers = [
-    { id: 1, name: 'K.S TRADERS' },
-    { id: 2, name: 'ABC ENTERPRISES' }
-  ];
+  isLoadingDealers = false;
+  isLoadingSubDealers = false;
+  isLoadingCategories = false;
+  isLoadingArtNos = false;
+  isLoadingSizes = false;
 
-  allSubdealers = [
-    { id: 101, dealerId: 1, name: 'METRO SHOE PARK' },
-    { id: 102, dealerId: 1, name: 'CITY FOOTWEAR' },
-    { id: 103, dealerId: 2, name: 'ALPHA RETAIL' }
-  ];
-  filteredSubdealers: any[] = [];
+  allArtNos: string[] = [];
+  cartItems: CartItem[] = [];
 
-  allDeliveryAddresses = [
-    { id: 201, dealerId: 1, name: 'ARANTHANGI', fullAddress: 'SARAPOJI VANIGA VAZGAGAM , ARANTHANGI' },
-    { id: 202, dealerId: 1, name: 'CHENNAI MAIN', fullAddress: '123 MAIN ST, CHENNAI' },
-    { id: 203, dealerId: 2, name: 'MADURAI BRANCH', fullAddress: '456 SOUTH ST, MADURAI' }
-  ];
-  filteredDeliveryAddresses: any[] = [];
+  // Current Editing Item (for modal)
+  currentEditingItem!: CartItem;
 
-  allWarehouses = [
-    { id: 301, dealerId: 1, name: 'BOYZONE POLYMERS INDIA PVT LTD., TAMILNADU' },
-    { id: 302, dealerId: 2, name: 'MAIN WAREHOUSE, KERALA' }
-  ];
-  filteredWarehouses: any[] = [];
+  // Cut Size Popup State
+  isCutSizePopupVisible = false;
+  currentCutSize: any = null;
+  currentCutSizeQuantities: { [key: string]: number } = {};
 
-  // Grid Data
-  orderItems: any[] = [];
+  colors: any[] = [];
+  categories: any[] = [];
+  artNos: any[] = [];
+  sizeConfigurations: SizeConfig[] = [];
 
-  // Grid Dropdown Data
-  items = [
-    { id: 1, name: 'Item A' },
-    { id: 2, name: 'Item B' }
-  ];
+  warehouses: any[] = [];
+  distributorsCache: { [key: string]: any[] } = {};
+  currentDistributors: any[] = [];
+  itemsList: any[] = [];
 
-  types = [
-    { id: 1, itemId: 1, name: 'Type 1A' },
-    { id: 2, itemId: 1, name: 'Type 1B' },
-    { id: 3, itemId: 2, name: 'Type 2A' }
-  ];
+  selectedDealerId: any = null;
 
-  categories = [
-    { id: 1, typeId: 1, name: 'Cat 1A-1' },
-    { id: 2, typeId: 2, name: 'Cat 1B-1' }
-  ];
-
-  artNos = [
-    { id: 1, categoryId: 1, name: 'Art-001' },
-    { id: 2, categoryId: 1, name: 'Art-002' }
-  ];
-
-  colors = [
-    { id: 1, artNoId: 1, name: 'Red' },
-    { id: 2, artNoId: 1, name: 'Blue' }
-  ];
-
-  packingMasterList = [
-    { id: 1, name: 'Box (10 pcs)' },
-    { id: 2, name: 'Carton (50 pcs)' },
-    { id: 3, name: 'Pallet (500 pcs)' }
-  ];
-
-  constructor() {
-    this.addEmptyRow();
-    
-    // Update the time every second
-    setInterval(() => {
-      this.currentDate = new Date();
-    }, 1000);
+  constructor(
+    private dataService: DataService,
+    private http: HttpClient,
+  ) {
+    this.currentEditingItem = this.getEmptyCartItem();
   }
 
   ngOnInit(): void {
+    this.loadDealers();
+    this.loadCategories();
   }
 
-  onDealerChanged(e: any) {
-    this.selectedDealerId = e.value;
-    
-    // Cascade Subdealers
-    this.filteredSubdealers = this.allSubdealers.filter(s => s.dealerId === this.selectedDealerId);
-    this.selectedSubdealerId = null; // Reset
-    
-    // Cascade Delivery Addresses
-    this.filteredDeliveryAddresses = this.allDeliveryAddresses.filter(d => d.dealerId === this.selectedDealerId);
-    if (this.filteredDeliveryAddresses.length > 0) {
-      this.selectedDeliveryAddressId = this.filteredDeliveryAddresses[0].id;
-      this.updateFullAddress();
-    } else {
-      this.selectedDeliveryAddressId = null;
-      this.fullAddressText = '';
+  loadCategories() {
+    this.dataService.Get_GropDown('ARTICLECATEGORY').subscribe(
+      (res: any) => {
+        this.categories = (Array.isArray(res) ? res : res || []).map(
+          (item: any) => ({
+            id: item.ID || item.id,
+            name: item.DESCRIPTION || item.description,
+          }),
+        );
+      },
+      (error) => console.error('Error fetching ARTICLECATEGORY', error),
+    );
+  }
+
+  loadDealers() {
+    this.loadDealerDataForTab(this.activeTab);
+  }
+
+  loadDealerDataForTab(tab: 'dealer' | 'subdealer') {
+    if (this.distributorsCache[tab]) {
+      this.currentDistributors = this.distributorsCache[tab];
+      return;
     }
 
-    // Cascade Warehouses
-    this.filteredWarehouses = this.allWarehouses.filter(w => w.dealerId === this.selectedDealerId);
-    if (this.filteredWarehouses.length > 0) {
-      this.selectedWarehouseId = this.filteredWarehouses[0].id;
-    } else {
-      this.selectedWarehouseId = null;
+    this.isLoadingDealers = true;
+    this.currentDistributors = [];
+    const apiName = tab === 'dealer' ? 'DEALER' : 'SUB_DEALER';
+
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const companyId = sessionData.SELECTED_COMPANY?.COMPANY_ID || 15;
+
+    const payload = {
+      NAME: apiName,
+    };
+
+    this.dataService.Item_Dropdown(payload).subscribe(
+      (res: any) => {
+        const data = (Array.isArray(res) ? res : res || []).map(
+          (item: any) => ({
+            ...item,
+            NAME: item.DESCRIPTION || item.description,
+            TYPE: apiName,
+          }),
+        );
+
+        this.distributorsCache[tab] = data;
+        this.currentDistributors = data;
+        this.isLoadingDealers = false;
+      },
+      (error) => {
+        console.error(`Error fetching ${apiName}`, error);
+        this.isLoadingDealers = false;
+      },
+    );
+  }
+
+  processItemsList() {
+    // Extract unique artNos, colors, and size configurations from itemsList
+    const uniqueArtNos = new Map();
+    const uniqueColors = new Map();
+    const uniqueSizes = new Map();
+
+    this.itemsList.forEach((item) => {
+      // ArtNo
+      if (item.ART_NO) {
+        uniqueArtNos.set(item.ART_NO, {
+          id: item.ART_NO,
+          categoryId: item.TYPE_ID,
+          name: item.ART_NO,
+          image: item.IMAGE,
+        });
+      }
+      // Color
+      if (item.COLOR_ID) {
+        uniqueColors.set(item.COLOR_ID, {
+          id: item.COLOR_ID,
+          name: item.COLOR_NAME,
+          hex: item.COLOR_CODE,
+        });
+      }
+      // SizeRun
+      if (item.SIZERUN_ID) {
+        uniqueSizes.set(item.SIZERUN_ID, {
+          id: item.SIZERUN_ID.toString(),
+          name: item.SIZERUN_NAME,
+          packQty: item.QTY || 30, // Fallback to 30 if QTY not present
+          description: '',
+        });
+      }
+    });
+
+    this.artNos = Array.from(uniqueArtNos.values());
+    this.colors = Array.from(uniqueColors.values());
+
+    // If API provided sizes, replace the dummy ones
+    if (uniqueSizes.size > 0) {
+      this.sizeConfigurations = Array.from(uniqueSizes.values());
     }
   }
 
-  onDeliveryAddressChanged(e: any) {
-    this.selectedDeliveryAddressId = e.value;
-    this.updateFullAddress();
-  }
-
-  updateFullAddress() {
-    const addr = this.allDeliveryAddresses.find(a => a.id === this.selectedDeliveryAddressId);
-    this.fullAddressText = addr ? addr.fullAddress : '';
-  }
-
-  hasSubdealerChanged(e: any) {
-    if (!this.hasSubdealer) {
-      this.selectedSubdealerId = null;
-    }
-  }
-
-  addEmptyRow() {
-    this.orderItems.push({
-      id: Date.now(),
-      itemId: null,
-      typeId: null,
+  getEmptyCartItem(): CartItem {
+    return {
+      id: 0,
       categoryId: null,
       artNoId: null,
       colorId: null,
-      packingId: null,
-      content: '',
-      qty: 0
-    });
-  }
-
-  onRowInserted(e: any) {
-    // Add a new empty row after one is inserted if needed, 
-    // or just rely on a custom add button.
-  }
-
-  // Helper functions for cascading dropdowns in the grid
-  getFilteredTypes = (options: any) => {
-    return {
-      store: this.types,
-      filter: options.data ? ['itemId', '=', options.data.itemId] : null
+      packingType: 'Case',
+      sizes: [],
+      imageUrl: '',
     };
   }
 
-  getFilteredCategories = (options: any) => {
-    return {
-      store: this.categories,
-      filter: options.data ? ['typeId', '=', options.data.typeId] : null
+  // --- Left Side Actions ---
+  setActiveTab(tab: 'dealer' | 'subdealer') {
+    if (this.activeTab !== tab) {
+      this.activeTab = tab;
+      this.selectedDealerId = null;
+      this.loadDealerDataForTab(tab);
+    }
+  }
+
+  onCategoryChange(e: any) {
+    // Only reset dependent fields if this is an actual user change (not initial binding)
+    if (e.previousValue !== undefined && e.previousValue !== e.value) {
+      if (this.currentEditingItem) {
+        this.currentEditingItem.artNoId = null;
+        this.currentEditingItem.colorId = null;
+      }
+    }
+
+    if (e.value) {
+      this.loadArtNos(e.value);
+    } else {
+      this.artNos = [];
+    }
+  }
+
+  loadArtNos(categoryId: any) {
+    this.isLoadingArtNos = true;
+    this.allArtNos = [];
+    this.artNos = [];
+    this.dataService
+      .getNewOrderArtNo({ CategoryID: categoryId.toString() })
+      .subscribe(
+        (res: any) => {
+          this.isLoadingArtNos = false;
+          if (Array.isArray(res)) {
+            this.allArtNos = res.map(String);
+          } else if (typeof res === 'string') {
+            try {
+              const parsed = JSON.parse(res);
+              this.allArtNos = Array.isArray(parsed) ? parsed.map(String) : [];
+            } catch (e) {
+              this.allArtNos = res.split(',').filter((s) => s.trim() !== '');
+            }
+          }
+          // Initially load only the first 50 to avoid freezing
+          this.artNos = this.allArtNos.slice(0, 50);
+        },
+        (error) => {
+          this.isLoadingArtNos = false;
+          console.error('Error fetching Art Nos', error);
+        },
+      );
+  }
+
+  onArtNoInput(e: any) {
+    const searchTerm = e.event?.target?.value || '';
+    if (searchTerm) {
+      // Filter values starting with the search term (case-insensitive) and limit to 50
+      this.artNos = this.allArtNos
+        .filter((a) => a.toLowerCase().startsWith(searchTerm.toLowerCase()))
+        .slice(0, 50);
+    } else {
+      this.artNos = this.allArtNos.slice(0, 50);
+    }
+  }
+
+  onArtNoChange(e: any) {
+    if (e.previousValue !== undefined && e.previousValue !== e.value) {
+      if (this.currentEditingItem) {
+        this.currentEditingItem.colorId = null;
+        this.currentEditingItem.sizes = [];
+        this.currentEditingItem.imageUrl = '';
+      }
+    }
+
+    if (e.value && this.currentEditingItem?.categoryId) {
+      this.fetchColors(e.value, this.currentEditingItem.categoryId);
+    } else {
+      this.colors = [];
+    }
+  }
+
+  fetchColors(artNo: string, categoryId: any) {
+    const payload = { ArtNo: artNo, CategoryID: categoryId.toString() };
+    this.dataService.getNewOrderArtColor(payload).subscribe(
+      (res: any) => {
+        if (res && res.flag === '1' && Array.isArray(res.Colors)) {
+          this.colors = res.Colors.map((c: any) => ({
+            id: c.Color,
+            name: c.Color,
+            hex: this.getHexForColor(c.Color),
+          }));
+
+          if (this.colors.length > 0) {
+            // Auto select the first one if none is selected
+            if (!this.currentEditingItem.colorId) {
+              this.selectColor(this.colors[0].id);
+            }
+          }
+        } else {
+          this.colors = [];
+        }
+      },
+      (err) => console.error('Error fetching colors', err),
+    );
+  }
+
+  getHexForColor(colorName: string): string {
+    const name = colorName ? colorName.toUpperCase().trim() : '';
+    const map: any = {
+      // Base Colors
+      BLACK: '#000000',
+      BLUE: '#0000FF',
+      RED: '#FF0000',
+      WHITE: '#FFFFFF',
+      GREEN: '#008000',
+      GREY: '#808080',
+      BROWN: '#A52A2A',
+      NAVY: '#000080',
+      TAN: '#D2B48C',
+      YELLOW: '#FFFF00',
+      ORANGE: '#FFA500',
+      PURPLE: '#800080',
+      PINK: '#FFC0CB',
+      MAROON: '#800000',
+      OLIVE: '#808000',
+      CYAN: '#00FFFF',
+      MAGENTA: '#FF00FF',
+      TEAL: '#008080',
+      SILVER: '#C0C0C0',
+      GOLD: '#FFD700',
+
+      // Extended/Compound Colors
+      'SKY BLUE': '#87CEEB',
+      'LIGHT BLUE': '#ADD8E6',
+      'DARK BLUE': '#00008B',
+      MOUSE: '#8c543c',
+      BEIGE: '#F5F5DC',
+      KHAKI: '#C3B091',
+      CAMEL: '#C19A6B',
+      MUSTARD: '#FFDB58',
+      'OLIVE GREEN': '#556B2F',
+      CHARCOAL: '#36454F',
+      RUST: '#B7410E',
+      BURGUNDY: '#800020',
+      PEACH: '#FFE5B4',
+      LILAC: '#C8A2C8',
+      MINT: '#98FF98',
+      CORAL: '#FF7F50',
+      CHERRY: '#D2042D',
     };
+
+    // Check exact match
+    if (map[name]) return map[name];
+
+    const sortedKeys = Object.keys(map).sort((a, b) => b.length - a.length);
+
+    for (const key of sortedKeys) {
+      if (name.includes(key)) {
+        return map[key];
+      }
+    }
+
+    return '#cccccc'; // Default fallback color
   }
 
-  getFilteredArtNos = (options: any) => {
-    return {
-      store: this.artNos,
-      filter: options.data ? ['categoryId', '=', options.data.categoryId] : null
+  openNewOrder() {
+    this.isEditMode = false;
+    this.currentEditingItem = this.getEmptyCartItem();
+    this.isPopupVisible = true;
+  }
+
+  closePopup() {
+    this.isPopupVisible = false;
+  }
+
+  selectColor(colorId: string) {
+    if (this.currentEditingItem.colorId === colorId) return;
+    this.currentEditingItem.colorId = colorId;
+    this.onColorChange(colorId);
+  }
+
+  onColorChange(color: string) {
+    if (
+      !this.currentEditingItem?.artNoId ||
+      !this.currentEditingItem?.categoryId
+    )
+      return;
+
+    this.isLoadingSizes = true;
+    const payload = {
+      ArtNo: this.currentEditingItem.artNoId,
+      CategoryID: this.currentEditingItem.categoryId.toString(),
+      Color: color,
     };
+
+    this.dataService.getNewOrderArtNoDetails(payload).subscribe(
+      (res: any) => {
+        this.isLoadingSizes = false;
+        if (res && res.flag === '1') {
+          this.currentEditingItem.imageUrl = res.IMAGE_NAME
+            ? `https://mmarkonline.com/artimages/${res.IMAGE_NAME}`
+            : '';
+
+          if (Array.isArray(res.Case)) {
+            this.currentEditingItem.sizes = res.Case.map((c: any) => ({
+              sizeId: c.PackingID,
+              description: c.Description,
+              isCutSize: c.IsCutSize,
+              availableSizes:
+                c.IsCutSize && c.Sizes
+                  ? c.Sizes.replace(/"/g, '')
+                      .split(',')
+                      .map((s: string) => s.trim())
+                  : [],
+              cutSizeQuantities: {},
+              combination: c.IsCutSize
+                ? ''
+                : (c.Combination || '')
+                    .replace(/,\s*/g, ', '),
+              pairQty: c.PairQty,
+              qty: 0,
+            }));
+          } else {
+            this.currentEditingItem.sizes = [];
+          }
+        }
+      },
+      (err) => {
+        this.isLoadingSizes = false;
+        console.error('Error fetching details', err);
+      },
+    );
   }
 
-  getFilteredColors = (options: any) => {
-    return {
-      store: this.colors,
-      filter: options.data ? ['artNoId', '=', options.data.artNoId] : null
+  incrementSize(sizeId: any) {
+    const size = this.currentEditingItem.sizes.find((s) => s.sizeId === sizeId);
+    if (size) {
+      if (size.isCutSize && size.qty === 0) {
+        this.openCutSizePopup(size);
+      } else {
+        size.qty++;
+      }
+    }
+  }
+
+  decrementSize(sizeId: any) {
+    const size = this.currentEditingItem.sizes.find((s) => s.sizeId === sizeId);
+    if (size && size.qty > 0) {
+      size.qty--;
+      if (size.isCutSize && size.qty === 0) {
+        size.cutSizeQuantities = {};
+        size.combination = '';
+      }
+    }
+  }
+
+  onMainQtyInput(size: any, event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    let value = inputElement.value.replace(/\D/g, '');
+
+    if (value === '') {
+      size.qty = 0;
+      return;
+    }
+
+    let parsed = parseInt(value, 10);
+    if (isNaN(parsed) || parsed < 0) {
+      parsed = 0;
+      inputElement.value = '0';
+    } else {
+      inputElement.value = parsed.toString();
+    }
+
+    size.qty = parsed;
+
+    if (size.isCutSize) {
+      if (size.qty === 0) {
+        size.cutSizeQuantities = {};
+        size.combination = '';
+      } else if (Object.keys(size.cutSizeQuantities || {}).length === 0) {
+        this.openCutSizePopup(size);
+      }
+    }
+  }
+
+  onMainQtyBlur(size: any, event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    if (inputElement.value === '') {
+      inputElement.value = '0';
+    }
+  }
+
+  // --- Cut Size Popup Methods ---
+  openCutSizePopup(size: any) {
+    this.currentCutSize = size;
+    // Clone to allow cancelling
+    this.currentCutSizeQuantities = { ...(size.cutSizeQuantities || {}) };
+    this.isCutSizePopupVisible = true;
+  }
+
+  closeCutSizePopup() {
+    if (this.currentCutSize) {
+      if (Object.keys(this.currentCutSize.cutSizeQuantities || {}).length === 0) {
+        this.currentCutSize.qty = 0;
+      }
+    }
+    this.isCutSizePopupVisible = false;
+    this.currentCutSize = null;
+  }
+
+  getCutSizeTotal(): number {
+    if (!this.currentCutSizeQuantities) return 0;
+    return Object.values(this.currentCutSizeQuantities).reduce(
+      (a, b) => a + b,
+      0,
+    );
+  }
+
+  incrementCutSizeQty(s: string) {
+    if (this.getCutSizeTotal() >= this.currentCutSize.pairQty) return;
+    if (!this.currentCutSizeQuantities[s]) {
+      this.currentCutSizeQuantities[s] = 0;
+    }
+    this.currentCutSizeQuantities[s]++;
+  }
+
+  decrementCutSizeQty(s: string) {
+    if (this.currentCutSizeQuantities[s] > 0) {
+      this.currentCutSizeQuantities[s]--;
+    }
+  }
+
+  onCutSizeQtyInput(s: string, event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    let value = inputElement.value.replace(/\D/g, '');
+
+    if (value === '') {
+      this.currentCutSizeQuantities[s] = 0;
+      return;
+    }
+
+    let parsed = parseInt(value, 10);
+    if (isNaN(parsed) || parsed < 0) {
+      parsed = 0;
+    }
+
+    // Ensure they can't type a value that exceeds the total allowed
+    const currentTotalWithoutThis =
+      this.getCutSizeTotal() - (this.currentCutSizeQuantities[s] || 0);
+    if (currentTotalWithoutThis + parsed > this.currentCutSize.pairQty) {
+      parsed = this.currentCutSize.pairQty - currentTotalWithoutThis;
+    }
+
+    inputElement.value = parsed.toString();
+    this.currentCutSizeQuantities[s] = parsed;
+  }
+
+  onCutSizeQtyBlur(s: string, event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    if (inputElement.value === '') {
+      inputElement.value = '0';
+    }
+  }
+
+  saveCutSize() {
+    const total = this.getCutSizeTotal();
+    if (total !== this.currentCutSize.pairQty) {
+      alert(
+        `Total quantity must be exactly ${this.currentCutSize.pairQty}. Currently it is ${total}.`,
+      );
+      return;
+    }
+
+    // Save configurations back to the size object
+    this.currentCutSize.cutSizeQuantities = {
+      ...this.currentCutSizeQuantities,
     };
+
+    // Generate combination string for display
+    const comboParts = [];
+    for (const size of this.currentCutSize.availableSizes) {
+      const q = this.currentCutSize.cutSizeQuantities[size];
+      if (q > 0) {
+        comboParts.push(`${size}x${q}`);
+      }
+    }
+    this.currentCutSize.combination = comboParts.join(', ');
+
+    if (this.currentCutSize.qty === 0) {
+      this.currentCutSize.qty = 1;
+    }
+    this.closeCutSizePopup();
   }
 
-  setItemValue = (newData: any, value: any, currentRowData: any) => {
-    newData.itemId = value;
-    newData.typeId = null;
-    newData.categoryId = null;
-    newData.artNoId = null;
-    newData.colorId = null;
+  getCurrentItemTotalQty(): number {
+    return this.currentEditingItem.sizes.reduce(
+      (sum, size) => sum + size.qty,
+      0,
+    );
   }
 
-  setTypeValue = (newData: any, value: any, currentRowData: any) => {
-    newData.typeId = value;
-    newData.categoryId = null;
-    newData.artNoId = null;
-    newData.colorId = null;
-  }
-  
-  setCategoryValue = (newData: any, value: any, currentRowData: any) => {
-    newData.categoryId = value;
-    newData.artNoId = null;
-    newData.colorId = null;
+  saveToCart() {
+    if (this.getCurrentItemTotalQty() === 0) {
+      // Might want a warning in real app
+    }
+
+    if (this.isEditMode) {
+      const index = this.cartItems.findIndex(
+        (item) => item.id === this.currentEditingItem.id,
+      );
+      if (index !== -1) {
+        this.cartItems[index] = JSON.parse(
+          JSON.stringify(this.currentEditingItem),
+        );
+      }
+    } else {
+      const newItem = JSON.parse(JSON.stringify(this.currentEditingItem));
+      newItem.id = Date.now();
+      this.cartItems.push(newItem);
+    }
+
+    console.log('Cart Data: ', this.cartItems);
+    this.isPopupVisible = false;
   }
 
-  setArtNoValue = (newData: any, value: any, currentRowData: any) => {
-    newData.artNoId = value;
-    newData.colorId = null;
+  editCartItem(item: CartItem) {
+    this.isEditMode = true;
+    this.currentEditingItem = JSON.parse(JSON.stringify(item));
+    if (this.currentEditingItem.categoryId) {
+      this.loadArtNos(this.currentEditingItem.categoryId);
+    }
+    if (this.currentEditingItem.categoryId && this.currentEditingItem.artNoId) {
+      this.fetchColors(
+        this.currentEditingItem.artNoId,
+        this.currentEditingItem.categoryId,
+      );
+    }
+    this.isPopupVisible = true;
   }
 
-  calculateTotalQty() {
-     return this.orderItems.reduce((acc, curr) => acc + (curr.qty || 0), 0);
+  removeCartItem(id: number) {
+    this.cartItems = this.cartItems.filter((item) => item.id !== id);
   }
 
-  onSave() {
-    console.log("Save clicked");
+  getItemTotalPairs(item: CartItem): number {
+    let total = 0;
+    for (const size of item.sizes) {
+      if (size.qty > 0) {
+        total += size.qty * (size.pairQty || 1);
+      }
+    }
+    return total;
   }
 
-  onSubmit() {
-    console.log("Submit clicked");
+  getCartTotalPairs(): number {
+    let total = 0;
+    for (const item of this.cartItems) {
+      total += this.getItemTotalPairs(item);
+    }
+    return total;
+  }
+
+  getCartActiveSizes(item: CartItem) {
+    return item.sizes.filter((s) => s.qty > 0);
+  }
+
+  // Helpers for display
+  getCategoryName(id: number | null): string {
+    return this.categories.find((c) => c.id === id)?.name || '';
+  }
+
+  getArtNoName(id: any): string {
+    return this.artNos.find((a) => a === id) || '';
+  }
+
+  getArtNoImage(id: any): string {
+    return this.currentEditingItem?.imageUrl || '';
+  }
+
+  getColor(id: string | null): any {
+    return this.colors.find((c) => c.id === id);
+  }
+
+  getSizeName(sizeId: string): string {
+    return this.sizeConfigurations.find((c) => c.id === sizeId)?.name || '';
+  }
+
+  getSizePackQty(sizeId: string): number | null {
+    return (
+      this.sizeConfigurations.find((c) => c.id === sizeId)?.packQty || null
+    );
+  }
+
+  getSizeDescription(sizeId: string): string {
+    return (
+      this.sizeConfigurations.find((c) => c.id === sizeId)?.description || ''
+    );
+  }
+
+  submitOrder() {
+    console.log('Order Submitted', this.cartItems);
+    alert('Order Submitted!');
   }
 }
 
@@ -242,10 +717,12 @@ export class NewOrderComponent implements OnInit {
     DxDateBoxModule,
     DxDataGridModule,
     DxTextAreaModule,
-    DxButtonModule
+    DxButtonModule,
+    DxPopupModule,
+    DxTextBoxModule,
   ],
   declarations: [NewOrderComponent],
   exports: [NewOrderComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class NewOrderModule { }
+export class NewOrderModule {}
