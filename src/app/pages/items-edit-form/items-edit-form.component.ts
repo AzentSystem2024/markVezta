@@ -1249,6 +1249,25 @@ export class ItemsEditFormComponent implements OnInit {
       finalCompanyIds = [];
     }
 
+    const loggedInCompanyId =
+      this.selected_Company_id ||
+      this.companyId ||
+      JSON.parse(sessionStorage.getItem('savedUserData') || '{}')?.SELECTED_COMPANY?.COMPANY_ID;
+
+    if (
+      loggedInCompanyId !== null &&
+      loggedInCompanyId !== undefined &&
+      String(loggedInCompanyId) !== '0' &&
+      String(loggedInCompanyId) !== ''
+    ) {
+      const loggedInId = !isNaN(Number(loggedInCompanyId))
+        ? Number(loggedInCompanyId)
+        : loggedInCompanyId;
+      if (!finalCompanyIds.includes(loggedInId)) {
+        finalCompanyIds.push(loggedInId);
+      }
+    }
+
     const items = this.itemData; // Adjust if needed based on your form structure
     const payload = {
       ...this.itemData,

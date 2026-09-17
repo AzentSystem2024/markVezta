@@ -552,6 +552,25 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       finalCompanyIds = [];
     }
 
+    const loggedInCompanyId =
+      this.selected_Company_id ||
+      this.companyId ||
+      JSON.parse(sessionStorage.getItem('savedUserData') || '{}')?.SELECTED_COMPANY?.COMPANY_ID;
+
+    if (
+      loggedInCompanyId !== null &&
+      loggedInCompanyId !== undefined &&
+      String(loggedInCompanyId) !== '0' &&
+      String(loggedInCompanyId) !== ''
+    ) {
+      const loggedInId = !isNaN(Number(loggedInCompanyId))
+        ? Number(loggedInCompanyId)
+        : loggedInCompanyId;
+      if (!finalCompanyIds.includes(loggedInId)) {
+        finalCompanyIds.push(loggedInId);
+      }
+    }
+
     return {
       ...this.newItems,
       COMPANY_ID: finalCompanyIds,
