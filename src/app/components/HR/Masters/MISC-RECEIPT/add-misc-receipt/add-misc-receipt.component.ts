@@ -271,7 +271,7 @@ export class AddMiscReceiptComponent {
     this.miscFormData.DEPT_ID = data.DEPT_ID ? Number(data.DEPT_ID) : null;
   }
 
-  onAddNewRow() {}
+  onAddNewRow() { }
 
   focusTaxRegn() {
     this.taxRegnRef.instance.focus();
@@ -637,7 +637,7 @@ export class AddMiscReceiptComponent {
     }
   }
 
-  calculateTaxAmount() {}
+  calculateTaxAmount() { }
 
   private formatDate(date: Date | string): string {
     if (!date) return '';
@@ -767,33 +767,53 @@ export class AddMiscReceiptComponent {
     const validRows = this.getValidInvoiceRows();
     const details: any[] = [];
 
+    // validRows.forEach((row) => {
+    //   const selectedLedger = this.ledgerList.find(
+    //     (l) => l.HEAD_CODE === row.ledgerCode,
+    //   );
+    //   if (!selectedLedger) return;
+
+    //   const expenseHeadId = selectedLedger.HEAD_ID;
+    //   const payHeadId = this.miscFormData.PAY_HEAD_ID;
+    //   const amount = Number(row.AMOUNT) || 0;
+    //   const remarks = row.REMARKS || '';
+
+    //   // ✅ Debit: Expense / Adjustment ledger
+    //   details.push({
+    //     HEAD_ID: expenseHeadId,
+    //     REMARKS: remarks,
+    //     DEBIT_AMOUNT: amount,
+    //     CREDIT_AMOUNT: 0,
+    //     OPP_HEAD_ID: payHeadId,
+    //   });
+
+    //   // ✅ Credit: Cash / Bank / Adjustment
+    //   details.push({
+    //     HEAD_ID: payHeadId,
+    //     REMARKS: remarks,
+    //     DEBIT_AMOUNT: 0,
+    //     CREDIT_AMOUNT: amount,
+    //     OPP_HEAD_ID: expenseHeadId,
+    //   });
+    // });
+
     validRows.forEach((row) => {
       const selectedLedger = this.ledgerList.find(
-        (l) => l.HEAD_CODE === row.ledgerCode,
+        (l) => l.HEAD_CODE === row.ledgerCode
       );
+
       if (!selectedLedger) return;
 
       const expenseHeadId = selectedLedger.HEAD_ID;
-      const payHeadId = this.miscFormData.PAY_HEAD_ID;
       const amount = Number(row.AMOUNT) || 0;
       const remarks = row.REMARKS || '';
 
-      // ✅ Debit: Expense / Adjustment ledger
       details.push({
         HEAD_ID: expenseHeadId,
         REMARKS: remarks,
         DEBIT_AMOUNT: amount,
         CREDIT_AMOUNT: 0,
-        OPP_HEAD_ID: payHeadId,
-      });
-
-      // ✅ Credit: Cash / Bank / Adjustment
-      details.push({
-        HEAD_ID: payHeadId,
-        REMARKS: remarks,
-        DEBIT_AMOUNT: 0,
-        CREDIT_AMOUNT: amount,
-        OPP_HEAD_ID: expenseHeadId,
+        OPP_HEAD_ID: this.miscFormData.PAY_HEAD_ID,
       });
     });
 
@@ -1306,4 +1326,4 @@ export class AddMiscReceiptComponent {
   exports: [AddMiscReceiptComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddMiscReceiptModule {}
+export class AddMiscReceiptModule { }

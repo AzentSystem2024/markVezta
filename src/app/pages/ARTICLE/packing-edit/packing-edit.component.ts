@@ -114,6 +114,7 @@ export class PackingEditComponent {
   ItemListDataSource: any[] = [];
   Default_company_Type: any;
   isHoStore: boolean;
+  Unit: any;
 
   constructor(private dataService: DataService) {
     this.sesstion_Details();
@@ -198,27 +199,10 @@ export class PackingEditComponent {
       NAME: 'PACKING_PRODUCTION_UNITS',
       COMPANY_TYPE: this.Default_company_Type
     };
-    // this.dataService.getDropdownData(payload).subscribe((response: any) => {
-    //   this.produCtionUnits = response;
-    // });
-    this.dataService.getDropdownData(payload).subscribe({
-      next: (response: any) => {
-        console.log('Production Units Response:', response);
-
-        this.produCtionUnits = Array.isArray(response)
-          ? [...response]
-          : [];
-
-        console.log(
-          'Production Units after binding:',
-          this.produCtionUnits
-        );
-      },
-      error: (error) => {
-        console.error('Production Unit API Error:', error);
-        this.produCtionUnits = [];
-      }
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      this.produCtionUnits = response;
     });
+
     const payload1 = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'MATERIAL_UNITS',
@@ -419,6 +403,7 @@ export class PackingEditComponent {
       };
       console.log(this.PackingData, 'UPDATED PACKING DATA');
       this.totalQuantity = this.PackingData.PAIR_QTY;
+      this.Unit = this.PackingData.UNIT_ID
       console.log(this.totalQuantity);
       this.isArticleFieldsDisabled = true;
 
