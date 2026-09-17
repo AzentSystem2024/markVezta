@@ -381,6 +381,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
   formItemsData: any = {
     COMPANY_ID: null,
+    item_companies: [],
     ITEM_CODE: '',
     BARCODE: '',
     DESCRIPTION: '',
@@ -571,9 +572,14 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
       }
     }
 
+    const singleCompId = loggedInCompanyId
+      ? (!isNaN(Number(loggedInCompanyId)) ? Number(loggedInCompanyId) : loggedInCompanyId)
+      : (this.companyId || this.selected_Company_id || null);
+
     return {
       ...this.newItems,
-      COMPANY_ID: finalCompanyIds,
+      COMPANY_ID: singleCompId,
+      item_companies: finalCompanyIds,
       UOM_PURCH: this.newItems.UOM_PURCH ? String(this.newItems.UOM_PURCH) : '',
 
       ITEM_STORES: mappedStores,
@@ -593,7 +599,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
 
   onCompanyChanged(event: any) {
     this.selectedCompanyIds = event.value || [];
-    this.newItems.COMPANY_ID = Array.isArray(this.selectedCompanyIds)
+    this.newItems.item_companies = Array.isArray(this.selectedCompanyIds)
       ? this.selectedCompanyIds
       : (this.selectedCompanyIds ? [this.selectedCompanyIds] : []);
   }
