@@ -13,6 +13,7 @@
             [searchEnabled]="true"
             [width]="380"
             placeholder="Select Email Type"
+            [readOnly]="isEditing"
           >
             <dx-validator>
               <dxi-validation-rule
@@ -82,9 +83,9 @@
         </div>
       </div>
 
-      <!-- Password and Confirm Password Row -->
-      <div class="form-row two-cols">
-        <div class="field-col half-width">
+      <!-- Password Row -->
+      <div class="form-row">
+        <div class="field-col full-width">
           <label class="field-label">Password <span class="required-star">*</span></label>
           <dx-text-box
             [mode]="isPasswordVisible ? 'text' : 'password'"
@@ -103,35 +104,6 @@
               <dxi-validation-rule
                 type="required"
                 message="Password is required"
-              ></dxi-validation-rule>
-            </dx-validator>
-          </dx-text-box>
-        </div>
-        <div class="field-col half-width right-col">
-          <label class="field-label right-label">Confirm Password <span class="required-star">*</span></label>
-          <dx-text-box
-            [mode]="isConfirmPasswordVisible ? 'text' : 'password'"
-            [(value)]="confirmPassword"
-            valueChangeEvent="keyup input change"
-            class="field-input"
-            [class.password-matched]="isPasswordMatching"
-            [inputAttr]="{ autocomplete: 'new-password', onpaste: 'return false;' }"
-            placeholder="Confirm Password"
-          >
-            <dxi-button
-              name="confirmPasswordToggle"
-              location="after"
-              [options]="confirmPasswordButtonOptions"
-            ></dxi-button>
-            <dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="Confirm Password is required"
-              ></dxi-validation-rule>
-              <dxi-validation-rule
-                type="compare"
-                [comparisonTarget]="passwordComparison"
-                message="Passwords do not match"
               ></dxi-validation-rule>
             </dx-validator>
           </dx-text-box>
