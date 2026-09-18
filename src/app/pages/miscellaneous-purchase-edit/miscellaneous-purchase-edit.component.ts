@@ -11,7 +11,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -37,6 +39,8 @@ import {
   DxSelectBoxComponent,
   DxNumberBoxComponent,
   DxButtonComponent,
+  DxTagBoxModule,
+  DxLoadIndicatorModule
 } from 'devextreme-angular';
 import {
   DxoItemModule,
@@ -146,9 +150,30 @@ export class MiscellaneousPurchaseEditComponent {
   subType: boolean = false;
   subTypeList: any;
 
+  // Print popup related variables
+  isTemplatePopupVisible = false;
+  templateList: any[] = [];
+  selectedTemplate: string | null = null;
+  isPreviewPopupVisible = false;
+  isLoadingPdf = false;
+  pdfBlobUrl: string = '';
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  currentPdfBlob: Blob | null = null;
+
+  isEmailPopupVisible = false;
+  emailSender: string = '';
+  emailReceivers: string[] = [];
+  selectedEmails: string[] = [];
+  emailSubject: string = '';
+  emailBody: string = '';
+  emailSettingsData: any = null;
+  isSendingEmail = false;
+
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -1290,6 +1315,148 @@ export class MiscellaneousPurchaseEditComponent {
     );
   }
 
+  fetchTemplates() {
+    fetch(environment.apiUrl + 'Reports')
+      .then(res => res.json())
+      .then(data => {
+        // Category 27 is for MiscPurchaseInvoice
+        this.templateList = data.filter((t: any) => t.categoryId === 27);
+      })
+      .catch(err => console.error('Error fetching templates:', err));
+  }
+
+  viewPdfDMGT(): void {
+    if (this.templateList.length === 0) {
+      this.fetchTemplates();
+    }
+    this.pdfPreviewUrl = null;
+    this.pdfBlobUrl = '';
+    this.selectedTemplate = null;
+    this.isTemplatePopupVisible = true;
+  }
+
+  previewSelectedTemplate(): void {
+    if (!this.selectedTemplate) return;
+    this.isTemplatePopupVisible = false;
+    this.isPreviewPopupVisible = true;
+    this.isLoadingPdf = true;
+    
+    const docNo = this.creditFormData?.[0]?.PURCH_NO || this.creditFormData?.[0]?.DOC_NO || '';
+    const transId = this.creditFormData?.[0]?.TRANS_ID;
+    
+    if (!transId || transId === 0) {
+      alert("Please save the document before generating a preview.");
+      this.isPreviewPopupVisible = false;
+      this.isLoadingPdf = false;
+      return;
+    }
+
+    const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?miscPurchId=${transId}&miscPurchNo=${encodeURIComponent(docNo)}`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob: Blob) => {
+        this.currentPdfBlob = blob;
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfBlobUrl = objectUrl;
+        this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+        this.isLoadingPdf = false;
+      }
+    });
+  }
+
+  printPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = this.pdfBlobUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
+  }
+
+  downloadPdf(): void {
+    if (!this.pdfBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = this.pdfBlobUrl;
+    a.download = `${this.selectedTemplate || 'MiscPurchaseInvoice'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  sendPdf(): void {
+    this.isEmailPopupVisible = true;
+    this.emailSender = '';
+    this.emailReceivers = [];
+    this.selectedEmails = [];
+    this.emailSubject = '';
+    this.emailBody = '';
+    this.emailSettingsData = null;
+    
+    // Category 27
+    this.dataService.selectEmailSettings(27).subscribe((res: any) => {
+      if (res && res.Data) {
+        this.emailSettingsData = res.Data;
+        this.emailSender = res.Data.SENDER_ID || '';
+        this.emailSubject = res.Data.EMAIL_SUBJECT || '';
+        this.emailBody = res.Data.EMAIL_CONTENT || '';
+        if (res.Data.RECEIVER_ID) {
+          const emails = res.Data.RECEIVER_ID.split(/[,\s]+/).filter((e: string) => e.trim().length > 0);
+          this.emailReceivers = emails;
+        }
+      }
+    });
+  }
+
+  sendEmailConfirm(): void {
+    if (this.selectedEmails.length === 0) {
+      alert("Please select at least one recipient.");
+      return;
+    }
+    if (!this.currentPdfBlob) {
+      alert("No PDF generated to attach.");
+      return;
+    }
+
+    this.isSendingEmail = true;
+    
+    const toEmail = this.selectedEmails[0];
+    const bccEmails = this.selectedEmails.slice(1).join(',');
+    
+    const formData = new FormData();
+    formData.append('To', toEmail);
+    formData.append('Bcc', bccEmails);
+    formData.append('Subject', this.emailSubject);
+    formData.append('Body', this.emailBody);
+    formData.append('EmailType', '27');
+    
+    const filename = `${this.selectedTemplate || 'MiscPurchaseInvoice'}.pdf`;
+    formData.append('Attachment', this.currentPdfBlob, filename);
+    
+    this.dataService.sendEmailWithAttachment(formData).subscribe({
+      next: (res: any) => {
+        this.isSendingEmail = false;
+        if (res && res.Success) {
+          notify({ message: 'Email sent successfully', position: { at: 'top right', my: 'top right' } }, 'success');
+          this.isEmailPopupVisible = false;
+        } else {
+          alert('Failed to send email: ' + (res?.Message || 'Unknown error'));
+        }
+      },
+      error: (err: any) => {
+        this.isSendingEmail = false;
+        console.error('Email error:', err);
+        alert('An error occurred while sending the email.');
+      }
+    });
+  }
+
   cancel() {
     this.popupClosed.emit();
   }
@@ -1325,6 +1492,8 @@ export class MiscellaneousPurchaseEditComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
+    DxTagBoxModule,
+    DxLoadIndicatorModule,
   ],
   providers: [],
   declarations: [MiscellaneousPurchaseEditComponent],
