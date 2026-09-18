@@ -336,6 +336,13 @@
       ></dx-check-box>
     </div>
     <dx-button
+      text="Print"
+      icon="print"
+      (onClick)="viewPdfDMGT()"
+      stylingMode="outlined"
+      type="default"
+    ></dx-button>
+    <dx-button
       text="Cancel"
       (onClick)="cancel()"
       stylingMode="outlined"
@@ -379,4 +386,121 @@
     <dxi-column dataField="NET_AMOUNT" caption="Net Amount"></dxi-column>
     <dxi-column dataField="BALANCE_AMOUNT" caption="Balance"></dxi-column>
   </dx-data-grid>
+</dx-popup>
+
+<!-- TEMPLATE POPUP -->
+<dx-popup
+  [width]="400"
+  [height]="200"
+  [showTitle]="true"
+  title="Select Print Template"
+  [dragEnabled]="false"
+  [closeOnOutsideClick]="true"
+  [(visible)]="isTemplatePopupVisible"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <div style="display: flex; flex-direction: column; gap: 15px">
+      <dx-select-box
+        [dataSource]="templateList"
+        displayExpr="name"
+        valueExpr="name"
+        [(value)]="selectedTemplate"
+        placeholder="Select a Template"
+      ></dx-select-box>
+      <div style="display: flex; justify-content: flex-end; gap: 10px">
+        <dx-button
+          text="Preview"
+          type="default"
+          stylingMode="contained"
+          (onClick)="previewSelectedTemplate()"
+        ></dx-button>
+        <dx-button
+          text="Cancel"
+          stylingMode="outlined"
+          (onClick)="isTemplatePopupVisible = false"
+        ></dx-button>
+      </div>
+    </div>
+  </div>
+</dx-popup>
+
+<!-- PDF PREVIEW POPUP -->
+<dx-popup
+  [width]="'90%'"
+  [height]="'90%'"
+  [showTitle]="true"
+  title="Preview Misc Purchase Invoice"
+  [dragEnabled]="false"
+  [closeOnOutsideClick]="false"
+  [(visible)]="isPreviewPopupVisible"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'" style="height: 100%; display: flex; flex-direction: column;">
+    <div style="margin-bottom: 10px; display: flex; gap: 10px;">
+      <dx-button text="Print" icon="print" type="default" stylingMode="contained" (onClick)="printPdf()"></dx-button>
+      <dx-button text="Send Email" icon="email" type="success" stylingMode="contained" (onClick)="sendPdf()"></dx-button>
+      <dx-button text="Download" icon="download" type="normal" stylingMode="contained" (onClick)="downloadPdf()"></dx-button>
+    </div>
+    <div style="flex: 1; border: 1px solid #ccc;">
+      <iframe *ngIf="pdfPreviewUrl" [src]="pdfPreviewUrl" style="width: 100%; height: 100%; border: none;"></iframe>
+      <div *ngIf="isLoadingPdf" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+        <dx-load-indicator [visible]="true"></dx-load-indicator>
+        <span style="margin-left: 10px;">Generating PDF...</span>
+      </div>
+    </div>
+  </div>
+</dx-popup>
+
+<!-- SEND EMAIL POPUP -->
+<dx-popup
+  [width]="600"
+  [height]="450"
+  [showTitle]="true"
+  title="Send Email"
+  [dragEnabled]="true"
+  [closeOnOutsideClick]="false"
+  [(visible)]="isEmailPopupVisible"
+  [showCloseButton]="true"
+>
+  <div *dxTemplate="let data of 'content'">
+    <div style="display: flex; flex-direction: column; gap: 15px">
+      
+      <dx-tag-box
+        [items]="emailReceivers"
+        [acceptCustomValue]="true"
+        [(value)]="selectedEmails"
+        label="Receivers (Select Multiple):"
+        labelMode="floating"
+      ></dx-tag-box>
+
+      <dx-text-box
+        [(value)]="emailSubject"
+        label="Subject:"
+        labelMode="floating"
+      ></dx-text-box>
+
+      <dx-text-area
+        [(value)]="emailBody"
+        [height]="120"
+        label="Body:"
+        labelMode="floating"
+      ></dx-text-area>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <dx-button
+          [text]="isSendingEmail ? 'Sending...' : 'Send Email'"
+          type="success"
+          stylingMode="contained"
+          [disabled]="isSendingEmail || selectedEmails.length === 0"
+          (onClick)="sendEmailConfirm()"
+        ></dx-button>
+        <dx-button
+          text="Cancel"
+          stylingMode="outlined"
+          (onClick)="isEmailPopupVisible = false"
+        ></dx-button>
+      </div>
+    </div>
+  </div>
 </dx-popup>
