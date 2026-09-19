@@ -1,37 +1,38 @@
 :host {
   display: block;
-  height: 100%;
-  background-color: #f8f9fa; /* slightly gray background for the whole page */
+  height: 100vh;
 }
 
 .view-wrapper {
-  padding: 20px;
-  height: 100%;
+  height: 100vh;
   overflow-y: auto;
 }
 
 .form-container {
   width: 100%;
-  height: 80vh;
+  height: 90vh;
 }
 
 /* Common utilities */
 .radius-12 { border-radius: 12px; }
 .cursor-pointer { cursor: pointer; }
 
-/* Custom Colors */
-.text-info { color: #3db8d9 !important; }
-.bg-info, .btn-info { background-color: #3db8d9 !important; border-color: #3db8d9 !important; color: white !important;}
-.btn-info:hover { background-color: #2da1c0 !important; border-color: #2da1c0 !important; }
+/* Force Card to respect theme */
+.card {
+  background-color: var(--base-bg) !important;
+  color: var(--text-color);
+  height: 100vh;
+}
 
-.bg-light-blue { background-color: #eaf6fc !important; }
-.btn-light-info { background-color: #d8f1f8 !important; color: #2c3e50 !important; border: none; }
-.bg-light-info { background-color: #eaf6fc !important; color: #3db8d9 !important; }
-
-.btn-light-danger { background-color: #fee2e2 !important; color: #ef4444 !important; border: none; }
-.btn-light-secondary { background-color: #f1f5f9 !important; color: #3db8d9 !important; border: none; }
-
-.btn-white { background-color: #ffffff !important; color: #000000 !important; }
+/* Tabs */
+.toggle-wrapper {
+  background-color: var(--border-color);
+}
+.tab-active {
+  background-color: var(--base-bg);
+  color: var(--text-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
 
 /* DevExtreme overrides */
 ::ng-deep .rounded-input .dx-texteditor-input {
@@ -43,10 +44,8 @@
 }
 ::ng-deep .dx-texteditor.dx-editor-outlined {
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
 }
-
-
 
 /* Color Circle */
 .color-circle {
@@ -54,7 +53,7 @@
   height: 16px;
   border-radius: 50%;
   display: inline-block;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
 }
 
 .color-picker-circle {
@@ -83,15 +82,16 @@
 }
 
 .popup-body {
-  /* hide scrollbar for cleaner look */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none; 
+  -ms-overflow-style: none;  
 }
 .popup-body::-webkit-scrollbar { 
-  display: none; /* WebKit */
+  display: none; 
 }
 
 .qty-control input {
   box-shadow: none !important;
   outline: none !important;
+  background-color: transparent !important;
+  color: var(--text-color) !important;
 }
