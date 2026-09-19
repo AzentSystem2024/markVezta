@@ -18,6 +18,8 @@ import {
   DxPopupModule,
   DxTextBoxModule,
 } from 'devextreme-angular';
+import DataSource from 'devextreme/data/data_source';
+
 export interface SizeConfig {
   id: string;
   name: string;
@@ -43,8 +45,7 @@ export class NewOrderComponent implements OnInit {
   activeTab: 'dealer' | 'subdealer' = 'dealer';
   searchQuery: string = '';
 
-  // Modal State
-  isPopupVisible = false;
+  // Form State
   isEditMode = false;
 
   isLoadingDealers = false;
@@ -67,6 +68,7 @@ export class NewOrderComponent implements OnInit {
   colors: any[] = [];
   categories: any[] = [];
   artNos: any[] = [];
+  artNosDataSource: any = null;
   sizeConfigurations: SizeConfig[] = [];
 
   warehouses: any[] = [];
@@ -246,8 +248,12 @@ export class NewOrderComponent implements OnInit {
               this.allArtNos = res.split(',').filter((s) => s.trim() !== '');
             }
           }
-          // Initially load only the first 50 to avoid freezing
-          this.artNos = this.allArtNos.slice(0, 50);
+          // Use DevExtreme DataSource for native searching and pagination
+          this.artNosDataSource = new DataSource({
+            store: this.allArtNos,
+            paginate: true,
+            pageSize: 50,
+          });
         },
         (error) => {
           this.isLoadingArtNos = false;
@@ -256,17 +262,7 @@ export class NewOrderComponent implements OnInit {
       );
   }
 
-  onArtNoInput(e: any) {
-    const searchTerm = e.event?.target?.value || '';
-    if (searchTerm) {
-      // Filter values starting with the search term (case-insensitive) and limit to 50
-      this.artNos = this.allArtNos
-        .filter((a) => a.toLowerCase().startsWith(searchTerm.toLowerCase()))
-        .slice(0, 50);
-    } else {
-      this.artNos = this.allArtNos.slice(0, 50);
-    }
-  }
+  // onArtNoInput removed because DevExtreme DataSource handles searching natively
 
   onArtNoChange(e: any) {
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
@@ -368,14 +364,12 @@ export class NewOrderComponent implements OnInit {
     return '#cccccc'; // Default fallback color
   }
 
-  openNewOrder() {
+  cancelForm() {
     this.isEditMode = false;
-    this.currentEditingItem = this.getEmptyCartItem();
-    this.isPopupVisible = true;
-  }
-
-  closePopup() {
-    this.isPopupVisible = false;
+    this.onColorChange(this.currentEditingItem.colorId);
+    // this.currentEditingItem = this.getEmptyCartItem();
+    // this.artNos = [];
+    // this.colors = [];
   }
 
   selectColor(colorId: string) {
@@ -420,8 +414,7 @@ export class NewOrderComponent implements OnInit {
               cutSizeQuantities: {},
               combination: c.IsCutSize
                 ? ''
-                : (c.Combination || '')
-                    .replace(/,\s*/g, ', '),
+                : (c.Combination || '').replace(/,\s*/g, ', '),
               pairQty: c.PairQty,
               qty: 0,
             }));
@@ -505,7 +498,9 @@ export class NewOrderComponent implements OnInit {
 
   closeCutSizePopup() {
     if (this.currentCutSize) {
-      if (Object.keys(this.currentCutSize.cutSizeQuantities || {}).length === 0) {
+      if (
+        Object.keys(this.currentCutSize.cutSizeQuantities || {}).length === 0
+      ) {
         this.currentCutSize.qty = 0;
       }
     }
@@ -614,18 +609,21 @@ export class NewOrderComponent implements OnInit {
         (item) => item.id === this.currentEditingItem.id,
       );
       if (index !== -1) {
-        this.cartItems[index] = JSON.parse(
-          JSON.stringify(this.currentEditingItem),
+        const updatedItem = JSON.parse(JSON.stringify(this.currentEditingItem));
+        updatedItem.sizes.forEach(
+          (size: any) => (size.cartId = updatedItem.id),
         );
+        this.cartItems[index] = updatedItem;
       }
     } else {
       const newItem = JSON.parse(JSON.stringify(this.currentEditingItem));
       newItem.id = Date.now();
+      newItem.sizes.forEach((size: any) => (size.cartId = newItem.id));
       this.cartItems.push(newItem);
     }
 
     console.log('Cart Data: ', this.cartItems);
-    this.isPopupVisible = false;
+    this.cancelForm();
   }
 
   editCartItem(item: CartItem) {
@@ -640,7 +638,6 @@ export class NewOrderComponent implements OnInit {
         this.currentEditingItem.categoryId,
       );
     }
-    this.isPopupVisible = true;
   }
 
   removeCartItem(id: number) {
@@ -675,7 +672,7 @@ export class NewOrderComponent implements OnInit {
   }
 
   getArtNoName(id: any): string {
-    return this.artNos.find((a) => a === id) || '';
+    return id || '';
   }
 
   getArtNoImage(id: any): string {

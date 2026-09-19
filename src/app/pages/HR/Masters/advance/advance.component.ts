@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import {
@@ -41,7 +42,7 @@ import { ExportService } from 'src/app/services/export.service';
   templateUrl: './advance.component.html',
   styleUrls: ['./advance.component.scss'],
 })
-export class AdvanceComponent {
+export class AdvanceComponent implements OnInit{
   // 1. VIEW CHILDS
   // ==========================================
   @ViewChild('formValidationGroup', { static: false })
@@ -156,26 +157,6 @@ export class AdvanceComponent {
   // 7. GRID ACTION BUTTON CONFIGURATIONS
   // ==========================================
 
-
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Filters',
-    stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilters(),
-  };
-
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
-  }
-
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -186,12 +167,13 @@ export class AdvanceComponent {
     text: '',
   };
 
-  refreshGrid() {
-    if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
-    }
-    this.get_advance_list();
-  }
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
   addButtonOptions = {
     type: 'default',
@@ -332,6 +314,24 @@ export class AdvanceComponent {
     this.getLedgerCodeDropdown();
   }
 
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_advance_list();
+  }
+
   // 9. DATA FETCHING METHODS
   // ==========================================
   sesstion_Details() {
@@ -449,7 +449,7 @@ export class AdvanceComponent {
         this.ledgerList = response?.Data || [];
         this.filterLedgerList();
       },
-      error: () => { },
+      error: () => {},
     });
   }
 
@@ -783,7 +783,11 @@ export class AdvanceComponent {
       return false;
     }
 
-    return row.STATUS === 'Open' || row.STATUS === 'Verified' || row.STATUS === 'Approved';
+    return (
+      row.STATUS === 'Open' ||
+      row.STATUS === 'Verified' ||
+      row.STATUS === 'Approved'
+    );
   }
 
   getVerifyApproveTitle(row: any): string {
@@ -1076,4 +1080,4 @@ export class AdvanceComponent {
   declarations: [AdvanceComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AdvanceModule { }
+export class AdvanceModule {}
