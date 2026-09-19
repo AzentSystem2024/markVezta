@@ -1,202 +1,93 @@
-<dx-tab-panel
-  class="form-tabs"
-  [(selectedIndex)]="selectedTabIndex"
-  [animationEnabled]="true"
-  [deferRendering]="false"
-  style="border: none"
->
+<dx-tab-panel class="form-tabs" [(selectedIndex)]="selectedTabIndex" [animationEnabled]="true" [deferRendering]="false"
+  style="border: none">
   <dxi-item title="Details">
     <dx-validation-group class="form-grid" #formValidationGroup>
       <div class="form-field">
         <dx-validation-group #ArtnoValidationGroup>
-          <dx-text-box
-            label="Art No."
-            [(value)]="PackingData.ART_NO"
-            labelMode="floating"
-            placeholder="Art No."
-            [disabled]="isArticleFieldsDisabled"
-            (onValueChanged)="updateItemDescription()"
-            ><dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="This field is required"
-              ></dxi-validation-rule> </dx-validator
-          ></dx-text-box>
+          <dx-text-box label="Art No." [(value)]="PackingData.ART_NO" labelMode="floating" placeholder="Art No."
+            [disabled]="isArticleFieldsDisabled" (onValueChanged)="updateItemDescription()"><dx-validator>
+              <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+            </dx-validator></dx-text-box>
         </dx-validation-group>
       </div>
       <div class="form-field">
         <dx-validation-group #ColorValidationGroup>
-          <dx-select-box
-            label="Color"
-            labelMode="floating"
-            placeholder="Color"
-            [(value)]="PackingData.COLOR"
-            [dataSource]="colorList"
-            valueExpr="DESCRIPTION"
-            displayExpr="DESCRIPTION"
-            [searchEnabled]="true"
-            [disabled]="isArticleFieldsDisabled"
-            (onValueChanged)="updateItemDescription()"
-            ><dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="This field is required"
-              ></dxi-validation-rule>
+          <dx-select-box label="Color" labelMode="floating" placeholder="Color" [(value)]="PackingData.COLOR"
+            [dataSource]="colorList" valueExpr="DESCRIPTION" displayExpr="DESCRIPTION" [searchEnabled]="true"
+            [disabled]="isArticleFieldsDisabled" (onValueChanged)="updateItemDescription()"><dx-validator>
+              <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </dx-validation-group>
       </div>
       <div class="form-field">
         <dx-validation-group #CategoryValidationGroup>
-          <dx-select-box
-            label="Category"
-            labelMode="floating"
-            placeholder="Category"
-            [dataSource]="categoryList"
-            valueExpr="ID"
-            [(value)]="PackingData.CATEGORY_ID"
-            displayExpr="DESCRIPTION"
-            [searchEnabled]="true"
-            [disabled]="isArticleFieldsDisabled"
-            (onValueChanged)="updateItemDescription()"
-            ><dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="This field is required"
-              ></dxi-validation-rule>
+          <dx-select-box label="Category" labelMode="floating" placeholder="Category" [dataSource]="categoryList"
+            valueExpr="ID" [(value)]="PackingData.CATEGORY_ID" displayExpr="DESCRIPTION" [searchEnabled]="true"
+            [disabled]="isArticleFieldsDisabled" (onValueChanged)="updateItemDescription()"><dx-validator>
+              <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
             </dx-validator>
           </dx-select-box>
         </dx-validation-group>
       </div>
 
       <div class="form-field">
-        <dx-select-box
-          label="Type *"
-          labelMode="floating"
-          placeholder="Type"
-          [(value)]="PackingData.ARTICLE_TYPE"
-          [dataSource]="typeList"
-          valueExpr="ID"
-          displayExpr="DESCRIPTION"
-          [searchEnabled]="true"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule>
+        <dx-select-box label="Type *" labelMode="floating" placeholder="Type" [(value)]="PackingData.ARTICLE_TYPE"
+          [dataSource]="typeList" valueExpr="ID" displayExpr="DESCRIPTION" [searchEnabled]="true"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
           </dx-validator>
         </dx-select-box>
       </div>
       <div class="form-field">
-        <dx-select-box
-          label="Brand *"
-          labelMode="floating"
-          placeholder="Brand"
-          [dataSource]="brandList"
-          [(value)]="PackingData.BRAND_ID"
-          valueExpr="ID"
-          displayExpr="DESCRIPTION"
-          (onValueChanged)="updateItemDescription()"
-          [searchEnabled]="true"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule>
+        <dx-select-box label="Brand *" labelMode="floating" placeholder="Brand" [dataSource]="brandList"
+          [(value)]="PackingData.BRAND_ID" valueExpr="ID" displayExpr="DESCRIPTION"
+          (onValueChanged)="updateItemDescription()" [searchEnabled]="true"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
           </dx-validator>
         </dx-select-box>
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Description *"
-          [(value)]="PackingData.DESCRIPTION"
-          labelMode="floating"
-          placeholder="Description"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        <dx-text-box label="Description *" [(value)]="PackingData.DESCRIPTION" labelMode="floating"
+          placeholder="Description"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-text-box>
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Serial No."
-          labelMode="floating"
-          [(value)]="PackingData.ART_SERIAL"
-          placeholder="Next Serial No."
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        <dx-text-box label="Serial No." labelMode="floating" [(value)]="PackingData.ART_SERIAL"
+          placeholder="Next Serial No."><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-text-box>
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Part No. *"
-          [(value)]="PackingData.PART_NO"
-          labelMode="floating"
-          placeholder="Part No."
-          [readOnly]="true"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        <dx-text-box label="Part No. *" [(value)]="PackingData.PART_NO" labelMode="floating" placeholder="Part No."
+          [readOnly]="true"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-text-box>
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Item Code"
-          [(value)]="PackingData.ALIAS_NO"
-          labelMode="floating"
-          placeholder="Item Code"
-          [readOnly]="true"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        <dx-text-box label="Item Code" [(value)]="PackingData.ALIAS_NO" labelMode="floating" placeholder="Item Code"
+          [readOnly]="true"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-text-box>
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Item Description *"
-          [(value)]="PackingData.ITEM_DESCRIPTION"
-          labelMode="floating"
-          [readOnly]="true"
-          placeholder="Art No."
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        <dx-text-box label="Item Description *" [(value)]="PackingData.ITEM_DESCRIPTION" labelMode="floating"
+          [readOnly]="true" placeholder="Art No."><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-text-box>
       </div>
 
       <div class="form-field">
         <dx-validation-group #UnitValidationGroup>
-          <dx-tag-box
-            label="Production Unit"
-            labelMode="floating"
-            placeholder="Production Unit"
-            [dataSource]="produCtionUnits"
-            valueExpr="ID"
-            displayExpr="DESCRIPTION"
-            [searchEnabled]="true"
-            [selectAllMode]="'allPages'"
-            [(value)]="PackingData.UNIT_ID"
-            [showSelectionControls]="true"
-            [hint]="selectedUnitsHint"
-            [readOnly]="false"
-            [disabled]="false"
-          >
+          <dx-tag-box label="Production Unit" labelMode="floating" placeholder="Production Unit"
+            [dataSource]="produCtionUnits" valueExpr="ID" displayExpr="DESCRIPTION" [searchEnabled]="true"
+            [selectAllMode]="'allPages'" [(value)]="PackingData.UNIT_ID" [showSelectionControls]="true"
+            [hint]="selectedUnitsHint" [readOnly]="false" [disabled]="false">
             <!-- <dx-validator>
               <dxi-validation-rule
                 type="required"
@@ -208,54 +99,26 @@
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Packing Order No. *"
-          [(value)]="PackingData.ORDER_NO"
-          labelMode="floating"
-          [readOnly]="true"
-          placeholder="Packing Order No."
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        <dx-text-box label="Packing Order No. *" [(value)]="PackingData.ORDER_NO" labelMode="floating" [readOnly]="true"
+          placeholder="Packing Order No."><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-text-box>
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          label="Standard Packing *"
-          [(value)]="PackingData.STANDARD_PACKING"
-          labelMode="floating"
-          placeholder="Standard Packing"
-          [showSpinButtons]="true"
-          (onValueChanged)="updateItemDescription()"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-text-box>
+        <dx-text-box label="Standard Packing *" [(value)]="PackingData.STANDARD_PACKING" labelMode="floating"
+          placeholder="Standard Packing" [showSpinButtons]="true"
+          (onValueChanged)="updateItemDescription()"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-text-box>
       </div>
 
       <div class="form-field">
-        <dx-number-box
-          label="MRP *"
-          [(value)]="PackingData.PACK_PRICE"
-          [format]="'#,##0.##'"
-          labelMode="floating"
-          placeholder="MRP"
-          (onValueChanged)="updateItemDescription()"
-          [min]="0"
-          [showSpinButtons]="true"
-          [format]="'#,##0.00'"
-          [inputAttr]="{ style: 'text-align: right;' }"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-number-box>
+        <dx-number-box label="MRP *" [(value)]="PackingData.PACK_PRICE" [format]="'#,##0.##'" labelMode="floating"
+          placeholder="MRP" (onValueChanged)="updateItemDescription()" [min]="0" [showSpinButtons]="true"
+          [format]="'#,##0.00'" [inputAttr]="{ style: 'text-align: right;' }"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-number-box>
       </div>
 
       <!-- <div class="form-field">
@@ -268,75 +131,37 @@
   </div> -->
 
       <div class="form-field">
-        <dx-number-box
-          label="Standard Price"
-          [format]="'#,##0.##'"
-          labelMode="floating"
-          placeholder="Standard Price"
-          [min]="0"
-          [showSpinButtons]="true"
-          [(value)]="PackingData.STD_PRICE"
-          [readOnly]="true"
-          [format]="'#,##0.00'"
-          [inputAttr]="{ style: 'text-align: right;' }"
-          ><dx-validator>
-            <dxi-validation-rule
-              type="required"
-              message="This field is required"
-            ></dxi-validation-rule> </dx-validator
-        ></dx-number-box>
+        <dx-number-box label="Standard Price" [format]="'#,##0.##'" labelMode="floating" placeholder="Standard Price"
+          [min]="0" [showSpinButtons]="true" [(value)]="PackingData.STD_PRICE" [readOnly]="true" [format]="'#,##0.00'"
+          [inputAttr]="{ style: 'text-align: right;' }"><dx-validator>
+            <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+          </dx-validator></dx-number-box>
       </div>
 
       <div class="form-field">
         <div class="d-flex" style="justify-content: space-between">
-          <dx-date-box
-            label="Effect From"
-            [displayFormat]="'dd/MM/yyyy'"
-            labelMode="floating"
-            placeholder="Effect From"
-            [(value)]="PackingData.STD_PRICE_EFFECT_FROM"
-            [showSpinButtons]="true"
-            [readOnly]="true"
-            class="me-2"
-            ><dx-validator>
-              <dxi-validation-rule
-                type="required"
-                message="This field is required"
-              ></dxi-validation-rule> </dx-validator
-          ></dx-date-box>
+          <dx-date-box label="Effect From" [displayFormat]="'dd/MM/yyyy'" labelMode="floating" placeholder="Effect From"
+            [(value)]="PackingData.STD_PRICE_EFFECT_FROM" [showSpinButtons]="true" [readOnly]="true"
+            class="me-2"><dx-validator>
+              <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
+            </dx-validator></dx-date-box>
 
           <div class="d-flex" style="gap: 5px">
             <!-- Change Button -->
-            <dx-button
-              text="Update"
-              stylingMode="contained"
-              type="default"
-              (onClick)="onChangePrice()"
-            >
+            <dx-button text="Update" stylingMode="contained" type="default" (onClick)="onChangePrice()">
             </dx-button>
 
             <!-- View Button -->
-            <dx-button
-              text="View"
-              stylingMode="outlined"
-              type="normal"
-              icon="eyeopen"
-              class="view-btn"
-              (onClick)="onViewPriceHistory()"
-            >
+            <dx-button text="View" stylingMode="outlined" type="normal" icon="eyeopen" class="view-btn"
+              (onClick)="onViewPriceHistory()">
             </dx-button>
           </div>
         </div>
       </div>
 
       <div class="form-field">
-        <dx-text-box
-          class="center-numberbox"
-          labelMode="floating"
-          label="Pair Quantity"
-          [(value)]="totalQuantity"
-          [readOnly]="true"
-        ></dx-text-box>
+        <dx-text-box class="center-numberbox" labelMode="floating" label="Pair Quantity" [(value)]="totalQuantity"
+          [readOnly]="true"></dx-text-box>
       </div>
 
       <!-- <div class="form-field mt-2">
@@ -345,103 +170,44 @@
 
       <div class="checkbox-container">
         <div style="display: flex">
-          <dx-check-box
-            text="Purchasable Item"
-            [(value)]="PackingData.IS_PURCHASABLE"
-            (onValueChanged)="onPurchasableChanged($event)"
-          ></dx-check-box>
-          <div
-            class="form-field"
-            *ngIf="PackingData.IS_PURCHASABLE"
-            class="supplier-box"
-          >
-            <dx-select-box
-              label="Supplier"
-              [searchEnabled]="true"
-              labelMode="floating"
-              placeholder="Supplier"
-              [dataSource]="materialUnits"
-              valueExpr="ID"
-              displayExpr="DESCRIPTION"
-              [(value)]="PackingData.SUPP_ID"
-              ><dx-validator>
-                <dxi-validation-rule
-                  type="required"
-                  message="This field is required"
-                ></dxi-validation-rule>
+          <dx-check-box text="Purchasable Item" [(value)]="PackingData.IS_PURCHASABLE"
+            (onValueChanged)="onPurchasableChanged($event)"></dx-check-box>
+          <div class="form-field" *ngIf="PackingData.IS_PURCHASABLE" class="supplier-box">
+            <dx-select-box label="Supplier" [searchEnabled]="true" labelMode="floating" placeholder="Supplier"
+              [dataSource]="materialUnits" valueExpr="ID" displayExpr="DESCRIPTION"
+              [(value)]="PackingData.SUPP_ID"><dx-validator>
+                <dxi-validation-rule type="required" message="This field is required"></dxi-validation-rule>
               </dx-validator>
             </dx-select-box>
           </div>
         </div>
 
-        <dx-check-box
-          text="Inactive"
-          [(value)]="PackingData.IS_INACTIVE"
-        ></dx-check-box>
+        <dx-check-box text="Inactive" [(value)]="PackingData.IS_INACTIVE"></dx-check-box>
 
-        <dx-check-box
-          text="Any Combination"
-          [(value)]="PackingData.IS_ANY_COMB"
-        ></dx-check-box>
+        <dx-check-box text="Any Combination" [(value)]="PackingData.IS_ANY_COMB"></dx-check-box>
         <!-- <dx-check-box text="Purchasable Item"      [(value)]="PackingData.IS_PURCHASABLE"></dx-check-box> -->
 
-        <dx-check-box
-          text="Export"
-          [(value)]="PackingData.IS_EXPORT"
-        ></dx-check-box>
+        <dx-check-box text="Export" [(value)]="PackingData.IS_EXPORT"></dx-check-box>
       </div>
 
       <div class="image-grid-wrapper">
         <div class="combination">
-          <dx-button
-            text="Reset"
-            hind="Reset form"
-            stylingMode="outlined"
-            (onClick)="clearForm()"
-            class="reset-btn"
-          ></dx-button>
-          <dx-button
-            text="Load Article"
-            stylingMode="contained"
-            (onClick)="loadArticle()"
-            type="default"
-          ></dx-button>
+          <dx-button text="Reset" hind="Reset form" stylingMode="outlined" (onClick)="clearForm()"
+            class="reset-btn"></dx-button>
+          <dx-button text="Load Article" stylingMode="contained" (onClick)="loadArticle()" type="default"></dx-button>
         </div>
-        <dx-data-grid
-          #sizeGrid
-          [dataSource]="PackingEntriesData"
-          [showBorders]="true"
-          [editing]="{ mode: 'cell', allowUpdating: true }"
-          [height]="'240px'"
-          [width]="'100%'"
-          (onRowUpdated)="onQuantityChanged()"
-          [sorting]="{ mode: 'single' }"
-          (onEditorPreparing)="onEditorPreparing($event)"
-          (onSelectionChanged)="onSelectionChanged($event)"
-          [(selectedRowKeys)]="selectedRows"
-          keyExpr="rowKey"
-          [selection]="{
+        <dx-data-grid #sizeGrid [dataSource]="PackingEntriesData" [showBorders]="true"
+          [editing]="{ mode: 'cell', allowUpdating: true }" [height]="'240px'" [width]="'100%'"
+          (onRowUpdated)="onQuantityChanged()" [sorting]="{ mode: 'single' }"
+          (onEditorPreparing)="onEditorPreparing($event)" (onSelectionChanged)="onSelectionChanged($event)"
+          [(selectedRowKeys)]="selectedRows" keyExpr="rowKey" [selection]="{
             mode: 'multiple',
             showCheckBoxesMode: 'always',
-          }"
-        >
-          <dxi-column
-            sortOrder="asc"
-            sortIndex="0"
-            [allowEditing]="false"
-            dataField="SIZE"
-            caption="Size"
-            alignment="center"
-            dataType="number"
-          ></dxi-column>
-          <dxi-column
-            dataField="QUANTITY"
-            sortOrder="asc"
-            sortIndex="0"
-            caption="Quantity"
-            dataType="number"
-            alignment="center"
-          ></dxi-column>
+          }">
+          <dxi-column sortOrder="asc" sortIndex="0" [allowEditing]="false" dataField="SIZE" caption="Size"
+            alignment="center" dataType="number"></dxi-column>
+          <dxi-column dataField="QUANTITY" sortOrder="asc" sortIndex="0" caption="Quantity" dataType="number"
+            alignment="center"></dxi-column>
         </dx-data-grid>
 
         <!-- [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }" -->
@@ -474,14 +240,8 @@
 
         <!-- CURRENT POSITION (move this) -->
         <div class="form-field" style="align-items: end">
-          <dx-text-box
-            class="center-numberbox"
-            labelMode="floating"
-            label="Quantity"
-            style="width: 160px"
-            [(value)]="totalQuantity"
-            [readOnly]="true"
-          ></dx-text-box>
+          <dx-text-box class="center-numberbox" labelMode="floating" label="Quantity" style="width: 160px"
+            [(value)]="totalQuantity" [readOnly]="true"></dx-text-box>
         </div>
 
         <!-- MOVE THIS BELOW IMAGE-GRID-WRAPPER     (onRowUpdated)="onQuantityChanged()" -->
@@ -491,101 +251,38 @@
 
   <dxi-item title="BoM">
     <div>
-      <div
-        class="popup-content"
-        style="height: 100%; display: flex; flex-direction: column"
-      >
+      <div class="popup-content" style="height: 100%; display: flex; flex-direction: column">
         <div style="display: flex; justify-content: flex-end; margin: 10px 0">
-          <dx-button
-            (onClick)="addNewRow()"
-            [width]="120"
-            stylingMode="contained"
-            type="default"
-            hint="New Row"
-            style="padding: 8px 8px"
-            ><div *dxTemplate="let data of 'content'">
+          <dx-button (onClick)="addNewRow()" [width]="120" stylingMode="contained" type="default" hint="New Row"
+            style="padding: 8px 8px">
+            <div *dxTemplate="let data of 'content'">
               <div class="add-btn-content">
-                <span
-                  class="iconify"
-                  data-icon="formkit:add"
-                  data-width="20"
-                  data-height="20"
-                ></span>
+                <span class="iconify" data-icon="formkit:add" data-width="20" data-height="20"></span>
                 <span class="add-text">New</span>
               </div>
-            </div></dx-button
-          >
+            </div>
+          </dx-button>
         </div>
         <div style="flex: 1; overflow: hidden">
-          <dx-data-grid
-            #itemsGridRef
-            [dataSource]="items"
-            [showBorders]="true"
-            [columnAutoWidth]="true"
-            [rowAlternationEnabled]="true"
-            [height]="'54vh'"
-            [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }"
-            (onInitialized)="onGridInitialized($event)"
-            (onInitNewRow)="onInitNewRow($event)"
-            (onEditorPreparing)="onEditorPreparings($event)"
-          >
-            <dxo-editing
-              mode="cell"
-              [allowUpdating]="true"
-              [allowAdding]="false"
-              [allowDeleting]="deleteButtonVisible"
-            >
+          <dx-data-grid #itemsGridRef [dataSource]="items" [showBorders]="true" [columnAutoWidth]="true"
+            [rowAlternationEnabled]="true" [height]="'54vh'"
+            [selection]="{ mode: 'single', showCheckBoxesMode: 'always' }" (onInitialized)="onGridInitialized($event)"
+            (onInitNewRow)="onInitNewRow($event)" (onEditorPreparing)="onEditorPreparings($event)">
+            <dxo-editing mode="cell" [allowUpdating]="true" [allowAdding]="false" [allowDeleting]="deleteButtonVisible">
             </dxo-editing>
 
             <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>
-            <dxo-pager
-              [visible]="true"
-              [allowedPageSizes]="allowedPageSizes"
-              [displayMode]="displayMode"
-              [showPageSizeSelector]="showPageSizeSelector"
-              [showInfo]="true"
-              [showNavigationButtons]="true"
-            ></dxo-pager>
+            <dxo-pager [visible]="true" [allowedPageSizes]="allowedPageSizes" [displayMode]="displayMode"
+              [showPageSizeSelector]="showPageSizeSelector" [showInfo]="true"
+              [showNavigationButtons]="true"></dxo-pager>
             <dxo-load-panel [showPane]="false"></dxo-load-panel>
             <dxo-scrolling mode="standard"></dxo-scrolling>
-            <dxo-filter-row
-              [visible]="isFilterRowVisible"
-              [applyFilter]="'auto'"
-            ></dxo-filter-row>
+            <dxo-filter-row [visible]="isFilterRowVisible" [applyFilter]="'auto'"></dxo-filter-row>
 
-            <dxi-column
-              dataField="ITEM"
-              caption="Item"
-              width="200"
-              [editorType]="'dxSelectBox'"
-              [lookup]="{
-                dataSource: itemsList,
-                valueExpr: 'DESCRIPTION',
-                displayExpr: 'DESCRIPTION',
-                searchEnabled: true,
-                paginate: true,
-                pageSize: 50,
-              }"
-              [editorOptions]="{
-                dataSource: {
-                  store: {
-                    type: 'array',
-                    data: itemsList,
-                  },
-                  paginate: true,
-                  pageSize: 50,
-                },
-                showScrollbar: 'always',
-                virtualScrollingEnabled: true,
-              }"
-            ></dxi-column>
-
-            <dxi-column
-              dataField="DESCRIPTION"
-              caption="Description"
-            ></dxi-column>
-            <dxi-column dataField="UOM" caption="UOM"></dxi-column>
-            <dxi-column dataField="QUANTITY" caption="Quantity"></dxi-column>
+            <dxi-column dataField="ITEM" caption="Item" width="200" [allowEditing]="false"></dxi-column>
+            <dxi-column dataField="DESCRIPTION" caption="Description" [allowEditing]="false"></dxi-column>
+            <dxi-column dataField="UOM" caption="UOM" [allowEditing]="false"></dxi-column>
+            <dxi-column dataField="QUANTITY" caption="Quantity" dataType="number"></dxi-column>
             <dxi-column dataField="ITEM_ID" [visible]="false"></dxi-column>
           </dx-data-grid>
         </div>
@@ -594,55 +291,25 @@
   </dxi-item>
 </dx-tab-panel>
 <div class="fixed-footer popup-footer right-footer">
-  <dx-button
-    text="Cancel"
-    stylingMode="outlined"
-    (onClick)="closePopup()"
-    type="normal"
-  ></dx-button>
-  <dx-button
-    text="Update"
-    stylingMode="contained"
-    type="default"
-    (onClick)="UpdateData()"
-  ></dx-button>
+  <dx-button text="Cancel" stylingMode="outlined" (onClick)="closePopup()" type="normal"></dx-button>
+  <dx-button text="Update" stylingMode="contained" type="default" (onClick)="UpdateData()"></dx-button>
 </div>
 
-<dx-popup
-  [(visible)]="pricePopupVisible"
-  title="Change Standard Price"
-  [width]="420"
-  [height]="'auto'"
-  [showCloseButton]="true"
-  [dragEnabled]="false"
-  [hideOnOutsideClick]="true"
->
+<dx-popup [(visible)]="pricePopupVisible" title="Change Standard Price" [width]="420" [height]="'auto'"
+  [showCloseButton]="true" [dragEnabled]="false" [hideOnOutsideClick]="true">
   <div class="popup-form">
     <!-- Standard Price -->
-    <dx-number-box
-      label="Standered Price"
-      labelMode="floating"
-      [format]="'#,##0.##'"
-      [min]="0"
-      [showSpinButtons]="true"
-      [(value)]="PackingData.STD_PRICE"
-    >
+    <dx-number-box label="Standered Price" labelMode="floating" [format]="'#,##0.##'" [min]="0" [showSpinButtons]="true"
+      [(value)]="PackingData.STD_PRICE">
       <dx-validator>
-        <dxi-validation-rule
-          type="required"
-          message="Standard Price is required"
-        >
+        <dxi-validation-rule type="required" message="Standard Price is required">
         </dxi-validation-rule>
       </dx-validator>
     </dx-number-box>
 
     <!-- Effect From -->
-    <dx-date-box
-      label="Effect From"
-      labelMode="floating"
-      [displayFormat]="'dd/MM/yyyy'"
-      [(value)]="PackingData.STD_PRICE_EFFECT_FROM"
-    >
+    <dx-date-box label="Effect From" labelMode="floating" [displayFormat]="'dd/MM/yyyy'"
+      [(value)]="PackingData.STD_PRICE_EFFECT_FROM">
       <dx-validator>
         <dxi-validation-rule type="required" message="Effect From is required">
         </dxi-validation-rule>
@@ -651,72 +318,31 @@
 
     <!-- Buttons -->
     <div class="popup-footer">
-      <dx-button
-        text="Cancel"
-        stylingMode="outlined"
-        (onClick)="pricePopupVisible = false"
-      >
+      <dx-button text="Cancel" stylingMode="outlined" (onClick)="pricePopupVisible = false">
       </dx-button>
 
-      <dx-button
-        text="Save"
-        type="default"
-        stylingMode="contained"
-        (onClick)="savePriceChange()"
-      >
+      <dx-button text="Save" type="default" stylingMode="contained" (onClick)="savePriceChange()">
       </dx-button>
     </div>
   </div>
 </dx-popup>
 
-<dx-popup
-  [(visible)]="ViewpricePopupVisible"
-  title="Standard Price History"
-  [width]="650"
-  [height]="400"
-  [showCloseButton]="true"
-  [dragEnabled]="false"
-  [hideOnOutsideClick]="true"
->
-  <dx-data-grid
-    [dataSource]="priceHistoryList"
-    [showBorders]="true"
-    [columnAutoWidth]="true"
-    [rowAlternationEnabled]="true"
-    [allowColumnReordering]="true"
-    [showColumnHeaders]="true"
-    [columnAutoWidth]="true"
-    [allowColumnResizing]="true"
-    [columnResizingMode]="'nextColumn'"
-    [filterRow]="{ visible: false }"
-    [headerFilter]="{ visible: false }"
-    [scrolling]="{ mode: 'virtual' }"
-  >
+<dx-popup [(visible)]="ViewpricePopupVisible" title="Standard Price History" [width]="650" [height]="400"
+  [showCloseButton]="true" [dragEnabled]="false" [hideOnOutsideClick]="true">
+  <dx-data-grid [dataSource]="priceHistoryList" [showBorders]="true" [columnAutoWidth]="true"
+    [rowAlternationEnabled]="true" [allowColumnReordering]="true" [showColumnHeaders]="true" [columnAutoWidth]="true"
+    [allowColumnResizing]="true" [columnResizingMode]="'nextColumn'" [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: false }" [scrolling]="{ mode: 'virtual' }">
     <!-- Price -->
-    <dxi-column
-      dataField="STD_PRICE"
-      caption="Standard Price"
-      dataType="number"
-      format="#,##0.00"
-    >
+    <dxi-column dataField="STD_PRICE" caption="Standard Price" dataType="number" format="#,##0.00">
     </dxi-column>
 
     <!-- Effect From -->
-    <dxi-column
-      dataField="STD_PRICE_EFFECT_FROM"
-      caption="Effect From"
-      dataType="date"
-      format="dd/MM/yyyy"
-    >
+    <dxi-column dataField="STD_PRICE_EFFECT_FROM" caption="Effect From" dataType="date" format="dd/MM/yyyy">
     </dxi-column>
 
     <!-- Created Time -->
-    <dxi-column
-      dataField="CREATED_TIME"
-      caption="Created On"
-      dataType="datetime"
-      format="dd/MM/yyyy HH:mm"
-    >
+    <dxi-column dataField="CREATED_TIME" caption="Created On" dataType="datetime" format="dd/MM/yyyy HH:mm">
     </dxi-column>
 
     <!-- User -->
@@ -725,33 +351,15 @@
 
   <!-- Footer -->
   <div class="popup-footer">
-    <dx-button
-      text="Close"
-      stylingMode="outlined"
-      (onClick)="ViewpricePopupVisible = false"
-    >
+    <dx-button text="Close" stylingMode="outlined" (onClick)="ViewpricePopupVisible = false">
     </dx-button>
   </div>
 </dx-popup>
 
-<dx-popup
-  [(visible)]="ItempopupVisible"
-  [width]="800"
-  [height]="500"
-  title="Items"
-  [showCloseButton]="true"
-  (onRowClick)="onItemSelect($event)"
->
-  <dx-data-grid
-    #bomGridRef
-    [dataSource]="ItemListDataSource"
-    [showBorders]="true"
-    keyExpr="ID"
-  >
-    <dxo-header-filter
-      [visible]="true"
-      [allowSearch]="true"
-    ></dxo-header-filter>
+<dx-popup [(visible)]="ItempopupVisible" [width]="800" [height]="500" title="Items" [showCloseButton]="true"
+  (onRowClick)="onItemSelect($event)">
+  <dx-data-grid #bomGridRef [dataSource]="ItemListDataSource" [showBorders]="true" keyExpr="ID">
+    <dxo-header-filter [visible]="true" [allowSearch]="true"></dxo-header-filter>
     <dxo-selection mode="multiple"></dxo-selection>
     <dxi-column dataField="ITEM_CODE" caption="Item"></dxi-column>
     <dxi-column dataField="DESCRIPTION" caption="Description"></dxi-column>
@@ -759,21 +367,15 @@
   </dx-data-grid>
 
   <!-- Buttons -->
-  <div
-    style="
+  <div style="
       margin-top: 10px;
       text-align: right;
       display: flex;
       justify-content: flex-end;
       gap: 15px;
-    "
-  >
+    ">
     <dx-button text="Cancel" (onClick)="ItempopupVisible = false"></dx-button>
 
-    <dx-button
-      text="Save"
-      (onClick)="saveSelectedItems()"
-      style="margin-right: 10px"
-    ></dx-button>
+    <dx-button text="Save" (onClick)="saveSelectedItems()" style="margin-right: 10px"></dx-button>
   </div>
 </dx-popup>

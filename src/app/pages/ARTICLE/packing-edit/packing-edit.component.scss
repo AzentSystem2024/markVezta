@@ -14,7 +14,8 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* 2 columns for fields, 1 for image/grid */
+  grid-template-columns: 1fr 1fr 1fr;
+  /* 2 columns for fields, 1 for image/grid */
   gap: 8px 12px;
   margin-bottom: 6px;
   margin-top: 14px;
@@ -123,16 +124,16 @@
   padding: 12px;
 }
 
-::ng-deep .dx-datagrid-rowsview .dx-row > td {
+::ng-deep .dx-datagrid-rowsview .dx-row>td {
   border-right: 1px solid #ccc !important;
 }
 
-::ng-deep .dx-datagrid-headers .dx-header-row > td {
+::ng-deep .dx-datagrid-headers .dx-header-row>td {
   border-right: 1px solid #ccc !important;
 }
 
-::ng-deep .dx-datagrid-rowsview .dx-row > td:last-child,
-::ng-deep .dx-datagrid-headers .dx-header-row > td:last-child {
+::ng-deep .dx-datagrid-rowsview .dx-row>td:last-child,
+::ng-deep .dx-datagrid-headers .dx-header-row>td:last-child {
   border-right: none !important;
 }
 
@@ -215,7 +216,7 @@
   height: 16px !important;
 }
 
-.article-size-grid .dx-datagrid-rowsview .dx-data-row > td {
+.article-size-grid .dx-datagrid-rowsview .dx-data-row>td {
   padding-top: 2px !important;
   padding-bottom: 2px !important;
 }

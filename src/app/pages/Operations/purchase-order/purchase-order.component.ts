@@ -614,9 +614,12 @@ export class PurchaseOrderComponent {
             };
           })
           .sort((a: any, b: any) => {
-            const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
-            const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
-            return numB - numA;
+            const numA = a.DOC_NO ? parseInt(String(a.DOC_NO).split('/').pop() || '0', 10) : 0;
+            const numB = b.DOC_NO ? parseInt(String(b.DOC_NO).split('/').pop() || '0', 10) : 0;
+            if (numA && numB && !isNaN(numA) && !isNaN(numB) && numA !== numB) {
+              return numB - numA;
+            }
+            return (b.ID || 0) - (a.ID || 0);
           });
 
         this.filteredPOList = this.dataSource;
