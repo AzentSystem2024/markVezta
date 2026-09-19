@@ -72,6 +72,7 @@ export class NewOrderComponent implements OnInit {
   sizeConfigurations: SizeConfig[] = [];
 
   warehouses: any[] = [];
+  selectedWarehouseId: any = null;
   distributorsCache: { [key: string]: any[] } = {};
   currentDistributors: any[] = [];
   itemsList: any[] = [];
@@ -88,6 +89,7 @@ export class NewOrderComponent implements OnInit {
   ngOnInit(): void {
     this.loadDealers();
     this.loadCategories();
+    this.loadWarehouses();
   }
 
   loadCategories() {
@@ -101,6 +103,23 @@ export class NewOrderComponent implements OnInit {
         );
       },
       (error) => console.error('Error fetching ARTICLECATEGORY', error),
+    );
+  }
+
+  loadWarehouses() {
+    this.dataService.Get_GropDown('WAREHOUSE').subscribe(
+      (res: any) => {
+        this.warehouses = (Array.isArray(res) ? res : res || []).map(
+          (item: any) => ({
+            id: item.ID || item.id,
+            name: item.DESCRIPTION || item.description,
+          }),
+        );
+        if (this.warehouses.length > 0) {
+          this.selectedWarehouseId = this.warehouses[0].id;
+        }
+      },
+      (error) => console.error('Error fetching WAREHOUSE', error),
     );
   }
 
@@ -209,7 +228,19 @@ export class NewOrderComponent implements OnInit {
     if (this.activeTab !== tab) {
       this.activeTab = tab;
       this.selectedDealerId = null;
+      this.currentEditingItem = this.getEmptyCartItem();
+      this.artNos = [];
+      this.colors = [];
       this.loadDealerDataForTab(tab);
+    }
+  }
+
+  onDealerChange(e: any) {
+    // Only reset dependent fields if this is an actual user change (not initial binding)
+    if (e.previousValue !== undefined && e.previousValue !== e.value) {
+      this.currentEditingItem = this.getEmptyCartItem();
+      this.artNos = [];
+      this.colors = [];
     }
   }
 
