@@ -7542,4 +7542,12 @@ The result can be exported to HTML or Markdown.`;
   getNewOrderSubDealerList(payload: any = {}): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetSubDealerList`, payload);
   }
+
+  postNewOrderAddToCart(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/AddToCart`, payload);
+  }
+
+  getNewOrderCart(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetCart`, payload);
+  }
 }

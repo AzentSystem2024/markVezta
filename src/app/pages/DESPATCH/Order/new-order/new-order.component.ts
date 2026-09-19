@@ -126,7 +126,6 @@ export class NewOrderComponent implements OnInit {
   loadDealers() {
     this.loadDealerDataForTab(this.activeTab);
   }
-  
 
   loadDealerDataForTab(tab: 'dealer' | 'subdealer') {
     if (this.distributorsCache[tab]) {
@@ -261,9 +260,11 @@ export class NewOrderComponent implements OnInit {
       if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
         this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
       }
+      this.loadCartData();
     } else {
       this.addresses = [];
       this.selectedWarehouseId = null;
+      this.cartItems = [];
     }
   }
 
@@ -273,13 +274,24 @@ export class NewOrderComponent implements OnInit {
       .getNewOrderDealerAddress({ DEALER_ID: dealerId })
       .subscribe(
         (res: any) => {
-          this.addresses = Array.isArray(res) ? res : res || [];
+          if (res.Flag === 1 && res.Data) {
+            const data = res.Data;
+            const fullAddress = [data.ADDRESS1, data.ADDRESS2, data.ADDRESS3]
+              .filter((a) => a && a.trim() !== '')
+              .join(', ');
+            this.addresses = [{ id: 1, name: fullAddress }];
+            this.selectedAddressId = 1; // Auto select since there's only one address returned
+          } else {
+            this.addresses = [];
+            this.selectedAddressId = null;
+          }
           this.isLoadingAddresses = false;
         },
         (error) => {
           console.error('Error fetching addresses', error);
           this.isLoadingAddresses = false;
           this.addresses = [];
+          this.selectedAddressId = null;
         },
       );
   }
@@ -481,9 +493,8 @@ export class NewOrderComponent implements OnInit {
                       .map((s: string) => s.trim())
                   : [],
               cutSizeQuantities: {},
-              combination: c.IsCutSize
-                ? ''
-                : (c.Combination || '').replace(/,\s*/g, ', '),
+              combination: (c.Combination || '').replace(/,\s*/g, ', '),
+              isAnyComb: c.IsAnyComb || c.IsCutSize || false,
               pairQty: c.PairQty,
               qty: 0,
             }));
@@ -671,28 +682,147 @@ export class NewOrderComponent implements OnInit {
   saveToCart() {
     if (this.getCurrentItemTotalQty() === 0) {
       // Might want a warning in real app
+      return;
     }
 
-    if (this.isEditMode) {
-      const index = this.cartItems.findIndex(
-        (item) => item.id === this.currentEditingItem.id,
-      );
-      if (index !== -1) {
-        const updatedItem = JSON.parse(JSON.stringify(this.currentEditingItem));
-        updatedItem.sizes.forEach(
-          (size: any) => (size.cartId = updatedItem.id),
-        );
-        this.cartItems[index] = updatedItem;
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+
+    const cartArray: any[] = [];
+    const comboArray: any[] = [];
+
+    this.currentEditingItem.sizes.forEach((s: any) => {
+      if (s.qty > 0) {
+        cartArray.push({
+          CART_ID: this.isEditMode ? this.currentEditingItem.id || 0 : 0,
+          PACKING_ID: s.sizeId,
+          QUANTITY: s.qty,
+          COMBINATION: s.description || '',
+          IS_ANY_COMB: s.isAnyComb || false,
+        });
+
+        if (s.isCutSize && s.cutSizeQuantities) {
+          Object.keys(s.cutSizeQuantities).forEach((sizeKey) => {
+            const sqty = s.cutSizeQuantities[sizeKey];
+            if (sqty > 0) {
+              comboArray.push({
+                PACKING_ID: s.sizeId,
+                SIZE: sizeKey,
+                QUANTITY: sqty,
+              });
+            }
+          });
+        }
       }
-    } else {
-      const newItem = JSON.parse(JSON.stringify(this.currentEditingItem));
-      newItem.id = Date.now();
-      newItem.sizes.forEach((size: any) => (size.cartId = newItem.id));
-      this.cartItems.push(newItem);
+    });
+
+    const payload = {
+      USER_ID: userId,
+      ORDER_ID: 0,
+      DEALER_ID: this.activeTab === 'dealer' ? this.selectedDealerId || 0 : 0,
+      SUBDEALER_ID:
+        this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
+      WAREHOUSE_ID: this.selectedWarehouseId || 0,
+      LOCATION_ID: 0,
+      CART: cartArray,
+      COMBO: comboArray,
+    };
+
+    console.log('add to card : ', payload);
+
+    this.dataService.postNewOrderAddToCart(payload).subscribe(
+      (res: any) => {
+        if (res.Flag === 1) {
+          this.cancelForm();
+          this.loadCartData(); // Reload cart from API after successful save
+        } else {
+          console.error('Failed to add to cart:', res.Message);
+        }
+      },
+      (error) => {
+        console.error('Error adding to cart', error);
+      },
+    );
+  }
+
+  loadCartData() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+    const dealerId =
+      this.activeTab === 'dealer' ? this.selectedDealerId || 0 : 0;
+    const subDealerId =
+      this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0;
+
+    if (!dealerId && !subDealerId) {
+      this.cartItems = [];
+      return;
     }
 
-    console.log('Cart Data: ', this.cartItems);
-    this.cancelForm();
+    const payload = {
+      USER_ID: userId,
+      DEALER_ID: dealerId,
+      SUBDEALER_ID: subDealerId,
+    };
+
+    this.dataService.getNewOrderCart(payload).subscribe(
+      (res: any) => {
+        if (res.Flag === 1 && res.Data && res.Data.length > 0) {
+          const apiCart = res.Data[0];
+          if (apiCart.ENTRIES) {
+            // Group ENTRIES by PRODUCT_ID since each cart item represents a product variant
+            const groupedEntries = new Map<number, any[]>();
+            apiCart.ENTRIES.forEach((entry: any) => {
+              if (!groupedEntries.has(entry.PRODUCT_ID)) {
+                groupedEntries.set(entry.PRODUCT_ID, []);
+              }
+              groupedEntries.get(entry.PRODUCT_ID)!.push(entry);
+            });
+
+            this.cartItems = [];
+            groupedEntries.forEach((entries, productId) => {
+              const sizes = entries.map((e: any) => ({
+                sizeId: e.PACKING_ID,
+                qty: e.QUANTITY,
+                combination: e.COMBINATION || '',
+                description: e.COMBINATION || '', // Assuming COMBINATION holds the description string from the backend
+                isCutSize: e.COMBINATIONS && e.COMBINATIONS.length > 0,
+                isAnyComb: e.COMBINATIONS && e.COMBINATIONS.length > 0,
+                cutSizeQuantities: e.COMBINATIONS
+                  ? e.COMBINATIONS.reduce((acc: any, combo: any) => {
+                      acc[combo.SIZE] = combo.QUANTITY;
+                      return acc;
+                    }, {})
+                  : {},
+                cartEntryId: e.CART_ENTRY_ID,
+                cartId: e.CART_ID,
+              }));
+
+              this.cartItems.push({
+                id: entries[0].CART_ID, // Use backend Cart ID
+                categoryId: null, // Note: Not provided in GetCart response
+                artNoId: productId, // Using PRODUCT_ID for artNoId as best guess
+                colorId: null, // Note: Not provided in GetCart response
+                imageUrl: '',
+                packingType: '',
+                sizes: sizes,
+              });
+            });
+          } else {
+            this.cartItems = [];
+          }
+        } else {
+          this.cartItems = [];
+        }
+      },
+      (error) => {
+        console.error('Error fetching cart data', error);
+        this.cartItems = [];
+      },
+    );
   }
 
   editCartItem(item: CartItem) {
