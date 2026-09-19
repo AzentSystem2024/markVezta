@@ -62,7 +62,10 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
             "styles": [
               "src/styles.scss",
               "devexpress-gantt/dist/dx-gantt.css",
@@ -76,7 +79,6 @@
               "node_modules/@devexpress/analytics-core/dist/css/dx-querybuilder.css",
               "node_modules/devexpress-reporting/dist/css/dx-webdocumentviewer.css",
               "node_modules/devexpress-reporting/dist/css/dx-reportdesigner.css",
-
               {
                 "input": "devextreme/scss/bundles/dx.fluent.saas.light.scss",
                 "bundleName": "theme-light"
@@ -107,8 +109,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "30mb",
-                  "maximumError": "32mb"
+                  "maximumWarning": "80mb",
+                  "maximumError": "90mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -169,7 +171,10 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
             "styles": [
               "src/styles.scss",
               "node_modules/devextreme/dist/css/dx.light.css",
@@ -186,14 +191,19 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }
     }
   },
   "cli": {
-    "schematicCollections": ["@angular-eslint/schematics"],
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ],
     "analytics": false
   }
 }

@@ -518,7 +518,6 @@ export class PackingEditComponent {
       this.items = [];
     }
 
-    this.ensureEmptyRow(); // IMPORTANT
     // this.PackingEntriesData = this.PackingData.PackingEntries;
     this.PackingEntriesData = [];
 
@@ -1166,36 +1165,6 @@ export class PackingEditComponent {
       this.ItemListDataSource = res.DataList;
       this.ItempopupVisible = true; // Open popup
     });
-    setTimeout(() => {
-      const grid = this.itemsGridRef?.instance;
-      if (!grid) return;
-
-      const rows = grid.getVisibleRows();
-
-      const hasIncompleteRow = rows.some(
-        (r: any) => !r.data?.ITEM || !r.data?.QUANTITY,
-      );
-
-      if (hasIncompleteRow) {
-        return;
-      }
-
-      this.items.push({
-        ITEM: null,
-        DESCRIPTION: '',
-        UOM: '',
-        QUANTITY: null,
-      });
-
-      setTimeout(() => {
-        const updatedRows = grid.getVisibleRows();
-        const newRowIndex = updatedRows.length - 1;
-
-        if (newRowIndex >= 0) {
-          grid.editCell(newRowIndex, 'ITEM');
-        }
-      }, 100);
-    }, 200);
   }
 
   onItemSelect(e: any) {
@@ -1283,7 +1252,6 @@ export class PackingEditComponent {
 
     // refresh BOM grid
     this.itemsGridRef.instance.refresh();
-    this.ensureEmptyRow(); //  IMPORTANT
     this.ItempopupVisible = false;
   }
 }
