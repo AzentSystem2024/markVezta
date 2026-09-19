@@ -56,6 +56,9 @@ export class NewOrderComponent implements OnInit {
 
   allArtNos: string[] = [];
   cartItems: CartItem[] = [];
+  addresses: any[] = [];
+  selectedAddressId: any = null;
+  isLoadingAddresses = false;
 
   // Current Editing Item (for modal)
   currentEditingItem!: CartItem;
@@ -115,9 +118,6 @@ export class NewOrderComponent implements OnInit {
             name: item.DESCRIPTION || item.description,
           }),
         );
-        if (this.warehouses.length > 0) {
-          this.selectedWarehouseId = this.warehouses[0].id;
-        }
       },
       (error) => console.error('Error fetching WAREHOUSE', error),
     );
@@ -126,6 +126,7 @@ export class NewOrderComponent implements OnInit {
   loadDealers() {
     this.loadDealerDataForTab(this.activeTab);
   }
+  
 
   loadDealerDataForTab(tab: 'dealer' | 'subdealer') {
     if (this.distributorsCache[tab]) {
@@ -146,13 +147,20 @@ export class NewOrderComponent implements OnInit {
       NAME: apiName,
     };
 
-    this.dataService.Item_Dropdown(payload).subscribe(
+    const apiCall =
+      tab === 'dealer'
+        ? this.dataService.getNewOrderDealerList({})
+        : this.dataService.getNewOrderSubDealerList({});
+
+    apiCall.subscribe(
       (res: any) => {
-        const data = (Array.isArray(res) ? res : res || []).map(
+        const rawData = res.Data || res;
+        const data = (Array.isArray(rawData) ? rawData : []).map(
           (item: any) => ({
             ...item,
             NAME: item.DESCRIPTION || item.description,
             TYPE: apiName,
+            WAREHOUSE_ID: item.WAREHOUSE_ID,
           }),
         );
 
@@ -241,7 +249,39 @@ export class NewOrderComponent implements OnInit {
       this.currentEditingItem = this.getEmptyCartItem();
       this.artNos = [];
       this.colors = [];
+      this.selectedAddressId = null;
     }
+
+    if (e.value) {
+      this.loadAddresses(e.value);
+      // Auto-load warehouse based on selected dealer
+      const selectedDealer = this.currentDistributors.find(
+        (d: any) => d.ID === e.value,
+      );
+      if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
+        this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
+      }
+    } else {
+      this.addresses = [];
+      this.selectedWarehouseId = null;
+    }
+  }
+
+  loadAddresses(dealerId: any) {
+    this.isLoadingAddresses = true;
+    this.dataService
+      .getNewOrderDealerAddress({ DEALER_ID: dealerId })
+      .subscribe(
+        (res: any) => {
+          this.addresses = Array.isArray(res) ? res : res || [];
+          this.isLoadingAddresses = false;
+        },
+        (error) => {
+          console.error('Error fetching addresses', error);
+          this.isLoadingAddresses = false;
+          this.addresses = [];
+        },
+      );
   }
 
   onCategoryChange(e: any) {
@@ -292,8 +332,6 @@ export class NewOrderComponent implements OnInit {
         },
       );
   }
-
-  // onArtNoInput removed because DevExtreme DataSource handles searching natively
 
   onArtNoChange(e: any) {
     if (e.previousValue !== undefined && e.previousValue !== e.value) {

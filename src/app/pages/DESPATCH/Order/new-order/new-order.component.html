@@ -139,8 +139,12 @@
                   <div class="col-12">
                     <!-- Address -->
                     <dx-select-box
-                      placeholder="Select Address"
-                      [disabled]="!selectedDealerId"
+                      [dataSource]="addresses"
+                      displayExpr="ADDRESS"
+                      valueExpr="ID"
+                      [(value)]="selectedAddressId"
+                      [placeholder]="isLoadingAddresses ? 'Loading...' : 'Select Address'"
+                      [disabled]="!selectedDealerId || isLoadingAddresses"
                       [searchEnabled]="true"
                       [showClearButton]="true"
                       class="rounded-input"

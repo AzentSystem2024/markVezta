@@ -7530,4 +7530,16 @@ The result can be exported to HTML or Markdown.`;
   getNewOrderArtNoDetails(payload: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetArtNoDetails`, payload);
   }
+
+  getNewOrderDealerAddress(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetDealerAddress`, payload);
+  }
+
+  getNewOrderDealerList(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetDealerList`, payload);
+  }
+
+  getNewOrderSubDealerList(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetSubDealerList`, payload);
+  }
 }
