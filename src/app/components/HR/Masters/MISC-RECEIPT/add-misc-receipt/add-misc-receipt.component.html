@@ -324,7 +324,7 @@
       type="normal"
     ></dx-button>
     <dx-button
-      *ngIf="status !== 'Approve'"
+      *ngIf="!isReadOnlyMode && status !== 'Approve' && status !== 'Approved' && status !== 5"
       #saveButtonRef
       [text]="
         isSaving

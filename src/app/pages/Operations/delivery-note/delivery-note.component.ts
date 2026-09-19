@@ -56,7 +56,7 @@ export class DeliveryNoteComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
-  displayMode: any = 'full';                  
+  displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;
   showFilterRow = true;
@@ -141,7 +141,7 @@ export class DeliveryNoteComponent {
     private dataService: DataService,
     private router: Router,
     private zone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -601,7 +601,7 @@ export class DeliveryNoteComponent {
   onEditDelivery(event: any) {
     event.cancel = true;
 
-    const deliveryId = event.data.ID;
+    const deliveryId = event.data.TRANS_ID;
     const status = event.data.STATUS;
 
     this.dataService
@@ -716,4 +716,4 @@ export class DeliveryNoteComponent {
   exports: [DeliveryNoteComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteModule {}
+export class DeliveryNoteModule { }

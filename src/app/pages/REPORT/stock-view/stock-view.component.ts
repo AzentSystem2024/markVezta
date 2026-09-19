@@ -94,6 +94,8 @@ export class StockViewComponent {
   stockViewList: any;
   Store: any;
   selectedStoreid: any;
+  itemtype: any;
+  selectedItemType: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -102,6 +104,7 @@ export class StockViewComponent {
   ) { }
 
   ngOnInit() {
+    console.log("ITEMSTOCKVIEW")
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -128,6 +131,7 @@ export class StockViewComponent {
       this.canApprove = packingRights.CanApprove;
     }
 
+    this.getItemTypeDropdown();
     this.getStockViewList();
     this.sessionData_tax();
     this.store_dropdown();
@@ -148,13 +152,7 @@ export class StockViewComponent {
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-
-    if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
-    }
+    this.isFilterRowVisible = this.isFilterOpened;
   }
 
   updateStoreHint() {
@@ -171,6 +169,20 @@ export class StockViewComponent {
     this.getStockViewList();
   }
 
+  getItemTypeDropdown() {
+    const itemTypePayload = {
+      NAME: 'ITEMTYPE',
+    };
+    this.dataService.getDropdownData(itemTypePayload).subscribe((data: any) => {
+      this.itemtype = data;
+    });
+  }
+
+  onItemTypeChange(event: any) {
+    this.selectedItemType = event.value;
+    this.getStockViewList();
+  }
+
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
@@ -182,19 +194,36 @@ export class StockViewComponent {
   }
 
   getStockViewList() {
-    const payload = {
+    const payload: any = {
       FIN_ID: this.finID,
       STORE_ID: this.selectedStoreid?.length
         ? this.selectedStoreid.join(',') // FINAL FIX
         : '',
       COMPANY_ID: this.companyID,
+      ITEM_TYPE: this.selectedItemType || 0,
+      ITEM_TYPE_ID: this.selectedItemType || 0,
     };
     this.stockViewList = new DataSource({
       load: () =>
         new Promise((resolve) => {
           this.dataService.getStockViewList(payload).subscribe({
             next: (response: any) => {
-              const list = response?.Data || [];
+              let list = response?.Data || [];
+
+              if (this.selectedItemType) {
+                const selectedObj = this.itemtype?.find((x: any) => x.ID === this.selectedItemType);
+                const selectedDesc = selectedObj ? selectedObj.DESCRIPTION : this.selectedItemType;
+
+                list = list.filter((item: any) => {
+                  return (
+                    item.ITEM_TYPE_ID === this.selectedItemType ||
+                    item.ITEM_TYPE === selectedDesc ||
+                    item.ITEM_TYPE === this.selectedItemType ||
+                    item.TYPE_ID === this.selectedItemType ||
+                    item.TYPE === selectedDesc
+                  );
+                });
+              }
 
               this.stockViewList = list;
 

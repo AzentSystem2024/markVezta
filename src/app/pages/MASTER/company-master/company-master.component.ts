@@ -68,6 +68,9 @@ export class CompanyMasterComponent {
   stateList: any;
   state: any;
   selected_Company_id: any;
+  selectedEditId: any = null;
+  originalCode: string = '';
+  originalName: string = '';
   isSaving = false;
   mobile_limit: any;
   countryCodes: any;
@@ -254,6 +257,15 @@ export class CompanyMasterComponent {
     this.selectedCompanyType = null;
     this.state = null;
     this.editingRowData = {};
+    this.selectedEditId = null;
+    this.originalCode = '';
+    this.originalName = '';
+    this.countryCodephone = null;
+    this.countryCodemobile = null;
+    this.countryCodewhatsapp = null;
+    this.Phone_limit = undefined;
+    this.mobile_limit = undefined;
+    this.whatsapp_limit = undefined;
   }
 
   addCompany() {
@@ -311,12 +323,30 @@ export class CompanyMasterComponent {
 
   onEditingStart(event: any) {
     event.cancel = true;
+    this.selectedEditId = event.data?.ID ?? event.data?.COMPANY_ID;
+    this.originalCode = (
+      event.data?.COMPANY_CODE ??
+      event.data?.Code ??
+      event.data?.CODE ??
+      ''
+    )
+      .toString()
+      .trim()
+      .toLowerCase();
+    this.originalName = (
+      event.data?.COMPANY_NAME ??
+      event.data?.CompanyName ??
+      event.data?.NAME ??
+      ''
+    )
+      .toString()
+      .trim()
+      .toLowerCase();
     this.editingRowData = { ...event.data };
+    this.selectedCompanyType = event.data?.COMPANY_TYPE ?? null;
+    this.state = event.data?.STATE_ID ?? null;
     this.selectData(event);
     this.editPopup = true;
-    setTimeout(() => {
-      this.editValidationGroup?.instance?.reset();
-    });
   }
 
   //===================get data list========================
@@ -374,8 +404,8 @@ export class CompanyMasterComponent {
     const Email = this.formsource.get('Email')?.value?.toString().trim() || '';
     const WhatsApp_no =
       this.formsource.get('WhatsApp')?.value?.toString().trim() || '';
-    const Company_type = this.formsource.get('CompanyType')?.value || 0;
-    const STATE_ID = this.formsource.get('STATE_ID')?.value || 0;
+    const Company_type = this.formsource.get('CompanyType')?.value;
+    const STATE_ID = this.formsource.get('STATE_ID')?.value;
     const PAN = this.formsource.get('PAN')?.value || '';
     const GSTNo = this.formsource.get('GSTNo')?.value || '';
     const CIN = this.formsource.get('CIN')?.value || '';
@@ -385,8 +415,8 @@ export class CompanyMasterComponent {
     const newName = Company_name.toLowerCase();
 
     const isDuplicate = this.companyList?.some((data: any) => {
-      const existingCode = data.COMPANY_CODE?.toString().trim().toLowerCase();
-      const existingName = data.COMPANY_NAME?.toString().trim().toLowerCase();
+      const existingCode = (data.COMPANY_CODE ?? data.CODE)?.toString().trim().toLowerCase();
+      const existingName = (data.COMPANY_NAME ?? data.NAME)?.toString().trim().toLowerCase();
 
       return existingCode === newCode || existingName === newName;
     });
@@ -423,11 +453,16 @@ export class CompanyMasterComponent {
       CIN: CIN,
     };
 
+    const isCompanyTypeValid =
+      Company_type !== null &&
+      Company_type !== undefined &&
+      Company_type !== '';
+
     // ---------------- API CALL ----------------
-    if (Company_code && Company_name && Company_type) {
+    if (Company_code && Company_name && isCompanyTypeValid) {
       this.isSaving = true;
-      this.dataservice.Insert_CompanyList_Api(payload).subscribe(
-        (res: any) => {
+      this.dataservice.Insert_CompanyList_Api(payload).subscribe({
+        next: (res: any) => {
           this.isSaving = false;
           notify(
             {
@@ -442,7 +477,7 @@ export class CompanyMasterComponent {
           this.addPopup = false;
           this.get_Company_List();
         },
-        (error) => {
+        error: (error: any) => {
           this.isSaving = false; // ✅ STOP loading
           console.error('Insert company failed:', error);
 
@@ -455,72 +490,122 @@ export class CompanyMasterComponent {
             'error',
           );
         },
-      );
+      });
     }
   }
 
   selectData(event: any) {
-    const ID = event?.data?.ID;
+    const ID = event?.data?.ID ?? event?.data?.COMPANY_ID ?? this.selectedEditId;
+    this.selectedEditId = ID;
 
-    if (ID !== undefined) {
-      this.dataservice.Select_CompanyList_Api(ID).subscribe((response: any) => {
-        const data = response?.Data || {};
-        this.selectedData = response;
-        this.editingRowData = { ...data };
+    if (ID !== undefined && ID !== null) {
+      this.dataservice.Select_CompanyList_Api(ID).subscribe({
+        next: (response: any) => {
+          let data: any = {};
+          if (response?.Data) {
+            data = Array.isArray(response.Data) ? response.Data[0] : response.Data;
+          } else if (Array.isArray(response)) {
+            data = response[0];
+          } else if (response) {
+            data = response;
+          }
 
-        // 🔹 PHONE split
-        if (data.PHONE) {
-          const phoneParts = data.PHONE.split('-');
-          if (phoneParts.length > 1) {
-            this.countryCodephone = phoneParts[0];
-            this.editingRowData.PHONE = phoneParts.slice(1).join('-');
+          if (!data || typeof data !== 'object') {
+            return;
+          }
+
+          this.selectedData = response;
+          this.editingRowData = { ...this.editingRowData, ...data };
+          if (data.ID ?? data.COMPANY_ID) {
+            this.selectedEditId = data.ID ?? data.COMPANY_ID;
+          }
+
+          const currentCode = (
+            data.COMPANY_CODE ??
+            data.Code ??
+            data.CODE ??
+            ''
+          )
+            .toString()
+            .trim()
+            .toLowerCase();
+          if (currentCode) {
+            this.originalCode = currentCode;
+          }
+          const currentName = (
+            data.COMPANY_NAME ??
+            data.CompanyName ??
+            data.NAME ??
+            ''
+          )
+            .toString()
+            .trim()
+            .toLowerCase();
+          if (currentName) {
+            this.originalName = currentName;
+          }
+
+          // 🔹 PHONE split
+          if (data.PHONE) {
+            const phoneParts = data.PHONE.toString().split('-');
+            if (phoneParts.length > 1) {
+              this.countryCodephone = phoneParts[0];
+              this.editingRowData.PHONE = phoneParts.slice(1).join('-');
+            } else {
+              this.countryCodephone = null;
+              this.editingRowData.PHONE = data.PHONE;
+            }
+            if (this.countryCodephone) {
+              this.onCountrycodeChangePhone({ value: this.countryCodephone });
+            }
           } else {
             this.countryCodephone = null;
-            this.editingRowData.PHONE = data.PHONE;
           }
-          if (this.countryCodephone) {
-            this.onCountrycodeChangePhone({ value: this.countryCodephone });
-          }
-        } else {
-          this.countryCodephone = null;
-        }
 
-        // 🔹 MOBILE split
-        if (data.MOBILE) {
-          const mobileParts = data.MOBILE.split('-');
-          if (mobileParts.length > 1) {
-            this.countryCodemobile = mobileParts[0];
-            this.editingRowData.MOBILE = mobileParts.slice(1).join('-');
+          // 🔹 MOBILE split
+          if (data.MOBILE) {
+            const mobileParts = data.MOBILE.toString().split('-');
+            if (mobileParts.length > 1) {
+              this.countryCodemobile = mobileParts[0];
+              this.editingRowData.MOBILE = mobileParts.slice(1).join('-');
+            } else {
+              this.countryCodemobile = null;
+              this.editingRowData.MOBILE = data.MOBILE;
+            }
+            if (this.countryCodemobile) {
+              this.onCountrycodeChangeMobile({ value: this.countryCodemobile });
+            }
           } else {
             this.countryCodemobile = null;
-            this.editingRowData.MOBILE = data.MOBILE;
           }
-          if (this.countryCodemobile) {
-            this.onCountrycodeChangeMobile({ value: this.countryCodemobile });
-          }
-        } else {
-          this.countryCodemobile = null;
-        }
 
-        // 🔹 WHATSAPP split
-        if (data.WHATSAPP) {
-          const whatsappParts = data.WHATSAPP.split('-');
-          if (whatsappParts.length > 1) {
-            this.countryCodewhatsapp = whatsappParts[0];
-            this.editingRowData.WHATSAPP = whatsappParts.slice(1).join('-');
+          // 🔹 WHATSAPP split
+          if (data.WHATSAPP) {
+            const whatsappParts = data.WHATSAPP.toString().split('-');
+            if (whatsappParts.length > 1) {
+              this.countryCodewhatsapp = whatsappParts[0];
+              this.editingRowData.WHATSAPP = whatsappParts.slice(1).join('-');
+            } else {
+              this.countryCodewhatsapp = null;
+              this.editingRowData.WHATSAPP = data.WHATSAPP;
+            }
+            if (this.countryCodewhatsapp) {
+              this.onCountrycodeChangeWhatsapp({ value: this.countryCodewhatsapp });
+            }
           } else {
             this.countryCodewhatsapp = null;
-            this.editingRowData.WHATSAPP = data.WHATSAPP;
           }
-          if (this.countryCodewhatsapp) {
-            this.onCountrycodeChangeWhatsapp({ value: this.countryCodewhatsapp });
-          }
-        } else {
-          this.countryCodewhatsapp = null;
-        }
 
-        this.selectedCompanyType = data.COMPANY_TYPE || null;
-        this.state = data.STATE_ID || null;
+          if (data.COMPANY_TYPE !== undefined && data.COMPANY_TYPE !== null) {
+            this.selectedCompanyType = data.COMPANY_TYPE;
+          }
+          if (data.STATE_ID !== undefined && data.STATE_ID !== null) {
+            this.state = data.STATE_ID;
+          }
+        },
+        error: (err: any) => {
+          console.error('Select company failed:', err);
+        },
       });
     } else {
       console.warn('No ID found in selected row event:', event);
@@ -533,9 +618,31 @@ export class CompanyMasterComponent {
       return;
     }
 
-    const Id = this.editingRowData.ID;
-    const Company_code = this.editingRowData.COMPANY_CODE?.toString().trim() || '';
-    const Company_name = this.editingRowData.COMPANY_NAME?.toString().trim() || '';
+    const Id =
+      this.selectedEditId ??
+      this.editingRowData.ID ??
+      this.editingRowData.COMPANY_ID ??
+      this.selectedData?.Data?.ID ??
+      this.selectedData?.ID;
+
+    const Company_code = (
+      this.editingRowData.COMPANY_CODE ??
+      this.editingRowData.Code ??
+      this.editingRowData.CODE ??
+      ''
+    )
+      .toString()
+      .trim();
+
+    const Company_name = (
+      this.editingRowData.COMPANY_NAME ??
+      this.editingRowData.CompanyName ??
+      this.editingRowData.NAME ??
+      ''
+    )
+      .toString()
+      .trim();
+
     const First_address = this.editingRowData.ADDRESS1 || '';
     const Second_address = this.editingRowData.ADDRESS2 || '';
     const Third_address = this.editingRowData.ADDRESS3 || '';
@@ -544,8 +651,19 @@ export class CompanyMasterComponent {
     const Mobile_no = this.editingRowData.MOBILE?.toString().trim() || '';
     const Email = this.editingRowData.EMAIL?.toString().trim() || '';
     const WhatsApp_no = this.editingRowData.WHATSAPP?.toString().trim() || '';
-    const Company_type = this.selectedCompanyType;
-    const STATE_ID = this.state;
+
+    const Company_type =
+      this.selectedCompanyType ??
+      this.editingRowData.COMPANY_TYPE ??
+      this.editingRowData.CompanyType ??
+      this.editingRowData.COMPANY_TYPE_ID;
+
+    const STATE_ID =
+      this.state ??
+      this.editingRowData.STATE_ID ??
+      this.editingRowData.StateId ??
+      this.editingRowData.STATE;
+
     const PAN = this.editingRowData.PAN_NO || '';
     const GSTNo = this.editingRowData.GST_NO || '';
     const CIN = this.editingRowData.CIN || '';
@@ -556,11 +674,26 @@ export class CompanyMasterComponent {
     const newName = Company_name.toLowerCase();
 
     const isDuplicate = this.companyList?.some((data: any) => {
-      if (data.ID === Id) return false;
-      const existingCode = data.COMPANY_CODE?.toString().trim().toLowerCase();
-      const existingName = data.COMPANY_NAME?.toString().trim().toLowerCase();
+      const dataId = data.ID ?? data.COMPANY_ID;
+      // Skip the record currently being edited
+      if (Id != null && dataId != null && String(dataId).trim() === String(Id).trim()) {
+        return false;
+      }
+      const existingCode = (data.COMPANY_CODE ?? data.CODE)?.toString().trim().toLowerCase();
+      const existingName = (data.COMPANY_NAME ?? data.NAME)?.toString().trim().toLowerCase();
 
-      return existingCode === newCode || existingName === newName;
+      // Only flag duplicate if changed to a value that exists on another record
+      const codeDuplicate =
+        newCode !== '' &&
+        newCode !== this.originalCode &&
+        existingCode === newCode;
+
+      const nameDuplicate =
+        newName !== '' &&
+        newName !== this.originalName &&
+        existingName === newName;
+
+      return codeDuplicate || nameDuplicate;
     });
 
     if (isDuplicate) {
@@ -601,10 +734,18 @@ export class CompanyMasterComponent {
       CIN: CIN,
     };
 
-    if (Company_code && Company_name && Company_type) {
+    const isCompanyTypeValid =
+      Company_type !== null &&
+      Company_type !== undefined &&
+      Company_type !== '';
+
+    const isCompanyCodeValid = Company_code.length > 0;
+    const isCompanyNameValid = Company_name.length > 0;
+
+    if (isCompanyCodeValid && isCompanyNameValid && isCompanyTypeValid) {
       this.isSaving = true;
-      this.dataservice.Update_CompanyList_Api(payload).subscribe(
-        (res: any) => {
+      this.dataservice.Update_CompanyList_Api(payload).subscribe({
+        next: (res: any) => {
           this.isSaving = false;
           notify(
             {
@@ -618,19 +759,28 @@ export class CompanyMasterComponent {
           this.editPopup = false;
           this.get_Company_List();
         },
-        (error) => {
+        error: (error: any) => {
           this.isSaving = false; // ✅ STOP loading
           console.error('Update failed:', error);
 
           notify(
             {
-              message: 'Failed to update data. Please try again.',
+              message: error?.error?.message || 'Failed to update data. Please try again.',
               position: { at: 'top right', my: 'top right' },
               displayTime: 1500,
             },
             'error',
           );
         },
+      });
+    } else {
+      notify(
+        {
+          message: 'Please fill all required fields',
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 1500,
+        },
+        'error',
       );
     }
   }

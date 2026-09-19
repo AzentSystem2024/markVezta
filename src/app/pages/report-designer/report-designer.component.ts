@@ -15,7 +15,7 @@ export enum ReportType {
     PurchaseReturn = 20,
     DeliveryNote = 23,
     SalesReturn = 26,
-    CustomerReceipts = 27,
+    MiscPurchaseInvoice = 27,
     SalaryPayment = 30
 }
 
@@ -177,6 +177,8 @@ export enum ReportType {
   styles: [`
     .dashboard-container {
         padding: 20px;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
     }
     .header-row {
         display: flex;
@@ -261,7 +263,7 @@ export class ReportDesignerComponent implements OnInit {
     { name: 'Purchase Return', value: ReportType.PurchaseReturn },
     { name: 'Delivery Note', value: ReportType.DeliveryNote },
     { name: 'Sales Return', value: ReportType.SalesReturn },
-    { name: 'Customer Receipts', value: ReportType.CustomerReceipts },
+    { name: 'Misc Purchase Invoice', value: ReportType.MiscPurchaseInvoice },
     { name: 'Salary Payment', value: ReportType.SalaryPayment }
   ];
 

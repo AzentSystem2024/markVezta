@@ -108,6 +108,7 @@ export class AddDebitComponent {
     VEHICLE_NO: '',
     ROUND_OFF: false,
     SUB_TYPE_ID: 0,
+    FIN_ID: 0,
     NOTE_DETAIL: [
       {
         SL_NO: '',
@@ -137,6 +138,7 @@ export class AddDebitComponent {
   GST_PERC: any;
   netAmount: string;
   selectedCompany: any;
+  finId: any;
   companyState: any;
   GST: any;
   distributorList: any;
@@ -213,6 +215,7 @@ export class AddDebitComponent {
         this.debitFormData.USER_ID = userData.USER_ID;
       }
 
+      this.finId = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
       if (firstFinYear?.FIN_ID) {
         this.debitFormData.FIN_ID = firstFinYear.FIN_ID;
@@ -1300,6 +1303,7 @@ export class AddDebitComponent {
         TRANS_DATE: this.formatDate(this.debitFormData.TRANS_DATE),
         ADD_TIME: this.formatDate(new Date()),
         SALE_DATE: this.formatDate(new Date()),
+        FIN_ID: this.debitFormData.FIN_ID
       }),
     );
 
@@ -1423,8 +1427,10 @@ export class AddDebitComponent {
           AMOUNT: Number(row.Amount) || 0,
           // GST_PERC: Number(row.GST_PERC) || 0,
           GST_PERC: row.GST_ID ?? row.GST_PERC,
-          CGST: Number(row.CGST) || 0,
-          SGST: Number(row.SGST) || 0,
+          // CGST: Number(row.CGST) || 0,
+          // SGST: Number(row.SGST) || 0,
+          CGST: 0,
+          SGST: 0,
           GST_AMOUNT: gstAmount,
           REMARKS: row.particulars || '',
         };
@@ -1439,27 +1445,9 @@ export class AddDebitComponent {
 
     // const isSameState = companyState === supplierState;
 
-    // ✅ FINAL TAX LOGIC (BASED ON STATE)
-    const companyState = this.companyState?.trim().toLowerCase();
-    const supplierState =
-      this.selectedSupplier?.STATE_NAME?.trim().toLowerCase();
-
-    const isSameState = companyState === supplierState;
-
     this.debitFormData.NOTE_DETAIL.forEach((row: any) => {
-      const gstPerc = Number(row.GST_PERC) || 0;
-
-      if (isSameState) {
-        // SAME STATE → split into CGST + SGST
-        row.CGST = gstPerc / 2;
-        row.SGST = gstPerc / 2;
-        row.GST_PERC = row.GST_PERC;
-      } else {
-        // DIFFERENT STATE → keep GST_PERC (IGST)
-        row.CGST = 0;
-        row.SGST = 0;
-        row.GST_PERC = row.GST_PERC;
-      }
+      row.CGST = 0;
+      row.SGST = 0;
     });
 
     // 4. Other fields
@@ -1476,6 +1464,7 @@ export class AddDebitComponent {
       this.debitFormData.SALE_DATE,
     );
     this.debitFormData.COMPANY_ID = this.selectedCompany;
+    this.debitFormData.FIN_ID = this.debitFormData.FIN_ID || this.finId || 0;
 
     //  NEW LOGIC HERE
     if (this.debitFormData.IS_APPROVED) {
@@ -1512,6 +1501,7 @@ export class AddDebitComponent {
       UNIT_ID: '',
       DUE_AMOUNT: '',
       SUB_TYPE_ID: null,
+      FIN_ID: this.finId || this.debitFormData.FIN_ID || 0,
       IS_APPROVED: false,
       NOTE_DETAIL: [
         {
@@ -1663,4 +1653,4 @@ export class AddDebitComponent {
   exports: [AddDebitComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddDebitModule {}
+export class AddDebitModule { }

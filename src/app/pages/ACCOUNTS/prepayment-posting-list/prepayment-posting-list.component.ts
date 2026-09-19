@@ -432,20 +432,23 @@ export class PrepaymentPostingListComponent {
     const rowData = e.row.data;
 
     // Open document -> Verify screen
-    if (rowData.TRANS_STATUS === 'Open') {
-      if (!this.canVerify) return;
+    if (rowData.TRANS_STATUS === 'Open' || rowData.TRANS_STATUS === 1) {
+      if (!this.canVerify && !this.canApprove) return;
       this.StatusType = 'verifyscreen';
     }
 
     // Verified document -> Approve screen
-    else if (rowData.TRANS_STATUS === 'Verify') {
+    else if (rowData.TRANS_STATUS === 'Verify' || rowData.TRANS_STATUS === 2) {
       if (!this.canApprove) return;
       this.StatusType = 'approvescreen';
     }
 
     // Approved
-    else if (rowData.TRANS_STATUS === 'Approved') {
-
+    else if (
+      rowData.TRANS_STATUS === 'Approved' ||
+      rowData.TRANS_STATUS === 'Approve' ||
+      rowData.TRANS_STATUS === 5
+    ) {
       // If user has Edit privilege, don't open from badge
       if (this.canEdit) {
         return;

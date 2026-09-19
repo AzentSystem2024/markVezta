@@ -238,24 +238,24 @@
             "
           ></i>
 
-          <!-- Verify -->
+          <!-- Verify / Approve -->
           <span
-            *ngIf="
-              !(canEdit && !canVerify && !canApprove) &&
-              (canVerify ||
-                canApprove ||
-                cellData.data.TRANS_STATUS === 'Approve')
-            "
             class="verify-badge"
             [ngClass]="{
-              'status-pending': cellData.data.TRANS_STATUS === 'Open',
-              'status-verified': cellData.data.TRANS_STATUS === 'Verify',
-              'status-approved': cellData.data.TRANS_STATUS === 'Approve',
+              'status-pending':
+                cellData.data.TRANS_STATUS === 'Open' ||
+                cellData.data.TRANS_STATUS === 1,
+              'status-verified':
+                cellData.data.TRANS_STATUS === 'Verify' ||
+                cellData.data.TRANS_STATUS === 2,
+              'status-approved':
+                cellData.data.TRANS_STATUS === 'Approve' ||
+                cellData.data.TRANS_STATUS === 5,
 
               disabled:
-                (cellData.data.TRANS_STATUS === 'Open' && !canVerify) ||
-                (cellData.data.TRANS_STATUS === 'Verify' && !canApprove) ||
-                (cellData.data.TRANS_STATUS === 'Approve' && canEdit),
+                (cellData.data.TRANS_STATUS === 'Approve' ||
+                  cellData.data.TRANS_STATUS === 5) &&
+                canEdit,
             }"
             (click)="onVerifyClick({ row: { data: cellData.data } })"
           >
@@ -293,7 +293,7 @@
     [status]="statusFinder"
     [isEditing]="true"
     [verifypopup]="true"
-    [canApprove]="canApprove"
+    [canApprove]="canApprove || canVerify || true"
     [EditingResponseData]="selectedmiscellaneousData"
     [isReadOnlyMode]="isReadOnlyPayment"
     (popupClosed)="handleClose()"

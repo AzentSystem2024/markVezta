@@ -511,6 +511,7 @@
                 [searchEnabled]="true"
                 [items]="CompanyTypeDropdown"
                 [(value)]="selectedCompanyType"
+                (onValueChanged)="onCompanyTypeChanged($event)"
               >
                 <dx-validator>
                   <dxi-validation-rule

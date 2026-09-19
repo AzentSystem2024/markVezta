@@ -210,6 +210,10 @@ export class LedgerSettingsListComponent {
       'Sales Account': 'AC_SALE_ID',
       'Depreciation Expense': 'AC_DEPRECIATION_EXPENSE_ID',
       'Goods in Transit': 'AC_GOODS_TRANSIT',
+      'Cost of Inventory': 'AC_COST_INVENTORY_ID',
+      'Input VAT': 'AC_INPUT_VAT',
+      'Output VAT': 'AC_OUTPUT_VAT',
+      'Inventory': 'AC_INVENTORY_ID',
     };
     const payload: any = {
       COMPANY_ID: this.companyID,
