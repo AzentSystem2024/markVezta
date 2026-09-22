@@ -7561,10 +7561,14 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getNewOrderList(payload: any = {}): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderList`, payload);
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderSummary`, payload);
   }
 
   saveNewOrderCartToOrder(payload: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/SaveCartToOrder`, payload);
+  }
+
+  getNewOrderDetail(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderDetail`, payload);
   }
 }

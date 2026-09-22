@@ -33,12 +33,12 @@
   padding: 4px 12px;
   border: none;
   cursor: pointer;
-  
+
   .add-btn-content {
     display: flex;
     align-items: center;
     gap: 4px;
-    
+
     .iconify {
       display: inline-block;
       vertical-align: middle;
@@ -55,22 +55,51 @@
 }
 
 .status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 600;
   display: inline-block;
-  min-width: 80px;
+  min-width: 60px;
 
-  &.status-1 { background-color: #fff3cd; color: #856404; } /* Draft - Yellow */
-  &.status-2 { background-color: #cce5ff; color: #004085; } /* Open - Blue */
-  &.status-3 { background-color: #d4edda; color: #155724; } /* Accepted - Green */
-  &.status-4 { background-color: #f8d7da; color: #721c24; } /* Rejected - Red */
-  &.status-5, &.status-6 { background-color: #e2e3e5; color: #383d41; } /* Production - Gray */
-  &.status-7, &.status-8 { background-color: #d1ecf1; color: #0c5460; } /* Partial/Transit - Cyan */
-  &.status-9 { background-color: #d4edda; color: #155724; } /* Delivered - Green */
-  &.status-10 { background-color: #f8d7da; color: #721c24; } /* Cancelled - Red */
-  &.status-11 { background-color: #c3e6cb; color: #155724; } /* Allocated - Green */
+  &.status-1 {
+    background-color: #fff3cd;
+    color: #856404;
+  } /* Draft - Yellow */
+  &.status-2 {
+    background-color: #cce5ff;
+    color: #004085;
+  } /* Open - Blue */
+  &.status-3 {
+    background-color: #d4edda;
+    color: #155724;
+  } /* Accepted - Green */
+  &.status-4 {
+    background-color: #f8d7da;
+    color: #721c24;
+  } /* Rejected - Red */
+  &.status-5,
+  &.status-6 {
+    background-color: #e2e3e5;
+    color: #383d41;
+  } /* Production - Gray */
+  &.status-7,
+  &.status-8 {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  } /* Partial/Transit - Cyan */
+  &.status-9 {
+    background-color: #d4edda;
+    color: #155724;
+  } /* Delivered - Green */
+  &.status-10 {
+    background-color: #f8d7da;
+    color: #721c24;
+  } /* Cancelled - Red */
+  &.status-11 {
+    background-color: #c3e6cb;
+    color: #155724;
+  } /* Allocated - Green */
 }
 
 .toolbar-divider {
@@ -84,13 +113,54 @@
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  
+
   .dx-icon {
     color: #666;
     font-size: 18px;
   }
-  
+
   &:hover .dx-icon {
     color: #333;
+  }
+}
+
+::ng-deep {
+  .dx-datagrid .dx-master-detail-row > .dx-master-detail-cell {
+    padding: 10px 10px 15px 20px !important;
+    position: relative;
+  }
+
+  .master-detail-flow-container {
+    position: sticky;
+    left: 25px;
+    max-width: calc(100vw - 120px);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: #fff;
+    padding: 5px;
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .flow-arrow {
+    position: absolute;
+    left: -20px;
+    top: -15px;
+    width: 20px;
+    height: 30px;
+    border-left: 2px solid #03b12b;
+    border-bottom: 2px solid #03b12b;
+    border-bottom-left-radius: 6px;
+  }
+
+  .flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    bottom: -6px;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid #03b12b;
   }
 }

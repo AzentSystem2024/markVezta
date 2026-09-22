@@ -27,13 +27,52 @@
       [scrolling]="{ mode: 'virtual' }"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
+      keyExpr="ORDER_ID"
+      (onRowExpanding)="onRowExpanding($event)"
+      (onRowCollapsed)="onRowCollapsed($event)"
       (onExporting)="onExporting($event)"
     >
-      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+      <dxo-filter-row [visible]="false"></dxo-filter-row>
 
-      <dxo-header-filter [visible]="isFilterRowVisible">
+      <dxo-header-filter [visible]="false">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
+
+      <dxo-master-detail
+        [enabled]="true"
+        template="detailTemplate"
+      ></dxo-master-detail>
+
+      <div
+        class="master-detail-flow-container"
+        *dxTemplate="let masterData of 'detailTemplate'"
+      >
+        <div class="flow-arrow"></div>
+        <div
+          class="detail-grid-container"
+          style="position: relative; min-height: 50px"
+        >
+          <div
+            *ngIf="detailLoadingMap[masterData.key]"
+            style="text-align: center; padding: 20px"
+          >
+            <dx-load-indicator [visible]="true"></dx-load-indicator>
+            <div style="margin-top: 10px; color: #666">Loading details...</div>
+          </div>
+          <dx-data-grid
+            *ngIf="!detailLoadingMap[masterData.key]"
+            [dataSource]="detailDataMap[masterData.key] || []"
+            noDataText="No details available"
+            [showBorders]="true"
+            [columnAutoWidth]="true"
+            [rowAlternationEnabled]="true"
+            [showRowLines]="true"
+            [customizeColumns]="customizeDetailColumns"
+            [height]="'30vh'"
+          >
+          </dx-data-grid>
+        </div>
+      </div>
 
       <dxo-export
         [enabled]="true"
@@ -79,6 +118,13 @@
 
         <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
 
+        <dxi-item location="after" template="statusFilterTemplate"></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
         <dxi-item
           location="after"
           widget="dxButton"
@@ -111,6 +157,22 @@
         ></dxi-item>
       </dxo-toolbar>
 
+      <div *dxTemplate="let data of 'statusFilterTemplate'">
+        <dx-tag-box
+          [dataSource]="getStatusFilterData"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="selectedStatuses"
+          [showSelectionControls]="true"
+          applyValueMode="useButtons"
+          [searchEnabled]="true"
+          placeholder="Status"
+          width="300"
+          [multiline]="false"
+          (onValueChanged)="onStatusChanged($event)"
+        ></dx-tag-box>
+      </div>
+
       <div *dxTemplate="let data of 'dateFilterTemplate'">
         <dx-select-box
           [dataSource]="dateRanges"
@@ -128,52 +190,57 @@
         </dx-select-box>
       </div>
 
-      <dxi-column dataField="OrderId" caption="Order ID"></dxi-column>
       <dxi-column
-        dataField="Orderdate"
+        dataField="ORDER_NO"
+        caption="Order ID"
+        [fixed]="true"
+      ></dxi-column>
+      <dxi-column
+        dataField="ORDER_DATE"
         caption="Order Date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-      <dxi-column dataField="Dealer" caption="Dealer"></dxi-column>
-      <dxi-column dataField="SubDealer" caption="Sub Dealer"></dxi-column>
-      <dxi-column dataField="Location" caption="Location"></dxi-column>
+      <dxi-column dataField="DEALER" caption="Dealer"></dxi-column>
+      <dxi-column dataField="SUBDEALER" caption="Sub Dealer"></dxi-column>
+      <dxi-column dataField="LOCATION" caption="Location"></dxi-column>
 
       <dxi-column
-        dataField="OrderQty"
+        dataField="ORDER_QTY"
         caption="Order Qty"
         dataType="number"
       ></dxi-column>
       <dxi-column
-        dataField="AllocatedQty"
+        dataField="ALLOCATED_QTY"
         caption="Allocated Qty"
         dataType="number"
       ></dxi-column>
       <dxi-column
-        dataField="ScanQty"
+        dataField="SCAN_QTY"
         caption="Scan Qty"
         dataType="number"
       ></dxi-column>
       <dxi-column
-        dataField="cancelledQty"
+        dataField="CANCELLED_QTY"
         caption="Cancelled Qty"
         dataType="number"
       ></dxi-column>
       <dxi-column
-        dataField="IssuesQty"
+        dataField="ISSUED_QTY"
         caption="Issues Qty"
         dataType="number"
       ></dxi-column>
       <dxi-column
-        dataField="OpenQty"
+        dataField="OPEN_QTY"
         caption="Open Qty"
         dataType="number"
       ></dxi-column>
 
       <dxi-column
-        dataField="Status"
+        dataField="ORDER_STATUS"
         caption="Status"
         [width]="150"
+        [alignment]="'center'"
         cellTemplate="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{ dataSource: getStatusFilterData }"
@@ -181,37 +248,32 @@
 
       <div *dxTemplate="let cell of 'statusCellRender'">
         <div style="text-align: center; width: 100%">
-          <span
-            class="status-badge status-{{
-              cell.data.Status || cell.data.STATUS
-            }}"
-          >
+          <span class="status-badge status-{{ cell.data.ORDER_STATUS }}">
             {{
-              cell.data.Status === 1 || cell.data.STATUS === 1
-                ? "Draft"
-                : cell.data.Status === 2 || cell.data.STATUS === 2
-                  ? "Open"
-                  : cell.data.Status === 3 || cell.data.STATUS === 3
-                    ? "Accepted"
-                    : cell.data.Status === 4 || cell.data.STATUS === 4
-                      ? "Rejected"
-                      : cell.data.Status === 5 || cell.data.STATUS === 5
-                        ? "In Production"
-                        : cell.data.Status === 6 || cell.data.STATUS === 6
-                          ? "Production Completed"
-                          : cell.data.Status === 7 || cell.data.STATUS === 7
-                            ? "Partial"
-                            : cell.data.Status === 8 || cell.data.STATUS === 8
-                              ? "In Transit"
-                              : cell.data.Status === 9 || cell.data.STATUS === 9
-                                ? "Delivered"
-                                : cell.data.Status === 10 ||
-                                    cell.data.STATUS === 10
-                                  ? "Cancelled"
-                                  : cell.data.Status === 11 ||
-                                      cell.data.STATUS === 11
-                                    ? "Allocated"
-                                    : "Unknown"
+              cell.data.STATUS_DESCRIPTION ||
+                (cell.data.ORDER_STATUS === 1
+                  ? "Draft"
+                  : cell.data.ORDER_STATUS === 2
+                    ? "Open"
+                    : cell.data.ORDER_STATUS === 3
+                      ? "Accepted"
+                      : cell.data.ORDER_STATUS === 4
+                        ? "Rejected"
+                        : cell.data.ORDER_STATUS === 5
+                          ? "In Production"
+                          : cell.data.ORDER_STATUS === 6
+                            ? "Production Completed"
+                            : cell.data.ORDER_STATUS === 7
+                              ? "Partial"
+                              : cell.data.ORDER_STATUS === 8
+                                ? "In Transit"
+                                : cell.data.ORDER_STATUS === 9
+                                  ? "Delivered"
+                                  : cell.data.ORDER_STATUS === 10
+                                    ? "Cancelled"
+                                    : cell.data.ORDER_STATUS === 11
+                                      ? "Allocated"
+                                      : "Unknown")
             }}
           </span>
         </div>
@@ -220,22 +282,21 @@
       <dxi-column
         type="buttons"
         caption="Actions"
-        [width]="100"
+        [width]="80"
         cellTemplate="actionTemplate"
+        [fixed]="true"
+        fixedPosition="right"
       ></dxi-column>
 
       <div *dxTemplate="let cell of 'actionTemplate'">
         <div class="action-icons" style="text-align: center">
           <i
             class="dx-icon dx-icon-edit"
-            [style.opacity]="
-              cell.data.Status === 1 || cell.data.STATUS === 1 ? '1' : '0.4'
+            [style.opacity]="cell.data.ORDER_STATUS === 1 ? '1' : '0.4'"
+            [style.cursor]="
+              cell.data.ORDER_STATUS === 1 ? 'pointer' : 'not-allowed'
             "
-            [style.pointer-events]="
-              cell.data.Status === 1 || cell.data.STATUS === 1 ? 'auto' : 'none'
-            "
-            title="Edit Order"
-            (click)="editOrder(cell.data)"
+            (click)="cell.data.ORDER_STATUS === 1 ? editOrder(cell.data) : null"
           ></i>
         </div>
       </div>

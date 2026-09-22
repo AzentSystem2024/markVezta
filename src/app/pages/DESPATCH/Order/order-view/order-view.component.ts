@@ -1,21 +1,42 @@
-import { Component, OnInit, ViewChild, NgModule, ChangeDetectorRef, NgZone } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  NgModule,
+  ChangeDetectorRef,
+  NgZone,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services/data.service';
-import { DxDataGridModule, DxButtonModule, DxDataGridComponent, DxSelectBoxModule } from 'devextreme-angular';
+import {
+  DxDataGridModule,
+  DxButtonModule,
+  DxDataGridComponent,
+  DxSelectBoxModule,
+  DxTagBoxModule,
+  DxLoadIndicatorModule,
+} from 'devextreme-angular';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { ExportService } from 'src/app/services/export.service';
 
 @Component({
   selector: 'app-order-view',
   templateUrl: './order-view.component.html',
-  styleUrls: ['./order-view.component.scss']
+  styleUrls: ['./order-view.component.scss'],
 })
 export class OrderViewComponent implements OnInit {
   @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
-  
+
   orderList: any[] = [];
   isLoading = false;
   isFilterRowVisible = false;
+  showFilterRow = false;
+  isFilterOpened = false;
+
+  detailDataMap: { [key: number]: any[] } = {};
+  detailLoadingMap: { [key: number]: boolean } = {};
+  expandedRowKeys: number[] = [];
 
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -25,11 +46,14 @@ export class OrderViewComponent implements OnInit {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
+  
   selectedDateRange: string = 'today';
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup = false;
-  
+
+  selectedStatuses: any[] = [];
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -65,51 +89,62 @@ export class OrderViewComponent implements OnInit {
     onClick: () => this.refreshGrid(),
     text: '',
   };
-  
-  getStatusFilterData = [
-    { text: 'Draft', value: 1 },
-    { text: 'Open', value: 2 },
-    { text: 'Accepted', value: 3 },
-    { text: 'Rejected', value: 4 },
-    { text: 'In Production', value: 5 },
-    { text: 'Production Completed', value: 6 },
-    { text: 'Partial', value: 7 },
-    { text: 'In Transit', value: 8 },
-    { text: 'Delivered', value: 9 },
-    { text: 'Cancelled', value: 10 },
-    { text: 'Allocated', value: 11 }
-  ];
+
+  getStatusFilterData: any[] = [];
 
   constructor(
     private dataService: DataService,
     private router: Router,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private exportService: ExportService,
   ) {}
 
   ngOnInit(): void {
+    this.loadStatusFilterData();
     this.loadOrders();
+  }
+
+  loadStatusFilterData() {
+    this.dataService.getDropdownData({ name: 'ORDER_STATUS' }).subscribe({
+      next: (res: any) => {
+        this.getStatusFilterData = res || [];
+      },
+      error: (err) => {
+        console.error('Error fetching order statuses:', err);
+      },
+    });
   }
 
   loadOrders() {
     this.isLoading = true;
     const datePayload = this.getDateRangePayload(this.selectedDateRange);
 
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || 0;
+
     const payload = {
+      USER_ID: userId,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      ORDER_STATUS:
+        this.selectedStatuses && this.selectedStatuses.length > 0
+          ? this.selectedStatuses.join(',')
+          : null,
     };
 
     this.dataService.getNewOrderList(payload).subscribe(
       (res: any) => {
         this.isLoading = false;
         // Ensure robust parsing depending on typical response structure
-        this.orderList = Array.isArray(res) ? res : (res?.Data || []);
+        this.orderList = Array.isArray(res) ? res : res?.Data || [];
       },
       (error: any) => {
         this.isLoading = false;
         console.error('Error fetching orders:', error);
-      }
+      },
     );
   }
 
@@ -122,8 +157,17 @@ export class OrderViewComponent implements OnInit {
 
   toggleFilterRow = () => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
-    this.cdr.detectChanges();
+    const grid = this.dataGrid?.instance;
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterRowVisible);
+      grid.option('headerFilter.visible', this.isFilterRowVisible);
+    }
   };
+
+  onStatusChanged(e: any) {
+    this.selectedStatuses = e.value;
+    this.loadOrders();
+  }
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
@@ -192,13 +236,6 @@ export class OrderViewComponent implements OnInit {
     return `${day}-${month}-${year}`;
   }
 
-  private formatAsYYYYMMDD(date: Date): string {
-    const yyyy = date.getFullYear();
-    const mm = (date.getMonth() + 1).toString().padStart(2, '0');
-    const dd = date.getDate().toString().padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  }
-
   private getDateRangePayload(range: string) {
     const today = new Date();
     let fromDate: Date | null = null;
@@ -250,8 +287,8 @@ export class OrderViewComponent implements OnInit {
     }
 
     return {
-      DATE_FROM: fromDate ? this.formatAsYYYYMMDD(fromDate) : null,
-      DATE_TO: toDate ? this.formatAsYYYYMMDD(toDate) : null,
+      DATE_FROM: fromDate ? fromDate.toISOString() : null,
+      DATE_TO: toDate ? toDate.toISOString() : null,
     };
   }
 
@@ -261,15 +298,76 @@ export class OrderViewComponent implements OnInit {
 
   editOrder(order: any) {
     // Get actual status and id fields, accounting for potential case differences
-    const status = order.Status !== undefined ? order.Status : order.STATUS;
-    if (status === 1 || status === '1') { // 1 = Draft
+    const status =
+      order.Status !== undefined
+        ? order.Status
+        : order.STATUS !== undefined
+          ? order.STATUS
+          : order.ORDER_STATUS;
+    if (status === 1 || status === '1') {
+      // 1 = Draft
       const orderId = order.OrderId || order.ORDER_ID;
-      this.router.navigate(['/DESPATCH/new-order'], { queryParams: { id: orderId } });
+      this.router.navigate(['/DESPATCH/new-order'], {
+        queryParams: { id: orderId },
+      });
     }
   }
 
+  onRowExpanding(e: any) {
+    const orderId = e.key;
+    if (!this.expandedRowKeys.includes(orderId)) {
+      this.expandedRowKeys.push(orderId);
+    }
+
+    if (!this.detailDataMap[orderId]) {
+      this.detailLoadingMap[orderId] = true;
+      this.dataService.getNewOrderDetail({ ORDER_ID: orderId }).subscribe({
+        next: (res: any) => {
+          this.detailDataMap[orderId] = res?.Data?.ORDER_DETAILS || [];
+          this.detailLoadingMap[orderId] = false;
+          // trigger change detection
+          this.detailDataMap = { ...this.detailDataMap };
+        },
+        error: (err) => {
+          console.error('Error fetching order details', err);
+          this.detailDataMap[orderId] = [];
+          this.detailLoadingMap[orderId] = false;
+          this.detailDataMap = { ...this.detailDataMap };
+        },
+      });
+    }
+  }
+
+  onRowCollapsed(e: any) {
+    const orderId = e.key;
+    this.expandedRowKeys = this.expandedRowKeys.filter((k) => k !== orderId);
+    delete this.detailDataMap[orderId];
+  }
+
+  customizeDetailColumns = (columns: any[]) => {
+    const hiddenFields = [
+      'ROW_ID',
+      'STATUS',
+      'REPLACE_PACKING_ID',
+      'ORDER_ID',
+      'ORDER_ENTRY_ID',
+      'CART_ID',
+      'PRODUCT_ID',
+      'PACKING_ID',
+      'UNIT_ID',
+      'CATEGORY_ID',
+      'ITEM_ID',
+      'IS_ANY_COMB',
+    ];
+    columns.forEach((col) => {
+      if (hiddenFields.includes(col.dataField)) {
+        col.visible = false;
+      }
+    });
+  };
+
   onExporting(e: any) {
-    // Standard export handled by DevExtreme grid export feature
+    this.exportService.onExporting(e, 'order data');
   }
 }
 
@@ -279,7 +377,9 @@ export class OrderViewComponent implements OnInit {
     DxDataGridModule,
     DxButtonModule,
     DxSelectBoxModule,
-    CustomDatePopupModule
+    DxTagBoxModule,
+    DxLoadIndicatorModule,
+    CustomDatePopupModule,
   ],
   declarations: [OrderViewComponent],
   exports: [OrderViewComponent],

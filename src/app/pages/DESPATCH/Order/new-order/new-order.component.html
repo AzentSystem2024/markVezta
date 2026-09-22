@@ -91,35 +91,17 @@
                 ></dx-select-box>
 
                 <div class="row">
-                  <div class="col-md-6">
-                    <!-- Category -->
+                  <div class="col-12">
+                    <!-- Address -->
                     <dx-select-box
-                      [dataSource]="categories"
-                      displayExpr="name"
-                      valueExpr="id"
-                      [(value)]="currentEditingItem.categoryId"
-                      (onValueChanged)="onCategoryChange($event)"
-                      placeholder="Select Category"
-                      [disabled]="!selectedDealerId"
-                      [showClearButton]="true"
-                      class="rounded-input"
-                    ></dx-select-box>
-                  </div>
-
-                  <div class="col-md-6">
-                    <!-- Art No -->
-                    <dx-select-box
-                      [dataSource]="artNosDataSource"
-                      [(value)]="currentEditingItem.artNoId"
-                      (onValueChanged)="onArtNoChange($event)"
+                      [dataSource]="addresses"
+                      displayExpr="ADDRESS"
+                      valueExpr="ID"
+                      [(value)]="selectedAddressId"
                       [placeholder]="
-                        isLoadingArtNos ? 'Loading...' : 'Search Art No'
+                        isLoadingAddresses ? 'Loading...' : 'Select Address'
                       "
-                      [disabled]="
-                        !selectedDealerId ||
-                        isLoadingArtNos ||
-                        !currentEditingItem.categoryId
-                      "
+                      [disabled]="!selectedDealerId || isLoadingAddresses"
                       [searchEnabled]="true"
                       [showClearButton]="true"
                       class="rounded-input"
@@ -129,14 +111,14 @@
 
                 <div class="row">
                   <div class="col-12">
-                    <!-- Address -->
+                    <!-- Warehouse -->
                     <dx-select-box
-                      [dataSource]="addresses"
-                      displayExpr="ADDRESS"
-                      valueExpr="ID"
-                      [(value)]="selectedAddressId"
-                      [placeholder]="isLoadingAddresses ? 'Loading...' : 'Select Address'"
-                      [disabled]="!selectedDealerId || isLoadingAddresses"
+                      [dataSource]="warehouses"
+                      displayExpr="name"
+                      valueExpr="id"
+                      [(value)]="selectedWarehouseId"
+                      placeholder="Select Warehouse"
+                      [disabled]="!selectedDealerId"
                       [searchEnabled]="true"
                       [showClearButton]="true"
                       class="rounded-input"
@@ -174,15 +156,36 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-9">
-                <!-- Warehouse -->
+
+              <div class="col-md-5">
+                <!-- Category -->
                 <dx-select-box
-                  [dataSource]="warehouses"
+                  [dataSource]="categories"
                   displayExpr="name"
                   valueExpr="id"
-                  [(value)]="selectedWarehouseId"
-                  placeholder="Select Warehouse"
+                  [(value)]="currentEditingItem.categoryId"
+                  (onValueChanged)="onCategoryChange($event)"
+                  placeholder="Select Category"
                   [disabled]="!selectedDealerId"
+                  [showClearButton]="true"
+                  class="rounded-input"
+                ></dx-select-box>
+              </div>
+
+              <div class="col-md-4">
+                <!-- Art No -->
+                <dx-select-box
+                  [dataSource]="artNosDataSource"
+                  [(value)]="currentEditingItem.artNoId"
+                  (onValueChanged)="onArtNoChange($event)"
+                  [placeholder]="
+                    isLoadingArtNos ? 'Loading...' : 'Search Art No'
+                  "
+                  [disabled]="
+                    !selectedDealerId ||
+                    isLoadingArtNos ||
+                    !currentEditingItem.categoryId
+                  "
                   [searchEnabled]="true"
                   [showClearButton]="true"
                   class="rounded-input"
@@ -220,6 +223,8 @@
                   [hoverStateEnabled]="true"
                   height="37vh"
                   class="size-data-grid"
+                  [rowAlternationEnabled]="true"
+                  rowAlternationInterval="2"
                 >
                   <dxo-scrolling mode="virtual"></dxo-scrolling>
 
