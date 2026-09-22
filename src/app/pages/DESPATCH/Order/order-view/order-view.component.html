@@ -311,3 +311,23 @@
   (applyDates)="onCustomDateApplied($event)"
 >
 </app-custom-date-popup>
+
+<dx-popup
+  [(visible)]="isNewOrderPopupVisible"
+  [fullScreen]="false"
+  [showTitle]="true"
+  title="Edit Order"
+  [showCloseButton]="true"
+  [closeOnOutsideClick]="false"
+  width="98vw"
+  height="98vh"
+>
+  <div *dxTemplate="let data of 'content'" style="padding: 0">
+    <app-new-order
+      *ngIf="isNewOrderPopupVisible"
+      [editDealerId]="selectedEditDealerId"
+      [editOrderId]="selectedEditOrderId"
+      (closePopup)="onNewOrderClosed()"
+    ></app-new-order>
+  </div>
+</dx-popup>

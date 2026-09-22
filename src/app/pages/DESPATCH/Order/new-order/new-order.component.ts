@@ -3,6 +3,11 @@ import {
   OnInit,
   NgModule,
   CUSTOM_ELEMENTS_SCHEMA,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { CommonModule } from '@angular/common';
@@ -43,7 +48,11 @@ export interface CartItem {
   templateUrl: './new-order.component.html',
   styleUrls: ['./new-order.component.scss'],
 })
-export class NewOrderComponent implements OnInit {
+export class NewOrderComponent implements OnInit, OnChanges {
+  @Input() editDealerId: number | null = null;
+  @Input() editOrderId: number | null = null;
+  @Output() closePopup = new EventEmitter<void>();
+
   // Navigation tabs
   activeTab: 'dealer' | 'subdealer' = 'dealer';
   searchQuery: string = '';
@@ -92,6 +101,24 @@ export class NewOrderComponent implements OnInit {
     private dataService: DataService,
   ) {
     this.currentEditingItem = this.getEmptyCartItem();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['editDealerId'] || changes['editOrderId']) {
+      if (this.editDealerId && this.editOrderId) {
+        this.selectedDealerId = this.editDealerId;
+        this.onDealerChange({ value: this.editDealerId });
+        this.currentEditingItem.orderId = this.editOrderId;
+      } else {
+        // Reset state for new
+        this.selectedDealerId = null;
+        this.cartItems = [];
+        this.currentEditingItem = this.getEmptyCartItem();
+        this.isEditMode = false;
+        this.isSettingEditData = false;
+        this.selectedWarehouseId = null;
+      }
+    }
   }
 
   ngOnInit(): void {
@@ -167,6 +194,15 @@ export class NewOrderComponent implements OnInit {
         this.distributorsCache[tab] = data;
         this.currentDistributors = data;
         this.isLoadingDealers = false;
+
+        if (this.selectedDealerId) {
+          const selectedDealer = this.currentDistributors.find(
+            (d: any) => d.ID === this.selectedDealerId,
+          );
+          if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
+            this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
+          }
+        }
       },
       (error) => {
         console.error(`Error fetching ${apiName}`, error);
@@ -922,6 +958,10 @@ export class NewOrderComponent implements OnInit {
               sizes: sizes,
             });
           });
+          
+          if (this.cartItems.length === 1 && this.editOrderId) {
+            this.editCartItem(this.cartItems[0]);
+          }
         } else {
           this.cartItems = [];
         }
@@ -1190,8 +1230,7 @@ export class NewOrderComponent implements OnInit {
         this.isProcessing = false;
         if (res.Flag === 1) {
           notify('Order Submitted Successfully!', 'success', 3000);
-          this.cartItems = [];
-          this.loadCartData();
+          this.closePopup.emit();
         } else {
           const errMsg = res.Message || 'Failed to submit order';
           console.error('Failed to submit order:', errMsg);

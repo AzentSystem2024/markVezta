@@ -46,7 +46,7 @@ export class OrderViewComponent implements OnInit {
     { label: 'Last 30 Days', value: 'last30' },
     { label: 'Custom', value: 'custom' },
   ];
-  
+
   selectedDateRange: string = 'today';
   customStartDate: any = null;
   customEndDate: any = null;
@@ -91,6 +91,10 @@ export class OrderViewComponent implements OnInit {
   };
 
   getStatusFilterData: any[] = [];
+
+  isNewOrderPopupVisible: boolean = false;
+  selectedEditOrderId: number | null = null;
+  selectedEditDealerId: number | null = null;
 
   constructor(
     private dataService: DataService,
@@ -293,7 +297,9 @@ export class OrderViewComponent implements OnInit {
   }
 
   addNewOrder() {
-    this.router.navigate(['/DESPATCH/new-order']);
+    this.selectedEditOrderId = null;
+    this.selectedEditDealerId = null;
+    this.isNewOrderPopupVisible = true;
   }
 
   editOrder(order: any) {
@@ -307,10 +313,16 @@ export class OrderViewComponent implements OnInit {
     if (status === 1 || status === '1') {
       // 1 = Draft
       const orderId = order.OrderId || order.ORDER_ID;
-      this.router.navigate(['/DESPATCH/new-order'], {
-        queryParams: { id: orderId },
-      });
+      const dealerId = order.DealerId || order.DEALER_ID;
+      this.selectedEditOrderId = orderId;
+      this.selectedEditDealerId = dealerId;
+      this.isNewOrderPopupVisible = true;
     }
+  }
+
+  onNewOrderClosed() {
+    this.isNewOrderPopupVisible = false;
+    this.refreshGrid();
   }
 
   onRowExpanding(e: any) {
@@ -371,6 +383,9 @@ export class OrderViewComponent implements OnInit {
   }
 }
 
+import { NewOrderModule } from '../new-order/new-order.component';
+import { DxPopupModule } from 'devextreme-angular';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -380,6 +395,8 @@ export class OrderViewComponent implements OnInit {
     DxTagBoxModule,
     DxLoadIndicatorModule,
     CustomDatePopupModule,
+    NewOrderModule,
+    DxPopupModule,
   ],
   declarations: [OrderViewComponent],
   exports: [OrderViewComponent],
