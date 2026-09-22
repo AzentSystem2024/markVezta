@@ -6,14 +6,6 @@
         <div
           class="card shadow-sm h-100 border-0 radius-12 d-flex flex-column text-center"
         >
-          <!-- Form Header -->
-          <div
-            *ngIf="isEditMode"
-            class="d-flex justify-content-between align-items-center p-0 border-bottom text-start"
-          >
-            <h6 class="m-0 text-primary">Edit Order</h6>
-          </div>
-
           <!-- Main Content -->
           <div
             class="flex-grow-1 d-flex flex-column p-4 text-start"
@@ -515,3 +507,16 @@
     </div>
   </div>
 </dx-popup>
+
+<!-- Global Loading Panel -->
+<dx-load-panel
+  #loadPanel
+  shadingColor="rgba(0,0,0,0.4)"
+  [position]="{ of: '.view-wrapper' }"
+  [(visible)]="isProcessing"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="false"
+  [closeOnOutsideClick]="false"
+>
+</dx-load-panel>

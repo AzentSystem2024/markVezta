@@ -592,7 +592,7 @@
         <fieldset
           class="border p-2 mt-2 mx-1"
           style="border-radius: 5px"
-          [style.opacity]="leaveFormData.PAY_TYPE_ID == 2 ? 1 : 0.5"
+          [style.opacity]="leaveFormData.PAY_TYPE_ID === 2 ? 1 : 0.5"
         >
           <legend class="float-none w-auto mb-0 px-2" style="font-size: 12px">
             Bank remittance details
@@ -608,14 +608,14 @@
                 [(value)]="leaveFormData.CHEQUE_NO"
                 [readOnly]="
                   (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
-                  leaveFormData.PAY_TYPE_ID != 2 ||
+                  leaveFormData.PAY_TYPE_ID !== 2 ||
                   !leaveFormData.EMP_ID
                 "
                 width="100%"
               >
                 <dx-validator
                   validationGroup="leaveForm"
-                  *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID == 2"
+                  *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID === 2"
                 >
                   <dxi-validation-rule
                     type="required"
@@ -635,14 +635,14 @@
                 displayFormat="dd-MM-yyyy"
                 [readOnly]="
                   (isReadOnlyMode && !isApproveMode && !isVerifyMode) ||
-                  leaveFormData.PAY_TYPE_ID != 2 ||
+                  leaveFormData.PAY_TYPE_ID !== 2 ||
                   !leaveFormData.EMP_ID
                 "
                 width="100%"
               >
                 <dx-validator
                   validationGroup="leaveForm"
-                  *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID == 2"
+                  *ngIf="isApproveMode && leaveFormData.PAY_TYPE_ID === 2"
                 >
                   <dxi-validation-rule
                     type="required"

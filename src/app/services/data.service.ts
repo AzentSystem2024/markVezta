@@ -7494,6 +7494,7 @@ The result can be exported to HTML or Markdown.`;
   getEmailSettings(): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/list`, {});
   }
+  
   insertEmailSettings(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/insert`, data);
   }
@@ -7535,6 +7536,14 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetDealerAddress`, payload);
   }
 
+  getCustomerDeliveryAddresses(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetCustomerDeliveryAddresses`, payload);
+  }
+
+  clearNewOrderCart(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/ClearCart`, payload);
+  }
+
   getNewOrderDealerList(payload: any = {}): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetDealerList`, payload);
   }
@@ -7549,5 +7558,13 @@ The result can be exported to HTML or Markdown.`;
 
   getNewOrderCart(payload: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetCart`, payload);
+  }
+
+  getNewOrderList(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderList`, payload);
+  }
+
+  saveNewOrderCartToOrder(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/SaveCartToOrder`, payload);
   }
 }

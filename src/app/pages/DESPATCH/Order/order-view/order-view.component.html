@@ -1,1 +1,252 @@
-<p>order-view works!</p>
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      noDataText="No orders found"
+      [width]="'100%'"
+      [height]="'82vh'"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+        showIndicator: true,
+        showPane: true,
+      }"
+      class="grid theme-dependent"
+      [dataSource]="orderList"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      columnResizingMode="nextColumn"
+      [showColumnHeaders]="true"
+      [scrolling]="{ mode: 'virtual' }"
+      [selection]="{ mode: 'single' }"
+      focusStateEnabled="false"
+      (onExporting)="onExporting($event)"
+    >
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+
+      <dxo-header-filter [visible]="isFilterRowVisible">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-export
+        [enabled]="true"
+        [allowExportSelectedData]="false"
+        [formats]="['xlsx']"
+      >
+      </dxo-export>
+
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      ></dxo-column-chooser>
+
+      <dxo-paging [pageSize]="20"></dxo-paging>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="[10, 20, 50, 100]"
+        displayMode="full"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+
+      <dxo-toolbar>
+        <dxi-item location="before" locateInMenu="never">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Order View
+          </div>
+        </dxi-item>
+
+        <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'dateFilterTemplate'">
+        <dx-select-box
+          [dataSource]="dateRanges"
+          [displayExpr]="displayExpr"
+          valueExpr="value"
+          [(value)]="selectedDateRange"
+          (onValueChanged)="onDateRangeChanged($event)"
+          (onOpened)="attachItemClickHandler($event)"
+          width="220"
+        >
+          <!-- This controls the dropdown list rendering -->
+          <div *dxTemplate="let item of 'item'">
+            {{ item.value === "custom" ? "Custom" : item.label }}
+          </div>
+        </dx-select-box>
+      </div>
+
+      <dxi-column dataField="OrderId" caption="Order ID"></dxi-column>
+      <dxi-column
+        dataField="Orderdate"
+        caption="Order Date"
+        dataType="date"
+        format="dd-MM-yyyy"
+      ></dxi-column>
+      <dxi-column dataField="Dealer" caption="Dealer"></dxi-column>
+      <dxi-column dataField="SubDealer" caption="Sub Dealer"></dxi-column>
+      <dxi-column dataField="Location" caption="Location"></dxi-column>
+
+      <dxi-column
+        dataField="OrderQty"
+        caption="Order Qty"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="AllocatedQty"
+        caption="Allocated Qty"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="ScanQty"
+        caption="Scan Qty"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="cancelledQty"
+        caption="Cancelled Qty"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="IssuesQty"
+        caption="Issues Qty"
+        dataType="number"
+      ></dxi-column>
+      <dxi-column
+        dataField="OpenQty"
+        caption="Open Qty"
+        dataType="number"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="Status"
+        caption="Status"
+        [width]="150"
+        cellTemplate="statusCellRender"
+        [allowHeaderFiltering]="true"
+        [headerFilter]="{ dataSource: getStatusFilterData }"
+      ></dxi-column>
+
+      <div *dxTemplate="let cell of 'statusCellRender'">
+        <div style="text-align: center; width: 100%">
+          <span
+            class="status-badge status-{{
+              cell.data.Status || cell.data.STATUS
+            }}"
+          >
+            {{
+              cell.data.Status === 1 || cell.data.STATUS === 1
+                ? "Draft"
+                : cell.data.Status === 2 || cell.data.STATUS === 2
+                  ? "Open"
+                  : cell.data.Status === 3 || cell.data.STATUS === 3
+                    ? "Accepted"
+                    : cell.data.Status === 4 || cell.data.STATUS === 4
+                      ? "Rejected"
+                      : cell.data.Status === 5 || cell.data.STATUS === 5
+                        ? "In Production"
+                        : cell.data.Status === 6 || cell.data.STATUS === 6
+                          ? "Production Completed"
+                          : cell.data.Status === 7 || cell.data.STATUS === 7
+                            ? "Partial"
+                            : cell.data.Status === 8 || cell.data.STATUS === 8
+                              ? "In Transit"
+                              : cell.data.Status === 9 || cell.data.STATUS === 9
+                                ? "Delivered"
+                                : cell.data.Status === 10 ||
+                                    cell.data.STATUS === 10
+                                  ? "Cancelled"
+                                  : cell.data.Status === 11 ||
+                                      cell.data.STATUS === 11
+                                    ? "Allocated"
+                                    : "Unknown"
+            }}
+          </span>
+        </div>
+      </div>
+
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="100"
+        cellTemplate="actionTemplate"
+      ></dxi-column>
+
+      <div *dxTemplate="let cell of 'actionTemplate'">
+        <div class="action-icons" style="text-align: center">
+          <i
+            class="dx-icon dx-icon-edit"
+            [style.opacity]="
+              cell.data.Status === 1 || cell.data.STATUS === 1 ? '1' : '0.4'
+            "
+            [style.pointer-events]="
+              cell.data.Status === 1 || cell.data.STATUS === 1 ? 'auto' : 'none'
+            "
+            title="Edit Order"
+            (click)="editOrder(cell.data)"
+          ></i>
+        </div>
+      </div>
+    </dx-data-grid>
+  </div>
+</div>
+
+<app-custom-date-popup
+  [(visible)]="showCustomDatePopup"
+  [startDate]="customStartDate"
+  [endDate]="customEndDate"
+  (applyDates)="onCustomDateApplied($event)"
+>
+</app-custom-date-popup>

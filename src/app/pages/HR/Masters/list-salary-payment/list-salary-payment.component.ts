@@ -3,6 +3,8 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnDestroy,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -31,9 +33,6 @@ import {
   DxiItemModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { AddMiscReceiptModule } from '../../../../components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
-import { EditMiscReceiptModule } from '../../../../components/HR/Masters/MISC-RECEIPT/edit-misc-receipt/edit-misc-receipt.component';
-import { ListMiscReceiptComponent } from '../../../ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
 import { AddSalaryPaymentModule } from '../../../../components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { DataService } from 'src/app/services/data.service';
 import notify from 'devextreme/ui/notify';
@@ -47,11 +46,12 @@ import { ExportService } from 'src/app/services/export.service';
   templateUrl: './list-salary-payment.component.html',
   styleUrls: ['./list-salary-payment.component.scss'],
 })
-export class ListSalaryPaymentComponent {
-  miscReceipts: any;
+export class ListSalaryPaymentComponent implements OnInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
+
+  miscReceipts: any;
   displayMode: any = 'full';
   showPageSizeSelector = true;
   showHeaderFilter: true;
@@ -68,12 +68,14 @@ export class ListSalaryPaymentComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     onClick: () => this.refreshGrid(),
     text: '',
   };
+
   addButtonOptions = {
     // icon: 'add',
     type: 'default',
@@ -97,11 +99,19 @@ export class ListSalaryPaymentComponent {
     `;
     },
   };
-  addMiscPaymentPopup: boolean = false;
 
-  onExporting(event: any) {
-    this.exportService.onExporting(event, 'Salary Payment');
-  }
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
+
+  addMiscPaymentPopup: boolean = false;
 
   dateRanges = [
     { label: 'Today', value: 'today' },
@@ -140,7 +150,7 @@ export class ListSalaryPaymentComponent {
     private ngZone: NgZone,
     private router: Router,
     private exportService: ExportService,
-  ) { }
+  ) {}
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -265,23 +275,20 @@ export class ListSalaryPaymentComponent {
 
     this.dataService.selectSalaryPayment(miscId).subscribe({
       next: (response: any) => {
-
         this.selectedSalaryData = response.Data;
 
         // OPEN document
-        if (status === 1) {   // <-- Replace 1 with your actual Open status if different
+        if (status === 1) {
+          // <-- Replace 1 with your actual Open status if different
 
           if (this.canEdit) {
-            this.isReadOnlyPayment = false;   // Edit mode
+            this.isReadOnlyPayment = false; // Edit mode
           } else {
-            this.isReadOnlyPayment = true;    // View mode
+            this.isReadOnlyPayment = true; // View mode
           }
-
         } else {
-
           // Verified / Approved / Other status
           this.isReadOnlyPayment = true;
-
         }
 
         this.editSalaryPopup = true;
@@ -289,12 +296,11 @@ export class ListSalaryPaymentComponent {
 
       error: (err) => {
         console.error('Failed to fetch salary payment:', err);
-      }
+      },
     });
   }
 
   isVerifyApproveDisabled(row: any): boolean {
-
     // Pending
     if (row.TRANS_STATUS === 1) {
       return !this.canVerify;
@@ -388,7 +394,8 @@ export class ListSalaryPaymentComponent {
       const refreshIndex = toolbarItems.findIndex(
         (item: any) => item.options?.icon === 'refresh',
       );
-      const insertIndex = refreshIndex >= 0 ? refreshIndex : toolbarItems.length;
+      const insertIndex =
+        refreshIndex >= 0 ? refreshIndex : toolbarItems.length;
 
       toolbarItems.splice(insertIndex, 0, {
         widget: 'dxButton',
@@ -402,19 +409,6 @@ export class ListSalaryPaymentComponent {
       });
     }
   }
-
-
-
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 'Approved',
-    },
-    {
-      text: 'Open',
-      value: 'Open',
-    },
-  ];
 
   addSalaryPayment() {
     this.addSalaryPopup = true;
@@ -602,7 +596,7 @@ export class ListSalaryPaymentComponent {
           notify(
             response?.Message || 'Failed to fetch salary payment data.',
             'error',
-            3000
+            3000,
           );
           return;
         }
@@ -618,16 +612,11 @@ export class ListSalaryPaymentComponent {
         // OPEN -> VERIFY
         // ==========================
         if (status == 1) {
-
           this.verifySalaryPopup = true;
           this.isReadOnlyPayment = false;
-
-        }
-        else if (status == 2) {
-
+        } else if (status == 2) {
           this.approveSalaryPopup = true;
           this.isReadOnlyPayment = false;
-
         }
         // ==========================
         // APPROVED / OTHER STATUS
@@ -644,10 +633,14 @@ export class ListSalaryPaymentComponent {
         notify(
           'An error occurred while fetching salary payment details.',
           'error',
-          3000
+          3000,
         );
       },
     });
+  }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Salary Payment');
   }
 }
 

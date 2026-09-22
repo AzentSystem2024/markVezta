@@ -423,14 +423,15 @@ import { RefundAddModule } from './pages/Operations/Deposit/refund-add/refund-ad
 import { RefundEditModule } from './pages/Operations/Deposit/refund-edit/refund-edit.component';
 import { SupplierwiseSalesModule } from './pages/REPORT/supplierwise-sales/supplierwise-sales.component';
 import { ProfitLossDepartmentwiseModule } from './pages/REPORT/profit-loss-departmentwise/profit-loss-departmentwise.component';
-import { EmailSettingComponent, EmailSettingModule } from './email-setting/email-setting.component';
-import { EmailSettingFormComponent, EmailSettingFormModule } from './email-setting-form/email-setting-form.component';
+import { EmailSettingModule } from './email-setting/email-setting.component';
+import { EmailSettingFormModule } from './email-setting-form/email-setting-form.component';
 import { NewOrderModule } from './pages/DESPATCH/Order/new-order/new-order.component';
-import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
+import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.component';
 
 @NgModule({
-  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent, OrderViewComponent,],
+  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent],
   imports: [
+    OrderViewModule,
     NewOrderModule,
     LeaveSalaryPaymentModule,
     CustomDatePopupModule,
