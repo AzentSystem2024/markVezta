@@ -19,6 +19,8 @@ import {
 } from 'devextreme-angular';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { ExportService } from 'src/app/services/export.service';
+import { NewOrderModule } from '../new-order/new-order.component';
+import { DxPopupModule } from 'devextreme-angular';
 
 @Component({
   selector: 'app-order-view',
@@ -356,35 +358,10 @@ export class OrderViewComponent implements OnInit {
     delete this.detailDataMap[orderId];
   }
 
-  customizeDetailColumns = (columns: any[]) => {
-    const hiddenFields = [
-      'ROW_ID',
-      'STATUS',
-      'REPLACE_PACKING_ID',
-      'ORDER_ID',
-      'ORDER_ENTRY_ID',
-      'CART_ID',
-      'PRODUCT_ID',
-      'PACKING_ID',
-      'UNIT_ID',
-      'CATEGORY_ID',
-      'ITEM_ID',
-      'IS_ANY_COMB',
-    ];
-    columns.forEach((col) => {
-      if (hiddenFields.includes(col.dataField)) {
-        col.visible = false;
-      }
-    });
-  };
-
   onExporting(e: any) {
     this.exportService.onExporting(e, 'order data');
   }
 }
-
-import { NewOrderModule } from '../new-order/new-order.component';
-import { DxPopupModule } from 'devextreme-angular';
 
 @NgModule({
   imports: [

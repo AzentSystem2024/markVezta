@@ -267,7 +267,7 @@
                       <button
                         class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
                         style="width: 32px; height: 32px"
-                        [disabled]="!selectedDealerId"
+                        [disabled]="!selectedDealerId || data.data.qty === 0"
                         (click)="decrementSize(data.data.sizeId)"
                       >
                         -
@@ -277,14 +277,14 @@
                         class="form-control text-center border fw-bold p-0"
                         style="width: 45px; height: 32px"
                         [value]="data.data.qty"
-                        [disabled]="!selectedDealerId"
+                        [disabled]="!selectedDealerId || (data.data.qty === 0 && isSizeDisabled(data.data))"
                         (input)="onMainQtyInput(data.data, $event)"
                         (blur)="onMainQtyBlur(data.data, $event)"
                       />
                       <button
                         class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
                         style="width: 32px; height: 32px"
-                        [disabled]="!selectedDealerId"
+                        [disabled]="!selectedDealerId || isSizeDisabled(data.data)"
                         (click)="incrementSize(data.data.sizeId)"
                       >
                         +

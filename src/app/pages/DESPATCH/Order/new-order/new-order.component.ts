@@ -623,9 +623,54 @@ export class NewOrderComponent implements OnInit, OnChanges {
     );
   }
 
+  getSizeRange(description: string): { start: number, end: number } | null {
+    if (!description) return null;
+    // Match ranges like "6X10", "6 TO 10", "6*10", "6-10"
+    const match = description.match(/(\d+)\s*(?:X|TO|\*|-)\s*(\d+)/i);
+    if (match) {
+      const start = parseInt(match[1], 10);
+      const end = parseInt(match[2], 10);
+      return { start: Math.min(start, end), end: Math.max(start, end) };
+    }
+    
+    // Match single numbers like "8"
+    const singleMatch = description.match(/\b(\d+)\b/);
+    if (singleMatch) {
+       const val = parseInt(singleMatch[1], 10);
+       return { start: val, end: val };
+    }
+    return null;
+  }
+
+  isSizeDisabled(size: any): boolean {
+    if (!this.currentEditingItem || !this.currentEditingItem.sizes)
+      return false;
+
+    // Rule: Cannot select overlapping sizes
+    const currentRange = this.getSizeRange(size.description);
+    if (currentRange && size.qty === 0) {
+      const hasOverlappingSize = this.currentEditingItem.sizes.some(s => {
+        if (s.sizeId === size.sizeId || s.qty === 0) return false;
+        
+        const sRange = this.getSizeRange(s.description);
+        if (sRange) {
+          return currentRange.start <= sRange.end && currentRange.end >= sRange.start;
+        }
+        return false;
+      });
+      if (hasOverlappingSize) return true;
+    }
+
+    return false;
+  }
+
   incrementSize(sizeId: any) {
     const size = this.currentEditingItem.sizes.find((s) => s.sizeId === sizeId);
     if (size) {
+      if (this.isSizeDisabled(size)) {
+        notify('Cannot select this size due to overlapping or mixed size rules.', 'warning', 3000);
+        return;
+      }
       if (size.isCutSize && size.qty === 0) {
         this.openCutSizePopup(size);
       } else {
@@ -647,6 +692,13 @@ export class NewOrderComponent implements OnInit, OnChanges {
 
   onMainQtyInput(size: any, event: Event) {
     const inputElement = event.target as HTMLInputElement;
+
+    if (this.isSizeDisabled(size) && size.qty === 0) {
+      inputElement.value = '0';
+      notify('Cannot select this size due to overlapping or mixed size rules.', 'warning', 3000);
+      return;
+    }
+
     let value = inputElement.value.replace(/\D/g, '');
 
     if (value === '') {

@@ -67,9 +67,30 @@
             [columnAutoWidth]="true"
             [rowAlternationEnabled]="true"
             [showRowLines]="true"
-            [customizeColumns]="customizeDetailColumns"
             [height]="'30vh'"
           >
+            <dxi-column dataField="CATEGORY_ID" caption="Category"></dxi-column>
+            <dxi-column dataField="ART_NO" caption="Art No"></dxi-column>
+            <dxi-column dataField="COLOR" caption="Color"></dxi-column>
+            <dxi-column dataField="DESCRIPTION" caption="Packing"></dxi-column>
+            <dxi-column dataField="ORDER_QTY" caption="Order Qty"></dxi-column>
+            <dxi-column
+              dataField="ALLOCATED_QTY"
+              caption="Allocated Qty"
+            ></dxi-column>
+            <dxi-column
+              dataField="ALLOTTED_QTY"
+              caption="Allotted Qty"
+            ></dxi-column>
+            <dxi-column
+              dataField="ISSUED_QTY"
+              caption="Issued Qty"
+            ></dxi-column>
+            <dxi-column
+              dataField="CANCELLED_QTY"
+              caption="Cancelled Qty"
+            ></dxi-column>
+            <dxi-column dataField="OPEN_QTY" caption="Open Qty"></dxi-column>
           </dx-data-grid>
         </div>
       </div>
@@ -254,28 +275,28 @@
                 (cell.data.ORDER_STATUS === 0
                   ? "Submitted"
                   : cell.data.ORDER_STATUS === 1
-                  ? "Draft"
-                  : cell.data.ORDER_STATUS === 2
-                    ? "Open"
-                    : cell.data.ORDER_STATUS === 3
-                      ? "Accepted"
-                      : cell.data.ORDER_STATUS === 4
-                        ? "Rejected"
-                        : cell.data.ORDER_STATUS === 5
-                          ? "In Production"
-                          : cell.data.ORDER_STATUS === 6
-                            ? "Production Completed"
-                            : cell.data.ORDER_STATUS === 7
-                              ? "Partial"
-                              : cell.data.ORDER_STATUS === 8
-                                ? "In Transit"
-                                : cell.data.ORDER_STATUS === 9
-                                  ? "Delivered"
-                                  : cell.data.ORDER_STATUS === 10
-                                    ? "Cancelled"
-                                    : cell.data.ORDER_STATUS === 11
-                                      ? "Allocated"
-                                      : "Unknown")
+                    ? "Draft"
+                    : cell.data.ORDER_STATUS === 2
+                      ? "Open"
+                      : cell.data.ORDER_STATUS === 3
+                        ? "Accepted"
+                        : cell.data.ORDER_STATUS === 4
+                          ? "Rejected"
+                          : cell.data.ORDER_STATUS === 5
+                            ? "In Production"
+                            : cell.data.ORDER_STATUS === 6
+                              ? "Production Completed"
+                              : cell.data.ORDER_STATUS === 7
+                                ? "Partial"
+                                : cell.data.ORDER_STATUS === 8
+                                  ? "In Transit"
+                                  : cell.data.ORDER_STATUS === 9
+                                    ? "Delivered"
+                                    : cell.data.ORDER_STATUS === 10
+                                      ? "Cancelled"
+                                      : cell.data.ORDER_STATUS === 11
+                                        ? "Allocated"
+                                        : "Unknown")
             }}
           </span>
         </div>
@@ -323,6 +344,7 @@
   [closeOnOutsideClick]="false"
   width="98vw"
   height="98vh"
+  (onHidden)="onNewOrderClosed()"
 >
   <div *dxTemplate="let data of 'content'" style="padding: 0">
     <app-new-order
