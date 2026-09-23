@@ -427,6 +427,7 @@ import { EmailSettingModule } from './email-setting/email-setting.component';
 import { EmailSettingFormModule } from './email-setting-form/email-setting-form.component';
 import { NewOrderModule } from './pages/DESPATCH/Order/new-order/new-order.component';
 import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
+import { SalesReportComponent, SalesReportModule } from './sales-report/sales-report.component';
 import { PurchaseReportMarkComponent, PurchaseReportMarkModule } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
 import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.component';
 
@@ -869,6 +870,7 @@ import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.co
     ProfitLossDepartmentwiseModule,
     EmailSettingModule,
     EmailSettingFormModule,
+    SalesReportModule,
     PurchaseReportMarkModule,
   ],
 

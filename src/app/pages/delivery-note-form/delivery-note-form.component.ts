@@ -160,7 +160,7 @@ export class DeliveryNoteFormComponent {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-  ) {}
+  ) { }
 
   ngOnInit() {
     const currentUrl = this.router.url;
@@ -291,11 +291,11 @@ export class DeliveryNoteFormComponent {
 
 
 
-Details: (data.Details || []).map((row: any) => ({
-  ...row,
-  ITEM_ID: row.ITEM_ID,
-  ITEM_CODE: row.ITEM_ID
-})),
+      Details: (data.Details || []).map((row: any) => ({
+        ...row,
+        ITEM_ID: row.ITEM_ID,
+        ITEM_CODE: row.ITEM_ID
+      })),
     };
 
     this.selectedCustomerId = this.deliveryFormData.CUST_ID;
@@ -311,7 +311,7 @@ Details: (data.Details || []).map((row: any) => ({
       UOM: '',
       QTY_STOCK: 0,
       PAIR_QTY: 0,
-  TOTAL_PAIR_QTY: 0,
+      TOTAL_PAIR_QTY: 0,
       QUANTITY: 0,
     });
 
@@ -345,13 +345,13 @@ Details: (data.Details || []).map((row: any) => ({
         UOM: '',
         QTY_STOCK: 0,
         PAIR_QTY: 0,
-  TOTAL_PAIR_QTY: 0,
+        TOTAL_PAIR_QTY: 0,
         QUANTITY: 0,
       },
     ];
   }
 
-  reindexDetails() {}
+  reindexDetails() { }
 
   onInitNewRow(e: any) {
     if (this.isEditing) return;
@@ -472,7 +472,7 @@ Details: (data.Details || []).map((row: any) => ({
         grid.cellValue(rowIndex, 'UOM', data.UOM);
         grid.cellValue(rowIndex, 'QTY_STOCK', data.QTY_STOCK);
         grid.cellValue(rowIndex, 'PAIR_QTY', data.PAIR_QTY);
-grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
+        grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
 
         grid.cellValue(rowIndex, 'QUANTITY', data.QUANTITY);
 
@@ -829,7 +829,7 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     }
   }
 
-  onAddItems() {}
+  onAddItems() { }
 
   validateQtyReceived = (e: any) => {
     const issued = e.data?.QUANTITY_ISSUED || 0;
@@ -885,7 +885,7 @@ grid.cellValue(rowIndex, 'TOTAL_PAIR_QTY', data.TOTAL_PAIR_QTY);
     );
   }
 
-  handleClose() {}
+  handleClose() { }
 
   cancel() {
     this.popupClosed.emit();
@@ -1416,4 +1416,4 @@ function numberToWordsIndianNumber(num: number) {
   exports: [DeliveryNoteFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DeliveryNoteFormModule {}
+export class DeliveryNoteFormModule { }
