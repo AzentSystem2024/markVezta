@@ -6,14 +6,6 @@
         <div
           class="card shadow-sm h-100 border-0 radius-12 d-flex flex-column text-center"
         >
-          <!-- Form Header -->
-          <div
-            *ngIf="isEditMode"
-            class="d-flex justify-content-between align-items-center p-0 border-bottom text-start"
-          >
-            <h6 class="m-0 text-primary">Edit Order</h6>
-          </div>
-
           <!-- Main Content -->
           <div
             class="flex-grow-1 d-flex flex-column p-4 text-start"
@@ -23,8 +15,8 @@
               <!-- Image Placeholder (Smaller) -->
               <div class="col-3">
                 <div
-                  class="rounded-3 w-100 d-flex align-items-center justify-content-center image-placeholder border"
-                  style="aspect-ratio: 1/1; overflow: hidden"
+                  class="rounded-3 mx-auto d-flex align-items-center justify-content-center image-placeholder border"
+                  style="aspect-ratio: 1/1; overflow: hidden; max-width: 160px"
                 >
                   <img
                     *ngIf="
@@ -44,6 +36,15 @@
                     class="dx-icon dx-icon-image"
                     style="font-size: 2.5rem; color: var(--border-color)"
                   ></i>
+                </div>
+                <!-- Selected color text below image -->
+                <div class="fw-bold text-center mt-1" style="font-size: 0.8rem">
+                  <div class="fw-bold text-nowrap" style="font-size: 0.7rem">
+                    Color :
+                    <span class="text-uppercase text-primary">{{
+                      getColor(currentEditingItem.colorId)?.name || "None"
+                    }}</span>
+                  </div>
                 </div>
               </div>
 
@@ -75,6 +76,7 @@
                   displayExpr="NAME"
                   valueExpr="ID"
                   [(value)]="selectedDealerId"
+                  (onValueChanged)="onDealerChange($event)"
                   [placeholder]="
                     isLoadingDealers
                       ? 'Loading...'
@@ -88,6 +90,74 @@
                   class="rounded-input"
                 ></dx-select-box>
 
+                <div class="row">
+                  <div class="col-12">
+                    <!-- Address -->
+                    <dx-select-box
+                      [dataSource]="addresses"
+                      displayExpr="name"
+                      valueExpr="id"
+                      [(value)]="selectedAddressId"
+                      [placeholder]="
+                        isLoadingAddresses ? 'Loading...' : 'Select Address'
+                      "
+                      [disabled]="!selectedDealerId || isLoadingAddresses"
+                      [searchEnabled]="true"
+                      [showClearButton]="true"
+                      class="rounded-input"
+                    ></dx-select-box>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <!-- Warehouse -->
+                    <dx-select-box
+                      [dataSource]="warehouses"
+                      displayExpr="name"
+                      valueExpr="id"
+                      [(value)]="selectedWarehouseId"
+                      placeholder="Select Warehouse"
+                      [disabled]="!selectedDealerId"
+                      [searchEnabled]="true"
+                      [showClearButton]="true"
+                      class="rounded-input"
+                    ></dx-select-box>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- New row for Warehouse and Colors -->
+            <div class="row align-items-center mb-3 flex-shrink-0">
+              <div class="col-md-3">
+                <!-- Color Selection -->
+                <div class="d-flex flex-column gap-1">
+                  <!-- Label and circles on one line -->
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex gap-1 flex-wrap ms-2">
+                      <div
+                        *ngFor="let color of colors"
+                        class="color-picker-circle"
+                        [style.backgroundColor]="color.hex"
+                        [class.selected]="
+                          currentEditingItem.colorId === color.id
+                        "
+                        (click)="
+                          selectedDealerId ? selectColor(color.id) : null
+                        "
+                        [style.opacity]="!selectedDealerId ? 0.5 : 1"
+                        [style.cursor]="
+                          !selectedDealerId ? 'not-allowed' : 'pointer'
+                        "
+                        style="width: 22px; height: 22px"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-5">
                 <!-- Category -->
                 <dx-select-box
                   [dataSource]="categories"
@@ -100,7 +170,9 @@
                   [showClearButton]="true"
                   class="rounded-input"
                 ></dx-select-box>
+              </div>
 
+              <div class="col-md-4">
                 <!-- Art No -->
                 <dx-select-box
                   [dataSource]="artNosDataSource"
@@ -118,39 +190,12 @@
                   [showClearButton]="true"
                   class="rounded-input"
                 ></dx-select-box>
-
-                <!-- Color Selection -->
-                <div class="d-flex align-items-center gap-3">
-                  <div
-                    class="fw-bold mb-0 text-nowrap"
-                    style="font-size: 0.9rem"
-                  >
-                    Color :
-                    <span class="text-uppercase text-primary">{{
-                      getColor(currentEditingItem.colorId)?.name || "None"
-                    }}</span>
-                  </div>
-                  <div class="d-flex gap-2 flex-wrap">
-                    <div
-                      *ngFor="let color of colors"
-                      class="color-picker-circle"
-                      [style.backgroundColor]="color.hex"
-                      [class.selected]="currentEditingItem.colorId === color.id"
-                      (click)="selectedDealerId ? selectColor(color.id) : null"
-                      [style.opacity]="!selectedDealerId ? 0.5 : 1"
-                      [style.cursor]="
-                        !selectedDealerId ? 'not-allowed' : 'pointer'
-                      "
-                      style="width: 24px; height: 24px"
-                    ></div>
-                  </div>
-                </div>
               </div>
             </div>
 
             <!-- Sizes Grid -->
             <div class="d-flex flex-column flex-grow-1" style="min-height: 0">
-              <div class="fw-bold fs-6 mb-3 flex-shrink-0">
+              <div class="fw-bold fs-8 mb-2 flex-shrink-0 ms-auto">
                 Total Quantity: {{ getCurrentItemTotalQty() }}
               </div>
 
@@ -158,7 +203,7 @@
               <div
                 *ngIf="isLoadingSizes"
                 class="d-flex flex-column justify-content-center align-items-center text-muted rounded border"
-                style="height: 34vh"
+                style="height: 37vh"
               >
                 <div
                   class="spinner-border text-primary me-2"
@@ -176,8 +221,10 @@
                   [showBorders]="false"
                   [showColumnHeaders]="true"
                   [hoverStateEnabled]="true"
-                  height="34vh"
+                  height="37vh"
                   class="size-data-grid"
+                  [rowAlternationEnabled]="true"
+                  rowAlternationInterval="2"
                 >
                   <dxo-scrolling mode="virtual"></dxo-scrolling>
 
@@ -218,7 +265,7 @@
                       class="qty-control d-flex align-items-center justify-content-center gap-2"
                     >
                       <button
-                        class="btn btn-info btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
+                        class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
                         style="width: 32px; height: 32px"
                         [disabled]="!selectedDealerId"
                         (click)="decrementSize(data.data.sizeId)"
@@ -235,7 +282,7 @@
                         (blur)="onMainQtyBlur(data.data, $event)"
                       />
                       <button
-                        class="btn btn-info btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
+                        class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
                         style="width: 32px; height: 32px"
                         [disabled]="!selectedDealerId"
                         (click)="incrementSize(data.data.sizeId)"
@@ -252,7 +299,7 @@
           <!-- Form Footer -->
           <div class="p-3 border-top mt-auto d-flex justify-content-end">
             <button
-              class="btn btn-info px-4 py-2 rounded-3 fw-bold shadow-sm"
+              class="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm"
               (click)="saveToCart()"
               [disabled]="
                 !selectedDealerId ||
@@ -284,15 +331,12 @@
           <!-- Cart Items Container -->
           <div
             class="cart-items p-3 flex-grow-1 overflow-auto"
-            style="min-height: 0; max-height: 65vh"
+            style="min-height: 0; max-height: 68vh"
           >
             <!-- Empty State -->
-            <div
-              *ngIf="cartItems.length === 0"
-              class="text-center text-muted mt-5"
-            >
+            <div *ngIf="cartItems.length === 0" class="text-center mt-5">
               <i
-                class="dx-icon dx-icon-cart fs-1 mb-3 text-muted"
+                class="dx-icon dx-icon-cart fs-1 mb-3"
                 style="opacity: 0.5"
               ></i>
               <p>Your cart is empty</p>
@@ -301,68 +345,73 @@
             <!-- Item Card -->
             <div
               *ngFor="let item of cartItems"
-              class="cart-item-card border rounded-3 p-3 mb-3"
+              class="cart-item-card border rounded-3 p-3 mb-3 d-flex align-items-center shadow-sm"
             >
-              <div class="row g-0">
-                <div class="col-6">
-                  <h5 class="fw-bold mb-1">{{ getArtNoName(item.artNoId) }}</h5>
-                  <div class="text-muted fw-bold mb-2">
-                    {{ getCategoryName(item.categoryId) }}
-                  </div>
-
-                  <div class="d-flex align-items-center mt-3">
-                    <span class="me-2 text-muted small fw-bold">COLOR</span>
-                    <div
-                      class="color-circle"
-                      [style.backgroundColor]="getColor(item.colorId)?.hex"
-                    ></div>
-                  </div>
+              <!-- Left section (Details) -->
+              <div class="flex-grow-1 pe-2">
+                <h5 class="fw-bold mb-1" style="font-size: 1.1rem">
+                  {{ getArtNoName(item.artNoId) }}
+                </h5>
+                <div
+                  class="fw-bold mb-1"
+                  style="font-size: 0.75rem; letter-spacing: 0.5px"
+                >
+                  {{ getCategoryName(item.categoryId) | uppercase }}
                 </div>
-
-                <div class="col-6 text-end">
-                  <div class="text-info fw-bold mb-2">
-                    {{ getItemTotalPairs(item) }}
-                  </div>
-                  <!-- Note: Usually this is item total, but mockup shows 90 on item level too, mapping to the total badge maybe. I'll just show item total pairs -->
-                  <table
-                    class="table table-sm table-borderless m-0 ms-auto w-75"
-                    style="font-size: 0.85rem"
-                  >
-                    <thead>
-                      <tr>
-                        <th class="text-muted text-end pb-0">Case</th>
-                        <th class="text-muted text-end pb-0">Qty</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let size of getCartActiveSizes(item)">
-                        <td class="text-end py-0">
-                          {{ size.description }}
-                        </td>
-                        <td class="text-end py-0 fw-bold">{{ size.qty }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div
+                  class="fw-bold"
+                  style="font-size: 0.75rem; letter-spacing: 0.5px"
+                >
+                  {{ getColor(item.colorId)?.name | uppercase }}
                 </div>
               </div>
 
-              <div class="row g-2 mt-3">
-                <div class="col-6">
-                  <button
-                    class="btn btn-light-danger text-danger w-100 rounded-3 fw-bold py-2"
-                    (click)="removeCartItem(item.id)"
-                  >
-                    <i class="dx-icon dx-icon-trash me-1"></i> Remove
-                  </button>
+              <!-- Middle section (Sizes) -->
+              <div class="text-end pe-3 border-end" style="min-width: 120px">
+                <div
+                  *ngFor="let size of getCartActiveSizes(item)"
+                  style="font-size: 0.75rem; margin-bottom: 2px"
+                >
+                  <span class="text-uppercase me-2">{{
+                    size.description
+                  }}</span>
+                  <span class="fw-bold">{{ size.qty }}</span>
                 </div>
-                <div class="col-6">
-                  <button
-                    class="btn btn-light-secondary text-primary w-100 rounded-3 fw-bold py-2"
-                    (click)="editCartItem(item)"
-                  >
-                    <i class="dx-icon dx-icon-edit me-1"></i> Edit
-                  </button>
-                </div>
+              </div>
+
+              <!-- Right section (Actions) -->
+              <div class="d-flex flex-column gap-2 ps-3">
+                <button
+                  class="btn d-flex align-items-center justify-content-center p-0 rounded-3 shadow-sm"
+                  style="
+                    background-color: #eef7f8;
+                    color: #17a2b8;
+                    width: 36px;
+                    height: 36px;
+                    border: 1px solid #d1edf2;
+                  "
+                  (click)="editCartItem(item)"
+                  title="Edit"
+                >
+                  <i class="dx-icon dx-icon-edit" style="font-size: 1.1rem"></i>
+                </button>
+                <button
+                  class="btn d-flex align-items-center justify-content-center p-0 rounded-3 shadow-sm"
+                  style="
+                    background-color: #fcebeb;
+                    color: #dc3545;
+                    width: 36px;
+                    height: 36px;
+                    border: 1px solid #fad2d5;
+                  "
+                  (click)="removeCartItem(item.id)"
+                  title="Remove"
+                >
+                  <i
+                    class="dx-icon dx-icon-trash"
+                    style="font-size: 1.1rem"
+                  ></i>
+                </button>
               </div>
             </div>
           </div>
@@ -370,7 +419,7 @@
           <!-- Cart Footer -->
           <div class="cart-footer p-3 border-top d-flex justify-content-end">
             <button
-              class="btn btn-info px-4 py-2 rounded-3 fw-bold shadow-sm"
+              class="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm"
               (click)="submitOrder()"
               [disabled]="cartItems.length === 0"
             >
@@ -417,7 +466,7 @@
             class="qty-control d-flex align-items-center justify-content-center gap-2"
           >
             <button
-              class="btn btn-info btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center border-0"
+              class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center border-0"
               style="width: 32px; height: 32px"
               [disabled]="(currentCutSizeQuantities[s] || 0) === 0"
               (click)="decrementCutSizeQty(s)"
@@ -433,7 +482,7 @@
               (blur)="onCutSizeQtyBlur(s, $event)"
             />
             <button
-              class="btn btn-info btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center border-0"
+              class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center border-0"
               style="width: 32px; height: 32px"
               [disabled]="getCutSizeTotal() >= (currentCutSize?.pairQty || 0)"
               (click)="incrementCutSizeQty(s)"
@@ -453,7 +502,7 @@
           Cancel
         </button>
         <button
-          class="btn btn-info fw-bold"
+          class="btn btn-primary fw-bold"
           style="width: 48%"
           (click)="saveCutSize()"
         >
@@ -463,3 +512,16 @@
     </div>
   </div>
 </dx-popup>
+
+<!-- Global Loading Panel -->
+<dx-load-panel
+  #loadPanel
+  shadingColor="rgba(0,0,0,0.4)"
+  [position]="{ of: '.view-wrapper' }"
+  [(visible)]="isProcessing"
+  [showIndicator]="true"
+  [showPane]="true"
+  [shading]="false"
+  [closeOnOutsideClick]="false"
+>
+</dx-load-panel>

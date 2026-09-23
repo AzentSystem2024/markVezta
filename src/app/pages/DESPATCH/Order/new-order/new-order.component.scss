@@ -1,10 +1,9 @@
 :host {
   display: block;
-  height: 100vh;
 }
 
 .view-wrapper {
-  height: 100vh;
+  height: 90vh;
   overflow-y: auto;
 }
 
@@ -94,4 +93,21 @@
   outline: none !important;
   background-color: transparent !important;
   color: var(--text-color) !important;
+}
+
+/* Match the global add-button style (#0073d8) for all primary buttons */
+.btn-primary {
+  background-color: #0073d8 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+}
+
+.btn-primary i {
+  color: #fff !important;
+}
+
+.btn-primary:hover:not([disabled]) {
+  background-color: #005cad !important;
+  color: #fff !important;
 }

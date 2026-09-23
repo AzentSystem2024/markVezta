@@ -164,20 +164,20 @@
         <div style="text-align: center; width: 100%">
           <span
             [ngClass]="{
-              'flag-pending': data.data.TRANS_STATUS == 1,
-              'flag-verified': data.data.TRANS_STATUS == 2,
-              'flag-approved': data.data.TRANS_STATUS == 5,
-              'flag-paid': data.data.TRANS_STATUS == 6,
+              'flag-pending': data.data.TRANS_STATUS === 1,
+              'flag-verified': data.data.TRANS_STATUS === 2,
+              'flag-approved': data.data.TRANS_STATUS === 5,
+              'flag-paid': data.data.TRANS_STATUS === 6,
             }"
           >
             {{
-              data.data.TRANS_STATUS == 1
+              data.data.TRANS_STATUS === 1
                 ? "Open"
-                : data.data.TRANS_STATUS == 2
+                : data.data.TRANS_STATUS === 2
                   ? "Verified"
-                  : data.data.TRANS_STATUS == 5
+                  : data.data.TRANS_STATUS === 5
                     ? "Approved"
-                    : data.data.TRANS_STATUS == 6
+                    : data.data.TRANS_STATUS === 6
                       ? "Paid"
                       : ""
             }}
@@ -223,9 +223,9 @@
           <span
             class="verify-badge"
             [ngClass]="{
-              'status-pending': cellData.data.TRANS_STATUS == 1,
-              'status-verified': cellData.data.TRANS_STATUS == 2,
-              'status-approved': cellData.data.TRANS_STATUS == 5,
+              'status-pending': cellData.data.TRANS_STATUS === 1,
+              'status-verified': cellData.data.TRANS_STATUS === 2,
+              'status-approved': cellData.data.TRANS_STATUS === 5,
             }"
             [class.disabled]="isVerifyApproveDisabled(cellData.data)"
             (click)="onverifyClick({ row: { data: cellData.data } })"

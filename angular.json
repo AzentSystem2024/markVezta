@@ -68,6 +68,8 @@
             ],
             "styles": [
               "src/styles.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "devexpress-gantt/dist/dx-gantt.css",
               "node_modules/ace-builds/css/ace.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",

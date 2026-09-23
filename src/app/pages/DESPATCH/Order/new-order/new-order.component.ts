@@ -3,8 +3,12 @@ import {
   OnInit,
   NgModule,
   CUSTOM_ELEMENTS_SCHEMA,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/services/data.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +23,9 @@ import {
   DxTextBoxModule,
 } from 'devextreme-angular';
 import DataSource from 'devextreme/data/data_source';
+import notify from 'devextreme/ui/notify';
+import { confirm } from 'devextreme/ui/dialog';
+import { DxLoadPanelModule } from 'devextreme-angular';
 
 export interface SizeConfig {
   id: string;
@@ -28,6 +35,7 @@ export interface SizeConfig {
 }
 export interface CartItem {
   id: number;
+  orderId?: number;
   categoryId: number | null;
   artNoId: any;
   colorId: string | null;
@@ -40,13 +48,20 @@ export interface CartItem {
   templateUrl: './new-order.component.html',
   styleUrls: ['./new-order.component.scss'],
 })
-export class NewOrderComponent implements OnInit {
+export class NewOrderComponent implements OnInit, OnChanges {
+  @Input() editDealerId: number | null = null;
+  @Input() editOrderId: number | null = null;
+  @Output() closePopup = new EventEmitter<void>();
+
   // Navigation tabs
   activeTab: 'dealer' | 'subdealer' = 'dealer';
   searchQuery: string = '';
 
+  isProcessing: boolean = false;
+
   // Form State
   isEditMode = false;
+  isSettingEditData = false;
 
   isLoadingDealers = false;
   isLoadingSubDealers = false;
@@ -56,6 +71,9 @@ export class NewOrderComponent implements OnInit {
 
   allArtNos: string[] = [];
   cartItems: CartItem[] = [];
+  addresses: any[] = [];
+  selectedAddressId: any = null;
+  isLoadingAddresses = false;
 
   // Current Editing Item (for modal)
   currentEditingItem!: CartItem;
@@ -72,22 +90,39 @@ export class NewOrderComponent implements OnInit {
   sizeConfigurations: SizeConfig[] = [];
 
   warehouses: any[] = [];
+  selectedWarehouseId: any = null;
   distributorsCache: { [key: string]: any[] } = {};
   currentDistributors: any[] = [];
   itemsList: any[] = [];
 
   selectedDealerId: any = null;
 
-  constructor(
-    private dataService: DataService,
-    private http: HttpClient,
-  ) {
+  constructor(private dataService: DataService) {
     this.currentEditingItem = this.getEmptyCartItem();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['editDealerId'] || changes['editOrderId']) {
+      if (this.editDealerId && this.editOrderId) {
+        this.selectedDealerId = this.editDealerId;
+        this.onDealerChange({ value: this.editDealerId });
+        this.currentEditingItem.orderId = this.editOrderId;
+      } else {
+        // Reset state for new
+        this.selectedDealerId = null;
+        this.cartItems = [];
+        this.currentEditingItem = this.getEmptyCartItem();
+        this.isEditMode = false;
+        this.isSettingEditData = false;
+        this.selectedWarehouseId = null;
+      }
+    }
   }
 
   ngOnInit(): void {
     this.loadDealers();
     this.loadCategories();
+    this.loadWarehouses();
   }
 
   loadCategories() {
@@ -101,6 +136,20 @@ export class NewOrderComponent implements OnInit {
         );
       },
       (error) => console.error('Error fetching ARTICLECATEGORY', error),
+    );
+  }
+
+  loadWarehouses() {
+    this.dataService.Get_GropDown('WAREHOUSE').subscribe(
+      (res: any) => {
+        this.warehouses = (Array.isArray(res) ? res : res || []).map(
+          (item: any) => ({
+            id: item.ID || item.id,
+            name: item.DESCRIPTION || item.description,
+          }),
+        );
+      },
+      (error) => console.error('Error fetching WAREHOUSE', error),
     );
   }
 
@@ -118,28 +167,40 @@ export class NewOrderComponent implements OnInit {
     this.currentDistributors = [];
     const apiName = tab === 'dealer' ? 'DEALER' : 'SUB_DEALER';
 
-    const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
-    );
-    const companyId = sessionData.SELECTED_COMPANY?.COMPANY_ID || 15;
+    const apiCall =
+      tab === 'dealer'
+        ? this.dataService.getNewOrderDealerList({})
+        : this.dataService.getNewOrderSubDealerList({});
 
-    const payload = {
-      NAME: apiName,
-    };
-
-    this.dataService.Item_Dropdown(payload).subscribe(
+    apiCall.subscribe(
       (res: any) => {
-        const data = (Array.isArray(res) ? res : res || []).map(
+        const rawData = res.Data || res;
+        const data = (Array.isArray(rawData) ? rawData : []).map(
           (item: any) => ({
             ...item,
-            NAME: item.DESCRIPTION || item.description,
+            NAME:
+              apiName === 'SUB_DEALER' && item.DEALER_NAME
+                ? `${item.DESCRIPTION || item.description} (${item.DEALER_NAME})`
+                : item.DESCRIPTION || item.description,
             TYPE: apiName,
+            WAREHOUSE_ID: item.WAREHOUSE_ID,
+            DEALER_ID: item.DEALER_ID,
+            DEALER_NAME: item.DEALER_NAME,
           }),
         );
 
         this.distributorsCache[tab] = data;
         this.currentDistributors = data;
         this.isLoadingDealers = false;
+
+        if (this.selectedDealerId) {
+          const selectedDealer = this.currentDistributors.find(
+            (d: any) => d.ID === this.selectedDealerId,
+          );
+          if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
+            this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
+          }
+        }
       },
       (error) => {
         console.error(`Error fetching ${apiName}`, error);
@@ -195,6 +256,7 @@ export class NewOrderComponent implements OnInit {
   getEmptyCartItem(): CartItem {
     return {
       id: 0,
+      orderId: 0,
       categoryId: null,
       artNoId: null,
       colorId: null,
@@ -204,16 +266,114 @@ export class NewOrderComponent implements OnInit {
     };
   }
 
+  getActualDealerId(): number {
+    if (this.activeTab === 'subdealer' && this.selectedDealerId) {
+      const selectedSubDealer = this.currentDistributors.find(
+        (d: any) => d.ID === this.selectedDealerId,
+      );
+      if (selectedSubDealer && selectedSubDealer.DEALER_ID) {
+        return selectedSubDealer.DEALER_ID;
+      }
+    }
+    return this.activeTab === 'dealer' ? this.selectedDealerId || 0 : 0;
+  }
+
+  getDealerName(): string {
+    if (this.selectedDealerId) {
+      const d = this.currentDistributors.find(
+        (x: any) => x.ID === this.selectedDealerId,
+      );
+      if (d) {
+        if (this.activeTab === 'dealer') {
+          return d.DESCRIPTION || d.description || '';
+        } else if (this.activeTab === 'subdealer') {
+          return d.DEALER_NAME || '';
+        }
+      }
+    }
+    return '';
+  }
+
+  getSubDealerName(): string {
+    if (this.activeTab === 'subdealer' && this.selectedDealerId) {
+      const sd = this.currentDistributors.find(
+        (x: any) => x.ID === this.selectedDealerId,
+      );
+      return sd ? sd.DESCRIPTION || sd.description || '' : '';
+    }
+    return '';
+  }
+
   // --- Left Side Actions ---
   setActiveTab(tab: 'dealer' | 'subdealer') {
     if (this.activeTab !== tab) {
       this.activeTab = tab;
       this.selectedDealerId = null;
+      this.isEditMode = false;
+      this.currentEditingItem = this.getEmptyCartItem();
+      this.artNos = [];
+      this.colors = [];
       this.loadDealerDataForTab(tab);
     }
   }
 
+  onDealerChange(e: any) {
+    // Only reset dependent fields if this is an actual user change (not initial binding)
+    if (e.previousValue !== undefined && e.previousValue !== e.value) {
+      this.isEditMode = false;
+      this.currentEditingItem = this.getEmptyCartItem();
+      this.artNos = [];
+      this.colors = [];
+      this.selectedAddressId = null;
+    }
+
+    if (e.value) {
+      this.loadAddresses(e.value);
+      // Auto-load warehouse based on selected dealer
+      const selectedDealer = this.currentDistributors.find(
+        (d: any) => d.ID === e.value,
+      );
+      if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
+        this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
+      }
+      this.loadCartData();
+    } else {
+      this.addresses = [];
+      this.selectedWarehouseId = null;
+      this.cartItems = [];
+    }
+  }
+
+  loadAddresses(dealerId: any) {
+    this.isLoadingAddresses = true;
+    this.dataService
+      .getCustomerDeliveryAddresses({ DEALER_ID: dealerId })
+      .subscribe(
+        (res: any) => {
+          if (res && Array.isArray(res) && res.length > 0) {
+            this.addresses = res.map((a: any) => ({
+              id: a.ID,
+              name: a.DESCRIPTION,
+            }));
+            // If the response has only one data then load it otherwise select first one
+            this.selectedAddressId = this.addresses[0].id;
+          } else {
+            this.addresses = [];
+            this.selectedAddressId = null;
+          }
+          this.isLoadingAddresses = false;
+        },
+        (error) => {
+          console.error('Error fetching addresses', error);
+          this.isLoadingAddresses = false;
+          this.addresses = [];
+          this.selectedAddressId = null;
+        },
+      );
+  }
+
   onCategoryChange(e: any) {
+    if (this.isSettingEditData) return;
     // Only reset dependent fields if this is an actual user change (not initial binding)
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
       if (this.currentEditingItem) {
@@ -229,7 +389,7 @@ export class NewOrderComponent implements OnInit {
     }
   }
 
-  loadArtNos(categoryId: any) {
+  loadArtNos(categoryId: any, onComplete?: () => void) {
     this.isLoadingArtNos = true;
     this.allArtNos = [];
     this.artNos = [];
@@ -254,17 +414,18 @@ export class NewOrderComponent implements OnInit {
             paginate: true,
             pageSize: 50,
           });
+          if (onComplete) onComplete();
         },
         (error) => {
           this.isLoadingArtNos = false;
           console.error('Error fetching Art Nos', error);
+          if (onComplete) onComplete();
         },
       );
   }
 
-  // onArtNoInput removed because DevExtreme DataSource handles searching natively
-
   onArtNoChange(e: any) {
+    if (this.isSettingEditData) return;
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
       if (this.currentEditingItem) {
         this.currentEditingItem.colorId = null;
@@ -280,7 +441,7 @@ export class NewOrderComponent implements OnInit {
     }
   }
 
-  fetchColors(artNo: string, categoryId: any) {
+  fetchColors(artNo: string, categoryId: any, onComplete?: () => void) {
     const payload = { ArtNo: artNo, CategoryID: categoryId.toString() };
     this.dataService.getNewOrderArtColor(payload).subscribe(
       (res: any) => {
@@ -297,11 +458,16 @@ export class NewOrderComponent implements OnInit {
               this.selectColor(this.colors[0].id);
             }
           }
+          if (onComplete) onComplete();
         } else {
           this.colors = [];
+          if (onComplete) onComplete();
         }
       },
-      (err) => console.error('Error fetching colors', err),
+      (err) => {
+        console.error('Error fetching colors', err);
+        if (onComplete) onComplete();
+      },
     );
   }
 
@@ -366,19 +532,47 @@ export class NewOrderComponent implements OnInit {
 
   cancelForm() {
     this.isEditMode = false;
-    this.onColorChange(this.currentEditingItem.colorId);
-    // this.currentEditingItem = this.getEmptyCartItem();
-    // this.artNos = [];
-    // this.colors = [];
+    this.currentEditingItem = this.getEmptyCartItem();
+    this.artNos = [];
+    this.allArtNos = [];
+    this.artNosDataSource = null;
+    this.colors = [];
   }
 
-  selectColor(colorId: string) {
+  async selectColor(colorId: string) {
+    if (this.isSettingEditData) return;
     if (this.currentEditingItem.colorId === colorId) return;
+
+    if (
+      !this.isEditMode &&
+      this.currentEditingItem.categoryId &&
+      this.currentEditingItem.artNoId
+    ) {
+      const existingCartItem = this.cartItems.find(
+        (item) =>
+          item.categoryId === this.currentEditingItem.categoryId &&
+          item.artNoId === this.currentEditingItem.artNoId &&
+          item.colorId === colorId,
+      );
+
+      if (existingCartItem) {
+        const dialogResult = await confirm(
+          'This item is already available in the cart. Only edit is available. Do you want to edit it?',
+          'Already in Cart',
+        );
+        if (dialogResult) {
+          this.editCartItem(existingCartItem);
+        }
+        return;
+      }
+    }
+
     this.currentEditingItem.colorId = colorId;
     this.onColorChange(colorId);
   }
 
   onColorChange(color: string) {
+    if (this.isSettingEditData) return;
     if (
       !this.currentEditingItem?.artNoId ||
       !this.currentEditingItem?.categoryId
@@ -412,9 +606,8 @@ export class NewOrderComponent implements OnInit {
                       .map((s: string) => s.trim())
                   : [],
               cutSizeQuantities: {},
-              combination: c.IsCutSize
-                ? ''
-                : (c.Combination || '').replace(/,\s*/g, ', '),
+              combination: (c.Combination || '').replace(/,\s*/g, ', '),
+              isAnyComb: c.IsAnyComb || c.IsCutSize || false,
               pairQty: c.PairQty,
               qty: 0,
             }));
@@ -565,8 +758,10 @@ export class NewOrderComponent implements OnInit {
   saveCutSize() {
     const total = this.getCutSizeTotal();
     if (total !== this.currentCutSize.pairQty) {
-      alert(
+      notify(
         `Total quantity must be exactly ${this.currentCutSize.pairQty}. Currently it is ${total}.`,
+        'warning',
+        3000,
       );
       return;
     }
@@ -601,47 +796,335 @@ export class NewOrderComponent implements OnInit {
 
   saveToCart() {
     if (this.getCurrentItemTotalQty() === 0) {
-      // Might want a warning in real app
+      notify('Please enter a quantity before saving to cart.', 'warning', 3000);
+      return;
     }
 
-    if (this.isEditMode) {
-      const index = this.cartItems.findIndex(
-        (item) => item.id === this.currentEditingItem.id,
-      );
-      if (index !== -1) {
-        const updatedItem = JSON.parse(JSON.stringify(this.currentEditingItem));
-        updatedItem.sizes.forEach(
-          (size: any) => (size.cartId = updatedItem.id),
-        );
-        this.cartItems[index] = updatedItem;
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+
+    const cartArray: any[] = [];
+    const comboArray: any[] = [];
+
+    this.currentEditingItem.sizes.forEach((s: any) => {
+      if (s.qty > 0) {
+        cartArray.push({
+          CART_ID: this.isEditMode ? s.cartId || 0 : 0,
+          PACKING_ID: s.sizeId,
+          QUANTITY: s.qty,
+          COMBINATION: s.description || '',
+          IS_ANY_COMB: s.isAnyComb || false,
+        });
+
+        if (s.isCutSize && s.cutSizeQuantities) {
+          Object.keys(s.cutSizeQuantities).forEach((sizeKey) => {
+            const sqty = s.cutSizeQuantities[sizeKey];
+            if (sqty > 0) {
+              comboArray.push({
+                PACKING_ID: s.sizeId,
+                SIZE: sizeKey,
+                QUANTITY: sqty,
+              });
+            }
+          });
+        }
       }
-    } else {
-      const newItem = JSON.parse(JSON.stringify(this.currentEditingItem));
-      newItem.id = Date.now();
-      newItem.sizes.forEach((size: any) => (size.cartId = newItem.id));
-      this.cartItems.push(newItem);
+    });
+
+    const existingOrderId =
+      this.cartItems.length > 0 ? this.cartItems[0].orderId || 0 : 0;
+    const finalOrderId =
+      this.currentEditingItem.orderId || existingOrderId || 0;
+
+    const payload = {
+      USER_ID: userId,
+      ORDER_ID: finalOrderId,
+      IS_UPDATE: this.isEditMode,
+      DEALER_ID: this.getActualDealerId(),
+      DEALER_NAME: this.getDealerName(),
+      SUBDEALER_ID:
+        this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
+      SUBDEALER_NAME: this.getSubDealerName(),
+      WAREHOUSE_ID: this.selectedWarehouseId || 0,
+      LOCATION_ID: this.selectedAddressId || 0,
+      CART: cartArray,
+      COMBO: comboArray,
+    };
+
+    console.log('add to card : ', payload);
+    this.isProcessing = true;
+
+    this.dataService.postNewOrderAddToCart(payload).subscribe(
+      (res: any) => {
+        this.isProcessing = false;
+        if (res.Flag === 1) {
+          notify('Cart updated successfully!', 'success', 3000);
+          this.cancelForm();
+          this.loadCartData(); // Reload cart from API after successful save
+        } else {
+          const errMsg = res.Message || 'Failed to add to cart';
+          console.error('Failed to add to cart:', errMsg);
+          notify(errMsg, 'error', 3000);
+        }
+      },
+      (error) => {
+        this.isProcessing = false;
+        console.error('Error adding to cart', error);
+        notify('Error adding to cart', 'error', 3000);
+      },
+    );
+  }
+
+  loadCartData() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+    const dealerId = this.getActualDealerId();
+    const subDealerId =
+      this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0;
+
+    if (!this.selectedDealerId) {
+      this.cartItems = [];
+      return;
     }
 
-    console.log('Cart Data: ', this.cartItems);
-    this.cancelForm();
+    const payload = {
+      USER_ID: userId,
+      DEALER_ID: dealerId,
+      DEALER_NAME: this.getDealerName(),
+      SUBDEALER_ID: subDealerId,
+      SUBDEALER_NAME: this.getSubDealerName(),
+    };
+
+    this.isProcessing = true;
+    this.dataService.getNewOrderCart(payload).subscribe(
+      (res: any) => {
+        this.isProcessing = false;
+        if (
+          res.Flag === 1 &&
+          res.Data &&
+          Array.isArray(res.Data) &&
+          res.Data.length > 0
+        ) {
+          const groupedEntries = new Map<string, any[]>();
+
+          res.Data.forEach((apiCart: any) => {
+            if (apiCart.ENTRIES && Array.isArray(apiCart.ENTRIES)) {
+              apiCart.ENTRIES.forEach((entry: any) => {
+                const key = `${entry.CART_ID}_${entry.PRODUCT_ID}`;
+                if (!groupedEntries.has(key)) {
+                  groupedEntries.set(key, []);
+                }
+                groupedEntries.get(key)!.push(entry);
+              });
+            }
+          });
+
+          this.cartItems = [];
+          groupedEntries.forEach((entries, key) => {
+            const sizes = entries.map((e: any) => ({
+              sizeId: e.PACKING_ID,
+              qty: e.QUANTITY,
+              combination: e.COMBINATION || '',
+              description: e.COMBINATION || '', // Assuming COMBINATION holds the description string from the backend
+              isCutSize: e.COMBINATIONS && e.COMBINATIONS.length > 0,
+              isAnyComb: e.COMBINATIONS && e.COMBINATIONS.length > 0,
+              cutSizeQuantities: e.COMBINATIONS
+                ? e.COMBINATIONS.reduce((acc: any, combo: any) => {
+                    acc[combo.SIZE] = combo.QUANTITY;
+                    return acc;
+                  }, {})
+                : {},
+              cartEntryId: e.CART_ENTRY_ID,
+              cartId: e.CART_ID,
+            }));
+
+            this.cartItems.push({
+              id: entries[0].CART_ID, // Use backend Cart ID
+              orderId: entries[0].ORDER_ID, // ADDED: Extract ORDER_ID from the cart data
+              categoryId: entries[0].CATEGORY_ID,
+              artNoId: entries[0].ART_NO,
+              colorId: entries[0].COLOR,
+              imageUrl: entries[0].IMAGE_NAME
+                ? `https://mmarkonline.com/artimages/${entries[0].IMAGE_NAME}`
+                : '',
+              packingType: 'Case',
+              sizes: sizes,
+            });
+          });
+
+          if (this.cartItems.length === 1 && this.editOrderId) {
+            this.editCartItem(this.cartItems[0]);
+          }
+        } else {
+          this.cartItems = [];
+        }
+      },
+      (error) => {
+        this.isProcessing = false;
+        console.error('Error fetching cart data', error);
+        notify('Error fetching cart data', 'error', 3000);
+        this.cartItems = [];
+      },
+    );
   }
 
   editCartItem(item: CartItem) {
     this.isEditMode = true;
-    this.currentEditingItem = JSON.parse(JSON.stringify(item));
-    if (this.currentEditingItem.categoryId) {
-      this.loadArtNos(this.currentEditingItem.categoryId);
-    }
-    if (this.currentEditingItem.categoryId && this.currentEditingItem.artNoId) {
-      this.fetchColors(
-        this.currentEditingItem.artNoId,
-        this.currentEditingItem.categoryId,
-      );
+    this.isProcessing = true; // Turn on global loader when editing starts
+    this.isSettingEditData = true; // Suppress UI change handlers
+
+    const targetCategoryId = item.categoryId;
+    const targetArtNoId = item.artNoId;
+    const targetColorId = item.colorId;
+
+    const finalizeEditMode = (fullSizes: any[], imageUrl: string) => {
+      const clonedItem = JSON.parse(JSON.stringify(item));
+      clonedItem.sizes = fullSizes;
+      if (imageUrl) clonedItem.imageUrl = imageUrl;
+
+      this.currentEditingItem = clonedItem;
+
+      // Allow bindings to update before re-enabling event handlers
+      setTimeout(() => {
+        this.isSettingEditData = false;
+        this.isProcessing = false;
+      }, 100);
+    };
+
+    const loadSizesApi = () => {
+      if (targetArtNoId && targetCategoryId && targetColorId) {
+        this.isLoadingSizes = true;
+        const payload = {
+          ArtNo: targetArtNoId,
+          CategoryID: targetCategoryId.toString(),
+          Color: targetColorId,
+        };
+
+        this.dataService.getNewOrderArtNoDetails(payload).subscribe(
+          (res: any) => {
+            this.isLoadingSizes = false;
+            let fullSizes = [];
+            let imageUrl = '';
+            if (res && res.flag === '1') {
+              imageUrl = res.IMAGE_NAME
+                ? `https://mmarkonline.com/artimages/${res.IMAGE_NAME}`
+                : '';
+
+              if (Array.isArray(res.Case)) {
+                fullSizes = res.Case.map((c: any) => ({
+                  sizeId: c.PackingID,
+                  description: c.Description,
+                  isCutSize: c.IsCutSize,
+                  availableSizes:
+                    c.IsCutSize && c.Sizes
+                      ? c.Sizes.replace(/"/g, '')
+                          .split(',')
+                          .map((s: string) => s.trim())
+                      : [],
+                  cutSizeQuantities: {},
+                  combination: (c.Combination || '').replace(/,\s*/g, ', '),
+                  isAnyComb: c.IsAnyComb || c.IsCutSize || false,
+                  pairQty: c.PairQty,
+                  qty: 0,
+                }));
+
+                // Merge quantities from cart
+                fullSizes.forEach((fs: any) => {
+                  const cartSize = item.sizes.find(
+                    (s) => s.sizeId === fs.sizeId,
+                  );
+                  if (cartSize) {
+                    fs.qty = cartSize.qty;
+                    fs.cartId = cartSize.cartId;
+                    fs.cartEntryId = cartSize.cartEntryId;
+                    if (fs.isCutSize && cartSize.cutSizeQuantities) {
+                      fs.cutSizeQuantities = { ...cartSize.cutSizeQuantities };
+                      const comboParts = [];
+                      for (const size of fs.availableSizes) {
+                        const q = fs.cutSizeQuantities[size];
+                        if (q > 0) {
+                          comboParts.push(`${size}x${q}`);
+                        }
+                      }
+                      fs.combination = comboParts.join(', ');
+                    }
+                  }
+                });
+              }
+            }
+            finalizeEditMode(fullSizes, imageUrl);
+          },
+          (err) => {
+            this.isLoadingSizes = false;
+            console.error('Error fetching details', err);
+            finalizeEditMode([], '');
+          },
+        );
+      } else {
+        finalizeEditMode([], '');
+      }
+    };
+
+    if (targetCategoryId) {
+      this.loadArtNos(targetCategoryId, () => {
+        if (targetArtNoId) {
+          this.fetchColors(targetArtNoId, targetCategoryId, () => {
+            loadSizesApi();
+          });
+        } else {
+          loadSizesApi();
+        }
+      });
+    } else {
+      loadSizesApi();
     }
   }
 
-  removeCartItem(id: number) {
-    this.cartItems = this.cartItems.filter((item) => item.id !== id);
+  async removeCartItem(id: number) {
+    const result = await confirm(
+      'Are you sure you want to remove this item?',
+      'Confirm Deletion',
+    );
+    if (!result) return;
+
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+
+    const payload = {
+      // USER_ID: userId,
+      // DEALER_ID: this.getActualDealerId(),
+      // DEALER_NAME: this.getDealerName(),
+      // SUBDEALER_ID:
+      //   this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
+      // SUBDEALER_NAME: this.getSubDealerName(),
+      CART_ID: id,
+    };
+
+    this.isProcessing = true;
+    this.dataService.clearNewOrderCart(payload).subscribe(
+      (res: any) => {
+        this.isProcessing = false;
+        if (res.Flag === 1) {
+          notify('Item removed from cart!', 'success', 2000);
+          this.loadCartData();
+        } else {
+          const errMsg = res.Message || 'Failed to clear cart';
+          console.error('Failed to clear cart:', errMsg);
+          notify(errMsg, 'error', 3000);
+        }
+      },
+      (error) => {
+        this.isProcessing = false;
+        console.error('Error clearing cart', error);
+        notify('Error clearing cart', 'error', 3000);
+      },
+    );
   }
 
   getItemTotalPairs(item: CartItem): number {
@@ -680,7 +1163,9 @@ export class NewOrderComponent implements OnInit {
   }
 
   getColor(id: string | null): any {
-    return this.colors.find((c) => c.id === id);
+    if (!id) return null;
+    const found = this.colors.find((c) => c.id === id);
+    return found || { id: id, name: id, hex: this.getHexForColor(id) };
   }
 
   getSizeName(sizeId: string): string {
@@ -699,9 +1184,59 @@ export class NewOrderComponent implements OnInit {
     );
   }
 
-  submitOrder() {
-    console.log('Order Submitted', this.cartItems);
-    alert('Order Submitted!');
+  async submitOrder() {
+    const result = await confirm(
+      'Are you sure you want to submit this order?',
+      'Confirm Order',
+    );
+    if (!result) return;
+
+    this.isProcessing = true;
+
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+    const orderId =
+      this.cartItems.length > 0 ? this.cartItems[0].orderId || 0 : 0;
+    const orderDate = new Date().toISOString();
+
+    const payload = {
+      USER_ID: userId,
+      ORDER_ID: orderId,
+      DEALER_ID: this.getActualDealerId(),
+      SUBDEALER_ID:
+        this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
+      ORDER_STATUS: 0,
+      ORDER_DATE: orderDate,
+      REMARKS: '',
+      EXPECTED_DELIVERY: orderDate,
+      STATUS_DESCRIPTION: 'Submitted',
+      IS_FROM_WEB: true,
+      LOCATION_ID: this.selectedAddressId || 0,
+      BRAND_ID: null,
+      WAREHOUSE_ID: this.selectedWarehouseId || 0,
+    };
+
+    this.dataService.saveNewOrderCartToOrder(payload).subscribe(
+      (res: any) => {
+        this.isProcessing = false;
+        if (res.Flag === 1) {
+          notify('Order Submitted Successfully!', 'success', 3000);
+          this.loadCartData();
+          this.closePopup.emit();
+        } else {
+          const errMsg = res.Message || 'Failed to submit order';
+          console.error('Failed to submit order:', errMsg);
+          notify(errMsg, 'error', 3000);
+        }
+      },
+      (error) => {
+        this.isProcessing = false;
+        console.error('Error submitting order', error);
+        notify('Error submitting order', 'error', 3000);
+      },
+    );
   }
 }
 
@@ -717,6 +1252,7 @@ export class NewOrderComponent implements OnInit {
     DxButtonModule,
     DxPopupModule,
     DxTextBoxModule,
+    DxLoadPanelModule,
   ],
   declarations: [NewOrderComponent],
   exports: [NewOrderComponent],
