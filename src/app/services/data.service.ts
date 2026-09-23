@@ -7494,7 +7494,7 @@ The result can be exported to HTML or Markdown.`;
   getEmailSettings(): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/list`, {});
   }
-  
+
   insertEmailSettings(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/insert`, data);
   }
@@ -7530,6 +7530,11 @@ The result can be exported to HTML or Markdown.`;
 
   getNewOrderArtNoDetails(payload: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetArtNoDetails`, payload);
+  }
+
+  Purchase_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'PurchaseReport/PurchaseSummaryRpt';
+    return this.http.post(getEndpoint, payload);
   }
 
   getNewOrderDealerAddress(payload: any): Observable<any> {
