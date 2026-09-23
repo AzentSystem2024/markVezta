@@ -7,7 +7,7 @@ import {
   Output,
   EventEmitter,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { CommonModule } from '@angular/common';
@@ -97,9 +97,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
 
   selectedDealerId: any = null;
 
-  constructor(
-    private dataService: DataService,
-  ) {
+  constructor(private dataService: DataService) {
     this.currentEditingItem = this.getEmptyCartItem();
   }
 
@@ -352,15 +350,8 @@ export class NewOrderComponent implements OnInit, OnChanges {
       .getCustomerDeliveryAddresses({ DEALER_ID: dealerId })
       .subscribe(
         (res: any) => {
-          // Check if response is a direct array
-          let data = Array.isArray(res)
-            ? res
-            : res && res.Data
-              ? res.Data
-              : null;
-
-          if (data && Array.isArray(data) && data.length > 0) {
-            this.addresses = data.map((a: any) => ({
+          if (res && Array.isArray(res) && res.length > 0) {
+            this.addresses = res.map((a: any) => ({
               id: a.ID,
               name: a.DESCRIPTION,
             }));
@@ -552,18 +543,22 @@ export class NewOrderComponent implements OnInit, OnChanges {
     if (this.isSettingEditData) return;
     if (this.currentEditingItem.colorId === colorId) return;
 
-    if (!this.isEditMode && this.currentEditingItem.categoryId && this.currentEditingItem.artNoId) {
+    if (
+      !this.isEditMode &&
+      this.currentEditingItem.categoryId &&
+      this.currentEditingItem.artNoId
+    ) {
       const existingCartItem = this.cartItems.find(
-        (item) => 
+        (item) =>
           item.categoryId === this.currentEditingItem.categoryId &&
           item.artNoId === this.currentEditingItem.artNoId &&
-          item.colorId === colorId
+          item.colorId === colorId,
       );
 
       if (existingCartItem) {
         const dialogResult = await confirm(
           'This item is already available in the cart. Only edit is available. Do you want to edit it?',
-          'Already in Cart'
+          'Already in Cart',
         );
         if (dialogResult) {
           this.editCartItem(existingCartItem);
@@ -801,7 +796,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
 
   saveToCart() {
     if (this.getCurrentItemTotalQty() === 0) {
-      // Might want a warning in real app
+      notify('Please enter a quantity before saving to cart.', 'warning', 3000);
       return;
     }
 
@@ -838,8 +833,10 @@ export class NewOrderComponent implements OnInit, OnChanges {
       }
     });
 
-    const existingOrderId = this.cartItems.length > 0 ? this.cartItems[0].orderId || 0 : 0;
-    const finalOrderId = this.currentEditingItem.orderId || existingOrderId || 0;
+    const existingOrderId =
+      this.cartItems.length > 0 ? this.cartItems[0].orderId || 0 : 0;
+    const finalOrderId =
+      this.currentEditingItem.orderId || existingOrderId || 0;
 
     const payload = {
       USER_ID: userId,
@@ -851,7 +848,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
         this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
       SUBDEALER_NAME: this.getSubDealerName(),
       WAREHOUSE_ID: this.selectedWarehouseId || 0,
-      LOCATION_ID: 0,
+      LOCATION_ID: this.selectedAddressId || 0,
       CART: cartArray,
       COMBO: comboArray,
     };
@@ -958,7 +955,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
               sizes: sizes,
             });
           });
-          
+
           if (this.cartItems.length === 1 && this.editOrderId) {
             this.editCartItem(this.cartItems[0]);
           }
@@ -988,9 +985,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
       const clonedItem = JSON.parse(JSON.stringify(item));
       clonedItem.sizes = fullSizes;
       if (imageUrl) clonedItem.imageUrl = imageUrl;
-      
+
       this.currentEditingItem = clonedItem;
-      
+
       // Allow bindings to update before re-enabling event handlers
       setTimeout(() => {
         this.isSettingEditData = false;
@@ -1075,13 +1072,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
     if (targetCategoryId) {
       this.loadArtNos(targetCategoryId, () => {
         if (targetArtNoId) {
-          this.fetchColors(
-            targetArtNoId,
-            targetCategoryId,
-            () => {
-              loadSizesApi();
-            },
-          );
+          this.fetchColors(targetArtNoId, targetCategoryId, () => {
+            loadSizesApi();
+          });
         } else {
           loadSizesApi();
         }
@@ -1204,32 +1197,33 @@ export class NewOrderComponent implements OnInit, OnChanges {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     const userId = sessionData.USER_ID || sessionData.ID || 0;
-    const orderId = this.cartItems.length > 0 ? this.cartItems[0].orderId || 0 : 0;
+    const orderId =
+      this.cartItems.length > 0 ? this.cartItems[0].orderId || 0 : 0;
     const orderDate = new Date().toISOString();
 
     const payload = {
       USER_ID: userId,
       ORDER_ID: orderId,
       DEALER_ID: this.getActualDealerId(),
-      SUBDEALER_ID: this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
-      ORDER_STATUS: 2,
+      SUBDEALER_ID:
+        this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
+      ORDER_STATUS: 0,
       ORDER_DATE: orderDate,
-      REMARKS: "",
+      REMARKS: '',
       EXPECTED_DELIVERY: orderDate,
-      STATUS_DESCRIPTION: "Submitted",
+      STATUS_DESCRIPTION: 'Submitted',
       IS_FROM_WEB: true,
-      LOCATION_ID: 0,
+      LOCATION_ID: this.selectedAddressId || 0,
       BRAND_ID: null,
-      WAREHOUSE_ID: this.selectedWarehouseId || 0
+      WAREHOUSE_ID: this.selectedWarehouseId || 0,
     };
-
-    console.log('Order Submit Payload', payload);
 
     this.dataService.saveNewOrderCartToOrder(payload).subscribe(
       (res: any) => {
         this.isProcessing = false;
         if (res.Flag === 1) {
           notify('Order Submitted Successfully!', 'success', 3000);
+          this.loadCartData();
           this.closePopup.emit();
         } else {
           const errMsg = res.Message || 'Failed to submit order';
@@ -1241,7 +1235,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
         this.isProcessing = false;
         console.error('Error submitting order', error);
         notify('Error submitting order', 'error', 3000);
-      }
+      },
     );
   }
 }

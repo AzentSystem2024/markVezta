@@ -95,8 +95,8 @@
                     <!-- Address -->
                     <dx-select-box
                       [dataSource]="addresses"
-                      displayExpr="ADDRESS"
-                      valueExpr="ID"
+                      displayExpr="name"
+                      valueExpr="id"
                       [(value)]="selectedAddressId"
                       [placeholder]="
                         isLoadingAddresses ? 'Loading...' : 'Select Address'
