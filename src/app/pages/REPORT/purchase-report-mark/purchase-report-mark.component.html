@@ -38,16 +38,11 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <!-- <dxo-toolbar>
-        <dxi-item location="before">
-          <div
-            class="grid-header"
-            style="font-weight: 600; font-size: 20px; margin-left: 12px"
-          >
-            Trial Balance
-          </div>
-        </dxi-item>
-      </dxo-toolbar> -->
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
 
       <dxo-toolbar>
         <dxi-item location="before">
@@ -194,6 +189,7 @@
         dataField="DOC_NO"
         caption="Voucher No"
         dataType="string"
+        [groupIndex]="0"
       ></dxi-column>
 
       <!-- HSN CODE -->

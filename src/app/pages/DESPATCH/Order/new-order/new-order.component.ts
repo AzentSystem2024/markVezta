@@ -1211,7 +1211,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
       ORDER_DATE: orderDate,
       REMARKS: '',
       EXPECTED_DELIVERY: orderDate,
-      STATUS_DESCRIPTION: 'Submitted',
+      STATUS_DESCRIPTION: 'Open',
       IS_FROM_WEB: true,
       LOCATION_ID: this.selectedAddressId || 0,
       BRAND_ID: null,
