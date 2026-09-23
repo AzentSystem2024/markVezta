@@ -7494,6 +7494,7 @@ The result can be exported to HTML or Markdown.`;
   getEmailSettings(): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/list`, {});
   }
+
   insertEmailSettings(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}EmailSettings/insert`, data);
   }
@@ -7534,5 +7535,45 @@ The result can be exported to HTML or Markdown.`;
   Purchase_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'PurchaseReport/PurchaseSummaryRpt';
     return this.http.post(getEndpoint, payload);
+  }
+
+  getNewOrderDealerAddress(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetDealerAddress`, payload);
+  }
+
+  getCustomerDeliveryAddresses(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetCustomerDeliveryAddresses`, payload);
+  }
+
+  clearNewOrderCart(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/ClearCart`, payload);
+  }
+
+  getNewOrderDealerList(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetDealerList`, payload);
+  }
+
+  getNewOrderSubDealerList(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetSubDealerList`, payload);
+  }
+
+  postNewOrderAddToCart(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/AddToCart`, payload);
+  }
+
+  getNewOrderCart(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetCart`, payload);
+  }
+
+  getNewOrderList(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderSummary`, payload);
+  }
+
+  saveNewOrderCartToOrder(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/SaveCartToOrder`, payload);
+  }
+
+  getNewOrderDetail(payload: any = {}): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderDetail`, payload);
   }
 }

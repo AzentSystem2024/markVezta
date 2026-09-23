@@ -152,6 +152,17 @@ export class InvoiceListComponent {
   isVerifyInvoice: boolean;
   isReadOnlyInvoice: boolean;
 
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'Approved',
+    },
+    {
+      text: 'Open',
+      value: 'Open',
+    },
+  ];
+
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -552,17 +563,6 @@ export class InvoiceListComponent {
 
   //   cellElement.appendChild(icon);
   // }
-
-  getStatusFilterData = [
-    {
-      text: 'Approved',
-      value: 'Approved',
-    },
-    {
-      text: 'Open',
-      value: 'Open',
-    },
-  ];
 
   onCellPrepared(e: any) {
     if (e.rowType === 'data' && e.column.command === 'edit') {
