@@ -1,227 +1,110 @@
 <dx-validation-group #journalVoucherGroup>
-  <div
-    class="invoice-wrapper"
-    style="
+  <div class="invoice-wrapper" style="
       height: 85vh;
       display: flex;
       flex-direction: column;
 
       box-sizing: border-box;
-    "
-  >
-    <div
-      class="stacked-toolbar-group"
-      style="
+    ">
+    <div class="stacked-toolbar-group" style="
         display: flex;
         flex-direction: column;
         gap: 5px;
         margin-bottom: 6px;
         margin-left: 20px;
         margin-right: 20px;
-      "
-    >
-      <div
-        style="
+      ">
+      <div style="
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           gap: 10px;
-        "
-      >
+        ">
         <div style="display: flex; gap: 10px; margin-top: 5px">
-          <dx-date-box
-            label="Return Date"
-            type="date"
-            labelMode="floating"
-            [width]="200"
-            [(value)]="salesReturnFormData.RET_DATE"
-            [displayFormat]="'dd-MM-yyyy'"
-            [readOnly]="true"
-          >
+          <dx-date-box label="Return Date" type="date" labelMode="floating" [width]="200"
+            [(value)]="salesReturnFormData.RET_DATE" [displayFormat]="'dd-MM-yyyy'" [readOnly]="true">
           </dx-date-box>
 
-          <dx-text-box
-            label="Reference No. *"
-            labelMode="floating"
-            [(value)]="salesReturnFormData.REF_NO"
-            [readOnly]="isReadOnlyMode"
-            [width]="200"
-          >
+          <dx-text-box label="Reference No. *" labelMode="floating" [(value)]="salesReturnFormData.REF_NO"
+            [readOnly]="isReadOnlyMode" [width]="200">
           </dx-text-box>
         </div>
 
-        <dx-select-box
-          [dataSource]="customerList"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          [width]="410"
-          [(value)]="salesReturnFormData.CUST_ID"
-          label="Customer"
-          labelMode="floating"
-          (onValueChanged)="onCustomerChanged($event)"
-          [readOnly]="isReadOnlyMode"
-          style="margin-top: 15px"
-        >
+        <dx-select-box [dataSource]="customerList" displayExpr="DESCRIPTION" valueExpr="ID" [width]="410"
+          [(value)]="salesReturnFormData.CUST_ID" label="Customer" labelMode="floating"
+          (onValueChanged)="onCustomerChanged($event)" [readOnly]="isReadOnlyMode" style="margin-top: 15px">
         </dx-select-box>
       </div>
 
-      <div
-        style="
+      <div style="
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           gap: 10px;
-        "
-      >
+        ">
         <div style="display: flex; gap: 10px">
-          <dx-text-box
-            label="Doc No."
-            labelMode="floating"
-            [(value)]="salesReturnFormData.RET_NO"
-            [readOnly]="true"
-            [width]="200"
-          >
+          <dx-text-box label="Doc No." labelMode="floating" [(value)]="salesReturnFormData.RET_NO" [readOnly]="true"
+            [width]="200">
           </dx-text-box>
-          <dx-select-box
-            [dataSource]="filteredStoreList"
-            [(value)]="salesReturnFormData.STORE_ID"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [width]="200"
-            label="Store"
-            labelMode="floating"
-            [readOnly]="isEditing"
-          >
+          <dx-select-box [dataSource]="filteredStoreList" [(value)]="salesReturnFormData.STORE_ID"
+            displayExpr="DESCRIPTION" valueExpr="ID" [width]="200" label="Store" labelMode="floating"
+            [readOnly]="isEditing">
           </dx-select-box>
         </div>
 
         <div style="display: flex; gap: 2px; justify-content: flex-end">
-          <dx-button
-            *ngIf="!isReadOnlyMode"
-            (onClick)="openPendingGrnPopup()"
-            [width]="410"
-            stylingMode="outlined"
-            class="blue-outline-btn"
-            [disabled]="isReadOnlyMode"
-          >
+          <dx-button *ngIf="!isReadOnlyMode" (onClick)="openPendingGrnPopup()" [width]="410" stylingMode="outlined"
+            class="blue-outline-btn" [disabled]="isReadOnlyMode">
             <div *dxTemplate="let data of 'content'">
               <div style="display: flex; align-items: center; gap: 6px">
-                <span
-                  class="iconify"
-                  data-icon="mingcute:time-line"
-                  data-width="20"
-                  data-height="20"
-                ></span>
+                <span class="iconify" data-icon="mingcute:time-line" data-width="20" data-height="20"></span>
                 <span>Fill Pending Invoice</span>
               </div>
-            </div></dx-button
-          >
+            </div>
+          </dx-button>
         </div>
       </div>
     </div>
     <div class="salary-grid-wrapper" style="padding: 0 20px">
       <div class="grid-container">
-        <dx-data-grid
-          #itemsGridRef
-          [dataSource]="mainGridData"
-          [showBorders]="true"
-          [showRowLines]="true"
-          [showColumnLines]="true"
-          [columnAutoWidth]="false"
-          [wordWrapEnabled]="false"
-          [rowAlternationEnabled]="true"
-          [headerFilter]="{ visible: true, allowSearch: true }"
-          [allowColumnReordering]="true"
-          [showColumnHeaders]="true"
-          [columnAutoWidth]="true"
-          [allowColumnResizing]="true"
-          [height]="'55vh'"
-          [width]="'auto'"
-          [columnResizingMode]="'nextColumn'"
-          [scrolling]="{ mode: 'virtual' }"
-          rowAlternationInterval="2"
-          [selection]="{ mode: 'single' }"
-          [editing]="{
+        <dx-data-grid #itemsGridRef [dataSource]="mainGridData" [showBorders]="true" [showRowLines]="true"
+          [showColumnLines]="true" [columnAutoWidth]="false" [wordWrapEnabled]="false" [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true, allowSearch: true }" [allowColumnReordering]="true"
+          [showColumnHeaders]="true" [columnAutoWidth]="true" [allowColumnResizing]="true" [height]="'55vh'"
+          [width]="'auto'" [columnResizingMode]="'nextColumn'" [scrolling]="{ mode: 'virtual' }"
+          rowAlternationInterval="2" [selection]="{ mode: 'single' }" [editing]="{
             mode: 'cell',
             allowUpdating: true,
             allowDeleting: !isReadOnlyMode,
             allowAdding: false,
             useIcons: true,
-          }"
-          (onEditorPreparing)="onEditorPreparing($event)"
-          (onContentReady)="onContentReady($event)"
-        >
+          }" (onEditorPreparing)="onEditorPreparing($event)" (onContentReady)="onContentReady($event)">
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
 
-          <dxi-column
-            dataField="ITEM_ID"
-            caption="Item ID"
-            [allowEditing]="false"
-            [visible]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="TRANSFER_NO"
-            caption="Invoice No"
-            [allowEditing]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="TRANSFER_DATE"
-            caption="Date"
-            dataType="date"
-            format="dd-MM-yyyy"
-            [allowEditing]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="ITEM_NAME"
-            caption="Item Name"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="ITEM_ID" caption="Item ID" [allowEditing]="false" [visible]="false"></dxi-column>
+          <dxi-column dataField="TRANSFER_NO" caption="Invoice No" [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="TRANSFER_DATE" caption="Date" dataType="date" format="dd-MM-yyyy"
+            [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="ITEM_NAME" caption="Item Name" [allowEditing]="false"></dxi-column>
           <!-- <dxi-column
             dataField="HSN_CODE"
             caption="HSN Code"
             dataType="number"
             [allowEditing]="false"
           ></dxi-column> -->
-          <dxi-column
-            dataField="PRICE"
-            caption="Price"
-            dataType="number"
-            format="#,##0.00"
-            [allowEditing]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="PENDING_QTY"
-            caption="Pending Qty"
-            dataType="number"
-            [allowEditing]="false"
-          ></dxi-column>
-          <dxi-column
-            dataField="QUANTITY"
-            caption="Qty"
-            dataType="number"
-            [allowEditing]="!isReadOnlyMode"
-          >
-            <dxi-validation-rule
-              type="custom"
-              [validationCallback]="validateQuantity"
-              message="Quantity cannot be greater than Pending Qty"
-            ></dxi-validation-rule>
+          <dxi-column dataField="PRICE" caption="Price" dataType="number" format="#,##0.00"
+            [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="PENDING_QTY" caption="Pending Qty" dataType="number"
+            [allowEditing]="false"></dxi-column>
+          <dxi-column dataField="QUANTITY" caption="Qty" dataType="number" [allowEditing]="!isReadOnlyMode">
+            <dxi-validation-rule type="custom" [validationCallback]="validateQuantity"
+              message="Quantity cannot be greater than Pending Qty"></dxi-validation-rule>
           </dxi-column>
-          <dxi-column
-            dataField="AMOUNT"
-            caption="Amount"
-            dataType="number"
-            format="#,##0.00"
-            [allowEditing]="false"
-            [calculateCellValue]="calculateAmount"
-          ></dxi-column>
-          <dxi-column
-            dataField="VAT_PERC"
-            dataType="number"
-            [caption]="vatTitle + '%'"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="AMOUNT" caption="Amount" dataType="number" format="#,##0.00" [allowEditing]="false"
+            [calculateCellValue]="calculateAmount"></dxi-column>
+          <dxi-column dataField="VAT_PERC" dataType="number" [caption]="vatTitle + '%'"
+            [allowEditing]="false"></dxi-column>
           <!-- <dxi-column
             dataField="CGST"
             caption="CGST"
@@ -236,100 +119,54 @@
             [visible]="showSGST"
             [allowEditing]="false"
           ></dxi-column> -->
-          <dxi-column
-            dataField="VAT_AMOUNT"
-            dataType="number"
-            [caption]="vatTitle + ' Amount'"
-            format="#,##0.00"
-            [allowEditing]="false"
-            [calculateCellValue]="calculateVATAmount"
-          ></dxi-column>
-          <dxi-column
-            dataField="TOTAL_AMOUNT"
-            caption="Total Amount"
-            dataType="number"
-            format="#,##0.00"
-            [allowEditing]="false"
-            [calculateCellValue]="calculateTotalAmount"
-          ></dxi-column>
+          <dxi-column dataField="VAT_AMOUNT" dataType="number" [caption]="vatTitle + ' Amount'" format="#,##0.00"
+            [allowEditing]="false" [calculateCellValue]="calculateVATAmount"></dxi-column>
+          <dxi-column dataField="TOTAL_AMOUNT" caption="Total Amount" dataType="number" format="#,##0.00"
+            [allowEditing]="false" [calculateCellValue]="calculateTotalAmount"></dxi-column>
           <dxo-summary>
-            <dxi-total-item
-              column="AMOUNT"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="{0}"
-              alignment="right"
-            ></dxi-total-item>
-            <dxi-total-item
-              column="TOTAL_AMOUNT"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="{0}"
-              alignment="right"
-            ></dxi-total-item>
+            <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
+              alignment="right"></dxi-total-item>
+            <dxi-total-item column="TOTAL_AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="{0}"
+              alignment="right"></dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
 
-        <div
-          style="
+        <div style="
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin: 10px 3px;
-          "
-        >
+          ">
           <!-- LEFT SIDE → Vehicle No -->
           <div>
-            <dx-text-box
-              label="Vehicle No"
-              labelMode="floating"
-              [(value)]="salesReturnFormData.VEHICLE_NO"
-              [width]="200"
-              [readOnly]="isReadOnlyMode"
-            ></dx-text-box>
+            <dx-text-box label="Vehicle No" labelMode="floating" [(value)]="salesReturnFormData.VEHICLE_NO"
+              [width]="200" [readOnly]="isReadOnlyMode"></dx-text-box>
           </div>
 
           <!-- RIGHT SIDE → Round Off + Net Amount -->
           <div style="display: flex; align-items: center; gap: 16px">
-            <dx-check-box
-              style="margin-right: 23px"
-              text="Round Off"
-              [(value)]="salesReturnFormData.ROUND_OFF"
-              [readOnly]="isReadOnlyMode"
-              (onValueChanged)="onRoundOffChange()"
-            ></dx-check-box>
+            <dx-check-box style="margin-right: 23px" text="Round Off" [(value)]="salesReturnFormData.ROUND_OFF"
+              [readOnly]="isReadOnlyMode" (onValueChanged)="onRoundOffChange()"></dx-check-box>
 
-            <dx-text-box
-              label="Net Amount"
-              labelMode="floating"
-              [value]="netAmount"
-              [width]="120"
-              [format]="'#,##0.00'"
-              [readOnly]="true"
-            ></dx-text-box>
+            <dx-text-box label="Net Amount" labelMode="floating" [value]="netAmount" [width]="120" [format]="'#,##0.00'"
+              [readOnly]="true"></dx-text-box>
           </div>
         </div>
 
         <div class="form-popup-buttons-container">
           <div class="cancel-group">
             <div class="approve-container" *ngIf="canApprove">
-              <dx-check-box
-                [value]="
+              <dx-check-box [value]="
                   isReadOnlyMode ? true : salesReturnFormData.IS_APPROVED
-                "
-                (valueChange)="
+                " (valueChange)="
                   !isReadOnlyMode
                     ? (salesReturnFormData.IS_APPROVED = $event)
                     : null
-                "
-                [text]="isReadOnlyMode ? 'Approved' : 'Approve'"
-                [readOnly]="isReadOnlyMode"
-                stylingMode="outlined"
-              >
+                " [text]="isReadOnlyMode ? 'Approved' : 'Approve'" [readOnly]="isReadOnlyMode" stylingMode="outlined">
               </dx-check-box>
             </div>
             <!-- <div class="popup-footer"> -->
-            <dx-button
+            <!-- <dx-button
               text="Print"
               stylingMode="contained"
               type="default"
@@ -337,18 +174,10 @@
               *ngIf="isEditing || isReadOnlyMode"
               (onClick)="getTemplates()"
               style="margin-right: 10px;"
-            ></dx-button>
-            <dx-button
-              text="Cancel"
-              stylingMode="outlined"
-              type="normal"
-              (onClick)="cancel()"
-            ></dx-button>
+            ></dx-button> -->
+            <dx-button text="Cancel" stylingMode="outlined" type="normal" (onClick)="cancel()"></dx-button>
           </div>
-          <dx-button
-            *ngIf="!isReadOnlyMode"
-            #saveButtonRef
-            [text]="
+          <dx-button *ngIf="!isReadOnlyMode" #saveButtonRef [text]="
               isSaving
                 ? salesReturnFormData.IS_APPROVED
                   ? 'Saving...'
@@ -356,206 +185,87 @@
                 : salesReturnFormData.IS_APPROVED
                   ? 'Save'
                   : 'Save'
-            "
-            [disabled]="isSaving"
-            (onClick)="saveSaleReturn()"
-            stylingMode="contained"
-            type="default"
-          ></dx-button>
+            " [disabled]="isSaving" (onClick)="saveSaleReturn()" stylingMode="contained" type="default"></dx-button>
         </div>
       </div>
     </div>
   </div>
 </dx-validation-group>
 
-<dx-popup
-  [(visible)]="isTrOutPopupVisible"
-  [width]="800"
-  [height]="500"
-  [showTitle]="true"
-  title="Pending Invoice"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="true"
-  (onHiding)="onPendingPopupClose()"
->
+<dx-popup [(visible)]="isTrOutPopupVisible" [width]="800" [height]="500" [showTitle]="true" title="Pending Invoice"
+  [dragEnabled]="true" [closeOnOutsideClick]="true" (onHiding)="onPendingPopupClose()">
   <div *dxTemplate="let data of 'content'">
-    <dx-data-grid
-      #popupGridRef
-      [dataSource]="pendingList"
-      [showBorders]="true"
-      [showRowLines]="true"
-      [showColumnLines]="true"
-      [columnAutoWidth]="false"
-      [wordWrapEnabled]="false"
-      [rowAlternationEnabled]="true"
-      [headerFilter]="{ visible: true, allowSearch: true }"
-      [allowColumnReordering]="true"
-      [showColumnHeaders]="true"
-      [columnAutoWidth]="true"
-      [allowColumnResizing]="true"
-      [height]="'60vh'"
-      [columnResizingMode]="'nextColumn'"
-      [scrolling]="{ mode: 'virtual' }"
-      rowAlternationInterval="2"
+    <dx-data-grid #popupGridRef [dataSource]="pendingList" [showBorders]="true" [showRowLines]="true"
+      [showColumnLines]="true" [columnAutoWidth]="false" [wordWrapEnabled]="false" [rowAlternationEnabled]="true"
+      [headerFilter]="{ visible: true, allowSearch: true }" [allowColumnReordering]="true" [showColumnHeaders]="true"
+      [columnAutoWidth]="true" [allowColumnResizing]="true" [height]="'60vh'" [columnResizingMode]="'nextColumn'"
+      [scrolling]="{ mode: 'virtual' }" rowAlternationInterval="2"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
-      (onSelectionChanged)="onPendingSelectionChanged($event)"
-      (onRowPrepared)="onPendingRowPrepared($event)"
-    >
+      (onSelectionChanged)="onPendingSelectionChanged($event)" (onRowPrepared)="onPendingRowPrepared($event)">
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-pager
-        [visible]="true"
-        [allowedPageSizes]="allowedPageSizes"
-        [displayMode]="displayMode"
-        [showPageSizeSelector]="showPageSizeSelector"
-        [showInfo]="true"
-        [showNavigationButtons]="true"
-      ></dxo-pager>
+      <dxo-pager [visible]="true" [allowedPageSizes]="allowedPageSizes" [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector" [showInfo]="true" [showNavigationButtons]="true"></dxo-pager>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
+      <dxo-filter-row [visible]="isFilterRowVisible" [applyFilter]="auto"></dxo-filter-row>
 
       <dxo-toolbar>
-        <div
-          class="stacked-toolbar-group"
-          style="display: flex; flex-direction: column; gap: 2px"
-        ></div>
+        <div class="stacked-toolbar-group" style="display: flex; flex-direction: column; gap: 2px"></div>
         <dxi-item location="before" locateInMenu="auto"> </dxi-item>
 
         <dxi-item location="after">
           <div class="toolbar-button-wrapper">
-            <dx-button
-              text="Select Invoice"
-              icon="check"
-              type="default"
-              stylingMode="contained"
-              class="blue-outline-btn"
-              (onClick)="onTransferSelectClick()"
-            ></dx-button>
+            <dx-button text="Select Invoice" icon="check" type="default" stylingMode="contained"
+              class="blue-outline-btn" (onClick)="onTransferSelectClick()"></dx-button>
           </div>
         </dxi-item>
 
         <dxi-item location="after" locateInMenu="auto"> </dxi-item>
       </dxo-toolbar>
       <dxi-column dataField="DOC_NO" caption="Doc No"></dxi-column>
-      <dxi-column
-        dataField="ID"
-        caption="SALE ID"
-        [visible]="false"
-      ></dxi-column>
-      <dxi-column
-        dataField="SALE_DET_ID"
-        caption="ID"
-        [visible]="false"
-      ></dxi-column>
-      <dxi-column
-        dataField="SALE_NO"
-        caption="ID"
-        [visible]="false"
-      ></dxi-column>
-      <dxi-column
-        dataField="SALE_DATE"
-        caption="Date"
-        dataType="date"
-        format="dd-MM-yyyy"
-      ></dxi-column>
-      <dxi-column
-        dataField="ITEM_NAME"
-        caption="Item Name"
-        dataType="date"
-        format="dd-MM-yyyy"
-      ></dxi-column>
-      <dxi-column
-        dataField="BARCODE"
-        caption="Barcode"
-        dataType="number"
-      ></dxi-column>
-      <dxi-column
-        dataField="PENDING_QTY"
-        caption="Quantity"
-        dataType="number"
-      ></dxi-column>
-      <dxi-column
-        dataField="PRICE"
-        caption="Price"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
-      <dxi-column
-        dataField="AMOUNT"
-        caption="Amount"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
-      <dxi-column
-        dataField="VAT_PERC"
-        caption="Tax%"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-        [visible]="false"
-      ></dxi-column>
-      <dxi-column
-        dataField="TAX_AMOUNT"
-        caption="Tax Amount"
-        [format]="{ type: 'fixedPoint', precision: 2 }"
-      ></dxi-column>
+      <dxi-column dataField="ID" caption="SALE ID" [visible]="false"></dxi-column>
+      <dxi-column dataField="SALE_DET_ID" caption="ID" [visible]="false"></dxi-column>
+      <dxi-column dataField="SALE_NO" caption="ID" [visible]="false"></dxi-column>
+      <dxi-column dataField="SALE_DATE" caption="Date" dataType="date" format="dd-MM-yyyy"></dxi-column>
+      <dxi-column dataField="ITEM_NAME" caption="Item Name" dataType="date" format="dd-MM-yyyy"></dxi-column>
+      <dxi-column dataField="BARCODE" caption="Barcode" dataType="number"></dxi-column>
+      <dxi-column dataField="PENDING_QTY" caption="Quantity" dataType="number"></dxi-column>
+      <dxi-column dataField="PRICE" caption="Price" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+      <dxi-column dataField="AMOUNT" caption="Amount" [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
+      <dxi-column dataField="VAT_PERC" caption="Tax%" [format]="{ type: 'fixedPoint', precision: 2 }"
+        [visible]="false"></dxi-column>
+      <dxi-column dataField="TAX_AMOUNT" caption="Tax Amount"
+        [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
     </dx-data-grid>
   </div>
 </dx-popup>
 
 <!-- TEMPLATE POPUP -->
-<dx-popup
-  [width]="400"
-  [height]="200"
-  [showTitle]="true"
-  title="Select Print Template"
-  [dragEnabled]="false"
-  [closeOnOutsideClick]="true"
-  [(visible)]="showTemplatePopup"
-  [showCloseButton]="true"
->
+<dx-popup [width]="400" [height]="200" [showTitle]="true" title="Select Print Template" [dragEnabled]="false"
+  [closeOnOutsideClick]="true" [(visible)]="showTemplatePopup" [showCloseButton]="true">
   <div *dxTemplate="let data of 'content'">
     <div style="display: flex; flex-direction: column; gap: 15px">
-      <dx-select-box
-        [dataSource]="templates"
-        displayExpr="TEMPLATE_NAME"
-        valueExpr="TEMPLATE_NAME"
-        [(value)]="selectedTemplate"
-        placeholder="Select a Template"
-      ></dx-select-box>
+      <dx-select-box [dataSource]="templates" displayExpr="TEMPLATE_NAME" valueExpr="TEMPLATE_NAME"
+        [(value)]="selectedTemplate" placeholder="Select a Template"></dx-select-box>
       <div style="display: flex; justify-content: flex-end; gap: 10px">
-        <dx-button
-          text="Preview"
-          type="default"
-          stylingMode="contained"
-          (onClick)="previewSelectedTemplate()"
-        ></dx-button>
-        <dx-button
-          text="Cancel"
-          stylingMode="outlined"
-          (onClick)="showTemplatePopup = false"
-        ></dx-button>
+        <dx-button text="Preview" type="default" stylingMode="contained"
+          (onClick)="previewSelectedTemplate()"></dx-button>
+        <dx-button text="Cancel" stylingMode="outlined" (onClick)="showTemplatePopup = false"></dx-button>
       </div>
     </div>
   </div>
 </dx-popup>
 
 <!-- PDF PREVIEW POPUP -->
-<dx-popup
-  [width]="'90%'"
-  [height]="'90%'"
-  [showTitle]="true"
-  title="Preview Sales Return"
-  [dragEnabled]="false"
-  [closeOnOutsideClick]="false"
-  [(visible)]="isPreviewPopupVisible"
-  (onHiding)="closePdfPreview()"
-  [showCloseButton]="true"
->
+<dx-popup [width]="'90%'" [height]="'90%'" [showTitle]="true" title="Preview Sales Return" [dragEnabled]="false"
+  [closeOnOutsideClick]="false" [(visible)]="isPreviewPopupVisible" (onHiding)="closePdfPreview()"
+  [showCloseButton]="true">
   <div *dxTemplate="let data of 'content'" style="height: 100%; display: flex; flex-direction: column;">
     <div style="margin-bottom: 10px; display: flex; gap: 10px;">
       <dx-button text="Print" icon="print" type="default" stylingMode="contained" (onClick)="printPdf()"></dx-button>
       <dx-button text="Send" icon="email" type="success" stylingMode="contained" (onClick)="sendPdf()"></dx-button>
-      <dx-button text="Download" icon="download" type="normal" stylingMode="contained" (onClick)="downloadPdf()"></dx-button>
+      <dx-button text="Download" icon="download" type="normal" stylingMode="contained"
+        (onClick)="downloadPdf()"></dx-button>
     </div>
     <div style="flex: 1; border: 1px solid #ccc;">
       <iframe *ngIf="pdfPreviewUrl" [src]="pdfPreviewUrl" style="width: 100%; height: 100%; border: none;"></iframe>
@@ -568,39 +278,17 @@
 </dx-popup>
 
 <!-- SEND EMAIL POPUP -->
-<dx-popup
-  [width]="600"
-  [height]="450"
-  [showTitle]="true"
-  title="Send Email"
-  [dragEnabled]="true"
-  [closeOnOutsideClick]="false"
-  [(visible)]="isEmailPopupVisible"
-  [showCloseButton]="true"
->
+<dx-popup [width]="600" [height]="450" [showTitle]="true" title="Send Email" [dragEnabled]="true"
+  [closeOnOutsideClick]="false" [(visible)]="isEmailPopupVisible" [showCloseButton]="true">
   <div *dxTemplate="let data of 'content'">
     <div style="display: flex; flex-direction: column; gap: 15px">
-      
-      <dx-tag-box
-        [items]="emailReceivers"
-        [acceptCustomValue]="true"
-        [(value)]="selectedEmails"
-        label="Receivers (Select Multiple):"
-        labelMode="floating"
-      ></dx-tag-box>
 
-      <dx-text-box
-        [(value)]="emailSubject"
-        label="Subject:"
-        labelMode="floating"
-      ></dx-text-box>
+      <dx-tag-box [items]="emailReceivers" [acceptCustomValue]="true" [(value)]="selectedEmails"
+        label="Receivers (Select Multiple):" labelMode="floating"></dx-tag-box>
 
-      <dx-text-area
-        [(value)]="emailBody"
-        [height]="120"
-        label="Body:"
-        labelMode="floating"
-      ></dx-text-area>
+      <dx-text-box [(value)]="emailSubject" label="Subject:" labelMode="floating"></dx-text-box>
+
+      <dx-text-area [(value)]="emailBody" [height]="120" label="Body:" labelMode="floating"></dx-text-area>
 
       <div style="font-size: 12px; color: #555;">
         Attachment:<br>
@@ -608,19 +296,10 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px">
-        <dx-button
-          [text]="isSendingEmail ? 'Sending...' : 'Send'"
-          type="success"
-          stylingMode="contained"
-          (onClick)="sendEmailConfirm()"
-          [disabled]="isSendingEmail"
-        ></dx-button>
-        <dx-button
-          text="Cancel"
-          stylingMode="outlined"
-          (onClick)="isEmailPopupVisible = false"
-          type="danger"
-        ></dx-button>
+        <dx-button [text]="isSendingEmail ? 'Sending...' : 'Send'" type="success" stylingMode="contained"
+          (onClick)="sendEmailConfirm()" [disabled]="isSendingEmail"></dx-button>
+        <dx-button text="Cancel" stylingMode="outlined" (onClick)="isEmailPopupVisible = false"
+          type="danger"></dx-button>
       </div>
     </div>
   </div>

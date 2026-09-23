@@ -1,47 +1,26 @@
 <dx-validation-group #journalVoucherGroup>
-  <div
-    class="invoice-wrapper"
-    style="
+  <div class="invoice-wrapper" style="
       height: 86vh;
       display: flex;
       flex-direction: column;
 
       box-sizing: border-box;
-    "
-  >
+    ">
     <div class="salary-grid-wrapper" style="padding: 0 10px">
       <div class="grid-container">
-        <dx-data-grid
-          #itemsGridRef
-          [dataSource]="gridData"
-          [showBorders]="true"
-          [showRowLines]="true"
-          [showColumnLines]="true"
-          [columnAutoWidth]="false"
-          [wordWrapEnabled]="false"
-          [rowAlternationEnabled]="true"
-          [headerFilter]="{ visible: true, allowSearch: true }"
-          [allowColumnReordering]="true"
-          [showColumnHeaders]="true"
-          [columnAutoWidth]="true"
-          [allowColumnResizing]="true"
-          [height]="'52vh'"
-          [columnResizingMode]="'nextColumn'"
-          [scrolling]="{ mode: 'virtual' }"
-          rowAlternationInterval="2"
-          [selection]="{ mode: 'single' }"
-          [keyboardNavigation]="{ editOnKeyPress: true }"
-          [editing]="{
+        <dx-data-grid #itemsGridRef [dataSource]="gridData" [showBorders]="true" [showRowLines]="true"
+          [showColumnLines]="true" [columnAutoWidth]="false" [wordWrapEnabled]="false" [rowAlternationEnabled]="true"
+          [headerFilter]="{ visible: true, allowSearch: true }" [allowColumnReordering]="true"
+          [showColumnHeaders]="true" [columnAutoWidth]="true" [allowColumnResizing]="true" [height]="'52vh'"
+          [columnResizingMode]="'nextColumn'" [scrolling]="{ mode: 'virtual' }" rowAlternationInterval="2"
+          [selection]="{ mode: 'single' }" [keyboardNavigation]="{ editOnKeyPress: true }" [editing]="{
             mode: 'cell',
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: true,
             useIcons: true,
-          }"
-          (onEditorPreparing)="onEditorPreparing($event)"
-          (onCellValueChanged)="onCellValueChanged($event)"
-          (onRowRemoved)="onRowRemoved($event)"
-        >
+          }" (onEditorPreparing)="onEditorPreparing($event)" (onCellValueChanged)="onCellValueChanged($event)"
+          (onRowRemoved)="onRowRemoved($event)">
           <dxo-load-panel [showPane]="false"></dxo-load-panel>
           <dxo-filter-builder [allowHierarchicalFields]="true">
           </dxo-filter-builder>
@@ -143,225 +122,111 @@
           <!-- </dxo-toolbar> -->
 
           <dxo-toolbar>
-            <div
-              class="stacked-toolbar-group"
-              style="display: flex; flex-direction: column; gap: 2px"
-            ></div>
+            <div class="stacked-toolbar-group" style="display: flex; flex-direction: column; gap: 2px"></div>
             <dxi-item location="before" locateInMenu="auto">
-              <div
-                class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 0px"
-              >
-                <div
-                  style="
+              <div class="stacked-toolbar-group" style="display: flex; flex-direction: column; gap: 0px">
+                <div style="
                     display: flex;
                     align-items: center;
                     gap: 6px;
                     margin-top: 6px;
                     width: 100%;
-                  "
-                >
-                  <dx-text-box
-                    label="Doc No"
-                    labelMode="floating"
-                    [width]="200"
-                    [readOnly]="true"
-                    [(value)]="productionJVFormData.DOC_NO"
-                  ></dx-text-box>
+                  ">
+                  <dx-text-box label="Doc No" labelMode="floating" [width]="200" [readOnly]="true"
+                    [(value)]="productionJVFormData.DOC_NO"></dx-text-box>
 
-                  <dx-text-box
-                    label="Reference No"
-                    labelMode="floating"
-                    [width]="200"
-                    [(value)]="productionJVFormData.REF_NO"
-                  ></dx-text-box>
+                  <dx-text-box label="Reference No" labelMode="floating" [width]="200"
+                    [(value)]="productionJVFormData.REF_NO"></dx-text-box>
 
                   <!-- Date box pushed to right end -->
                 </div>
 
-                <dx-date-box
-                  label="Date"
-                  labelMode="floating"
-                  [width]="200"
-                  displayFormat="dd-MM-yyyy"
-                  [readOnly]="false"
-                  [(value)]="productionJVFormData.PRODUCTION_DATE"
-                ></dx-date-box>
+                <dx-date-box label="Date" labelMode="floating" [width]="200" displayFormat="dd-MM-yyyy"
+                  [readOnly]="false" [(value)]="productionJVFormData.PRODUCTION_DATE"></dx-date-box>
               </div>
             </dxi-item>
 
             <dxi-item location="after" locateInMenu="auto">
-              <div
-                class="stacked-toolbar-group"
-                style="display: flex; flex-direction: column; gap: 6px"
-              >
+              <div class="stacked-toolbar-group" style="display: flex; flex-direction: column; gap: 6px">
                 <!-- Date Field (Top) -->
                 <div style="display: flex; align-items: baseline; gap: 2px">
-                  <dx-select-box
-                    label="Product *"
-                    labelMode="floating"
-                    [width]="400"
-                    [valueExpr]="'ID'"
-                    [displayExpr]="'DESCRIPTION'"
-                    [items]="Article"
-                    [searchEnabled]="true"
+                  <dx-select-box label="Product *" labelMode="floating" [width]="400" [valueExpr]="'ID'"
+                    [displayExpr]="'DESCRIPTION'" [items]="Article" [searchEnabled]="true"
                     [(value)]="productionJVFormData.PRODUCT_ID"
-                    (onValueChanged)="onProductChange($event)"
-                  ></dx-select-box>
+                    (onValueChanged)="onProductChange($event)"></dx-select-box>
                 </div>
 
                 <!-- Qty + Button Row -->
                 <div style="display: flex; gap: 8px; justify-content: end">
-                  <dx-number-box
-                    label="Production Qty *"
-                    labelMode="floating"
-                    [width]="150"
-                    [(value)]="productionJVFormData.PROD_QTY"
-                    (onValueChanged)="onProductionQtyChange()"
-                    [readOnly]="false"
-                  ></dx-number-box>
+                  <dx-number-box label="Production Qty *" labelMode="floating" [width]="150"
+                    [(value)]="productionJVFormData.PROD_QTY" (onValueChanged)="onProductionQtyChange()"
+                    [readOnly]="false"></dx-number-box>
 
-                  <dx-button
-                    text="Fill Component"
-                    stylingMode="contained"
-                    type="default"
-                    style="height: 32px; margin-top: 5px"
-                    (onClick)="fillComponents()"
-                  ></dx-button>
+                  <dx-button text="Fill Component" stylingMode="contained" type="default"
+                    style="height: 32px; margin-top: 5px" (onClick)="fillComponents()"></dx-button>
                 </div>
               </div>
             </dxi-item>
           </dxo-toolbar>
 
-          <dxi-column
-            dataField="ITEM_CODE"
-            caption="Item Code"
-            [width]="130"
-            [editorType]="'dxSelectBox'"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="ITEM_CODE" caption="Item Code" [width]="130" [editorType]="'dxSelectBox'"
+            [allowEditing]="false"></dxi-column>
 
-          <dxi-column
-            dataField="DESCRIPTION"
-            caption="Item Description"
-            [width]="200"
-            [editorType]="'dxSelectBox'"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="DESCRIPTION" caption="Item Description" [width]="200" [editorType]="'dxSelectBox'"
+            [allowEditing]="false"></dxi-column>
 
-          <dxi-column
-            dataField="UOM"
-            caption="UOM"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="UOM" caption="UOM" [allowEditing]="false"></dxi-column>
 
-          <dxi-column
-            dataField="QUANTITY"
-            caption="BoM Qty"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="QUANTITY" caption="BoM Qty" [allowEditing]="false"></dxi-column>
 
-          <dxi-column
-            dataField="REQUIRED_QTY"
-            caption="Qty Required"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="REQUIRED_QTY" caption="Qty Required" [allowEditing]="false"></dxi-column>
 
-          <dxi-column
-            dataField="QTY_AVAILABLE"
-            caption="Qty Available"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="QTY_AVAILABLE" caption="Qty Available" [allowEditing]="false"></dxi-column>
 
-          <dxi-column
-            dataField="USED_QTY"
-            caption="Qty used"
-            [allowEditing]="true"
-          ></dxi-column>
+          <dxi-column dataField="USED_QTY" caption="Qty used" [allowEditing]="true"></dxi-column>
 
-          <dxi-column
-            dataField="COST"
-            caption="Cost"
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-            [allowEditing]="false"
-          ></dxi-column>
+          <dxi-column dataField="COST" caption="Cost" dataType="number" [format]="{ type: 'fixedPoint', precision: 2 }"
+            [allowEditing]="false"></dxi-column>
 
-          <dxi-column
-            dataField="AMOUNT"
-            caption="Amount"
-            [allowEditing]="false"
-            dataType="number"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dxi-column>
+          <dxi-column dataField="AMOUNT" caption="Amount" [allowEditing]="false" dataType="number"
+            [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
 
           <dxo-summary>
-            <dxi-total-item
-              column="AMOUNT"
-              summaryType="sum"
-              valueFormat="#,##0.00"
-              displayFormat="Total: {0}"
-              alignment="right"
-            >
+            <dxi-total-item column="AMOUNT" summaryType="sum" valueFormat="#,##0.00" displayFormat="Total: {0}"
+              alignment="right">
             </dxi-total-item>
           </dxo-summary>
         </dx-data-grid>
 
         <!-- Fill Amount Button below grid -->
-        <div
-          style="display: flex; justify-content: flex-end; margin-top: 5px"
-        ></div>
-        <div
-          class="bordered-grid"
-          style="
+        <div style="display: flex; justify-content: flex-end; margin-top: 5px"></div>
+        <div class="bordered-grid" style="
             margin-top: 10px;
             padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 5px;
-          "
-        >
+          ">
           <div style="display: flex; gap: 10px; align-items: center">
             <!-- Remark -->
-            <dx-number-box
-              label="Additional Cost"
-              labelMode="floating"
-              style="flex: 2"
-              [readOnly]="false"
+            <dx-number-box label="Additional Cost" labelMode="floating" style="flex: 2" [readOnly]="false"
               [(value)]="productionJVFormData.ADDL_COST"
-              (onValueChanged)="onAdditionalCostChange($event)"
-            ></dx-number-box>
+              (onValueChanged)="onAdditionalCostChange($event)"></dx-number-box>
 
             <!-- Unit Product Cost -->
-            <dx-number-box
-              label="Cost of production"
-              labelMode="floating"
-              style="flex: 1"
-              [format]="{ type: 'fixedPoint', precision: 2 }"
-              [readOnly]="true"
-              [value]="finalCost"
-            ></dx-number-box>
+            <dx-number-box label="Cost of production" labelMode="floating" style="flex: 1"
+              [format]="{ type: 'fixedPoint', precision: 2 }" [readOnly]="true" [value]="finalCost"></dx-number-box>
           </div>
 
           <div style="display: flex; gap: 10px; align-items: center">
             <!-- Remark -->
-            <dx-text-box
-              label="Remark"
-              labelMode="floating"
-              style="flex: 2"
-              [readOnly]="false"
-              [(value)]="productionJVFormData.REMARKS"
-            ></dx-text-box>
+            <dx-text-box label="Remark" labelMode="floating" style="flex: 2" [readOnly]="false"
+              [(value)]="productionJVFormData.REMARKS"></dx-text-box>
 
             <!-- Unit Product Cost -->
-            <dx-number-box
-              label="Unit Product Cost"
-              labelMode="floating"
-              style="flex: 1"
-              [format]="{ type: 'fixedPoint', precision: 2 }"
-              [readOnly]="true"
-              [value]="unitProductCost"
-            ></dx-number-box>
+            <dx-number-box label="Unit Product Cost" labelMode="floating" style="flex: 1"
+              [format]="{ type: 'fixedPoint', precision: 2 }" [readOnly]="true"
+              [value]="unitProductCost"></dx-number-box>
           </div>
         </div>
       </div>
@@ -370,38 +235,21 @@
 </dx-validation-group>
 
 <div class="form-popup-buttons-container">
-  <div
-    class="popup-footer"
-    style="
+  <div class="popup-footer" style="
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-    "
-  >
+    ">
     <!-- Approve Checkbox -->
-    <dx-check-box
-      *ngIf="isEditing"
-      text="Approve"
-      [value]="productionJVFormData.STATUS === 5"
-      (onValueChanged)="onApproveChanged($event)"
-    ></dx-check-box>
+    <dx-check-box *ngIf="isEditing" text="Approve" [value]="productionJVFormData.STATUS === 5"
+      (onValueChanged)="onApproveChanged($event)"></dx-check-box>
 
     <!-- Action buttons -->
     <div style="display: flex; gap: 10px">
-      <dx-button
-        text="Cancel"
-        stylingMode="outlined"
-        (onClick)="Cancel()"
-        type="normal"
-      ></dx-button>
+      <dx-button text="Cancel" stylingMode="outlined" (onClick)="Cancel()" type="normal"></dx-button>
 
-      <dx-button
-        text="Save"
-        stylingMode="contained"
-        type="default"
-        (onClick)="onSave()"
-      ></dx-button>
+      <dx-button text="Save" stylingMode="contained" type="default" (onClick)="onSave()"></dx-button>
     </div>
   </div>
 </div>

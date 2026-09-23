@@ -62,6 +62,10 @@
   display: inline-block;
   min-width: 60px;
 
+  &.status-0 {
+    background-color: #cce5ff;
+    color: #004085;
+  } /* Submitted - Blue */
   &.status-1 {
     background-color: #fff3cd;
     color: #856404;

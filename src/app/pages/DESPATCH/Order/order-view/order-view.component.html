@@ -251,7 +251,9 @@
           <span class="status-badge status-{{ cell.data.ORDER_STATUS }}">
             {{
               cell.data.STATUS_DESCRIPTION ||
-                (cell.data.ORDER_STATUS === 1
+                (cell.data.ORDER_STATUS === 0
+                  ? "Submitted"
+                  : cell.data.ORDER_STATUS === 1
                   ? "Draft"
                   : cell.data.ORDER_STATUS === 2
                     ? "Open"

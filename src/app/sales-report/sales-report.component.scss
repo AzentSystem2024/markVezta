@@ -1,0 +1,94 @@
+@use "../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 72px;
+  width: 100%;
+  display: contents;
+}
+
+.view-wrapper {
+  position: relative;
+  flex-direction: column;
+  padding: 0 10px;
+
+  .grid {
+    .name-template {
+      .position {
+        font-size: 10px;
+        color: var(--texteditor-label-color);
+      }
+    }
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+
+    .dxo-filter-row {
+      height: 4px;
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+.button-container {
+  padding: 0px;
+  height: 0.3vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.toggleButton {
+  border-radius: 4px;
+  background-color: #b0d4f3;
+}
+
+.SearchParams-container {
+  transition: transform 0.5s ease, opacity 0.5s ease, max-height 0.5s ease;
+  transform: translateY(0);
+  opacity: 1;
+  max-height: 500px;
+  margin-top: 10px;
+}
+
+.hide-content {
+  transform: translateY(-20px);
+  opacity: 0;
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.button-container .toggleButton .dx-icon {
+  font-size: 50px;
+  width: 50px;
+}
+
+/* Push Apply button to right end */
+::ng-deep .apply-btn-right .dx-field-item-content {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
