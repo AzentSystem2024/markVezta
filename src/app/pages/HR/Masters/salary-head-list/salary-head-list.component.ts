@@ -71,20 +71,6 @@ export class SalaryHeadListComponent {
   canApprove = false;
   canPrint = false;
 
-  isEditAllowed = (e: any) => {
-    if (e.row?.data?.HEAD_NAME?.toLowerCase() === 'overtime allowance') {
-      return false;
-    }
-    return this.canEdit;
-  };
-
-  isDeleteAllowed = (e: any) => {
-    if (e.row?.data?.HEAD_NAME?.toLowerCase() === 'overtime allowance') {
-      return false;
-    }
-    return this.canDelete;
-  };
-
   //=================================refresh=============================
   addButtonOptions = {
     type: 'default',
@@ -115,11 +101,6 @@ export class SalaryHeadListComponent {
     onClick: () => this.toggleFilters(),
   };
   isFilterOpened: boolean = false;
-
-  onExporting(event: any) {
-    const fileName = 'Credit_Note';
-    this.dataservice.exportDataGrid(event, fileName);
-  }
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -159,6 +140,19 @@ export class SalaryHeadListComponent {
     this.getSalaryHeadList();
   }
 
+  isEditAllowed = (e: any) => {
+    if (e.row?.data?.HEAD_NAME?.toLowerCase() === 'overtime allowance') {
+      return false;
+    }
+    return this.canEdit;
+  };
+
+  isDeleteAllowed = (e: any) => {
+    if (e.row?.data?.HEAD_NAME?.toLowerCase() === 'overtime allowance') {
+      return false;
+    }
+    return this.canDelete;
+  };
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
@@ -199,7 +193,9 @@ export class SalaryHeadListComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
 
@@ -268,6 +264,11 @@ export class SalaryHeadListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+
+  onExporting(event: any) {
+    const fileName = 'Credit_Note';
+    this.dataservice.exportDataGrid(event, fileName);
+  }
 }
 @NgModule({
   imports: [
@@ -302,4 +303,4 @@ export class SalaryHeadListComponent {
   exports: [SalaryHeadListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalaryHeadListModule { }
+export class SalaryHeadListModule {}
