@@ -1,0 +1,276 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="PurchaseReport"
+      width="100%"
+      noDataText=""
+      height="82vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <!-- <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="font-weight: 600; font-size: 20px; margin-left: 12px"
+          >
+            Trial Balance
+          </div>
+        </dxi-item>
+      </dxo-toolbar> -->
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            Purchase Report
+          </div>
+        </dxi-item>
+
+        <dxi-item style="margin-bottom: 6px">
+          <dx-select-box
+            labelMode="floating"
+            labelLocation="left"
+            label="Year"
+            [width]="150"
+            [(value)]="selectedYear"
+            [dataSource]="years"
+            (onValueChanged)="onYearChanged($event)"
+            placeholder="Year"
+          ></dx-select-box>
+        </dxi-item>
+
+        <dxi-item style="margin-bottom: 6px">
+          <dx-select-box
+            labelMode="floating"
+            labelLocation="left"
+            label="month"
+            [dataSource]="monthDataSource"
+            displayExpr="name"
+            valueExpr="value"
+            [(value)]="selectedmonth"
+            (onValueChanged)="onMonthValueChanged($event)"
+            [dropDownOptions]="{ width: 'auto' }"
+          >
+          </dx-select-box>
+        </dxi-item>
+
+        <dxi-item style="margin-bottom: 6px">
+          <dx-date-box
+            [width]="150"
+            label="Date From"
+            labelMode="floating"
+            [displayFormat]="'dd-MM-yyyy'"
+            [value]="formatted_from_date"
+            (onValueChanged)="onFromDateChange($event)"
+          ></dx-date-box>
+        </dxi-item>
+        <dxi-item style="margin-bottom: 6px">
+          <dx-date-box
+            [width]="150"
+            label="Date To"
+            labelMode="floating"
+            [displayFormat]="'dd-MM-yyyy'"
+            [value]="formatted_To_date"
+            (onValueChanged)="onToDateChange($event)"
+          >
+          </dx-date-box>
+        </dxi-item>
+
+        <dxi-item style="margin-bottom: 6px">
+          <dx-select-box
+            [dataSource]="distributorList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [width]="300"
+            label="Supplier"
+            [(value)]="selectedSupplier"
+            [searchEnabled]="true"
+            labelMode="floating"
+            (onValueChanged)="onSupplierChanged($event)"
+          >
+          </dx-select-box>
+        </dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item>
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="get_Purchase_list()"
+          >
+          </dx-button>
+        </dxi-item>
+      </dxo-toolbar>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <!-- Invoice Date -->
+      <dxi-column
+        dataField="PURCH_DATE"
+        caption="Date"
+        dataType="date"
+        format="dd/MM/yyyy"
+      ></dxi-column>
+
+      <!-- Particulars -->
+      <dxi-column
+        dataField="SUPP_NAME"
+        caption="Particulars"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="HSN_CODE"
+        caption="HSN CODE"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- Voucher Type -->
+      <dxi-column
+        dataField="VoucherType"
+        caption="Voucher Type"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- Voucher No -->
+      <dxi-column
+        dataField="DOC_NO"
+        caption="Voucher No"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="REF_NO"
+        caption="Voucher reference No"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="Quantity"
+        caption="Quantity"
+        dataType="string"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="GrossTotal"
+        caption="Gross Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="Disc"
+        caption="Discount Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="GSTPurchase"
+        caption="GST"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="CGSTPurchaseInput9"
+        caption="CGST"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="SGSTPurchaseInput9"
+        caption="SGST"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+      ></dxi-column>
+
+      <!-- HSN CODE -->
+      <dxi-column
+        dataField="RoundOff"
+        caption="Round Off Amount"
+        dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+      ></dxi-column>
+      <!-- Group summary for MAIN_GROUP_NAME -->
+
+      <!-- <dxi-column
+        *ngIf="PurchaseReport.length > 0"
+        type="buttons"
+        [width]="100"
+      >
+        <dxi-button
+          hint="View"
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)"
+        ></dxi-button>
+      </dxi-column> -->
+    </dx-data-grid>
+  </div>
+</div>

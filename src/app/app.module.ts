@@ -427,6 +427,7 @@ import { EmailSettingComponent, EmailSettingModule } from './email-setting/email
 import { EmailSettingFormComponent, EmailSettingFormModule } from './email-setting-form/email-setting-form.component';
 import { NewOrderModule } from './pages/DESPATCH/Order/new-order/new-order.component';
 import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
+import { PurchaseReportMarkComponent, PurchaseReportMarkModule } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
 
 @NgModule({
   declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent, OrderViewComponent,],
@@ -865,7 +866,8 @@ import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view
     SupplierwiseSalesModule,
     ProfitLossDepartmentwiseModule,
     EmailSettingModule,
-    EmailSettingFormModule
+    EmailSettingFormModule,
+    PurchaseReportMarkModule,
   ],
 
   providers: [
@@ -880,4 +882,4 @@ import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

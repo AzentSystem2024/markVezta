@@ -7530,4 +7530,9 @@ The result can be exported to HTML or Markdown.`;
   getNewOrderArtNoDetails(payload: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetArtNoDetails`, payload);
   }
+
+  Purchase_Report(payload: any) {
+    const getEndpoint = this.apiUrl + 'PurchaseReport/PurchaseSummaryRpt';
+    return this.http.post(getEndpoint, payload);
+  }
 }
