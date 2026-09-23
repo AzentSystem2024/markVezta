@@ -6951,6 +6951,12 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
+  //-----------------------sales summary rpt-------------------------
+  SalesSummaryRpt(payload: any): Observable<any> {
+    const getEndpoint = this.apiUrl + 'SalesReport/SalesSummaryRpt';
+    return this.http.post(getEndpoint, payload);
+  }
+
   //-----------------------sales Detail report-------------------------
   SalesDetailReport(payload: any) {
     const getEndpoint = this.apiUrl + 'SalesReport/SalesDetail';

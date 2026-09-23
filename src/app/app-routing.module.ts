@@ -230,6 +230,7 @@ import { ProfitLossDepartmentwiseComponent } from './pages/REPORT/profit-loss-de
 import { EmailSettingComponent } from './email-setting/email-setting.component';
 import { NewOrderComponent } from './pages/DESPATCH/Order/new-order/new-order.component';
 import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
+import { SalesReportComponent } from './sales-report/sales-report.component';
 
 const routes: Routes = [
   {
@@ -1411,7 +1412,12 @@ const routes: Routes = [
       {
         path: 'email-settings',
         component: EmailSettingComponent,
-        // canActivate: [AuthGuardService],
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'sales-report',
+        component: SalesReportComponent,
+        canActivate: [AuthGuardService],
       },
       {
         path: '**',
@@ -1429,4 +1435,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

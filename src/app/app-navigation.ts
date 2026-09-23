@@ -209,10 +209,10 @@ export const navigation = [
         text: 'Stock Reports',
         path: '',
       },
-      {
-        text: 'Sale Reports',
-        path: '',
-      },
+      // {
+      //   text: 'Sale Reports',
+      //   path: '/sales-report',
+      // },
       // {
       //   text: 'dept',
       //   path: '',
