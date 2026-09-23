@@ -870,7 +870,7 @@ import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.co
     ProfitLossDepartmentwiseModule,
     EmailSettingModule,
     EmailSettingFormModule,
-    SalesReportModule
+    SalesReportModule,
     PurchaseReportMarkModule,
   ],
 
