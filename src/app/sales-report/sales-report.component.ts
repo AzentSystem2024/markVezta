@@ -183,6 +183,39 @@ export class SalesReportComponent implements OnInit {
     }
   }
 
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1);
+      this.selected_To_date = today;
+    } else if (this.selectedYear) {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1);
+      this.selected_To_date = new Date(this.selectedYear, 11, 31);
+    }
+  }
+
+  onMonthValueChanged(e: any): void {
+    this.selectedmonth = e.value ?? '';
+    const year = this.selectedYear || new Date().getFullYear();
+    if (this.selectedmonth === '' || this.selectedmonth === null || this.selectedmonth === undefined) {
+      const currentYear = new Date().getFullYear();
+      if (year === currentYear) {
+        this.selected_from_date = new Date(year, 0, 1);
+        this.selected_To_date = new Date();
+      } else {
+        this.selected_from_date = new Date(year, 0, 1);
+        this.selected_To_date = new Date(year, 11, 31);
+      }
+    } else {
+      const monthNum = Number(this.selectedmonth);
+      this.selected_from_date = new Date(year, monthNum, 1);
+      this.selected_To_date = new Date(year, monthNum + 1, 0);
+    }
+  }
+
   onFromDateChange(event: any) {
     this.selected_from_date = event.value;
   }
