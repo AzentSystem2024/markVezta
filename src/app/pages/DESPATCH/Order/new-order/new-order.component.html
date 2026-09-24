@@ -16,7 +16,14 @@
               <div class="col-3">
                 <div
                   class="rounded-3 mx-auto d-flex align-items-center justify-content-center image-placeholder border"
-                  style="aspect-ratio: 1/1; overflow: hidden; max-width: 160px"
+                  style="
+                    aspect-ratio: 1/1;
+                    overflow: hidden;
+                    max-width: 160px;
+                    cursor: pointer;
+                  "
+                  title="Click to enlarge"
+                  (click)="openImagePopup()"
                 >
                   <img
                     *ngIf="
@@ -86,6 +93,7 @@
                   "
                   [disabled]="isLoadingDealers"
                   [searchEnabled]="true"
+                  searchMode="startswith"
                   [showClearButton]="true"
                   class="rounded-input"
                 ></dx-select-box>
@@ -103,6 +111,7 @@
                       "
                       [disabled]="!selectedDealerId || isLoadingAddresses"
                       [searchEnabled]="true"
+                      searchMode="startswith"
                       [showClearButton]="true"
                       class="rounded-input"
                     ></dx-select-box>
@@ -120,6 +129,7 @@
                       placeholder="Select Warehouse"
                       [disabled]="!selectedDealerId"
                       [searchEnabled]="true"
+                      searchMode="startswith"
                       [showClearButton]="true"
                       class="rounded-input"
                     ></dx-select-box>
@@ -167,6 +177,8 @@
                   (onValueChanged)="onCategoryChange($event)"
                   placeholder="Select Category"
                   [disabled]="!selectedDealerId"
+                  [searchEnabled]="true"
+                  searchMode="startswith"
                   [showClearButton]="true"
                   class="rounded-input"
                 ></dx-select-box>
@@ -187,6 +199,7 @@
                     !currentEditingItem.categoryId
                   "
                   [searchEnabled]="true"
+                  searchMode="startswith"
                   [showClearButton]="true"
                   class="rounded-input"
                 ></dx-select-box>
@@ -218,6 +231,7 @@
               <div class="size-list rounded border" *ngIf="!isLoadingSizes">
                 <dx-data-grid
                   [dataSource]="currentEditingItem.sizes"
+                  keyExpr="sizeId"
                   [showBorders]="false"
                   [showColumnHeaders]="true"
                   [hoverStateEnabled]="true"
@@ -230,14 +244,13 @@
 
                   <dxi-column
                     dataField="description"
-                    caption="Size(inch)"
+                    caption="Size"
                     cellTemplate="sizeInfoTemplate"
                   ></dxi-column>
                   <dxi-column
-                    dataField="qty"
                     caption="Quantity"
                     alignment="center"
-                    [width]="150"
+                    [width]="200"
                     cellTemplate="qtyTemplate"
                   ></dxi-column>
 
@@ -265,26 +278,44 @@
                       class="qty-control d-flex align-items-center justify-content-center gap-2"
                     >
                       <button
+                        *ngIf="data.data.isCutSize && data.data.qty > 0"
+                        class="btn btn-outline-secondary btn-sm rounded-1 d-flex align-items-center justify-content-center border-0"
+                        style="width: 32px; height: 32px"
+                        title="Edit Cut Size Combination"
+                        (click)="openCutSizePopup(data.data)"
+                      >
+                        <i
+                          class="dx-icon dx-icon-edit"
+                          style="font-size: 1.1rem"
+                        ></i>
+                      </button>
+                      <div
+                        *ngIf="!(data.data.isCutSize && data.data.qty > 0)"
+                        style="width: 32px; height: 32px"
+                      ></div>
+                      <button
                         class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
                         style="width: 32px; height: 32px"
-                        [disabled]="!selectedDealerId || data.data.qty === 0"
+                        [disabled]="!selectedDealerId"
                         (click)="decrementSize(data.data.sizeId)"
                       >
                         -
                       </button>
                       <input
                         type="text"
+                        maxlength="3"
                         class="form-control text-center border fw-bold p-0"
-                        style="width: 45px; height: 32px"
+                        style="width: 55px; height: 32px"
                         [value]="data.data.qty"
-                        [disabled]="!selectedDealerId || (data.data.qty === 0 && isSizeDisabled(data.data))"
+                        [disabled]="!selectedDealerId"
+                        (focus)="onMainQtyFocus(data.data, $event)"
                         (input)="onMainQtyInput(data.data, $event)"
                         (blur)="onMainQtyBlur(data.data, $event)"
                       />
                       <button
                         class="btn btn-primary btn-sm rounded-1 fw-bold d-flex align-items-center justify-content-center"
                         style="width: 32px; height: 32px"
-                        [disabled]="!selectedDealerId || isSizeDisabled(data.data)"
+                        [disabled]="!selectedDealerId"
                         (click)="incrementSize(data.data.sizeId)"
                       >
                         +
@@ -324,7 +355,7 @@
             <h5 class="m-0 fw-bold d-flex align-items-center">Cart</h5>
             <span
               class="badge bg-light-info text-info fs-6 px-3 py-2 rounded-pill"
-              >Total Pair : {{ getCartTotalPairs() }}</span
+              >Total Case : {{ getCartTotalPairs() }}</span
             >
           </div>
 
@@ -359,9 +390,14 @@
                   {{ getCategoryName(item.categoryId) | uppercase }}
                 </div>
                 <div
-                  class="fw-bold"
+                  class="fw-bold d-flex align-items-center gap-1"
                   style="font-size: 0.75rem; letter-spacing: 0.5px"
                 >
+                  <div
+                    class="rounded-circle border border-secondary shadow-sm"
+                    [style.backgroundColor]="getColor(item.colorId)?.hex"
+                    style="width: 14px; height: 14px"
+                  ></div>
                   {{ getColor(item.colorId)?.name | uppercase }}
                 </div>
               </div>
@@ -392,6 +428,7 @@
                   "
                   (click)="editCartItem(item)"
                   title="Edit"
+                  [disabled]="isEditMode && currentEditingItem.id === item.id"
                 >
                   <i class="dx-icon dx-icon-edit" style="font-size: 1.1rem"></i>
                 </button>
@@ -406,6 +443,7 @@
                   "
                   (click)="removeCartItem(item.id)"
                   title="Remove"
+                  [disabled]="isEditMode && currentEditingItem.id === item.id"
                 >
                   <i
                     class="dx-icon dx-icon-trash"
@@ -475,9 +513,11 @@
             </button>
             <input
               type="text"
+              maxlength="3"
               class="form-control text-center border fw-bold p-0"
-              style="width: 45px; height: 32px"
+              style="width: 55px; height: 32px"
               [value]="currentCutSizeQuantities[s] || 0"
+              (focus)="onCutSizeQtyFocus(s, $event)"
               (input)="onCutSizeQtyInput(s, $event)"
               (blur)="onCutSizeQtyBlur(s, $event)"
             />
@@ -525,3 +565,29 @@
   [closeOnOutsideClick]="false"
 >
 </dx-load-panel>
+
+<!-- Image Zoom Popup -->
+<dx-popup
+  [width]="'auto'"
+  [height]="'auto'"
+  [maxWidth]="'75vw'"
+  [maxHeight]="'85vh'"
+  [showTitle]="true"
+  [title]="getImagePopupTitle()"
+  [dragEnabled]="false"
+  [hideOnOutsideClick]="true"
+  [(visible)]="isImagePopupVisible"
+>
+  <div
+    *dxTemplate="let data of 'content'"
+    class="d-flex justify-content-center align-items-center p-2"
+  >
+    <img
+      *ngIf="isImagePopupVisible"
+      [src]="getArtNoImage(currentEditingItem.artNoId)"
+      alt="Enlarged Product Image"
+      class="img-fluid rounded shadow-sm border"
+      style="max-width: 100%; max-height: 75vh; object-fit: contain"
+    />
+  </div>
+</dx-popup>

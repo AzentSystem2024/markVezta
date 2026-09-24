@@ -85,6 +85,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
   currentCutSize: any = null;
   currentCutSizeQuantities: { [key: string]: number } = {};
 
+  // Image Popup State
+  isImagePopupVisible = false;
+
   colors: any[] = [];
   categories: any[] = [];
   artNos: any[] = [];
@@ -99,6 +102,10 @@ export class NewOrderComponent implements OnInit, OnChanges {
 
   selectedDealerId: any = null;
 
+  _oldCutSizeQuantities: { [key: string]: number } = {};
+  isReverting = false;
+
+  
   constructor(private dataService: DataService) {
     this.currentEditingItem = this.getEmptyCartItem();
   }
@@ -313,8 +320,16 @@ export class NewOrderComponent implements OnInit, OnChanges {
   }
 
   // --- Left Side Actions ---
-  setActiveTab(tab: 'dealer' | 'subdealer') {
+  async setActiveTab(tab: 'dealer' | 'subdealer') {
     if (this.activeTab !== tab) {
+      if (this.getCurrentItemTotalQty() > 0) {
+        const result = await confirm(
+          'Switching tabs will clear the entered quantities. Are you sure?',
+          'Warning',
+        );
+        if (!result) return;
+      }
+      
       this.activeTab = tab;
       this.selectedDealerId = null;
       this.isEditMode = false;
@@ -325,9 +340,23 @@ export class NewOrderComponent implements OnInit, OnChanges {
     }
   }
 
-  onDealerChange(e: any) {
+  async onDealerChange(e: any) {
+    if (this.isReverting) return;
     // Only reset dependent fields if this is an actual user change (not initial binding)
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
+      if (this.getCurrentItemTotalQty() > 0 && !this.isSettingEditData) {
+        const result = await confirm(
+          'Changing the dealer will clear the entered quantities. Are you sure?',
+          'Warning',
+        );
+        if (!result) {
+          this.isReverting = true;
+          e.component.option('value', e.previousValue);
+          this.isReverting = false;
+          return;
+        }
+      }
+
       this.isEditMode = false;
       this.currentEditingItem = this.getEmptyCartItem();
       this.artNos = [];
@@ -363,8 +392,12 @@ export class NewOrderComponent implements OnInit, OnChanges {
               id: a.ID,
               name: a.DESCRIPTION,
             }));
-            // If the response has only one data then load it otherwise select first one
-            this.selectedAddressId = this.addresses[0].id;
+            // If the response has only one data then load it otherwise let user select
+            if (this.addresses.length === 1) {
+              this.selectedAddressId = this.addresses[0].id;
+            } else {
+              this.selectedAddressId = null;
+            }
           } else {
             this.addresses = [];
             this.selectedAddressId = null;
@@ -380,10 +413,23 @@ export class NewOrderComponent implements OnInit, OnChanges {
       );
   }
 
-  onCategoryChange(e: any) {
-    if (this.isSettingEditData) return;
+  async onCategoryChange(e: any) {
+    if (this.isSettingEditData || this.isReverting) return;
     // Only reset dependent fields if this is an actual user change (not initial binding)
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
+      if (this.getCurrentItemTotalQty() > 0) {
+        const result = await confirm(
+          'Changing the category will clear the entered quantities. Are you sure?',
+          'Warning',
+        );
+        if (!result) {
+          this.isReverting = true;
+          e.component.option('value', e.previousValue);
+          this.isReverting = false;
+          return;
+        }
+      }
+
       if (this.currentEditingItem) {
         this.currentEditingItem.artNoId = null;
         this.currentEditingItem.colorId = null;
@@ -432,9 +478,22 @@ export class NewOrderComponent implements OnInit, OnChanges {
       );
   }
 
-  onArtNoChange(e: any) {
-    if (this.isSettingEditData) return;
+  async onArtNoChange(e: any) {
+    if (this.isSettingEditData || this.isReverting) return;
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
+      if (this.getCurrentItemTotalQty() > 0) {
+        const result = await confirm(
+          'Changing the Art No will clear the entered quantities. Are you sure?',
+          'Warning',
+        );
+        if (!result) {
+          this.isReverting = true;
+          e.component.option('value', e.previousValue);
+          this.isReverting = false;
+          return;
+        }
+      }
+
       if (this.currentEditingItem) {
         this.currentEditingItem.colorId = null;
         this.currentEditingItem.sizes = [];
@@ -461,9 +520,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
           }));
 
           if (this.colors.length > 0) {
-            // Auto select the first one if none is selected
+            // Auto select a color that is not already in the cart
             if (!this.currentEditingItem.colorId) {
-              this.selectColor(this.colors[0].id);
+              this.autoSelectAvailableColor();
             }
           }
           if (onComplete) onComplete();
@@ -538,6 +597,27 @@ export class NewOrderComponent implements OnInit, OnChanges {
     return '#cccccc'; // Default fallback color
   }
 
+  autoSelectAvailableColor() {
+    if (this.colors.length > 0 && !this.currentEditingItem.colorId) {
+      const availableColor = this.colors.find(
+        (c) =>
+          !this.cartItems.some(
+            (item) =>
+              item.categoryId === this.currentEditingItem.categoryId &&
+              item.artNoId === this.currentEditingItem.artNoId &&
+              item.colorId === c.id,
+          ),
+      );
+
+      if (availableColor) {
+        this.selectColor(availableColor.id, true);
+      } else {
+        // If all colors are in the cart, default to the first one
+        this.selectColor(this.colors[0].id, true);
+      }
+    }
+  }
+
   cancelForm() {
     this.isEditMode = false;
     this.currentEditingItem = this.getEmptyCartItem();
@@ -547,7 +627,16 @@ export class NewOrderComponent implements OnInit, OnChanges {
     this.colors = [];
   }
 
-  async selectColor(colorId: string) {
+  resetFormAfterSave() {
+    this.isEditMode = false;
+    this.currentEditingItem.id = 0;
+    this.currentEditingItem.orderId = 0;
+    this.currentEditingItem.colorId = null;
+    this.currentEditingItem.sizes = [];
+    this.currentEditingItem.imageUrl = '';
+  }
+
+  async selectColor(colorId: string, isAutoSelect = false) {
     if (this.isSettingEditData) return;
     if (this.currentEditingItem.colorId === colorId) return;
 
@@ -564,6 +653,11 @@ export class NewOrderComponent implements OnInit, OnChanges {
       );
 
       if (existingCartItem) {
+        if (isAutoSelect) {
+          this.editCartItem(existingCartItem);
+          return;
+        }
+
         const dialogResult = await confirm(
           'This item is already available in the cart. Only edit is available. Do you want to edit it?',
           'Already in Cart',
@@ -573,6 +667,14 @@ export class NewOrderComponent implements OnInit, OnChanges {
         }
         return;
       }
+    }
+
+    if (this.getCurrentItemTotalQty() > 0) {
+      const result = await confirm(
+        'Changing the color will clear the entered quantities. Are you sure?',
+        'Warning',
+      );
+      if (!result) return;
     }
 
     this.currentEditingItem.colorId = colorId;
@@ -631,7 +733,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
     );
   }
 
-  getSizeRange(description: string): { start: number, end: number } | null {
+  getSizeRange(description: string): { start: number; end: number } | null {
     if (!description) return null;
     // Match ranges like "6X10", "6 TO 10", "6*10", "6-10"
     const match = description.match(/(\d+)\s*(?:X|TO|\*|-)\s*(\d+)/i);
@@ -640,45 +742,19 @@ export class NewOrderComponent implements OnInit, OnChanges {
       const end = parseInt(match[2], 10);
       return { start: Math.min(start, end), end: Math.max(start, end) };
     }
-    
+
     // Match single numbers like "8"
     const singleMatch = description.match(/\b(\d+)\b/);
     if (singleMatch) {
-       const val = parseInt(singleMatch[1], 10);
-       return { start: val, end: val };
+      const val = parseInt(singleMatch[1], 10);
+      return { start: val, end: val };
     }
     return null;
-  }
-
-  isSizeDisabled(size: any): boolean {
-    if (!this.currentEditingItem || !this.currentEditingItem.sizes)
-      return false;
-
-    // Rule: Cannot select overlapping sizes
-    const currentRange = this.getSizeRange(size.description);
-    if (currentRange && size.qty === 0) {
-      const hasOverlappingSize = this.currentEditingItem.sizes.some(s => {
-        if (s.sizeId === size.sizeId || s.qty === 0) return false;
-        
-        const sRange = this.getSizeRange(s.description);
-        if (sRange) {
-          return currentRange.start <= sRange.end && currentRange.end >= sRange.start;
-        }
-        return false;
-      });
-      if (hasOverlappingSize) return true;
-    }
-
-    return false;
   }
 
   incrementSize(sizeId: any) {
     const size = this.currentEditingItem.sizes.find((s) => s.sizeId === sizeId);
     if (size) {
-      if (this.isSizeDisabled(size)) {
-        notify('Cannot select this size due to overlapping or mixed size rules.', 'warning', 3000);
-        return;
-      }
       if (size.isCutSize && size.qty === 0) {
         this.openCutSizePopup(size);
       } else {
@@ -701,12 +777,6 @@ export class NewOrderComponent implements OnInit, OnChanges {
   onMainQtyInput(size: any, event: Event) {
     const inputElement = event.target as HTMLInputElement;
 
-    if (this.isSizeDisabled(size) && size.qty === 0) {
-      inputElement.value = '0';
-      notify('Cannot select this size due to overlapping or mixed size rules.', 'warning', 3000);
-      return;
-    }
-
     let value = inputElement.value.replace(/\D/g, '');
 
     if (value === '') {
@@ -717,9 +787,13 @@ export class NewOrderComponent implements OnInit, OnChanges {
     let parsed = parseInt(value, 10);
     if (isNaN(parsed) || parsed < 0) {
       parsed = 0;
-      inputElement.value = '0';
     } else {
-      inputElement.value = parsed.toString();
+      if (parsed > 999) parsed = 999;
+    }
+
+    const newVal = parsed.toString();
+    if (inputElement.value !== newVal) {
+      inputElement.value = newVal;
     }
 
     size.qty = parsed;
@@ -734,11 +808,19 @@ export class NewOrderComponent implements OnInit, OnChanges {
     }
   }
 
+  onMainQtyFocus(size: any, event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    size._oldQty = size.qty;
+    inputElement.value = '';
+  }
+
   onMainQtyBlur(size: any, event: Event) {
     const inputElement = event.target as HTMLInputElement;
     if (inputElement.value === '') {
-      inputElement.value = '0';
+      size.qty = size._oldQty !== undefined ? size._oldQty : 0;
+      inputElement.value = size.qty.toString();
     }
+    delete size._oldQty;
   }
 
   // --- Cut Size Popup Methods ---
@@ -747,6 +829,26 @@ export class NewOrderComponent implements OnInit, OnChanges {
     // Clone to allow cancelling
     this.currentCutSizeQuantities = { ...(size.cutSizeQuantities || {}) };
     this.isCutSizePopupVisible = true;
+  }
+
+  // --- Image Popup Methods ---
+  openImagePopup() {
+    if (this.currentEditingItem.artNoId && this.getArtNoImage(this.currentEditingItem.artNoId)) {
+      this.isImagePopupVisible = true;
+    }
+  }
+
+  getImagePopupTitle(): string {
+    const category = this.getCategoryName(this.currentEditingItem.categoryId);
+    const artNo = this.getArtNoName(this.currentEditingItem.artNoId);
+    const color = this.getColor(this.currentEditingItem.colorId)?.name;
+    
+    const parts = [];
+    if (category) parts.push(category);
+    if (artNo) parts.push(artNo);
+    if (color) parts.push(color);
+    
+    return parts.length > 0 ? parts.join(' - ') : 'Image';
   }
 
   closeCutSizePopup() {
@@ -795,6 +897,8 @@ export class NewOrderComponent implements OnInit, OnChanges {
     let parsed = parseInt(value, 10);
     if (isNaN(parsed) || parsed < 0) {
       parsed = 0;
+    } else if (parsed > 999) {
+      parsed = 999;
     }
 
     // Ensure they can't type a value that exceeds the total allowed
@@ -802,17 +906,36 @@ export class NewOrderComponent implements OnInit, OnChanges {
       this.getCutSizeTotal() - (this.currentCutSizeQuantities[s] || 0);
     if (currentTotalWithoutThis + parsed > this.currentCutSize.pairQty) {
       parsed = this.currentCutSize.pairQty - currentTotalWithoutThis;
+      notify(
+        `Total quantity cannot exceed ${this.currentCutSize.pairQty}.`,
+        'warning',
+        3000,
+      );
     }
 
-    inputElement.value = parsed.toString();
+    const newVal = parsed.toString();
+    if (inputElement.value !== newVal) {
+      inputElement.value = newVal;
+    }
     this.currentCutSizeQuantities[s] = parsed;
+  }
+
+  onCutSizeQtyFocus(s: string, event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    this._oldCutSizeQuantities[s] = this.currentCutSizeQuantities[s] || 0;
+    inputElement.value = '';
   }
 
   onCutSizeQtyBlur(s: string, event: Event) {
     const inputElement = event.target as HTMLInputElement;
     if (inputElement.value === '') {
-      inputElement.value = '0';
+      this.currentCutSizeQuantities[s] =
+        this._oldCutSizeQuantities[s] !== undefined
+          ? this._oldCutSizeQuantities[s]
+          : 0;
+      inputElement.value = this.currentCutSizeQuantities[s].toString();
     }
+    delete this._oldCutSizeQuantities[s];
   }
 
   saveCutSize() {
@@ -857,6 +980,15 @@ export class NewOrderComponent implements OnInit, OnChanges {
   saveToCart() {
     if (this.getCurrentItemTotalQty() === 0) {
       notify('Please enter a quantity before saving to cart.', 'warning', 3000);
+      return;
+    }
+
+    if (this.addresses.length > 0 && !this.selectedAddressId) {
+      notify(
+        'Please select an address before saving to cart.',
+        'warning',
+        3000,
+      );
       return;
     }
 
@@ -921,7 +1053,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
         this.isProcessing = false;
         if (res.Flag === 1) {
           notify('Cart updated successfully!', 'success', 3000);
-          this.cancelForm();
+          this.resetFormAfterSave();
           this.loadCartData(); // Reload cart from API after successful save
         } else {
           const errMsg = res.Message || 'Failed to add to cart';
@@ -1019,8 +1151,17 @@ export class NewOrderComponent implements OnInit, OnChanges {
           if (this.cartItems.length === 1 && this.editOrderId) {
             this.editCartItem(this.cartItems[0]);
           }
+
+          // Auto-select next color if retaining category & art no
+          if (!this.currentEditingItem.colorId && this.currentEditingItem.artNoId) {
+            this.autoSelectAvailableColor();
+          }
         } else {
           this.cartItems = [];
+          
+          if (!this.currentEditingItem.colorId && this.currentEditingItem.artNoId) {
+            this.autoSelectAvailableColor();
+          }
         }
       },
       (error) => {
@@ -1032,7 +1173,15 @@ export class NewOrderComponent implements OnInit, OnChanges {
     );
   }
 
-  editCartItem(item: CartItem) {
+  async editCartItem(item: CartItem) {
+    if (this.getCurrentItemTotalQty() > 0) {
+      const result = await confirm(
+        'You have entered quantities for the current item. Editing this cart item will discard them. Do you want to continue?',
+        'Warning',
+      );
+      if (!result) return;
+    }
+
     this.isEditMode = true;
     this.isProcessing = true; // Turn on global loader when editing starts
     this.isSettingEditData = true; // Suppress UI change handlers
@@ -1245,6 +1394,15 @@ export class NewOrderComponent implements OnInit, OnChanges {
   }
 
   async submitOrder() {
+    if (this.addresses.length > 0 && !this.selectedAddressId) {
+      notify(
+        'Please select an address before submitting the order.',
+        'warning',
+        3000,
+      );
+      return;
+    }
+
     const result = await confirm(
       'Are you sure you want to submit this order?',
       'Confirm Order',

@@ -224,7 +224,6 @@
       ></dxi-column>
       <dxi-column dataField="DEALER" caption="Dealer"></dxi-column>
       <dxi-column dataField="SUBDEALER" caption="Sub Dealer"></dxi-column>
-      <dxi-column dataField="LOCATION" caption="Location"></dxi-column>
 
       <dxi-column
         dataField="ORDER_QTY"
@@ -267,6 +266,16 @@
         [headerFilter]="{ dataSource: getStatusFilterData }"
       ></dxi-column>
 
+      <dxi-column dataField="LOCATION" caption="Location"></dxi-column>
+
+      <dxi-column
+        type="buttons"
+        caption="Actions"
+        [width]="80"
+        cellTemplate="actionTemplate"
+        [fixed]="true"
+        fixedPosition="right"
+      ></dxi-column>
       <div *dxTemplate="let cell of 'statusCellRender'">
         <div style="text-align: center; width: 100%">
           <span class="status-badge status-{{ cell.data.ORDER_STATUS }}">
@@ -301,15 +310,6 @@
           </span>
         </div>
       </div>
-
-      <dxi-column
-        type="buttons"
-        caption="Actions"
-        [width]="80"
-        cellTemplate="actionTemplate"
-        [fixed]="true"
-        fixedPosition="right"
-      ></dxi-column>
 
       <div *dxTemplate="let cell of 'actionTemplate'">
         <div class="action-icons" style="text-align: center">
