@@ -97,6 +97,8 @@ export class OrderViewComponent implements OnInit {
   isNewOrderPopupVisible: boolean = false;
   selectedEditOrderId: number | null = null;
   selectedEditDealerId: number | null = null;
+  selectedEditParentDealerId: number | null = null;
+  selectedEditTab: 'dealer' | 'subdealer' = 'dealer';
 
   constructor(
     private dataService: DataService,
@@ -301,6 +303,8 @@ export class OrderViewComponent implements OnInit {
   addNewOrder() {
     this.selectedEditOrderId = null;
     this.selectedEditDealerId = null;
+    this.selectedEditParentDealerId = null;
+    this.selectedEditTab = 'dealer';
     this.isNewOrderPopupVisible = true;
   }
 
@@ -315,9 +319,12 @@ export class OrderViewComponent implements OnInit {
     if (status === 1 || status === '1') {
       // 1 = Draft
       const orderId = order.OrderId || order.ORDER_ID;
+      const subDealerId = order.SUBDEALER_ID;
       const dealerId = order.DealerId || order.DEALER_ID;
       this.selectedEditOrderId = orderId;
-      this.selectedEditDealerId = dealerId;
+      this.selectedEditDealerId = subDealerId ? subDealerId : dealerId;
+      this.selectedEditParentDealerId = subDealerId ? dealerId : null;
+      this.selectedEditTab = subDealerId ? 'subdealer' : 'dealer';
       this.isNewOrderPopupVisible = true;
     }
   }

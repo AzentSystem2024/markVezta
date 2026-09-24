@@ -50,7 +50,9 @@ export interface CartItem {
 })
 export class NewOrderComponent implements OnInit, OnChanges {
   @Input() editDealerId: number | null = null;
+  @Input() editParentDealerId: number | null = null;
   @Input() editOrderId: number | null = null;
+  @Input() initialTab: 'dealer' | 'subdealer' = 'dealer';
   @Output() closePopup = new EventEmitter<void>();
 
   // Navigation tabs
@@ -102,6 +104,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['initialTab'] && changes['initialTab'].currentValue) {
+      this.activeTab = changes['initialTab'].currentValue;
+    }
     if (changes['editDealerId'] || changes['editOrderId']) {
       if (this.editDealerId && this.editOrderId) {
         this.selectedDealerId = this.editDealerId;
@@ -268,6 +273,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
 
   getActualDealerId(): number {
     if (this.activeTab === 'subdealer' && this.selectedDealerId) {
+      if (this.editParentDealerId) {
+        return this.editParentDealerId;
+      }
       const selectedSubDealer = this.currentDistributors.find(
         (d: any) => d.ID === this.selectedDealerId,
       );
@@ -828,7 +836,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
     for (const size of this.currentCutSize.availableSizes) {
       const q = this.currentCutSize.cutSizeQuantities[size];
       if (q > 0) {
-        comboParts.push(`${size}x${q}`);
+        comboParts.push(`${size}"x${q}`);
       }
     }
     this.currentCutSize.combination = comboParts.join(', ');

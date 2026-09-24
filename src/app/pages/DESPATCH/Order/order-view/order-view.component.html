@@ -350,7 +350,9 @@
     <app-new-order
       *ngIf="isNewOrderPopupVisible"
       [editDealerId]="selectedEditDealerId"
+      [editParentDealerId]="selectedEditParentDealerId"
       [editOrderId]="selectedEditOrderId"
+      [initialTab]="selectedEditTab"
       (closePopup)="onNewOrderClosed()"
     ></app-new-order>
   </div>
