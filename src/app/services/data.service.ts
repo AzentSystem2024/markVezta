@@ -7621,5 +7621,7 @@ The result can be exported to HTML or Markdown.`;
 
   deleteTrOutForInventoryMark(id: number) {
     return this.http.post<any>(`${this.apiUrl}TransferOut_Mark/delete/` + id, {});
+    updateOrderEntryQty(payload: any): Observable < any > {
+      return this.http.post<any>(`${this.apiUrl}NewOrder/UpdateOrderEntryQty`, payload);
+    }
   }
-}
