@@ -147,6 +147,7 @@ export class InvoiceListComponent {
   canPrint = false;
   companyID: any;
   vatTitle: any;
+  userID: any;
   canVerify: any;
   isApproveInvoice: boolean;
   isVerifyInvoice: boolean;
@@ -182,6 +183,7 @@ export class InvoiceListComponent {
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = userData.USER_ID || menuResponse.USER_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     //
     const packingRights = menuGroups
@@ -210,6 +212,7 @@ export class InvoiceListComponent {
       COMPANY_ID: this.companyID,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      USER_ID: this.userID || this.sessionData?.USER_ID || null,
     };
 
     this.InvoiceDataSource = new DataSource({
@@ -385,7 +388,7 @@ export class InvoiceListComponent {
     );
 
     this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-
+    this.userID = this.sessionData.USER_ID;
     this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     const sessionYear = this.sessionData.FINANCIAL_YEARS;

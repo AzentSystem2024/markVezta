@@ -14,6 +14,7 @@
     (onEditingStart)="OnEditCustomer($event)"
     (onRowRemoving)="onRowRemoving($event)"
     [showColumnLines]="true"
+    (onCellPrepared)="onCellPrepared($event)"
   >
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>

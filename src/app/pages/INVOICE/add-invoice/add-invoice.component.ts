@@ -102,6 +102,7 @@ export class AddInvoiceComponent {
     UNIT_ID: 0,
     DISTRIBUTOR_ID: 0,
     FIN_ID: 0,
+    CREATE_USER_ID: 0,
     GROSS_AMOUNT: '',
     GST_AMOUNT: '',
     NET_AMOUNT: '',
@@ -179,7 +180,7 @@ export class AddInvoiceComponent {
       }
 
       if (userData.USER_ID) {
-        this.invoiceFormData.USER_ID = userData.USER_ID;
+        this.invoiceFormData.CREATE_USER_ID = userData.USER_ID;
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
@@ -212,6 +213,7 @@ export class AddInvoiceComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.invoiceFormData.CREATE_USER_ID || null,
     };
     this.dataService
       .getOutsideCustomerWithState(payload)
@@ -738,7 +740,7 @@ export class AddInvoiceComponent {
     this.invoiceFormData = {
       COMPANY_ID: this.selectedCompanyId || null,
       FIN_ID: this.invoiceFormData.FIN_ID || null,
-      USER_ID: this.invoiceFormData.USER_ID || null,
+      CREATE_USER_ID: this.invoiceFormData.CREATE_USER_ID || null,
       UNIT_ID: 0,
       DISTRIBUTOR_ID: 0,
       GROSS_AMOUNT: 0,

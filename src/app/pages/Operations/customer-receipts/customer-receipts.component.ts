@@ -159,6 +159,7 @@ export class CustomerReceiptsComponent {
   isReadOnlyReceipt: boolean = false;
   sessionData: any;
   selectedCompanyId: any;
+  userID: any;
 
   constructor(
     private dataService: DataService,
@@ -170,7 +171,8 @@ export class CustomerReceiptsComponent {
   sessionData_tax() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     // this.selected_vat_id = this.sessionData.VAT_ID;
-    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selectedCompanyId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.userID = this.sessionData?.USER_ID;
   }
 
   ngOnInit() {
@@ -179,6 +181,11 @@ export class CustomerReceiptsComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userDataString = localStorage.getItem('userData') || '{}';
+    const userData = JSON.parse(userDataString);
+    if (userData?.USER_ID || menuResponse?.USER_ID) {
+      this.userID = userData?.USER_ID || menuResponse?.USER_ID;
+    }
 
     const menuGroups = menuResponse.MenuGroups || [];
 
@@ -207,6 +214,7 @@ export class CustomerReceiptsComponent {
       COMPANY_ID: this.selectedCompanyId,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      USER_ID: this.userID || this.sessionData?.USER_ID || null,
     };
 
     this.ReceiptDataSource = new DataSource({

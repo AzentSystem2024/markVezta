@@ -572,6 +572,7 @@ export class GrnNewFormComponent implements OnInit {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.newGrnData?.USER_ID || this.sessionData?.USER_ID || null,
     };
     this.service.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
@@ -593,19 +594,24 @@ export class GrnNewFormComponent implements OnInit {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
 
-    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
 
     this.newGrnData.COMPANY_ID = this.selected_Company_id;
-    this.selected_fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    if (this.sessionData?.USER_ID) {
+      this.newGrnData.USER_ID = this.sessionData.USER_ID;
+      this.grnData.USER_ID = this.sessionData.USER_ID;
+    }
+    this.selected_fin_id = this.sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
 
-    const sessionYear = this.sessionData.FINANCIAL_YEARS;
-    this.financialYeaDate = sessionYear[0].DATE_FROM;
+    const sessionYear = this.sessionData?.FINANCIAL_YEARS;
+    if (sessionYear?.length) {
+      this.financialYeaDate = sessionYear[0].DATE_FROM;
+      this.formatted_from_date = this.financialYeaDate;
+    }
 
-    this.formatted_from_date = this.financialYeaDate;
-
-    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selected_vat_id = this.sessionData?.VAT_ID;
   }
 
   updateCell(event: any) {

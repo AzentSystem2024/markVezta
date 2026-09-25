@@ -137,6 +137,7 @@ export class SaleReturnComponent {
   selected_vat_id: any;
   saleReturnDataSource: any;
   companyID: any;
+  userID: any;
   saleReturnArray: any[] = [];
   saleReturnCount = 0;
   isAddSaleReturn: boolean = false;
@@ -157,8 +158,9 @@ export class SaleReturnComponent {
   ) { }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     this.selected_vat_id = this.sessionData.VAT_ID;
+    this.userID = this.sessionData.USER_ID;
   }
 
   ngOnInit() {
@@ -171,6 +173,7 @@ export class SaleReturnComponent {
     const userData = JSON.parse(userDataString);
     this.vatTitle = userData.GeneralSettings.VAT_TITLE;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = userData?.USER_ID || menuResponse?.USER_ID;
     this.sessionData_tax();
     const menuGroups = menuResponse.MenuGroups || [];
 
@@ -199,6 +202,7 @@ export class SaleReturnComponent {
       COMPANY_ID: this.companyID,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      USER_ID: this.userID || this.sessionData?.USER_ID || null,
     };
 
     this.saleReturnDataSource = new DataSource({
