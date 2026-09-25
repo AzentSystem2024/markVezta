@@ -105,7 +105,6 @@ export class NewOrderComponent implements OnInit, OnChanges {
   _oldCutSizeQuantities: { [key: string]: number } = {};
   isReverting = false;
 
-  
   constructor(private dataService: DataService) {
     this.currentEditingItem = this.getEmptyCartItem();
   }
@@ -322,14 +321,14 @@ export class NewOrderComponent implements OnInit, OnChanges {
   // --- Left Side Actions ---
   async setActiveTab(tab: 'dealer' | 'subdealer') {
     if (this.activeTab !== tab) {
-      if (this.getCurrentItemTotalQty() > 0) {
+      if (this.hasUnsavedChanges()) {
         const result = await confirm(
           'Switching tabs will clear the entered quantities. Are you sure?',
           'Warning',
         );
         if (!result) return;
       }
-      
+
       this.activeTab = tab;
       this.selectedDealerId = null;
       this.isEditMode = false;
@@ -344,7 +343,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
     if (this.isReverting) return;
     // Only reset dependent fields if this is an actual user change (not initial binding)
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
-      if (this.getCurrentItemTotalQty() > 0 && !this.isSettingEditData) {
+      if (this.hasUnsavedChanges() && !this.isSettingEditData) {
         const result = await confirm(
           'Changing the dealer will clear the entered quantities. Are you sure?',
           'Warning',
@@ -417,7 +416,12 @@ export class NewOrderComponent implements OnInit, OnChanges {
     if (this.isSettingEditData || this.isReverting) return;
     // Only reset dependent fields if this is an actual user change (not initial binding)
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
-      if (this.getCurrentItemTotalQty() > 0) {
+      const currentValue = this.currentEditingItem.categoryId;
+      this.currentEditingItem.categoryId = e.previousValue;
+      const unsaved = this.hasUnsavedChanges();
+      this.currentEditingItem.categoryId = currentValue;
+
+      if (unsaved) {
         const result = await confirm(
           'Changing the category will clear the entered quantities. Are you sure?',
           'Warning',
@@ -481,7 +485,12 @@ export class NewOrderComponent implements OnInit, OnChanges {
   async onArtNoChange(e: any) {
     if (this.isSettingEditData || this.isReverting) return;
     if (e.previousValue !== undefined && e.previousValue !== e.value) {
-      if (this.getCurrentItemTotalQty() > 0) {
+      const currentValue = this.currentEditingItem.artNoId;
+      this.currentEditingItem.artNoId = e.previousValue;
+      const unsaved = this.hasUnsavedChanges();
+      this.currentEditingItem.artNoId = currentValue;
+
+      if (unsaved) {
         const result = await confirm(
           'Changing the Art No will clear the entered quantities. Are you sure?',
           'Warning',
@@ -613,7 +622,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
         this.selectColor(availableColor.id, true);
       } else {
         // If all colors are in the cart, default to the first one
-        this.selectColor(this.colors[0].id, true);
+        this.selectColor(this.colors[0].id, false);
       }
     }
   }
@@ -640,11 +649,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
     if (this.isSettingEditData) return;
     if (this.currentEditingItem.colorId === colorId) return;
 
-    if (
-      !this.isEditMode &&
-      this.currentEditingItem.categoryId &&
-      this.currentEditingItem.artNoId
-    ) {
+    if (this.currentEditingItem.categoryId && this.currentEditingItem.artNoId) {
       const existingCartItem = this.cartItems.find(
         (item) =>
           item.categoryId === this.currentEditingItem.categoryId &&
@@ -669,7 +674,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
       }
     }
 
-    if (this.getCurrentItemTotalQty() > 0) {
+    if (this.hasUnsavedChanges()) {
       const result = await confirm(
         'Changing the color will clear the entered quantities. Are you sure?',
         'Warning',
@@ -700,9 +705,11 @@ export class NewOrderComponent implements OnInit, OnChanges {
       (res: any) => {
         this.isLoadingSizes = false;
         if (res && res.flag === '1') {
+          console.log('image file name', res.IMAGE_NAME);
+
           this.currentEditingItem.imageUrl = res.IMAGE_NAME
             ? `https://mmarkonline.com/artimages/${res.IMAGE_NAME}`
-            : '';
+            : 'https://mmarkonline.com/artimages/NoImage.jpg';
 
           if (Array.isArray(res.Case)) {
             this.currentEditingItem.sizes = res.Case.map((c: any) => ({
@@ -833,7 +840,10 @@ export class NewOrderComponent implements OnInit, OnChanges {
 
   // --- Image Popup Methods ---
   openImagePopup() {
-    if (this.currentEditingItem.artNoId && this.getArtNoImage(this.currentEditingItem.artNoId)) {
+    if (
+      this.currentEditingItem.artNoId &&
+      this.getArtNoImage(this.currentEditingItem.artNoId)
+    ) {
       this.isImagePopupVisible = true;
     }
   }
@@ -842,12 +852,12 @@ export class NewOrderComponent implements OnInit, OnChanges {
     const category = this.getCategoryName(this.currentEditingItem.categoryId);
     const artNo = this.getArtNoName(this.currentEditingItem.artNoId);
     const color = this.getColor(this.currentEditingItem.colorId)?.name;
-    
+
     const parts = [];
     if (category) parts.push(category);
     if (artNo) parts.push(artNo);
     if (color) parts.push(color);
-    
+
     return parts.length > 0 ? parts.join(' - ') : 'Image';
   }
 
@@ -977,6 +987,72 @@ export class NewOrderComponent implements OnInit, OnChanges {
     );
   }
 
+  get isActualEditMode(): boolean {
+    if (!this.isEditMode) return false;
+    const originalItem = this.cartItems.find(
+      (item) => item.id === this.currentEditingItem.id,
+    );
+    if (!originalItem) return false;
+
+    return (
+      this.currentEditingItem.categoryId === originalItem.categoryId &&
+      this.currentEditingItem.artNoId === originalItem.artNoId &&
+      this.currentEditingItem.colorId === originalItem.colorId
+    );
+  }
+
+  hasUnsavedChanges(): boolean {
+    if (!this.isActualEditMode) {
+      return this.getCurrentItemTotalQty() > 0;
+    }
+
+    const originalItem = this.cartItems.find(
+      (item) => item.id === this.currentEditingItem.id,
+    );
+    if (!originalItem) {
+      return this.getCurrentItemTotalQty() > 0;
+    }
+
+    for (const currentSize of this.currentEditingItem.sizes) {
+      const originalSize = originalItem.sizes.find(
+        (s) => s.sizeId === currentSize.sizeId,
+      );
+      const currentQty = currentSize.qty || 0;
+      const originalQty = originalSize ? originalSize.qty || 0 : 0;
+
+      if (currentQty !== originalQty) return true;
+
+      if (currentSize.isCutSize) {
+        const currentCutSizes = currentSize.cutSizeQuantities || {};
+        const originalCutSizes = originalSize
+          ? originalSize.cutSizeQuantities || {}
+          : {};
+
+        const allKeys = new Set([
+          ...Object.keys(currentCutSizes),
+          ...Object.keys(originalCutSizes),
+        ]);
+
+        for (const key of Array.from(allKeys)) {
+          if ((currentCutSizes[key] || 0) !== (originalCutSizes[key] || 0)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    for (const originalSize of originalItem.sizes) {
+      if ((originalSize.qty || 0) > 0) {
+        const currentSize = this.currentEditingItem.sizes.find(
+          (s) => s.sizeId === originalSize.sizeId,
+        );
+        if (!currentSize) return true;
+      }
+    }
+
+    return false;
+  }
+
   saveToCart() {
     if (this.getCurrentItemTotalQty() === 0) {
       notify('Please enter a quantity before saving to cart.', 'warning', 3000);
@@ -1003,7 +1079,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
     this.currentEditingItem.sizes.forEach((s: any) => {
       if (s.qty > 0) {
         cartArray.push({
-          CART_ID: this.isEditMode ? s.cartId || 0 : 0,
+          CART_ID: this.isActualEditMode ? s.cartId || 0 : 0,
           PACKING_ID: s.sizeId,
           QUANTITY: s.qty,
           COMBINATION: s.description || '',
@@ -1033,7 +1109,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
     const payload = {
       USER_ID: userId,
       ORDER_ID: finalOrderId,
-      IS_UPDATE: this.isEditMode,
+      IS_UPDATE: this.isActualEditMode,
       DEALER_ID: this.getActualDealerId(),
       DEALER_NAME: this.getDealerName(),
       SUBDEALER_ID:
@@ -1153,13 +1229,19 @@ export class NewOrderComponent implements OnInit, OnChanges {
           // }
 
           // Auto-select next color if retaining category & art no
-          if (!this.currentEditingItem.colorId && this.currentEditingItem.artNoId) {
+          if (
+            !this.currentEditingItem.colorId &&
+            this.currentEditingItem.artNoId
+          ) {
             this.autoSelectAvailableColor();
           }
         } else {
           this.cartItems = [];
-          
-          if (!this.currentEditingItem.colorId && this.currentEditingItem.artNoId) {
+
+          if (
+            !this.currentEditingItem.colorId &&
+            this.currentEditingItem.artNoId
+          ) {
             this.autoSelectAvailableColor();
           }
         }
@@ -1174,7 +1256,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
   }
 
   async editCartItem(item: CartItem) {
-    if (this.getCurrentItemTotalQty() > 0) {
+    if (this.hasUnsavedChanges()) {
       const result = await confirm(
         'You have entered quantities for the current item. Editing this cart item will discard them. Do you want to continue?',
         'Warning',
