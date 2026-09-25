@@ -7582,4 +7582,8 @@ The result can be exported to HTML or Markdown.`;
   getNewOrderDetail(payload: any = {}): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderDetail`, payload);
   }
+
+  updateOrderEntryQty(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}NewOrder/UpdateOrderEntryQty`, payload);
+  }
 }

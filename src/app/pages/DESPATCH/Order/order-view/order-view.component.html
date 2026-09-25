@@ -68,29 +68,71 @@
             [rowAlternationEnabled]="true"
             [showRowLines]="true"
             [height]="'30vh'"
+            (onEditorPreparing)="onDetailEditorPreparing($event, masterData)"
+            (onRowUpdating)="onDetailRowUpdating($event, masterData)"
           >
-            <dxi-column dataField="CATEGORY_ID" caption="Category"></dxi-column>
-            <dxi-column dataField="ART_NO" caption="Art No"></dxi-column>
-            <dxi-column dataField="COLOR" caption="Color"></dxi-column>
-            <dxi-column dataField="DESCRIPTION" caption="Packing"></dxi-column>
-            <dxi-column dataField="ORDER_QTY" caption="Order Qty"></dxi-column>
+            <dxo-editing
+              mode="row"
+              [allowUpdating]="masterData.data.ORDER_STATUS === 1"
+              [useIcons]="true"
+            ></dxo-editing>
+
+            <dxo-filter-row [visible]="false"></dxo-filter-row>
+
+            <dxo-header-filter [visible]="false">
+              <dxo-search [enabled]="true"></dxo-search>
+            </dxo-header-filter>
+
+            <dxi-column
+              dataField="CATEGORY_ID"
+              caption="Category"
+              [allowEditing]="false"
+            ></dxi-column>
+            <dxi-column
+              dataField="ART_NO"
+              caption="Art No"
+              [allowEditing]="false"
+            ></dxi-column>
+            <dxi-column
+              dataField="COLOR"
+              caption="Color"
+              [allowEditing]="false"
+            ></dxi-column>
+            <dxi-column
+              dataField="DESCRIPTION"
+              caption="Packing"
+              [allowEditing]="false"
+            ></dxi-column>
+            <dxi-column
+              dataField="ORDER_QTY"
+              caption="Order Qty"
+              dataType="number"
+            ></dxi-column>
             <dxi-column
               dataField="ALLOCATED_QTY"
               caption="Allocated Qty"
+              [allowEditing]="false"
             ></dxi-column>
             <dxi-column
               dataField="ALLOTTED_QTY"
               caption="Allotted Qty"
+              [allowEditing]="false"
             ></dxi-column>
             <dxi-column
               dataField="ISSUED_QTY"
               caption="Issued Qty"
+              [allowEditing]="false"
             ></dxi-column>
             <dxi-column
               dataField="CANCELLED_QTY"
               caption="Cancelled Qty"
+              [allowEditing]="false"
             ></dxi-column>
-            <dxi-column dataField="OPEN_QTY" caption="Open Qty"></dxi-column>
+            <dxi-column
+              dataField="OPEN_QTY"
+              caption="Open Qty"
+              [allowEditing]="false"
+            ></dxi-column>
           </dx-data-grid>
         </div>
       </div>
@@ -266,7 +308,11 @@
         [headerFilter]="{ dataSource: getStatusFilterData }"
       ></dxi-column>
 
-      <dxi-column dataField="LOCATION" caption="Location"></dxi-column>
+      <dxi-column
+        dataField="LOCATION"
+        caption="Location"
+        width="150"
+      ></dxi-column>
 
       <dxi-column
         type="buttons"
@@ -312,14 +358,42 @@
       </div>
 
       <div *dxTemplate="let cell of 'actionTemplate'">
-        <div class="action-icons" style="text-align: center">
+        <div
+          class="action-icons"
+          style="
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+          "
+        >
           <i
+            *ngIf="cell.data.ORDER_STATUS === 1"
             class="dx-icon dx-icon-edit"
-            [style.opacity]="cell.data.ORDER_STATUS === 1 ? '1' : '0.4'"
-            [style.cursor]="
-              cell.data.ORDER_STATUS === 1 ? 'pointer' : 'not-allowed'
+            title="Edit Order"
+            style="
+              background-color: #f0f4f8;
+              color: #0056b3;
+              padding: 6px;
+              border-radius: 4px;
+              cursor: pointer;
             "
-            (click)="cell.data.ORDER_STATUS === 1 ? editOrder(cell.data) : null"
+            (click)="editOrder(cell.data)"
+          ></i>
+          <i
+            *ngIf="cell.data.ORDER_STATUS === 1"
+            class="dx-icon dx-icon-check"
+            title="Submit Order"
+            style="
+              background-color: #e6f4ea;
+              color: #28a745;
+              padding: 6px;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 16px;
+              font-weight: bold;
+            "
+            (click)="submitOrder(cell.data)"
           ></i>
         </div>
       </div>

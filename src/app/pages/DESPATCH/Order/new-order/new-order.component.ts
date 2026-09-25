@@ -1148,9 +1148,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
             });
           });
 
-          if (this.cartItems.length === 1 && this.editOrderId) {
-            this.editCartItem(this.cartItems[0]);
-          }
+          // if (this.cartItems.length === 1 && this.editOrderId) {
+          //   this.editCartItem(this.cartItems[0]);
+          // }
 
           // Auto-select next color if retaining category & art no
           if (!this.currentEditingItem.colorId && this.currentEditingItem.artNoId) {
