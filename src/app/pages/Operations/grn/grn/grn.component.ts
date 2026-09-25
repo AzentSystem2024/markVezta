@@ -129,6 +129,7 @@ export class GrnComponent implements OnInit {
   canApprove = false;
   canPrint = false;
   companyID: any;
+  userID: any;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -484,8 +485,9 @@ export class GrnComponent implements OnInit {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.selectedCompanyId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.userID = this.sessionData?.USER_ID;
   }
 
   getGrnLogData() {
@@ -498,6 +500,7 @@ export class GrnComponent implements OnInit {
       COMPANY_ID: this.selectedCompanyId,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      USER_ID: this.userID || this.sessionData?.USER_ID || null,
     };
 
     this.service
@@ -672,6 +675,7 @@ export class GrnComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = menuResponse.USER_ID;
     const menuGroups = menuResponse.MenuGroups || [];
     console.log(menuResponse.FINANCIAL_YEARS[0].FIN_ID, 'MENURESPONSEINGRN');
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;

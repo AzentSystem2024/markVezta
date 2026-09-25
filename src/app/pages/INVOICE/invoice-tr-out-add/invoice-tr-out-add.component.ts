@@ -662,9 +662,9 @@ export class InvoiceTrOutAddComponent {
     }
   }
 
-  selectInvoice() {}
+  selectInvoice() { }
 
-  cancelPopup() {}
+  cancelPopup() { }
 
   logGridSummaries() {
     this.summaryValues = this.itemsGridRef?.instance?.getTotalSummaryValue;
@@ -823,7 +823,7 @@ export class InvoiceTrOutAddComponent {
     }
   }
 
-  openPDF() {}
+  openPDF() { }
 
   resetInvoiceForm() {
     this.invoiceFormData = {
@@ -915,4 +915,4 @@ export class InvoiceTrOutAddComponent {
   exports: [InvoiceTrOutAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InvoiceTrOutAddModule {}
+export class InvoiceTrOutAddModule { }

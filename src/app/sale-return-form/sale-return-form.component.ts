@@ -393,6 +393,7 @@ export class SaleReturnFormComponent {
     console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.salesReturnFormData?.USER_ID || this.userID || null,
     };
     this.dataService
       .getOutsideCustomerWithState(payload)

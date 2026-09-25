@@ -206,6 +206,7 @@ export class PurchaseOrderComponent {
   isApproveMode: boolean = false;
   popupTitle: string = 'Edit Purchase Order';
   finId: any;
+  userID: any;
 
   constructor(
     private service: DataService,
@@ -219,6 +220,7 @@ export class PurchaseOrderComponent {
     this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
     this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = sessionData.USER_ID;
   }
 
   ngOnInit(): void {
@@ -250,6 +252,9 @@ export class PurchaseOrderComponent {
     }
     const userDataString = localStorage.getItem('userData') || '{}';
     const userData = JSON.parse(userDataString);
+    if (userData.USER_ID) {
+      this.userID = userData.USER_ID;
+    }
     this.getStoreData();
     this.isHQApp = userData.GeneralSettings.IS_HQ_APP;
     const configStore = userData.Configuration?.[0];
@@ -583,6 +588,7 @@ export class PurchaseOrderComponent {
       DATE_FROM: fromDate,
       DATE_TO: toDate,
       STORE_ID: this.selectedStoreId,
+      USER_ID: this.userID || this.sessionData?.USER_ID || null,
     };
 
     this.service.getPurchaseOrderList(payload).subscribe({

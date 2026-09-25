@@ -997,6 +997,7 @@ export class PurchaseOrderNewFormComponent implements OnInit {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.companyID,
+      USER_ID: this.poData?.USER_ID || this.newPoData?.USER_ID || null,
     };
     this.service.getDropdownData(payload).subscribe((res) => {
       this.SupplierList = res;

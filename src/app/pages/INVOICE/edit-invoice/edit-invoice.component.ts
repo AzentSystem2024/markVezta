@@ -143,7 +143,7 @@ export class EditInvoiceComponent {
       }
 
       if (userData.USER_ID) {
-        this.invoiceFormData.USER_ID = userData.USER_ID;
+        this.invoiceFormData.CREATE_USER_ID = userData.USER_ID;
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
@@ -305,7 +305,7 @@ export class EditInvoiceComponent {
         this.companyList = [selectedCompany]; // ✅ Show only selected company
       }
       if (userData.USER_ID) {
-        this.invoiceFormData.USER_ID = userData.USER_ID;
+        this.invoiceFormData.CREATE_USER_ID = userData.USER_ID;
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
@@ -318,6 +318,7 @@ export class EditInvoiceComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      CREATE_USER_ID: this.invoiceFormData?.CREATE_USER_ID || null,
     };
     this.dataService
       .getOutsideCustomerWithState(payload)
@@ -719,6 +720,7 @@ export class EditInvoiceComponent {
             PARTY_NAME: this.invoiceFormData.PARTY_NAME,
             ROUND_OFF: this.invoiceFormData.ROUND_OFF,
             VEHICLE_NO: this.invoiceFormData.VEHICLE_NO,
+            CREATE_USER_ID: this.invoiceFormData.CREATE_USER_ID || null,
             SALE_DETAILS: this.mainInvoiceGridList.map((row: any) => ({
               DN_DETAIL_ID: row.DN_DETAIL_ID || '',
               QUANTITY: row.TOTAL_PAIR_QTY || 0,
@@ -775,6 +777,7 @@ export class EditInvoiceComponent {
         PARTY_NAME: this.invoiceFormData.PARTY_NAME,
         ROUND_OFF: this.invoiceFormData.ROUND_OFF,
         VEHICLE_NO: this.invoiceFormData.VEHICLE_NO,
+        CREATE_USER_ID: this.invoiceFormData.CREATE_USER_ID || null,
         IS_VERIFIED: this.isVerifyMode
           ? true
           : this.invoiceFormData.IS_VERIFIED,

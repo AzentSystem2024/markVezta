@@ -158,7 +158,7 @@ export class AddInvoiceRetailComponent {
   pendingDeliveryList: any[] = [];
   // invoiceMode: 'MANUAL' | 'DELIVERY' = 'MANUAL';
   selectedDeliveryRows: any[] = [];
-  constructor(private dataService: DataService, private http: HttpClient, private sanitizer: DomSanitizer) {}
+  constructor(private dataService: DataService, private http: HttpClient, private sanitizer: DomSanitizer) { }
   ngOnChanges() {
     console.log(this.EditingResponseData, 'EditingResponseData');
     if (this.isEditing && this.EditingResponseData) {
@@ -1912,7 +1912,7 @@ export class AddInvoiceRetailComponent {
         // Category 12 is for Sales Invoice (or 3 as we set before)
         this.templateList = data.filter((t: any) => t.categoryId === 12 || t.categoryId === 3);
         if (this.templateList.length > 0) {
-            this.selectedTemplate = this.templateList[0].name;
+          this.selectedTemplate = this.templateList[0].name;
         }
         this.fetchPdf();
       })
@@ -1927,12 +1927,12 @@ export class AddInvoiceRetailComponent {
   fetchPdf(): void {
     const id = this.EditingResponseData?.TRANS_ID;
     if (!id) return;
-    
+
     this.isLoadingPdf = true;
     this.pdfPreviewUrl = null;
-    
+
     const url = `${environment.apiUrl}Reports/${encodeURIComponent(this.selectedTemplate)}/export?invoiceId=${id}`;
-    
+
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob) => {
         const objectUrl = URL.createObjectURL(blob);
@@ -1958,14 +1958,14 @@ export class AddInvoiceRetailComponent {
   }
 
   selectedEmails: any = [];
-  
+
   sendPdf(): void {
     this.isEmailPopupVisible = true;
     this.emailReceivers = [];
     this.selectedEmails = [];
     this.emailSubject = '';
     this.emailBody = '';
-    
+
     this.dataService.selectEmailSettings(19).subscribe((res: any) => {
       if (res && res.Data) {
         this.emailSubject = res.Data.EMAIL_SUBJECT || '';
@@ -1987,25 +1987,25 @@ export class AddInvoiceRetailComponent {
       alert("No PDF generated to attach.");
       return;
     }
-    
+
     this.isSendingEmail = true;
-    
+
     const toEmail = this.selectedEmails[0];
     const bccEmails = this.selectedEmails.slice(1).join(',');
-    
+
     const formData = new FormData();
     formData.append('To', toEmail);
     formData.append('Bcc', bccEmails);
     formData.append('Subject', this.emailSubject);
     formData.append('Body', this.emailBody);
-    
+
     const id = this.EditingResponseData?.TRANS_ID;
     formData.append('DocumentId', id.toString());
     formData.append('EmailType', '19'); // Placeholder for Sales Invoice
-    
+
     const fileName = `${this.selectedTemplate || 'SalesInvoice'}.pdf`;
     formData.append('Attachment', this.currentPdfBlob, fileName);
-    
+
     this.http.post(`${environment.apiUrl}EmailSettings/send-with-attachment`, formData).subscribe({
       next: (res: any) => {
         notify('Email sent successfully!', 'success', 3000);
@@ -2081,4 +2081,4 @@ export class AddInvoiceRetailComponent {
   exports: [AddInvoiceRetailComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddInvoiceRetailModule {}
+export class AddInvoiceRetailModule { }

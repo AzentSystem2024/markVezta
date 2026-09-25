@@ -107,6 +107,7 @@ export class EditCustomerReceiptComponent {
   settings: any;
   CashID: any;
   BankID: any;
+  userID: any;
 
   constructor(private dataService: DataService) {}
 
@@ -117,6 +118,9 @@ export class EditCustomerReceiptComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       this.companyList = userData.Companies || [];
+      if (userData.USER_ID) {
+        this.userID = userData.USER_ID;
+      }
 
       if (this.companyList.length > 0) {
         this.selectedCompanyId = this.companyList[1].COMPANY_ID;
@@ -132,8 +136,11 @@ export class EditCustomerReceiptComponent {
   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.selectedstoreId = sessionData?.Configuration?.[0]?.STORE_ID;
+    if (sessionData?.USER_ID) {
+      this.userID = sessionData.USER_ID;
+    }
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['receiprtFormData'] && this.receiprtFormData) {
@@ -294,6 +301,7 @@ export class EditCustomerReceiptComponent {
     const payload = {
       NAME: 'CUSTOMER',
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.distributorList = response;

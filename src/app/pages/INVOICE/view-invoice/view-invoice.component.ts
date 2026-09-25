@@ -147,7 +147,7 @@ export class ViewInvoiceComponent implements OnInit, OnChanges {
       }
 
       if (userData.USER_ID) {
-        this.invoiceFormData.USER_ID = userData.USER_ID;
+        this.invoiceFormData.CREATE_USER_ID = userData.USER_ID;
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
@@ -237,7 +237,7 @@ export class ViewInvoiceComponent implements OnInit, OnChanges {
         this.companyList = [selectedCompany]; // Show only selected company
       }
       if (userData.USER_ID) {
-        this.invoiceFormData.USER_ID = userData.USER_ID;
+        this.invoiceFormData.CREATE_USER_ID = userData.USER_ID;
       }
 
       const firstFinYear = userData.FINANCIAL_YEARS?.[0];
@@ -272,6 +272,7 @@ export class ViewInvoiceComponent implements OnInit, OnChanges {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      CREATE_USER_ID: this.invoiceFormData?.CREATE_USER_ID || null,
       NAME: 'CUSTOMER',
     };
     this.dataService

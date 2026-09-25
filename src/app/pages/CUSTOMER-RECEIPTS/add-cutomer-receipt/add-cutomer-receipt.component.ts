@@ -127,6 +127,7 @@ export class AddCutomerReceiptComponent {
   CashID: any;
   BankID: any;
   settings: any;
+  userID: any;
 
   constructor(
     private dataService: DataService,
@@ -141,6 +142,9 @@ export class AddCutomerReceiptComponent {
       const userData = JSON.parse(userDataString);
       this.companyList = userData.Companies || [];
       this.selectedCompanyId = userData.SELECTED_COMPANY.COMPANY_ID;
+      if (userData.USER_ID) {
+        this.userID = userData.USER_ID;
+      }
     } else {
       console.warn('No userData found in localStorage');
     }
@@ -153,8 +157,11 @@ export class AddCutomerReceiptComponent {
   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.selectedstoreId = sessionData?.Configuration?.[0]?.STORE_ID;
+    if (sessionData?.USER_ID) {
+      this.userID = sessionData.USER_ID;
+    }
   }
 
   AC_Default() {
@@ -304,6 +311,7 @@ export class AddCutomerReceiptComponent {
     const payload = {
       // NAME: 'CUSTOMER',
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userID || null,
     };
     this.dataService
       .getOutsideCustomerWithState(payload)
