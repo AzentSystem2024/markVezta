@@ -232,6 +232,7 @@ import { NewOrderComponent } from './pages/DESPATCH/Order/new-order/new-order.co
 import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
 import { SalesReportComponent } from './sales-report/sales-report.component';
 import { PurchaseReportMarkComponent } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
+import { TransferOutInventoryMarkComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
 
 const routes: Routes = [
   {
@@ -1423,6 +1424,11 @@ const routes: Routes = [
       {
         path: 'purchase-report-mark',
         component: PurchaseReportMarkComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'transfer-out-inventory-mark',
+        component: TransferOutInventoryMarkComponent,
         canActivate: [AuthGuardService],
       },
       {

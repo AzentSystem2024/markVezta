@@ -430,9 +430,11 @@ import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view
 import { SalesReportComponent, SalesReportModule } from './sales-report/sales-report.component';
 import { PurchaseReportMarkComponent, PurchaseReportMarkModule } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
 import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.component';
+import { TransferOutInventoryMarkComponent, TransferOutInventoryMarkModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
+import { TransferOutInventoryAddMarkComponent, TransferOutInventoryAddMarkModule } from './pages/transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
 
 @NgModule({
-  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent],
+  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent,],
   imports: [
     OrderViewModule,
     NewOrderModule,
@@ -872,6 +874,8 @@ import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.co
     EmailSettingFormModule,
     SalesReportModule,
     PurchaseReportMarkModule,
+    TransferOutInventoryMarkModule,
+    TransferOutInventoryAddMarkModule,
   ],
 
   providers: [

@@ -7582,4 +7582,44 @@ The result can be exported to HTML or Markdown.`;
   getNewOrderDetail(payload: any = {}): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderDetail`, payload);
   }
+
+  //====================TRANSFER OUT INVENTORY MARK============================
+  getTransferOutForInventoryMainListMark(items: any): Observable<any> {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/list`, data);
+  }
+  insertTransferOutForInventoryMark(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/insert`, data);
+  }
+  selectTransferOutForInventoryMark(id: number) {
+    return this.http.post<any>(`${this.apiUrl}TransferOut_Mark/select/` + id, {});
+  }
+
+  getItemBind(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/getitem`, data);
+  }
+
+  getTransferNoMark(): Observable<any> {
+    return this.http.post(`${this.apiUrl}TransferOutInv/transferno`, {});
+  }
+
+  updateTransferOutForInventoryMark(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/update`, data);
+  }
+
+  verifyTransferOutForInventoryMark(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/verify`, data);
+  }
+  approveTransferOutForInventoryMark(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+  }
+
+  deleteTrOutForInventoryMark(id: number) {
+    return this.http.post<any>(`${this.apiUrl}TransferOut_Mark/delete/` + id, {});
+  }
 }

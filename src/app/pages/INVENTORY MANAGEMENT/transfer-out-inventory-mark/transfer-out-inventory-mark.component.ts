@@ -1,0 +1,811 @@
+import {
+  ChangeDetectorRef,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxCheckBoxModule,
+  DxRadioGroupModule,
+  DxFileUploaderModule,
+  DxDataGridModule,
+  DxButtonModule,
+  DxValidatorModule,
+  DxProgressBarModule,
+  DxPopupModule,
+  DxDropDownBoxModule,
+  DxToolbarModule,
+  DxTabPanelModule,
+  DxTabsModule,
+  DxNumberBoxModule,
+  DxDataGridComponent,
+  DxTagBoxModule,
+} from 'devextreme-angular';
+import {
+  DxoItemModule,
+  DxoFormItemModule,
+  DxoLookupModule,
+  DxiItemModule,
+  DxiGroupModule,
+  DxoSummaryModule,
+} from 'devextreme-angular/ui/nested';
+import { FormTextboxModule } from 'src/app/components';
+
+import { DataService } from 'src/app/services';
+import { Router } from '@angular/router';
+
+import notify from 'devextreme/ui/notify';
+import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
+import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
+import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { ExportService } from 'src/app/services/export.service';
+import { TransferOutInventoryAddMarkModule } from '../../transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
+
+
+
+@Component({
+  selector: 'app-transfer-out-inventory-mark',
+  templateUrl: './transfer-out-inventory-mark.component.html',
+  styleUrls: ['./transfer-out-inventory-mark.component.scss']
+})
+export class TransferOutInventoryMarkComponent {
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  sessionData: any;
+  selected_vat_id: any;
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    // onClick: () => this.addCreditNote(),
+    onClick: () => {
+      this.zone.run(() => {
+        this.addTransferOut();
+      });
+    },
+    elementAttr: { class: 'add-button' },
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+  isAddTransferOut: boolean = false;
+  transferOutList: any;
+  selecteTrOut: any;
+  isEditTransferOut: boolean = false;
+  selectedTrOut: any;
+  canVerify: boolean = false;
+  allButtons = [
+    {
+      name: 'edit',
+      onClick: (e: any) => this.onEditTransferOut(e),
+      visible: (e: any) => {
+
+        return this.canEdit &&
+          (
+            e.row.data.STATUS === 'OPEN'
+          )
+      }
+
+    },
+    {
+      name: 'delete',
+      visible: (e: any) => {
+        const status = e.row.data.STATUS;
+
+        return this.canDelete &&
+          (
+            (e.row.data.STATUS == 'OPEN') || (status === 'VERIFIED' && this.canApprove)
+
+          )
+
+      },
+    },
+    {
+      hint: 'Verify',
+      icon: 'material-symbols:verified-outline',
+      text: 'Verify',
+      onClick: (e: any) => this.onVerifyClick(e),
+      visible: (e: any) => {
+        return this.canVerify && e.row.data.STATUS === 'OPEN';
+      },
+    },
+    {
+      hint: 'Approve',
+      icon: 'material-symbols:verified-outline',
+      text: 'Approve',
+      onClick: (e: any) => this.onApproveClick(e),
+      visible: (e: any) => {
+        return this.canApprove &&
+          (
+            e.row.data.STATUS === 'VERIFIED' || (this.canVerify ? false : e.row.data.STATUS === 'OPEN')
+          )
+
+      },
+    },
+    {
+      hint: 'View',
+      icon: 'material-symbols:verified-outline',
+      text: 'View',
+      onClick: (e: any) => this.onViewClick(e),
+      visible: (e: any) =>
+        this.canView &&
+        (
+          e.row.data.STATUS === 'APPROVED' ||
+          (e.row.data.STATUS === 'VERIFIED' && !this.canApprove)
+        )
+
+    },
+  ];
+
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup = false;
+  filteredInvoiceList: any;
+  filteredTrOutList: any;
+  isReadOnlyTrOut: boolean = false;
+  selected_Company_id: any;
+  selectedStoreid: any;
+  Store: any[] = [];
+  dateFilteredList: any = [];
+  StatusType: any;
+  selected_Data_Status: any;
+  buttonText: string;
+
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private zone: NgZone,
+    private exportService: ExportService,
+    private cdr: ChangeDetectorRef
+  ) { }
+
+  ngOnInit() {
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    // this.sessionData_tax()
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+    console.log(packingRights, 'PACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      console.log('packingRights.CanAdd:', packingRights.CanAdd);
+      console.log('this.canAdd after assign:', this.canAdd);
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify;
+    }
+    this.sessionData_tax();
+    this.store_dropdown()
+
+    this.getTransferOutList();
+  }
+
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.selected_Company_id = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+
+  getTransferOutList(dateRange: string = this.selectedDateRange) {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService
+      .getTransferOutForInventoryMainListMark(payload)
+      .subscribe((response: any) => {
+        this.transferOutList = response.Header.map((item: any) => {
+          let dateValue: Date;
+
+          if (!isNaN(Date.parse(item.TRANSFER_DATE))) {
+            dateValue = new Date(item.TRANSFER_DATE);
+          } else {
+            dateValue = this.parseDateString(item.TRANSFER_DATE);
+          }
+
+          return {
+            ...item,
+            TRANSFER_NO: item.ISSUE_NO,
+            TRANSFER_DATE: dateValue,
+            DESTINATION_STORE: item.STORE_NAME,
+          };
+        }).sort((a: any, b: any) => {
+          const numA = parseInt(a.DOC_NO.split('/').pop(), 10);
+          const numB = parseInt(b.DOC_NO.split('/').pop(), 10);
+          return numB - numA; // descending order
+        });
+
+        console.log('TransferOutList after mapping:', this.transferOutList);
+        this.applyDateFilter();
+      });
+  }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'TransferOutInventory');
+  }
+
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 'APPROVED',
+    },
+    {
+      text: 'Open',
+      value: 'OPEN',
+    },
+  ];
+
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.customStartDate = null;
+      this.customEndDate = null;
+      this.showCustomDatePopup = true;
+    } else {
+      // Reset the custom label
+      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
+      if (customOpt) {
+        customOpt.label = 'Custom';
+      }
+      this.applyDateFilter();
+    }
+  }
+
+  // applyDateFilter() {
+  //   if (!this.transferOutList) return;
+
+  //   let baseList = [...this.transferOutList];
+
+  //   if (!this.selectedDateRange || this.selectedDateRange === 'all') {
+  //     this.filteredTrOutList = baseList;
+  //     this.applyStoreFilter(); // ✅ important
+  //     return;
+  //   }
+
+  //   const today = new Date();
+  //   let startDate: Date;
+  //   const endDate = new Date();
+
+  //   switch (this.selectedDateRange) {
+  //     case 'today':
+  //       startDate = new Date();
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last7':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 6);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last15':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 14);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     case 'last30':
+  //       startDate = new Date();
+  //       startDate.setDate(today.getDate() - 29);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       break;
+  //     default:
+  //       this.filteredTrOutList = baseList;
+  //       this.applyStoreFilter();
+  //       return;
+  //   }
+
+  //   this.filteredTrOutList = baseList.filter((item: any) => {
+  //     const date = new Date(item.TRANSFER_DATE);
+  //     return date >= startDate && date <= endDate;
+  //   });
+
+  //   this.applyStoreFilter(); // ✅ MUST
+  // }
+  applyDateFilter() {
+    if (!this.transferOutList) return;
+
+    let baseList = [...this.transferOutList];
+
+    if (!this.selectedDateRange || this.selectedDateRange === 'all') {
+      this.dateFilteredList = baseList; // ✅ STORE THIS
+      this.filteredTrOutList = baseList;
+      this.applyStoreFilter();
+      return;
+    }
+
+    const today = new Date();
+    let startDate: Date;
+    const endDate = new Date();
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+        break;
+
+      case 'last7':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 6);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+
+      case 'last15':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 14);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+
+      case 'last30':
+        startDate = new Date();
+        startDate.setDate(today.getDate() - 29);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+
+      default:
+        this.dateFilteredList = baseList;
+        this.filteredTrOutList = baseList;
+        this.applyStoreFilter();
+        return;
+    }
+
+    this.dateFilteredList = baseList.filter((item: any) => {
+      const date = new Date(item.TRANSFER_DATE);
+      return date >= startDate && date <= endDate;
+    });
+
+    this.filteredTrOutList = [...this.dateFilteredList];
+
+    this.applyStoreFilter();
+  }
+  applyCustomDateFilter() {
+    if (!(this.customStartDate && this.customEndDate)) return;
+
+    const start = new Date(this.customStartDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(this.customEndDate);
+    end.setHours(23, 59, 59, 999);
+
+    this.filteredTrOutList = this.transferOutList.filter((item: any) => {
+      const invoiceDate = item.TRANSFER_DATE;
+      return invoiceDate >= start && invoiceDate <= end;
+    });
+
+    const fromLabel = this.formatAsDDMMYYYY(start);
+    const toLabel = this.formatAsDDMMYYYY(end);
+
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        : option,
+    );
+
+    this.showCustomDatePopup = false;
+    this.getTransferOutList('custom');
+  }
+
+  private parseDateString(dateStr: string): Date {
+    if (!dateStr || typeof dateStr !== 'string') {
+      console.warn('Invalid date string:', dateStr);
+      return new Date('Invalid'); // or new Date(0) if you want a fallback
+    }
+
+    const [day, month, year] = dateStr
+      .split('-')
+      .map((part) => parseInt(part, 10));
+    return new Date(year, month - 1, day);
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} to ${to}`;
+    }
+
+    return item.label;
+  };
+
+  openCustomDatePopup() {
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.showCustomDatePopup = true;
+  }
+
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  get customStartDateFormatted(): string {
+    return this.customStartDate
+      ? this.formatAsDDMMYYYY(new Date(this.customStartDate))
+      : '';
+  }
+
+  get customEndDateFormatted(): string {
+    return this.customEndDate
+      ? this.formatAsDDMMYYYY(new Date(this.customEndDate))
+      : '';
+  }
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+      if (innerList) {
+        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
+        innerList.on('itemClick', (clickEvent: any) => {
+          const clickedValue = clickEvent.itemData.value;
+          if (clickedValue === 'custom') {
+            this.openCustomDatePopup();
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
+
+  formatDate(date: Date) {
+    if (!date) return '';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  refreshGrid() {
+    this.getTransferOutList();
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+  }
+
+  addTransferOut() {
+    this.isAddTransferOut = true;
+  }
+
+
+  onCellPrepared(e: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      if (e.data.STATUS === 'APPROVED') {
+        const deleteButton = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteButton) {
+          deleteButton.style.display = 'none';
+        }
+      }
+    }
+  }
+  onEditTransferOut(event: any) {
+    console.log('Edit button clicked for row:', event);
+    event.cancel = true;
+    const trOutId = event.data.TRANS_ID;
+    this.selected_Data_Status = event.data.STATUS;
+    this.StatusType = 'EditScreen'
+    this.buttonText = 'Update Transfer Out';
+    this.isReadOnlyTrOut = false
+    this.select_function(trOutId)
+    if (this.selected_Data_Status === 'OPEN') {
+      this.isReadOnlyTrOut = false;
+      this.StatusType = 'EditScreen';
+      this.buttonText = 'Update Transfer Out';
+    } else {
+      this.isReadOnlyTrOut = true;
+      this.StatusType = 'viewScreen';
+      this.buttonText = 'View Transfer Out';
+    }
+
+    this.isEditTransferOut = true;
+  }
+
+  select_function(trOutId: any) {
+    this.dataService
+      .selectTransferOutForInventoryMark(trOutId)
+      .subscribe((response: any) => {
+        this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+
+        this.cdr.detectChanges();
+
+
+      });
+
+  }
+
+  onDeleteTrOuT(event: any) {
+    const trOutId = event.row.data.ID;
+    const status = event.row.data.STATUS;
+    if (event.row.data.STATUS === 'APPROVED') {
+      event.cancel = true;
+      notify('This cannot be deleted.', 'error', 2000);
+      return;
+    }
+    event.cancel = true;
+    // Call your delete API
+    this.dataService.deleteTrOutForInventoryMark(trOutId).subscribe(
+      (response: any) => {
+        if (response) {
+          notify(
+            {
+              message: 'Deleted Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
+          this.getTransferOutList();
+          // this.dataGrid.instance.refresh();
+        } else {
+          notify(
+            {
+              message: 'Your Data Not deleted',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+        // or whatever method you use to refresh `employeeList`
+      },
+      (error) => {
+        console.error('Error deleting employee:', error);
+      },
+    );
+  }
+
+  handleClose() {
+    this.isAddTransferOut = false;
+    this.isEditTransferOut = false;
+    this.getTransferOutList();
+  }
+  onCustomDateApplied(e: any) {
+    this.customStartDate = e.start;
+    this.customEndDate = e.end;
+
+    this.applyCustomDateFilter(); // your existing function
+  }
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
+    }
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
+  applyStoreFilter() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.filteredTrOutList = [...this.dateFilteredList]; // ✅ reset correctly
+      return;
+    }
+
+    const selectedNames = (this.Store || [])
+      .filter((s: any) => this.selectedStoreid.includes(Number(s.ID)))
+      .map((s: any) => s.DESCRIPTION);
+
+    this.filteredTrOutList = this.dateFilteredList.filter((item: any) =>
+      selectedNames.includes(item.STORE_NAME)
+    );
+  }
+
+  onStoreChanged(e: any) {
+    console.log('Selected store IDs:', this.selectedStoreid);
+    this.applyStoreFilter(); // ✅ ONLY store filter
+  }
+
+  onViewClick(e: any) {
+    console.log('Edit button clicked for row:', e.row.data);
+    e.cancel = true;
+    const trOutId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+
+    this.dataService
+      .selectTransferOutForInventoryMark(trOutId)
+      .subscribe((response: any) => {
+        this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+        if (this.selected_Data_Status === 'OPEN') {
+          this.StatusType = 'VerifyScreen';
+          this.buttonText = 'Verify';
+        } else if (this.selected_Data_Status === 'VERIFY') {
+          this.StatusType = 'ApprovalScreen';
+          this.buttonText = 'Approve';
+        } else {
+          this.StatusType = 'viewScreen';
+          this.buttonText = 'View';
+        }
+        this.cdr.detectChanges();
+      });
+  }
+  onApproveClick(e: any) {
+    console.log('Edit button clicked for row:', e.row.data);
+    e.cancel = true;
+    const trOutId = e.row.data.TRANS_ID;
+    const status = e.row.data.STATUS;
+    this.dataService
+      .selectTransferOutForInventoryMark(trOutId)
+      .subscribe((response: any) => {
+        this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+        this.cdr.detectChanges();
+
+
+      });
+  }
+  onVerifyClick(e: any) {
+    console.log('Edit button clicked for row:', e.row.data);
+    e.cancel = true;
+    const trOutId = e.row.data.TRANS_ID;
+    this.selected_Data_Status = e.row.data.STATUS;
+    const rowData = e.row.data;
+    // Open document -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // Verified document -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // Approved document -> If user has Edit privilege, do nothing
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+    if (e.row.data.STATUS == 'APPROVED') {
+      this.isReadOnlyTrOut = true;
+      console.log(this.isReadOnlyTrOut, '================this.isReadOnlyTrOut===================')
+    }
+    else {
+      this.isReadOnlyTrOut = false;
+    }
+    this.cdr.detectChanges();
+    this.dataService
+      .selectTransferOutForInventoryMark(trOutId)
+      .subscribe((response: any) => {
+        this.selectedTrOut = response;
+        this.isEditTransferOut = true;
+        console.log(this.selected_Data_Status, "STSSSSSSUSSS")
+        if (this.selected_Data_Status === 'OPEN') {
+          this.StatusType = 'VerifyScreen'
+          this.buttonText = 'Verify Transfer Out';
+
+        } else if (
+          this.selected_Data_Status === 'VERIFY') {
+          this.buttonText = 'Approve Transfer Out';
+          this.StatusType = 'ApprovalScreen'
+
+        } else {
+          this.StatusType = 'viewScreen'
+          this.buttonText = 'View Transfer Out';
+
+        }
+      });
+  }
+
+}
+@NgModule({
+  imports: [
+    BrowserModule,
+    DxSelectBoxModule,
+    DxTextAreaModule,
+    DxDateBoxModule,
+    DxFormModule,
+    DxTextBoxModule,
+    FormTextboxModule,
+    DxCheckBoxModule,
+    DxRadioGroupModule,
+    DxFileUploaderModule,
+    DxDataGridModule,
+    DxButtonModule,
+    DxoItemModule,
+    DxoFormItemModule,
+    DxoLookupModule,
+    DxValidatorModule,
+    DxProgressBarModule,
+    DxPopupModule,
+    DxDropDownBoxModule,
+    DxButtonModule,
+    DxToolbarModule,
+    DxiItemModule,
+    DxoItemModule,
+    DxTabPanelModule,
+    DxTabsModule,
+    DxiGroupModule,
+    FormsModule,
+    DxNumberBoxModule,
+    DxoSummaryModule,
+    AddCreditNoteModule,
+    EditCreditNoteModule,
+    ViewCreditNoteModule,
+    TransferOutInventoryAddMarkModule,
+    CustomDatePopupModule,
+    DxTagBoxModule
+  ],
+  providers: [],
+  declarations: [TransferOutInventoryMarkComponent],
+  exports: [TransferOutInventoryMarkComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class TransferOutInventoryMarkModule { }

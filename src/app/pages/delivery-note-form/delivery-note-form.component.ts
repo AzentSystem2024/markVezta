@@ -379,6 +379,7 @@ export class DeliveryNoteFormComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userID,
     };
     this.dataService
       .getOutsideCustomerWithState(payload)
