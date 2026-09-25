@@ -19,6 +19,8 @@ import {
 } from 'devextreme-angular';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { ExportService } from 'src/app/services/export.service';
+import { NewOrderModule } from '../new-order/new-order.component';
+import { DxPopupModule } from 'devextreme-angular';
 
 @Component({
   selector: 'app-order-view',
@@ -95,6 +97,8 @@ export class OrderViewComponent implements OnInit {
   isNewOrderPopupVisible: boolean = false;
   selectedEditOrderId: number | null = null;
   selectedEditDealerId: number | null = null;
+  selectedEditParentDealerId: number | null = null;
+  selectedEditTab: 'dealer' | 'subdealer' = 'dealer';
 
   constructor(
     private dataService: DataService,
@@ -299,6 +303,8 @@ export class OrderViewComponent implements OnInit {
   addNewOrder() {
     this.selectedEditOrderId = null;
     this.selectedEditDealerId = null;
+    this.selectedEditParentDealerId = null;
+    this.selectedEditTab = 'dealer';
     this.isNewOrderPopupVisible = true;
   }
 
@@ -313,9 +319,12 @@ export class OrderViewComponent implements OnInit {
     if (status === 1 || status === '1') {
       // 1 = Draft
       const orderId = order.OrderId || order.ORDER_ID;
+      const subDealerId = order.SUBDEALER_ID;
       const dealerId = order.DealerId || order.DEALER_ID;
       this.selectedEditOrderId = orderId;
-      this.selectedEditDealerId = dealerId;
+      this.selectedEditDealerId = subDealerId ? subDealerId : dealerId;
+      this.selectedEditParentDealerId = subDealerId ? dealerId : null;
+      this.selectedEditTab = subDealerId ? 'subdealer' : 'dealer';
       this.isNewOrderPopupVisible = true;
     }
   }
@@ -356,35 +365,10 @@ export class OrderViewComponent implements OnInit {
     delete this.detailDataMap[orderId];
   }
 
-  customizeDetailColumns = (columns: any[]) => {
-    const hiddenFields = [
-      'ROW_ID',
-      'STATUS',
-      'REPLACE_PACKING_ID',
-      'ORDER_ID',
-      'ORDER_ENTRY_ID',
-      'CART_ID',
-      'PRODUCT_ID',
-      'PACKING_ID',
-      'UNIT_ID',
-      'CATEGORY_ID',
-      'ITEM_ID',
-      'IS_ANY_COMB',
-    ];
-    columns.forEach((col) => {
-      if (hiddenFields.includes(col.dataField)) {
-        col.visible = false;
-      }
-    });
-  };
-
   onExporting(e: any) {
     this.exportService.onExporting(e, 'order data');
   }
 }
-
-import { NewOrderModule } from '../new-order/new-order.component';
-import { DxPopupModule } from 'devextreme-angular';
 
 @NgModule({
   imports: [

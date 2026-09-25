@@ -154,24 +154,17 @@ export class CustomerListComponent {
     VAT_REGNO: '',
   };
 
-  //==========================Dummy data===========================
 
-  // addButtonOptions = {
-  //   text: 'New',
-  //   icon: 'bi bi-file-earmark-plus',
-  //   type: 'default',
-  //   stylingMode: 'contained',
-  //   hint: 'Add new entry',
-  //   onClick: () => {
-  //     // Run inside Angular's zone
-  //     this.ngZone.run(() => this.addCustomer());
-  //   },
-  //   elementAttr: { class: 'add-button' },
-  // };
   Selected_Customer_Data: any;
   changed_Customer_Data: any;
 
+
+  loggedInCompanyId: number = 0;
+  loggedInCompanyType: any = null;
+  isHOCompany: boolean = false;
+
   selected_fin_id: any;
+  companyType: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -205,8 +198,9 @@ export class CustomerListComponent {
     this.showCountry();
     this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
 
-    this.showCustomer();
     this.sesstion_Details();
+    this.showCustomer();
+
   }
   // onExporting(event: any) {
   //   this.exportService.onExporting(event, 'Customer-list');
@@ -255,6 +249,20 @@ export class CustomerListComponent {
   }
   OnEditCustomer(e: any) {
     e.cancel = true;
+
+    // Permission check
+    if (!this.canModifyCustomer(e.data)) {
+      notify(
+        {
+          message: 'You are not authorized to edit this customer.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning'
+      );
+
+      return;
+    }
+
     this.isEditCustomerPopupOpened = true;
     const ID = e.data.ID;
     this.dataservice.Select_Customer_Api(ID).subscribe((res: any) => {
@@ -264,6 +272,7 @@ export class CustomerListComponent {
   showCustomer() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      COMPANY_TYPE: this.loggedInCompanyType,
     };
 
     this.CustomerDataSource = new DataSource({
@@ -278,6 +287,7 @@ export class CustomerListComponent {
 
               this.customerList = data; // ✅ array cache
               this.customerRowCount = data.length;
+              this.companyType = data[0]?.COMPANY_TYPE || null; // Set companyType based on the first item
 
               resolve(data); // 🔑 stop grid loader
             },
@@ -300,11 +310,59 @@ export class CustomerListComponent {
   // }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+
+    this.loggedInCompanyId = Number(
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ?? 0
+    );
+
+    this.loggedInCompanyType =
+      sessionData?.SELECTED_COMPANY?.COMPANY_TYPE ?? null;
+
+    // HO company type is 0
+    this.isHOCompany = Number(this.loggedInCompanyType) === 0;
+
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
   }
+
+  canModifyCustomer(rowData: any): boolean {
+    // HO company can edit/delete every customer
+    if (this.isHOCompany) {
+      return true;
+    }
+
+    // Non-HO company can modify only its own customers
+    const customerCompanyId = Number(rowData?.COMPANY_ID);
+
+    return customerCompanyId === this.loggedInCompanyId;
+  }
+
+  onCellPrepared(e: any) {
+    if (e.rowType !== 'data' || e.column?.type !== 'buttons') {
+      return;
+    }
+
+    const canModify = this.canModifyCustomer(e.data);
+
+    if (!canModify) {
+      const editButton =
+        e.cellElement.querySelector('.dx-link-edit');
+
+      if (editButton) {
+        editButton.style.display = 'none';
+      }
+
+      const deleteButton =
+        e.cellElement.querySelector('.dx-link-delete');
+
+      if (deleteButton) {
+        deleteButton.style.display = 'none';
+      }
+    }
+  }
+
   onClickSaveCustomer() {
     const {
       WAREHOUSE_ID,
@@ -411,6 +469,19 @@ export class CustomerListComponent {
 
     const selectedRow = event.data;
 
+    // Permission check
+    if (!this.canModifyCustomer(selectedRow)) {
+      notify(
+        {
+          message: 'You are not authorized to delete this customer.',
+          position: { at: 'top right', my: 'top right' },
+        },
+        'warning'
+      );
+
+      return;
+    }
+
     const {
       ID,
       CUST_CODE,
@@ -512,6 +583,7 @@ export class CustomerListComponent {
       this.canApprove = packingRights.CanApprove;
     }
 
+    this.sesstion_Details();
     this.showCustomer();
     this.getPaymentTerms();
 
@@ -562,7 +634,7 @@ export class CustomerListComponent {
     //   this.StateDropdownData = data;
     // });
   }
-  onStateSelectionChanged(event: any) {}
+  onStateSelectionChanged(event: any) { }
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
@@ -670,4 +742,4 @@ export class CustomerListComponent {
   exports: [],
   declarations: [CustomerListComponent],
 })
-export class CustomerListModule {}
+export class CustomerListModule { }

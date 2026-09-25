@@ -169,6 +169,7 @@ export class InvoiceTrOutAddComponent {
   previousCustomerId: number | null = null;
   pendingCustomerId: number | null = null;
   isSaving = false;
+  userId: any;
 
   constructor(
     private dataService: DataService,
@@ -182,6 +183,7 @@ export class InvoiceTrOutAddComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.userId = this.sessionData.USER_ID;
     this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
     this.GST = this.sessionData.GeneralSettings.GST_PERC;
     this.invoiceFormData.FIN_ID = this.sessionData.FINANCIAL_YEARS.FIN_ID;
@@ -344,7 +346,8 @@ export class InvoiceTrOutAddComponent {
 
   getCustomerOrUnitLst() {
     const payload = {
-      COMPANY_ID: this.invoiceFormData.COMPANY_ID,
+      COMPANY_ID: this.selectedCompany,
+      USER_ID: this.userId,
       // NAME: 'CUSTOMER',
     };
 
