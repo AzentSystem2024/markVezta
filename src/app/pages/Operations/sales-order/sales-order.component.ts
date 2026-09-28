@@ -138,6 +138,7 @@ export class SalesOrderComponent implements OnInit {
   salesOrderList: any;
   isAddSalesOrder: boolean;
   companyID: any;
+  userId: any;
 
   showTemplatePopup: boolean = false;
   templateList: any[] = [];
@@ -171,9 +172,11 @@ export class SalesOrderComponent implements OnInit {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.companyID = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.userId = menuResponse?.USER_ID || userData?.USER_ID;
     this.sessionData_tax();
-    const menuGroups = menuResponse.MenuGroups || [];
+    const menuGroups = menuResponse.MenuGroups || userData.MenuGroups || [];
 
     const packingRights = menuGroups
       .flatMap((group) => group.Menus)
@@ -194,8 +197,12 @@ export class SalesOrderComponent implements OnInit {
 
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selected_vat_id = this.sessionData?.VAT_ID || userData?.VAT_ID;
+    if (!this.userId) {
+      this.userId = this.sessionData?.USER_ID || userData?.USER_ID;
+    }
   }
 
   getsalesOrderList() {
@@ -208,6 +215,7 @@ export class SalesOrderComponent implements OnInit {
       COMPANY_ID: this.companyID,
       DATE_FROM: fromDate,
       DATE_TO: toDate,
+      USER_ID: this.userId || null,
     };
 
     this.dataService.getSalesOrderMainList(payload).subscribe({

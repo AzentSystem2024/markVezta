@@ -310,7 +310,12 @@ export class EditPurchaseInvoiceComponent {
   }
 
   getSupplierDropdown() {
-    this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selectedCompany,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;
       console.log(
         this.supplierList,
@@ -322,6 +327,7 @@ export class EditPurchaseInvoiceComponent {
   getSupplierOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompany,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
     };
     this.dataService
       .getSupplierWithState(payload)
@@ -335,6 +341,7 @@ export class EditPurchaseInvoiceComponent {
     const payload = {
       SUPP_ID: this.selectedSupplierId,
       COMPANY_ID: this.selectedCompany,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
     };
     this.dataService.getPendingGRN(payload).subscribe((response: any) => {
       this.pendingGRNs = response.Data;

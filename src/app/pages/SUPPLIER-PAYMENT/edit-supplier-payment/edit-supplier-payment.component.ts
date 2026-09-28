@@ -133,6 +133,7 @@ export class EditSupplierPaymentComponent {
   settings: any;
   BankID: any;
   CashID: any;
+  userId: any;
 
   getFormMode(): string {
     if (this.isReadOnlyMode) {
@@ -366,12 +367,18 @@ export class EditSupplierPaymentComponent {
   };
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selectedCompanyId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.userId = this.sessionData?.USER_ID || userData?.USER_ID;
   }
 
   getPendingInvoiceList(supplierId: number) {
-    const payload = { SUPP_ID: supplierId, COMPANY_ID: this.selectedCompanyId };
+    const payload = {
+      SUPP_ID: supplierId,
+      COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userId || this.paymentFormData?.USER_ID || null,
+    };
 
     this.dataService
       .getPendingInvoiceforSupplierPayment(payload)
@@ -437,6 +444,7 @@ export class EditSupplierPaymentComponent {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userId || this.paymentFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;

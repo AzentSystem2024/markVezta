@@ -56,6 +56,7 @@ export class PdcEditFormComponent {
   Supplier: any;
   selectedBeneficiaryTypeID: any;
   selected_Company_id: any;
+  userId: any;
   priorities_value: any;
   isEnabled = true;
   Bank: any;
@@ -217,11 +218,10 @@ console.log(this.isApproveMode,":-------------fhytyu")
     private dataservice: DataService,
     private sanitizer: DomSanitizer,
   ) {
+    this.sesstion_Details();
     this.get_Supplier_dropdown();
-     this.sesstion_Details();
     this.get_Bank_dropdown();
     this.get_Customer_dropdown();
-   
   }
 
   onSupplierChanged(event: any) {
@@ -261,9 +261,11 @@ console.log(this.isApproveMode,":-------------fhytyu")
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
 
   savePDC() {
@@ -288,6 +290,7 @@ console.log(this.isApproveMode,":-------------fhytyu")
     const payload = {
       ID: this.PDCFormData.ID ? +this.PDCFormData.ID : 0,
       COMPANY_ID: this.selected_Company_id || 0,
+      USER_ID: this.userId || null,
       BANK_HEAD_ID: this.PDCFormData.BANK_HEAD_ID || 0,
       CUST_ID: this.PDCFormData.CUST_ID || 0,
       SUPP_ID: this.PDCFormData.SUPP_ID || 0,
@@ -370,6 +373,7 @@ if (this.isApproveMode) {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'SUPPLIER',
+      USER_ID: this.userId || null,
     };
     this.dataservice.Supplier_Dropdown(payload).subscribe((res: any) => {
       this.Supplier = res;
@@ -388,6 +392,7 @@ if (this.isApproveMode) {
     const payload = {
       NAME: 'CUSTOMER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataservice.Customer_Dropdown(payload).subscribe((res: any) => {
       this.Customer = res;
@@ -395,7 +400,7 @@ if (this.isApproveMode) {
   }
 
   ngOnInit(): void {
-    
+    this.sesstion_Details();
     if (!this.selectedPDC) {
       // Initialize default values for Add mode
       this.selectedType = this.priorities[0];
@@ -405,6 +410,7 @@ if (this.isApproveMode) {
 
     this.get_Supplier_dropdown();
     this.get_Bank_dropdown();
+    this.get_Customer_dropdown();
   }
 
 

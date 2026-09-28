@@ -168,6 +168,7 @@ export class AddCreditNoteComponent {
   vatTitle: any;
   showSubType: boolean;
   VatClass: any;
+  userId: any;
 
   constructor(
     private dataService: DataService,
@@ -186,11 +187,11 @@ export class AddCreditNoteComponent {
     if (userDataString) {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
-      this.companyState = selectedCompany.STATE_NAME;
-      this.companyStateID = selectedCompany.STATE_ID;
-      this.HSNCODE = userData.GeneralSettings.HSN_CODE;
-      this.GST = userData.GeneralSettings.GST_PERC;
-      this.vatTitle = userData.GeneralSettings.VAT_TITLE;
+      this.companyState = selectedCompany?.STATE_NAME;
+      this.companyStateID = selectedCompany?.STATE_ID;
+      this.HSNCODE = userData.GeneralSettings?.HSN_CODE;
+      this.GST = userData.GeneralSettings?.GST_PERC;
+      this.vatTitle = userData.GeneralSettings?.VAT_TITLE;
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
 
@@ -198,6 +199,7 @@ export class AddCreditNoteComponent {
       }
 
       if (userData.USER_ID) {
+        this.userId = userData.USER_ID;
         this.creditFormData.USER_ID = userData.USER_ID;
       }
 
@@ -234,11 +236,15 @@ export class AddCreditNoteComponent {
   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
-    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
-
-    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selectedstoreId = sessionData?.Configuration?.[0]?.STORE_ID || userData?.Configuration?.[0]?.STORE_ID;
+    this.HSN_CODE = sessionData?.GeneralSettings?.HSN_CODE || userData?.GeneralSettings?.HSN_CODE;
+    this.GST_PERC = sessionData?.GeneralSettings?.GST_PERC || userData?.GeneralSettings?.GST_PERC;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
+    if (this.userId) {
+      this.creditFormData.USER_ID = this.userId;
+    }
   }
 
   getSupTypeList() {
@@ -1052,6 +1058,7 @@ export class AddCreditNoteComponent {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userId || this.creditFormData?.USER_ID || null,
     };
     this.dataService
       .getCustomerWithState(payload)
@@ -1070,6 +1077,7 @@ export class AddCreditNoteComponent {
     const payload = {
       CUST_ID: this.selectedCustomerId, // or customerId if you pass it
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userId || this.creditFormData?.USER_ID || null,
     };
 
     this.dataService
@@ -1311,8 +1319,13 @@ export class AddCreditNoteComponent {
         this.selectedCompanyId || userData?.Companies?.[0]?.COMPANY_ID || null;
       this.creditFormData.STORE_ID =
         this.selectedstoreId || userData?.Configuration?.[0]?.STORE_ID || null;
+      this.creditFormData.USER_ID =
+        this.userId || userData?.USER_ID || null;
       this.creditFormData.ROUND_OFF = this.creditFormData.ROUND_OFF;
       this.creditFormData.VEHICLE_NO = this.creditFormData.VEHICLE_NO;
+    } else {
+      this.creditFormData.USER_ID =
+        this.userId || this.creditFormData.USER_ID || null;
     }
 
     // --- Save data ---
@@ -1415,6 +1428,7 @@ export class AddCreditNoteComponent {
       TRANS_TYPE: 37,
       COMPANY_ID: 1,
       STORE_ID: 0,
+      USER_ID: this.userId || null,
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
       PARTY_ID: 1,

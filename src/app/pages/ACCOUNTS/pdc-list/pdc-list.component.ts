@@ -187,6 +187,7 @@ export class PdcListComponent {
   selectPDC: any;
   PDCid: any;
   selected_Company_id: any;
+  userId: any;
   isFilterOpened: boolean;
 
   //========================Export data ==========================
@@ -205,11 +206,13 @@ export class PdcListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.userId = menuResponse?.USER_ID || userData?.USER_ID;
 
-    const menuGroups = menuResponse.MenuGroups || [];
+    const menuGroups = menuResponse?.MenuGroups || userData?.MenuGroups || [];
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === currentUrl);
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -720,8 +723,10 @@ export class PdcListComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
 
   onCustomDateApplied(e: any) {
@@ -770,6 +775,7 @@ export class PdcListComponent {
 
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
       ...dueDatePayload,
       ...entryDatePayload,
     };

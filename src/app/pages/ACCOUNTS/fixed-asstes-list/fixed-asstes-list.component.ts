@@ -74,6 +74,7 @@ export class FixedAsstesListComponent {
   selectedFA: any;
   fixedAssetId: any;
   selected_Company_id: any;
+  userId: any;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -158,6 +159,7 @@ export class FixedAsstesListComponent {
       this.canApprove = packingRights.CanApprove;
     }
 
+    this.sesstion_Details();
     this.list_fixed_assets();
   }
   toggleFilters() {
@@ -283,9 +285,16 @@ export class FixedAsstesListComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id =
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ||
+      userData?.SELECTED_COMPANY?.COMPANY_ID ||
+      1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
 
   ngOnInit() {
@@ -297,6 +306,7 @@ export class FixedAsstesListComponent {
 
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
     };

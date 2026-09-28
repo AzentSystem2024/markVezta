@@ -33,7 +33,7 @@ import { DataService } from 'src/app/services';
 })
 export class PrepaymentPostingAddComponent {
   @Output() popupClosed = new EventEmitter<void>();
-@Input() canApprove: boolean = false;
+  @Input() canApprove: boolean = false;
   selectedMonthYear: string | number | Date;
   PrepaymentList: any;
   PREPAY_DETAIL: any;
@@ -145,8 +145,8 @@ export class PrepaymentPostingAddComponent {
 
     console.log(this.PREPAY_DETAIL);
   }
-  onEditorPreparing(event: any) {}
-  onCellValueChanged(event: any) {}
+  onEditorPreparing(event: any) { }
+  onCellValueChanged(event: any) { }
 
   AddData() {
     const payload = {
@@ -204,4 +204,4 @@ export class PrepaymentPostingAddComponent {
   exports: [PrepaymentPostingAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PrepaymentPostingAddModule {}
+export class PrepaymentPostingAddModule { }
