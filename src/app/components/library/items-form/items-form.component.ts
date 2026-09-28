@@ -222,161 +222,6 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   selected_Company_id: any;
   companyId: any;
 
-  constructor(
-    private dataservice: DataService,
-    authservice: AuthService,
-    private imageService: ImageService,
-    private cdr: ChangeDetectorRef,
-    private router: Router,
-    private countryFlagService: CountryServiceService,
-  ) {
-    this.sesstion_Details();
-    this.selectedPriority = 1;
-    // this.onDropZoneEnter = this.onDropZoneEnter.bind(this);
-    // this.onDropZoneLeave = this.onDropZoneLeave.bind(this);
-    this.onUploaded = this.onUploaded.bind(this);
-    // this.onProgress = this.onProgress.bind(this);
-    // this.onUploadStarted = this.onUploadStarted.bind(this);
-
-    this.itemlabel1 = authservice.getsettingsData().ITEM_PROPERTY1;
-    this.itemlabel2 = authservice.getsettingsData().ITEM_PROPERTY2;
-    this.itemlabel3 = authservice.getsettingsData().ITEM_PROPERTY3;
-    this.itemlabel4 = authservice.getsettingsData().ITEM_PROPERTY4;
-    this.itemlabel5 = authservice.getsettingsData().ITEM_PROPERTY5;
-
-    this.sesstion_Details();
-    const Dropdown_ItemTaxPayload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'VAT_CLASS',
-    };
-    dataservice.Dropdown_ItemTax(Dropdown_ItemTaxPayload).subscribe((data) => {
-      this.VatClass = data;
-    });
-    const parentItemPayload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'PARENTITEM',
-    };
-    dataservice.getDropdownData(parentItemPayload).subscribe((data) => {
-      this.parentitem = data;
-    });
-    const itemTypePayload = {
-      // COMPANY_ID: this.selected_Company_id,
-      NAME: 'ITEMTYPE',
-    };
-    dataservice.getDropdownData(itemTypePayload).subscribe((data) => {
-      this.itemtype = data;
-    });
-
-    dataservice.getDropdownData('COUNTRY').subscribe((data) => {
-      this.country = data;
-    });
-    const storePayload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'STORE',
-    };
-    dataservice.getDropdownData(storePayload).subscribe((data) => {
-      this.store = data;
-    });
-    const brandPayload = {
-      NAME: 'brand',
-    };
-    dataservice.getDropdownData(brandPayload).subscribe((data) => {
-      this.brand = data;
-    });
-
-    dataservice.getCountryWithFlags().subscribe((data) => {
-      this.countries = data;
-    });
-    const itemProp1Payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getItemProperty1Data(itemProp1Payload).subscribe((data) => {
-      this.itemprop1 = data;
-    });
-    const itemProp2Payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getItemProperty2Data(itemProp2Payload).subscribe((data) => {
-      this.itemprop2 = data;
-    });
-    const itemProp3Payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getItemProperty3Data(itemProp3Payload).subscribe((data) => {
-      this.itemprop3 = data;
-    });
-    const itemProp4Payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getItemProperty4Data(itemProp4Payload).subscribe((data) => {
-      this.itemprop4 = data;
-    });
-    const itemProp5Payload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getItemProperty5Data(itemProp5Payload).subscribe((data) => {
-      this.itemprop5 = data;
-    });
-
-    const department = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getDepartmentData(department).subscribe((data) => {
-      this.department = data;
-    });
-    // const subcategory = {
-    //   COMPANY_ID: this.selected_Company_id,
-    // };
-    // dataservice.getSubCategoryData(subcategory).subscribe((data) => {
-    //   this.subcatagory = data;
-    // });
-    const vatClassPayload = {
-      COMPANY_ID: this.selected_Company_id,
-    };
-    dataservice.getVatclassData(vatClassPayload).subscribe((data) => {
-      this.vat = data;
-    });
-    const payload = { COMPANY_ID: this.selected_Company_id };
-    dataservice.getSupplierData(payload).subscribe((data) => {
-      this.supplier = data;
-    });
-    // const itemCategoryPayload = {
-    //   COMPANY_ID: this.selected_Company_id,
-    //   NAME: 'ITEMCATEGORY',
-    // };
-    // dataservice.getDropdownData(itemCategoryPayload).subscribe((data) => {
-    //   this.catagory = data;
-    // });
-    const uomPayload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'UOM',
-    };
-    dataservice.getDropdownData(uomPayload).subscribe((data) => {
-      this.uom = data;
-      this.filterDropdownOptions();
-    });
-
-    dataservice.getItemsData().subscribe((data) => {
-      this.items = data;
-    });
-    const costingMethodPayload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'COSTINGMETHOD',
-    };
-    dataservice.getDropdownData(costingMethodPayload).subscribe((data) => {
-      this.costingMethodOptions = data;
-      const defaultItem = data.find((x: any) => x.ID === 1);
-      if (defaultItem) {
-        this.newItems.COSTING_METHOD = defaultItem.ID;
-      }
-    });
-    const packingPayload = {
-      NAME: 'PACKING',
-    };
-    dataservice.getDropdownData(packingPayload).subscribe((data) => {
-      this.packing = data;
-    });
-  }
   ALias_list: any;
 
   formItemsData: any = {
@@ -516,6 +361,155 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   //   })),
   // });
 
+  constructor(
+    private dataservice: DataService,
+    authservice: AuthService,
+    private imageService: ImageService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private countryFlagService: CountryServiceService,
+  ) {
+    this.sesstion_Details();
+    this.selectedPriority = 1;
+    // this.onDropZoneEnter = this.onDropZoneEnter.bind(this);
+    // this.onDropZoneLeave = this.onDropZoneLeave.bind(this);
+    this.onUploaded = this.onUploaded.bind(this);
+    // this.onProgress = this.onProgress.bind(this);
+    // this.onUploadStarted = this.onUploadStarted.bind(this);
+
+    this.itemlabel1 = authservice.getsettingsData().ITEM_PROPERTY1;
+    this.itemlabel2 = authservice.getsettingsData().ITEM_PROPERTY2;
+    this.itemlabel3 = authservice.getsettingsData().ITEM_PROPERTY3;
+    this.itemlabel4 = authservice.getsettingsData().ITEM_PROPERTY4;
+    this.itemlabel5 = authservice.getsettingsData().ITEM_PROPERTY5;
+
+    this.sesstion_Details();
+    const Dropdown_ItemTaxPayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'VAT_CLASS',
+    };
+    dataservice.Dropdown_ItemTax(Dropdown_ItemTaxPayload).subscribe((data) => {
+      this.VatClass = data;
+    });
+    const parentItemPayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'PARENTITEM',
+    };
+    dataservice.getDropdownData(parentItemPayload).subscribe((data) => {
+      this.parentitem = data;
+    });
+    const itemTypePayload = {
+      // COMPANY_ID: this.selected_Company_id,
+      NAME: 'ITEMTYPE',
+    };
+    dataservice.getDropdownData(itemTypePayload).subscribe((data) => {
+      this.itemtype = data;
+    });
+
+    dataservice.getDropdownData('COUNTRY').subscribe((data) => {
+      this.country = data;
+    });
+    const storePayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'STORE',
+    };
+    dataservice.getDropdownData(storePayload).subscribe((data) => {
+      this.store = data;
+    });
+    const brandPayload = {
+      NAME: 'brand',
+    };
+    dataservice.getDropdownData(brandPayload).subscribe((data) => {
+      this.brand = data;
+    });
+
+    dataservice.getCountryWithFlags().subscribe((data) => {
+      this.countries = data;
+    });
+    const itemProp1Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty1Data(itemProp1Payload).subscribe((data) => {
+      this.itemprop1 = data;
+    });
+    const itemProp2Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty2Data(itemProp2Payload).subscribe((data) => {
+      this.itemprop2 = data;
+    });
+    const itemProp3Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty3Data(itemProp3Payload).subscribe((data) => {
+      this.itemprop3 = data;
+    });
+    const itemProp4Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty4Data(itemProp4Payload).subscribe((data) => {
+      this.itemprop4 = data;
+    });
+    const itemProp5Payload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getItemProperty5Data(itemProp5Payload).subscribe((data) => {
+      this.itemprop5 = data;
+    });
+
+    const department = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getDepartmentData(department).subscribe((data) => {
+      this.department = data;
+    });
+    // const subcategory = {
+    //   COMPANY_ID: this.selected_Company_id,
+    // };
+    // dataservice.getSubCategoryData(subcategory).subscribe((data) => {
+    //   this.subcatagory = data;
+    // });
+    const vatClassPayload = {
+      COMPANY_ID: this.selected_Company_id,
+    };
+    dataservice.getVatclassData(vatClassPayload).subscribe((data) => {
+      this.vat = data;
+    });
+    const payload = { COMPANY_ID: this.selected_Company_id };
+    dataservice.getSupplierData(payload).subscribe((data) => {
+      this.supplier = data;
+    });
+    const uomPayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'UOM',
+    };
+    dataservice.getDropdownData(uomPayload).subscribe((data) => {
+      this.uom = data;
+      this.filterDropdownOptions();
+    });
+
+    dataservice.getItemsData().subscribe((data) => {
+      this.items = data;
+    });
+    const costingMethodPayload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'COSTINGMETHOD',
+    };
+    dataservice.getDropdownData(costingMethodPayload).subscribe((data) => {
+      this.costingMethodOptions = data;
+      const defaultItem = data.find((x: any) => x.ID === 1);
+      if (defaultItem) {
+        this.newItems.COSTING_METHOD = defaultItem.ID;
+      }
+    });
+    const packingPayload = {
+      NAME: 'PACKING',
+    };
+    dataservice.getDropdownData(packingPayload).subscribe((data) => {
+      this.packing = data;
+    });
+  }
+
   getNewItems = () => {
     //  FORCE supplier grid to commit edits
     this.supplierGrid?.instance.saveEditData();
@@ -545,10 +539,20 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     let finalCompanyIds: any[] = [];
     if (Array.isArray(rawCompIds) && rawCompIds.length > 0) {
       finalCompanyIds = rawCompIds
-        .filter((id: any) => id !== null && id !== undefined && id !== '' && String(id) !== '0')
+        .filter(
+          (id: any) =>
+            id !== null && id !== undefined && id !== '' && String(id) !== '0',
+        )
         .map((id: any) => (!isNaN(Number(id)) ? Number(id) : id));
-    } else if (rawCompIds !== null && rawCompIds !== undefined && String(rawCompIds) !== '0' && String(rawCompIds) !== '') {
-      finalCompanyIds = [!isNaN(Number(rawCompIds)) ? Number(rawCompIds) : rawCompIds];
+    } else if (
+      rawCompIds !== null &&
+      rawCompIds !== undefined &&
+      String(rawCompIds) !== '0' &&
+      String(rawCompIds) !== ''
+    ) {
+      finalCompanyIds = [
+        !isNaN(Number(rawCompIds)) ? Number(rawCompIds) : rawCompIds,
+      ];
     } else {
       finalCompanyIds = [];
     }
@@ -556,7 +560,8 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     const loggedInCompanyId =
       this.selected_Company_id ||
       this.companyId ||
-      JSON.parse(sessionStorage.getItem('savedUserData') || '{}')?.SELECTED_COMPANY?.COMPANY_ID;
+      JSON.parse(sessionStorage.getItem('savedUserData') || '{}')
+        ?.SELECTED_COMPANY?.COMPANY_ID;
 
     if (
       loggedInCompanyId !== null &&
@@ -573,8 +578,10 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     }
 
     const singleCompId = loggedInCompanyId
-      ? (!isNaN(Number(loggedInCompanyId)) ? Number(loggedInCompanyId) : loggedInCompanyId)
-      : (this.companyId || this.selected_Company_id || null);
+      ? !isNaN(Number(loggedInCompanyId))
+        ? Number(loggedInCompanyId)
+        : loggedInCompanyId
+      : this.companyId || this.selected_Company_id || null;
 
     return {
       ...this.newItems,
@@ -601,7 +608,9 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     this.selectedCompanyIds = event.value || [];
     this.newItems.item_companies = Array.isArray(this.selectedCompanyIds)
       ? this.selectedCompanyIds
-      : (this.selectedCompanyIds ? [this.selectedCompanyIds] : []);
+      : this.selectedCompanyIds
+        ? [this.selectedCompanyIds]
+        : [];
   }
 
   ngOnInit() {
@@ -613,9 +622,14 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     this.sesstion_Details();
 
     const currentUrl = this.router.url;
-    const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
-    const companyType = menuResponse?.SELECTED_COMPANY?.COMPANY_TYPE ?? sessionData?.SELECTED_COMPANY?.COMPANY_TYPE;
-    this.isCompanyDropdownVisible = String(companyType) === '0' || Number(companyType) === 0;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const companyType =
+      menuResponse?.SELECTED_COMPANY?.COMPANY_TYPE ??
+      sessionData?.SELECTED_COMPANY?.COMPANY_TYPE;
+    this.isCompanyDropdownVisible =
+      String(companyType) === '0' || Number(companyType) === 0;
     const menuGroups = menuResponse.MenuGroups || [];
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -748,7 +762,9 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
   }
 
   sesstion_Details() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.company_list = this.sessionData?.Companies || [];
 
     const defaultCompId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
@@ -780,7 +796,8 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     this.selected_Company_id = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID;
     this.companyId = this.selected_Company_id;
     const companyType = this.sessionData?.SELECTED_COMPANY?.COMPANY_TYPE;
-    this.isCompanyDropdownVisible = String(companyType) === '0' || Number(companyType) === 0;
+    this.isCompanyDropdownVisible =
+      String(companyType) === '0' || Number(companyType) === 0;
     if (this.newItems) {
       this.newItems.COMPANY_ID = this.selected_Company_id;
     }

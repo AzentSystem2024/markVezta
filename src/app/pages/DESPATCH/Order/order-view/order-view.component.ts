@@ -21,6 +21,8 @@ import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-pop
 import { ExportService } from 'src/app/services/export.service';
 import { NewOrderModule } from '../new-order/new-order.component';
 import { DxPopupModule } from 'devextreme-angular';
+import { confirm } from 'devextreme/ui/dialog';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-order-view',
@@ -334,6 +336,53 @@ export class OrderViewComponent implements OnInit {
     this.refreshGrid();
   }
 
+  async submitOrder(rowData: any) {
+    const result = await confirm(
+      'Are you sure you want to submit this order?',
+      'Confirm Order',
+    );
+    if (!result) return;
+
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+    const orderDate = new Date().toISOString();
+
+    const payload = {
+      USER_ID: userId,
+      ORDER_ID: rowData.ORDER_ID || 0,
+      DEALER_ID: rowData.DEALER_ID || 0,
+      SUBDEALER_ID: rowData.SUBDEALER_ID || 0,
+      ORDER_STATUS: 0,
+      ORDER_DATE: orderDate,
+      REMARKS: '',
+      EXPECTED_DELIVERY: orderDate,
+      STATUS_DESCRIPTION: 'Open',
+      IS_FROM_WEB: true,
+      LOCATION_ID: rowData.LOCATION_ID || 0,
+      BRAND_ID: null,
+      WAREHOUSE_ID: rowData.WAREHOUSE_ID || 0,
+    };
+
+    this.dataService.saveNewOrderCartToOrder(payload).subscribe(
+      (res: any) => {
+        if (res.Flag === 1) {
+          notify('Order Submitted Successfully!', 'success', 3000);
+          this.refreshGrid();
+        } else {
+          const errMsg = res.Message || 'Failed to submit order';
+          console.error('Failed to submit order:', errMsg);
+          notify(errMsg, 'error', 3000);
+        }
+      },
+      (error) => {
+        console.error('Error submitting order', error);
+        notify('Error submitting order', 'error', 3000);
+      },
+    );
+  }
+
   onRowExpanding(e: any) {
     const orderId = e.key;
     if (!this.expandedRowKeys.includes(orderId)) {
@@ -367,6 +416,85 @@ export class OrderViewComponent implements OnInit {
 
   onExporting(e: any) {
     this.exportService.onExporting(e, 'order data');
+  }
+
+  onDetailEditorPreparing(e: any, masterData: any) {
+    if (e.parentType === 'dataRow') {
+      const parentStatus = Number(masterData.data.ORDER_STATUS);
+      // Only allow editing if status is 1 (Draft) or 2 (Open)-- && parentStatus !== 2
+      if (parentStatus !== 1) {
+        e.editorOptions.disabled = true;
+        return;
+      }
+
+      if (e.dataField === 'ORDER_QTY') {
+        const orderQty = Number(e.row.data.ORDER_QTY);
+        const openQty = Number(e.row.data.OPEN_QTY);
+
+        // Only allow if ORDER_QTY is equal to OPEN_QTY
+        if (orderQty !== openQty) {
+          e.editorOptions.disabled = true;
+        }
+      } else {
+        // Other columns are read-only
+        e.editorOptions.disabled = true;
+      }
+    }
+  }
+
+  onDetailRowUpdating(e: any, masterData: any) {
+    const newQty = e.newData.ORDER_QTY;
+    if (newQty === undefined) return;
+
+    const rowData = { ...e.oldData, ...e.newData };
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userId = sessionData.USER_ID || sessionData.ID || 0;
+
+    const payload = {
+      ...rowData,
+      USER_ID: userId,
+      ORDER_ID: masterData.key
+    };
+
+    e.cancel = new Promise<void>((resolve, reject) => {
+      this.dataService.updateOrderEntryQty(payload).subscribe({
+        next: (res: any) => {
+          if (res.Flag === 1) {
+            notify('Quantity updated successfully!', 'success', 3000);
+            
+            // Refresh the main grid
+            this.refreshGrid();
+
+            // Refresh the details grid
+            const orderId = masterData.key;
+            this.detailLoadingMap[orderId] = true;
+            this.dataService.getNewOrderDetail({ ORDER_ID: orderId }).subscribe({
+              next: (detailRes: any) => {
+                this.detailDataMap[orderId] = detailRes?.Data?.ORDER_DETAILS || [];
+                this.detailLoadingMap[orderId] = false;
+                this.detailDataMap = { ...this.detailDataMap };
+                resolve();
+              },
+              error: (err) => {
+                console.error('Error refreshing details', err);
+                this.detailLoadingMap[orderId] = false;
+                resolve();
+              }
+            });
+          } else {
+            notify(res.Message || 'Failed to update quantity', 'error', 3000);
+            reject(res.Message);
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          notify('Error updating quantity', 'error', 3000);
+          reject(err);
+        }
+      });
+    });
   }
 }
 

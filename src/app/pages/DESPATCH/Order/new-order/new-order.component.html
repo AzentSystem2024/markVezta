@@ -339,7 +339,7 @@
                 !currentEditingItem.colorId
               "
             >
-              {{ isEditMode ? "UPDATE CART" : "ADD TO CART" }}
+              {{ isActualEditMode ? "UPDATE CART" : "ADD TO CART" }}
             </button>
           </div>
         </div>
@@ -428,7 +428,7 @@
                   "
                   (click)="editCartItem(item)"
                   title="Edit"
-                  [disabled]="isEditMode && currentEditingItem.id === item.id"
+                  [disabled]="isActualEditMode && currentEditingItem.id === item.id"
                 >
                   <i class="dx-icon dx-icon-edit" style="font-size: 1.1rem"></i>
                 </button>
@@ -443,7 +443,7 @@
                   "
                   (click)="removeCartItem(item.id)"
                   title="Remove"
-                  [disabled]="isEditMode && currentEditingItem.id === item.id"
+                  [disabled]="isActualEditMode && currentEditingItem.id === item.id"
                 >
                   <i
                     class="dx-icon dx-icon-trash"
