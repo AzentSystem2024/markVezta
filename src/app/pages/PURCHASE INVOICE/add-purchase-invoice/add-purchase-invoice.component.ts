@@ -206,6 +206,10 @@ export class AddPurchaseInvoiceComponent {
     this.GST = userData.GeneralSettings.GST_PERC;
 
     this.sessionData_tax();
+    if (userData.USER_ID) {
+      this.user_id = userData.USER_ID;
+      this.purchaseInvoiceFormData.USER_ID = this.user_id;
+    }
     this.getSupplierOrUnitLst();
     this.getPendingGRNList();
 
@@ -232,6 +236,7 @@ export class AddPurchaseInvoiceComponent {
     const payload = {
       NAME: 'STORE',
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((res) => {
       this.storeList = res;
@@ -256,6 +261,7 @@ export class AddPurchaseInvoiceComponent {
     const payload = {
       NAME: 'DEPARTMENTS',
       COMPANY_ID: this.selectedCompany,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((res) => {
       this.departmentList = res;
@@ -263,7 +269,12 @@ export class AddPurchaseInvoiceComponent {
   }
 
   getSupplierDropdown() {
-    this.dataService.getDropdownData('SUPPLIER').subscribe((response: any) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;
     });
   }
@@ -282,6 +293,7 @@ export class AddPurchaseInvoiceComponent {
   getSupplierOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selectedCompany,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
     };
     this.dataService
       .getSupplierWithState(payload)
@@ -291,27 +303,28 @@ export class AddPurchaseInvoiceComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    const sessiondata = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '',
-    );
-    // this.CurrencyCode = sessiondata.GeneralSettings.SYMBOL
-    this.selected_vat_id = this.sessionData.VAT_ID;
-    this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.fin_id = this.sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selected_vat_id = this.sessionData?.VAT_ID;
+    this.selectedCompany = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.fin_id = this.sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID || userData?.FINANCIAL_YEARS?.[0]?.FIN_ID || 1;
     console.log(this.fin_id);
-    this.store_id = this.sessionData.Configuration?.[0]?.STORE_ID;
+    this.store_id = this.sessionData?.Configuration?.[0]?.STORE_ID || userData?.Configuration?.[0]?.STORE_ID;
     console.log(this.store_id);
-    this.user_id = this.sessionData.USER_ID;
+    this.user_id = this.sessionData?.USER_ID || userData?.USER_ID;
+    if (this.user_id) {
+      this.purchaseInvoiceFormData.USER_ID = this.user_id;
+    }
     console.log(this.user_id);
-    this.companyState = this.sessionData.SELECTED_COMPANY.STATE_NAME;
-    this.GST = this.sessionData.GeneralSettings.GST_PERC;
+    this.companyState = this.sessionData?.SELECTED_COMPANY?.STATE_NAME || userData?.SELECTED_COMPANY?.STATE_NAME;
+    this.GST = this.sessionData?.GeneralSettings?.GST_PERC || userData?.GeneralSettings?.GST_PERC;
   }
 
   getPendingGRNList() {
     const payload = {
       SUPP_ID: this.selectedSupplierId,
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.user_id || this.purchaseInvoiceFormData?.USER_ID || null,
     };
     this.dataService.getPendingGRN(payload).subscribe((response: any) => {
       this.pendingGRNs = response.Data;

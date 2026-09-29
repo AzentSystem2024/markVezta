@@ -57,6 +57,7 @@ export class FixedAsstesAddComponent {
   isFilterRowVisible: boolean = false;
   selected_Company_id: number;
   selected_fin_id: any;
+  userId: any;
   new_asset_type_popup: boolean = false;
 
   FixedAssetsData: any = {
@@ -102,15 +103,21 @@ export class FixedAsstesAddComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id =
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ||
+      userData?.SELECTED_COMPANY?.COMPANY_ID ||
+      1;
 
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.selected_fin_id =
+      sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID ||
+      userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
 
-    const sessionYear = sessionData.FINANCIAL_YEARS;
-    //  this.financialYeaDate=sessionYear[0].DATE_FROM
-    // this.formatted_from_date=this.financialYeaDate
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
   calculateDepreciation(event: any) {
     const life = event.value;
@@ -134,6 +141,7 @@ export class FixedAsstesAddComponent {
     const payload = {
       NAME: 'DEPT',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
@@ -154,6 +162,7 @@ export class FixedAsstesAddComponent {
     const subdepartment = {
       NAME: 'SUB_DEPT',
       DEPT_ID: selectedDeptId,
+      USER_ID: this.userId || null,
     };
 
     this.dataService
@@ -166,6 +175,7 @@ export class FixedAsstesAddComponent {
   list_fixed_assets() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataService.list_Fixed_Asset_api(payload).subscribe((res: any) => {
       this.FixedAssets = res.Data;

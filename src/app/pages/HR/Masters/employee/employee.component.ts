@@ -64,6 +64,7 @@ export class EmployeeComponent implements OnInit {
   isLoading: boolean = false;
   isFilterRowVisible: boolean = false;
   selected_Company_id: any;
+  userId: any;
   canAdd = false;
   canEdit = false;
   canView = false;
@@ -175,11 +176,13 @@ export class EmployeeComponent implements OnInit {
     const savedUserData = sessionStorage.getItem('savedUserData');
     if (!savedUserData) {
       this.selected_Company_id = null;
+      this.userId = null;
       return;
     }
 
     const sessionData = JSON.parse(savedUserData);
     this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.userId = sessionData?.USER_ID || sessionStorage.getItem('UserId');
   }
 
   toggleFilters() {
@@ -197,6 +200,7 @@ export class EmployeeComponent implements OnInit {
     this.isLoading = true;
     const payload = {
       CompanyId: this.selected_Company_id,
+      UserId: this.userId,
     };
 
     this.dataservice.employeeList(payload).subscribe({

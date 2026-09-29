@@ -212,7 +212,12 @@ export class JournalVoucherListComponent {
     this.sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selectedCompanyId =
+      this.sessionData?.SELECTED_COMPANY?.COMPANY_ID ||
+      userData?.SELECTED_COMPANY?.COMPANY_ID ||
+      1;
+    this.userId = this.sessionData?.USER_ID || userData?.USER_ID;
   }
 
   getJournalVouchers() {
@@ -223,6 +228,7 @@ export class JournalVoucherListComponent {
 
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
+      USER_ID: this.userId || null,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
     };

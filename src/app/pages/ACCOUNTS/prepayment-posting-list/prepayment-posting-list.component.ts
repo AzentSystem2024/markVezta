@@ -130,6 +130,7 @@ export class PrepaymentPostingListComponent {
   prepaymentpostingId: any;
   selectedprepaymentposting: any;
   selected_Company_id: any;
+  userId: any;
   isFilterOpened: boolean;
   companyID: any;
   canVerify: any;
@@ -147,7 +148,7 @@ export class PrepaymentPostingListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.companyID = menuResponse?.SELECTED_COMPANY?.COMPANY_ID;
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
@@ -202,15 +203,23 @@ export class PrepaymentPostingListComponent {
     },
   ];
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id =
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ||
+      userData?.SELECTED_COMPANY?.COMPANY_ID ||
+      1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
     this.get_prepayment_posting_list();
 
   }
   get_prepayment_posting_list() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataservice.Prepayment_posting_list(payload).subscribe((res: any) => {
       this.prepaymentList = res.Data

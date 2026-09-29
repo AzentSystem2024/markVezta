@@ -141,6 +141,7 @@ export class SupplierPaymentListComponent {
   isApprovePayment: boolean = false;
   isVerifyPayment: boolean = false;
   canVerify: any;
+  userId: any;
 
   constructor(
     private dataService: DataService,
@@ -156,8 +157,10 @@ export class SupplierPaymentListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    const menuGroups = menuResponse.MenuGroups || [];
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.companyID = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID;
+    this.userId = menuResponse?.USER_ID || userData?.USER_ID;
+    const menuGroups = menuResponse.MenuGroups || userData.MenuGroups || [];
 
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -181,8 +184,10 @@ export class SupplierPaymentListComponent {
     this.sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     // this.selected_vat_id = this.sessionData.VAT_ID;
-    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selectedCompanyId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = this.sessionData?.USER_ID || userData?.USER_ID;
   }
 
   getSupplierPayments() {
@@ -195,6 +200,7 @@ export class SupplierPaymentListComponent {
       COMPANY_ID: this.selectedCompanyId,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      USER_ID: this.userId || null,
     };
 
     this.dataService.getSupplierPaymentList(payload).subscribe({

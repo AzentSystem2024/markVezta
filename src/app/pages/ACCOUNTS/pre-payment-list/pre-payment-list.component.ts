@@ -71,6 +71,7 @@ export class PrePaymentListComponent {
   selectprepayment: any;
   PrepaymentId: any;
   selected_Company_id: any;
+  userId: any;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -92,6 +93,7 @@ export class PrePaymentListComponent {
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {
+    this.sesstion_Details();
     this.get_PrePaymentList();
   }
 
@@ -219,15 +221,23 @@ export class PrePaymentListComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id =
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ||
+      userData?.SELECTED_COMPANY?.COMPANY_ID ||
+      1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
 
   get_PrePaymentList() {
     const datePayload = this.getDateRangePayload();
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
     };

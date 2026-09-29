@@ -48,6 +48,7 @@ export class PdcAddFormComponent {
   selectedBeneficiaryCommonName: any;
   selectedBeneficiaryTypeID: any;
   selected_Company_id: any;
+  userId: any;
   isEnabled = true;
   Bank: any;
   Customer: any;
@@ -65,6 +66,12 @@ export class PdcAddFormComponent {
   docNo: any;
 
   ngOnInit(): void {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
+
     this.getDocNo();
     this.get_Supplier_dropdown();
     this.get_Bank_dropdown();
@@ -87,6 +94,7 @@ export class PdcAddFormComponent {
     const payload = {
       TRANS_TYPE: 40,
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataservice.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
@@ -237,9 +245,11 @@ onCustomerChanged(event: any) {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
 
   savePDC() {
@@ -265,6 +275,7 @@ onCustomerChanged(event: any) {
     const payload = {
       ID: this.PDCFormData.ID ? +this.PDCFormData.ID : 0,
       COMPANY_ID: this.selected_Company_id || 0,
+      USER_ID: this.userId || null,
       BANK_HEAD_ID: this.PDCFormData.BANK_HEAD_ID || 0,
       CUST_ID: this.PDCFormData.CUST_ID || 0,
       SUPP_ID: this.PDCFormData.SUPP_ID || 0,
@@ -325,6 +336,7 @@ onCustomerChanged(event: any) {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       this.Supplier = res;
@@ -343,6 +355,7 @@ onCustomerChanged(event: any) {
     const payload = {
       NAME: 'CUSTOMER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       this.Customer = res;
