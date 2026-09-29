@@ -380,9 +380,10 @@ export class DeliveryNoteFormComponent {
     const payload = {
       COMPANY_ID: this.selectedCompanyId,
       USER_ID: this.userID,
+      NAME: 'CUSTOMER'
     };
     this.dataService
-      .getOutsideCustomerWithState(payload)
+      .Common_Dropdown(payload)
       .subscribe((response: any) => {
         this.distributorList = response;
       });
