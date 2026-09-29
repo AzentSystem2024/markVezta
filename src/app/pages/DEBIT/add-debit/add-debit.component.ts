@@ -155,6 +155,7 @@ export class AddDebitComponent {
   vatTitle: any;
   showSubType: boolean = false;
   VatClass: any;
+  userId: any;
 
   get actionButtonText(): string {
     switch (this.mode) {
@@ -176,12 +177,17 @@ export class AddDebitComponent {
   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selectedstoreId = sessionData?.Configuration?.[0]?.STORE_ID || userData?.Configuration?.[0]?.STORE_ID;
 
-    this.HSN_CODE = sessionData.GeneralSettings.HSN_CODE;
+    this.HSN_CODE = sessionData?.GeneralSettings?.HSN_CODE || userData?.GeneralSettings?.HSN_CODE;
 
-    this.GST_PERC = sessionData.GeneralSettings.GST_PERC;
+    this.GST_PERC = sessionData?.GeneralSettings?.GST_PERC || userData?.GeneralSettings?.GST_PERC;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
+    if (this.userId) {
+      this.debitFormData.USER_ID = this.userId;
+    }
   }
 
   sessionData_tax() {
@@ -1454,6 +1460,7 @@ export class AddDebitComponent {
     this.debitFormData.NET_AMOUNT = this.netAmountDisplay;
     this.debitFormData.STORE_ID = this.selectedstoreId;
     this.debitFormData.INVOICE_NO = String(this.debitFormData.INVOICE_NO);
+    this.debitFormData.USER_ID = this.userId || this.debitFormData.USER_ID || null;
     // this.debitFormData.TRANS_DATE = this.formatDate(
     //   this.debitFormData.TRANS_DATE
     // );
@@ -1491,6 +1498,7 @@ export class AddDebitComponent {
       TRANS_TYPE: 36,
       COMPANY_ID: 0,
       STORE_ID: 0,
+      USER_ID: this.userId || null,
       DOC_NO: this.getDocNo(),
       TRANS_DATE: new Date(),
       TRANS_STATUS: 1,
