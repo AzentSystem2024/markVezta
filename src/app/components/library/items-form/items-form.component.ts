@@ -475,7 +475,7 @@ export class ItemsFormComponent implements OnInit, AfterViewInit {
     dataservice.getVatclassData(vatClassPayload).subscribe((data) => {
       this.vat = data;
     });
-    const payload = { COMPANY_ID: this.selected_Company_id };
+    const payload = { COMPANY_ID: this.selected_Company_id, USER_ID: this.sessionData.USER_ID };
     dataservice.getSupplierData(payload).subscribe((data) => {
       this.supplier = data;
     });

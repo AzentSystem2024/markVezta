@@ -129,6 +129,7 @@ export class SupplierListComponent implements OnInit {
     </div>
   `,
   };
+  userId: any;
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -206,6 +207,7 @@ export class SupplierListComponent implements OnInit {
   showSupplier() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId,
     };
 
     this.SupplierDataSource = new DataSource({
@@ -458,6 +460,7 @@ export class SupplierListComponent implements OnInit {
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.userId = sessionData.USER_ID;
   }
 }
 
