@@ -115,6 +115,7 @@ export class CreditNoteListComponent {
   isVerifyCreditNote: boolean = false;
   selectedCompanyId: any;
   isViewCreditNote: boolean = false;
+  userId: any;
   dateRanges = [
     { label: 'Today', value: 'today' },
     { label: 'All', value: 'all' },
@@ -161,12 +162,14 @@ export class CreditNoteListComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
+    this.vatTitle = userData?.GeneralSettings?.VAT_TITLE;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const localUserData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.userId = menuResponse?.USER_ID || localUserData?.USER_ID;
     this.sessionData_tax();
-    const menuGroups = menuResponse.MenuGroups || [];
+    const menuGroups = menuResponse.MenuGroups || localUserData.MenuGroups || [];
 
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -195,6 +198,7 @@ export class CreditNoteListComponent {
       COMPANY_ID: this.selectedCompanyId,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      USER_ID: this.userId || null,
     };
 
     this.dataService.getCreditNoteList(payload).subscribe({
@@ -377,9 +381,11 @@ export class CreditNoteListComponent {
 
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_vat_id = this.sessionData.VAT_ID;
-    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selected_vat_id = this.sessionData?.VAT_ID || userData?.VAT_ID;
+    this.selectedCompanyId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = this.sessionData?.USER_ID || userData?.USER_ID;
   }
 
   applyDateFilter() {

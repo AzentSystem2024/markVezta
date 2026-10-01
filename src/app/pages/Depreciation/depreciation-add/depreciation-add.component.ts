@@ -47,7 +47,7 @@ export class DepreciationAddComponent {
   formValidationGroup: DxValidationGroupComponent;
   depreciationDate: any;
 
-  @Input() canApprove:boolean = false;
+  @Input() canApprove: boolean = false;
 
   DepreciationPayload: any = {
     DEPR_DATE: new Date(), // format: YYYY-MM-DD
@@ -122,7 +122,7 @@ export class DepreciationAddComponent {
 
     //======================Date calculation============================
   }
-  onSelectAllChange(event: any) {}
+  onSelectAllChange(event: any) { }
   formatDateToDMY(date: Date): string {
     const day = date.getDate(); // no leading zero
     const month = date.getMonth() + 1; // January is 0
@@ -134,7 +134,7 @@ export class DepreciationAddComponent {
     const date = event.value;
     this.depreciationDate = date;
   }
-  onEditorPreparing(event: any) {}
+  onEditorPreparing(event: any) { }
   calculateDepreciationDays() {
     const currentDate = this.depreciationDate;
 
@@ -152,7 +152,7 @@ export class DepreciationAddComponent {
     return new Date(year, month, day);
   }
 
-  onCellValueChanged(event: any) {}
+  onCellValueChanged(event: any) { }
   onDepreciationDateChange(newDate: Date) {
     this.depreciationDate = newDate;
     this.calculateDepreciationDays();
@@ -407,4 +407,4 @@ export class DepreciationAddComponent {
   declarations: [DepreciationAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DepreciationAddModule {}
+export class DepreciationAddModule { }

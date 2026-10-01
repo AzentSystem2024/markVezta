@@ -217,12 +217,16 @@ export class QuotationFormComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
+    this.matrixCode = menuResponse?.GeneralSettings?.ENABLE_MATRIX_CODE || userData?.GeneralSettings?.ENABLE_MATRIX_CODE;
 
-    this.userID = menuResponse.USER_ID;
-    this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = menuResponse?.USER_ID || userData?.USER_ID;
+    if (this.userID) {
+      this.quotationFormData.USER_ID = this.userID;
+    }
+    this.finID = menuResponse?.FINANCIAL_YEARS?.[0]?.FIN_ID || userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
+    this.companyID = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID;
 
     console.log(
       this.companyID,
@@ -230,8 +234,8 @@ export class QuotationFormComponent {
       'COMPANYIDDDDDDDDDDDDDDDDDDDDDDDDDDD',
     );
 
-    const menuGroups = menuResponse.MenuGroups || [];
-    this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
+    const menuGroups = menuResponse?.MenuGroups || userData?.MenuGroups || [];
+    this.storeFromSession = menuResponse?.Configuration?.[0]?.STORE_ID || userData?.Configuration?.[0]?.STORE_ID;
 
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -361,6 +365,7 @@ export class QuotationFormComponent {
     const payload = {
       COMPANY_ID: this.companyID,
       NAME: 'STORE',
+      USER_ID: this.userID || this.quotationFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.stores = response;
@@ -390,8 +395,9 @@ export class QuotationFormComponent {
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selected_vat_id = this.sessionData?.VAT_ID || userData?.VAT_ID;
   }
 
   ngAfterViewInit(): void {
@@ -514,6 +520,7 @@ export class QuotationFormComponent {
     const payload = {
       COMPANY_ID: this.companyID,
       NAME: 'SALESMAN',
+      USER_ID: this.userID || this.quotationFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.salesman = response;
@@ -524,6 +531,7 @@ export class QuotationFormComponent {
     const payload = {
       COMPANY_ID: this.companyID,
       NAME: 'CUSTOMER',
+      USER_ID: this.userID || this.quotationFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.customer = response;
@@ -538,7 +546,10 @@ export class QuotationFormComponent {
   getCustomerDetails() {
     if (!this.selectedCustomerId) return;
 
-    const payload = { CUST_ID: this.selectedCustomerId };
+    const payload = {
+      CUST_ID: this.selectedCustomerId,
+      USER_ID: this.userID || this.quotationFormData?.USER_ID || null,
+    };
 
     this.dataService.getCustomerDetailDeliveryNote(payload).subscribe({
       next: (response: any) => {
@@ -569,6 +580,7 @@ export class QuotationFormComponent {
     const payload = {
       COMPANY_ID: this.companyID,
       NAME: 'PAYMENTTERMS',
+      USER_ID: this.userID || this.quotationFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.paymentTerms = response;
@@ -579,6 +591,7 @@ export class QuotationFormComponent {
     const payload = {
       COMPANY_ID: this.companyID,
       NAME: 'DELIVERYTERMS',
+      USER_ID: this.userID || this.quotationFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.deliveryTerms = response;
@@ -675,6 +688,7 @@ export class QuotationFormComponent {
     const payload = {
       STORE_ID,
       CUSTOMER_ID: customerId,
+      USER_ID: this.userID || this.quotationFormData?.USER_ID || null,
     };
 
     this.isItemsLoading = true;

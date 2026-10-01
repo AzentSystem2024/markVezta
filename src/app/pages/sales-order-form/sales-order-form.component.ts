@@ -185,15 +185,19 @@ export class SalesOrderFormComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.matrixCode = menuResponse.GeneralSettings.ENABLE_MATRIX_CODE;
+    this.matrixCode = menuResponse?.GeneralSettings?.ENABLE_MATRIX_CODE || userData?.GeneralSettings?.ENABLE_MATRIX_CODE;
 
-    this.userID = menuResponse.USER_ID;
-    this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.userID = menuResponse?.USER_ID || userData?.USER_ID;
+    if (this.userID) {
+      this.salesOrderFormData.USER_ID = this.userID;
+    }
+    this.finID = menuResponse?.FINANCIAL_YEARS?.[0]?.FIN_ID || userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
+    this.companyID = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID;
     console.log(menuResponse, 'COMPANYIDDDDDDDDDDDDDDDDD');
-    const menuGroups = menuResponse.MenuGroups || [];
-    this.salesOrderFormData.STORE_ID = menuResponse.Configuration[0].STORE_ID;
+    const menuGroups = menuResponse?.MenuGroups || userData?.MenuGroups || [];
+    this.salesOrderFormData.STORE_ID = menuResponse?.Configuration?.[0]?.STORE_ID || userData?.Configuration?.[0]?.STORE_ID;
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
       .find((menu: any) => menu.Path === '/sales-order');
@@ -1099,6 +1103,7 @@ export class SalesOrderFormComponent {
     const payload = {
       NAME: 'DEALER',
       COMPANY_ID: this.companyID,
+      USER_ID: this.userID || this.salesOrderFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.dealerList = response;
@@ -1120,6 +1125,7 @@ export class SalesOrderFormComponent {
   getSubDealer(dealerId: number) {
     const payload = {
       DEALER_ID: dealerId,
+      USER_ID: this.userID || this.salesOrderFormData?.USER_ID || null,
     };
     this.dataService.getSubdealer(payload).subscribe((response: any) => {
       this.subDealerList = response;
@@ -1138,6 +1144,7 @@ export class SalesOrderFormComponent {
     const payload = {
       CUST_ID: dealerId,
       COMPANY_ID: this.companyID,
+      USER_ID: this.userID || this.salesOrderFormData?.USER_ID || null,
     };
     this.dataService.getWarehouse(payload).subscribe((response: any) => {
       this.warehouse = response.Data;
@@ -1153,6 +1160,7 @@ export class SalesOrderFormComponent {
     const payload = {
       CUST_ID: dealerId,
       COMPANY_ID: this.companyID,
+      USER_ID: this.userID || this.salesOrderFormData?.USER_ID || null,
     };
 
     this.dataService.getDealerDropdown(payload).subscribe((response: any) => {

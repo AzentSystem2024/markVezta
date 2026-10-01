@@ -95,6 +95,7 @@ export class FixedAsstesEditComponent {
   pdfSrc: SafeResourceUrl | null = null;
   isPdfPopupVisible: boolean = false;
   selected_Company_id: any;
+  userId: any;
   Department: any;
   SubDepartment: any;
 
@@ -103,6 +104,7 @@ export class FixedAsstesEditComponent {
     private router: Router,
     private sanitizer: DomSanitizer,
   ) {
+    this.sesstion_Details();
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -111,8 +113,8 @@ export class FixedAsstesEditComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/fixed-assets');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === '/fixed-assets');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -135,9 +137,16 @@ export class FixedAsstesEditComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id =
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ||
+      userData?.SELECTED_COMPANY?.COMPANY_ID ||
+      1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
 
   ngOnInit() {
@@ -148,6 +157,7 @@ export class FixedAsstesEditComponent {
   list_fixed_assets() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
     };
     this.dataService.list_Fixed_Asset_api(payload).subscribe((res: any) => {
       this.FixedAssets = res.Data;
@@ -174,8 +184,9 @@ export class FixedAsstesEditComponent {
 
     const payload = {
       NAME: 'DEPT',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
     });
@@ -187,7 +198,8 @@ export class FixedAsstesEditComponent {
 
     const subdepartment = {
       NAME: 'SUB_DEPT',
-      DEPT_ID: selectedDeptId
+      DEPT_ID: selectedDeptId,
+      USER_ID: this.userId || null,
     };
 
     this.dataService.Get_SubDepartment_Dropdown(subdepartment)
@@ -202,6 +214,7 @@ export class FixedAsstesEditComponent {
     try {
       const payload = {
         COMPANY_ID: this.selected_Company_id,
+        USER_ID: this.userId || null,
       };
       const res: any = await firstValueFrom(
         this.dataService.list_Fixed_Asset_api(payload),

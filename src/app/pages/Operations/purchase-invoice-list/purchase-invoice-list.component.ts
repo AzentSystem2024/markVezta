@@ -142,6 +142,7 @@ export class PurchaseInvoiceListComponent {
   selectedInvoice: any;
   isEditInvoiceReadOnly: boolean = false;
   selected_Company_id: any;
+  userId: any;
 
   constructor(
     private dataService: DataService,
@@ -156,6 +157,8 @@ export class PurchaseInvoiceListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.userId = menuResponse?.USER_ID || userData?.USER_ID;
 
     const menuGroups = menuResponse.MenuGroups || [];
 
@@ -181,8 +184,10 @@ export class PurchaseInvoiceListComponent {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
   }
 
   getPurchaseInvoiceList() {
@@ -195,6 +200,7 @@ export class PurchaseInvoiceListComponent {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: fromDate,
       DATE_TO: toDate,
+      USER_ID: this.userId || null,
     };
 
     this.dataService.getPurchaseInvoiceList(payload).subscribe({

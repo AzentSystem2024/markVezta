@@ -133,6 +133,7 @@ export class DebitComponent {
   selectedCompanyId: any;
   vatTitle: any;
   isApproveDebitNote: boolean;
+  userId: any;
 
   popupTitle: string = '';
   popupMode: 'new' | 'edit' | 'verify' | 'approve' | 'view' = 'new';
@@ -152,9 +153,11 @@ export class DebitComponent {
   };
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_vat_id = this.sessionData.VAT_ID;
-    this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.selected_vat_id = this.sessionData?.VAT_ID || userData?.VAT_ID;
+    this.selectedCompanyId = this.sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = this.sessionData?.USER_ID || userData?.USER_ID;
   }
 
   constructor(
@@ -170,12 +173,14 @@ export class DebitComponent {
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.vatTitle = userData.GeneralSettings.VAT_TITLE;
+    this.vatTitle = userData?.GeneralSettings?.VAT_TITLE;
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    const localUserData = JSON.parse(localStorage.getItem('userData') || '{}');
+    this.userId = menuResponse?.USER_ID || localUserData?.USER_ID;
     this.sessionData_tax();
-    const menuGroups = menuResponse.MenuGroups || [];
+    const menuGroups = menuResponse.MenuGroups || localUserData.MenuGroups || [];
 
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
@@ -205,6 +210,7 @@ export class DebitComponent {
       COMPANY_ID: this.selectedCompanyId,
       DATE_FROM: datePayload.DATE_FROM,
       DATE_TO: datePayload.DATE_TO,
+      USER_ID: this.userId || null,
     };
 
     this.dataService.getDebitNoteList(payload).subscribe({

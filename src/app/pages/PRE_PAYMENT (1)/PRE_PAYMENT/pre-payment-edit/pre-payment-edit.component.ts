@@ -421,6 +421,7 @@ export class PrePaymentEditComponent {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.selected_user_id || null,
     };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);

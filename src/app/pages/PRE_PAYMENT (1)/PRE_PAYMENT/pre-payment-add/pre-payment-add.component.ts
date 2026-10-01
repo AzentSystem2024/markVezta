@@ -123,20 +123,22 @@ export class PrePaymentAddComponent {
     private dataservice: DataService,
     private ngZone: NgZone,
   ) {
+    this.sesstion_Details();
+    this.sessionData_tax();
     this.get_Supplier_dropdown();
     this.get_ExpenseLedger_dropdown();
-    this.sesstion_Details();
     this.get_PrePaymentLedger_dropdown();
-    this.sessionData_tax();
     this.getDocNo();
   }
   ngOnInit() {
+    this.sesstion_Details();
     this.get_Supplier_dropdown();
   }
   getDocNo() {
     const payload = {
       TRANS_TYPE: 38,
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.selected_user_id || null,
     };
     this.dataservice.getDocNo(payload).subscribe((response: any) => {
       this.docNo = response.DOC_NO;
@@ -316,6 +318,7 @@ export class PrePaymentAddComponent {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.selected_user_id || null,
     };
     this.dataservice.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);
@@ -449,23 +452,37 @@ export class PrePaymentAddComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
-    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') ||
+        localStorage.getItem('userData') ||
+        '{}',
+    );
+    this.selected_vat_id = this.sessionData?.VAT_ID;
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id =
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ||
+      userData?.SELECTED_COMPANY?.COMPANY_ID ||
+      1;
 
-    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.selected_fin_id =
+      sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID ||
+      userData?.FINANCIAL_YEARS?.[0]?.FIN_ID;
 
-    this.selected_user_id = sessionData.USER_ID;
+    this.selected_user_id = sessionData?.USER_ID || userData?.USER_ID;
     console.log(
       this.selected_user_id,
       '===========selected user id===================',
     );
-    this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    this.selectedstoreId =
+      sessionData?.Configuration?.[0]?.STORE_ID ||
+      userData?.Configuration?.[0]?.STORE_ID;
   }
 
   savePrePayment() {

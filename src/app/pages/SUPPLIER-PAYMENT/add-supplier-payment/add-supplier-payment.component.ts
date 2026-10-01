@@ -134,6 +134,8 @@ export class AddSupplierPaymentComponent {
   CashID: any;
   BankID: any;
 
+  userId: any;
+
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
@@ -149,11 +151,15 @@ export class AddSupplierPaymentComponent {
       const userData = JSON.parse(userDataString);
       const selectedCompany = userData?.SELECTED_COMPANY;
       console.log(userData, selectedCompany, 'USERDATAAAAAAAAAAAAAAAAA');
-      this.companyState = selectedCompany.STATE_NAME;
-      this.companyStateID = selectedCompany.STATE_ID;
+      this.companyState = selectedCompany?.STATE_NAME;
+      this.companyStateID = selectedCompany?.STATE_ID;
       console.log(this.companyStateID, 'COMPANYSTATE');
-      this.finID = userData.FINANCIAL_YEARS?.[0].FIN_ID;
-      console.log(userData.FINANCIAL_YEARS?.[0].FIN_ID, 'FINIDDDDDDDDDDDDDDDD');
+      this.finID = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
+      console.log(userData.FINANCIAL_YEARS?.[0]?.FIN_ID, 'FINIDDDDDDDDDDDDDDDD');
+      if (userData.USER_ID) {
+        this.userId = userData.USER_ID;
+        this.paymentFormData.USER_ID = this.userId;
+      }
       if (selectedCompany?.COMPANY_ID) {
         this.selectedCompanyId = selectedCompany.COMPANY_ID;
         console.log(
@@ -174,9 +180,14 @@ export class AddSupplierPaymentComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
-    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID || userData?.SELECTED_COMPANY?.COMPANY_ID || 1;
+    this.userId = sessionData?.USER_ID || userData?.USER_ID;
+    if (this.userId) {
+      this.paymentFormData.USER_ID = this.userId;
+    }
   }
 
   AC_Default() {
@@ -222,6 +233,7 @@ export class AddSupplierPaymentComponent {
     const payload = {
       SUPP_ID: supplierId,
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || this.paymentFormData?.USER_ID || null,
     };
 
     this.dataService
@@ -246,6 +258,7 @@ export class AddSupplierPaymentComponent {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || this.paymentFormData?.USER_ID || null,
     };
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.supplierList = response;
@@ -888,6 +901,7 @@ export class AddSupplierPaymentComponent {
       ADD_TIME: '',
       SUPP_ID: '',
       NET_AMOUNT: '',
+      USER_ID: this.userId,
       SUPP_DETAIL: [
         {
           BILL_ID: '',
