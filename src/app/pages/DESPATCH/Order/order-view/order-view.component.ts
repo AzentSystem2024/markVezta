@@ -2,12 +2,9 @@ import {
   Component,
   OnInit,
   ViewChild,
-  NgModule,
-  ChangeDetectorRef,
-  NgZone,
+  NgModule, NgZone
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { DataService } from 'src/app/services/data.service';
 import {
   DxDataGridModule,
@@ -104,9 +101,7 @@ export class OrderViewComponent implements OnInit {
 
   constructor(
     private dataService: DataService,
-    private router: Router,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef,
     private exportService: ExportService,
   ) {}
 
@@ -143,6 +138,7 @@ export class OrderViewComponent implements OnInit {
         this.selectedStatuses && this.selectedStatuses.length > 0
           ? this.selectedStatuses.join(',')
           : null,
+      IS_FROM_WEB: true,
     };
 
     this.dataService.getNewOrderList(payload).subscribe(
@@ -317,7 +313,7 @@ export class OrderViewComponent implements OnInit {
         ? order.Status
         : order.STATUS !== undefined
           ? order.STATUS
-          : order.ORDER_STATUS;
+          : order.ORDER_STATUS;;
     if (status === 1 || status === '1') {
       // 1 = Draft
       const orderId = order.OrderId || order.ORDER_ID;
@@ -455,7 +451,7 @@ export class OrderViewComponent implements OnInit {
     const payload = {
       ...rowData,
       USER_ID: userId,
-      ORDER_ID: masterData.key
+      ORDER_ID: masterData.key,
     };
 
     e.cancel = new Promise<void>((resolve, reject) => {
@@ -463,26 +459,29 @@ export class OrderViewComponent implements OnInit {
         next: (res: any) => {
           if (res.Flag === 1) {
             notify('Quantity updated successfully!', 'success', 3000);
-            
+
             // Refresh the main grid
             this.refreshGrid();
 
             // Refresh the details grid
             const orderId = masterData.key;
             this.detailLoadingMap[orderId] = true;
-            this.dataService.getNewOrderDetail({ ORDER_ID: orderId }).subscribe({
-              next: (detailRes: any) => {
-                this.detailDataMap[orderId] = detailRes?.Data?.ORDER_DETAILS || [];
-                this.detailLoadingMap[orderId] = false;
-                this.detailDataMap = { ...this.detailDataMap };
-                resolve();
-              },
-              error: (err) => {
-                console.error('Error refreshing details', err);
-                this.detailLoadingMap[orderId] = false;
-                resolve();
-              }
-            });
+            this.dataService
+              .getNewOrderDetail({ ORDER_ID: orderId })
+              .subscribe({
+                next: (detailRes: any) => {
+                  this.detailDataMap[orderId] =
+                    detailRes?.Data?.ORDER_DETAILS || [];
+                  this.detailLoadingMap[orderId] = false;
+                  this.detailDataMap = { ...this.detailDataMap };
+                  resolve();
+                },
+                error: (err) => {
+                  console.error('Error refreshing details', err);
+                  this.detailLoadingMap[orderId] = false;
+                  resolve();
+                },
+              });
           } else {
             notify(res.Message || 'Failed to update quantity', 'error', 3000);
             reject(res.Message);
@@ -492,7 +491,7 @@ export class OrderViewComponent implements OnInit {
           console.error(err);
           notify('Error updating quantity', 'error', 3000);
           reject(err);
-        }
+        },
       });
     });
   }

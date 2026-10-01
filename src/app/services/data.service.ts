@@ -115,8 +115,6 @@ export class DataService {
     return this.http.post(`${this.apiUrl}accountGroup/Insert`, data);
   }
 
-
-
   selectAccountHead(id: number) {
     return this.http.post<any>(`${this.apiUrl}accountHead/select/` + id, {});
   }
@@ -932,8 +930,16 @@ export class DataService {
     return this.http.post(`${this.apiUrl}TransferIn/gettrout`, payload);
   }
 
-  public getItemsforTransferIn(id: any, companyId: any, storeId: any): Observable<any> {
-    const reqBodyData = { TRANSFER_ID: id, COMPANY_ID: companyId, STORE_ID: storeId };
+  public getItemsforTransferIn(
+    id: any,
+    companyId: any,
+    storeId: any,
+  ): Observable<any> {
+    const reqBodyData = {
+      TRANSFER_ID: id,
+      COMPANY_ID: companyId,
+      STORE_ID: storeId,
+    };
     return this.http.post(`${this.apiUrl}TransferIn/getitem`, reqBodyData);
   }
 
@@ -5140,7 +5146,7 @@ The result can be exported to HTML or Markdown.`;
     days: any,
   ) {
     const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
     const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
@@ -5413,7 +5419,7 @@ The result can be exported to HTML or Markdown.`;
   ) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/save';
     const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
     const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
@@ -5493,7 +5499,7 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'EmployeeVacation/update';
 
     const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
     const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
@@ -5549,7 +5555,7 @@ The result can be exported to HTML or Markdown.`;
     const getEndpoint = this.apiUrl + 'EmployeeVacation/verify';
 
     const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
     const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
@@ -5604,7 +5610,7 @@ The result can be exported to HTML or Markdown.`;
   ) {
     const getEndpoint = this.apiUrl + 'EmployeeVacation/approve';
     const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+      sessionStorage.getItem('savedUserData') || '{}',
     );
     const company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
     const fin_id = sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID || 0;
@@ -7048,7 +7054,12 @@ The result can be exported to HTML or Markdown.`;
   }
 
   // =========== import AR data API ==============
-  import_AR_Data(batchNo: any, FileName: any, FileData: any, isOverWrite: boolean = false) {
+  import_AR_Data(
+    batchNo: any,
+    FileName: any,
+    FileData: any,
+    isOverWrite: boolean = false,
+  ) {
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -7367,15 +7378,24 @@ The result can be exported to HTML or Markdown.`;
   }
 
   get_leave_salary_employee_details(payload: any) {
-    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/EmployeeDetails', payload);
+    return this.http.post(
+      this.apiUrl + 'EmployeeLeaveSalary/EmployeeDetails',
+      payload,
+    );
   }
 
   get_leave_salary_vacation_list(payload: any) {
-    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/VacationList', payload);
+    return this.http.post(
+      this.apiUrl + 'EmployeeLeaveSalary/VacationList',
+      payload,
+    );
   }
 
   get_leave_salary_vacation_details(payload: any) {
-    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/GetVacationDetails', payload);
+    return this.http.post(
+      this.apiUrl + 'EmployeeLeaveSalary/GetVacationDetails',
+      payload,
+    );
   }
 
   add_leave_salary(payload: any) {
@@ -7403,7 +7423,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   get_calculated_leave_salary(payload: any) {
-    return this.http.post(this.apiUrl + 'EmployeeLeaveSalary/Getleavesalary', payload);
+    return this.http.post(
+      this.apiUrl + 'EmployeeLeaveSalary/Getleavesalary',
+      payload,
+    );
   }
 
   getValidationARData(payload: any): Observable<any> {
@@ -7450,12 +7473,18 @@ The result can be exported to HTML or Markdown.`;
 
   selectRefundDeposit(items: any) {
     const data = items;
-    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtype/select`, data);
+    return this.http.post<any>(
+      `${this.apiUrl}CustReceipts_Subtype/select`,
+      data,
+    );
   }
 
   deleteRefundDeposit(items: any) {
     const data = items;
-    return this.http.post<any>(`${this.apiUrl}CustReceipts_Subtype/delete`, data);
+    return this.http.post<any>(
+      `${this.apiUrl}CustReceipts_Subtype/delete`,
+      data,
+    );
   }
 
   //supplierwise report
@@ -7476,25 +7505,37 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
-
-
   get2FASetupInfo(tempToken: string) {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${tempToken}`);
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${tempToken}`,
+    );
     return this.http.get(`${this.apiUrl}Employee/setup-2fa`, { headers });
   }
 
-  verify2FA(tempToken: string, pin: string, secretKey: string, companyId: number, financialYearId: number) {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${tempToken}`);
-    return this.http.post(`${this.apiUrl}Employee/verify-login-2fa`, {
-      TempToken: tempToken,
-      Code: pin,
-      SecretKey: secretKey,
-      CompanyId: companyId,
-      FinancialYearId: financialYearId
-    }, { headers });
+  verify2FA(
+    tempToken: string,
+    pin: string,
+    secretKey: string,
+    companyId: number,
+    financialYearId: number,
+  ) {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${tempToken}`,
+    );
+    return this.http.post(
+      `${this.apiUrl}Employee/verify-login-2fa`,
+      {
+        TempToken: tempToken,
+        Code: pin,
+        SecretKey: secretKey,
+        CompanyId: companyId,
+        FinancialYearId: financialYearId,
+      },
+      { headers },
+    );
   }
-
-
 
   //----------------------EMAIL-SETTINGS-------------------------------//
   getEmailSettings(): Observable<any> {
@@ -7522,7 +7563,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   sendEmailWithAttachment(formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}EmailSettings/SendEmailWithAttachment`, formData);
+    return this.http.post(
+      `${this.apiUrl}EmailSettings/SendEmailWithAttachment`,
+      formData,
+    );
   }
 
   // --- New Order API Methods ---
@@ -7535,7 +7579,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getNewOrderArtNoDetails(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/GetArtNoDetails`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/GetArtNoDetails`,
+      payload,
+    );
   }
 
   Purchase_Report(payload: any) {
@@ -7544,11 +7591,17 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getNewOrderDealerAddress(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/GetDealerAddress`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/GetDealerAddress`,
+      payload,
+    );
   }
 
   getCustomerDeliveryAddresses(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/GetCustomerDeliveryAddresses`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/GetCustomerDeliveryAddresses`,
+      payload,
+    );
   }
 
   clearNewOrderCart(payload: any): Observable<any> {
@@ -7560,7 +7613,10 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getNewOrderSubDealerList(payload: any = {}): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/GetSubDealerList`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/GetSubDealerList`,
+      payload,
+    );
   }
 
   postNewOrderAddToCart(payload: any): Observable<any> {
@@ -7572,15 +7628,24 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getNewOrderList(payload: any = {}): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderSummary`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/GetOrderSummary`,
+      payload,
+    );
   }
 
   saveNewOrderCartToOrder(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/SaveCartToOrder`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/SaveCartToOrder`,
+      payload,
+    );
   }
 
   getNewOrderDetail(payload: any = {}): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/GetOrderDetail`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/GetOrderDetail`,
+      payload,
+    );
   }
 
   //====================TRANSFER OUT INVENTORY MARK============================
@@ -7593,7 +7658,10 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}TransferOut_Mark/insert`, data);
   }
   selectTransferOutForInventoryMark(id: number) {
-    return this.http.post<any>(`${this.apiUrl}TransferOut_Mark/select/` + id, {});
+    return this.http.post<any>(
+      `${this.apiUrl}TransferOut_Mark/select/` + id,
+      {},
+    );
   }
 
   getItemBind(items: any) {
@@ -7620,8 +7688,15 @@ The result can be exported to HTML or Markdown.`;
   }
 
   deleteTrOutForInventoryMark(id: number) {
-    return this.http.post<any>(`${this.apiUrl}TransferOut_Mark/delete/` + id, {});
-    updateOrderEntryQty(payload: any): Observable < any > {
-      return this.http.post<any>(`${this.apiUrl}NewOrder/UpdateOrderEntryQty`, payload);
-    }
+    return this.http.post<any>(
+      `${this.apiUrl}TransferOut_Mark/delete/` + id,
+      {},
+    );
   }
+  updateOrderEntryQty(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/UpdateOrderEntryQty`,
+      payload,
+    );
+  }
+}
