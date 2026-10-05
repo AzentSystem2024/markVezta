@@ -281,6 +281,7 @@ export class StockMovementReportComponent {
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    this.appType = sessionData.Configuration[0].APP_TYPE;
   }
 
   refreshGrid() {
@@ -1108,4 +1109,4 @@ export class StockMovementReportComponent {
   exports: [StockMovementReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StockMovementReportModule {}
+export class StockMovementReportModule { }

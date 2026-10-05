@@ -114,7 +114,7 @@ export class PackingAddComponent {
     IS_ANY_COMB: false,
     SUPP_ID: 0,
     COMPANY_ID: 0,
-    STD_PRICE: 0,
+    STD_PRICE: null,
     ITEM_DESCRIPTION: '',
     STD_PRICE_EFFECT_FROM: new Date(),
     PackingEntries: [
@@ -872,6 +872,7 @@ export class PackingAddComponent {
       ART_SERIAL: '',
       COMBINATION: '2x4',
       PACK_PRICE: null,
+      STD_PRICE: null,
       UNIT_ID: null,
       IS_PURCHASABLE: false,
       IS_EXPORT: false,
@@ -922,7 +923,7 @@ export class PackingAddComponent {
     this.PackingData.STD_PRICE_EFFECT_FROM = new Date();
 
     setTimeout(() => {
-      this.PackingData.STD_PRICE = 0;
+      this.PackingData.STD_PRICE = null;
     });
 
     this.items = [
