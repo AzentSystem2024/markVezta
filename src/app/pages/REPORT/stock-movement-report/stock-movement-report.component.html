@@ -261,20 +261,22 @@
         caption="Consumption"
         [visible]="true"
       ></dxi-column>
-      <!-- <dxi-column
-        dataField="TRANSFEROUT_QTY"
+      <dxi-column
+        dataField="TRANSFER_OUT_QTY"
         dataType="number"
         format="#,##0.00"
         alignment="right"
         caption="Transf.Out"
+        [visible]="appType === 'VEZTA'"
       ></dxi-column>
       <dxi-column
-        dataField="TRANSFERIN_QTY"
+        dataField="TRANSFER_IN_QTY"
         dataType="number"
         format="#,##0.00"
         alignment="right"
         caption="Transf.In"
-      ></dxi-column> -->
+        [visible]="appType === 'VEZTA'"
+      ></dxi-column>
       <dxi-column
         dataField="DELIVERY_QTY"
         dataType="number"
