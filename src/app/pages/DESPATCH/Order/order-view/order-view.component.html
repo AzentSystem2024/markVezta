@@ -413,7 +413,7 @@
   [(visible)]="isNewOrderPopupVisible"
   [fullScreen]="false"
   [showTitle]="true"
-  title="Edit Order"
+  [title]="selectedEditOrderId ? 'Edit Order' : 'New Order'"
   [showCloseButton]="true"
   [closeOnOutsideClick]="false"
   width="98vw"

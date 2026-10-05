@@ -1119,6 +1119,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
       LOCATION_ID: this.selectedAddressId || 0,
       CART: cartArray,
       COMBO: comboArray,
+      IS_FROM_WEB: true,
     };
 
     console.log('add to card : ', payload);
@@ -1165,6 +1166,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
       DEALER_NAME: this.getDealerName(),
       SUBDEALER_ID: subDealerId,
       SUBDEALER_NAME: this.getSubDealerName(),
+      IS_FROM_WEB: true,
     };
 
     this.isProcessing = true;
@@ -1229,21 +1231,21 @@ export class NewOrderComponent implements OnInit, OnChanges {
           // }
 
           // Auto-select next color if retaining category & art no
-          if (
-            !this.currentEditingItem.colorId &&
-            this.currentEditingItem.artNoId
-          ) {
-            this.autoSelectAvailableColor();
-          }
+          // if (
+          //   !this.currentEditingItem.colorId &&
+          //   this.currentEditingItem.artNoId
+          // ) {
+          //   this.autoSelectAvailableColor();
+          // }
         } else {
           this.cartItems = [];
 
-          if (
-            !this.currentEditingItem.colorId &&
-            this.currentEditingItem.artNoId
-          ) {
-            this.autoSelectAvailableColor();
-          }
+          // if (
+          //   !this.currentEditingItem.colorId &&
+          //   this.currentEditingItem.artNoId
+          // ) {
+          //   this.autoSelectAvailableColor();
+          // }
         }
       },
       (error) => {
@@ -1387,14 +1389,12 @@ export class NewOrderComponent implements OnInit, OnChanges {
     );
     const userId = sessionData.USER_ID || sessionData.ID || 0;
 
+    const itemToRemove = this.cartItems.find(item => item.id === id);
+    const orderId = itemToRemove?.orderId || 0;
+
     const payload = {
-      // USER_ID: userId,
-      // DEALER_ID: this.getActualDealerId(),
-      // DEALER_NAME: this.getDealerName(),
-      // SUBDEALER_ID:
-      //   this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
-      // SUBDEALER_NAME: this.getSubDealerName(),
       CART_ID: id,
+      ORDER_ID: orderId,
     };
 
     this.isProcessing = true;
