@@ -118,7 +118,7 @@ export class ProfitLossDepartmentwiseComponent {
     //
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    this.appType = sessionData.Configuration?.APP_TYPE || '';
+    this.appType = sessionData.Configuration[0]?.APP_TYPE || '';
   }
 
   //================ Year value change ===================
