@@ -164,6 +164,7 @@ export class StoresFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.showCountryList();
+    this.sessionData_tax();
     const userDataString = localStorage.getItem('userData');
     const userData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
@@ -201,6 +202,7 @@ export class StoresFormComponent implements OnInit {
     );
     ;
     this.appType = this.sessionData.Configuration[0].APP_TYPE;
+    console.log(this.appType, 'appType');
   }
   showCountryList() {
     this.service.getCountryDataAPi().subscribe((response) => {

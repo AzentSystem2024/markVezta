@@ -31,7 +31,9 @@
     <dxi-item>
       <div *dxTemplate>
         <dx-text-box
-          label="Store Name *"
+          [label]="
+            appType === 'VEZTA' ? 'Facility Name *' : 'Store/Branch Name *'
+          "
           labelMode="floating"
           [(value)]="newStores.STORE_NAME"
         >
