@@ -96,6 +96,7 @@ export class StockViewComponent {
   selectedStoreid: any;
   itemtype: any;
   selectedItemType: any;
+  appType: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -110,6 +111,7 @@ export class StockViewComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.appType = menuResponse.Configuration?.APP_TYPE || '';
     this.fin_id = menuResponse.FINANCIAL_YEARS;
     if (this.fin_id.length) {
       this.finID = this.fin_id[0].FIN_ID;
@@ -141,6 +143,7 @@ export class StockViewComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || " ");
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.companyID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.appType = this.sessionData.Configuration[0]?.APP_TYPE || '';
     console.log(this.companyID)
   }
   refreshGrid() {

@@ -204,7 +204,7 @@
         caption="Remarks"
         [width]="300"
       ></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
+      <dxi-column dataField="STORE_NAME" [caption]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column
         dataField="DebitAmount"

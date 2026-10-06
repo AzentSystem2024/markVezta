@@ -94,6 +94,7 @@ export class StockAdjustmentAddComponent {
       );
     }
   };
+  appType: any;
 
   getSaveButtonText(): string {
     if (this.isSaving) {
@@ -322,6 +323,7 @@ export class StockAdjustmentAddComponent {
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
+    this.appType = menuResponse.Configuration[0]?.APP_TYPE || '';
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
@@ -559,95 +561,95 @@ export class StockAdjustmentAddComponent {
   }
 
   onEditorPreparing(event: any) {
-  if (event.dataField !== 'NEW_QTY') {
-    return;
-  }
+    if (event.dataField !== 'NEW_QTY') {
+      return;
+    }
 
-  event.editorOptions = event.editorOptions || {};
+    event.editorOptions = event.editorOptions || {};
 
-  event.editorOptions.elementAttr = {
-    style: `
+    event.editorOptions.elementAttr = {
+      style: `
       height: 100%;
       margin: 0;
       padding: 0;
       display: flex;
       align-items: center;
     `,
-  };
+    };
 
-  event.editorOptions.inputAttr = {
-    style: `
+    event.editorOptions.inputAttr = {
+      style: `
       height: 100%;
       padding: 0 4px;
       box-sizing: border-box;
     `,
-  };
+    };
 
-  event.editorOptions.showSpinButtons = false;
+    event.editorOptions.showSpinButtons = false;
 
-  // IMPORTANT: Calculate when NEW_QTY changes
-  event.editorOptions.onValueChanged = (args: any) => {
+    // IMPORTANT: Calculate when NEW_QTY changes
+    event.editorOptions.onValueChanged = (args: any) => {
 
-    const row = event.row.data;
+      const row = event.row.data;
 
-    const stockQty = Number(row.STOCK_QTY) || 0;
-    const newQty = Number(args.value) || 0;
-    const cost = Number(row.COST) || 0;
+      const stockQty = Number(row.STOCK_QTY) || 0;
+      const newQty = Number(args.value) || 0;
+      const cost = Number(row.COST) || 0;
 
-    // Calculate adjusted quantity
-    const adjQty = newQty - stockQty;
+      // Calculate adjusted quantity
+      const adjQty = newQty - stockQty;
 
-    // Calculate amount
-    const amount = adjQty * cost;
+      // Calculate amount
+      const amount = adjQty * cost;
 
-    // Update row
-    row.NEW_QTY = newQty;
-    row.ADJ_QTY = adjQty;
-    row.AMOUNT = amount;
+      // Update row
+      row.NEW_QTY = newQty;
+      row.ADJ_QTY = adjQty;
+      row.AMOUNT = amount;
 
-    // Update total amount
-    this.totalAmount = this.adjustmentFormData.Details.reduce(
-      (sum: number, item: any) => {
-        return sum + (Number(item.AMOUNT) || 0);
-      },
-      0
-    );
-
-    this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
-
-    console.log('Stock Qty:', stockQty);
-    console.log('New Qty:', newQty);
-    console.log('Adjusted Qty:', adjQty);
-    console.log('Cost:', cost);
-    console.log('Amount:', amount);
-    console.log('Total Amount:', this.totalAmount);
-
-    // Refresh the grid
-    event.component.refresh();
-  };
-
-  // Keep your Enter key logic
-  event.editorOptions.onKeyDown = (keyEvent: any) => {
-    if (keyEvent.event.key === 'Enter') {
-
-      const grid = this.itemsGridRef?.instance;
-
-      if (!grid) {
-        return;
-      }
-
-      const visibleRows = grid.getVisibleRows();
-
-      const rowIndex = visibleRows.findIndex(
-        (r: any) => r?.data === event.row?.data
+      // Update total amount
+      this.totalAmount = this.adjustmentFormData.Details.reduce(
+        (sum: number, item: any) => {
+          return sum + (Number(item.AMOUNT) || 0);
+        },
+        0
       );
 
-      setTimeout(() => {
-        // Keep your existing Enter navigation logic here
-      }, 50);
-    }
-  };
-}
+      this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
+
+      console.log('Stock Qty:', stockQty);
+      console.log('New Qty:', newQty);
+      console.log('Adjusted Qty:', adjQty);
+      console.log('Cost:', cost);
+      console.log('Amount:', amount);
+      console.log('Total Amount:', this.totalAmount);
+
+      // Refresh the grid
+      event.component.refresh();
+    };
+
+    // Keep your Enter key logic
+    event.editorOptions.onKeyDown = (keyEvent: any) => {
+      if (keyEvent.event.key === 'Enter') {
+
+        const grid = this.itemsGridRef?.instance;
+
+        if (!grid) {
+          return;
+        }
+
+        const visibleRows = grid.getVisibleRows();
+
+        const rowIndex = visibleRows.findIndex(
+          (r: any) => r?.data === event.row?.data
+        );
+
+        setTimeout(() => {
+          // Keep your existing Enter navigation logic here
+        }, 50);
+      }
+    };
+  }
   // onEditorPreparing(event: any) {
   //   if (event.dataField === 'NEW_QTY') {
   //     event.editorOptions = event.editorOptions || {};
@@ -711,43 +713,43 @@ export class StockAdjustmentAddComponent {
   onEditPackUpdate(e: any) { }
 
   onCellValueChanged(e: any) {
-  // console.log('Cell Value Changed:', e);
+    // console.log('Cell Value Changed:', e);
 
-  // if (e.dataField !== 'NEW_QTY') {
-  //   return;
-  // }
+    // if (e.dataField !== 'NEW_QTY') {
+    //   return;
+    // }
 
-  // const row = e.data;
+    // const row = e.data;
 
-  // const stockQty = Number(row.STOCK_QTY) || 0;
-  // const newQty = Number(e.value) || 0;
-  // const cost = Number(row.COST) || 0;
+    // const stockQty = Number(row.STOCK_QTY) || 0;
+    // const newQty = Number(e.value) || 0;
+    // const cost = Number(row.COST) || 0;
 
-  // // Calculate adjusted stock
-  // row.ADJ_QTY = newQty - stockQty;
+    // // Calculate adjusted stock
+    // row.ADJ_QTY = newQty - stockQty;
 
-  // // Calculate amount
-  // row.AMOUNT = row.ADJ_QTY * cost;
+    // // Calculate amount
+    // row.AMOUNT = row.ADJ_QTY * cost;
 
-  // // Update total amount
-  // this.totalAmount = this.adjustmentFormData.Details.reduce(
-  //   (sum: number, item: any) => {
-  //     return sum + (Number(item.AMOUNT) || 0);
-  //   },
-  //   0
-  // );
+    // // Update total amount
+    // this.totalAmount = this.adjustmentFormData.Details.reduce(
+    //   (sum: number, item: any) => {
+    //     return sum + (Number(item.AMOUNT) || 0);
+    //   },
+    //   0
+    // );
 
-  // this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
+    // this.adjustmentFormData.NET_AMOUNT = this.totalAmount;
 
-  // console.log('Stock:', stockQty);
-  // console.log('New Qty:', newQty);
-  // console.log('Adjusted Qty:', row.ADJ_QTY);
-  // console.log('Amount:', row.AMOUNT);
-  // console.log('Total Amount:', this.totalAmount);
+    // console.log('Stock:', stockQty);
+    // console.log('New Qty:', newQty);
+    // console.log('Adjusted Qty:', row.ADJ_QTY);
+    // console.log('Amount:', row.AMOUNT);
+    // console.log('Total Amount:', this.totalAmount);
 
-  // // Refresh grid so summary updates
-  // e.component.refresh();
-}
+    // // Refresh grid so summary updates
+    // e.component.refresh();
+  }
 
   // onCellValueChanged(e: any) {
   //   console.log(e, '===============pppppppppp==============  ');

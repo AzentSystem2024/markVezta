@@ -198,7 +198,7 @@
       ></dxi-column>
       <dxi-column
         dataField="STORE_NAME"
-        caption="Store/Branch"
+        [caption]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"
         width="250"
       ></dxi-column>
       <dxi-column

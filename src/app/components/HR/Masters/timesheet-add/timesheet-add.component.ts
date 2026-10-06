@@ -97,6 +97,7 @@ export class TimesheetAddComponent implements OnInit {
       },
     ],
   };
+  appType: any;
 
   // 2. Constructor & Lifecycle Hooks
   // =========================================================================
@@ -104,7 +105,7 @@ export class TimesheetAddComponent implements OnInit {
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.sesstion_Details();
@@ -136,6 +137,7 @@ export class TimesheetAddComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID || 0;
+    this.appType = sessionData.Configuration[0]?.APP_TYPE || '';
   }
 
   getPaySettings() {
@@ -770,4 +772,4 @@ export class TimesheetAddComponent implements OnInit {
   exports: [TimesheetAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class TimesheetAddModule {}
+export class TimesheetAddModule { }

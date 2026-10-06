@@ -175,7 +175,10 @@
           (onRowUpdated)="onTimesheetDetailsUpdated($event)"
           (onEditorPreparing)="onEditorPreparingTImesheetdetails($event)"
         >
-          <dxi-column dataField="STORE_ID" caption="Store/Branch">
+          <dxi-column
+            dataField="STORE_ID"
+            [caption]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"
+          >
             <dxo-lookup
               [dataSource]="Stores_List"
               displayExpr="DESCRIPTION"
@@ -202,10 +205,7 @@
               message="Worked days cannot exceed total allowed days"
             ></dxi-validation-rule
           ></dxi-column>
-          <dxi-column
-            dataField="NORMAL_OT"
-            caption="OT Hours"
-            dataType="number"
+          <dxi-column dataField="NORMAL_OT" caption="OT Hours" dataType="number"
             ><dxi-validation-rule
               type="custom"
               [validationCallback]="validTime"
@@ -221,9 +221,6 @@
             ></dxi-validation-rule
           ></dxi-column>
           <dxo-summary>
-           
-
-           
             <dxi-total-item
               column="DAYS"
               summaryType="sum"

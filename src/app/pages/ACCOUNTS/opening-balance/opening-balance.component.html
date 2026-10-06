@@ -148,7 +148,7 @@
       ></dxi-column>
       <dxi-column
         dataField="STORE_ID"
-        caption="Branch/Store"
+        [caption]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"
         [editorType]="'dxSelectBox'"
         [allowEditing]="!isReadOnly"
         [lookup]="{

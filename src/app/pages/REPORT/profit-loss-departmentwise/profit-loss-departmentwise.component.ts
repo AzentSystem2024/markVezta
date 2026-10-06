@@ -66,6 +66,7 @@ export class ProfitLossDepartmentwiseComponent {
   selectedStoreid: any[] = [];
   storeHint: string = '';
   showViewColumn = false;
+  appType: any;
 
   constructor(
     private dataservice: DataService,
@@ -117,10 +118,7 @@ export class ProfitLossDepartmentwiseComponent {
     //
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    // console.log(
-    //   this.selected_Company_id,
-    //   '============selected_Company_id==============',
-    // );
+    this.appType = sessionData.Configuration?.APP_TYPE || '';
   }
 
   //================ Year value change ===================

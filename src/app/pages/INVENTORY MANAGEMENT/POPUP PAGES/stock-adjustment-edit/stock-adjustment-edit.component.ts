@@ -94,6 +94,7 @@ export class StockAdjustmentEditComponent {
       );
     }
   };
+  appType: any;
 
   getSaveButtonText(): string {
     if (this.status === 'verifyscreen') {
@@ -197,6 +198,7 @@ export class StockAdjustmentEditComponent {
     console.log(this.userID, 'USERIDINSTOCKADJ');
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.Companies[0].COMPANY_ID;
+    this.appType = menuResponse.Configuration[0]?.APP_TYPE || '';
     const menuGroups = menuResponse.MenuGroups || [];
     console.log('MenuGroups:', menuResponse.Configuration[0].STORE_ID);
     this.storeFromSession = menuResponse.Configuration[0].STORE_ID;
@@ -238,7 +240,7 @@ export class StockAdjustmentEditComponent {
       this.adjustmentFormData = this.EditingResponseData;
       console.log(this.EditingResponseData);
       console.log(this.adjustmentFormData);
-      
+
       if (this.adjustmentFormData.Details && this.adjustmentFormData.Details.length > 0) {
         this.adjustmentFormData.Details.forEach((item: any, i: number) => {
           item.SL_NO = i + 1;

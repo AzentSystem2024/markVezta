@@ -157,6 +157,9 @@
           [items]="State"
           [(value)]="newStores.STATE_ID"
           [searchEnabled]="true"
+          [placeholder]="
+            appType === 'VEZTA' ? 'Select Emirates *' : 'Select State *'
+          "
           labelMode="floating"
           (onValueChanged)="onStateValue($event)"
         >
