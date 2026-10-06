@@ -301,7 +301,7 @@
               [valueExpr]="'ID'"
               [displayExpr]="'DESCRIPTION'"
               [placeholder]="'Select State'"
-              label="State"
+              [label]="appType === 'VEZTA' ? 'Emirates' : 'State'"
               [labelMode]="'floating'"
               [searchEnabled]="true"
               (onValueChanged)="onStateChange($event)"

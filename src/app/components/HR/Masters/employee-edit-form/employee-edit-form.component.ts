@@ -179,6 +179,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   // Flags
   salaryHeadLoaded = false;
   employeeDataLoaded = false;
+  appType: any;
 
   constructor(
     public dataservice: DataService,
@@ -319,6 +320,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     if (savedUserData) {
       this.sessiondata = JSON.parse(savedUserData);
       const companyId = this.sessiondata?.SELECTED_COMPANY?.COMPANY_ID;
+      this.appType = this.sessiondata.Configuration?.APP_TYPE;
       this.selected_Company_id = companyId;
       this.COMPANY_ID = companyId;
     } else {
@@ -747,4 +749,4 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
   exports: [EmployeeEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeEditFormFormModule {}
+export class EmployeeEditFormFormModule { }

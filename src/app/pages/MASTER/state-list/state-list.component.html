@@ -64,7 +64,7 @@
             margin-right: 3px;
           "
         >
-          State
+          {{ appType === "VEZTA" ? "Emirates" : "State" }}
         </div>
       </dxi-item>
       <dxi-item name="searchPanel" locateInMenu="auto"></dxi-item>
@@ -100,10 +100,26 @@
       ></dxi-item>
     </dxo-toolbar>
 
-    <dxi-column dataField="STATE_CODE" caption="State Codes"></dxi-column>
-    <dxi-column dataField="STATE_NAME" caption="State Name">
-      <dxi-validation-rule type="required" message="State is required">
-        <dxi-validation-rule type="required" message="State is required">
+    <dxi-column
+      dataField="STATE_CODE"
+      [caption]="appType === 'VEZTA' ? 'Emirates Codes' : 'State Codes'"
+    ></dxi-column>
+    <dxi-column
+      dataField="STATE_NAME"
+      [caption]="appType === 'VEZTA' ? 'Emirates Name' : 'State Name'"
+    >
+      <dxi-validation-rule
+        type="required"
+        [message]="
+          appType === 'VEZTA' ? 'Emirates is required' : 'State is required'
+        "
+      >
+        <dxi-validation-rule
+          type="required"
+          [message]="
+            appType === 'VEZTA' ? 'Emirates is required' : 'State is required'
+          "
+        >
         </dxi-validation-rule>
       </dxi-validation-rule>
     </dxi-column>
