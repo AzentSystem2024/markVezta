@@ -144,6 +144,7 @@ export class AddMiscReceiptComponent {
   settings: any;
   CashID: any;
   BankID: any;
+  appType: any;
 
   constructor(
     private dataService: DataService,
@@ -156,6 +157,7 @@ export class AddMiscReceiptComponent {
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
+    this.appType = sessionData.Configuration[0]?.APP_TYPE || '';
   }
   ngOnInit() {
     this.sessionDetails();
