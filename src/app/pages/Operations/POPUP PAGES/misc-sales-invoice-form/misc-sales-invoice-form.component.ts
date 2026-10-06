@@ -50,20 +50,20 @@ import { DataService } from 'src/app/services';
   templateUrl: './misc-sales-invoice-form.component.html',
   styleUrls: ['./misc-sales-invoice-form.component.scss'],
 })
-export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
+export class MiscSalesInvoiceFormComponent implements OnInit, OnChanges {
   @Output() saveSuccess = new EventEmitter<void>();
   @Input() invoiceFormData: any;
-  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent|undefined;
+  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent | undefined;
 
   invoiceHeader: any = {
-    id:0,
+    id: 0,
     invoiceNo: '',
     date: new Date(),
     referenceNo: '',
     referenceDate: null,
     customerId: null,
     tpaId: null,
-    storeId : null,
+    storeId: null,
     encounterType: null,
     patientId: '',
     patientName: '',
@@ -92,25 +92,25 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
   encounterTypes: any;
   transactionTypes = ['Cash', 'Credit'];
   subDeptMap: any = {};
-  branch:any;
-  userID:any;
-  finID:any;
+  branch: any;
+  userID: any;
+  finID: any;
 
   isReadOnly: boolean = false;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) { }
 
   ngOnInit(): void {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
 
-    console.log(menuResponse,"menuResponse");
+    console.log(menuResponse, "menuResponse");
 
     this.userID = menuResponse.USER_ID;
     this.finID = menuResponse.FINANCIAL_YEARS[0].FIN_ID;
     this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
-    
+
     this.getCustomerDropdown();
     this.getEncounterDropDownData();
     this.getItemsDropDownData();
@@ -125,128 +125,128 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
 
-  if (changes['invoiceFormData'] && this.invoiceFormData) {
+    if (changes['invoiceFormData'] && this.invoiceFormData) {
 
-    const data = this.invoiceFormData;
+      const data = this.invoiceFormData;
 
-    //  HEADER
-    this.invoiceHeader = {
-      id : data.ID,
-      invoiceNo: data.INVOICE_NO,
-      date: data.INVOICE_DATE ? new Date(data.INVOICE_DATE) : null,
-      referenceNo: data.REF_NO,
-      referenceDate: data.REF_DATE ? new Date(data.REF_DATE) : null,
-      customerId: data.CUSTOMER_ID,
-      tpaId: data.TPA_ID,
-      encounterType: data.ENCOUNTER_TYPE,
-      patientId: data.PATIENT_ID,
-      patientName: data.PATIENT_NAME,
-      storeId: data.STORE_ID
-    };
+      //  HEADER
+      this.invoiceHeader = {
+        id: data.ID,
+        invoiceNo: data.INVOICE_NO,
+        date: data.INVOICE_DATE ? new Date(data.INVOICE_DATE) : null,
+        referenceNo: data.REF_NO,
+        referenceDate: data.REF_DATE ? new Date(data.REF_DATE) : null,
+        customerId: data.CUSTOMER_ID,
+        tpaId: data.TPA_ID,
+        encounterType: data.ENCOUNTER_TYPE,
+        patientId: data.PATIENT_ID,
+        patientName: data.PATIENT_NAME,
+        storeId: data.STORE_ID
+      };
 
-    this.isReadOnly = data.TRANS_STATUS === 5;
+      this.isReadOnly = data.TRANS_STATUS === 5;
 
-    this.isApproved = data.IS_APPROVED;
+      this.isApproved = data.IS_APPROVED;
 
-    //  DETAILS
-    this.invoiceDetails = (data.DETAILS || []).map((d: any) => ({
-      itemCode: d.ITEM_ID,
-      itemDescription: d.ITEM_DESCRIPTION,
-      clinician: d.CLINICIAN,
-      orderingClinician: d.ORDERING_CLINICIAN,
-      department: d.DEPARTMENT_ID,
-      subDepartment: d.SUB_DEPARTMENT_ID,
-      quantity: d.QUANTITY,
-      duration: d.DURATION,
-      grossAmount: d.GROSS_AMOUNT,
-      patientShare: d.PATIENT_SHARE,
-      vatCode: d.VAT_CODE,
-      vatPercent: d.VAT_PERC,
-      vatID: d.VAT_CLASS_ID,
-      vatAmount: d.VAT_AMOUNT,
-      netAmount: d.NET_AMOUNT
-    }));
+      //  DETAILS
+      this.invoiceDetails = (data.DETAILS || []).map((d: any) => ({
+        itemCode: d.ITEM_ID,
+        itemDescription: d.ITEM_DESCRIPTION,
+        clinician: d.CLINICIAN,
+        orderingClinician: d.ORDERING_CLINICIAN,
+        department: d.DEPARTMENT_ID,
+        subDepartment: d.SUB_DEPARTMENT_ID,
+        quantity: d.QUANTITY,
+        duration: d.DURATION,
+        grossAmount: d.GROSS_AMOUNT,
+        patientShare: d.PATIENT_SHARE,
+        vatCode: d.VAT_CODE,
+        vatPercent: d.VAT_PERC,
+        vatID: d.VAT_CLASS_ID,
+        vatAmount: d.VAT_AMOUNT,
+        netAmount: d.NET_AMOUNT
+      }));
 
 
-    setTimeout(() => {
-
-      if (this.isReadOnly) return;
-
-      if (!this.invoiceDetails) {
-        this.invoiceDetails = [];
-      }
-
-      const hasEmptyRow = this.invoiceDetails.some(r =>
-        !r.itemCode &&
-        (!r.quantity || r.quantity === 0) &&
-        (!r.grossAmount || r.grossAmount === 0)
-      );
-
-      let addedNewRow = false;
-
-      //  Add only if no empty row exists
-      if (!hasEmptyRow) {
-        this.invoiceDetails.push({
-          itemCode: null,
-          itemDescription: '',
-          clinician: '',
-          orderingClinician: '',
-          department: null,
-          subDepartment: null,
-          quantity: 0,
-          duration: 0,
-          grossAmount: 0,
-          patientShare: 0,
-          vatCode: null,
-          vatPercent: 0,
-          vatID: null,
-          vatAmount: 0,
-          netAmount: 0
-        });
-
-        addedNewRow = true;
-      }
-
-      //  Focus itemCode of last row
       setTimeout(() => {
-        const grid = this.itemsGridRef?.instance;
 
-        if (grid) {
-          const lastIndex = this.invoiceDetails.length - 1;
+        if (this.isReadOnly) return;
 
-          grid.editCell(lastIndex, 'itemCode');
+        if (!this.invoiceDetails) {
+          this.invoiceDetails = [];
         }
-      }, 100);
 
-    }, 0);
+        const hasEmptyRow = this.invoiceDetails.some(r =>
+          !r.itemCode &&
+          (!r.quantity || r.quantity === 0) &&
+          (!r.grossAmount || r.grossAmount === 0)
+        );
 
-    this.subDeptMap = {};
-    this.allSubDepartments = []; // 🔥 ADD THIS
+        let addedNewRow = false;
 
-    this.invoiceDetails.forEach((row, index) => {
+        //  Add only if no empty row exists
+        if (!hasEmptyRow) {
+          this.invoiceDetails.push({
+            itemCode: null,
+            itemDescription: '',
+            clinician: '',
+            orderingClinician: '',
+            department: null,
+            subDepartment: null,
+            quantity: 0,
+            duration: 0,
+            grossAmount: 0,
+            patientShare: 0,
+            vatCode: null,
+            vatPercent: 0,
+            vatID: null,
+            vatAmount: 0,
+            netAmount: 0
+          });
 
-      if (row.department) {
+          addedNewRow = true;
+        }
 
-        this.getSubDepartment(row.department, (data) => {
+        //  Focus itemCode of last row
+        setTimeout(() => {
+          const grid = this.itemsGridRef?.instance;
 
-          this.subDeptMap[index] = data;
+          if (grid) {
+            const lastIndex = this.invoiceDetails.length - 1;
 
-          // 🔥 ADD THIS (same as onEditorPreparing)
-          this.allSubDepartments = [
-            ...this.allSubDepartments,
-            ...data.filter(d =>
-              !this.allSubDepartments.some(x => x.ID === d.ID)
-            )
-          ];
+            grid.editCell(lastIndex, 'itemCode');
+          }
+        }, 100);
 
-        });
+      }, 0);
 
-      }
+      this.subDeptMap = {};
+      this.allSubDepartments = []; // 🔥 ADD THIS
 
-    });
+      this.invoiceDetails.forEach((row, index) => {
 
+        if (row.department) {
+
+          this.getSubDepartment(row.department, (data) => {
+
+            this.subDeptMap[index] = data;
+
+            // 🔥 ADD THIS (same as onEditorPreparing)
+            this.allSubDepartments = [
+              ...this.allSubDepartments,
+              ...data.filter(d =>
+                !this.allSubDepartments.some(x => x.ID === d.ID)
+              )
+            ];
+
+          });
+
+        }
+
+      });
+
+    }
   }
-}
 
   getCustomerDropdown() {
     const payload = {
@@ -301,7 +301,7 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
     const name = {
       NAME: 'STORE',
       COMPANY_ID: this.companyID,
-      
+
     };
     this.dataService.getDropdownData(name).subscribe((res: any) => {
       this.branch = res;
@@ -323,211 +323,249 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
 
   onCellValueChanged(e: any) {
 
-  if (
-    ['quantity', 'duration', 'vatPercent', 'patientShare', 'grossAmount'].includes(e.column.dataField)
-  ) {
-    this.calculateRowWithGrid(e);
+    if (
+      ['quantity', 'duration', 'vatPercent', 'patientShare', 'grossAmount'].includes(e.column.dataField)
+    ) {
+      this.calculateRowWithGrid(e);
+    }
+
+    if (e.column.dataField === 'department') {
+      const deptId = e.value;
+      e.data.subDepartment = null;
+
+      this.getSubDepartment(deptId, (data) => {
+        e.data.subDepartmentList = data;
+      });
+    }
   }
 
-  if (e.column.dataField === 'department') {
-    const deptId = e.value;
-    e.data.subDepartment = null;
+  //   updateCalculation(e: any) {
 
-    this.getSubDepartment(deptId, (data) => {
-      e.data.subDepartmentList = data;
-    });
-  }
-}
+  //   const row = e.data;
 
-//   updateCalculation(e: any) {
+  //   const quantity = Number(row.quantity) || 0;
+  //   const duration = Number(row.duration) || 0;
+  //   const vatPercent = Number(row.vatPercent) || 0;
+  //   const patientShare = Number(row.patientShare) || 0;
 
-//   const row = e.data;
+  //   let gross = Number(row.grossAmount) || 0;
 
-//   const quantity = Number(row.quantity) || 0;
-//   const duration = Number(row.duration) || 0;
-//   const vatPercent = Number(row.vatPercent) || 0;
-//   const patientShare = Number(row.patientShare) || 0;
+  //   // 🔥 If quantity/duration present → calculate gross
+  //   // if (quantity && duration) {
+  //   //   // gross = quantity * duration;
+  //   //   row.grossAmount = gross;
+  //   // }
 
-//   let gross = Number(row.grossAmount) || 0;
+  //   // 🔥 VAT
+  //   const vatAmount = (gross * vatPercent) / 100;
+  //   row.vatAmount = vatAmount;
 
-//   // 🔥 If quantity/duration present → calculate gross
-//   // if (quantity && duration) {
-//   //   // gross = quantity * duration;
-//   //   row.grossAmount = gross;
-//   // }
-
-//   // 🔥 VAT
-//   const vatAmount = (gross * vatPercent) / 100;
-//   row.vatAmount = vatAmount;
-
-//   // 🔥 NET
-//   row.netAmount = gross + vatAmount - patientShare;
-// }
+  //   // 🔥 NET
+  //   row.netAmount = gross + vatAmount - patientShare;
+  // }
 
 
   updateCalculation(e: any) {
 
-  const row = e.data;
+    const row = e.data;
 
-  const quantity = Number(row.quantity) || 0;
-  const duration = Number(row.duration) || 0;
-  const vatPercent = Number(row.vatPercent) || 0;
-  const patientShare = Number(row.patientShare) || 0;
-  const gross = Number(row.grossAmount) || 0;
+    const quantity = Number(row.quantity) || 0;
+    const duration = Number(row.duration) || 0;
+    const vatPercent = Number(row.vatPercent) || 0;
+    const patientShare = Number(row.patientShare) || 0;
+    const gross = Number(row.grossAmount) || 0;
 
-  //  VAT
-  const vatAmount = (gross * vatPercent) / 100;
-  row.vatAmount = vatAmount;
+    //  VAT
+    const vatAmount = (gross * vatPercent) / 100;
+    row.vatAmount = vatAmount;
 
-  //  NET
-  row.netAmount = gross + vatAmount - patientShare;
+    //  NET
+    row.netAmount = gross + vatAmount - patientShare;
 
-  // ============================
-  //  ADD THIS BLOCK (ROW ADD)
-  // ============================
+    // ============================
+    //  ADD THIS BLOCK (ROW ADD)
+    // ============================
 
-  const rowIndex = e.component.getRowIndexByKey(e.key);
+    const rowIndex = e.component.getRowIndexByKey(e.key);
 
-  const isValid =
-    row.itemCode &&
-    quantity > 0 &&
-    gross > 0;
+    const isValid =
+      row.itemCode &&
+      quantity > 0 &&
+      gross > 0;
 
-  if (!isValid) return;
+    if (!isValid) return;
 
-  const isLastRow = rowIndex === this.invoiceDetails.length - 1;
+    const isLastRow = rowIndex === this.invoiceDetails.length - 1;
 
-  if (!isLastRow) return;
+    if (!isLastRow) return;
 
-  //  check next row
-  const nextRow = this.invoiceDetails[rowIndex + 1];
+    //  check next row
+    const nextRow = this.invoiceDetails[rowIndex + 1];
 
-  const hasNextEmptyRow =
-    nextRow &&
-    !nextRow.itemCode &&
-    (!nextRow.quantity || nextRow.quantity === 0) &&
-    (!nextRow.grossAmount || nextRow.grossAmount === 0);
+    const hasNextEmptyRow =
+      nextRow &&
+      !nextRow.itemCode &&
+      (!nextRow.quantity || nextRow.quantity === 0) &&
+      (!nextRow.grossAmount || nextRow.grossAmount === 0);
 
-  if (hasNextEmptyRow) return;
+    if (hasNextEmptyRow) return;
 
-  //  ADD ROW
-  this.invoiceDetails = [
-    ...this.invoiceDetails,
-    {
-      itemCode: null,
-      itemDescription: '',
-      clinician: '',
-      orderingClinician: '',
-      department: null,
-      subDepartment: null,
-      quantity: 0,
-      duration: 0,
-      grossAmount: 0,
-      patientShare: 0,
-      vatCode: null,
-      vatPercent: 0,
-      vatID: null,
-      vatAmount: 0,
-      netAmount: 0
-    }
-  ];
+    //  ADD ROW
+    this.invoiceDetails = [
+      ...this.invoiceDetails,
+      {
+        itemCode: null,
+        itemDescription: '',
+        clinician: '',
+        orderingClinician: '',
+        department: null,
+        subDepartment: null,
+        quantity: 0,
+        duration: 0,
+        grossAmount: 0,
+        patientShare: 0,
+        vatCode: null,
+        vatPercent: 0,
+        vatID: null,
+        vatAmount: 0,
+        netAmount: 0
+      }
+    ];
 
-  //  REFRESH + FOCUS
-  setTimeout(() => {
-    const grid = this.itemsGridRef?.instance;
+    //  REFRESH + FOCUS
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
 
-    if (grid) {
-      grid.refresh();
+      if (grid) {
+        grid.refresh();
 
-      setTimeout(() => {
-        const newIndex = this.invoiceDetails.length - 1;
-        grid.editCell(newIndex, 'itemCode');
-      }, 100);
-    }
+        setTimeout(() => {
+          const newIndex = this.invoiceDetails.length - 1;
+          grid.editCell(newIndex, 'itemCode');
+        }, 100);
+      }
 
-  }, 0);
-}
+    }, 0);
+  }
 
   calculateRowWithGrid(e: any) {
 
-  const rowIndex = e.row.rowIndex;
+    const rowIndex = e.row.rowIndex;
 
-  // 🔥 get latest values from grid
-  const quantity = Number(e.component.cellValue(rowIndex, 'quantity')) || 0;
-  const duration = Number(e.component.cellValue(rowIndex, 'duration')) || 0;
-  const vatPercent = Number(e.component.cellValue(rowIndex, 'vatPercent')) || 0;
-  const patientShare = Number(e.component.cellValue(rowIndex, 'patientShare')) || 0;
+    // 🔥 get latest values from grid
+    const quantity = Number(e.component.cellValue(rowIndex, 'quantity')) || 0;
+    const duration = Number(e.component.cellValue(rowIndex, 'duration')) || 0;
+    const vatPercent = Number(e.component.cellValue(rowIndex, 'vatPercent')) || 0;
+    const patientShare = Number(e.component.cellValue(rowIndex, 'patientShare')) || 0;
 
-  let gross = Number(e.component.cellValue(rowIndex, 'grossAmount')) || 0;
+    let gross = Number(e.component.cellValue(rowIndex, 'grossAmount')) || 0;
 
-  // 🔥 CASE 1: If quantity or duration changed → calculate gross
-  if (['quantity', 'duration'].includes(e.column.dataField)) {
-    gross = quantity * duration;
-    e.component.cellValue(rowIndex, 'grossAmount', gross);
+    // 🔥 CASE 1: If quantity or duration changed → calculate gross
+    if (['quantity', 'duration'].includes(e.column.dataField)) {
+      gross = quantity * duration;
+      e.component.cellValue(rowIndex, 'grossAmount', gross);
+    }
+
+    // 🔥 CASE 2: If user manually entered gross → use it directly
+    if (e.column.dataField === 'grossAmount') {
+      gross = Number(e.value) || 0;
+    }
+
+    // 🔥 VAT calculation
+    const vatAmount = (gross * vatPercent) / 100;
+
+    // 🔥 NET calculation
+    const net = gross + vatAmount - patientShare;
+
+    e.component.cellValue(rowIndex, 'vatAmount', vatAmount);
+    e.component.cellValue(rowIndex, 'netAmount', net);
   }
-
-  // 🔥 CASE 2: If user manually entered gross → use it directly
-  if (e.column.dataField === 'grossAmount') {
-    gross = Number(e.value) || 0;
-  }
-
-  // 🔥 VAT calculation
-  const vatAmount = (gross * vatPercent) / 100;
-
-  // 🔥 NET calculation
-  const net = gross + vatAmount - patientShare;
-
-  e.component.cellValue(rowIndex, 'vatAmount', vatAmount);
-  e.component.cellValue(rowIndex, 'netAmount', net);
-}
 
   onEditorPreparing(e: any) {
+    if (
+      e.dataField === 'itemCode' ||
+      e.dataField === 'itemDescription' ||
+      e.dataField === 'orderingClinician' ||
+      e.dataField === 'clinician' ||
+      e.dataField === 'department' ||
+      e.dataField === 'subDepartment' ||
+      e.dataField === 'quantity' ||
+      e.dataField === 'duration' ||
+      e.dataField === 'grossAmount'
+    ) {
+      e.editorOptions = e.editorOptions || {};
+
+      // Let the editor inherit row height naturally (no fixed height)
+      e.editorOptions.elementAttr = {
+        style: `
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      `,
+      };
+
+      // Make sure the input fits snugly inside
+      e.editorOptions.inputAttr = {
+        style: `
+        height: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+      `,
+      };
+
+      // Remove spin buttons to prevent layout changes
+      if (e.editorName === 'dxNumberBox') {
+        e.editorOptions.showSpinButtons = false;
+      }
+    }
 
     if (e.dataField === 'itemCode' && e.parentType === 'dataRow') {
 
-  const original = e.editorOptions.onValueChanged;
+      const original = e.editorOptions.onValueChanged;
 
-  e.editorOptions.onValueChanged = (args: any) => {
+      e.editorOptions.onValueChanged = (args: any) => {
 
-    e.setValue(args.value);
+        e.setValue(args.value);
 
-    const itemId = args.value;
+        const itemId = args.value;
 
-    const payload = {
-      ITEM_ID: itemId
-    };
+        const payload = {
+          ITEM_ID: itemId
+        };
 
-    this.dataService.getItems(payload).subscribe((res: any) => {
+        this.dataService.getItems(payload).subscribe((res: any) => {
 
-      if (res?.data?.length) {
+          if (res?.data?.length) {
 
-        const item = res.data[0];
-        console.log('VAT_CLASS_ID:', item.VAT_CLASS_ID); // 🔥 your value
+            const item = res.data[0];
+            console.log('VAT_CLASS_ID:', item.VAT_CLASS_ID); // 🔥 your value
 
-        const rowIndex = e.row.rowIndex;
+            const rowIndex = e.row.rowIndex;
 
-        const rowData = this.invoiceDetails[rowIndex];
+            const rowData = this.invoiceDetails[rowIndex];
 
-        rowData.vatID = item.VAT_CLASS_ID; 
+            rowData.vatID = item.VAT_CLASS_ID;
 
-        // FIX HERE
-        e.component.cellValue(rowIndex, 'itemDescription', item.ITEM_DESCRIPTION);
-        e.component.cellValue(rowIndex, 'vatCode', item.VAT_CODE);
-        e.component.cellValue(rowIndex, 'vatPercent', item.VAT_PERC);
-        e.component.cellValue(rowIndex, 'vatID', item.VAT_CLASS_ID);
-        
+            // FIX HERE
+            e.component.cellValue(rowIndex, 'itemDescription', item.ITEM_DESCRIPTION);
+            e.component.cellValue(rowIndex, 'vatCode', item.VAT_CODE);
+            e.component.cellValue(rowIndex, 'vatPercent', item.VAT_PERC);
+            e.component.cellValue(rowIndex, 'vatID', item.VAT_CLASS_ID);
 
-        //  recalc
-        this.calculateRowWithGrid(e);
 
-        // optional refresh
-        e.component.repaintRows([rowIndex]);
-      }
-    });
+            //  recalc
+            this.calculateRowWithGrid(e);
 
-    if (original) original(args);
-  };
-}
+            // optional refresh
+            e.component.repaintRows([rowIndex]);
+          }
+        });
+
+        if (original) original(args);
+      };
+    }
 
     if (e.dataField === 'department' && e.parentType === 'dataRow') {
       const original = e.editorOptions.onValueChanged;
@@ -548,7 +586,7 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
 
           this.allSubDepartments = [
             ...this.allSubDepartments,
-            ...data.filter(d => 
+            ...data.filter(d =>
               !this.allSubDepartments.some(x => x.ID === d.ID)
             )
           ];
@@ -602,251 +640,251 @@ export class MiscSalesInvoiceFormComponent implements OnInit,OnChanges {
 
   onSave() {
 
-  // ✅ VALIDATION FIRST
-  if (!this.validateForm()) {
-    return;
-  }
-
-  const payload = {
-    ID: this.invoiceHeader.id || 0, 
-    USER_ID : this.userID,
-    FIN_ID : this.finID,
-    INVOICE_NO: this.invoiceHeader.invoiceNo,
-    INVOICE_DATE: this.invoiceHeader.date,
-    REF_NO: this.invoiceHeader.referenceNo,
-    REF_DATE: this.invoiceHeader.referenceDate,
-    CUSTOMER_ID: this.invoiceHeader.customerId,
-    TPA_ID: this.invoiceHeader.tpaId,
-    ENCOUNTER_TYPE: this.invoiceHeader.encounterType,
-    PATIENT_ID: this.invoiceHeader.patientId,
-    PATIENT_NAME: this.invoiceHeader.patientName,
-    COMPANY_ID : this.companyID,
-    STORE_ID : this.invoiceHeader.storeId,
-    IS_APPROVED : this.isApproved,
-
-    DETAILS: this.invoiceDetails
-    .filter((row: any) =>
-      row.itemCode &&
-      Number(row.quantity) > 0 &&
-      Number(row.grossAmount) > 0
-    )
-    .map((row: any) => ({
-      ITEM_ID: row.itemCode,
-      CLINICIAN: row.clinician,
-      ORDERING_CLINICIAN: row.orderingClinician,
-      DEPARTMENT_ID: row.department,
-      SUB_DEPARTMENT_ID: row.subDepartment,
-      QUANTITY: row.quantity,
-      DURATION: row.duration,
-      GROSS_AMOUNT: row.grossAmount,
-      PATIENT_SHARE: row.patientShare,
-      VAT_CODE: row.vatCode,
-      VAT_PERC: row.vatPercent,
-      VAT_CLASS_ID: row.vatID,
-      VAT_AMOUNT: row.vatAmount,
-      NET_AMOUNT: row.netAmount
-    }))
-  };
-
-  console.log(payload, "FINAL PAYLOAD");
-
-  //  API call
-  this.dataService.miscSalesInvoiceInsert(payload).subscribe((res:any)=>{
-
-    if (res) {
-
-      // ✅ Notify
-      notify({
-      message: this.invoiceHeader.id
-        ? 'Invoice Updated Successfully'
-        : (this.isApproved 
-            ? 'Invoice Committed Successfully' 
-            : 'Invoice Saved Successfully'),
-      position: { at: 'top center', my: 'top center' }
-    }, 'success', 2000);
-
-      // ✅ Emit to parent
-      this.saveSuccess.emit();
-
-      // ✅ Optional: reset form
-      this.onCancel();
-    }
-    else {
-      notify('Save failed', 'error', 2000);
+    // ✅ VALIDATION FIRST
+    if (!this.validateForm()) {
+      return;
     }
 
-  });
-}
+    const payload = {
+      ID: this.invoiceHeader.id || 0,
+      USER_ID: this.userID,
+      FIN_ID: this.finID,
+      INVOICE_NO: this.invoiceHeader.invoiceNo,
+      INVOICE_DATE: this.invoiceHeader.date,
+      REF_NO: this.invoiceHeader.referenceNo,
+      REF_DATE: this.invoiceHeader.referenceDate,
+      CUSTOMER_ID: this.invoiceHeader.customerId,
+      TPA_ID: this.invoiceHeader.tpaId,
+      ENCOUNTER_TYPE: this.invoiceHeader.encounterType,
+      PATIENT_ID: this.invoiceHeader.patientId,
+      PATIENT_NAME: this.invoiceHeader.patientName,
+      COMPANY_ID: this.companyID,
+      STORE_ID: this.invoiceHeader.storeId,
+      IS_APPROVED: this.isApproved,
 
-onCancel() {
+      DETAILS: this.invoiceDetails
+        .filter((row: any) =>
+          row.itemCode &&
+          Number(row.quantity) > 0 &&
+          Number(row.grossAmount) > 0
+        )
+        .map((row: any) => ({
+          ITEM_ID: row.itemCode,
+          CLINICIAN: row.clinician,
+          ORDERING_CLINICIAN: row.orderingClinician,
+          DEPARTMENT_ID: row.department,
+          SUB_DEPARTMENT_ID: row.subDepartment,
+          QUANTITY: row.quantity,
+          DURATION: row.duration,
+          GROSS_AMOUNT: row.grossAmount,
+          PATIENT_SHARE: row.patientShare,
+          VAT_CODE: row.vatCode,
+          VAT_PERC: row.vatPercent,
+          VAT_CLASS_ID: row.vatID,
+          VAT_AMOUNT: row.vatAmount,
+          NET_AMOUNT: row.netAmount
+        }))
+    };
 
-  // 🔥 clear form
-  this.invoiceHeader = {
-    invoiceNo: '',
-    date: new Date(),
-    referenceNo: '',
-    referenceDate: null,
-    customerId: null,
-    tpaId: null,
-    encounterType: null,
-    patientId: '',
-    patientName: '',
-    transactionType: null
-  };
+    console.log(payload, "FINAL PAYLOAD");
 
-  this.invoiceDetails = [];
+    //  API call
+    this.dataService.miscSalesInvoiceInsert(payload).subscribe((res: any) => {
 
-}
+      if (res) {
 
-validateForm(): boolean {
+        // ✅ Notify
+        notify({
+          message: this.invoiceHeader.id
+            ? 'Invoice Updated Successfully'
+            : (this.isApproved
+              ? 'Invoice Committed Successfully'
+              : 'Invoice Saved Successfully'),
+          position: { at: 'top center', my: 'top center' }
+        }, 'success', 2000);
 
-  // 🔹 HEADER VALIDATION
-  if (!this.invoiceHeader.date) {
-    notify('Invoice Date is required', 'warning', 2000);
-    return false;
+        // ✅ Emit to parent
+        this.saveSuccess.emit();
+
+        // ✅ Optional: reset form
+        this.onCancel();
+      }
+      else {
+        notify('Save failed', 'error', 2000);
+      }
+
+    });
   }
 
-  if (!this.invoiceHeader.customerId) {
-    notify('Customer is required', 'warning', 2000);
-    return false;
-  }
+  onCancel() {
 
-  if (!this.invoiceHeader.storeId) {
-    notify('Branch is required', 'warning', 2000);
-    return false;
-  }
+    // 🔥 clear form
+    this.invoiceHeader = {
+      invoiceNo: '',
+      date: new Date(),
+      referenceNo: '',
+      referenceDate: null,
+      customerId: null,
+      tpaId: null,
+      encounterType: null,
+      patientId: '',
+      patientName: '',
+      transactionType: null
+    };
 
-  if (!this.invoiceHeader.patientName) {
-    notify('Patient Name is required', 'warning', 2000);
-    return false;
-  }
-
-  // 🔹 GRID VALIDATION
-  if (!this.invoiceDetails || this.invoiceDetails.length === 0) {
-    notify('At least one item is required', 'warning', 2000);
-    return false;
-  }
-
-  for (let i = 0; i < this.invoiceDetails.length; i++) {
-
-  const row = this.invoiceDetails[i];
-
-  const isEmptyRow =
-    !row.itemCode &&
-    (!row.quantity || row.quantity === 0) &&
-    (!row.grossAmount || row.grossAmount === 0);
-
-  // skip completely empty row
-  if (isEmptyRow) {
-    continue;
-  }
-
-  // validate only filled rows
-  if (!row.itemCode) {
-    notify(`Row ${i + 1}: Item is required`, 'warning', 2000);
-    return false;
-  }
-
-  if (!row.quantity || row.quantity <= 0) {
-    notify(`Row ${i + 1}: Quantity must be > 0`, 'warning', 2000);
-    return false;
-  }
-
-  if (!row.grossAmount || row.grossAmount <= 0) {
-    notify(`Row ${i + 1}: Gross Amount must be > 0`, 'warning', 2000);
-    return false;
-  }
-}
-
-  return true;
-}
-
-
-addNewManualRow() {
-
-  if (!this.invoiceDetails) {
     this.invoiceDetails = [];
+
   }
 
-  // ✅ prevent empty row
-  if (this.hasEmptyRow()) {
-    notify(
-      'Please fill the existing empty row before adding a new one.',
-      'warning',
-      2000
-    );
-    return;
+  validateForm(): boolean {
+
+    // 🔹 HEADER VALIDATION
+    if (!this.invoiceHeader.date) {
+      notify('Invoice Date is required', 'warning', 2000);
+      return false;
+    }
+
+    if (!this.invoiceHeader.customerId) {
+      notify('Customer is required', 'warning', 2000);
+      return false;
+    }
+
+    if (!this.invoiceHeader.storeId) {
+      notify('Branch is required', 'warning', 2000);
+      return false;
+    }
+
+    if (!this.invoiceHeader.patientName) {
+      notify('Patient Name is required', 'warning', 2000);
+      return false;
+    }
+
+    // 🔹 GRID VALIDATION
+    if (!this.invoiceDetails || this.invoiceDetails.length === 0) {
+      notify('At least one item is required', 'warning', 2000);
+      return false;
+    }
+
+    for (let i = 0; i < this.invoiceDetails.length; i++) {
+
+      const row = this.invoiceDetails[i];
+
+      const isEmptyRow =
+        !row.itemCode &&
+        (!row.quantity || row.quantity === 0) &&
+        (!row.grossAmount || row.grossAmount === 0);
+
+      // skip completely empty row
+      if (isEmptyRow) {
+        continue;
+      }
+
+      // validate only filled rows
+      if (!row.itemCode) {
+        notify(`Row ${i + 1}: Item is required`, 'warning', 2000);
+        return false;
+      }
+
+      if (!row.quantity || row.quantity <= 0) {
+        notify(`Row ${i + 1}: Quantity must be > 0`, 'warning', 2000);
+        return false;
+      }
+
+      if (!row.grossAmount || row.grossAmount <= 0) {
+        notify(`Row ${i + 1}: Gross Amount must be > 0`, 'warning', 2000);
+        return false;
+      }
+    }
+
+    return true;
   }
 
-  // ✅ optional SL_NO (if needed)
-  const nextSlNo =
-    this.invoiceDetails.length > 0
-      ? Math.max(...this.invoiceDetails.map((r: any, i: number) => i + 1))
-      : 1;
 
-  const newRow = {
-    itemCode: null,
-    itemDescription: '',
-    clinician: '',
-    orderingClinician: '',
-    department: null,
-    subDepartment: null,
-    quantity: 0,
-    duration: 0,
-    grossAmount: 0,
-    patientShare: 0,
-    vatCode: null,
-    vatPercent: 0,
-    vatID: null,
-    vatAmount: 0,
-    netAmount: 0
+  addNewManualRow() {
+
+    if (!this.invoiceDetails) {
+      this.invoiceDetails = [];
+    }
+
+    // ✅ prevent empty row
+    if (this.hasEmptyRow()) {
+      notify(
+        'Please fill the existing empty row before adding a new one.',
+        'warning',
+        2000
+      );
+      return;
+    }
+
+    // ✅ optional SL_NO (if needed)
+    const nextSlNo =
+      this.invoiceDetails.length > 0
+        ? Math.max(...this.invoiceDetails.map((r: any, i: number) => i + 1))
+        : 1;
+
+    const newRow = {
+      itemCode: null,
+      itemDescription: '',
+      clinician: '',
+      orderingClinician: '',
+      department: null,
+      subDepartment: null,
+      quantity: 0,
+      duration: 0,
+      grossAmount: 0,
+      patientShare: 0,
+      vatCode: null,
+      vatPercent: 0,
+      vatID: null,
+      vatAmount: 0,
+      netAmount: 0
+    };
+
+    // 🔥 IMPORTANT CHANGE → add at TOP
+    this.invoiceDetails = [
+      ...this.invoiceDetails,
+      newRow
+    ];
+
+    // 🔥 focus FIRST ROW (index 0)
+    setTimeout(() => {
+      const grid = this.itemsGridRef?.instance;
+      const lastIndex = this.invoiceDetails.length - 1;
+      grid?.editCell(lastIndex, 'itemCode');
+    }, 100);
+  }
+
+  private hasEmptyRow(): boolean {
+    return (this.invoiceDetails || []).some((r: any) => {
+
+      const hasItem = !!r.itemCode;
+
+      const hasQuantity = Number(r.quantity) > 0;
+      const hasGross = Number(r.grossAmount) > 0;
+      const hasNet = Number(r.netAmount) > 0;
+
+      // ✅ block if item selected but values not filled
+      return hasItem && (!hasQuantity || !hasGross || !hasNet);
+    });
+  }
+
+
+  calculateVatAmount = (row: any) => {
+    const gross = Number(row.grossAmount) || 0;
+    const vatPercent = Number(row.vatPercent) || 0;
+
+    return (gross * vatPercent) / 100;
   };
 
-  // 🔥 IMPORTANT CHANGE → add at TOP
-  this.invoiceDetails = [
-  ...this.invoiceDetails,
-  newRow
-];
+  calculateNetAmount = (row: any) => {
+    const gross = Number(row.grossAmount) || 0;
+    const vatPercent = Number(row.vatPercent) || 0;
+    const patientShare = Number(row.patientShare) || 0;
 
-  // 🔥 focus FIRST ROW (index 0)
-  setTimeout(() => {
-    const grid = this.itemsGridRef?.instance;
-    const lastIndex = this.invoiceDetails.length - 1;
-    grid?.editCell(lastIndex, 'itemCode');
-  }, 100);
-}
+    const vat = (gross * vatPercent) / 100;
 
-private hasEmptyRow(): boolean {
-  return (this.invoiceDetails || []).some((r: any) => {
-
-    const hasItem = !!r.itemCode;
-
-    const hasQuantity = Number(r.quantity) > 0;
-    const hasGross = Number(r.grossAmount) > 0;
-    const hasNet = Number(r.netAmount) > 0;
-
-    // ✅ block if item selected but values not filled
-    return hasItem && (!hasQuantity || !hasGross || !hasNet);
-  });
-}
-
-
-calculateVatAmount = (row: any) => {
-  const gross = Number(row.grossAmount) || 0;
-  const vatPercent = Number(row.vatPercent) || 0;
-
-  return (gross * vatPercent) / 100;
-};
-
-calculateNetAmount = (row: any) => {
-  const gross = Number(row.grossAmount) || 0;
-  const vatPercent = Number(row.vatPercent) || 0;
-  const patientShare = Number(row.patientShare) || 0;
-
-  const vat = (gross * vatPercent) / 100;
-
-  return gross + vat - patientShare;
-};
+    return gross + vat - patientShare;
+  };
 
 }
 
@@ -887,4 +925,4 @@ calculateNetAmount = (row: any) => {
   exports: [MiscSalesInvoiceFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class MiscSalesInvoiceFormModule {}
+export class MiscSalesInvoiceFormModule { }
