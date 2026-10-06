@@ -160,6 +160,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   countryCode: any;
   CountryId: any;
   sessiondata: any;
+  appType: any;
 
   constructor(public dataservice: DataService) {
     const savedUserData = sessionStorage.getItem('savedUserData');
@@ -364,6 +365,7 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     if (savedUserData) {
       this.sessiondata = JSON.parse(savedUserData);
       this.selected_Company_id = this.sessiondata.SELECTED_COMPANY.COMPANY_ID;
+      this.appType = this.sessiondata.Configuration?.APP_TYPE;
     }
   }
 
@@ -476,8 +478,8 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
 
     this.isSaving = true; // start loading
 
-    const payload = { 
-      ...this.employeeFormData, 
+    const payload = {
+      ...this.employeeFormData,
       Company_Id: this.COMPANY_ID,
       MOBILE: this.countryCode ? `${this.countryCode}-${this.employeeFormData.MOBILE}` : this.employeeFormData.MOBILE
     };
@@ -585,4 +587,4 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
   exports: [EmployeeAddFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeAddFormModule {}
+export class EmployeeAddFormModule { }

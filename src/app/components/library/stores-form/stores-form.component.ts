@@ -83,6 +83,8 @@ export class StoresFormComponent implements OnInit {
   stateLabel: any;
 
   storesArray: any[] = [];
+  sessionData: any;
+  appType: any;
 
   constructor(
     private service: DataService,
@@ -158,7 +160,7 @@ export class StoresFormComponent implements OnInit {
     };
   }
 
-  onDepartmentChanged(event: any) {}
+  onDepartmentChanged(event: any) { }
 
   ngOnInit(): void {
     this.showCountryList();
@@ -185,12 +187,21 @@ export class StoresFormComponent implements OnInit {
     this.get_Country_Dropdown_List();
     this.getCountryListWithFlag();
     this.showCountry();
+    this.sessionData_tax();
 
     if (this.storeData && Object.keys(this.storeData).length > 0) {
       this.newStores = { ...this.storeData }; // copy data
     }
   }
 
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    ;
+    this.appType = this.sessionData.Configuration[0].APP_TYPE;
+  }
   showCountryList() {
     this.service.getCountryDataAPi().subscribe((response) => {
       this.Country = response;
@@ -402,4 +413,4 @@ export class StoresFormComponent implements OnInit {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [StoresFormComponent],
 })
-export class StoresFormModule {}
+export class StoresFormModule { }

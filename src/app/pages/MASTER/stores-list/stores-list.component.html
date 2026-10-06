@@ -64,7 +64,7 @@
               margin-right: 3px;
             "
           >
-            Store/Branch
+            Store/Facility
           </div>
         </dxi-item>
         <!-- <dxi-item location="after" template="dateFilterTemplate"></dxi-item> -->
@@ -101,7 +101,10 @@
       <dxi-column dataField="CODE" caption="Code"></dxi-column>
       <dxi-column dataField="STORE_NAME" caption="Store"></dxi-column>
       <dxi-column dataField="CITY" caption="City"></dxi-column>
-      <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
+      <dxi-column
+        dataField="STATE_NAME"
+        [caption]="appType === 'VEZTA' ? 'Emirates' : 'State'"
+      ></dxi-column>
       <dxi-column dataField="COUNTRY_NAME" caption="Country"></dxi-column>
       <dxi-column
         caption="Status"

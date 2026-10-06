@@ -112,6 +112,7 @@ export class EmployeeComponent implements OnInit {
     },
     text: '',
   };
+  appType: any;
 
 
 
@@ -183,6 +184,7 @@ export class EmployeeComponent implements OnInit {
     const sessionData = JSON.parse(savedUserData);
     this.selected_Company_id = sessionData?.SELECTED_COMPANY?.COMPANY_ID;
     this.userId = sessionData?.USER_ID || sessionStorage.getItem('UserId');
+    this.appType = sessionData.Configuration?.APP_TYPE || sessionStorage.getItem('AppType');
   }
 
   toggleFilters() {

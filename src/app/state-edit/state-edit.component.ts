@@ -44,8 +44,10 @@ export class StateEditComponent {
   };
   dataGrid: any;
   state: any;
+  sessionData: any;
+  appType: any;
 
-  constructor(private service: DataService) {}
+  constructor(private service: DataService) { }
 
   showState() {
     this.service.getStateData().subscribe((response) => {
@@ -68,14 +70,23 @@ export class StateEditComponent {
   ngOnInit(): void {
     this.getCountryDropDown();
     this.showState();
+    this.sessionData_tax();
+  }
+
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.appType = this.sessionData.Configuration[0].APP_TYPE;
   }
 
   onRowUpdating(validationGroup: any) {
     const result = validationGroup.instance.validate();
 
-  if (!result.isValid) {
-    return;
-  }
+    if (!result.isValid) {
+      return;
+    }
 
     const payload = {
       ID: this.formStateData.ID,
@@ -115,9 +126,8 @@ export class StateEditComponent {
     if (isDuplicateCode || isDuplicateName) {
       notify(
         {
-          message: `${
-            isDuplicateCode ? 'State Code already exists. ' : ''
-          }${isDuplicateName ? 'State Name already exists.' : ''}`,
+          message: `${isDuplicateCode ? 'State Code already exists. ' : ''
+            }${isDuplicateName ? 'State Name already exists.' : ''}`,
           position: { at: 'top right', my: 'top right' },
         },
         'warning',
@@ -175,4 +185,4 @@ export class StateEditComponent {
   declarations: [StateEditComponent],
   exports: [StateEditComponent],
 })
-export class StateEditModule {}
+export class StateEditModule { }

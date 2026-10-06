@@ -149,9 +149,19 @@ export class PaySlipComponent implements OnInit {
 
         // --- Earnings and Deductions Table ---
         const earnings = emp.SalaryHeads.filter((h: any) => h.HEAD_TYPE === 1);
-        const deductions = emp.SalaryHeads.filter(
+        const salaryHeadDeductions = emp.SalaryHeads.filter(
           (h: any) => h.HEAD_TYPE === 2 || h.HEAD_TYPE === 3,
         );
+
+        // If employee-level DEDUCTIONS exists, add it as a deduction row
+        const deductions = [...salaryHeadDeductions];
+
+        if (emp.DEDUCTIONS != null && Number(emp.DEDUCTIONS) > 0) {
+          deductions.push({
+            HEAD_NAME: 'DEDUCTIONS',
+            HEAD_AMOUNT: Number(emp.DEDUCTIONS),
+          });
+        }
         const totalEarnings = earnings.reduce(
           (sum: any, e: any) => sum + e.HEAD_AMOUNT,
           0,
@@ -401,7 +411,7 @@ export class PaySlipComponent implements OnInit {
         res +=
           (a[tens] ||
             b[Number(val[1])] +
-              (Number(val[2]) ? ' ' + a[Number(val[2])] : '')) + ' ';
+            (Number(val[2]) ? ' ' + a[Number(val[2])] : '')) + ' ';
       }
       return res;
     };
@@ -430,29 +440,29 @@ export class PaySlipComponent implements OnInit {
         str +=
           Number(n[1]) !== 0
             ? (a[Number(n[1])] ||
-                b[Number(n[1][0])] + ' ' + a[Number(n[1][1])]) + ' CRORE '
+              b[Number(n[1][0])] + ' ' + a[Number(n[1][1])]) + ' CRORE '
             : '';
         str +=
           Number(n[2]) !== 0
             ? (a[Number(n[2])] ||
-                b[Number(n[2][0])] + ' ' + a[Number(n[2][1])]) + ' LAKH '
+              b[Number(n[2][0])] + ' ' + a[Number(n[2][1])]) + ' LAKH '
             : '';
         str +=
           Number(n[3]) !== 0
             ? (a[Number(n[3])] ||
-                b[Number(n[3][0])] + ' ' + a[Number(n[3][1])]) + ' THOUSAND '
+              b[Number(n[3][0])] + ' ' + a[Number(n[3][1])]) + ' THOUSAND '
             : '';
         str +=
           Number(n[4]) !== 0
             ? (a[Number(n[4])] ||
-                b[Number(n[4][0])] + ' ' + a[Number(n[4][1])]) + ' HUNDRED '
+              b[Number(n[4][0])] + ' ' + a[Number(n[4][1])]) + ' HUNDRED '
             : '';
         str +=
           Number(n[5]) !== 0
             ? (str !== '' ? 'AND ' : '') +
-              (a[Number(n[5])] ||
-                b[Number(n[5][0])] +
-                  (Number(n[5][1]) ? ' ' + a[Number(n[5][1])] : ''))
+            (a[Number(n[5])] ||
+              b[Number(n[5][0])] +
+              (Number(n[5][1]) ? ' ' + a[Number(n[5][1])] : ''))
             : '';
       }
       return str.trim();
@@ -510,4 +520,4 @@ export class PaySlipComponent implements OnInit {
   exports: [PaySlipComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PaySlipModule {}
+export class PaySlipModule { }
