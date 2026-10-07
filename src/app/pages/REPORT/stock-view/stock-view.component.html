@@ -31,6 +31,13 @@
       [groupPanel]="{ visible: true }"
       [grouping]="{ autoExpandAll: true }"
     >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
       <dxo-group-panel [visible]="true"></dxo-group-panel>
       <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
       </dxo-grouping>
@@ -102,6 +109,7 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
       </dxo-toolbar>
 
       <div *dxTemplate="let data of 'itemTypeFilterTemplate'">

@@ -25,6 +25,12 @@
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
     >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      ></dxo-column-chooser>
       <dxo-paging [pageSize]="10"></dxo-paging>
 
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
@@ -157,6 +163,8 @@
           cssClass="export-btn mt-1"
         ></dxi-item>
 
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+
         <dxi-item location="after" template="ApplyButton"> </dxi-item>
 
         <div *dxTemplate="let data of 'ApplyButton'">
@@ -204,7 +212,10 @@
         caption="Remarks"
         [width]="300"
       ></dxi-column>
-      <dxi-column dataField="STORE_NAME" [caption]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"></dxi-column>
+      <dxi-column
+        dataField="STORE_NAME"
+        [caption]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"
+      ></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column
         dataField="DebitAmount"

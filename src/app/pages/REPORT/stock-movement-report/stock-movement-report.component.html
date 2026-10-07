@@ -35,6 +35,13 @@
       (onExporting)="onExporting($event)"
       (onCellClick)="onCellClick($event)"
     >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      ></dxo-column-chooser>
+
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -170,6 +177,8 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
 
         <!-- <dxi-item location="after">
           <dx-check-box
