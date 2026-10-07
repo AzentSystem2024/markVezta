@@ -35,6 +35,13 @@
       (onRowRemoving)="onDeleteCreditNote($event)"
       (onCellPrepared)="onCellPrepared($event)"
     >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      >
+      </dxo-column-chooser>
       <dxo-editing
         mode="popup"
         [allowUpdating]="canEdit"
@@ -106,6 +113,8 @@
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
 
         <dxi-item
           *ngIf="canAdd"
