@@ -1,8 +1,21 @@
 <div class="salary-grid-wrapper">
   <div class="grid-container">
-    <div class="custom-toolbar" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-      <div class="toolbar-left" style="display: flex; gap: 16px; flex-wrap: wrap;">
-        <div class="stacked-toolbar-group" style="display: flex; gap: 8px;">
+    <div
+      class="custom-toolbar"
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 16px;
+      "
+    >
+      <div
+        class="toolbar-left"
+        style="display: flex; gap: 16px; flex-wrap: wrap"
+      >
+        <div class="stacked-toolbar-group" style="display: flex; gap: 8px">
           <dx-date-box
             class="custom-select-box"
             label="Salary Month"
@@ -25,7 +38,7 @@
             [readOnly]="true"
           ></dx-text-box>
         </div>
-        
+
         <div class="stacked-toolbar-group basic-salary-container">
           <dx-number-box
             class="basic-salary-box"
@@ -62,7 +75,8 @@
               [width]="139"
               [readOnly]="is_approve"
             ></dx-number-box>
-            <dx-button class="mt-2"
+            <dx-button
+              class="mt-2"
               *ngIf="!is_approve"
               icon="plus"
               type="default"
@@ -92,7 +106,7 @@
       [selection]="{ mode: 'single' }"
       [editing]="{
         mode: 'cell',
-        allowAdding: !is_approve,
+        allowAdding: false,
         allowDeleting: !is_approve,
         allowUpdating: !is_approve,
         useIcons: true,

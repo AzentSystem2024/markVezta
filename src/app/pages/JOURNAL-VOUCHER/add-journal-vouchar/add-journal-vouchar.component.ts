@@ -125,6 +125,7 @@ export class AddJournalVoucharComponent {
   isSaving = false;
   storeList: any;
   departmentList: any;
+  appType: any;
 
   constructor(
     private dataService: DataService,
@@ -140,6 +141,7 @@ export class AddJournalVoucharComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.appType = menuResponse.Configuration[0]?.APP_TYPE || '';
     this.journalVoucherFormData.FIN_ID = menuResponse.FINANCIAL_YEARS.FIN_ID;
     this.journalVoucherFormData.COMPANY_ID =
       menuResponse?.Companies[0].COMPANY_ID;
@@ -751,8 +753,8 @@ export class AddJournalVoucharComponent {
     const nextSlNo =
       this.journalVoucherFormData.DETAILS.length > 0
         ? Math.max(
-            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
-          ) + 1
+          ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
+        ) + 1
         : 1;
 
     const newRow = {
@@ -1151,4 +1153,4 @@ export class AddJournalVoucharComponent {
   exports: [AddJournalVoucharComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddJournalVoucharModule {}
+export class AddJournalVoucharModule { }

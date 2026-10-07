@@ -107,12 +107,13 @@ export class EditJournalVoucherComponent {
   selectedCompanyId: any;
   storeList: any;
   departmentList: any;
+  appType: any;
 
   constructor(
     private dataService: DataService,
     private router: Router,
     private sanitizer: DomSanitizer,
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log(this.isApproveMode, 'ISVERIFYMODEEEEEEEEEEEEEEE');
@@ -121,6 +122,7 @@ export class EditJournalVoucherComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.appType = menuResponse.Configuration[0]?.APP_TYPE || '';
     this.selectedCompanyId = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || null;
     const menuGroups = menuResponse.MenuGroups || [];
 
@@ -719,8 +721,8 @@ export class EditJournalVoucherComponent {
     const nextSlNo =
       this.journalVoucherFormData.DETAILS.length > 0
         ? Math.max(
-            ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
-          ) + 1
+          ...this.journalVoucherFormData.DETAILS.map((r) => r.billNo),
+        ) + 1
         : 1;
 
     const newRow = {
@@ -1066,4 +1068,4 @@ export class EditJournalVoucherComponent {
   exports: [EditJournalVoucherComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditJournalVoucherModule {}
+export class EditJournalVoucherModule { }

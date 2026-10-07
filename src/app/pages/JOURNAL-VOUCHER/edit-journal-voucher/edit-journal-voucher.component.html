@@ -200,7 +200,10 @@
               searchEnabled: true,
             }"
           ></dxi-column>
-          <dxi-column dataField="STORE_ID" caption="Store">
+          <dxi-column
+            dataField="STORE_ID"
+            [caption]="appType === 'VEZTA' ? 'Facility' : 'Store'"
+          >
             <dxo-lookup
               [dataSource]="storeList"
               displayExpr="DESCRIPTION"
