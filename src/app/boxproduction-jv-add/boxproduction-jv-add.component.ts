@@ -116,6 +116,11 @@ export class BoxproductionJvAddComponent {
   selected_fin_id: any;
   user_id: any;
 
+  isComponentsPopupVisible: boolean = false;
+
+  componentPopupData: any[] = [];
+  componentDate: any = new Date();
+
   constructor(
     private dataservice: DataService,
     private ngZone: NgZone,
@@ -220,59 +225,151 @@ export class BoxproductionJvAddComponent {
     row.AMOUNT = qtyUsed * price;
   }
 
-  fillComponents() {
-    const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
+  // fillComponents() {
+  //   const prodQty = Number(this.productionJVFormData.PROD_QTY) || 0;
 
-    //  VALIDATION: Product required
-    if (!this.productionJVFormData.PRODUCT_ID) {
-      notify(
-        {
-          message: 'Please select a Product',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-        3000,
-      );
-      return;
-    }
+  //   //  VALIDATION: Product required
+  //   if (!this.productionJVFormData.PRODUCT_ID) {
+  //     notify(
+  //       {
+  //         message: 'Please select a Product',
+  //         position: { at: 'top right', my: 'top right' },
+  //       },
+  //       'warning',
+  //       3000,
+  //     );
+  //     return;
+  //   }
 
-    //  VALIDATION: Production Qty required
-    if (!prodQty || prodQty <= 0) {
-      notify(
-        {
-          message: 'Please enter Production Quantity',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-        3000,
-      );
-      return; //  STOP execution
-    }
+  //   //  VALIDATION: Production Qty required
+  //   if (!prodQty || prodQty <= 0) {
+  //     notify(
+  //       {
+  //         message: 'Please enter Production Quantity',
+  //         position: { at: 'top right', my: 'top right' },
+  //       },
+  //       'warning',
+  //       3000,
+  //     );
+  //     return; //  STOP execution
+  //   }
+
+  //   const payload = {
+  //     ITEM_ID: this.productionJVFormData.PRODUCT_ID,
+  //   };
+
+  //   this.dataservice
+  //     .get_Product_In_Bom_Production_Api(payload)
+  //     .subscribe((response: any) => {
+  //       //  Set grid data ONLY here
+  //       this.gridData = response.Data;
+
+  //       //  Apply existing logic (UNCHANGED)
+  //       this.gridData.forEach((item) => {
+  //         const bomQty = Number(item.QUANTITY) || 0;
+  //         item.QTY_AVAILABLE = item.QTY_AVAILABLE;
+  //         item.REQUIRED_QTY = prodQty * bomQty;
+  //         item.USED_QTY = item.REQUIRED_QTY;
+  //         // item.COST = 1000;
+
+  //         this.calculateAmount(item);
+  //       });
+
+  //       this.calculateTotalAmount();
+  //       this.itemsGrid.instance.refresh();
+  //     });
+  // }
+
+  fillComponents(): void {
+    this.isComponentsPopupVisible = true;
+
+    // Clear old data when opening the popup
+    this.componentPopupData = [];
+
+    const selectedDate = this.componentDate
+      ? new Date(this.componentDate)
+      : new Date();
 
     const payload = {
-      ITEM_ID: this.productionJVFormData.PRODUCT_ID,
+      PRODUCTION_DATE: [
+        selectedDate.getFullYear(),
+        String(selectedDate.getMonth() + 1).padStart(2, '0'),
+        String(selectedDate.getDate()).padStart(2, '0')
+      ].join('-')
     };
 
     this.dataservice
       .get_Product_In_Bom_Production_Api(payload)
-      .subscribe((response: any) => {
-        //  Set grid data ONLY here
-        this.gridData = response.Data;
+      .subscribe({
+        next: (response: any) => {
+          console.log('Full API response:', response);
 
-        //  Apply existing logic (UNCHANGED)
-        this.gridData.forEach((item) => {
-          const bomQty = Number(item.QUANTITY) || 0;
-          item.QTY_AVAILABLE = item.QTY_AVAILABLE;
-          item.REQUIRED_QTY = prodQty * bomQty;
-          item.USED_QTY = item.REQUIRED_QTY;
-          // item.COST = 1000;
-
-          this.calculateAmount(item);
-        });
-
-        this.calculateTotalAmount();
-        this.itemsGrid.instance.refresh();
+          if (response?.Flag === 1 && response?.Header) {
+            // Bind the header fields to the popup grid
+            this.componentPopupData = [{ ...response.Header }];
+            console.log('Popup grid data:', this.componentPopupData);
+          } else {
+            this.componentPopupData = [];
+          }
+        },
+        error: (error: any) => {
+          console.error('Error fetching article BOM list:', error);
+          this.componentPopupData = [];
+        }
       });
+  }
+
+  onComponentDateChanged(e: any): void {
+    const selectedDate = e.value;
+
+    if (!selectedDate) {
+      this.componentPopupData = [];
+      return;
+    }
+
+    this.fillComponents();
+  }
+
+  onComponentSelected(e: any): void {
+    const selectedArticle = e.data;
+
+    console.log('Selected Article:', selectedArticle);
+    console.log('Items Details:', selectedArticle.Items);
+
+    this.productionJVFormData.PROD_QTY =
+      Number(selectedArticle.QUANTITY_PRODUCED) || 0;
+    // Pass the actual ID to the save API
+    this.productionJVFormData.PRODUCT_ID =
+      Number(selectedArticle.ITEM_ID) || 0;
+
+    // Display the description in the Product field
+    this.productionJVFormData.PRODUCT_DESCRIPTION =
+      selectedArticle.DESCRIPTION || '';
+
+    // Bind the selected article's Items details to the main grid
+    this.gridData = (selectedArticle.Items || []).map((item: any) => ({
+      ...item,
+      REQUIRED_QTY: (Number(item.QUANTITY) || 0) * this.productionJVFormData.PROD_QTY,
+      QTY_AVAILABLE: Number(item.QTY_AVAILABLE) || 0,
+      USED_QTY: (Number(item.QTY_AVAILABLE) || 0),
+      COST: Number(item.COST) || 0,
+      AMOUNT:
+        (Number(item.QTY_AVAILABLE) || 0) *
+        (Number(item.COST) || 0)
+    }));
+
+    // Calculate total item amount first
+    this.calculateTotalAmount();
+
+    // Calculate final cost = total amount + additional cost
+    this.calculateFinalCost();
+
+    // Update unit product cost
+    this.calculateUnitProductCost();
+
+    // Close the popup after selecting an article
+    this.isComponentsPopupVisible = false;
+    // You can use selectedArticle to populate your form
   }
 
   onCellValueChanged(e: any) {
@@ -524,7 +621,7 @@ export class BoxproductionJvAddComponent {
       UNIT_PRODUCT_COST: this.unitProductCost,
       REF_NO: this.productionJVFormData.REF_NO,
       ADDL_COST: this.productionJVFormData.ADDL_COST,
-      PRODUCT_ID: this.productionJVFormData.PRODUCT_ID,
+      PRODUCT_ID: Number(this.productionJVFormData.PRODUCT_ID),
       PROD_QTY: this.productionJVFormData.PROD_QTY,
       STATUS: this.productionJVFormData.STATUS ?? 1,
       PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE ?? 2,
@@ -571,8 +668,12 @@ export class BoxproductionJvAddComponent {
     // =====================================================
 
     if (!this.isEditing) {
-      // -------- ADD MODE --------
-      callInsertAPI();
+      // First-time insertion
+      if (payload.STATUS === 5) {
+        callCommitAPI(); // Insert with approved status
+      } else {
+        callInsertAPI(); // Insert without approval
+      }
       return;
     }
 
