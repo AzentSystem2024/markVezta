@@ -325,10 +325,9 @@ export class ProductionJvAddComponent {
   //     });
   // }
 
+
   fillComponents(): void {
     this.isComponentsPopupVisible = true;
-
-    // Clear old data when opening the popup
     this.componentPopupData = [];
 
     const selectedDate = this.componentDate
@@ -349,25 +348,25 @@ export class ProductionJvAddComponent {
         next: (response: any) => {
           console.log('Full API response:', response);
 
-          if (response?.Flag === 1 && response?.Data) {
+          if (
+            response?.Flag === 1 &&
+            Array.isArray(response?.Data)
+          ) {
+            // Bind all API records to the grid
+            this.componentPopupData = response.Data;
 
-            // Bind the header fields to the popup grid
-            this.componentPopupData = [{ ...response.Data }];
-            this.selectedItemId = Number(this.componentPopupData[0].ITEM_ID) || 0;
-
-            this.selectedArticleProductionId =
-              this.componentPopupData[0].ARTICLE_PRODUCTION_ID || '';
             console.log('Popup grid data:', this.componentPopupData);
           } else {
             this.componentPopupData = [];
           }
         },
         error: (error: any) => {
-          console.error('Error fetching article BOM list:', error);
+          console.error('Error fetching article production list:', error);
           this.componentPopupData = [];
         }
       });
   }
+
 
   onComponentDateChanged(e: any): void {
     const selectedDate = e.value;
@@ -393,11 +392,19 @@ export class ProductionJvAddComponent {
     // Pass the actual ID to the save API
     this.productionJVFormData.PRODUCT_ID =
       Number(selectedArticle.ITEM_ID) || 0;
+    this.selectedItemId = Number(selectedArticle.ITEM_ID) || 0;
 
-    // Display the description in the Product field
+    this.selectedArticleProductionId =
+      selectedArticle.ARTICLE_PRODUCTION_ID || '';
+
+    // Keep the value in the form model as well
+    this.productionJVFormData.ARTICLE_PRODUCTION_ID =
+      this.selectedArticleProductionId;
+    console.log('Selected Article Production ID:', this.selectedArticleProductionId);
+    // Display the description in   the Product field
     this.productionJVFormData.PRODUCT_DESCRIPTION =
       selectedArticle.DESCRIPTION || '';
-    console.log('Selected Article ID:', this.productionJVFormData.PRODUCT_DESCRIPTION);
+
 
     // Bind the selected article's Items details to the main grid
     this.gridData = (selectedArticle.Items || []).map((item: any) => ({
@@ -527,7 +534,7 @@ export class ProductionJvAddComponent {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
       USER_ID: this.user_id,
-
+      PRODUCT_DESCRIPTION: header.DESCRIPTION || '',
       REF_NO: header.REF_NO,
       PRODUCTION_DATE: productionDate,
       REMARKS: header.REMARKS || '',
@@ -543,6 +550,27 @@ export class ProductionJvAddComponent {
 
       RawMaterials: [], // will be set below
     };
+
+    // ================= RESTORE SELECTED IDs =================
+    this.selectedItemId =
+      Number(header.PRODUCT_ID) ||
+      Number(this.productionJVFormData.PRODUCT_ID) ||
+      0;
+
+    this.selectedArticleProductionId =
+      header.ARTICLE_PRODUCTION_ID ??
+      this.EditingResponseData.ARTICLE_PRODUCTION_ID ??
+      '';
+
+    // Keep the product ID consistent
+    this.productionJVFormData.PRODUCT_ID =
+      this.selectedItemId;
+
+    // Restore approval checkbox state
+    this.isApproved =
+      Number(this.productionJVFormData.STATUS) === 5;
+
+
 
     // ================= GRID DATA =================
     this.gridData = rawMaterials.map((item: any) => ({
@@ -731,19 +759,55 @@ export class ProductionJvAddComponent {
     // =====================================================
     // VALIDATION 3: USED_QTY <= AVAILABLE_QTY
     // =====================================================
-    const invalidRow = this.gridData.find((item: any) => {
+    // const invalidRow = this.gridData.find((item: any) => {
+    //   const usedQty = Number(item.USED_QTY) || 0;
+    //   const availableQty = Number(item.QTY_AVAILABLE) || 0;
+    //   return usedQty > availableQty;
+    // });
+
+    // if (invalidRow) {
+    //   notify(
+    //     'Used Quantity cannot be greater than Available Quantity',
+    //     'error',
+    //     4000,
+    //   );
+    //   return;
+    // }
+
+
+    // =====================================================
+    // VALIDATION: REQUIRED_QTY & USED_QTY must be <= AVAILABLE_QTY
+    // =====================================================
+    for (const item of this.gridData) {
+      const requiredQty = Number(item.REQUIRED_QTY) || 0;
       const usedQty = Number(item.USED_QTY) || 0;
       const availableQty = Number(item.QTY_AVAILABLE) || 0;
-      return usedQty > availableQty;
-    });
 
-    if (invalidRow) {
-      notify(
-        'Used Quantity cannot be greater than Available Quantity',
-        'error',
-        4000,
-      );
-      return;
+      // Used Qty Validation
+      if (usedQty > availableQty) {
+        notify(
+          {
+            message: `Used Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+          4000,
+        );
+        return;
+      }
+
+      // Required Qty Validation
+      if (requiredQty > availableQty) {
+        notify(
+          {
+            message: `Required Quantity cannot be greater than Available Quantity for ${item.DESCRIPTION}.`,
+            position: { at: 'top right', my: 'top right' },
+          },
+          'error',
+          4000,
+        );
+        return;
+      }
     }
 
     // =====================================================
@@ -764,11 +828,14 @@ export class ProductionJvAddComponent {
       REF_NO: this.productionJVFormData.REF_NO,
       ADDL_COST: this.productionJVFormData.ADDL_COST,
       PRODUCT_ID: this.selectedItemId,
-      ARTICLE_PRODUCTION_ID: this.selectedArticleProductionId,
+      ARTICLE_PRODUCTION_ID:
+        this.selectedArticleProductionId ??
+        this.productionJVFormData.ARTICLE_PRODUCTION_ID ??
+        '',
       PROD_QTY: this.productionJVFormData.PROD_QTY,
       STATUS: this.productionJVFormData.STATUS ?? 1,
       PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE,
-
+      IS_APPROVED: this.isApproved ? true : false,
       RawMaterials: this.gridData,
       // IS_APPROVED: this.isApproved,
     };
@@ -818,11 +885,11 @@ export class ProductionJvAddComponent {
 
     if (!this.isEditing) {
       // First-time insertion
-      if (payload.STATUS === 5) {
-        callCommitAPI(); // Insert with approved status
-      } else {
-        callInsertAPI(); // Insert without approval
-      }
+      // if (payload.STATUS === 5) {
+      //   callCommitAPI(); // Insert with approved status
+      // } else {
+      callInsertAPI(); // Insert without approval
+      // }
       return;
     }
 

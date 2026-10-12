@@ -80,6 +80,8 @@ export class BoxproductionJvAddComponent {
   // additionalCost: number = 0;
   unitProductCost: number = 0;
   isApproved: boolean = false;
+  selectedItemId: number;
+  selectedArticleProductionId: any;
 
   productionJVFormData: any = {
     ID: 0,
@@ -304,9 +306,13 @@ export class BoxproductionJvAddComponent {
         next: (response: any) => {
           console.log('Full API response:', response);
 
-          if (response?.Flag === 1 && response?.Header) {
-            // Bind the header fields to the popup grid
-            this.componentPopupData = [{ ...response.Header }];
+          if (
+            response?.Flag === 1 &&
+            Array.isArray(response?.Header)
+          ) {
+            // Bind all API records to the grid
+            this.componentPopupData = response.Header;
+
             console.log('Popup grid data:', this.componentPopupData);
           } else {
             this.componentPopupData = [];
@@ -341,7 +347,14 @@ export class BoxproductionJvAddComponent {
     // Pass the actual ID to the save API
     this.productionJVFormData.PRODUCT_ID =
       Number(selectedArticle.ITEM_ID) || 0;
+    this.selectedItemId = Number(selectedArticle.ITEM_ID) || 0;
 
+    this.selectedArticleProductionId =
+      selectedArticle.PACK_PRODUCTION_ID || '';
+
+    // Keep the value in the form model as well
+    this.productionJVFormData.PACK_PRODUCTION_ID =
+      this.selectedArticleProductionId;
     // Display the description in the Product field
     this.productionJVFormData.PRODUCT_DESCRIPTION =
       selectedArticle.DESCRIPTION || '';
@@ -446,7 +459,7 @@ export class BoxproductionJvAddComponent {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
       USER_ID: this.user_id,
-
+      PRODUCT_DESCRIPTION: header.DESCRIPTION || '',
       REF_NO: header.REF_NO,
       PRODUCTION_DATE: productionDate,
       REMARKS: header.REMARKS || '',
@@ -462,6 +475,29 @@ export class BoxproductionJvAddComponent {
 
       RawMaterials: [], // will be set below
     };
+
+    // ================= RESTORE SELECTED IDs =================
+    this.selectedItemId =
+      Number(header.PRODUCT_ID) ||
+      Number(this.productionJVFormData.PRODUCT_ID) ||
+      0;
+
+    this.selectedArticleProductionId =
+      header.ARTICLE_PRODUCTION_ID ??
+      this.EditingResponseData.ARTICLE_PRODUCTION_ID ??
+      '';
+
+    // Keep the product ID consistent
+    this.productionJVFormData.PRODUCT_ID =
+      this.selectedItemId;
+
+    this.productionJVFormData.PRODUCT_DESCRIPTION =
+      this.EditingResponseData.Header?.DESCRIPTION || '';
+
+    // Restore approval checkbox state
+    this.isApproved =
+      Number(this.productionJVFormData.STATUS) === 5;
+
 
     // ================= GRID DATA =================
     this.gridData = rawMaterials.map((item: any) => ({
@@ -621,11 +657,15 @@ export class BoxproductionJvAddComponent {
       UNIT_PRODUCT_COST: this.unitProductCost,
       REF_NO: this.productionJVFormData.REF_NO,
       ADDL_COST: this.productionJVFormData.ADDL_COST,
-      PRODUCT_ID: Number(this.productionJVFormData.PRODUCT_ID),
+      PRODUCT_ID: this.selectedItemId,
+      PACK_PRODUCTION_ID:
+        this.selectedArticleProductionId ??
+        this.productionJVFormData.PACK_PRODUCTION_ID ??
+        '',
       PROD_QTY: this.productionJVFormData.PROD_QTY,
       STATUS: this.productionJVFormData.STATUS ?? 1,
       PRODUCTION_TYPE: this.productionJVFormData.PRODUCTION_TYPE ?? 2,
-
+      IS_APPROVED: this.isApproved ? true : false,
       RawMaterials: this.gridData,
     };
     // =====================================================
@@ -669,11 +709,11 @@ export class BoxproductionJvAddComponent {
 
     if (!this.isEditing) {
       // First-time insertion
-      if (payload.STATUS === 5) {
-        callCommitAPI(); // Insert with approved status
-      } else {
-        callInsertAPI(); // Insert without approval
-      }
+      // if (payload.STATUS === 5) {
+      //   callCommitAPI(); // Insert with approved status
+      // } else {
+      callInsertAPI(); // Insert without approval
+      // }
       return;
     }
 
