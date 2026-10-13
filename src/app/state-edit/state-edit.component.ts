@@ -90,7 +90,7 @@ export class StateEditComponent {
 
     const payload = {
       ID: this.formStateData.ID,
-      STATE_CODE: this.formStateData.STATE_CODE,
+      // STATE_CODE: this.formStateData.STATE_CODE,
       STATE_NAME: this.formStateData.STATE_NAME,
       COUNTRY_ID: this.formStateData.COUNTRY_ID,
     };
@@ -106,16 +106,16 @@ export class StateEditComponent {
       return;
     }
 
-    const STATE_CODE = payload.STATE_CODE;
+    // const STATE_CODE = payload.STATE_CODE;
     const STATE_NAME = payload.STATE_NAME;
     const currentId = payload.ID;
 
     // DUPLICATE CHECK (IGNORE CURRENT ID)
-    const isDuplicateCode = this.stateDataList.some(
-      (x: any) =>
-        x.ID !== currentId &&
-        x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
-    );
+    // const isDuplicateCode = this.stateDataList.some(
+    //   (x: any) =>
+    //     x.ID !== currentId &&
+    //     x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
+    // );
 
     const isDuplicateName = this.stateDataList.some(
       (x: any) =>
@@ -123,17 +123,17 @@ export class StateEditComponent {
         x.STATE_NAME?.toLowerCase().trim() === STATE_NAME?.toLowerCase().trim(),
     );
 
-    if (isDuplicateCode || isDuplicateName) {
-      notify(
-        {
-          message: `${isDuplicateCode ? 'State Code already exists. ' : ''
-            }${isDuplicateName ? 'State Name already exists.' : ''}`,
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-      );
-      return;
-    }
+    // if (isDuplicateCode || isDuplicateName) {
+    //   notify(
+    //     {
+    //       message: `${isDuplicateCode ? 'State Code already exists. ' : ''
+    //         }${isDuplicateName ? 'State Name already exists.' : ''}`,
+    //       position: { at: 'top right', my: 'top right' },
+    //     },
+    //     'warning',
+    //   );
+    //   return;
+    // }
 
     // API CALL
     this.service.UpdateState(payload).subscribe((data: any) => {

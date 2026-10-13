@@ -2619,11 +2619,11 @@ export class DataService {
   //   return this.http.post(`${this.apiUrl}dropdown`, reqBody);
   // }
   public postStateData(
-    STATE_CODE: any,
+    // STATE_CODE: any,
     STATE_NAME: any,
     COUNTRY_ID: any,
   ): Observable<any> {
-    const data = { STATE_CODE, STATE_NAME, COUNTRY_ID };
+    const data = { STATE_NAME, COUNTRY_ID };
 
     return this.http.post(`${this.apiUrl}state/save`, data);
   }
@@ -6173,7 +6173,7 @@ The result can be exported to HTML or Markdown.`;
 
   Company_api(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}Login/initdata`, data);
+    return this.http.post(`${this.apiUrl}Login/Markinitdata`, data);
   }
 
   //============LOGIN FUNCTION======
@@ -6185,7 +6185,7 @@ The result can be exported to HTML or Markdown.`;
   //   }
   login_function_api(item: any) {
     const payload = item;
-    return this.http.post(`${this.apiUrl}LOGIN/login`, payload);
+    return this.http.post(`${this.apiUrl}Login/marklogin`, payload);
   }
 
   //====================VIEW===================

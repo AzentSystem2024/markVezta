@@ -224,29 +224,29 @@ export class StateListComponent {
       return;
     }
 
-    const { STATE_CODE, STATE_NAME, COUNTRY_ID } = newStateData;
+    const { STATE_NAME, COUNTRY_ID } = newStateData;
 
     // DUPLICATE CHECK
-    const isDuplicateCode = this.stateArray.some(
-      (x: any) =>
-        x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
-    );
+    // const isDuplicateCode = this.stateArray.some(
+    //   (x: any) =>
+    //     x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
+    // );
 
     const isDuplicateName = this.stateArray.some(
       (x: any) =>
         x.STATE_NAME?.toLowerCase().trim() === STATE_NAME?.toLowerCase().trim(),
     );
 
-    if (isDuplicateCode) {
-      notify(
-        {
-          message: 'State Code already exists',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-      );
-      return;
-    }
+    // if (isDuplicateCode) {
+    //   notify(
+    //     {
+    //       message: 'State Code already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //     },
+    //     'warning',
+    //   );
+    //   return;
+    // }
 
     if (isDuplicateName) {
       notify(
@@ -261,7 +261,7 @@ export class StateListComponent {
 
     // ✅ API CALL (only if no duplicates)
     this.dataservice
-      .postStateData(STATE_CODE, STATE_NAME, COUNTRY_ID)
+      .postStateData(STATE_NAME, COUNTRY_ID)
       .subscribe((response) => {
         if (response) {
           try {
