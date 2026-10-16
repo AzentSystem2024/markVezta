@@ -236,12 +236,13 @@ icon="plus"
         [inputAttr]="{ style: 'text-align: right' }"
       ></dx-number-box>
 
-      <dx-text-box
+      <dx-date-box
         label="Last Depreciation"
         [(value)]="FixedAssetsData.LAST_DEPR_DATE"
         labelMode="floating"
         [readOnly]="true"
-      ></dx-text-box>
+        displayFormat="dd/MM/yyyy"
+      ></dx-date-box>
 
       <dx-number-box
         label="Current Asset Value"

@@ -411,7 +411,7 @@ export class CustomerFinEditFormComponent {
     });
   }
 
-  onStateSelectionChanged(event: any) {}
+  onStateSelectionChanged(event: any) { }
 
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
@@ -510,10 +510,11 @@ export class CustomerFinEditFormComponent {
       PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
       CUST_TYPE: 1,
       IS_COMPANY_BRANCH: this.IS_COMPANY_BRANCH_VALUE ? 1 : 0,
+      USER_ID: this.sessionData.USER_ID,
     };
   }
 
-  closePopup() {}
+  closePopup() { }
 
   saveDeliveryAddress() {
     // Validate that at least one field is filled
@@ -964,4 +965,4 @@ export class CustomerFinEditFormComponent {
   declarations: [CustomerFinEditFormComponent],
   exports: [CustomerFinEditFormComponent],
 })
-export class CustomerFinEditFormModule {}
+export class CustomerFinEditFormModule { }

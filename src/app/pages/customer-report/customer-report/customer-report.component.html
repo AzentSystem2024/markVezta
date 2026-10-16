@@ -263,11 +263,7 @@
 
       <!-- Group summary for MAIN_GROUP_NAME -->
 
-      <dxi-column
-        *ngIf="CustomerListDataSource.length > 0"
-        type="buttons"
-        [width]="100"
-      >
+      <dxi-column *ngIf="hasData" type="buttons" [width]="100">
         <dxi-button
           hint="View"
           icon="eyeopen"

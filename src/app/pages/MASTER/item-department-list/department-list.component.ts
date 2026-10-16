@@ -284,8 +284,7 @@ export class DepartmentListComponent implements OnInit {
 
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .flatMap((menu: any) => menu.Children || [])
-      .find((child: any) => child.Path === currentUrl);
+      .find((menu: any) => menu.Path === '/item-department');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -295,6 +294,7 @@ export class DepartmentListComponent implements OnInit {
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
     }
+
 
     this.showDepartment();
   }

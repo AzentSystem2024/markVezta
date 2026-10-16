@@ -52,6 +52,7 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
   selected_Company_id: any;
   GST_PERC: any;
   HSN_CODE: any;
+  userId: any;
 
   constructor(private service: DataService) {
     const settingsData = sessionStorage.getItem('settings');
@@ -523,7 +524,12 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
   }
 
   GetSupplierList() {
-    this.service.getDropdownData('SUPPLIER').subscribe((res) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
+    }
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.SupplierList = res;
     });
   }
@@ -570,6 +576,7 @@ export class PurchaseOrderApproveFormComponent implements OnInit, OnChanges {
       '===========selected GST PERC==================='
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.userId = sessionData.USER_ID;
   }
 
   loadPurchaseOrders(itemId: string) {

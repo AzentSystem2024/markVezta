@@ -36,7 +36,7 @@ export class PdcAddFormComponent {
   @Output() formClosed = new EventEmitter<void>();
   @Input() selectedPDC: any;
   @Output() pdcInserted = new EventEmitter<any>();
-  @Input() canApprove :boolean = false;
+  @Input() canApprove: boolean = false;
   @Input() popupMode: string = 'new';
 
   Supplier: any;
@@ -168,29 +168,29 @@ export class PdcAddFormComponent {
     this.sesstion_Details();
   }
 
-onSupplierChanged(event: any) {
-  this.selectedSupplierId = event.value;
-  this.PDCFormData.SUPP_ID = event.value;
+  onSupplierChanged(event: any) {
+    this.selectedSupplierId = event.value;
+    this.PDCFormData.SUPP_ID = event.value;
 
-  const selectedSupplier = this.Supplier.find(
-    (item: any) => item.ID === this.selectedSupplierId,
-  );
+    const selectedSupplier = this.Supplier.find(
+      (item: any) => item.ID === this.selectedSupplierId,
+    );
 
-  this.selectedBeneficiaryCommonName =
-    selectedSupplier?.DESCRIPTION || '';
-}
+    this.selectedBeneficiaryCommonName =
+      selectedSupplier?.DESCRIPTION || '';
+  }
 
-onCustomerChanged(event: any) {
-  this.selectedCustomerId = event.value;
-  this.PDCFormData.CUST_ID = event.value;
+  onCustomerChanged(event: any) {
+    this.selectedCustomerId = event.value;
+    this.PDCFormData.CUST_ID = event.value;
 
-  const selectedCustomer = this.Customer.find(
-    (item: any) => item.ID === this.selectedCustomerId,
-  );
+    const selectedCustomer = this.Customer.find(
+      (item: any) => item.ID === this.selectedCustomerId,
+    );
 
-  this.selectedBeneficiaryCommonName =
-    selectedCustomer?.DESCRIPTION || '';
-}
+    this.selectedBeneficiaryCommonName =
+      selectedCustomer?.DESCRIPTION || '';
+  }
 
   cancel() {
     this.resetForm();
@@ -260,13 +260,13 @@ onCustomerChanged(event: any) {
       !this.PDCFormData.ENTRY_DATE ||
       !this.PDCFormData.CHEQUE_DATE ||
       !this.PDCFormData.AMOUNT ||
-      !this.PDCFormData.REMARKS ||
+      // !this.PDCFormData.REMARKS ||
       !this.selectedBeneficiaryTypeID ||
       !(
-  this.selectedBeneficiaryTypeID === 3
-    ? this.PDCFormData.BENEFICIARY_NAME
-    : this.selectedBeneficiaryCommonName
-)
+        this.selectedBeneficiaryTypeID === 3
+          ? this.PDCFormData.BENEFICIARY_NAME
+          : this.selectedBeneficiaryCommonName
+      )
     ) {
       notify('Please fill all the fields before saving.', 'error', 3000);
       return; //  Stop function if fields are missing
@@ -283,9 +283,9 @@ onCustomerChanged(event: any) {
       // BENEFICIARY_NAME: this.PDCFormData.BENEFICIARY_NAME || '',
       // BENEFICIARY_NAME: this.selectedBeneficiaryCommonName || '',
       BENEFICIARY_NAME:
-  this.selectedBeneficiaryTypeID === 3
-    ? this.PDCFormData.BENEFICIARY_NAME || ''
-    : this.selectedBeneficiaryCommonName || '',
+        this.selectedBeneficiaryTypeID === 3
+          ? this.PDCFormData.BENEFICIARY_NAME || ''
+          : this.selectedBeneficiaryCommonName || '',
 
       // BENEFICIARY_TYPE: this.PDCFormData.BENEFICIARY_TYPE || 0,
       BENEFICIARY_TYPE: this.selectedBeneficiaryTypeID || 0,
@@ -297,7 +297,7 @@ onCustomerChanged(event: any) {
       IS_PAYMENT: this.PDCFormData.IS_PAYMENT?.name === 'Issued', // true if Issued
       ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
-      IS_VERIFIED : false,
+      IS_VERIFIED: false,
     };
 
     this.dataservice.Insert_PDC(payload).subscribe((res: any) => {
@@ -389,4 +389,4 @@ onCustomerChanged(event: any) {
   exports: [PdcAddFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PdcAddFormModule {}
+export class PdcAddFormModule { }

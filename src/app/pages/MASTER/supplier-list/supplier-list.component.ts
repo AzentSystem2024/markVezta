@@ -266,6 +266,7 @@ export class SupplierListComponent implements OnInit {
       ...newSupplierData,
       COMPANY_ID: this.selected_Company_id,
       CURRENCY_ID: currencyIdNumber,
+      USER_ID: this.userId,
       STATE_ID: StateID,
       IS_INACTIVE: isInactiveBoolean,
     };
@@ -325,7 +326,7 @@ export class SupplierListComponent implements OnInit {
   onRowUpdating(event: any) {
     const updataDate = event.newData;
     const oldData = event.oldData;
-    const combinedData = { ...oldData, ...updataDate };
+    const combinedData = { ...oldData, ...updataDate ,USER_ID:this.userId};
 
     this.dataservice.updateSupplier(combinedData).subscribe((data: any) => {
       if (data) {

@@ -44,11 +44,11 @@ export class PdcEditFormComponent {
   @Input() selectedPDC: any;
   @Input() isEditReadOnly: boolean = false;
   @Input() PDCid: any;
-   @Input() canApprove :boolean = false;
-   @Input() isVerifyMode: boolean = false;
-   @Input() isApproveMode: boolean = false;
+  @Input() canApprove: boolean = false;
+  @Input() isVerifyMode: boolean = false;
+  @Input() isApproveMode: boolean = false;
   // @Input() popupMode: string = 'new';
-   @Input() VerifyPDCPopupOpened:boolean = false;
+  @Input() VerifyPDCPopupOpened: boolean = false;
   isPdfPopupVisible: boolean = false;
   pdfSrc: SafeResourceUrl | null = null;
   @Input() popupMode: string = '';
@@ -92,23 +92,23 @@ export class PdcEditFormComponent {
   };
   entryStatus: any;
 
- get actionButtonText(): string {
-  if (this.isVerifyMode) {
-    return 'Verify';
+  get actionButtonText(): string {
+    if (this.isVerifyMode) {
+      return 'Verify';
+    }
+
+    if (this.isApproveMode) {
+      return 'Approve';
+    }
+
+    return 'Update';
   }
 
-  if (this.isApproveMode) {
-    return 'Approve';
-  }
-
-  return 'Update';
-}
-
-    ngOnChanges(changes: SimpleChanges): void {
-      console.log(this.isVerifyMode,":geyueuryuirirg")
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(this.isVerifyMode, ":geyueuryuirirg")
     if (changes['selectedPDC'] && changes['selectedPDC'].currentValue) {
       const data = changes['selectedPDC'].currentValue;
-      console.log(data,'==========data')
+      console.log(data, '==========data')
       this.entryStatus = data.ENTRY_STATUS
       console.log(this.entryStatus)
       this.PDCFormData = {
@@ -130,7 +130,7 @@ export class PdcEditFormComponent {
         ENTRY_STATUS: data.ENTRY_STATUS,
         AC_TRANS_ID: data.AC_TRANS_ID,
       };
-console.log(this.isApproveMode,":-------------fhytyu")
+      console.log(this.isApproveMode, ":-------------fhytyu")
       this.selectedType = this.PDCFormData.IS_PAYMENT;
       this.selectedBeneficiaryType = this.BeneficiaryType.find(
         (b) => b.id === data.BENEFICIARY_TYPE,
@@ -225,24 +225,24 @@ console.log(this.isApproveMode,":-------------fhytyu")
   }
 
   onSupplierChanged(event: any) {
-  this.PDCFormData.SUPP_ID = event.value;
+    this.PDCFormData.SUPP_ID = event.value;
 
-  const supplier = this.Supplier?.find(
-    (item: any) => item.ID === event.value
-  );
+    const supplier = this.Supplier?.find(
+      (item: any) => item.ID === event.value
+    );
 
-  this.PDCFormData.BENEFICIARY_NAME = supplier?.DESCRIPTION || '';
-}
+    this.PDCFormData.BENEFICIARY_NAME = supplier?.DESCRIPTION || '';
+  }
 
   onCustomerChanged(event: any) {
-  this.PDCFormData.CUST_ID = event.value;
+    this.PDCFormData.CUST_ID = event.value;
 
-  const customer = this.Customer?.find(
-    (item: any) => item.ID === event.value
-  );
+    const customer = this.Customer?.find(
+      (item: any) => item.ID === event.value
+    );
 
-  this.PDCFormData.BENEFICIARY_NAME = customer?.DESCRIPTION || '';
-}
+    this.PDCFormData.BENEFICIARY_NAME = customer?.DESCRIPTION || '';
+  }
 
   cancel() {
     this.formClosed.emit();
@@ -269,20 +269,20 @@ console.log(this.isApproveMode,":-------------fhytyu")
   }
 
   savePDC() {
-    console.log(this.entryStatus,'=====entryvstatus')
+    console.log(this.entryStatus, '=====entryvstatus')
     if (
       !this.PDCFormData.BANK_HEAD_ID ||
       !this.PDCFormData.CHEQUE_NO ||
       !this.PDCFormData.ENTRY_DATE ||
       !this.PDCFormData.CHEQUE_DATE ||
       !this.PDCFormData.AMOUNT ||
-      !this.PDCFormData.REMARKS ||
+      // !this.PDCFormData.REMARKS ||
       !this.selectedBeneficiaryTypeID ||
       !this.PDCFormData.BENEFICIARY_NAME ||
       (
-    this.selectedBeneficiaryTypeID === 3 &&
-    !this.PDCFormData.BENEFICIARY_NAME
-  )
+        this.selectedBeneficiaryTypeID === 3 &&
+        !this.PDCFormData.BENEFICIARY_NAME
+      )
     ) {
       notify('Please fill all the fields before saving.', 'error', 3000);
       return; //  Stop function if fields are missing
@@ -296,11 +296,11 @@ console.log(this.isApproveMode,":-------------fhytyu")
       SUPP_ID: this.PDCFormData.SUPP_ID || 0,
       // BENEFICIARY_NAME: this.PDCFormData.BENEFICIARY_NAME || '',
       BENEFICIARY_NAME:
-  this.selectedBeneficiaryTypeID === 1
-    ? this.Supplier?.find((x: any) => x.ID === this.PDCFormData.SUPP_ID)?.DESCRIPTION || ''
-    : this.selectedBeneficiaryTypeID === 2
-    ? this.Customer?.find((x: any) => x.ID === this.PDCFormData.CUST_ID)?.DESCRIPTION || ''
-    : this.PDCFormData.BENEFICIARY_NAME || '',
+        this.selectedBeneficiaryTypeID === 1
+          ? this.Supplier?.find((x: any) => x.ID === this.PDCFormData.SUPP_ID)?.DESCRIPTION || ''
+          : this.selectedBeneficiaryTypeID === 2
+            ? this.Customer?.find((x: any) => x.ID === this.PDCFormData.CUST_ID)?.DESCRIPTION || ''
+            : this.PDCFormData.BENEFICIARY_NAME || '',
       BENEFICIARY_TYPE: this.selectedBeneficiaryTypeID || 0,
 
       ENTRY_DATE: this.formatDate(this.PDCFormData.ENTRY_DATE),
@@ -310,50 +310,50 @@ console.log(this.isApproveMode,":-------------fhytyu")
       REMARKS: this.PDCFormData.REMARKS || '',
       IS_PAYMENT: this.PDCFormData.IS_PAYMENT?.name === 'Issued', // true if Issued
       // ENTRY_STATUS: this.PDCFormData.ENTRY_STATUS ? 5 : 1,
-    ENTRY_STATUS: this.isVerifyMode
-  ? 2
-  : this.isApproveMode
-    ? 5
-    : 1,
+      ENTRY_STATUS: this.isVerifyMode
+        ? 2
+        : this.isApproveMode
+          ? 5
+          : 1,
       AC_TRANS_ID: this.PDCFormData.AC_TRANS_ID || 0,
-      
+
     };
 
-  if (this.isVerifyMode) {
-  confirm(
-    'Are you sure you want to verify this PDC?',
-    'Confirm Verification'
-  ).then((result) => {
-    if (result) {
-      this.dataservice.Update_PDC(payload).subscribe((res: any) => {
-        if (res.Message === 'Success') {
-          notify('PDC verified successfully', 'success', 2000);
-          this.formClosed.emit();
+    if (this.isVerifyMode) {
+      confirm(
+        'Are you sure you want to verify this PDC?',
+        'Confirm Verification'
+      ).then((result) => {
+        if (result) {
+          this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+            if (res.Message === 'Success') {
+              notify('PDC verified successfully', 'success', 2000);
+              this.formClosed.emit();
+            }
+          });
         }
       });
+
+      return;
     }
-  });
 
-  return;
-}
-
-if (this.isApproveMode) {
-  confirm(
-    'Are you sure you want to approve this PDC?',
-    'Confirm Approval'
-  ).then((result) => {
-    if (result) {
-      this.dataservice.Update_PDC(payload).subscribe((res: any) => {
-        if (res.Message === 'Success') {
-          notify('PDC approved successfully', 'success', 2000);
-          this.formClosed.emit();
+    if (this.isApproveMode) {
+      confirm(
+        'Are you sure you want to approve this PDC?',
+        'Confirm Approval'
+      ).then((result) => {
+        if (result) {
+          this.dataservice.Update_PDC(payload).subscribe((res: any) => {
+            if (res.Message === 'Success') {
+              notify('PDC approved successfully', 'success', 2000);
+              this.formClosed.emit();
+            }
+          });
         }
       });
-    }
-  });
 
-  return;
-}
+      return;
+    }
     this.dataservice.Update_PDC(payload).subscribe((res: any) => {
       if (res.Message === 'Success') {
         notify(
@@ -472,4 +472,4 @@ if (this.isApproveMode) {
   exports: [PdcEditFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PdcEditFormModule {}
+export class PdcEditFormModule { }

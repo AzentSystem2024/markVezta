@@ -165,6 +165,7 @@ export class CustomerListComponent {
 
   selected_fin_id: any;
   companyType: any;
+  userId: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -273,6 +274,7 @@ export class CustomerListComponent {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       COMPANY_TYPE: this.loggedInCompanyType,
+      USER_ID: this.userId
     };
 
     this.CustomerDataSource = new DataSource({
@@ -312,6 +314,7 @@ export class CustomerListComponent {
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.userId = sessionData.USER_ID;
 
     this.loggedInCompanyId = Number(
       sessionData?.SELECTED_COMPANY?.COMPANY_ID ?? 0
@@ -405,6 +408,7 @@ export class CustomerListComponent {
     const payload = {
       ...newCustomerData,
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || '',
     };
 
     this.dataservice.insert_customer_Data(payload).subscribe((res: any) => {

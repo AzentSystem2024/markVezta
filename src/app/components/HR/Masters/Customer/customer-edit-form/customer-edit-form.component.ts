@@ -15,9 +15,12 @@ import { FormTextboxModule } from '../../../../utils/form-textbox/form-textbox.c
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDropDownBoxModule,
+  DxListModule,
   DxRadioGroupModule,
   DxTabPanelModule,
   DxValidationGroupModule,
+  DxValidatorComponent,
   DxValidatorModule,
 } from 'devextreme-angular';
 import { confirm } from 'devextreme/ui/dialog';
@@ -27,8 +30,10 @@ import {
   DxDateBoxModule,
   DxFormModule,
 } from 'devextreme-angular';
-import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
+import { DxTextBoxComponent, DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { AuthService, DataService } from 'src/app/services';
+import CountryList from 'country-list-with-dial-code-and-flag';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 @Component({
   selector: 'app-customer-edit-form',
@@ -40,13 +45,22 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   @Output() ChangedCustomerData: any;
   @Output() updateCompleted = new EventEmitter<any>();
   @ViewChild('mobileBoxRef', { static: false }) mobileBoxRef: any;
+  @ViewChild('mobileValidator', { static: false })
+  mobileValidator!: DxValidatorComponent;
+  @ViewChild('phoneValidator', { static: false })
+  phoneValidator!: DxValidatorComponent;
+  @ViewChild('mobileBox', { static: false }) mobileBox!: DxTextBoxComponent;
+  @ViewChild('phoneBox', { static: false }) phoneBox!: DxTextBoxComponent;
+  @ViewChild('deliveryMobileValidator', { static: false })
+  deliveryMobileValidator!: DxValidatorComponent;
+  @ViewChild('deliveryMobileBox', { static: false })
+  deliveryMobileBox!: DxTextBoxComponent;
 
   CountryDropdownData: any;
   VATRuleDropdownData: any[] = [];
   PaymentTermsDropdownData: any;
   PriceLevelDropdownData: any[] = [];
   StateDropdownData: any;
-  countryCode: any;
   isCurrencyAccepted: boolean = true;
   selecte_countyId: any;
   Warehouse: any[] = [];
@@ -98,8 +112,8 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     DELIVERY_ADDRESS: [],
     DEALER_TYPE: 0,
     DEALER_ID: 0,
-    DISTRICT_ID:0,
-    SALESMAN_ID:0,
+    DISTRICT_ID: 0,
+    SALESMAN_ID: 0,
     DeliveryAddresses: [],
   };
 
@@ -134,6 +148,13 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   districtData: any;
   Salesman: any;
   selected_stateId: any;
+  userId: any;
+
+  countryCode: string = '+91';
+  phoneCountryCode: string = '+91';
+  isCountryDropdownOpen = false;
+  isPhoneDropdownOpen = false;
+  isDeliveryCountryDropdownOpen = false;
 
   constructor(private service: DataService) {
     this.getStateDropDown();
@@ -141,9 +162,13 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.sessionData_tax();
     this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
 
-    service.getCountryWithFlags().subscribe((data) => {
-      this.countryCodes = data;
-    });
+    const codes = CountryList.getAll();
+    this.countryCodes = codes.map((country: any) => ({
+      ...country,
+      flagUrl: `https://flagcdn.com/w20/${country.code.toLowerCase()}.png`,
+      display: `${country.dial_code}`,
+    }));
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -169,16 +194,16 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
         this.deliveryAddress3 = '';
       }
 
-      // Handle DeliveryAddresses (array of detailed addresses)
       if (this.formCustomerData.DeliveryAddresses?.length > 0) {
-        const firstAddress = this.formCustomerData.DeliveryAddresses[0];
-        const deliveyMobile = firstAddress.MOBILE;
-        const [countryCode, number] = deliveyMobile.split('-');
+        const firstAddress: any = this.formCustomerData.DeliveryAddresses[0];
+        const deliveyMobileData = this.parseIncomingPhone(
+          firstAddress?.MOBILE || '',
+        );
 
         // Fill form input values
         this.Address1Value = firstAddress.ADDRESS1 || '';
-        this.countryCodeDeliveryaddress = countryCode || '';
-        this.MobileValue = number || '';
+        this.countryCodeDeliveryaddress = deliveyMobileData.code;
+        this.MobileValue = deliveyMobileData.number;
         this.locationValue = firstAddress.LOCATION || '';
         this.phoneValue = firstAddress.PHONE || '';
 
@@ -206,16 +231,18 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       }
     }
 
-    const MobileNo = this.selectedCustomerData.MOBILE_NO;
+    const mobileData = this.parseIncomingPhone(
+      this.selectedCustomerData.MOBILE_NO || '',
+    );
+    this.countryCode = mobileData.code;
+    this.formCustomerData.MOBILE_NO = mobileData.number;
 
-    const [countryCode, number] = MobileNo.split('-');
-    this.countryCode = countryCode;
-    this.formCustomerData.MOBILE_NO = number;
-    const PhoneNo = this.selectedCustomerData.PHONE;
-
-    const [countryCodephone, phonenumber] = PhoneNo.split('-');
-    this.PhonenumberCode = countryCodephone;
-    this.formCustomerData.PHONE = phonenumber;
+    const phoneData = this.parseIncomingPhone(
+      this.selectedCustomerData.PHONE || '',
+    );
+    this.phoneCountryCode = phoneData.code;
+    this.PhonenumberCode = phoneData.code;
+    this.formCustomerData.PHONE = phoneData.number;
   }
 
   validateEmail = (e: any): boolean => {
@@ -290,13 +317,15 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
 
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.userId = sessionData.USER_ID;
+
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
@@ -373,7 +402,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     });
   }
 
-    getDistrictDropDown() {
+  getDistrictDropDown() {
     const id = this.selected_stateId;
     const payload = {
       NAME: 'DISTRICT_NAME',
@@ -384,7 +413,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     });
   }
 
-    getSalesmanDropDown() {
+  getSalesmanDropDown() {
     const payload = {
       NAME: 'SALESMAN',
       COMPANY_ID: this.selected_Company_id,
@@ -393,8 +422,8 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       this.Salesman = data;
     });
   }
-  
-    onStateSelectionChanged(event: any) {
+
+  onStateSelectionChanged(event: any) {
     this.selected_stateId = event.value;
     this.getDistrictDropDown();
   }
@@ -402,24 +431,42 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.getStateDropDown();
+
+    if (!this.CountryDropdownData?.length) return;
+
     const selectedCountry = this.CountryDropdownData.find(
-      (country: any) => country.ID === this.selecte_countyId,
+      (c: any) => c.ID === this.selecte_countyId,
     );
 
-    // If found, set code & name
-    if (selectedCountry) {
-      // this.countryCode = selectedCountry.CODE; // e.g., '+971'
-      this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
-    } else {
-      // Fallback if no country found
-      // this.countryCode = '';
-      this.DEFAULT_COUNTRY_CODE = '';
-      console.warn(
-        '⚠️ No matching country found for ID:',
-        this.selecte_countyId,
-      );
+    if (!selectedCountry) return;
+
+    const selectedName = selectedCountry.DESCRIPTION?.toLowerCase().trim();
+    if (!selectedName || !this.countryCodes?.length) return;
+
+    const matchedCountry = this.countryCodes.find((c: any) => {
+      const cName = (
+        c.name ||
+        c.COUNTRY_NAME ||
+        c.data?.name ||
+        ''
+      ).toLowerCase();
+      return cName.includes(selectedName) || selectedName.includes(cName);
+    });
+
+    if (matchedCountry) {
+      const dialCode =
+        matchedCountry.dial_code ||
+        matchedCountry.data?.dial_code ||
+        matchedCountry.CODE;
+      if (dialCode) {
+        this.countryCode = dialCode;
+        this.phoneCountryCode = dialCode;
+        this.PhonenumberCode = dialCode;
+        this.DEFAULT_COUNTRY_CODE = dialCode;
+      }
     }
   }
+
 
   ngOnInit(): void {
     this.sesstion_Details();
@@ -431,7 +478,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.getPriceLevelDropDown();
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
-    
+
   }
   keyPressNumbers(event: any) {
     var charCode = event.which ? event.which : event.keyCode;
@@ -456,10 +503,11 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       ...this.selectedCustomerData,
       MOBILE_NO: this.countryCode + '-' + this.formCustomerData.MOBILE_NO,
       PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
+      USER_ID: this.userId || '',
     };
   }
 
-  closePopup() {}
+  closePopup() { }
 
   saveDeliveryAddress() {
     // Validate that at least one field is filled
@@ -535,14 +583,307 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     // ✅ Remember which card is being edited
     this.editingIndex = i;
   }
-  onDropdownClosed() {}
-  onDropdownOpened() {}
-  updateMobileNumber() {}
+
+  private parseIncomingPhone(
+    fullPhone: string,
+    defaultCode: string = '+971',
+  ): { code: string; number: string } {
+    if (!fullPhone) {
+      return { code: defaultCode, number: '' };
+    }
+
+    const str = String(fullPhone).trim();
+    if (!str) {
+      return { code: defaultCode, number: '' };
+    }
+
+    let code = '';
+    let num = '';
+
+    if (str.includes('-')) {
+      const parts = str.split('-');
+      code = (parts[0] || '').trim();
+      num = (parts[1] || '').trim();
+    } else if (str.startsWith('+')) {
+      code = defaultCode;
+      num = str.replace(/\D/g, '');
+    } else {
+      num = str.replace(/\D/g, '');
+    }
+
+    if (code) {
+      if (!code.startsWith('+')) {
+        code = '+' + code;
+      }
+    } else {
+      code = defaultCode;
+    }
+
+    return { code, number: num };
+  }
+
+  private extractDialCode(event: any): string {
+    if (!event) return '';
+    let code = '';
+    if (typeof event === 'string') code = event;
+    else if (typeof event.value === 'string') code = event.value;
+    else if (typeof event.value?.dial_code === 'string')
+      code = event.value.dial_code;
+    else if (typeof event.value?.data?.dial_code === 'string')
+      code = event.value.data.dial_code;
+    else if (typeof event.itemData?.dial_code === 'string')
+      code = event.itemData.dial_code;
+    else if (typeof event.itemData?.data?.dial_code === 'string')
+      code = event.itemData.data.dial_code;
+    else if (typeof event.dial_code === 'string') code = event.dial_code;
+    else if (typeof event.data?.dial_code === 'string')
+      code = event.data.dial_code;
+
+    code = (code || '').trim();
+    if (code && !code.startsWith('+')) {
+      code = '+' + code;
+    }
+    return code;
+  }
+
+  onDeliveryCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (
+        this.countryCodeDeliveryaddress &&
+        this.countryCodeDeliveryaddress !== dialCode
+      ) {
+        this.MobileValue = '';
+        if (this.deliveryMobileBox?.instance) {
+          this.deliveryMobileBox.instance.option('isValid', true);
+        }
+      }
+      this.countryCodeDeliveryaddress = dialCode;
+    }
+    this.isDeliveryCountryDropdownOpen = false;
+    this.revalidateDeliveryMobile();
+  }
+
+  revalidateDeliveryMobile() {
+    setTimeout(() => {
+      const val = this.MobileValue || '';
+      if (val) {
+        const isValid = this.DeliveryMobileValidate({ value: val });
+        if (this.deliveryMobileBox?.instance) {
+          this.deliveryMobileBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.deliveryMobileBox.instance.option('validationError', {
+              message: 'Invalid mobile number',
+            });
+          }
+        }
+      } else if (this.deliveryMobileBox?.instance) {
+        this.deliveryMobileBox.instance.option('isValid', true);
+      }
+      this.deliveryMobileValidator?.instance?.validate();
+    }, 0);
+  }
+
+  DeliveryMobileValidate = (e: any): boolean => {
+    return this.validateDeliveryMobile(e);
+  };
+
+  validateDeliveryMobile(e: any): boolean {
+    const dialCode = (this.countryCodeDeliveryaddress || '').trim();
+    const mobileValue = e?.value ? e.value.toString().trim() : '';
+    const mobileNum = mobileValue.replace(/\D/g, '');
+    if (!mobileNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return mobileNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + mobileNum);
+    } catch {
+      return false;
+    }
+  }
+
+  onDeliveryMobileInputChange(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.MobileValue = digits;
+    this.revalidateDeliveryMobile();
+  }
+
+  onCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (this.countryCode && this.countryCode !== dialCode) {
+        this.formCustomerData.MOBILE_NO = '';
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', true);
+        }
+      }
+      this.countryCode = dialCode;
+    }
+    this.isCountryDropdownOpen = false;
+    this.revalidateMobile();
+  }
+
+  onPhoneCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (this.phoneCountryCode && this.phoneCountryCode !== dialCode) {
+        this.formCustomerData.PHONE = '';
+        if (this.phoneBox?.instance) {
+          this.phoneBox.instance.option('isValid', true);
+        }
+      }
+      this.phoneCountryCode = dialCode;
+      this.PhonenumberCode = dialCode;
+    }
+    this.isPhoneDropdownOpen = false;
+    this.revalidatePhone();
+  }
+
+  revalidateMobile() {
+    setTimeout(() => {
+      const val = this.formCustomerData.MOBILE_NO || '';
+      if (val) {
+        const isValid = this.MobileValidate({ value: val });
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.mobileBox.instance.option('validationError', {
+              message: 'Invalid mobile number',
+            });
+          }
+        }
+      } else if (this.mobileBox?.instance) {
+        this.mobileBox.instance.option('isValid', true);
+      }
+      this.mobileValidator?.instance?.validate();
+    }, 0);
+  }
+
+  revalidatePhone() {
+    setTimeout(() => {
+      const val = this.formCustomerData.PHONE || '';
+      if (val) {
+        const isValid = this.PhoneValidate({ value: val });
+        if (this.phoneBox?.instance) {
+          this.phoneBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.phoneBox.instance.option('validationError', {
+              message: 'Invalid phone number',
+            });
+          }
+        }
+      } else if (this.phoneBox?.instance) {
+        this.phoneBox.instance.option('isValid', true);
+      }
+      this.phoneValidator?.instance?.validate();
+    }, 0);
+  }
+
+  MobileValidate = (e: any): boolean => {
+    const dialCode = (this.countryCode || '').trim();
+    const mobileValue = e.value ? e.value.toString().trim() : '';
+    const mobileNum = mobileValue.replace(/\D/g, '');
+    if (!mobileNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return mobileNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + mobileNum);
+    } catch {
+      return false;
+    }
+  };
+
+  PhoneValidate = (e: any): boolean => {
+    const dialCode = (
+      this.phoneCountryCode ||
+      this.PhonenumberCode ||
+      ''
+    ).trim();
+    const phoneValue = e.value ? e.value.toString().trim() : '';
+    const phoneNum = phoneValue.replace(/\D/g, '');
+    if (!phoneNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return phoneNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + phoneNum);
+    } catch {
+      return false;
+    }
+  };
+
+  onMobileInputChange(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.formCustomerData.MOBILE_NO = digits;
+    this.revalidateMobile();
+  }
+
+  validatePhone(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.formCustomerData.PHONE = digits;
+    this.revalidatePhone();
+  }
 
   countryDisplay(item: any) {
     if (!item) return '';
-    return `${item.CODE}${item.COUNTRY_NAME}`;
+    return `${item.CODE}`;
   }
+
+  onCountrycodeChangePhoneNocode(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+
+  validateMobileLengthdeliveryaddress = (e: any): boolean => {
+    const value = (e.value || '').trim();
+    if (!value) return true;
+
+    if (!this.mobile_limit_Delivery_Address) return false;
+
+    return value.length === this.mobile_limit_Delivery_Address;
+  };
+
+  allowOnlyNumbers(e: any) {
+    const value = e.event.target.value;
+    e.event.target.value = value.replace(/\D/g, '');
+  }
+
+  onDropdownClosed() { }
+  onDropdownOpened() { }
+  updateMobileNumber() { }
 
   onCountrycodeChangeDeliveryAddressmobile(e: any) {
     const payload = {
@@ -569,23 +910,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     return value.length === this.Phone_limit;
   };
 
-  onCountrycodeChangePhoneNocode(e: any) {
-    const payload = {
-      COUNTRY_CODE: e.value,
-    };
-    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
-    });
-  }
-
-  validateMobileLengthdeliveryaddress = (e: any): boolean => {
-    const value = (e.value || '').trim();
-    if (!value) return true;
-
-    if (!this.mobile_limit_Delivery_Address) return false;
-
-    return value.length === this.mobile_limit_Delivery_Address;
-  };
 }
 
 @NgModule({
@@ -604,8 +928,10 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     DxRadioGroupModule,
     DxTabPanelModule,
     DxButtonModule,
+    DxListModule,
+    DxDropDownBoxModule,
   ],
   declarations: [CustomerEditFormComponent],
   exports: [CustomerEditFormComponent],
 })
-export class CustomerEditFormModule {}
+export class CustomerEditFormModule { }

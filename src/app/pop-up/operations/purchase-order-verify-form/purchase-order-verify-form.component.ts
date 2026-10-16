@@ -52,6 +52,7 @@ export class PurchaseOrderVerifyFormComponent implements OnChanges {
   HSN_CODE: any;
   selected_Company_id: any;
   GST_PERC: any;
+  userId: any;
 
   constructor(private service: DataService) {
     const settingsData = sessionStorage.getItem('settings');
@@ -550,7 +551,12 @@ export class PurchaseOrderVerifyFormComponent implements OnChanges {
   }
 
   GetSupplierList() {
-    this.service.getDropdownData('SUPPLIER').subscribe((res) => {
+    const payload = {
+      NAME: 'SUPPLIER',
+      COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId || null,
+    }
+    this.service.getDropdownData(payload).subscribe((res) => {
       this.SupplierList = res;
     });
   }
@@ -598,14 +604,11 @@ export class PurchaseOrderVerifyFormComponent implements OnChanges {
     );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    console.log(
-      this.selected_Company_id,
-      '============selected_Company_id=============='
-    );
+    this.userId = sessionData.USER_ID;
   }
 
   loadPurchaseOrders(itemId: string) {
-    this.service.getLast5PoItemsList(itemId,this.selected_Company_id).subscribe((data: any[]) => {
+    this.service.getLast5PoItemsList(itemId, this.selected_Company_id).subscribe((data: any[]) => {
       // Filter out records where PO_NO matches this.newPOData.PO_NO
       this.purchaseOrders = data
         .filter((po) => po.PO_NO !== this.newPoData.PO_NO)
@@ -875,4 +878,4 @@ export class PurchaseOrderVerifyFormComponent implements OnChanges {
   declarations: [PurchaseOrderVerifyFormComponent],
   exports: [PurchaseOrderVerifyFormComponent],
 })
-export class PurchaseOrderVerifyFormModule {}
+export class PurchaseOrderVerifyFormModule { }

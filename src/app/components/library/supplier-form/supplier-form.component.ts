@@ -12,8 +12,11 @@ import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.compone
 import {
   DxCheckBoxModule,
   DxDataGridComponent,
+  DxDropDownBoxModule,
+  DxListModule,
   DxRadioGroupModule,
   DxValidationGroupComponent,
+  DxValidatorComponent,
   DxValidatorModule,
 } from 'devextreme-angular';
 import { DxValidationGroupModule } from 'devextreme-angular';
@@ -25,8 +28,11 @@ import {
   DxDateBoxModule,
   DxFormModule,
 } from 'devextreme-angular';
-import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
+import { DxTextBoxComponent, DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { AuthService, DataService } from 'src/app/services';
+import CountryList from 'country-list-with-dial-code-and-flag';
+import { isValidPhoneNumber } from 'libphonenumber-js';
+
 
 @Component({
   selector: 'app-supplier-form',
@@ -40,13 +46,22 @@ export class SupplierFormComponent implements OnInit {
   @ViewChild('landedCostGrid', { static: false })
   landedCostGrid!: DxDataGridComponent; // reference to dx-data-grid
 
+  @ViewChild('mobileValidator', { static: false })
+  mobileValidator!: DxValidatorComponent;
+  @ViewChild('phoneValidator', { static: false })
+  phoneValidator!: DxValidatorComponent;
+  @ViewChild('mobileBox', { static: false }) mobileBox!: DxTextBoxComponent;
+  @ViewChild('phoneBox', { static: false }) phoneBox!: DxTextBoxComponent;
+
   CountryDropdownData: any[] = [];
   VATRuleDropdownData: any[] = [];
   SupplierCategory: any[] = [];
   PaymentTermsDropdownData: any[] = [];
   CurrencyDropdownData: any[] = [];
   StateDropdownData: any[] = [];
-  countryCode: any;
+  countryCode: string = '+91';
+  phoneCountryCode: string = '+91';
+  countryCodePhone: string = '+91';
   DEFAULT_COUNTRY_CODE: any;
   sessionData: any;
   stateLabel: any;
@@ -96,7 +111,6 @@ export class SupplierFormComponent implements OnInit {
   Supplier_mobile: any;
   mobile_limit: any;
 
-  countryCodePhone: any;
   PhoneNumber: any;
   countryCodes: any;
   purchaseTypeOptions = [
@@ -104,14 +118,29 @@ export class SupplierFormComponent implements OnInit {
     { text: 'Interstate Purchase', value: 2 },
   ];
   Phone_limit: any;
+  isCountryDropdownOpen = false;
+  isPhoneDropdownOpen = false;
 
   constructor(
     private service: DataService,
     private authservice: AuthService,
   ) {
     this.stateLabel = authservice.getsettingsData()?.STATE_LABEL;
-    this.countryCode = authservice.getsettingsData()?.DEFAULT_COUNTRY_CODE;
-    this.DEFAULT_COUNTRY_CODE = authservice.getsettingsData()?.DEFAULT_COUNTRY_CODE;
+    // this.countryCode = authservice.getsettingsData()?.DEFAULT_COUNTRY_CODE;
+    // this.DEFAULT_COUNTRY_CODE = authservice.getsettingsData()?.DEFAULT_COUNTRY_CODE;
+
+    const defaultCc =
+      authservice.getsettingsData().DEFAULT_COUNTRY_CODE || '+91';
+    this.countryCode = defaultCc;
+    this.phoneCountryCode = defaultCc;
+    this.countryCodePhone = defaultCc;
+
+    const codes = CountryList.getAll();
+    this.countryCodes = codes.map((country: any) => ({
+      ...country,
+      flagUrl: `https://flagcdn.com/w20/${country.code.toLowerCase()}.png`,
+      display: `${country.dial_code}`,
+    }));
 
     this.get_Country_Dropdown_List();
     this.get_State_Dropdown_List();
@@ -124,9 +153,9 @@ export class SupplierFormComponent implements OnInit {
         this.newSupplier.CURRENCY_ID = defCur;
       }
     }
-    service.getCountryWithFlags().subscribe((data) => {
-      this.countryCodes = data;
-    });
+    // service.getCountryWithFlags().subscribe((data) => {
+    //   this.countryCodes = data;
+    // });
   }
   newSupplier = this.formSupplierData;
 
@@ -138,7 +167,7 @@ export class SupplierFormComponent implements OnInit {
         if (settings && settings.CURRENCY_ID !== undefined && settings.CURRENCY_ID !== null && settings.CURRENCY_ID !== '') {
           return settings.CURRENCY_ID;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const savedUserStr = sessionStorage.getItem('savedUserData') || localStorage.getItem('userData');
@@ -157,7 +186,7 @@ export class SupplierFormComponent implements OnInit {
         if (savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== undefined && savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== null && savedUser?.SELECTED_COMPANY?.CURRENCY_ID !== '') {
           return savedUser.SELECTED_COMPANY.CURRENCY_ID;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const authSettings = this.authservice?.getsettingsData?.();
@@ -333,28 +362,63 @@ export class SupplierFormComponent implements OnInit {
       this.StateDropdownData = data;
     });
   }
+
   onCountrySelectionChanged(event: any) {
     this.selecte_countyId = event.value;
     this.CountryId = event.value;
-
     this.get_State_Dropdown_List();
 
     const selectedCountry = this.CountryDropdownData.find(
-      (country: any) => country.ID === this.selecte_countyId,
+      (c: any) => c.ID === event.value,
     );
-    // 4️ If found, set code & name
-    if (selectedCountry) {
-      this.countryCode = selectedCountry.CODE; // e.g., '+971'
-      this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
-      this.countryCodePhone = selectedCountry.CODE;
+
+    if (!selectedCountry) return;
+
+    const matchedCountry = this.countryCodes.find(
+      (c: any) =>
+        (c.name || c.COUNTRY_NAME || '')?.toLowerCase().trim() ===
+        (selectedCountry.COUNTRY_NAME || selectedCountry.DESCRIPTION || '')
+          ?.toLowerCase()
+          .trim(),
+    );
+
+    if (matchedCountry) {
+      const dialCode = matchedCountry.dial_code || matchedCountry.CODE;
+      this.countryCode = dialCode;
+      this.phoneCountryCode = dialCode;
+      this.countryCodePhone = dialCode;
+      this.revalidateMobile();
+      this.revalidatePhone();
     } else {
-      // 5️ Fallback if no country found
-      this.countryCode = '';
-      this.DEFAULT_COUNTRY_CODE = '';
-      this.countryCodePhone = '';
-      console.warn(' No matching country found for ID:', this.selecte_countyId);
+      console.warn(
+        'No matching country code found for:',
+        selectedCountry.COUNTRY_NAME || selectedCountry.DESCRIPTION,
+      );
     }
   }
+
+  // onCountrySelectionChanged(event: any) {
+  //   this.selecte_countyId = event.value;
+  //   this.CountryId = event.value;
+
+  //   this.get_State_Dropdown_List();
+
+  //   const selectedCountry = this.CountryDropdownData.find(
+  //     (country: any) => country.ID === this.selecte_countyId,
+  //   );
+  //   // 4️ If found, set code & name
+  //   if (selectedCountry) {
+  //     this.countryCode = selectedCountry.CODE; // e.g., '+971'
+  //     this.DEFAULT_COUNTRY_CODE = this.countryCode; // bind to textbox
+  //     this.countryCodePhone = selectedCountry.CODE;
+  //   } else {
+  //     // 5️ Fallback if no country found
+  //     this.countryCode = '';
+  //     this.DEFAULT_COUNTRY_CODE = '';
+  //     this.countryCodePhone = '';
+  //     console.warn(' No matching country found for ID:', this.selecte_countyId);
+  //   }
+  // }
 
   onPayTermSelectionChanged(event: any) {
     this.PaymentId = event.value;
@@ -427,6 +491,165 @@ export class SupplierFormComponent implements OnInit {
     //  this.financialYeaDate=sessionYear[0].DATE_FROM
     // this.formatted_from_date=this.financialYeaDate
   }
+
+
+  private extractDialCode(event: any): string {
+    if (!event) return '';
+    if (typeof event === 'string') return event;
+    if (typeof event.value === 'string') return event.value;
+    if (typeof event.value?.dial_code === 'string')
+      return event.value.dial_code;
+    if (typeof event.value?.data?.dial_code === 'string')
+      return event.value.data.dial_code;
+    if (typeof event.itemData?.dial_code === 'string')
+      return event.itemData.dial_code;
+    if (typeof event.itemData?.data?.dial_code === 'string')
+      return event.itemData.data.dial_code;
+    if (typeof event.dial_code === 'string') return event.dial_code;
+    if (typeof event.data?.dial_code === 'string') return event.data.dial_code;
+    return '';
+  }
+
+  onCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (this.countryCode && this.countryCode !== dialCode) {
+        this.Supplier_mobile = '';
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', true);
+        }
+      }
+      this.countryCode = dialCode;
+    }
+    this.isCountryDropdownOpen = false;
+    this.revalidateMobile();
+  }
+
+  onPhoneCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (this.phoneCountryCode && this.phoneCountryCode !== dialCode) {
+        this.PhoneNumber = '';
+        if (this.phoneBox?.instance) {
+          this.phoneBox.instance.option('isValid', true);
+        }
+      }
+      this.phoneCountryCode = dialCode;
+      this.countryCodePhone = dialCode;
+    }
+    this.isPhoneDropdownOpen = false;
+    this.revalidatePhone();
+  }
+
+  revalidateMobile() {
+    setTimeout(() => {
+      const val = this.Supplier_mobile || '';
+      if (val) {
+        const isValid = this.MobileValidate({ value: val });
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.mobileBox.instance.option('validationError', {
+              message: 'Invalid mobile number',
+            });
+          }
+        }
+      } else if (this.mobileBox?.instance) {
+        this.mobileBox.instance.option('isValid', true);
+      }
+      this.mobileValidator?.instance?.validate();
+    }, 0);
+  }
+
+  revalidatePhone() {
+    setTimeout(() => {
+      const val = this.PhoneNumber || '';
+      if (val) {
+        const isValid = this.PhoneValidate({ value: val });
+        if (this.phoneBox?.instance) {
+          this.phoneBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.phoneBox.instance.option('validationError', {
+              message: 'Invalid phone number',
+            });
+          }
+        }
+      } else if (this.phoneBox?.instance) {
+        this.phoneBox.instance.option('isValid', true);
+      }
+      this.phoneValidator?.instance?.validate();
+    }, 0);
+  }
+
+  MobileValidate = (e: any): boolean => {
+    const dialCode = (this.countryCode || '').trim();
+    const mobileValue = e?.value ? e.value.toString().trim() : '';
+    const mobileNum = mobileValue.replace(/\D/g, '');
+    if (!mobileNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return mobileNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + mobileNum);
+    } catch {
+      return false;
+    }
+  };
+
+  PhoneValidate = (e: any): boolean => {
+    const dialCode = (
+      this.phoneCountryCode ||
+      this.countryCodePhone ||
+      ''
+    ).trim();
+    const phoneValue = e?.value ? e.value.toString().trim() : '';
+    const phoneNum = phoneValue.replace(/\D/g, '');
+    if (!phoneNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return phoneNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + phoneNum);
+    } catch {
+      return false;
+    }
+  };
+
+  onMobileInputChange(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.Supplier_mobile = digits;
+    this.revalidateMobile();
+  }
+
+  validatePhone(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.PhoneNumber = digits;
+    this.revalidatePhone();
+  }
+
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+
   onCountrycodeChange(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
@@ -435,10 +658,7 @@ export class SupplierFormComponent implements OnInit {
       this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
     });
   }
-  countryDisplay(item: any) {
-    if (!item) return '';
-    return `${item.CODE}`;
-  }
+
   onCountrycodeChangePhone(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
@@ -476,9 +696,11 @@ export class SupplierFormComponent implements OnInit {
     DxValidationGroupModule,
     DxValidatorModule,
     DxDataGridModule,
+    DxDropDownBoxModule,
+    DxListModule,
   ],
   declarations: [SupplierFormComponent],
   exports: [SupplierFormComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SupplierFormModule {}
+export class SupplierFormModule { }

@@ -225,24 +225,36 @@
         </dx-select-box>
 
         <dx-text-box
+          #phoneBox
           label="Phone *"
           labelMode="floating"
           [width]="250"
           class="phone-style"
           [(value)]="newStores.PHONE"
           (keypress)="keyPressNumbers($event)"
+          (onValueChanged)="onPhoneInputChange($event)"
+          valueChangeEvent="input"
         >
-          <dx-validator>
+          <dx-validator #phoneValidator>
             <dxi-validation-rule
               type="required"
               message="This Field is required"
             >
-              <dxi-validation-rule type="numeric"> </dxi-validation-rule>
             </dxi-validation-rule>
+            <dxi-validation-rule
+              type="numeric"
+              message="Only numbers are allowed"
+            >
+            </dxi-validation-rule>
+
             <dxi-validation-rule
               type="custom"
               [validationCallback]="validatePhoneLength"
-              [message]="'Phone no. must be  ' + Phone_limit + ' digits long'"
+              [message]="
+                Phone_limit
+                  ? 'Phone number must be exactly ' + Phone_limit + ' digits'
+                  : 'Please select a country code first'
+              "
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
       </div>

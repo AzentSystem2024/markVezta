@@ -6173,7 +6173,7 @@ The result can be exported to HTML or Markdown.`;
 
   Company_api(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}Login/Markinitdata`, data);
+    return this.http.post(`${this.apiUrl}Login/initdata`, data);
   }
 
   //============LOGIN FUNCTION======
@@ -6185,7 +6185,7 @@ The result can be exported to HTML or Markdown.`;
   //   }
   login_function_api(item: any) {
     const payload = item;
-    return this.http.post(`${this.apiUrl}Login/marklogin`, payload);
+    return this.http.post(`${this.apiUrl}Login/login`, payload);
   }
 
   //====================VIEW===================

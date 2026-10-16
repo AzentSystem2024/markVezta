@@ -16,6 +16,7 @@ import { FormTextboxModule } from '../../utils/form-textbox/form-textbox.compone
 import {
   DxCheckBoxModule,
   DxTagBoxModule,
+  DxValidatorComponent,
   DxValidatorModule,
 } from 'devextreme-angular';
 
@@ -25,7 +26,7 @@ import {
   DxDateBoxModule,
   DxFormModule,
 } from 'devextreme-angular';
-import { DxTextBoxModule } from 'devextreme-angular/ui/text-box';
+import { DxTextBoxComponent, DxTextBoxModule } from 'devextreme-angular/ui/text-box';
 import { DataService } from 'src/app/services';
 import { CountryServiceService } from 'src/app/services/country-service.service';
 
@@ -39,6 +40,11 @@ export class StoresFormComponent implements OnInit {
   @Input() companyId!: number;
   @ViewChild('dxFormRef', { static: false }) dxForm: any;
   @Output() formSubmit = new EventEmitter<any>();
+  @ViewChild('phoneBox', { static: false })
+  phoneBox!: DxTextBoxComponent;
+
+  @ViewChild('phoneValidator', { static: false })
+  phoneValidator!: DxValidatorComponent;
   CountryDropdownData: any[] = [];
   GroupDropdownData: any[] = [];
   StateDropdownData: any[] = [];
@@ -327,22 +333,87 @@ export class StoresFormComponent implements OnInit {
     }
   }
 
+  // onCountrycodeChangePhone(e: any) {
+  //   const payload = {
+  //     COUNTRY_CODE: e.value,
+  //   };
+  //   this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+  //     this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+  //   });
+  // }
+
+
   onCountrycodeChangePhone(e: any) {
     const payload = {
       COUNTRY_CODE: e.value,
     };
-    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
-      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+
+    this.Phone_limit = undefined;
+
+    this.service.get_mobile_no_length(payload).subscribe({
+      next: (res: any) => {
+        const digits = Number(res?.Data?.[0]?.MOBILE_DIGITS);
+
+        this.Phone_limit =
+          Number.isFinite(digits) && digits > 0 ? digits : undefined;
+
+        console.log('Phone limit:', this.Phone_limit);
+
+        // ✅ KEY FIX: re-trigger phone validator after limit is fetched
+        setTimeout(() => {
+          this.phoneValidator?.instance?.validate();
+        }, 0);
+      },
+      error: (err: any) => {
+        console.error('Failed to get phone length:', err);
+        this.Phone_limit = undefined;
+      },
     });
   }
-
   validatePhoneLength = (e: any): boolean => {
-    const value = (e.value || '').trim();
+    const value = String(e.value ?? '').replace(/\D/g, ''); // strip non-digits
 
-    if (!this.Phone_limit) return false;
+    // Skip custom validation until country code is selected and API responds
+    if (this.Phone_limit == null) {
+      return true;
+    }
 
     return value.length === this.Phone_limit;
   };
+
+  // validatePhoneLength = (e: any): boolean => {
+  //   const value = String(e.value ?? '').trim();
+
+  //   // Wait until the phone limit is available
+  //   if (this.Phone_limit == null) {
+  //     return true;
+  //   }
+
+  //   return value.length === this.Phone_limit;
+  // };
+
+  onPhoneInputChange(event: any): void {
+    const target = (event.target || event.event?.target) as HTMLInputElement;
+    if (!target) return;
+
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+
+    this.newStores.PHONE = digits;
+
+    // ✅ re-validate phone each time the user types
+    this.phoneValidator?.instance?.validate();
+  }
+
+  // validatePhoneLength = (e: any): boolean => {
+  //   const value = (e.value || '').trim();
+
+  //   if (!this.Phone_limit) return false;
+
+  //   return value.length === this.Phone_limit;
+  // };
 
   countryDisplay(item: any) {
     if (!item) return '';
