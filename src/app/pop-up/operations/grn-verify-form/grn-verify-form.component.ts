@@ -244,6 +244,7 @@ export class GrnVerifyFormComponent implements OnInit, OnChanges {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selected_Company_id,
+       USER_ID: this.sessionData?.USER_ID || null,
     };
     this.service.getDropdownData(payload).subscribe((res: any) => {
       console.log('supplier dropdown', res);

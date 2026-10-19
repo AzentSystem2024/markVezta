@@ -85,6 +85,7 @@ export class CustomerReportComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+  hasData = false;
   customer_details: any = {
     CUSTOMER_ID: 0,
     SALE_ID: 0,
@@ -108,7 +109,7 @@ export class CustomerReportComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
   ngOnInit() {
     // initialize with today's date
@@ -248,41 +249,41 @@ this.selectedmonth = currentMonth;
 
 
   GET_CUSTOMER_LIST() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-    CUSTOMER_ID: this.select_customer_id || 0,
-    DATE_FROM: this.formatted_from_date,
-    DATE_TO: this.formatted_To_date,
-  };
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      CUSTOMER_ID: this.select_customer_id || 0,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+    };
 
-  this.CustomerListDataSource = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.customer_report_Api(payload).subscribe({
-          next: (res: any) => {
-            const list = res.Data || [];
+    this.CustomerListDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.customer_report_Api(payload).subscribe({
+            next: (res: any) => {
+              const list = res.Data || [];
+              this.hasData = list.length > 0;
+              resolve(list);
 
-            resolve(list);
-
-            if (list.length === 0) {
-              notify({
-                message: 'No data available',
-                type: 'warning',
-                displayTime: 2000,
-                position: {
-                  at: 'top center',
-                  my: 'top center',
-                },
-              });
-            }
-          },
-          error: () => {
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
+            },
+            error: () => {
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
   onViewClick(e: any) {
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE_ID;
     const trans_id = e.row.data.TRANS_ID;
@@ -456,4 +457,4 @@ this.selectedmonth = currentMonth;
   exports: [CustomerReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomerReportModule {}
+export class CustomerReportModule { }

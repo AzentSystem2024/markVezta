@@ -202,6 +202,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
   vatTitle: any;
   storeItems: any;
   CurrencySymbol: any;
+  userID: any;
 
   constructor(
     private service: DataService,
@@ -782,6 +783,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.companyStateID = sessionData.SELECTED_COMPANY.STATE_ID;
+    this.userID = sessionData.USER_ID;
   }
 
   calculateTotalQuantity() {
@@ -1052,6 +1054,7 @@ export class PurchaseOrderEditFormComponent implements OnInit, OnChanges {
     const payload = {
       NAME: 'SUPPLIER',
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userID || null,
     };
     this.service.getDropdownData(payload).subscribe((res) => {
       this.SupplierList = res;

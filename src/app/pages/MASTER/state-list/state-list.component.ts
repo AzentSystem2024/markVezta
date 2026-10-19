@@ -102,6 +102,7 @@ export class StateListComponent {
   sessionData: any;
   selected_vat_id: any;
   selectedCompanyId: any;
+  appType: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -139,14 +140,14 @@ export class StateListComponent {
     this.isAddStatePopupOpened = true;
   }
 
-CloseEditForm() {
-  this.isEditPopupOpened = false;
-  this.isAddStatePopupOpened = false;
+  CloseEditForm() {
+    this.isEditPopupOpened = false;
+    this.isAddStatePopupOpened = false;
 
-  this.stateComponent?.resetStateForm();   // reset form
+    this.stateComponent?.resetStateForm();   // reset form
 
-  this.showState();
-}
+    this.showState();
+  }
 
   showState() {
     this.StateDataSource = new DataSource({
@@ -223,29 +224,29 @@ CloseEditForm() {
       return;
     }
 
-    const { STATE_CODE, STATE_NAME, COUNTRY_ID } = newStateData;
+    const { STATE_NAME, COUNTRY_ID } = newStateData;
 
     // DUPLICATE CHECK
-    const isDuplicateCode = this.stateArray.some(
-      (x: any) =>
-        x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
-    );
+    // const isDuplicateCode = this.stateArray.some(
+    //   (x: any) =>
+    //     x.STATE_CODE?.toLowerCase().trim() === STATE_CODE?.toLowerCase().trim(),
+    // );
 
     const isDuplicateName = this.stateArray.some(
       (x: any) =>
         x.STATE_NAME?.toLowerCase().trim() === STATE_NAME?.toLowerCase().trim(),
     );
 
-    if (isDuplicateCode) {
-      notify(
-        {
-          message: 'State Code already exists',
-          position: { at: 'top right', my: 'top right' },
-        },
-        'warning',
-      );
-      return;
-    }
+    // if (isDuplicateCode) {
+    //   notify(
+    //     {
+    //       message: 'State Code already exists',
+    //       position: { at: 'top right', my: 'top right' },
+    //     },
+    //     'warning',
+    //   );
+    //   return;
+    // }
 
     if (isDuplicateName) {
       notify(
@@ -260,7 +261,7 @@ CloseEditForm() {
 
     // ✅ API CALL (only if no duplicates)
     this.dataservice
-      .postStateData(STATE_CODE, STATE_NAME, COUNTRY_ID)
+      .postStateData(STATE_NAME, COUNTRY_ID)
       .subscribe((response) => {
         if (response) {
           try {
@@ -272,10 +273,10 @@ CloseEditForm() {
               'success',
             );
 
-           this.formClosed.emit();
-this.stateComponent?.resetStateForm();
-this.isAddStatePopupOpened = false;
-this.showState();
+            this.formClosed.emit();
+            this.stateComponent?.resetStateForm();
+            this.isAddStatePopupOpened = false;
+            this.showState();
           } catch (error) {
             notify(
               {
@@ -289,37 +290,37 @@ this.showState();
       });
   }
 
-onRowRemoving(event: any) {
-  const selectedRow = event.data;
-  const { ID, STATE_CODE, STATE_NAME, COUNTRY_ID } = selectedRow;
+  onRowRemoving(event: any) {
+    const selectedRow = event.data;
+    const { ID, STATE_CODE, STATE_NAME, COUNTRY_ID } = selectedRow;
 
-  event.cancel = true; // stop default delete
+    event.cancel = true; // stop default delete
 
-  this.dataservice
-    .removeState(ID, STATE_CODE, STATE_NAME, COUNTRY_ID)
-    .subscribe({
-      next: () => {
-        notify(
-          {
-            message: 'Delete operation successful',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'success'
-        );
+    this.dataservice
+      .removeState(ID, STATE_CODE, STATE_NAME, COUNTRY_ID)
+      .subscribe({
+        next: () => {
+          notify(
+            {
+              message: 'Delete operation successful',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'success'
+          );
 
-        this.showState(); // reload datasource only
-      },
-      error: () => {
-        notify(
-          {
-            message: 'Delete operation failed',
-            position: { at: 'top right', my: 'top right' },
-          },
-          'error'
-        );
-      },
-    });
-}
+          this.showState(); // reload datasource only
+        },
+        error: () => {
+          notify(
+            {
+              message: 'Delete operation failed',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error'
+          );
+        },
+      });
+  }
 
   getCountryDropDown() {
     this.dataservice.getCountryData().subscribe((data: any) => {
@@ -335,6 +336,7 @@ onRowRemoving(event: any) {
     );
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.selectedCompanyId = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.appType = this.sessionData.Configuration[0].APP_TYPE;
   }
 
   onEditingRow(event: any) {

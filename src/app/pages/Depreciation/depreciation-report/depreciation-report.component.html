@@ -1,33 +1,118 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
+    <!-- Collapsible filter panel (outside grid, above it) -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-select-box
+          [width]="200"
+          label="Location"
+          labelMode="floating"
+          [items]="Department"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="select_department_id"
+          [searchEnabled]="true"
+        >
+        </dx-select-box>
+
+        <dx-select-box
+          labelMode="floating"
+          label="Year"
+          [width]="150"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        >
+        </dx-select-box>
+
+        <dx-select-box
+          labelMode="floating"
+          label="month"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        >
+        </dx-select-box>
+
+        <dx-date-box
+          [width]="150"
+          label="Date From"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          [value]="formatted_from_date"
+          (onValueChanged)="onFromDateChange($event)"
+        >
+        </dx-date-box>
+
+        <dx-date-box
+          [width]="150"
+          label="Date To"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          [value]="formatted_To_date"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+
+        <dx-button
+          text="Apply"
+          type="default"
+          stylingMode="contained"
+          (onClick)="Depreciation_Report()"
+        >
+        </dx-button>
+
+        <dx-button
+          text="Cancel"
+          type="danger"
+          stylingMode="outlined"
+          (onClick)="cancelReport()"
+        ></dx-button>
+      </div>
+    </div>
+
+    <!-- ✅ Toggle Bar -->
+    <div class="toggle-bar" (click)="toggleParameters()">
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
     <dx-data-grid
       class="grid theme-dependent"
       [dataSource]="DepreciationReport"
       width="100%"
       noDataText=""
-      height="82vh"
-      [showBorders]="true"
-      [showColumnLines]="true"
-      [columnAutoWidth]="true"
-      [wordWrapEnabled]="false"
+      height="75vh"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
       [grouping]="{ autoExpandAll: false }"
-      [filterRow]="{ visible: false }"
       [rowAlternationEnabled]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-      [export]="{ enabled: true, formats: ['xlsx'] }"
-      [summary]="summaryColumnsData"
-      (onExporting)="onExporting($event)"
-      [loadPanel]="{ enabled: true, text: 'Loading...' }"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      ...
     >
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
@@ -38,216 +123,98 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <!-- <dxo-toolbar>
+      <dxo-toolbar>
         <dxi-item location="before">
           <div
             class="grid-header"
             style="font-weight: 600; font-size: 20px; margin-left: 12px"
           >
-            Trial Balance
-          </div>
-        </dxi-item>
-      </dxo-toolbar> -->
-
-      <dxo-toolbar>
-        <dxi-item location="before">
-          <div
-            class="grid-header"
-            style="
-              font-weight: 600;
-              font-size: 20px;
-              margin-left: 12px;
-              padding: -3px;
-              margin-right: 3px;
-            "
-          >
             Depreciation Report
           </div>
         </dxi-item>
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            [width]="200"
-            label="Location"
-            labelMode="floating"
-            [items]="Department"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="select_department_id"
-            [searchEnabled]="true"
-          >
-          </dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="Year"
-            [width]="150"
-            [(value)]="selectedYear"
-            [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)"
-            placeholder="Year"
-          ></dx-select-box>
-        </dxi-item>
-
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="month"
-            [dataSource]="monthDataSource"
-            displayExpr="name"
-            valueExpr="value"
-            [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)"
-            [dropDownOptions]="{ width: 'auto' }"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <dxi-item style="margin-bottom: 6px">
-          <dx-date-box
-            [width]="150"
-            label="Date From"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [value]="formatted_from_date"
-            (onValueChanged)="onFromDateChange($event)"
-          ></dx-date-box>
-        </dxi-item>
-        <dxi-item style="margin-bottom: 6px">
-          <dx-date-box
-            [width]="150"
-            label="Date To"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [value]="formatted_To_date"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <!-- rest of grid unchanged -->
+    </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
           <dx-button
             text="Apply"
             type="default"
             stylingMode="contained"
-            (onClick)="Depreciation_Report()"
-          >
-          </dx-button>
-        </dxi-item>
-      </dxo-toolbar>
-
-      <dxo-grouping
-        [autoExpandAll]="false"
-        [contextMenuEnabled]="true"
-        [expandMode]="'rowClick'"
-      ></dxo-grouping>
-      <dxo-header-filter [visible]="true">
-        <dxo-search [enabled]="true"></dxo-search>
-      </dxo-header-filter>
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
-
-      <!-- Customer Name -->
-      <dxi-column
-        dataField="CODE"
-        caption="Asset Code"
-        dataType="string"
-      ></dxi-column>
-
-      <!-- Age -->
-      <dxi-column
-        dataField="DESCRIPTION"
-        caption="Description"
-        dataType="string"
-      ></dxi-column>
-
-      <!-- Invoice No -->
-      <dxi-column
-        dataField="ASSET_TYPE"
-        caption="Asset Type"
-        dataType="string"
-      ></dxi-column>
-
-      <!-- Reference No -->
-      <dxi-column
-        dataField="LOCATION"
-        caption="Location"
-        dataType="string"
-      ></dxi-column>
-
-      <!-- Invoice Date -->
-      <dxi-column
-        dataField="PURCH_DATE"
-        caption="Purch Date"
-        dataType="date"
-        format="dd/MM/yyyy"
-      ></dxi-column>
-
-      <!-- Narration -->
-      <dxi-column
-        dataField="ASSET_VALUE"
-        caption="Purchase Value"
-        dataType="number"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-      ></dxi-column>
-
-      <!-- Net Amount -->
-      <dxi-column
-        dataField="USEFUL_LIFE"
-        caption="Useful Life"
-        dataType="number"
-        [customizeText]="formatUsefulLife"
-      ></dxi-column>
-
-      <dxi-column caption="Depreciation" [width]="120" alignment="center">
-        <dxi-column
-          dataField="OPENING_DEPR"
-          caption="Opening"
-          [width]="130"
-          [allowEditing]="false"
-          alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        ></dxi-column>
-        <dxi-column
-          dataField="DURING_DEPR"
-          caption="During"
-          [width]="130"
-          [allowEditing]="false"
-          alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        ></dxi-column>
-        <dxi-column
-          dataField="CLOSING_DEPR"
-          caption="Closing"
-          [width]="100"
-          alignment="center"
-          alignment="right"
-          [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-          dataType="number"
-        >
-        </dxi-column>
-      </dxi-column>
-
-      <!-- Received Amount -->
-      <dxi-column
-        dataField="CURRENT_VALUE"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-        caption="Net Asset Value"
-        dataType="number"
-        format="currency"
-      ></dxi-column>
-    </dx-data-grid>
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>

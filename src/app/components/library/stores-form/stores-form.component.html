@@ -31,7 +31,9 @@
     <dxi-item>
       <div *dxTemplate>
         <dx-text-box
-          label="Store Name *"
+          [label]="
+            appType === 'VEZTA' ? 'Facility Name *' : 'Store/Branch Name *'
+          "
           labelMode="floating"
           [(value)]="newStores.STORE_NAME"
         >
@@ -150,19 +152,28 @@
     <dxi-item>
       <div *dxTemplate>
         <dx-select-box
-          label="State"
+          [label]="appType === 'VEZTA' ? 'Emirates' : 'State'"
           [items]="State"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
           [items]="State"
           [(value)]="newStores.STATE_ID"
-          placeholder="Select State State *"
           [searchEnabled]="true"
+          [placeholder]="
+            appType === 'VEZTA' ? 'Select Emirates *' : 'Select State *'
+          "
           labelMode="floating"
           (onValueChanged)="onStateValue($event)"
         >
           <dx-validator>
-            <dxi-validation-rule type="required" message="Select state">
+            <dxi-validation-rule
+              type="required"
+              [message]="
+                appType === 'VEZTA'
+                  ? 'Emirates is required'
+                  : 'State is required'
+              "
+            >
             </dxi-validation-rule>
           </dx-validator>
         </dx-select-box>
@@ -214,24 +225,36 @@
         </dx-select-box>
 
         <dx-text-box
+          #phoneBox
           label="Phone *"
           labelMode="floating"
           [width]="250"
           class="phone-style"
           [(value)]="newStores.PHONE"
           (keypress)="keyPressNumbers($event)"
+          (onValueChanged)="onPhoneInputChange($event)"
+          valueChangeEvent="input"
         >
-          <dx-validator>
+          <dx-validator #phoneValidator>
             <dxi-validation-rule
               type="required"
               message="This Field is required"
             >
-              <dxi-validation-rule type="numeric"> </dxi-validation-rule>
             </dxi-validation-rule>
+            <dxi-validation-rule
+              type="numeric"
+              message="Only numbers are allowed"
+            >
+            </dxi-validation-rule>
+
             <dxi-validation-rule
               type="custom"
               [validationCallback]="validatePhoneLength"
-              [message]="'Phone no. must be  ' + Phone_limit + ' digits long'"
+              [message]="
+                Phone_limit
+                  ? 'Phone number must be exactly ' + Phone_limit + ' digits'
+                  : 'Please select a country code first'
+              "
             ></dxi-validation-rule> </dx-validator
         ></dx-text-box>
       </div>

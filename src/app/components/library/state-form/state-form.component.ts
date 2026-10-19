@@ -26,7 +26,9 @@ export class StateFormComponent implements OnInit {
     STATE_NAME: '',
     COUNTRY_ID: '',
   };
-  constructor(private service: DataService) {}
+  appType: any;
+  sessionData: any;
+  constructor(private service: DataService) { }
   newState = this.formStateData;
 
   getNewStateData = () => ({ ...this.newState });
@@ -38,9 +40,17 @@ export class StateFormComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getCountryDropDown();
+    this.sessionData_tax();
   }
 
-   resetStateForm() {
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.appType = this.sessionData.Configuration[0].APP_TYPE;
+  }
+  resetStateForm() {
     this.newState = {
       STATE_CODE: '',
       STATE_NAME: '',
@@ -66,4 +76,4 @@ export class StateFormComponent implements OnInit {
   declarations: [StateFormComponent],
   exports: [StateFormComponent],
 })
-export class StateFormModule {}
+export class StateFormModule { }

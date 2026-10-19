@@ -162,6 +162,7 @@ export class CustomerFinListComponent {
   changed_Customer_Data: any;
 
   selected_fin_id: any;
+  userId: any;
   constructor(
     private dataservice: DataService,
     private exportService: ExportService,
@@ -229,6 +230,7 @@ export class CustomerFinListComponent {
   showCustomer() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
+      USER_ID: this.userId
     };
 
     this.CustomerDataSource = new DataSource({
@@ -267,7 +269,7 @@ export class CustomerFinListComponent {
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-
+    this.userId = sessionData.USER_ID;
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
   }
   onClickSaveCustomer() {

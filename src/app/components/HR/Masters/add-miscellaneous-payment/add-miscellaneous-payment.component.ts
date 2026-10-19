@@ -169,6 +169,7 @@ export class AddMiscellaneousPaymentComponent {
   BankID: any;
   settings: any;
   CashID: any;
+  appType: any;
 
   get popupTitle(): string {
     switch (this.mode) {
@@ -253,12 +254,13 @@ export class AddMiscellaneousPaymentComponent {
     private dataService: DataService,
     private ngZone: NgZone,
     private sanitizer: DomSanitizer,
-  ) {}
+  ) { }
 
   sessionDetails() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.appType = sessionData.Configuration[0]?.APP_TYPE || '';
   }
 
   ngOnInit() {
@@ -1396,4 +1398,4 @@ export class AddMiscellaneousPaymentComponent {
   exports: [AddMiscellaneousPaymentComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddMiscellaneousPaymentModule {}
+export class AddMiscellaneousPaymentModule { }

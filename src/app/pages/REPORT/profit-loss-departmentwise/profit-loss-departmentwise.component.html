@@ -34,6 +34,12 @@
         text: 'Loading...',
       }"
     >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      ></dxo-column-chooser>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
@@ -63,7 +69,7 @@
 
         <dxi-item>
           <dx-tag-box
-            label="Store/Branch"
+            [label]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"
             labelMode="floating"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
@@ -154,6 +160,7 @@
           cssClass="export-btn"
         ></dxi-item>
 
+        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
         <dxi-item>
           <dx-button
             text="Apply"

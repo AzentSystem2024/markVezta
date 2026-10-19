@@ -141,12 +141,12 @@ export class MiscSalesInvoiceListComponent {
   formatted_from_date: any;
   selected_vat_id: any;
 
-  canAdd = false;
-  canEdit = false;
-  canView = false;
-  canDelete = false;
-  canApprove = false;
-  canPrint = false;
+  canAdd = true;
+  canEdit = true;
+  canView = true;
+  canDelete = true;
+  canApprove = true;
+  canPrint = true;
   companyID: any;
 
   constructor(
@@ -164,12 +164,12 @@ export class MiscSalesInvoiceListComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-    this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    this.companyID = menuResponse?.SELECTED_COMPANY?.COMPANY_ID || menuResponse?.SELECTED_COMPANY;
     const menuGroups = menuResponse.MenuGroups || [];
     //
     const packingRights = menuGroups
       .flatMap((group: any) => group.Menus)
-      .find((menu: any) => menu.Path === '/invoice');
+      .find((menu: any) => menu.Path === currentUrl || menu.Path === '/misc-sales-invoice' || menu.Path === '/invoice');
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -574,7 +574,7 @@ export class MiscSalesInvoiceListComponent {
     const invoiceId = event.data.TRANS_ID;
     event.cancel = true;
     // Call your delete API
-    this.dataService.deleteInvoice(invoiceId).subscribe(
+    this.dataService.deleteMiscSalesInvoice(invoiceId).subscribe(
       (response: any) => {
         if (response) {
           notify(

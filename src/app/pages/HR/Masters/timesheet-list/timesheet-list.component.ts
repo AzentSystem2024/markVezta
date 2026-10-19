@@ -79,6 +79,7 @@ export class TimesheetListComponent {
   yearSelectorVisible = false;
 
   CompanyID: any;
+  UserID: any;
   selectedRowKeys: any[] = [];
   selectedTimesheet: any = null;
   timesheetList: any[] = [];
@@ -220,6 +221,9 @@ export class TimesheetListComponent {
     );
     if (menuResponse && menuResponse.SELECTED_COMPANY) {
       this.CompanyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
+    }
+    if (menuResponse && menuResponse.USER_ID) {
+      this.UserID = menuResponse.USER_ID;
     }
 
     const menuGroups = menuResponse.MenuGroups || [];
@@ -493,6 +497,7 @@ export class TimesheetListComponent {
   fetchTimesheetList() {
     const payload = {
       COMPANY_ID: this.CompanyID,
+      USER_ID: this.UserID,
       MONTH: this.selectedMonth
         .toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
         .replace(/\s/g, ''),

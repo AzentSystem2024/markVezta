@@ -52,6 +52,72 @@ import DataSource from 'devextreme/data/data_source';
 export class StockViewComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+
+  // Custom Column Chooser
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'ITEM_CODE', caption: 'Item Code' },
+    { dataField: 'ITEM_TYPE', caption: 'Type' },
+    { dataField: 'ITEM_DESCRIPTION', caption: 'Description' },
+    {
+      dataField: 'STORE_NAME',
+      caption: 'Store/Branch',
+    },
+    { dataField: 'DEPARTMENT', caption: 'Department' },
+    { dataField: 'CATEGORY', caption: 'Category' },
+    { dataField: 'SUB_CATEGORY', caption: 'Sub Category' },
+    { dataField: 'BRAND', caption: 'Brand' },
+    { dataField: 'CURRENT_STOCK', caption: 'Stock' },
+  ];
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -96,6 +162,7 @@ export class StockViewComponent {
   selectedStoreid: any;
   itemtype: any;
   selectedItemType: any;
+  appType: any;
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
@@ -110,6 +177,7 @@ export class StockViewComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.appType = menuResponse.Configuration?.APP_TYPE || '';
     this.fin_id = menuResponse.FINANCIAL_YEARS;
     if (this.fin_id.length) {
       this.finID = this.fin_id[0].FIN_ID;
@@ -141,6 +209,7 @@ export class StockViewComponent {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || " ");
     this.selected_vat_id = this.sessionData.VAT_ID;
     this.companyID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.appType = this.sessionData.Configuration[0]?.APP_TYPE || '';
     console.log(this.companyID)
   }
   refreshGrid() {

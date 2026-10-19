@@ -180,7 +180,7 @@
                 </div>
 
                 <div style="display: flex; align-items: baseline; gap: 2px">
-                  <dx-select-box
+                  <dx-text-box
                     label="Product*"
                     labelMode="floating"
                     [width]="400"
@@ -188,9 +188,10 @@
                     [displayExpr]="'DESCRIPTION'"
                     [items]="Article"
                     [searchEnabled]="true"
-                    [(value)]="productionJVFormData.PRODUCT_ID"
+                    [(value)]="productionJVFormData.PRODUCT_DESCRIPTION"
                     (onValueChanged)="onProductChange($event)"
-                  ></dx-select-box>
+                    [readOnly]="true"
+                  ></dx-text-box>
                 </div>
               </div>
             </dxi-item>
@@ -219,11 +220,11 @@
                     [width]="150"
                     [(value)]="productionJVFormData.PROD_QTY"
                     (onValueChanged)="onProductionQtyChange()"
-                    [readOnly]="false"
+                    [readOnly]="true"
                   ></dx-number-box>
 
                   <dx-button
-                    text="Fill Component"
+                    text="Select Box"
                     stylingMode="contained"
                     type="default"
                     style="height: 32px"
@@ -382,7 +383,6 @@
   >
     <!-- ✅ Approve Checkbox -->
     <dx-check-box
-      *ngIf="isEditing"
       text="Approve"
       [(value)]="isApproved"
       (onValueChanged)="onApproveChanged($event)"
@@ -426,3 +426,82 @@
     ></iframe>
   </div>
 </dx-popup> -->
+
+<dx-popup
+  [(visible)]="isComponentsPopupVisible"
+  title="Select Article"
+  [width]="950"
+  [height]="'auto'"
+  [maxHeight]="'80vh'"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [hideOnOutsideClick]="false"
+>
+  <div *dxTemplate="let data of 'content'">
+    <!-- DateBox at the top-right -->
+    <div
+      style="
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 10px;
+      "
+    >
+      <dx-date-box
+        [(value)]="componentDate"
+        type="date"
+        displayFormat="dd/MM/yyyy"
+        [width]="180"
+        (onValueChanged)="onComponentDateChanged($event)"
+      ></dx-date-box>
+    </div>
+
+    <dx-data-grid
+      [dataSource]="componentPopupData"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [showColumnLines]="true"
+      [rowAlternationEnabled]="true"
+      [columnAutoWidth]="true"
+      [hoverStateEnabled]="true"
+      [selection]="{ mode: 'single' }"
+      (onRowDblClick)="onComponentSelected($event)"
+    >
+      <dxo-filter-row [visible]="true"></dxo-filter-row>
+      <dxo-paging [enabled]="true" [pageSize]="10"></dxo-paging>
+
+      <dxi-column dataField="ART_NO" caption="Art No"></dxi-column>
+
+      <dxi-column dataField="COLOR" caption="Color"></dxi-column>
+
+      <dxi-column dataField="CATEGORY" caption="Category"></dxi-column>
+
+      <dxi-column
+        dataField="STD_PACKING"
+        caption="Standard Packing"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="QUANTITY_PRODUCED"
+        caption="Qty Produce"
+        dataType="number"
+        alignment="right"
+      ></dxi-column>
+    </dx-data-grid>
+
+    <div
+      style="
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 15px;
+      "
+    >
+      <dx-button
+        text="Close"
+        stylingMode="outlined"
+        (onClick)="isComponentsPopupVisible = false"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>

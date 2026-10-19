@@ -79,6 +79,7 @@ export class CompanyMasterComponent {
   countryCodewhatsapp: any;
   Phone_limit: number;
   whatsapp_limit: number;
+  appType: any;
 
   constructor(
     private fb: FormBuilder,
@@ -183,6 +184,7 @@ export class CompanyMasterComponent {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.appType = sessionData.Configuration[0].APP_TYPE;
   }
 
   ngOnInit() {

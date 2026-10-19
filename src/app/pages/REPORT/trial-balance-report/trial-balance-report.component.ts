@@ -55,6 +55,7 @@ export class TrialBalanceReportComponent {
   Store: any;
   selectedStoreid: any;
   storeid: any;
+  appType: any;
 
   constructor(
     private dataservice: DataService,
@@ -74,7 +75,7 @@ export class TrialBalanceReportComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-  this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -134,6 +135,7 @@ export class TrialBalanceReportComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.appType = sessionData.Configuration[0]?.APP_TYPE || '';
   }
 
   toggleFilterRow = () => {
@@ -341,7 +343,7 @@ export class TrialBalanceReportComponent {
     console.log(sessionStorage.getItem('HEADID'));
 
     sessionStorage.setItem('STOREID', this.storeid);
-        
+
     // Navigate to ledger-statement route
     this.router.navigate(['/ledger-statement']);
   }

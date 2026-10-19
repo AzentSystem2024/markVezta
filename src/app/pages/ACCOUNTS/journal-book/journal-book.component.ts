@@ -219,7 +219,8 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
     onClick: () => this.toggleFilters(),
   };
   selectedSalaryData: any;
-  ledgerlistdata:any[]=[]
+  ledgerlistdata: any[] = []
+  appType: any;
 
   constructor(
     private dataService: DataService,
@@ -245,6 +246,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
     this.savedUserData = JSON.parse(raw);
     this.company_list = this.savedUserData?.Companies ?? [];
     this.fin_id = this.savedUserData?.FINANCIAL_YEARS ?? [];
+    this.appType = this.savedUserData?.Configuration[0]?.APP_TYPE || '';
     this.selected_Company_id =
       this.savedUserData?.SELECTED_COMPANY?.COMPANY_ID ?? null;
     this.selected_fin_id =
@@ -269,7 +271,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   ledgerlist() {
     this.dataService.listledgerlist().subscribe((res: any) => {
       this.ledgerlistdata = res.Data || [];
-    
+
     });
   }
 
@@ -723,4 +725,4 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   exports: [],
   declarations: [JournalBookComponent],
 })
-export class JournalBookModule {}
+export class JournalBookModule { }

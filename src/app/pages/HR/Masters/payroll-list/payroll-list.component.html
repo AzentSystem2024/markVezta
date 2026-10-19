@@ -33,6 +33,10 @@
       (onEditorPreparing)="onEditorPreparing($event)"
       [selectedRowKeys]="selectedRowKeys"
       keyExpr="SALARY_BILL_NO"
+      [selection]="{
+        mode: 'multiple',
+        showCheckBoxesMode: 'always',
+      }"
     >
       <dxo-editing
         mode="popup"
@@ -175,7 +179,7 @@
           widget="dxButton"
           [options]="approveButtonOptions"
         ></dxi-item> -->
-        <!-- <dxi-item
+        <dxi-item
           *ngIf="canVerify"
           location="after"
           widget="dxButton"
@@ -186,7 +190,7 @@
           location="after"
           widget="dxButton"
           [options]="approveButtonOptions"
-        ></dxi-item> -->
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxi-column dataField="EMPLOYEE_NO" caption="Employee No."></dxi-column>

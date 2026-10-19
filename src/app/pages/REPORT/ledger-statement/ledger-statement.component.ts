@@ -188,6 +188,7 @@ export class LedgerStatementComponent implements OnInit {
   // -------------------------------------------------------------
   loadingInvoice: boolean = false;
   popupReady: boolean = false;
+  appType: any;
 
   constructor(
     private dataService: DataService,
@@ -257,6 +258,10 @@ export class LedgerStatementComponent implements OnInit {
   // -------------------------------------------------------------
   initSessionData() {
     const sessionDataStr = sessionStorage.getItem('savedUserData');
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.appType = menuResponse.Configuration[0]?.APP_TYPE || '';
     const localDataStr = localStorage.getItem('userData');
 
     this.savedUserData = sessionDataStr ? JSON.parse(sessionDataStr) : null;

@@ -131,7 +131,10 @@
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column dataField="DESG_NAME" caption="Designation"></dxi-column>
 
-      <dxi-column dataField="STATE_NAME" caption="State"></dxi-column>
+      <dxi-column
+        dataField="STATE_NAME"
+        [caption]="appType === 'VEZTA' ? 'Emirates' : 'State'"
+      ></dxi-column>
 
       <dxi-column
         dataField="DAMAN_CATEGORY"

@@ -171,6 +171,17 @@
           cssClass="export-btn"
         ></dxi-item>
 
+        <!-- <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item> -->
+
+        <dxi-item location="after">
+          <dx-button
+            icon="columnchooser"
+            hint="Choose Columns"
+            stylingMode="outlined"
+            (onClick)="openColumnChooser()"
+          ></dx-button>
+        </dxi-item>
+
         <!-- <dxi-item location="after">
           <dx-check-box
             hint="Show Non Zero Stock"
@@ -261,20 +272,22 @@
         caption="Consumption"
         [visible]="true"
       ></dxi-column>
-      <!-- <dxi-column
-        dataField="TRANSFEROUT_QTY"
+      <dxi-column
+        dataField="TRANSFER_OUT_QTY"
         dataType="number"
         format="#,##0.00"
         alignment="right"
         caption="Transf.Out"
+        [visible]="appType === 'VEZTA'"
       ></dxi-column>
       <dxi-column
-        dataField="TRANSFERIN_QTY"
+        dataField="TRANSFER_IN_QTY"
         dataType="number"
         format="#,##0.00"
         alignment="right"
         caption="Transf.In"
-      ></dxi-column> -->
+        [visible]="appType === 'VEZTA'"
+      ></dxi-column>
       <dxi-column
         dataField="DELIVERY_QTY"
         dataType="number"
@@ -332,6 +345,58 @@
       <dxi-column dataField="COLOR" caption="Color"></dxi-column>
       <dxi-column dataField="STYLE" caption="Style"></dxi-column> -->
     </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>
 

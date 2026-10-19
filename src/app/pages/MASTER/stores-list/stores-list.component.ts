@@ -86,6 +86,8 @@ export class StoresListComponent implements OnInit {
   canApprove: any;
   selectedStore: any = null;
   selected_Company_id: any;
+  sessionData: any;
+  appType: any;
 
   constructor(
     private dataservice: DataService,
@@ -443,7 +445,15 @@ export class StoresListComponent implements OnInit {
     this.showStores();
     this.getCountryDropDown();
     this.getGroupDropDown();
-    // this.getStateDropDown();
+    this.sessionData_tax();
+  }
+
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.appType = this.sessionData.Configuration[0].APP_TYPE;
   }
 
   onExporting(event: any) {

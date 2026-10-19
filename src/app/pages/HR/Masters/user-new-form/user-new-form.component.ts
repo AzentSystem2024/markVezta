@@ -116,6 +116,7 @@ export class UserNewFormComponent {
   mobile_limit: any;
   sessionData: any;
   storeid: any;
+  appType: any;
 
   constructor(
     private fb: FormBuilder,
@@ -129,6 +130,8 @@ export class UserNewFormComponent {
       display: `${country.dial_code}`,
     }));
   }
+
+
 
   countryCodes: any[] = [];
 
@@ -196,12 +199,23 @@ export class UserNewFormComponent {
     this.get_Company_details();
     this.user_role_dropdown();
     this.sesstion_Details();
+    this.setDefaultCountryCode();
   }
 
   sesstion_Details() {
     this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.storeid = this.sessionData.Configuration[0].STORE_ID;
     console.log(this.storeid);
+    this.appType = this.sessionData.Configuration[0].APP_TYPE;
+  }
+
+  setDefaultCountryCode(): void {
+    const defaultCode = this.appType === 'VEZTA' ? '+971' : '+91';
+
+    this.countryCode = defaultCode;
+    this.whatsappCountryCode = defaultCode;
+
+    this.newUserData.countryCode = defaultCode;
   }
 
   getUSerData() {

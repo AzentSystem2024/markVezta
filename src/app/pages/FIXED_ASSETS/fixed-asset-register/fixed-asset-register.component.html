@@ -1,6 +1,7 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
     <dx-data-grid
+      #dataGrid
       class="grid theme-dependent"
       [dataSource]="FixedAssetRegister"
       width="100%"
@@ -11,12 +12,10 @@
       [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
       [grouping]="{ autoExpandAll: false }"
-      [filterRow]="{ visible: false }"
       [rowAlternationEnabled]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
@@ -26,8 +25,12 @@
       [export]="{ enabled: true, formats: ['xlsx'] }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
-      [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
@@ -69,7 +72,7 @@
             [width]="200"
             label="Location"
             labelMode="floating"
-            [items]="Department"
+            [items]="DepartmentWithAll"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
             [(value)]="select_department_id"
@@ -78,10 +81,36 @@
           </dx-select-box>
         </dxi-item>
 
+        <!-- <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item> -->
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
+        ></dxi-item>
+
+        <!-- <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item> -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
         ></dxi-item>
 
         <dxi-item>
@@ -103,10 +132,7 @@
       <dxo-header-filter [visible]="true">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
-      <dxo-filter-row
-        [visible]="isFilterRowVisible"
-        [applyFilter]="auto"
-      ></dxo-filter-row>
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
       <!-- <dxi-column dataField="DEPARTMENT_NAME" caption="Department Name" dataType="string"></dxi-column> -->
       <!-- Customer ID -->
@@ -174,5 +200,63 @@
         format="currency"
       ></dxi-column>
     </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      [showTitle]="true"
+      title="Choose Columns"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [showCloseButton]="true"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{
+        my: 'center',
+        at: 'center',
+        of: 'window',
+      }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select the columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            type="normal"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            type="normal"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            stylingMode="contained"
+            type="default"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>

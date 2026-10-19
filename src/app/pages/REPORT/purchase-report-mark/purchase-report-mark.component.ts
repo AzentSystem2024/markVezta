@@ -56,6 +56,70 @@ import notify from 'devextreme/ui/notify';
 })
 export class PurchaseReportMarkComponent {
 
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'PURCH_DATE', caption: 'Date' },
+    { dataField: 'SUPP_NAME', caption: 'Particulars' },
+    { dataField: 'HSN_CODE', caption: 'HSN CODE' },
+    { dataField: 'VoucherType', caption: 'Voucher Type' },
+    { dataField: 'DOC_NO', caption: 'Invoice No' },
+    { dataField: 'REF_NO', caption: 'Voucher reference No' },
+    { dataField: 'Quantity', caption: 'Quantity' },
+    { dataField: 'GrossTotal', caption: 'Gross Amount' },
+    { dataField: 'Disc', caption: 'Discount Amount' },
+    { dataField: 'GSTPurchase', caption: 'GST' },
+    { dataField: 'CGSTPurchaseInput9', caption: 'CGST' },
+    { dataField: 'SGSTPurchaseInput9', caption: 'SGST' },
+    { dataField: 'RoundOff', caption: 'Round Off Amount' },
+  ];
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   PurchaseReport: any[] = [];
   isFilterRowVisible: boolean = false;
   editPDCPopupOpened: boolean = false;

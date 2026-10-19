@@ -34,7 +34,7 @@
             displayExpr="DESCRIPTION"
             valueExpr="ID"
             [searchEnabled]="true"
-            label="Store/Branch"
+            [label]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"
             labelMode="floating"
             width="100%"
           >

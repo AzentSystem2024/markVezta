@@ -1,22 +1,96 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
+    <!-- ✅ Collapsible Filter Panel -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-select-box
+          [width]="200"
+          label="Location"
+          labelMode="floating"
+          [items]="Department"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="select_department_id"
+          [searchEnabled]="true"
+        ></dx-select-box>
+
+        <dx-select-box
+          labelMode="floating"
+          label="Year"
+          [width]="120"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        ></dx-select-box>
+
+        <dx-select-box
+          labelMode="floating"
+          label="Month"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        ></dx-select-box>
+
+        <dx-date-box
+          [width]="140"
+          label="Date From"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          [value]="formatted_from_date"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+
+        <dx-date-box
+          [width]="140"
+          label="Date To"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          [value]="formatted_To_date"
+          (onValueChanged)="onToDateChange($event)"
+        ></dx-date-box>
+
+        <dx-button
+          text="Apply"
+          type="default"
+          stylingMode="contained"
+          (onClick)="get_PrepaymentPosting_report()"
+        ></dx-button>
+
+        <!-- ✅ Cancel button — visible only while loading -->
+        <dx-button
+          text="Cancel"
+          type="danger"
+          stylingMode="outlined"
+          (onClick)="cancelReport()"
+        ></dx-button>
+      </div>
+    </div>
+
+    <!-- ✅ Toggle Bar -->
+    <div class="toggle-bar" (click)="toggleParameters()">
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
     <dx-data-grid
       class="grid theme-dependent"
       [dataSource]="PrepaymentpostingReport"
       width="100%"
       noDataText=""
-      height="82vh"
+      height="75vh"
       [showBorders]="true"
       [showColumnLines]="true"
       [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
       [grouping]="{ autoExpandAll: false }"
-      [filterRow]="{ visible: false }"
-      [rowAlternationEnabled]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
       id="dataGrid"
       [headerFilter]="{ visible: false }"
       [columnFixing]="{
@@ -26,10 +100,16 @@
       [export]="{ enabled: true, formats: ['xlsx'] }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
-      [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
+      <!-- ✅ Controlled load panel -->
+      <!-- <dxo-load-panel
+        [enabled]="true"
+        [visible]="isGridLoading"
+        text="Loading..."
+      ></dxo-load-panel> -->
+
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"></dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -38,112 +118,44 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <!-- <dxo-toolbar>
-        <dxi-item location="before">
-          <div
-            class="grid-header"
-            style="font-weight: 600; font-size: 20px; margin-left: 12px"
-          >
-            Trial Balance
-          </div>
-        </dxi-item>
-      </dxo-toolbar> -->
 
       <dxo-toolbar>
         <dxi-item location="before">
           <div
             class="grid-header"
-            style="
-              font-weight: 600;
-              font-size: 20px;
-              margin-left: 12px;
-              padding: -3px;
-              margin-right: 3px;
-            "
+            style="font-weight: 600; font-size: 20px; margin-left: 12px"
           >
             Prepayment Posting Report
           </div>
         </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            [width]="200"
-            label="Location"
-            labelMode="floating"
-            [items]="Department"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="select_department_id"
-            [searchEnabled]="true"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="Year"
-            [width]="120"
-            [(value)]="selectedYear"
-            [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)"
-            placeholder="Year"
-          ></dx-select-box>
-        </dxi-item>
-
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="month"
-            [dataSource]="monthDataSource"
-            displayExpr="name"
-            valueExpr="value"
-            [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)"
-            [dropDownOptions]="{ width: 'auto' }"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <dxi-item style="margin-bottom: 6px">
-          <dx-date-box
-            [width]="140"
-            label="Date From"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [value]="formatted_from_date"
-            (onValueChanged)="onFromDateChange($event)"
-          ></dx-date-box>
-        </dxi-item>
-        <dxi-item style="margin-bottom: 6px">
-          <dx-date-box
-            [width]="140"
-            label="Date To"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [value]="formatted_To_date"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
         ></dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            (onClick)="get_PrepaymentPosting_report()"
-          >
-          </dx-button>
-        </dxi-item>
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping
@@ -159,116 +171,143 @@
         [applyFilter]="auto"
       ></dxo-filter-row>
 
-      <!-- Customer Name -->
       <dxi-column
         dataField="INV_NO"
         caption="Invoice No."
         dataType="string"
       ></dxi-column>
-
       <dxi-column
         dataField="SUPP_CODE"
         caption="Supplier Code"
         dataType="string"
       ></dxi-column>
-
       <dxi-column
         dataField="SUPP_NAME"
         caption="Supplier name"
         dataType="string"
       ></dxi-column>
-
       <dxi-column
         dataField="DEPT_NAME"
         caption="Department"
         dataType="string"
       ></dxi-column>
-
-      <!-- Invoice Date -->
       <dxi-column
         dataField="EXPENSE_LEDGER"
         caption="Expense ledger"
         dataType="string"
       ></dxi-column>
-
-      <!-- Invoice No -->
       <dxi-column
         dataField="PREPAYMENT_LEDGER"
         caption="Prepayment ledger"
         dataType="string"
       ></dxi-column>
-
-      <!-- Reference No -->
       <dxi-column
         dataField="TRANSACTON_DATE"
         caption="Transaction date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-
-      <!-- Net Amount -->
       <dxi-column
         dataField="NO_OF_MONTHS"
         caption="Prepayment period(Months)"
         dataType="string"
       ></dxi-column>
-
       <dxi-column
         dataField="NO_OF_DAYS"
         caption="Prepayment period(Days)"
         dataType="string"
       ></dxi-column>
-
       <dxi-column
         dataField="DATE_FROM"
         caption="Posting Start Date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-
       <dxi-column
         dataField="DATE_TO"
         caption="End date"
         dataType="date"
         format="dd-MM-yyyy"
       ></dxi-column>
-
       <dxi-column
         dataField="PURCH_VALUE"
         caption="Purchase value(prepaid expense)"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       ></dxi-column>
-
       <dxi-column
         dataField="OPENING_ACCUR"
         caption="Acrued expense already expensed off"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       ></dxi-column>
-
-      <!-- Received Amount -->
       <dxi-column
         dataField="CURRENT_ACCUR"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
         caption="Current period expense posted"
         dataType="number"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       ></dxi-column>
-
       <dxi-column
         dataField="TOTAL_ACCUR"
         caption="Total prepaid expense write off"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       ></dxi-column>
-
       <dxi-column
         dataField="BALANCE_ACCUR"
         caption="Unacrued expense(net)"
         dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
       ></dxi-column>
-      <!-- Group summary for MAIN_GROUP_NAME -->
     </dx-data-grid>
+
+    <!-- Column Chooser Popup (unchanged) -->
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>

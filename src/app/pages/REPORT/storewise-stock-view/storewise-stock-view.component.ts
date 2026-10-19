@@ -17,6 +17,7 @@ import {
   DxLoadIndicatorModule,
   DxLoadPanelModule,
   DxNumberBoxModule,
+  DxPopupModule,
   DxSelectBoxModule,
   DxTagBoxModule,
   DxTextBoxModule,
@@ -38,6 +39,75 @@ export class StorewiseStockViewComponent {
 
   @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
   @ViewChild(DxDataGridComponent) grid!: DxDataGridComponent;
+
+
+  // Custom Column Chooser
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly fixedChooserColumns = [
+    { dataField: 'CODE', caption: 'Item Code' },
+    { dataField: 'DESCRIPTION', caption: 'Description' },
+    { dataField: 'StoreStock.TOTAL', caption: 'Total' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) return;
+
+    // Include fixed columns
+    const fixedColumns = this.fixedChooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    // Include currently generated dynamic store columns
+    const dynamicStoreColumns = this.dynamicColumns.map((column) => ({
+      dataField: column.dataField,
+      caption: column.caption,
+      visible:
+        grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.tempColumns = [...fixedColumns, ...dynamicStoreColumns];
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) return;
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -491,6 +561,7 @@ export class StorewiseStockViewComponent {
     DxButtonModule,
     LedgerStatementModule,
     DxTagBoxModule,
+    DxPopupModule
   ],
   providers: [],
   exports: [],

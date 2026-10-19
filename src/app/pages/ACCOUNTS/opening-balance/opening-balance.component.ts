@@ -105,6 +105,8 @@ export class OpeningBalanceComponent {
   Departments: any = [];
   Stores_List: any = [];
   selected_Financial_Year_id: any;
+  appType: any;
+  sessionData: any;
 
   //========================Export data ==========================
   onExporting(event: any) {
@@ -162,6 +164,7 @@ export class OpeningBalanceComponent {
     const menuResponse = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
+    this.appType = menuResponse.Configuration?.APP_TYPE || '';
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
@@ -178,6 +181,13 @@ export class OpeningBalanceComponent {
     }
 
     this.getLedgerCodeDropdown();
+    this.sesstion_Details();
+  }
+
+  sesstion_Details() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.appType = this.sessionData.Configuration[0]?.APP_TYPE || '';
+    console.log(this.appType, 'APPTYPE=====================');
   }
 
   loadOpeningBalance(companyId: number, finId: number) {

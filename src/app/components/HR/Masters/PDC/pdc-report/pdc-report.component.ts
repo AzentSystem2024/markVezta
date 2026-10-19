@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -28,6 +29,7 @@ import {
   DxValidationGroupModule,
   DxAutocompleteModule,
   DxTagBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 
 import {
@@ -40,6 +42,8 @@ import {
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { PdcEditFormModule } from '../pdc-edit-form/pdc-edit-form.component';
+import { Subscription } from 'rxjs';
+import notify from 'devextreme/ui/notify';
 
 
 @Component({
@@ -48,8 +52,70 @@ import { PdcEditFormModule } from '../pdc-edit-form/pdc-edit-form.component';
   styleUrls: ['./pdc-report.component.scss']
 })
 export class PDCReportComponent {
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
 
-   PDCReport: any[] = [];
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'CHEQUE_NO', caption: 'Cheque No.' },
+    { dataField: 'CHEQUE_DATE', caption: 'Due Date' },
+    { dataField: 'BANK', caption: 'Bank' },
+    { dataField: 'BENEFICIARY_NAME', caption: 'Beneficiary Name' },
+    { dataField: 'PAID', caption: 'Issued' },
+    { dataField: 'RECEIVED', caption: 'Received' },
+    { dataField: 'PDC_STATUS', caption: 'Status' },
+    { dataField: 'REMARKS', caption: 'Remarks' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+  PDCReport: any[] = [];
   isFilterRowVisible: boolean = false;
   editPDCPopupOpened: boolean = false;
   BalanceSheetReport: any = [];
@@ -84,7 +150,15 @@ export class PDCReportComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
-    canApprove = false;
+  canApprove = false;
+  isSummaryVisible = true;
+  showParameters = true;
+  isLoading = false;
+  private reportSubscription: Subscription | null = null;
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
 
   customer_details: any = {
     CUSTOMER_ID: 0,
@@ -99,7 +173,7 @@ export class PDCReportComponent {
     private router: Router,
   ) {
     this.sesstion_Details();
-   
+
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
@@ -109,7 +183,7 @@ export class PDCReportComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
   ngOnInit() {
     // initialize with today's date
@@ -130,7 +204,7 @@ this.selectedmonth = currentMonth;
     setTimeout(() => {
       this.get_PDC_list();
     }, 0);
-    
+
   }
 
   //================ Year value change ===================
@@ -169,8 +243,57 @@ this.selectedmonth = currentMonth;
     }
   }
 
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_PDC_list();
+    }
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    // Your existing summary show/hide logic goes here
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -185,7 +308,7 @@ this.selectedmonth = currentMonth;
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
-  
+
 
   onExporting(event: any) {
     const fileName = 'BalanceSheetReport';
@@ -228,75 +351,117 @@ this.selectedmonth = currentMonth;
   }
 
   get_PDC_list() {
+    // Cancel any in-flight request
+    if (this.reportSubscription) {
+      this.reportSubscription.unsubscribe();
+      this.reportSubscription = null;
+    }
+    this.showParameters = false;   // ⬅️ collapse panel on Apply
+    this.isLoading = true;
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
     };
 
-    this.dataservice.PDC_Report(payload).subscribe((res: any) => {
-      this.PDCReport = res.PDCDetails;
-    });
+    this.reportSubscription = this.dataservice
+      .PDC_Report(payload)
+      .subscribe({
+        next: (res: any) => {
+          this.PDCReport = res.PDCDetails;
+          this.isLoading = false;
+          this.reportSubscription = null;
+        },
+        error: () => {
+          this.isLoading = false;
+          this.reportSubscription = null;
+        },
+      });
+
   }
+
+  cancelReport(): void {
+    if (this.reportSubscription) {
+      this.reportSubscription.unsubscribe();
+      this.reportSubscription = null;
+      this.isLoading = false;
+      notify(
+        {
+          message: 'Report loading cancelled.',
+          type: 'warning',
+          displayTime: 3000,
+          position: { at: 'top right', my: 'top right', offset: '-20 20' },
+        },
+        'warning',
+        3000
+      );
+    }
+  }
+
   onViewClick(e: any) {
-    console.log(e,'event')
+    console.log(e, 'event')
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE;
     const trans_id = e.row.data.ID;
-      this.dataservice
-        .Select_PDC(trans_id)
-        .subscribe((response: any) => {
-          this.selectedPDC = response.Data[0];
+    this.dataservice
+      .Select_PDC(trans_id)
+      .subscribe((response: any) => {
+        this.selectedPDC = response.Data[0];
 
-          this.editPDCPopupOpened = true;
-          this.cdr.detectChanges();
-        });
+        this.editPDCPopupOpened = true;
+        this.cdr.detectChanges();
+      });
   }
 
   handleClose() {
     this.editPDCPopupOpened = false;
   }
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'PAID',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'PAID',
-        alignment: 'right',
+  get summaryColumnsData(): any {
+    return {
+      totalItems: this.isSummaryVisible ? [
+        {
+          column: 'PAID',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'PAID',
+          alignment: 'right',
+        },
+        {
+          column: 'RECEIVED',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'RECEIVED',
+          alignment: 'right',
+        },
+      ]
+        : [],
+      groupItems: this.isSummaryVisible ? [
+        {
+          column: 'PAID',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+        {
+          column: 'RECEIVED',
+          summaryType: 'sum',
+          displayFormat: ' {0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+
+      ]
+        : [],
+      calculateCustomSummary: (options) => {
+        if (options.name === 'summaryRow') {
+          // Custom logic if needed
+        }
       },
-      {
-        column: 'RECEIVED',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'RECEIVED',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'PAID',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'RECEIVED',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-     
-    ],
-    calculateCustomSummary: (options) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
-}
+    }
+  }
 }
 
 @NgModule({
@@ -339,4 +504,4 @@ this.selectedmonth = currentMonth;
   exports: [PDCReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PDCReportModule {}
+export class PDCReportModule { }

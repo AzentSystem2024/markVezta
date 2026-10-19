@@ -1517,3 +1517,119 @@ body {
   padding-inline-end: 12px;
   width: 400px !important;
 }
+
+//--------COLUMN CHOOSER POPUP STYLE-----------------//
+/* Global Column Chooser Styling */
+
+.column-chooser-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.column-chooser-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e5e5;
+  color: #666;
+  font-size: 13px;
+}
+
+.column-chooser-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.column-chooser-item {
+  padding: 11px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.column-chooser-item:hover {
+  background-color: #f5f7fa;
+}
+
+.column-chooser-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Popup title and content styling */
+.custom-column-chooser-popup .dx-popup-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.custom-column-chooser-popup .dx-popup-content {
+  padding: 18px;
+}
+
+//--TOGGLE BAR IN REPORTS-------
+/* Collapsible filter panel */
+.filter-panel {
+  overflow: hidden;
+  max-height: 80px;
+  transition: max-height 0.3s ease;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-bottom: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+
+  &.collapsed {
+    max-height: 0;
+    padding: 0 16px;
+  }
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+/* ✅ Toggle Bar */
+.toggle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 8px;
+  width: 150px;
+  background: #e8f4f8;
+  border: 1px solid #c5dce8;
+  border-bottom: none;
+  cursor: pointer;
+  margin: 0 auto;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #d0eaf5;
+  }
+}
+
+.toggle-arrow {
+  display: flex;
+  align-items: center;
+  color: #1a7fc1;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+
+  &.rotated {
+    transform: rotate(180deg);
+  }
+
+  i {
+    font-size: 14px;
+  }
+}

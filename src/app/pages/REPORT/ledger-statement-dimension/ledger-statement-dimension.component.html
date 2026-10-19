@@ -61,7 +61,7 @@
 
         <!-- Store -->
         <dxi-item>
-             <dx-tag-box
+          <dx-tag-box
             label="Store"
             labelMode="floating"
             displayExpr="DESCRIPTION"
@@ -78,8 +78,8 @@
           ></dx-tag-box>
         </dxi-item>
         <dxi-item>
-            <dx-validation-group class="form-grid" #formValidationGroup>
-           <dx-select-box
+          <dx-validation-group class="form-grid" #formValidationGroup>
+            <dx-select-box
               label="Ledger"
               labelMode="floating"
               [items]="HEAD_ID_LIST"
@@ -95,12 +95,12 @@
                 ></dxi-validation-rule>
               </dx-validator>
             </dx-select-box>
-            </dx-validation-group>
+          </dx-validation-group>
         </dxi-item>
 
         <!-- Customer (smaller width) -->
         <dxi-item [colSpan]="2">
-            <dx-tag-box
+          <dx-tag-box
             labelMode="floating"
             labelLocation="left"
             label="Financial Dimension"
@@ -213,7 +213,7 @@
         <dxi-item name="exportButton"></dxi-item>
       </dxo-toolbar>
 
-       <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>
       <dxo-header-filter visible="true"></dxo-header-filter>
       <dxo-paging page-size="10"></dxo-paging>
@@ -246,7 +246,10 @@
       ></dxi-column>
       <dxi-column dataField="VOUCHER_NO" caption="Voucher No"></dxi-column>
       <dxi-column dataField="PARTICULARS" caption="Particulars"></dxi-column>
-      <dxi-column dataField="STORE_NAME" caption="Store/Branch"></dxi-column>
+      <dxi-column
+        dataField="STORE_NAME"
+        [caption]="appType === 'VEZTA' ? 'Facility' : 'Store/Branch'"
+      ></dxi-column>
       <dxi-column dataField="DEPT_NAME" caption="Department"></dxi-column>
       <dxi-column
         dataField="DR_AMOUNT"
@@ -664,23 +667,23 @@
 </dx-popup>
 
 <!-- //Dimesion popup--------------------- -->
- <dx-popup
-    [(visible)]="dimensionPopupVisible"
-    [width]="700"
-    [height]="500"
-    title="Financial Dimension Details"
-    [showCloseButton]="true"
-    [dragEnabled]="true"
-    [hideOnOutsideClick]="true"
+<dx-popup
+  [(visible)]="dimensionPopupVisible"
+  [width]="700"
+  [height]="500"
+  title="Financial Dimension Details"
+  [showCloseButton]="true"
+  [dragEnabled]="true"
+  [hideOnOutsideClick]="true"
+>
+  <dx-data-grid
+    [dataSource]="dimensionPopupData"
+    [showBorders]="true"
+    [columnAutoWidth]="true"
+    [rowAlternationEnabled]="true"
   >
-    <dx-data-grid
-      [dataSource]="dimensionPopupData"
-      [showBorders]="true"
-      [columnAutoWidth]="true"
-      [rowAlternationEnabled]="true"
-    >
-      <dxi-column dataField="Dimension" caption="Dimension"></dxi-column>
-      <dxi-column dataField="Code" caption="Code"></dxi-column>
-      <dxi-column dataField="Description" caption="Description"></dxi-column>
-    </dx-data-grid>
-  </dx-popup>
+    <dxi-column dataField="Dimension" caption="Dimension"></dxi-column>
+    <dxi-column dataField="Code" caption="Code"></dxi-column>
+    <dxi-column dataField="Description" caption="Description"></dxi-column>
+  </dx-data-grid>
+</dx-popup>
