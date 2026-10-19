@@ -528,12 +528,6 @@ export class NewOrderComponent implements OnInit, OnChanges {
             hex: this.getHexForColor(c.Color),
           }));
 
-          if (this.colors.length > 0) {
-            // Auto select a color that is not already in the cart
-            if (!this.currentEditingItem.colorId) {
-              this.autoSelectAvailableColor();
-            }
-          }
           if (onComplete) onComplete();
         } else {
           this.colors = [];
@@ -604,27 +598,6 @@ export class NewOrderComponent implements OnInit, OnChanges {
     }
 
     return '#cccccc'; // Default fallback color
-  }
-
-  autoSelectAvailableColor() {
-    if (this.colors.length > 0 && !this.currentEditingItem.colorId) {
-      const availableColor = this.colors.find(
-        (c) =>
-          !this.cartItems.some(
-            (item) =>
-              item.categoryId === this.currentEditingItem.categoryId &&
-              item.artNoId === this.currentEditingItem.artNoId &&
-              item.colorId === c.id,
-          ),
-      );
-
-      if (availableColor) {
-        this.selectColor(availableColor.id, true);
-      } else {
-        // If all colors are in the cart, default to the first one
-        this.selectColor(this.colors[0].id, false);
-      }
-    }
   }
 
   cancelForm() {
@@ -715,6 +688,10 @@ export class NewOrderComponent implements OnInit, OnChanges {
             this.currentEditingItem.sizes = res.Case.map((c: any) => ({
               sizeId: c.PackingID,
               description: c.Description,
+              availableQty: this.getAvailableQtyFromCase(
+                c,
+                this.selectedWarehouseId,
+              ),
               isCutSize: c.IsCutSize,
               availableSizes:
                 c.IsCutSize && c.Sizes
@@ -738,6 +715,25 @@ export class NewOrderComponent implements OnInit, OnChanges {
         console.error('Error fetching details', err);
       },
     );
+  }
+
+  getAvailableQtyFromCase(c: any, warehouseId: any): number {
+    if (!c || warehouseId == null) return 0;
+
+    const wid = Number(warehouseId);
+    const whTargetKey = `WAREHOUSE_${wid}`.toUpperCase();
+
+    for (const key of Object.keys(c)) {
+      if (
+        key.toUpperCase() === whTargetKey &&
+        c[key] !== undefined &&
+        c[key] !== null
+      ) {
+        return Number(c[key]) || 0;
+      }
+    }
+
+    return 0;
   }
 
   getSizeRange(description: string): { start: number; end: number } | null {
@@ -1311,6 +1307,10 @@ export class NewOrderComponent implements OnInit, OnChanges {
                 fullSizes = res.Case.map((c: any) => ({
                   sizeId: c.PackingID,
                   description: c.Description,
+                  availableQty: this.getAvailableQtyFromCase(
+                    c,
+                    this.selectedWarehouseId,
+                  ),
                   isCutSize: c.IsCutSize,
                   availableSizes:
                     c.IsCutSize && c.Sizes

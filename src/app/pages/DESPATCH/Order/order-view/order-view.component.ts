@@ -13,6 +13,7 @@ import {
   DxSelectBoxModule,
   DxTagBoxModule,
   DxLoadIndicatorModule,
+  DxLoadPanelModule,
 } from 'devextreme-angular';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { ExportService } from 'src/app/services/export.service';
@@ -92,6 +93,22 @@ export class OrderViewComponent implements OnInit {
   };
 
   getStatusFilterData: any[] = [];
+  statusHeaderFilter: any = {
+    dataSource: [
+      { text: 'Submitted', value: 0 },
+      { text: 'Draft', value: 1 },
+      { text: 'Open', value: 2 },
+      { text: 'Accepted', value: 3 },
+      { text: 'Rejected', value: 4 },
+      { text: 'In Production', value: 5 },
+      { text: 'Production Completed', value: 6 },
+      { text: 'Partial', value: 7 },
+      { text: 'In Transit', value: 8 },
+      { text: 'Delivered', value: 9 },
+      { text: 'Cancelled', value: 10 },
+      { text: 'Allocated', value: 11 },
+    ],
+  };
 
   isNewOrderPopupVisible: boolean = false;
   selectedEditOrderId: number | null = null;
@@ -113,7 +130,21 @@ export class OrderViewComponent implements OnInit {
   loadStatusFilterData() {
     this.dataService.getDropdownData({ name: 'ORDER_STATUS' }).subscribe({
       next: (res: any) => {
-        this.getStatusFilterData = res || [];
+        if (Array.isArray(res) && res.length > 0) {
+          this.getStatusFilterData = res.map((item: any) => ({
+            ...item,
+            text: item.DESCRIPTION || item.text,
+            value: item.ID !== undefined ? item.ID : item.value,
+          }));
+          this.statusHeaderFilter = {
+            dataSource: this.getStatusFilterData.map((item: any) => ({
+              text: item.text,
+              value: item.value,
+            })),
+          };
+        } else {
+          this.getStatusFilterData = res || [];
+        }
       },
       error: (err) => {
         console.error('Error fetching order statuses:', err);
@@ -157,8 +188,8 @@ export class OrderViewComponent implements OnInit {
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();
-      this.loadOrders();
     }
+    this.loadOrders();
   }
 
   toggleFilterRow = () => {
@@ -495,6 +526,105 @@ export class OrderViewComponent implements OnInit {
       });
     });
   }
+
+  onDetailCellPrepared(e: any, masterData: any) {
+    if (e.rowType === 'data' && e.column.command === 'edit') {
+      const parentStatus = Number(masterData.data.ORDER_STATUS);
+      const orderQty = Number(e.data?.ORDER_QTY);
+      const openQty = Number(e.data?.OPEN_QTY);
+
+      // Hide edit/delete icons if parent is not Draft (1) or if item has been partially processed
+      if (parentStatus !== 1 || orderQty !== openQty) {
+        const editLink = e.cellElement.querySelector('.dx-link-edit');
+        if (editLink) editLink.style.display = 'none';
+
+        const deleteLink = e.cellElement.querySelector('.dx-link-delete');
+        if (deleteLink) deleteLink.style.display = 'none';
+      }
+    }
+  }
+
+  onDetailRowRemoving(e: any, masterData: any) {
+    const parentStatus = Number(masterData.data.ORDER_STATUS);
+    if (parentStatus !== 1) {
+      e.cancel = true;
+      notify('Cannot delete item for this order status.', 'warning', 3000);
+      return;
+    }
+
+    const orderQty = Number(e.data?.ORDER_QTY);
+    const openQty = Number(e.data?.OPEN_QTY);
+    if (orderQty !== openQty) {
+      e.cancel = true;
+      notify(
+        'Cannot delete item as it is already partially processed.',
+        'warning',
+        3000,
+      );
+      return;
+    }
+
+    const orderEntryId =
+      e.data?.ORDER_ENTRY_ID ||
+      e.data?.orderEntryId ||
+      e.data?.OrderEntryId ||
+      e.key;
+
+    if (!orderEntryId) {
+      e.cancel = true;
+      notify('Order Entry ID not found.', 'error', 3000);
+      return;
+    }
+
+    const payload = {
+      ORDER_ENTRY_ID: orderEntryId,
+    };
+
+    e.cancel = new Promise<void>((resolve, reject) => {
+      this.dataService.deleteOrderDetail(payload).subscribe({
+        next: (res: any) => {
+          if (res.Flag === 1 || res.flag === 1 || res.flag === '1') {
+            notify(
+              res.Message || 'Order detail deleted successfully.',
+              'success',
+              3000,
+            );
+
+            // Refresh the main grid
+            this.refreshGrid();
+
+            // Refresh the details grid
+            const orderId = masterData.key;
+            this.detailLoadingMap[orderId] = true;
+            this.dataService
+              .getNewOrderDetail({ ORDER_ID: orderId })
+              .subscribe({
+                next: (detailRes: any) => {
+                  this.detailDataMap[orderId] =
+                    detailRes?.Data?.ORDER_DETAILS || [];
+                  this.detailLoadingMap[orderId] = false;
+                  this.detailDataMap = { ...this.detailDataMap };
+                  resolve();
+                },
+                error: (err) => {
+                  console.error('Error refreshing details', err);
+                  this.detailLoadingMap[orderId] = false;
+                  resolve();
+                },
+              });
+          } else {
+            notify(res.Message || 'Failed to delete order detail', 'error', 3000);
+            reject(res.Message);
+          }
+        },
+        error: (err) => {
+          console.error('Error deleting order detail', err);
+          notify('Error deleting order detail', 'error', 3000);
+          reject(err);
+        },
+      });
+    });
+  }
 }
 
 @NgModule({
@@ -505,6 +635,7 @@ export class OrderViewComponent implements OnInit {
     DxSelectBoxModule,
     DxTagBoxModule,
     DxLoadIndicatorModule,
+    DxLoadPanelModule,
     CustomDatePopupModule,
     NewOrderModule,
     DxPopupModule,

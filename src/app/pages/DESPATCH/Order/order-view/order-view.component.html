@@ -24,7 +24,15 @@
       [allowColumnResizing]="true"
       columnResizingMode="nextColumn"
       [showColumnHeaders]="true"
-      [scrolling]="{ mode: 'virtual' }"
+      [columnFixing]="{
+        enabled: true,
+        texts: {
+          fix: 'Freeze',
+          unfix: 'Unfreeze',
+          leftPosition: 'To the left',
+          rightPosition: 'To the right',
+        },
+      }"
       [selection]="{ mode: 'single' }"
       focusStateEnabled="false"
       keyExpr="ORDER_ID"
@@ -32,6 +40,7 @@
       (onRowCollapsed)="onRowCollapsed($event)"
       (onExporting)="onExporting($event)"
     >
+      <dxo-scrolling mode="virtual" rowRenderingMode="virtual"></dxo-scrolling>
       <dxo-filter-row [visible]="false"></dxo-filter-row>
 
       <dxo-header-filter [visible]="false">
@@ -68,12 +77,20 @@
             [rowAlternationEnabled]="true"
             [showRowLines]="true"
             [height]="'30vh'"
+            (onCellPrepared)="onDetailCellPrepared($event, masterData)"
             (onEditorPreparing)="onDetailEditorPreparing($event, masterData)"
             (onRowUpdating)="onDetailRowUpdating($event, masterData)"
+            (onRowRemoving)="onDetailRowRemoving($event, masterData)"
           >
+            <dxo-scrolling
+              mode="virtual"
+              rowRenderingMode="virtual"
+            ></dxo-scrolling>
+            <dxo-paging [pageSize]="20"></dxo-paging>
             <dxo-editing
               mode="row"
               [allowUpdating]="masterData.data.ORDER_STATUS === 1"
+              [allowDeleting]="masterData.data.ORDER_STATUS === 1"
               [useIcons]="true"
             ></dxo-editing>
 
@@ -263,54 +280,104 @@
         caption="Order Date"
         dataType="date"
         format="dd-MM-yyyy"
+        [fixed]="true"
       ></dxi-column>
-      <dxi-column dataField="DEALER" caption="Dealer"></dxi-column>
+      <dxi-column
+        dataField="DEALER"
+        caption="Dealer"
+        [fixed]="true"
+      ></dxi-column>
       <dxi-column dataField="SUBDEALER" caption="Sub Dealer"></dxi-column>
 
       <dxi-column
         dataField="ORDER_QTY"
-        caption="Order Qty"
+        caption="Ordered Qty"
         dataType="number"
+        [width]="100"
+        alignment="center"
+        headerCellTemplate="ordQtyHeader"
       ></dxi-column>
+      <div *dxTemplate="let data of 'ordQtyHeader'">
+        <div class="qty-header-title">Ordered<br />Qty</div>
+      </div>
+
       <dxi-column
         dataField="ALLOCATED_QTY"
         caption="Allocated Qty"
         dataType="number"
+        [width]="100"
+        alignment="center"
+        headerCellTemplate="allocQtyHeader"
       ></dxi-column>
+      <div *dxTemplate="let data of 'allocQtyHeader'">
+        <div class="qty-header-title">Allocated<br />Qty</div>
+      </div>
+
       <dxi-column
         dataField="SCAN_QTY"
-        caption="Scan Qty"
+        caption="Scanned Qty"
         dataType="number"
+        [width]="100"
+        alignment="center"
+        headerCellTemplate="scanQtyHeader"
       ></dxi-column>
+      <div *dxTemplate="let data of 'scanQtyHeader'">
+        <div class="qty-header-title">Scanned<br />Qty</div>
+      </div>
+
       <dxi-column
         dataField="CANCELLED_QTY"
         caption="Cancelled Qty"
         dataType="number"
+        [width]="100"
+        alignment="center"
+        headerCellTemplate="cancelQtyHeader"
       ></dxi-column>
+      <div *dxTemplate="let data of 'cancelQtyHeader'">
+        <div class="qty-header-title">Cancelled<br />Qty</div>
+      </div>
+
       <dxi-column
         dataField="ISSUED_QTY"
-        caption="Issues Qty"
+        caption="Issued Qty"
         dataType="number"
+        [width]="100"
+        alignment="center"
+        headerCellTemplate="issueQtyHeader"
       ></dxi-column>
+      <div *dxTemplate="let data of 'issueQtyHeader'">
+        <div class="qty-header-title">Issued<br />Qty</div>
+      </div>
+
       <dxi-column
         dataField="OPEN_QTY"
         caption="Open Qty"
         dataType="number"
+        [width]="100"
+        alignment="center"
+        headerCellTemplate="openQtyHeader"
       ></dxi-column>
+      <div *dxTemplate="let data of 'openQtyHeader'">
+        <div class="qty-header-title">Open<br />Qty</div>
+      </div>
 
       <dxi-column
-        dataField="ORDER_STATUS"
+        dataField="STATUS_DESCRIPTION"
         caption="Status"
         [width]="150"
         [alignment]="'center'"
         cellTemplate="statusCellRender"
         [allowHeaderFiltering]="true"
-        [headerFilter]="{ dataSource: getStatusFilterData }"
       ></dxi-column>
 
       <dxi-column
         dataField="LOCATION"
-        caption="Location"
+        caption="Delivery Location"
+        width="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="WAREHOUSE_NAME"
+        caption="Warehouse"
         width="150"
       ></dxi-column>
 
@@ -325,34 +392,7 @@
       <div *dxTemplate="let cell of 'statusCellRender'">
         <div style="text-align: center; width: 100%">
           <span class="status-badge status-{{ cell.data.ORDER_STATUS }}">
-            {{
-              cell.data.STATUS_DESCRIPTION ||
-                (cell.data.ORDER_STATUS === 0
-                  ? "Submitted"
-                  : cell.data.ORDER_STATUS === 1
-                    ? "Draft"
-                    : cell.data.ORDER_STATUS === 2
-                      ? "Open"
-                      : cell.data.ORDER_STATUS === 3
-                        ? "Accepted"
-                        : cell.data.ORDER_STATUS === 4
-                          ? "Rejected"
-                          : cell.data.ORDER_STATUS === 5
-                            ? "In Production"
-                            : cell.data.ORDER_STATUS === 6
-                              ? "Production Completed"
-                              : cell.data.ORDER_STATUS === 7
-                                ? "Partial"
-                                : cell.data.ORDER_STATUS === 8
-                                  ? "In Transit"
-                                  : cell.data.ORDER_STATUS === 9
-                                    ? "Delivered"
-                                    : cell.data.ORDER_STATUS === 10
-                                      ? "Cancelled"
-                                      : cell.data.ORDER_STATUS === 11
-                                        ? "Allocated"
-                                        : "Unknown")
-            }}
+            {{ cell.data.STATUS_DESCRIPTION }}
           </span>
         </div>
       </div>
@@ -398,6 +438,19 @@
         </div>
       </div>
     </dx-data-grid>
+
+    <dx-load-panel
+      #loadPanel
+      shadingColor="rgba(0, 0, 0, 0.2)"
+      [position]="{ of: '.grid-container' }"
+      [(visible)]="isLoading"
+      [showIndicator]="true"
+      [showPane]="true"
+      [shading]="true"
+      [closeOnOutsideClick]="false"
+      message="Loading..."
+    >
+    </dx-load-panel>
   </div>
 </div>
 

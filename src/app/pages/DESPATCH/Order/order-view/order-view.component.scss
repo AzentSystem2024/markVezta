@@ -167,4 +167,23 @@
     border-bottom: 5px solid transparent;
     border-left: 6px solid #03b12b;
   }
+
+  .qty-header-title {
+    text-align: center;
+    line-height: 13px;
+    font-size: 11.5px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .dx-datagrid-headers .dx-header-row > td {
+    &.dx-header-filter-indicator,
+    &.dx-sort-indicator,
+    &:has(.dx-header-filter),
+    &:has(.dx-sort) {
+      .qty-header-title {
+        padding-right: 14px;
+      }
+    }
+  }
 }
