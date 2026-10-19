@@ -52,7 +52,6 @@
             labelMode="floating"
             [(value)]="selected_To_date"
             displayFormat="dd-MM-yyyy"
-            
             (onValueChanged)="onToDateChange($event)"
           >
           </dx-date-box>
@@ -149,11 +148,9 @@
       [headerFilter]="{ visible: true }"
       (onExporting)="onExporting($event)"
     >
-     <dxo-group-panel [visible]="true"></dxo-group-panel>
-     <dxo-grouping
-      [contextMenuEnabled]="true"
-    [autoExpandAll]="false">
-  </dxo-grouping>
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+      <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
+      </dxo-grouping>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
       <dxo-pager
@@ -177,10 +174,23 @@
         </dxi-item>
 
         <dxi-item name="exportButton"></dxi-item>
+
+        <dxi-item location="after">
+          <dx-button
+            icon="columnchooser"
+            hint="Choose Columns"
+            stylingMode="outlined"
+            (onClick)="openColumnChooser()"
+          ></dx-button>
+        </dxi-item>
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->
-       <dxi-column dataField="STORE" caption="Store" [groupIndex]="0"></dxi-column>
+      <dxi-column
+        dataField="STORE"
+        caption="Store"
+        [groupIndex]="0"
+      ></dxi-column>
       <dxi-column
         dataField="DATE"
         caption="Date"
@@ -190,10 +200,26 @@
       >
       </dxi-column>
 
-      <dxi-column dataField="INVOICE_NO" caption="Invoice No" width="190"></dxi-column>
-      <dxi-column dataField="SUPPLIER" caption="Supplier" width="300"></dxi-column>
-      <dxi-column dataField="PURCHASE_NO" caption="Purchase No" width="120"></dxi-column>
-      <dxi-column dataField="DISCOUNT" caption="Discount" width="100"></dxi-column>
+      <dxi-column
+        dataField="INVOICE_NO"
+        caption="Invoice No"
+        width="190"
+      ></dxi-column>
+      <dxi-column
+        dataField="SUPPLIER"
+        caption="Supplier"
+        width="300"
+      ></dxi-column>
+      <dxi-column
+        dataField="PURCHASE_NO"
+        caption="Purchase No"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="DISCOUNT"
+        caption="Discount"
+        width="100"
+      ></dxi-column>
       <dxi-column
         caption="Excl.VAT Total(AED)"
         name="ExVATtotal"
@@ -222,7 +248,7 @@
         [format]="{ type: 'fixedPoint', precision: 2 }"
       >
       </dxi-column>
- 
+
       <dxi-column *ngIf="journalBookCount > 0" type="buttons" [width]="100">
         <dxi-button
           icon="eyeopen"
@@ -232,6 +258,59 @@
         </dxi-button>
       </dxi-column>
     </dx-data-grid>
+
+    <!-- Custom Column Chooser Popup -->
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>
 

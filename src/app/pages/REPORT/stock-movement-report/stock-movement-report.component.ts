@@ -61,6 +61,78 @@ import { DeliveryNoteFormFinanceModule } from '../../Operations/POPUP PAGES/deli
 export class StockMovementReportComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid!: DxDataGridComponent;
+
+
+  // Custom Column Chooser
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'ITEM_CODE', caption: 'Code' },
+    { dataField: 'ITEM_NAME', caption: 'Description' },
+    { dataField: 'UOM', caption: 'UOM' },
+    { dataField: 'STORE_NAME', caption: 'Store' },
+    { dataField: 'OPENING_QTY', caption: 'Opening Qty' },
+    { dataField: 'GRN_QTY', caption: 'GRN Qty' },
+    { dataField: 'PURCHASE_RETURN_QTY', caption: 'Purch.Return' },
+    { dataField: 'PRODUCTION_QTY', caption: 'Production' },
+    { dataField: 'CONSUMPTION_QTY', caption: 'Consumption' },
+    { dataField: 'TRANSFER_OUT_QTY', caption: 'Transf.Out' },
+    { dataField: 'TRANSFER_IN_QTY', caption: 'Transf.In' },
+    { dataField: 'DELIVERY_QTY', caption: 'Delivery Note' },
+    { dataField: 'DELIVERY_RETURN_QTY', caption: 'Delivery Return' },
+    { dataField: 'SALE_QTY', caption: 'Sale Qty' },
+    { dataField: 'SALE_RETURN_QTY', caption: 'Sales Return' },
+    { dataField: 'ADJUSTED', caption: 'Adjusted' },
+    { dataField: 'BALANCE_STOCK', caption: 'Closing' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+    if (!grid) return;
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible:
+        grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+    if (!grid) return;
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+
   readonly allowedPageSizes: any = [5, 10, 'all'];
 
   StockMovementDatasource: any[] = [];

@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -28,6 +29,7 @@ import {
   DxValidationGroupModule,
   DxAutocompleteModule,
   DxTagBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 
 import {
@@ -41,13 +43,78 @@ import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-fixed-asset-register',
   templateUrl: './fixed-asset-register.component.html',
   styleUrls: ['./fixed-asset-register.component.scss']
 })
 export class FixedAssetRegisterComponent {
-FixedAssetRegister: any[] = [];
+
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'ASSET_NAME', caption: 'Asset Name' },
+    { dataField: 'STORE_CODE', caption: 'Store Code' },
+    { dataField: 'LOCATION', caption: 'Location' },
+    { dataField: 'TRANS_DATE', caption: 'Trans Date' },
+    { dataField: 'PURCH_VALUE', caption: 'Purch Value' },
+    { dataField: 'USEFUL_LIFE', caption: 'Useful Life' },
+    { dataField: 'NET_DEPRECIATION', caption: 'Net Depreciation' },
+    {
+      dataField: 'CURRENT_ASSETVALUE',
+      caption: 'Current Asset Value',
+    },
+  ];
+
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+  FixedAssetRegister: any[] = [];
   isFilterRowVisible: boolean = false;
   isViewInvoice: boolean = false;
   BalanceSheetReport: any = [];
@@ -90,6 +157,9 @@ FixedAssetRegister: any[] = [];
     COMPANY_ID: 0,
   };
   Department: any;
+  DepartmentWithAll: any[] = [];
+  isSummaryVisible = true;
+
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
@@ -129,9 +199,30 @@ FixedAssetRegister: any[] = [];
     this.Department_dropdown();
   }
 
-  
 
-  
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.Fixed_Asset_register();
+    }
+  }
+
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
@@ -149,10 +240,35 @@ FixedAssetRegister: any[] = [];
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
-  
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    // Your existing summary show/hide logic goes here
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
 
   onExporting(event: any) {
-    const fileName = 'BalanceSheetReport';
+    const fileName = 'FixedAssetRegister';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
@@ -174,13 +290,22 @@ FixedAssetRegister: any[] = [];
 
 
 
-  Department_dropdown(){
- const payload = {
-      NAME : 'DEPT',
-      COMPANY_ID : this.selected_Company_id
+  Department_dropdown() {
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
+
+      this.DepartmentWithAll = [
+        {
+          ID: null,
+          DESCRIPTION: '(All)'
+        },
+        ...this.Department
+      ];
+      this.select_department_id = null;
     });
   }
 
@@ -199,49 +324,52 @@ FixedAssetRegister: any[] = [];
   handleClose() {
     this.isViewInvoice = false;
   }
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'NET_DEPRECIATION',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'NET_DEPRECIATION',
-        alignment: 'right',
+  get summaryColumnsData(): any {
+    return {
+      totalItems: this.isSummaryVisible ? [
+        {
+          column: 'NET_DEPRECIATION',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'NET_DEPRECIATION',
+          alignment: 'right',
+        },
+        {
+          column: 'CURRENT_ASSETVALUE',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'CURRENT_ASSETVALUE',
+          alignment: 'right',
+        },
+      ]
+        : [],
+      groupItems: this.isSummaryVisible ? [
+        {
+          column: 'NET_DEPRECIATION',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+        {
+          column: 'CURRENT_ASSETVALUE',
+          summaryType: 'sum',
+          displayFormat: ' {0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+      ]
+        : [],
+      calculateCustomSummary: (options) => {
+        if (options.name === 'summaryRow') {
+          // Custom logic if needed
+        }
       },
-      {
-        column: 'CURRENT_ASSETVALUE',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CURRENT_ASSETVALUE',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'NET_DEPRECIATION',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'CURRENT_ASSETVALUE',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-    ],
-    calculateCustomSummary: (options) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
-  };
+    };
+  }
 }
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -282,4 +410,4 @@ FixedAssetRegister: any[] = [];
   exports: [FixedAssetRegisterComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class FixedAssetRegisterModule {}
+export class FixedAssetRegisterModule { }

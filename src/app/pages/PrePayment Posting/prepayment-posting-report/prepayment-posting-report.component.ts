@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -28,6 +29,7 @@ import {
   DxValidationGroupModule,
   DxAutocompleteModule,
   DxTagBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 
 import {
@@ -39,6 +41,8 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-prepayment-posting-report',
@@ -47,7 +51,96 @@ import { Router } from '@angular/router';
 })
 export class PrepaymentPostingReportComponent {
 
-    PrepaymentpostingReport: any[] = [];
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'INV_NO', caption: 'Invoice No.' },
+    { dataField: 'SUPP_CODE', caption: 'Supplier Code' },
+    { dataField: 'SUPP_NAME', caption: 'Supplier name' },
+    { dataField: 'DEPT_NAME', caption: 'Department' },
+    { dataField: 'EXPENSE_LEDGER', caption: 'Expense ledger' },
+    { dataField: 'PREPAYMENT_LEDGER', caption: 'Prepayment ledger' },
+    { dataField: 'TRANSACTON_DATE', caption: 'Transaction date' },
+    { dataField: 'NO_OF_MONTHS', caption: 'Prepayment period (Months)' },
+    { dataField: 'NO_OF_DAYS', caption: 'Prepayment period (Days)' },
+    { dataField: 'DATE_FROM', caption: 'Posting Start Date' },
+    { dataField: 'DATE_TO', caption: 'End date' },
+    { dataField: 'PURCH_VALUE', caption: 'Purchase value (prepaid expense)' },
+    {
+      dataField: 'OPENING_ACCUR',
+      caption: 'Accrued expense already expensed off',
+    },
+    {
+      dataField: 'CURRENT_ACCUR',
+      caption: 'Current period expense posted',
+    },
+    {
+      dataField: 'TOTAL_ACCUR',
+      caption: 'Total prepaid expense write off',
+    },
+    { dataField: 'BALANCE_ACCUR', caption: 'Unaccrued expense (net)' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+  showParameters = true;
+  isLoading = false;
+  isGridLoading = false;
+  private reportSubscription: Subscription | null = null;
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  PrepaymentpostingReport: any[] = [];
   isFilterRowVisible: boolean = false;
   isViewInvoice: boolean = false;
   BalanceSheetReport: any = [];
@@ -91,13 +184,15 @@ export class PrepaymentPostingReportComponent {
   };
   Department: any;
   select_department_id: number;
+  isSummaryVisible = true;
+
   constructor(
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {
     this.sesstion_Details();
-   
+
     //============Year field dataSource===============
     const currentYear = new Date().getFullYear();
     for (let year = currentYear; year >= 2015; year--) {
@@ -107,7 +202,7 @@ export class PrepaymentPostingReportComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
   ngOnInit() {
     // initialize with today's date
@@ -125,11 +220,61 @@ this.selectedmonth = currentMonth;
 
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
-   
-    
+
+
     this.sesstion_Details();
     this.Department_dropdown();
   }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_PrepaymentPosting_report();
+    }
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    // Your existing summary show/hide logic goes here
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -183,7 +328,7 @@ this.selectedmonth = currentMonth;
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
-  
+
 
   onExporting(event: any) {
     const fileName = 'BalanceSheetReport';
@@ -225,17 +370,25 @@ this.selectedmonth = currentMonth;
     return `${year}-${month}-${day}`;
   }
 
-      Department_dropdown(){
- const payload = {
-      NAME : 'DEPT',
-      COMPANY_ID : this.selected_Company_id
+  Department_dropdown() {
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
     });
   }
-  
-  get_PrepaymentPosting_report() {
+
+  get_PrepaymentPosting_report(): void {
+    if (this.reportSubscription) {
+      this.reportSubscription.unsubscribe();
+      this.reportSubscription = null;
+    }
+
+    this.showParameters = false;   // ⬅️ collapse panel on Apply
+
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DEPARTMENT_ID: String(this.select_department_id || 0),
@@ -243,100 +396,138 @@ this.selectedmonth = currentMonth;
       DATE_TO: this.formatted_To_date,
     };
 
-    this.dataservice.Prepayment_posting_Report(payload).subscribe((res: any) => {
-      this.PrepaymentpostingReport = res.PrepaymentDetails;
-    });
+    this.reportSubscription = this.dataservice
+      .Prepayment_posting_Report(payload)
+      .subscribe({
+        next: (res: any) => {
+          this.PrepaymentpostingReport = res.PrepaymentDetails;
+
+          this.reportSubscription = null;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.isLoading = false;
+          this.isGridLoading = false;
+          this.reportSubscription = null;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  cancelReport(): void {
+    if (this.reportSubscription) {
+      this.reportSubscription.unsubscribe();
+      this.reportSubscription = null;
+      this.isLoading = false;
+      this.isGridLoading = false;
+      this.cdr.detectChanges();
+
+      notify(
+        {
+          message: 'Report loading cancelled.',
+          type: 'warning',
+          displayTime: 3000,
+          position: { at: 'top right', my: 'top right', offset: '-20 20' },
+        },
+        'warning',
+        3000
+      );
+    }
   }
 
   handleClose() {
     this.isViewInvoice = false;
   }
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'PURCH_VALUE',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'PURCH_VALUE',
-        alignment: 'right',
+  get summaryColumnsData(): any {
+    return {
+      totalItems: this.isSummaryVisible ? [
+        {
+          column: 'PURCH_VALUE',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'PURCH_VALUE',
+          alignment: 'right',
+        },
+        {
+          column: 'OPENING_ACCUR',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'OPENING_ACCUR',
+          alignment: 'right',
+        },
+        {
+          column: 'CURRENT_ACCUR',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'CURRENT_ACCUR',
+          alignment: 'right',
+        },
+        {
+          column: 'TOTAL_ACCUR',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'TOTAL_ACCUR',
+          alignment: 'right',
+        },
+        {
+          column: 'BALANCE_ACCUR',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          showInColumn: 'BALANCE_ACCUR',
+          alignment: 'right',
+        },
+      ]
+        : [],
+      groupItems: this.isSummaryVisible ? [
+        {
+          column: 'PURCH_VALUE',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+        {
+          column: 'OPENING_ACCUR',
+          summaryType: 'sum',
+          displayFormat: ' {0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+        {
+          column: 'CURRENT_ACCUR',
+          summaryType: 'sum',
+          displayFormat: ' {0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+        {
+          column: 'TOTAL_ACCUR',
+          summaryType: 'sum',
+          displayFormat: ' {0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+        {
+          column: 'BALANCE_ACCUR',
+          summaryType: 'sum',
+          displayFormat: ' {0}',
+          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+          alignByColumn: true,
+        },
+      ]
+        : [],
+      calculateCustomSummary: (options) => {
+        if (options.name === 'summaryRow') {
+          // Custom logic if needed
+        }
       },
-      {
-        column: 'OPENING_ACCUR',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'OPENING_ACCUR',
-        alignment: 'right',
-      },
-      {
-        column: 'CURRENT_ACCUR',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CURRENT_ACCUR',
-        alignment: 'right',
-      },
-      {
-        column: 'TOTAL_ACCUR',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'TOTAL_ACCUR',
-        alignment: 'right',
-      },
-      {
-        column: 'BALANCE_ACCUR',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'BALANCE_ACCUR',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'PURCH_VALUE',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'OPENING_ACCUR',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'CURRENT_ACCUR',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'TOTAL_ACCUR',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'BALANCE_ACCUR',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-    ],
-    calculateCustomSummary: (options) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
-}
+    }
+  }
 }
 
 @NgModule({
@@ -378,4 +569,4 @@ this.selectedmonth = currentMonth;
   exports: [PrepaymentPostingReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PrepaymentPostingReportModule {}
+export class PrepaymentPostingReportModule { }
