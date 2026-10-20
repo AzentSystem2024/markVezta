@@ -1,24 +1,100 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
+    <!-- Collapsible Filter Panel -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-select-box
+          labelMode="floating"
+          label="Year"
+          [width]="150"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        ></dx-select-box>
+
+        <dx-select-box
+          labelMode="floating"
+          label="Month"
+          [width]="150"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        ></dx-select-box>
+
+        <dx-date-box
+          [width]="150"
+          label="Date From"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          [value]="formatted_from_date"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+
+        <dx-date-box
+          [width]="150"
+          label="Date To"
+          labelMode="floating"
+          [displayFormat]="'dd-MM-yyyy'"
+          [value]="formatted_To_date"
+          (onValueChanged)="onToDateChange($event)"
+        ></dx-date-box>
+
+        <dx-select-box
+          [dataSource]="distributorList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [width]="250"
+          label="Supplier"
+          [(value)]="selectedSupplier"
+          [searchEnabled]="true"
+          labelMode="floating"
+          [showClearButton]="true"
+          (onValueChanged)="onSupplierChanged($event)"
+        ></dx-select-box>
+
+        <dx-button
+          text="Apply"
+          type="default"
+          stylingMode="contained"
+          (onClick)="get_Purchase_list()"
+        ></dx-button>
+
+        <dx-button
+          text="Cancel"
+          stylingMode="outlined"
+          (onClick)="cancelReport()"
+        ></dx-button>
+      </div>
+    </div>
+
+    <!-- Horizontal Toggle Bar -->
+    <div class="toggle-bar" (click)="toggleParameters()">
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
+    <!-- Data Grid -->
     <dx-data-grid
+      #dataGrid
       class="grid theme-dependent"
       [dataSource]="PurchaseReport"
       width="100%"
       noDataText=""
-      height="82vh"
+      height="75vh"
       [showBorders]="true"
       [showColumnLines]="true"
       [columnAutoWidth]="true"
       [wordWrapEnabled]="false"
       [grouping]="{ autoExpandAll: false }"
-      [filterRow]="{ visible: false }"
-      [rowAlternationEnabled]="true"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-      [filterRow]="{ visible: false }"
       id="dataGrid"
-      [headerFilter]="{ visible: false }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -29,7 +105,9 @@
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+
+      <dxo-export [enabled]="true" [formats]="['xlsx']"></dxo-export>
+
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -38,92 +116,43 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
+
       <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
 
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
       <dxo-toolbar>
         <dxi-item location="before">
           <div
             class="grid-header"
-            style="
-              font-weight: 600;
-              font-size: 20px;
-              margin-left: 12px;
-              padding: -3px;
-              margin-right: 3px;
-            "
+            style="font-weight: 600; font-size: 20px; margin-left: 12px"
           >
             Purchase Report
           </div>
         </dxi-item>
 
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="Year"
-            [width]="150"
-            [(value)]="selectedYear"
-            [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)"
-            placeholder="Year"
-          ></dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="month"
-            [dataSource]="monthDataSource"
-            displayExpr="name"
-            valueExpr="value"
-            [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)"
-            [dropDownOptions]="{ width: 'auto' }"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <dxi-item style="margin-bottom: 6px">
-          <dx-date-box
-            [width]="150"
-            label="Date From"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [value]="formatted_from_date"
-            (onValueChanged)="onFromDateChange($event)"
-          ></dx-date-box>
-        </dxi-item>
-        <dxi-item style="margin-bottom: 6px">
-          <dx-date-box
-            [width]="150"
-            label="Date To"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [value]="formatted_To_date"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            [dataSource]="distributorList"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [width]="300"
-            label="Supplier"
-            [(value)]="selectedSupplier"
-            [searchEnabled]="true"
-            labelMode="floating"
-            (onValueChanged)="onSupplierChanged($event)"
-          >
-          </dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
 
         <dxi-item
           name="exportButton"
@@ -131,24 +160,17 @@
           cssClass="export-btn"
         ></dxi-item>
 
-        <dxi-item location="after">
-          <dx-button
-            icon="columnchooser"
-            hint="Choose Columns"
-            stylingMode="outlined"
-            (onClick)="openColumnChooser()"
-          ></dx-button>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            (onClick)="get_Purchase_list()"
-          >
-          </dx-button>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping

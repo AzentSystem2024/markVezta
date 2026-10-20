@@ -120,6 +120,33 @@ export class PurchaseReportMarkComponent {
     }));
   }
 
+
+  showParameters = true;
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  cancelReport(): void {
+    this.selectedYear = new Date().getFullYear();
+    this.selectedmonth = '';
+    this.selectedSupplier = null;
+
+    const today = new Date();
+
+    this.formatted_from_date = new Date(
+      today.getFullYear(),
+      0,
+      1
+    );
+
+    this.formatted_To_date = today;
+
+    // Reset the report using the default filters.
+    this.get_Purchase_list();
+  }
+
+
   PurchaseReport: any[] = [];
   isFilterRowVisible: boolean = false;
   editPDCPopupOpened: boolean = false;
@@ -157,6 +184,7 @@ export class PurchaseReportMarkComponent {
   selectedmonth: any = '';
   canApprove = false;
   selectedSupplier: any;
+  isSummaryVisible = true;
 
   customer_details: any = {
     CUSTOMER_ID: 0,
@@ -189,7 +217,7 @@ export class PurchaseReportMarkComponent {
     // this.onToDateChange({ value: this.defaultDate });
     //   this.onFromDateChange({ value: this.financialYeaDate });
     //get datasource======== function call==========
-
+    this.updateSummaryColumnsData();
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -220,6 +248,57 @@ export class PurchaseReportMarkComponent {
     // // First-time selection
     // this.applySupplierChange(newSupplierId);
   }
+
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_Purchase_list();
+    }
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.updateSummaryColumnsData();
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -357,107 +436,56 @@ export class PurchaseReportMarkComponent {
   handleClose() {
     this.editPDCPopupOpened = false;
   }
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'GrossTotal',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'GrossTotal',
-        alignment: 'right',
-      },
-      {
-        column: 'Disc',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'Disc',
-        alignment: 'right',
-      },
-      {
-        column: 'GSTPurchase',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'GSTPurchase',
-        alignment: 'right',
-      },
-      {
-        column: 'CGSTPurchaseInput9',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CGSTPurchaseInput9',
-        alignment: 'right',
-      },
-      {
-        column: 'SGSTPurchaseInput9',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'SGSTPurchaseInput9',
-        alignment: 'right',
-      },
-      {
-        column: 'RoundOff',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'RoundOff',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'GrossTotal',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'Disc',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'GSTPurchase',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'CGSTPurchaseInput9',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'SGSTPurchaseInput9',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'RoundOff',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
+  };
 
-    ],
-    calculateCustomSummary: (options) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
+
+  updateSummaryColumnsData(): void {
+    if (!this.isSummaryVisible) {
+      this.summaryColumnsData = {
+        totalItems: [],
+        groupItems: [],
+      };
+      return;
+    }
+
+    const columns = [
+      'GrossTotal',
+      'Disc',
+      'GSTPurchase',
+      'CGSTPurchaseInput9',
+      'SGSTPurchaseInput9',
+      'RoundOff',
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: columns.map((column) => ({
+        column,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        showInColumn: column,
+        alignment: 'right',
+      })),
+
+      groupItems: columns.map((column) => ({
+        column,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        alignByColumn: true,
+      })),
+    };
   }
 }
 @NgModule({

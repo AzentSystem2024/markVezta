@@ -180,7 +180,7 @@ export class FixedAssetRegisterComponent {
     // this.onToDateChange({ value: this.defaultDate });
     //   this.onFromDateChange({ value: this.financialYeaDate });
     //get datasource======== function call==========
-
+    this.updateSummaryColumnsData();
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -257,7 +257,7 @@ export class FixedAssetRegisterComponent {
 
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;
-
+    this.updateSummaryColumnsData();
     // Your existing summary show/hide logic goes here
 
     this.summaryButtonOptions = {
@@ -324,49 +324,59 @@ export class FixedAssetRegisterComponent {
   handleClose() {
     this.isViewInvoice = false;
   }
-  get summaryColumnsData(): any {
-    return {
-      totalItems: this.isSummaryVisible ? [
-        {
-          column: 'NET_DEPRECIATION',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'NET_DEPRECIATION',
-          alignment: 'right',
-        },
-        {
-          column: 'CURRENT_ASSETVALUE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'CURRENT_ASSETVALUE',
-          alignment: 'right',
-        },
-      ]
+
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
+  };
+
+  updateSummaryColumnsData(): void {
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
+    };
+
+    this.summaryColumnsData = {
+      totalItems: this.isSummaryVisible
+        ? [
+          {
+            column: 'NET_DEPRECIATION',
+            summaryType: 'sum',
+            displayFormat: '{0}',
+            valueFormat: moneyFormat,
+            showInColumn: 'NET_DEPRECIATION',
+            alignment: 'right',
+          },
+          {
+            column: 'CURRENT_ASSETVALUE',
+            summaryType: 'sum',
+            displayFormat: '{0}',
+            valueFormat: moneyFormat,
+            showInColumn: 'CURRENT_ASSETVALUE',
+            alignment: 'right',
+          },
+        ]
         : [],
-      groupItems: this.isSummaryVisible ? [
-        {
-          column: 'NET_DEPRECIATION',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'CURRENT_ASSETVALUE',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-      ]
+
+      groupItems: this.isSummaryVisible
+        ? [
+          {
+            column: 'NET_DEPRECIATION',
+            summaryType: 'sum',
+            displayFormat: '{0}',
+            valueFormat: moneyFormat,
+            alignByColumn: true,
+          },
+          {
+            column: 'CURRENT_ASSETVALUE',
+            summaryType: 'sum',
+            displayFormat: '{0}',
+            valueFormat: moneyFormat,
+            alignByColumn: true,
+          },
+        ]
         : [],
-      calculateCustomSummary: (options) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed
-        }
-      },
     };
   }
 }

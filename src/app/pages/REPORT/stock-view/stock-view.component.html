@@ -110,14 +110,18 @@
           cssClass="export-btn"
         ></dxi-item>
         <!-- <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item> -->
-        <dxi-item location="after">
-          <dx-button
-            icon="columnchooser"
-            hint="Choose Columns"
-            stylingMode="outlined"
-            (onClick)="openColumnChooser()"
-          ></dx-button>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <div *dxTemplate="let data of 'itemTypeFilterTemplate'">
@@ -169,7 +173,7 @@
       <dxi-column dataField="SUB_CATEGORY" caption="Sub Category"></dxi-column>
       <dxi-column dataField="BRAND" caption="Brand"></dxi-column>
       <dxi-column dataField="CURRENT_STOCK" caption="Stock"></dxi-column>
-      <dxo-summary>
+      <dxo-summary [visible]="isSummaryVisible">
         <dxi-total-item
           column="CURRENT_STOCK"
           summaryType="sum"

@@ -13,7 +13,9 @@ import {
   DxCheckBoxModule,
   DxDataGridComponent,
   DxDataGridModule,
+  DxDropDownBoxModule,
   DxFormModule,
+  DxListModule,
   DxLoadIndicatorModule,
   DxLoadPanelModule,
   DxNumberBoxModule,
@@ -30,6 +32,8 @@ import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
+import { event } from 'jquery';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 @Component({
   selector: 'app-company-master',
@@ -80,6 +84,14 @@ export class CompanyMasterComponent {
   Phone_limit: number;
   whatsapp_limit: number;
   appType: any;
+  CountryDropdownDataList: any = [];
+  CurrencyDropdownDataList: any = [];
+  selecte_countyId: any;
+  selected_currency_id: any;
+  isPhoneCountryDropdownOpen = false;
+  isMobileCountryDropdownOpen = false;
+  isWhatsappCountryDropdownOpen = false;
+  DEFAULT_COUNTRY_CODE: any;
 
   constructor(
     private fb: FormBuilder,
@@ -106,6 +118,8 @@ export class CompanyMasterComponent {
       PAN: [''],
       CIN: [''],
       GSTNo: [''],
+      COUNTRY_ID: [null, Validators.required],
+      CURRENCY_ID: ['']
     });
     this.get_Company_List();
     this.get_Company_Dropdown_List();
@@ -173,21 +187,53 @@ export class CompanyMasterComponent {
     this.cdr.detectChanges();
   };
 
-  getCompanyList() {
-    const payload = { COMPANY_ID: this.selected_Company_id, NAME: 'STATE' };
-    this.dataservice.getDropdownData(payload).subscribe((response: any) => {
-      this.stateList = response;
+
+  getCompanyList(countryId: any, selectedStateId?: any): void {
+    if (countryId === null || countryId === undefined || countryId === '') {
+      this.stateList = [];
+      this.formsource.patchValue({ STATE_ID: null });
+      return;
+    }
+
+    const payload = {
+      COUNTRY_ID: countryId,
+      NAME: 'STATE_NAME'
+    };
+
+    this.dataservice.getDropdownData(payload).subscribe({
+      next: (response: any) => {
+        this.stateList = response || [];
+
+        // Restore the saved state after the list is loaded
+        if (selectedStateId !== undefined && selectedStateId !== null) {
+          this.formsource.patchValue({
+            STATE_ID: selectedStateId
+          });
+          this.state = selectedStateId;
+        }
+      },
+      error: (error: any) => {
+        console.error('Failed to load states:', error);
+        this.stateList = [];
+      }
     });
   }
 
+
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.appType = sessionData.Configuration[0].APP_TYPE;
+
+    this.DEFAULT_COUNTRY_CODE =
+      sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+    console.log(this.DEFAULT_COUNTRY_CODE)
   }
 
+
   ngOnInit() {
+    this.setDefaultCountryCode();
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -209,8 +255,78 @@ export class CompanyMasterComponent {
       this.canApprove = packingRights.CanApprove;
     }
     this.sesstion_Details();
-    this.getCompanyList();
+    this.getCompanyList(this.selecte_countyId);
+    this.showCountry();
+    this.get_Currency_dropdown();
+
   }
+
+  defaultCountryCode: string = '';
+
+  setDefaultCountryCode(): void {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}'
+    );
+
+    const defaultCode =
+      sessionData?.GeneralSettings?.DEFAULT_COUNTRY_CODE;
+
+    if (defaultCode) {
+      this.defaultCountryCode = defaultCode;
+
+      this.countryCodephone = defaultCode;
+      this.countryCodemobile = defaultCode;
+      this.countryCodewhatsapp = defaultCode;
+
+      // Load validation lengths for the default country
+      this.onCountrycodeChangePhone({ value: defaultCode });
+      this.onCountrycodeChangeMobile({ value: defaultCode });
+      this.onCountrycodeChangeWhatsapp({ value: defaultCode });
+    }
+  }
+
+  showCountry() {
+    console.log('======================================;;;;;;;;;');
+    this.dataservice.getCountryDataAPi().subscribe((response) => {
+      this.CountryDropdownDataList = response;
+      console;
+    });
+  }
+
+  get_Currency_dropdown() {
+    const payload = {
+      NAME: 'CURRENCY'
+    }
+    this.dataservice.Common_Dropdown(payload).subscribe((response) => {
+      this.CurrencyDropdownDataList = response;
+      console;
+    });
+  }
+
+
+  onCountrySelectionChanged(event: any): void {
+    this.selecte_countyId = event.value;
+
+    // Clear the previous state when country changes
+    this.state = null;
+    this.formsource.patchValue({ STATE_ID: null });
+
+    if (event.value !== null && event.value !== undefined && event.value !== '') {
+      this.getCompanyList(event.value);
+    } else {
+      this.stateList = [];
+    }
+  }
+
+  onCurrencySelectionChanged(event: any): void {
+    this.selected_currency_id = event.value;
+  }
+
+
+  onStateChanged(event: any): void {
+    this.state = event.value;
+  }
+
 
   validateEmail = (e: any): boolean => {
     const value = (e.value || '').trim();
@@ -223,6 +339,102 @@ export class CompanyMasterComponent {
 
     return emailRegex.test(value);
   };
+
+
+  validatePhoneLength = (e: any): boolean => {
+    const value = (e.value ?? '').toString().trim();
+    if (!value) return true;
+
+    return this.isCountryPhoneValid(value, this.countryCodephone);
+  };
+
+  validateMobileLength = (e: any): boolean => {
+    const value = (e.value ?? '').toString().trim();
+    if (!value) return true;
+
+    return this.isCountryPhoneValid(value, this.countryCodemobile);
+  };
+
+  validateWhatsAppLength = (e: any): boolean => {
+    const value = (e.value ?? '').toString().trim();
+    if (!value) return true;
+
+    return this.isCountryPhoneValid(value, this.countryCodewhatsapp);
+  };
+
+  private isCountryPhoneValid(
+    value: string,
+    countryCode: string | null | undefined
+  ): boolean {
+    if (!countryCode) {
+      return false;
+    }
+
+    const dialCode = countryCode.trim();
+    const digits = value.replace(/\D/g, '');
+
+    if (!digits) {
+      return false;
+    }
+
+    // Match the UAE validation used in CustomerFormComponent
+    if (dialCode === '+971' || dialCode === '971') {
+      return digits.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(`${dialCode.startsWith('+') ? dialCode : '+' + dialCode}${digits}`);
+    } catch {
+      return false;
+    }
+  }
+
+
+  onPhoneCountryCodeSelected(event: any): void {
+    const selectedCountry = event?.itemData;
+
+    if (!selectedCountry?.CODE) {
+      return;
+    }
+
+    this.countryCodephone = selectedCountry.CODE;
+    this.isPhoneCountryDropdownOpen = false;
+
+    // Preserve your existing phone-length validation logic
+    this.onCountrycodeChangePhone({
+      value: selectedCountry.CODE
+    });
+  }
+
+  onMobileCountryCodeSelected(event: any): void {
+    const selectedCountry = event?.itemData;
+
+    if (!selectedCountry?.CODE) {
+      return;
+    }
+
+    this.countryCodemobile = selectedCountry.CODE;
+    this.isMobileCountryDropdownOpen = false;
+
+    this.onCountrycodeChangeMobile({
+      value: selectedCountry.CODE
+    });
+  }
+
+  onWhatsappCountryCodeSelected(event: any): void {
+    const selectedCountry = event?.itemData;
+
+    if (!selectedCountry?.CODE) {
+      return;
+    }
+
+    this.countryCodewhatsapp = selectedCountry.CODE;
+    this.isWhatsappCountryDropdownOpen = false;
+
+    this.onCountrycodeChangeWhatsapp({
+      value: selectedCountry.CODE
+    });
+  }
 
   onAddPopupHidden() {
     this.addValidationGroup?.instance?.reset();
@@ -248,10 +460,15 @@ export class CompanyMasterComponent {
       Email: '',
       Inactive: false,
       STATE_ID: null,
+      COUNTRY_ID: null,
+      CURRENCY_ID: null,
       PAN: '',
       CIN: '',
       GSTNo: '',
     });
+    this.state = null;
+    this.selecte_countyId = null;
+    this.stateList = [];
   }
 
   onEditPopupHidden() {
@@ -286,6 +503,8 @@ export class CompanyMasterComponent {
       Email: '',
       Inactive: false,
       STATE_ID: null,
+      COUNTRY_ID: null,
+      CURRENCY_ID: null,
       PAN: '',
       CIN: '',
       GSTNo: '',
@@ -298,6 +517,8 @@ export class CompanyMasterComponent {
     this.mobile_limit = undefined;
     this.whatsapp_limit = undefined;
     this.addPopup = true;
+
+    this.setDefaultCountryCode();
 
     setTimeout(() => {
       this.addValidationGroup?.instance?.reset();
@@ -317,10 +538,6 @@ export class CompanyMasterComponent {
 
   onCompanyTypeChanged(event: any) {
     this.selectedCompanyType = event.value;
-  }
-
-  onStateChanged(event: any) {
-    this.state = event.value;
   }
 
   onEditingStart(event: any) {
@@ -411,6 +628,8 @@ export class CompanyMasterComponent {
     const PAN = this.formsource.get('PAN')?.value || '';
     const GSTNo = this.formsource.get('GSTNo')?.value || '';
     const CIN = this.formsource.get('CIN')?.value || '';
+    const CURRENCY_ID = this.formsource.get('CURRENCY_ID')?.value;
+    const COUNTRY_ID = this.formsource.get('COUNTRY_ID')?.value;
 
     // ---------------- DUPLICATE CHECK ----------------
     const newCode = Company_code.toLowerCase();
@@ -453,6 +672,9 @@ export class CompanyMasterComponent {
       GST_NO: GSTNo,
       PAN_NO: PAN,
       CIN: CIN,
+      COUNTRY_ID: COUNTRY_ID,
+      CURRENCY_ID: CURRENCY_ID
+
     };
 
     const isCompanyTypeValid =
@@ -521,6 +743,36 @@ export class CompanyMasterComponent {
           if (data.ID ?? data.COMPANY_ID) {
             this.selectedEditId = data.ID ?? data.COMPANY_ID;
           }
+
+
+          this.selecte_countyId = data.COUNTRY_ID != null
+            ? Number(data.COUNTRY_ID)
+            : null;
+
+          this.selected_currency_id = data.CURRENCY_ID != null
+            ? Number(data.CURRENCY_ID)
+            : null;
+
+          // Keep the reactive form values synchronized too
+          this.formsource.patchValue({
+            COUNTRY_ID: this.selecte_countyId,
+            CURRENCY_ID: this.selected_currency_id
+          });
+
+          // Load the saved country's states
+          this.getCompanyList(
+            this.selecte_countyId,
+            data.STATE_ID
+          );
+
+
+          this.selecte_countyId = data.COUNTRY_ID ?? null;
+
+          // Load the states for the saved country, then restore STATE_ID
+          this.getCompanyList(
+            data.COUNTRY_ID,
+            data.STATE_ID
+          );
 
           const currentCode = (
             data.COMPANY_CODE ??
@@ -731,9 +983,12 @@ export class CompanyMasterComponent {
       COMPANY_TYPE: Company_type,
       IS_INACTIVE: Is_Inactive,
       STATE_ID: STATE_ID,
+
       PAN_NO: PAN,
       GST_NO: GSTNo,
       CIN: CIN,
+      COUNTRY_ID: this.selecte_countyId,
+      CURRENCY_ID: this.selected_currency_id
     };
 
     const isCompanyTypeValid =
@@ -870,24 +1125,23 @@ export class CompanyMasterComponent {
       }
     });
   }
-  validateMobileLength = (e: any): boolean => {
-    const value = (e.value || '').toString().trim();
-    if (!value || !this.mobile_limit) return true;
-    return value.length === this.mobile_limit;
-  };
-  validatePhoneLength = (e: any): boolean => {
-    const value = (e.value || '').toString().trim();
-    if (!value || !this.Phone_limit) return true;
-    return value.length === this.Phone_limit;
-  };
-  validateWhatsAppLength = (e: any): boolean => {
-    const value = (e.value || '').toString().trim();
-    if (!value || !this.whatsapp_limit) return true;
-    return value.length === this.whatsapp_limit;
-  };
-  countryDisplay(item: any) {
-    if (!item) return '';
-    return `${item.CODE}`;
+  // validateMobileLength = (e: any): boolean => {
+  //   const value = (e.value || '').toString().trim();
+  //   if (!value || !this.mobile_limit) return true;
+  //   return value.length === this.mobile_limit;
+  // };
+  // validatePhoneLength = (e: any): boolean => {
+  //   const value = (e.value || '').toString().trim();
+  //   if (!value || !this.Phone_limit) return true;
+  //   return value.length === this.Phone_limit;
+  // };
+  // validateWhatsAppLength = (e: any): boolean => {
+  //   const value = (e.value || '').toString().trim();
+  //   if (!value || !this.whatsapp_limit) return true;
+  //   return value.length === this.whatsapp_limit;
+  // };
+  countryDisplay(item: any): string {
+    return item?.CODE ?? '';
   }
 }
 
@@ -910,6 +1164,8 @@ export class CompanyMasterComponent {
     DxLoadPanelModule,
     DxLoadIndicatorModule,
     DxNumberBoxModule,
+    DxListModule,
+    DxDropDownBoxModule
   ],
   providers: [],
   exports: [],

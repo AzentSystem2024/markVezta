@@ -140,6 +140,7 @@ export class StockViewComponent {
   fin_id: any;
   finID: any;
   storeHint: string = '';
+  isSummaryVisible = false;
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -222,6 +223,30 @@ export class StockViewComponent {
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
     this.isFilterRowVisible = this.isFilterOpened;
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
   }
 
   updateStoreHint() {

@@ -4,6 +4,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  ViewChild,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -33,6 +34,7 @@ import {
   DxAutocompleteModule,
   DxTagBoxModule,
   DxLoadPanelModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 
 import {
@@ -64,6 +66,8 @@ import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAY
   styleUrls: ['./cash-book.component.scss'],
 })
 export class CashBookComponent {
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
   isEditJournalVoucher: boolean = false;
   isViewJournalVoucher: boolean = false;
   isViewDebitNote: boolean = false;
@@ -79,6 +83,142 @@ export class CashBookComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+
+  showParameters = true;
+  isFilterRowVisible = false;
+  isLoading = false;
+  isSummaryVisible = true;
+  auto: string = 'auto';
+
+  private savedSummaryItems: any = null;
+
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'PURCH_DATE', caption: 'Date' },
+    { dataField: 'SUPP_NAME', caption: 'Particulars' },
+    { dataField: 'HSN_CODE', caption: 'HSN CODE' },
+    { dataField: 'VoucherType', caption: 'Voucher Type' },
+    { dataField: 'DOC_NO', caption: 'Invoice No' },
+    { dataField: 'REF_NO', caption: 'Voucher reference No' },
+    { dataField: 'Quantity', caption: 'Quantity' },
+    { dataField: 'GrossTotal', caption: 'Gross Amount' },
+    { dataField: 'Disc', caption: 'Discount Amount' },
+    { dataField: 'GSTPurchase', caption: 'GST' },
+    { dataField: 'CGSTPurchaseInput9', caption: 'CGST' },
+    { dataField: 'SGSTPurchaseInput9', caption: 'SGST' },
+    { dataField: 'RoundOff', caption: 'Round Off Amount' },
+  ];
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    stylingMode: 'outlined',
+    onClick: () => this.refreshGrid(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.Cash_book_data();
+    }
+  }
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  toggleFilterRow(): void {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+  }
+
+  toggleSummary(): void {
+    if (this.isSummaryVisible) {
+      this.savedSummaryItems = {
+        totalItems: this.summaryColumnsData.totalItems,
+        groupItems: this.summaryColumnsData.groupItems,
+      };
+
+      this.summaryColumnsData = {
+        ...this.summaryColumnsData,
+        totalItems: [],
+        groupItems: [],
+      };
+    } else if (this.savedSummaryItems) {
+      this.summaryColumnsData = {
+        ...this.summaryColumnsData,
+        ...this.savedSummaryItems,
+      };
+    }
+
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
   //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
@@ -272,7 +412,7 @@ export class CashBookComponent {
     const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
-  onHeadIdChange(event: any) {}
+  onHeadIdChange(event: any) { }
 
   formatDates(cellData: any): string {
     const date = new Date(cellData);
@@ -585,4 +725,4 @@ export class CashBookComponent {
   exports: [CashBookComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CashBookModule {}
+export class CashBookModule { }

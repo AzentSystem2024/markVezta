@@ -34,6 +34,7 @@ import { DxTextBoxComponent, DxTextBoxModule } from 'devextreme-angular/ui/text-
 import { AuthService, DataService } from 'src/app/services';
 import CountryList from 'country-list-with-dial-code-and-flag';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-customer-form',
   templateUrl: './customer-form.component.html',
@@ -168,10 +169,12 @@ export class CustomerFormComponent {
 
     this.sessionData_tax();
     this.getStateDropDown();
+    this.setDefaultDeliveryCountryCode();
   }
 
 
   ngOnInit(): void {
+
     this.getDealerDropDown();
     this.getPaymentTerms();
     this.showCountry();
@@ -182,6 +185,29 @@ export class CustomerFormComponent {
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
     this.sesstion_Details();
+
+  }
+
+  setDefaultDeliveryCountryCode(): void {
+    const defaultCode = String(
+      this.DEFAULT_COUNTRY_CODE || ''
+    ).trim();
+
+    if (!defaultCode) {
+      return;
+    }
+
+    // Match the default code with the dropdown's data
+    const matchedCountry = this.countryCodes.find(
+      (country: any) =>
+        String(country.dial_code).trim() === defaultCode ||
+        String(country.dial_code).replace(/\D/g, '') ===
+        defaultCode.replace(/\D/g, '')
+    );
+
+    if (matchedCountry) {
+      this.countryCodeDeliveryaddress = matchedCountry.dial_code;
+    }
   }
 
   onCountrycodeChange(e: any) {
@@ -271,6 +297,7 @@ export class CustomerFormComponent {
 
     this.DEFAULT_COUNTRY_CODE =
       sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+
   }
 
   onDealerTypeChange(e: any) {
@@ -454,6 +481,21 @@ export class CustomerFormComponent {
 
   savedAddresses: any[] = [];
   saveDeliveryAddress() {
+    if (!this.locationValue || !this.locationValue.trim()) {
+      notify(
+        {
+          message: 'Location is required',
+          type: 'error',
+          displayTime: 3000,
+          position: {
+            my: 'top center',
+            at: 'top center',
+            of: window,
+          },
+        }
+      );
+      return;
+    }
     // Validate that at least one field is filled
     if (
       this.Address1Value ||
@@ -486,7 +528,7 @@ export class CustomerFormComponent {
       this.MobileValue = '';
       this.locationValue = '';
       this.phoneValue = '';
-      this.countryCodeDeliveryaddress = '';
+      this.setDefaultDeliveryCountryCode();
     }
   }
 

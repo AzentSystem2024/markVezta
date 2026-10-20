@@ -164,94 +164,50 @@ export class DepreciationReportComponent implements OnInit {
   private reportSubscription: Subscription | null = null;
   isLoading = false;   // ⬅️ controls Cancel button visibility
 
-  get summaryColumnsData(): any {
-    return {
-      totalItems: this.isSummaryVisible ? [
-        {
-          column: 'ASSET_VALUE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'ASSET_VALUE',
-          alignment: 'right',
-        },
-        {
-          column: 'OPENING_DEPR',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'OPENING_DEPR',
-          alignment: 'right',
-        },
-        {
-          column: 'DURING_DEPR',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'DURING_DEPR',
-          alignment: 'right',
-        },
-        {
-          column: 'CLOSING_DEPR',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'CLOSING_DEPR',
-          alignment: 'right',
-        },
-        {
-          column: 'CURRENT_VALUE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'CURRENT_VALUE',
-          alignment: 'right',
-        },
-      ]
-        : [],
-      groupItems: this.isSummaryVisible ? [
-        {
-          column: 'ASSET_VALUE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'OPENING_DEPR',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'DURING_DEPR',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'CLOSING_DEPR',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'CURRENT_VALUE',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-      ] : [],
-      calculateCustomSummary: (options: any) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed.
-        }
-      },
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
+  };
+
+  updateSummaryColumnsData(): void {
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
     };
+
+    const summaryFields = [
+      'ASSET_VALUE',
+      'OPENING_DEPR',
+      'DURING_DEPR',
+      'CLOSING_DEPR',
+      'CURRENT_VALUE',
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          showInColumn: field,
+          alignment: 'right',
+        }))
+        : [],
+
+      groupItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        }))
+        : [],
+    };
+
+    this.cdr.detectChanges();
   }
 
   constructor(
@@ -275,6 +231,7 @@ export class DepreciationReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.updateSummaryColumnsData();
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -339,13 +296,15 @@ export class DepreciationReportComponent implements OnInit {
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;
 
-    // Your existing summary show/hide logic goes here
+    this.updateSummaryColumnsData();
 
     this.summaryButtonOptions = {
       ...this.summaryButtonOptions,
       icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
+
+    this.cdr.detectChanges();
   }
 
   // Year value change.
@@ -483,7 +442,7 @@ export class DepreciationReportComponent implements OnInit {
       DATE_TO: this.formatted_To_date,
     };
 
-    this.reportSubscription = this.dataservice
+    this.dataservice
       .Depreciation_Report(payload)
       .subscribe({
         next: (res: any) => {
