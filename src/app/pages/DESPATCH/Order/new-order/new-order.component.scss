@@ -125,3 +125,12 @@
   background-color: #005cad !important;
   color: #fff !important;
 }
+::ng-deep {
+  .dx-editor-outlined.dx-texteditor-with-label,
+  .dx-editor-outlined.dx-texteditor-with-floating-label,
+  .dx-texteditor-with-floating-label {
+    outline: none;
+    margin-top: 0px !important;
+  }
+}
+
