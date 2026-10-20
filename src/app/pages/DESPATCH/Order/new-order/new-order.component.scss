@@ -13,8 +13,12 @@
 }
 
 /* Common utilities */
-.radius-12 { border-radius: 12px; }
-.cursor-pointer { cursor: pointer; }
+.radius-12 {
+  border-radius: 12px;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
 
 /* Force Card to respect theme */
 .card {
@@ -30,13 +34,21 @@
 .tab-active {
   background-color: var(--base-bg);
   color: var(--text-color);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* DevExtreme overrides */
 ::ng-deep .rounded-input .dx-texteditor-input {
   border-radius: 8px;
-  padding: 10px 15px;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+::ng-deep
+  .rounded-input:not(.dx-texteditor-with-floating-label):not(
+    :has(.dx-texteditor-with-floating-label)
+  )
+  .dx-texteditor-input {
+  padding: 10px 14px;
 }
 ::ng-deep .rounded-input.dx-dropdowneditor-button-visible .dx-texteditor-input {
   border-radius: 8px 0 0 8px;
@@ -61,7 +73,9 @@
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: transform 0.1s, border-color 0.1s;
+  transition:
+    transform 0.1s,
+    border-color 0.1s;
 }
 
 .color-picker-circle:hover {
@@ -81,11 +95,11 @@
 }
 
 .popup-body {
-  scrollbar-width: none; 
-  -ms-overflow-style: none;  
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.popup-body::-webkit-scrollbar { 
-  display: none; 
+.popup-body::-webkit-scrollbar {
+  display: none;
 }
 
 .qty-control input {
@@ -111,3 +125,12 @@
   background-color: #005cad !important;
   color: #fff !important;
 }
+::ng-deep {
+  .dx-editor-outlined.dx-texteditor-with-label,
+  .dx-editor-outlined.dx-texteditor-with-floating-label,
+  .dx-texteditor-with-floating-label {
+    outline: none;
+    margin-top: 0px !important;
+  }
+}
+

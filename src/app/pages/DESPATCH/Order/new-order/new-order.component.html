@@ -12,15 +12,16 @@
             style="overflow: hidden"
           >
             <div class="row g-4 mb-2 flex-shrink-0">
-              <!-- Image Placeholder (Smaller) -->
-              <div class="col-3">
+              <!-- Image Placeholder -->
+              <div class="col-3 d-flex flex-column align-items-center">
                 <div
-                  class="rounded-3 mx-auto d-flex align-items-center justify-content-center image-placeholder border"
+                  class="rounded-3 d-flex align-items-center justify-content-center image-placeholder border w-100"
                   style="
-                    aspect-ratio: 1/1;
+                    height: 240px;
+                    max-width: 190px;
                     overflow: hidden;
-                    max-width: 160px;
                     cursor: pointer;
+                    background-color: #f8f9fa;
                   "
                   title="Click to enlarge"
                   (click)="openImagePopup()"
@@ -33,7 +34,7 @@
                     [src]="getArtNoImage(currentEditingItem.artNoId)"
                     alt="Product Image"
                     class="img-fluid rounded-3 w-100 h-100"
-                    style="object-fit: cover"
+                    style="object-fit: contain"
                   />
                   <i
                     *ngIf="
@@ -46,7 +47,7 @@
                 </div>
                 <!-- Selected color text below image -->
                 <div class="fw-bold text-center mt-1" style="font-size: 0.8rem">
-                  <div class="fw-bold text-nowrap" style="font-size: 0.7rem">
+                  <div class="fw-bold text-nowrap" style="font-size: 0.75rem">
                     Color :
                     <span class="text-uppercase text-primary">{{
                       getColor(currentEditingItem.colorId)?.name || "None"
@@ -56,7 +57,7 @@
               </div>
 
               <!-- Controls Area -->
-              <div class="col-9 d-flex flex-column gap-3">
+              <div class="col-9 d-flex flex-column gap-2">
                 <!-- Dealer Tabs -->
                 <div class="d-flex rounded-pill p-1 toggle-wrapper">
                   <button
@@ -84,13 +85,8 @@
                   valueExpr="ID"
                   [(value)]="selectedDealerId"
                   (onValueChanged)="onDealerChange($event)"
-                  [placeholder]="
-                    isLoadingDealers
-                      ? 'Loading...'
-                      : activeTab === 'dealer'
-                        ? 'Search Dealer'
-                        : 'Search Sub Dealer'
-                  "
+                  [label]="activeTab === 'dealer' ? 'Dealer' : 'Sub Dealer'"
+                  labelMode="floating"
                   [disabled]="isLoadingDealers"
                   [searchEnabled]="true"
                   searchMode="startswith"
@@ -98,7 +94,7 @@
                   class="rounded-input"
                 ></dx-select-box>
 
-                <div class="row">
+                <div class="row mt-0">
                   <div class="col-12">
                     <!-- Address -->
                     <dx-select-box
@@ -106,9 +102,8 @@
                       displayExpr="name"
                       valueExpr="id"
                       [(value)]="selectedAddressId"
-                      [placeholder]="
-                        isLoadingAddresses ? 'Loading...' : 'Select Address'
-                      "
+                      label="Delivery Address"
+                      labelMode="floating"
                       [disabled]="!selectedDealerId || isLoadingAddresses"
                       [searchEnabled]="true"
                       searchMode="startswith"
@@ -118,7 +113,7 @@
                   </div>
                 </div>
 
-                <div class="row">
+                <div class="row mt-0">
                   <div class="col-12">
                     <!-- Warehouse -->
                     <dx-select-box
@@ -126,7 +121,8 @@
                       displayExpr="name"
                       valueExpr="id"
                       [(value)]="selectedWarehouseId"
-                      placeholder="Select Warehouse"
+                      label="Warehouse"
+                      labelMode="floating"
                       [disabled]="!selectedDealerId"
                       [searchEnabled]="true"
                       searchMode="startswith"
@@ -135,82 +131,89 @@
                     ></dx-select-box>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- New row for Warehouse and Colors -->
-            <div class="row align-items-center mb-3 flex-shrink-0">
-              <div class="col-md-3">
-                <!-- Color Selection -->
-                <div class="d-flex flex-column gap-1">
-                  <!-- Label and circles on one line -->
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="d-flex gap-1 flex-wrap ms-2">
-                      <div
-                        *ngFor="let color of colors"
-                        class="color-picker-circle"
-                        [style.backgroundColor]="color.hex"
-                        [class.selected]="
-                          currentEditingItem.colorId === color.id
-                        "
-                        (click)="
-                          selectedDealerId ? selectColor(color.id) : null
-                        "
-                        [style.opacity]="!selectedDealerId ? 0.5 : 1"
-                        [style.cursor]="
-                          !selectedDealerId ? 'not-allowed' : 'pointer'
-                        "
-                        style="width: 22px; height: 22px"
-                      ></div>
+                <!-- Category & Art No Row -->
+                <div class="row mt-0 g-1">
+                  <div class="col-6">
+                    <!-- Category -->
+                    <dx-select-box
+                      [dataSource]="categories"
+                      displayExpr="name"
+                      valueExpr="id"
+                      [(value)]="currentEditingItem.categoryId"
+                      (onValueChanged)="onCategoryChange($event)"
+                      label="Category"
+                      labelMode="floating"
+                      [disabled]="!selectedDealerId"
+                      [searchEnabled]="true"
+                      searchMode="startswith"
+                      [showClearButton]="true"
+                      class="rounded-input"
+                    ></dx-select-box>
+                  </div>
+                  <div class="col-6">
+                    <!-- Art No -->
+                    <dx-select-box
+                      [dataSource]="artNosDataSource"
+                      [(value)]="currentEditingItem.artNoId"
+                      (onValueChanged)="onArtNoChange($event)"
+                      label="Art No"
+                      labelMode="floating"
+                      [disabled]="
+                        !selectedDealerId ||
+                        isLoadingArtNos ||
+                        !currentEditingItem.categoryId
+                      "
+                      [searchEnabled]="true"
+                      searchMode="startswith"
+                      [showClearButton]="true"
+                      class="rounded-input"
+                    ></dx-select-box>
+                  </div>
+                </div>
+
+                <!-- Color Selection & Total Quantity Row (Directly below Category & Art No) -->
+                <div class="row g-1 align-items-center flex-shrink-0 mt-0">
+                  <!-- Color Selection (Directly in bottom of Category selection) -->
+                  <div class="col-6">
+                    <div class="d-flex align-items-center gap-2 ps-1">
+                      <span class="fw-bold text-muted" style="font-size: 0.8rem"
+                        >Color:</span
+                      >
+                      <div class="d-flex gap-1 flex-wrap align-items-center">
+                        <div
+                          *ngFor="let color of colors"
+                          class="color-picker-circle"
+                          [style.backgroundColor]="color.hex"
+                          [class.selected]="
+                            currentEditingItem.colorId === color.id
+                          "
+                          (click)="
+                            selectedDealerId ? selectColor(color.id) : null
+                          "
+                          [style.opacity]="!selectedDealerId ? 0.5 : 1"
+                          [style.cursor]="
+                            !selectedDealerId ? 'not-allowed' : 'pointer'
+                          "
+                          [title]="color.name"
+                          style="width: 22px; height: 22px"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Total Quantity (Right-aligned under Art No) -->
+                  <div class="col-6 text-end">
+                    <div class="fw-bold fs-8 pe-1">
+                      Total Quantity: {{ getCurrentItemTotalQty() }}
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div class="col-md-5">
-                <!-- Category -->
-                <dx-select-box
-                  [dataSource]="categories"
-                  displayExpr="name"
-                  valueExpr="id"
-                  [(value)]="currentEditingItem.categoryId"
-                  (onValueChanged)="onCategoryChange($event)"
-                  placeholder="Select Category"
-                  [disabled]="!selectedDealerId"
-                  [searchEnabled]="true"
-                  searchMode="startswith"
-                  [showClearButton]="true"
-                  class="rounded-input"
-                ></dx-select-box>
-              </div>
-
-              <div class="col-md-4">
-                <!-- Art No -->
-                <dx-select-box
-                  [dataSource]="artNosDataSource"
-                  [(value)]="currentEditingItem.artNoId"
-                  (onValueChanged)="onArtNoChange($event)"
-                  [placeholder]="
-                    isLoadingArtNos ? 'Loading...' : 'Search Art No'
-                  "
-                  [disabled]="
-                    !selectedDealerId ||
-                    isLoadingArtNos ||
-                    !currentEditingItem.categoryId
-                  "
-                  [searchEnabled]="true"
-                  searchMode="startswith"
-                  [showClearButton]="true"
-                  class="rounded-input"
-                ></dx-select-box>
               </div>
             </div>
 
             <!-- Sizes Grid -->
             <div class="d-flex flex-column flex-grow-1" style="min-height: 0">
-              <div class="fw-bold fs-8 mb-2 flex-shrink-0 ms-auto">
-                Total Quantity: {{ getCurrentItemTotalQty() }}
-              </div>
 
               <!-- Sizes Loading State -->
               <div
@@ -248,6 +251,13 @@
                     cellTemplate="sizeInfoTemplate"
                   ></dxi-column>
                   <dxi-column
+                    dataField="availableQty"
+                    caption="Available Qty"
+                    alignment="center"
+                    [width]="120"
+                    cellTemplate="availableQtyTemplate"
+                  ></dxi-column>
+                  <dxi-column
                     caption="Quantity"
                     alignment="center"
                     [width]="200"
@@ -271,6 +281,17 @@
                     >
                       {{ data.data.combination }}
                     </div>
+                  </div>
+
+                  <div *dxTemplate="let data of 'availableQtyTemplate'">
+                    <span
+                      class="badge rounded-pill px-2 py-1 fw-bold"
+                      [style.backgroundColor]="(data.data.availableQty || 0) > 0 ? '#e6f4ea' : '#f1f3f4'"
+                      [style.color]="(data.data.availableQty || 0) > 0 ? '#137333' : '#70757a'"
+                      style="font-size: 0.85rem;"
+                    >
+                      {{ data.data.availableQty ?? 0 }}
+                    </span>
                   </div>
 
                   <div *dxTemplate="let data of 'qtyTemplate'">
@@ -362,7 +383,7 @@
           <!-- Cart Items Container -->
           <div
             class="cart-items p-3 flex-grow-1 overflow-auto"
-            style="min-height: 0; max-height: 68vh"
+            style="min-height: 0; max-height: 72vh"
           >
             <!-- Empty State -->
             <div *ngIf="cartItems.length === 0" class="text-center mt-5">
