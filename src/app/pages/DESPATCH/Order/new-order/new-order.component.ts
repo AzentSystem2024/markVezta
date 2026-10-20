@@ -52,6 +52,8 @@ export class NewOrderComponent implements OnInit, OnChanges {
   @Input() editDealerId: number | null = null;
   @Input() editParentDealerId: number | null = null;
   @Input() editOrderId: number | null = null;
+  @Input() editLocationId: number | null = null;
+  @Input() editWarehouseId: number | null = null;
   @Input() initialTab: 'dealer' | 'subdealer' = 'dealer';
   @Output() closePopup = new EventEmitter<void>();
 
@@ -113,9 +115,21 @@ export class NewOrderComponent implements OnInit, OnChanges {
     if (changes['initialTab'] && changes['initialTab'].currentValue) {
       this.activeTab = changes['initialTab'].currentValue;
     }
+    if (changes['editWarehouseId'] && this.editWarehouseId) {
+      this.selectedWarehouseId = Number(this.editWarehouseId);
+    }
+    if (changes['editLocationId'] && this.editLocationId) {
+      this.selectedAddressId = Number(this.editLocationId);
+    }
     if (changes['editDealerId'] || changes['editOrderId']) {
       if (this.editDealerId && this.editOrderId) {
         this.selectedDealerId = this.editDealerId;
+        if (this.editWarehouseId) {
+          this.selectedWarehouseId = Number(this.editWarehouseId);
+        }
+        if (this.editLocationId) {
+          this.selectedAddressId = Number(this.editLocationId);
+        }
         this.onDealerChange({ value: this.editDealerId });
         this.currentEditingItem.orderId = this.editOrderId;
       } else {
@@ -126,6 +140,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
         this.isEditMode = false;
         this.isSettingEditData = false;
         this.selectedWarehouseId = null;
+        this.selectedAddressId = null;
       }
     }
   }
@@ -159,6 +174,16 @@ export class NewOrderComponent implements OnInit, OnChanges {
             name: item.DESCRIPTION || item.description,
           }),
         );
+        if (this.editWarehouseId) {
+          const matchedWh = this.warehouses.find(
+            (w: any) => w.id == this.editWarehouseId,
+          );
+          if (matchedWh) {
+            this.selectedWarehouseId = matchedWh.id;
+          } else {
+            this.selectedWarehouseId = Number(this.editWarehouseId);
+          }
+        }
       },
       (error) => console.error('Error fetching WAREHOUSE', error),
     );
@@ -208,7 +233,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
           const selectedDealer = this.currentDistributors.find(
             (d: any) => d.ID === this.selectedDealerId,
           );
-          if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
+          if (this.editWarehouseId) {
+            this.selectedWarehouseId = Number(this.editWarehouseId);
+          } else if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
             this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
           }
         }
@@ -361,15 +388,19 @@ export class NewOrderComponent implements OnInit, OnChanges {
       this.artNos = [];
       this.colors = [];
       this.selectedAddressId = null;
+      this.editLocationId = null;
+      this.editWarehouseId = null;
     }
 
     if (e.value) {
       this.loadAddresses(e.value);
-      // Auto-load warehouse based on selected dealer
+      // Auto-load warehouse based on editWarehouseId or selected dealer
       const selectedDealer = this.currentDistributors.find(
         (d: any) => d.ID === e.value,
       );
-      if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
+      if (this.editWarehouseId) {
+        this.selectedWarehouseId = Number(this.editWarehouseId);
+      } else if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
         this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
       }
       this.loadCartData();
@@ -391,15 +422,23 @@ export class NewOrderComponent implements OnInit, OnChanges {
               id: a.ID,
               name: a.DESCRIPTION,
             }));
-            // If the response has only one data then load it otherwise let user select
-            if (this.addresses.length === 1) {
+            const matched = this.addresses.find(
+              (a: any) => a.id == this.editLocationId,
+            );
+            if (matched) {
+              this.selectedAddressId = matched.id;
+            } else if (this.editLocationId) {
+              this.selectedAddressId = Number(this.editLocationId);
+            } else if (this.addresses.length === 1) {
               this.selectedAddressId = this.addresses[0].id;
             } else {
               this.selectedAddressId = null;
             }
           } else {
             this.addresses = [];
-            this.selectedAddressId = null;
+            this.selectedAddressId = this.editLocationId
+              ? Number(this.editLocationId)
+              : null;
           }
           this.isLoadingAddresses = false;
         },
@@ -407,7 +446,9 @@ export class NewOrderComponent implements OnInit, OnChanges {
           console.error('Error fetching addresses', error);
           this.isLoadingAddresses = false;
           this.addresses = [];
-          this.selectedAddressId = null;
+          this.selectedAddressId = this.editLocationId
+            ? Number(this.editLocationId)
+            : null;
         },
       );
   }

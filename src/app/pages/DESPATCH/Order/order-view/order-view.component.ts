@@ -2,7 +2,9 @@ import {
   Component,
   OnInit,
   ViewChild,
-  NgModule, NgZone
+  NgModule,
+  NgZone,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from 'src/app/services/data.service';
@@ -114,12 +116,15 @@ export class OrderViewComponent implements OnInit {
   selectedEditOrderId: number | null = null;
   selectedEditDealerId: number | null = null;
   selectedEditParentDealerId: number | null = null;
+  selectedEditLocationId: number | null = null;
+  selectedEditWarehouseId: number | null = null;
   selectedEditTab: 'dealer' | 'subdealer' = 'dealer';
 
   constructor(
     private dataService: DataService,
     private ngZone: NgZone,
     private exportService: ExportService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -154,6 +159,16 @@ export class OrderViewComponent implements OnInit {
 
   loadOrders() {
     this.isLoading = true;
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.beginCustomLoading('Loading...');
+    } else {
+      setTimeout(() => {
+        if (this.isLoading) {
+          this.dataGrid?.instance?.beginCustomLoading('Loading...');
+        }
+      }, 0);
+    }
+    this.cdr.detectChanges();
     const datePayload = this.getDateRangePayload(this.selectedDateRange);
 
     const sessionData = JSON.parse(
@@ -172,17 +187,21 @@ export class OrderViewComponent implements OnInit {
       IS_FROM_WEB: true,
     };
 
-    this.dataService.getNewOrderList(payload).subscribe(
-      (res: any) => {
+    this.dataService.getNewOrderList(payload).subscribe({
+      next: (res: any) => {
         this.isLoading = false;
+        this.dataGrid?.instance?.endCustomLoading();
         // Ensure robust parsing depending on typical response structure
         this.orderList = Array.isArray(res) ? res : res?.Data || [];
+        this.cdr.detectChanges();
       },
-      (error: any) => {
+      error: (error: any) => {
         this.isLoading = false;
+        this.dataGrid?.instance?.endCustomLoading();
         console.error('Error fetching orders:', error);
+        this.cdr.detectChanges();
       },
-    );
+    });
   }
 
   refreshGrid() {
@@ -190,6 +209,7 @@ export class OrderViewComponent implements OnInit {
       this.dataGrid.instance.refresh();
     }
     this.loadOrders();
+    this.refreshExpandedOrderDetails();
   }
 
   toggleFilterRow = () => {
@@ -258,64 +278,92 @@ export class OrderViewComponent implements OnInit {
     if (!item) return '';
 
     if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
-      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
-      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      const from = this.formatAsDDMMYYYY(this.customStartDate);
+      const to = this.formatAsDDMMYYYY(this.customEndDate);
       return `${from} to ${to}`;
     }
 
     return item.label;
   };
 
-  private formatAsDDMMYYYY(d: Date): string {
+  private formatAsDDMMYYYY(date: any): string {
+    if (!date) return '';
+
+    if (typeof date === 'string') {
+      const ymdMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (ymdMatch) {
+        return `${ymdMatch[3]}-${ymdMatch[2]}-${ymdMatch[1]}`;
+      }
+      const dmyMatch = date.match(/^(\d{2})[-/](\d{2})[-/](\d{4})/);
+      if (dmyMatch) {
+        return `${dmyMatch[1]}-${dmyMatch[2]}-${dmyMatch[3]}`;
+      }
+    }
+
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return '';
     const day = d.getDate().toString().padStart(2, '0');
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   }
 
+  private formatDate(date: any): string | null {
+    if (!date) return null;
+
+    if (typeof date === 'string') {
+      const ymdMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (ymdMatch) {
+        return `${ymdMatch[1]}-${ymdMatch[2]}-${ymdMatch[3]}`;
+      }
+      const dmyMatch = date.match(/^(\d{2})[-/](\d{2})[-/](\d{4})/);
+      if (dmyMatch) {
+        return `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
+      }
+    }
+
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return null;
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private getDateRangePayload(range: string) {
     const today = new Date();
-    let fromDate: Date | null = null;
-    let toDate: Date | null = null;
+    let fromDate: any = null;
+    let toDate: any = null;
 
     switch (range) {
       case 'today':
         fromDate = new Date();
-        fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
-        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last7':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 6);
-        fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
-        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last15':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 14);
-        fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
-        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'last30':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 29);
-        fromDate.setHours(0, 0, 0, 0);
         toDate = new Date();
-        toDate.setHours(23, 59, 59, 999);
         break;
 
       case 'custom':
         if (this.customStartDate && this.customEndDate) {
-          fromDate = new Date(this.customStartDate);
-          fromDate.setHours(0, 0, 0, 0);
-          toDate = new Date(this.customEndDate);
-          toDate.setHours(23, 59, 59, 999);
+          fromDate = this.customStartDate;
+          toDate = this.customEndDate;
         }
         break;
 
@@ -324,8 +372,8 @@ export class OrderViewComponent implements OnInit {
     }
 
     return {
-      DATE_FROM: fromDate ? fromDate.toISOString() : null,
-      DATE_TO: toDate ? toDate.toISOString() : null,
+      DATE_FROM: this.formatDate(fromDate),
+      DATE_TO: this.formatDate(toDate),
     };
   }
 
@@ -333,6 +381,8 @@ export class OrderViewComponent implements OnInit {
     this.selectedEditOrderId = null;
     this.selectedEditDealerId = null;
     this.selectedEditParentDealerId = null;
+    this.selectedEditLocationId = null;
+    this.selectedEditWarehouseId = null;
     this.selectedEditTab = 'dealer';
     this.isNewOrderPopupVisible = true;
   }
@@ -344,23 +394,53 @@ export class OrderViewComponent implements OnInit {
         ? order.Status
         : order.STATUS !== undefined
           ? order.STATUS
-          : order.ORDER_STATUS;;
-    if (status === 1 || status === '1') {
-      // 1 = Draft
+          : order.ORDER_STATUS;
+    if (status === 1 || status === '1' || status === 2 || status === '2') {
       const orderId = order.OrderId || order.ORDER_ID;
       const subDealerId = order.SUBDEALER_ID;
       const dealerId = order.DealerId || order.DEALER_ID;
+      const locationId =
+        order.LocationId !== undefined
+          ? order.LocationId
+          : order.LOCATION_ID !== undefined
+            ? order.LOCATION_ID
+            : order.locationId;
+      const warehouseId =
+        order.WarehouseId !== undefined
+          ? order.WarehouseId
+          : order.WAREHOUSE_ID !== undefined
+            ? order.WAREHOUSE_ID
+            : order.warehouseId;
+
       this.selectedEditOrderId = orderId;
       this.selectedEditDealerId = subDealerId ? subDealerId : dealerId;
       this.selectedEditParentDealerId = subDealerId ? dealerId : null;
       this.selectedEditTab = subDealerId ? 'subdealer' : 'dealer';
+      this.selectedEditLocationId =
+        locationId !== undefined && locationId !== null
+          ? Number(locationId)
+          : null;
+      this.selectedEditWarehouseId =
+        warehouseId !== undefined && warehouseId !== null
+          ? Number(warehouseId)
+          : null;
       this.isNewOrderPopupVisible = true;
     }
   }
 
   onNewOrderClosed() {
+    const editedOrderId = this.selectedEditOrderId;
     this.isNewOrderPopupVisible = false;
+    if (editedOrderId) {
+      this.refreshOrderDetail(editedOrderId);
+    }
     this.refreshGrid();
+    this.selectedEditOrderId = null;
+    this.selectedEditDealerId = null;
+    this.selectedEditParentDealerId = null;
+    this.selectedEditLocationId = null;
+    this.selectedEditWarehouseId = null;
+    this.selectedEditTab = 'dealer';
   }
 
   async submitOrder(rowData: any) {
@@ -410,29 +490,78 @@ export class OrderViewComponent implements OnInit {
     );
   }
 
+  refreshOrderDetail(orderId: number): Promise<void> {
+    if (!orderId) return Promise.resolve();
+    this.detailLoadingMap[orderId] = true;
+    return new Promise<void>((resolve) => {
+      this.dataService.getNewOrderDetail({ ORDER_ID: orderId }).subscribe({
+        next: (res: any) => {
+          this.detailDataMap[orderId] = res?.Data?.ORDER_DETAILS || [];
+          this.detailLoadingMap[orderId] = false;
+          this.detailDataMap = { ...this.detailDataMap };
+          resolve();
+        },
+        error: (err) => {
+          console.error(
+            'Error fetching order details for orderId:',
+            orderId,
+            err,
+          );
+          this.detailLoadingMap[orderId] = false;
+          this.detailDataMap = { ...this.detailDataMap };
+          resolve();
+        },
+      });
+    });
+  }
+
+  refreshExpandedOrderDetails() {
+    const orderIdsToRefresh = new Set<number>();
+
+    if (this.selectedEditOrderId) {
+      orderIdsToRefresh.add(Number(this.selectedEditOrderId));
+    }
+
+    if (this.expandedRowKeys && this.expandedRowKeys.length > 0) {
+      this.expandedRowKeys.forEach((key) => {
+        const num = Number(key);
+        if (!isNaN(num) && num > 0) {
+          orderIdsToRefresh.add(num);
+        }
+      });
+    }
+
+    if (this.detailDataMap) {
+      Object.keys(this.detailDataMap).forEach((key) => {
+        const num = Number(key);
+        if (!isNaN(num) && num > 0) {
+          orderIdsToRefresh.add(num);
+        }
+      });
+    }
+
+    const grid = this.dataGrid?.instance;
+    if (grid && this.orderList && this.orderList.length > 0) {
+      this.orderList.forEach((order) => {
+        const id = order.ORDER_ID || order.OrderId || order.Id || order.ID;
+        if (id && grid.isRowExpanded(id)) {
+          orderIdsToRefresh.add(Number(id));
+        }
+      });
+    }
+
+    orderIdsToRefresh.forEach((orderId) => {
+      this.refreshOrderDetail(orderId);
+    });
+  }
+
   onRowExpanding(e: any) {
     const orderId = e.key;
     if (!this.expandedRowKeys.includes(orderId)) {
       this.expandedRowKeys.push(orderId);
     }
 
-    if (!this.detailDataMap[orderId]) {
-      this.detailLoadingMap[orderId] = true;
-      this.dataService.getNewOrderDetail({ ORDER_ID: orderId }).subscribe({
-        next: (res: any) => {
-          this.detailDataMap[orderId] = res?.Data?.ORDER_DETAILS || [];
-          this.detailLoadingMap[orderId] = false;
-          // trigger change detection
-          this.detailDataMap = { ...this.detailDataMap };
-        },
-        error: (err) => {
-          console.error('Error fetching order details', err);
-          this.detailDataMap[orderId] = [];
-          this.detailLoadingMap[orderId] = false;
-          this.detailDataMap = { ...this.detailDataMap };
-        },
-      });
-    }
+    this.refreshOrderDetail(orderId);
   }
 
   onRowCollapsed(e: any) {
@@ -491,28 +620,9 @@ export class OrderViewComponent implements OnInit {
           if (res.Flag === 1) {
             notify('Quantity updated successfully!', 'success', 3000);
 
-            // Refresh the main grid
+            // Refresh the main grid and details grid
             this.refreshGrid();
-
-            // Refresh the details grid
-            const orderId = masterData.key;
-            this.detailLoadingMap[orderId] = true;
-            this.dataService
-              .getNewOrderDetail({ ORDER_ID: orderId })
-              .subscribe({
-                next: (detailRes: any) => {
-                  this.detailDataMap[orderId] =
-                    detailRes?.Data?.ORDER_DETAILS || [];
-                  this.detailLoadingMap[orderId] = false;
-                  this.detailDataMap = { ...this.detailDataMap };
-                  resolve();
-                },
-                error: (err) => {
-                  console.error('Error refreshing details', err);
-                  this.detailLoadingMap[orderId] = false;
-                  resolve();
-                },
-              });
+            this.refreshOrderDetail(masterData.key).then(() => resolve());
           } else {
             notify(res.Message || 'Failed to update quantity', 'error', 3000);
             reject(res.Message);
@@ -590,30 +700,15 @@ export class OrderViewComponent implements OnInit {
               3000,
             );
 
-            // Refresh the main grid
+            // Refresh the main grid and details grid
             this.refreshGrid();
-
-            // Refresh the details grid
-            const orderId = masterData.key;
-            this.detailLoadingMap[orderId] = true;
-            this.dataService
-              .getNewOrderDetail({ ORDER_ID: orderId })
-              .subscribe({
-                next: (detailRes: any) => {
-                  this.detailDataMap[orderId] =
-                    detailRes?.Data?.ORDER_DETAILS || [];
-                  this.detailLoadingMap[orderId] = false;
-                  this.detailDataMap = { ...this.detailDataMap };
-                  resolve();
-                },
-                error: (err) => {
-                  console.error('Error refreshing details', err);
-                  this.detailLoadingMap[orderId] = false;
-                  resolve();
-                },
-              });
+            this.refreshOrderDetail(masterData.key).then(() => resolve());
           } else {
-            notify(res.Message || 'Failed to delete order detail', 'error', 3000);
+            notify(
+              res.Message || 'Failed to delete order detail',
+              'error',
+              3000,
+            );
             reject(res.Message);
           }
         },

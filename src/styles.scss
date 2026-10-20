@@ -1515,7 +1515,22 @@ body {
 
 ::ng-deep .dx-popup-title.dx-toolbar .dx-toolbar-before {
   padding-inline-end: 12px;
-  width: 400px !important;
+  width: auto !important;
+  max-width: calc(100% - 60px) !important;
+}
+
+.dx-popup-title .dx-toolbar-label {
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  white-space: nowrap !important;
+
+  & > div {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    white-space: nowrap !important;
+  }
 }
 
 //--------COLUMN CHOOSER POPUP STYLE-----------------//

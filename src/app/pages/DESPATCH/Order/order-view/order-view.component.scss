@@ -1,6 +1,12 @@
 @use "../../../../../variables.scss" as *;
 @use "sass:math";
 
+.Order_page-div,
+.order_page-div,
+.grid-container {
+  position: relative;
+}
+
 .flag-red {
   color: red;
 }
@@ -184,6 +190,44 @@
       .qty-header-title {
         padding-right: 14px;
       }
+    }
+  }
+
+  .dx-popup-title {
+    .dx-toolbar-before {
+      width: auto !important;
+      max-width: calc(100% - 60px) !important;
+      flex: 1 1 auto !important;
+    }
+
+    .dx-toolbar-label {
+      max-width: none !important;
+      width: auto !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+      white-space: nowrap !important;
+      font-size: 18px !important;
+      font-weight: 600 !important;
+
+      & > div {
+        overflow: visible !important;
+        text-overflow: unset !important;
+        white-space: nowrap !important;
+        max-width: none !important;
+      }
+    }
+
+    .dx-item-content {
+      max-width: none !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+    }
+
+    .dx-toolbar-after {
+      flex: 0 0 auto !important;
+      margin-left: auto !important;
+      display: flex !important;
+      align-items: center !important;
     }
   }
 }

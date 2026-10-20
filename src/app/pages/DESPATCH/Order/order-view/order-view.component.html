@@ -1,16 +1,10 @@
-<div class="view-wrapper list-page">
+<div class="view-wrapper list-page Order_page-div order_page-div">
   <div class="grid-container">
     <dx-data-grid
       #dataGrid
       noDataText="No orders found"
       [width]="'100%'"
       [height]="'82vh'"
-      [loadPanel]="{
-        enabled: true,
-        text: 'Loading...',
-        showIndicator: true,
-        showPane: true,
-      }"
       class="grid theme-dependent"
       [dataSource]="orderList"
       [showBorders]="true"
@@ -178,7 +172,14 @@
         [showNavigationButtons]="true"
       ></dxo-pager>
 
-      <dxo-load-panel [showPane]="false"></dxo-load-panel>
+      <dxo-load-panel
+        [enabled]="true"
+        [showPane]="true"
+        [showIndicator]="true"
+        [shading]="true"
+        shadingColor="rgba(0, 0, 0, 0.2)"
+        text="Loading..."
+      ></dxo-load-panel>
 
       <dxo-toolbar>
         <dxi-item location="before" locateInMenu="never">
@@ -438,19 +439,6 @@
         </div>
       </div>
     </dx-data-grid>
-
-    <dx-load-panel
-      #loadPanel
-      shadingColor="rgba(0, 0, 0, 0.2)"
-      [position]="{ of: '.grid-container' }"
-      [(visible)]="isLoading"
-      [showIndicator]="true"
-      [showPane]="true"
-      [shading]="true"
-      [closeOnOutsideClick]="false"
-      message="Loading..."
-    >
-    </dx-load-panel>
   </div>
 </div>
 
@@ -479,6 +467,8 @@
       [editDealerId]="selectedEditDealerId"
       [editParentDealerId]="selectedEditParentDealerId"
       [editOrderId]="selectedEditOrderId"
+      [editLocationId]="selectedEditLocationId"
+      [editWarehouseId]="selectedEditWarehouseId"
       [initialTab]="selectedEditTab"
       (closePopup)="onNewOrderClosed()"
     ></app-new-order>
