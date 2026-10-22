@@ -236,6 +236,7 @@ export class StockViewComponent {
     icon: 'chevrondown',
     hint: 'Hide Summary',
     stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleSummary(),
   };
 
@@ -247,6 +248,7 @@ export class StockViewComponent {
       icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
+    this.cdr.detectChanges();
   }
 
   updateStoreHint() {

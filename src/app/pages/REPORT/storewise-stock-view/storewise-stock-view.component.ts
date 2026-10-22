@@ -160,6 +160,10 @@ export class StorewiseStockViewComponent {
   itemHint: string = '';
   grandTotal: number = 0;
   storeColumnTotals: any = {};
+  isSummaryVisible = true;
+  isFilterOpened = false;
+  showPageSizeSelector = true;
+
 
 
   constructor(
@@ -210,10 +214,48 @@ export class StorewiseStockViewComponent {
   }
 
 
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+    this.cdr.detectChanges();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
+  }
 
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
     //
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -222,6 +264,17 @@ export class StorewiseStockViewComponent {
     //   '============selected_Company_id==============',
     // );
   }
+
+  applyButtonOptions = {
+    text: 'Apply',
+    type: 'default',
+    stylingMode: 'contained',
+    width: 100,
+    elementAttr: {
+      class: 'apply-toolbar-btn',
+    },
+    onClick: () => this.get_DataSource(),
+  };
 
   //================ Year value change ===================
   onYearChanged(e: any): void {

@@ -114,7 +114,7 @@ export class DepreciationReportComponent implements OnInit {
   resetColumnSelection(): void {
     this.tempColumns = this.tempColumns.map((column) => ({
       ...column,
-      visible: true,
+      viopenColumnsible: true,
     }));
   }
 
