@@ -1,73 +1,117 @@
-<div class="grid-container">
-  <dx-data-grid
-    #dataGrid
-    [dataSource]="VATreturn"
-    width="100%"
-    height="83vh"
-    [showBorders]="true"
-    [showRowLines]="true"
-    [allowColumnResizing]="false"
-    [showColumnLines]="true"
-    [columnAutoWidth]="true"
-    [groupPanel]="{ visible: true }"
-    [grouping]="{ autoExpandAll: false }"
-    [rowAlternationEnabled]="true"
-    rowAlternationInterval="2"
-    [remoteOperations]="false"
-    [allowColumnReordering]="true"
-    [filterRow]="{ visible: false }"
-    id="dataGrid"
-    [headerFilter]="{ visible: false }"
-    [export]="{ enabled: true, formats: ['xlsx', 'pdf'] }"
-    [columnFixing]="{
-      enabled: true,
-      texts: { fix: 'Freeze', unfix: 'Unfreeze' },
-    }"
-    (onExporting)="onExporting($event)"
-    [loadPanel]="{
-  enabled: true,
-  text: 'Loading...'
-}"
-[loading]="isLoading"
-    (onCellClick)="onCellClick($event)"
-     (onRowPrepared)="onRowPrepared($event)"
-  >
-    <dxo-scrolling
-      mode="virtual"
-      rowRenderingMode="virtual"
-      columnRenderingMode="virtual"
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      #dataGrid
+      [dataSource]="VATreturn"
+      width="100%"
+      height="83vh"
+      [showBorders]="true"
+      [showRowLines]="true"
+      [allowColumnResizing]="false"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [groupPanel]="{ visible: true }"
+      [grouping]="{ autoExpandAll: false }"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [remoteOperations]="false"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [headerFilter]="{ visible: false }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{
+        enabled: true,
+        text: 'Loading...',
+      }"
+      [loading]="isLoading"
+      (onCellClick)="onCellClick($event)"
+      (onRowPrepared)="onRowPrepared($event)"
     >
-    </dxo-scrolling>
+      <dxo-scrolling
+        mode="virtual"
+        rowRenderingMode="virtual"
+        columnRenderingMode="virtual"
+      >
+      </dxo-scrolling>
 
-    <dxo-paging [pageSize]="10"></dxo-paging>
-    <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
-    <dxo-pager
-      [visible]="true"
-      [allowedPageSizes]="allowedPageSizes"
-      [displayMode]="displayMode"
-      [showPageSizeSelector]="true"
-      [showInfo]="true"
-      [showNavigationButtons]="true"
-    ></dxo-pager>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
 
-    <dxo-toolbar>
-      <dxi-item location="before">
-        <div
-          class="grid-header"
-          style="
-            font-weight: 600;
-            font-size: 20px;
-            margin-left: 12px;
-            padding: -3px;
-            margin-right: 3px;
-          "
-        >
-          VAT Return
-        </div>
-      </dxi-item>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right: 3px;
+            "
+          >
+            VAT Return
+          </div>
+        </dxi-item>
 
-      <dxi-item> </dxi-item>
-      <dxi-item>
+        <dxi-item> </dxi-item>
+
+        <dxi-item location="after" template="fromdateTemplate"></dxi-item>
+
+        <dxi-item location="after" template="todateTemplate"></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="applyButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'fromdateTemplate'">
         <dx-date-box
           [width]="150"
           label="From Date"
@@ -77,8 +121,8 @@
           (onValueChanged)="onFromDateChange($event)"
         >
         </dx-date-box>
-      </dxi-item>
-      <dxi-item>
+      </div>
+      <div *dxTemplate="let data of 'todateTemplate'">
         <dx-date-box
           [width]="150"
           label="To Date"
@@ -88,105 +132,73 @@
           (onValueChanged)="onToDateChange($event)"
         >
         </dx-date-box>
-      </dxi-item>
+      </div>
 
-      <dxi-item location="after">
-        <div class="toolbar-divider"></div>
-      </dxi-item>
-      <dxi-item>
-        <dx-button
-          text="Apply"
-          stylingMode="contained"
-          type="default"
-          (onClick)="Vat_Return_Data()"
-        >
-        </dx-button>
-      </dxi-item>
+      <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+      <dxo-header-filter visible="true"></dxo-header-filter>
+      <dxo-paging page-size="10"></dxo-paging>
+      <dxo-pager
+        show-page-size-selector="true"
+        show-info="true"
+        show-navigator="true"
+      ></dxo-pager>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
 
-     <dxi-item>
-  <dx-button
-    icon="exportpdf"
-    hint="Export PDF"
-    stylingMode="contained"
-    type="default"
-    (onClick)="downloadPdf()">
-  </dx-button>
-</dxi-item>
-    </dxo-toolbar>
+      <dxo-grouping [autoExpandAll]="true"> </dxo-grouping>
 
-    <dxo-sorting mode="none"></dxo-sorting>
-    <dxo-filter-row visible="true"></dxo-filter-row>
-    <dxo-header-filter visible="true"></dxo-header-filter>
-    <dxo-paging page-size="10"></dxo-paging>
-    <dxo-pager
-      show-page-size-selector="true"
-      show-info="true"
-      show-navigator="true"
-    ></dxo-pager>
-    <dxo-header-filter [visible]="true">
-      <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+      <dxi-column
+        dataField="GROUP_NAME"
+        [groupIndex]="0"
+        [visible]="false"
+        sortOrder="desc"
+        groupCellTemplate="groupTemplate"
+      >
+      </dxi-column>
+      <div *dxTemplate="let data of 'groupTemplate'">
+        <span style="font-weight: 600; font-size: 16px">
+          {{ data.value }}
+        </span>
+      </div>
 
-    <dxo-grouping [autoExpandAll]="true"> </dxo-grouping>
+      <dxi-column
+        dataField="DESCRIPTION"
+        caption="Particulars"
+        dataType="string"
+      ></dxi-column>
 
-   <!-- <dxi-column
-  dataField="GROUP_NAME"
-  [groupIndex]="0"
-  sortOrder="desc"
-  [visible]="false"
-  groupCellTemplate="groupTemplate">
-</dxi-column> -->
+      <dxi-column
+        dataField="AMOUNT"
+        caption="Amount"
+        dataType="number"
+        format="#,##0.00"
+        alignment="right"
+      >
+      </dxi-column>
 
-    <dxi-column
-  dataField="GROUP_NAME"
-  [groupIndex]="0"
-  [visible]="false"
-  sortOrder="desc"
-  groupCellTemplate="groupTemplate">
-</dxi-column>
-    <div *dxTemplate="let data of 'groupTemplate'">
-  <span style="font-weight:600;font-size:16px">
-    {{ data.value }}
-  </span>
-</div>
+      <dxi-column
+        dataField="VAT"
+        caption="VAT Amount"
+        dataType="number"
+        format="#,##0.00"
+        alignment="right"
+      >
+      </dxi-column>
 
-    <dxi-column
-      dataField="DESCRIPTION"
-      caption="Particulars"
-      dataType="string"
-    ></dxi-column>
+      <dxi-column
+        dataField="ADJUSTMENT"
+        caption="Adjustment"
+        dataType="number"
+        format="#,##0.00"
+        alignment="right"
+      >
+      </dxi-column>
 
-    <dxi-column
-      dataField="AMOUNT"
-      caption="Amount"
-      dataType="number"
-      format="#,##0.00"
-      alignment="right"
-    >
-    </dxi-column>
-
-    <dxi-column
-      dataField="VAT"
-      caption="VAT Amount"
-      dataType="number"
-      format="#,##0.00"
-      alignment="right"
-    >
-    </dxi-column>
-
-    <dxi-column
-      dataField="ADJUSTMENT"
-      caption="Adjustment"
-      dataType="number"
-      format="#,##0.00"
-      alignment="right"
-    >
-    </dxi-column>
-
-    <dxo-summary>
-
-      <!-- Grand Totals -->
-      <!-- <dxi-total-item
+      <dxo-summary>
+        <!-- Grand Totals -->
+        <!-- <dxi-total-item
         name="NetVATDue"
         summaryType="custom"
         [displayFormat]="'Net VAT Due: ' + netVatDue"
@@ -194,8 +206,61 @@
         showInColumn="DESCRIPTION"
       >
       </dxi-total-item> -->
-    </dxo-summary>
-  </dx-data-grid>
+      </dxo-summary>
+    </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
+  </div>
 </div>
 
 <div class="pdf-container" style="margin-top: 30px" *ngIf="pdfSrc">
@@ -274,20 +339,28 @@
 
     <dxo-summary>
       <!-- Grand Totals -->
-        <dxi-total-item column="EXEMPTED" summaryType="sum" valueFormat="#,##0.00">
-      </dxi-total-item>
-
-      <dxi-total-item column="STANDARD_RATE" summaryType="sum" valueFormat="#,##0.00">
-      </dxi-total-item>
-
-      <dxi-total-item column="TAX_AMOUNT" summaryType="sum" valueFormat="#,##0.00">
-      </dxi-total-item>
-
       <dxi-total-item
-        column="TOTAL"
+        column="EXEMPTED"
         summaryType="sum"
         valueFormat="#,##0.00"
       >
+      </dxi-total-item>
+
+      <dxi-total-item
+        column="STANDARD_RATE"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+
+      <dxi-total-item
+        column="TAX_AMOUNT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+
+      <dxi-total-item column="TOTAL" summaryType="sum" valueFormat="#,##0.00">
       </dxi-total-item>
     </dxo-summary>
   </dx-data-grid>
@@ -305,19 +378,15 @@
     [dataSource]="storeVatPopupData"
     [showBorders]="true"
     [height]="'100%'"
-     (onRowClick)="onInvoiceRowClick($event)">
-
-     <dxi-column
+    (onRowClick)="onInvoiceRowClick($event)"
+  >
+    <dxi-column
       dataField="DOC_NO"
       caption="Doc No."
       dataType="string"
     ></dxi-column>
 
-    <dxi-column
-      dataField="DATE"
-      caption="Date"
-      dataType="date"
-    ></dxi-column>
+    <dxi-column dataField="DATE" caption="Date" dataType="date"></dxi-column>
 
     <dxi-column caption="VAT Category" alignment="center">
       <dxi-column
@@ -364,33 +433,36 @@
     ></dxi-column>
 
     <dxo-summary>
-
-
       <!-- Grand Totals -->
-       <dxi-total-item column="EXEMPTED" summaryType="sum" valueFormat="#,##0.00">
-      </dxi-total-item>
-
-
-      <dxi-total-item column="STANDARD_RATE" summaryType="sum" valueFormat="#,##0.00">
-      </dxi-total-item>
-
-      <dxi-total-item column="TAX_AMOUNT" summaryType="sum" valueFormat="#,##0.00">
-      </dxi-total-item>
-
       <dxi-total-item
-        column="TOTAL"
+        column="EXEMPTED"
         summaryType="sum"
         valueFormat="#,##0.00"
       >
       </dxi-total-item>
+
+      <dxi-total-item
+        column="STANDARD_RATE"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+
+      <dxi-total-item
+        column="TAX_AMOUNT"
+        summaryType="sum"
+        valueFormat="#,##0.00"
+      >
+      </dxi-total-item>
+
+      <dxi-total-item column="TOTAL" summaryType="sum" valueFormat="#,##0.00">
+      </dxi-total-item>
     </dxo-summary>
   </dx-data-grid>
-
 </dx-popup>
 
-
 <!-- VIEW PAGE OF SALES INVOICE------------------------------- -->
- <dx-popup
+<dx-popup
   *ngIf="isViewInvoice"
   [(visible)]="isViewInvoice"
   [width]="'95vw'"
@@ -409,14 +481,13 @@
 </dx-popup>
 
 <!-- VIEW PAGE OF PURCHASE INVOICE------------------------ -->
- <dx-popup
+<dx-popup
   [(visible)]="isVerifyInvoice"
   [width]="'100vw'"
   [height]="'100vh'"
   title="Purchase Invoice"
   (onHiding)="handleClose()"
 >
- 
   <ng-container *ngIf="isVerifyInvoice">
     <app-edit-purchase-invoice
       [isVerifyInvoice]="true"
@@ -436,5 +507,6 @@
   [showIndicator]="true"
   [showPane]="true"
   [shading]="true"
-  message="Loading...">
+  message="Loading..."
+>
 </dx-load-panel>

@@ -3,6 +3,8 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
+  NgZone,
+  ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -10,6 +12,7 @@ import {
   DxAutocompleteModule,
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxDropDownBoxModule,
@@ -54,6 +57,70 @@ import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add
   styleUrls: ['./input-vat.component.scss'],
 })
 export class InputVatComponent {
+
+  @ViewChild('dataGrid', { static: false })
+  dataGrid!: DxDataGridComponent;
+
+
+  isColumnChooserVisible = false;
+  showParameters = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'DOC_NO', caption: 'Doc No' },
+    { dataField: 'PURCH_DATE', caption: 'Date' },
+    { dataField: 'VAT_REG_NO', caption: 'Suppliers TRN' },
+    { dataField: 'SUPP_NAME', caption: 'Supplier name' },
+    { dataField: 'TAXABLE_AMOUNT', caption: 'Taxable amount' },
+    { dataField: 'TAX_AMOUNT', caption: 'Tax Amount' },
+    { dataField: 'TOTAL', caption: 'Total' },
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+
   InputVatReport: any[] = [];
   isFilterRowVisible: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -92,13 +159,16 @@ export class InputVatComponent {
   isReadOnlyPayment: boolean = true;
   financialYeaDate: string;
   Store: any;
- selectedStoreid: number[] = [1];
+  selectedStoreid: number[] = [1];
+  isSummaryVisible = true;
+  isFilterOpened = false;
 
   constructor(
     private dataservice: DataService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private zone: NgZone,
   ) {
     this.get_sessionstorage_data();
     this.sesstion_Details();
@@ -112,6 +182,69 @@ export class InputVatComponent {
     this.onToDateChange({ value: this.defaultDate });
     this.get_DataSource(); //get datasource======== function call==========
   }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
+  }
+
+  // Toggle filter panel
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+    this.cdr.detectChanges();
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_DataSource();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+    this.cdr.detectChanges();
+  }
+
 
   onFromDateChange(event: any) {
     const rawDate: Date = new Date(event.value);
@@ -161,37 +294,37 @@ export class InputVatComponent {
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
-    storeHint: string = '';
-  
+  storeHint: string = '';
+
   updateStoreHint() {
     if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
       this.storeHint = 'No store selected';
       return;
     }
-  
+
     const selectedNames = this.Store
       .filter(x => this.selectedStoreid.includes(x.ID))
       .map(x => x.DESCRIPTION);
-  
+
     this.storeHint = selectedNames.join(', ');
   }
-  
-    store_dropdown(){
-      const payload = {
-        NAME :'STORE',
-        COMPANY_ID : this.selected_Company_id
-      }
-      this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Store = res;
-        const hoStore = this.Store.find(
-    (x: any) => x.DESCRIPTION === 'HO_STORE'
-  );
 
-  if (hoStore) {
-    this.selectedStoreid = [hoStore.ID];
-  }
-      });
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
     }
+    this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+      const hoStore = this.Store.find(
+        (x: any) => x.DESCRIPTION === 'HO_STORE'
+      );
+
+      if (hoStore) {
+        this.selectedStoreid = [hoStore.ID];
+      }
+    });
+  }
 
   onSupplierChanged(event: any) {
     this.selectedSupplierId = event.value;
@@ -369,6 +502,15 @@ export class InputVatComponent {
       },
     ],
   };
+
+  get summaryConfig() {
+    return this.isSummaryVisible
+      ? this.summaryColumnsData
+      : {
+        totalItems: [],
+        groupItems: [],
+      };
+  }
 }
 @NgModule({
   imports: [
@@ -416,4 +558,4 @@ export class InputVatComponent {
   exports: [InputVatComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class InputVatModule {}
+export class InputVatModule { }

@@ -17,7 +17,6 @@
       rowAlternationInterval="2"
       [remoteOperations]="false"
       [scrolling]="{ mode: 'virtual' }"
-      [summary]="summaryColumnsData"
       [allowColumnReordering]="true"
       [filterRow]="{ visible: false }"
       id="dataGrid"
@@ -63,71 +62,21 @@
           </div>
         </dxi-item>
 
-        <dxi-item>
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="Year"
-            [width]="150"
-            [(value)]="selectedYear"
-            [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)"
-            placeholder="Year"
-          ></dx-select-box>
-        </dxi-item>
+        <dxi-item location="after" template="supplierFilterTemplate"></dxi-item>
 
-        <dxi-item>
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="month"
-            [dataSource]="monthDataSource"
-            displayExpr="name"
-            valueExpr="value"
-            [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)"
-            [dropDownOptions]="{ width: 'auto' }"
-          >
-          </dx-select-box>
-        </dxi-item>
+        <dxi-item location="after" template="dateboxTemplate"></dxi-item>
 
-        <dxi-item>
-          <!-- <dx-date-box
-            [width]="150"
-            label="Date From"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [value]="formatted_from_date"
-            (onValueChanged)="onFromDateChange($event)"
-          ></dx-date-box> -->
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="As on Date"
-            labelMode="floating"
-            [value]="formatted_To_date"
-            [displayFormat]="'dd-MM-yyyy'"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-        <!-- <dxi-item name="exportButton" [disabled]="isEmptyDatagrid"></dxi-item> -->
-
-        <dxi-item>
-          <dx-select-box
-            label="Supplier"
-            labelMode="floating"
-            stylingMode="outlined"
-            [valueExpr]="'ID'"
-            [displayExpr]="'DESCRIPTION'"
-            [items]="Supplier"
-            [searchEnabled]="true"
-            [(value)]="selectedSupplierId"
-            (onValueChanged)="onSupplierChanged($event)"
-          ></dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
 
         <dxi-item
           name="exportButton"
@@ -135,17 +84,52 @@
           cssClass="export-btn"
         ></dxi-item>
 
-        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            (onClick)="get_DataSource()"
-          >
-          </dx-button>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="applyButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'supplierFilterTemplate'">
+        <dx-select-box
+          label="Supplier"
+          labelMode="floating"
+          stylingMode="outlined"
+          [valueExpr]="'ID'"
+          [displayExpr]="'DESCRIPTION'"
+          [items]="Supplier"
+          [searchEnabled]="true"
+          [(value)]="selectedSupplierId"
+          [width]="200"
+          (onValueChanged)="onSupplierChanged($event)"
+        ></dx-select-box>
+      </div>
+
+      <div *dxTemplate="let data of 'dateboxTemplate'">
+        <dx-date-box
+          [width]="150"
+          label="As on Date"
+          labelMode="floating"
+          [value]="formatted_To_date"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+      </div>
 
       <dxo-grouping
         [autoExpandAll]="false"
@@ -236,6 +220,58 @@
         dataType="number"
       ></dxi-column>
 
+      <!-- Group summary for MAIN_GROUP_NAME -->
+      <dxo-summary *ngIf="isSummaryVisible">
+        <dxi-total-item
+          column="AGE_0_30"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="AGE_31_60"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="AGE_61_90"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="AGE_91_120"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="AGE_121_150"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="AGE_151_180"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="AGE_ABOVE_180"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+        <dxi-total-item
+          column="BALANCE"
+          summaryType="sum"
+          displayFormat="Total: {0}"
+          valueFormat="#,##0.00"
+        ></dxi-total-item>
+      </dxo-summary>
+
       <dxi-column
         *ngIf="AgedPayableReport.length > 0"
         type="buttons"
@@ -249,6 +285,58 @@
         ></dxi-button>
       </dxi-column>
     </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>
 <!-- drill down   -->

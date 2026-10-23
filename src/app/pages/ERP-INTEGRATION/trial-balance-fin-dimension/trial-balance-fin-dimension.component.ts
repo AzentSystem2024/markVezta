@@ -29,7 +29,9 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./trial-balance-fin-dimension.component.scss'],
 })
 export class TrialBalanceFinDimensionComponent {
-  @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
+  @ViewChild('dataGrid', { static: false })
+  dataGrid!: DxDataGridComponent;
+
 
   isColumnChooserVisible = false;
 
@@ -40,25 +42,24 @@ export class TrialBalanceFinDimensionComponent {
   }[] = [];
 
   private readonly chooserColumns = [
-    { dataField: 'MainGroup', caption: 'Category' },
-    { dataField: 'SubGroup', caption: 'Group' },
-    { dataField: 'Category', caption: 'Particulars' },
-    {
-      dataField: 'Code',
-      caption: 'Code',
-    },
+    { dataField: 'MainGroup', caption: 'Main Group' },
+    { dataField: 'SubGroup', caption: 'Sub Group' },
+    { dataField: 'Category', caption: 'Category' },
+    { dataField: 'Code', caption: 'Code' },
     { dataField: 'Description', caption: 'Description' },
-
+    { dataField: 'OpeningBalanceDebit', caption: 'Opening Balance - Debit' },
+    { dataField: 'OpeningBalanceCredit', caption: 'Opening Balance - Credit' },
+    { dataField: 'DuringThePeriodDebit', caption: 'During the Period - Debit' },
+    { dataField: 'DuringThePeriodCredit', caption: 'During the Period - Credit' },
+    { dataField: 'ClosingBalanceDebit', caption: 'Closing Balance - Debit' },
+    { dataField: 'ClosingBalanceCredit', caption: 'Closing Balance - Credit' },
   ];
   appType: any;
 
   openColumnChooser(): void {
     this.tempColumns = this.chooserColumns.map((column) => ({
       ...column,
-      caption:
-        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
-          ? 'Facility'
-          : column.caption,
+
       visible:
         this.dataGrid.instance.columnOption(
           column.dataField,
@@ -237,6 +238,18 @@ export class TrialBalanceFinDimensionComponent {
       }
     },
   };
+
+
+  get summaryConfig() {
+    if (this.isSummaryVisible) {
+      return this.summaryColumnsData;
+    }
+
+    return {
+      totalItems: [],
+      groupItems: [],
+    };
+  }
 
   constructor(
     private dataservice: DataService,

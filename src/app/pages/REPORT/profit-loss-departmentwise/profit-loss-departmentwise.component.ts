@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, NgModule, NgZone, ViewChild } from '@angular/core';
-import { DxDataGridModule, DxButtonModule, DxTextBoxModule, DxCheckBoxModule, DxValidatorModule, DxValidationGroupModule, DxSelectBoxModule, DxLoadPanelModule, DxLoadIndicatorModule, DxNumberBoxModule, DxDateBoxModule, DxDataGridComponent, DxTagBoxModule } from 'devextreme-angular';
+import { DxDataGridModule, DxButtonModule, DxTextBoxModule, DxCheckBoxModule, DxValidatorModule, DxValidationGroupModule, DxSelectBoxModule, DxLoadPanelModule, DxLoadIndicatorModule, DxNumberBoxModule, DxDateBoxModule, DxDataGridComponent, DxTagBoxModule, DxPopupModule } from 'devextreme-angular';
 import { LedgerStatementModule } from '../ledger-statement/ledger-statement.component';
 import { ProfitAndLossComponent } from '../profit-and-loss/profit-and-loss.component';
 import DataSource from 'devextreme/data/data_source';
@@ -17,16 +17,61 @@ import { Router } from '@angular/router';
 export class ProfitLossDepartmentwiseComponent {
   @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
   @ViewChild(DxDataGridComponent) grid!: DxDataGridComponent;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.refreshGrid(),
-    onClick: () => {
-      this.zone.run(() => this.refreshGrid());
-    },
-    text: '',
-  };
+
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'TYPE_NAME', caption: 'Category' },
+    { dataField: 'MAIN_GROUP_NAME', caption: 'Group' },
+    { dataField: 'HEAD_NAME', caption: 'Particulars' },
+    { dataField: 'AMOUNT', caption: 'Amount' },
+  ];
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
 
   isFilterRowVisible: boolean = false;
   ProfitLossReport: any = [];
@@ -67,6 +112,9 @@ export class ProfitLossDepartmentwiseComponent {
   storeHint: string = '';
   showViewColumn = false;
   appType: any;
+  isSummaryVisible = true;
+  showParameters = false;
+  isFilterOpened = false;
 
   constructor(
     private dataservice: DataService,
@@ -106,11 +154,66 @@ export class ProfitLossDepartmentwiseComponent {
     // this.get_DataSource();
   }
 
+  // Toggle filter panel
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+    this.cdr.detectChanges();
+  }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh(); // Or reload data from API if needed
     }
     this.get_DataSource();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+    this.cdr.detectChanges();
   }
 
   sesstion_Details() {
@@ -395,6 +498,7 @@ export class ProfitLossDepartmentwiseComponent {
     DxTagBoxModule,
     DxButtonModule,
     LedgerStatementModule,
+    DxPopupModule,
   ],
   providers: [],
   exports: [],
