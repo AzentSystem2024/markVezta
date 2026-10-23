@@ -119,6 +119,7 @@ export class OrderViewComponent implements OnInit {
   selectedEditLocationId: number | null = null;
   selectedEditWarehouseId: number | null = null;
   selectedEditTab: 'dealer' | 'subdealer' = 'dealer';
+  selectedEditOrderData: any = null;
 
   constructor(
     private dataService: DataService,
@@ -384,6 +385,7 @@ export class OrderViewComponent implements OnInit {
     this.selectedEditLocationId = null;
     this.selectedEditWarehouseId = null;
     this.selectedEditTab = 'dealer';
+    this.selectedEditOrderData = null;
     this.isNewOrderPopupVisible = true;
   }
 
@@ -396,35 +398,61 @@ export class OrderViewComponent implements OnInit {
           ? order.STATUS
           : order.ORDER_STATUS;
     if (status === 1 || status === '1' || status === 2 || status === '2') {
-      const orderId = order.OrderId || order.ORDER_ID;
-      const subDealerId = order.SUBDEALER_ID;
-      const dealerId = order.DealerId || order.DEALER_ID;
-      const locationId =
-        order.LocationId !== undefined
-          ? order.LocationId
-          : order.LOCATION_ID !== undefined
-            ? order.LOCATION_ID
-            : order.locationId;
-      const warehouseId =
-        order.WarehouseId !== undefined
-          ? order.WarehouseId
-          : order.WAREHOUSE_ID !== undefined
-            ? order.WAREHOUSE_ID
-            : order.warehouseId;
+      const orderId = order.OrderId || order.ORDER_ID || order.Id || order.ID;
+      if (!orderId) {
+        notify('Order ID not found', 'error', 3000);
+        return;
+      }
 
-      this.selectedEditOrderId = orderId;
-      this.selectedEditDealerId = subDealerId ? subDealerId : dealerId;
-      this.selectedEditParentDealerId = subDealerId ? dealerId : null;
-      this.selectedEditTab = subDealerId ? 'subdealer' : 'dealer';
-      this.selectedEditLocationId =
-        locationId !== undefined && locationId !== null
-          ? Number(locationId)
-          : null;
-      this.selectedEditWarehouseId =
-        warehouseId !== undefined && warehouseId !== null
-          ? Number(warehouseId)
-          : null;
-      this.isNewOrderPopupVisible = true;
+      this.isLoading = true;
+      this.dataService.selectNewOrder(orderId).subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+          if (
+            res &&
+            (res.Flag === 1 || res.flag === 1 || res.Flag === '1' || res.flag === '1') &&
+            res.Data &&
+            Array.isArray(res.Data) &&
+            res.Data.length > 0
+          ) {
+            const orderData = res.Data[0];
+            const orderIdVal = orderData.ORDER_ID || orderId;
+            const subDealerId = orderData.SUBDEALER_ID;
+            const dealerId = orderData.DEALER_ID;
+            const locationId =
+              orderData.LOCATION_ID !== undefined && orderData.LOCATION_ID !== null
+                ? orderData.LOCATION_ID
+                : order.LOCATION_ID;
+            const warehouseId =
+              orderData.WAREHOUSE_ID !== undefined && orderData.WAREHOUSE_ID !== null
+                ? orderData.WAREHOUSE_ID
+                : order.WAREHOUSE_ID;
+
+            this.selectedEditOrderId = orderIdVal;
+            this.selectedEditDealerId = subDealerId ? subDealerId : dealerId;
+            this.selectedEditParentDealerId = subDealerId ? dealerId : null;
+            this.selectedEditTab = subDealerId ? 'subdealer' : 'dealer';
+            this.selectedEditLocationId =
+              locationId !== undefined && locationId !== null
+                ? Number(locationId)
+                : null;
+            this.selectedEditWarehouseId =
+              warehouseId !== undefined && warehouseId !== null
+                ? Number(warehouseId)
+                : null;
+            this.selectedEditOrderData = orderData;
+            this.isNewOrderPopupVisible = true;
+            this.cdr.detectChanges();
+          } else {
+            notify(res?.Message || 'Failed to fetch order details', 'error', 3000);
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('Error fetching order details', err);
+          notify('Error fetching order details', 'error', 3000);
+        },
+      });
     }
   }
 
@@ -441,6 +469,7 @@ export class OrderViewComponent implements OnInit {
     this.selectedEditLocationId = null;
     this.selectedEditWarehouseId = null;
     this.selectedEditTab = 'dealer';
+    this.selectedEditOrderData = null;
   }
 
   async submitOrder(rowData: any) {

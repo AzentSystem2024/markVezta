@@ -55,6 +55,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
   @Input() editLocationId: number | null = null;
   @Input() editWarehouseId: number | null = null;
   @Input() initialTab: 'dealer' | 'subdealer' = 'dealer';
+  @Input() editOrderData: any = null;
   @Output() closePopup = new EventEmitter<void>();
 
   // Navigation tabs
@@ -66,6 +67,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
   // Form State
   isEditMode = false;
   isSettingEditData = false;
+  private hasLoadedOrderData = false;
 
   isLoadingDealers = false;
   isLoadingSubDealers = false;
@@ -121,6 +123,10 @@ export class NewOrderComponent implements OnInit, OnChanges {
     if (changes['editLocationId'] && this.editLocationId) {
       this.selectedAddressId = Number(this.editLocationId);
     }
+    if (changes['editOrderData'] && this.editOrderData) {
+      this.loadFromOrderData(this.editOrderData);
+      return;
+    }
     if (changes['editDealerId'] || changes['editOrderId']) {
       if (this.editDealerId && this.editOrderId) {
         this.selectedDealerId = this.editDealerId;
@@ -141,6 +147,7 @@ export class NewOrderComponent implements OnInit, OnChanges {
         this.isSettingEditData = false;
         this.selectedWarehouseId = null;
         this.selectedAddressId = null;
+        this.hasLoadedOrderData = false;
       }
     }
   }
@@ -149,6 +156,119 @@ export class NewOrderComponent implements OnInit, OnChanges {
     this.loadDealers();
     this.loadCategories();
     this.loadWarehouses();
+    if (this.editOrderData && !this.hasLoadedOrderData) {
+      this.loadFromOrderData(this.editOrderData);
+    }
+  }
+
+  loadFromOrderData(orderData: any) {
+    if (!orderData) return;
+
+    this.hasLoadedOrderData = true;
+    this.isSettingEditData = true;
+
+    const subDealerId = orderData.SUBDEALER_ID;
+    const dealerId = orderData.DEALER_ID;
+
+    this.editOrderId = orderData.ORDER_ID;
+    this.currentEditingItem.orderId = this.editOrderId;
+
+    if (subDealerId) {
+      this.activeTab = 'subdealer';
+      this.selectedDealerId = subDealerId;
+      this.editParentDealerId = dealerId;
+    } else {
+      this.activeTab = 'dealer';
+      this.selectedDealerId = dealerId;
+      this.editParentDealerId = null;
+    }
+
+    if (orderData.WAREHOUSE_ID) {
+      this.selectedWarehouseId = Number(orderData.WAREHOUSE_ID);
+      this.editWarehouseId = Number(orderData.WAREHOUSE_ID);
+    }
+
+    if (orderData.LOCATION_ID) {
+      this.selectedAddressId = Number(orderData.LOCATION_ID);
+      this.editLocationId = Number(orderData.LOCATION_ID);
+    }
+
+    this.loadDealerDataForTab(this.activeTab);
+
+    if (this.selectedDealerId) {
+      this.loadAddresses(this.selectedDealerId);
+    }
+
+    this.populateCartFromEntries(orderData.ENTRIES || [], orderData.ORDER_ID);
+
+    setTimeout(() => {
+      this.isSettingEditData = false;
+    }, 200);
+  }
+
+  populateCartFromEntries(entries: any[], orderId?: number) {
+    if (!entries || !Array.isArray(entries) || entries.length === 0) {
+      this.cartItems = [];
+      return;
+    }
+
+    const groupedEntries = new Map<string, any[]>();
+    entries.forEach((entry: any) => {
+      const key = `${entry.CART_ID || 0}_${entry.CATEGORY_ID || ''}_${entry.ART_NO || ''}_${entry.COLOR || ''}`;
+      if (!groupedEntries.has(key)) {
+        groupedEntries.set(key, []);
+      }
+      groupedEntries.get(key)!.push(entry);
+    });
+
+    const newCartItems: CartItem[] = [];
+    const usedIds = new Set<number>();
+    let nextFallbackId = 1;
+
+    groupedEntries.forEach((groupEntries) => {
+      const first = groupEntries[0];
+      let itemId = Number(first.CART_ID);
+      if (!itemId || isNaN(itemId) || usedIds.has(itemId)) {
+        itemId = nextFallbackId;
+      }
+      while (usedIds.has(itemId)) {
+        itemId++;
+      }
+      usedIds.add(itemId);
+
+      const sizes = groupEntries.map((e: any) => ({
+        sizeId: e.PACKING_ID,
+        qty: e.QUANTITY,
+        combination: e.COMBINATION || '',
+        description: e.COMBINATION || '',
+        isCutSize: Array.isArray(e.COMBINATIONS) && e.COMBINATIONS.length > 0,
+        isAnyComb: Array.isArray(e.COMBINATIONS) && e.COMBINATIONS.length > 0,
+        cutSizeQuantities: Array.isArray(e.COMBINATIONS)
+          ? e.COMBINATIONS.reduce((acc: any, combo: any) => {
+              acc[combo.SIZE] = combo.QUANTITY;
+              return acc;
+            }, {})
+          : {},
+        cartEntryId: e.CART_ENTRY_ID,
+        cartId: e.CART_ID,
+        pairQty: e.PAIR_QTY || e.PairQty || 1,
+      }));
+
+      newCartItems.push({
+        id: itemId,
+        orderId: first.ORDER_ID || orderId || 0,
+        categoryId: first.CATEGORY_ID,
+        artNoId: first.ART_NO,
+        colorId: first.COLOR,
+        imageUrl: first.IMAGE_NAME
+          ? `https://mmarkonline.com/artimages/${first.IMAGE_NAME}`
+          : '',
+        packingType: 'Case',
+        sizes: sizes,
+      });
+    });
+
+    this.cartItems = newCartItems;
   }
 
   loadCategories() {
@@ -383,13 +503,17 @@ export class NewOrderComponent implements OnInit, OnChanges {
         }
       }
 
-      this.isEditMode = false;
-      this.currentEditingItem = this.getEmptyCartItem();
-      this.artNos = [];
-      this.colors = [];
-      this.selectedAddressId = null;
-      this.editLocationId = null;
-      this.editWarehouseId = null;
+      if (!this.isSettingEditData) {
+        this.isEditMode = false;
+        this.currentEditingItem = this.getEmptyCartItem();
+        this.artNos = [];
+        this.colors = [];
+        this.selectedAddressId = null;
+        this.editLocationId = null;
+        this.editWarehouseId = null;
+        this.editOrderData = null;
+        this.editOrderId = null;
+      }
     }
 
     if (e.value) {
@@ -403,7 +527,10 @@ export class NewOrderComponent implements OnInit, OnChanges {
       } else if (selectedDealer && selectedDealer.WAREHOUSE_ID) {
         this.selectedWarehouseId = selectedDealer.WAREHOUSE_ID;
       }
-      this.loadCartData();
+
+      if (!this.isSettingEditData && !this.editOrderData && !this.editOrderId) {
+        this.loadCartData();
+      }
     } else {
       this.addresses = [];
       this.selectedWarehouseId = null;
@@ -1184,6 +1311,37 @@ export class NewOrderComponent implements OnInit, OnChanges {
   }
 
   loadCartData() {
+    if (this.editOrderId) {
+      this.isProcessing = true;
+      this.dataService.selectNewOrder(this.editOrderId).subscribe({
+        next: (res: any) => {
+          this.isProcessing = false;
+          if (
+            res &&
+            (res.Flag === 1 || res.flag === 1 || res.Flag === '1' || res.flag === '1') &&
+            res.Data &&
+            Array.isArray(res.Data) &&
+            res.Data.length > 0
+          ) {
+            const orderData = res.Data[0];
+            this.populateCartFromEntries(
+              orderData.ENTRIES || [],
+              this.editOrderId!,
+            );
+          } else {
+            this.cartItems = [];
+          }
+        },
+        error: (error) => {
+          this.isProcessing = false;
+          console.error('Error fetching order cart data', error);
+          notify('Error fetching order data', 'error', 3000);
+          this.cartItems = [];
+        },
+      });
+      return;
+    }
+
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
@@ -1216,73 +1374,15 @@ export class NewOrderComponent implements OnInit, OnChanges {
           Array.isArray(res.Data) &&
           res.Data.length > 0
         ) {
-          const groupedEntries = new Map<string, any[]>();
-
+          const allEntries: any[] = [];
           res.Data.forEach((apiCart: any) => {
             if (apiCart.ENTRIES && Array.isArray(apiCart.ENTRIES)) {
-              apiCart.ENTRIES.forEach((entry: any) => {
-                const key = `${entry.CART_ID}_${entry.PRODUCT_ID}`;
-                if (!groupedEntries.has(key)) {
-                  groupedEntries.set(key, []);
-                }
-                groupedEntries.get(key)!.push(entry);
-              });
+              allEntries.push(...apiCart.ENTRIES);
             }
           });
-
-          this.cartItems = [];
-          groupedEntries.forEach((entries, key) => {
-            const sizes = entries.map((e: any) => ({
-              sizeId: e.PACKING_ID,
-              qty: e.QUANTITY,
-              combination: e.COMBINATION || '',
-              description: e.COMBINATION || '', // Assuming COMBINATION holds the description string from the backend
-              isCutSize: e.COMBINATIONS && e.COMBINATIONS.length > 0,
-              isAnyComb: e.COMBINATIONS && e.COMBINATIONS.length > 0,
-              cutSizeQuantities: e.COMBINATIONS
-                ? e.COMBINATIONS.reduce((acc: any, combo: any) => {
-                    acc[combo.SIZE] = combo.QUANTITY;
-                    return acc;
-                  }, {})
-                : {},
-              cartEntryId: e.CART_ENTRY_ID,
-              cartId: e.CART_ID,
-            }));
-
-            this.cartItems.push({
-              id: entries[0].CART_ID, // Use backend Cart ID
-              orderId: entries[0].ORDER_ID, // ADDED: Extract ORDER_ID from the cart data
-              categoryId: entries[0].CATEGORY_ID,
-              artNoId: entries[0].ART_NO,
-              colorId: entries[0].COLOR,
-              imageUrl: entries[0].IMAGE_NAME
-                ? `https://mmarkonline.com/artimages/${entries[0].IMAGE_NAME}`
-                : '',
-              packingType: 'Case',
-              sizes: sizes,
-            });
-          });
-
-          // if (this.cartItems.length === 1 && this.editOrderId) {
-          //   this.editCartItem(this.cartItems[0]);
-          // }
-
-          // Auto-select next color if retaining category & art no
-          // if (
-          //   !this.currentEditingItem.colorId &&
-          //   this.currentEditingItem.artNoId
-          // ) {
-          //   this.autoSelectAvailableColor();
-          // }
+          this.populateCartFromEntries(allEntries, 0);
         } else {
           this.cartItems = [];
-
-          // if (
-          //   !this.currentEditingItem.colorId &&
-          //   this.currentEditingItem.artNoId
-          // ) {
-          //   this.autoSelectAvailableColor();
-          // }
         }
       },
       (error) => {
@@ -1431,10 +1531,11 @@ export class NewOrderComponent implements OnInit, OnChanges {
     const userId = sessionData.USER_ID || sessionData.ID || 0;
 
     const itemToRemove = this.cartItems.find(item => item.id === id);
-    const orderId = itemToRemove?.orderId || 0;
+    const orderId = itemToRemove?.orderId || this.editOrderId || 0;
+    const cartId = itemToRemove?.sizes?.[0]?.cartId || itemToRemove?.id || id;
 
     const payload = {
-      CART_ID: id,
+      CART_ID: cartId,
       ORDER_ID: orderId,
     };
 
@@ -1540,11 +1641,12 @@ export class NewOrderComponent implements OnInit, OnChanges {
     const userId = sessionData.USER_ID || sessionData.ID || 0;
     const orderId =
       this.cartItems.length > 0 ? this.cartItems[0].orderId || 0 : 0;
+    const finalOrderId = this.editOrderId || orderId || 0;
     const orderDate = new Date().toISOString();
 
     const payload = {
       USER_ID: userId,
-      ORDER_ID: orderId,
+      ORDER_ID: finalOrderId,
       DEALER_ID: this.getActualDealerId(),
       SUBDEALER_ID:
         this.activeTab === 'subdealer' ? this.selectedDealerId || 0 : 0,
