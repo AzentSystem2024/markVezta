@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
@@ -52,6 +53,8 @@ import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.
 import { DataService } from 'src/app/services';
 import { ExportService } from 'src/app/services/export.service';
 import { DeliveryNoteFormFinanceModule } from '../../Operations/POPUP PAGES/delivery-note-form/delivery-note-form-finance.component';
+import { Subscription } from 'rxjs';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-stock-movement-report',
@@ -119,7 +122,6 @@ export class StockMovementReportComponent {
 
     this.isColumnChooserVisible = false;
   }
-
   cancelColumnChooser(): void {
     this.tempColumns = [];
     this.isColumnChooserVisible = false;
@@ -132,6 +134,10 @@ export class StockMovementReportComponent {
     }));
   }
 
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
+  };
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
 
@@ -180,6 +186,39 @@ export class StockMovementReportComponent {
     },
     text: '',
   };
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.updateSummaryColumnsData();
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
+  }
+
   fromDate!: Date | string | number;
   toDate!: Date | string | number;
   selected_To_date!: any;
@@ -232,17 +271,28 @@ export class StockMovementReportComponent {
   storeHint: string = '';
   Store: any;
   showZeroStock: boolean = false;
+  isFilterVisible: boolean = true;
   appType: any;
+  showParameters = true;
+  private reportSubscription: Subscription | null = null;
+  isLoading = false;
+  isSummaryVisible = false;
+
+  toggleFiltersPanel(): void {
+    this.isFilterVisible = !this.isFilterVisible;
+  }
 
   onExporting(event: any) {
     this.exportService.onExporting(event, 'stock-movement-report');
   }
+
 
   constructor(
     private dataService: DataService,
     private sanitizer: DomSanitizer,
     private exportService: ExportService,
     private zone: NgZone,
+    private cdr: ChangeDetectorRef,
   ) {
     this.sesstion_Details();
     this.store_dropdown();
@@ -260,7 +310,9 @@ export class StockMovementReportComponent {
     this.selectedmonth = currentMonth;
   }
 
+
   ngOnInit() {
+    this.updateSummaryColumnsData();
     const userDataString = localStorage.getItem('userData');
     console.log('userData', userDataString);
     if (!userDataString) return;
@@ -377,6 +429,7 @@ export class StockMovementReportComponent {
     grid.endUpdate();
   }
 
+
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
@@ -407,7 +460,7 @@ export class StockMovementReportComponent {
   //   elementAttr: { class: 'toolbar-icon-btn' },
   //   onClick: () => this.refreshGrid(),
   //   text: '',
-  // };
+  // }
 
   onItemIdChange(event: any) {
     this.selected_item_Id = event.value;
@@ -452,8 +505,12 @@ export class StockMovementReportComponent {
   }
 
   getStockMovement() {
+    if (this.reportSubscription) {
+      this.reportSubscription.unsubscribe();
+      this.reportSubscription = null;
+    }
     const grid = this.dataGrid?.instance;
-
+    this.showParameters = false;
     grid?.beginCustomLoading('Loading...'); // optional but recommended
 
     const payload = {
@@ -488,212 +545,58 @@ export class StockMovementReportComponent {
     });
   }
 
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'OPENING_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'OPENING_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'GRN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'GRN_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'BALANCE_STOCK',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'BALANCE_STOCK',
-        alignment: 'Right',
-      },
-      {
-        column: 'PURCHASE_RETURN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'PURCHASE_RETURN_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'TRANSFEROUT_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'TRANSFEROUT_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'TRANSFERIN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'TRANSFERIN_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'DELIVERY_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'DELIVERY_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'DELIVERY_RETURN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'DELIVERY_RETURN_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'SALE_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'SALE_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'SALE_RETURN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'SALE_RETURN_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'ADJUSTED',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'ADJUSTED',
-        alignment: 'Right',
-      },
-      {
-        column: 'TRANSFER_OUT_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'TRANSFER_OUT_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'TRANSFER_IN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'TRANSFER_IN_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'PRODUCTION_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'PRODUCTION_QTY',
-        alignment: 'Right',
-      },
-      {
-        column: 'CONSUMPTION_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        showInColumn: 'CONSUMPTION_QTY',
-        alignment: 'Right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'OPENING_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'GRN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'BALANCE_STOCK',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'PURCHASE_RETURN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'TRANSFEROUT_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'TRANSFERIN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'DELIVERY_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'DELIVERY_RETURN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'SALE_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'SALE_RETURN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'ADJUSTED',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'TRANSFER_OUT_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'TRANSFER_IN_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'PRODUCTION_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-      {
-        column: 'CONSUMPTION_QTY',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        alignByColumn: true,
-      },
-    ],
-    calculateCustomSummary: (options: any) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
-  };
+  updateSummaryColumnsData(): void {
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
+    };
+
+    const summaryFields = [
+      'OPENING_QTY',
+      'GRN_QTY',
+      'BALANCE_STOCK',
+      'PURCHASE_RETURN_QTY',
+      'TRANSFEROUT_QTY',
+      'TRANSFERIN_QTY',
+      'DELIVERY_QTY',
+      'DELIVERY_RETURN_QTY',
+      'SALE_QTY',
+      'SALE_RETURN_QTY',
+      'ADJUSTED',
+      'TRANSFER_OUT_QTY',
+      'TRANSFER_IN_QTY',
+      'PRODUCTION_QTY',
+      'CONSUMPTION_QTY'
+
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          showInColumn: field,
+          alignment: 'right',
+        }))
+        : [],
+
+      groupItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        }))
+        : [],
+    };
+
+    this.cdr.detectChanges();
+  }
+
 
   onCellClick(e: any) {
     if (e.rowType !== 'data') return;
@@ -827,6 +730,7 @@ export class StockMovementReportComponent {
     });
   }
 
+
   loadPurchReturnDetails(itemId: number) {
     const payload = {
       ITEM_ID: itemId,
@@ -871,6 +775,7 @@ export class StockMovementReportComponent {
       this.salesInvoiceDetails = res.data || [];
     });
   }
+
 
   loadAdjustedDetails(itemId: number) {
     const payload = {
@@ -1035,7 +940,6 @@ export class StockMovementReportComponent {
 
         return; // important → stop further execution
       }
-
       case 'salesInvoice': {
         const returnId = row.TRANS_ID; //  Sale Return uses TRANS_ID
         const status = row.TRANS_STATUS;
@@ -1132,6 +1036,24 @@ export class StockMovementReportComponent {
 
     // Optional: reset common flags
     this.isReadOnlyInvoice = false;
+  }
+
+  cancelReport(): void {
+    if (this.reportSubscription) {
+      this.reportSubscription.unsubscribe();
+      this.reportSubscription = null;
+      this.isLoading = false;
+      notify(
+        {
+          message: 'Report loading cancelled.',
+          type: 'warning',
+          displayTime: 3000,
+          position: { at: 'top right', my: 'top right', offset: '-20 20' },
+        },
+        'warning',
+        3000
+      );
+    }
   }
 }
 

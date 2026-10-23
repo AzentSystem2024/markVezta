@@ -133,8 +133,8 @@
 
 <dx-popup
   [(visible)]="addPopup"
-  [width]="630"
-  height="640"
+  [width]="650"
+  height="auto"
   title="New Company"
   [showCloseButton]="true"
   (onHidden)="onAddPopupHidden()"
@@ -215,7 +215,30 @@
               ></dx-text-box>
             </dxi-item>
           </dxi-item>
+
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+            <dxi-item>
+              <dx-select-box
+                label="Country *"
+                [items]="CountryDropdownDataList"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                formControlName="COUNTRY_ID"
+                placeholder="Select Country"
+                (onValueChanged)="onCountrySelectionChanged($event)"
+                [searchEnabled]="true"
+                labelMode="floating"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Country is required"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-select-box>
+            </dxi-item>
+
             <dxi-item>
               <dx-select-box
                 [label]="appType === 'VEZTA' ? 'Emirates*' : 'State*'"
@@ -230,9 +253,31 @@
                 <dx-validator>
                   <dxi-validation-rule
                     type="required"
-                    [message]="appType === 'VEZTA' ? 'Emirates is required' : 'State is required'"
+                    [message]="
+                      appType === 'VEZTA'
+                        ? 'Emirates is required'
+                        : 'State is required'
+                    "
                   ></dxi-validation-rule> </dx-validator
               ></dx-select-box>
+            </dxi-item>
+          </dxi-item>
+
+          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+            <dxi-item>
+              <dx-select-box
+                labelMode="floating"
+                label="Currency."
+                formControlName="Currency"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                formControlName="CURRENCY_ID"
+                placeholder="Select Currency"
+                (onValueChanged)="onCurrencySelectionChanged($event)"
+                [searchEnabled]="true"
+                [items]="CurrencyDropdownDataList"
+              >
+              </dx-select-box>
             </dxi-item>
 
             <dxi-item>
@@ -281,29 +326,68 @@
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
               <div *dxTemplate style="display: flex">
-                <dx-select-box
+                <dx-drop-down-box
                   label="Country code"
-                  [searchEnabled]="true"
                   labelMode="floating"
                   [(value)]="countryCodephone"
-                  [items]="countryCodes"
-                  valueExpr="CODE"
-                  [displayExpr]="countryDisplay"
-                  placeholder="+1"
-                  [dropDownOptions]="{ width: '370px' }"
-                  hint="Country Code"
                   (onValueChanged)="onCountrycodeChangePhone($event)"
+                  [(opened)]="isPhoneCountryDropdownOpen"
+                  [dataSource]="countryCodes || []"
+                  valueExpr="CODE"
+                  displayExpr="CODE"
+                  [width]="'100%'"
+                  placeholder="Select country code"
+                  hint="Country Code"
+                  [dropDownOptions]="{ width: 370 }"
                 >
-                  <div *dxTemplate="let data of 'item'">
-                    <img
-                      [src]="data.FLAG_URL"
-                      width="20"
-                      style="margin-right: 8px"
-                    />
-                    {{ data.CODE }}
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-list
+                      [dataSource]="countryCodes || []"
+                      selectionMode="single"
+                      [searchEnabled]="true"
+                      [searchExpr]="[
+                        'COUNTRY_NAME',
+                        'NAME',
+                        'DESCRIPTION',
+                        'CODE',
+                      ]"
+                      [focusStateEnabled]="false"
+                      (onItemClick)="onPhoneCountryCodeSelected($event)"
+                    >
+                      <div
+                        *dxTemplate="let item of 'item'"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 8px;
+                          padding: 4px 6px;
+                        "
+                      >
+                        <img
+                          [src]="item.FLAG_URL"
+                          width="20"
+                          height="14"
+                          style="border-radius: 2px; object-fit: cover"
+                        />
+
+                        <span style="min-width: 55px; font-weight: 500">
+                          {{ item.CODE }}
+                        </span>
+
+                        <span>
+                          {{
+                            item.COUNTRY_NAME ||
+                              item.NAME ||
+                              item.DESCRIPTION ||
+                              ""
+                          }}
+                        </span>
+                      </div>
+                    </dx-list>
                   </div>
-                </dx-select-box>
-                <dx-text-box
+                </dx-drop-down-box>
+
+                <dx-number-box
                   #telephoneBoxRef
                   type="text"
                   formControlName="Telephone"
@@ -315,39 +399,74 @@
                     <dxi-validation-rule
                       type="custom"
                       [validationCallback]="validatePhoneLength"
-                      [message]="
-                        'Phone no. must be ' + Phone_limit + ' digits long'
-                      "
-                    ></dxi-validation-rule> </dx-validator
-                ></dx-text-box>
+                      message="Enter a valid phone number for the selected country code"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-number-box>
               </div>
             </dxi-item>
 
             <dxi-item>
               <div *dxTemplate style="display: flex">
-                <dx-select-box
+                <dx-drop-down-box
                   label="Country code"
-                  [searchEnabled]="true"
                   labelMode="floating"
                   [(value)]="countryCodemobile"
-                  [items]="countryCodes"
+                  [(opened)]="isMobileCountryDropdownOpen"
+                  [dataSource]="countryCodes || []"
                   valueExpr="CODE"
-                  [displayExpr]="countryDisplay"
+                  displayExpr="CODE"
+                  [width]="'100%'"
                   placeholder="+1"
-                  [dropDownOptions]="{ width: '370px' }"
                   hint="Country Code"
-                  (onValueChanged)="onCountrycodeChangeMobile($event)"
+                  [dropDownOptions]="{ width: 370 }"
                 >
-                  <div *dxTemplate="let data of 'item'">
-                    <img
-                      [src]="data.FLAG_URL"
-                      width="20"
-                      style="margin-right: 8px"
-                    />
-                    {{ data.CODE }}
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-list
+                      [dataSource]="countryCodes || []"
+                      selectionMode="single"
+                      [searchEnabled]="true"
+                      [searchExpr]="[
+                        'CODE',
+                        'COUNTRY_NAME',
+                        'NAME',
+                        'DESCRIPTION',
+                      ]"
+                      [focusStateEnabled]="false"
+                      (onItemClick)="onMobileCountryCodeSelected($event)"
+                    >
+                      <div
+                        *dxTemplate="let item of 'item'"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 8px;
+                          padding: 4px 6px;
+                        "
+                      >
+                        <img
+                          [src]="item.FLAG_URL"
+                          width="20"
+                          height="14"
+                          style="border-radius: 2px; object-fit: cover"
+                        />
+                        <span style="min-width: 55px; font-weight: 500">
+                          {{ item.CODE }}
+                        </span>
+                        <span>
+                          {{
+                            item.COUNTRY_NAME ||
+                              item.NAME ||
+                              item.DESCRIPTION ||
+                              ""
+                          }}
+                        </span>
+                      </div>
+                    </dx-list>
                   </div>
-                </dx-select-box>
-                <dx-text-box
+                </dx-drop-down-box>
+
+                <dx-number-box
                   #telephoneBoxRef
                   type="text"
                   formControlName="Mobile"
@@ -360,11 +479,10 @@
                     <dxi-validation-rule
                       type="custom"
                       [validationCallback]="validateMobileLength"
-                      [message]="
-                        'Mobile no. must be ' + mobile_limit + ' digits long'
-                      "
-                    ></dxi-validation-rule> </dx-validator
-                ></dx-text-box>
+                      message="Enter a valid phone number for the selected country code"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-number-box>
               </div>
             </dxi-item>
           </dxi-item>
@@ -372,29 +490,63 @@
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
               <div *dxTemplate style="display: flex">
-                <dx-select-box
+                <dx-drop-down-box
                   label="Country code"
-                  [searchEnabled]="true"
                   labelMode="floating"
                   [(value)]="countryCodewhatsapp"
-                  [items]="countryCodes"
+                  [(opened)]="isWhatsappCountryDropdownOpen"
+                  [dataSource]="countryCodes || []"
                   valueExpr="CODE"
-                  [displayExpr]="countryDisplay"
+                  displayExpr="CODE"
+                  [width]="'100%'"
                   placeholder="+1"
-                  [dropDownOptions]="{ width: '370px' }"
                   hint="Country Code"
-                  (onValueChanged)="onCountrycodeChangeWhatsapp($event)"
+                  [dropDownOptions]="{ width: 370 }"
                 >
-                  <div *dxTemplate="let data of 'item'">
-                    <img
-                      [src]="data.FLAG_URL"
-                      width="20"
-                      style="margin-right: 8px"
-                    />
-                    {{ data.CODE }} {{ data.COUNTRY_NAME }}
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-list
+                      [dataSource]="countryCodes || []"
+                      selectionMode="single"
+                      [searchEnabled]="true"
+                      [searchExpr]="[
+                        'CODE',
+                        'COUNTRY_NAME',
+                        'NAME',
+                        'DESCRIPTION',
+                      ]"
+                      [focusStateEnabled]="false"
+                      (onItemClick)="onWhatsappCountryCodeSelected($event)"
+                    >
+                      <div
+                        *dxTemplate="let item of 'item'"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 8px;
+                          padding: 4px 6px;
+                        "
+                      >
+                        <img
+                          [src]="item.FLAG_URL"
+                          width="20"
+                          height="14"
+                          style="border-radius: 2px; object-fit: cover"
+                        />
+                        <span style="min-width: 55px; font-weight: 500">
+                          {{ item.CODE }}
+                        </span>
+                        <span>{{
+                          item.COUNTRY_NAME ||
+                            item.NAME ||
+                            item.DESCRIPTION ||
+                            ""
+                        }}</span>
+                      </div>
+                    </dx-list>
                   </div>
-                </dx-select-box>
-                <dx-text-box
+                </dx-drop-down-box>
+
+                <dx-number-box
                   #whatsAppBoxRef
                   type="text"
                   formControlName="WhatsApp"
@@ -406,11 +558,10 @@
                     <dxi-validation-rule
                       type="custom"
                       [validationCallback]="validateWhatsAppLength"
-                      [message]="
-                        'Whatsapp no. must be ' + whatsapp_limit + ' digits long'
-                      "
-                    ></dxi-validation-rule> </dx-validator
-                ></dx-text-box>
+                      message="Enter a valid phone number for the selected country code"
+                    ></dxi-validation-rule>
+                  </dx-validator>
+                </dx-number-box>
               </div>
             </dxi-item>
 
@@ -487,7 +638,7 @@
 <dx-popup
   [(visible)]="editPopup"
   [width]="630"
-  height="670"
+  height="auto"
   title="Update Company"
   [showCloseButton]="true"
   (onHidden)="onEditPopupHidden()"
@@ -568,6 +719,28 @@
           <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
             <dxi-item>
               <dx-select-box
+                label="Country *"
+                [items]="CountryDropdownDataList"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                [(value)]="selecte_countyId"
+                placeholder="Select Country"
+                (onValueChanged)="onCountrySelectionChanged($event)"
+                [searchEnabled]="true"
+                labelMode="floating"
+              >
+                <dx-validator>
+                  <dxi-validation-rule
+                    type="required"
+                    message="Country is required"
+                  >
+                  </dxi-validation-rule>
+                </dx-validator>
+              </dx-select-box>
+            </dxi-item>
+
+            <dxi-item>
+              <dx-select-box
                 [label]="appType === 'VEZTA' ? 'Emirates*' : 'State*'"
                 labelMode="floating"
                 alignment="center"
@@ -581,9 +754,29 @@
                 <dx-validator>
                   <dxi-validation-rule
                     type="required"
-                    [message]="appType === 'VEZTA' ? 'Emirates is required' : 'State is required'"
+                    [message]="
+                      appType === 'VEZTA'
+                        ? 'Emirates is required'
+                        : 'State is required'
+                    "
                   ></dxi-validation-rule> </dx-validator
               ></dx-select-box>
+            </dxi-item>
+          </dxi-item>
+          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+            <dxi-item>
+              <dx-select-box
+                labelMode="floating"
+                label="Currency."
+                [(value)]="selected_currency_id"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                placeholder="Select Currency"
+                (onValueChanged)="onCurrencySelectionChanged($event)"
+                [searchEnabled]="true"
+                [items]="CurrencyDropdownDataList"
+              >
+              </dx-select-box>
             </dxi-item>
 
             <dxi-item>
@@ -662,9 +855,7 @@
                     <dxi-validation-rule
                       type="custom"
                       [validationCallback]="validatePhoneLength"
-                      [message]="
-                        'Phone no. must be ' + Phone_limit + ' digits long'
-                      "
+                      message="Enter a valid phone number for the selected country code"
                     ></dxi-validation-rule>
                   </dx-validator>
                 </dx-text-box>
@@ -706,9 +897,7 @@
                     <dxi-validation-rule
                       type="custom"
                       [validationCallback]="validateMobileLength"
-                      [message]="
-                        'Mobile no. must be ' + mobile_limit + ' digits long'
-                      "
+                      message="Enter a valid phone number for the selected country code"
                     ></dxi-validation-rule>
                   </dx-validator>
                 </dx-text-box>
@@ -748,13 +937,11 @@
                   label="Whatsapp No"
                   labelMode="floating"
                 >
-                  <dx-validator>
+                   <dx-validator>
                     <dxi-validation-rule
                       type="custom"
                       [validationCallback]="validateWhatsAppLength"
-                      [message]="
-                        'Whatsapp no. must be ' + whatsapp_limit + ' digits long'
-                      "
+                      message="Enter a valid phone number for the selected country code"
                     ></dxi-validation-rule>
                   </dx-validator>
                 </dx-text-box>

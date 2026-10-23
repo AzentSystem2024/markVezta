@@ -190,7 +190,7 @@ export class PDCReportComponent {
     // this.onToDateChange({ value: this.defaultDate });
     //   this.onFromDateChange({ value: this.financialYeaDate });
     //get datasource======== function call==========
-
+    this.updateSummaryColumnsData();
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -282,7 +282,7 @@ export class PDCReportComponent {
 
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;
-
+    this.updateSummaryColumnsData();
     // Your existing summary show/hide logic goes here
 
     this.summaryButtonOptions = {
@@ -311,7 +311,7 @@ export class PDCReportComponent {
 
 
   onExporting(event: any) {
-    const fileName = 'BalanceSheetReport';
+    const fileName = 'PDCReport';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
@@ -416,51 +416,53 @@ export class PDCReportComponent {
   handleClose() {
     this.editPDCPopupOpened = false;
   }
-  get summaryColumnsData(): any {
-    return {
-      totalItems: this.isSummaryVisible ? [
-        {
-          column: 'PAID',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'PAID',
-          alignment: 'right',
-        },
-        {
-          column: 'RECEIVED',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'RECEIVED',
-          alignment: 'right',
-        },
-      ]
-        : [],
-      groupItems: this.isSummaryVisible ? [
-        {
-          column: 'PAID',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'RECEIVED',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
 
-      ]
-        : [],
-      calculateCustomSummary: (options) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed
-        }
-      },
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
+  };
+
+
+  updateSummaryColumnsData(): void {
+    if (!this.isSummaryVisible) {
+      this.summaryColumnsData = {
+        totalItems: [],
+        groupItems: [],
+      };
+      return;
     }
+
+    const columns = [
+      'PAID',
+      'RECEIVED',
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: columns.map((column) => ({
+        column,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        showInColumn: column,
+        alignment: 'right',
+      })),
+
+      groupItems: columns.map((column) => ({
+        column,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        alignByColumn: true,
+      })),
+    };
   }
 }
 

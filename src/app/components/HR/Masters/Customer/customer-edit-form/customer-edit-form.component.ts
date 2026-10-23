@@ -34,6 +34,7 @@ import { DxTextBoxComponent, DxTextBoxModule } from 'devextreme-angular/ui/text-
 import { AuthService, DataService } from 'src/app/services';
 import CountryList from 'country-list-with-dial-code-and-flag';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-customer-edit-form',
@@ -137,6 +138,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   isSubDealerPopupVisible: boolean;
   dealerList: any;
   PhonenumberCode: any;
+  mobilenocode: any;
   mobileNumber: any;
   countryCodes: any;
   mobile_limit: any;
@@ -163,10 +165,11 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
 
     const codes = CountryList.getAll();
+
     this.countryCodes = codes.map((country: any) => ({
       ...country,
-      flagUrl: `https://flagcdn.com/w20/${country.code.toLowerCase()}.png`,
-      display: `${country.dial_code}`,
+      flagUrl: `https://flagcdn.com/w20/${String(country.code).toLowerCase()}.png`,
+      display: country.dial_code,
     }));
 
   }
@@ -180,43 +183,30 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
 
       this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
       this.ChangedCustomerData = this.formCustomerData;
-      if (this.formCustomerData.DELIVERY_ADDRESS?.length) {
-        this.deliveryAddress1 =
-          this.formCustomerData.DELIVERY_ADDRESS[0]?.DELIVERY_ADDRESS || '';
-        this.deliveryAddress2 =
-          this.formCustomerData.DELIVERY_ADDRESS[1]?.DELIVERY_ADDRESS || '';
-        this.deliveryAddress3 =
-          this.formCustomerData.DELIVERY_ADDRESS[2]?.DELIVERY_ADDRESS || '';
-      } else {
-        // In case no addresses exist yet
-        this.deliveryAddress1 = '';
-        this.deliveryAddress2 = '';
-        this.deliveryAddress3 = '';
-      }
+      // if (this.formCustomerData.DELIVERY_ADDRESS?.length) {
+      //   this.deliveryAddress1 =
+      //     this.formCustomerData.DELIVERY_ADDRESS[0]?.DELIVERY_ADDRESS || '';
+      //   this.deliveryAddress2 =
+      //     this.formCustomerData.DELIVERY_ADDRESS[1]?.DELIVERY_ADDRESS || '';
+      //   this.deliveryAddress3 =
+      //     this.formCustomerData.DELIVERY_ADDRESS[2]?.DELIVERY_ADDRESS || '';
+      // } else {
+      //   // In case no addresses exist yet
+      //   this.deliveryAddress1 = '';
+      //   this.deliveryAddress2 = '';
+      //   this.deliveryAddress3 = '';
+      // }
+      // Do not automatically bind delivery address fields
+      this.Address1Value = '';
+      this.countryCodeDeliveryaddress = '';
+      this.MobileValue = '';
+      this.locationValue = '';
+      this.phoneValue = '';
 
-      if (this.formCustomerData.DeliveryAddresses?.length > 0) {
-        const firstAddress: any = this.formCustomerData.DeliveryAddresses[0];
-        const deliveyMobileData = this.parseIncomingPhone(
-          firstAddress?.MOBILE || '',
-        );
-
-        // Fill form input values
-        this.Address1Value = firstAddress.ADDRESS1 || '';
-        this.countryCodeDeliveryaddress = deliveyMobileData.code;
-        this.MobileValue = deliveyMobileData.number;
-        this.locationValue = firstAddress.LOCATION || '';
-        this.phoneValue = firstAddress.PHONE || '';
-
-        // Populate savedAddresses array to show cards
-        this.savedAddresses = [...this.formCustomerData.DeliveryAddresses];
-      } else {
-        // Reset all when no data found
-        this.Address1Value = '';
-        this.MobileValue = '';
-        this.locationValue = '';
-        this.phoneValue = '';
-        this.savedAddresses = [];
-      }
+      // Keep existing addresses visible as cards
+      this.savedAddresses = [
+        ...(this.formCustomerData.DeliveryAddresses || [])
+      ];
 
       // Show dealer dropdown automatically if Dealer Type = 2
       if (this.formCustomerData.CUST_TYPE === 2) {
@@ -231,18 +221,40 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
       }
     }
 
+    // Split customer mobile number
     const mobileData = this.parseIncomingPhone(
-      this.selectedCustomerData.MOBILE_NO || '',
+      this.selectedCustomerData.MOBILE_NO || ''
+
     );
+    console.log(mobileData)
+
     this.countryCode = mobileData.code;
+    this.mobilenocode = mobileData.code
     this.formCustomerData.MOBILE_NO = mobileData.number;
 
+    // Split customer telephone number
     const phoneData = this.parseIncomingPhone(
-      this.selectedCustomerData.PHONE || '',
+      this.selectedCustomerData.PHONE || ''
+
     );
+    console.log(phoneData)
+
     this.phoneCountryCode = phoneData.code;
     this.PhonenumberCode = phoneData.code;
     this.formCustomerData.PHONE = phoneData.number;
+
+
+    // Dealer dropdown
+    if (this.formCustomerData.CUST_TYPE === 2) {
+      if (this.formCustomerData.DEALER_TYPE === 2) {
+        this.isDealerVisible = true;
+        this.getDealerDropDown();
+      } else {
+        this.isDealerVisible = false;
+      }
+    } else {
+      this.isDealerVisible = false;
+    }
   }
 
   validateEmail = (e: any): boolean => {
@@ -460,8 +472,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
         matchedCountry.CODE;
       if (dialCode) {
         this.countryCode = dialCode;
-        this.phoneCountryCode = dialCode;
-        this.PhonenumberCode = dialCode;
         this.DEFAULT_COUNTRY_CODE = dialCode;
       }
     }
@@ -501,7 +511,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     console.log(this.selectedCustomerData);
     return {
       ...this.selectedCustomerData,
-      MOBILE_NO: this.countryCode + '-' + this.formCustomerData.MOBILE_NO,
+      MOBILE_NO: this.mobilenocode + '-' + this.formCustomerData.MOBILE_NO,
       PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
       USER_ID: this.userId || '',
     };
@@ -510,6 +520,21 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   closePopup() { }
 
   saveDeliveryAddress() {
+    if (!this.locationValue || !this.locationValue.trim()) {
+      notify(
+        {
+          message: 'Location is required',
+          type: 'error',
+          displayTime: 3000,
+          position: {
+            my: 'top center',
+            at: 'top center',
+            of: window,
+          },
+        }
+      );
+      return;
+    }
     // Validate that at least one field is filled
     if (
       this.Address1Value ||
@@ -573,10 +598,12 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     const addr = this.savedAddresses[i];
     const [countryCodephone, phonenumber] = addr.MOBILE.split('-');
 
+    const mobileData = this.parseIncomingPhone(addr.MOBILE || '');
     // Fill form fields
     this.Address1Value = addr.ADDRESS1;
     this.MobileValue = phonenumber;
-    this.countryCodeDeliveryaddress = countryCodephone;
+    this.countryCodeDeliveryaddress = mobileData.code;
+    // this.countryCodeDeliveryaddress = countryCodephone;
     this.locationValue = addr.LOCATION;
     this.phoneValue = addr.PHONE;
 
@@ -584,42 +611,35 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.editingIndex = i;
   }
 
+
   private parseIncomingPhone(
     fullPhone: string,
-    defaultCode: string = '+971',
+    defaultCode: string = '+91'
   ): { code: string; number: string } {
+
     if (!fullPhone) {
       return { code: defaultCode, number: '' };
     }
 
     const str = String(fullPhone).trim();
+
     if (!str) {
       return { code: defaultCode, number: '' };
     }
 
-    let code = '';
-    let num = '';
-
     if (str.includes('-')) {
       const parts = str.split('-');
-      code = (parts[0] || '').trim();
-      num = (parts[1] || '').trim();
-    } else if (str.startsWith('+')) {
-      code = defaultCode;
-      num = str.replace(/\D/g, '');
-    } else {
-      num = str.replace(/\D/g, '');
+
+      return {
+        code: parts[0].trim(),
+        number: parts.slice(1).join('-').replace(/\D/g, '')
+      };
     }
 
-    if (code) {
-      if (!code.startsWith('+')) {
-        code = '+' + code;
-      }
-    } else {
-      code = defaultCode;
-    }
-
-    return { code, number: num };
+    return {
+      code: defaultCode,
+      number: str.replace(/\D/g, '')
+    };
   }
 
   private extractDialCode(event: any): string {
@@ -718,21 +738,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.revalidateDeliveryMobile();
   }
 
-  onCountrySelected(event: any) {
-    const dialCode = this.extractDialCode(event);
-
-    if (dialCode) {
-      if (this.countryCode && this.countryCode !== dialCode) {
-        this.formCustomerData.MOBILE_NO = '';
-        if (this.mobileBox?.instance) {
-          this.mobileBox.instance.option('isValid', true);
-        }
-      }
-      this.countryCode = dialCode;
-    }
-    this.isCountryDropdownOpen = false;
-    this.revalidateMobile();
-  }
 
   onPhoneCountrySelected(event: any) {
     const dialCode = this.extractDialCode(event);
@@ -750,6 +755,24 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.isPhoneDropdownOpen = false;
     this.revalidatePhone();
   }
+
+  onCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (this.countryCode && this.countryCode !== dialCode) {
+        this.formCustomerData.MOBILE_NO = '';
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', true);
+        }
+      }
+      this.countryCode = dialCode;
+      this.mobilenocode = dialCode;
+    }
+    this.isCountryDropdownOpen = false;
+    this.revalidateMobile();
+  }
+
 
   revalidateMobile() {
     setTimeout(() => {
@@ -792,7 +815,7 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   }
 
   MobileValidate = (e: any): boolean => {
-    const dialCode = (this.countryCode || '').trim();
+    const dialCode = (this.countryCode || this.mobilenocode || '').trim();
     const mobileValue = e.value ? e.value.toString().trim() : '';
     const mobileNum = mobileValue.replace(/\D/g, '');
     if (!mobileNum) return true;

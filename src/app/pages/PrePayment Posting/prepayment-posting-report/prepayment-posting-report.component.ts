@@ -209,7 +209,7 @@ export class PrepaymentPostingReportComponent {
     // this.onToDateChange({ value: this.defaultDate });
     //   this.onFromDateChange({ value: this.financialYeaDate });
     //get datasource======== function call==========
-
+    this.updateSummaryColumnsData();
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -265,7 +265,7 @@ export class PrepaymentPostingReportComponent {
 
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;
-
+    this.updateSummaryColumnsData();
     // Your existing summary show/hide logic goes here
 
     this.summaryButtonOptions = {
@@ -438,95 +438,57 @@ export class PrepaymentPostingReportComponent {
   handleClose() {
     this.isViewInvoice = false;
   }
-  get summaryColumnsData(): any {
-    return {
-      totalItems: this.isSummaryVisible ? [
-        {
-          column: 'PURCH_VALUE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'PURCH_VALUE',
-          alignment: 'right',
-        },
-        {
-          column: 'OPENING_ACCUR',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'OPENING_ACCUR',
-          alignment: 'right',
-        },
-        {
-          column: 'CURRENT_ACCUR',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'CURRENT_ACCUR',
-          alignment: 'right',
-        },
-        {
-          column: 'TOTAL_ACCUR',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'TOTAL_ACCUR',
-          alignment: 'right',
-        },
-        {
-          column: 'BALANCE_ACCUR',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'BALANCE_ACCUR',
-          alignment: 'right',
-        },
-      ]
-        : [],
-      groupItems: this.isSummaryVisible ? [
-        {
-          column: 'PURCH_VALUE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'OPENING_ACCUR',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'CURRENT_ACCUR',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'TOTAL_ACCUR',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'BALANCE_ACCUR',
-          summaryType: 'sum',
-          displayFormat: ' {0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-      ]
-        : [],
-      calculateCustomSummary: (options) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed
-        }
-      },
+
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
+  };
+
+
+  updateSummaryColumnsData(): void {
+    if (!this.isSummaryVisible) {
+      this.summaryColumnsData = {
+        totalItems: [],
+        groupItems: [],
+      };
+      return;
     }
+
+    const columns = [
+      'PURCH_VALUE',
+      'OPENING_ACCUR',
+      'CURRENT_ACCUR',
+      'TOTAL_ACCUR',
+      'BALANCE_ACCUR',
+      'RoundOff',
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: columns.map((column) => ({
+        column,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        showInColumn: column,
+        alignment: 'right',
+      })),
+
+      groupItems: columns.map((column) => ({
+        column,
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: {
+          type: 'fixedPoint',
+          precision: 2,
+          useGrouping: true,
+        },
+        alignByColumn: true,
+      })),
+    };
   }
 }
 

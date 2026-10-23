@@ -28,6 +28,7 @@ import {
 } from 'devextreme-angular';
 import DataSource from 'devextreme/data/data_source';
 import notify from 'devextreme/ui/notify';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sales-report',
@@ -56,6 +57,7 @@ export class SalesReportComponent implements OnInit {
   Store: any[] = [];
   selectedStoreid: any[] = [];
   storeHint: string = '';
+  auto: string = 'auto';
 
   Saletype = [
     { ID: 0, DESCRIPTION: 'All' },
@@ -104,22 +106,224 @@ export class SalesReportComponent implements OnInit {
   salesDataArray: any[] = [];
   readonly allowedPageSizes: any = [5, 10, 25, 50, 'all'];
   displayMode: any = 'full';
+  isFilterRowVisible: boolean = false;
 
-  searchButtonOptions = {
-    icon: 'search',
-    hint: 'Show / Hide Column Filters',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilters(),
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'PURCH_DATE', caption: 'Date' },
+    { dataField: 'SUPP_NAME', caption: 'Particulars' },
+    { dataField: 'HSN_CODE', caption: 'HSN CODE' },
+    { dataField: 'VoucherType', caption: 'Voucher Type' },
+    { dataField: 'DOC_NO', caption: 'Invoice No' },
+    { dataField: 'REF_NO', caption: 'Voucher reference No' },
+    { dataField: 'Quantity', caption: 'Quantity' },
+    { dataField: 'GrossTotal', caption: 'Gross Amount' },
+    { dataField: 'Disc', caption: 'Discount Amount' },
+    { dataField: 'GSTPurchase', caption: 'GST' },
+    { dataField: 'CGSTPurchaseInput9', caption: 'CGST' },
+    { dataField: 'SGSTPurchaseInput9', caption: 'SGST' },
+    { dataField: 'RoundOff', caption: 'Round Off Amount' },
+  ];
+  UserId: any;
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+
+  showParameters = true;
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  cancelReport(): void {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    this.selectedYear = currentYear;
+    this.selectedmonth = currentMonth;
+    this.selectedCustomer = null;
+
+    this.selected_from_date = new Date(
+      currentYear,
+      currentMonth,
+      1
+    );
+    this.selected_To_date = today;
+
+    this.load_Sales_data();
+  }
+  // Loading state
+  isLoading = false;
+
+  // Summary visibility
+  isSummaryVisible = true;
+
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
   };
+
+  updateSummaryColumnsData(): void {
+    if (!this.isSummaryVisible) {
+      this.summaryColumnsData = {
+        totalItems: [],
+        groupItems: [],
+      };
+      return;
+    }
+
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
+    };
+
+    this.summaryColumnsData = {
+      groupItems: [
+        {
+          column: 'Quantity',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          alignByColumn: true,
+        },
+        {
+          column: 'GrossTotal',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        },
+        {
+          column: 'RoundOff',
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        },
+      ],
+
+      totalItems: [
+        {
+          column: 'Quantity',
+          summaryType: 'sum',
+          displayFormat: 'Total Qty: {0}',
+          alignment: 'right',
+        },
+        {
+          column: 'GrossTotal',
+          summaryType: 'sum',
+          displayFormat: 'Total Gross: {0}',
+          valueFormat: moneyFormat,
+          alignment: 'right',
+        },
+        {
+          column: 'RoundOff',
+          summaryType: 'sum',
+          displayFormat: 'Total Net: {0}',
+          valueFormat: moneyFormat,
+          alignment: 'right',
+        },
+      ],
+    };
+  }
 
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => {
-      this.zone.run(() => this.refreshGrid());
-    },
+    onClick: () => this.refreshGrid(),
+    text: '',
   };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.load_Sales_data();
+    }
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.updateSummaryColumnsData();
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
 
   constructor(
     private dataService: DataService,
@@ -148,6 +352,7 @@ export class SalesReportComponent implements OnInit {
         this.savedUserData?.SELECTED_COMPANY?.COMPANY_ID ?? 15;
       this.selected_fin_id =
         this.savedUserData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? 1;
+      this.UserId = this.savedUserData.USER_ID
     }
 
     const today = new Date();
@@ -166,6 +371,7 @@ export class SalesReportComponent implements OnInit {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       NAME: 'CUSTOMER',
+      USER_ID: this.UserId
     };
     if (typeof this.dataService.Common_Dropdown === 'function') {
       this.dataService.Common_Dropdown(payload).subscribe((response: any) => {
@@ -248,58 +454,88 @@ export class SalesReportComponent implements OnInit {
     return !isNaN(d.getTime()) ? d.toISOString() : new Date().toISOString();
   }
 
-  load_Sales_data() {
+  load_Sales_data(): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    if (
+      this.selected_from_date &&
+      this.selected_To_date &&
+      new Date(this.selected_from_date) >
+      new Date(this.selected_To_date)
+    ) {
+      notify({
+        message: 'From Date cannot be later than To Date',
+        type: 'warning',
+        displayTime: 2000,
+        position: { at: 'top center', my: 'top center' },
+      });
+      return;
+    }
+
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
       DATE_FROM: this.formatToISO(this.selected_from_date),
       DATE_TO: this.formatToISO(this.selected_To_date),
       CUST_ID:
-        this.selectedCustomer != null ? String(this.selectedCustomer) : '',
+        this.selectedCustomer != null
+          ? String(this.selectedCustomer)
+          : '',
     };
 
-    this.dataService.SalesSummaryRpt(payload).subscribe({
-      next: (res: any) => {
-        let list: any[] = [];
-        if (Array.isArray(res)) {
-          list = res;
-        } else if (res && Array.isArray(res.Data)) {
-          list = res.Data;
-        } else if (res && Array.isArray(res.data)) {
-          list = res.data;
-        }
+    this.isLoading = true;
 
-        this.salesDataArray = list;
-        this.salesDataSource = list;
-        this.cdr.detectChanges();
+    this.dataService
+      .SalesSummaryRpt(payload)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (res: any) => {
+          let list: any[] = [];
 
-        if (list.length === 0) {
+          if (Array.isArray(res)) {
+            list = res;
+          } else if (Array.isArray(res?.Data)) {
+            list = res.Data;
+          } else if (Array.isArray(res?.data)) {
+            list = res.data;
+          }
+
+          this.salesDataArray = list;
+          this.salesDataSource = list;
+
+          if (list.length === 0) {
+            notify({
+              message: 'No data found for selected criteria',
+              type: 'warning',
+              displayTime: 2000,
+              position: { at: 'top center', my: 'top center' },
+            });
+          }
+        },
+
+        error: (err: any) => {
+          console.error('Error fetching sales summary report:', err);
+
+          this.salesDataArray = [];
+          this.salesDataSource = [];
+
           notify({
-            message: 'No data found for selected criteria',
-            type: 'warning',
+            message: 'Failed to load sales report',
+            type: 'error',
             displayTime: 2000,
             position: { at: 'top center', my: 'top center' },
           });
-        }
-      },
-      error: (err: any) => {
-        console.error('Error fetching sales summary report:', err);
-        notify({
-          message: 'Failed to load sales report',
-          type: 'error',
-          displayTime: 2000,
-          position: { at: 'top center', my: 'top center' },
-        });
-        this.salesDataArray = [];
-        this.salesDataSource = [];
-        this.cdr.detectChanges();
-      },
-    });
+        },
+      });
   }
 
-  refreshGrid() {
-    this.load_Sales_data();
-  }
 
   onExporting(event: any) {
     const fileName = 'Sales_Report';
@@ -329,4 +565,4 @@ export class SalesReportComponent implements OnInit {
   exports: [SalesReportComponent],
   declarations: [SalesReportComponent],
 })
-export class SalesReportModule {}
+export class SalesReportModule { }

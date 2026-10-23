@@ -62,6 +62,72 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'Date', caption: 'Date' },
+    { dataField: 'DocumentType', caption: 'Document Type' },
+    { dataField: 'VoucherNo', caption: 'VoucherNo' },
+    { dataField: 'Particulars', caption: 'Particulars' },
+    { dataField: 'Remarks', caption: 'Remarks' },
+    { dataField: 'STORE_NAME', caption: "Store/Branch" },
+    { dataField: 'DebitAmount', caption: 'Debit Amount' },
+    { dataField: 'CreditAmount', caption: 'Credit Amount' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
   // Grid Data
   JournalBookDataSource: DataSource;
   journalBookArray: any[] = [];
@@ -157,49 +223,83 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   // Loading States
   loadingInvoice = false;
   popupReady = false;
+  isSummaryVisible = true;
 
-  // Summaries
-  summaryColumnsData = {
-    totalItems: [
-      {
-        name: 'totalDr',
-        column: 'DebitAmount',
-        summaryType: 'sum',
-        displayFormat: 'Total {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DebitAmount',
-        alignment: 'right',
-      },
-      {
-        name: 'totalCr',
-        column: 'CreditAmount',
-        summaryType: 'sum',
-        displayFormat: 'Total {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CreditAmount',
-        alignment: 'right',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'DebitAmount',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'CreditAmount',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-    ],
-    calculateCustomSummary: (options: any) => {
-      // Custom logic if needed
-    },
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
   };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.updateSummaryColumnsData();
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
+  }
+
+
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
+  };
+
+  updateSummaryColumnsData(): void {
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
+    };
+
+    const summaryFields = [
+      'DebitAmount',
+      'CreditAmount',
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          showInColumn: field,
+          alignment: 'right',
+        }))
+        : [],
+
+      groupItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        }))
+        : [],
+    };
+
+    this.cdr.detectChanges();
+  }
 
   // Toolbar Configs
   refreshButtonOptions = {
@@ -238,6 +338,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.updateSummaryColumnsData();
     this.resetPopups();
     const raw = sessionStorage.getItem('savedUserData');
 
@@ -396,6 +497,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   }
 
   load_JournalBook_data() {
+    this.showParameters = false;
     const payload = {
       CompanyId: this.selected_Company_id,
       FinId: this.selected_fin_id,

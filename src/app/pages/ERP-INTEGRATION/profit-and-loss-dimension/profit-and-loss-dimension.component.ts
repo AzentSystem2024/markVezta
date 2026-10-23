@@ -34,16 +34,70 @@ import { DataService } from 'src/app/services';
 export class ProfitAndLossDimensionComponent {
   @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
   @ViewChild(DxDataGridComponent) grid!: DxDataGridComponent;
-  refreshButtonOptions = {
-    icon: 'refresh',
-    hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.refreshGrid(),
-    onClick: () => {
-      this.zone.run(() => this.refreshGrid());
+
+  showParameters = false;
+  // Custom Column Chooser
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'TYPE_NAME', caption: 'Category' },
+    { dataField: 'MAIN_GROUP_NAME', caption: 'Group' },
+    { dataField: 'HEAD_NAME', caption: 'Particulars' },
+    {
+      dataField: 'CODE',
+      caption: 'Code',
     },
-    text: '',
-  };
+    { dataField: 'DESCRIPTION', caption: 'Description' },
+    { dataField: 'AMOUNT', caption: 'Amount' },
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
 
   isFilterRowVisible: boolean = false;
   ProfitLossReport: any = [];
@@ -73,7 +127,8 @@ export class ProfitAndLossDimensionComponent {
   totalRevenue: number = 0;
   totalExpense: number = 0;
 
-  selectedYear: any = null;
+  selectedYear: number = new Date().getFullYear();
+
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
@@ -83,6 +138,8 @@ export class ProfitAndLossDimensionComponent {
   dimensionPopupVisible: boolean = false;
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
+  isFilterOpened = false;
+  isSummaryVisible = true;
 
   constructor(
     private dataservice: DataService,
@@ -103,21 +160,76 @@ export class ProfitAndLossDimensionComponent {
     }
     this.selectedYear = currentYear;
     //============Month field dataSource===============
+
     this.monthDataSource = this.dataservice.getMonths();
-    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-    this.selectedmonth = currentMonth;
+
     const today = new Date();
-    const SystemDate =
-      today.getFullYear() +
-      '-' +
-      String(today.getMonth() + 1).padStart(2, '0') +
-      '-' +
-      String(today.getDate()).padStart(2, '0');
-    this.selectedYear = null;
-    this.selectedmonth = null;
-    this.formatted_from_date = SystemDate;
-    this.formatted_To_date = SystemDate;
+    const currentMonth = today.getMonth();
+
+    // Set current year and month by default
+    this.selectedYear = currentYear;
+    this.selectedmonth = currentMonth;
+
+    // Set date range from the first day of this month to today
+    this.formatted_from_date = this.formatDate(today);
+    this.formatted_To_date = this.formatDate(today);
+
     this.get_DataSource();
+
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
+  }
+
+  // Expand or collapse the parameter panel.
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+    this.cdr.detectChanges();
   }
 
   //================ Year value change ===================
@@ -161,6 +273,7 @@ export class ProfitAndLossDimensionComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.appType = sessionData.Configurations?.APP_TYPE;
   }
 
   refreshGrid() {

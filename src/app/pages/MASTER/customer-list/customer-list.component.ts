@@ -448,7 +448,7 @@ export class CustomerListComponent {
       try {
         notify(
           {
-            message: 'Customerssssssssss data updated successfully',
+            message: 'Customer data updated successfully',
             position: { at: 'top right', my: 'top right' },
           },
           'success',

@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
+import { ChangeDetectorRef, Component, NgModule, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxLoadIndicatorModule,
@@ -25,6 +26,71 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./balance-sheet-dimension.component.scss'],
 })
 export class BalanceSheetDimensionComponent {
+
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'TYPE_NAME', caption: 'Category' },
+    { dataField: 'MAIN_GROUP_NAME', caption: 'Group' },
+    { dataField: 'PARTICULARS', caption: 'Particulars' },
+    { dataField: 'CODE', caption: 'Code' },
+    { dataField: 'DESCRIPTION', caption: 'Description' },
+    { dataField: 'AMOUNT', caption: 'Amount' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      viopenColumnsible: true,
+    }));
+  }
+
   isFilterRowVisible: boolean = false;
 
   BalanceSheetReport: any = [];
@@ -60,6 +126,8 @@ export class BalanceSheetDimensionComponent {
   dimensionPopupVisible: boolean = false;
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
+  isSummaryVisible = true;
+  showDimensionPopup = false;
 
   constructor(
     private dataservice: DataService,
@@ -96,6 +164,67 @@ export class BalanceSheetDimensionComponent {
     this.formatted_To_date = SystemDate;
     this.Diamension_dropdown();
     this.get_DataSource();
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_DataSource();
+    }
+  }
+
+  applyButtonOptions = {
+    width: 100,
+    hint: 'Apply Filters',
+    text: 'Apply',
+    type: 'default',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.get_DataSource(),
+  };
+
+
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
   }
 
   //================ Year value change ===================
@@ -372,4 +501,4 @@ export class BalanceSheetDimensionComponent {
   exports: [],
   declarations: [BalanceSheetDimensionComponent],
 })
-export class BalanceSheetDimensionModule {}
+export class BalanceSheetDimensionModule { }

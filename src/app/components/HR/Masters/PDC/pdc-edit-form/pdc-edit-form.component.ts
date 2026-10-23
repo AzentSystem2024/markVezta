@@ -52,6 +52,7 @@ export class PdcEditFormComponent {
   isPdfPopupVisible: boolean = false;
   pdfSrc: SafeResourceUrl | null = null;
   @Input() popupMode: string = '';
+  @Input() isReadOnly = false;
 
   Supplier: any;
   selectedBeneficiaryTypeID: any;

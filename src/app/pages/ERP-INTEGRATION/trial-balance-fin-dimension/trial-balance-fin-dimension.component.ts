@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
+import { ChangeDetectorRef, Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxDropDownBoxModule,
@@ -28,6 +29,70 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./trial-balance-fin-dimension.component.scss'],
 })
 export class TrialBalanceFinDimensionComponent {
+  @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'MainGroup', caption: 'Category' },
+    { dataField: 'SubGroup', caption: 'Group' },
+    { dataField: 'Category', caption: 'Particulars' },
+    {
+      dataField: 'Code',
+      caption: 'Code',
+    },
+    { dataField: 'Description', caption: 'Description' },
+
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   isFilterRowVisible: boolean = false;
 
   TrialBalanceReport: any = [];
@@ -65,6 +130,11 @@ export class TrialBalanceFinDimensionComponent {
   dimensionPopupVisible: boolean = false;
   dimensionPopupData: any[] = [];
   selectedRowData: any = null;
+  // Filter panel visibility
+  showParameters = false;
+  isFilterOpened = false;
+  isSummaryVisible = true;
+
 
   summaryColumnsData = {
     totalItems: [
@@ -172,6 +242,7 @@ export class TrialBalanceFinDimensionComponent {
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private zone: NgZone,
   ) {
     this.get_sessionstorage_data();
     this.sesstion_Details();
@@ -193,12 +264,79 @@ export class TrialBalanceFinDimensionComponent {
       String(today.getMonth() + 1).padStart(2, '0') +
       '-' +
       String(today.getDate()).padStart(2, '0');
-    this.selectedYear = null;
-    this.selectedmonth = null;
-    this.formatted_from_date = SystemDate;
-    this.formatted_To_date = SystemDate;
+    this.selectedYear = today.getFullYear();
+
+    // Current month (January = 0, December = 11)
+    this.selectedmonth = today.getMonth();
+
+    // Current date for From Date and To Date
+    this.formatted_from_date = this.formatDate(today);
+    this.formatted_To_date = this.formatDate(today);
     this.Diamension_dropdown();
     this.get_DataSource();
+  }
+
+
+  // Toggle filter panel
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+    this.cdr.detectChanges();
+  }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_DataSource();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+    this.cdr.detectChanges();
   }
 
   //================ Year value change ===================
@@ -282,6 +420,7 @@ export class TrialBalanceFinDimensionComponent {
   }
 
   get_DataSource() {
+    this.showParameters = false;
     const payload = {
       companyId: this.selected_Company_id,
       finId: this.selected_fin_id,
@@ -454,4 +593,4 @@ export class TrialBalanceFinDimensionComponent {
   exports: [],
   declarations: [TrialBalanceFinDimensionComponent],
 })
-export class TrialBalanceFinDimensionModule {}
+export class TrialBalanceFinDimensionModule { }

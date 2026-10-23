@@ -35,6 +35,7 @@ import {
   DxAutocompleteModule,
   DxTagBoxModule,
   DxValidationGroupComponent,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 
 import {
@@ -83,6 +84,77 @@ export class LedgerStatementComponent implements OnInit {
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup!: DxValidationGroupComponent;
 
+
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'TRANS_DATE', caption: 'Date' },
+    { dataField: 'TRANS_TYPE_NAME', caption: 'Document Type' },
+    { dataField: 'VOUCHER_NO', caption: 'Voucher No' },
+    { dataField: 'PARTICULARS', caption: 'Particulars' },
+    { dataField: 'STORE_NAME', caption: 'Store/Branch' },
+    { dataField: 'DEPT_NAME', caption: 'Department' },
+    { dataField: 'DR_AMOUNT', caption: 'Debit Amount' },
+    { dataField: 'CR_AMOUNT', caption: 'Credit Amount' },
+    { dataField: 'BALANCE', caption: 'Balance' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
   // -------------------------------------------------------------
   // Data Sources & Core Lists
   // -------------------------------------------------------------
@@ -189,6 +261,8 @@ export class LedgerStatementComponent implements OnInit {
   loadingInvoice: boolean = false;
   popupReady: boolean = false;
   appType: any;
+  isSummaryVisible = true;
+  isFilterRowVisible = false;
 
   constructor(
     private dataService: DataService,
@@ -217,6 +291,7 @@ export class LedgerStatementComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.updateSummaryColumnsData();
     const today = new Date();
     const SystemDate =
       today.getFullYear() +
@@ -251,6 +326,66 @@ export class LedgerStatementComponent implements OnInit {
 
 
     this.loadLedgerData();
+  }
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  toggleFilterRow = (): void => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.load_Ledgre_data();
+    }
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.updateSummaryColumnsData();
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
   }
 
   // -------------------------------------------------------------
@@ -392,6 +527,7 @@ export class LedgerStatementComponent implements OnInit {
   }
 
   load_Ledgre_data() {
+    this.showParameters = false;
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) return;
 
@@ -724,123 +860,168 @@ export class LedgerStatementComponent implements OnInit {
   // -------------------------------------------------------------
   // DataGrid Summaries
   // -------------------------------------------------------------
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'PARTICULARS',
-        summaryType: '',
-        displayFormat: ' Total',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'PARTICULARS',
-        alignment: 'right',
-      },
-      {
-        column: 'PARTICULARS',
-        summaryType: '',
-        displayFormat: ' Closing Balance',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'PARTICULARS',
-        alignment: 'right',
-      },
-      {
-        column: 'PARTICULARS',
-        summaryType: '',
-        displayFormat: ' Grand Total',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'PARTICULARS',
-        alignment: 'right',
-      },
-      {
-        name: 'totalDr',
-        column: 'DR_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DR_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        name: 'totalCr',
-        column: 'CR_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CR_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        name: 'closingBalanceDr',
-        summaryType: 'custom',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DR_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        name: 'closingBalanceCr',
-        summaryType: 'custom',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CR_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        name: 'grandTotalDr',
-        summaryType: 'custom',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DR_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        name: 'grandTotalCr',
-        summaryType: 'custom',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CR_AMOUNT',
-        alignment: 'right',
-      },
-    ],
+  // summaryColumnsData = {
+  //   totalItems: [
+  //     {
+  //       column: 'PARTICULARS',
+  //       summaryType: '',
+  //       displayFormat: ' Total',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'PARTICULARS',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       column: 'PARTICULARS',
+  //       summaryType: '',
+  //       displayFormat: ' Closing Balance',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'PARTICULARS',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       column: 'PARTICULARS',
+  //       summaryType: '',
+  //       displayFormat: ' Grand Total',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'PARTICULARS',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'totalDr',
+  //       column: 'DR_AMOUNT',
+  //       summaryType: 'sum',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'DR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'totalCr',
+  //       column: 'CR_AMOUNT',
+  //       summaryType: 'sum',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'CR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'closingBalanceDr',
+  //       summaryType: 'custom',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'DR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'closingBalanceCr',
+  //       summaryType: 'custom',
+  //       displayFormat: '{0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'CR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'grandTotalDr',
+  //       summaryType: 'custom',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'DR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'grandTotalCr',
+  //       summaryType: 'custom',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'CR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //   ],
 
-    calculateCustomSummary: (options: any) => {
-      if (options.summaryProcess === 'finalize') {
-        const items = this.ledgerSummaryData || [];
+  //   calculateCustomSummary: (options: any) => {
+  //     if (options.summaryProcess === 'finalize') {
+  //       const items = this.ledgerSummaryData || [];
 
-        const totalDr = items.reduce((sum: number, item: any) => {
-          const val = parseFloat(
-            String(item?.DR_AMOUNT || '0')
-              .replace(/,/g, '')
-              .trim(),
-          );
-          return sum + (isNaN(val) ? 0 : val);
-        }, 0);
+  //       const totalDr = items.reduce((sum: number, item: any) => {
+  //         const val = parseFloat(
+  //           String(item?.DR_AMOUNT || '0')
+  //             .replace(/,/g, '')
+  //             .trim(),
+  //         );
+  //         return sum + (isNaN(val) ? 0 : val);
+  //       }, 0);
 
-        const totalCr = items.reduce((sum: number, item: any) => {
-          const val = parseFloat(
-            String(item?.CR_AMOUNT || '0')
-              .replace(/,/g, '')
-              .trim(),
-          );
-          return sum + (isNaN(val) ? 0 : val);
-        }, 0);
+  //       const totalCr = items.reduce((sum: number, item: any) => {
+  //         const val = parseFloat(
+  //           String(item?.CR_AMOUNT || '0')
+  //             .replace(/,/g, '')
+  //             .trim(),
+  //         );
+  //         return sum + (isNaN(val) ? 0 : val);
+  //       }, 0);
 
-        const closingBalance = totalDr - totalCr;
+  //       const closingBalance = totalDr - totalCr;
 
-        if (options.name === 'closingBalanceCr') {
-          options.totalValue = closingBalance > 0 ? closingBalance : 0;
-        }
-        if (options.name === 'closingBalanceDr') {
-          options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
-        }
-        if (options.name === 'grandTotalCr') {
-          options.totalValue = totalCr + (closingBalance > 0 ? closingBalance : 0);
-        }
-        if (options.name === 'grandTotalDr') {
-          options.totalValue = totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-        }
-      }
-    },
+  //       if (options.name === 'closingBalanceCr') {
+  //         options.totalValue = closingBalance > 0 ? closingBalance : 0;
+  //       }
+  //       if (options.name === 'closingBalanceDr') {
+  //         options.totalValue = closingBalance < 0 ? Math.abs(closingBalance) : 0;
+  //       }
+  //       if (options.name === 'grandTotalCr') {
+  //         options.totalValue = totalCr + (closingBalance > 0 ? closingBalance : 0);
+  //       }
+  //       if (options.name === 'grandTotalDr') {
+  //         options.totalValue = totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
+  //       }
+  //     }
+  //   },
+  // };
+
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
   };
+
+
+  updateSummaryColumnsData(): void {
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
+    };
+
+    const summaryFields = [
+      'DR_AMOUNT',
+      'CR_AMOUNT',
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          showInColumn: field,
+          alignment: 'right',
+        }))
+        : [],
+
+      groupItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        }))
+        : [],
+    };
+
+    this.cdr.detectChanges();
+  }
+
 }
 
 @NgModule({

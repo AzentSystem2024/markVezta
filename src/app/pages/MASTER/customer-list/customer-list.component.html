@@ -15,6 +15,7 @@
     (onRowRemoving)="onRowRemoving($event)"
     [showColumnLines]="true"
     (onCellPrepared)="onCellPrepared($event)"
+    width="100%"
   >
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>
@@ -176,18 +177,18 @@
       alignment="left"
       width="70"
     ></dxi-column>
-    <dxi-column dataField="CUST_CODE" caption="Code">
+    <dxi-column dataField="CUST_CODE" caption="Code" width="90">
       <dxi-validation-rule type="required" message="Code is required">
       </dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="CUST_NAME" caption="Name" width="400px">
+    <dxi-column dataField="CUST_NAME" caption="Name" width="300">
       <dxi-validation-rule type="required" message="Customer name is required">
         <dxi-validation-rule type="pattern" message="Customer name is required">
         </dxi-validation-rule>
       </dxi-validation-rule>
     </dxi-column>
 
-    <dxi-column dataField="CITY" caption="City">
+    <dxi-column dataField="CITY" caption="City" width="170">
       <dxi-validation-rule type="required" message="City is required">
         <dxi-validation-rule type="pattern" message="City is required">
         </dxi-validation-rule>
@@ -264,14 +265,15 @@
       </dxi-validation-rule>
     </dxi-column>
 
-    <dxi-column dataField="COUNTRY_NAME" caption="Country"> </dxi-column>
-    <dxi-column dataField="PHONE" caption="Phone">
+    <dxi-column dataField="COUNTRY_NAME" caption="Country" width="120">
+    </dxi-column>
+    <dxi-column dataField="PHONE" caption="Phone" width="120">
       <dxi-validation-rule type="required" message="Phone number is required">
         <dxi-validation-rule type="pattern" message="Phone number is required">
         </dxi-validation-rule>
       </dxi-validation-rule>
     </dxi-column>
-    <dxi-column dataField="EMAIL" caption="Email">
+    <dxi-column dataField="EMAIL" caption="Email" width="120">
       <dxi-validation-rule
         type="required"
         message="Email is required"
@@ -329,7 +331,7 @@
       </dxi-validation-rule>
     </dxi-column>
 
-    <dxi-column dataField="TYPE" caption="Type" width="400px">
+    <dxi-column dataField="TYPE" caption="Type" width="100">
       <dxi-validation-rule type="required" message="Customer type is required">
         <dxi-validation-rule type="pattern" message="Customer type is required">
         </dxi-validation-rule>
