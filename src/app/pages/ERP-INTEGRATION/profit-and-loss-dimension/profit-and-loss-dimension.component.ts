@@ -171,10 +171,7 @@ export class ProfitAndLossDimensionComponent {
     this.selectedmonth = currentMonth;
 
     // Set date range from the first day of this month to today
-    this.formatted_from_date = this.formatDate(
-      new Date(currentYear, currentMonth, 1)
-    );
-
+    this.formatted_from_date = this.formatDate(today);
     this.formatted_To_date = this.formatDate(today);
 
     this.get_DataSource();
