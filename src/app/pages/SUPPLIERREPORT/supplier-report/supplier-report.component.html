@@ -1,5 +1,88 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
+    <!-- Collapsible Filter Panel -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <!-- Year -->
+        <dx-select-box
+          labelMode="floating"
+          label="Year"
+          [width]="150"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        ></dx-select-box>
+
+        <!-- Month -->
+        <dx-select-box
+          labelMode="floating"
+          label="Month"
+          [width]="150"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        ></dx-select-box>
+
+        <!-- Date From -->
+        <dx-date-box
+          [width]="150"
+          label="Date From"
+          labelMode="floating"
+          displayFormat="dd-MM-yyyy"
+          [(value)]="formatted_from_date"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+
+        <!-- Date To -->
+        <dx-date-box
+          [width]="150"
+          label="Date To"
+          labelMode="floating"
+          displayFormat="dd-MM-yyyy"
+          [value]="formatted_To_date"
+          (onValueChanged)="onToDateChange($event)"
+        ></dx-date-box>
+
+        <!-- Supplier -->
+        <dx-select-box
+          label="Supplier"
+          labelMode="floating"
+          stylingMode="outlined"
+          valueExpr="ID"
+          displayExpr="DESCRIPTION"
+          [items]="Supplier"
+          [searchEnabled]="true"
+          [(value)]="selectedSupplierId"
+          [width]="200"
+          (onValueChanged)="onSupplierChanged($event)"
+        ></dx-select-box>
+
+        <!-- Apply -->
+        <dx-button
+          text="Apply"
+          icon="check"
+          type="default"
+          stylingMode="contained"
+          (onClick)="get_DataSource()"
+        ></dx-button>
+      </div>
+    </div>
+
+    <!-- Horizontal Toggle Bar -->
+    <div
+      class="toggle-bar"
+      (click)="toggleParameters()"
+      [title]="showParameters ? 'Hide Filters' : 'Show Filters'"
+    >
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
     <dx-data-grid
       #dataGrid
       class="grid theme-dependent"
@@ -65,70 +148,17 @@
           </div>
         </dxi-item>
 
-        <dxi-item>
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="Year"
-            [width]="150"
-            [(value)]="selectedYear"
-            [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)"
-            placeholder="Year"
-          ></dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="month"
-            [dataSource]="monthDataSource"
-            displayExpr="name"
-            valueExpr="value"
-            [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)"
-            [dropDownOptions]="{ width: 'auto' }"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="Date From"
-            labelMode="floating"
-            [displayFormat]="'dd-MM-yyyy'"
-            [(value)]="formatted_from_date"
-            (onValueChanged)="onFromDateChange($event)"
-          ></dx-date-box>
-        </dxi-item>
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="Date To"
-            labelMode="floating"
-            [value]="formatted_To_date"
-            [displayFormat]="'dd-MM-yyyy'"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-
-        <dxi-item>
-          <dx-select-box
-            label="Supplier"
-            labelMode="floating"
-            stylingMode="outlined"
-            [valueExpr]="'ID'"
-            [displayExpr]="'DESCRIPTION'"
-            [items]="Supplier"
-            [searchEnabled]="true"
-            [(value)]="selectedSupplierId"
-            width="200px"
-            (onValueChanged)="onSupplierChanged($event)"
-          ></dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
 
         <dxi-item
           name="exportButton"
@@ -136,17 +166,18 @@
           cssClass="export-btn"
         ></dxi-item>
 
-        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            (onClick)="get_DataSource()"
-          >
-          </dx-button>
-        </dxi-item>
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping
@@ -248,6 +279,58 @@
         </dxi-button>
       </dxi-column>
     </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>
 

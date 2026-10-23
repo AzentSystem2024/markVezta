@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
+import { ChangeDetectorRef, Component, NgModule, ViewChild } from '@angular/core';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxLoadIndicatorModule,
@@ -28,6 +29,74 @@ import notify from 'devextreme/ui/notify';
   styleUrls: ['./supplier-report.component.scss'],
 })
 export class SupplierReportComponent {
+
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'SUPP_NAME', caption: 'Supplier Name' },
+    { dataField: 'DOC_NO', caption: 'Doc No' },
+    { dataField: 'PURCH_DATE', caption: 'Date' },
+    { dataField: 'SUPP_INV_NO', caption: 'Supplier invoice no' },
+    { dataField: 'NET_AMOUNT', caption: 'Net Amount' },
+    { dataField: 'PAID_AMOUNT', caption: 'Paid Amount' },
+    { dataField: 'RETURN_AMOUNT', caption: 'Return Amount' },
+    { dataField: 'ADJ_AMOUNT', caption: 'Adjusted Amount' },
+    { dataField: 'BALANCE', caption: 'Balance' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   SupplierReport: any;
   isFilterRowVisible: boolean = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
@@ -57,6 +126,7 @@ export class SupplierReportComponent {
   selectedmonth: any = '';
   isLoading = false;
   hasData = false;
+  isSummaryVisible = true;
 
   constructor(
     private dataservice: DataService,
@@ -77,10 +147,11 @@ export class SupplierReportComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
+    this.updateSummaryColumnsData();
     // initialize with today's date
     // this.onToDateChange({ value: this.defaultDate });
     //get datasource======== function call==========
@@ -96,6 +167,63 @@ this.selectedmonth = currentMonth;
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
     this.get_DataSource();
+  }
+
+
+  // Expand or collapse the parameter panel.
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_DataSource();
+    }
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.updateSummaryColumnsData();
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
   }
 
   //================ Year value change ===================
@@ -263,134 +391,94 @@ this.selectedmonth = currentMonth;
     });
   }
 
-get_DataSource() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-    DATE_FROM: this.formatted_from_date,
-    DATE_TO: this.formatted_To_date,
-    SUPP_ID: this.selectedSupplierId || 0,
+  get_DataSource() {
+    this.showParameters = false;
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+      SUPP_ID: this.selectedSupplierId || 0,
+    };
+
+    sessionStorage.setItem('supplierViewClick', JSON.stringify(payload));
+
+    this.SupplierReport = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.Supplier_Report_Api(payload).subscribe({
+            next: (res: any) => {
+              const list = res.data || [];
+
+              this.hasData = list.length > 0;
+              resolve(list);
+
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
+
+              resolve(list);
+            },
+            error: () => {
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
+
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
   };
 
-  sessionStorage.setItem('supplierViewClick', JSON.stringify(payload));
+  updateSummaryColumnsData(): void {
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
+    };
 
-  this.SupplierReport = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.Supplier_Report_Api(payload).subscribe({
-          next: (res: any) => {
-            const list = res.data || [];
+    const summaryFields = [
+      'NET_AMOUNT',
+      'PAID_AMOUNT',
+      'RETURN_AMOUNT',
+      'ADJ_AMOUNT',
+      'BALANCE',
+    ];
 
-            this.hasData = list.length > 0;
-            resolve(list);
-            
-            if (list.length === 0) {
-              notify({
-                message: 'No data available',
-                type: 'warning',
-                displayTime: 2000,
-                position: {
-                  at: 'top center',
-                  my: 'top center',
-                },
-              });
-            }
+    this.summaryColumnsData = {
+      totalItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          showInColumn: field,
+          alignment: 'right',
+        }))
+        : [],
 
-            resolve(list);
-          },
-          error: () => {
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+      groupItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        }))
+        : [],
+    };
 
-  summaryColumnsData = {
-    totalItems: [
-      {
-        column: 'NET_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'NET_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        column: 'PAID_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'PAID_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        column: 'RETURN_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'RETURN_AMOUNT',
-        alignment: 'left',
-      },
-      {
-        column: 'ADJ_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'ADJ_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        column: 'BALANCE',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'BALANCE',
-        alignment: 'left',
-      },
-    ],
-    groupItems: [
-      {
-        column: 'NET_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'PAID_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'RETURN_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'ADJ_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'BALANCE',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-    ],
-    calculateCustomSummary: (options) => {
-      if (options.name === 'summaryRow') {
-        // Custom logic if needed
-      }
-    },
-  };
+    this.cdr.detectChanges();
+  }
 }
 
 @NgModule({
@@ -416,4 +504,4 @@ get_DataSource() {
   exports: [],
   declarations: [SupplierReportComponent],
 })
-export class SupplierReportModule {}
+export class SupplierReportModule { }

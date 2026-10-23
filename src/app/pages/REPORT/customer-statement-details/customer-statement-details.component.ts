@@ -7,6 +7,7 @@ import {
   Input,
   NgModule,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
@@ -33,6 +34,7 @@ import {
   DxValidationGroupModule,
   DxAutocompleteModule,
   DxTagBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 
 import {
@@ -41,7 +43,7 @@ import {
   DxoLookupModule,
   DxiItemModule,
   DxiGroupModule,
-} from 'devextreme-angular/ui/nested';  
+} from 'devextreme-angular/ui/nested';
 import { filter } from 'rxjs';
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
@@ -55,6 +57,71 @@ import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-inv
   styleUrls: ['./customer-statement-details.component.scss'],
 })
 export class CustomerStatementDetailsComponent {
+
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'TRANS_DATE', caption: 'Date' },
+    { dataField: 'DOC_NO', caption: 'Doc No' },
+    { dataField: 'DOC_NAME', caption: 'Document Name' },
+    { dataField: 'NARRATION', caption: 'Narration' },
+    { dataField: 'DR_AMOUNT', caption: 'Debit Amount' },
+    { dataField: 'CR_AMOUNT', caption: 'Credit Amount' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   @Input() CustomerDetilsData: any = {};
 
   CustomerListDataSource: any[] = [];
@@ -79,7 +146,7 @@ export class CustomerStatementDetailsComponent {
   selectedDebitNote: any;
   isViewCreditNote: boolean = false;
   selectedCreditNote: any;
-  isRetailInvoice :boolean= false;
+  isRetailInvoice: boolean = false;
   isViewInvoice: boolean = false;
   selectedInvoice: any;
   isViewReceipt: boolean = false;
@@ -95,8 +162,72 @@ export class CustomerStatementDetailsComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
-  isReadOnlyInvoice : boolean = true;
+  isReadOnlyInvoice: boolean = true;
   vat_title: any;
+  isSummaryVisible = true;
+  isFilterRowVisible = false;
+
+  // Expand or collapse the parameter panel.
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  toggleFilterRow = (): void => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_customer_list();
+    }
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.updateSummaryColumnsData();
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
+  }
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -126,6 +257,7 @@ export class CustomerStatementDetailsComponent {
   }
 
   ngOnInit() {
+    this.updateSummaryColumnsData();
     this.get_customer_list();
 
     this.loadLedgerData();
@@ -191,16 +323,31 @@ export class CustomerStatementDetailsComponent {
   // }
 
   async loadLedgerData() {
-    // this.customerSummaryData=this.Ledger_statement_datasource
-    // const sessiondata = this.getSessionData('customerDetails');
-    // const headid = this.getSessionData('HEADID');
+    
     const session = JSON.parse(sessionStorage.getItem('customerDetails'));
 
     this.select_customer_id = session.CUSTOMER_ID;
-    // this.selected_from_date=session.DATE_FROM
-    // this.selected_To_date=session.DATE_TO
-    ((this.selected_from_date = this.formatted_from_date),
-      (this.selected_To_date = this.formatted_To_date));
+   
+      // Read dates from the API payload
+  if (session.DATE_FROM) {
+    this.formatted_from_date = new Date(session.DATE_FROM);
+  }
+
+  if (session.DATE_TO) {
+    this.formatted_To_date = new Date(session.DATE_TO);
+  }
+
+  // Bind the month based on DATE_FROM
+  if (session.DATE_FROM) {
+    const fromDate = new Date(session.DATE_FROM);
+
+    this.selectedYear = fromDate.getFullYear();
+    this.selectedmonth = fromDate.getMonth();
+  }
+
+  // Keep the selected dates in the payload
+  this.selected_from_date = session.DATE_FROM;
+  this.selected_To_date = session.DATE_TO;
 
     await this.dataService
       .Customer_statement_Details_Api(session)
@@ -307,7 +454,7 @@ export class CustomerStatementDetailsComponent {
     this.selectedInvoice = null;
     this.loadingInvoice = true;
     this.popupReady = false;
-   
+
 
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE;
     const trans_id = e.row.data.TRANS_ID;
@@ -333,34 +480,34 @@ export class CustomerStatementDetailsComponent {
         this.isViewCreditNote = true;
         this.cdr.detectChanges();
       });
-    }  else if (TRANS_TYPE_ID === 25) {
+    } else if (TRANS_TYPE_ID === 25) {
 
-  if (this.vat_title === 'GST') {
+      if (this.vat_title === 'GST') {
 
-    this.dataService.selectInvoice(trans_id)
-      .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
+        this.dataService.selectInvoice(trans_id)
+          .subscribe((response: any) => {
+            this.selectedInvoice = response.Data;
 
-        this.isViewInvoice = true;
-        this.isRetailInvoice = false;
+            this.isViewInvoice = true;
+            this.isRetailInvoice = false;
 
-        this.cdr.detectChanges();
-      });
+            this.cdr.detectChanges();
+          });
 
-  } else {
+      } else {
 
-    this.dataService.selectInvoiceRetail(trans_id)
-      .subscribe((response: any) => {
-        this.selectedInvoice = response.Data;
+        this.dataService.selectInvoiceRetail(trans_id)
+          .subscribe((response: any) => {
+            this.selectedInvoice = response.Data;
 
-        this.isRetailInvoice = true;
-        this.isViewInvoice = false;
+            this.isRetailInvoice = true;
+            this.isViewInvoice = false;
 
-        this.cdr.detectChanges();
-      });
+            this.cdr.detectChanges();
+          });
 
-  }
-}else if (TRANS_TYPE_ID === 27) {
+      }
+    } else if (TRANS_TYPE_ID === 27) {
       this.dataService
         .selectCustomerReceipt(trans_id)
         .subscribe((response: any) => {
@@ -385,140 +532,187 @@ export class CustomerStatementDetailsComponent {
     this.cdr.detectChanges();
   }
 
-  summaryColumnsData = {
-    totalItems: [
-      // 1. Total Debitṅ
-      {
-        column: 'NARRATION',
-        summaryType: '',
-        displayFormat: ' Total',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'NARRATION',
-        alignment: 'right',
-      },
-      {
-        column: 'NARRATION',
-        summaryType: '',
-        displayFormat: ' Closing Balance',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'NARRATION',
-        alignment: 'right',
-      },
-      {
-        column: 'NARRATION',
-        summaryType: '',
-        displayFormat: ' Grand Total',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'NARRATION',
-        alignment: 'right',
-      },
-      {
-        name: 'totalDr',
-        column: 'DR_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DR_AMOUNT',
-        alignment: 'right',
-      },
-      // 2. Total Credit
-      {
-        name: 'totalCr',
-        column: 'CR_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CR_AMOUNT',
-        alignment: 'right',
-      },
-      // 3. Closing Balance (shows in Debit or Credit column based on value)
-      {
-        name: 'closingBalanceDr',
-        summaryType: 'custom',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DR_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        name: 'closingBalanceCr',
-        summaryType: 'custom',
-        displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CR_AMOUNT',
-        alignment: 'right',
-      },
-      // 4. Grand Total (sum of totals + closing balance)
-      {
-        name: 'grandTotalDr',
-        summaryType: 'custom',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'DR_AMOUNT',
-        alignment: 'right',
-      },
-      {
-        name: 'grandTotalCr',
-        summaryType: 'custom',
-        displayFormat: ' {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CR_AMOUNT',
-        alignment: 'right',
-      },
-    ],
+  // summaryColumnsData = {
+  //   totalItems: [
+  //     // 1. Total Debitṅ
+  //     {
+  //       column: 'NARRATION',
+  //       summaryType: '',
+  //       displayFormat: ' Total',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'NARRATION',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       column: 'NARRATION',
+  //       summaryType: '',
+  //       displayFormat: ' Closing Balance',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'NARRATION',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       column: 'NARRATION',
+  //       summaryType: '',
+  //       displayFormat: ' Grand Total',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'NARRATION',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'totalDr',
+  //       column: 'DR_AMOUNT',
+  //       summaryType: 'sum',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'DR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     // 2. Total Credit
+  //     {
+  //       name: 'totalCr',
+  //       column: 'CR_AMOUNT',
+  //       summaryType: 'sum',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'CR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     // 3. Closing Balance (shows in Debit or Credit column based on value)
+  //     {
+  //       name: 'closingBalanceDr',
+  //       summaryType: 'custom',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'DR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'closingBalanceCr',
+  //       summaryType: 'custom',
+  //       displayFormat: '{0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'CR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     // 4. Grand Total (sum of totals + closing balance)
+  //     {
+  //       name: 'grandTotalDr',
+  //       summaryType: 'custom',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'DR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //     {
+  //       name: 'grandTotalCr',
+  //       summaryType: 'custom',
+  //       displayFormat: ' {0}',
+  //       valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+  //       showInColumn: 'CR_AMOUNT',
+  //       alignment: 'right',
+  //     },
+  //   ],
 
-    calculateCustomSummary: (options: any) => {
-      if (options.summaryProcess === 'finalize') {
-        const items = this.customerSummaryData || [];
+  //   calculateCustomSummary: (options: any) => {
+  //     if (options.summaryProcess === 'finalize') {
+  //       const items = this.customerSummaryData || [];
 
-        const totalDr = items.reduce((sum, item) => {
-          const val = parseFloat(
-            String(item?.DR_AMOUNT || '0')
-              .replace(/,/g, '')
-              .trim(),
-          );
-          return sum + (isNaN(val) ? 0 : val);
-        }, 0);
+  //       const totalDr = items.reduce((sum, item) => {
+  //         const val = parseFloat(
+  //           String(item?.DR_AMOUNT || '0')
+  //             .replace(/,/g, '')
+  //             .trim(),
+  //         );
+  //         return sum + (isNaN(val) ? 0 : val);
+  //       }, 0);
 
-        const totalCr = items.reduce((sum, item) => {
-          const val = parseFloat(
-            String(item?.CR_AMOUNT || '0')
-              .replace(/,/g, '')
-              .trim(),
-          );
-          return sum + (isNaN(val) ? 0 : val);
-        }, 0);
+  //       const totalCr = items.reduce((sum, item) => {
+  //         const val = parseFloat(
+  //           String(item?.CR_AMOUNT || '0')
+  //             .replace(/,/g, '')
+  //             .trim(),
+  //         );
+  //         return sum + (isNaN(val) ? 0 : val);
+  //       }, 0);
 
-        const closingBalance = totalDr - totalCr;
+  //       const closingBalance = totalDr - totalCr;
 
-        // Closing Balance Cr
-        if (options.name === 'closingBalanceCr') {
-          options.totalValue = closingBalance > 0 ? closingBalance : 0;
-        }
+  //       // Closing Balance Cr
+  //       if (options.name === 'closingBalanceCr') {
+  //         options.totalValue = closingBalance > 0 ? closingBalance : 0;
+  //       }
 
-        // Closing Balance Dr
-        if (options.name === 'closingBalanceDr') {
-          options.totalValue =
-            closingBalance < 0 ? Math.abs(closingBalance) : 0;
-        }
+  //       // Closing Balance Dr
+  //       if (options.name === 'closingBalanceDr') {
+  //         options.totalValue =
+  //           closingBalance < 0 ? Math.abs(closingBalance) : 0;
+  //       }
 
-        // Grand Total Cr
-        if (options.name === 'grandTotalCr') {
-          options.totalValue =
-            totalCr + (closingBalance > 0 ? closingBalance : 0);
-        }
+  //       // Grand Total Cr
+  //       if (options.name === 'grandTotalCr') {
+  //         options.totalValue =
+  //           totalCr + (closingBalance > 0 ? closingBalance : 0);
+  //       }
 
-        // Grand Total Dr
-        if (options.name === 'grandTotalDr') {
-          options.totalValue =
-            totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
-        }
-      }
-    },
+  //       // Grand Total Dr
+  //       if (options.name === 'grandTotalDr') {
+  //         options.totalValue =
+  //           totalDr + (closingBalance < 0 ? Math.abs(closingBalance) : 0);
+  //       }
+  //     }
+  //   },
+  // };
+
+
+
+  summaryColumnsData: any = {
+    totalItems: [],
+    groupItems: [],
   };
 
+
+  updateSummaryColumnsData(): void {
+    const moneyFormat = {
+      type: 'fixedPoint',
+      precision: 2,
+      useGrouping: true,
+    };
+
+    const summaryFields = [
+      'DR_AMOUNT',
+      'CR_AMOUNT',
+    ];
+
+    this.summaryColumnsData = {
+      totalItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          showInColumn: field,
+          alignment: 'right',
+        }))
+        : [],
+
+      groupItems: this.isSummaryVisible
+        ? summaryFields.map((field) => ({
+          column: field,
+          summaryType: 'sum',
+          displayFormat: '{0}',
+          valueFormat: moneyFormat,
+          alignByColumn: true,
+        }))
+        : [],
+    };
+
+    this.cdr.detectChanges();
+  }
+
+
   onExporting(event: any) {
-    const fileName = 'Ledger Statement Report';
+    const fileName = 'Customer Statement Details Report';
     this.dataService.exportDataGridReport(event, fileName);
   }
 
@@ -567,4 +761,4 @@ export class CustomerStatementDetailsComponent {
   exports: [CustomerStatementDetailsComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomerStatementDetailsModule {}
+export class CustomerStatementDetailsModule { }
