@@ -215,11 +215,19 @@ export class PurchaseReportComponent {
   statusFinder: any;
   canApprove = false;
   buttonText: string;
+  isSummaryVisible = true;
+  showParameters = false;
 
   //  Toggle function
   toggleFiltersPanel() {
     this.isFilterVisible = !this.isFilterVisible;
   }
+
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -281,10 +289,46 @@ export class PurchaseReportComponent {
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
 
-    // this.load_JournalBook_data();
+
     this.store_dropdown();
     this.getCustomerOrUnitLst();
   }
+
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.dataGrid?.instance.option(
+      'summary.totalItems',
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+    );
+
+    this.dataGrid?.instance.option(
+      'summary.groupItems',
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+    );
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
 
   ngAfterViewInit() {
     setTimeout(() => this.resetPopups());
@@ -451,6 +495,7 @@ export class PurchaseReportComponent {
   }
 
   load_JournalBook_data() {
+    this.showParameters = false;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,

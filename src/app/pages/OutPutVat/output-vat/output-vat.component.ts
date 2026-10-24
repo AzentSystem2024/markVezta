@@ -7,7 +7,9 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   Input,
   NgModule,
+  NgZone,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
@@ -34,6 +36,7 @@ import {
   DxValidationGroupModule,
   DxAutocompleteModule,
   DxTagBoxModule,
+  DxDataGridComponent,
 } from 'devextreme-angular';
 
 import {
@@ -57,6 +60,68 @@ import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-inv
   styleUrls: ['./output-vat.component.scss'],
 })
 export class OutputVatComponent {
+
+  @ViewChild('dataGrid', { static: false })
+  dataGrid!: DxDataGridComponent;
+
+
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'STORE_NAME', caption: 'Store Name' },
+    { dataField: 'DOC_NO', caption: 'Bill No' },
+    { dataField: 'EXEMPTED', caption: 'Exempted' },
+    { dataField: 'ZERO_RATE', caption: 'Zero' },
+    { dataField: 'STANDARD_RATE', caption: 'Standard Rate' },
+    { dataField: 'TAX_AMOUNT', caption: 'Tax Amount' },
+    { dataField: 'TOTAL', caption: 'Total' },
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   @Input() EditingResponseData: any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -104,12 +169,16 @@ export class OutputVatComponent {
   selectedStoreid: any;
   isReadOnlyInvoice: boolean = false;
   isLoading = false;
+  isSummaryVisible = true;
+  isFilterOpened = false;
+  showParameters = false;
 
 
   constructor(
     private dataService: DataService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private zone: NgZone,
   ) {
     this.get_sessionstorage_data();
     this.get_fin_id();
@@ -149,6 +218,70 @@ export class OutputVatComponent {
         console.log(this.HEAD_ID_LIST);
       });
   }
+
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
+  }
+
+  // Toggle filter panel
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+    this.cdr.detectChanges();
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.Load_Output_vat();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+    this.cdr.detectChanges();
+  }
+
 
   get_customer_list() {
     const payload = {
@@ -192,26 +325,26 @@ export class OutputVatComponent {
   }
 
   Load_Output_vat() {
-     this.isLoading = true;
+    this.isLoading = true;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
       STORE_ID: this.selectedStoreid?.join(',') || '',
-      FIN_ID : this.selected_fin_id
+      FIN_ID: this.selected_fin_id
     };
 
     this.dataService.Output_VAT_Report_Api(payload).subscribe({
-    next: (res: any) => {
-      this.CustomerListDataSource = res.Data || [];
-      this.customerSummaryData = this.CustomerListDataSource;
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    },
-    error: () => {
-      this.isLoading = false;
-    }
-  });
+      next: (res: any) => {
+        this.CustomerListDataSource = res.Data || [];
+        this.customerSummaryData = this.CustomerListDataSource;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
   get_sessionstorage_data() {
@@ -481,6 +614,14 @@ export class OutputVatComponent {
     },
   };
 
+  get summaryConfig() {
+    return this.isSummaryVisible
+      ? this.summaryColumnsData
+      : {
+        totalItems: [],
+        groupItems: [],
+      };
+  }
   onExporting(event: any) {
     const fileName = 'Output VAT';
     this.dataService.exportDataGridReport(event, fileName);
@@ -530,4 +671,4 @@ export class OutputVatComponent {
   exports: [OutputVatComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class OutputVatModule {}
+export class OutputVatModule { }

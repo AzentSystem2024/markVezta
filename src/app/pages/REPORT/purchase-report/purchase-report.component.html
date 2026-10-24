@@ -1,129 +1,93 @@
 <div class="view-wrapper list-page">
-  <!-- ================= FILTER PANEL ================= -->
-  <div
-    class="paramsDiv SearchParams-container"
-    [ngClass]="{ 'hide-content': !isFilterVisible }"
-  >
-    <dx-form>
-      <dxi-item itemType="group" [colCount]="6">
-        <!-- Year -->
-        <dxi-item>
-          <dx-select-box
-            label="Year"
-            labelMode="floating"
-            [(value)]="selectedYear"
-            [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <!-- Month -->
-        <dxi-item>
-          <dx-select-box
-            label="Month"
-            labelMode="floating"
-            [dataSource]="monthDataSource"
-            displayExpr="name"
-            valueExpr="value"
-            [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <!-- From Date -->
-        <dxi-item>
-          <dx-date-box
-            label="From Date"
-            labelMode="floating"
-            [(value)]="selected_from_date"
-            displayFormat="dd-MM-yyyy"
-            [max]="today"
-            (onValueChanged)="onFromDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-
-        <!-- To Date -->
-        <dxi-item>
-          <dx-date-box
-            label="To Date"
-            labelMode="floating"
-            [(value)]="selected_To_date"
-            displayFormat="dd-MM-yyyy"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-
-        <!-- Store -->
-        <dxi-item>
-          <dx-tag-box
-            label="Store"
-            labelMode="floating"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [items]="Store"
-            [searchEnabled]="true"
-            [(value)]="selectedStoreid"
-            [showSelectionControls]="true"
-            [maxDisplayedTags]="100"
-            [showMultiTagOnly]="true"
-            [multiline]="false"
-            [hint]="storeHint"
-            (onValueChanged)="updateStoreHint()"
-          ></dx-tag-box>
-        </dxi-item>
-
-        <!-- Customer (smaller width) -->
-        <dxi-item>
-          <dx-select-box
-            label="Supplier"
-            labelMode="floating"
-            [(value)]="selectedCustomer"
-            [dataSource]="distributorList"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [searchEnabled]="true"
-          >
-          </dx-select-box>
-        </dxi-item>
-
-        <!-- Empty space -->
-        <dxi-item [colSpan]="5"></dxi-item>
-
-        <!-- Apply button -->
-        <dxi-item [colSpan]="1" cssClass="apply-btn-right">
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            (onClick)="load_JournalBook_data()"
-          >
-          </dx-button>
-        </dxi-item>
-      </dxi-item>
-    </dx-form>
-  </div>
-
-  <!-- ================= TOGGLE BUTTON ================= -->
-  <div class="button-container mt-1 mb-2">
-    <dx-button
-      class="toggleButton"
-      [width]="200"
-      [height]="13"
-      stylingMode="outlined"
-      type="normal"
-      [icon]="isFilterVisible ? 'chevronup' : 'chevrondown'"
-      (onClick)="toggleFiltersPanel()"
-      [hint]="isFilterVisible ? 'Hide Filters' : 'Show Filters'"
-    >
-    </dx-button>
-  </div>
-
-  <!-- ================= GRID ================= -->
   <div class="grid-container">
+    <!-- ================= FILTER PANEL ================= -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-select-box
+          label="Year"
+          labelMode="floating"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+        >
+        </dx-select-box>
+
+        <dx-select-box
+          label="Month"
+          labelMode="floating"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+        >
+        </dx-select-box>
+
+        <dx-date-box
+          label="From Date"
+          labelMode="floating"
+          [(value)]="selected_from_date"
+          displayFormat="dd-MM-yyyy"
+          [max]="today"
+          (onValueChanged)="onFromDateChange($event)"
+        >
+        </dx-date-box>
+
+        <dx-date-box
+          label="To Date"
+          labelMode="floating"
+          [(value)]="selected_To_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+
+        <dx-tag-box
+          label="Store"
+          labelMode="floating"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [items]="Store"
+          [searchEnabled]="true"
+          [(value)]="selectedStoreid"
+          [showSelectionControls]="true"
+          [maxDisplayedTags]="100"
+          [showMultiTagOnly]="true"
+          [multiline]="false"
+          [hint]="storeHint"
+          (onValueChanged)="updateStoreHint()"
+        ></dx-tag-box>
+
+        <dx-select-box
+          label="Supplier"
+          labelMode="floating"
+          [(value)]="selectedCustomer"
+          [dataSource]="distributorList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [searchEnabled]="true"
+        >
+        </dx-select-box>
+
+        <dx-button
+          text="Apply"
+          type="default"
+          stylingMode="contained"
+          (onClick)="load_JournalBook_data()"
+        >
+        </dx-button>
+      </div>
+    </div>
+
+    <!-- ================= TOGGLE BUTTON ================= -->
+    <div class="toggle-bar" (click)="toggleParameters()">
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
+    <!-- ================= GRID ================= -->
+
     <dx-data-grid
       #dataGrid
       class="grid theme-dependent"
@@ -152,7 +116,7 @@
       <dxo-grouping [contextMenuEnabled]="true" [autoExpandAll]="false">
       </dxo-grouping>
       <dxo-paging [pageSize]="10"></dxo-paging>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -173,16 +137,24 @@
         <dxi-item widget="dxButton" [options]="refreshButtonOptions">
         </dxi-item>
 
-        <dxi-item name="exportButton"></dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
 
-        <dxi-item location="after">
-          <dx-button
-            icon="columnchooser"
-            hint="Choose Columns"
-            stylingMode="outlined"
-            (onClick)="openColumnChooser()"
-          ></dx-button>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
 
       <!-- ================= COLUMNS ================= -->

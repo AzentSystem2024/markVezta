@@ -91,12 +91,7 @@
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
     >
-      <dxo-column-chooser
-        [height]="500"
-        hideOnOutsideClick="true"
-        [enabled]="true"
-        mode="select"
-      ></dxo-column-chooser>
+    
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-pager
@@ -140,8 +135,11 @@
         ></dxi-item>
 
         <!-- Column chooser -->
-        <dxi-item name="columnChooserButton" location="after"></dxi-item>
-
+       <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
         <!-- Show/hide summary -->
         <dxi-item
           location="after"
