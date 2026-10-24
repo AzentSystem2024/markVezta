@@ -60,702 +60,822 @@ import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-
   styleUrls: ['./itemwise-purchase-report.component.scss']
 })
 export class ItemwisePurchaseReportComponent {
-   @ViewChild(DxDataGridComponent, { static: true })
-    dataGrid: DxDataGridComponent;
-    JournalBookDataSource: DataSource; // ONLY for dx-data-grid
-    journalBookArray: any[] = []; // ONLY for logic / checks
-    journalBookCount = 0;
-    readonly allowedPageSizes: any = [5, 10, 'all'];
-    displayMode: any = 'full';
-    company_list: any[] = [];
-    company_id: any;
-    HEAD_ID_LIST: any[] = [];
-    fin_id: any[] = [];
-    ledgerSummaryData: any = [];
-    savedUserData: any;
-    selected_from_date: any;
-    selected_To_date: any;
-    selected_Head_Id: any;
-    selected_fin_id: any;
-    isEditReadOnly: boolean = true;
-    isViewJournalVoucher: boolean = false;
-    formatted_from_date: string;
-    formatted_To_date: string;
-    editLedgerPopup: boolean = false;
-    isViewDebitNote: boolean = false;
-    isViewCreditNote: boolean = false;
-    isViewInvoice: boolean = false;
-    isViewReceipt: boolean = false;
-    editMiscPopup: boolean = false;
-    selectedJournalVoucher: any;
-    selectedDebitNote: any;
-    selectedCreditNote: any;
-    selectedInvoice: any;
-    selectedReceipt: any;
-    selected_Company_id: any;
-    isEditInvoice: boolean = false;
-    isEditInvoiceReadOnly: boolean = true;
-    editPrePaymentPopupOpened: boolean = false;
-    isReadOnlyPayment: boolean = true;
-    isEditReceipt: boolean = false;
-    isReadOnlyReceipt: boolean = true;
-    loadingInvoice = false;
-    popupReady = false;
-  
-    selectedSaleReturn: any;
-    isReadOnlySaleReturn: boolean = true;
-    isEditSaleReturn: boolean = false;
-  
-    selectedYear: number | null = null;
-    years: number[] = [];
-    monthDataSource: { name: string; value: any }[];
-    selectedmonth: any = '';
-  
-    editMiscPopupOpened: boolean = false;
-    isReadOnlyPurchaseReturn: boolean = true;
-    isEditPurchaseReturn: boolean = false;
-    // @Input() MiscReceiptId : any;
-    isFilterOpened = false;
-    defaultDate: Date = new Date();
-    selectedmiscellaneousData: any;
-    selectedPrePayment: any;
-    selectedSupplierPayment: any;
-    selectedPurchaseReturn: any;
-    selectedMiscPayment: any;
-    selecte_prepayment_Data: any;
-    isEditPopupPrepaymentPosting: boolean = false;
-    selectedTrOut: any;
-    isEditTransferOut: boolean = false;
-    isReadOnlyTrOut: boolean = true;
-    selectedTrIn: any;
-    isEditTransferIn: boolean = false;
-    isReadOnlyTrIn: boolean = true;
-    isMiscViewInvoice: boolean = false;
-    isEditCustomerReceipt: boolean = false;
-    viewPayrollPopupOpened: boolean = false;
-    refreshButtonOptions = {
-      icon: 'refresh',
-      hint: 'Refresh',
-      elementAttr: { class: 'toolbar-icon-btn' },
-      onClick: () => {
-        this.zone.run(() => this.refreshGrid());
-      },
-      text: '',
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'ITEM_CODE', caption: 'Item' },
+    { dataField: 'DESCRIPTION', caption: 'Description' },
+    { dataField: 'PURCH_DATE', caption: 'Date' },
+    { dataField: 'PURCH_NO', caption: 'Purch No' },
+    { dataField: 'STORE_NAME', caption: 'Store' },
+    { dataField: 'SUPP_NAME', caption: "Supplier" },
+    { dataField: 'QUANTITY', caption: 'Quantity' },
+    { dataField: 'DEPT_NAME', caption: 'Department' },
+    { dataField: 'CAT_NAME', caption: 'Category' },
+    { dataField: 'SUBCAT_NAME', caption: 'Subcategory' },
+    { dataField: 'BRAND_NAME', caption: 'Brand' },
+    { dataField: 'CUSTOM1_NAME', caption: 'ItemProperty1' },
+    { dataField: 'CUSTOM2_NAME', caption: 'ItemProperty2' },
+    { dataField: 'RATE', caption: 'Price' },
+    { dataField: 'DISCOUNT', caption: 'Discount' },
+    { dataField: 'GROSS_AMOUNT', caption: 'Excl.VAT Amount' },
+    { dataField: 'VAT_PERCENT', caption: 'VAT %' },
+    { dataField: 'VAT_AMOUNT', caption: 'VAT Amount' },
+    { dataField: 'NET_AMOUNT', caption: 'Net Amount' },
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+  JournalBookDataSource: DataSource; // ONLY for dx-data-grid
+  journalBookArray: any[] = []; // ONLY for logic / checks
+  journalBookCount = 0;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  company_list: any[] = [];
+  company_id: any;
+  HEAD_ID_LIST: any[] = [];
+  fin_id: any[] = [];
+  ledgerSummaryData: any = [];
+  savedUserData: any;
+  selected_from_date: any;
+  selected_To_date: any;
+  selected_Head_Id: any;
+  selected_fin_id: any;
+  isEditReadOnly: boolean = true;
+  isViewJournalVoucher: boolean = false;
+  formatted_from_date: string;
+  formatted_To_date: string;
+  editLedgerPopup: boolean = false;
+  isViewDebitNote: boolean = false;
+  isViewCreditNote: boolean = false;
+  isViewInvoice: boolean = false;
+  isViewReceipt: boolean = false;
+  editMiscPopup: boolean = false;
+  selectedJournalVoucher: any;
+  selectedDebitNote: any;
+  selectedCreditNote: any;
+  selectedInvoice: any;
+  selectedReceipt: any;
+  selected_Company_id: any;
+  isEditInvoice: boolean = false;
+  isEditInvoiceReadOnly: boolean = true;
+  editPrePaymentPopupOpened: boolean = false;
+  isReadOnlyPayment: boolean = true;
+  isEditReceipt: boolean = false;
+  isReadOnlyReceipt: boolean = true;
+  loadingInvoice = false;
+  popupReady = false;
+
+  selectedSaleReturn: any;
+  isReadOnlySaleReturn: boolean = true;
+  isEditSaleReturn: boolean = false;
+
+  selectedYear: number | null = null;
+  years: number[] = [];
+  monthDataSource: { name: string; value: any }[];
+  selectedmonth: any = '';
+
+  editMiscPopupOpened: boolean = false;
+  isReadOnlyPurchaseReturn: boolean = true;
+  isEditPurchaseReturn: boolean = false;
+  // @Input() MiscReceiptId : any;
+  isFilterOpened = false;
+  defaultDate: Date = new Date();
+  selectedmiscellaneousData: any;
+  selectedPrePayment: any;
+  selectedSupplierPayment: any;
+  selectedPurchaseReturn: any;
+  selectedMiscPayment: any;
+  selecte_prepayment_Data: any;
+  isEditPopupPrepaymentPosting: boolean = false;
+  selectedTrOut: any;
+  isEditTransferOut: boolean = false;
+  isReadOnlyTrOut: boolean = true;
+  selectedTrIn: any;
+  isEditTransferIn: boolean = false;
+  isReadOnlyTrIn: boolean = true;
+  isMiscViewInvoice: boolean = false;
+  isEditCustomerReceipt: boolean = false;
+  viewPayrollPopupOpened: boolean = false;
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+  selectedProduction: any;
+  isViewProduction: boolean;
+  selectedPayroll: any;
+  Store: any;
+  selectedStoreid: any;
+  selectedCustomer: any;
+  selectedBrand: any;
+  selectedDepartment: any;
+  selectedCategory: any;
+  selectedSubcategory: any;
+  selectedSalesman: any;
+
+  items: any;
+  selectedItem: any[] = [];
+  itemHint: string = '';
+
+  // Add this variable
+  isFilterVisible: boolean = true;
+  distributorList: any;
+  Salesman: any;
+  Brand: any;
+  Subcategory: any;
+  Category: any;
+  Department: any;
+  selectedItemProperty1: any;
+  selectedItemProperty2: any;
+  itemProperty2: any;
+  itemProperty1: any;
+  today: Date = new Date();
+  buttonText: string;
+  canApprove: boolean;
+  statusFinder: any;
+  isVerifyInvoice: boolean = false;
+  isSummaryVisible = true;
+
+  //  Toggle function
+  toggleFiltersPanel() {
+    this.isFilterVisible = !this.isFilterVisible;
+  }
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef,
+  ) {
+    // this.get_sessionstorage_data();
+    // this.get_fin_id();
+    // this.sesstion_Details();
+
+    //============Year field dataSource===============
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2015; year--) {
+      this.years.push(year);
+    }
+    this.selectedYear = currentYear;
+    //============Month field dataSource===============
+    this.monthDataSource = this.dataService.getMonths();
+    const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
+    this.selectedmonth = currentMonth;
+  }
+
+  ngOnInit() {
+    this.resetPopups();
+    const raw = sessionStorage.getItem('savedUserData');
+
+    // if (!raw) {
+    //   // delay navigation until routing is ready
+    //   setTimeout(() => {
+    //     this.router.navigate(['/login']);
+    //   });
+    //   return;
+    // }
+
+    this.savedUserData = JSON.parse(raw);
+
+    this.company_list = this.savedUserData?.Companies ?? [];
+    this.fin_id = this.savedUserData?.FINANCIAL_YEARS ?? [];
+
+    this.selected_Company_id =
+      this.savedUserData?.SELECTED_COMPANY?.COMPANY_ID ?? null;
+
+    this.selected_fin_id =
+      this.savedUserData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? null;
+
+    if (!this.selected_Company_id || !this.selected_fin_id) return;
+    this.appType = this.savedUserData?.Configuration[0]?.APP_TYPE || '';
+    // this.onFromDateChange({ value: this.defaultDate });
+    // this.onToDateChange({ value: this.defaultDate });
+
+    const today = new Date();
+    const SystemDate =
+      today.getFullYear() +
+      '-' +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    this.selected_from_date = SystemDate;
+    this.selected_To_date = SystemDate;
+
+
+    this.store_dropdown();
+    this.item_dropdown();
+    this.getCustomerOrUnitLst();
+    this.department_dropdown();
+    this.Catgeory_dropdown();
+    this.SubCatgeory_dropdown();
+    this.Brand_dropdown();
+    this.Salesman_dropdown();
+    this.ItemProperty1_dropdown();
+    this.ItemProperty2_dropdown();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.dataGrid?.instance.option(
+      'summary.totalItems',
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+    );
+
+    this.dataGrid?.instance.option(
+      'summary.groupItems',
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+    );
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
-    selectedProduction: any;
-    isViewProduction: boolean;
-    selectedPayroll: any;
-    Store: any;
-    selectedStoreid: any;
-    selectedCustomer: any;
-    selectedBrand: any;
-    selectedDepartment: any;
-    selectedCategory: any;
-    selectedSubcategory: any;
-    selectedSalesman: any;
-  
-    items: any;
-    selectedItem: any[] = [];
-    itemHint: string = '';
-  
-    // Add this variable
-    isFilterVisible: boolean = true;
-    distributorList: any;
-    Salesman: any;
-    Brand: any;
-    Subcategory: any;
-    Category: any;
-    Department: any;
-    selectedItemProperty1: any;
-    selectedItemProperty2: any;
-    itemProperty2: any;
-    itemProperty1: any;
-    today: Date = new Date();
-buttonText: string;
-canApprove: boolean;
-statusFinder: any;
-  isVerifyInvoice: boolean;
-  
-    //  Toggle function
-    toggleFiltersPanel() {
-      this.isFilterVisible = !this.isFilterVisible;
-    }
-    constructor(
-      private dataService: DataService,
-      private router: Router,
-      private zone: NgZone,
-      private cdr: ChangeDetectorRef,
-    ) {
-      // this.get_sessionstorage_data();
-      // this.get_fin_id();
-      // this.sesstion_Details();
-  
-      //============Year field dataSource===============
-      const currentYear = new Date().getFullYear();
-      for (let year = currentYear; year >= 2015; year--) {
-        this.years.push(year);
-      }
-      this.selectedYear = currentYear;
-      //============Month field dataSource===============
-      this.monthDataSource = this.dataService.getMonths();
-      const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-  this.selectedmonth = currentMonth;
-    }
-  
-    ngOnInit() {
-      this.resetPopups();
-      const raw = sessionStorage.getItem('savedUserData');
-  
-      // if (!raw) {
-      //   // delay navigation until routing is ready
-      //   setTimeout(() => {
-      //     this.router.navigate(['/login']);
-      //   });
-      //   return;
-      // }
-  
-      this.savedUserData = JSON.parse(raw);
-  
-      this.company_list = this.savedUserData?.Companies ?? [];
-      this.fin_id = this.savedUserData?.FINANCIAL_YEARS ?? [];
-  
-      this.selected_Company_id =
-        this.savedUserData?.SELECTED_COMPANY?.COMPANY_ID ?? null;
-  
-      this.selected_fin_id =
-        this.savedUserData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? null;
-  
-      if (!this.selected_Company_id || !this.selected_fin_id) return;
-  
-      // this.onFromDateChange({ value: this.defaultDate });
-      // this.onToDateChange({ value: this.defaultDate });
-  
-      const today = new Date();
-      const SystemDate =
-        today.getFullYear() +
-        '-' +
-        String(today.getMonth() + 1).padStart(2, '0') +
-        '-' +
-        String(today.getDate()).padStart(2, '0');
-  
-      this.selected_from_date = SystemDate;
-      this.selected_To_date = SystemDate;
-  
-      
-      this.store_dropdown();
-      this.item_dropdown();
-      this.getCustomerOrUnitLst();
-      this.department_dropdown();
-      this.Catgeory_dropdown();
-      this.SubCatgeory_dropdown();
-      this.Brand_dropdown();
-      this.Salesman_dropdown();
-      this.ItemProperty1_dropdown();
-      this.ItemProperty2_dropdown();
-    }
-  
-    ngAfterViewInit() {
-      setTimeout(() => this.resetPopups());
-    }
-    private reloadJournalBook() {
-      if (!this.dataGrid?.instance) return;
-  
-      this.Itemwise_Purchase_data();
-    }
-    //================ Year value change ===================
-    onYearChanged(e: any): void {
-      this.selectedYear = e.value;
-      this.selectedmonth = '';
-      const currentYear = new Date().getFullYear();
-      const today = new Date();
-      if (this.selectedYear === currentYear) {
-        // Set from date to the start of the year and to date to today
-        this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
-        this.selected_To_date = today; // Today's date
-      } else {
-        this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
-        this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
-      }
-      // this.reloadJournalBook();
-    }
-  
-    //================Month value change ===================
-    onMonthValueChanged(e: any) {
-      this.selectedmonth = e.value ?? '';
-      if (this.selectedmonth === '') {
-        this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
-        this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
-      } else {
-        this.selected_from_date = new Date(
-          this.selectedYear,
-          this.selectedmonth,
-          1,
-        );
-        this.selected_To_date = new Date(
-          this.selectedYear,
-          this.selectedmonth + 1,
-          0,
-        );
-      }
-      // this.reloadJournalBook();
-    }
-  
-    searchButtonOptions = {
-      icon: 'search',
-      hint: 'Show / Hide Filters',
-      elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-      onClick: () => this.toggleFilters(),
-    };
-  
-    toggleFilters() {
-      this.isFilterOpened = !this.isFilterOpened;
-  
-      const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
-  
-      if (grid) {
-        grid.option('filterRow.visible', this.isFilterOpened);
-        grid.option('headerFilter.visible', this.isFilterOpened);
-      }
-    }
-  
-    resetPopups() {
-      this.isViewJournalVoucher = false;
-      this.isViewDebitNote = false;
-      this.isViewCreditNote = false;
-      this.isViewInvoice = false;
-      this.isEditInvoice = false;
-      this.isEditCustomerReceipt = false;
-      this.editMiscPopup = false;
-      this.editMiscPopupOpened = false;
-      this.editPrePaymentPopupOpened = false;
-      this.isEditReceipt = false;
-      this.isEditPurchaseReturn = false;
-      this.isEditTransferOut = false;
-      this.isEditTransferIn = false;
-      this.isEditPopupPrepaymentPosting = false;
-    }
-    refreshGrid() {
-      if (this.dataGrid?.instance) {
-        this.dataGrid.instance.refresh(); // Or reload data from API if needed
-      }
-      this.Itemwise_Purchase_data();
-    }
-    getSessionData(key: string) {
-      const data = sessionStorage.getItem(key);
-      return data ? JSON.parse(data) : null;
-    }
-  
-    sesstion_Details() {
-      const sessionDataRaw = sessionStorage.getItem('savedUserData');
-  
-      const sessionData = JSON.parse(sessionDataRaw);
-  
-      this.selected_Company_id =
-        sessionData?.SELECTED_COMPANY?.COMPANY_ID ?? null;
-  
-      this.selected_fin_id = sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? null;
-    }
-  
-    get_sessionstorage_data() {
-      this.savedUserData = this.getSessionData('savedUserData');
-      if (this.savedUserData) {
-        this.company_list = this.savedUserData.Companies || [];
-      }
-    }
-  
-    get_fin_id() {
-      this.fin_id = this.savedUserData?.FINANCIAL_YEARS || [];
-      if (this.fin_id.length) {
-        this.selected_fin_id = this.fin_id[0].FIN_ID;
-      }
-      console.log(this.selected_fin_id, '========financial year');
-    }
-  
-    onCompanyChange(event: any) {
-      this.company_id = event.value;
-      this.dataService
-        .HeadId_Dropdown_api(this.selected_fin_id)
-        .subscribe((res: any) => {
-          this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
-        });
-      this.reloadJournalBook();
-    }
-  
-    onFromDateChange(event: any) {
-      const rawDate: Date = new Date(event.value);
-      const today = new Date();
-  
-      // if (rawDate > today) {
-      //   notify('To Date cannot be greater than today', 'error', 2000);
-      //   this.selected_To_date = today;
-      //   return;
-      // }
-      this.formatted_from_date = this.formatDate(rawDate);
-      // this.reloadJournalBook();
-    }
-  
-    onToDateChange(event: any) {
-      const rawDate: Date = new Date(event.value);
-      const today = new Date();
-  
-      // if (rawDate > today) {
-      //   notify('To Date cannot be greater than today', 'error', 2000);
-      //   this.selected_To_date = today;
-      //   return;
-      // }
-      this.formatted_To_date = this.formatDate(rawDate);
-      // this.reloadJournalBook();
-    }
-  
-    formatDate(date: Date): string {
-      const year = date.getFullYear();
-      const month = ('0' + (date.getMonth() + 1)).slice(-2);
-      const day = ('0' + date.getDate()).slice(-2);
-      return `${year}-${month}-${day}`;
-    }
-  
-    onHeadIdChange(event: any) {
-      // Optional: Update sessionStorage if needed
-    }
-  
-    Itemwise_Purchase_data() {
-      const payload = {
-        COMPANY_ID: this.selected_Company_id,
-        FIN_ID: this.selected_fin_id,
-        DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-        DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-        STORE_ID: this.selectedStoreid?.length
-          ? this.selectedStoreid.join(',') // FINAL FIX
-          : '',
-        SUPP_ID:
-          this.selectedCustomer != null ? String(this.selectedCustomer) : '',
-        BRAND_ID: this.selectedBrand != null ? String(this.selectedBrand) : '',
-        ITEM_ID: '',
-        DEPT_ID:
-          this.selectedDepartment != null ? Number(this.selectedDepartment) : '',
-        CAT_ID:
-          this.selectedCategory != null ? Number(this.selectedCategory) : '',
-        SUBCAT_ID:
-          this.selectedSubcategory != null
-            ? Number(this.selectedSubcategory)
-            : '',
-        CUSTOM1:
-          this.selectedItemProperty1 != null
-            ? Number(this.selectedItemProperty1)
-            : '',
-        CUSTOM2:
-          this.selectedItemProperty2 != null
-            ? Number(this.selectedItemProperty2)
-            : '',
-      };
-  
-      this.JournalBookDataSource = new DataSource({
-        load: () =>
-          new Promise((resolve) => {
-            this.dataService.ItemwisePurchaseReport(payload).subscribe({
-              next: (res: any) => {
-                const list = res?.data || [];
-  
-                // 🔑 cache for logic
-                this.journalBookArray = list;
-                this.journalBookCount = list.length;
-  
-                this.ledgerSummaryData = list;
-                if (list.length === 0) {
-                  notify({
-                    message: 'No data available',
-                    type: 'warning',
-                    displayTime: 2000,
-                    position: {
-                      at: 'top center',
-                      my: 'top center',
-                    },
-                  });
-                }
-                this.isFilterVisible = false;
-                resolve(list); // 🔑 grid gets data
-              },
-              error: () => {
-                this.journalBookArray = [];
-                this.journalBookCount = 0;
-                this.ledgerSummaryData = [];
-                resolve([]);
-              },
-            });
-          }),
-      });
-    }
-  
- onViewClick(e: any) {
-  const trans_id = e.row.data.TRANS_ID;
+  }
 
-  this.dataService.selectPurchaseInvoice(trans_id).subscribe((response: any) => {
+  ngAfterViewInit() {
+    setTimeout(() => this.resetPopups());
+  }
+  private reloadJournalBook() {
+    if (!this.dataGrid?.instance) return;
 
-    this.selectedInvoice = response.Data;
-
-    if (this.selectedInvoice.STATUS == "Approved") {
-      this.buttonText = 'View Purchase Invoice';
-    } else if (this.selectedInvoice.STATUS == "Open") {
-      this.buttonText = 'Verify Purchase Invoice';
-    } else if (this.selectedInvoice.STATUS == "Verified") {
-      this.buttonText = 'Approve Purchase Invoice';
+    this.Itemwise_Purchase_data();
+  }
+  //================ Year value change ===================
+  onYearChanged(e: any): void {
+    this.selectedYear = e.value;
+    this.selectedmonth = '';
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedYear === currentYear) {
+      // Set from date to the start of the year and to date to today
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the current year
+      this.selected_To_date = today; // Today's date
     } else {
-      this.buttonText = 'Purchase Invoice';
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31
+    }
+    // this.reloadJournalBook();
+  }
+
+  //================Month value change ===================
+  onMonthValueChanged(e: any) {
+    this.selectedmonth = e.value ?? '';
+    if (this.selectedmonth === '') {
+      this.selected_from_date = new Date(this.selectedYear, 0, 1); // January 1 of the selected year
+      this.selected_To_date = new Date(this.selectedYear, 11, 31); // December 31 of the selected year
+    } else {
+      this.selected_from_date = new Date(
+        this.selectedYear,
+        this.selectedmonth,
+        1,
+      );
+      this.selected_To_date = new Date(
+        this.selectedYear,
+        this.selectedmonth + 1,
+        0,
+      );
+    }
+    // this.reloadJournalBook();
+  }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  resetPopups() {
+    this.isViewJournalVoucher = false;
+    this.isViewDebitNote = false;
+    this.isViewCreditNote = false;
+    this.isViewInvoice = false;
+    this.isEditInvoice = false;
+    this.isEditCustomerReceipt = false;
+    this.editMiscPopup = false;
+    this.editMiscPopupOpened = false;
+    this.editPrePaymentPopupOpened = false;
+    this.isEditReceipt = false;
+    this.isEditPurchaseReturn = false;
+    this.isEditTransferOut = false;
+    this.isEditTransferIn = false;
+    this.isEditPopupPrepaymentPosting = false;
+  }
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.Itemwise_Purchase_data();
+  }
+  getSessionData(key: string) {
+    const data = sessionStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  }
+
+  sesstion_Details() {
+    const sessionDataRaw = sessionStorage.getItem('savedUserData');
+
+    const sessionData = JSON.parse(sessionDataRaw);
+
+    this.selected_Company_id =
+      sessionData?.SELECTED_COMPANY?.COMPANY_ID ?? null;
+
+    this.selected_fin_id = sessionData?.FINANCIAL_YEARS?.[0]?.FIN_ID ?? null;
+  }
+
+  get_sessionstorage_data() {
+    this.savedUserData = this.getSessionData('savedUserData');
+    if (this.savedUserData) {
+      this.company_list = this.savedUserData.Companies || [];
+    }
+  }
+
+  get_fin_id() {
+    this.fin_id = this.savedUserData?.FINANCIAL_YEARS || [];
+    if (this.fin_id.length) {
+      this.selected_fin_id = this.fin_id[0].FIN_ID;
+    }
+    console.log(this.selected_fin_id, '========financial year');
+  }
+
+  onCompanyChange(event: any) {
+    this.company_id = event.value;
+    this.dataService
+      .HeadId_Dropdown_api(this.selected_fin_id)
+      .subscribe((res: any) => {
+        this.HEAD_ID_LIST = res.LEDGER_HEADS || [];
+      });
+    this.reloadJournalBook();
+  }
+
+  onFromDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    const today = new Date();
+
+    // if (rawDate > today) {
+    //   notify('To Date cannot be greater than today', 'error', 2000);
+    //   this.selected_To_date = today;
+    //   return;
+    // }
+    this.formatted_from_date = this.formatDate(rawDate);
+    // this.reloadJournalBook();
+  }
+
+  onToDateChange(event: any) {
+    const rawDate: Date = new Date(event.value);
+    const today = new Date();
+
+    // if (rawDate > today) {
+    //   notify('To Date cannot be greater than today', 'error', 2000);
+    //   this.selected_To_date = today;
+    //   return;
+    // }
+    this.formatted_To_date = this.formatDate(rawDate);
+    // this.reloadJournalBook();
+  }
+
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+  onHeadIdChange(event: any) {
+    // Optional: Update sessionStorage if needed
+  }
+
+  Itemwise_Purchase_data() {
+    this.showParameters = false;
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.selected_fin_id,
+      DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
+      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
+      STORE_ID: this.selectedStoreid?.length
+        ? this.selectedStoreid.join(',') // FINAL FIX
+        : '',
+      SUPP_ID:
+        this.selectedCustomer != null ? String(this.selectedCustomer) : '',
+      BRAND_ID: this.selectedBrand != null ? String(this.selectedBrand) : '',
+      ITEM_ID: '',
+      DEPT_ID:
+        this.selectedDepartment != null ? Number(this.selectedDepartment) : '',
+      CAT_ID:
+        this.selectedCategory != null ? Number(this.selectedCategory) : '',
+      SUBCAT_ID:
+        this.selectedSubcategory != null
+          ? Number(this.selectedSubcategory)
+          : '',
+      CUSTOM1:
+        this.selectedItemProperty1 != null
+          ? Number(this.selectedItemProperty1)
+          : '',
+      CUSTOM2:
+        this.selectedItemProperty2 != null
+          ? Number(this.selectedItemProperty2)
+          : '',
+    };
+
+    this.JournalBookDataSource = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.ItemwisePurchaseReport(payload).subscribe({
+            next: (res: any) => {
+              const list = res?.data || [];
+
+              // 🔑 cache for logic
+              this.journalBookArray = list;
+              this.journalBookCount = list.length;
+
+              this.ledgerSummaryData = list;
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
+              this.isFilterVisible = false;
+              resolve(list); // 🔑 grid gets data
+            },
+            error: () => {
+              this.journalBookArray = [];
+              this.journalBookCount = 0;
+              this.ledgerSummaryData = [];
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
+
+  onViewClick(e: any) {
+    const trans_id = e.row.data.TRANS_ID;
+
+    this.dataService.selectPurchaseInvoice(trans_id).subscribe((response: any) => {
+
+      this.selectedInvoice = response.Data;
+
+      if (this.selectedInvoice.STATUS == "Approved") {
+        this.buttonText = 'View Purchase Invoice';
+      } else if (this.selectedInvoice.STATUS == "Open") {
+        this.buttonText = 'Verify Purchase Invoice';
+      } else if (this.selectedInvoice.STATUS == "Verified") {
+        this.buttonText = 'Approve Purchase Invoice';
+      } else {
+        this.buttonText = 'Purchase Invoice';
+      }
+
+      // Open popup AFTER data is received
+      this.isVerifyInvoice = true;
+    });
+  }
+
+  summaryColumnsData = {
+    totalItems: [
+      {
+        name: 'totalDr',
+        column: 'RATE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'RATE',
+        alignment: 'right',
+      },
+      {
+        name: 'totalDr',
+        column: 'QUANTITY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'QUANTITY',
+        alignment: 'right',
+      },
+      {
+        name: 'totalDr',
+        column: 'GROSS_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'GROSS_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        name: 'totalDr',
+        column: 'VAT_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'VAT_AMOUNT',
+        alignment: 'right',
+      },
+      {
+        name: 'totalDr',
+        column: 'NET_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'NET_AMOUNT',
+        alignment: 'right',
+      },
+    ],
+    groupItems: [
+      {
+        column: 'RATE',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'QUANTITY',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'GROSS_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'VAT_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'NET_AMOUNT',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+    ],
+    calculateCustomSummary: (options: any) => {
+      if (options.name === 'summaryRow') {
+        // Custom logic if needed
+      }
+    },
+  };
+
+  handleClose() {
+    this.editLedgerPopup = false;
+    this.isViewJournalVoucher = false;
+    this.isVerifyInvoice = false;
+    this.isViewDebitNote = false;
+    this.isViewCreditNote = false;
+    this.isViewInvoice = false;
+    this.isViewReceipt = false;
+    this.isEditInvoice = false;
+    this.editMiscPopup = false;
+    this.isMiscViewInvoice = false;
+    this.viewPayrollPopupOpened = false;
+  }
+
+  storeHint: string = '';
+
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
     }
 
-    // Open popup AFTER data is received
-    this.isVerifyInvoice = true;
-  });
-}
-  
-    summaryColumnsData = {
-      totalItems: [
-         {
-          name: 'totalDr',
-          column: 'RATE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'RATE',
-          alignment: 'right',
-        },
-        {
-          name: 'totalDr',
-          column: 'QUANTITY',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'QUANTITY',
-          alignment: 'right',
-        },
-         {
-          name: 'totalDr',
-          column: 'GROSS_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'GROSS_AMOUNT',
-          alignment: 'right',
-        },
-         {
-          name: 'totalDr',
-          column: 'VAT_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'VAT_AMOUNT',
-          alignment: 'right',
-        },
-        {
-          name: 'totalDr',
-          column: 'NET_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          showInColumn: 'NET_AMOUNT',
-          alignment: 'right',
-        },
-      ],
-      groupItems: [
-         {
-          column: 'RATE',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'QUANTITY',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'GROSS_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'VAT_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-        {
-          column: 'NET_AMOUNT',
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-          alignByColumn: true,
-        },
-      ],
-      calculateCustomSummary: (options: any) => {
-        if (options.name === 'summaryRow') {
-          // Custom logic if needed
-        }
-      },
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
+  }
+
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id,
     };
-  
-    handleClose() {
-      this.editLedgerPopup = false;
-      this.isViewJournalVoucher = false;
-      this.isVerifyInvoice = false;
-      this.isViewDebitNote = false;
-      this.isViewCreditNote = false;
-      this.isViewInvoice = false;
-      this.isViewReceipt = false;
-      this.isEditInvoice = false;
-      this.editMiscPopup = false;
-      this.isMiscViewInvoice = false;
-      this.viewPayrollPopupOpened = false;
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
+
+  department_dropdown() {
+    const payload = {
+      NAME: 'DEPARTMENT',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Department = res;
+    });
+  }
+
+  Catgeory_dropdown() {
+    const payload = {
+      NAME: 'ITEMCATEGORY',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Category = res;
+    });
+  }
+
+  SubCatgeory_dropdown() {
+    const payload = {
+      NAME: 'SUBCATEGORY',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Subcategory = res;
+    });
+  }
+
+  Brand_dropdown() {
+    const payload = {
+      NAME: 'BRAND',
+      // COMPANY_ID : this.selected_Company_id
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Brand = res;
+    });
+  }
+
+  ItemProperty1_dropdown() {
+    const payload = {
+      NAME: 'ITEMPROPERTY1',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.itemProperty1 = res;
+    });
+  }
+
+  ItemProperty2_dropdown() {
+    const payload = {
+      NAME: 'ITEMPROPERTY2',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.itemProperty2 = res;
+    });
+  }
+
+  Salesman_dropdown() {
+    const payload = {
+      NAME: 'SALESMAN',
+      // COMPANY_ID : this.selected_Company_id
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Salesman = res;
+    });
+  }
+
+  item_dropdown() {
+    const payload = {
+      NAME: 'ITEMS',
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.items = res;
+    });
+  }
+
+  updateItemHint() {
+    if (!this.selectedItem || this.selectedItem.length === 0) {
+      this.itemHint = 'No item selected';
+      return;
     }
-  
-    storeHint: string = '';
-  
-    updateStoreHint() {
-      if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-        this.storeHint = 'No store selected';
-        return;
-      }
-  
-      const selectedNames = this.Store.filter((x) =>
-        this.selectedStoreid.includes(x.ID),
-      ).map((x) => x.DESCRIPTION);
-  
-      this.storeHint = selectedNames.join(', ');
-    }
-  
-    store_dropdown() {
-      const payload = {
-        NAME: 'STORE',
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Store = res;
-      });
-    }
-  
-    department_dropdown() {
-      const payload = {
-        NAME: 'DEPARTMENT',
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Department = res;
-      });
-    }
-  
-    Catgeory_dropdown() {
-      const payload = {
-        NAME: 'ITEMCATEGORY',
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Category = res;
-      });
-    }
-  
-    SubCatgeory_dropdown() {
-      const payload = {
-        NAME: 'SUBCATEGORY',
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Subcategory = res;
-      });
-    }
-  
-    Brand_dropdown() {
-      const payload = {
-        NAME: 'BRAND',
-        // COMPANY_ID : this.selected_Company_id
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Brand = res;
-      });
-    }
-  
-    ItemProperty1_dropdown() {
-      const payload = {
-        NAME: 'ITEMPROPERTY1',
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.itemProperty1 = res;
-      });
-    }
-  
-    ItemProperty2_dropdown() {
-      const payload = {
-        NAME: 'ITEMPROPERTY2',
-        COMPANY_ID: this.selected_Company_id,
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.itemProperty2 = res;
-      });
-    }
-  
-    Salesman_dropdown() {
-      const payload = {
-        NAME: 'SALESMAN',
-        // COMPANY_ID : this.selected_Company_id
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.Salesman = res;
-      });
-    }
-  
-    item_dropdown() {
-      const payload = {
-        NAME: 'ITEMS',
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
-        this.items = res;
-      });
-    }
-  
-    updateItemHint() {
-      if (!this.selectedItem || this.selectedItem.length === 0) {
-        this.itemHint = 'No item selected';
-        return;
-      }
-  
-      const selectedNames = this.items
-        .filter((x) => this.selectedItem.includes(x.ID))
-        .map((x) => x.DESCRIPTION);
-  
-      this.itemHint = selectedNames.join(', ');
-    }
-  
-    getCustomerOrUnitLst() {
-      const payload = {
-        COMPANY_ID: this.selected_Company_id,
-        NAME: 'SUPPLIER',
-      };
-      this.dataService.Common_Dropdown(payload).subscribe((response: any) => {
-        this.distributorList = response;
-      });
-    }
-  
-    formatDates(cellData: any): string {
-      const date = new Date(cellData);
-      if (isNaN(date.getTime())) return '';
-  
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-  
-      return `${day}-${month}-${year}`;
-    }
-  
-    onExporting(event: any) {
-      const fileName = 'Journal_Book';
-      this.dataService.exportDataGridReport(event, fileName);
-    }
+
+    const selectedNames = this.items
+      .filter((x) => this.selectedItem.includes(x.ID))
+      .map((x) => x.DESCRIPTION);
+
+    this.itemHint = selectedNames.join(', ');
+  }
+
+  getCustomerOrUnitLst() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'SUPPLIER',
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((response: any) => {
+      this.distributorList = response;
+    });
+  }
+
+  formatDates(cellData: any): string {
+    const date = new Date(cellData);
+    if (isNaN(date.getTime())) return '';
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
+
+  onExporting(event: any) {
+    const fileName = 'Journal_Book';
+    this.dataService.exportDataGridReport(event, fileName);
+  }
 }
 @NgModule({
   imports: [
@@ -803,4 +923,4 @@ statusFinder: any;
   exports: [],
   declarations: [ItemwisePurchaseReportComponent],
 })
-export class ItemwisePurchaseReportModule {}
+export class ItemwisePurchaseReportModule { }

@@ -62,6 +62,85 @@ import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-
 export class SalesSummaryComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'Store', caption: 'Store' },
+    { dataField: 'Date', caption: 'Date' },
+    { dataField: 'Invoice No', caption: 'Invoice No' },
+    { dataField: 'Customer', caption: 'Customer' },
+    { dataField: 'Invoice Type', caption: 'Invoice Type' },
+    { dataField: 'Discount', caption: "Discount" },
+    { dataField: 'Exempted', caption: 'Exempted' },
+    { dataField: 'Ex. VAT Total', caption: 'Ex. VAT Total' },
+    { dataField: 'VAT Amount', caption: 'VAT Amount' },
+    { dataField: 'Inc.VAT Total', caption: 'Inc.VAT Total' },
+    { dataField: 'CASH', caption: 'Cash' },
+    { dataField: 'BANK CARD', caption: 'Bank Card' },
+    { dataField: 'FAB POS CARD', caption: 'Fab Pos Card' },
+    { dataField: 'ROOM CHARGE', caption: 'Room Charge' },
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
   SaleSummaryDataSource: DataSource; // ONLY for dx-data-grid
   journalBookArray: any[] = []; // ONLY for logic / checks
   journalBookCount = 0;
@@ -157,6 +236,7 @@ export class SalesSummaryComponent {
   isFilterVisible: boolean = true;
   distributorList: any;
   today: Date = new Date();
+  isSummaryVisible = true;
 
   Saletype = [
     { ID: 0, DESCRIPTION: 'All' },
@@ -194,7 +274,7 @@ export class SalesSummaryComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -245,6 +325,42 @@ this.selectedmonth = currentMonth;
   ngAfterViewInit() {
     setTimeout(() => this.resetPopups());
   }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.dataGrid?.instance.option(
+      'summary.totalItems',
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+    );
+
+    this.dataGrid?.instance.option(
+      'summary.groupItems',
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+    );
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
+
   private reloadJournalBook() {
     if (!this.dataGrid?.instance) return;
 
@@ -407,6 +523,7 @@ this.selectedmonth = currentMonth;
   }
 
   load_JournalBook_data() {
+    this.showParameters = false;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
@@ -479,7 +596,7 @@ this.selectedmonth = currentMonth;
   };
 
   summaryColumnsData = {
-    
+
     totalItems: [
       {
         column: 'Discount',
@@ -758,4 +875,4 @@ this.selectedmonth = currentMonth;
   exports: [],
   declarations: [SalesSummaryComponent],
 })
-export class SalesSummaryModule {}
+export class SalesSummaryModule { }

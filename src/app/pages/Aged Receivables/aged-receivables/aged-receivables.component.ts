@@ -192,7 +192,6 @@ export class AgedReceivablesComponent {
 
     this.formatted_from_date = SystemDate;
     this.formatted_To_date = SystemDate;
-    this.updateSummaryColumnsData();
     this.GET_CUSTOMER_LIST();
   }
 
@@ -224,6 +223,16 @@ export class AgedReceivablesComponent {
     }
   }
 
+  applyButtonOptions = {
+    width: 100,
+    hint: 'Apply Filters',
+    text: 'Apply',
+    type: 'default',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.GET_CUSTOMER_LIST(),
+  };
+
   columnChooserButtonOptions = {
     icon: 'columnchooser',
     hint: 'Choose Columns',
@@ -240,8 +249,6 @@ export class AgedReceivablesComponent {
 
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;
-
-    this.updateSummaryColumnsData();
 
     this.summaryButtonOptions = {
       ...this.summaryButtonOptions,
@@ -449,55 +456,6 @@ export class AgedReceivablesComponent {
 
   handleClose() {
     this.isViewInvoice = false;
-  }
-
-  summaryColumnsData: any = {
-    totalItems: [],
-    groupItems: [],
-  };
-
-  updateSummaryColumnsData(): void {
-    const moneyFormat = {
-      type: 'fixedPoint',
-      precision: 2,
-      useGrouping: true,
-    };
-
-    const summaryFields = [
-      'AGE_0_30',
-      'AGE_31_60',
-      'AGE_61_90',
-      'AGE_91_120',
-      'AGE_121_150',
-      'AGE_151_180',
-      'AGE_ABOVE_180',
-      'TOTAL_BALANCE'
-    ];
-
-    this.summaryColumnsData = {
-      totalItems: this.isSummaryVisible
-        ? summaryFields.map((field) => ({
-          column: field,
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: moneyFormat,
-          showInColumn: field,
-          alignment: 'right',
-        }))
-        : [],
-
-      groupItems: this.isSummaryVisible
-        ? summaryFields.map((field) => ({
-          column: field,
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: moneyFormat,
-          alignByColumn: true,
-        }))
-        : [],
-    };
-
-    this.cdr.detectChanges();
   }
 }
 

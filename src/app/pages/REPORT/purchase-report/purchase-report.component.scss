@@ -9,15 +9,15 @@
 }
 
 .grid-container {
-    width: 100%;
+  width: 100%;
 }
 
 .grid {
-    width: 100%;
+  width: 100%;
 }
 
 .view-wrapper {
-   position: relative;
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -107,11 +107,14 @@
 }
 .toggleButton {
   border-radius: 4px;
-  background-color: #B0D4F3;
+  background-color: #b0d4f3;
 }
 
 .SearchParams-container {
-  transition: transform 0.5s ease, opacity 0.5s ease, max-height 0.5s ease;
+  transition:
+    transform 0.5s ease,
+    opacity 0.5s ease,
+    max-height 0.5s ease;
   transform: translateY(0);
   opacity: 1;
   max-height: 500px;
@@ -134,8 +137,6 @@
   // height: 20px;     /* Adjust height to match the font-size */
 }
 
-
-
 .custom-close-btn {
   position: absolute;
   // top: 1px;
@@ -149,7 +150,6 @@
   padding: 0;
   margin: 0;
 }
-
 
 .custom-close-btn:focus {
   outline: none;
@@ -167,8 +167,6 @@
   padding: 0px;
 }
 
-
-
 /* General button styles */
 .custom-minimize-btn {
   position: absolute;
@@ -183,12 +181,11 @@
   background: var(--base-bg);
   text-align: center;
   color: var(--border-color); /* Icon color */
-  font-size:large;
+  font-size: large;
   font-weight: bold;
   cursor: pointer;
   padding: 0;
 }
-
 
 /* Expandform icon for the expand state */
 .custom-minimize-btn.expand:before {
@@ -198,9 +195,6 @@
   background: var(--base-bg);
   color: var(--border-color);
 }
-
-
-
 
 .custom-close-btn {
   position: absolute;
@@ -219,12 +213,11 @@
 }
 
 ::ng-deep .dx-datagrid-column-chooser-button .dx-icon {
-  background-image: url('/assets/icons/fa6-solid--list-check.svg');
+  background-image: url("/assets/icons/fa6-solid--list-check.svg");
   background-size: contain;
-
 }
 ::ng-deep .dx-button .dx-icon.dx-icon-custom-summary {
-  background-image: url('/assets/icons/ph--sigma.svg');
+  background-image: url("/assets/icons/ph--sigma.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 22px 22px;
@@ -232,12 +225,12 @@
   width: 22px;
   height: 22px;
 
-  font-size: 0 !important;     /* prevent font glyph overlap */
+  font-size: 0 !important; /* prevent font glyph overlap */
   color: var(--icon-color);
 }
 
 ::ng-deep .dx-datagrid-export-button .dx-icon.dx-icon-custom-export {
-  background-image: url('/assets/icons/solar--export-bold.svg');
+  background-image: url("/assets/icons/solar--export-bold.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 22px 22px;
@@ -247,9 +240,8 @@
   color: var(--icon-color) !important;
 }
 
-
 ::ng-deep .dx-button .dx-icon.dx-icon-custom-memorize {
-  background-image: url('/assets/icons/bookmark-save-memmorize.svg'); 
+  background-image: url("/assets/icons/bookmark-save-memmorize.svg");
 
   background-repeat: no-repeat;
   background-position: center;
@@ -264,7 +256,7 @@
 
 /* DropDownButton icon inside overflow/menu */
 ::ng-deep .dx-menu-item .dx-icon-custom-memorise-list {
-  background-image: url('/assets/icons/material-symbols--description-outline-rounded.svg');
+  background-image: url("/assets/icons/material-symbols--description-outline-rounded.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 20px 20px;
@@ -279,7 +271,7 @@
 
 /* Column finder icon – overflow/menu */
 ::ng-deep .dx-menu-item .dx-icon-custom-column-finder {
-  background-image: url('/assets/icons/tabler--list-search.svg'); /* your SVG */
+  background-image: url("/assets/icons/tabler--list-search.svg"); /* your SVG */
   background-repeat: no-repeat;
   background-position: center;
   background-size: 20px 20px;
@@ -287,10 +279,9 @@
   width: 20px;
   height: 20px;
 
-  font-size: 0 !important;      /* prevent font glyph overlap */
-  color: inherit !important;    /* IMPORTANT for SVG visibility */
+  font-size: 0 !important; /* prevent font glyph overlap */
+  color: inherit !important; /* IMPORTANT for SVG visibility */
 }
-
 
 /* Push Apply button to right end */
 ::ng-deep .apply-btn-right .dx-field-item-content {
@@ -301,6 +292,59 @@
 
 ::ng-deep .dx-tagbox .dx-tag-container {
   display: flex;
-  flex-wrap: nowrap;        /* 👈 prevents vertical stacking */
-  overflow-x: auto;         /* 👈 enables horizontal scroll */
+  flex-wrap: nowrap; /* 👈 prevents vertical stacking */
+  overflow-x: auto; /* 👈 enables horizontal scroll */
+}
+
+.filter-panel {
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.filter-panel:not(.collapsed) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.filter-panel .filter-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: 16px 12px;
+  align-items: end;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.filter-row dx-select-box,
+.filter-row dx-date-box,
+.filter-row dx-tag-box {
+  width: 100%;
+  min-width: 0;
+}
+
+.filter-panel.collapsed {
+  height: 0 !important;
+  max-height: 0 !important;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden !important;
+}
+
+@media (max-width: 1000px) {
+  .filter-panel .filter-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-panel .filter-row {
+    grid-template-columns: 1fr;
+  }
 }

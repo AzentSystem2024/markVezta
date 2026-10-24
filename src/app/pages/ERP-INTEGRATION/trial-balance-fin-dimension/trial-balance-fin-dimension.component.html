@@ -93,6 +93,8 @@
     </div>
 
     <dx-data-grid
+      #dataGrid
+      id="dataGrid"
       class="grid theme-dependent"
       [dataSource]="TrialBalanceReport"
       width="100%"
@@ -106,7 +108,7 @@
       [grouping]="{ autoExpandAll: false }"
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
-      [summary]="summaryColumnsData"
+      [summary]="summaryConfig"
       [allowColumnReordering]="true"
       id="dataGrid"
       [scrolling]="{ mode: 'virtual' }"

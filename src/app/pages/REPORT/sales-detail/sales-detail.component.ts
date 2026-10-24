@@ -65,6 +65,88 @@ export class SalesDetailComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'SALE_NO', caption: 'Sale no.' },
+    { dataField: 'STORE_NAME', caption: 'Store' },
+    { dataField: 'SALE_DATE', caption: 'Date' },
+    { dataField: 'SALE_TYPE_NAME', caption: 'Sale type' },
+    { dataField: 'CUST_NAME', caption: 'Customer' },
+    { dataField: 'ITEM_CODE', caption: "ItemCode" },
+    { dataField: 'DESCRIPTION', caption: 'Description' },
+    { dataField: 'QUANTITY', caption: 'Quantity' },
+    { dataField: 'PRICE', caption: 'Price' },
+    { dataField: 'DEPT_NAME', caption: 'Department' },
+    { dataField: 'CAT_NAME', caption: 'Category' },
+    { dataField: 'BRAND_NAME', caption: 'Brand' },
+    { dataField: 'CUSTOM1_NAME', caption: 'ItemProperty1' },
+    { dataField: 'CUSTOM2_NAME', caption: 'ItemProperty2' },
+    { dataField: 'DISCOUNT', caption: 'Discount' },
+    { dataField: 'SALESMAN', caption: 'Salesman' },
+    { dataField: 'DISC_REASON', caption: 'Reason' },
+    { dataField: 'GROSS_AMOUNT', caption: 'Excl.VAT Amount' },
+    { dataField: 'VAT_PERCENT', caption: 'VAT%' },
+    { dataField: 'VAT_AMOUNT', caption: 'VAT Amount' },
+    { dataField: 'NET_AMOUNT', caption: 'Net Amount' },
+    { dataField: 'COMMISSION', caption: 'Commission' },
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   JournalBookDataSource: DataSource; // ONLY for dx-data-grid
   journalBookArray: any[] = []; // ONLY for logic / checks
   journalBookCount = 0;
@@ -186,10 +268,15 @@ export class SalesDetailComponent {
   selectedSaletype = [0]; // or [] if nothing selected
   itemProperty1: any;
   itemProperty2: any;
+  isSummaryVisible = true;
 
   //  Toggle function
-  toggleFiltersPanel() {
+  toggleFiltersPanel(): void {
     this.isFilterVisible = !this.isFilterVisible;
+  }
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
   }
   constructor(
     private dataService: DataService,
@@ -210,7 +297,7 @@ export class SalesDetailComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -356,6 +443,42 @@ this.selectedmonth = currentMonth;
     return data ? JSON.parse(data) : null;
   }
 
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.dataGrid?.instance.option(
+      'summary.totalItems',
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+    );
+
+    this.dataGrid?.instance.option(
+      'summary.groupItems',
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+    );
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
+
   sesstion_Details() {
     const sessionDataRaw = sessionStorage.getItem('savedUserData');
 
@@ -409,7 +532,7 @@ this.selectedmonth = currentMonth;
     const rawDate: Date = new Date(event.value);
     const today = new Date();
 
-   
+
     this.formatted_To_date = this.formatDate(rawDate);
     // this.reloadJournalBook();
   }
@@ -426,7 +549,7 @@ this.selectedmonth = currentMonth;
   }
 
   load_JournalBook_data() {
-
+    this.isFilterVisible = false;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
@@ -579,7 +702,7 @@ this.selectedmonth = currentMonth;
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
-       {
+      {
         column: 'DISCOUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
