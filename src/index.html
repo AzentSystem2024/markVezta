@@ -5,6 +5,43 @@
     <title>Vezta</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Immediate Mobile & Tablet Redirect (Executes before Angular bundles load) -->
+    <script>
+      (function () {
+        var ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
+
+        // 1. Modern Chrome / Edge Client Hints (Android Chrome natively reports mobile: true)
+        var isMobileUaData = Boolean(navigator.userAgentData && navigator.userAgentData.mobile);
+
+        // 2. Universal Mobile & Tablet User Agent check (matches ANY Android device, iOS, and other mobiles)
+        var isMobileOrTabletUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|kindle/i.test(ua);
+
+        // 3. Modern iPadOS check (reports as Macintosh desktop UA but has multi-touch)
+        var isIPadOS = (navigator.platform === 'MacIntel' || /macintosh/i.test(ua)) && (navigator.maxTouchPoints > 1);
+
+        // 4. Touch + small screen fallback (excluding Windows/Mac laptops)
+        var isTouch = (navigator.maxTouchPoints > 0) || ('ontouchstart' in window);
+        var isSmallScreen = window.screen && (window.screen.width <= 800 || window.screen.height <= 800);
+        var isDesktopOS = /windows nt|macintosh/i.test(ua) && !isIPadOS;
+        var isMobileFallback = isTouch && isSmallScreen && !isDesktopOS;
+
+        if (isMobileUaData || isMobileOrTabletUA || isIPadOS || isMobileFallback) {
+          var targetUrl = "http://veztmobile.diligenzit.com";
+          try {
+            window.location.replace(targetUrl);
+          } catch (e) {
+            window.location.href = targetUrl;
+          }
+          // Fallback if replace was aborted during early DOM parsing
+          setTimeout(function () {
+            if (window.location.href !== targetUrl) {
+              window.location.href = targetUrl;
+            }
+          }, 50);
+        }
+      })();
+    </script>
     <!-- <link rel="icon" type="image/x-icon" href="favicon.ico" /> -->
     <link rel="icon" type="image/png" href="assets/images/logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
