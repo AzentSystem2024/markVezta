@@ -357,7 +357,9 @@
                 !selectedDealerId ||
                 !currentEditingItem.categoryId ||
                 !currentEditingItem.artNoId ||
-                !currentEditingItem.colorId
+                !currentEditingItem.colorId ||
+                (isActualEditMode &&
+                  (!hasUnsavedChanges() || getCurrentItemTotalQty() === 0))
               "
             >
               {{ isActualEditMode ? "UPDATE CART" : "ADD TO CART" }}

@@ -1154,14 +1154,17 @@ export class NewOrderComponent implements OnInit, OnChanges {
   get isActualEditMode(): boolean {
     if (!this.isEditMode) return false;
     const originalItem = this.cartItems.find(
-      (item) => item.id === this.currentEditingItem.id,
+      (item) => String(item.id) === String(this.currentEditingItem?.id),
     );
     if (!originalItem) return false;
 
     return (
-      this.currentEditingItem.categoryId === originalItem.categoryId &&
-      this.currentEditingItem.artNoId === originalItem.artNoId &&
-      this.currentEditingItem.colorId === originalItem.colorId
+      String(this.currentEditingItem?.categoryId ?? '') ===
+        String(originalItem.categoryId ?? '') &&
+      String(this.currentEditingItem?.artNoId ?? '') ===
+        String(originalItem.artNoId ?? '') &&
+      String(this.currentEditingItem?.colorId ?? '') ===
+        String(originalItem.colorId ?? '')
     );
   }
 
@@ -1171,18 +1174,21 @@ export class NewOrderComponent implements OnInit, OnChanges {
     }
 
     const originalItem = this.cartItems.find(
-      (item) => item.id === this.currentEditingItem.id,
+      (item) => String(item.id) === String(this.currentEditingItem?.id),
     );
     if (!originalItem) {
       return this.getCurrentItemTotalQty() > 0;
     }
 
-    for (const currentSize of this.currentEditingItem.sizes) {
-      const originalSize = originalItem.sizes.find(
-        (s) => s.sizeId === currentSize.sizeId,
+    const currentSizes = this.currentEditingItem?.sizes || [];
+    const originalSizes = originalItem.sizes || [];
+
+    for (const currentSize of currentSizes) {
+      const originalSize = originalSizes.find(
+        (s) => String(s.sizeId) === String(currentSize.sizeId),
       );
-      const currentQty = currentSize.qty || 0;
-      const originalQty = originalSize ? originalSize.qty || 0 : 0;
+      const currentQty = Number(currentSize.qty) || 0;
+      const originalQty = originalSize ? Number(originalSize.qty) || 0 : 0;
 
       if (currentQty !== originalQty) return true;
 
@@ -1198,17 +1204,20 @@ export class NewOrderComponent implements OnInit, OnChanges {
         ]);
 
         for (const key of Array.from(allKeys)) {
-          if ((currentCutSizes[key] || 0) !== (originalCutSizes[key] || 0)) {
+          if (
+            (Number(currentCutSizes[key]) || 0) !==
+            (Number(originalCutSizes[key]) || 0)
+          ) {
             return true;
           }
         }
       }
     }
 
-    for (const originalSize of originalItem.sizes) {
-      if ((originalSize.qty || 0) > 0) {
-        const currentSize = this.currentEditingItem.sizes.find(
-          (s) => s.sizeId === originalSize.sizeId,
+    for (const originalSize of originalSizes) {
+      if ((Number(originalSize.qty) || 0) > 0) {
+        const currentSize = currentSizes.find(
+          (s) => String(s.sizeId) === String(originalSize.sizeId),
         );
         if (!currentSize) return true;
       }

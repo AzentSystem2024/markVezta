@@ -126,7 +126,7 @@
             ></dxi-column>
             <dxi-column
               dataField="ALLOTTED_QTY"
-              caption="Allotted Qty"
+              caption="Scanned Qty"
               [allowEditing]="false"
             ></dxi-column>
             <dxi-column
@@ -144,7 +144,13 @@
               caption="Open Qty"
               [allowEditing]="false"
             ></dxi-column>
-          </dx-data-grid>
+            <dxi-column
+              dataField="SOURCE"
+              caption="Source"
+              width="80"
+              [allowEditing]="false"
+            ></dxi-column>
+          </dx-data-grid>  
         </div>
       </div>
 
@@ -327,18 +333,6 @@
       </div>
 
       <dxi-column
-        dataField="CANCELLED_QTY"
-        caption="Cancelled Qty"
-        dataType="number"
-        [width]="100"
-        alignment="center"
-        headerCellTemplate="cancelQtyHeader"
-      ></dxi-column>
-      <div *dxTemplate="let data of 'cancelQtyHeader'">
-        <div class="qty-header-title">Cancelled<br />Qty</div>
-      </div>
-
-      <dxi-column
         dataField="ISSUED_QTY"
         caption="Issued Qty"
         dataType="number"
@@ -348,6 +342,18 @@
       ></dxi-column>
       <div *dxTemplate="let data of 'issueQtyHeader'">
         <div class="qty-header-title">Issued<br />Qty</div>
+      </div>
+
+      <dxi-column
+        dataField="CANCELLED_QTY"
+        caption="Cancelled Qty"
+        dataType="number"
+        [width]="100"
+        alignment="center"
+        headerCellTemplate="cancelQtyHeader"
+      ></dxi-column>
+      <div *dxTemplate="let data of 'cancelQtyHeader'">
+        <div class="qty-header-title">Cancelled<br />Qty</div>
       </div>
 
       <dxi-column
@@ -361,7 +367,7 @@
       <div *dxTemplate="let data of 'openQtyHeader'">
         <div class="qty-header-title">Open<br />Qty</div>
       </div>
-
+      <dxi-column dataField="SOURCE" caption="Source" width="80"></dxi-column>
       <dxi-column
         dataField="STATUS_DESCRIPTION"
         caption="Status"
@@ -475,5 +481,3 @@
     ></app-new-order>
   </div>
 </dx-popup>
-
-
