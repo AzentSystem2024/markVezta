@@ -7634,6 +7634,13 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+  getOrderSummaryReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/OrderSummary`,
+      payload,
+    );
+  }
+
   saveNewOrderCartToOrder(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}NewOrder/SaveCartToOrder`,

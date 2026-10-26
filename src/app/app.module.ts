@@ -426,15 +426,18 @@ import { ProfitLossDepartmentwiseModule } from './pages/REPORT/profit-loss-depar
 import { EmailSettingModule } from './email-setting/email-setting.component';
 import { EmailSettingFormModule } from './email-setting-form/email-setting-form.component';
 import { NewOrderModule } from './pages/DESPATCH/Order/new-order/new-order.component';
-import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
-import { SalesReportComponent, SalesReportModule } from './sales-report/sales-report.component';
-import { PurchaseReportMarkComponent, PurchaseReportMarkModule } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
+import { SalesReportModule } from './sales-report/sales-report.component';
+import { PurchaseReportMarkModule } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
 import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.component';
-import { TransferOutInventoryMarkComponent, TransferOutInventoryMarkModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
-import { TransferOutInventoryAddMarkComponent, TransferOutInventoryAddMarkModule } from './pages/transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
+import { TransferOutInventoryMarkModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
+import { TransferOutInventoryAddMarkModule } from './pages/transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
+import { OrderReportModule } from './pages/DESPATCH/Reports/order-report/order-report.component';
+import { DispatchReportComponent } from './pages/DESPATCH/Reports/dispatch-report/dispatch-report.component';
+import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
+import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
 
 @NgModule({
-  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent,],
+  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent, DispatchReportComponent, StockReportComponent, MultiboxReportComponent,],
   imports: [
     OrderViewModule,
     NewOrderModule,
@@ -876,6 +879,7 @@ import { TransferOutInventoryAddMarkComponent, TransferOutInventoryAddMarkModule
     PurchaseReportMarkModule,
     TransferOutInventoryMarkModule,
     TransferOutInventoryAddMarkModule,
+    OrderReportModule,
   ],
 
   providers: [
