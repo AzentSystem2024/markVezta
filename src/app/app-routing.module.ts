@@ -233,6 +233,10 @@ import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view
 import { SalesReportComponent } from './sales-report/sales-report.component';
 import { PurchaseReportMarkComponent } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
 import { TransferOutInventoryMarkComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
+import { OrderReportComponent } from './pages/DESPATCH/Reports/order-report/order-report.component';
+import { DispatchReportComponent } from './pages/DESPATCH/Reports/dispatch-report/dispatch-report.component';
+import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
+import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
 
 const routes: Routes = [
   {
@@ -1429,6 +1433,26 @@ const routes: Routes = [
       {
         path: 'transfer-out-inventory-mark',
         component: TransferOutInventoryMarkComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'order-report',
+        component: OrderReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'dispatch-report',
+        component: DispatchReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'stock-report',
+        component: StockReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'multibox-report',
+        component: MultiboxReportComponent,
         canActivate: [AuthGuardService],
       },
       {

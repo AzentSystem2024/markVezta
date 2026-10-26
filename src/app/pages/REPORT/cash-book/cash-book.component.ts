@@ -152,7 +152,6 @@ export class CashBookComponent {
 
   private savedSummaryItems: any = null;
 
-
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
@@ -180,7 +179,7 @@ export class CashBookComponent {
     hint: 'Choose Columns',
     stylingMode: 'outlined',
     onClick: () => this.openColumnChooser(),
-  }
+  };
 
   summaryButtonOptions = {
     icon: 'chevrondown',
@@ -417,7 +416,7 @@ export class CashBookComponent {
     const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
-  onHeadIdChange(event: any) { }
+  onHeadIdChange(event: any) {}
 
   formatDates(cellData: any): string {
     const date = new Date(cellData);
@@ -730,4 +729,4 @@ export class CashBookComponent {
   exports: [CashBookComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CashBookModule { }
+export class CashBookModule {}
