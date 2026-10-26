@@ -9,24 +9,43 @@
     <!-- Immediate Mobile & Tablet Redirect (Executes before Angular bundles load) -->
     <script>
       (function () {
-        var ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
+        var ua = (
+          navigator.userAgent ||
+          navigator.vendor ||
+          window.opera ||
+          ""
+        ).toLowerCase();
 
         // 1. Modern Chrome / Edge Client Hints (Android Chrome natively reports mobile: true)
-        var isMobileUaData = Boolean(navigator.userAgentData && navigator.userAgentData.mobile);
+        var isMobileUaData = Boolean(
+          navigator.userAgentData && navigator.userAgentData.mobile,
+        );
 
         // 2. Universal Mobile & Tablet User Agent check (matches ANY Android device, iOS, and other mobiles)
-        var isMobileOrTabletUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|kindle/i.test(ua);
+        var isMobileOrTabletUA =
+          /android|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|kindle/i.test(
+            ua,
+          );
 
         // 3. Modern iPadOS check (reports as Macintosh desktop UA but has multi-touch)
-        var isIPadOS = (navigator.platform === 'MacIntel' || /macintosh/i.test(ua)) && (navigator.maxTouchPoints > 1);
+        var isIPadOS =
+          (navigator.platform === "MacIntel" || /macintosh/i.test(ua)) &&
+          navigator.maxTouchPoints > 1;
 
         // 4. Touch + small screen fallback (excluding Windows/Mac laptops)
-        var isTouch = (navigator.maxTouchPoints > 0) || ('ontouchstart' in window);
-        var isSmallScreen = window.screen && (window.screen.width <= 800 || window.screen.height <= 800);
+        var isTouch = navigator.maxTouchPoints > 0 || "ontouchstart" in window;
+        var isSmallScreen =
+          window.screen &&
+          (window.screen.width <= 800 || window.screen.height <= 800);
         var isDesktopOS = /windows nt|macintosh/i.test(ua) && !isIPadOS;
         var isMobileFallback = isTouch && isSmallScreen && !isDesktopOS;
 
-        if (isMobileUaData || isMobileOrTabletUA || isIPadOS || isMobileFallback) {
+        if (
+          isMobileUaData ||
+          isMobileOrTabletUA ||
+          isIPadOS ||
+          isMobileFallback
+        ) {
           var targetUrl = "http://veztmobile.diligenzit.com";
           try {
             window.location.replace(targetUrl);
@@ -65,23 +84,13 @@
 
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 
-    <!-- for preload theme fonts -->
     <style>
       body::after {
         content: "";
         font-family: "Inter";
       }
     </style>
-    <!-- Matomo Tag Manager -->
-    <!-- <script>
-        var _mtm = window._mtm = window._mtm || [];
-        _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
-        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-        g.async = true; g.src = 'https://matomo.devexpress.com/js/container_foTT0fJ8.js'; g.setAttributeNode(d.createAttribute('data-ot-ignore')); s.parentNode.insertBefore(g, s);
-    </script> -->
-    <!-- End Matomo Tag Manager -->
 
-    <!-- index.html -->
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
   </head>
   <body class="dx-viewport">
