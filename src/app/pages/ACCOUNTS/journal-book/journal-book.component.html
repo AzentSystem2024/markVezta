@@ -44,7 +44,7 @@
         ></dx-date-box>
 
         <dx-tag-box
-          label="Store"
+          [label]="appType === 'VEZTA' ? 'Facility' : 'Store'"
           labelMode="floating"
           [width]="200"
           [items]="Store"

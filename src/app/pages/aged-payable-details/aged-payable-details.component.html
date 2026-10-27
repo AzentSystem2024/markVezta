@@ -37,7 +37,7 @@
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export
         [enabled]="true"
-        [formats]="['xlsx', 'pdf']"
+        [formats]="['xlsx']"
         style="padding-right: 15px"
       >
       </dxo-export>
@@ -108,6 +108,7 @@
             [searchEnabled]="true"
             [(value)]="selectedSupplierId"
             (onValueChanged)="onSupplierChanged($event)"
+            [showClearButton]="true"
           ></dx-select-box>
         </dxi-item>
 

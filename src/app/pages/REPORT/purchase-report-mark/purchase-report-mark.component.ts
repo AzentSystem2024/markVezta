@@ -367,7 +367,7 @@ export class PurchaseReportMarkComponent {
 
 
   onExporting(event: any) {
-    const fileName = 'BalanceSheetReport';
+    const fileName = 'Purchase Report';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
@@ -407,6 +407,7 @@ export class PurchaseReportMarkComponent {
   }
 
   get_Purchase_list() {
+    this.showParameters = false
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,

@@ -12,6 +12,7 @@
           valueExpr="ID"
           [(value)]="select_department_id"
           [searchEnabled]="true"
+          [showClearButton]="true"
         ></dx-select-box>
 
         <dx-select-box
@@ -61,12 +62,12 @@
         ></dx-button>
 
         <!-- ✅ Cancel button — visible only while loading -->
-        <dx-button
+        <!-- <dx-button
           text="Cancel"
           type="danger"
           stylingMode="outlined"
           (onClick)="cancelReport()"
-        ></dx-button>
+        ></dx-button> -->
       </div>
     </div>
 

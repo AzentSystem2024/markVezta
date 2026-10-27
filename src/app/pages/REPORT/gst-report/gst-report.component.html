@@ -27,12 +27,6 @@
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
     >
-      <!-- [summary.calculateCustomSummary]="summaryColumnsData.calculateCustomSummary" -->
-      <!-- (onEditingStart)="onEditLedger($event)" -->
-      <!-- <dxo-editing
-        mode="popup"
-        [allowUpdating]="true"
-      ></dxo-editing> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
 
       <dxo-pager
@@ -43,7 +37,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -241,26 +235,7 @@
         caption="Total GST"
         width="130px"
       ></dxi-column>
-      <!-- <dxi-column
-        dataField="DebitAmount"
-        caption="Debit Amount"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-        alignment="right"
-      >
-      </dxi-column> -->
 
-      <!-- <dxi-column
-        dataField="CreditAmount"
-        caption="Credit Amount"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-        alignment="right"
-      >
-      </dxi-column> -->
-
-      <!-- <dxi-column dataField="BALANCE" caption="Balance"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column> -->
       <dxi-column
         *ngIf="GST_datasource.length > 0"
         type="buttons"
@@ -276,52 +251,6 @@
     </dx-data-grid>
   </div>
 </div>
-
-<!-- <dx-popup
-  [(visible)]="editLedgerPopup"
-  [width]="'50vw'"
-  [height]="'55vh'"
-  title="View Ledger statement"
-  (onHiding)="handleClose()"
->
-<form>
-  <div style="display: flex;">
-    <dx-text-box></dx-text-box>
-      <dx-text-box></dx-text-box>
-  </div>
-</form>
-  
-</dx-popup> -->
-<!-- =================header filter======================== -->
-<!-- <dx-popup
-  [(visible)]="isCustomDatePopupVisible"
-  [width]="'300px'"
-  title="Select Custom Date Range"
-  [showCloseButton]="true"
-  [dragEnabled]="false"
-  [closeOnOutsideClick]="true"
-  [height]="'300px'"
->
-  <div class="p-3">
-    <dx-date-box
-      [(value)]="fromDate"
-      type="date"
-      displayFormat="yyyy-MM-dd"
-      label="From Date"
-    >
-    </dx-date-box>
-
-    <dx-date-box
-      [(value)]="toDate"
-      type="date"
-      displayFormat="yyyy-MM-dd"
-      label="To Date"
-    >
-    </dx-date-box>
-
-    <button class="custom-apply-btn" (click)="applyCustomDate()">Apply</button>
-  </div>
-</dx-popup> -->
 
 <dx-popup
   [(visible)]="isViewJournalVoucher"

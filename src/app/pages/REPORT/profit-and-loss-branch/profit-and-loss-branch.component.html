@@ -116,7 +116,7 @@
 
         <dxi-item>
           <dx-tag-box
-            label="Store"
+            [label]="appType === 'VEZTA' ? 'Facility' : 'Store'"
             labelMode="floating"
             displayExpr="DESCRIPTION"
             valueExpr="ID"
