@@ -816,7 +816,7 @@
           </dx-text-box>
         </dxi-item>
 
-        <dxi-item>
+        <!-- <dxi-item>
           <dx-text-box
             label="Telephone"
             labelMode="floating"
@@ -835,7 +835,29 @@
               ></dxi-validation-rule>
             </dx-validator>
           </dx-text-box>
-        </dxi-item>
+        </dxi-item> -->
+
+          <dxi-item>
+  <dx-text-box
+    label="Telephone"
+    labelMode="floating"
+    [(value)]="phoneValue"
+    stylingMode="outlined"
+    width="100%"
+  >
+    <dx-validator>
+      <dxi-validation-rule
+        type="custom"
+        [validationCallback]="validateMobileLengthdeliveryaddress"
+        [message]="
+          'Telephone number must be ' +
+          mobile_limit_Delivery_Address +
+          ' digits long'
+        "
+      ></dxi-validation-rule>
+    </dx-validator>
+  </dx-text-box>
+</dxi-item>  
       </dx-form>
       <dxi-item>
         <div class="save-btn">
