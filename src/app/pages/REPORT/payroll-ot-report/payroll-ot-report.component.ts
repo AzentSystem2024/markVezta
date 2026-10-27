@@ -55,6 +55,7 @@ export class PayrollOtReportComponent {
   dataGrid!: DxDataGridComponent;
 
   isColumnChooserVisible = false;
+  showParameters = true;
 
   tempColumns: {
     dataField: string;
@@ -143,6 +144,8 @@ export class PayrollOtReportComponent {
   select_department_id: number;
   paymentType: any;
   selected_payment_mode: number;
+  isFilterOpened = false;
+  isSummaryVisible = true;
 
   constructor(
     private dataService: DataService,
@@ -194,6 +197,86 @@ export class PayrollOtReportComponent {
       this.cdr.detectChanges();
     });
   }
+
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    const grid = this.dataGrid?.instance;
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+    }
+    this.Payroll_Report();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    // Update the DataGrid summary visibility
+    const grid = this.dataGrid?.instance;
+
+    if (grid) {
+      grid.option(
+        'summary.totalItems',
+        this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+      );
+
+      grid.option(
+        'summary.groupItems',
+        this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+      );
+    }
+
+    // Update the button icon and tooltip
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
+
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -308,6 +391,7 @@ export class PayrollOtReportComponent {
   }
 
   Payroll_Report() {
+    this.showParameters = false
     const payload = {
       FromDate: this.selected_from_date,
       ToDate: this.selected_To_date,
