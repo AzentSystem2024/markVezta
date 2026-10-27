@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule, NgZone, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   BrowserModule,
@@ -8,6 +8,7 @@ import {
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxDropDownBoxModule,
@@ -46,9 +47,85 @@ import { DataService } from 'src/app/services';
 })
 export class SalaryWPSComponent {
 
-   gridData: any;
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'SalaryMonth', caption: 'Salary Month' },
+    { dataField: 'EmployeeNo', caption: 'Emp No' },
+    { dataField: 'EmployeeName', caption: 'Name' },
+    { dataField: 'Designation', caption: 'Designation' },
+    { dataField: 'BasicPay', caption: 'BasicPay' },
+    { dataField: 'Allowance', caption: "Allowance" },
+    { dataField: 'TotalDue', caption: 'TotalDue' },
+    { dataField: 'Overtime', caption: 'Overtime' },
+    { dataField: 'Advance', caption: 'Advance' },
+    { dataField: 'Deductions', caption: 'Deductions' },
+    { dataField: 'NetPayable', caption: 'Net Payable' },
+
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+
+  gridData: any;
   months: any[] = [];
-  PaySettings:any;
+  PaySettings: any;
   selectedMonth: Date = new Date();
   payloadDate: string;
   pdfData: any;
@@ -60,21 +137,22 @@ export class SalaryWPSComponent {
   selected_Company_name: any;
   financialYeaDate: any;
   selected_fin_id: any;
-   
+
   department: any;
 
   employees: any[] = [];
+  employeeslist: any[] = [];
   auto: string = 'auto';
   Department: any;
-select_department_id: any;
- isFilterRowVisible: boolean = false;
+  select_department_id: any;
+  isFilterRowVisible: boolean = false;
 
- calendarVisible = false;
- selectedYear: number;
- selectedMonthForAdd: string;
- yearSelectorVisible = false;
-years: number[] = [];
- monthNames = [
+  calendarVisible = false;
+  selectedYear: number;
+  selectedMonthForAdd: string;
+  yearSelectorVisible = false;
+  years: number[] = [];
+  monthNames = [
     'January',
     'February',
     'March',
@@ -91,17 +169,87 @@ years: number[] = [];
   labour_id: string;
   bankCode: string;
   currencyname: any;
+  selectedEmployeeIds: any[] = [];
+  selectedEmployees: any[] = [];
+  isSummaryVisible = true;
+  isFilterOpened = false;
 
-  constructor(private dataService: DataService) {
-    
+  summaryColumnsData = {
+
+    totalItems: [
+      {
+        column: 'BasicPay',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'BasicPay',
+        alignment: 'right',
+      },
+      {
+        column: 'Allowance',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        showInColumn: 'Allowance',
+        alignment: 'right',
+      },
+    ],
+    groupItems: [
+      {
+        column: 'BasicPay',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+      {
+        column: 'Deductions',
+        summaryType: 'sum',
+        displayFormat: '{0}',
+        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
+        alignByColumn: true,
+      },
+    ],
+    calculateCustomSummary: (options) => {
+      if (options.name === 'summaryRow') {
+        // Custom logic if needed
+      }
+    },
+  };
+
+  constructor(private dataService: DataService, private ngZone: NgZone,) {
+
+  }
+
+  onSelectionChanged(event: any): void {
+    this.selectedEmployeeIds = event.selectedRowKeys;
+    this.selectedEmployees = event.selectedRowsData;
+
+    console.log('Selected Employee IDs:', this.selectedEmployeeIds);
   }
 
   // 🔹 Button click
-  onShowClick() {
+  onShowClick(): void {
+    // if (!this.selectedEmployeeIds || this.selectedEmployeeIds.length === 0) {
+    //   notify(
+    //     {
+    //       message: 'Please select at least one employee to download the WPS file.',
+    //       type: 'warning',
+    //       displayTime: 3000,
+    //       position: {
+    //         at: 'top center',
+    //         my: 'top center',
+    //       },
+    //     }
+    //   );
+
+    //   return;
+    // }
+
     this.loadEmployees();
   }
 
-  ngOnInit(){
+  ngOnInit() {
     console.log('calling')
 
     const today = new Date();
@@ -113,32 +261,32 @@ years: number[] = [];
     });
     this.selectedYear = this.selectedMonth.getFullYear();
 
-     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.currencyname = sessionData.GeneralSettings.CODE
     console.log(this.currencyname)
 
     const payload = {
-    NAME : 'DEPT',
-    COMPANY_ID : this.selected_Company_id
-  };
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id
+    };
 
-  console.log('Payload:', payload);
+    console.log('Payload:', payload);
 
-  this.dataService.Common_Dropdown(payload).subscribe(
-    (res: any) => {
-      console.log(' API Response:', res);
-      this.Department = res.data || res;
-    },
-    (err) => {
-      console.error(' API Error:', err);
-    }
-  );
+    this.dataService.Common_Dropdown(payload).subscribe(
+      (res: any) => {
+        console.log(' API Response:', res);
+        this.Department = res.data || res;
+      },
+      (err) => {
+        console.error(' API Error:', err);
+      }
+    );
 
 
-  const payload1 ={
-      COMPANY_ID : this.selected_Company_id
+    const payload1 = {
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataService.get_PaySettingsList(payload1).subscribe((res: any) => {
       this.PaySettings = res.data;
@@ -149,14 +297,15 @@ years: number[] = [];
     this.sesstion_Details();
     this.Department_dropdown();
     this.get_PaySettingsList();
-     this.generateYears();
+    this.WpsList();
+    this.generateYears();
 
-  
+
   }
 
-    get_PaySettingsList() {
-    const payload ={
-      COMPANY_ID : this.selected_Company_id
+  get_PaySettingsList() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataService.get_PaySettingsList(payload).subscribe((res: any) => {
       this.PaySettings = res.data;
@@ -180,22 +329,97 @@ years: number[] = [];
     this.formatted_from_date = this.financialYeaDate;
   }
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
 
-
-
-    goToPreviousMonth() {
-    const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    this.selectedMonth = currentDate;   
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    const grid = this.dataGrid?.instance;
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
-    goToNextMonth() {
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+    }
+    this.WpsList();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    // Update the DataGrid summary visibility
+    const grid = this.dataGrid?.instance;
+
+    if (grid) {
+      grid.option(
+        'summary.totalItems',
+        this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+      );
+
+      grid.option(
+        'summary.groupItems',
+        this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+      );
+    }
+
+    // Update the button icon and tooltip
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
+
+
+  goToPreviousMonth() {
+    const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    this.selectedMonth = currentDate;
+    this.WpsList();
+  }
+
+  goToNextMonth() {
     const currentDate = new Date(this.selectedMonth); // Ensure it's a Date object
     currentDate.setMonth(currentDate.getMonth() + 1);
     this.selectedMonth = currentDate;
+    this.WpsList();
   }
 
-    toggleCalendar() {
+  toggleCalendar() {
     this.calendarVisible = !this.calendarVisible;
 
     if (this.calendarVisible) {
@@ -207,7 +431,7 @@ years: number[] = [];
     }
   }
 
-    generateYears() {
+  generateYears() {
     const currentYear = new Date().getFullYear();
     this.years = [];
 
@@ -216,7 +440,7 @@ years: number[] = [];
     }
   }
 
-    selectMonthByIndex(monthIndex: number) {
+  selectMonthByIndex(monthIndex: number) {
     this.selectedMonth = new Date(this.selectedYear, monthIndex, 1, 12); // Set the date to the 1st of the selected month
     this.onMonthChange({ value: this.selectedMonth }); // Pass the selected month to onMonthChange
 
@@ -225,7 +449,7 @@ years: number[] = [];
     // Hide calendar after selection (optional)
   }
 
-   onMonthandYearChanged(e: any) {
+  onMonthandYearChanged(e: any) {
     if (e.value) {
       const updatedMonth = new Date(e.value);
       this.selectedMonth = new Date(
@@ -240,7 +464,7 @@ years: number[] = [];
     }
   }
 
-    onMonthChange(event: any): void {
+  onMonthChange(event: any): void {
     const selectedDate = new Date(event.value);
 
     if (isNaN(selectedDate.getTime())) return;
@@ -264,7 +488,7 @@ years: number[] = [];
     this.yearSelectorVisible = !this.yearSelectorVisible;
   }
 
-    previousYear() {
+  previousYear() {
     this.selectedYear--;
   }
 
@@ -272,13 +496,13 @@ years: number[] = [];
     this.selectedYear++;
   }
 
-    selectYear(year: number, event: MouseEvent) {
+  selectYear(year: number, event: MouseEvent) {
     event.stopPropagation(); // Prevent calendar from closing
     this.selectedYear = year;
     this.yearSelectorVisible = false;
   }
 
-   outsideClickListener = (event: any) => {
+  outsideClickListener = (event: any) => {
     const calendarElement = document.querySelector('.calendar-popup');
     const labelElement = document.querySelector('.month-label');
 
@@ -297,64 +521,128 @@ years: number[] = [];
     this.calendarVisible = false;
   }
 
-   Department_dropdown(){
-  console.log(' Department dropdown triggered');
+  Department_dropdown() {
+    console.log(' Department dropdown triggered');
 
-  const payload = {
-    NAME : 'DEPT',
-    COMPANY_ID : this.selected_Company_id
-  };
+    const payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.selected_Company_id
+    };
 
-  console.log('Payload:', payload);
+    console.log('Payload:', payload);
 
-  this.dataService.Common_Dropdown(payload).subscribe(
-    (res: any) => {
-      console.log(' API Response:', res);
-      this.Department = res.data || res;
-    },
-    (err) => {
-      console.error(' API Error:', err);
-    }
-  );
-}
+    this.dataService.Common_Dropdown(payload).subscribe(
+      (res: any) => {
+        console.log(' API Response:', res);
+        this.Department = res.data || res;
+      },
+      (err) => {
+        console.error(' API Error:', err);
+      }
+    );
+  }
 
-  
+
+  WpsList(): void {
+    const salMonth = this.formatDate(
+      new Date(
+        this.selectedMonth.getFullYear(),
+        this.selectedMonth.getMonth(),
+        1
+      )
+    );
+
+    const payload = {
+      SAL_MONTH: salMonth,
+      COMPANY_ID: this.selected_Company_id
+    };
+
+    this.dataService.WpsList(payload).subscribe({
+      next: (res: any) => {
+        if (res?.flag === 1 && Array.isArray(res.data)) {
+          this.employeeslist = res.data;
+        } else {
+          this.employeeslist = [];
+        }
+
+        console.log('WPS API response:', res);
+        console.log('Grid data:', this.employeeslist);
+      },
+      error: (error: any) => {
+        console.error('Error loading WPS list:', error);
+        this.employeeslist = [];
+      }
+    });
+  }
   // 🔹 Load employees from API (example)
-  loadEmployees() {
-    // Replace with your API
+  loadEmployees(): void {
+    if (!this.selectedEmployeeIds || this.selectedEmployeeIds.length === 0) {
+      notify(
+        {
+          message: 'Please select at least one employee.',
+          type: 'warning',
+          displayTime: 3000
+        }
+      );
+      return;
+    }
 
     const salMonth = this.formatDate(
-  new Date(
-    this.selectedMonth.getFullYear(),
-    this.selectedMonth.getMonth(),
-    1
-  )
-);
+      new Date(
+        this.selectedMonth.getFullYear(),
+        this.selectedMonth.getMonth(),
+        1
+      )
+    );
+
     const payload = {
-      SAL_MONTH :salMonth,
-     DEPARTMENT_ID: this.select_department_id ? String(this.select_department_id) : '',
-      COMPANY_ID : this.selected_Company_id
-    }
-    this.dataService.SalaryWPSFile(payload)
-      .subscribe((res: any) => {
-        this.employees = res.data;
-        this.generateSIF();
-      });
+      SAL_MONTH: salMonth,
+      EMP_ID: this.selectedEmployeeIds.join(', '),
+      DEPARTMENT_ID: this.select_department_id
+        ? String(this.select_department_id)
+        : '',
+      COMPANY_ID: this.selected_Company_id
+    };
+
+    console.log('Salary WPS File Payload:', payload);
+
+    this.dataService.SalaryWPSFile(payload).subscribe({
+      next: (res: any) => {
+        if (res?.flag === 1 && Array.isArray(res.data) && res.data.length > 0) {
+          this.employees = res.data;
+          this.generateSIF();
+        } else {
+          notify({
+            message: 'No employee data available.',
+            type: 'warning',
+            displayTime: 3000
+          });
+        }
+      },
+      error: (error: any) => {
+        console.error('Error loading Salary WPS file:', error);
+        notify({
+          message: 'Failed to load Salary WPS data.',
+          type: 'error',
+          displayTime: 3000
+        });
+      }
+    });
   }
 
   //  MAIN FUNCTION
   generateSIF() {
 
     if (!this.employees || this.employees.length === 0) {
-    notify('No data available', 'warning', 3000);
-    return; //  stop execution
-  }
+      notify('No data available', 'warning', 3000);
+      return; //  stop execution
+    }
 
 
     if (!this.PaySettings || this.PaySettings.length === 0) {
-  alert('PaySettings not loaded');
-  return;
-}
+      alert('PaySettings not loaded');
+      return;
+    }
 
 
     const now = new Date();
@@ -371,64 +659,64 @@ years: number[] = [];
 
     // Salary month start & end
     // Convert selectedMonth (YYYY-MM) → Date
-const year = this.selectedMonth.getFullYear();
-const month = this.selectedMonth.getMonth(); // already 0-based
+    const year = this.selectedMonth.getFullYear();
+    const month = this.selectedMonth.getMonth(); // already 0-based
 
-const startDate = new Date(year, month, 1);
-const endDate = new Date(year, month + 1, 0);
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
 
-// JS month is 0-based (Jan = 0)
-// const startDate = new Date(Number(year), Number(month) - 1, 1);
-// const endDate = new Date(Number(year), Number(month), 0);
+    // JS month is 0-based (Jan = 0)
+    // const startDate = new Date(Number(year), Number(month) - 1, 1);
+    // const endDate = new Date(Number(year), Number(month), 0);
 
-console.log('Start Date:', startDate);
-console.log('End Date:', endDate);
+    console.log('Start Date:', startDate);
+    console.log('End Date:', endDate);
 
     let rows: string[] = [];
-    
+
 
     let totalEmployees = 0;
     let totalSalary = 0;
 
- this.employees.forEach(emp => {
+    this.employees.forEach(emp => {
 
-  // Correct mapping from API
-  const mol = this.padLeft(emp.MOL_NUMBER || '', 14);
+      // Correct mapping from API
+      const mol = this.padLeft(emp.MOL_NUMBER || '', 14);
 
-  const bankCode = emp.BANK_CODE || '';
-  const accountNumber = emp.BANK_AC_NO || '';
+      const bankCode = emp.BANK_CODE || '';
+      const accountNumber = emp.BANK_AC_NO || '';
 
-  const totalDays = emp.WORKED_DAYS || 0;
-  const leaveDays = emp.LEAVE_DAYS || 0;
+      const totalDays = emp.WORKED_DAYS || 0;
+      const leaveDays = emp.LEAVE_DAYS || 0;
 
-  // If WORKED_DAYS already correct → use directly
-  const workingDaysFormatted = this.padLeft(totalDays, 2);
+      // If WORKED_DAYS already correct → use directly
+      const workingDaysFormatted = this.padLeft(totalDays, 2);
 
-  const fixedSalary = Math.round(Number(emp.FIXED_SALARY) || 0);
-  const variableSalary = Math.round(Number(emp.VARIABLE_SALARY) || 0);
+      const fixedSalary = Math.round(Number(emp.FIXED_SALARY) || 0);
+      const variableSalary = Math.round(Number(emp.VARIABLE_SALARY) || 0);
 
-  totalSalary += (fixedSalary + variableSalary);
-  totalEmployees++;
+      totalSalary += (fixedSalary + variableSalary);
+      totalEmployees++;
 
-  const row = [
-    'EDR',
-    mol,
-    bankCode,
-    accountNumber,
-    this.formatDate(startDate),
-    this.formatDate(endDate),
-    workingDaysFormatted,
-    fixedSalary.toString(),
-    variableSalary.toString(),
-    leaveDays.toString()
-  ].join(',');
+      const row = [
+        'EDR',
+        mol,
+        bankCode,
+        accountNumber,
+        this.formatDate(startDate),
+        this.formatDate(endDate),
+        workingDaysFormatted,
+        fixedSalary.toString(),
+        variableSalary.toString(),
+        leaveDays.toString()
+      ].join(',');
 
-  rows.push(row);
+      rows.push(row);
 
-  console.log('Employees:', this.employees);
-console.log('PaySettings:', this.PaySettings);
-console.log('File content:', rows);
-});
+      console.log('Employees:', this.employees);
+      console.log('PaySettings:', this.PaySettings);
+      console.log('File content:', rows);
+    });
 
     // 🔹 SCR ROW
 
@@ -446,8 +734,8 @@ console.log('File content:', rows);
     ].join(',');
 
     if (this.employees && this.employees.length > 0) {
-  rows.push(scrRow);
-}
+      rows.push(scrRow);
+    }
 
     const fileContent = rows.join('\n');
 
@@ -466,22 +754,22 @@ console.log('File content:', rows);
     const d = ('0' + date.getDate()).slice(-2);
     return `${y}-${m}-${d}`;
   }
-  
 
-downloadFile(content: string, fileName: string) {
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-  const url = window.URL.createObjectURL(blob);
 
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
+  downloadFile(content: string, fileName: string) {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
 
-  document.body.appendChild(link); // VERY IMPORTANT
-  link.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
 
-  document.body.removeChild(link); // cleanup
-  window.URL.revokeObjectURL(url); // cleanup
-}
+    document.body.appendChild(link); // VERY IMPORTANT
+    link.click();
+
+    document.body.removeChild(link); // cleanup
+    window.URL.revokeObjectURL(url); // cleanup
+  }
 
 }
 @NgModule({
@@ -521,4 +809,4 @@ downloadFile(content: string, fileName: string) {
   exports: [SalaryWPSComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalaryWPSModule {}
+export class SalaryWPSModule { }
