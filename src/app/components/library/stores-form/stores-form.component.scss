@@ -17,4 +17,7 @@
     margin-left: 10px;
   }
 
-  
+:host ::ng-deep .plain-styled-form .dx-checkbox {
+  margin-bottom: 8px;
+}
+ 
