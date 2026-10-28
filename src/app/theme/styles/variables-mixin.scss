@@ -74,6 +74,11 @@ $theme-mode: null !default;
   --divider: #64748b;
   --readOnly: #f0f4f8;
   --details-panel-bg: #fafafa;
+  --scrollbar-track: rgba(0, 0, 0, 0.05);
+  --scrollbar-thumb: #8da2b5;
+  --scrollbar-thumb-hover: #5a738e;
+  --scrollbar-thumb-active: #0073d8;
+  --scrollbar-size: 12px;
 
   @if $theme-mode ==dark {
     --card-bg-color: rgba(128, 128, 128, 0.03);
@@ -101,6 +106,11 @@ $theme-mode: null !default;
     --divider: #64748b;
     --readOnly: #131111;
     --details-panel-bg: #1e1e1e;
+    --scrollbar-track: rgba(255, 255, 255, 0.06);
+    --scrollbar-thumb: #525e6f;
+    --scrollbar-thumb-hover: #7b8ba1;
+    --scrollbar-thumb-active: #00a2ed;
+    --scrollbar-size: 12px;
   }
 
   --border-color: #{$base-border-color};

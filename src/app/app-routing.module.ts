@@ -234,9 +234,11 @@ import { SalesReportComponent } from './sales-report/sales-report.component';
 import { PurchaseReportMarkComponent } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
 import { TransferOutInventoryMarkComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
 import { OrderReportComponent } from './pages/DESPATCH/Reports/order-report/order-report.component';
-import { DispatchReportComponent } from './pages/DESPATCH/Reports/dispatch-report/dispatch-report.component';
+import { DispatchReportComponent } from './pages/DESPATCH/Reports/dispatch-summary-report/dispatch-report.component';
 import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
 import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
+import { OrderDetailsReportComponent } from './pages/DESPATCH/Reports/order-details-report/order-details-report.component';
+import { DispatchDetailsReportComponent } from './pages/DESPATCH/Reports/dispatch-details-report/dispatch-details-report.component';
 
 const routes: Routes = [
   {
@@ -1441,8 +1443,18 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'order-detail',
+        component: OrderDetailsReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'dispatch-report',
         component: DispatchReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'dispatch-detail',
+        component: DispatchDetailsReportComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1471,4 +1483,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

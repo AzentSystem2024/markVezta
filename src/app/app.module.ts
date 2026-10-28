@@ -8,7 +8,7 @@ import {
   DxTagBoxModule,
   DxRadioGroupModule,
   DxDateBoxModule,
-  DxButtonModule
+  DxButtonModule,
 } from 'devextreme-angular';
 import { AppComponent } from './app.component';
 import { SideNavOuterToolbarModule, SingleCardModule } from './layouts';
@@ -432,12 +432,19 @@ import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.co
 import { TransferOutInventoryMarkModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
 import { TransferOutInventoryAddMarkModule } from './pages/transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
 import { OrderReportModule } from './pages/DESPATCH/Reports/order-report/order-report.component';
-import { DispatchReportComponent } from './pages/DESPATCH/Reports/dispatch-report/dispatch-report.component';
+import { DispatchReportModule } from './pages/DESPATCH/Reports/dispatch-summary-report/dispatch-report.component';
 import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
 import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
+import { OrderDetailsReportModule } from './pages/DESPATCH/Reports/order-details-report/order-details-report.component';
+import { DispatchDetailsReportModule } from './pages/DESPATCH/Reports/dispatch-details-report/dispatch-details-report.component';
 
 @NgModule({
-  declarations: [AppComponent, AnalyticsDashboardVeztaMedicalComponent, DispatchReportComponent, StockReportComponent, MultiboxReportComponent,],
+  declarations: [
+    AppComponent,
+    AnalyticsDashboardVeztaMedicalComponent,
+    StockReportComponent,
+    MultiboxReportComponent,
+  ],
   imports: [
     OrderViewModule,
     NewOrderModule,
@@ -880,6 +887,10 @@ import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-repor
     TransferOutInventoryMarkModule,
     TransferOutInventoryAddMarkModule,
     OrderReportModule,
+    OrderDetailsReportModule,
+    DispatchReportModule,
+    DispatchDetailsReportModule,
+
   ],
 
   providers: [
@@ -894,4 +905,4 @@ import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-repor
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

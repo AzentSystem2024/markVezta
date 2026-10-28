@@ -7641,6 +7641,27 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+  getOrderDetailsReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/OrderDetails`,
+      payload,
+    );
+  }
+
+  getDispatchSummaryReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchSummary`,
+      payload,
+    );
+  }
+
+  getDispatchDetailsReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchDetail`,
+      payload,
+    );
+  }
+
   saveNewOrderCartToOrder(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}NewOrder/SaveCartToOrder`,
@@ -7660,10 +7681,12 @@ The result can be exported to HTML or Markdown.`;
     const data = items;
     return this.http.post(`${this.apiUrl}TransferOut_Mark/list`, data);
   }
+
   insertTransferOutForInventoryMark(items: any) {
     const data = items;
     return this.http.post(`${this.apiUrl}TransferOut_Mark/insert`, data);
   }
+
   selectTransferOutForInventoryMark(id: number) {
     return this.http.post<any>(
       `${this.apiUrl}TransferOut_Mark/select/` + id,

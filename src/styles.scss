@@ -19,6 +19,189 @@ body {
   box-sizing: border-box;
 }
 
+/* ================= GLOBAL FULL-TIME VISIBLE SCROLLBARS ================= */
+:root {
+  --scrollbar-track: rgba(0, 0, 0, 0.05);
+  --scrollbar-thumb: #8da2b5;
+  --scrollbar-thumb-hover: #5a738e;
+  --scrollbar-thumb-active: #0073d8;
+  --scrollbar-size: 12px;
+}
+
+/* 1. Native / Browser Scrollbars (All HTML elements & overflow containers) */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--scrollbar-thumb, #8da2b5) var(--scrollbar-track, rgba(0, 0, 0, 0.05));
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size, 12px) !important;
+  height: var(--scrollbar-size, 12px) !important;
+  background-color: var(--scrollbar-track, rgba(0, 0, 0, 0.05)) !important;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, rgba(0, 0, 0, 0.05)) !important;
+  border-radius: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb, #8da2b5) !important;
+  border-radius: 6px !important;
+  border: 2px solid transparent !important;
+  background-clip: content-box !important;
+  min-height: 28px;
+  min-width: 28px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--scrollbar-thumb-hover, #5a738e) !important;
+  }
+
+  &:active {
+    background-color: var(--scrollbar-thumb-active, #0073d8) !important;
+  }
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 2. DevExtreme Global Scrollbars (DataGrid, ScrollView, TreeList, Lists, etc.) */
+.dx-scrollable-scrollbar {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background-color: var(--scrollbar-track, rgba(0, 0, 0, 0.05)) !important;
+  border-radius: 6px !important;
+  z-index: 15 !important;
+  pointer-events: auto !important;
+
+  /* Vertical scrollbar: full-time visible with bigger width */
+  &.dx-scrollbar-vertical,
+  &.dx-scrollbar-vertical.dx-scrollbar-hoverable {
+    width: var(--scrollbar-size, 12px) !important;
+    min-width: var(--scrollbar-size, 12px) !important;
+    max-width: var(--scrollbar-size, 12px) !important;
+    transition: none !important;
+
+    .dx-scrollable-scroll {
+      width: var(--scrollbar-size, 12px) !important;
+      min-width: var(--scrollbar-size, 12px) !important;
+      max-width: var(--scrollbar-size, 12px) !important;
+    }
+  }
+
+  /* Horizontal scrollbar: full-time visible with bigger height */
+  &.dx-scrollbar-horizontal,
+  &.dx-scrollbar-horizontal.dx-scrollbar-hoverable {
+    height: var(--scrollbar-size, 12px) !important;
+    min-height: var(--scrollbar-size, 12px) !important;
+    max-height: var(--scrollbar-size, 12px) !important;
+    transition: none !important;
+
+    .dx-scrollable-scroll {
+      height: var(--scrollbar-size, 12px) !important;
+      min-height: var(--scrollbar-size, 12px) !important;
+      max-height: var(--scrollbar-size, 12px) !important;
+    }
+  }
+}
+
+/* Scroll Thumb - full-time visible even when DevExtreme applies dx-state-invisible */
+.dx-scrollable-scroll {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  padding: 1.5px !important;
+  transition: none !important;
+
+  &.dx-state-invisible {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    transition: none !important;
+
+    .dx-scrollable-scroll-content {
+      background-color: var(--scrollbar-thumb, #8da2b5) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* Scroll Thumb Content */
+.dx-scrollable-scroll-content {
+  background-color: var(--scrollbar-thumb, #8da2b5) !important;
+  border-radius: 5px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: background-color 0.15s ease !important;
+}
+
+/* Hover and Active states for DevExtreme scrollbars */
+.dx-scrollable-scrollbar:hover .dx-scrollable-scroll-content,
+.dx-scrollable-scroll:hover .dx-scrollable-scroll-content,
+.dx-scrollable-scrollbar.dx-state-hover .dx-scrollable-scroll-content,
+.dx-scrollable-scrollbar.dx-scrollable-scrollbar-active .dx-scrollable-scroll-content {
+  background-color: var(--scrollbar-thumb-hover, #5a738e) !important;
+}
+
+.dx-scrollable-scroll:active .dx-scrollable-scroll-content,
+.dx-scrollable-scrollbar-active .dx-scrollable-scroll-content {
+  background-color: var(--scrollbar-thumb-active, var(--accent-color, #0073d8)) !important;
+}
+
+/* Adjust padding for always-visible scrollbars to match 12px size */
+.dx-scrollable-scrollbars-alwaysvisible {
+  &.dx-scrollable-vertical,
+  &.dx-scrollable-both {
+    > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
+      padding-right: var(--scrollbar-size, 12px) !important;
+    }
+  }
+
+  &.dx-scrollable-horizontal,
+  &.dx-scrollable-both {
+    > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
+      padding-bottom: var(--scrollbar-size, 12px) !important;
+    }
+  }
+}
+
+/* 3. Side Navigation Menu Override (Remove 12px scrollbar & remove bottom dead white space) */
+side-navigation-menu,
+.dx-drawer-panel-content,
+.layout-body .menu-container {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  padding-bottom: 0px !important;
+
+  &::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
+    display: none !important;
+  }
+
+  .dx-scrollable-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    height: 0px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    background-color: transparent !important;
+    pointer-events: none !important;
+
+    .dx-scrollable-scroll,
+    .dx-scrollable-scroll-content {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      background-color: transparent !important;
+    }
+  }
+}
+
 .header-text {
   @include header();
 }
@@ -276,6 +459,7 @@ body {
 
   .layout-body .menu-container.theme-dependent {
     padding-top: 0;
+    padding-bottom: 0 !important;
   }
 
   .view-wrapper {

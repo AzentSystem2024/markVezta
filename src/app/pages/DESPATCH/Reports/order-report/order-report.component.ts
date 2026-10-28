@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 
 import {
   DxSelectBoxModule,
@@ -24,6 +23,8 @@ import {
   DxLoadIndicatorModule,
   DxDataGridComponent,
 } from 'devextreme-angular';
+import DataSource from 'devextreme/data/data_source';
+import ArrayStore from 'devextreme/data/array_store';
 
 import { DataService } from 'src/app/services';
 
@@ -68,8 +69,26 @@ export class OrderReportComponent implements OnInit {
   subDealerList: any[] = [];
   selectedSubDealers: any[] = [];
 
-  private isSyncingDealers = false;
-  private autoSelectedDealerIds: Set<any> = new Set<any>();
+  dealerDataSource: DataSource = new DataSource({
+    store: new ArrayStore({
+      data: [],
+      key: 'ID',
+    }),
+    paginate: true,
+    pageSize: 50,
+  });
+
+  subDealerDataSource: DataSource = new DataSource({
+    store: new ArrayStore({
+      data: [],
+      key: 'ID',
+    }),
+    paginate: true,
+    pageSize: 50,
+  });
+
+  private dealerMap = new Map<any, string>();
+  private subDealerMap = new Map<any, any>();
 
   statusList: any[] = [];
   selectedStatuses: any[] = [];
@@ -111,8 +130,7 @@ export class OrderReportComponent implements OnInit {
     { dataField: 'TFF', caption: 'TFF' },
   ];
 
-  // Summary State (Same as CashBook)
-  private savedSummaryItems: any = null;
+  // Summary Configuration
   summaryColumnsData = {
     totalItems: [
       {
@@ -213,7 +231,7 @@ export class OrderReportComponent implements OnInit {
 
   summaryButtonOptions = {
     icon: 'formula',
-    hint: 'Hide Summary',
+    hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     stylingMode: 'outlined',
     onClick: () => this.toggleSummary(),
   };
@@ -221,7 +239,6 @@ export class OrderReportComponent implements OnInit {
   constructor(
     private dataService: DataService,
     private cdr: ChangeDetectorRef,
-    private router: Router,
   ) {
     // Populate Year dropdown (from current year down to 2015)
     const currentYear = new Date().getFullYear();
@@ -236,17 +253,17 @@ export class OrderReportComponent implements OnInit {
 
   ngOnInit(): void {
     const today = new Date();
+    const currentYear = today.getFullYear();
     const systemDate = this.formatDate(today);
 
-    // Initial default date: 1st of current month to today
-    this.selected_from_date = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1,
-    );
+    // Initial default date: Jan 1 of current year to today (Month: All)
+    this.selectedYear = currentYear;
+    this.selectedmonth = '';
+
+    this.selected_from_date = new Date(currentYear, 0, 1);
     this.formatted_from_date = this.formatDate(this.selected_from_date);
 
-    this.selected_To_date = systemDate;
+    this.selected_To_date = today;
     this.formatted_To_date = systemDate;
 
     // Load filter dropdowns only (data is loaded only when user clicks Apply)
@@ -345,12 +362,26 @@ export class OrderReportComponent implements OnInit {
     this.dataService.getNewOrderDealerList({}).subscribe({
       next: (res: any) => {
         const raw = res?.Data || (Array.isArray(res) ? res : []);
-        this.allDealers = raw.map((item: any) => ({
-          ID: item.ID !== undefined ? item.ID : item.id,
-          DESCRIPTION:
-            item.DESCRIPTION || item.description || item.NAME || item.name,
-        }));
+        this.dealerMap.clear();
+        this.allDealers = raw.map((item: any) => {
+          const id = item.ID !== undefined ? item.ID : item.id;
+          const desc =
+            item.DESCRIPTION || item.description || item.NAME || item.name;
+          this.dealerMap.set(id, desc);
+          return {
+            ID: id,
+            DESCRIPTION: desc,
+          };
+        });
         this.dealerList = [...this.allDealers];
+        this.dealerDataSource = new DataSource({
+          store: new ArrayStore({
+            data: this.allDealers,
+            key: 'ID',
+          }),
+          paginate: true,
+          pageSize: 50,
+        });
         if (this.allSubDealers.length > 0) {
           this.refreshSubDealerDisplayNames();
         }
@@ -361,10 +392,21 @@ export class OrderReportComponent implements OnInit {
     this.dataService.getNewOrderSubDealerList({}).subscribe({
       next: (res: any) => {
         const raw = res?.Data || (Array.isArray(res) ? res : []);
-        this.allSubDealers = raw.map((item: any) =>
-          this.formatSubDealerItem(item),
-        );
+        this.subDealerMap.clear();
+        this.allSubDealers = raw.map((item: any) => {
+          const formatted = this.formatSubDealerItem(item);
+          this.subDealerMap.set(formatted.ID, formatted);
+          return formatted;
+        });
         this.subDealerList = [...this.allSubDealers];
+        this.subDealerDataSource = new DataSource({
+          store: new ArrayStore({
+            data: this.allSubDealers,
+            key: 'ID',
+          }),
+          paginate: true,
+          pageSize: 50,
+        });
       },
       error: (err: any) => console.error('Error fetching subdealer list:', err),
     });
@@ -379,10 +421,17 @@ export class OrderReportComponent implements OnInit {
       item.name ||
       '';
     let dealerName = item.DEALER_NAME || '';
-    if (!dealerName && item.DEALER_ID != null && this.allDealers?.length > 0) {
-      const parent = this.allDealers.find((d: any) => d.ID === item.DEALER_ID);
-      if (parent) {
-        dealerName = parent.DESCRIPTION || parent.NAME || '';
+    if (!dealerName && item.DEALER_ID != null) {
+      dealerName =
+        this.dealerMap.get(item.DEALER_ID) ||
+        this.dealerMap.get(Number(item.DEALER_ID)) ||
+        this.dealerMap.get(String(item.DEALER_ID)) ||
+        '';
+      if (!dealerName && this.allDealers?.length > 0) {
+        const parent = this.allDealers.find((d: any) => d.ID == item.DEALER_ID);
+        if (parent) {
+          dealerName = parent.DESCRIPTION || parent.NAME || '';
+        }
       }
     }
     const displayName = dealerName ? `${rawDesc} (${dealerName})` : rawDesc;
@@ -399,16 +448,21 @@ export class OrderReportComponent implements OnInit {
   }
 
   private refreshSubDealerDisplayNames(): void {
-    this.allSubDealers = this.allSubDealers.map((item: any) =>
-      this.formatSubDealerItem(item),
-    );
-    if (this.selectedDealers.length > 0) {
-      this.subDealerList = this.allSubDealers.filter((sub) =>
-        this.selectedDealers.includes(sub.DEALER_ID),
-      );
-    } else {
-      this.subDealerList = [...this.allSubDealers];
-    }
+    this.subDealerMap.clear();
+    this.allSubDealers = this.allSubDealers.map((item: any) => {
+      const formatted = this.formatSubDealerItem(item);
+      this.subDealerMap.set(formatted.ID, formatted);
+      return formatted;
+    });
+    this.subDealerList = [...this.allSubDealers];
+    this.subDealerDataSource = new DataSource({
+      store: new ArrayStore({
+        data: this.allSubDealers,
+        key: 'ID',
+      }),
+      paginate: true,
+      pageSize: 50,
+    });
   }
 
   private fallbackStatuses(): void {
@@ -428,111 +482,23 @@ export class OrderReportComponent implements OnInit {
     ];
   }
 
-  // ================= CASCADING DEALER & SUBDEALER =================
+  // ================= DEALER & SUBDEALER CHANGED =================
   onDealerChanged(event: any): void {
-    if (this.isSyncingDealers) return;
-    this.isSyncingDealers = true;
-
-    try {
-      const selected = event.value;
-      const selectedDealerIds = Array.isArray(selected)
-        ? selected
-        : selected != null
-          ? [selected]
-          : [];
-
-      this.selectedDealers = selectedDealerIds;
-
-      // Clean up autoSelectedDealerIds if user removed any dealer in the Dealer box
-      this.autoSelectedDealerIds.forEach((dId) => {
-        if (!selectedDealerIds.includes(dId)) {
-          this.autoSelectedDealerIds.delete(dId);
-        }
-      });
-
-      if (selectedDealerIds.length > 0) {
-        // Filter subdealers that belong to selected dealers
-        this.subDealerList = this.allSubDealers.filter((sub) =>
-          selectedDealerIds.includes(sub.DEALER_ID),
-        );
-
-        // Clear any currently selected subdealers that do not belong to the selected dealer(s)
-        if (Array.isArray(this.selectedSubDealers)) {
-          this.selectedSubDealers = this.selectedSubDealers.filter((subId) =>
-            this.subDealerList.some((s) => s.ID === subId),
-          );
-        }
-      } else {
-        // Restore all subdealers when no dealer is selected
-        this.subDealerList = [...this.allSubDealers];
-        this.selectedSubDealers = [];
-        this.autoSelectedDealerIds.clear();
-      }
-    } finally {
-      this.isSyncingDealers = false;
-    }
+    const selected = event.value;
+    this.selectedDealers = Array.isArray(selected)
+      ? selected
+      : selected != null
+        ? [selected]
+        : [];
   }
 
   onSubDealerChanged(event: any): void {
-    if (this.isSyncingDealers) return;
-    this.isSyncingDealers = true;
-
-    try {
-      const selected = event.value;
-      const selectedSubIds: any[] = Array.isArray(selected)
-        ? selected
-        : selected != null
-          ? [selected]
-          : [];
-
-      this.selectedSubDealers = selectedSubIds;
-
-      // Find parent dealer IDs for all currently selected subdealers
-      const currentParentDealerIds = new Set<any>();
-      selectedSubIds.forEach((subId) => {
-        const sub = this.allSubDealers.find((s) => s.ID === subId);
-        if (sub && sub.DEALER_ID != null) {
-          currentParentDealerIds.add(sub.DEALER_ID);
-        }
-      });
-
-      const currentDealers = Array.isArray(this.selectedDealers)
-        ? [...this.selectedDealers]
+    const selected = event.value;
+    this.selectedSubDealers = Array.isArray(selected)
+      ? selected
+      : selected != null
+        ? [selected]
         : [];
-
-      // 1. Remove auto-selected dealers that are no longer associated with selected subdealers
-      let updatedDealers = currentDealers.filter((dId) => {
-        if (
-          this.autoSelectedDealerIds.has(dId) &&
-          !currentParentDealerIds.has(dId)
-        ) {
-          this.autoSelectedDealerIds.delete(dId);
-          return false;
-        }
-        return true;
-      });
-
-      // 2. Auto-select corresponding parent dealer(s) for newly selected subdealers
-      currentParentDealerIds.forEach((parentDId) => {
-        if (!updatedDealers.includes(parentDId)) {
-          updatedDealers.push(parentDId);
-          this.autoSelectedDealerIds.add(parentDId);
-        }
-      });
-
-      this.selectedDealers = [...updatedDealers];
-
-      // Update subDealerList based on the resulting selected dealers
-      if (this.selectedDealers.length > 0) {
-        this.subDealerList = this.allSubDealers.filter((sub) =>
-          this.selectedDealers.includes(sub.DEALER_ID),
-        );
-      } else {
-        this.subDealerList = [...this.allSubDealers];
-      }
-    } finally {
-      this.isSyncingDealers = false;
-    }
   }
 
   onOrderFilterCustomItemCreating(e: any): void {
@@ -545,6 +511,25 @@ export class OrderReportComponent implements OnInit {
   // ================= LOAD ORDER REPORT DATA (On Apply Button Click) =================
   loadOrderReportData(): void {
     this.isLoading = true;
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.beginCustomLoading('Loading orders...');
+    } else {
+      setTimeout(() => {
+        if (this.isLoading) {
+          this.dataGrid?.instance?.beginCustomLoading('Loading orders...');
+        }
+      }, 0);
+    }
+    this.cdr.detectChanges();
+
+    const formatValue = (val: any): string => {
+      if (Array.isArray(val)) {
+        return val
+          .filter((item) => item !== null && item !== undefined && item !== '')
+          .join(',');
+      }
+      return val != null && val !== '' ? String(val) : '';
+    };
 
     // Build payload according to exact API specification:
     // api/OrderRpt/OrderSummary
@@ -555,27 +540,15 @@ export class OrderReportComponent implements OnInit {
       DATE_TO:
         this.formatted_To_date ||
         this.formatDate(new Date(this.selected_To_date)),
-      STATUS:
-        this.selectedStatuses && this.selectedStatuses.length > 0
-          ? this.selectedStatuses.join(',')
+      STATUS: formatValue(this.selectedStatuses),
+      BRAND_ID:
+        this.selectedBrand != null && this.selectedBrand !== ''
+          ? String(this.selectedBrand)
           : '',
-      BRAND_ID: Number(this.selectedBrand) || 0,
-      STATE_ID:
-        this.selectedStates && this.selectedStates.length > 0
-          ? Number(this.selectedStates[0])
-          : 0,
-      UNIT_ID:
-        this.selectedUnits && this.selectedUnits.length > 0
-          ? Number(this.selectedUnits[0])
-          : 0,
-      DEALER_ID:
-        this.selectedDealers && this.selectedDealers.length > 0
-          ? Number(this.selectedDealers[0])
-          : 0,
-      SUB_DEALER_ID:
-        this.selectedSubDealers && this.selectedSubDealers.length > 0
-          ? Number(this.selectedSubDealers[0])
-          : 0,
+      STATE_ID: formatValue(this.selectedStates),
+      UNIT_ID: formatValue(this.selectedUnits),
+      DEALER_ID: formatValue(this.selectedDealers),
+      SUB_DEALER_ID: formatValue(this.selectedSubDealers),
       ORDER_NO: Number(this.orderNumber) || 0,
       ORDER_FILTER: this.orderFilter ? String(this.orderFilter) : '',
     };
@@ -583,10 +556,13 @@ export class OrderReportComponent implements OnInit {
     this.dataService.getOrderSummaryReport(payload).subscribe({
       next: (res: any) => {
         this.isLoading = false;
+        this.dataGrid?.instance?.endCustomLoading();
         if (res && res.Data && Array.isArray(res.Data)) {
           this.orderReportDataSource = res.Data;
+          this.showParameters = false;
         } else if (Array.isArray(res)) {
           this.orderReportDataSource = res;
+          this.showParameters = false;
         } else {
           this.orderReportDataSource = [];
         }
@@ -594,37 +570,12 @@ export class OrderReportComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
+        this.dataGrid?.instance?.endCustomLoading();
         console.error('Error loading order summary report:', err);
         this.orderReportDataSource = [];
         this.cdr.detectChanges();
       },
     });
-  }
-
-  resetFilters(): void {
-    const currentYear = new Date().getFullYear();
-    const today = new Date();
-    const systemDate = this.formatDate(today);
-
-    this.selectedYear = currentYear;
-    this.selectedmonth = '';
-    this.selected_from_date = new Date(currentYear, today.getMonth(), 1);
-    this.selected_To_date = systemDate;
-    this.formatted_from_date = this.formatDate(this.selected_from_date);
-    this.formatted_To_date = systemDate;
-
-    this.selectedStates = [];
-    this.selectedUnits = [];
-    this.selectedDealers = [];
-    this.selectedSubDealers = [];
-    this.autoSelectedDealerIds.clear();
-    this.subDealerList = [...this.allSubDealers];
-    this.selectedStatuses = [];
-    this.selectedBrand = null;
-    this.orderNumber = null;
-    this.orderFilter = '';
-
-    this.orderReportDataSource = [];
   }
 
   // ================= DATE CHANGED HANDLERS (Same as CashBook) =================
@@ -649,9 +600,12 @@ export class OrderReportComponent implements OnInit {
   onMonthValueChanged(e: any): void {
     this.selectedmonth = e.value ?? '';
     const yr = this.selectedYear || new Date().getFullYear();
-    if (this.selectedmonth === '') {
+    const currentYear = new Date().getFullYear();
+    const today = new Date();
+    if (this.selectedmonth === '' || this.selectedmonth === null) {
       this.selected_from_date = new Date(yr, 0, 1);
-      this.selected_To_date = new Date(yr, 11, 31);
+      this.selected_To_date =
+        yr === currentYear ? today : new Date(yr, 11, 31);
     } else {
       this.selected_from_date = new Date(yr, this.selectedmonth, 1);
       this.selected_To_date = new Date(yr, this.selectedmonth + 1, 0);
@@ -663,15 +617,15 @@ export class OrderReportComponent implements OnInit {
 
   onFromDateChange(event: any): void {
     if (event.value) {
-      const rawDate: Date = new Date(event.value);
-      this.formatted_from_date = this.formatDate(rawDate);
+      this.selected_from_date = new Date(event.value);
+      this.formatted_from_date = this.formatDate(this.selected_from_date);
     }
   }
 
   onToDateChange(event: any): void {
     if (event.value) {
-      const rawDate: Date = new Date(event.value);
-      this.formatted_To_date = this.formatDate(rawDate);
+      this.selected_To_date = new Date(event.value);
+      this.formatted_To_date = this.formatDate(this.selected_To_date);
     }
   }
 
@@ -716,55 +670,62 @@ export class OrderReportComponent implements OnInit {
   }
 
   onExporting(event: any): void {
-    const fileName = 'Order Report';
+    const fileName = 'Order Summary Report';
     this.dataService.exportDataGridReport(event, fileName);
   }
 
-  // ================= SUMMARY TOGGLE (Same as CashBook) =================
+  // ================= SUMMARY TOGGLE =================
   toggleSummary(): void {
-    if (this.isSummaryVisible) {
-      this.savedSummaryItems = {
-        totalItems: this.summaryColumnsData.totalItems,
-        groupItems: this.summaryColumnsData.groupItems,
-      };
-
-      this.summaryColumnsData = {
-        ...this.summaryColumnsData,
-        totalItems: [],
-        groupItems: [],
-      };
-    } else if (this.savedSummaryItems) {
-      this.summaryColumnsData = {
-        ...this.summaryColumnsData,
-        ...this.savedSummaryItems,
-      };
-    }
-
     this.isSummaryVisible = !this.isSummaryVisible;
 
     this.summaryButtonOptions = {
       ...this.summaryButtonOptions,
-      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      icon: 'formula',
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
   }
 
-  // ================= COLUMN CHOOSER (Same as CashBook) =================
+  // ================= COLUMN CHOOSER =================
   openColumnChooser(): void {
     const grid = this.dataGrid?.instance;
     if (!grid) return;
 
-    this.tempColumns = this.chooserColumns.map((column) => ({
-      ...column,
-      visible: grid.columnOption(column.dataField, 'visible') !== false,
-    }));
+    this.tempColumns = this.chooserColumns.map((column) => {
+      const isVisible = grid.columnOption(column.dataField, 'visible');
+      return {
+        ...column,
+        visible: isVisible !== false,
+      };
+    });
 
     this.isColumnChooserVisible = true;
+    this.cdr.detectChanges();
+  }
+
+  selectAllColumns(selectAll: boolean): void {
+    this.tempColumns.forEach((column) => {
+      column.visible = selectAll;
+    });
+    this.tempColumns = [...this.tempColumns];
+    this.cdr.detectChanges();
+  }
+
+  resetColumnSelection(): void {
+    this.selectAllColumns(true);
   }
 
   applyColumnChooser(): void {
     const grid = this.dataGrid?.instance;
     if (!grid) return;
+
+    // Ensure at least one column remains visible so grid layout doesn't collapse
+    const hasVisibleColumn = this.tempColumns.some((col) => col.visible);
+    if (!hasVisibleColumn) {
+      const defaultCol = this.tempColumns.find(
+        (c) => c.dataField === 'ORDER_NO',
+      );
+      if (defaultCol) defaultCol.visible = true;
+    }
 
     this.tempColumns.forEach((column) => {
       grid.columnOption(column.dataField, 'visible', column.visible);
@@ -774,15 +735,7 @@ export class OrderReportComponent implements OnInit {
   }
 
   cancelColumnChooser(): void {
-    this.tempColumns = [];
     this.isColumnChooserVisible = false;
-  }
-
-  resetColumnSelection(): void {
-    this.tempColumns = this.tempColumns.map((column) => ({
-      ...column,
-      visible: true,
-    }));
   }
 }
 
