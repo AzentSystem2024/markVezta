@@ -239,6 +239,10 @@ import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stoc
 import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
 import { OrderDetailsReportComponent } from './pages/DESPATCH/Reports/order-details-report/order-details-report.component';
 import { DispatchDetailsReportComponent } from './pages/DESPATCH/Reports/dispatch-details-report/dispatch-details-report.component';
+import { DispatchSalesThroughReportComponent } from './pages/DESPATCH/Reports/dispatch-sales-through-report/dispatch-sales-through-report.component';
+import { DispatchStateWiseReportComponent } from './pages/DESPATCH/Reports/dispatch-state-wise-report/dispatch-state-wise-report.component';
+import { DispatchTallyFormatComponent } from './pages/DESPATCH/Reports/dispatch-tally-format/dispatch-tally-format.component';
+import { DispatchYearlyReportComponent } from './pages/DESPATCH/Reports/dispatch-yearly-report/dispatch-yearly-report.component';
 
 const routes: Routes = [
   {
@@ -1455,6 +1459,26 @@ const routes: Routes = [
       {
         path: 'dispatch-detail',
         component: DispatchDetailsReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'sales-through',
+        component: DispatchSalesThroughReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tally-format',
+        component: DispatchTallyFormatComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'dispatch-yearly-report',
+        component: DispatchYearlyReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'dispatch-state-report',
+        component: DispatchStateWiseReportComponent,
         canActivate: [AuthGuardService],
       },
       {
