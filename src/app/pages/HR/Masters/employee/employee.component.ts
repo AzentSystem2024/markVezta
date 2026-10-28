@@ -71,6 +71,7 @@ export class EmployeeComponent implements OnInit {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isReadOnly: boolean = false;
 
   addButtonOptions = {
     type: 'default',
@@ -167,7 +168,9 @@ export class EmployeeComponent implements OnInit {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.isReadOnly = packingRights.Readonly === true;
     }
+
     this.isLoading = false;
     this.sesstion_Details();
     this.getEmployeeList();

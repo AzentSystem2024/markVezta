@@ -70,6 +70,7 @@ export class SalaryHeadListComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isReadOnly: boolean = false;
 
   //=================================refresh=============================
   addButtonOptions = {
@@ -134,6 +135,7 @@ export class SalaryHeadListComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+      this.isReadOnly = packingRights.Readonly === true;
     }
 
     this.sesstion_Details();
@@ -303,4 +305,4 @@ export class SalaryHeadListComponent {
   exports: [SalaryHeadListComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SalaryHeadListModule {}
+export class SalaryHeadListModule { }
