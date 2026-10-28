@@ -12,13 +12,24 @@
     min-height: 100%;
     width: 250px;
     display: flex;
+    flex-direction: column;
     flex: 1;
     padding-top: var(--toolbar-vertical-padding);
-    padding-bottom: var(--footer-height);
+    padding-bottom: 0px !important;
 
     ::ng-deep .dx-treeview {
+      height: 100%;
+      flex: 1;
       // ## Long text positioning
       white-space: nowrap;
+
+      .dx-scrollable-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
 
       // ## Icon width customization
       .dx-treeview-item {

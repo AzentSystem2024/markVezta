@@ -80,7 +80,7 @@
         <dx-tag-box
           label="Dealer"
           labelMode="floating"
-          [dataSource]="dealerList"
+          [dataSource]="dealerDataSource"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
           [(value)]="selectedDealers"
@@ -96,7 +96,7 @@
         <dx-tag-box
           label="SubDealer"
           labelMode="floating"
-          [dataSource]="subDealerList"
+          [dataSource]="subDealerDataSource"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
           [(value)]="selectedSubDealers"
@@ -114,7 +114,7 @@
           labelMode="floating"
           [dataSource]="statusList"
           displayExpr="DESCRIPTION"
-          valueExpr="DESCRIPTION"
+          valueExpr="ID"
           [(value)]="selectedStatuses"
           [showSelectionControls]="true"
           applyValueMode="useButtons"
@@ -169,12 +169,6 @@
             [disabled]="isLoading"
             (onClick)="loadOrderReportData()"
           ></dx-button>
-          <dx-button
-            text="Reset"
-            stylingMode="outlined"
-            [disabled]="isLoading"
-            (onClick)="resetFilters()"
-          ></dx-button>
         </div>
       </div>
     </div>
@@ -194,10 +188,11 @@
     <dx-data-grid
       #dataGrid
       class="grid theme-dependent"
+      [class.hide-summary]="!isSummaryVisible"
       [dataSource]="orderReportDataSource"
       width="100%"
       height="82vh"
-      noDataText="No orders found. Click Apply to load data."
+      noDataText="No orders found."
       [showBorders]="true"
       [showColumnLines]="true"
       [showRowLines]="true"
@@ -206,7 +201,9 @@
       [rowAlternationEnabled]="true"
       rowAlternationInterval="2"
       [allowColumnReordering]="true"
-      [scrolling]="{ mode: 'virtual' }"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'widget'"
+      [scrolling]="{ mode: 'virtual', showScrollbar: 'always' }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -276,7 +273,7 @@
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row>
-      <dxo-header-filter [visible]="true">
+      <dxo-header-filter [visible]="isFilterRowVisible">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
 
@@ -377,20 +374,33 @@
       [showTitle]="true"
       [showCloseButton]="true"
       [dragEnabled]="false"
-      [hideOnOutsideClick]="false"
+      [hideOnOutsideClick]="true"
       [shading]="true"
       shadingColor="rgba(0, 0, 0, 0.4)"
       [position]="{ my: 'center', at: 'center', of: 'window' }"
       [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+      (onHiding)="cancelColumnChooser()"
     >
       <div class="column-chooser-content">
         <div class="column-chooser-header">
           <span>Select columns to display</span>
-          <dx-button
-            text="Reset"
-            stylingMode="text"
-            (onClick)="resetColumnSelection()"
-          ></dx-button>
+          <div class="column-chooser-actions">
+            <dx-button
+              text="Select All"
+              stylingMode="text"
+              (onClick)="selectAllColumns(true)"
+            ></dx-button>
+            <dx-button
+              text="Deselect All"
+              stylingMode="text"
+              (onClick)="selectAllColumns(false)"
+            ></dx-button>
+            <dx-button
+              text="Reset"
+              stylingMode="text"
+              (onClick)="resetColumnSelection()"
+            ></dx-button>
+          </div>
         </div>
 
         <div class="column-chooser-list">
