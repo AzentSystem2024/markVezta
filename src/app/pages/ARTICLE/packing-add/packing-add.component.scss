@@ -1,12 +1,12 @@
-:host ::ng-deep .dx-popup-wrapper .dx-overlay-content {
-  max-height: 95vh !important;
-  height: 92vh !important;
-}
+// :host ::ng-deep .dx-popup-wrapper .dx-overlay-content {
+//   max-height: 95vh !important;
+//   height: 92vh !important;
+// }
 
-:host ::ng-deep .dx-popup-content {
-  padding: 8px 16px 10px 16px !important;
-  overflow-y: hidden !important;
-}
+// :host ::ng-deep .dx-popup-content {
+//   padding: 8px 16px 10px 16px !important;
+//   overflow-y: hidden !important;
+// }
 
 ::ng-deep .form-tabs .dx-tabs {
   margin-bottom: 6px !important;
@@ -61,28 +61,28 @@
 }
 
 /* Override DevExtreme spacing */
-::ng-deep .dx-field {
-  margin: 0 !important;
-  padding: 0 !important;
-}
+// ::ng-deep .dx-field {
+//   margin: 0 !important;
+//   padding: 0 !important;
+// }
 
-::ng-deep .dx-texteditor,
-::ng-deep .dx-selectbox {
-  margin: 0 !important;
-  padding: 0 !important;
-  height: 34px !important;
-}
+// ::ng-deep .dx-texteditor,
+// ::ng-deep .dx-selectbox {
+//   margin: 0 !important;
+//   padding: 0 !important;
+//   height: 34px !important;
+// }
 
-::ng-deep .dx-tagbox {
-  min-height: 34px !important;
-  height: auto !important;
-}
+// ::ng-deep .dx-tagbox {
+//   min-height: 34px !important;
+//   height: auto !important;
+// }
 
-::ng-deep .dx-texteditor-input {
-  height: 100% !important;
-  line-height: 18px !important;
-  padding: 4px 8px !important;
-}
+// ::ng-deep .dx-texteditor-input {
+//   height: 100% !important;
+//   line-height: 18px !important;
+//   padding: 4px 8px !important;
+// }
 
 /* Additional UI Layouts */
 .checkbox-container {

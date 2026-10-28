@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
+import { ChangeDetectorRef, Component, NgModule, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxLoadIndicatorModule,
   DxLoadPanelModule,
   DxNumberBoxModule,
+  DxPopupModule,
   DxSelectBoxModule,
   DxTextBoxModule,
   DxValidationGroupModule,
@@ -25,9 +27,73 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./balance-sheet.component.scss'],
 })
 export class BalanceSheetComponent {
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'TYPE_NAME', caption: 'Category' },
+    { dataField: 'MAIN_GROUP_NAME', caption: 'Group' },
+    { dataField: 'PARTICULARS', caption: 'Particulars' },
+    { dataField: 'CODE', caption: 'Code' },
+    { dataField: 'DESCRIPTION', caption: 'Description' },
+    { dataField: 'AMOUNT', caption: 'Amount' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      viopenColumnsible: true,
+    }));
+  }
+
   isFilterRowVisible: boolean = false;
 
-  BalanceSheetReport: any ;
+  BalanceSheetReport: any;
   auto: string = 'auto';
   isEmptyDatagrid: boolean = true;
   expandedOnce = false;
@@ -54,6 +120,8 @@ export class BalanceSheetComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+  isSummaryVisible = true;
+
   constructor(
     private dataservice: DataService,
     private fb: FormBuilder,
@@ -73,7 +141,7 @@ export class BalanceSheetComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataservice.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -93,6 +161,67 @@ this.selectedmonth = currentMonth;
     this.get_DataSource();
   }
 
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.get_DataSource();
+    }
+  }
+
+  applyButtonOptions = {
+    width: 100,
+    hint: 'Apply Filters',
+    text: 'Apply',
+    type: 'default',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.get_DataSource(),
+  };
+
+
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
+  }
   //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
@@ -184,59 +313,59 @@ this.selectedmonth = currentMonth;
     return `${year}-${month}-${day}`;
   }
 
-get_DataSource() {
-  const payload = {
-    COMPANY_ID: this.selected_Company_id,
-    FIN_ID: this.finID,
-    DATE_FROM: this.formatted_from_date,
-    DATE_TO: this.formatted_To_date,
-  };
+  get_DataSource() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      FIN_ID: this.finID,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+    };
 
-  const payloadData = {
-    companyId: payload.COMPANY_ID,
-    finId: payload.FIN_ID,
-    dateFrom: payload.DATE_FROM,
-    dateTo: payload.DATE_TO,
-  };
+    const payloadData = {
+      companyId: payload.COMPANY_ID,
+      finId: payload.FIN_ID,
+      dateFrom: payload.DATE_FROM,
+      dateTo: payload.DATE_TO,
+    };
 
-  sessionStorage.removeItem('viewclickvalue');
-  sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
+    sessionStorage.removeItem('viewclickvalue');
+    sessionStorage.setItem('viewclickvalue', JSON.stringify(payloadData));
 
-  this.BalanceSheetReport = new DataSource({
-    load: () =>
-      new Promise((resolve) => {
-        this.dataservice.Balance_Sheet_Api(payload).subscribe({
-          next: (res: any) => {
-            const list = res.data || [];
+    this.BalanceSheetReport = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataservice.Balance_Sheet_Api(payload).subscribe({
+            next: (res: any) => {
+              const list = res.data || [];
 
-            this.isEmptyDatagrid = list.length === 0;
+              this.isEmptyDatagrid = list.length === 0;
 
-           this.calculateCustomSummaries(list);
-            // this.expandedOnce = false;
+              this.calculateCustomSummaries(list);
+              // this.expandedOnce = false;
 
-            if (list.length === 0) {
-              notify({
-                message: 'No data available',
-                type: 'warning',
-                displayTime: 2000,
-                position: {
-                  at: 'top center',
-                  my: 'top center',
-                },
-              });
-            }
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
 
-            resolve(list);
-            this.expandedOnce = false;
-          },
-          error: () => {
-            this.isEmptyDatagrid = true;
-            resolve([]);
-          },
-        });
-      }),
-  });
-}
+              resolve(list);
+              this.expandedOnce = false;
+            },
+            error: () => {
+              this.isEmptyDatagrid = true;
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
 
   onViewClick(e: any) {
     this.HeadId = e.row.data.HEAD_ID;
@@ -260,8 +389,8 @@ get_DataSource() {
   // }
 
   calculateCustomSummaries(list: any[]) {
-  // calculate summaries here if needed
-}
+    // calculate summaries here if needed
+  }
 
   onContentReady(e) {
     if (!this.expandedOnce && e.component.getDataSource().isLoaded()) {
@@ -287,9 +416,10 @@ get_DataSource() {
     DxDateBoxModule,
     DxSelectBoxModule,
     DxButtonModule,
+    DxPopupModule,
   ],
   providers: [],
   exports: [],
   declarations: [BalanceSheetComponent],
 })
-export class BalanceSheetModule {}
+export class BalanceSheetModule { }

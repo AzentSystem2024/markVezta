@@ -6819,6 +6819,11 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(getEndpoint, payload);
   }
 
+  WpsList(payload: any) {
+    const getEndpoint = this.apiUrl + 'SalaryWps/approvedpayroll';
+    return this.http.post(getEndpoint, payload)
+  }
+
   profitLoss_Branch_Report(payload: any) {
     const getEndpoint = this.apiUrl + 'Report/profitlossbranch';
     return this.http.post(getEndpoint, payload);

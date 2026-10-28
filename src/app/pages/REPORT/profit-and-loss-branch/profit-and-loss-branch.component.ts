@@ -35,7 +35,7 @@ import {
   styleUrls: ['./profit-and-loss-branch.component.scss']
 })
 export class ProfitAndLossBranchComponent {
-    @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
+  @ViewChild('dataGrid', { static: false }) dataGrid!: DxDataGridComponent;
   @ViewChild(DxDataGridComponent) grid!: DxDataGridComponent;
   refreshButtonOptions = {
     icon: 'refresh',
@@ -83,6 +83,7 @@ export class ProfitAndLossBranchComponent {
   selectedmonth: any = '';
   Store: any;
   dynamicColumns: any[] = [];
+  appType: any;
 
   constructor(
     private dataservice: DataService,
@@ -126,17 +127,15 @@ export class ProfitAndLossBranchComponent {
   }
 
 
-  
+
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     //
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
-    // console.log(
-    //   this.selected_Company_id,
-    //   '============selected_Company_id==============',
-    // );
+    this.appType = sessionData?.Configuration[0]?.APP_TYPE || '';
+
   }
 
   //================ Year value change ===================
@@ -225,23 +224,23 @@ export class ProfitAndLossBranchComponent {
 
   storeHint: string = '';
 
-updateStoreHint() {
-  if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-    this.storeHint = 'No store selected';
-    return;
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store
+      .filter(x => this.selectedStoreid.includes(x.ID))
+      .map(x => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
   }
 
-  const selectedNames = this.Store
-    .filter(x => this.selectedStoreid.includes(x.ID))
-    .map(x => x.DESCRIPTION);
-
-  this.storeHint = selectedNames.join(', ');
-}
-
-    store_dropdown(){
+  store_dropdown() {
     const payload = {
-      NAME :'STORE',
-      COMPANY_ID : this.selected_Company_id
+      NAME: 'STORE',
+      COMPANY_ID: this.selected_Company_id
     }
     this.dataservice.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
@@ -254,20 +253,20 @@ updateStoreHint() {
 
     this.dynamicColumns = [];
 
-if (this.selectedStoreid?.length) {
-  this.selectedStoreid.forEach((storeId) => {
-    const storeObj = this.Store.find(s => s.ID === storeId);
+    if (this.selectedStoreid?.length) {
+      this.selectedStoreid.forEach((storeId) => {
+        const storeObj = this.Store.find(s => s.ID === storeId);
 
-    if (storeObj) {
-      this.dynamicColumns.push({
-        dataField: `StoreAmounts.${storeObj.DESCRIPTION}`,
-        caption: storeObj.DESCRIPTION,
-        dataType: 'number',
-        alignment: 'right'
+        if (storeObj) {
+          this.dynamicColumns.push({
+            dataField: `StoreAmounts.${storeObj.DESCRIPTION}`,
+            caption: storeObj.DESCRIPTION,
+            dataType: 'number',
+            alignment: 'right'
+          });
+        }
       });
     }
-  });
-}
 
     let payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -282,7 +281,7 @@ if (this.selectedStoreid?.length) {
       finId: payload.FIN_ID,
       dateFrom: payload.DATE_FROM,
       dateTo: payload.DATE_TO,
-      storeid : payload.STORE_ID
+      storeid: payload.STORE_ID
     };
 
     sessionStorage.removeItem('viewclickvalue');
@@ -300,39 +299,39 @@ if (this.selectedStoreid?.length) {
 
         this.ProfitLossReport = res.ProfitLossDetails;
 
-// 👉 STEP 1: Get all store names from response
-const firstRow = this.ProfitLossReport[0];
+        // 👉 STEP 1: Get all store names from response
+        const firstRow = this.ProfitLossReport[0];
 
-if (firstRow && firstRow.StoreAmounts) {
-  this.dynamicColumns = Object.keys(firstRow.StoreAmounts)
-    .filter(key => key !== 'BL_ORDER' && key !== 'TOTAL') // remove unwanted
-    .map(key => ({
-      dataField: 'StoreAmounts.' + key,
-      caption: key
-    }));
-}
+        if (firstRow && firstRow.StoreAmounts) {
+          this.dynamicColumns = Object.keys(firstRow.StoreAmounts)
+            .filter(key => key !== 'BL_ORDER' && key !== 'TOTAL') // remove unwanted
+            .map(key => ({
+              dataField: 'StoreAmounts.' + key,
+              caption: key
+            }));
+        }
 
-if (this.selectedStoreid.length) {
-  const selectedNames = this.Store
-    .filter(s => this.selectedStoreid.includes(s.ID))
-    .map(s => s.DESCRIPTION);
+        if (this.selectedStoreid.length) {
+          const selectedNames = this.Store
+            .filter(s => this.selectedStoreid.includes(s.ID))
+            .map(s => s.DESCRIPTION);
 
-  this.dynamicColumns = this.dynamicColumns.filter(col =>
-    selectedNames.includes(col.caption)
-  );
-}
+          this.dynamicColumns = this.dynamicColumns.filter(col =>
+            selectedNames.includes(col.caption)
+          );
+        }
 
         this.calculateNetProfit();
 
         this.dataGrid.instance.refresh(); // force grid to recalc summaries
       },
-      error: () => {},
+      error: () => { },
       complete: () => {
         grid?.endCustomLoading();
       },
-      
+
     });
-    
+
   }
   typeSorting = (a: string, b: string) => {
     const order = {
@@ -342,7 +341,7 @@ if (this.selectedStoreid.length) {
 
     return (order[a] || 99) - (order[b] || 99);
 
-    
+
   };
 
   onViewClick(e: any) {
@@ -365,26 +364,26 @@ if (this.selectedStoreid.length) {
     }
   }
 
-calculateNetProfit() {
-  let revenue = 0,
-    expense = 0;
+  calculateNetProfit() {
+    let revenue = 0,
+      expense = 0;
 
-  this.ProfitLossReport.forEach((row) => {
-    const type = (row.TYPE_NAME || '').trim().toUpperCase();
-    const amount = Number(row.StoreAmounts?.TOTAL || 0);
+    this.ProfitLossReport.forEach((row) => {
+      const type = (row.TYPE_NAME || '').trim().toUpperCase();
+      const amount = Number(row.StoreAmounts?.TOTAL || 0);
 
-    console.log(type, amount); // debug
+      console.log(type, amount); // debug
 
-    if (type === 'REVENUE') revenue += amount;   //  FIXED
-    else if (type === 'EXPENSES') expense += amount;
-  });
+      if (type === 'REVENUE') revenue += amount;   //  FIXED
+      else if (type === 'EXPENSES') expense += amount;
+    });
 
-  this.netProfit = Number((revenue - expense).toFixed(2));
+    this.netProfit = Number((revenue - expense).toFixed(2));
 
-  console.log('Revenue:', revenue);
-  console.log('Expense:', expense);
-  console.log('Net Profit:', this.netProfit);
-}
+    console.log('Revenue:', revenue);
+    console.log('Expense:', expense);
+    console.log('Net Profit:', this.netProfit);
+  }
 
   onCellPrepared(e: any) {
     if (
@@ -431,4 +430,4 @@ calculateNetProfit() {
   exports: [],
   declarations: [ProfitAndLossBranchComponent],
 })
-export class ProfitAndLossBranchModule {}
+export class ProfitAndLossBranchModule { }

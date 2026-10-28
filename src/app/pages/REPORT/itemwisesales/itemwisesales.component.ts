@@ -61,6 +61,90 @@ import notify from 'devextreme/ui/notify';
 export class ItemwisesalesComponent {
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'ITEM_CODE', caption: 'Item' },
+    { dataField: 'DESCRIPTION', caption: 'Description' },
+    { dataField: 'SALE_DATE', caption: 'Date' },
+    { dataField: 'SALE_NO', caption: 'Invoice No' },
+    { dataField: 'STORE_NAME', caption: "Store" },
+    { dataField: 'SALE_TYPE_NAME', caption: 'Sale Type' },
+    { dataField: 'CUST_NAME', caption: 'Customer' },
+    { dataField: 'QUANTITY', caption: 'Quantity' },
+    { dataField: 'DEPT_NAME', caption: 'Department' },
+    { dataField: 'CAT_NAME', caption: 'Category' },
+    { dataField: 'SUBCAT_NAME', caption: 'Subcategory' },
+    { dataField: 'BRAND_NAME', caption: 'Brand' },
+    { dataField: 'CUSTOM1_NAME', caption: 'ItemProperty1' },
+    { dataField: 'CUSTOM2_NAME', caption: 'ItemProperty2' },
+    { dataField: 'SALESMAN', caption: 'Salesman' },
+    { dataField: 'PRICE', caption: 'Price' },
+    { dataField: 'DISCOUNT', caption: 'Discount' },
+    { dataField: 'DISC_REASON', caption: 'Reason' },
+    { dataField: 'GROSS_AMOUNT', caption: 'Excl.VAT Amount' },
+    { dataField: 'VAT_PERCENT', caption: 'VAT%' },
+    { dataField: 'VAT_AMOUNT', caption: 'VAT Amount' },
+    { dataField: 'NET_AMOUNT', caption: 'Net Amount' },
+    { dataField: 'COMMISSION', caption: 'Commission' },
+  ];
+  appType: any;
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
   JournalBookDataSource: DataSource; // ONLY for dx-data-grid
   journalBookArray: any[] = []; // ONLY for logic / checks
   journalBookCount = 0;
@@ -183,6 +267,7 @@ export class ItemwisesalesComponent {
   itemProperty2: any;
   itemProperty1: any;
   today: Date = new Date();
+  isSummaryVisible = true;
 
   //  Toggle function
   toggleFiltersPanel() {
@@ -207,7 +292,7 @@ export class ItemwisesalesComponent {
     //============Month field dataSource===============
     this.monthDataSource = this.dataService.getMonths();
     const currentMonth = new Date().getMonth(); // 0 = Jan, 6 = Jul, 11 = Dec
-this.selectedmonth = currentMonth;
+    this.selectedmonth = currentMonth;
   }
 
   ngOnInit() {
@@ -261,6 +346,42 @@ this.selectedmonth = currentMonth;
     this.ItemProperty1_dropdown();
     this.ItemProperty2_dropdown();
   }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.dataGrid?.instance.option(
+      'summary.totalItems',
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+    );
+
+    this.dataGrid?.instance.option(
+      'summary.groupItems',
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+    );
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+  }
+
+
 
   ngAfterViewInit() {
     setTimeout(() => this.resetPopups());
@@ -427,6 +548,7 @@ this.selectedmonth = currentMonth;
   }
 
   load_JournalBook_data() {
+    this.showParameters = false
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
@@ -525,7 +647,7 @@ this.selectedmonth = currentMonth;
         showInColumn: 'QUANTITY',
         alignment: 'right',
       },
-       {
+      {
         name: 'totalDr',
         column: 'GROSS_AMOUNT',
         summaryType: 'sum',
@@ -534,7 +656,7 @@ this.selectedmonth = currentMonth;
         showInColumn: 'GROSS_AMOUNT',
         alignment: 'right',
       },
-       {
+      {
         name: 'totalDr',
         column: 'VAT_AMOUNT',
         summaryType: 'sum',
@@ -742,7 +864,7 @@ this.selectedmonth = currentMonth;
   }
 
   onExporting(event: any) {
-    const fileName = 'Journal_Book';
+    const fileName = 'Itemwise sales report';
     this.dataService.exportDataGridReport(event, fileName);
   }
 }
@@ -791,4 +913,4 @@ this.selectedmonth = currentMonth;
   exports: [],
   declarations: [ItemwisesalesComponent],
 })
-export class ItemwisesalesModule {}
+export class ItemwisesalesModule { }

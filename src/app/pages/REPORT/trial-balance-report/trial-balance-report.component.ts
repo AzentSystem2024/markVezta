@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule } from '@angular/core';
+import { ChangeDetectorRef, Component, NgModule, NgZone, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxLoadIndicatorModule,
   DxLoadPanelModule,
   DxNumberBoxModule,
+  DxPopupModule,
   DxSelectBoxModule,
   DxTagBoxModule,
   DxTextBoxModule,
@@ -25,6 +27,137 @@ import { DataService } from 'src/app/services';
   styleUrls: ['./trial-balance-report.component.scss'],
 })
 export class TrialBalanceReportComponent {
+
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'MainGroup', caption: 'Main Group' },
+    { dataField: 'SubGroup', caption: 'Sub Group' },
+    { dataField: 'Category', caption: 'Category' },
+    { dataField: 'LedgerCode', caption: 'Code' },
+    { dataField: 'LedgerName', caption: 'Description' },
+    { dataField: 'STORE_NAME', caption: 'Store' },
+    { dataField: 'DEPT_NAME', caption: 'Department' },
+    { dataField: 'OpeningBalanceDebit', caption: 'Opening Balance - Debit' },
+    { dataField: 'OpeningBalanceCredit', caption: 'Opening Balance - Credit' },
+    { dataField: 'DuringThePeriodDebit', caption: 'During the Period - Debit' },
+    { dataField: 'DuringThePeriodCredit', caption: 'During the Period - Credit' },
+    { dataField: 'ClosingBalanceDebit', caption: 'Closing Balance - Debit' },
+    { dataField: 'ClosingBalanceCredit', caption: 'Closing Balance - Credit' },
+  ];
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      viopenColumnsible: true,
+    }));
+  }
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    // onClick: () => this.refreshGrid(),
+    onClick: () => {
+      this.zone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+    this.get_DataSource();
+  }
+
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
+  }
+
+
+  isSummaryVisible = true;
   isFilterRowVisible: boolean = false;
 
   TrialBalanceReport: any = [];
@@ -62,6 +195,7 @@ export class TrialBalanceReportComponent {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private zone: NgZone,
   ) {
     this.get_sessionstorage_data();
     this.get_fin_id();
@@ -92,6 +226,16 @@ export class TrialBalanceReportComponent {
     this.get_DataSource();
     this.store_dropdown();
   }
+
+  applyButtonOptions = {
+    width: 100,
+    hint: 'Apply Filters',
+    text: 'Apply',
+    type: 'default',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.get_DataSource(),
+  };
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -138,10 +282,6 @@ export class TrialBalanceReportComponent {
     this.appType = sessionData.Configuration[0]?.APP_TYPE || '';
   }
 
-  toggleFilterRow = () => {
-    this.isFilterRowVisible = !this.isFilterRowVisible;
-    this.cdr.detectChanges();
-  };
 
   summaryColumnsData = {
     totalItems: [
@@ -244,6 +384,18 @@ export class TrialBalanceReportComponent {
       }
     },
   };
+
+  get summaryConfig() {
+    if (this.isSummaryVisible) {
+      return this.summaryColumnsData;
+    }
+
+    return {
+      totalItems: [],
+      groupItems: [],
+    };
+  }
+
 
   onExporting(event: any) {
     const fileName = 'TrialBalanceReport';
@@ -366,6 +518,7 @@ export class TrialBalanceReportComponent {
     DxSelectBoxModule,
     DxButtonModule,
     DxTagBoxModule,
+    DxPopupModule,
   ],
   providers: [],
   exports: [],

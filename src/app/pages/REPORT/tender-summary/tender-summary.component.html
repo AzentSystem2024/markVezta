@@ -87,6 +87,7 @@
             [searchEnabled]="true"
             [showSelectionControls]="true"
             (onValueChanged)="updateStoreHint()"
+            [showClearButton]="true"
           >
           </dx-select-box>
         </dxi-item>
@@ -101,6 +102,7 @@
             displayExpr="DESCRIPTION"
             valueExpr="ID"
             [searchEnabled]="true"
+            [showClearButton]="true"
           >
           </dx-select-box>
         </dxi-item>
@@ -124,20 +126,12 @@
   </div>
 
   <!-- ================= TOGGLE BUTTON ================= -->
-  <div class="button-container mt-1 mb-2">
-    <dx-button
-      class="toggleButton"
-      [width]="200"
-      [height]="13"
-      stylingMode="outlined"
-      type="normal"
-      [icon]="isFilterVisible ? 'chevronup' : 'chevrondown'"
-      (onClick)="toggleFiltersPanel()"
-      [hint]="isFilterVisible ? 'Hide Filters' : 'Show Filters'"
-    >
-    </dx-button>
+  <!-- Toggle Bar -->
+  <div class="toggle-bar" (click)="toggleFiltersPanel()">
+    <span class="toggle-arrow" [class.rotated]="!isFilterVisible">
+      <i class="dx-icon-chevronup"></i>
+    </span>
   </div>
-
   <!-- ================= GRID ================= -->
   <div class="grid-container">
     <dx-data-grid
@@ -197,15 +191,23 @@
         <dxi-item widget="dxButton" [options]="refreshButtonOptions">
         </dxi-item>
 
-        <!-- Divider -->
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
         ></dxi-item>
       </dxo-toolbar>
 
@@ -253,6 +255,58 @@
         </dxi-button>
       </dxi-column>
     </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>
 

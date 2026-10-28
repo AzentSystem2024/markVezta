@@ -902,7 +902,7 @@ export class SalesDetailComponent {
   }
 
   onExporting(event: any) {
-    const fileName = 'Journal_Book';
+    const fileName = 'Sale Detail Report';
     this.dataService.exportDataGridReport(event, fileName);
   }
 }

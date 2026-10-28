@@ -67,25 +67,13 @@
             Fixed Asset Register
           </div>
         </dxi-item>
-        <dxi-item style="margin-bottom: 6px">
-          <dx-select-box
-            [width]="200"
-            label="Location"
-            labelMode="floating"
-            [items]="DepartmentWithAll"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="select_department_id"
-            [searchEnabled]="true"
-          >
-          </dx-select-box>
-        </dxi-item>
 
-        <!-- <dxi-item
+        <dxi-item location="after" template="locationTemplate"></dxi-item>
+        <dxi-item
           location="after"
           widget="dxButton"
           [options]="searchButtonOptions"
-        ></dxi-item> -->
+        ></dxi-item>
 
         <!-- Refresh -->
         <dxi-item
@@ -113,16 +101,27 @@
           [options]="summaryButtonOptions"
         ></dxi-item>
 
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            (onClick)="Fixed_Asset_register()"
-          >
-          </dx-button>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="applyButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'locationTemplate'">
+        <dx-select-box
+          [width]="200"
+          label="Location"
+          labelMode="floating"
+          [items]="DepartmentWithAll"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="select_department_id"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+        >
+        </dx-select-box>
+      </div>
 
       <dxo-grouping
         [autoExpandAll]="false"

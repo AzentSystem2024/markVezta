@@ -147,36 +147,65 @@
           </ng-template>
         </dxi-item>
 
-        <dxi-item>
-          <dx-select-box
-            [width]="200"
-            label="Department"
-            labelMode="floating"
-            [items]="Department"
-            displayExpr="DESCRIPTION"
-            valueExpr="ID"
-            [(value)]="select_department_id"
-            [searchEnabled]="true"
-          >
-          </dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          template="departmentFilterTemplate"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
 
         <dxi-item
           name="exportButton"
           location="after"
           cssClass="toolbar-icon-btn export-btn"
         ></dxi-item>
-        <dxi-item name="columnChooserButton" locateInMenu="auto"></dxi-item>
-        <dxi-item>
-          <dx-button
-            text="Apply"
-            type="default"
-            stylingMode="contained"
-            (onClick)="Timesheet_Report()"
-          >
-          </dx-button>
-        </dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="applyButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'departmentFilterTemplate'">
+        <dx-select-box
+          [width]="200"
+          label="Department"
+          labelMode="floating"
+          [items]="Department"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="select_department_id"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+        >
+        </dx-select-box>
+      </div>
 
       <dxo-grouping
         [autoExpandAll]="false"
@@ -254,5 +283,57 @@
         dataType="number"
       ></dxi-column>
     </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>
