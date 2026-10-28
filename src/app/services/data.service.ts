@@ -7660,6 +7660,20 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+  getSalesThroughReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/SalesThrough`,
+      payload,
+    );
+  }
+
+  getDispatchReportStateWise(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchReportStateWise`,
+      payload,
+    );
+  }
+
   getDispatchDetailsReport(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}OrderRpt/DispatchDetail`,
