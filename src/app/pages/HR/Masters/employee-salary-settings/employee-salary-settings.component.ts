@@ -76,6 +76,7 @@ export class EmployeeSalarySettingsComponent implements OnInit {
     { text: 'Latest', value: 4 },
   ];
   selected_Company_id: any;
+  fin_id: any;
 
   // ==================== Constructor ====================
   constructor(
@@ -135,6 +136,7 @@ export class EmployeeSalarySettingsComponent implements OnInit {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY?.COMPANY_ID;
+    this.fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
   }
 
   getEmployeeSalarySettingsList() {
@@ -145,6 +147,7 @@ export class EmployeeSalarySettingsComponent implements OnInit {
     const payload = {
       CompanyId: this.selected_Company_id,
       FilterAction: Number(this.selectedFilterAction),
+      FIN_ID: this.fin_id
     };
 
     this.dataservice.getEmployeeSalarySettingsList(payload).subscribe({

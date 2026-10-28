@@ -47,6 +47,18 @@ export class PaytimeEntryComponent {
   selectedYear: number;
   selectedRows: any[] = [];
   selectedMonthForAdd: string;
+
+  // PERMISSIONS
+  // ==========================================
+  canAdd = false;
+  canEdit = false;
+  canDelete = false;
+  canPrint = false;
+  canView = false;
+  canVerify = false;
+  canApprove = false;
+  isReadOnly = false;
+
   monthNames = [
     'January',
     'February',
@@ -66,8 +78,8 @@ export class PaytimeEntryComponent {
   amountForm: any;
   newPopupAmount: boolean = false;
   amountModes = [
-    { text: 'Copy amount to all', value: 'copy' },
-    { text: 'Divide amount to all', value: 'divide' },
+    { text: 'Copy amount to selected rows', value: 'copy' },
+    { text: 'Divide amount to selected rows', value: 'divide' },
   ];
   // filledAmount: number = null; // this will appear in toolbar number box
   SalaryHead: any;
@@ -83,6 +95,27 @@ export class PaytimeEntryComponent {
   }
 
   ngOnInit(): void {
+
+    const currentUrl = this.router.url;
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+
+    const menuGroups = menuResponse.MenuGroups || [];
+    const packingRights = menuGroups
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+      this.isReadOnly = packingRights.Readonly === true;
+    }
+
     this.amountForm = this.fb.group({
       amount: [0],
       mode: [''],
@@ -185,7 +218,7 @@ export class PaytimeEntryComponent {
     this.selectedRows = e.selectedRowKeys;
   }
 
-  onAddPopupClose() {}
+  onAddPopupClose() { }
   CityClosePopup() {
     this.newPopupAmount = false;
   }
@@ -420,4 +453,4 @@ export class PaytimeEntryComponent {
   exports: [PaytimeEntryComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PaytimeEntryModule {}
+export class PaytimeEntryModule { }
