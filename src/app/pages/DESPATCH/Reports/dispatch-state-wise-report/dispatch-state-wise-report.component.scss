@@ -208,8 +208,66 @@
 
 /* ================= DATA GRID & POPUP STYLING ================= */
 ::ng-deep {
-  /* DataGrid Total Footer / Summary Styling */
   .grid {
+    /* 1. Neutralize conflicting global scrollbar padding on rowsview content */
+    .dx-datagrid-rowsview {
+      .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
+        padding-right: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    }
+
+    /* 2. Strictly synchronize table-layout and table sizing across headers, rows, and footer */
+    .dx-datagrid-headers .dx-datagrid-table,
+    .dx-datagrid-rowsview .dx-datagrid-table,
+    .dx-datagrid-total-footer .dx-datagrid-table {
+      table-layout: fixed !important;
+      margin: 0 !important;
+    }
+
+    /* 3. Strict box-sizing for all table cells, header cells, and footer cells */
+    .dx-datagrid-table,
+    .dx-datagrid-table .dx-row > td,
+    .dx-datagrid-table .dx-row > th {
+      box-sizing: border-box !important;
+    }
+
+    /* 4. Cell padding & vertical alignment synchronization */
+    .dx-datagrid-headers .dx-header-row > td {
+      box-sizing: border-box !important;
+      padding: 8px 10px !important;
+      vertical-align: middle !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
+    .dx-datagrid-rowsview .dx-data-row > td {
+      box-sizing: border-box !important;
+      padding: 6px 10px !important;
+      vertical-align: middle !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
+    /* 5. Synchronize scrollable containers and headers-scrollable spacer */
+    .dx-datagrid-scrollable-simulated {
+      box-sizing: border-box !important;
+    }
+
+    .dx-datagrid-rowsview.dx-scrollable .dx-scrollable-container {
+      box-sizing: border-box !important;
+    }
+
+    /* 6. Text truncation inside cells so content never forces columns wider */
+    .dx-datagrid-text-content {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
+    /* DataGrid Total Footer / Summary Styling */
     .dx-datagrid-total-footer {
       border-top: 2px solid var(--accent-color, #2b7a9e) !important;
       border-bottom: 2px solid var(--border-color, #cbd5e1) !important;
@@ -236,6 +294,9 @@
           background-color: transparent !important;
           font-weight: 700 !important;
           color: var(--base-text-color) !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
         }
       }
 

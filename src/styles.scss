@@ -153,7 +153,7 @@ body {
 }
 
 /* Adjust padding for always-visible scrollbars to match 12px size */
-.dx-scrollable-scrollbars-alwaysvisible {
+.dx-scrollable-scrollbars-alwaysvisible:not(.dx-datagrid-rowsview) {
   &.dx-scrollable-vertical,
   &.dx-scrollable-both {
     > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
