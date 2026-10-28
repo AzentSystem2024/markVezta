@@ -66,6 +66,7 @@ export class EmployeeSalarySettingsComponent implements OnInit {
   canDelete: boolean = false;
   canApprove: boolean = false;
   canPrint: boolean = false;
+  ReadOnly: boolean = false;
 
   // Filters & Settings
   selectedFilterAction: number = 4; // default is "Latest"
@@ -94,21 +95,38 @@ export class EmployeeSalarySettingsComponent implements OnInit {
   // ==================== Initialization & Data Loading ====================
   checkPermissions() {
     const currentUrl = this.router.url;
+
     const menuResponse = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}',
+      sessionStorage.getItem('savedUserData') || '{}'
     );
+
     const menuGroups = menuResponse.MenuGroups || [];
-    const packingRights = menuGroups
-      .flatMap((group: any) => group.Menus)
+
+    const currentMenu = menuGroups
+      .flatMap((group: any) => group.Menus || [])
       .find((menu: any) => menu.Path === currentUrl);
 
-    if (packingRights) {
-      this.canAdd = packingRights.CanAdd;
-      this.canEdit = packingRights.CanEdit;
-      this.canDelete = packingRights.CanDelete;
-      this.canPrint = packingRights.CanPrint;
-      this.canView = packingRights.canView;
-      this.canApprove = packingRights.CanApprove;
+    console.log('Current URL:', currentUrl);
+    console.log('Current Menu:', currentMenu);
+
+    if (currentMenu) {
+      this.canAdd = currentMenu.CanAdd === true;
+      this.canEdit = currentMenu.CanEdit === true;
+      this.canDelete = currentMenu.CanDelete === true;
+      this.canPrint = currentMenu.CanPrint === true;
+      this.canView = currentMenu.CanView === true;
+      this.canApprove = currentMenu.CanApprove === true;
+
+      this.ReadOnly =
+        currentMenu.Readonly === true ||
+        currentMenu.Readonly === 'true' ||
+        currentMenu.Readonly === 1 ||
+        currentMenu.Readonly === '1';
+
+      console.log('canAdd:', this.canAdd);
+      console.log('ReadOnly:', this.ReadOnly);
+    } else {
+      console.log('Menu not found for URL:', currentUrl);
     }
   }
 

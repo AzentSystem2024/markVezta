@@ -37,8 +37,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="isEditAllowed"
-        [allowDeleting]="isDeleteAllowed"
+        [allowUpdating]="isEditAllowed && !isReadOnly"
+        [allowDeleting]="isDeleteAllowed && !isReadOnly"
       ></dxo-editing>
       <!-- <dxi-item name="exportButton" ></dxi-item> -->
       <dxo-paging [pageSize]="10"></dxo-paging>
@@ -110,7 +110,7 @@
         ></dxi-item>
 
         <dxi-item
-          *ngIf="canAdd"
+          *ngIf="canAdd && !isReadOnly"
           location="after"
           locateInMenu="auto"
           widget="dxButton"

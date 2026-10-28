@@ -116,6 +116,7 @@ export class TimesheetListComponent {
   canView = false;
   canVerify = false;
   canApprove = false;
+  isReadOnly = false;
   SessioncanApprove = false;
   SessioncanVerify = false;
 
@@ -237,6 +238,7 @@ export class TimesheetListComponent {
       this.canDelete = packingRights.CanDelete;
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
+      this.isReadOnly = packingRights.Readonly === true;
       this.SessioncanApprove = packingRights.CanApprove;
       this.SessioncanVerify = packingRights.CanVerify;
     }

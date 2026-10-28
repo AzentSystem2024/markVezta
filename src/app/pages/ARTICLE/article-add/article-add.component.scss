@@ -1,15 +1,15 @@
-:host ::ng-deep .dx-popup-wrapper .dx-overlay-content {
-  max-height: 90vh !important; /* allows the popup to expand higher */
-  height: auto !important; /* prevent fixed height */
-  overflow-y: hidden !important; /* remove scroll overflow */
-}
+// :host ::ng-deep .dx-popup-wrapper .dx-overlay-content {
+//   max-height: 90vh !important; /* allows the popup to expand higher */
+//   height: auto !important; /* prevent fixed height */
+//   overflow-y: hidden !important; /* remove scroll overflow */
+// }
 
-:host ::ng-deep .dx-popup-content-scrollable,
-:host ::ng-deep .dx-popup-content,
-:host ::ng-deep .dx-overlay-content {
-  overflow-y: hidden !important;
-  overscroll-behavior: contain !important;
-}
+// :host ::ng-deep .dx-popup-content-scrollable,
+// :host ::ng-deep .dx-popup-content,
+// :host ::ng-deep .dx-overlay-content {
+//   overflow-y: hidden !important;
+//   overscroll-behavior: contain !important;
+// }
 
 .form-grid {
   display: grid;
@@ -160,20 +160,40 @@
 }
 
 /* Override DevExtreme spacing */
-::ng-deep .dx-field {
+// ::ng-deep .dx-field {
+//   margin: 0 !important;
+//   padding: 0 !important;
+// }
+
+// ::ng-deep .dx-texteditor,
+// ::ng-deep .dx-selectbox {
+//   margin: 0 !important;
+//   padding: 0 !important;
+//   height: 36px !important;
+// }
+
+// ::ng-deep .dx-texteditor-input {
+//   height: 100% !important;
+//   line-height: 20px !important;
+//   padding: 6px 10px !important;
+// }
+
+/* Article form only */
+:host ::ng-deep .article-form-container .dx-field {
   margin: 0 !important;
   padding: 0 !important;
 }
 
-::ng-deep .dx-texteditor,
-::ng-deep .dx-selectbox {
+:host ::ng-deep .article-form-container .dx-texteditor,
+:host ::ng-deep .article-form-container .dx-selectbox {
   margin: 0 !important;
   padding: 0 !important;
-  height: 36px !important;
+  min-height: 36px;
+  box-sizing: border-box;
 }
 
-::ng-deep .dx-texteditor-input {
-  height: 100% !important;
+:host ::ng-deep .article-form-container .dx-texteditor-input {
+  box-sizing: border-box;
   line-height: 20px !important;
   padding: 6px 10px !important;
 }
@@ -293,9 +313,15 @@
   padding-bottom: 80px; /* must be >= height of buttons + margin */
 }
 
-:host ::ng-deep .dx-popup-content-scrollable {
-  overflow-y: hidden !important;
-  max-height: none !important;
+// :host ::ng-deep .dx-popup-content-scrollable {
+//   overflow-y: hidden !important;
+//   max-height: none !important;
+// }
+
+/* Target only the Article Items popup */
+::ng-deep .article-item-popup .dx-popup-content {
+  padding: 10px !important;
+  box-sizing: border-box;
 }
 
 .preview-wrapper {

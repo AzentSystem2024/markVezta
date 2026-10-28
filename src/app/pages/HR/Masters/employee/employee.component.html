@@ -39,8 +39,8 @@
       </dxo-column-chooser>
       <dxo-editing
         mode="popup"
-        [allowUpdating]="canEdit"
-        [allowDeleting]="canDelete"
+        [allowUpdating]="canEdit && !isReadOnly"
+        [allowDeleting]="canDelete && !isReadOnly"
       ></dxo-editing>
 
       <dxo-paging [pageSize]="25"></dxo-paging>
@@ -117,7 +117,7 @@
         ></dxi-item>
 
         <dxi-item
-          *ngIf="canAdd"
+          *ngIf="canAdd && !isReadOnly"
           location="after"
           locateInMenu="auto"
           widget="dxButton"

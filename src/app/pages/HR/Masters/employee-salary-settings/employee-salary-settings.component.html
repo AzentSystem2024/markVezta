@@ -36,8 +36,8 @@
     >
       <dxo-editing
         mode="popup"
-        [allowUpdating]="isEditAllowed"
-        [allowDeleting]="isDeleteAllowed"
+        [allowUpdating]="isEditAllowed && !ReadOnly"
+        [allowDeleting]="isDeleteAllowed && !ReadOnly"
       ></dxo-editing>
 
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
@@ -105,6 +105,7 @@
         ></dxi-item>
         <!-- ADD BUTTON -->
         <dxi-item
+          *ngIf="canAdd && !ReadOnly"
           location="after"
           widget="dxButton"
           [options]="addButtonOptions"
