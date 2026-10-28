@@ -58,7 +58,7 @@ export class UserComponent {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private router: Router,
-  ) {}
+  ) { }
 
   selectedData: any;
   popupwidth: any = '75%';
@@ -187,6 +187,17 @@ export class UserComponent {
       this.canPrint = packingRights.CanPrint;
       this.canView = packingRights.canView;
       this.canApprove = packingRights.CanApprove;
+    }
+  }
+
+
+  onCellPrepared(e: any): void {
+    if (
+      e.rowType === 'data' &&
+      e.data?.ID === 1 &&
+      e.column?.type === 'buttons'
+    ) {
+      e.cellElement.style.display = 'none';
     }
   }
 
@@ -358,7 +369,7 @@ export class UserComponent {
   }
 
   get_userlist() {
-    this.dataservice.get_User_data().subscribe((res: any) => {});
+    this.dataservice.get_User_data().subscribe((res: any) => { });
   }
 
   CloseEditForm() {
@@ -389,4 +400,4 @@ export class UserComponent {
   exports: [],
   declarations: [UserComponent],
 })
-export class UserModule {}
+export class UserModule { }

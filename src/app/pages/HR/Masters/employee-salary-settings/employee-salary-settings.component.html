@@ -105,6 +105,7 @@
         ></dxi-item>
         <!-- ADD BUTTON -->
         <dxi-item
+        *ngIf ="canAdd"
           location="after"
           widget="dxButton"
           [options]="addButtonOptions"

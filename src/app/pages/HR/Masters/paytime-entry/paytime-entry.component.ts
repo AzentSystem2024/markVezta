@@ -78,8 +78,8 @@ export class PaytimeEntryComponent {
   amountForm: any;
   newPopupAmount: boolean = false;
   amountModes = [
-    { text: 'Copy amount to all', value: 'copy' },
-    { text: 'Divide amount to all', value: 'divide' },
+    { text: 'Copy amount to selected rows', value: 'copy' },
+    { text: 'Divide amount to selected rows', value: 'divide' },
   ];
   // filledAmount: number = null; // this will appear in toolbar number box
   SalaryHead: any;

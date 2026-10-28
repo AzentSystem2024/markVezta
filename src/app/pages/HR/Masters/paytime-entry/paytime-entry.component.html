@@ -203,9 +203,8 @@
       </dx-number-box>
         </dxi-item> -->
 
-        <dxi-item>
+        <dxi-item *ngIf="canAdd">
           <dx-button
-            *ngIf="canAdd"
             text="Save"
             type="default"
             stylingMode="contained"
@@ -230,12 +229,12 @@
       <dxi-column
         dataField="DAYS"
         caption="Worked Days"
-        [allowEditing]="true"
+        [allowEditing]="canEdit"
       ></dxi-column>
       <dxi-column
         dataField="AMOUNT"
         caption="Amount"
-        [allowEditing]="true"
+        [allowEditing]="canEdit"
         [format]="{ type: 'fixedPoint', precision: 2 }"
       ></dxi-column>
 
