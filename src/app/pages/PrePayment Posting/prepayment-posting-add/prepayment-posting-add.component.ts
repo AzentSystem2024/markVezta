@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -31,7 +32,17 @@ import { DataService } from 'src/app/services';
   templateUrl: './prepayment-posting-add.component.html',
   styleUrls: ['./prepayment-posting-add.component.scss'],
 })
-export class PrepaymentPostingAddComponent {
+export class PrepaymentPostingAddComponent implements AfterViewInit {
+
+  @ViewChild('dataGrid')
+  dataGrid!: DxDataGridComponent;
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.dataGrid?.instance?.updateDimensions();
+    }, 100);
+  }
+
   @Output() popupClosed = new EventEmitter<void>();
   @Input() canApprove: boolean = false;
   selectedMonthYear: string | number | Date;
