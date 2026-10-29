@@ -437,9 +437,9 @@ import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stoc
 import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
 import { OrderDetailsReportModule } from './pages/DESPATCH/Reports/order-details-report/order-details-report.component';
 import { DispatchDetailsReportModule } from './pages/DESPATCH/Reports/dispatch-details-report/dispatch-details-report.component';
-import { DispatchYearlyReportComponent } from './pages/DESPATCH/Reports/dispatch-yearly-report/dispatch-yearly-report.component';
+import { DispatchYearlyReportModule } from './pages/DESPATCH/Reports/dispatch-yearly-report/dispatch-yearly-report.component';
 import { DispatchStateWiseReportModule } from './pages/DESPATCH/Reports/dispatch-state-wise-report/dispatch-state-wise-report.component';
-import { DispatchTallyFormatComponent } from './pages/DESPATCH/Reports/dispatch-tally-format/dispatch-tally-format.component';
+import { DispatchTallyFormatModule } from './pages/DESPATCH/Reports/dispatch-tally-format/dispatch-tally-format.component';
 import { DispatchSalesThroughReportModule } from './pages/DESPATCH/Reports/dispatch-sales-through-report/dispatch-sales-through-report.component';
 
 @NgModule({
@@ -448,9 +448,9 @@ import { DispatchSalesThroughReportModule } from './pages/DESPATCH/Reports/dispa
     AnalyticsDashboardVeztaMedicalComponent,
     StockReportComponent,
     MultiboxReportComponent,
-    DispatchYearlyReportComponent,
 
-    DispatchTallyFormatComponent,
+
+
   ],
   imports: [
     OrderViewModule,
@@ -899,6 +899,8 @@ import { DispatchSalesThroughReportModule } from './pages/DESPATCH/Reports/dispa
     DispatchDetailsReportModule,
     DispatchSalesThroughReportModule,
     DispatchStateWiseReportModule,
+    DispatchYearlyReportModule,
+    DispatchTallyFormatModule,
   ],
 
   providers: [

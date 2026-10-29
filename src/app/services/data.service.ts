@@ -7674,6 +7674,20 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+  getDispatchReportYearly(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchReportYearly`,
+      payload,
+    );
+  }
+
+  getDispatchReportTally(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchReportTally`,
+      payload,
+    );
+  }
+
   getDispatchDetailsReport(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}OrderRpt/DispatchDetail`,
