@@ -67,8 +67,9 @@ export class PayrollAddComponent implements OnInit, OnChanges {
   displayMode: any = 'full';
   showPageSizeSelector: boolean = true;
   filterRowVisible: boolean = false;
+  fin_id: any;
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) { }
 
   // ================= Lifecycle Hooks =================
 
@@ -124,6 +125,7 @@ export class PayrollAddComponent implements OnInit, OnChanges {
         COMPANY_ID: this.companyID,
         TS_ID: row.ID,
         USER_ID: this.userID,
+        FIN_ID: this.fin_id
       };
 
       this.dataService.generatePayroll(payload).subscribe({
@@ -165,6 +167,9 @@ export class PayrollAddComponent implements OnInit, OnChanges {
     if (menuResponse?.SELECTED_COMPANY) {
       this.companyID = menuResponse.SELECTED_COMPANY.COMPANY_ID;
       this.userID = menuResponse.USER_ID;
+      this.fin_id = menuResponse?.FINANCIAL_YEARS?.[0]?.FIN_ID;
+
+      console.log('Financial ID:', this.fin_id);
     }
   }
 }
@@ -203,4 +208,4 @@ export class PayrollAddComponent implements OnInit, OnChanges {
   exports: [PayrollAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class PayrollAddModule {}
+export class PayrollAddModule { }

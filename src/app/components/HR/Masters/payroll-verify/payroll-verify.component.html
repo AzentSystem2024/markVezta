@@ -60,20 +60,18 @@
             ></dx-text-box>
 
             <dx-number-box
-            label="Allowance"
-            [labelMode]="'floating'"
-            [(value)]="payRollData.EMP_ALLOWANCE"
-            [width]="180"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dx-number-box>
+              label="Allowance"
+              [labelMode]="'floating'"
+              [(value)]="payRollData.EMP_ALLOWANCE"
+              [width]="180"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+            ></dx-number-box>
           </div>
         </dxi-item>
 
         <dxi-item location="after" locateInMenu="auto">
           <div class="stacked-toolbar-group"></div>
           <div class="stacked-toolbar-group">
-          
-
             <dx-number-box
               [placeholder]="'Normal OT Hours'"
               [label]="'Normal OT Hours'"
@@ -134,7 +132,6 @@
         </dxi-total-item>
 
         <dxi-total-item
-        
           column="DEDUCT"
           summaryType="sum"
           [valueFormat]="customFormat"
@@ -188,7 +185,7 @@
           dataType="number"
           [editorOptions]="{ format: '#,##0.00' }"
           [format]="{ type: 'fixedPoint', precision: 2 }"
-          [rtlEnabled]="true"
+          [rtlEnabled]="false"
         ></dx-number-box>
       </div>
     </div>
@@ -205,8 +202,6 @@
         ></dx-text-box>
       </div>
     </div>
-
-    
   </div>
 </div>
 
