@@ -113,12 +113,7 @@ export class DispatchDetailsReportComponent implements OnInit {
   // Summary Configuration
   summaryColumnsData = {
     totalItems: [
-      {
-        column: 'DISPATCH_NO',
-        summaryType: 'count',
-        displayFormat: 'Total: {0} Rows',
-        alignment: 'left',
-      },
+     
       {
         column: 'QUANTITY',
         summaryType: 'sum',

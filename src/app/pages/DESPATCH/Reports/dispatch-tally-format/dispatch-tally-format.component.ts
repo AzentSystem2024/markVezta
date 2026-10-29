@@ -132,12 +132,7 @@ export class DispatchTallyFormatComponent implements OnInit {
   // Summary Configuration
   summaryColumnsData = {
     totalItems: [
-      {
-        column: 'DISPATCH_NO',
-        summaryType: 'count',
-        displayFormat: 'Total: {0} Dispatches',
-        alignment: 'left',
-      },
+     
       {
         column: 'TOTAL_PAIR',
         summaryType: 'sum',

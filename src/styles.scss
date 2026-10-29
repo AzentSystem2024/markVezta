@@ -153,6 +153,22 @@ body {
 }
 
 /* Adjust padding for always-visible scrollbars to match 12px size */
+/* 2.1 Global DataGrid Scrollbar Overlap Protection */
+.dx-datagrid {
+  .dx-datagrid-rowsview .dx-scrollable-scrollbar.dx-scrollbar-vertical {
+    background-color: transparent !important;
+  }
+
+  .dx-datagrid-headers .dx-datagrid-table .dx-row > td:last-child,
+  .dx-datagrid-headers .dx-datagrid-table .dx-header-row > td:last-child,
+  .dx-datagrid-rowsview .dx-datagrid-table .dx-row > td:last-child,
+  .dx-datagrid-rowsview .dx-datagrid-table .dx-data-row > td:last-child,
+  .dx-datagrid-filter-row .dx-datagrid-table .dx-row > td:last-child,
+  .dx-datagrid-total-footer .dx-datagrid-table .dx-row > td:last-child {
+    padding-right: calc(var(--scrollbar-size, 12px) + 12px) !important;
+  }
+}
+
 .dx-scrollable-scrollbars-alwaysvisible:not(.dx-datagrid-rowsview) {
   &.dx-scrollable-vertical,
   &.dx-scrollable-both {

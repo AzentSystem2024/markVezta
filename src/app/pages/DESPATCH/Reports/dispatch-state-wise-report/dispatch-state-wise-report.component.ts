@@ -75,12 +75,7 @@ export class DispatchStateWiseReportComponent implements OnInit {
   // Summary Configuration
   summaryColumnsData: any = {
     totalItems: [
-      {
-        column: 'ART_NO',
-        summaryType: 'count',
-        displayFormat: 'Total: {0} Items',
-        alignment: 'left',
-      },
+      
       {
         column: 'STOCK',
         summaryType: 'sum',

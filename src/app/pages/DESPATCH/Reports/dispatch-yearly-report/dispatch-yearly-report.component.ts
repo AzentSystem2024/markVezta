@@ -82,12 +82,7 @@ export class DispatchYearlyReportComponent implements OnInit {
   // Summary Configuration
   summaryColumnsData: any = {
     totalItems: [
-      {
-        column: 'ART_NO',
-        summaryType: 'count',
-        displayFormat: 'Total: {0} Items',
-        alignment: 'left',
-      },
+      
       ...['APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC', 'JAN', 'FEB', 'MAR'].map(
         (col) => ({
           column: col,

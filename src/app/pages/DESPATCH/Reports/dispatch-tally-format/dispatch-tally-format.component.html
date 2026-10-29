@@ -247,6 +247,7 @@
       <dxi-column
         dataField="DISPATCH_NO"
         caption="Dispatch No"
+        [width]="120"
       ></dxi-column>
 
       <dxi-column
@@ -254,51 +255,60 @@
         caption="Dispatch Date"
         dataType="date"
         [format]="{ type: 'custom', formatter: formatDates }"
-      ></dxi-column>
+        [width]="120"></dxi-column>
 
       <dxi-column
         dataField="ORDER_NO"
         caption="Order No"
+        [width]="105"
       ></dxi-column>
 
       <dxi-column
         dataField="PARTY_CODE"
         caption="Party Code"
+        [width]="105"
       ></dxi-column>
 
       <dxi-column
         dataField="PARTY_NAME"
         caption="Party Name"
+        [width]="190"
       ></dxi-column>
 
       <dxi-column
         dataField="PLACE"
         caption="Place"
+        [width]="110"
       ></dxi-column>
 
       <dxi-column
         dataField="ART_NO"
         caption="Art No"
+        [width]="100"
       ></dxi-column>
 
       <dxi-column
         dataField="SERIAL_NO"
         caption="Serial No"
+        [width]="95"
       ></dxi-column>
 
       <dxi-column
         dataField="CATEGORY"
         caption="Category"
+        [width]="110"
       ></dxi-column>
 
       <dxi-column
         dataField="COLOR"
         caption="Color"
+        [width]="110"
       ></dxi-column>
 
       <dxi-column
         dataField="DESCRIPTION"
         caption="Size"
+        [width]="95"
       ></dxi-column>
 
       <dxi-column
@@ -307,6 +317,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="95"
       ></dxi-column>
 
       <dxi-column
@@ -315,6 +326,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        [width]="95"
       ></dxi-column>
 
       <dxi-column
@@ -323,16 +335,19 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2 }"
+        [width]="90"
       ></dxi-column>
 
       <dxi-column
         dataField="PACKING_ALIAS"
         caption="Packing Alias"
+        [width]="120"
       ></dxi-column>
 
       <dxi-column
         dataField="WAREHOUSE_ALIAS"
         caption="Warehouse Alias"
+        [width]="120"
       ></dxi-column>
 
       <dxi-column
@@ -341,6 +356,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        [width]="110"
       ></dxi-column>
 
       <dxi-column
@@ -348,11 +364,13 @@
         caption="Credit Days"
         dataType="number"
         alignment="right"
+        [width]="100"
       ></dxi-column>
 
       <dxi-column
         dataField="STATE_NAME"
         caption="State"
+        [width]="120"
       ></dxi-column>
     </dx-data-grid>
 

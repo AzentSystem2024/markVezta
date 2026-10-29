@@ -127,12 +127,7 @@ export class DispatchSalesThroughReportComponent implements OnInit {
   // Summary Configuration
   summaryColumnsData = {
     totalItems: [
-      {
-        column: 'CATEGORY',
-        summaryType: 'count',
-        displayFormat: 'Total: {0} Items',
-        alignment: 'left',
-      },
+     
       {
         column: 'ORDER_QTY',
         summaryType: 'sum',

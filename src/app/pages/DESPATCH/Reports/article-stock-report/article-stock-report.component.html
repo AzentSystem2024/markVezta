@@ -1,0 +1,289 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <!-- ================= COLLAPSIBLE FILTER PANEL ================= -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-select-box
+          class="filter-control-unit"
+          label="Unit"
+          labelMode="floating"
+          [dataSource]="unitList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="selectedUnit"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+          placeholder="Unit"
+        ></dx-select-box>
+
+        <div class="filter-btn-group">
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            [disabled]="isLoading"
+            (onClick)="loadArticleStockData()"
+          ></dx-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HORIZONTAL TOGGLE BAR ================= -->
+    <div
+      class="toggle-bar"
+      (click)="toggleParameters()"
+      hint="Toggle Filter Panel"
+    >
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
+    <!-- ================= DATA GRID ================= -->
+    <dx-data-grid
+      #dataGrid
+      class="grid theme-dependent"
+      [class.hide-summary]="!isSummaryVisible"
+      [dataSource]="articleStockDataSource"
+      width="100%"
+      height="82vh"
+      noDataText="No records found."
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showRowLines]="true"
+      [columnAutoWidth]="false"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'widget'"
+      [scrolling]="{ mode: 'virtual', showScrollbar: 'always' }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading article stock report...' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"></dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <!-- Toolbar -->
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">
+            <span>Article Stock Report</span>
+          </div>
+        </dxi-item>
+
+        <!-- Show/Hide Filter Row -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <!-- Column Chooser -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show/Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+
+        <!-- Excel Export -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-sorting mode="multiple"></dxo-sorting>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterRowVisible">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+
+      <!-- Data Columns (Fixed width, resizable by user) -->
+       <dxi-column
+        dataField="BRAND_NAME"
+        caption="Brand"
+        [width]="110"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="ART_NO"
+        caption="Art No"
+        [width]="100"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="COLOR"
+        caption="Color"
+        [width]="110"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="CATEGORY"
+        caption="Category"
+        [width]="110"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="TYPE_NAME"
+        caption="Type"
+        [width]="90"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="SIZE"
+        caption="Size"
+        alignment="center"
+        [width]="80"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="ORDER_NO"
+        caption="Order No"
+        [width]="100"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="MRP"
+        caption="MRP"
+        dataType="number"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        [width]="95"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="QUANTITY"
+        caption="Quantity"
+        dataType="number"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="95"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="MULTIBOX_QTY"
+        caption="Multibox Qty"
+        dataType="number"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="110"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="TOTAL_QTY"
+        caption="Total Qty"
+        dataType="number"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="100"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="ARTICLE_ID"
+        caption="Article ID"
+        [visible]="false"
+        [width]="90"
+      ></dxi-column>
+     
+    </dx-data-grid>
+  </div>
+</div>
+
+<!-- ================= CUSTOM COLUMN CHOOSER POPUP ================= -->
+<dx-popup
+  [width]="420"
+  [height]="'auto'"
+  [showTitle]="true"
+  title="Column Chooser"
+  [dragEnabled]="true"
+  [hideOnOutsideClick]="true"
+  [showCloseButton]="true"
+  [(visible)]="isColumnChooserVisible"
+  [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+>
+  <div *dxTemplate="let data of 'content'" class="column-chooser-content">
+    <div class="chooser-quick-actions">
+      <dx-button
+        text="Select All"
+        stylingMode="text"
+        icon="check"
+        (onClick)="selectAllColumns(true)"
+      ></dx-button>
+      <dx-button
+        text="Deselect All"
+        stylingMode="text"
+        icon="close"
+        (onClick)="selectAllColumns(false)"
+      ></dx-button>
+      <dx-button
+        text="Reset"
+        stylingMode="text"
+        icon="revert"
+        (onClick)="resetColumnSelection()"
+      ></dx-button>
+    </div>
+
+    <div class="chooser-columns-list">
+      <div *ngFor="let col of tempColumns" class="chooser-column-item">
+        <dx-check-box
+          [text]="col.caption"
+          [(value)]="col.visible"
+        ></dx-check-box>
+      </div>
+    </div>
+
+    <div class="chooser-footer">
+      <dx-button
+        text="Cancel"
+        stylingMode="outlined"
+        (onClick)="cancelColumnChooser()"
+      ></dx-button>
+      <dx-button
+        text="Apply"
+        type="default"
+        stylingMode="contained"
+        (onClick)="applyColumnChooser()"
+      ></dx-button>
+    </div>
+  </div>
+</dx-popup>
