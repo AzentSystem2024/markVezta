@@ -133,12 +133,7 @@ export class OrderReportComponent implements OnInit {
   // Summary Configuration
   summaryColumnsData = {
     totalItems: [
-      {
-        column: 'DEALER',
-        summaryType: 'count',
-        displayFormat: 'Total: {0} Orders',
-        alignment: 'left',
-      },
+     
       {
         column: 'ORDER_QTY',
         summaryType: 'sum',

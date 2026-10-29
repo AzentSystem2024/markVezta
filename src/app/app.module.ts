@@ -433,17 +433,26 @@ import { TransferOutInventoryMarkModule } from './pages/INVENTORY MANAGEMENT/tra
 import { TransferOutInventoryAddMarkModule } from './pages/transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
 import { OrderReportModule } from './pages/DESPATCH/Reports/order-report/order-report.component';
 import { DispatchReportModule } from './pages/DESPATCH/Reports/dispatch-summary-report/dispatch-report.component';
-import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
-import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
+import { StockReportModule } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
+import { MultiboxReportModule } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
 import { OrderDetailsReportModule } from './pages/DESPATCH/Reports/order-details-report/order-details-report.component';
 import { DispatchDetailsReportModule } from './pages/DESPATCH/Reports/dispatch-details-report/dispatch-details-report.component';
+import { DispatchYearlyReportModule } from './pages/DESPATCH/Reports/dispatch-yearly-report/dispatch-yearly-report.component';
+import { DispatchStateWiseReportModule } from './pages/DESPATCH/Reports/dispatch-state-wise-report/dispatch-state-wise-report.component';
+import { DispatchTallyFormatModule } from './pages/DESPATCH/Reports/dispatch-tally-format/dispatch-tally-format.component';
+import { DispatchSalesThroughReportModule } from './pages/DESPATCH/Reports/dispatch-sales-through-report/dispatch-sales-through-report.component';
+import { TransferOutReportModule } from './pages/DESPATCH/Reports/transfer-out-report/transfer-out-report.component';
+import { TopMovingReportModule } from './pages/DESPATCH/Reports/top-moving-report/top-moving-report.component';
+import { AgeWisePendingReportModule } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
+import { AgeWiseReportModule } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
+import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
-    StockReportComponent,
-    MultiboxReportComponent,
+
+
   ],
   imports: [
     OrderViewModule,
@@ -887,10 +896,21 @@ import { DispatchDetailsReportModule } from './pages/DESPATCH/Reports/dispatch-d
     TransferOutInventoryMarkModule,
     TransferOutInventoryAddMarkModule,
     OrderReportModule,
+    StockReportModule,
+    TransferOutReportModule,
     OrderDetailsReportModule,
     DispatchReportModule,
     DispatchDetailsReportModule,
-
+    DispatchSalesThroughReportModule,
+    DispatchStateWiseReportModule,
+    DispatchYearlyReportModule,
+    DispatchTallyFormatModule,
+    TopMovingReportModule,
+    AgeWisePendingReportModule,
+    AgeWiseReportModule,
+    
+    ArticleStockReportModule,
+    MultiboxReportModule,
   ],
 
   providers: [

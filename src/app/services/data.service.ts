@@ -7660,11 +7660,82 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+  getSalesThroughReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/SalesThrough`,
+      payload,
+    );
+  }
+
+  getDispatchReportStateWise(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchReportStateWise`,
+      payload,
+    );
+  }
+
+  getDispatchReportYearly(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchReportYearly`,
+      payload,
+    );
+  }
+
+  getDispatchReportTally(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DispatchReportTally`,
+      payload,
+    );
+  }
+
+  getTopMovingReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/TopMoving`,
+      payload,
+    );
+  }
+
+  getAgewisePendingOrder(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/AgewisePendingOrder`,
+      payload,
+    );
+  }
+
+  getAgewiseOrderReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/AgewiseOrder`,
+      payload,
+    );
+  }
+
+  getArticleStockReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/ArticleStockView`,
+      payload,
+    );
+  }
+
+  getMultiboxReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/Multibox`,
+      payload,
+    );
+  }
+
   getDispatchDetailsReport(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}OrderRpt/DispatchDetail`,
       payload,
     );
+  }
+
+  getStockViewReport(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/StockView`, payload);
+  }
+
+  getTransferOutReport(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/Transferout`, payload);
   }
 
   saveNewOrderCartToOrder(payload: any): Observable<any> {

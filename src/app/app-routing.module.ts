@@ -236,9 +236,18 @@ import { TransferOutInventoryMarkComponent } from './pages/INVENTORY MANAGEMENT/
 import { OrderReportComponent } from './pages/DESPATCH/Reports/order-report/order-report.component';
 import { DispatchReportComponent } from './pages/DESPATCH/Reports/dispatch-summary-report/dispatch-report.component';
 import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
+import { TransferOutReportComponent } from './pages/DESPATCH/Reports/transfer-out-report/transfer-out-report.component';
 import { MultiboxReportComponent } from './pages/DESPATCH/Reports/multibox-report/multibox-report.component';
 import { OrderDetailsReportComponent } from './pages/DESPATCH/Reports/order-details-report/order-details-report.component';
 import { DispatchDetailsReportComponent } from './pages/DESPATCH/Reports/dispatch-details-report/dispatch-details-report.component';
+import { DispatchSalesThroughReportComponent } from './pages/DESPATCH/Reports/dispatch-sales-through-report/dispatch-sales-through-report.component';
+import { DispatchStateWiseReportComponent } from './pages/DESPATCH/Reports/dispatch-state-wise-report/dispatch-state-wise-report.component';
+import { DispatchTallyFormatComponent } from './pages/DESPATCH/Reports/dispatch-tally-format/dispatch-tally-format.component';
+import { DispatchYearlyReportComponent } from './pages/DESPATCH/Reports/dispatch-yearly-report/dispatch-yearly-report.component';
+import { AgeWisePendingReportComponent } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
+import { AgeWiseReportComponent } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
+import { TopMovingReportComponent } from './pages/DESPATCH/Reports/top-moving-report/top-moving-report.component';
+import { ArticleStockReportComponent } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
 
 const routes: Routes = [
   {
@@ -1458,13 +1467,59 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'sales-through',
+        component: DispatchSalesThroughReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'tally-format',
+        component: DispatchTallyFormatComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'dispatch-yearly-report',
+        component: DispatchYearlyReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'dispatch-state-report',
+        component: DispatchStateWiseReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: 'stock-report',
         component: StockReportComponent,
         canActivate: [AuthGuardService],
       },
       {
+        path: 'transfer-out',
+        component: TransferOutReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'top-moving',
+        component: TopMovingReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'agewise',
+        component: AgeWiseReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'agewise-pending',
+        component: AgeWisePendingReportComponent,
+        canActivate: [AuthGuardService],
+      },
+
+      {
         path: 'multibox-report',
         component: MultiboxReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'article-stock',
+        component: ArticleStockReportComponent,
         canActivate: [AuthGuardService],
       },
       {

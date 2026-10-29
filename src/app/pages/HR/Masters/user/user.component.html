@@ -14,6 +14,7 @@
     (onExporting)="onExporting($event)"
     [showColumnLines]="true"
     [scrolling]="{ mode: 'virtual' }"
+    (onCellPrepared)="onCellPrepared($event)"
   >
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-editing

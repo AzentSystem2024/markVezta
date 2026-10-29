@@ -284,25 +284,25 @@
       ></dxo-grouping>
 
       <!-- Data Columns (Matching API Response: OrderRpt/OrderSummary) -->
-      <dxi-column dataField="ORDER_NO" caption="Order No"></dxi-column>
+      <dxi-column dataField="ORDER_NO" caption="Order No" [width]="110"></dxi-column>
 
       <dxi-column
         dataField="ORDER_DATE"
         caption="Order Date"
         dataType="date"
         [format]="{ type: 'custom', formatter: formatDates }"
-      ></dxi-column>
+        [width]="120"></dxi-column>
 
-      <dxi-column dataField="DEALER" caption="Dealer"></dxi-column>
+      <dxi-column dataField="DEALER" caption="Dealer" [width]="200"></dxi-column>
 
-      <dxi-column dataField="SUB_DEALER" caption="Sub Dealer"></dxi-column>
+      <dxi-column dataField="SUB_DEALER" caption="Sub Dealer" [width]="180"></dxi-column>
 
       <dxi-column
         dataField="DESCRIPTION"
         caption="Status"
         alignment="center"
         cellTemplate="statusCellTemplate"
-      ></dxi-column>
+        [width]="110"></dxi-column>
 
       <dxi-column
         dataField="ORDER_QTY"
@@ -310,6 +310,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="105"
       ></dxi-column>
 
       <dxi-column
@@ -318,6 +319,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="105"
       ></dxi-column>
 
       <dxi-column
@@ -326,6 +328,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="105"
       ></dxi-column>
 
       <dxi-column
@@ -334,6 +337,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="105"
       ></dxi-column>
 
       <dxi-column
@@ -342,6 +346,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="105"
       ></dxi-column>
 
       <dxi-column
@@ -350,6 +355,7 @@
         dataType="number"
         alignment="right"
         [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="95"
       ></dxi-column>
 
       <!-- Status Cell Template -->

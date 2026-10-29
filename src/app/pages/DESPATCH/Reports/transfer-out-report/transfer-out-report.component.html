@@ -1,0 +1,271 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <!-- ================= COLLAPSIBLE FILTER PANEL ================= -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-date-box
+          class="filter-control-date"
+          label="From Date"
+          labelMode="floating"
+          [(value)]="selected_from_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+
+        <dx-date-box
+          class="filter-control-date"
+          label="To Date"
+          labelMode="floating"
+          [(value)]="selected_To_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        ></dx-date-box>
+
+        <dx-select-box
+          class="filter-control-brand"
+          label="Brand"
+          labelMode="floating"
+          [dataSource]="brandList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="selectedBrand"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+          placeholder="Brand"
+        ></dx-select-box>
+
+        <dx-select-box
+          class="filter-control-transfer-out"
+          label="Transfer Out"
+          labelMode="floating"
+          [dataSource]="transferOutList"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="selectedTransferOut"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+          placeholder="Transfer Out"
+        ></dx-select-box>
+
+        <div class="filter-btn-group">
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            [disabled]="isLoading"
+            (onClick)="loadTransferOutReportData()"
+          ></dx-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HORIZONTAL TOGGLE BAR ================= -->
+    <div
+      class="toggle-bar"
+      (click)="toggleParameters()"
+      hint="Toggle Filter Panel"
+    >
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
+    <!-- ================= DATA GRID ================= -->
+    <dx-data-grid
+      #dataGrid
+      class="grid theme-dependent"
+      [class.hide-summary]="!isSummaryVisible"
+      [dataSource]="transferOutDataSource"
+      width="100%"
+      height="82vh"
+      noDataText="No transfer out records found."
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showRowLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'widget'"
+      [scrolling]="{ mode: 'virtual', showScrollbar: 'always' }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading transfer out...' }"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"></dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">
+            <span>Transfer Out Report</span>
+          </div>
+        </dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-sorting mode="multiple"></dxo-sorting>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterRowVisible">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+
+      <dxi-column
+        dataField="TRANSFER_NO"
+        caption="Transfer No"
+        [width]="130"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="TRANSFER_TIME"
+        caption="Transfer Time"
+        [format]="{ type: 'custom', formatter: formatDateTime }"
+        [width]="180"
+      ></dxi-column>
+
+      <dxi-column dataField="WORK_ORDER" caption="Work Order" [width]="110"></dxi-column>
+      <dxi-column dataField="CUST_NAME" caption="Customer" [width]="180"></dxi-column>
+      <dxi-column dataField="UNIT" caption="Unit" [width]="90"></dxi-column>
+      <dxi-column dataField="ART_NO" caption="Art No" [width]="100"></dxi-column>
+      <dxi-column dataField="COLOR" caption="Color" [width]="110"></dxi-column>
+      <dxi-column dataField="CATEGORY" caption="Category" [width]="110"></dxi-column>
+      <dxi-column dataField="SIZE" caption="Size" alignment="center" [width]="80"></dxi-column>
+      <dxi-column dataField="PACKING" caption="Packing" [width]="100"></dxi-column>
+
+      <dxi-column
+        dataField="QTY"
+        caption="Qty"
+        dataType="number"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 0, useGrouping: true }"
+        [width]="95"></dxi-column>
+
+      <dxi-column
+        dataField="BOX_PRICE"
+        caption="Box Price"
+        dataType="number"
+        alignment="right"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        [width]="95"></dxi-column>
+
+      <dxi-column dataField="BRAND" caption="Brand" [width]="110"></dxi-column>
+    </dx-data-grid>
+
+    <!-- ================= CUSTOM COLUMN CHOOSER POPUP ================= -->
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="true"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+      (onHiding)="cancelColumnChooser()"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+          <div class="column-chooser-actions">
+            <dx-button
+              text="Select All"
+              stylingMode="text"
+              (onClick)="selectAllColumns(true)"
+            ></dx-button>
+            <dx-button
+              text="Deselect All"
+              stylingMode="text"
+              (onClick)="selectAllColumns(false)"
+            ></dx-button>
+            <dx-button
+              text="Reset"
+              stylingMode="text"
+              (onClick)="resetColumnSelection()"
+            ></dx-button>
+          </div>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
+  </div>
+</div>

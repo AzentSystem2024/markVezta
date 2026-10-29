@@ -60,12 +60,12 @@
             ></dx-text-box>
 
             <dx-number-box
-            label="Allowance"
-            [labelMode]="'floating'"
-            [(value)]="payRollData.EMP_ALLOWANCE"
-            [width]="180"
-            [format]="{ type: 'fixedPoint', precision: 2 }"
-          ></dx-number-box>
+              label="Allowance"
+              [labelMode]="'floating'"
+              [(value)]="payRollData.EMP_ALLOWANCE"
+              [width]="180"
+              [format]="{ type: 'fixedPoint', precision: 2 }"
+            ></dx-number-box>
           </div>
         </dxi-item>
 
@@ -88,8 +88,8 @@
               [labelMode]="'floating'"
               [(value)]="payRollData.NOT_HOURS"
               [width]="180"
-                              [min]="0"
-                [max]="12"
+              [min]="0"
+              [max]="12"
             ></dx-number-box>
           </div>
         </dxi-item>
@@ -109,8 +109,8 @@
               [labelMode]="'floating'"
               [(value)]="payRollData.HOT_HOURS"
               [width]="180"
-                              [min]="0"
-                [max]="12"
+              [min]="0"
+              [max]="12"
             ></dx-number-box>
           </div>
         </dxi-item>
@@ -142,7 +142,6 @@
         </dxi-total-item>
 
         <dxi-total-item
-        
           column="DEDUCT"
           summaryType="sum"
           [valueFormat]="customFormat"
@@ -196,7 +195,7 @@
           dataType="number"
           [editorOptions]="{ format: '#,##0.00' }"
           [format]="{ type: 'fixedPoint', precision: 2 }"
-          [rtlEnabled]="true"
+          [rtlEnabled]="false"
         ></dx-number-box>
       </div>
     </div>
@@ -213,8 +212,6 @@
         ></dx-text-box>
       </div>
     </div>
-
-    
   </div>
 </div>
 
