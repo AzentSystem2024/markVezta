@@ -72,6 +72,7 @@
       class="grid theme-dependent"
       [class.hide-summary]="!isSummaryVisible"
       [dataSource]="multiboxDataSource"
+      keyExpr="ID"
       width="100%"
       height="82vh"
       noDataText="No records found."
@@ -91,6 +92,8 @@
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
       [export]="{ enabled: true, formats: ['xlsx'] }"
+      (onRowExpanding)="onRowExpanding($event)"
+      (onRowCollapsed)="onRowCollapsed($event)"
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading multibox report...' }"
     >
@@ -163,6 +166,100 @@
         [contextMenuEnabled]="true"
         [expandMode]="'rowClick'"
       ></dxo-grouping>
+
+      <!-- Master Detail Configuration -->
+      <dxo-master-detail
+        [enabled]="true"
+        template="detailTemplate"
+      ></dxo-master-detail>
+
+      <!-- Master Detail Template (Order View style) -->
+      <div
+        class="master-detail-flow-container"
+        *dxTemplate="let masterData of 'detailTemplate'"
+      >
+        <div class="flow-arrow"></div>
+        <div
+          class="detail-grid-container"
+          style="position: relative; min-height: 50px"
+        >
+          <div
+            *ngIf="detailLoadingMap[masterData.key]"
+            style="text-align: center; padding: 20px"
+          >
+            <dx-load-indicator [visible]="true"></dx-load-indicator>
+            <div style="margin-top: 10px; color: #666">Loading details...</div>
+          </div>
+
+          <dx-data-grid
+            *ngIf="!detailLoadingMap[masterData.key]"
+            [dataSource]="detailDataMap[masterData.key] || []"
+            noDataText="No details available"
+            [showBorders]="true"
+            [showColumnLines]="true"
+            [showRowLines]="true"
+            [columnAutoWidth]="false"
+            [wordWrapEnabled]="false"
+            [rowAlternationEnabled]="true"
+            rowAlternationInterval="2"
+            [allowColumnResizing]="true"
+            [columnResizingMode]="'widget'"
+            [height]="'30vh'"
+          >
+            <dxo-scrolling
+              mode="virtual"
+              rowRenderingMode="virtual"
+            ></dxo-scrolling>
+            <dxo-paging [pageSize]="20"></dxo-paging>
+            <dxo-pager
+              [visible]="true"
+              [allowedPageSizes]="[10, 20, 50, 'all']"
+              [showPageSizeSelector]="true"
+              [showInfo]="true"
+            ></dxo-pager>
+
+            <dxi-column
+              dataField="ART_NO"
+              caption="Art No"
+              alignment="left"
+              [width]="120"
+            ></dxi-column>
+            <dxi-column
+              dataField="COLOR"
+              caption="Color"
+              alignment="left"
+              
+            ></dxi-column>
+            <dxi-column
+              dataField="CATEGORY"
+              caption="Category"
+              alignment="left"
+              
+            ></dxi-column>
+            <dxi-column
+              dataField="SIZE"
+              caption="Size"
+              alignment="center"
+              [width]="90"
+            ></dxi-column>
+            <dxi-column
+              dataField="QUANTITY"
+              caption="Quantity"
+              dataType="number"
+              alignment="right"
+              [width]="140"
+            ></dxi-column>
+
+            <dxo-summary>
+              <dxi-total-item
+                column="QUANTITY"
+                summaryType="sum"
+                displayFormat="Total: {0}"
+              ></dxi-total-item>
+            </dxo-summary>
+          </dx-data-grid>
+        </div>
+      </div>
 
       <!-- Grid Columns with fixed widths and user resizable -->
       <dxi-column
