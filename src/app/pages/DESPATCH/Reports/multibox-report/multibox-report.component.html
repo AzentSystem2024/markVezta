@@ -86,7 +86,6 @@
       [allowColumnReordering]="true"
       [allowColumnResizing]="true"
       [columnResizingMode]="'widget'"
-      [scrolling]="{ mode: 'virtual', showScrollbar: 'always' }"
       [columnFixing]="{
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
@@ -97,6 +96,7 @@
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading multibox report...' }"
     >
+      <dxo-scrolling mode="standard" showScrollbar="always"></dxo-scrolling>
       <dxo-paging [pageSize]="20"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx']"></dxo-export>
       <dxo-pager
@@ -183,8 +183,11 @@
           class="detail-grid-container"
           style="position: relative; min-height: 50px"
         >
+          <!-- Trigger ensureDetailsLoaded for masterData -->
+          <ng-container *ngIf="ensureDetailsLoaded(masterData)"></ng-container>
+
           <div
-            *ngIf="detailLoadingMap[masterData.key]"
+            *ngIf="detailLoadingMap[masterData.key] || detailLoadingMap[masterData.data?.PRODUCTION_ID]"
             style="text-align: center; padding: 20px"
           >
             <dx-load-indicator [visible]="true"></dx-load-indicator>
@@ -192,8 +195,8 @@
           </div>
 
           <dx-data-grid
-            *ngIf="!detailLoadingMap[masterData.key]"
-            [dataSource]="detailDataMap[masterData.key] || []"
+            *ngIf="!detailLoadingMap[masterData.key] && !detailLoadingMap[masterData.data?.PRODUCTION_ID]"
+            [dataSource]="detailDataMap[masterData.key] || detailDataMap[masterData.data?.PRODUCTION_ID] || []"
             noDataText="No details available"
             [showBorders]="true"
             [showColumnLines]="true"
@@ -204,16 +207,17 @@
             rowAlternationInterval="2"
             [allowColumnResizing]="true"
             [columnResizingMode]="'widget'"
-            [height]="'30vh'"
+            width="100%"
+            [height]="((detailDataMap[masterData.key] || detailDataMap[masterData.data?.PRODUCTION_ID])?.length || 0) <= 5 ? 'auto' : 240"
           >
             <dxo-scrolling
               mode="virtual"
-              rowRenderingMode="virtual"
+              showScrollbar="always"
             ></dxo-scrolling>
             <dxo-paging [pageSize]="20"></dxo-paging>
             <dxo-pager
               [visible]="true"
-              [allowedPageSizes]="[10, 20, 50, 'all']"
+              [allowedPageSizes]="[20, 50, 'all']"
               [showPageSizeSelector]="true"
               [showInfo]="true"
             ></dxo-pager>
@@ -222,32 +226,32 @@
               dataField="ART_NO"
               caption="Art No"
               alignment="left"
-              [width]="120"
+              [minWidth]="130"
             ></dxi-column>
             <dxi-column
               dataField="COLOR"
               caption="Color"
               alignment="left"
-              
+              [minWidth]="140"
             ></dxi-column>
             <dxi-column
               dataField="CATEGORY"
               caption="Category"
               alignment="left"
-              
+              [minWidth]="130"
             ></dxi-column>
             <dxi-column
               dataField="SIZE"
               caption="Size"
               alignment="center"
-              [width]="90"
+              [width]="110"
             ></dxi-column>
             <dxi-column
               dataField="QUANTITY"
               caption="Quantity"
               dataType="number"
               alignment="right"
-              [width]="140"
+              [width]="130"
             ></dxi-column>
 
             <dxo-summary>
@@ -266,14 +270,22 @@
         dataField="COMPANY_CODE"
         caption="Unit"
         alignment="left"
-        [width]="120"
+        [width]="140"
+      ></dxi-column>
+
+      <dxi-column
+        dataField="PRODUCTION_ID"
+        caption="Production ID"
+        alignment="left"
+        [width]="140"
+        [visible]="false"
       ></dxi-column>
 
       <dxi-column
         dataField="BARCODE"
         caption="Barcode"
         alignment="left"
-        [width]="180"
+        [width]="200"
       ></dxi-column>
 
       <dxi-column
@@ -283,7 +295,7 @@
         dataType="datetime"
         [format]="{ type: 'custom', formatter: formatDateTime }"
         [calculateDisplayValue]="formatDateTime"
-        [width]="200"
+        [minWidth]="220"
       ></dxi-column>
     </dx-data-grid>
   </div>

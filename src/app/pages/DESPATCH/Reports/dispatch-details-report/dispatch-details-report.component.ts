@@ -540,10 +540,7 @@ export class DispatchDetailsReportComponent implements OnInit {
       dateTo = this.formatted_To_date;
     }
 
-    const orderNo =
-      this.orderNumber != null && this.orderNumber !== ''
-        ? String(this.orderNumber).trim()
-        : '';
+    const orderNo = Number(this.orderNumber) || 0;
 
     const statusVal =
       this.selectedStatuses && this.selectedStatuses.length > 0

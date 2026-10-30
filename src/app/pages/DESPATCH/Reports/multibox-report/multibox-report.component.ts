@@ -280,27 +280,32 @@ export class MultiboxReportComponent implements OnInit {
           rawData = res;
         }
 
-        this.multiboxDataSource = rawData.map((item: any, index: number) => ({
-          ...item,
-          ID:
-            item.PRODUCTION_ID != null && item.PRODUCTION_ID !== ''
-              ? String(item.PRODUCTION_ID)
-              : 'row_' + index,
-          PRODUCTION_ID:
+        this.multiboxDataSource = rawData.map((item: any, index: number) => {
+          const barcode = item.BARCODE || item.barcode || '';
+          const prodId =
             item.PRODUCTION_ID ||
             item.productionId ||
             item.PACK_PRODUCTION_ID ||
             item.packProductionId ||
-            '',
-          COMPANY_CODE:
-            item.COMPANY_CODE ||
-            item.companyCode ||
-            item.UNIT ||
-            item.unit ||
-            '',
-          BARCODE: item.BARCODE || item.barcode || '',
-          PRODUCTION_TIME: item.PRODUCTION_TIME || item.productionTime || '',
-        }));
+            '';
+          return {
+            ...item,
+            ID: barcode
+              ? String(barcode)
+              : prodId
+                ? String(prodId) + '_' + index
+                : 'row_' + index,
+            PRODUCTION_ID: prodId,
+            COMPANY_CODE:
+              item.COMPANY_CODE ||
+              item.companyCode ||
+              item.UNIT ||
+              item.unit ||
+              '',
+            BARCODE: barcode,
+            PRODUCTION_TIME: item.PRODUCTION_TIME || item.productionTime || '',
+          };
+        });
 
         this.showParameters = false;
         this.cdr.detectChanges();
@@ -317,12 +322,55 @@ export class MultiboxReportComponent implements OnInit {
 
   // ================= MASTER-DETAIL ROW EXPANSION =================
   onRowExpanding(e: any): void {
-    const prodId = e.data?.PRODUCTION_ID || e.key;
     const rowKey = e.key;
     if (!this.expandedRowKeys.includes(rowKey)) {
       this.expandedRowKeys.push(rowKey);
     }
+
+    let rowData = e.data;
+    if (!rowData && this.multiboxDataSource && this.multiboxDataSource.length > 0) {
+      rowData = this.multiboxDataSource.find(
+        (item: any) =>
+          item.ID === rowKey ||
+          item.BARCODE === rowKey ||
+          item.PRODUCTION_ID === rowKey,
+      );
+    }
+
+    const prodId =
+      rowData?.PRODUCTION_ID ||
+      rowData?.PACK_PRODUCTION_ID ||
+      rowData?.production_id ||
+      rowData?.productionId ||
+      e.data?.PRODUCTION_ID ||
+      e.data?.PACK_PRODUCTION_ID ||
+      rowKey;
+
     this.loadMultiBoxDetails(prodId, rowKey);
+  }
+
+  ensureDetailsLoaded(masterData: any): string {
+    const key = masterData?.key;
+    const prodId =
+      masterData?.data?.PRODUCTION_ID ||
+      masterData?.data?.PACK_PRODUCTION_ID ||
+      masterData?.data?.production_id ||
+      masterData?.data?.productionId ||
+      key;
+
+    if (
+      key &&
+      prodId &&
+      !this.detailDataMap[key] &&
+      !this.detailDataMap[String(prodId)] &&
+      !this.detailLoadingMap[key] &&
+      !this.detailLoadingMap[String(prodId)]
+    ) {
+      setTimeout(() => {
+        this.loadMultiBoxDetails(prodId, key);
+      }, 0);
+    }
+    return '';
   }
 
   onRowCollapsed(e: any): void {
@@ -333,11 +381,15 @@ export class MultiboxReportComponent implements OnInit {
     }
     delete this.detailDataMap[rowKey];
     delete this.detailLoadingMap[rowKey];
+    this.detailDataMap = { ...this.detailDataMap };
+    this.detailLoadingMap = { ...this.detailLoadingMap };
+    this.cdr.detectChanges();
   }
 
   loadMultiBoxDetails(productionId: any, rowKey: any): void {
     const packProdId = Number(productionId);
     if (!packProdId || isNaN(packProdId)) {
+      console.warn('Invalid productionId for multibox details:', productionId);
       this.detailDataMap[rowKey] = [];
       this.detailLoadingMap[rowKey] = false;
       this.detailDataMap = { ...this.detailDataMap };
@@ -346,6 +398,7 @@ export class MultiboxReportComponent implements OnInit {
     }
 
     this.detailLoadingMap[rowKey] = true;
+    this.detailLoadingMap[String(packProdId)] = true;
     this.cdr.detectChanges();
 
     const payload = {
@@ -360,7 +413,7 @@ export class MultiboxReportComponent implements OnInit {
         } else if (Array.isArray(res)) {
           details = res;
         }
-        this.detailDataMap[rowKey] = details.map((d: any) => ({
+        const mapped = details.map((d: any) => ({
           ...d,
           ART_NO: d.ART_NO || d.artNo || '',
           COLOR: d.COLOR || d.color || '',
@@ -368,15 +421,23 @@ export class MultiboxReportComponent implements OnInit {
           SIZE: d.SIZE != null ? String(d.SIZE) : '',
           QUANTITY: Number(d.QUANTITY) || 0,
         }));
+
+        this.detailDataMap[rowKey] = mapped;
+        this.detailDataMap[String(packProdId)] = mapped;
         this.detailLoadingMap[rowKey] = false;
+        this.detailLoadingMap[String(packProdId)] = false;
         this.detailDataMap = { ...this.detailDataMap };
+        this.detailLoadingMap = { ...this.detailLoadingMap };
         this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Error fetching multibox details for id:', packProdId, err);
         this.detailDataMap[rowKey] = [];
+        this.detailDataMap[String(packProdId)] = [];
         this.detailLoadingMap[rowKey] = false;
+        this.detailLoadingMap[String(packProdId)] = false;
         this.detailDataMap = { ...this.detailDataMap };
+        this.detailLoadingMap = { ...this.detailLoadingMap };
         this.cdr.detectChanges();
       },
     });
