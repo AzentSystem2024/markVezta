@@ -7723,6 +7723,13 @@ The result can be exported to HTML or Markdown.`;
     );
   }
 
+  getMultiBoxDetails(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/MultiBoxDetails`,
+      payload,
+    );
+  }
+
   getDispatchDetailsReport(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}OrderRpt/DispatchDetail`,

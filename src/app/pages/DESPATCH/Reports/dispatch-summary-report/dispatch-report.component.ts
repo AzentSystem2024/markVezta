@@ -92,6 +92,7 @@ export class DispatchReportComponent implements OnInit {
   private subDealerMap = new Map<any, any>();
 
   statusList: any[] = [];
+  selectedStatus: any = null;
   selectedStatuses: any[] = [];
 
   brandList: any[] = [];
@@ -533,6 +534,14 @@ export class DispatchReportComponent implements OnInit {
       return val != null && val !== '' ? String(val) : '';
     };
 
+    let dateFrom = '';
+    if (this.selected_from_date) {
+      dateFrom = this.formatDate(this.selected_from_date);
+    }
+    if (!dateFrom) {
+      dateFrom = this.formatted_from_date || '';
+    }
+
     let dateTo = '';
     if (this.selected_To_date) {
       const d = new Date(this.selected_To_date);
@@ -544,24 +553,22 @@ export class DispatchReportComponent implements OnInit {
       dateTo = this.formatted_To_date;
     }
 
-    let statusVal: any = 0;
-    if (this.selectedStatuses && this.selectedStatuses.length > 0) {
-      const formatted = formatValue(this.selectedStatuses);
-      statusVal = !isNaN(Number(formatted)) ? Number(formatted) : formatted;
-    }
+    const orderNo = Number(this.orderNumber) || 0;
+    const statusVal =
+      this.selectedStatus != null && this.selectedStatus !== ''
+        ? Number(this.selectedStatus)
+        : 0;
 
     // Build payload according to exact API specification:
     // api/OrderRpt/DispatchSummary
     const payload = {
-      DATE_FROM:
-        this.formatted_from_date ||
-        this.formatDate(new Date(this.selected_from_date)),
+      DATE_FROM: dateFrom,
       DATE_TO: dateTo,
       BRAND_ID:
         this.selectedBrand != null && this.selectedBrand !== ''
           ? String(this.selectedBrand)
           : '',
-      ORDER_NO: Number(this.orderNumber) || 0,
+      ORDER_NO: orderNo,
       STATUS: statusVal,
       STATE_ID: formatValue(this.selectedStates),
       UNIT_ID: formatValue(this.selectedUnits),

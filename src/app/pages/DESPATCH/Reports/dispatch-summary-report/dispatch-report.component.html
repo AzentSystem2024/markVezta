@@ -109,20 +109,17 @@
           (onValueChanged)="onSubDealerChanged($event)"
         ></dx-tag-box>
 
-        <dx-tag-box
+        <dx-select-box
           label="Status"
           labelMode="floating"
           [dataSource]="statusList"
           displayExpr="DESCRIPTION"
           valueExpr="ID"
-          [(value)]="selectedStatuses"
-          [showSelectionControls]="true"
-          applyValueMode="useButtons"
+          [(value)]="selectedStatus"
           [searchEnabled]="true"
           placeholder="Status"
           [showClearButton]="true"
-          [multiline]="false"
-        ></dx-tag-box>
+        ></dx-select-box>
       </div>
 
       <!-- ROW 3 -->
