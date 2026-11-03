@@ -119,16 +119,15 @@ export class EmployeeSalarySettingsEditComponent {
     this.FinID = sessionData.SELECTED_FIN_YEAR.FIN_ID;
   }
 
-  EmployeeListDropDown() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'Employee',
-    };
-    this.dataservice.getEmployeeDropDown(payload).subscribe((response: any) => {
+  async EmployeeListDropDown() {
+    const payload = { COMPANY_ID: this.selected_Company_id, NAME: 'Employee' };
+    try {
+      const response: any = await this.dataservice.getEmployeeDropDown(payload).toPromise();
       this.EmployeeDropdown = response;
-    });
+    } catch (error) {
+      console.error('Failed to load Employee DropDown:', error);
+    }
   }
-
   get_SalaryHead_List() {
     if (!this.selectedEmployeeId) {
       console.warn('No employee selected');
