@@ -1,0 +1,158 @@
+@use "../../../../variables.scss" as *;
+@use "sass:math";
+
+:host {
+  --side-panel-toolbar-height: 76px;
+
+  width: 100%;
+  display: contents;
+  overflow: auto;
+}
+
+.view-wrapper {
+  .grid {
+    .name-template {
+      .position {
+        font-size: 12px;
+        color: var(--texteditor-label-color);
+      }
+    }
+
+    ::ng-deep & {
+      .dx-datagrid-header-panel {
+        padding: 0 var(--content-padding);
+      }
+
+      .dx-toolbar {
+        margin-bottom: 0;
+        padding: var(--toolbar-margin-bottom) 0;
+      }
+
+      .dx-datagrid-content .dx-row {
+        cursor: pointer;
+      }
+    }
+
+    .grid-header {
+      @include header();
+    }
+
+    &.grid-no-data {
+      ::ng-deep {
+        .dx-header-row > .dx-command-select,
+        .dx-datagrid-headers .dx-command-select {
+          display: none !important;
+          visibility: hidden !important;
+          width: 0 !important;
+          padding: 0 !important;
+          border: none !important;
+        }
+      }
+    }
+  }
+
+  user-panel {
+    display: inherit;
+  }
+}
+
+.edit-cell {
+  position: relative;
+
+  contact-status {
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 11px;
+  }
+}
+
+/* popup wrapper */
+.popup-content-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* footer buttons */
+.popup-btn {
+  min-width: 110px;
+  font-weight: 500;
+}
+
+/* better spacing */
+.dx-popup-content {
+  padding: 12px !important;
+}
+
+::ng-deep .action-buttons .dx-button-has-icon .dx-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  margin-inline-end: 0;
+  margin-inline-start: 0;
+  color: rgb(37, 139, 242) !important;
+}
+
+.dx-select-checkbox[aria-label="Select row"] {
+  pointer-events: auto;
+}
+
+::ng-deep {
+  .dx-datagrid .dx-master-detail-row > .dx-master-detail-cell {
+    padding: 10px 14px 15px 24px !important;
+    position: relative;
+    background-color: var(--base-accent-light, #f8fafc) !important;
+  }
+
+  .master-detail-flow-container {
+    position: relative !important;
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    padding: 10px 14px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+  }
+
+  .detail-grid-container {
+    width: 100% !important;
+
+    .dx-datagrid-rowsview {
+      > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+      .dx-scrollable-content {
+        padding-bottom: calc(var(--scrollbar-size, 12px) + 4px) !important;
+      }
+
+      .dx-datagrid-content-fixed {
+        bottom: calc(var(--scrollbar-size, 12px) + 4px) !important;
+      }
+    }
+  }
+
+  .flow-arrow {
+    position: absolute;
+    left: -18px;
+    top: -15px;
+    width: 18px;
+    height: 30px;
+    border-left: 2px solid #03b12b;
+    border-bottom: 2px solid #03b12b;
+    border-bottom-left-radius: 6px;
+  }
+
+  .flow-arrow::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    bottom: -6px;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid #03b12b;
+  }
+}
+

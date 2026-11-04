@@ -446,15 +446,15 @@ import { TopMovingReportModule } from './pages/DESPATCH/Reports/top-moving-repor
 import { AgeWisePendingReportModule } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
 import { AgeWiseReportModule } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
+import { ApListPageModule } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
-
-
   ],
   imports: [
+    ApListPageModule,
     OrderViewModule,
     NewOrderModule,
     LeaveSalaryPaymentModule,

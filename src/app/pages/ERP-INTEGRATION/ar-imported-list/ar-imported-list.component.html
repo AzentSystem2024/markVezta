@@ -56,6 +56,7 @@
           "
           (onCellPrepared)="onCellPrepared($event)"
         >
+          <dxo-scrolling mode="standard" showScrollbar="always"></dxo-scrolling>
           <dxi-column
             *ngFor="let col of detailsDataColumns"
             [dataField]="col"
