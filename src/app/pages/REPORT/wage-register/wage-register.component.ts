@@ -327,17 +327,26 @@ export class WageRegisterComponent {
     this.dataService.getWageRegister(payload).subscribe((response: any) => {
       let data: any[] = [];
 
-      // ✅ Select dataset based on report type
+      // Select dataset based on report type
       if (this.selectedReport === 'Wages') {
-        if (!response?.WageDetails || response.WageDetails.length === 0) {
-          return; // nothing to show
-        }
-        data = response.WageDetails;
+        data = response?.WageDetails || [];
       } else if (this.selectedReport === 'Salary') {
-        if (!response?.SalaryDetails || response.SalaryDetails.length === 0) {
-          return; // nothing to show
-        }
-        data = response.SalaryDetails;
+        data = response?.SalaryDetails || [];
+      }
+
+      // Check whether data exists
+      if (!data || data.length === 0) {
+        notify(
+          {
+            message: `No ${this.selectedReport} data available for the selected month.`,
+            position: { at: 'top center', my: 'top center' },
+          },
+          'warning',
+          3000
+        );
+
+        this.pdfSrc = null;
+        return;
       }
 
       // ✅ Now generate the PDF with common logic
