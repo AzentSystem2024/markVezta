@@ -169,6 +169,21 @@ body {
   }
 }
 
+/* 2.2 Master-Detail Detail Grid Horizontal Scrollbar Overlap Protection */
+.detail-grid-container,
+.master-detail-flow-container {
+  .dx-datagrid .dx-datagrid-rowsview {
+    > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+    .dx-scrollable-content {
+      padding-bottom: calc(var(--scrollbar-size, 12px) + 4px) !important;
+    }
+
+    .dx-datagrid-content-fixed {
+      bottom: calc(var(--scrollbar-size, 12px) + 4px) !important;
+    }
+  }
+}
+
 .dx-scrollable-scrollbars-alwaysvisible:not(.dx-datagrid-rowsview) {
   &.dx-scrollable-vertical,
   &.dx-scrollable-both {
