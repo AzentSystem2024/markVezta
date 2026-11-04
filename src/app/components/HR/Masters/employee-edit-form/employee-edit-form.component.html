@@ -539,6 +539,17 @@
             text="Salesman"
           ></dx-check-box>
 
+          <dx-radio-group
+            [(value)]="employeeFormData.IS_SALARY"
+            [items]="[
+              { text: 'Wage', value: false },
+              { text: 'Salary', value: true },
+            ]"
+            valueExpr="value"
+            displayExpr="text"
+            layout="horizontal"
+          ></dx-radio-group>
+
           <dx-check-box
             [(value)]="employeeFormData.IS_INACTIVE"
             text="Inactive"

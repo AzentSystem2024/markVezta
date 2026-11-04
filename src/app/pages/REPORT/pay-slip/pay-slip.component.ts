@@ -72,11 +72,13 @@ export class PaySlipComponent implements OnInit {
     private sanitizer: DomSanitizer,
   ) {
     this.sesstion_Details();
+    this.GetEmployeeList();
   }
 
   ngOnInit(): void {
     const currentYear = new Date().getFullYear();
     this.generateMonths(currentYear);
+    this.sesstion_Details();
     this.GetEmployeeList();
   }
 
@@ -99,8 +101,18 @@ export class PaySlipComponent implements OnInit {
       ? new Date(this.payloadDate)
       : new Date(`${monthToUse}-01T00:00:00.000Z`);
 
+
+    const selectedDate = this.payloadDate
+      ? new Date(this.payloadDate)
+      : new Date();
+
+    const formattedMonth = `${selectedDate.getFullYear()}-${String(
+      selectedDate.getMonth() + 1
+    ).padStart(2, '0')}-01`;
+
     const payload = {
-      Month: this.payloadDate || `${monthToUse}-01T00:00:00.000Z`,
+      // Month: this.payloadDate || `${monthToUse}-01T00:00:00.000Z`,
+      Month: `${formattedMonth}T00:00:00`,
       EmployeeIDs: this.selectedEmployee,
       COMPANY_ID: this.selected_Company_id,
     };
@@ -156,20 +168,23 @@ export class PaySlipComponent implements OnInit {
         // If employee-level DEDUCTIONS exists, add it as a deduction row
         const deductions = [...salaryHeadDeductions];
 
-        if (emp.DEDUCTIONS != null && Number(emp.DEDUCTIONS) > 0) {
-          deductions.push({
-            HEAD_NAME: 'DEDUCTIONS',
-            HEAD_AMOUNT: Number(emp.DEDUCTIONS),
-          });
-        }
+        // if (emp.DEDUCTIONS != null && Number(emp.DEDUCTIONS) > 0) {
+        //   deductions.push({
+        //     HEAD_NAME: 'DEDUCTIONS',
+        //     HEAD_AMOUNT: Number(emp.DEDUCTIONS),
+        //   });
+        // }
+
         const totalEarnings = earnings.reduce(
-          (sum: any, e: any) => sum + e.HEAD_AMOUNT,
-          0,
+          (sum: number, e: any) => sum + Number(e.HEAD_AMOUNT || 0),
+          0
         );
+
         const totalDeductions = deductions.reduce(
-          (sum: any, d: any) => sum + d.HEAD_AMOUNT,
-          0,
+          (sum: number, d: any) => sum + Number(d.HEAD_AMOUNT || 0),
+          0
         );
+
         const netPay = totalEarnings - totalDeductions;
 
         autoTable(doc, {

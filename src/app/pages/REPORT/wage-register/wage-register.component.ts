@@ -92,7 +92,7 @@ export class WageRegisterComponent {
     this.selectedMonth = `${year}-${month}`;
     this.payloadDate = `${year}-${month}-09`;
 
-    }
+  }
 
   generateMonths(year: number) {
     this.months = [];
@@ -143,7 +143,7 @@ export class WageRegisterComponent {
   GetEmployeeList() {
     this.dataService.getDropdownData('EMPLOYEE').subscribe((res) => {
       this.employeeList = res;
-      });
+    });
   }
 
   //  getWageRegister(): void {
@@ -321,6 +321,7 @@ export class WageRegisterComponent {
     const payload = {
       Month: this.payloadDate || `${monthToUse}-01`,
       ReportType: this.selectedReport,
+      COMPANY_ID: this.selected_Company_id,
     };
 
     this.dataService.getWageRegister(payload).subscribe((response: any) => {
@@ -532,7 +533,7 @@ export class WageRegisterComponent {
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    }
+  }
 }
 
 @NgModule({
@@ -572,4 +573,4 @@ export class WageRegisterComponent {
   exports: [WageRegisterComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class WageRegisterModule {}
+export class WageRegisterModule { }

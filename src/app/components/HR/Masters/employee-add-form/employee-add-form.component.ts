@@ -122,11 +122,13 @@ export class EmployeeAddFormComponent implements OnInit, OnChanges {
     PAYMENT_TYPE: 1,
     LEAVE_DAY_BALANCE: 0,
     DAYS_DEDUCTED: 0,
+    IS_SALARY: true,
   };
   imageUrl: string | ArrayBuffer | null = null;
   uploadedFile: any;
   isSaving: boolean = false;
   damanCardCategories = ['Basic', 'Enhanced', 'Premier'];
+
   attachments: any[] = [];
   selectedFiles: File[] = [];
   lastRejoinDate: any;
