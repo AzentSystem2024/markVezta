@@ -32,6 +32,8 @@
       type="selection"
       [allowSelectAll]="true"
       [visible]="(importDataList?.length || 0) > 0"
+      [allowHeaderFiltering]="false"
+      [allowFiltering]="false"
     >
     </dxi-column>
 
@@ -40,7 +42,7 @@
       dataField="DocumentType"
       caption="Document Type"
       alignment="left"
-      [width]="130"
+      [width]="150"
     ></dxi-column>
 
     <dxi-column
@@ -311,11 +313,11 @@
 
     <!-- ================= Filter ================= -->
     <dxo-filter-row
-      [visible]="showFilterRow"
+      [visible]="false"
       [applyFilter]="currentFilter"
     ></dxo-filter-row>
 
-    <dxo-header-filter [visible]="isFilterOpened">
+    <dxo-header-filter [visible]="false">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 

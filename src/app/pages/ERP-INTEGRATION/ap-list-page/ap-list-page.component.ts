@@ -151,10 +151,6 @@ export class ApListPageComponent implements OnInit {
 
   // ================= Date Formatting & Filter Helpers =================
 
-  /**
-   * Safely parses any date input (Date object, YYYY-MM-DD string, or DD/MM/YYYY)
-   * into its exact year, month, and day components without timezone shift.
-   */
   private parseLocalDate(
     input: any,
   ): { year: number; month: number; day: number } | null {
@@ -197,10 +193,6 @@ export class ApListPageComponent implements OnInit {
     return null;
   }
 
-  /**
-   * Formats the date as an exact ISO string matching the selected calendar date,
-   * avoiding any UTC timezone shift rollback (e.g. 1-Jan becoming 31-Dec).
-   */
   private formatAsPayloadDate(
     input: any,
     isEndDate: boolean = false,
@@ -389,9 +381,6 @@ export class ApListPageComponent implements OnInit {
     });
   }
 
-  /**
-   * Processes raw header & detail arrays, assigns unique keys, formats dates
-   */
   private processApiResponse(headers: any[], details: any[]) {
     const formatData = (data: any[] = [], isHeader: boolean = false) => {
       return data.map((item: any, index: number) => {
@@ -448,12 +437,6 @@ export class ApListPageComponent implements OnInit {
     }
   }
 
-  /**
-   * Matches detail rows to a header row using the SQL condition:
-   * ON Header.InvoiceNo = Detail.ApexInvoiceNumber
-   * AND Header.SupplierCode = Detail.SupplierCode
-   * AND Header.SupplierInvoiceNo = Detail.SupplierInvoiceNumber
-   */
   getMatchingDetails = (headerRow: any): any[] => {
     if (
       !headerRow ||
@@ -476,11 +459,7 @@ export class ApListPageComponent implements OnInit {
         .toString()
         .trim()
         .toLowerCase();
-      const detailInv = (
-        detail.ApexInvoiceNumber ||
-        detail.InvoiceNo ||
-        ''
-      )
+      const detailInv = (detail.ApexInvoiceNumber || detail.InvoiceNo || '')
         .toString()
         .trim()
         .toLowerCase();
@@ -529,11 +508,11 @@ export class ApListPageComponent implements OnInit {
       // Fallback if secondary fields are empty/omitted in raw data
       if (headerInv && detailInv && headerInv === detailInv) {
         const suppCodeOk =
-          !headerSuppCode || !detailSuppCode || headerSuppCode === detailSuppCode;
+          !headerSuppCode ||
+          !detailSuppCode ||
+          headerSuppCode === detailSuppCode;
         const suppInvOk =
-          !headerSuppInv ||
-          !detailSuppInv ||
-          headerSuppInv === detailSuppInv;
+          !headerSuppInv || !detailSuppInv || headerSuppInv === detailSuppInv;
         return suppCodeOk && suppInvOk;
       }
 
@@ -553,7 +532,8 @@ export class ApListPageComponent implements OnInit {
     if (!this.detailDataMap[rowKey] && !this.detailLoadingMap[rowKey]) {
       this.detailLoadingMap[rowKey] = true;
       const headerRow =
-        masterData.data || this.importDataList.find((x) => x._rowKey === rowKey);
+        masterData.data ||
+        this.importDataList.find((x) => x._rowKey === rowKey);
 
       setTimeout(() => {
         this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
@@ -602,11 +582,13 @@ export class ApListPageComponent implements OnInit {
 
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
+    this.showFilterRow = this.isFilterOpened;
     const grid = this.detailGrid?.instance;
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
+    this.cdr.detectChanges();
   }
 
   onCellPrepared(e: any) {
@@ -746,7 +728,6 @@ export class ApListPageComponent implements OnInit {
           this.failedRequestCount++;
         }
       } catch (error: any) {
-        console.error('Process AP Row failed:', error);
         this.failedRequestCount++;
       }
 
@@ -768,11 +749,14 @@ export class ApListPageComponent implements OnInit {
     this.detailGrid?.instance.searchByText('');
 
     notify(
-      `Processing completed.
+      {
+        message: `Processing completed.
       Success : ${this.completedRequestCount}
       Failed : ${this.failedRequestCount}`,
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 5000,
+      },
       'success',
-      5000,
     );
 
     await new Promise((resolve) => setTimeout(resolve, 500));
