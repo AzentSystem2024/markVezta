@@ -7471,6 +7471,31 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}aplist/process`, payload);
   }
 
+  // ================= INVENTORY LIST API =================
+  import_Inventory_Full_List(datas: any): Observable<any> {
+    const payload = {
+      FromDate: datas.FromDate !== undefined ? datas.FromDate : (datas.DATE_FROM || null),
+      ToDate: datas.ToDate !== undefined ? datas.ToDate : (datas.DATE_TO || null),
+    };
+    return this.http.post(`${this.apiUrl}APList/inventorylist`, payload);
+  }
+
+  // ========= PROCESS SELECTED PENDING INVENTORY LIST ==========
+  process_pending_inventory_rows(rowdata: any) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      CompanyID: sessionData.SELECTED_COMPANY?.COMPANY_ID,
+      UserID: sessionData.USER_ID,
+      TransactionID: rowdata.ID ?? rowdata.HeaderID ?? rowdata.TransactionID ?? rowdata.TransRefCode,
+      StoreID: sessionData.Configuration?.[0]?.STORE_ID,
+      FinID: sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID,
+    };
+
+    return this.http.post(`${this.apiUrl}inventorylist/process`, payload);
+  }
+
   getRevenueDashboardData(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}Dashboard/revenuedashboard`, payload);
   }

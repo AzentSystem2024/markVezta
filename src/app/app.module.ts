@@ -447,6 +447,7 @@ import { AgeWisePendingReportModule } from './pages/DESPATCH/Reports/age-wise-pe
 import { AgeWiseReportModule } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
 import { ApListPageModule } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-page.component';
+import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-page/inventory-list-page.component';
 
 @NgModule({
   declarations: [
@@ -455,6 +456,7 @@ import { ApListPageModule } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-p
   ],
   imports: [
     ApListPageModule,
+    InventoryListPageModule,
     OrderViewModule,
     NewOrderModule,
     LeaveSalaryPaymentModule,

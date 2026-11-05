@@ -19,7 +19,12 @@
     (onCellClick)="onCellClick($event)"
   >
     <dxo-selection mode="multiple" showCheckBoxesMode="always"> </dxo-selection>
-    <dxi-column type="selection" [allowSelectAll]="true"> </dxi-column>
+    <dxi-column
+      type="selection"
+      [allowSelectAll]="true"
+      [allowHeaderFiltering]="false"
+      [allowFiltering]="false"
+    ></dxi-column>
     <dxi-column
       *ngFor="let col of detailViewColumns"
       [dataField]="col"
@@ -73,12 +78,12 @@
     </div>
 
     <!-- ================= Filter ================= -->
-    <dxo-filter-row
-      [visible]="showFilterRow"
+     <dxo-filter-row
+      [visible]="false"
       [applyFilter]="currentFilter"
     ></dxo-filter-row>
 
-    <dxo-header-filter [visible]="isFilterOpened">
+    <dxo-header-filter [visible]="false">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
 

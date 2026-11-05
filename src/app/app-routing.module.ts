@@ -194,6 +194,7 @@ import { MiscellaneousSalesInvoiceComponent } from './pages/Operations/miscellan
 import { SalesInvoiceRetailComponent } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
 import { ARImportedListComponent } from './pages/ERP-INTEGRATION/ar-imported-list/ar-imported-list.component';
 import { ApListPageComponent } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-page.component';
+import { InventoryListPageComponent } from './pages/ERP-INTEGRATION/inventory-list-page/inventory-list-page.component';
 import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinician-master.component';
 import { CPTMasterComponent } from './pages/MASTER/cpt-master/cpt-master.component';
 import { DepartmentGroupComponent } from './pages/MASTER/department-group/department-group.component';
@@ -1283,8 +1284,8 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'ap-list-page',
-        component: ApListPageComponent,
+        path: 'Inventory-List',
+        component: InventoryListPageComponent,
         canActivate: [AuthGuardService],
       },
       {
