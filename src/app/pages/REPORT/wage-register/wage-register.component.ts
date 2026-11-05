@@ -92,7 +92,7 @@ export class WageRegisterComponent {
     this.selectedMonth = `${year}-${month}`;
     this.payloadDate = `${year}-${month}-09`;
 
-    }
+  }
 
   generateMonths(year: number) {
     this.months = [];
@@ -143,7 +143,7 @@ export class WageRegisterComponent {
   GetEmployeeList() {
     this.dataService.getDropdownData('EMPLOYEE').subscribe((res) => {
       this.employeeList = res;
-      });
+    });
   }
 
   //  getWageRegister(): void {
@@ -321,22 +321,32 @@ export class WageRegisterComponent {
     const payload = {
       Month: this.payloadDate || `${monthToUse}-01`,
       ReportType: this.selectedReport,
+      COMPANY_ID: this.selected_Company_id,
     };
 
     this.dataService.getWageRegister(payload).subscribe((response: any) => {
       let data: any[] = [];
 
-      // ✅ Select dataset based on report type
+      // Select dataset based on report type
       if (this.selectedReport === 'Wages') {
-        if (!response?.WageDetails || response.WageDetails.length === 0) {
-          return; // nothing to show
-        }
-        data = response.WageDetails;
+        data = response?.WageDetails || [];
       } else if (this.selectedReport === 'Salary') {
-        if (!response?.SalaryDetails || response.SalaryDetails.length === 0) {
-          return; // nothing to show
-        }
-        data = response.SalaryDetails;
+        data = response?.SalaryDetails || [];
+      }
+
+      // Check whether data exists
+      if (!data || data.length === 0) {
+        notify(
+          {
+            message: `No ${this.selectedReport} data available for the selected month.`,
+            position: { at: 'top center', my: 'top center' },
+          },
+          'warning',
+          3000
+        );
+
+        this.pdfSrc = null;
+        return;
       }
 
       // ✅ Now generate the PDF with common logic
@@ -532,7 +542,7 @@ export class WageRegisterComponent {
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
 
-    }
+  }
 }
 
 @NgModule({
@@ -572,4 +582,4 @@ export class WageRegisterComponent {
   exports: [WageRegisterComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class WageRegisterModule {}
+export class WageRegisterModule { }
