@@ -26,35 +26,35 @@ import {
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services/data.service';
 import notify from 'devextreme/ui/notify';
-import { Router } from '@angular/router';
 import {
   ERPJVModule,
   ERPJVComponent,
 } from '../POPUP-PAGES/erp-jv/erp-jv.component';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
-
 @Component({
   selector: 'app-inventory-list-page',
   templateUrl: './inventory-list-page.component.html',
   styleUrls: ['./inventory-list-page.component.scss'],
 })
 export class InventoryListPageComponent implements OnInit {
-  @ViewChild('detailGrid', { static: false })
+  @ViewChild('detailGrid', {
+    static: false,
+  })
   detailGrid!: DxDataGridComponent;
-
   @ViewChild(ERPJVComponent)
   JournalVoucherFormComponent!: ERPJVComponent;
-
   isFilterOpened: boolean = false;
   showFilterRow: boolean = false;
   currentFilter: string = 'auto';
-
   importDataList: any[] = [];
   importDetailData: any[] = [];
   expandedRowKeys: any[] = [];
-  detailDataMap: { [key: string]: any[] } = {};
-  detailLoadingMap: { [key: string]: boolean } = {};
-
+  detailDataMap: {
+    [key: string]: any[];
+  } = {};
+  detailLoadingMap: {
+    [key: string]: boolean;
+  } = {};
   isLoading: boolean = false;
   loadingMessage: string = 'Loading Inventory data...';
 
@@ -83,10 +83,22 @@ export class InventoryListPageComponent implements OnInit {
 
   // ================= Date Filter Variables =================
   dateRanges = [
-    { label: 'Last 7 Days', value: 'last7' },
-    { label: 'Last 15 Days', value: 'last15' },
-    { label: 'Last 30 Days', value: 'last30' },
-    { label: 'Custom', value: 'custom' },
+    {
+      label: 'Last 7 Days',
+      value: 'last7',
+    },
+    {
+      label: 'Last 15 Days',
+      value: 'last15',
+    },
+    {
+      label: 'Last 30 Days',
+      value: 'last30',
+    },
+    {
+      label: 'Custom',
+      value: 'custom',
+    },
   ];
 
   selectedDateRange: any = 'last30';
@@ -99,14 +111,18 @@ export class InventoryListPageComponent implements OnInit {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' },
+    elementAttr: {
+      class: 'toolbar-icon-btn',
+    },
     onClick: () => this.toggleFilters(),
   };
 
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
+    elementAttr: {
+      class: 'toolbar-icon-btn',
+    },
     onClick: () => {
       this.ngZone.run(() => this.refreshGrid());
     },
@@ -122,7 +138,9 @@ export class InventoryListPageComponent implements OnInit {
     onClick: () => {
       this.processPendingRows();
     },
-    elementAttr: { class: 'add-button' },
+    elementAttr: {
+      class: 'add-button',
+    },
   };
 
   ValidateButtonOptions = {
@@ -135,14 +153,15 @@ export class InventoryListPageComponent implements OnInit {
     onClick: () => {
       this.verifyPendingRows();
     },
-    elementAttr: { class: 'add-button mx-2' },
+    elementAttr: {
+      class: 'add-button mx-2',
+    },
   };
 
   constructor(
     private ngZone: NgZone,
     private srvce: DataService,
     private cdr: ChangeDetectorRef,
-    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -150,14 +169,11 @@ export class InventoryListPageComponent implements OnInit {
   }
 
   // ================= Date Formatting & Filter Helpers =================
-
-  /**
-   * Safely parses any date input (Date object, YYYY-MM-DD string, or DD/MM/YYYY)
-   * into its exact year, month, and day components without timezone shift.
-   */
-  private parseLocalDate(
-    input: any,
-  ): { year: number; month: number; day: number } | null {
+  private parseLocalDate(input: any): {
+    year: number;
+    month: number;
+    day: number;
+  } | null {
     if (!input) return null;
     if (input instanceof Date) {
       if (isNaN(input.getTime())) return null;
@@ -197,10 +213,6 @@ export class InventoryListPageComponent implements OnInit {
     return null;
   }
 
-  /**
-   * Formats the date as an exact ISO string matching the selected calendar date,
-   * avoiding any UTC timezone shift rollback (e.g. 1-Jan becoming 31-Dec).
-   */
   private formatAsPayloadDate(
     input: any,
     isEndDate: boolean = false,
@@ -216,13 +228,11 @@ export class InventoryListPageComponent implements OnInit {
 
   displayExpr = (item: any) => {
     if (!item) return '';
-
     if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
       const from = this.formatAsDDMMYYYY(this.customStartDate);
       const to = this.formatAsDDMMYYYY(this.customEndDate);
       return `${from} to ${to}`;
     }
-
     return item.label;
   };
 
@@ -237,19 +247,20 @@ export class InventoryListPageComponent implements OnInit {
 
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
-
     if (e.value === 'custom') {
       this.showCustomDatePopup = true;
       return;
     }
-
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+      option.value === 'custom'
+        ? {
+            ...option,
+            label: 'Custom',
+          }
+        : option,
     );
-
     this.customStartDate = null;
     this.customEndDate = null;
-
     this.fetch_Full_import_list();
   }
 
@@ -277,33 +288,34 @@ export class InventoryListPageComponent implements OnInit {
     this.showCustomDatePopup = true;
   }
 
-  private getDateRange(): { fromDate: string | null; toDate: string | null } {
+  private getDateRange(): {
+    fromDate: string | null;
+    toDate: string | null;
+  } {
     const today = new Date();
     let fromDate: any = null;
     let toDate: any = null;
-
     switch (this.selectedDateRange) {
       case 'last7':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 6);
         toDate = new Date();
         break;
-
       case 'last15':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 14);
         toDate = new Date();
         break;
-
       case 'last30':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 29);
         toDate = new Date();
         break;
-
       case 'all':
-        return { fromDate: null, toDate: null };
-
+        return {
+          fromDate: null,
+          toDate: null,
+        };
       case 'custom':
         if (this.customStartDate && this.customEndDate) {
           fromDate = this.customStartDate;
@@ -311,7 +323,6 @@ export class InventoryListPageComponent implements OnInit {
         }
         break;
     }
-
     return {
       fromDate: this.formatAsPayloadDate(fromDate, false),
       toDate: this.formatAsPayloadDate(toDate, true),
@@ -326,10 +337,8 @@ export class InventoryListPageComponent implements OnInit {
 
   applyCustomDateFilter() {
     if (!this.customStartDate || !this.customEndDate) return;
-
     const fromParts = this.parseLocalDate(this.customStartDate);
     const toParts = this.parseLocalDate(this.customEndDate);
-
     if (fromParts && toParts) {
       const fromNum =
         fromParts.year * 10000 + fromParts.month * 100 + fromParts.day;
@@ -339,19 +348,18 @@ export class InventoryListPageComponent implements OnInit {
         return;
       }
     }
-
     const fromLabel = this.formatAsDDMMYYYY(this.customStartDate);
     const toLabel = this.formatAsDDMMYYYY(this.customEndDate);
-
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        ? {
+            ...option,
+            label: `${fromLabel} - ${toLabel}`,
+          }
         : option,
     );
-
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
-
     this.fetch_Full_import_list();
   }
 
@@ -360,7 +368,6 @@ export class InventoryListPageComponent implements OnInit {
     this.isLoading = true;
     this.loadingMessage = 'Loading Inventory data...';
     this.cdr.detectChanges();
-
     const { fromDate, toDate } = this.getDateRange();
     const payload = {
       FromDate: fromDate,
@@ -371,16 +378,13 @@ export class InventoryListPageComponent implements OnInit {
     this.srvce.import_Inventory_Full_List(payload).subscribe({
       next: (response: any) => {
         this.isLoading = false;
-
         const rawHeaders = response?.Header || response?.header || [];
         const rawDetails = response?.Detail || response?.detail || [];
-
         this.processApiResponse(rawHeaders, rawDetails);
         this.cdr.detectChanges();
       },
       error: (error: any) => {
         this.isLoading = false;
-        console.error('api/APList/inventorylist API call failed:', error);
         this.importDataList = [];
         this.importDetailData = [];
         this.detailDataMap = {};
@@ -389,13 +393,12 @@ export class InventoryListPageComponent implements OnInit {
     });
   }
 
-  /**
-   * Processes raw header & detail arrays, assigns unique keys, formats dates
-   */
   private processApiResponse(headers: any[], details: any[]) {
     const formatData = (data: any[] = [], isHeader: boolean = false) => {
       return data.map((item: any, index: number) => {
-        const updatedItem: any = { ...item };
+        const updatedItem: any = {
+          ...item,
+        };
 
         // Guaranteed unique row key for DevExtreme internal tracking
         if (isHeader) {
@@ -403,17 +406,16 @@ export class InventoryListPageComponent implements OnInit {
             item.ID != null
               ? `inv_hdr_${item.ID}_${index}`
               : item.TransRefCode
-              ? `${item.TransRefCode}_${index}`
-              : `inv_hdr_${index}`;
+                ? `${item.TransRefCode}_${index}`
+                : `inv_hdr_${index}`;
         } else {
           updatedItem._rowKey =
             item.ID != null
               ? `inv_det_${item.ID}_${index}`
               : item.TransRefCode
-              ? `${item.TransRefCode}_${index}`
-              : `inv_det_${index}`;
+                ? `${item.TransRefCode}_${index}`
+                : `inv_det_${index}`;
         }
-
         Object.keys(updatedItem).forEach((key: string) => {
           const value = updatedItem[key];
 
@@ -433,11 +435,9 @@ export class InventoryListPageComponent implements OnInit {
             }
           }
         });
-
         return updatedItem;
       });
     };
-
     this.importDataList = formatData(headers, true);
     this.importDetailData = formatData(details, false);
 
@@ -449,13 +449,12 @@ export class InventoryListPageComponent implements OnInit {
           this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
         }
       });
-      this.detailDataMap = { ...this.detailDataMap };
+      this.detailDataMap = {
+        ...this.detailDataMap,
+      };
     }
   }
 
-  /**
-   * Matches detail rows to a header row using Reference Code and Transaction Type
-   */
   getMatchingDetails = (headerRow: any): any[] => {
     if (
       !headerRow ||
@@ -464,12 +463,23 @@ export class InventoryListPageComponent implements OnInit {
     ) {
       return [];
     }
-
     return this.importDetailData.filter((detail: any) => {
-      const headerRef = (headerRow.TransRefCode || '').toString().trim().toLowerCase();
-      const detailRef = (detail.TransRefCode || '').toString().trim().toLowerCase();
-      const headerType = (headerRow.TransactionType || '').toString().trim().toLowerCase();
-      const detailType = (detail.TransactionType || '').toString().trim().toLowerCase();
+      const headerRef = (headerRow.TransRefCode || '')
+        .toString()
+        .trim()
+        .toLowerCase();
+      const detailRef = (detail.TransRefCode || '')
+        .toString()
+        .trim()
+        .toLowerCase();
+      const headerType = (headerRow.TransactionType || '')
+        .toString()
+        .trim()
+        .toLowerCase();
+      const detailType = (detail.TransactionType || '')
+        .toString()
+        .trim()
+        .toLowerCase();
 
       // Primary join condition: Reference Code & Transaction Type
       if (
@@ -489,10 +499,13 @@ export class InventoryListPageComponent implements OnInit {
       }
 
       // Fallback by ID if present
-      if (headerRow.ID != null && detail.ID != null && headerRow.ID === detail.ID) {
+      if (
+        headerRow.ID != null &&
+        detail.ID != null &&
+        headerRow.ID === detail.ID
+      ) {
         return true;
       }
-
       return false;
     });
   };
@@ -504,12 +517,14 @@ export class InventoryListPageComponent implements OnInit {
     if (!this.detailDataMap[rowKey] && !this.detailLoadingMap[rowKey]) {
       this.detailLoadingMap[rowKey] = true;
       const headerRow =
-        masterData.data || this.importDataList.find((x) => x._rowKey === rowKey);
-
+        masterData.data ||
+        this.importDataList.find((x) => x._rowKey === rowKey);
       setTimeout(() => {
         this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
         this.detailLoadingMap[rowKey] = false;
-        this.detailDataMap = { ...this.detailDataMap };
+        this.detailDataMap = {
+          ...this.detailDataMap,
+        };
         this.cdr.detectChanges();
       }, 300);
     }
@@ -523,15 +538,15 @@ export class InventoryListPageComponent implements OnInit {
     }
     const headerRow =
       e.data || this.importDataList.find((x) => x._rowKey === rowKey);
-
     if (!this.detailDataMap[rowKey]) {
       this.detailLoadingMap[rowKey] = true;
       this.cdr.detectChanges();
-
       setTimeout(() => {
         this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
         this.detailLoadingMap[rowKey] = false;
-        this.detailDataMap = { ...this.detailDataMap };
+        this.detailDataMap = {
+          ...this.detailDataMap,
+        };
         this.cdr.detectChanges();
       }, 300);
     }
@@ -572,7 +587,6 @@ export class InventoryListPageComponent implements OnInit {
       e.cellElement.style.pointerEvents = 'none';
       e.cellElement.style.opacity = '0.5';
       e.cellElement.setAttribute('title', 'Click to open journal voucher');
-
       const checkbox = e.cellElement.querySelector('.dx-select-checkbox');
       if (checkbox) {
         (checkbox as HTMLElement).style.display = 'none';
@@ -582,7 +596,6 @@ export class InventoryListPageComponent implements OnInit {
     // ===== Status Column Color =====
     if (e.rowType === 'data' && e.column.dataField === 'Status') {
       const status = e.value?.trim();
-
       if (status === 'Open') {
         e.cellElement.style.color = '#ff6f0f';
         e.cellElement.style.fontWeight = '600';
@@ -614,7 +627,6 @@ export class InventoryListPageComponent implements OnInit {
     if (e.rowType !== 'data') return;
     if (e.column?.dataField !== 'Status') return;
     if (e.data?.Status?.trim() !== 'Posted') return;
-
     const matching = this.getMatchingDetails(e.data);
     this.selectedTransID =
       e.data?.AcTransID ||
@@ -623,18 +635,14 @@ export class InventoryListPageComponent implements OnInit {
       matching?.[0]?.AcTransID ||
       matching?.[0]?.TransactionID ||
       matching?.[0]?.ID;
-
     if (!this.selectedTransID) {
       notify('Transaction ID not found', 'warning', 3000);
       return;
     }
-
     this.isLoading = true;
-
     this.srvce.select_Erp_JournalVoucher(this.selectedTransID).subscribe({
       next: (res: any) => {
         this.isLoading = false;
-
         if (res.flag === 1) {
           this.selectedJournalVoucher = res?.Data || null;
           this.isViewJournalVoucher = true;
@@ -644,7 +652,6 @@ export class InventoryListPageComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        console.error('Failed to load Journal Voucher', err);
         notify('Failed to load Journal Voucher', 'error', 3000);
       },
     });
@@ -662,37 +669,27 @@ export class InventoryListPageComponent implements OnInit {
   // ================= Process Pending Rows =================
   async processPendingRows() {
     const selectedRows = this.detailGrid?.instance.getSelectedRowsData();
-
     if (!selectedRows || selectedRows.length === 0) {
       notify('Please select rows', 'warning', 3000);
       return;
     }
-
-    const pendingRows = selectedRows.filter(
-      (x: any) => x.Status !== 'Posted',
-    );
-
+    const pendingRows = selectedRows.filter((x: any) => x.Status !== 'Posted');
     if (pendingRows.length === 0) {
       notify('Please select pending rows only', 'warning', 3000);
       return;
     }
-
     this.isProcessingRows = true;
     this.progressMessage = 'Processing Pending Rows...';
-
     this.totalRequestCount = pendingRows.length;
     this.completedRequestCount = 0;
     this.failedRequestCount = 0;
     this.pendingRequestCount = pendingRows.length;
-
     this.cdr.detectChanges();
-
     for (const row of pendingRows) {
       try {
         const response: any = await this.srvce
           .process_pending_inventory_rows(row)
           .toPromise();
-
         if (
           response?.flag === '1' ||
           response?.flag === 1 ||
@@ -704,39 +701,35 @@ export class InventoryListPageComponent implements OnInit {
           this.failedRequestCount++;
         }
       } catch (error: any) {
-        console.error('Process Inventory Row failed:', error);
         this.failedRequestCount++;
       }
-
       this.pendingRequestCount =
         this.totalRequestCount -
         (this.completedRequestCount + this.failedRequestCount);
-
       this.cdr.detectChanges();
     }
-
     this.isProcessingRows = false;
     this.cdr.detectChanges();
-
     await new Promise((resolve) => setTimeout(resolve, 500));
     this.detailGrid?.instance.clearSelection();
     await new Promise((resolve) => setTimeout(resolve, 100));
     this.detailGrid?.instance.clearFilter();
     await new Promise((resolve) => setTimeout(resolve, 100));
     this.detailGrid?.instance.searchByText('');
-
     notify(
       {
         message: `Processing completed.
       Success : ${this.completedRequestCount}
       Failed : ${this.failedRequestCount}`,
-        position: { at: 'top right', my: 'top right' },
+        position: {
+          at: 'top right',
+          my: 'top right',
+        },
         displayTime: 5000,
       },
       'success',
       5000,
     );
-
     await new Promise((resolve) => setTimeout(resolve, 500));
     await this.fetch_Full_import_list();
     this.refreshGrid();
@@ -761,7 +754,6 @@ export class InventoryListPageComponent implements OnInit {
       current.MissingCount += Number(err.ErrorCount) || 0;
       current.AffectedRowsCount += Number(err.AffectedRowsCount) || 0;
     });
-
     this.filteredValidationGridData = Array.from(map.values());
   }
 
@@ -771,19 +763,15 @@ export class InventoryListPageComponent implements OnInit {
       TransactionType: cellData.TransactionType,
       Particular: cellData.Particular,
     };
-
     this.loadingMessage = 'Loading error details...';
     this.isLoading = true;
     this.cdr.detectChanges();
-
     try {
       const response: any = await this.srvce
         .getARErrorData(payload)
         .toPromise();
-
       this.isLoading = false;
       this.loadingMessage = 'Loading Inventory data...';
-
       if (response?.flag === '1') {
         this.errorDetailsGridData = (response.data || []).map((item: any) => {
           if (item.hasOwnProperty('Verified')) {
@@ -804,7 +792,6 @@ export class InventoryListPageComponent implements OnInit {
       }
     } catch (error: any) {
       this.isLoading = false;
-      console.error(error);
       notify('Failed to fetch error details', 'error', 3000);
     }
     this.cdr.detectChanges();
@@ -816,7 +803,6 @@ export class InventoryListPageComponent implements OnInit {
         x.Particular === particular && x.TransactionType === transactionType,
     );
   }
-
   async downloadMissingParticulars(
     particular: string,
     transactionType: string,
@@ -825,12 +811,10 @@ export class InventoryListPageComponent implements OnInit {
       (x) =>
         x.Particular === particular && x.TransactionType === transactionType,
     );
-
     if (missingValues.length === 0) {
       notify('No missing values found for this particular.', 'info', 3000);
       return;
     }
-
     let masterKey = '';
     if (['HISTPACode', 'HISInsuCode', 'HISInstCode'].includes(particular)) {
       masterKey = 'Customer';
@@ -847,13 +831,10 @@ export class InventoryListPageComponent implements OnInit {
     } else if (['CPTCode'].includes(particular)) {
       masterKey = 'Cpt';
     }
-
     try {
       const response: any = await this.srvce.getImportMasterList().toPromise();
-
       let headers: string[] = [];
       let templateColumns: any[] = [];
-
       if (response && response[masterKey]) {
         templateColumns = response[masterKey];
         templateColumns.sort((a: any, b: any) => a.ID - b.ID);
@@ -861,15 +842,11 @@ export class InventoryListPageComponent implements OnInit {
       } else {
         headers = ['Particular', 'NotFoundValue'];
       }
-
       let csv = headers.join(',') + '\n';
-
       missingValues.forEach((row) => {
         const val = (row.NotFoundValue || '').toString();
-
         const rowData = headers.map((header, index) => {
           let cellValue = '';
-
           if (header === 'Particular') cellValue = particular;
           else if (header === 'NotFoundValue') cellValue = val;
           else if (
@@ -888,14 +865,13 @@ export class InventoryListPageComponent implements OnInit {
             headers[0] !== 'Particular'
           )
             cellValue = val;
-
           return `"${cellValue.replace(/"/g, '""')}"`;
         });
-
         csv += rowData.join(',') + '\n';
       });
-
-      const blob = new Blob([csv], { type: 'text/csv' });
+      const blob = new Blob([csv], {
+        type: 'text/csv',
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -903,7 +879,6 @@ export class InventoryListPageComponent implements OnInit {
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to download template', error);
       notify('Failed to generate template.', 'error', 3000);
     }
   }
@@ -912,7 +887,6 @@ export class InventoryListPageComponent implements OnInit {
     this.srvce.exportDataGridReport(event, 'Inventory_List_Report');
   }
 }
-
 @NgModule({
   imports: [
     BrowserModule,
