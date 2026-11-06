@@ -145,6 +145,7 @@ export class EPFRegisterReportComponent {
 
     const payload = {
       Month: this.payloadDate || `${monthToUse}-01`,
+      COMPANY_ID: this.selected_Company_id,
     };
 
     this.dataService.getEPFRegister(payload).subscribe((response: any) => {
@@ -279,17 +280,35 @@ export class EPFRegisterReportComponent {
 
       // ===== FOOTER SUMMARY =====
       let finalY = (doc as any).lastAutoTable.finalY + 20;
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
+      // doc.setFontSize(10);
+      // doc.setFont('helvetica', 'normal');
+
+      const epfSummary = response.EPFSummary || {};
+
+      const ac21 = epfSummary.AC21 || 0;
+      const adminChargesAC2 = epfSummary.ADMINISTRATIVE_CHARGES_AC2 || 0;
+      const ac22 = epfSummary.AC22 || 0;
 
       const summary = [
         `EPF Contribution of Employee      :  ${totals.empShare.toFixed(2)}`,
         `EPF Contribution of Employer      :  ${totals.ac01.toFixed(2)}`,
         `Employees Pension Fund            :  ${totals.ac10.toFixed(2)}`,
-        `A/C No. 21 (0.5%)                 :  1,160.24`,
-        `Administrative Charges A/C . 2 0.85% :  1,972.00`,
-        `A/C No. 22                        :  200.00`,
+        `A/C No. 21 (0.5%)                 :  ${ac21.toFixed(2)}`,
+        `Administrative Charges A/C . 2 0.85% : ${adminChargesAC2.toFixed(2)}`,
+        `A/C No. 22                        : ${ac22.toFixed(2)}`,
       ];
+
+      // Check whether summary fits on the current page
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const requiredHeight = summary.length * 18 + 20;
+
+      if (finalY + requiredHeight > pageHeight - 30) {
+        doc.addPage();
+        finalY = 50;
+      }
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
 
       summary.forEach((line, i) => {
         doc.text(line, 60, finalY + i * 18);
@@ -352,4 +371,4 @@ export class EPFRegisterReportComponent {
   exports: [EPFRegisterReportComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EPFRegisterReportModule {}
+export class EPFRegisterReportModule { }

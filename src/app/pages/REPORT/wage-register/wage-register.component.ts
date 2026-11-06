@@ -318,8 +318,13 @@ export class WageRegisterComponent {
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       })();
 
+    const selectedDate = this.payloadDate || `${monthToUse}-01`;
+
+    const formattedMonth = selectedDate.substring(0, 7) + '-01';
+
     const payload = {
-      Month: this.payloadDate || `${monthToUse}-01`,
+      // Month: this.payloadDate || `${monthToUse}-01`,
+      Month: formattedMonth,
       ReportType: this.selectedReport,
       COMPANY_ID: this.selected_Company_id,
     };
