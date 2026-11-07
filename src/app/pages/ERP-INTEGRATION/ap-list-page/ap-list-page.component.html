@@ -500,6 +500,7 @@
     [showCloseButton]="true"
     [dragEnabled]="true"
     [closeOnOutsideClick]="false"
+    (onHiding)="refreshGrid()"
   >
     <div *dxTemplate="let data of 'content'">
       <dx-data-grid
@@ -529,24 +530,28 @@
           caption="Transaction Type"
           width="auto"
         ></dxi-column>
+
         <dxi-column
           dataField="ErrorMessage"
           caption="Particulars"
-          width="350"
+          width="400"
           [wordWrapEnabled]="true"
         ></dxi-column>
+
         <dxi-column
           dataField="MissingCount"
           caption="Missing Count"
           alignment="center"
           width="auto"
         ></dxi-column>
+
         <dxi-column
           dataField="AffectedRowsCount"
           caption="Rows Count"
           alignment="center"
           width="auto"
         ></dxi-column>
+        <!--         
         <dxi-column
           caption="Download"
           cellTemplate="downloadTemplate"
@@ -573,7 +578,7 @@
               )
             "
           ></dx-button>
-        </div>
+        </div> -->
       </dx-data-grid>
     </div>
   </dx-popup>
@@ -582,19 +587,52 @@
   <dx-popup
     [(visible)]="isErrorDetailsPopupVisible"
     [width]="'90vw'"
-    [height]="'90vh'"
+    [height]="'auto'"
     title="Error Details"
     [showCloseButton]="true"
   >
-    <div *dxTemplate="let data of 'content'" class="p-1">
+    <div *dxTemplate="let data of 'content'" class="p-2">
+      <!-- Error Summary Header Banner -->
+      <div
+        *ngIf="selectedErrorSummary"
+        class="error-summary-header"
+      >
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <div>
+            <span class="fw-bold text-secondary me-2">Document Type:</span>
+            <span class="badge bg-secondary me-3">{{ selectedErrorSummary.TransactionType || selectedErrorSummary.DocumentType }}</span>
+
+            <span class="fw-bold text-secondary me-2">Particular:</span>
+            <span class="badge bg-primary me-3">{{ selectedErrorSummary.Particular }}</span>
+
+            <span class="fw-bold text-secondary me-2">Error:</span>
+            <span class="text-danger fw-semibold">{{ selectedErrorSummary.ErrorMessage }}</span>
+          </div>
+
+          <div
+            *ngIf="selectedErrorSummary.NotFoundValues && selectedErrorSummary.NotFoundValues.length > 0"
+            class="d-flex align-items-center flex-wrap gap-1"
+          >
+            <span class="fw-bold text-danger me-1">
+              Not Found Values ({{ selectedErrorSummary.NotFoundValues.length }}):
+            </span>
+            <span
+              *ngFor="let val of selectedErrorSummary.NotFoundValues"
+              class="not-found-badge"
+            >
+              {{ val }}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <dx-data-grid
         [dataSource]="errorDetailsGridData"
         [showBorders]="true"
         [rowAlternationEnabled]="true"
-        [columnAutoWidth]="false"
-        [columnWidth]="150"
+        [columnAutoWidth]="true"
         [allowColumnResizing]="true"
-        [height]="'80vh'"
+        [height]="'72vh'"
       >
         <dxo-scrolling
           mode="virtual"
@@ -607,6 +645,48 @@
           [allowedPageSizes]="[10, 20, 50, 100]"
           [showInfo]="true"
         ></dxo-pager>
+
+        <dxi-column
+          dataField="HeaderID"
+          caption="Header ID"
+          width="160"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          dataField="DocumentType"
+          caption="Document Type"
+          width="140"
+        ></dxi-column>
+        <dxi-column
+          dataField="Particular"
+          caption="Particular"
+          width="140"
+        ></dxi-column>
+        <dxi-column
+          dataField="NotFoundValue"
+          caption="Not Found Value"
+          width="180"
+          cellTemplate="detailNotFoundCellTemplate"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          dataField="ErrorMessage"
+          caption="Error Message"
+          minWidth="260"
+          [wordWrapEnabled]="true"
+        ></dxi-column>
+
+        <div *dxTemplate="let cell of 'detailNotFoundCellTemplate'">
+          <span
+            *ngIf="cell.value && cell.value !== '-'; else noDetailVal"
+            class="not-found-badge"
+          >
+            {{ cell.value }}
+          </span>
+          <ng-template #noDetailVal>
+            <span class="text-muted fst-italic">-</span>
+          </ng-template>
+        </div>
       </dx-data-grid>
     </div>
   </dx-popup>

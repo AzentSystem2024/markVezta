@@ -7438,6 +7438,10 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}ImportAR/validate`, payload);
   }
 
+  getValidationAPData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}APList/validateap`, payload);
+  }
+
   getARErrorData(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}ImportAR/ARerrordata`, payload);
   }
