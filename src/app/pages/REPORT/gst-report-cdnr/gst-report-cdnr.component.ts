@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, NgModule } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, NgModule, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import {
   DxButtonModule,
   DxCheckBoxModule,
+  DxDataGridComponent,
   DxDataGridModule,
   DxDateBoxModule,
   DxLoadIndicatorModule,
@@ -41,6 +42,9 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
   styleUrls: ['./gst-report-cdnr.component.scss'],
 })
 export class GstReportCDNRComponent {
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid!: DxDataGridComponent;
+
   GST_datasource: any[] = [];
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
@@ -54,6 +58,7 @@ export class GstReportCDNRComponent {
   isViewInvoice: boolean = false;
   isViewReceipt: boolean = false;
   editMiscPopup: boolean = false;
+  isViewPayment: boolean = false;
   selectedJournalVoucher: any;
   selectedDebitNote: any;
   selectedCreditNote: any;
@@ -98,6 +103,9 @@ export class GstReportCDNRComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+  isFilterRowVisible: boolean = false;
+  isSummaryVisible: boolean = true
+  auto: string = 'auto';
 
   constructor(
     private dataService: DataService,
@@ -117,6 +125,138 @@ export class GstReportCDNRComponent {
     this.monthDataSource = this.dataService.getMonths();
   }
 
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilterRow(),
+  };
+
+  toggleFilterRow = () => {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
+    this.cdr.detectChanges();
+  };
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh();
+      // Or reload data from API if needed
+      this.load_GST_data();
+    }
+  }
+
+  applyButtonOptions = {
+    width: 100,
+    hint: 'Apply Filters',
+    text: 'Apply',
+    type: 'default',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.load_GST_data(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+
+    this.cdr.detectChanges();
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  isColumnChooserVisible = false;
+
+  // Controls whether the report parameters are expanded or collapsed.
+  showParameters = true;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'DOC_NO', caption: 'Doc No.' },
+    { dataField: 'DOC_DATE', caption: 'Doc Date.' },
+    { dataField: 'DOC_NAME', caption: 'Document Name' },
+    { dataField: 'RECEIVER_NAME', caption: 'Receiver Name' },
+    { dataField: 'INVOICE_AMOUNT', caption: 'Invoice Amount' },
+    { dataField: 'GSTIN', caption: 'GSTIN' },
+    { dataField: 'CGST', caption: 'CGST %' },
+    { dataField: 'SGST', caption: 'SGST %' },
+    { dataField: 'IGST', caption: 'IGST %' },
+    { dataField: 'HSN_CODE', caption: 'HSN CODE' },
+    { dataField: 'TAXABLE_AMOUNT', caption: 'Taxable Amount' },
+    { dataField: 'INVOICE_AMOUNT', caption: 'Total GST' },
+  ];
+
+  openColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      visible: grid.columnOption(column.dataField, 'visible') !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    const grid = this.dataGrid?.instance;
+
+    if (!grid) {
+      return;
+    }
+
+    this.tempColumns.forEach((column) => {
+      grid.columnOption(column.dataField, 'visible', column.visible);
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      viopenColumnsible: true,
+    }));
+  }
+
+
   ngOnInit() {
     // this.loadLedgerData();
 
@@ -125,6 +265,7 @@ export class GstReportCDNRComponent {
     // this.onToDateChange({ value: this.defaultDate });
 
     const today = new Date();
+    this.selectedmonth = today.getMonth();
     const SystemDate =
       today.getFullYear() +
       '-' +
@@ -269,13 +410,6 @@ export class GstReportCDNRComponent {
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
-      // {
-      //   column: 'TOTAL_PAIR_QTY',
-      //   summaryType: 'sum',
-      //   displayFormat: '{0}',
-      //   valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-      //   alignByColumn: true,
-      // },
     ],
     calculateCustomSummary: (options) => {
       if (options.name === 'summaryRow') {
@@ -291,8 +425,6 @@ export class GstReportCDNRComponent {
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };
-
-    console.log(payload, '==========manual payload===========');
 
     this.dataService.GST_Report_Api_CDNR(payload).subscribe((res: any) => {
       this.GST_datasource = res.DATA || [];
@@ -327,19 +459,7 @@ export class GstReportCDNRComponent {
         this.cdr.detectChanges();
       });
     }
-    //   else if (TransType == 37) {
 
-    //
-    //     this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-    //
-    //     this.selectedCreditNote = response.Data;
-    //      this.loadingInvoice = false;
-
-    //       this.isViewCreditNote = true;
-    //       this.cdr.detectChanges();
-    //     console.log(this.selectedCreditNote, "SELECTEDJOURNALVOUCHERRRRRRRRRRRR");
-    //   });
-    // }
     else if (TransType == 37) {
       this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
         if (response?.Data?.length > 0) {
@@ -356,10 +476,8 @@ export class GstReportCDNRComponent {
       this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
         this.selectedInvoice = response.Data;
         this.loadingInvoice = false;
-
         this.isViewInvoice = true;
         this.cdr.detectChanges();
-        console.log(this.selectedInvoice, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
       });
     } else if (TransType == 19) {
       this.dataService
@@ -367,7 +485,6 @@ export class GstReportCDNRComponent {
         .subscribe((response: any) => {
           this.selectedInvoice = response.Data;
           this.loadingInvoice = false;
-
           this.isEditInvoice = true;
           this.cdr.detectChanges();
         });
@@ -378,10 +495,6 @@ export class GstReportCDNRComponent {
           this.selectedReceipt = response.Data;
           this.isEditCustomerReceipt = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedReceipt,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType == 2) {
       this.dataService
@@ -390,10 +503,6 @@ export class GstReportCDNRComponent {
           this.selectedmiscellaneousData = response.Data;
           this.editMiscPopup = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType == 38) {
       this.dataService
@@ -402,10 +511,7 @@ export class GstReportCDNRComponent {
           this.selectedPrePayment = response.Data;
           this.editPrePaymentPopupOpened = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
+
         });
     } else if (TransType == 21) {
       this.dataService
@@ -413,12 +519,9 @@ export class GstReportCDNRComponent {
         .subscribe((response: any) => {
           this.selectedSupplierPayment = response.Data;
           console.log(this.selectedSupplierPayment);
-          this.isEditReceipt = true;
+          this.isViewPayment = true;
           this.cdr.detectChanges();
-          console.log(
-            this.selectedPrePayment,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
+
         });
     } else if (TransType == 20) {
       this.dataService
@@ -428,10 +531,7 @@ export class GstReportCDNRComponent {
           this.isEditPurchaseReturn = true;
 
           this.cdr.detectChanges();
-          console.log(
-            this.selectedPurchaseReturn,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
+
         });
     } else if (TransType == 14) {
       this.dataService
@@ -440,9 +540,7 @@ export class GstReportCDNRComponent {
           this.selectedTrOut = response;
           console.log(this.selectedTrOut);
           this.isEditTransferOut = true;
-
           this.cdr.detectChanges();
-          console.log(this.selectedTrOut, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TransType == 15) {
       this.dataService
@@ -450,10 +548,8 @@ export class GstReportCDNRComponent {
         .subscribe((response: any) => {
           this.selectedTrIn = response;
           this.loadingInvoice = false;
-
           this.isEditTransferIn = true;
           this.cdr.detectChanges();
-          console.log(this.selectedTrIn, 'SELECTEDJOURNALVOUCHERRRRRRRRRRRR');
         });
     } else if (TransType == 39) {
       this.dataService
@@ -461,12 +557,7 @@ export class GstReportCDNRComponent {
         .subscribe((response: any) => {
           this.selecte_prepayment_Data = response.Data;
           this.isEditPopupPrepaymentPosting = true;
-
           this.cdr.detectChanges();
-          console.log(
-            this.selecte_prepayment_Data,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     } else if (TransType == 3) {
       this.dataService
@@ -475,12 +566,7 @@ export class GstReportCDNRComponent {
           this.selectedmiscellaneousData = response;
           console.log(this.selectedmiscellaneousData);
           this.editMiscPopupOpened = true;
-
           this.cdr.detectChanges();
-          console.log(
-            this.selectedmiscellaneousData,
-            'SELECTEDJOURNALVOUCHERRRRRRRRRRRR',
-          );
         });
     }
     //else {
@@ -525,4 +611,4 @@ export class GstReportCDNRComponent {
   exports: [],
   declarations: [GstReportCDNRComponent],
 })
-export class GstReportCDNRModule {}
+export class GstReportCDNRModule { }

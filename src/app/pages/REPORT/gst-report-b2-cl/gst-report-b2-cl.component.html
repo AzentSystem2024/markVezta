@@ -24,11 +24,13 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
-      [summary]="summaryColumnsData"
+      [summary]="
+        isSummaryVisible
+          ? summaryColumnsData
+          : { totalItems: [], groupItems: [] }
+      "
       (onExporting)="onExporting($event)"
     >
-      <!-- [summary.calculateCustomSummary]="summaryColumnsData.calculateCustomSummary" -->
-      <!-- (onEditingStart)="onEditLedger($event)" -->
       <!-- <dxo-editing
         mode="popup"
         [allowUpdating]="true"
@@ -43,7 +45,7 @@
         [showInfo]="true"
         [showNavigationButtons]="true"
       ></dxo-pager>
-      <dxo-export [enabled]="true" [formats]="['xlsx', 'pdf']"> </dxo-export>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -59,129 +61,105 @@
             GST Report(B2CL)
           </div>
         </dxi-item>
-        <!-- <dxi-item>
-           <dx-select-box
-        [width]="150"
-        label="Fin Id"
-        labelMode="floating"
-         [items]="fin_id"
-    displayExpr="FIN_CODE"
-    valueExpr="FIN_ID"
-    [(value)]="selected_fin_id"
-    [searchEnabled]="true"
-    (onValueChanged)="onCompanyChange($event)"
-        >
 
-        </dx-select-box>
+        <dxi-item location="after" template="yearboxTemplate"></dxi-item>
 
-        </dxi-item> -->
-        <!-- <dxi-item>
-           <dx-select-box
-    [width]="200"
-    label="Company Id"
-    labelMode="floating"
-    [items]="company_list"
-    displayExpr="COMPANY_NAME"
-    valueExpr="COMPANY_ID"
-    [(value)]="selectedCompanyId"
-    [searchEnabled]="true"
-    (onValueChanged)="onCompanyChange($event)">
-        >
+        <dxi-item location="after" template="monthboxTemplate"></dxi-item>
 
-        </dx-select-box>
+        <dxi-item location="after" template="fromdateboxTemplate"></dxi-item>
 
-        </dxi-item> -->
-        <!-- <dxi-item>
-           <dx-select-box
-        [width]="200"
-        label="Ledger"
-        labelMode="floating"
-         [items]="HEAD_ID_LIST"
-    displayExpr="NAME"
-    valueExpr="ID"
-    [(value)]="selected_Head_Id"
-    (onValueChanged)="onHeadIdChange($event)"
-    [searchEnabled]="true"
-        >
-        </dx-select-box>
+        <dxi-item location="after" template="todateboxTemplate"></dxi-item>
 
-        </dxi-item> -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="Year"
-            [width]="150"
-            [(value)]="selectedYear"
-            [dataSource]="years"
-            (onValueChanged)="onYearChanged($event)"
-            placeholder="Year"
-          ></dx-select-box>
-        </dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-select-box
-            labelMode="floating"
-            labelLocation="left"
-            label="month"
-            [dataSource]="monthDataSource"
-            displayExpr="name"
-            valueExpr="value"
-            [(value)]="selectedmonth"
-            (onValueChanged)="onMonthValueChanged($event)"
-            [dropDownOptions]="{ width: 'auto' }"
-          >
-          </dx-select-box>
-        </dxi-item>
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
 
-        <dxi-item>
-          <dx-date-box
-            [width]="150"
-            label="From Date"
-            labelMode="floating"
-            [value]="selected_from_date"
-            [displayFormat]="'dd-MM-yyyy'"
-            (onValueChanged)="onFromDateChange($event)"
-          >
-          </dx-date-box>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
 
-          <!-- <dx-date-box
-        [width]="150"
-        label="From Date"
-        labelMode="floating"
-            [(value)]="selected_from_date"
-              displayFormat="yyyy-MM-dd"
-        >
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
 
-        </dx-date-box> -->
-        </dxi-item>
-        <dxi-item itemType="simple" verticalAlignment="center">
-          <dx-date-box
-            [width]="150"
-            label="To Date"
-            labelMode="floating"
-            [value]="selected_To_date"
-            displayFormat="dd-MM-yyyy"
-            (onValueChanged)="onToDateChange($event)"
-          >
-          </dx-date-box>
-        </dxi-item>
-        <dxi-item location="after">
-          <div class="toolbar-divider"></div>
-        </dxi-item>
-
-        <dxi-item itemType="simple" verticalAlignment="center">
-          <dx-button
-            text="Apply"
-            stylingMode="contained"
-            type="default"
-            (onClick)="load_GST_data()"
-          >
-          </dx-button>
-        </dxi-item>
-        <dxi-item name="exportButton"></dxi-item>
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="applyButtonOptions"
+        ></dxi-item>
       </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'yearboxTemplate'">
+        <dx-select-box
+          labelMode="floating"
+          labelLocation="left"
+          label="Year"
+          [width]="150"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        ></dx-select-box>
+      </div>
+
+      <div *dxTemplate="let data of 'monthboxTemplate'">
+        <dx-select-box
+          labelMode="floating"
+          labelLocation="left"
+          label="month"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        >
+        </dx-select-box>
+      </div>
+
+      <div *dxTemplate="let data of 'fromdateboxTemplate'">
+        <dx-date-box
+          [width]="150"
+          label="From Date"
+          labelMode="floating"
+          [value]="selected_from_date"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onFromDateChange($event)"
+        >
+        </dx-date-box>
+      </div>
+
+      <div *dxTemplate="let data of 'todateboxTemplate'">
+        <dx-date-box
+          [width]="150"
+          label="To Date"
+          labelMode="floating"
+          [value]="selected_To_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+      </div>
+
       <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>
       <dxo-header-filter visible="true"></dxo-header-filter>
@@ -194,10 +172,10 @@
       <dxo-header-filter [visible]="true">
         <dxo-search [enabled]="true"></dxo-search>
       </dxo-header-filter>
-      <!-- <dxo-filter-row
-      [visible]="isFilterRowVisible"
-      [applyFilter]="auto"
-    ></dxo-filter-row> -->
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
       <dxo-grouping
         [autoExpandAll]="false"
         [contextMenuEnabled]="true"
@@ -241,26 +219,7 @@
         caption="Total GST"
         width="130px"
       ></dxi-column>
-      <!-- <dxi-column
-        dataField="DebitAmount"
-        caption="Debit Amount"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-        alignment="right"
-      >
-      </dxi-column> -->
-
-      <!-- <dxi-column
-        dataField="CreditAmount"
-        caption="Credit Amount"
-        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-        alignment="right"
-      >
-      </dxi-column> -->
-
-      <!-- <dxi-column dataField="BALANCE" caption="Balance"
-  [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
-  alignment="right">
-</dxi-column> -->
+   
       <dxi-column
         *ngIf="GST_datasource.length > 0"
         type="buttons"
@@ -274,54 +233,60 @@
         ></dxi-button>
       </dxi-column>
     </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
   </div>
 </div>
-
-<!-- <dx-popup
-  [(visible)]="editLedgerPopup"
-  [width]="'50vw'"
-  [height]="'55vh'"
-  title="View Ledger statement"
-  (onHiding)="handleClose()"
->
-<form>
-  <div style="display: flex;">
-    <dx-text-box></dx-text-box>
-      <dx-text-box></dx-text-box>
-  </div>
-</form>
-  
-</dx-popup> -->
-<!-- =================header filter======================== -->
-<!-- <dx-popup
-  [(visible)]="isCustomDatePopupVisible"
-  [width]="'300px'"
-  title="Select Custom Date Range"
-  [showCloseButton]="true"
-  [dragEnabled]="false"
-  [closeOnOutsideClick]="true"
-  [height]="'300px'"
->
-  <div class="p-3">
-    <dx-date-box
-      [(value)]="fromDate"
-      type="date"
-      displayFormat="yyyy-MM-dd"
-      label="From Date"
-    >
-    </dx-date-box>
-
-    <dx-date-box
-      [(value)]="toDate"
-      type="date"
-      displayFormat="yyyy-MM-dd"
-      label="To Date"
-    >
-    </dx-date-box>
-
-    <button class="custom-apply-btn" (click)="applyCustomDate()">Apply</button>
-  </div>
-</dx-popup> -->
 
 <dx-popup
   [(visible)]="isViewJournalVoucher"
@@ -462,20 +427,19 @@
 
 <!-- Supplier Payment -->
 <dx-popup
-  [(visible)]="isEditReceipt"
-  [width]="'75vw'"
+  *ngIf="isViewPayment"
+  [(visible)]="isViewPayment"
+  [width]="'90vw'"
   [height]="'100vh'"
-  title="Supplier Payment"
+  title="View Supplier Payment"
   (onHiding)="handleClose()"
 >
-  <!-- <ng-container *ngIf="isAddInvoice"> -->
   <app-edit-supplier-payment
     [paymentData]="selectedReceipt"
     [isReadOnlyMode]="isReadOnlyReceipt"
     (popupClosed)="handleClose()"
     [supplierPaymentId]="selectedSupplierPayment"
   ></app-edit-supplier-payment>
-  <!-- </ng-container> -->
 </dx-popup>
 
 <!-- purchase return -->
