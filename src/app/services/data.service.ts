@@ -7486,14 +7486,15 @@ The result can be exported to HTML or Markdown.`;
       sessionStorage.getItem('savedUserData') || '{}',
     );
     const payload = {
-      CompanyID: sessionData.SELECTED_COMPANY?.COMPANY_ID,
-      UserID: sessionData.USER_ID,
-      TransactionID: rowdata.ID ?? rowdata.HeaderID ?? rowdata.TransactionID ?? rowdata.TransRefCode,
-      StoreID: sessionData.Configuration?.[0]?.STORE_ID,
-      FinID: sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID,
-    };
+      TransactionType: rowdata.TransactionType,
+      TransRefCode: rowdata.TransRefCode,
+      FIN_ID: sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID ?? sessionData.FIN_ID ?? 0,
+      USER_ID: sessionData.USER_ID ?? 0,
+      COMPANY_ID: sessionData.SELECTED_COMPANY?.COMPANY_ID ?? sessionData.COMPANY_ID ?? 0,
+      STORE_ID: sessionData.Configuration?.[0]?.STORE_ID ?? sessionData.STORE_ID ?? 0,
+  };
 
-    return this.http.post(`${this.apiUrl}inventorylist/process`, payload);
+    return this.http.post(`${this.apiUrl}APList/processinventory`, payload);
   }
 
   getRevenueDashboardData(payload: any): Observable<any> {
