@@ -393,13 +393,18 @@ export class ApListPageComponent implements OnInit {
         // Guaranteed unique row key for DevExtreme internal tracking
         if (isHeader) {
           updatedItem._rowKey =
-            item.HeaderID ||
-            (item.InvoiceNo ? `${item.InvoiceNo}_${index}` : `ap_hdr_${index}`);
+            item.ID != null
+              ? item.ID
+              : (item.HeaderID != null
+                  ? item.HeaderID
+                  : (item.InvoiceNo ? `${item.InvoiceNo}_${index}` : `ap_hdr_${index}`));
         } else {
           updatedItem._rowKey =
-            item.ID ||
-            item.TransactionID ||
-            `${item.ApexInvoiceNumber || item.InvoiceNo || 'det'}_${index}`;
+            item.ID != null
+              ? item.ID
+              : (item.TransactionID != null
+                  ? item.TransactionID
+                  : `${item.ApexInvoiceNumber || item.InvoiceNo || 'det'}_${index}`);
         }
 
         Object.keys(updatedItem).forEach((key: string) => {
@@ -432,7 +437,9 @@ export class ApListPageComponent implements OnInit {
     // Refresh detail maps for any already expanded rows
     if (this.expandedRowKeys.length > 0) {
       this.expandedRowKeys.forEach((rowKey) => {
-        const headerRow = this.importDataList.find((x) => x._rowKey === rowKey);
+        const headerRow = this.importDataList.find(
+          (x) => x._rowKey === rowKey || String(x._rowKey) === String(rowKey),
+        );
         if (headerRow) {
           this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
         }
@@ -450,11 +457,31 @@ export class ApListPageComponent implements OnInit {
       return [];
     }
 
+    const headerId = headerRow.ID ?? headerRow.HeaderID ?? headerRow.Id;
+
     return this.importDetailData.filter((detail: any) => {
-      // 1. Direct join condition:
-      // Header.InvoiceNo = Detail.ApexInvoiceNumber
-      // AND Header.SupplierCode = Detail.SupplierCode
-      // AND Header.SupplierInvoiceNo = Detail.SupplierInvoiceNumber
+      const detailHeaderId =
+        detail.HEADER_ID ??
+        detail.HeaderID ??
+        detail.HeaderId ??
+        detail.header_id;
+
+      // 1. Direct join condition: header.ID = details.HeaderID (or HEADER_ID)
+      if (headerId != null && detailHeaderId != null) {
+        return String(headerId).trim() === String(detailHeaderId).trim();
+      }
+
+      // 2. Fallback: match by TransactionID
+      if (
+        headerRow.TransactionID != null &&
+        detail.TransactionID != null &&
+        String(headerRow.TransactionID).trim() ===
+          String(detail.TransactionID).trim()
+      ) {
+        return true;
+      }
+
+      // 3. Fallback: match by InvoiceNo / ApexInvoiceNumber + SupplierCode + SupplierInvoiceNo
       const headerInv = (
         headerRow.InvoiceNo ||
         headerRow.ApexInvoiceNumber ||
@@ -494,7 +521,6 @@ export class ApListPageComponent implements OnInit {
         .trim()
         .toLowerCase();
 
-      // Primary check: all three conditions match
       if (
         headerInv &&
         detailInv &&
@@ -509,7 +535,7 @@ export class ApListPageComponent implements OnInit {
         return true;
       }
 
-      // Fallback if secondary fields are empty/omitted in raw data
+      // Secondary fallback if secondary fields are empty/omitted
       if (headerInv && detailInv && headerInv === detailInv) {
         const suppCodeOk =
           !headerSuppCode ||
@@ -520,11 +546,6 @@ export class ApListPageComponent implements OnInit {
         return suppCodeOk && suppInvOk;
       }
 
-      // Fallback if HeaderID is present on both
-      if (headerRow.HeaderID != null && detail.HeaderID != null) {
-        return String(headerRow.HeaderID) === String(detail.HeaderID);
-      }
-
       return false;
     });
   };
@@ -532,12 +553,14 @@ export class ApListPageComponent implements OnInit {
   // ===== Master-Detail Row Expanding =====
   ensureDetailsLoaded(masterData: any): boolean {
     const rowKey = masterData?.key;
-    if (!rowKey) return true;
+    if (rowKey == null) return true;
     if (!this.detailDataMap[rowKey] && !this.detailLoadingMap[rowKey]) {
       this.detailLoadingMap[rowKey] = true;
       const headerRow =
         masterData.data ||
-        this.importDataList.find((x) => x._rowKey === rowKey);
+        this.importDataList.find(
+          (x) => x._rowKey === rowKey || String(x._rowKey) === String(rowKey),
+        );
 
       setTimeout(() => {
         this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
@@ -551,11 +574,14 @@ export class ApListPageComponent implements OnInit {
 
   onRowExpanding(e: any) {
     const rowKey = e.key;
-    if (!this.expandedRowKeys.includes(rowKey)) {
+    if (!this.expandedRowKeys.some((k) => String(k) === String(rowKey))) {
       this.expandedRowKeys.push(rowKey);
     }
     const headerRow =
-      e.data || this.importDataList.find((x) => x._rowKey === rowKey);
+      e.data ||
+      this.importDataList.find(
+        (x) => x._rowKey === rowKey || String(x._rowKey) === String(rowKey),
+      );
 
     if (!this.detailDataMap[rowKey]) {
       this.detailLoadingMap[rowKey] = true;
@@ -572,7 +598,9 @@ export class ApListPageComponent implements OnInit {
 
   onRowCollapsing(e: any) {
     const rowKey = e.key;
-    this.expandedRowKeys = this.expandedRowKeys.filter((x) => x !== rowKey);
+    this.expandedRowKeys = this.expandedRowKeys.filter(
+      (x) => String(x) !== String(rowKey),
+    );
     delete this.detailDataMap[rowKey];
     delete this.detailLoadingMap[rowKey];
   }
@@ -650,8 +678,10 @@ export class ApListPageComponent implements OnInit {
     this.selectedTransID =
       e.data?.AcTransID ||
       e.data?.TransactionID ||
+      e.data?.ID ||
       matching?.[0]?.AcTransID ||
-      matching?.[0]?.TransactionID;
+      matching?.[0]?.TransactionID ||
+      matching?.[0]?.ID;
 
     if (!this.selectedTransID) {
       notify('Transaction ID not found', 'warning', 3000);
@@ -782,6 +812,7 @@ export class ApListPageComponent implements OnInit {
     this.completedRequestCount = 0;
     this.failedRequestCount = 0;
     this.pendingRequestCount = pendingRows.length;
+    const failureMessages: string[] = [];
 
     this.cdr.detectChanges();
 
@@ -791,18 +822,38 @@ export class ApListPageComponent implements OnInit {
           .process_pending_ap_rows(row)
           .toPromise();
 
-        if (
+        const isSuccess =
           response?.flag === '1' ||
           response?.flag === 1 ||
+          response?.Flag === '1' ||
+          response?.Flag === 1 ||
           response?.Success === true ||
-          response?.success === true
-        ) {
+          response?.success === true;
+
+        if (isSuccess) {
           this.completedRequestCount++;
         } else {
           this.failedRequestCount++;
+          const msg =
+            response?.Message ||
+            response?.FailureReason ||
+            response?.message ||
+            response?.failureReason;
+          if (msg && !failureMessages.includes(msg)) {
+            failureMessages.push(msg);
+          }
         }
       } catch (error: any) {
         this.failedRequestCount++;
+        const errorMsg =
+          error?.error?.Message ||
+          error?.error?.FailureReason ||
+          error?.error?.message ||
+          error?.error?.failureReason ||
+          error?.message;
+        if (errorMsg && !failureMessages.includes(errorMsg)) {
+          failureMessages.push(errorMsg);
+        }
       }
 
       this.pendingRequestCount =
@@ -822,16 +873,48 @@ export class ApListPageComponent implements OnInit {
     await new Promise((resolve) => setTimeout(resolve, 100));
     this.detailGrid?.instance.searchByText('');
 
-    notify(
-      {
-        message: `Processing completed.
+    if (this.completedRequestCount === 0 && this.failedRequestCount > 0) {
+      const failureMsg =
+        failureMessages.length > 0
+          ? failureMessages.join('\n')
+          : 'Processing failed';
+
+      notify(
+        {
+          message: failureMsg,
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 6000,
+        },
+        'error',
+      );
+    } else if (this.failedRequestCount > 0) {
+      const failureMsg =
+        failureMessages.length > 0
+          ? `\nReason: ${failureMessages.join('\n')}`
+          : '';
+
+      notify(
+        {
+          message: `Processing completed.
+      Success : ${this.completedRequestCount}
+      Failed : ${this.failedRequestCount}${failureMsg}`,
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 6000,
+        },
+        'warning',
+      );
+    } else {
+      notify(
+        {
+          message: `Processing completed.
       Success : ${this.completedRequestCount}
       Failed : ${this.failedRequestCount}`,
-        position: { at: 'top right', my: 'top right' },
-        displayTime: 5000,
-      },
-      'success',
-    );
+          position: { at: 'top right', my: 'top right' },
+          displayTime: 5000,
+        },
+        'success',
+      );
+    }
 
     await new Promise((resolve) => setTimeout(resolve, 500));
     await this.fetch_Full_import_list();

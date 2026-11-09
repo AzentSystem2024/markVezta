@@ -409,17 +409,17 @@ export class InventoryListPageComponent implements OnInit {
         if (isHeader) {
           updatedItem._rowKey =
             item.ID != null
-              ? `inv_hdr_${item.ID}_${index}`
-              : item.TransRefCode
-                ? `${item.TransRefCode}_${index}`
-                : `inv_hdr_${index}`;
+              ? item.ID
+              : (item.HeaderID != null
+                  ? item.HeaderID
+                  : (item.TransRefCode ? `${item.TransRefCode}_${index}` : `inv_hdr_${index}`));
         } else {
           updatedItem._rowKey =
             item.ID != null
-              ? `inv_det_${item.ID}_${index}`
-              : item.TransRefCode
-                ? `${item.TransRefCode}_${index}`
-                : `inv_det_${index}`;
+              ? item.ID
+              : (item.TransactionID != null
+                  ? item.TransactionID
+                  : `${item.TransRefCode || 'det'}_${index}`);
         }
         Object.keys(updatedItem).forEach((key: string) => {
           const value = updatedItem[key];
@@ -449,7 +449,9 @@ export class InventoryListPageComponent implements OnInit {
     // Refresh detail maps for any already expanded rows
     if (this.expandedRowKeys.length > 0) {
       this.expandedRowKeys.forEach((rowKey) => {
-        const headerRow = this.importDataList.find((x) => x._rowKey === rowKey);
+        const headerRow = this.importDataList.find(
+          (x) => x._rowKey === rowKey || String(x._rowKey) === String(rowKey),
+        );
         if (headerRow) {
           this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
         }
@@ -468,7 +470,22 @@ export class InventoryListPageComponent implements OnInit {
     ) {
       return [];
     }
+
+    const headerId = headerRow.ID ?? headerRow.HeaderID ?? headerRow.Id;
+
     return this.importDetailData.filter((detail: any) => {
+      const detailHeaderId =
+        detail.HEADER_ID ??
+        detail.HeaderID ??
+        detail.HeaderId ??
+        detail.header_id;
+
+      // 1. Direct join condition: header.ID = details.HeaderID (or HEADER_ID)
+      if (headerId != null && detailHeaderId != null) {
+        return String(headerId).trim() === String(detailHeaderId).trim();
+      }
+
+      // 2. Fallback: match by TransRefCode & TransactionType
       const headerRef = (headerRow.TransRefCode || '')
         .toString()
         .trim()
@@ -486,7 +503,6 @@ export class InventoryListPageComponent implements OnInit {
         .trim()
         .toLowerCase();
 
-      // Primary join condition: Reference Code & Transaction Type
       if (
         headerRef &&
         detailRef &&
@@ -498,19 +514,21 @@ export class InventoryListPageComponent implements OnInit {
         return true;
       }
 
-      // Secondary match: Reference Code matches
+      // 3. Fallback: match by TransRefCode
       if (headerRef && detailRef && headerRef === detailRef) {
         return true;
       }
 
-      // Fallback by ID if present
+      // 4. Fallback by TransactionID if present
       if (
-        headerRow.ID != null &&
-        detail.ID != null &&
-        headerRow.ID === detail.ID
+        headerRow.TransactionID != null &&
+        detail.TransactionID != null &&
+        String(headerRow.TransactionID).trim() ===
+          String(detail.TransactionID).trim()
       ) {
         return true;
       }
+
       return false;
     });
   };
@@ -518,12 +536,14 @@ export class InventoryListPageComponent implements OnInit {
   // ================= Master-Detail Row Expanding =================
   ensureDetailsLoaded(masterData: any): boolean {
     const rowKey = masterData?.key;
-    if (!rowKey) return true;
+    if (rowKey == null) return true;
     if (!this.detailDataMap[rowKey] && !this.detailLoadingMap[rowKey]) {
       this.detailLoadingMap[rowKey] = true;
       const headerRow =
         masterData.data ||
-        this.importDataList.find((x) => x._rowKey === rowKey);
+        this.importDataList.find(
+          (x) => x._rowKey === rowKey || String(x._rowKey) === String(rowKey),
+        );
       setTimeout(() => {
         this.detailDataMap[rowKey] = this.getMatchingDetails(headerRow);
         this.detailLoadingMap[rowKey] = false;
@@ -538,11 +558,14 @@ export class InventoryListPageComponent implements OnInit {
 
   onRowExpanding(e: any) {
     const rowKey = e.key;
-    if (!this.expandedRowKeys.includes(rowKey)) {
+    if (!this.expandedRowKeys.some((k) => String(k) === String(rowKey))) {
       this.expandedRowKeys.push(rowKey);
     }
     const headerRow =
-      e.data || this.importDataList.find((x) => x._rowKey === rowKey);
+      e.data ||
+      this.importDataList.find(
+        (x) => x._rowKey === rowKey || String(x._rowKey) === String(rowKey),
+      );
     if (!this.detailDataMap[rowKey]) {
       this.detailLoadingMap[rowKey] = true;
       this.cdr.detectChanges();
@@ -559,7 +582,9 @@ export class InventoryListPageComponent implements OnInit {
 
   onRowCollapsing(e: any) {
     const rowKey = e.key;
-    this.expandedRowKeys = this.expandedRowKeys.filter((x) => x !== rowKey);
+    this.expandedRowKeys = this.expandedRowKeys.filter(
+      (x) => String(x) !== String(rowKey),
+    );
     delete this.detailDataMap[rowKey];
     delete this.detailLoadingMap[rowKey];
   }
