@@ -1,0 +1,46 @@
+<div
+  class="toast-container position-fixed top-0 end-0 p-3"
+  style="z-index: 999999; max-width: 440px; pointer-events: none"
+>
+  <div
+    *ngFor="let toast of toastService.toasts"
+    class="toast show shadow mb-3"
+    [ngClass]="'toast-' + toast.type"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    style="
+      pointer-events: auto;
+      border-radius: 8px;
+      overflow: hidden;
+      min-width: 320px;
+    "
+  >
+    <div class="toast-header d-flex align-items-center py-2 px-3">
+      <i [class]="toast.icon" class="me-2 fs-5"></i>
+      <strong class="me-auto text-capitalize" style="font-weight: 600">
+        {{ toast.title }}
+      </strong>
+      <small class="ms-2 opacity-75">{{ toast.time }}</small>
+      <button
+        type="button"
+        class="btn-close ms-2"
+        [class.btn-close-white]="toast.type !== 'warning'"
+        aria-label="Close"
+        (click)="toastService.remove(toast.id)"
+      ></button>
+    </div>
+    <div
+      class="toast-body p-3"
+      style="
+        white-space: pre-line;
+        word-break: break-word;
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 500;
+      "
+    >
+      {{ toast.message }}
+    </div>
+  </div>
+</div>

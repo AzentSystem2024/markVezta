@@ -18,12 +18,14 @@ import {
   CreateAccountFormModule,
   ChangePasswordFormModule,
   LoginFormModule,
+  ToastContainerModule,
 } from './components';
 import {
   AuthService,
   ScreenService,
   AppInfoService,
   DataService,
+  ToastService,
 } from './services';
 import { UnauthenticatedContentModule } from './layouts/unauthenticated-content/unauthenticated-content';
 import { AppRoutingModule } from './app-routing.module';
@@ -472,6 +474,7 @@ import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-
     CreateAccountFormModule,
     ChangePasswordFormModule,
     LoginFormModule,
+  ToastContainerModule,
     UnauthenticatedContentModule,
     DxSelectBoxModule,
     DxTagBoxModule,
@@ -921,6 +924,7 @@ import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-
     AppInfoService,
     ThemeService,
     DataService,
+  ToastService,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: RouteReuseStrategy, useClass: CustomReuseStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

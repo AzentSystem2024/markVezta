@@ -4,6 +4,7 @@ import {
   AuthService,
   ScreenService,
   ThemeService,
+  ToastService,
 } from './services';
 
 @Component({
@@ -22,7 +23,8 @@ export class AppComponent implements OnDestroy {
     private authService: AuthService,
     private themeService: ThemeService,
     private screen: ScreenService,
-    public appInfo: AppInfoService
+    public appInfo: AppInfoService,
+    private toastService: ToastService
   ) {
     themeService.setAppTheme();
   }
