@@ -74,12 +74,14 @@ export class InventoryListPageComponent implements OnInit {
   // ================= Validation Popup Variables =================
   isValidationPopupVisible: boolean = false;
   transactionTypes: string[] = [];
+  documentTypes: string[] = [];
   selectedTransactionType: string = '';
   allValidationErrors: any[] = [];
   allMissingMasterData: any[] = [];
   filteredValidationGridData: any[] = [];
   isErrorDetailsPopupVisible: boolean = false;
   errorDetailsGridData: any[] = [];
+  selectedErrorSummary: any = null;
 
   // ================= Date Filter Variables =================
   dateRanges = [
@@ -144,12 +146,11 @@ export class InventoryListPageComponent implements OnInit {
   };
 
   ValidateButtonOptions = {
-    text: 'Verify',
+    text: 'Validate',
     icon: '',
     type: 'default',
     stylingMode: 'contained',
-    hint: 'Verify Inventory Data (Coming soon)',
-    disabled: true,
+    hint: 'Validate Inventory Data',
     onClick: () => {
       this.verifyPendingRows();
     },
@@ -364,32 +365,36 @@ export class InventoryListPageComponent implements OnInit {
   }
 
   // ====== Fetch Inventory Data list exclusively from API using DataService =======
-  fetch_Full_import_list() {
-    this.isLoading = true;
-    this.loadingMessage = 'Loading Inventory data...';
-    this.cdr.detectChanges();
-    const { fromDate, toDate } = this.getDateRange();
-    const payload = {
-      FromDate: fromDate,
-      ToDate: toDate,
-    };
+  fetch_Full_import_list(): Promise<any> {
+    return new Promise((resolve) => {
+      this.isLoading = true;
+      this.loadingMessage = 'Loading Inventory data...';
+      this.cdr.detectChanges();
+      const { fromDate, toDate } = this.getDateRange();
+      const payload = {
+        FromDate: fromDate,
+        ToDate: toDate,
+      };
 
-    // Calling real Inventory List API (api/APList/inventorylist) via DataService
-    this.srvce.import_Inventory_Full_List(payload).subscribe({
-      next: (response: any) => {
-        this.isLoading = false;
-        const rawHeaders = response?.Header || response?.header || [];
-        const rawDetails = response?.Detail || response?.detail || [];
-        this.processApiResponse(rawHeaders, rawDetails);
-        this.cdr.detectChanges();
-      },
-      error: (error: any) => {
-        this.isLoading = false;
-        this.importDataList = [];
-        this.importDetailData = [];
-        this.detailDataMap = {};
-        this.cdr.detectChanges();
-      },
+      // Calling real Inventory List API (api/APList/inventorylist) via DataService
+      this.srvce.import_Inventory_Full_List(payload).subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
+          const rawHeaders = response?.Header || response?.header || [];
+          const rawDetails = response?.Detail || response?.detail || [];
+          this.processApiResponse(rawHeaders, rawDetails);
+          this.cdr.detectChanges();
+          resolve(response);
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          this.importDataList = [];
+          this.importDetailData = [];
+          this.detailDataMap = {};
+          this.cdr.detectChanges();
+          resolve(null);
+        },
+      });
     });
   }
 
@@ -559,11 +564,12 @@ export class InventoryListPageComponent implements OnInit {
     delete this.detailLoadingMap[rowKey];
   }
 
-  refreshGrid() {
-    this.fetch_Full_import_list();
+  refreshGrid(): Promise<any> {
+    const fetchPromise = this.fetch_Full_import_list();
     if (this.detailGrid?.instance) {
       this.detailGrid.instance.refresh();
     }
+    return fetchPromise;
   }
 
   toggleFilters() {
@@ -661,9 +667,76 @@ export class InventoryListPageComponent implements OnInit {
     this.isViewJournalVoucher = false;
   }
 
-  // ================= Verify Pending Rows (Keep Empty as Requested) =================
-  verifyPendingRows() {
-    // Keep empty function in Inventory list as requested by user because API is not ready
+  // ================= Verify Pending Rows =================
+  async verifyPendingRows() {
+    const selectedRows = this.detailGrid?.instance.getSelectedRowsData();
+
+    if (!selectedRows || selectedRows.length === 0) {
+      notify('Please select rows', 'warning', 3000);
+      return;
+    }
+
+    // Pending Rows Only (Open or Failed or not Posted)
+    const pendingRows = selectedRows.filter((x: any) => x.Status !== 'Posted');
+
+    if (pendingRows.length === 0) {
+      notify('Please select pending rows only', 'warning', 3000);
+      return;
+    }
+
+    const transactionIDs = pendingRows
+      .map((row: any) => row.ID)
+      .filter((id: any) => id != null)
+      .join(',');
+
+    this.loadingMessage = 'Validating...';
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    try {
+      const response: any = await this.srvce
+        .getValidationInventoryData({
+          TransactionIDs: transactionIDs,
+        })
+        .toPromise();
+
+      this.isLoading = false;
+      this.loadingMessage = 'Loading Inventory data...';
+
+      const errors = response?.errors || [];
+      const notFoundValues = response?.notFoundValues || [];
+
+      if (errors.length > 0 || notFoundValues.length > 0) {
+        this.documentTypes =
+          response?.documentTypes || response?.transactionTypes || [];
+        this.transactionTypes =
+          response?.transactionTypes || response?.documentTypes || [];
+        this.allValidationErrors = errors;
+        this.allMissingMasterData = notFoundValues;
+
+        this.updateValidationGrid();
+        this.isValidationPopupVisible = true;
+      } else if (
+        response?.flag === '1' ||
+        response?.flag === 1 ||
+        response?.success === true ||
+        response?.Success === true
+      ) {
+        notify(response?.message || 'Validation successful', 'success', 3000);
+      } else {
+        notify(response?.message || 'Validation failed', 'error', 3000);
+      }
+
+      // Refresh full grid data after validation completes
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await this.refreshGrid();
+    } catch (error: any) {
+      this.isLoading = false;
+      this.loadingMessage = 'Loading Inventory data...';
+      console.error(error);
+      notify('Failed to validate Inventory data', 'error', 3000);
+    }
+    this.cdr.detectChanges();
   }
 
   // ================= Process Pending Rows =================
@@ -738,50 +811,191 @@ export class InventoryListPageComponent implements OnInit {
   // ================= Validation Helpers =================
   updateValidationGrid() {
     const map = new Map<string, any>();
-    this.allValidationErrors.forEach((err) => {
-      const key = `${err.TransactionType}_${err.ErrorMessage}`;
+    const errorList =
+      this.allValidationErrors && this.allValidationErrors.length > 0
+        ? this.allValidationErrors
+        : this.allMissingMasterData || [];
+
+    errorList.forEach((err) => {
+      const type = err.TransactionType || err.DocumentType || 'Consumption';
+      const particular = err.Particular || '';
+      const errorMessage =
+        err.ErrorMessage ||
+        err.Message ||
+        (particular ? `${particular} Not Found` : 'Validation Error');
+      const key = `${type}_${errorMessage}_${particular}`;
+
       if (!map.has(key)) {
         map.set(key, {
-          ErrorMessage: err.ErrorMessage,
+          ErrorMessage: errorMessage,
           MissingCount: 0,
           AffectedRowsCount: 0,
-          Particular: err.Particular,
+          Particular: particular,
           BatchNo: err.BatchNo,
-          TransactionType: err.TransactionType,
+          TransactionType: type,
+          DocumentType: type,
+          NotFoundValues: [],
+          _headerIds: new Set<any>(),
         });
       }
       const current = map.get(key);
-      current.MissingCount += Number(err.ErrorCount) || 0;
-      current.AffectedRowsCount += Number(err.AffectedRowsCount) || 0;
+
+      if (err.ErrorCount != null) {
+        current.MissingCount += Number(err.ErrorCount) || 0;
+      } else if (err.MissingCount != null) {
+        current.MissingCount += Number(err.MissingCount) || 0;
+      } else {
+        current.MissingCount += 1;
+      }
+
+      if (err.AffectedRowsCount != null) {
+        current.AffectedRowsCount += Number(err.AffectedRowsCount) || 0;
+      } else if (
+        err.HeaderID != null ||
+        err.ID != null ||
+        err.TransactionID != null
+      ) {
+        current._headerIds.add(err.HeaderID ?? err.ID ?? err.TransactionID);
+        current.AffectedRowsCount = current._headerIds.size;
+      } else {
+        current.AffectedRowsCount += 1;
+      }
     });
+
+    map.forEach((item) => {
+      const missingForParticular = (this.allMissingMasterData || []).filter(
+        (x: any) => {
+          const matchPart =
+            !item.Particular || x.Particular === item.Particular;
+          const matchType =
+            !item.TransactionType ||
+            x.TransactionType === item.TransactionType ||
+            x.DocumentType === item.TransactionType;
+          return matchPart && matchType;
+        },
+      );
+
+      const notFoundVals = Array.from(
+        new Set(
+          missingForParticular
+            .map((x: any) =>
+              (x.NotFoundValue ?? x.Value ?? x.ParticularValue ?? x.Code ?? '')
+                .toString()
+                .trim(),
+            )
+            .filter((v: string) => v.length > 0),
+        ),
+      );
+
+      item.NotFoundValues = notFoundVals;
+    });
+
     this.filteredValidationGridData = Array.from(map.values());
   }
 
   async viewErrorDetails(cellData: any) {
+    this.selectedErrorSummary = cellData;
+    const type = cellData.TransactionType || cellData.DocumentType;
     const payload = {
       BatchNo: cellData.BatchNo,
-      TransactionType: cellData.TransactionType,
+      TransactionType: type,
       Particular: cellData.Particular,
     };
+
+    const matchingNotFound = (this.allMissingMasterData || []).filter(
+      (x: any) => {
+        const matchPart =
+          !cellData.Particular || x.Particular === cellData.Particular;
+        const matchType =
+          !type || x.TransactionType === type || x.DocumentType === type;
+        return matchPart && matchType;
+      },
+    );
+
+    const notFoundVals = Array.from(
+      new Set(
+        matchingNotFound
+          .map((x: any) =>
+            (x.NotFoundValue ?? x.Value ?? x.ParticularValue ?? x.Code ?? '')
+              .toString()
+              .trim(),
+          )
+          .filter((v: string) => v.length > 0),
+      ),
+    );
+
+    if (this.allValidationErrors && this.allValidationErrors.length > 0) {
+      const matched = this.allValidationErrors.filter((item: any) => {
+        const itemType = item.TransactionType || item.DocumentType;
+        const matchesType = !type || itemType === type;
+        const matchesPart =
+          !cellData.Particular || item.Particular === cellData.Particular;
+        const matchesBatch =
+          !cellData.BatchNo || item.BatchNo === cellData.BatchNo;
+        return (
+          matchesType &&
+          (cellData.Particular ? matchesPart : true) &&
+          (cellData.BatchNo ? matchesBatch : true)
+        );
+      });
+
+      if (matched.length > 0) {
+        this.errorDetailsGridData = matched.map((item: any, idx: number) => {
+          const row: any = { ...item };
+          if (row.hasOwnProperty('Verified')) {
+            row.Verified = row.Verified ? 'True' : 'False';
+          }
+          row.HeaderID = item.HeaderID ?? item.ID ?? item.TransactionID ?? '-';
+          row.DocumentType = item.TransactionType || item.DocumentType || type;
+          row.Particular = item.Particular || cellData.Particular;
+          row.NotFoundValue =
+            item.NotFoundValue ||
+            matchingNotFound[idx]?.NotFoundValue ||
+            (notFoundVals.length === 1
+              ? notFoundVals[0]
+              : notFoundVals[idx] || '-');
+          row.ErrorMessage = item.ErrorMessage || cellData.ErrorMessage;
+          return row;
+        });
+        this.isErrorDetailsPopupVisible = true;
+        this.cdr.detectChanges();
+        return;
+      }
+    }
+
     this.loadingMessage = 'Loading error details...';
     this.isLoading = true;
     this.cdr.detectChanges();
+
     try {
       const response: any = await this.srvce
         .getARErrorData(payload)
         .toPromise();
+
       this.isLoading = false;
       this.loadingMessage = 'Loading Inventory data...';
+
       if (response?.flag === '1') {
-        this.errorDetailsGridData = (response.data || []).map((item: any) => {
-          if (item.hasOwnProperty('Verified')) {
-            item.Verified = item.Verified ? 'True' : 'False';
-          }
-          delete item.HeaderID;
-          delete item.TransactionID;
-          delete item.DataID;
-          return item;
-        });
+        this.errorDetailsGridData = (response.data || []).map(
+          (item: any, idx: number) => {
+            const row: any = { ...item };
+            if (row.hasOwnProperty('Verified')) {
+              row.Verified = row.Verified ? 'True' : 'False';
+            }
+            if (!row.NotFoundValue) {
+              row.NotFoundValue =
+                matchingNotFound[idx]?.NotFoundValue ||
+                (notFoundVals.length === 1
+                  ? notFoundVals[0]
+                  : notFoundVals[idx] || '-');
+            }
+            row.HeaderID =
+              item.HeaderID ?? item.ID ?? item.TransactionID ?? '-';
+            row.DocumentType =
+              item.TransactionType || item.DocumentType || type;
+            return row;
+          },
+        );
         this.isErrorDetailsPopupVisible = true;
       } else {
         notify(
@@ -792,6 +1006,8 @@ export class InventoryListPageComponent implements OnInit {
       }
     } catch (error: any) {
       this.isLoading = false;
+      this.loadingMessage = 'Loading Inventory data...';
+      console.error(error);
       notify('Failed to fetch error details', 'error', 3000);
     }
     this.cdr.detectChanges();
@@ -800,24 +1016,37 @@ export class InventoryListPageComponent implements OnInit {
   hasMissingData(particular: string, transactionType: string): boolean {
     return this.allMissingMasterData.some(
       (x) =>
-        x.Particular === particular && x.TransactionType === transactionType,
+        x.Particular === particular &&
+        (!transactionType ||
+          x.TransactionType === transactionType ||
+          x.DocumentType === transactionType),
     );
   }
+
   async downloadMissingParticulars(
     particular: string,
     transactionType: string,
   ) {
     const missingValues = this.allMissingMasterData.filter(
       (x) =>
-        x.Particular === particular && x.TransactionType === transactionType,
+        x.Particular === particular &&
+        (!transactionType ||
+          x.TransactionType === transactionType ||
+          x.DocumentType === transactionType),
     );
     if (missingValues.length === 0) {
       notify('No missing values found for this particular.', 'info', 3000);
       return;
     }
     let masterKey = '';
-    if (['HISTPACode', 'HISInsuCode', 'HISInstCode'].includes(particular)) {
-      masterKey = 'Customer';
+    if (
+      ['HISTPACode', 'HISInsuCode', 'HISInstCode', 'SupplierCode'].includes(
+        particular,
+      )
+    ) {
+      masterKey = 'Supplier';
+    } else if (['MatlCode', 'ItemCode'].includes(particular)) {
+      masterKey = 'Item';
     } else if (
       ['HISReportingDoctor', 'HISReferringDoctor'].includes(particular)
     ) {
