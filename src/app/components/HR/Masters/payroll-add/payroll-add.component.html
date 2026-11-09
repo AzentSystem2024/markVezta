@@ -27,7 +27,13 @@
       rowAlternationInterval="2"
       [selection]="{ mode: 'multiple', showCheckBoxesMode: 'always' }"
       [focusStateEnabled]="false"
+      [showHeaderFilter]="true"
     >
+    <dxo-header-filter
+  [visible]="true"
+  [allowSearch]="true"
+  [searchTimeout]="500"
+></dxo-header-filter>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"

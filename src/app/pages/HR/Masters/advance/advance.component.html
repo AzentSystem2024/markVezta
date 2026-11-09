@@ -62,7 +62,7 @@
             margin-right: 3px;
           "
         >
-          Salary Advance
+          Salary Advances
         </div>
       </dxi-item>
 
@@ -541,7 +541,6 @@
             valueChangeEvent="input"
             [(value)]="reco_Amount_value"
             [inputAttr]="{ style: 'text-align: right;' }"
-            (valueChange)="onNetAmountUpdateChange()"
             [labelMode]="'floating'"
           ></dx-number-box>
         </dxi-item>
@@ -569,7 +568,6 @@
             [format]="'#,##0.##'"
             [readOnly]="isEditReadOnly"
             [(value)]="reco_inst_count_value"
-            (valueChange)="onInstallmentCountChange()"
             [inputAttr]="{ style: 'text-align: right;' }"
             [labelMode]="'floating'"
           ></dx-number-box>
@@ -580,7 +578,6 @@
             label="Installment Amount"
             format="#,##0.00"
             valueChangeEvent="input"
-            [readOnly]="isEditReadOnly"
             [(value)]="reco_install_Amount_value"
             [readOnly]="true"
             [labelMode]="'floating'"
