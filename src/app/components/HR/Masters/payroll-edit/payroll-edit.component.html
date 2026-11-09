@@ -114,6 +114,11 @@
       (onEditorPreparing)="onEditorPreparing($event)"
       (onContentReady)="onContentReady($event)"
     >
+      <dxo-header-filter
+        [visible]="true"
+        [allowSearch]="true"
+        [searchTimeout]="500"
+      ></dxo-header-filter>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-filter-builder [allowHierarchicalFields]="true">
