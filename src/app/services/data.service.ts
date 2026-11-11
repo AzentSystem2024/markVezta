@@ -6077,6 +6077,7 @@ The result can be exported to HTML or Markdown.`;
       EMAIL: data.Email,
       STORE_ID: data.STORE_ID,
       IS_INACTIVE: data.IsInactive,
+      IS_COMPANY_SWITCH: data.IS_COMPANY_SWITCH,
     };
     return this.http.post(url, reqBody);
   }
@@ -6100,6 +6101,7 @@ The result can be exported to HTML or Markdown.`;
       LOCK_DATE_FROM: data.LOCK_DATE_FROM,
       LOCK_DATE_TO: data.LOCK_DATE_TO,
       LOCK_REASON: data.LOCK_REASON,
+      IS_COMPANY_SWITCH: data.IS_COMPANY_SWITCH,
     };
 
     return this.http.post(url, reqBody);
@@ -7491,13 +7493,13 @@ The result can be exported to HTML or Markdown.`;
     const sessionData = JSON.parse(
       sessionStorage.getItem('savedUserData') || '{}',
     );
-     const payload = {
-       COMPANY_ID: sessionData.SELECTED_COMPANY?.COMPANY_ID,
-       USER_ID: sessionData.USER_ID,
-       IMPORT_DATA_ID: rowdata.ID,
-       STORE_ID: sessionData.Configuration?.[0]?.STORE_ID,
-       FIN_ID: sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID,
-     };
+    const payload = {
+      COMPANY_ID: sessionData.SELECTED_COMPANY?.COMPANY_ID,
+      USER_ID: sessionData.USER_ID,
+      IMPORT_DATA_ID: rowdata.ID,
+      STORE_ID: sessionData.Configuration?.[0]?.STORE_ID,
+      FIN_ID: sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID,
+    };
 
     return this.http.post(`${this.apiUrl}APList/processinventory`, payload);
   }

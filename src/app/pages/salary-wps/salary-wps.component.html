@@ -23,6 +23,7 @@
         enabled: true,
         texts: { fix: 'Freeze', unfix: 'Unfreeze' },
       }"
+      [scrolling]="{ mode: 'virtual' }"
       [export]="{ enabled: true, formats: ['xlsx'] }"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
       [(selectedRowKeys)]="selectedEmployeeIds"
@@ -35,6 +36,18 @@
         [showCheckBoxesMode]="'always'"
         [selectAllMode]="'allPages'"
       ></dxo-selection>
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+      <dxo-scrolling mode="standard"></dxo-scrolling>
+
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="showPageSizeSelector"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
 
       <dxo-toolbar>
         <dxi-item location="before">

@@ -147,6 +147,10 @@ export class SalaryWPSComponent {
   select_department_id: any;
   isFilterRowVisible: boolean = false;
 
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector: boolean = true;
+
   calendarVisible = false;
   selectedYear: number;
   selectedMonthForAdd: string;

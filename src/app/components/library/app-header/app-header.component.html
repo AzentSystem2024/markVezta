@@ -44,7 +44,32 @@
       <ng-container *dxTemplate>
         <div class="user-info">
           <div class="user-name">{{ UserName }}</div>
-          <div class="company-name">{{ company }}</div>
+          <!-- <div class="company-name">{{ company }}</div> -->
+          <div
+            id="companyName"
+            class="company-name"
+            [class.disabled]="!canSwitchCompany"
+            (click)="openCompanyPopup()"
+          >
+            {{ company }}
+
+            <i class="dx-icon-chevron-down" *ngIf="canSwitchCompany"></i>
+          </div>
+          <!-- <div class="company-switcher">
+            <dx-select-box
+              [dataSource]="companyList"
+              displayExpr="COMPANY_NAME"
+              valueExpr="COMPANY_ID"
+              [(value)]="selectedCompanyId"
+              [searchEnabled]="true"
+              [showClearButton]="false"
+              [dropDownOptions]="{ width: 280 }"
+              stylingMode="underlined"
+              (onValueChanged)="onCompanyChanged($event)"
+              [elementAttr]="{ class: 'company-select' }"
+            >
+            </dx-select-box>
+          </div> -->
           <div class="financial-year">Fin Year : {{ finId }}</div>
         </div>
       </ng-container>
@@ -78,4 +103,37 @@
       ></user-panel>
     </div>
   </dx-toolbar>
+
+  <dx-popup
+    [(visible)]="companyPopupVisible"
+    [width]="300"
+    [height]="'auto'"
+    [showTitle]="false"
+    [showCloseButton]="false"
+    [dragEnabled]="false"
+    [hideOnOutsideClick]="true"
+    [position]="{
+      of: '#companyName',
+      my: 'left top',
+      at: 'left bottom',
+      offset: '0 5',
+    }"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <div class="company-list">
+        <div
+          class="company-item"
+          *ngFor="let item of companyList"
+          (click)="onCompanyChanged(item)"
+        >
+          <span>{{ item.COMPANY_NAME }}</span>
+
+          <i
+            *ngIf="item.COMPANY_ID == selectedCompanyId"
+            class="dx-icon-check"
+          ></i>
+        </div>
+      </div>
+    </div>
+  </dx-popup>
 </header>
