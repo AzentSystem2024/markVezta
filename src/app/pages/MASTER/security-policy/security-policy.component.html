@@ -275,14 +275,14 @@
       </div>
 
       <div style="width: 30%; min-width: 0">
-        <dx-number-box
+        <dx-text-box
           [(value)]="disableUserOn"
           labelMode="floating"
           labelLocation="left"
           label="Disable User On"
           width="100%"
           hint="Enter the number of days to disable the user after inactivity"
-        ></dx-number-box>
+        ></dx-text-box>
       </div>
     </div>
   </div>
@@ -295,7 +295,7 @@
   [shading]="true"
   [showIndicator]="true"
   [showPane]="true"
-  [closeOnOutsideClick]="false"
+  [closeOnOutsideClick]="true"
   [position]="{ of: '.FullBody' }"
 >
 </dx-load-panel>

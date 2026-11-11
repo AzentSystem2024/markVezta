@@ -73,6 +73,7 @@ export class WageRegisterComponent {
   selected_fin_id: any;
 
   pdfSrc: SafeResourceUrl | null = null;
+  appType: any;
 
   ngOnInit() {
     const currentYear = new Date().getFullYear();
@@ -435,7 +436,10 @@ export class WageRegisterComponent {
         Number(row.MINIMUM_RATE_OF_WAGES_PAYABLE_DA) || 0,
         Number(row.RATE_OF_WAGES_ACTUALLY_PAID_BASIC) || 0,
         Number(row.RATE_OF_WAGES_ACTUALLY_PAID_DA) || 0,
-        Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0,
+        // Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0,
+        this.appType !== 'VEZTA'
+          ? Math.round(Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0)
+          : Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0,
         Number(row.OVERTIME_WORKED) || 0,
         Number(row.GROSS_WAGES_PAYABLE) || 0,
         Number(row.EMPLOYEE_CONTRIBUTION_TO_PF) || 0,
@@ -522,7 +526,9 @@ export class WageRegisterComponent {
           fontStyle: 'bold',
         },
         theme: 'grid',
-        foot: [grandTotalRow], // ✅ Add footer row
+        foot: [grandTotalRow],
+        showFoot: 'lastPage',
+
         footStyles: {
           fillColor: [255, 255, 255],
           textColor: 20,
@@ -546,6 +552,7 @@ export class WageRegisterComponent {
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.appType = sessionData.Configuration?.APP_TYPE;
 
   }
 }
