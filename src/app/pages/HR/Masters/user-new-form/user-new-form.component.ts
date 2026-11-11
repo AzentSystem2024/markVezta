@@ -92,6 +92,7 @@ export class UserNewFormComponent {
     COMPANY_ID: [],
     Date_Format: '',
     Time_Format: '',
+    IS_COMPANY_SWITCH: false,
 
     // Decimal_Points:'',
     // Currency_Symbol:'',
@@ -848,6 +849,7 @@ export class UserNewFormComponent {
       UserName: this.newUserData.UserName || this.newUserData.USER_NAME,
       LoginName: this.newUserData.LoginName || this.newUserData.LOGIN_NAME,
       LOGIN_NAME: this.newUserData.LOGIN_NAME || this.newUserData.LoginName,
+      IS_COMPANY_SWITCH: this.newUserData.IS_COMPANY_SWITCH,
       COMPANY_ID: this.selectedRows,
       STORE_ID: this.storeid,
       Mobile: mobileCode + '-' + mobileVal,

@@ -312,6 +312,13 @@
               hint="Inactive"
               labelMode="floating"
             ></dx-check-box>
+
+            <dx-check-box
+              [(value)]="newUserData.IS_COMPANY_SWITCH"
+              text="Allow Company Switching"
+              stylingMode="outlined"
+              hint="Allow this user to switch between companies"
+            ></dx-check-box>
           </div>
 
           <div *ngIf="newUserData.IS_LOCKED" style="margin-top: 15px">
