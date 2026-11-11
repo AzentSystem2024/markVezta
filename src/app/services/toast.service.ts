@@ -28,7 +28,11 @@ export interface ToastOptions {
 })
 export class ToastService {
   private static instance: ToastService | null = null;
-  public static pendingQueue: { messageOrOptions: any; type?: any }[] = [];
+  public static pendingQueue: {
+    messageOrOptions: any;
+    type?: any;
+    displayTime?: any;
+  }[] = [];
 
   private toastsSubject = new BehaviorSubject<ToastInfo[]>([]);
   public toasts$: Observable<ToastInfo[]> = this.toastsSubject.asObservable();
@@ -41,7 +45,9 @@ export class ToastService {
     if (ToastService.pendingQueue.length > 0) {
       const queue = [...ToastService.pendingQueue];
       ToastService.pendingQueue = [];
-      queue.forEach((item) => this.show(item.messageOrOptions, item.type));
+      queue.forEach((item) =>
+        this.show(item.messageOrOptions, item.type, item.displayTime),
+      );
     }
   }
 
@@ -65,16 +71,30 @@ export class ToastService {
       }
     } else if (messageOrOptions && typeof messageOrOptions === 'object') {
       message = messageOrOptions.message || '';
-      type = this.normalizeType(
-        messageOrOptions.type || typeParam || 'info',
-      );
+      type = this.normalizeType(messageOrOptions.type || typeParam || 'info');
       customTitle = messageOrOptions.title || '';
     }
 
     if (!message) return '';
 
+    let customDisplayTime: number | undefined;
+    if (typeof _displayTime === 'number' && _displayTime > 0) {
+      customDisplayTime = _displayTime;
+    } else if (
+      messageOrOptions &&
+      typeof messageOrOptions === 'object' &&
+      typeof messageOrOptions.displayTime === 'number' &&
+      messageOrOptions.displayTime > 0
+    ) {
+      customDisplayTime = messageOrOptions.displayTime;
+    }
+
     if (!ToastService.instance) {
-      ToastService.pendingQueue.push({ messageOrOptions, type });
+      ToastService.pendingQueue.push({
+        messageOrOptions,
+        type,
+        displayTime: customDisplayTime,
+      });
       return '';
     }
 
@@ -101,10 +121,26 @@ export class ToastService {
     };
 
     ToastService.instance.ngZone.run(() => {
-      // Kept until user manually closes - no autohide timer
-      ToastService.instance!.toasts = [newToast, ...ToastService.instance!.toasts];
+      ToastService.instance!.toasts = [
+        newToast,
+        ...ToastService.instance!.toasts,
+      ];
       ToastService.instance!.toastsSubject.next(ToastService.instance!.toasts);
     });
+
+    // Auto-close success toasts after 10 seconds (or customDisplayTime if specified)
+    const autoCloseTime =
+      customDisplayTime !== undefined
+        ? customDisplayTime
+        : type === 'success'
+          ? 10000
+          : 0;
+
+    if (autoCloseTime > 0) {
+      setTimeout(() => {
+        this.remove(id);
+      }, autoCloseTime);
+    }
 
     return id;
   }
@@ -128,6 +164,7 @@ export class ToastService {
   public remove(id: string): void {
     if (!ToastService.instance) return;
     ToastService.instance.ngZone.run(() => {
+      if (!ToastService.instance!.toasts.some((t) => t.id === id)) return;
       ToastService.instance!.toasts = ToastService.instance!.toasts.filter(
         (t) => t.id !== id,
       );
@@ -196,7 +233,7 @@ export function notify(
   if (ToastService.getInstance()) {
     ToastService.getInstance()!.show(messageOrOptions, type, displayTime);
   } else {
-    ToastService.pendingQueue.push({ messageOrOptions, type });
+    ToastService.pendingQueue.push({ messageOrOptions, type, displayTime });
   }
 }
 
@@ -242,4 +279,3 @@ try {
 }
 
 export default notify;
-
