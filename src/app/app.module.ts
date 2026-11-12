@@ -446,13 +446,12 @@ import { TopMovingReportModule } from './pages/DESPATCH/Reports/top-moving-repor
 import { AgeWisePendingReportModule } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
 import { AgeWiseReportModule } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
+import {  PendingActivityModule } from './pages/pending-activity/pending-activity.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
-
-
   ],
   imports: [
     OrderViewModule,
@@ -908,9 +907,10 @@ import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock
     TopMovingReportModule,
     AgeWisePendingReportModule,
     AgeWiseReportModule,
-    
     ArticleStockReportModule,
     MultiboxReportModule,
+    PendingActivityModule
+  
   ],
 
   providers: [

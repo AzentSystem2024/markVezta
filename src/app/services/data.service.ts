@@ -7808,4 +7808,8 @@ The result can be exported to HTML or Markdown.`;
   selectNewOrder(id: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/select/` + id, {});
   }
+
+    TaskBarApi(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}Taskbar/taskbar`, payload);
+  }
 }

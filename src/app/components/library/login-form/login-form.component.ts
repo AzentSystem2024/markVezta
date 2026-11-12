@@ -27,6 +27,16 @@ import {
   DxValidatorModule,
 } from 'devextreme-angular';
 import { SessionService } from 'src/app/services/session.service';
+import { PendingActivityComponent, PendingActivityModule } from 'src/app/pages/pending-activity/pending-activity.component';
+import {
+  ApplicationRef,
+  EnvironmentInjector,
+  createComponent,
+  ComponentRef
+} from '@angular/core';
+
+// import { PendingActivityComponent } from
+//   'src/app/pages/pending-activity/pending-activity.component';
 
 @Component({
   selector: 'app-login-form',
@@ -35,6 +45,7 @@ import { SessionService } from 'src/app/services/session.service';
   providers: [DataService],
 })
 export class LoginFormComponent implements OnInit {
+ 
   @Input() resetLink = '/auth/reset-password';
   @Input() createAccountLink = '/auth/create-account';
   showPassword: boolean = false;
@@ -86,6 +97,7 @@ export class LoginFormComponent implements OnInit {
   };
   datasource: any;
   userDataResponse: any;
+  showPendingActivity = false;
 
   constructor(
     private authService: AuthService,
@@ -94,6 +106,9 @@ export class LoginFormComponent implements OnInit {
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
     private sessionService: SessionService,
+    private appRef: ApplicationRef,
+  private environmentInjector: EnvironmentInjector
+ 
   ) {
     this.themeService.isDark.subscribe((value: boolean) => {
       this.btnStylingMode = value ? 'outlined' : 'contained';
@@ -204,6 +219,7 @@ export class LoginFormComponent implements OnInit {
   }
 
   async onSubmit(event: Event) {
+   
     event.preventDefault();
     this.loading = true;
 
@@ -217,6 +233,7 @@ export class LoginFormComponent implements OnInit {
       this.loading = false;
       return;
     }
+
     if (!this.formData.FINANCIAL_YEAR_ID) {
       notify({
         message: 'Please select financial year',
@@ -255,9 +272,11 @@ export class LoginFormComponent implements OnInit {
       next: (res: any) => {
         if (res.flag === 1) {
           localStorage.setItem('userData', JSON.stringify(res));
+      
           sessionStorage.setItem('savedUserData', JSON.stringify(res));
           localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
           sessionStorage.setItem('authToken', res.Token);
+              this.showPendingActivityPanel();
           this.userDataResponse = JSON.parse(
             sessionStorage.getItem('savedUserData') || '{}',
           );
@@ -265,6 +284,7 @@ export class LoginFormComponent implements OnInit {
             'Saved User Data:',
             this.userDataResponse?.GeneralSettings?.VAT_TITLE,
           );
+
           if (this.userDataResponse?.GeneralSettings?.VAT_TITLE === 'GST') {
             this.router.navigate(['/mark-dashboard']);
           } else {
@@ -386,6 +406,7 @@ export class LoginFormComponent implements OnInit {
     if (!this.otpCode || this.otpCode.length < 6) {
       notify({ message: 'Please enter a valid 6-digit code', type: 'error', displayTime: 3000 });
       return;
+     
     }
 
     this.loading = true;
@@ -396,6 +417,7 @@ export class LoginFormComponent implements OnInit {
           sessionStorage.setItem('savedUserData', JSON.stringify(res));
           localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
           sessionStorage.setItem('authToken', res.Token);
+              this.showPendingActivityPanel();
           this.userDataResponse = JSON.parse(
             sessionStorage.getItem('savedUserData') || '{}',
           );
@@ -416,6 +438,29 @@ export class LoginFormComponent implements OnInit {
       }
     });
   }
+
+  private pendingComponentRef?: ComponentRef<PendingActivityComponent>;
+
+showPendingActivityPanel(): void {
+
+  // Prevent duplicate panels
+  if (this.pendingComponentRef) {
+    return;
+  }
+
+  this.pendingComponentRef = createComponent(
+    PendingActivityComponent,
+    {
+      environmentInjector: this.environmentInjector
+    }
+  );
+
+  this.appRef.attachView(this.pendingComponentRef.hostView);
+
+  document.body.appendChild(
+    this.pendingComponentRef.location.nativeElement
+  );
+}
 }
 
 @NgModule({
@@ -430,6 +475,7 @@ export class LoginFormComponent implements OnInit {
     DxValidatorModule,
     DxTextBoxModule,
     DxSelectBoxModule,
+  PendingActivityModule,
   ],
   declarations: [LoginFormComponent],
   exports: [LoginFormComponent],

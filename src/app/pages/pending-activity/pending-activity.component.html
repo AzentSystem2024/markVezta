@@ -1,0 +1,63 @@
+<!-- Click-away backdrop -->
+<div class="pending-backdrop" *ngIf="isPanelVisible" (click)="closeWithAnimation()"></div>
+
+<!-- Floating Popup Card -->
+<div
+  class="pending-panel"
+  *ngIf="isPanelVisible"
+  [class.panel-closing]="isClosing"
+  [class.expanded]="showAll"
+  (click)="$event.stopPropagation()">
+
+  <!-- Header -->
+  <div class="pending-header">
+    <h3 class="pending-title">Documents for approval</h3>
+    <span class="total-count">Total :{{ totalPending || taskBarData.length }}</span>
+  </div>
+
+  <!-- Loader -->
+  <div class="pending-loader" *ngIf="isLoading">
+    <dx-load-indicator
+      [visible]="true"
+      [height]="32"
+      [width]="32">
+    </dx-load-indicator>
+    <span>Loading pending activities...</span>
+  </div>
+
+  <!-- List & Actions -->
+  <ng-container *ngIf="!isLoading">
+    <div class="pending-list" [class.expanded-list]="showAll">
+      <div
+        class="pending-card"
+        *ngFor="let activity of displayedActivities; let i = index"
+        (click)="navigateToModule(activity)">
+        <div class="activity-info">
+          <div class="activity-name">
+            {{ activity.DESCRIPTION }}
+          </div>
+          <div class="activity-description">
+            View all approval pending's in <strong>{{ activity.DESCRIPTION | lowercase }}</strong>
+          </div>
+        </div>
+
+        <span
+          class="activity-count"
+          [ngClass]="i % 2 === 0 ? 'badge-orange' : 'badge-cyan'">
+          {{ activity.VERIFY_COUNT }}
+        </span>
+      </div>
+    </div>
+
+    <!-- View All / View Less button -->
+    <div class="show-more-section" *ngIf="taskBarData.length > 2">
+      <button
+        type="button"
+        class="btn-view-toggle"
+        (click)="toggleShowMore()">
+        {{ showAll ? 'View Less' : 'View All' }}
+      </button>
+    </div>
+  </ng-container>
+
+</div>

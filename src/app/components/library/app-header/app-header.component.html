@@ -30,6 +30,48 @@
       </div>
     </dxi-item>
 
+
+    <!-- Notification Bell  -->
+ <dxi-item location="after" locateInMenu="never">
+  <ng-container *dxTemplate>
+    <div class="notification-column">
+
+      <dx-button
+        icon="bell"
+        stylingMode="text"
+        hint="Pending Activities"
+        (onClick)="togglePanel()">
+      </dx-button>
+
+      <span class="notification-count" *ngIf="totalPending > 0">
+        {{ totalPending }}
+      </span>
+
+    </div>
+  </ng-container>
+</dxi-item>
+
+
+<!-- Notification Bell -->
+<!-- <dxi-item location="after" locateInMenu="never">
+  <ng-container *dxTemplate>
+    <div class="notification-bell">
+
+      <dx-button
+        icon="bell"
+        stylingMode="text"
+        hint="Pending Activities"
+        (onClick)="togglePanel()">
+      </dx-button>
+
+      <span class="notification-count" *ngIf="totalPending > 0">
+        {{ totalPending > 99 ? '99+' : totalPending }}
+      </span>
+
+    </div>
+  </ng-container>
+</dxi-item> -->
+
     <dxi-item location="after" locateInMenu="never">
       <ng-container *dxTemplate>
         <theme-switcher></theme-switcher>
@@ -79,3 +121,8 @@
     </div>
   </dx-toolbar>
 </header>
+
+ <app-pending-activity
+  *ngIf="showPendingActivity"
+  (close)="showPendingActivity = false">
+</app-pending-activity>
