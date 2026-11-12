@@ -643,7 +643,7 @@ export class InventoryListPageComponent implements OnInit {
     }
   }
 
-  // ================= Allow Checkbox Only For Pending / Failed / Unknown =================
+  // ======= Allow Checkbox Only For Pending / Failed / Unknown =======
   onEditorPreparing(e: any) {
     if (e.parentType === 'dataRow' && e.command === 'select') {
       const status = e.row?.data?.Status;
@@ -653,7 +653,7 @@ export class InventoryListPageComponent implements OnInit {
     }
   }
 
-  // ================= Click On Posted Status Cell -> Open Journal Voucher =================
+  // ====== Click On Posted Status Cell -> Open Journal Voucher======
   onCellClick(e: any) {
     if (e.rowType !== 'data') return;
     if (e.column?.dataField !== 'Status') return;

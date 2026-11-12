@@ -3382,11 +3382,7 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}uom/list`, body, { headers });
   }
 
-  // postUOM(uom: any): Observable<any> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   const body = { UOM: uom , COMPANY_ID : this.selected_Company_id};
-  //   return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
-  // }
+
   postUOM(payload: { UOM: string }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.apiUrl}uom/insert`, payload, {

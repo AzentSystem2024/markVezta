@@ -7,7 +7,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-
+import { firstValueFrom } from 'rxjs';
 import { LoginOauthModule } from 'src/app/components/library/login-oauth/login-oauth.component';
 import { DxFormModule } from 'devextreme-angular/ui/form';
 import { DxLoadIndicatorModule } from 'devextreme-angular/ui/load-indicator';
@@ -19,15 +19,11 @@ import {
   IResponse,
   ThemeService,
 } from 'src/app/services';
-import { text } from 'stream/consumers';
-import * as path from 'path';
 import {
   DxSelectBoxModule,
   DxTextBoxModule,
   DxValidatorModule,
 } from 'devextreme-angular';
-import { SessionService } from 'src/app/services/session.service';
-
 @Component({
   selector: 'app-login-form',
   templateUrl: './login-form.component.html',
@@ -35,21 +31,26 @@ import { SessionService } from 'src/app/services/session.service';
   providers: [DataService],
 })
 export class LoginFormComponent implements OnInit {
-  @Input() resetLink = '/auth/reset-password';
-  @Input() createAccountLink = '/auth/create-account';
+  @Input()
+  resetLink = '/auth/reset-password';
+  @Input()
+  createAccountLink = '/auth/create-account';
   showPassword: boolean = false;
-
   defaultAuthData: IResponse;
-
   btnStylingMode: DxButtonTypes.ButtonStyle;
-
-  menus: { [key: string]: any } | undefined;
-  settings: { [key: string]: any } | undefined;
-
+  menus:
+    | {
+        [key: string]: any;
+      }
+    | undefined;
+  settings:
+    | {
+        [key: string]: any;
+      }
+    | undefined;
   errorMessage: any;
   resData: any;
   navigation: any;
-
   validUsernames: string[] = [];
   isPasswordVisible: boolean = false;
   passwordVisible = false;
@@ -70,22 +71,34 @@ export class LoginFormComponent implements OnInit {
   mfaProvider: string = 'Google';
   savedCompanyId: number;
   savedFinYearId: number;
+
   passwordEditorOptions = {
     placeholder: 'Password',
     stylingMode: 'outlined',
     mode: this.passwordMode,
     value: '',
-
     buttons: [
       {
         name: 'lockIcon',
         location: 'before',
-        options: { icon: 'lock', stylingMode: 'text' },
+        options: {
+          icon: 'lock',
+          stylingMode: 'text',
+        },
       },
     ],
   };
+
   datasource: any;
   userDataResponse: any;
+
+  private lastNotificationMessage = '';
+  private lastNotificationTime = 0;
+
+  private ipFetchPromise: Promise<{
+    internetIP: string;
+    localIP: string;
+  }> | null = null;
 
   constructor(
     private authService: AuthService,
@@ -93,7 +106,6 @@ export class LoginFormComponent implements OnInit {
     private themeService: ThemeService,
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
-    private sessionService: SessionService,
   ) {
     this.themeService.isDark.subscribe((value: boolean) => {
       this.btnStylingMode = value ? 'outlined' : 'contained';
@@ -114,6 +126,7 @@ export class LoginFormComponent implements OnInit {
   };
 
   async ngOnInit(): Promise<void> {
+    this.fetchIPs();
     this.get_financial_year_dropdown();
     this.defaultAuthData = await this.authService.getUser();
 
@@ -121,8 +134,7 @@ export class LoginFormComponent implements OnInit {
     this.navigation = JSON.parse(localStorage.getItem('sidemenuItems') || '[]');
   }
 
-  ///=========================NEW CHANGES =====================
-
+  // ======= NEW CHANGES =======
   get_financial_year_dropdown() {
     this.dataservice.financial_year_api().subscribe((res: any) => {
       this.finacialYearList = res || []; // Ensure fallback to empty array
@@ -137,12 +149,10 @@ export class LoginFormComponent implements OnInit {
 
   onUsernameChange(e: any) {
     const typedUsername = e.value?.trim();
-
     if (typedUsername && typedUsername.length >= 3) {
       const payload = {
         LOGIN_NAME: typedUsername,
       };
-
       this.dataservice.Company_api(payload).subscribe((res: any) => {
         // Optionally store or use the company list
         this.CompanyList = res.Companies || [];
@@ -155,10 +165,15 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
-  // Internet IP (public)
+  // Internet IP (public) with timeout
   async getInternetIP(): Promise<string> {
     try {
-      const res = await fetch('https://api.ipify.org?format=json');
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 1500);
+      const res = await fetch('https://api.ipify.org?format=json', {
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
       const data = await res.json();
       return data.ip || '';
     } catch {
@@ -170,30 +185,29 @@ export class LoginFormComponent implements OnInit {
   getLocalIP(): Promise<string> {
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
-        resolve(''); // ⛑ fallback if nothing happens
-      }, 1500);
-
+        resolve(''); // fallback if nothing happens
+      }, 1000);
       try {
-        const pc = new RTCPeerConnection({ iceServers: [] });
+        const pc = new RTCPeerConnection({
+          iceServers: [],
+        });
         pc.createDataChannel('');
-
         pc.createOffer()
           .then((offer) => pc.setLocalDescription(offer))
           .catch(() => {
             clearTimeout(timeout);
             resolve('');
           });
-
         pc.onicecandidate = (event) => {
           if (!event || !event.candidate) return;
-
           const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
           const match = ipRegex.exec(event.candidate.candidate);
-
           if (match) {
             clearTimeout(timeout);
             resolve(match[1]);
-            pc.close();
+            try {
+              pc.close();
+            } catch {}
           }
         };
       } catch {
@@ -203,124 +217,164 @@ export class LoginFormComponent implements OnInit {
     });
   }
 
-  async onSubmit(event: Event) {
-    event.preventDefault();
-    this.loading = true;
+  fetchIPs(): Promise<{ internetIP: string; localIP: string }> {
+    if (this.ipFetchPromise) {
+      return this.ipFetchPromise;
+    }
+    this.ipFetchPromise = Promise.all([this.getInternetIP(), this.getLocalIP()])
+      .then(([internetIP, localIP]) => ({ internetIP, localIP }))
+      .catch(() => ({ internetIP: '', localIP: '' }));
 
-    if (!this.formData.LOGIN_NAME || !this.formData.PASSWORD) {
-      notify({
-        message: 'Please enter login name and password',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      this.loading = false;
+    return this.ipFetchPromise;
+  }
+
+  showNotification(
+    message: string,
+    type: 'success' | 'warning' | 'error' | 'info' = 'info',
+    displayTime = 3000,
+  ): void {
+    const now = Date.now();
+    // Prevent duplicate toast if identical message is triggered within 1 second
+    if (
+      this.lastNotificationMessage === message &&
+      now - this.lastNotificationTime < 1000
+    ) {
       return;
     }
-    if (!this.formData.FINANCIAL_YEAR_ID) {
-      notify({
-        message: 'Please select financial year',
-        type: 'warning',
-        displayTime: 3000,
-        position: { at: 'top right', my: 'top right' },
-      });
-      this.loading = false;
-      return;
-    }
+    this.lastNotificationMessage = message;
+    this.lastNotificationTime = now;
 
-    const COMPUTER_NAME = 'AZENT-1';
-    const COMPUTER_USER = 'Indu';
-    const DOMAIN_NAME = window.location.hostname || '';
-
-    // ✅ SAFE async calls
-    const [INTERNET_IP, LOCAL_IP] = await Promise.all([
-      this.getInternetIP(),
-      this.getLocalIP(),
-    ]);
-    const SYSTEM_DATETIME = new Date().toISOString();
-    const payload = {
-      LOGIN_NAME: this.formData.LOGIN_NAME,
-      PASSWORD: this.formData.PASSWORD,
-      COMPANY_ID: this.formData.COMPANY_ID,
-      FINANCIAL_YEAR_ID: this.formData.FINANCIAL_YEAR_ID,
-      COMPUTER_NAME,
-      COMPUTER_USER,
-      DOMAIN_NAME,
-      LOCAL_IP,
-      INTERNET_IP,
-      SYSTEM_DATETIME,
-    };
-
-    this.dataservice.login_function_api(payload).subscribe({
-      next: (res: any) => {
-        if (res.flag === 1) {
-          localStorage.setItem('userData', JSON.stringify(res));
-          sessionStorage.setItem('savedUserData', JSON.stringify(res));
-          localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
-          sessionStorage.setItem('authToken', res.Token);
-          this.userDataResponse = JSON.parse(
-            sessionStorage.getItem('savedUserData') || '{}',
-          );
-          console.log(
-            'Saved User Data:',
-            this.userDataResponse?.GeneralSettings?.VAT_TITLE,
-          );
-          if (this.userDataResponse?.GeneralSettings?.VAT_TITLE === 'GST') {
-            this.router.navigate(['/mark-dashboard']);
-          } else {
-            this.router.navigate(['/analytics-dashboard']);
-          }
-
-          notify({
-            message: 'Login successful!',
-            type: 'success',
-            displayTime: 2000,
-            position: { at: 'top right', my: 'top right' },
-          });
-        } else if (res.flag === 10) {
-          this.savedCompanyId = this.formData.COMPANY_ID;
-          this.savedFinYearId = this.formData.FINANCIAL_YEAR_ID;
-          this.is2FAState = true;
-          this.isSetup2FA = true;
-          this.tempToken = res.tempToken;
-          this.mfaProvider = res.mfaProvider || 'Google';
-          this.fetch2FASetupInfo();
-        } else if (res.flag === 11) {
-          this.savedCompanyId = this.formData.COMPANY_ID;
-          this.savedFinYearId = this.formData.FINANCIAL_YEAR_ID;
-          this.is2FAState = true;
-          this.isSetup2FA = false;
-          this.tempToken = res.tempToken;
-          this.mfaProvider = res.mfaProvider || 'Google';
-        }
-
-        if (res.UTC_DIFF_MESSAGE && res.UTC_DIFF_MESSAGE.trim() !== '') {
-          notify({
-            message: res.UTC_DIFF_MESSAGE,
-            type: 'warning', // best for time mismatch
-            displayTime: 5000,
-            position: { at: 'top right', my: 'top right' },
-          });
-        } else {
-          // Backend validation message
-          notify({
-            message: res.Message || 'Username or password is incorrect',
-            type: 'success',
-            displayTime: 3000,
-            position: { at: 'top right', my: 'top right' },
-          });
-        }
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        notify({
-          message: 'Something went wrong. Please try again.',
-          type: 'error',
-          displayTime: 3000,
-        });
+    notify({
+      message,
+      type,
+      displayTime,
+      position: {
+        at: 'top right',
+        my: 'top right',
       },
     });
+  }
+
+  async onSubmit(event?: Event) {
+    if (event) {
+      event.preventDefault();
+    }
+
+    // Prevent concurrent / duplicate submissions
+    if (this.loading) {
+      return;
+    }
+
+    const username = this.formData.LOGIN_NAME?.trim();
+    const password = this.formData.PASSWORD;
+    const companyId = this.formData.COMPANY_ID;
+    const financialYearId = this.formData.FINANCIAL_YEAR_ID;
+
+    // Fast synchronous validation
+    if (!username || !password) {
+      this.showNotification('Please enter login name and password', 'warning');
+      return;
+    }
+
+    if (!financialYearId) {
+      this.showNotification('Please select financial year', 'warning');
+      return;
+    }
+
+    this.loading = true;
+
+    try {
+      const { internetIP, localIP } = await this.fetchIPs();
+
+      const payload = {
+        LOGIN_NAME: username,
+        PASSWORD: password,
+        COMPANY_ID: companyId,
+        FINANCIAL_YEAR_ID: financialYearId,
+        COMPUTER_NAME: 'AZENT-1',
+        COMPUTER_USER: 'Indu',
+        DOMAIN_NAME: window.location.hostname || '',
+        LOCAL_IP: localIP,
+        INTERNET_IP: internetIP,
+        SYSTEM_DATETIME: new Date().toISOString(),
+      };
+
+      const res: any = await firstValueFrom(
+        this.dataservice.login_function_api(payload),
+      );
+
+      this.handleLoginResponse(res);
+    } catch {
+      this.showNotification('Something went wrong. Please try again.', 'error');
+    } finally {
+      this.loading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  private handleLoginResponse(res: any): void {
+    if (!res) {
+      this.showNotification(
+        'Unexpected server response. Please try again.',
+        'error',
+      );
+      return;
+    }
+
+    switch (res.flag) {
+      case 1:
+        this.handleSuccessfulLogin(res);
+        break;
+
+      case 10:
+        this.savedCompanyId = this.formData.COMPANY_ID;
+        this.savedFinYearId = this.formData.FINANCIAL_YEAR_ID;
+        this.is2FAState = true;
+        this.isSetup2FA = true;
+        this.tempToken = res.tempToken;
+        this.mfaProvider = res.mfaProvider || 'Google';
+        this.fetch2FASetupInfo();
+        break;
+
+      case 11:
+        this.savedCompanyId = this.formData.COMPANY_ID;
+        this.savedFinYearId = this.formData.FINANCIAL_YEAR_ID;
+        this.is2FAState = true;
+        this.isSetup2FA = false;
+        this.tempToken = res.tempToken;
+        this.mfaProvider = res.mfaProvider || 'Google';
+        break;
+
+      default:
+        // Authentication or backend validation failure
+        this.showNotification(
+          res.Message || res.message || 'Username or password is incorrect',
+          'error',
+        );
+        break;
+    }
+
+    if (res.UTC_DIFF_MESSAGE && res.UTC_DIFF_MESSAGE.trim() !== '') {
+      this.showNotification(res.UTC_DIFF_MESSAGE.trim(), 'warning', 5000);
+    }
+  }
+
+  private handleSuccessfulLogin(res: any): void {
+    localStorage.setItem('userData', JSON.stringify(res));
+    sessionStorage.setItem('savedUserData', JSON.stringify(res));
+    localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups || []));
+    sessionStorage.setItem('authToken', res.Token || '');
+
+    this.userDataResponse = res;
+
+    this.showNotification('Login successful!', 'success', 2000);
+
+    const redirectPath =
+      this.userDataResponse?.GeneralSettings?.VAT_TITLE === 'GST'
+        ? '/mark-dashboard'
+        : '/analytics-dashboard';
+
+    this.router.navigate([redirectPath]);
   }
 
   fetch2FASetupInfo() {
@@ -331,11 +385,13 @@ export class LoginFormComponent implements OnInit {
         this.manualEntryKey = res.manualEntryKey || res.ManualEntryKey;
         this.secretKey = res.secretKey || res.SecretKey;
         this.loading = false;
+        this.cdr.markForCheck();
       },
-      error: (err: any) => {
-        notify({ message: 'Failed to fetch 2FA setup info', type: 'error', displayTime: 3000 });
+      error: () => {
+        this.showNotification('Failed to fetch 2FA setup info', 'error');
         this.loading = false;
-      }
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -347,13 +403,14 @@ export class LoginFormComponent implements OnInit {
   onOtpInput(index: number, event: any) {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/[^0-9]/g, '');
-
     if (value.length > 1) {
       const chars = value.split('').slice(0, 6);
       for (let i = 0; i < chars.length; i++) {
         if (index + i < 6) {
           this.otpDigits[index + i] = chars[i];
-          const nextInput = document.getElementById(`otp-${index + i}`) as HTMLInputElement;
+          const nextInput = document.getElementById(
+            `otp-${index + i}`,
+          ) as HTMLInputElement;
           if (nextInput) nextInput.value = chars[i];
         }
       }
@@ -363,11 +420,9 @@ export class LoginFormComponent implements OnInit {
       if (focusTarget) focusTarget.focus();
       return;
     }
-
     this.otpDigits[index] = value;
     input.value = value;
     this.otpCode = this.otpDigits.join('');
-
     if (value && index < 5) {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       if (nextInput) nextInput.focus();
@@ -382,42 +437,46 @@ export class LoginFormComponent implements OnInit {
   }
 
   onVerifyOTP(e: Event) {
-    e.preventDefault();
-    if (!this.otpCode || this.otpCode.length < 6) {
-      notify({ message: 'Please enter a valid 6-digit code', type: 'error', displayTime: 3000 });
+    if (e) {
+      e.preventDefault();
+    }
+    if (this.loading) {
       return;
     }
-
+    if (!this.otpCode || this.otpCode.length < 6) {
+      this.showNotification('Please enter a valid 6-digit code', 'error');
+      return;
+    }
     this.loading = true;
-    this.dataservice.verify2FA(this.tempToken, this.otpCode, this.secretKey, this.savedCompanyId, this.savedFinYearId).subscribe({
-      next: async (res: any) => {
-        if (res.flag == 1) {
-          localStorage.setItem('userData', JSON.stringify(res));
-          sessionStorage.setItem('savedUserData', JSON.stringify(res));
-          localStorage.setItem('sideMenuItems', JSON.stringify(res.MenuGroups));
-          sessionStorage.setItem('authToken', res.Token);
-          this.userDataResponse = JSON.parse(
-            sessionStorage.getItem('savedUserData') || '{}',
-          );
-          if (this.userDataResponse?.GeneralSettings?.VAT_TITLE === 'GST') {
-            this.router.navigate(['/mark-dashboard']);
+    this.dataservice
+      .verify2FA(
+        this.tempToken,
+        this.otpCode,
+        this.secretKey,
+        this.savedCompanyId,
+        this.savedFinYearId,
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res?.flag === 1) {
+            this.handleSuccessfulLogin(res);
           } else {
-            this.router.navigate(['/analytics-dashboard']);
+            this.showNotification(
+              res?.Message || res?.message || 'Invalid code',
+              'error',
+            );
           }
-          notify({ message: 'Login successful!', type: 'success', displayTime: 2000, position: { at: 'top right', my: 'top right' } });
-        } else {
-          notify({ message: res.Message || res.message || 'Invalid code', type: 'error', displayTime: 3000, position: { at: 'top right', my: 'top right' } });
-        }
-        this.loading = false;
-      },
-      error: (err: any) => {
-        notify({ message: 'Verification failed', type: 'error', displayTime: 3000, position: { at: 'top right', my: 'top right' } });
-        this.loading = false;
-      }
-    });
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.showNotification('Verification failed', 'error');
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+      });
   }
 }
-
 @NgModule({
   imports: [
     CommonModule,
@@ -434,11 +493,4 @@ export class LoginFormComponent implements OnInit {
   declarations: [LoginFormComponent],
   exports: [LoginFormComponent],
 })
-export class LoginFormModule { }
-
-
-
-
-
-
-
+export class LoginFormModule {}
