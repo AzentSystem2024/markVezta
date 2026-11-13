@@ -7863,4 +7863,25 @@ The result can be exported to HTML or Markdown.`;
   selectNewOrder(id: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/select/` + id, {});
   }
+
+  EditedAttendance(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+  }
+  LateComerList(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+  }
+  AbsentList(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+  }
+  ExcessBreaks(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+  }
+  StaffShiftChangeReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+  }
 }

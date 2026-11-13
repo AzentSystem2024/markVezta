@@ -431,7 +431,7 @@ export class StaffShiftChangeReportComponent {
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };
 
-    this.dataService.GST_Report_Api(payload).subscribe((res: any) => {
+    this.dataService.StaffShiftChangeReport(payload).subscribe((res: any) => {
       this.GST_datasource = res.DATA || [];
       this.ledgerSummaryData = this.GST_datasource;
     });
