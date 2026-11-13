@@ -239,3 +239,51 @@
   }
 }
 
+/* ================= MASTER-DETAIL STYLING (Order View Style) ================= */
+::ng-deep {
+  .dx-datagrid .dx-master-detail-row > .dx-master-detail-cell {
+    padding: 10px 8px 15px 20px !important;
+    position: relative;
+    background-color: var(--base-accent-light, #f8fafc) !important;
+  }
+
+  .master-detail-flow-container {
+    position: relative !important;
+    width: calc(100% - 10px) !important;
+    max-width: calc(100% - 10px) !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    padding: 10px 14px;
+    margin-left: 8px;
+    margin-right: 2px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+  }
+
+  .detail-grid-container {
+    width: 100% !important;
+  }
+
+  .flow-arrow {
+    position: absolute;
+    left: -18px;
+    top: -15px;
+    width: 18px;
+    height: 30px;
+    border-left: 2px solid #03b12b;
+    border-bottom: 2px solid #03b12b;
+    border-bottom-left-radius: 6px;
+  }
+
+  .flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    bottom: -6px;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid #03b12b;
+  }
+}

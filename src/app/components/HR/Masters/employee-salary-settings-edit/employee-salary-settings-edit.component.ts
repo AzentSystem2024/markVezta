@@ -59,7 +59,7 @@ export class EmployeeSalarySettingsEditComponent {
   SalaryDetails: any[] = [];
   selected_Batch_id: any;
   selected_Company_id: any;
-  FinID = 1;
+  FinID: any;
   selectedRows: any[] = [];
   PreviousRevision: any;
   employeeFormData: any = {
@@ -75,7 +75,7 @@ export class EmployeeSalarySettingsEditComponent {
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
   ) {
-    
+
   }
 
   ngOnInit() {
@@ -116,18 +116,18 @@ export class EmployeeSalarySettingsEditComponent {
       sessionStorage.getItem('savedUserData') || '{}',
     );
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.FinID = sessionData.SELECTED_FIN_YEAR.FIN_ID;
   }
 
-  EmployeeListDropDown() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      NAME: 'Employee',
-    };
-    this.dataservice.getEmployeeDropDown(payload).subscribe((response: any) => {
+  async EmployeeListDropDown() {
+    const payload = { COMPANY_ID: this.selected_Company_id, NAME: 'Employee' };
+    try {
+      const response: any = await this.dataservice.getEmployeeDropDown(payload).toPromise();
       this.EmployeeDropdown = response;
-    });
+    } catch (error) {
+      console.error('Failed to load Employee DropDown:', error);
+    }
   }
-
   get_SalaryHead_List() {
     if (!this.selectedEmployeeId) {
       console.warn('No employee selected');
@@ -140,8 +140,8 @@ export class EmployeeSalarySettingsEditComponent {
     }
 
     // Extract the employee object (handle both array and object formats)
-    const empData = Array.isArray(this.selectedEmployee) 
-      ? this.selectedEmployee[0] 
+    const empData = Array.isArray(this.selectedEmployee)
+      ? this.selectedEmployee[0]
       : this.selectedEmployee;
 
     if (!empData) return;
@@ -153,8 +153,8 @@ export class EmployeeSalarySettingsEditComponent {
       EMP_NAME: empData.EMP_NAME || '',
       DESIGNATION: empData.DESG_NAME || '',
       BASIC_SALARY: empData.SALARY ? Number(empData.SALARY) : undefined,
-      EFFECT_FROM: empData.EFFECT_FROM 
-        ? this.parseDateSafe(empData.EFFECT_FROM) 
+      EFFECT_FROM: empData.EFFECT_FROM
+        ? this.parseDateSafe(empData.EFFECT_FROM)
         : null,
       PREVIOUS_EFFECT_FROM: empData.PREVIOUS_EFFECT_FROM
         ? this.parseDateSafe(empData.PREVIOUS_EFFECT_FROM)
@@ -305,7 +305,7 @@ export class EmployeeSalarySettingsEditComponent {
   isValid() {
     return this.SalaryHeadValidation?.instance.validate().isValid;
   }
-  
+
   stripToDateOnly(date: Date | null): string | null {
     if (!(date instanceof Date) || isNaN(date.getTime())) return null;
     const yyyy = date.getFullYear();
@@ -417,4 +417,4 @@ export class EmployeeSalarySettingsEditComponent {
   exports: [EmployeeSalarySettingsEditComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EmployeeSalarySettingsEditModule {}
+export class EmployeeSalarySettingsEditModule { }

@@ -1,0 +1,124 @@
+.toast-container {
+  max-width: 440px;
+
+  .toast {
+    animation: toastSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.22) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+
+    // Toast error: red header and red message portion
+    &.toast-error {
+      background-color: #dc3545 !important;
+      color: #ffffff !important;
+      border: 1px solid #b02a37 !important;
+
+      .toast-header {
+        background-color: rgba(0, 0, 0, 0.1) !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+
+        i,
+        strong,
+        small {
+          color: #ffffff !important;
+        }
+      }
+
+      .toast-body {
+        background-color: #dc3545 !important;
+        color: #ffffff !important;
+      }
+    }
+
+    // Toast success: green header and green message portion
+    &.toast-success {
+      background-color: #198754 !important;
+      color: #ffffff !important;
+      border: 1px solid #146c43 !important;
+
+      .toast-header {
+        background-color: rgba(0, 0, 0, 0.1) !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+
+        i,
+        strong,
+        small {
+          color: #ffffff !important;
+        }
+      }
+
+      .toast-body {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+      }
+    }
+
+    // Toast warning: yellow header and yellow message portion
+    &.toast-warning {
+      background-color: #ffc107 !important;
+      color: #212529 !important;
+      border: 1px solid #dfa100 !important;
+
+      .toast-header {
+        background-color: rgba(0, 0, 0, 0.06) !important;
+        color: #212529 !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+
+        i,
+        strong,
+        small {
+          color: #212529 !important;
+        }
+      }
+
+      .toast-body {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+      }
+    }
+
+    // Toast info: blue header and blue message portion
+    &.toast-info {
+      background-color: #0d6efd !important;
+      color: #ffffff !important;
+      border: 1px solid #0a58ca !important;
+
+      .toast-header {
+        background-color: rgba(0, 0, 0, 0.1) !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+
+        i,
+        strong,
+        small {
+          color: #ffffff !important;
+        }
+      }
+
+      .toast-body {
+        background-color: #0d6efd !important;
+        color: #ffffff !important;
+      }
+    }
+
+    .toast-body {
+      font-weight: 500 !important;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 12px 16px !important;
+    }
+  }
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

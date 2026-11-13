@@ -171,3 +171,40 @@ header {
   font-weight: 700;
   line-height: 1;
 }
+//   company switcher styles
+.company-name {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.company-name:hover {
+  color: var(--base-accent);
+}
+
+.company-list {
+  padding: 5px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.company-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.company-item:hover {
+  background: var(--hover-bg);
+}
+.disabled-company {
+  cursor: default;
+  pointer-events: auto;
+}

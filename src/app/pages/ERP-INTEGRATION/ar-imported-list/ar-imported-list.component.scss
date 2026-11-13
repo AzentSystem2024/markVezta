@@ -97,6 +97,21 @@
     margin-bottom: 5px;
   }
 
+  .detail-grid-container {
+    width: 100% !important;
+
+    .dx-datagrid-rowsview {
+      > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+      .dx-scrollable-content {
+        padding-bottom: calc(var(--scrollbar-size, 12px) + 4px) !important;
+      }
+
+      .dx-datagrid-content-fixed {
+        bottom: calc(var(--scrollbar-size, 12px) + 4px) !important;
+      }
+    }
+  }
+
   .flow-arrow {
     position: absolute;
     left: -20px;

@@ -126,6 +126,7 @@ export class EmployeeEditFormComponent implements OnInit, OnChanges {
     Company_Id: 0,
     LEAVE_DAY_BALANCE: '',
     DAYS_DEDUCTED: '',
+    IS_SALARY: true,
     Attachment: [],
     EmployeeSalary: [],
   };

@@ -1,0 +1,233 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="GST_datasource"
+      noDataText=""
+      width="100%"
+      height="82vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [summary]="
+        isSummaryVisible
+          ? summaryColumnsData
+          : { totalItems: [], groupItems: [] }
+      "
+      (onExporting)="onExporting($event)"
+    >
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header gst-report-title">Late Comer List</div>
+        </dxi-item>
+
+        <dxi-item location="after" template="yearboxTemplate"></dxi-item>
+
+        <dxi-item location="after" template="monthboxTemplate"></dxi-item>
+
+        <dxi-item location="after" template="fromdateboxTemplate"></dxi-item>
+
+        <dxi-item location="after" template="todateboxTemplate"></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="applyButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <div *dxTemplate="let data of 'yearboxTemplate'">
+        <dx-select-box
+          label="Year"
+          labelMode="floating"
+          [width]="100"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        ></dx-select-box>
+      </div>
+
+      <div *dxTemplate="let data of 'monthboxTemplate'">
+        <dx-select-box
+          label="Month"
+          labelMode="floating"
+          [width]="120"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        ></dx-select-box>
+      </div>
+
+      <div *dxTemplate="let data of 'fromdateboxTemplate'">
+        <dx-date-box
+          label="From Date"
+          labelMode="floating"
+          [width]="135"
+          [(value)]="selected_from_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+      </div>
+
+      <div *dxTemplate="let data of 'todateboxTemplate'">
+        <dx-date-box
+          label="To Date"
+          labelMode="floating"
+          [width]="135"
+          [(value)]="selected_To_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        ></dx-date-box>
+      </div>
+
+      <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-filter-row visible="true"></dxo-filter-row>
+      <dxo-header-filter visible="true"></dxo-header-filter>
+      <dxo-paging page-size="10"></dxo-paging>
+      <dxo-pager
+        show-page-size-selector="true"
+        show-info="true"
+        show-navigator="true"
+      ></dxo-pager>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
+      <dxi-column dataField="DOC_NO" caption="Date"></dxi-column>
+      <dxi-column dataField="DOC_DATE" caption="Emp Name"></dxi-column>
+      <dxi-column dataField="DOC_NAME" caption="Less Minute"></dxi-column>
+      <dxi-column dataField="RECEIVER_NAME" caption="Time in"></dxi-column>
+      <dxi-column dataField="RECEIVER_NAME" caption="Time out"></dxi-column>
+      <dxi-column dataField="RECEIVER_NAME" caption="Shift Name"></dxi-column>
+      <dxi-column
+        dataField="INVOICE_AMOUNT"
+        caption="Break Out"
+      ></dxi-column>
+
+      <dxi-column dataField="RECEIVER_NAME" caption="Break In"></dxi-column>
+    </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
+  </div>
+</div>

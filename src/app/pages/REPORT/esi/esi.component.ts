@@ -121,6 +121,7 @@ export class ESIComponent {
 
     const payload = {
       Month: this.payloadDate || `${monthToUse}-01`,
+      COMPANY_ID: this.selected_Company_id
     };
     this.dataService.getESIRegister(payload).subscribe((response: any) => {
       if (!response?.ESIDetails || response.ESIDetails.length === 0) {
@@ -218,6 +219,7 @@ export class ESIComponent {
           fontStyle: 'bold',
         },
         foot: [grandTotalRow],
+        showFoot: 'lastPage',
         footStyles: {
           fillColor: [255, 255, 255],
           textColor: 20,
@@ -283,4 +285,4 @@ export class ESIComponent {
   exports: [ESIComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ESIModule {}
+export class ESIModule { }

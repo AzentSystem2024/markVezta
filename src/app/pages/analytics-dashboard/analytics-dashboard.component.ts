@@ -48,7 +48,7 @@ type DashboardData =
   | SalesByState
   | SalesByStateAndCity
   | null;
-type DataLoader = (startDate: string, endDate: string) => Observable<Object>;
+type DataLoader = (startDate: string, endDate: string) => Observable<any>;
 @Component({
   templateUrl: './analytics-dashboard.component.html',
   styleUrls: ['./analytics-dashboard.component.scss'],
@@ -137,9 +137,9 @@ export class AnalyticsDashboardComponent implements OnInit {
   fromDate: any;
 
   // opportunities: SalesOrOpportunitiesByCategory = null;
-  sales: Sales = null;
-  salesByState: SalesByState = null;
-  salesByCategory: SalesByStateAndCity = null;
+  sales: Sales | null = null;
+  salesByState: SalesByState | null = null;
+  salesByCategory: SalesByStateAndCity | null = null;
   showCustomDatePopup = false;
   customStartDate: any = null;
   isLoading: boolean = true;
@@ -216,30 +216,38 @@ export class AnalyticsDashboardComponent implements OnInit {
   customizeSaleText(arg: { percentText: string }) {
     return arg.percentText;
   }
+
   loadData = (startDate: string, endDate: string) => {
     this.isLoading = true;
-    const tasks: Observable<object>[] = [
+    const tasksData: [string, DataLoader][] = [
       ['opportunities', this.service.getOpportunitiesByCategory],
       ['sales', this.service.getSales],
       ['salesByCategory', this.service.getSalesByCategory],
       [
         'salesByState',
-        (startDate: string, endDate: string) =>
+        (sDate: string, eDate: string) =>
           this.service
-            .getSalesByStateAndCity(startDate, endDate)
+            .getSalesByStateAndCity(sDate, eDate)
             .pipe(map((data) => this.service.getSalesByState(data))),
       ],
-    ].map(([dataName, loader]: [string, DataLoader]) => {
+    ];
+    const tasks: Observable<any>[] = tasksData.map(([dataName, loader]) => {
       const loaderObservable = loader(startDate, endDate).pipe(share());
       loaderObservable.subscribe((result: DashboardData) => {
-        this[dataName] = result;
+        (this as any)[dataName] = result;
       });
       return loaderObservable;
     });
-    forkJoin(tasks).subscribe(() => {
-      this.isLoading = false;
+    forkJoin(tasks).subscribe({
+      next: () => {
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      },
     });
   };
+
   ngOnInit(): void {
     const [startDate, endDate] = analyticsPanelItems[4].value.split('/');
     this.isLoading = false;
@@ -311,9 +319,11 @@ export class AnalyticsDashboardComponent implements OnInit {
     }
     this.getDashboardData();
   }
+
   dateChanged() {
     this.getDashboardData();
   }
+  
   getDashboardData() {
     this.loadingVisible = true;
     const timeoutId = setTimeout(() => {

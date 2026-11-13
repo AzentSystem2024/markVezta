@@ -73,6 +73,7 @@ export class WageRegisterComponent {
   selected_fin_id: any;
 
   pdfSrc: SafeResourceUrl | null = null;
+  appType: any;
 
   ngOnInit() {
     const currentYear = new Date().getFullYear();
@@ -92,7 +93,7 @@ export class WageRegisterComponent {
     this.selectedMonth = `${year}-${month}`;
     this.payloadDate = `${year}-${month}-09`;
 
-    }
+  }
 
   generateMonths(year: number) {
     this.months = [];
@@ -143,7 +144,7 @@ export class WageRegisterComponent {
   GetEmployeeList() {
     this.dataService.getDropdownData('EMPLOYEE').subscribe((res) => {
       this.employeeList = res;
-      });
+    });
   }
 
   //  getWageRegister(): void {
@@ -318,25 +319,40 @@ export class WageRegisterComponent {
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       })();
 
+    const selectedDate = this.payloadDate || `${monthToUse}-01`;
+
+    const formattedMonth = selectedDate.substring(0, 7) + '-01';
+
     const payload = {
-      Month: this.payloadDate || `${monthToUse}-01`,
+      // Month: this.payloadDate || `${monthToUse}-01`,
+      Month: formattedMonth,
       ReportType: this.selectedReport,
+      COMPANY_ID: this.selected_Company_id,
     };
 
     this.dataService.getWageRegister(payload).subscribe((response: any) => {
       let data: any[] = [];
 
-      // ✅ Select dataset based on report type
+      // Select dataset based on report type
       if (this.selectedReport === 'Wages') {
-        if (!response?.WageDetails || response.WageDetails.length === 0) {
-          return; // nothing to show
-        }
-        data = response.WageDetails;
+        data = response?.WageDetails || [];
       } else if (this.selectedReport === 'Salary') {
-        if (!response?.SalaryDetails || response.SalaryDetails.length === 0) {
-          return; // nothing to show
-        }
-        data = response.SalaryDetails;
+        data = response?.SalaryDetails || [];
+      }
+
+      // Check whether data exists
+      if (!data || data.length === 0) {
+        notify(
+          {
+            message: `No ${this.selectedReport} data available for the selected month.`,
+            position: { at: 'top center', my: 'top center' },
+          },
+          'warning',
+          3000
+        );
+
+        this.pdfSrc = null;
+        return;
       }
 
       // ✅ Now generate the PDF with common logic
@@ -420,7 +436,10 @@ export class WageRegisterComponent {
         Number(row.MINIMUM_RATE_OF_WAGES_PAYABLE_DA) || 0,
         Number(row.RATE_OF_WAGES_ACTUALLY_PAID_BASIC) || 0,
         Number(row.RATE_OF_WAGES_ACTUALLY_PAID_DA) || 0,
-        Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0,
+        // Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0,
+        this.appType !== 'VEZTA'
+          ? Math.round(Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0)
+          : Number(row.TOTAL_ATTENDANCE_UNITS_OF_WORK_DONE) || 0,
         Number(row.OVERTIME_WORKED) || 0,
         Number(row.GROSS_WAGES_PAYABLE) || 0,
         Number(row.EMPLOYEE_CONTRIBUTION_TO_PF) || 0,
@@ -507,7 +526,9 @@ export class WageRegisterComponent {
           fontStyle: 'bold',
         },
         theme: 'grid',
-        foot: [grandTotalRow], // ✅ Add footer row
+        foot: [grandTotalRow],
+        showFoot: 'lastPage',
+
         footStyles: {
           fillColor: [255, 255, 255],
           textColor: 20,
@@ -531,8 +552,9 @@ export class WageRegisterComponent {
     this.formatted_from_date = this.financialYeaDate;
 
     this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+    this.appType = sessionData.Configuration?.APP_TYPE;
 
-    }
+  }
 }
 
 @NgModule({
@@ -572,4 +594,4 @@ export class WageRegisterComponent {
   exports: [WageRegisterComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class WageRegisterModule {}
+export class WageRegisterModule { }

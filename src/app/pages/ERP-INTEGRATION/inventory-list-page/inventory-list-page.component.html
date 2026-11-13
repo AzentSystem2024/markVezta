@@ -1,0 +1,613 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    #detailGrid
+    class="grid theme-dependent"
+    [class.grid-no-data]="!importDataList?.length"
+    [dataSource]="importDataList"
+    [showBorders]="true"
+    [rowAlternationEnabled]="true"
+    rowAlternationInterval="2"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'widget'"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [height]="'84vh'"
+    noDataText="No records found."
+    keyExpr="_rowKey"
+    [export]="{ enabled: true, formats: ['xlsx'] }"
+    (onRowExpanding)="onRowExpanding($event)"
+    (onRowCollapsing)="onRowCollapsing($event)"
+    (onCellPrepared)="onCellPrepared($event)"
+    (onEditorPreparing)="onEditorPreparing($event)"
+    (onCellClick)="onCellClick($event)"
+    (onExporting)="onExporting($event)"
+  >
+    <dxo-selection
+      [mode]="importDataList?.length ? 'multiple' : 'none'"
+      [showCheckBoxesMode]="importDataList?.length ? 'always' : 'none'"
+    >
+    </dxo-selection>
+    <dxi-column
+      type="selection"
+      [allowSelectAll]="true"
+      [visible]="(importDataList?.length || 0) > 0"
+      [allowHeaderFiltering]="false"
+      [allowFiltering]="false"
+    >
+    </dxi-column>
+
+    <!-- Master Grid Explicit Columns via dxi-column (No ID fields) -->
+    <dxi-column
+      dataField="TransactionType"
+      caption="Transaction Type"
+      alignment="left"
+      [width]="140"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="TransRefCode"
+      caption="Reference Code"
+      alignment="left"
+      [width]="160"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="TransLocationCode"
+      caption="From Loc Code"
+      alignment="left"
+      [width]="130"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="TransLocationName"
+      caption="From Location"
+      alignment="left"
+      [minWidth]="160"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="TransToLocationCode"
+      caption="To Loc Code"
+      alignment="left"
+      [width]="130"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="TransToLocationName"
+      caption="To Location"
+      alignment="left"
+      [minWidth]="160"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="ApexTransferDate"
+      caption="Transfer Date"
+      alignment="center"
+      [width]="140"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="Status"
+      caption="Status"
+      alignment="center"
+      [width]="100"
+      [fixed]="true"
+      fixedPosition="right"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="FailureReason"
+      caption="Failure Reason"
+      alignment="left"
+      [width]="160"
+      [fixed]="true"
+      fixedPosition="right"
+    ></dxi-column>
+
+    <!-- Master Detail Configuration -->
+    <dxo-master-detail [enabled]="true" template="detailTemplate">
+    </dxo-master-detail>
+
+    <!-- =========== master details main div ========= -->
+    <div
+      class="master-detail-flow-container"
+      *dxTemplate="let masterData of 'detailTemplate'"
+    >
+      <div class="flow-arrow"></div>
+      <div
+        class="detail-grid-container"
+        style="position: relative; min-height: 60px"
+      >
+        <!-- Ensure loader and details are triggered -->
+        <ng-container *ngIf="ensureDetailsLoaded(masterData)"></ng-container>
+
+        <!-- Loader displayed while expanding / loading details -->
+        <div
+          *ngIf="detailLoadingMap[masterData.key]"
+          style="text-align: center; padding: 25px 0"
+        >
+          <dx-load-indicator [visible]="true"></dx-load-indicator>
+          <div style="margin-top: 10px; color: #666; font-size: 13px">
+            Loading details...
+          </div>
+        </div>
+
+        <dx-data-grid
+          *ngIf="!detailLoadingMap[masterData.key]"
+          [dataSource]="detailDataMap[masterData.key] || []"
+          noDataText="No details available"
+          [showBorders]="true"
+          [showColumnLines]="true"
+          [showRowLines]="true"
+          [columnAutoWidth]="false"
+          [wordWrapEnabled]="false"
+          [rowAlternationEnabled]="true"
+          width="100%"
+          [height]="'30vh'"
+          (onCellPrepared)="onCellPrepared($event)"
+        >
+          <dxo-scrolling mode="standard" showScrollbar="always"></dxo-scrolling>
+          <dxo-paging [pageSize]="10"></dxo-paging>
+          <dxo-pager
+            [visible]="false"
+            [allowedPageSizes]="[10, 20, 50, 'all']"
+            [showPageSizeSelector]="true"
+            [showInfo]="true"
+          ></dxo-pager>
+
+          <!-- Detail Grid Explicit Columns via dxi-column (No ID fields) -->
+          <dxi-column
+            dataField="TransactionDate"
+            caption="Date"
+            alignment="center"
+            [width]="120"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="TransRefAccountCode"
+            caption="Account Code"
+            alignment="left"
+            [width]="130"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="TransRefDescription"
+            caption="Description"
+            alignment="left"
+            [minWidth]="250"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="MatlAmt"
+            caption="Amount"
+            alignment="right"
+            dataType="number"
+            format="#,##0.00"
+            [width]="120"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="OrgnBranchCode"
+            caption="Branch"
+            alignment="center"
+            [width]="90"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="PostedFlag"
+            caption="Posted Flag"
+            alignment="center"
+            [width]="90"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="GPRefNo"
+            caption="GP Ref No"
+            alignment="left"
+            [width]="120"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="RecordStatus"
+            caption="Record Status"
+            alignment="center"
+            [width]="90"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="ApexTransferDate"
+            caption="Transfer Date"
+            alignment="center"
+            [width]="130"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="AXTransferDate"
+            caption="AX Transfer Date"
+            alignment="center"
+            [width]="130"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="Status"
+            caption="Status"
+            alignment="center"
+            [width]="100"
+            [fixed]="true"
+            fixedPosition="right"
+          ></dxi-column>
+
+          <dxi-column
+            dataField="FailureReason"
+            caption="Failure Reason"
+            alignment="left"
+            [width]="160"
+            [fixed]="true"
+            fixedPosition="right"
+          ></dxi-column>
+
+          <dxo-summary>
+            <dxi-total-item
+              column="MatlAmt"
+              summaryType="sum"
+              valueFormat="#,##0.00"
+              displayFormat="Total: {0}"
+            ></dxi-total-item>
+          </dxo-summary>
+        </dx-data-grid>
+      </div>
+    </div>
+
+    <!-- ================= Filter ================= -->
+    <dxo-filter-row
+      [visible]="false"
+      [applyFilter]="currentFilter"
+    ></dxo-filter-row>
+
+    <dxo-header-filter [visible]="false">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter>
+
+    <!-- ================= Paging ================= -->
+    <dxo-paging [pageSize]="10"></dxo-paging>
+
+    <dxo-pager
+      [visible]="true"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+      [showPageSizeSelector]="true"
+      [allowedPageSizes]="[10, 20, 30, 40]"
+    >
+    </dxo-pager>
+    <dxo-scrolling
+      mode="virtual"
+      rowRenderingMode="virtual"
+      columnRenderingMode="virtual"
+      showScrollbar="always"
+      preloadEnabled="true"
+      useNative="false"
+    >
+    </dxo-scrolling>
+
+    <dxo-load-panel [enabled]="false" [showPane]="true" [showIndicator]="true">
+    </dxo-load-panel>
+
+    <!-- ================= Toolbar ================= -->
+    <dxo-toolbar>
+      <dxi-item location="before" locateInMenu="never">
+        <div class="grid-header">Inventory List</div>
+      </dxi-item>
+
+      <dxi-item location="after" template="dateFilterTemplate"></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      >
+      </dxi-item>
+
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      >
+      </dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <dxi-item name="exportButton" location="after" cssClass="export-btn">
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="ValidateButtonOptions"
+      >
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="ReProcessButtonOptions"
+      >
+      </dxi-item>
+    </dxo-toolbar>
+
+    <!-- ---- custom daterange select box template ---- -->
+    <div *dxTemplate="let data of 'dateFilterTemplate'">
+      <dx-select-box
+        [dataSource]="dateRanges"
+        [displayExpr]="displayExpr"
+        valueExpr="value"
+        [(value)]="selectedDateRange"
+        (onValueChanged)="onDateRangeChanged($event)"
+        (onOpened)="attachItemClickHandler($event)"
+        width="220"
+      >
+        <div *dxTemplate="let item of 'item'">
+          {{ item.value === "custom" ? "Custom" : item.label }}
+        </div>
+      </dx-select-box>
+    </div>
+  </dx-data-grid>
+
+  <!-- Journal Voucher Popup -->
+  <dx-popup
+    [(visible)]="isViewJournalVoucher"
+    [width]="'90vw'"
+    [height]="'100vh'"
+    title="Journal View"
+    (onHiding)="handleClose()"
+  >
+    <app-erp-jv
+      [journalVoucherFormData]="selectedJournalVoucher"
+      (popupClosed)="handleClose()"
+      [JVid]="selectedTransID"
+    ></app-erp-jv>
+  </dx-popup>
+
+  <!-- Custom Date Popup -->
+  <app-custom-date-popup
+    [(visible)]="showCustomDatePopup"
+    [startDate]="customStartDate"
+    [endDate]="customEndDate"
+    (applyDates)="onCustomDateApplied($event)"
+  >
+  </app-custom-date-popup>
+
+  <!-- Loading Panel -->
+  <dx-load-panel
+    [visible]="isLoading"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [hideOnOutsideClick]="false"
+    shadingColor="rgba(0,0,0,0.4)"
+    [message]="loadingMessage"
+  >
+  </dx-load-panel>
+
+  <!-- Progress Section for Processing Rows -->
+  <dx-load-panel
+    [visible]="isProcessingRows"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [hideOnOutsideClick]="false"
+    shadingColor="rgba(0,0,0,0.4)"
+    [message]="progressMessage"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <div class="text-center">
+        <div class="mb-2">
+          Total :
+          <b>{{ totalRequestCount }}</b>
+        </div>
+
+        <div class="mb-2">
+          Completed :
+          <b class="text-success">
+            {{ completedRequestCount }}
+          </b>
+        </div>
+
+        <div class="mb-2">
+          Failed :
+          <b class="text-danger">
+            {{ failedRequestCount }}
+          </b>
+        </div>
+
+        <div class="mb-2">
+          Pending :
+          <b class="text-warning">
+            {{ pendingRequestCount }}
+          </b>
+        </div>
+      </div>
+    </div>
+  </dx-load-panel>
+
+  <!-- Validation Summary Popup -->
+  <dx-popup
+    [(visible)]="isValidationPopupVisible"
+    [width]="'70vw'"
+    [height]="'auto'"
+    title="Validation Summary"
+    [showCloseButton]="true"
+    [dragEnabled]="true"
+    [closeOnOutsideClick]="false"
+    (onHiding)="refreshGrid()"
+  >
+    <div *dxTemplate="let data of 'content'">
+      <dx-data-grid
+        [dataSource]="filteredValidationGridData"
+        [showBorders]="true"
+        [rowAlternationEnabled]="true"
+        [columnAutoWidth]="true"
+        [height]="'65vh'"
+        (onRowDblClick)="viewErrorDetails($event.data)"
+      >
+        <dxo-header-filter [visible]="true">
+          <dxo-search [enabled]="true"></dxo-search>
+        </dxo-header-filter>
+        <dxo-scrolling
+          mode="virtual"
+          rowRenderingMode="virtual"
+        ></dxo-scrolling>
+        <dxo-paging [pageSize]="10"></dxo-paging>
+        <dxo-pager
+          [visible]="true"
+          [showPageSizeSelector]="true"
+          [allowedPageSizes]="[10, 20, 50, 100]"
+          [showInfo]="true"
+        ></dxo-pager>
+        <dxi-column
+          dataField="TransactionType"
+          caption="Transaction Type"
+          width="auto"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="ErrorMessage"
+          caption="Particulars"
+          width="400"
+          [wordWrapEnabled]="true"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="MissingCount"
+          caption="Missing Count"
+          alignment="center"
+          width="auto"
+        ></dxi-column>
+
+        <dxi-column
+          dataField="AffectedRowsCount"
+          caption="Rows Count"
+          alignment="center"
+          width="auto"
+        ></dxi-column>
+      </dx-data-grid>
+    </div>
+  </dx-popup>
+
+  <!-- Error Details Popup -->
+  <dx-popup
+    [(visible)]="isErrorDetailsPopupVisible"
+    [width]="'90vw'"
+    [height]="'auto'"
+    title="Error Details"
+    [showCloseButton]="true"
+  >
+    <div *dxTemplate="let data of 'content'" class="p-2">
+      <!-- Error Summary Header Banner -->
+      <div
+        *ngIf="selectedErrorSummary"
+        class="error-summary-header"
+      >
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <div>
+            <span class="fw-bold text-secondary me-2">Document Type:</span>
+            <span class="badge bg-secondary me-3">{{ selectedErrorSummary.TransactionType || selectedErrorSummary.DocumentType }}</span>
+
+            <span class="fw-bold text-secondary me-2">Particular:</span>
+            <span class="badge bg-primary me-3">{{ selectedErrorSummary.Particular }}</span>
+
+            <span class="fw-bold text-secondary me-2">Error:</span>
+            <span class="text-danger fw-semibold">{{ selectedErrorSummary.ErrorMessage }}</span>
+          </div>
+
+          <div
+            *ngIf="selectedErrorSummary.NotFoundValues && selectedErrorSummary.NotFoundValues.length > 0"
+            class="d-flex align-items-center flex-wrap gap-1"
+          >
+            <span class="fw-bold text-danger me-1">
+              Not Found Values ({{ selectedErrorSummary.NotFoundValues.length }}):
+            </span>
+            <span
+              *ngFor="let val of selectedErrorSummary.NotFoundValues"
+              class="not-found-badge"
+            >
+              {{ val }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <dx-data-grid
+        [dataSource]="errorDetailsGridData"
+        [showBorders]="true"
+        [rowAlternationEnabled]="true"
+        [columnAutoWidth]="true"
+        [allowColumnResizing]="true"
+        [height]="'72vh'"
+      >
+        <dxo-scrolling
+          mode="virtual"
+          rowRenderingMode="virtual"
+        ></dxo-scrolling>
+        <dxo-paging [pageSize]="20"></dxo-paging>
+        <dxo-pager
+          [visible]="true"
+          [showPageSizeSelector]="true"
+          [allowedPageSizes]="[10, 20, 50, 100]"
+          [showInfo]="true"
+        ></dxo-pager>
+
+        <dxi-column
+          dataField="HeaderID"
+          caption="Header ID"
+          width="160"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          dataField="DocumentType"
+          caption="Transaction Type"
+          width="140"
+        ></dxi-column>
+        <dxi-column
+          dataField="Particular"
+          caption="Particular"
+          width="140"
+        ></dxi-column>
+        <dxi-column
+          dataField="NotFoundValue"
+          caption="Not Found Value"
+          width="180"
+          cellTemplate="detailNotFoundCellTemplate"
+          alignment="center"
+        ></dxi-column>
+        <dxi-column
+          dataField="ErrorMessage"
+          caption="Error Message"
+          minWidth="260"
+          [wordWrapEnabled]="true"
+        ></dxi-column>
+
+        <div *dxTemplate="let cell of 'detailNotFoundCellTemplate'">
+          <span
+            *ngIf="cell.value && cell.value !== '-'; else noDetailVal"
+            class="not-found-badge"
+          >
+            {{ cell.value }}
+          </span>
+          <ng-template #noDetailVal>
+            <span class="text-muted fst-italic">-</span>
+          </ng-template>
+        </div>
+      </dx-data-grid>
+    </div>
+  </dx-popup>
+</div>

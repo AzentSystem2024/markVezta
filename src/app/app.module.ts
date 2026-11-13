@@ -18,12 +18,14 @@ import {
   CreateAccountFormModule,
   ChangePasswordFormModule,
   LoginFormModule,
+  ToastContainerModule,
 } from './components';
 import {
   AuthService,
   ScreenService,
   AppInfoService,
   DataService,
+  ToastService,
 } from './services';
 import { UnauthenticatedContentModule } from './layouts/unauthenticated-content/unauthenticated-content';
 import { AppRoutingModule } from './app-routing.module';
@@ -447,6 +449,13 @@ import { AgeWisePendingReportModule } from './pages/DESPATCH/Reports/age-wise-pe
 import { AgeWiseReportModule } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
 import {  PendingActivityModule } from './pages/pending-activity/pending-activity.component';
+import { ApListPageModule } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-page.component';
+import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-page/inventory-list-page.component';
+import { EditedAttendanceModule } from './pages/REPORT/edited-attendance/edited-attendance.component';
+import { LateComerListModule } from './pages/REPORT/late-comer-list/late-comer-list.component';
+import { AbsentListComponent, AbsentListModule } from './pages/REPORT/absent-list/absent-list.component';
+import { ExcessBreaksComponent, ExcessBreaksModule } from './pages/REPORT/excess-breaks/excess-breaks.component';
+import { StaffShiftChangeReportComponent, StaffShiftChangeReportModule } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
 
 @NgModule({
   declarations: [
@@ -454,6 +463,8 @@ import {  PendingActivityModule } from './pages/pending-activity/pending-activit
     AnalyticsDashboardVeztaMedicalComponent,
   ],
   imports: [
+    ApListPageModule,
+    InventoryListPageModule,
     OrderViewModule,
     NewOrderModule,
     LeaveSalaryPaymentModule,
@@ -469,6 +480,7 @@ import {  PendingActivityModule } from './pages/pending-activity/pending-activit
     CreateAccountFormModule,
     ChangePasswordFormModule,
     LoginFormModule,
+    ToastContainerModule,
     UnauthenticatedContentModule,
     DxSelectBoxModule,
     DxTagBoxModule,
@@ -909,8 +921,12 @@ import {  PendingActivityModule } from './pages/pending-activity/pending-activit
     AgeWiseReportModule,
     ArticleStockReportModule,
     MultiboxReportModule,
-    PendingActivityModule
-  
+    PendingActivityModule ,
+    EditedAttendanceModule,
+    LateComerListModule,
+    AbsentListModule,
+    ExcessBreaksModule,
+    StaffShiftChangeReportModule,
   ],
 
   providers: [
@@ -919,10 +935,11 @@ import {  PendingActivityModule } from './pages/pending-activity/pending-activit
     AppInfoService,
     ThemeService,
     DataService,
+    ToastService,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: RouteReuseStrategy, useClass: CustomReuseStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

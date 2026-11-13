@@ -86,7 +86,7 @@ export class SecurityPolicyComponent {
     private dataService: DataService,
     private dataservice: DataService,
     private route: ActivatedRoute,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.userId = sessionStorage.getItem('UserID');
@@ -230,7 +230,7 @@ export class SecurityPolicyComponent {
       AccountLockAttempt: this.LoginAttempts,
       AccountLockDuration: this.resetDuration,
       AccountLockFailedLogin: this.failedLoginDuration,
-      DisableUserOnInactiveDays: this.disableUserOn,
+      DisableUserOnInactiveDays: Boolean(this.disableUserOn),
       EnableMFA: this.MFAvalidationRequired,
       LowercaseCharacters: this.isLowercaseChecked,
       MFACustom: this.isCustomAuthenticator,
@@ -298,4 +298,4 @@ export class SecurityPolicyComponent {
   exports: [],
   declarations: [SecurityPolicyComponent],
 })
-export class SecurityPolicyModule {}
+export class SecurityPolicyModule { }

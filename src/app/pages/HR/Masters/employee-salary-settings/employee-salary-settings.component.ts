@@ -245,6 +245,10 @@ export class EmployeeSalarySettingsComponent implements OnInit {
     return this.canDelete;
   };
 
+  get showAddButton(): boolean {
+    return this.canAdd && Number(this.selectedFilterAction) !== 5;
+  }
+
   refreshGrid() {
     if (this.dataGrid?.instance) {
       this.dataGrid.instance.refresh();

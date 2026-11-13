@@ -3382,11 +3382,7 @@ export class DataService {
     return this.http.post<any>(`${this.apiUrl}uom/list`, body, { headers });
   }
 
-  // postUOM(uom: any): Observable<any> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   const body = { UOM: uom , COMPANY_ID : this.selected_Company_id};
-  //   return this.http.post<any>(`${this.apiUrl}uom/insert`, body, { headers });
-  // }
+
   postUOM(payload: { UOM: string }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.apiUrl}uom/insert`, payload, {
@@ -6081,6 +6077,7 @@ The result can be exported to HTML or Markdown.`;
       EMAIL: data.Email,
       STORE_ID: data.STORE_ID,
       IS_INACTIVE: data.IsInactive,
+      IS_COMPANY_SWITCH: data.IS_COMPANY_SWITCH,
     };
     return this.http.post(url, reqBody);
   }
@@ -6104,6 +6101,7 @@ The result can be exported to HTML or Markdown.`;
       LOCK_DATE_FROM: data.LOCK_DATE_FROM,
       LOCK_DATE_TO: data.LOCK_DATE_TO,
       LOCK_REASON: data.LOCK_REASON,
+      IS_COMPANY_SWITCH: data.IS_COMPANY_SWITCH,
     };
 
     return this.http.post(url, reqBody);
@@ -6821,7 +6819,7 @@ The result can be exported to HTML or Markdown.`;
 
   WpsList(payload: any) {
     const getEndpoint = this.apiUrl + 'SalaryWps/approvedpayroll';
-    return this.http.post(getEndpoint, payload)
+    return this.http.post(getEndpoint, payload);
   }
 
   profitLoss_Branch_Report(payload: any) {
@@ -7438,12 +7436,72 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}ImportAR/validate`, payload);
   }
 
+  getValidationAPData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}APList/validateap`, payload);
+  }
+
+  getValidationInventoryData(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}APList/validateinventory`, payload);
+  }
+
   getARErrorData(payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}ImportAR/ARerrordata`, payload);
   }
 
   getImportMasterList(): Observable<any> {
     return this.http.post(`${this.apiUrl}ImportMaster/importmasterlist`, {});
+  }
+
+  // ================= AP LIST API =================
+  import_AP_Full_List(datas: any): Observable<any> {
+    const payload = {
+      FromDate:
+        datas.FromDate !== undefined ? datas.FromDate : datas.DATE_FROM || null,
+      ToDate: datas.ToDate !== undefined ? datas.ToDate : datas.DATE_TO || null,
+    };
+    return this.http.post(`${this.apiUrl}APList/aplist`, payload);
+  }
+
+  // ========= PROCESS SELECTED PENDING AP LIST ==========
+  process_pending_ap_rows(rowdata: any) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      COMPANY_ID: sessionData.SELECTED_COMPANY?.COMPANY_ID,
+      USER_ID: sessionData.USER_ID,
+      IMPORT_DATA_ID: rowdata.ID,
+      STORE_ID: sessionData.Configuration?.[0]?.STORE_ID,
+      FIN_ID: sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID,
+    };
+
+    return this.http.post(`${this.apiUrl}aplist/process`, payload);
+  }
+
+  // ================= INVENTORY LIST API =================
+  import_Inventory_Full_List(datas: any): Observable<any> {
+    const payload = {
+      FromDate:
+        datas.FromDate !== undefined ? datas.FromDate : datas.DATE_FROM || null,
+      ToDate: datas.ToDate !== undefined ? datas.ToDate : datas.DATE_TO || null,
+    };
+    return this.http.post(`${this.apiUrl}APList/inventorylist`, payload);
+  }
+
+  // ========= PROCESS SELECTED PENDING INVENTORY LIST ==========
+  process_pending_inventory_rows(rowdata: any) {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    const payload = {
+      COMPANY_ID: sessionData.SELECTED_COMPANY?.COMPANY_ID,
+      USER_ID: sessionData.USER_ID,
+      IMPORT_DATA_ID: rowdata.ID,
+      STORE_ID: sessionData.Configuration?.[0]?.STORE_ID,
+      FIN_ID: sessionData.FINANCIAL_YEARS?.[0]?.FIN_ID,
+    };
+
+    return this.http.post(`${this.apiUrl}APList/processinventory`, payload);
   }
 
   getRevenueDashboardData(payload: any): Observable<any> {
@@ -7640,17 +7698,11 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getOrderSummaryReport(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}OrderRpt/OrderSummary`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/OrderSummary`, payload);
   }
 
   getOrderDetailsReport(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}OrderRpt/OrderDetails`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/OrderDetails`, payload);
   }
 
   getDispatchSummaryReport(payload: any): Observable<any> {
@@ -7661,10 +7713,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getSalesThroughReport(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}OrderRpt/SalesThrough`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/SalesThrough`, payload);
   }
 
   getDispatchReportStateWise(payload: any): Observable<any> {
@@ -7689,10 +7738,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getTopMovingReport(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}OrderRpt/TopMoving`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/TopMoving`, payload);
   }
 
   getAgewisePendingOrder(payload: any): Observable<any> {
@@ -7703,10 +7749,7 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getAgewiseOrderReport(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${this.apiUrl}OrderRpt/AgewiseOrder`,
-      payload,
-    );
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/AgewiseOrder`, payload);
   }
 
   getArticleStockReport(payload: any): Observable<any> {
@@ -7717,8 +7760,12 @@ The result can be exported to HTML or Markdown.`;
   }
 
   getMultiboxReport(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}OrderRpt/Multibox`, payload);
+  }
+
+  getMultiBoxDetails(payload: any): Observable<any> {
     return this.http.post<any>(
-      `${this.apiUrl}OrderRpt/Multibox`,
+      `${this.apiUrl}OrderRpt/MultiBoxDetails`,
       payload,
     );
   }
@@ -7794,15 +7841,23 @@ The result can be exported to HTML or Markdown.`;
   }
 
   deleteTrOutForInventoryMark(id: number) {
-    return this.http.post<any>(`${this.apiUrl}TransferOut_Mark/delete/` + id, {});
-
+    return this.http.post<any>(
+      `${this.apiUrl}TransferOut_Mark/delete/` + id,
+      {},
+    );
   }
   updateOrderEntryQty(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/UpdateOrderEntryQty`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/UpdateOrderEntryQty`,
+      payload,
+    );
   }
 
   deleteOrderDetail(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}NewOrder/DeleteOrderDetail`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}NewOrder/DeleteOrderDetail`,
+      payload,
+    );
   }
 
   selectNewOrder(id: any): Observable<any> {

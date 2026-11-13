@@ -5,6 +5,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   NgModule,
   NgZone,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -21,8 +22,6 @@ import {
   DxDataGridComponent,
   DxSelectBoxModule,
 } from 'devextreme-angular';
-import CustomStore from 'devextreme/data/custom_store';
-import DataSource from 'devextreme/data/data_source';
 import { FormPopupModule } from 'src/app/components';
 import { DataService } from 'src/app/services/data.service';
 import notify from 'devextreme/ui/notify';
@@ -32,23 +31,21 @@ import {
   ERPJVComponent,
 } from '../POPUP-PAGES/erp-jv/erp-jv.component';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
-
 @Component({
   selector: 'app-ar-imported-list',
   templateUrl: './ar-imported-list.component.html',
   styleUrls: ['./ar-imported-list.component.scss'],
 })
-export class ARImportedListComponent {
-  @ViewChild('detailGrid', { static: false })
+export class ARImportedListComponent implements OnInit {
+  @ViewChild('detailGrid', {
+    static: false,
+  })
   detailGrid!: DxDataGridComponent;
-
   @ViewChild(ERPJVComponent)
   JournalVoucherFormComponent!: ERPJVComponent;
-
   isFilterOpened: boolean = false;
   showFilterRow: boolean = false;
   currentFilter: string = 'auto';
-
   importDataList: any[] = [];
   detailViewColumns: any[] = [];
 
@@ -56,56 +53,55 @@ export class ARImportedListComponent {
   importDetailData: any[] = [];
   filteredDetailData: any[] = [];
   detailsDataColumns: any[] = [];
-
   expandedRowKeys: any[] = [];
-  detailDataMap: { [key: string]: any[] } = {};
-
+  detailDataMap: {
+    [key: string]: any[];
+  } = {};
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
-    elementAttr: { class: 'toolbar-icon-btn' },
-
+    elementAttr: {
+      class: 'toolbar-icon-btn',
+    },
     onClick: () => this.toggleFilters(),
   };
-
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
-    elementAttr: { class: 'toolbar-icon-btn' },
+    elementAttr: {
+      class: 'toolbar-icon-btn',
+    },
     onClick: () => {
       this.ngZone.run(() => this.refreshGrid());
     },
-
     text: '',
   };
-
   ReProcessButtonOptions = {
     text: 'Process',
     icon: '',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Import AR Data',
-
     onClick: () => {
       this.processPendingRows();
     },
-
-    elementAttr: { class: 'add-button' },
+    elementAttr: {
+      class: 'add-button',
+    },
   };
-
   ValidateButtonOptions = {
     text: 'Validate',
     icon: '',
     type: 'default',
     stylingMode: 'contained',
     hint: 'Validate AR Data',
-
     onClick: () => {
       this.validatePendingRows();
     },
-
-    elementAttr: { class: 'add-button mx-2' },
+    elementAttr: {
+      class: 'add-button mx-2',
+    },
   };
   // ================= Progress Variables =================
   isProcessingRows: boolean = false;
@@ -114,11 +110,9 @@ export class ARImportedListComponent {
   completedRequestCount: number = 0;
   failedRequestCount: number = 0;
   pendingRequestCount: number = 0;
-
   isViewJournalVoucher: boolean = false;
   selectedJournalVoucher: any[] = [];
   selectedTransID: any;
-
   isValidationPopupVisible: boolean = false;
   transactionTypes: string[] = [];
   selectedTransactionType: string = '';
@@ -127,56 +121,60 @@ export class ARImportedListComponent {
   filteredValidationGridData: any[] = [];
   isErrorDetailsPopupVisible: boolean = false;
   errorDetailsGridData: any[] = [];
-
   isLoading: boolean = false;
   loadingMessage: string = 'Loading...';
-
   dateRanges = [
-    { label: 'All', value: 'all' },
-    { label: 'Last 7 Days', value: 'last7' },
-    { label: 'Last 15 Days', value: 'last15' },
-    { label: 'Last 30 Days', value: 'last30' },
-    { label: 'Custom', value: 'custom' },
+    {
+      label: 'All',
+      value: 'all',
+    },
+    {
+      label: 'Last 7 Days',
+      value: 'last7',
+    },
+    {
+      label: 'Last 15 Days',
+      value: 'last15',
+    },
+    {
+      label: 'Last 30 Days',
+      value: 'last30',
+    },
+    {
+      label: 'Custom',
+      value: 'custom',
+    },
   ];
-
   selectedDateRange: any = 'all';
   customStartDate: any = null;
   customEndDate: any = null;
   showCustomDatePopup: boolean = false;
-
   constructor(
     private ngZone: NgZone,
     private srvce: DataService,
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {}
-
   ngOnInit(): void {
     this.fetch_Full_import_list();
   }
-
   displayExpr = (item: any) => {
     if (!item) return '';
-
     if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
       const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
       const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
       return `${from} to ${to}`;
     }
-
     return item.label;
   };
-
   private formatAsDDMMYYYY(d: Date): string {
     const day = d.getDate().toString().padStart(2, '0');
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   }
-
   onDateRangeChanged(e: any) {
     this.selectedDateRange = e.value;
-
     if (e.value === 'custom') {
       this.showCustomDatePopup = true;
       return;
@@ -184,15 +182,17 @@ export class ARImportedListComponent {
 
     // reset custom label
     this.dateRanges = this.dateRanges.map((option) =>
-      option.value === 'custom' ? { ...option, label: 'Custom' } : option,
+      option.value === 'custom'
+        ? {
+            ...option,
+            label: 'Custom',
+          }
+        : option,
     );
-
     this.customStartDate = null;
     this.customEndDate = null;
-
     this.fetch_Full_import_list();
   }
-
   attachItemClickHandler(e: any) {
     setTimeout(() => {
       const popup = e.component._popup;
@@ -210,18 +210,18 @@ export class ARImportedListComponent {
       }
     }, 0);
   }
-
   openCustomDatePopup() {
     this.customStartDate = null;
     this.customEndDate = null;
     this.showCustomDatePopup = true;
   }
-
-  private getDateRange(): { fromDate: string | null; toDate: string | null } {
+  private getDateRange(): {
+    fromDate: string | null;
+    toDate: string | null;
+  } {
     const today = new Date();
     let fromDate: Date | null = null;
     let toDate: Date | null = null;
-
     switch (this.selectedDateRange) {
       case 'last7':
         fromDate = new Date();
@@ -230,7 +230,6 @@ export class ARImportedListComponent {
         toDate = new Date();
         toDate.setHours(23, 59, 59, 999);
         break;
-
       case 'last15':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 14);
@@ -238,7 +237,6 @@ export class ARImportedListComponent {
         toDate = new Date();
         toDate.setHours(23, 59, 59, 999);
         break;
-
       case 'last30':
         fromDate = new Date();
         fromDate.setDate(today.getDate() - 29);
@@ -246,10 +244,11 @@ export class ARImportedListComponent {
         toDate = new Date();
         toDate.setHours(23, 59, 59, 999);
         break;
-
       case 'all':
-        return { fromDate: null, toDate: null };
-
+        return {
+          fromDate: null,
+          toDate: null,
+        };
       case 'custom':
         if (this.customStartDate && this.customEndDate) {
           fromDate = new Date(this.customStartDate);
@@ -259,57 +258,56 @@ export class ARImportedListComponent {
         }
         break;
     }
-
     return {
       fromDate: fromDate ? this.formatDate(fromDate) : null,
       toDate: toDate ? this.formatDate(toDate) : null,
     };
   }
-
   private formatDate(date: Date): string {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   }
-
   onCustomDateApplied(e: any) {
     this.customStartDate = e.start;
     this.customEndDate = e.end;
-
     this.applyCustomDateFilter(); // your existing function
   }
-
   applyCustomDateFilter() {
     if (!this.customStartDate || !this.customEndDate) return;
-
     if (this.customStartDate > this.customEndDate) {
       alert('From date cannot be greater than To date');
       return;
     }
-
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
-
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
-        ? { ...option, label: `${fromLabel} - ${toLabel}` }
+        ? {
+            ...option,
+            label: `${fromLabel} - ${toLabel}`,
+          }
         : option,
     );
-
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
-
     this.fetch_Full_import_list();
   }
 
   // ====== Fetch Import data list =======
   async fetch_Full_import_list() {
+    this.isLoading = true;
+    this.loadingMessage = 'Loading AR data...';
+    this.detailGrid?.instance?.beginCustomLoading('Loading AR data...');
+    this.cdr.detectChanges();
+
     //  Common Formatter
     const formatData = (data: any[] = []) => {
       return data.map((item: any) => {
-        const updatedItem: any = { ...item };
-
+        const updatedItem: any = {
+          ...item,
+        };
         Object.keys(updatedItem).forEach((key: string) => {
           const value = updatedItem[key];
 
@@ -323,7 +321,6 @@ export class ARImportedListComponent {
                   : value == null
                     ? null
                     : String(value);
-
             return;
           }
 
@@ -334,7 +331,6 @@ export class ARImportedListComponent {
             key.toLowerCase().includes('date')
           ) {
             const date = new Date(value);
-
             if (!isNaN(date.getTime())) {
               updatedItem[key] = [
                 String(date.getDate()).padStart(2, '0'),
@@ -344,14 +340,11 @@ export class ARImportedListComponent {
             }
           }
         });
-
         return updatedItem;
       });
     };
-
     try {
       const { fromDate, toDate } = this.getDateRange();
-
       const payload = {
         DATE_FROM: fromDate,
         DATE_TO: toDate,
@@ -371,7 +364,6 @@ export class ARImportedListComponent {
 
       // Dynamic Header Columns
       this.detailViewColumns = Object.keys(headerData?.[0] || {});
-
       this.importDataList = headerData;
 
       // Update detail data map for already expanded rows to ensure their data gets refreshed
@@ -382,11 +374,16 @@ export class ARImportedListComponent {
           );
         });
         // create a new object reference to trigger change detection for the map
-        this.detailDataMap = { ...this.detailDataMap };
+        this.detailDataMap = {
+          ...this.detailDataMap,
+        };
       }
     } catch (error) {
-      console.error(error);
       this.importDataList = [];
+    } finally {
+      this.isLoading = false;
+      this.detailGrid?.instance?.endCustomLoading();
+      this.cdr.detectChanges();
     }
   }
 
@@ -411,24 +408,22 @@ export class ARImportedListComponent {
     this.expandedRowKeys = this.expandedRowKeys.filter((x) => x !== headerID);
     delete this.detailDataMap[headerID];
   }
-
   refreshGrid() {
+    this.fetch_Full_import_list();
     if (this.detailGrid?.instance) {
       this.detailGrid.instance.refresh();
     }
   }
-
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-
+    this.showFilterRow = this.isFilterOpened;
     const grid = this.detailGrid?.instance;
-
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
+    this.cdr.detectChanges();
   }
-
   onCellPrepared(e: any) {
     // ===== Disable Selection Checkbox =====
     if (
@@ -443,7 +438,6 @@ export class ARImportedListComponent {
 
       // Hide checkbox
       const checkbox = e.cellElement.querySelector('.dx-select-checkbox');
-
       if (checkbox) {
         (checkbox as HTMLElement).style.display = 'none';
       }
@@ -472,10 +466,7 @@ export class ARImportedListComponent {
       }
     }
   }
-
   onCellClick(e: any) {
-    console.log('clicked row data:', e.data);
-
     if (e.rowType !== 'data') {
       return;
     }
@@ -489,20 +480,15 @@ export class ARImportedListComponent {
     if (e.data?.Status !== 'Posted') {
       return;
     }
-
     this.selectedTransID = e.data?.AcTransID;
-
     if (!this.selectedTransID) {
       notify('Transaction ID not found', 'warning', 3000);
       return;
     }
-
     this.isLoading = true;
-
     this.srvce.select_Erp_JournalVoucher(this.selectedTransID).subscribe({
       next: (res: any) => {
         this.isLoading = false;
-
         if (res.flag === 1) {
           this.selectedJournalVoucher = res?.Data || null;
           this.isViewJournalVoucher = true;
@@ -510,16 +496,12 @@ export class ARImportedListComponent {
           notify('Journal Voucher not found', 'error', 3000);
         }
       },
-
       error: (err: any) => {
         this.isLoading = false;
-
-        console.error(err);
         notify('Failed to load Journal Voucher', 'error', 3000);
       },
     });
   }
-
   handleClose() {
     this.isViewJournalVoucher = false;
   }
@@ -538,7 +520,6 @@ export class ARImportedListComponent {
   async processPendingRows() {
     // Selected Rows
     const selectedRows = this.detailGrid?.instance.getSelectedRowsData();
-
     if (!selectedRows || selectedRows.length === 0) {
       notify('Please select rows', 'warning', 3000);
       return;
@@ -548,7 +529,6 @@ export class ARImportedListComponent {
     const pendingRows = selectedRows.filter(
       (x: any) => x.Status === 'Open' || x.Status === 'Failed',
     );
-
     if (pendingRows.length === 0) {
       notify('Please select pending rows only', 'warning', 3000);
       return;
@@ -557,7 +537,6 @@ export class ARImportedListComponent {
     //  Initialize Counters
     this.isProcessingRows = true;
     this.progressMessage = 'Processing Pending Rows...';
-
     this.totalRequestCount = pendingRows.length;
     this.completedRequestCount = 0;
     this.failedRequestCount = 0;
@@ -580,7 +559,6 @@ export class ARImportedListComponent {
           this.failedRequestCount++;
         }
       } catch (error: any) {
-        console.error(error);
         //  Failed
         this.failedRequestCount++;
       }
@@ -606,13 +584,18 @@ export class ARImportedListComponent {
     //  Clear Search
     this.detailGrid?.instance.searchByText('');
     //  Notification
+
     notify(
-      `Processing completed.
+      {
+        message: `Processing completed.
       Success : ${this.completedRequestCount}
       Failed : ${this.failedRequestCount}`,
-      'success',
-      5000,
+        position: { at: 'top right', my: 'top right' },
+        displayTime: 5000,
+      },
+      'success'
     );
+
     //  Refresh Grid
     await new Promise((resolve) => setTimeout(resolve, 500));
     await this.fetch_Full_import_list();
@@ -623,7 +606,6 @@ export class ARImportedListComponent {
   async validatePendingRows() {
     // Selected Rows
     const selectedRows = this.detailGrid?.instance.getSelectedRowsData();
-
     if (!selectedRows || selectedRows.length === 0) {
       notify('Please select rows', 'warning', 3000);
       return;
@@ -633,33 +615,28 @@ export class ARImportedListComponent {
     const pendingRows = selectedRows.filter(
       (x: any) => x.Status === 'Open' || x.Status === 'Failed',
     );
-
     if (pendingRows.length === 0) {
       notify('Please select pending rows only', 'warning', 3000);
       return;
     }
-
     const transactionIDs = pendingRows
       .map((row: any) => row.HeaderID)
       .join(',');
-
     this.loadingMessage = 'Validating...';
     this.isLoading = true;
     this.cdr.detectChanges();
-
     try {
       const response: any = await this.srvce
-        .getValidationARData({ TransactionIDs: transactionIDs })
+        .getValidationARData({
+          TransactionIDs: transactionIDs,
+        })
         .toPromise();
-
       this.isLoading = false;
       this.loadingMessage = 'Loading...';
-
       if (response?.flag === '1') {
         this.transactionTypes = response.transactionTypes || [];
         this.allValidationErrors = response.errors || [];
         this.allMissingMasterData = response.notFoundValues || [];
-
         if (
           this.allValidationErrors.length === 0 &&
           this.allMissingMasterData.length === 0
@@ -674,7 +651,6 @@ export class ARImportedListComponent {
       }
     } catch (error: any) {
       this.isLoading = false;
-      console.error(error);
       notify('Failed to validate AR data', 'error', 3000);
     }
     this.cdr.detectChanges();
@@ -699,7 +675,6 @@ export class ARImportedListComponent {
       current.MissingCount += Number(err.ErrorCount) || 0;
       current.AffectedRowsCount += Number(err.AffectedRowsCount) || 0;
     });
-
     this.filteredValidationGridData = Array.from(map.values());
   }
 
@@ -710,19 +685,15 @@ export class ARImportedListComponent {
       TransactionType: cellData.TransactionType,
       Particular: cellData.Particular,
     };
-
     this.loadingMessage = 'Loading error details...';
     this.isLoading = true;
     this.cdr.detectChanges();
-
     try {
       const response: any = await this.srvce
         .getARErrorData(payload)
         .toPromise();
-
       this.isLoading = false;
       this.loadingMessage = 'Loading...';
-
       if (response?.flag === '1') {
         this.errorDetailsGridData = (response.data || []).map((item: any) => {
           if (item.hasOwnProperty('Verified')) {
@@ -743,19 +714,16 @@ export class ARImportedListComponent {
       }
     } catch (error: any) {
       this.isLoading = false;
-      console.error(error);
       notify('Failed to fetch error details', 'error', 3000);
     }
     this.cdr.detectChanges();
   }
-
   hasMissingData(particular: string, transactionType: string): boolean {
     return this.allMissingMasterData.some(
       (x) =>
         x.Particular === particular && x.TransactionType === transactionType,
     );
   }
-
   async downloadMissingParticulars(
     particular: string,
     transactionType: string,
@@ -764,14 +732,11 @@ export class ARImportedListComponent {
       (x) =>
         x.Particular === particular && x.TransactionType === transactionType,
     );
-
     if (missingValues.length === 0) {
       notify('No missing values found for this particular.', 'info', 3000);
       return;
     }
-
     let masterKey = '';
-
     if (['HISTPACode', 'HISInsuCode', 'HISInstCode'].includes(particular)) {
       masterKey = 'Customer';
     } else if (
@@ -787,13 +752,10 @@ export class ARImportedListComponent {
     } else if (['CPTCode'].includes(particular)) {
       masterKey = 'Cpt';
     }
-
     try {
       const response: any = await this.srvce.getImportMasterList().toPromise();
-
       let headers: string[] = [];
       let templateColumns: any[] = [];
-
       if (response && response[masterKey]) {
         templateColumns = response[masterKey];
         templateColumns.sort((a: any, b: any) => a.ID - b.ID);
@@ -801,15 +763,11 @@ export class ARImportedListComponent {
       } else {
         headers = ['Particular', 'NotFoundValue'];
       }
-
       let csv = headers.join(',') + '\n';
-
       missingValues.forEach((row) => {
         const val = (row.NotFoundValue || '').toString();
-
         const rowData = headers.map((header, index) => {
           let cellValue = '';
-
           if (header === 'Particular') cellValue = particular;
           else if (header === 'NotFoundValue') cellValue = val;
           else if (
@@ -828,14 +786,13 @@ export class ARImportedListComponent {
             headers[0] !== 'Particular'
           )
             cellValue = val;
-
           return `"${cellValue.replace(/"/g, '""')}"`;
         });
-
         csv += rowData.join(',') + '\n';
       });
-
-      const blob = new Blob([csv], { type: 'text/csv' });
+      const blob = new Blob([csv], {
+        type: 'text/csv',
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -843,7 +800,6 @@ export class ARImportedListComponent {
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to download template', error);
       notify('Failed to generate template.', 'error', 3000);
     }
   }
