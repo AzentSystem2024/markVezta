@@ -1245,7 +1245,7 @@ export class DataService {
 
   //  ATTENDANCE SHEET
   getAttendanceSheet(data: any) {
-    return this.http.post(`${this.apiUrl}ESIReport/esireport`, data);
+    return this.http.post(`${this.apiUrl}Report/GetAttendanceReport`, data);
   }
 
   //  ITEM QUANTITY STOCK
