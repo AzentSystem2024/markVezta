@@ -35,6 +35,7 @@ export class DepartmentGroupComponent {
 
   formsource: FormGroup;
   showFilterRow: boolean = true;
+  isFilterRowVisible: boolean = false;
   currentFilter: string = 'auto';
   Status: boolean = false;
   department: any;
@@ -83,17 +84,17 @@ export class DepartmentGroupComponent {
     hint: 'Show / Hide Filters',
     stylingMode: 'contained',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilters(),
+    onClick: () => this.toggleFiltersRow(),
   };
 
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
+  toggleFiltersRow() {
+    this.isFilterRowVisible = !this.isFilterRowVisible;
 
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
 
     if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterRow.visible', this.isFilterRowVisible);
+      grid.option('headerFilter.visible', this.isFilterRowVisible);
     }
   }
 
@@ -114,7 +115,7 @@ export class DepartmentGroupComponent {
     this.get_Department_List();
   }
 
-  isFilterOpened: boolean = false;
+  // isFilterOpened: boolean = false;
   sessionData: any;
   COMPANY_ID: any;
   COMPANY_NAME: any;
