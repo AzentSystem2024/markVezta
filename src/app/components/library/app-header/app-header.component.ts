@@ -6,6 +6,10 @@ import {
   EventEmitter,
   OnInit,
   ChangeDetectorRef,
+  // createComponent,
+  // ComponentRef,
+  // EnvironmentInjector,
+  // ApplicationRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -16,6 +20,7 @@ import { UserPanelModule } from '../user-panel/user-panel.component';
 import { AuthService, DataService, IUser, ThemeService } from 'src/app/services';
 import { ThemeSwitcherModule } from 'src/app/components/library/theme-switcher/theme-switcher.component';
 import { Router } from '@angular/router';
+import { PendingActivityComponent, PendingActivityModule } from 'src/app/pages/pending-activity/pending-activity.component';
 import { DxPopupModule, DxSelectBoxModule } from 'devextreme-angular';
 
 @Component({
@@ -36,6 +41,7 @@ export class AppHeaderComponent implements OnInit {
   user: IUser | null = { email: 'rererer' };
   UserName: any;
   popupVisible: boolean = false
+    showPendingActivity = false;
 
   companyList: any[] = [];
   selectedCompanyId: number | null = null;
@@ -63,20 +69,29 @@ export class AppHeaderComponent implements OnInit {
   finId: any;
   userInitials = '';
   logoPath: string = '';
+  pendingActivities: any[] = [];
+  // taskBarData: any[] = [];
+
+  // isPanelVisible = false;
+  
   canSwitchCompany = false;
 
   constructor(
     private authService: AuthService,
-    private changeDetectorRef: ChangeDetectorRef,
+    // private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private dataservice: DataService,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+      // private cdr: ChangeDetectorRef
+    // private appRef: ApplicationRef,
+    // private environmentInjector: EnvironmentInjector
   ) { }
 
   ngOnInit() {
     this.authService.getUser().then((e) => (this.user = e.data));
     this.sesstion_Details();
     this.version = this.dataservice.get_version();
+    this.loadPendingActivities();
 
     this.themeService.isDark.subscribe((isDark) => {
       this.logoPath = isDark
@@ -84,6 +99,33 @@ export class AppHeaderComponent implements OnInit {
         : 'assets/images/6e23102ce572502e660df2d9b8ac0c1454ec149d.png';
     });
   }
+
+  loadPendingActivities(): void {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
+    const payload = {
+      USER_ID: sessionData?.USER_ID,
+      COMPANY_ID: sessionData?.SELECTED_COMPANY?.COMPANY_ID
+    };
+
+    if (payload.USER_ID && payload.COMPANY_ID) {
+      this.dataservice.TaskBarApi(payload).subscribe({
+        next: (res: any) => {
+          this.pendingActivities = res?.TASK_LIST || [];
+        },
+        error: () => {}
+      });
+    }
+  }
+
+  // Total pending count
+  get totalPending(): number {
+    if (!this.pendingActivities || this.pendingActivities.length === 0) return 0;
+    return this.pendingActivities.reduce(
+      (total, item) => total + (Number(item.VERIFY_COUNT) || Number(item.count) || 0), 0
+    );
+  }
+
+  // private pendingComponentRef?: ComponentRef<PendingActivityComponent>;
 
   private getInitials(name: string): string {
     if (!name) return '';
@@ -97,7 +139,7 @@ export class AppHeaderComponent implements OnInit {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
 
     this.UserName = sessionData?.USER_NAME;
     // Get all available companies
@@ -166,9 +208,38 @@ export class AppHeaderComponent implements OnInit {
   toggleMenu = () => {
     this.menuToggle.emit();
   };
+ 
+// togglePanel() {
+//   this.showPendingActivityPanel();
+// }
+togglePanel(): void {
+  this.showPendingActivity = !this.showPendingActivity;
+ 
+  // this.cdr.detectChanges();
+}
 
+//  
+// showPendingActivityPanel(): void {
 
+//   if (this.pendingComponentRef) {
+//     return;
+//   }
 
+//   this.pendingComponentRef = createComponent(
+//     PendingActivityComponent,
+//     {
+//       environmentInjector: this.environmentInjector
+//     }
+//   );
+
+//   this.appRef.attachView(this.pendingComponentRef.hostView);
+
+//   document.body.appendChild(
+//     this.pendingComponentRef.location.nativeElement
+//   );
+
+//   this.pendingComponentRef.changeDetectorRef.detectChanges();
+// }
 }
 
 @NgModule({
@@ -179,6 +250,7 @@ export class AppHeaderComponent implements OnInit {
     ThemeSwitcherModule,
     UserPanelModule,
     DxPopupModule,
+    PendingActivityModule,
     DxSelectBoxModule,
   ],
   declarations: [AppHeaderComponent],

@@ -56,7 +56,7 @@ export class CompanyMasterComponent {
   companyRowCount = 0;
   formsource: any;
   isFilterRowVisible: boolean = false;
-  isFilterOpened = false;
+  // isFilterOpened = false;
   addPopup: boolean = false;
   editPopup: boolean = false;
   editingRowData: any = {};
@@ -182,10 +182,21 @@ export class CompanyMasterComponent {
     }
   }
 
-  toggleFilterRow = () => {
+  // toggleFilterRow = () => {
+  //   this.isFilterRowVisible = !this.isFilterRowVisible;
+  //   this.cdr.detectChanges();
+  // };
+
+toggleFilterRow() {
     this.isFilterRowVisible = !this.isFilterRowVisible;
-    this.cdr.detectChanges();
-  };
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterRowVisible);
+      grid.option('headerFilter.visible', this.isFilterRowVisible);
+    }
+  }
 
 
   getCompanyList(countryId: any, selectedStateId?: any): void {

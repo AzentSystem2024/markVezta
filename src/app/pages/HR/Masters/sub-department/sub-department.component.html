@@ -17,6 +17,7 @@
       [height]="'82vh'"
     >
       <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
 
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
       <dxo-paging [pageSize]="10"></dxo-paging>

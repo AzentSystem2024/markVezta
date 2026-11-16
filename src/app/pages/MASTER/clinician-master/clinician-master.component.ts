@@ -57,7 +57,7 @@ export class ClinicianMasterComponent {
   auto: string = 'auto';
 
   showSearchBar: boolean = false;
-  isFilterOpened = false;
+  // isFilterOpened = false;
 
   dataSource = new DataSource<any>({
     load: () =>
@@ -137,13 +137,13 @@ export class ClinicianMasterComponent {
   };
 
   toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = !this.isFilterRowVisible;
 
     const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
 
     if (grid) {
-      grid.option('filterRow.visible', this.isFilterOpened);
-      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterRow.visible', this.isFilterRowVisible);
+      grid.option('headerFilter.visible', this.isFilterRowVisible);
     }
   }
 

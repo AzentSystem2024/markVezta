@@ -19,14 +19,21 @@
     (onExporting)="onExporting($event)"
     [showColumnLines]="true"
   >
-    <!-- <dxo-filter-row
+    <dxo-filter-row
       [visible]="showFilterRow"
       [applyFilter]="currentFilter"
-    ></dxo-filter-row> -->
+    ></dxo-filter-row> 
 
-    <dxo-header-filter [visible]="true">
+     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
-    </dxo-header-filter>
+    </dxo-header-filter> 
+    <dxo-filter-panel [visible]="isFilterRowVisible"></dxo-filter-panel>
+     <!-- <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+   <dxo-filter-panel [visible]="isFilterRowVisible"></dxo-filter-panel>
+
+    <dxo-header-filter [visible]="isFilterRowVisible">
+      <dxo-search [enabled]="true"></dxo-search>
+    </dxo-header-filter> -->
 
     <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
     <dxo-paging [pageSize]="10"></dxo-paging>

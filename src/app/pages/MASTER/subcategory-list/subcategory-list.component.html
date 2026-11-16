@@ -15,6 +15,7 @@
       [scrolling]="{ mode: 'virtual' }"
       (onEditingStart)="onEditSubcategory($event)"
     >
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
         [visible]="true"
@@ -92,7 +93,7 @@
           </dxi-validation-rule>
         </dxi-validation-rule>
       </dxi-column>
-      <dxi-column dataField="SUBCAT_NAME" caption="subCategory">
+      <dxi-column dataField="SUBCAT_NAME" caption="SubCategory">
         <dxi-validation-rule type="required" message="Sub Category is required">
           <dxi-validation-rule
             type="required"
