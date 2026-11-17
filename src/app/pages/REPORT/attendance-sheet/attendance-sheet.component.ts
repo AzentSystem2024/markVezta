@@ -63,6 +63,9 @@ export class AttendanceSheetComponent {
   ngOnInit() {
     const currentYear = new Date().getFullYear();
     this.generateMonths(currentYear);
+    this.onMonthChange({
+      value: this.selectedMonth
+    });
   }
 
   constructor(
@@ -73,9 +76,26 @@ export class AttendanceSheetComponent {
   }
 
   onMonthChange(e: any) {
-    const [year, month] = e.value.split('-');
-    this.selectedMonth = `${year}-${month}`;
-    this.payloadDate = `${year}-${month}-09`;
+    const selectedValue = e.value; // Example: 2026-10
+
+    if (!selectedValue) return;
+
+    const [year, month] = selectedValue.split('-').map(Number);
+
+    this.selectedMonth = selectedValue;
+
+    // First date of selected month
+    this.formatted_from_date =
+      `${year}-${String(month).padStart(2, '0')}-01`;
+
+    // Last date of selected month
+    const lastDay = new Date(year, month, 0).getDate();
+
+    this.formatted_To_date =
+      `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+    // Month payload
+    this.payloadDate = this.formatted_from_date;
   }
 
   generateMonths(year: number) {
@@ -110,6 +130,7 @@ export class AttendanceSheetComponent {
       `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
 
+
   getAttendanceSheet(): void {
     const monthToUse =
       this.selectedMonth ||
@@ -118,82 +139,138 @@ export class AttendanceSheetComponent {
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       })();
 
+    // Make sure dates are initialized
+    const [year, month] = monthToUse.split('-').map(Number);
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    this.formatted_from_date =
+      `${year}-${String(month).padStart(2, '0')}-01`;
+
+    this.formatted_To_date =
+      `${year}-${String(month).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+
     const payload = {
-      Month: this.payloadDate || `${monthToUse}-01`,
+      DATE_FROM: this.formatted_from_date,
+      DATE_TO: this.formatted_To_date,
+      COMPANY_ID: this.selected_Company_id,
     };
 
-    //  Create PDF
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'pt',
-      format: 'a4',
-    });
+    this.dataService.getAttendanceSheet(payload).subscribe({
+      next: (response: any) => {
 
-    const pageWidth = doc.internal.pageSize.getWidth();
+        if (
+          response?.Flag !== 1 ||
+          !response?.AttendanceDetails ||
+          response.AttendanceDetails.length === 0
+        ) {
+          console.log('No attendance data available');
+          this.pdfSrc = null;
+          return;
+        }
 
-    // --- Report Title ---
-    doc.setFontSize(14);
-    const reportTitle = 'Reports - Payroll';
-    const textWidth = doc.getTextWidth(reportTitle);
-    doc.text(reportTitle, (pageWidth - textWidth) / 2, 30);
+        const data = response.AttendanceDetails;
 
-      this.dataService.getAttendanceSheet(payload).subscribe((response: any) => {
-    if (!response?.AttendanceDetails || response.AttendanceDetails.length === 0) {
-      return;
-    }
+        const doc = new jsPDF({
+          orientation: 'landscape',
+          unit: 'pt',
+          format: 'a4',
+        });
 
-     const data = response.AttendanceDetails;
+        const pageWidth = doc.internal.pageSize.getWidth();
 
-    // const data = [];
+        // Report title
+        doc.setFontSize(14);
+        const reportTitle = 'Attendance Sheet';
 
-    //  Parse year & month
-    const [year, month] = monthToUse.split('-').map(Number);
-    const daysInMonth = new Date(year, month, 0).getDate(); // total days in month
+        doc.text(
+          reportTitle,
+          pageWidth / 2,
+          30,
+          { align: 'center' }
+        );
 
-    //  Generate header with day + weekday
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const dynamicDays = Array.from({ length: daysInMonth }, (_, i) => {
-      const date = new Date(year, month - 1, i + 1);
-      return `${i + 1}\n${dayNames[date.getDay()]}`;
-    });
+        // Generate dynamic day headers
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const head = [['Staff Id', 'Name', ...dynamicDays]];
+        const dynamicDays = Array.from(
+          { length: daysInMonth },
+          (_, i) => {
+            const date = new Date(year, month - 1, i + 1);
 
-    //  Table Body
-    const body = data.map((row: any) => [
-      row.StaffId,
-      row.Name,
-      ...row.Attendance, // must have attendance marks for each day
-    ]);
+            return `${i + 1}\n${dayNames[date.getDay()]}`;
+          }
+        );
 
-    // --- Generate Table ---
-    autoTable(doc, {
-      head,
-      body,
-      startY: 60,
-      theme: 'grid',
-      styles: {
-        fontSize: 9,
-        cellPadding: 3,
-        halign: 'center',
-        valign: 'middle',
+        const head = [
+          ['Staff ID', 'Staff Name', ...dynamicDays]
+        ];
+
+        // Map API response correctly
+        const body = data.map((row: any) => [
+          row.STAFF_ID,
+          row.STAFF_NAME,
+          ...Array.from(
+            { length: daysInMonth },
+            (_, i) => row[`Day${i + 1}`] ?? ''
+          ),
+        ]);
+
+        // Generate PDF table
+        autoTable(doc, {
+          head: head,
+          body: body,
+          startY: 50,
+          theme: 'grid',
+
+          styles: {
+            fontSize: 7,
+            cellPadding: 3,
+            halign: 'center',
+            valign: 'middle',
+            overflow: 'linebreak',
+          },
+
+          headStyles: {
+            fillColor: [135, 206, 235],
+            textColor: 20,
+            fontStyle: 'bold',
+          },
+
+          columnStyles: {
+            0: {
+              cellWidth: 55,
+            },
+            1: {
+              cellWidth: 100,
+              halign: 'left',
+            },
+          },
+
+          alternateRowStyles: {
+            fillColor: [240, 240, 240],
+          },
+
+          margin: {
+            left: 20,
+            right: 20,
+          },
+        });
+
+        // Preview PDF
+        const blob = doc.output('blob');
+        const url = URL.createObjectURL(blob);
+
+        this.pdfSrc =
+          this.sanitizer.bypassSecurityTrustResourceUrl(url);
       },
-      headStyles: {
-        fillColor: [135, 206, 235], // dark blue
-        textColor: 20, // white text
-        fontStyle: 'bold',
-      },
-      alternateRowStyles: {
-        fillColor: [240, 240, 240], // light grey
-      },
-    });
 
-    // Convert PDF to blob & preview
-    const blob = doc.output('blob');
-    const url = URL.createObjectURL(blob);
-    this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      error: (error: any) => {
+        console.error('Attendance API error:', error);
+      },
     });
   }
+
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
@@ -242,4 +319,4 @@ export class AttendanceSheetComponent {
   exports: [AttendanceSheetComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AttendanceSheetModule {}
+export class AttendanceSheetModule { }
