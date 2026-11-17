@@ -39,6 +39,7 @@ export class ItemProperty4ListComponent {
   isItemProperty4PopupOpened = false;
   itemlabel: any;
   isFilterRowVisible: boolean = false;
+  isFilterOpened = false;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   isEditItemProperty4PopupOpened: boolean = false;
@@ -68,6 +69,18 @@ export class ItemProperty4ListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterPanel.visible', this.isFilterOpened);
+
+    }
+  }
 
   addButtonOptions = {
     type: 'default',
@@ -106,7 +119,7 @@ export class ItemProperty4ListComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    // onClick: () => this.toggleFilters(),
+    onClick: () => this.toggleFilters(),
   };
 
   sessionDetails() {
