@@ -72,6 +72,7 @@ export class UserRoleComponent implements OnInit {
 
   isSaving = false;
   isUpdating = false;
+  isFilterOpened=false;
 
   addButtonOptions = {
     type: 'default',
@@ -99,7 +100,7 @@ export class UserRoleComponent implements OnInit {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   refreshButtonOptions = {
@@ -180,6 +181,17 @@ export class UserRoleComponent implements OnInit {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+  this.isFilterOpened = !this.isFilterOpened;
+
+  const grid = this.dataGrid?.instance;
+
+  if (grid) {
+    grid.option('filterRow.visible', this.isFilterOpened);
+    grid.option('headerFilter.visible', this.isFilterOpened);
+    grid.option('filterPanel.visible', this.isFilterOpened);
+  }
+}
 
   show_new_Form() {
     this.isAddFormVisible = true;

@@ -77,6 +77,7 @@ export class UserComponent {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isFilterOpened=false;
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -98,7 +99,14 @@ export class UserComponent {
     `;
     },
   };
-
+searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+    this.toggleFilters();
+  },
+};
   // addButtonOptions = {
   //   text: 'New',
   //   icon: 'bi bi-file-earmark-plus',
@@ -120,6 +128,17 @@ export class UserComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+  this.isFilterOpened = !this.isFilterOpened;
+
+  const grid = this.dataGrid?.instance;
+
+  if (grid) {
+    grid.option('filterRow.visible', this.isFilterOpened);
+    grid.option('headerFilter.visible', this.isFilterOpened);
+     grid.option('filterPanel.visible', this.isFilterOpened);
+  }
+}
 
   //=================== Page refreshing==========================
   refresh = () => {
