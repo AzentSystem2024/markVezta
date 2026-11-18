@@ -157,6 +157,7 @@
         caption="Status"
         dataField="STATUS"
         [width]="80"
+        alignment="center"
         [cellTemplate]="statusCellRender"
         [allowHeaderFiltering]="true"
         [headerFilter]="{
@@ -171,6 +172,7 @@
         caption="Actions"
         [width]="140"
         cellTemplate="actionTemplate"
+        alignment="left"
       >
       </dxi-column>
       <div *dxTemplate="let cellData of 'actionTemplate'">
