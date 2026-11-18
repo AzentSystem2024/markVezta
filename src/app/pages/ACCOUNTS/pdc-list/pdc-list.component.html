@@ -61,6 +61,7 @@
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row> -->
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-toolbar>
         <dxi-item location="before">
           <div
@@ -201,7 +202,7 @@
         caption="Status"
         cellTemplate="statusCellRender"
         width="140  "
-        alignment="right"
+        alignment="center"
         [headerFilter]="{
           dataSource: getStatusFilterData,
           encodeHtml: false,

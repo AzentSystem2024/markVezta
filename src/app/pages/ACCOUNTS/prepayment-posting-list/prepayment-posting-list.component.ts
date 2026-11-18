@@ -131,7 +131,7 @@ export class PrepaymentPostingListComponent {
   selectedprepaymentposting: any;
   selected_Company_id: any;
   userId: any;
-  isFilterOpened: boolean;
+  isFilterOpened: boolean = false;
   companyID: any;
   canVerify: any;
   constructor(
