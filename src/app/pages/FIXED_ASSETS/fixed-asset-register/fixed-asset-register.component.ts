@@ -159,6 +159,7 @@ export class FixedAssetRegisterComponent {
   Department: any;
   DepartmentWithAll: any[] = [];
   isSummaryVisible = true;
+  isFilterOpened=false;
 
   constructor(
     private dataservice: DataService,
@@ -212,7 +213,7 @@ export class FixedAssetRegisterComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   refreshGrid() {
@@ -249,6 +250,17 @@ export class FixedAssetRegisterComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible',this.isFilterOpened);
+    }
+  }
 
   columnChooserButtonOptions = {
     icon: 'columnchooser',

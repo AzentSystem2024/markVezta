@@ -240,11 +240,20 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     this.getLedgerCodeDropdown();
   }
 
-  toggleFilters() {
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.showFilterRow = this.isFilterOpened;
+  // }
+toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-    this.showFilterRow = this.isFilterOpened;
-  }
 
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
   private getLedgerCodeDropdown() {
     this.dataService.getAccountHeadList().subscribe({
       next: (response: any) => {

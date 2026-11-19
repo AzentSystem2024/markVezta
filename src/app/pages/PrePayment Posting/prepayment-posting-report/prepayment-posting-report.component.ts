@@ -185,6 +185,7 @@ export class PrepaymentPostingReportComponent {
   Department: any;
   select_department_id: number;
   isSummaryVisible = true;
+  isFilterOpened=false;
 
   constructor(
     private dataservice: DataService,
@@ -238,8 +239,19 @@ export class PrepaymentPostingReportComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+       grid.option('headerPanel.visible', this.isFilterOpened);
+    }
+  }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {

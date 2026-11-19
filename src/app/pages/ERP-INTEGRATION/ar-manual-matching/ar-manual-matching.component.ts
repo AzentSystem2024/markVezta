@@ -208,6 +208,7 @@ export class ARManualMatchingComponent implements AfterViewInit {
     },
     onClick: () => this.toggleFilters(),
   };
+  dataGrid: any;
 
   constructor(private dataService: DataService) {}
 
@@ -217,9 +218,19 @@ export class ARManualMatchingComponent implements AfterViewInit {
     });
   }
 
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.showFilterRow = !this.showFilterRow;
+  // }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-    this.showFilterRow = !this.showFilterRow;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
   fetchData() {

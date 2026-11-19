@@ -227,6 +227,7 @@ export class SalesSummaryComponent {
   Store: any;
   selectedStoreid: any;
   selectedCustomer: any;
+  ColumnNames : any;
 
   items: any;
   selectedItem: any[] = [];
@@ -339,6 +340,32 @@ export class SalesSummaryComponent {
     stylingMode: 'outlined',
     onClick: () => this.toggleSummary(),
   };
+
+  findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataService.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;

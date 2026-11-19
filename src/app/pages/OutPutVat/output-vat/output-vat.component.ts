@@ -201,6 +201,17 @@ export class OutputVatComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible', this.isFilterOpened);
+    }
+  }
 
   ngOnInit() {
     this.onToDateChange({ value: this.defaultDate });
@@ -227,10 +238,7 @@ export class OutputVatComponent {
     onClick: () => this.toggleFilters(),
   };
 
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-    this.isFilterRowVisible = this.isFilterOpened;
-  }
+ 
 
   // Toggle filter panel
   toggleParameters(): void {

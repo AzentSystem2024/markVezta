@@ -263,6 +263,7 @@ export class LedgerStatementComponent implements OnInit {
   appType: any;
   isSummaryVisible = true;
   isFilterRowVisible = false;
+  isFilterOpened=false;
 
   constructor(
     private dataService: DataService,
@@ -344,13 +345,24 @@ export class LedgerStatementComponent implements OnInit {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   toggleFilterRow = (): void => {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible', this.isFilterOpened);
+    }
+  }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {

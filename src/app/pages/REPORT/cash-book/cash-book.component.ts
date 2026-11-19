@@ -143,6 +143,7 @@ export class CashBookComponent {
   years: number[] = [];
   monthDataSource: { name: string; value: any }[];
   selectedmonth: any = '';
+  isFilterOpened=false;
 
   showParameters = true;
   isFilterRowVisible = false;
@@ -156,7 +157,7 @@ export class CashBookComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     stylingMode: 'outlined',
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   refreshButtonOptions = {
@@ -194,6 +195,17 @@ export class CashBookComponent {
 
   toggleFilterRow(): void {
     this.isFilterRowVisible = !this.isFilterRowVisible;
+  }
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible', this.isFilterOpened);
+    }
   }
 
   toggleSummary(): void {
