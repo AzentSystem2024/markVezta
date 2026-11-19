@@ -15,6 +15,7 @@
     [showColumnLines]="true"
   >
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
 
     <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
     <dxo-editing
@@ -31,7 +32,7 @@
         <div class="grid-header">Supplier</div>
       </dxi-item>
 
-      <dxi-item
+      <!-- <dxi-item
         location="after"
         widget="dxButton"
         [options]="{
@@ -41,7 +42,12 @@
           stylingMode: 'contained',
           elementAttr: { class: 'toolbar-icon-btn' },
         }"
-      ></dxi-item>
+      ></dxi-item> -->
+      <dxi-item
+  location="after"
+  widget="dxButton"
+  [options]="searchButtonOptions"
+></dxi-item>
 
       <dxi-item
         location="after"

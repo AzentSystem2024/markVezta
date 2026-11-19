@@ -252,10 +252,21 @@ export class EosPaymentListComponent implements OnInit {
     this.getLedgerCodeDropdown();
   }
 
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.showFilterRow = this.isFilterOpened;
+
+  // }
   toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-    this.showFilterRow = this.isFilterOpened;
+  this.isFilterOpened = !this.isFilterOpened;
+
+  const grid = this.dataGrid?.instance;
+
+  if (grid) {
+    grid.option('filterRow.visible', this.isFilterOpened);
+    grid.option('headerFilter.visible', this.isFilterOpened);
   }
+}
 
   private getLedgerCodeDropdown() {
     this.dataService.getAccountHeadList().subscribe({

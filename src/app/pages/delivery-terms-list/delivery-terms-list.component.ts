@@ -32,6 +32,7 @@ export class DeliveryTermsListComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
+  isFilterOpened = false;
 
   canAdd = false;
   canEdit = false;
@@ -58,7 +59,7 @@ export class DeliveryTermsListComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   //=================================refresh=============================
@@ -101,6 +102,17 @@ export class DeliveryTermsListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterPanel.visible', this.isFilterOpened);
+    }
+  }
 
   showDeliveryTerms() {
     this.dataservice.getDeliveryTermsData().subscribe((response) => {

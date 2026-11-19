@@ -122,7 +122,7 @@ export class PrePaymentListComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
     type: 'default',
@@ -179,6 +179,17 @@ export class PrePaymentListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterPanel.visible',this.isFilterOpened);
+    }
+  }
 
   addPrepayment() {
     this.popupMode = 'new';

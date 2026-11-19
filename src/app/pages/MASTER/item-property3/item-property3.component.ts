@@ -65,6 +65,7 @@ export class ItemProperty3Component {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isFilterOpened = false;
 
   constructor(
     private dataservice: DataService,
@@ -82,7 +83,7 @@ export class ItemProperty3Component {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   sesstion_Details() {
@@ -147,6 +148,19 @@ export class ItemProperty3Component {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterPanel.visible', this.isFilterOpened);
+
+    }
+  }
 
   addButtonOptions = {
     type: 'default',

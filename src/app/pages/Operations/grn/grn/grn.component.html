@@ -16,6 +16,7 @@
     <dxo-sorting mode="multiple"></dxo-sorting>
     <dxo-header-filter [visible]="true"></dxo-header-filter>
     <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
 
     <dxo-paging [pageSize]="10"></dxo-paging>
     <dxo-pager
@@ -111,13 +112,13 @@
     <dxi-column
       dataField="DOC_NO"
       width="130"
-      caption="GRN NO"
+      caption="GRN No"
       alignment="left"
     ></dxi-column>
     <dxi-column
       dataField="GRN_DATE"
       displayFormat="dd-MM-yyyy"
-      caption="GRN DATE"
+      caption="GRN Date"
       dataType="date"
       [allowEditing]="false"
       format="dd-MM-yyyy"
@@ -125,13 +126,13 @@
     <dxi-column
       dataField="PO_NO"
       width="130"
-      caption="PO NO"
+      caption="PO No"
       alignment="left"
     ></dxi-column>
-    <dxi-column caption="SUPPLIER NAME" dataField="SUPPPLIER_NAME"></dxi-column>
+    <dxi-column caption="Supplier Name" dataField="SUPPPLIER_NAME"></dxi-column>
     <dxi-column caption="Store" dataField="STORE_NAME"></dxi-column>
     <dxi-column
-      caption="NET AMOUNT"
+      caption="Net Amount"
       dataField="NET_AMOUNT"
       dataType="number"
       width="130"
@@ -145,9 +146,10 @@
       [format]="{ type: 'fixedPoint', precision: 2 }"
     ></dxi-column> -->
     <dxi-column
-      caption="STATUS"
+      caption="Status"
       dataField="STATUS"
       cellTemplate="statusCellRender"
+      alignment="center"
     ></dxi-column>
 
     <div *dxTemplate="let data of 'statusCellRender'">
