@@ -422,19 +422,41 @@ export class AbsentListComponent {
     },
   };
 
-  load_GST_data() {
-    const payload = {
-      COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.selected_fin_id,
-      DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
-      DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-    };
 
-    this.dataService.AbsentList(payload).subscribe((res: any) => {
-      this.GST_datasource = res.DATA || [];
-      this.ledgerSummaryData = this.GST_datasource;
-    });
+load_GST_data() {
+  let monthDate: string | null = null;
+
+  if (this.selectedmonth !== '' && this.selectedmonth !== null) {
+    const date = new Date(
+      this.selectedYear,
+      this.selectedmonth,
+      1,
+      7, 20, 28, 606
+    );
+
+    monthDate = date.toISOString();
   }
+
+  const payload = {
+    COMPANY_ID: this.selected_Company_id,
+    MONTH: monthDate
+  };
+
+  this.dataService.AbsentList(payload).subscribe({
+    next: (res: any) => {
+      console.log('API Response:', res);
+
+      this.GST_datasource = res?.data || [];
+
+      console.log('Grid Data:', this.GST_datasource);
+    },
+    error: (err) => {
+      console.error('Absent List API Error:', err);
+      this.GST_datasource = [];
+    }
+  });
+}
+
 }
 @NgModule({
   imports: [
