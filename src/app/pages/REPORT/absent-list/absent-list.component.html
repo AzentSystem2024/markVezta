@@ -52,10 +52,6 @@
 
         <dxi-item location="after" template="monthboxTemplate"></dxi-item>
 
-        <dxi-item location="after" template="fromdateboxTemplate"></dxi-item>
-
-        <dxi-item location="after" template="todateboxTemplate"></dxi-item>
-
         <dxi-item
           location="after"
           widget="dxButton"
@@ -120,7 +116,7 @@
         ></dx-select-box>
       </div>
 
-      <div *dxTemplate="let data of 'fromdateboxTemplate'">
+      <!-- <div *dxTemplate="let data of 'fromdateboxTemplate'">
         <dx-date-box
           label="From Date"
           labelMode="floating"
@@ -129,9 +125,9 @@
           displayFormat="dd-MM-yyyy"
           (onValueChanged)="onFromDateChange($event)"
         ></dx-date-box>
-      </div>
+      </div> -->
 
-      <div *dxTemplate="let data of 'todateboxTemplate'">
+      <!-- <div *dxTemplate="let data of 'todateboxTemplate'">
         <dx-date-box
           label="To Date"
           labelMode="floating"
@@ -140,7 +136,7 @@
           displayFormat="dd-MM-yyyy"
           (onValueChanged)="onToDateChange($event)"
         ></dx-date-box>
-      </div>
+      </div> -->
 
       <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>
@@ -164,17 +160,19 @@
         [expandMode]="'rowClick'"
       ></dxo-grouping>
       <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
-      <dxi-column dataField="DOC_NO" caption="Enroll No"></dxi-column>
-      <dxi-column dataField="DOC_DATE" caption="Emp Name"></dxi-column>
+      <dxi-column dataField="EMP_CODE" caption="Enroll No."></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Emp Name"></dxi-column>
       <dxi-column
-        dataField="DOC_NAME"
+        dataField="JOIN_DATE"
         caption="Join Date"
         dataType="date"
+        format="dd-MM-yyyy"
       ></dxi-column>
       <dxi-column
-        dataField="RECEIVER_NAME"
+        dataField="LAST_DATE"
         caption="Last Date"
         dataType="date"
+        format="dd-MM-yyyy"
       ></dxi-column>
     </dx-data-grid>
 
