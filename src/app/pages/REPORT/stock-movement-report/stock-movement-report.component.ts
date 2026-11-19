@@ -277,6 +277,7 @@ export class StockMovementReportComponent {
   private reportSubscription: Subscription | null = null;
   isLoading = false;
   isSummaryVisible = false;
+  ColumnNames:any;
 
   toggleFiltersPanel(): void {
     this.isFilterVisible = !this.isFilterVisible;
@@ -428,6 +429,32 @@ export class StockMovementReportComponent {
     });
     grid.endUpdate();
   }
+
+   findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataService.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
 
   store_dropdown() {

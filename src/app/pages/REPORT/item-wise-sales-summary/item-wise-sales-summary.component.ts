@@ -159,6 +159,7 @@ export class ItemWiseSalesSummaryComponent {
   itemProperty1: any;
   selectedItemProperty1: any;
   selectedItemProperty2: any;
+  ColumnNames : any;
   today: Date = new Date();
 
   Saletype = [
@@ -313,7 +314,31 @@ export class ItemWiseSalesSummaryComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataService.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
 
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
   resetPopups() {
     this.isViewJournalVoucher = false;
     this.isViewDebitNote = false;

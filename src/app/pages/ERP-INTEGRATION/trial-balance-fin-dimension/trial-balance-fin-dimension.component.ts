@@ -306,9 +306,20 @@ export class TrialBalanceFinDimensionComponent {
     onClick: () => this.toggleFilters(),
   };
 
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.isFilterRowVisible = this.isFilterOpened;
+  // }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-    this.isFilterRowVisible = this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible', this.isFilterOpened);
+    }
   }
 
   refreshButtonOptions = {
