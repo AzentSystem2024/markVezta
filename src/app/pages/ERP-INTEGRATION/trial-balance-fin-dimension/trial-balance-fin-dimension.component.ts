@@ -8,6 +8,7 @@ import {
   DxDataGridModule,
   DxDateBoxModule,
   DxDropDownBoxModule,
+  DxDropDownButtonModule,
   DxListModule,
   DxLoadIndicatorModule,
   DxLoadPanelModule,
@@ -135,6 +136,7 @@ export class TrialBalanceFinDimensionComponent {
   showParameters = false;
   isFilterOpened = false;
   isSummaryVisible = true;
+  ColumnNames : any;
 
 
   summaryColumnsData = {
@@ -287,6 +289,7 @@ export class TrialBalanceFinDimensionComponent {
     this.formatted_To_date = this.formatDate(today);
     this.Diamension_dropdown();
     this.get_DataSource();
+    console.log(this.ColumnNames,'--column names--')
   }
 
 
@@ -351,6 +354,35 @@ export class TrialBalanceFinDimensionComponent {
     };
     this.cdr.detectChanges();
   }
+
+  findColumnLocation = (e: any) => {
+    console.log('CLICK EVENT TRIGGERED');
+  console.log('Full Event:', e);
+    const columnName = e.itemData;
+    console.log('Selected Item:', e.itemData);
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -454,6 +486,10 @@ export class TrialBalanceFinDimensionComponent {
         // this.TrialBalanceReport = res.data;
         this.TrialBalanceReport = [...res.data];
         console.log(this.TrialBalanceReport);
+         // Populate Column Finder names
+      if (this.TrialBalanceReport.length > 0) {
+        this.ColumnNames = Object.keys(this.TrialBalanceReport[0]);
+      }
       });
   }
 
@@ -601,6 +637,7 @@ export class TrialBalanceFinDimensionComponent {
     DxListModule,
     DxDropDownBoxModule,
     DxPopupModule,
+    DxDropDownButtonModule,
   ],
   providers: [],
   exports: [],
