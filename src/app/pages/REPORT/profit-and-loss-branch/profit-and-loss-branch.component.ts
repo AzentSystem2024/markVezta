@@ -85,6 +85,7 @@ export class ProfitAndLossBranchComponent {
   dynamicColumns: any[] = [];
   appType: any;
   isFilterOpened=false;
+  ColumnNames:any;
 
   constructor(
     private dataservice: DataService,
@@ -138,6 +139,32 @@ export class ProfitAndLossBranchComponent {
     this.appType = sessionData?.Configuration[0]?.APP_TYPE || '';
 
   }
+
+  findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   //================ Year value change ===================
   onYearChanged(e: any): void {

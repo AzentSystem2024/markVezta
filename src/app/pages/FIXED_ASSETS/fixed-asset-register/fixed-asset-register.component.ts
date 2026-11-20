@@ -160,6 +160,7 @@ export class FixedAssetRegisterComponent {
   DepartmentWithAll: any[] = [];
   isSummaryVisible = true;
   isFilterOpened=false;
+  ColumnNames:any;
 
   constructor(
     private dataservice: DataService,
@@ -287,6 +288,32 @@ export class FixedAssetRegisterComponent {
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
   }
+
+   findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   onExporting(event: any) {
     const fileName = 'FixedAssetRegister';
