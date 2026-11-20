@@ -7888,4 +7888,27 @@ The result can be exported to HTML or Markdown.`;
     const data = items;
     return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
   }
+
+  ShiftMasterReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ShiftMaster/list`, data);
+  }
+
+  InsertShiftMasterReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ShiftMaster/insert`, data);
+  }
+
+  SelectShiftMasterReport(id: any) {
+    return this.http.post(`${this.apiUrl}ShiftMaster/select/` + id, {});
+  }
+
+  UpdateShiftMasterReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ShiftMaster/update`, data);
+  }
+
+  DeleteShiftMasterReport(id: any) {
+    return this.http.post(`${this.apiUrl}ShiftMaster/delete/` + id, {});
+  }
 }

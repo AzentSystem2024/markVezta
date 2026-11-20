@@ -255,6 +255,7 @@ import { LateComerListComponent } from './pages/REPORT/late-comer-list/late-come
 import { AbsentListComponent } from './pages/REPORT/absent-list/absent-list.component';
 import { ExcessBreaksComponent } from './pages/REPORT/excess-breaks/excess-breaks.component';
 import { StaffShiftChangeReportComponent } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
+import { ShiftMasterComponent } from './pages/REPORT/shift-master/shift-master.component';
 
 const routes: Routes = [
   {
@@ -1562,6 +1563,11 @@ const routes: Routes = [
       {
         path: 'staff-shift-change-report',
         component: StaffShiftChangeReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'shift-master',
+        component: ShiftMasterComponent,
         canActivate: [AuthGuardService],
       },
       {
