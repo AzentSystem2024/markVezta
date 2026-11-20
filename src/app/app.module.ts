@@ -448,19 +448,24 @@ import { TopMovingReportModule } from './pages/DESPATCH/Reports/top-moving-repor
 import { AgeWisePendingReportModule } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
 import { AgeWiseReportModule } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
-import {  PendingActivityModule } from './pages/pending-activity/pending-activity.component';
+import { PendingActivityModule } from './pages/pending-activity/pending-activity.component';
 import { ApListPageModule } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-page.component';
 import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-page/inventory-list-page.component';
 import { EditedAttendanceModule } from './pages/REPORT/edited-attendance/edited-attendance.component';
 import { LateComerListModule } from './pages/REPORT/late-comer-list/late-comer-list.component';
-import { AbsentListComponent, AbsentListModule } from './pages/REPORT/absent-list/absent-list.component';
-import { ExcessBreaksComponent, ExcessBreaksModule } from './pages/REPORT/excess-breaks/excess-breaks.component';
-import { StaffShiftChangeReportComponent, StaffShiftChangeReportModule } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
+import { AbsentListModule } from './pages/REPORT/absent-list/absent-list.component';
+import { ExcessBreaksModule } from './pages/REPORT/excess-breaks/excess-breaks.component';
+import {  StaffShiftChangeReportModule } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
+import { ShiftMasterModule } from './pages/REPORT/shift-master/shift-master.component';
+import {  ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-master-add.component';
+import {  ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
+    // ShiftMasterComponent,
   ],
   imports: [
     ApListPageModule,
@@ -921,12 +926,15 @@ import { StaffShiftChangeReportComponent, StaffShiftChangeReportModule } from '.
     AgeWiseReportModule,
     ArticleStockReportModule,
     MultiboxReportModule,
-    PendingActivityModule ,
+    PendingActivityModule,
     EditedAttendanceModule,
     LateComerListModule,
     AbsentListModule,
     ExcessBreaksModule,
     StaffShiftChangeReportModule,
+    ShiftMasterModule,
+    ShiftMasterAddModule,
+    ShiftMasterEditModule
   ],
 
   providers: [
