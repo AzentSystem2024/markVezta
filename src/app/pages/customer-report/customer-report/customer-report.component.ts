@@ -127,7 +127,7 @@ export class CustomerReportComponent {
   auto: string = 'auto';
   isEmptyDatagrid: boolean = true;
   expandedOnce = false;
-
+  ColumnNames:any;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   company_list: any = [];
@@ -321,6 +321,31 @@ export class CustomerReportComponent {
        grid.option('headerPanel.visible', this.isFilterOpened);
     }
   }
+   findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
   get_customer_list() {
     const payload = {
       NAME: 'CUSTOMER',

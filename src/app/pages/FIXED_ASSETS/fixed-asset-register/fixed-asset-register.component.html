@@ -25,6 +25,8 @@
       [export]="{ enabled: true, formats: ['xlsx'] }"
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
+      (onContentReady)="updateVisibleColumnNames()"
+(onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
 
@@ -106,6 +108,22 @@
           location="after"
           widget="dxButton"
           [options]="applyButtonOptions"
+        ></dxi-item>
+          <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
         ></dxi-item>
       </dxo-toolbar>
 
