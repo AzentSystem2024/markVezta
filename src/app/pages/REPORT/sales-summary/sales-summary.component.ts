@@ -238,6 +238,7 @@ export class SalesSummaryComponent {
   distributorList: any;
   today: Date = new Date();
   isSummaryVisible = true;
+  // isFilterOpened=false;
 
   Saletype = [
     { ID: 0, DESCRIPTION: 'All' },
@@ -446,8 +447,10 @@ onGridOptionChanged(e: any) {
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible', this.isFilterOpened);
     }
   }
+ 
 
   resetPopups() {
     this.isViewJournalVoucher = false;
