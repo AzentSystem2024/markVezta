@@ -117,6 +117,8 @@ export class ExcessBreakDetailsComponent {
   selectedmonth: any = '';
   isSummaryVisible = true;
   auto: string = 'auto';
+  employeeDropdownData: any[] = [];
+  selected_employee: any;
 
   constructor(
     private dataService: DataService,
@@ -278,10 +280,11 @@ export class ExcessBreakDetailsComponent {
 
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
+    this.EmployeeDropdown();
     this.load_GST_data();
   }
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -358,6 +361,16 @@ export class ExcessBreakDetailsComponent {
     return `${day}-${month}-${year}`;
   }
 
+  EmployeeDropdown() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id,
+      NAME: 'EMPLOYEE',
+    };
+    this.dataService.getEmployeeDropDown(payload).subscribe((res: any) => {
+      this.employeeDropdownData = res || [];
+    });
+  }
+
   formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -381,36 +394,19 @@ export class ExcessBreakDetailsComponent {
       // 1. Total Debitṅ
       {
         name: 'totalDr',
-        column: 'INVOICE_AMOUNT',
+        column: 'TS_COUNT',
         summaryType: 'sum',
         displayFormat: 'Total {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'INVOICE_AMOUNT',
-        alignment: 'right',
-      },
-      // 2. Total Credit
-      {
-        name: 'totalCr',
-        column: 'TAXABLE_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: 'Total {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CreditAmount',
+        showInColumn: 'TS_COUNT',
         alignment: 'right',
       },
     ],
     groupItems: [
       {
-        column: 'INVOICE_AMOUNT',
+        column: 'TS_COUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'TAXABLE_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
@@ -422,16 +418,20 @@ export class ExcessBreakDetailsComponent {
     },
   };
 
+  onEmployeeValueChanged(e: any) {
+    this.selected_employee = e.value;
+  }
+
   load_GST_data() {
     const payload = {
-      COMPANY_ID: this.selected_Company_id,
+      EMP_ID: this.selected_employee || null,
       EXCESS_MINUTES: 30,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };
 
     this.dataService.ExcessBreakDetails(payload).subscribe((res: any) => {
-      this.GST_datasource = res.DATA || [];
+      this.GST_datasource = res.Data || [];
       this.ledgerSummaryData = this.GST_datasource;
     });
   }

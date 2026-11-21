@@ -381,36 +381,19 @@ export class ExcessBreaksComponent {
       // 1. Total Debitṅ
       {
         name: 'totalDr',
-        column: 'INVOICE_AMOUNT',
+        column: 'TS_COUNT',
         summaryType: 'sum',
         displayFormat: 'Total {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'INVOICE_AMOUNT',
-        alignment: 'right',
-      },
-      // 2. Total Credit
-      {
-        name: 'totalCr',
-        column: 'TAXABLE_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: 'Total {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CreditAmount',
+        showInColumn: 'TS_COUNT',
         alignment: 'right',
       },
     ],
     groupItems: [
       {
-        column: 'INVOICE_AMOUNT',
+        column: 'TS_COUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'TAXABLE_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
@@ -431,7 +414,7 @@ export class ExcessBreaksComponent {
     };
 
     this.dataService.ExcessBreaks(payload).subscribe((res: any) => {
-      this.GST_datasource = res.DATA || [];
+      this.GST_datasource = res.Data || [];
       this.ledgerSummaryData = this.GST_datasource;
     });
   }

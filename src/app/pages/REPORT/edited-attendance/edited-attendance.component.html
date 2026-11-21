@@ -83,11 +83,11 @@
         ></dxi-item>
 
         <!-- Show / Hide Summary -->
-        <dxi-item
+        <!-- <dxi-item
           location="after"
           widget="dxButton"
           [options]="summaryButtonOptions"
-        ></dxi-item>
+        ></dxi-item> -->
 
         <dxi-item
           location="after"
@@ -171,9 +171,10 @@
       <dxi-column dataField="SHIFT_NAME" caption="Shift Name"></dxi-column>
       <dxi-column dataField="EDITED_USER" caption="Edited User"></dxi-column>
       <dxi-column
-        dataField="EDITED_DATE"
+        dataField="START_DATE"
         caption="Edited Date"
         dataType="date"
+        displayFormat="dd-MM-yyyy"
       ></dxi-column>
     </dx-data-grid>
 

@@ -431,7 +431,7 @@ export class StaffShiftChangeReportComponent {
     };
 
     this.dataService.StaffShiftChangeReport(payload).subscribe((res: any) => {
-      this.GST_datasource = res.DATA || [];
+      this.GST_datasource = res.Data || [];
       this.ledgerSummaryData = this.GST_datasource;
     });
   }
