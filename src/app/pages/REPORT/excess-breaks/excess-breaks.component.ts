@@ -425,7 +425,7 @@ export class ExcessBreaksComponent {
   load_GST_data() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.selected_fin_id,
+      EXCESS_MINUTES: 30,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };

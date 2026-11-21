@@ -7870,11 +7870,11 @@ The result can be exported to HTML or Markdown.`;
 
   EditedAttendance(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+    return this.http.post(`${this.apiUrl}Report/GetTimesheetEdits`, data);
   }
   LateComerList(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+    return this.http.post(`${this.apiUrl}Report/GetLateComersRpt`, data);
   }
   AbsentList(items: any) {
     const data = items;
@@ -7882,11 +7882,15 @@ The result can be exported to HTML or Markdown.`;
   }
   ExcessBreaks(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+    return this.http.post(`${this.apiUrl}Report/GetExcessBreakSummary`, data);
+  }
+  ExcessBreakDetails(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Report/GetExcessBreakDetails`, data);
   }
   StaffShiftChangeReport(items: any) {
     const data = items;
-    return this.http.post(`${this.apiUrl}TransferOut_Mark/approve`, data);
+    return this.http.post(`${this.apiUrl}Report/GetShiftLogReport`, data);
   }
 
   ShiftMasterReport(items: any) {

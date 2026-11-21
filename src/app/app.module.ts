@@ -455,17 +455,17 @@ import { EditedAttendanceModule } from './pages/REPORT/edited-attendance/edited-
 import { LateComerListModule } from './pages/REPORT/late-comer-list/late-comer-list.component';
 import { AbsentListModule } from './pages/REPORT/absent-list/absent-list.component';
 import { ExcessBreaksModule } from './pages/REPORT/excess-breaks/excess-breaks.component';
-import {  StaffShiftChangeReportModule } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
+import { StaffShiftChangeReportModule } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
 import { ShiftMasterModule } from './pages/REPORT/shift-master/shift-master.component';
-import {  ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-master-add.component';
-import {  ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
+import { ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-master-add.component';
+import { ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
+import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/excess-break-details.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
-    // ShiftMasterComponent,
   ],
   imports: [
     ApListPageModule,
@@ -934,7 +934,8 @@ import {  ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-m
     StaffShiftChangeReportModule,
     ShiftMasterModule,
     ShiftMasterAddModule,
-    ShiftMasterEditModule
+    ShiftMasterEditModule,
+    ExcessBreakDetailsModule,
   ],
 
   providers: [
