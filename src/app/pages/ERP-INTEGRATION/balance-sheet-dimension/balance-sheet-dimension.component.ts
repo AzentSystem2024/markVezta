@@ -128,6 +128,7 @@ export class BalanceSheetDimensionComponent {
   selectedRowData: any = null;
   isSummaryVisible = true;
   showDimensionPopup = false;
+  ColumnNames:any;
 
   constructor(
     private dataservice: DataService,
@@ -319,6 +320,32 @@ export class BalanceSheetDimensionComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+
+   findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   onExporting(event: any) {
     const fileName = 'BalanceSheetReport';

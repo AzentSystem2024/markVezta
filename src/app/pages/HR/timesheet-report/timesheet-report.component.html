@@ -27,6 +27,8 @@
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
+       (onContentReady)="updateVisibleColumnNames()"
+     (onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-column-chooser
         [height]="500"
@@ -55,6 +57,7 @@
           </div>
         </dxi-item>
       </dxo-toolbar> -->
+     
 
       <dxo-toolbar>
         <dxi-item location="before">
@@ -190,6 +193,22 @@
           location="after"
           widget="dxButton"
           [options]="applyButtonOptions"
+        ></dxi-item>
+         <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
         ></dxi-item>
       </dxo-toolbar>
 

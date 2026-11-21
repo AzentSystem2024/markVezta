@@ -140,6 +140,7 @@ export class ProfitAndLossDimensionComponent {
   selectedRowData: any = null;
   isFilterOpened = false;
   isSummaryVisible = true;
+  ColumnNames:any;
 
   constructor(
     private dataservice: DataService,
@@ -231,6 +232,31 @@ export class ProfitAndLossDimensionComponent {
     };
     this.cdr.detectChanges();
   }
+    findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   //================ Year value change ===================
   onYearChanged(e: any): void {

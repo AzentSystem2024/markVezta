@@ -16,6 +16,8 @@
       [scrolling]="{ mode: 'virtual' }"
       [selection]="{ mode: 'single' }"
       (onExporting)="onExporting($event)"
+      (onContentReady)="updateVisibleColumnNames()"
+     (onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-export
         [enabled]="true"
@@ -70,6 +72,22 @@
           locateInMenu="auto"
           widget="dxButton"
           [options]="addButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
         ></dxi-item>
       </dxo-toolbar>
 

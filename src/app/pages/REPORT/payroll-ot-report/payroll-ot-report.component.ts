@@ -146,6 +146,7 @@ export class PayrollOtReportComponent {
   selected_payment_mode: number;
   isFilterOpened = false;
   isSummaryVisible = true;
+  ColumnNames:any;
 
   constructor(
     private dataService: DataService,
@@ -275,6 +276,32 @@ export class PayrollOtReportComponent {
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
   }
+
+   findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataService.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
 
 
