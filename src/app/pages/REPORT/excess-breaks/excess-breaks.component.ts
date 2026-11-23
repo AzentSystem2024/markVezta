@@ -381,36 +381,19 @@ export class ExcessBreaksComponent {
       // 1. Total Debitṅ
       {
         name: 'totalDr',
-        column: 'INVOICE_AMOUNT',
+        column: 'TS_COUNT',
         summaryType: 'sum',
         displayFormat: 'Total {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'INVOICE_AMOUNT',
-        alignment: 'right',
-      },
-      // 2. Total Credit
-      {
-        name: 'totalCr',
-        column: 'TAXABLE_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: 'Total {0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        showInColumn: 'CreditAmount',
+        showInColumn: 'TS_COUNT',
         alignment: 'right',
       },
     ],
     groupItems: [
       {
-        column: 'INVOICE_AMOUNT',
+        column: 'TS_COUNT',
         summaryType: 'sum',
         displayFormat: '{0}',
-        valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
-        alignByColumn: true,
-      },
-      {
-        column: 'TAXABLE_AMOUNT',
-        summaryType: 'sum',
-        displayFormat: ' {0}',
         valueFormat: { type: 'fixedPoint', precision: 2, useGrouping: true },
         alignByColumn: true,
       },
@@ -425,13 +408,13 @@ export class ExcessBreaksComponent {
   load_GST_data() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      FIN_ID: this.selected_fin_id,
+      EXCESS_MINUTES: 30,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };
 
     this.dataService.ExcessBreaks(payload).subscribe((res: any) => {
-      this.GST_datasource = res.DATA || [];
+      this.GST_datasource = res.Data || [];
       this.ledgerSummaryData = this.GST_datasource;
     });
   }

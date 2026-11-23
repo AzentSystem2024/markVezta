@@ -81,11 +81,11 @@
         ></dxi-item>
 
         <!-- Show / Hide Summary -->
-        <dxi-item
+        <!-- <dxi-item
           location="after"
           widget="dxButton"
           [options]="summaryButtonOptions"
-        ></dxi-item>
+        ></dxi-item> -->
 
         <dxi-item
           location="after"
@@ -164,18 +164,15 @@
         [expandMode]="'rowClick'"
       ></dxo-grouping>
       <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
-      <dxi-column dataField="DOC_NO" caption="Date"></dxi-column>
-      <dxi-column dataField="DOC_DATE" caption="Emp Name"></dxi-column>
-      <dxi-column dataField="DOC_NAME" caption="Less Minute"></dxi-column>
-      <dxi-column dataField="RECEIVER_NAME" caption="Time in"></dxi-column>
-      <dxi-column dataField="RECEIVER_NAME" caption="Time out"></dxi-column>
-      <dxi-column dataField="RECEIVER_NAME" caption="Shift Name"></dxi-column>
-      <dxi-column
-        dataField="INVOICE_AMOUNT"
-        caption="Break Out"
-      ></dxi-column>
+      <dxi-column dataField="DATE" caption="Date"></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Emp Name"></dxi-column>
+      <dxi-column dataField="LESS_MINUTES" caption="Less Minute"></dxi-column>
+      <dxi-column dataField="TIME_IN" caption="Time in"></dxi-column>
+      <dxi-column dataField="TIME_OUT" caption="Time out"></dxi-column>
+      <dxi-column dataField="SHIFT_NAME" caption="Shift Name"></dxi-column>
+      <dxi-column dataField="BREAK_OUT" caption="Break Out"></dxi-column>
 
-      <dxi-column dataField="RECEIVER_NAME" caption="Break In"></dxi-column>
+      <dxi-column dataField="BREAK_IN" caption="Break In"></dxi-column>
     </dx-data-grid>
 
     <dx-popup

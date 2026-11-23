@@ -83,11 +83,11 @@
         ></dxi-item>
 
         <!-- Show / Hide Summary -->
-        <dxi-item
+        <!-- <dxi-item
           location="after"
           widget="dxButton"
           [options]="summaryButtonOptions"
-        ></dxi-item>
+        ></dxi-item> -->
 
         <dxi-item
           location="after"
@@ -166,14 +166,15 @@
         [expandMode]="'rowClick'"
       ></dxo-grouping>
       <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
-      <dxi-column dataField="DOC_NO" caption="Emp Name"></dxi-column>
-      <dxi-column dataField="DOC_DATE" caption="Emp Code"></dxi-column>
-      <dxi-column dataField="DOC_NAME" caption="Shift Name"></dxi-column>
-      <dxi-column dataField="RECEIVER_NAME" caption="Edited User"></dxi-column>
+      <dxi-column dataField="EMP_NAME" caption="Emp Name"></dxi-column>
+      <dxi-column dataField="EMP_CODE" caption="Emp Code"></dxi-column>
+      <dxi-column dataField="SHIFT_NAME" caption="Shift Name"></dxi-column>
+      <dxi-column dataField="EDITED_USER" caption="Edited User"></dxi-column>
       <dxi-column
-        dataField="INVOICE_AMOUNT"
+        dataField="START_DATE"
         caption="Edited Date"
         dataType="date"
+        displayFormat="dd-MM-yyyy"
       ></dxi-column>
     </dx-data-grid>
 
