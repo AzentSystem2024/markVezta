@@ -245,7 +245,7 @@ export class ShiftMasterEditComponent {
       breaks.push({
         TIME_IN: this.toTimeString(this.shiftData.BREAK2_START),
         TIME_OUT: this.toTimeString(this.shiftData.BREAK2_END),
-        TOTAL_MINUTES: Math.round(
+        TOTAL_MINUTES: (
           (this.shiftData.BREAK2_TOTAL_MINUTES || 0) * 60
         )
       });
@@ -259,8 +259,8 @@ export class ShiftMasterEditComponent {
       IS_NEXT_DAY: this.shiftData.IS_NEXT_DAY,
       TOTAL_HOURS: this.shiftData.TOTAL_HOURS,
       BREAK_HOURS: this.shiftData.BREAK_HOURS,
-      ENTRY_VALID_FROM: this.toTimeString(this.shiftData.ENTRY_VALID_FROM),
-      ENTRY_VALID_TO: this.toTimeString(this.shiftData.ENTRY_VALID_TO),
+      ENTRY_VALID_FROM: this.shiftData.ENTRY_VALID_FROM,
+      ENTRY_VALID_TO: this.shiftData.ENTRY_VALID_TO,
       MAX_EXIT_TIME: this.shiftData.MAX_EXIT_TIME,
       BREAK_MINUTES: this.shiftData.BREAK_MINUTES,
       IS_FIXED: this.shiftData.IS_FIXED,
