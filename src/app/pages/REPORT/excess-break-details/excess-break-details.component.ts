@@ -119,6 +119,7 @@ export class ExcessBreakDetailsComponent {
   auto: string = 'auto';
   employeeDropdownData: any[] = [];
   selected_employee: any;
+  selected_Excess_Minutes: any;
 
   constructor(
     private dataService: DataService,
@@ -261,6 +262,9 @@ export class ExcessBreakDetailsComponent {
     }));
   }
 
+  toggleParameters(): void {
+    this.showParameters = !this.showParameters;
+  }
 
   ngOnInit() {
     // this.loadLedgerData();
@@ -423,9 +427,10 @@ export class ExcessBreakDetailsComponent {
   }
 
   load_GST_data() {
+    this.showParameters = false;
     const payload = {
       EMP_ID: this.selected_employee || null,
-      EXCESS_MINUTES: 30,
+      EXCESS_MINUTES: this.selected_Excess_Minutes,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };

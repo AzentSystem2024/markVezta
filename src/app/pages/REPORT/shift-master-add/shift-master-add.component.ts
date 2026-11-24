@@ -144,10 +144,29 @@ export class ShiftMasterAddComponent {
       IS_FIXED: false,
       SHIFT_CHANGE: false,
       IS_DAILY_WAGE: false,
-      NO_HALF_DAY: false
+      NO_HALF_DAY: false,
+      IS_BREAK1: false,
+      BREAK1_TIME_IN: null,
+      BREAK1_TIME_OUT: null,
+      BREAK1_TOTAL_MINUTES: 0,
+
+      IS_BREAK2: false,
+      BREAK2_TIME_IN: null,
+      BREAK2_TIME_OUT: null,
+      BREAK2_TOTAL_MINUTES: 0
     };
   }
 
+  calculateBreakMinutes(timeIn: any, timeOut: any): number {
+    if (!timeIn || !timeOut) {
+      return 0;
+    }
+
+    const start = new Date(timeIn);
+    const end = new Date(timeOut);
+
+    return Math.round((end.getTime() - start.getTime()) / 60000);
+  }
 
   saveForm() {
     const validation = this.shiftForm.instance.validate();
@@ -157,15 +176,35 @@ export class ShiftMasterAddComponent {
       return;
     }
 
+    // Prepare break details
+    const breaks: any[] = [];
+
+    if (this.shiftData.IS_BREAK1) {
+      breaks.push({
+        TIME_IN: this.toTimeString(this.shiftData.BREAK1_TIME_IN),
+        TIME_OUT: this.toTimeString(this.shiftData.BREAK1_TIME_OUT),
+        TOTAL_MINUTES: this.shiftData.BREAK1_TOTAL_MINUTES || 0
+      });
+    }
+
+    if (this.shiftData.IS_BREAK2) {
+      breaks.push({
+        TIME_IN: this.toTimeString(this.shiftData.BREAK2_TIME_IN),
+        TIME_OUT: this.toTimeString(this.shiftData.BREAK2_TIME_OUT),
+        TOTAL_MINUTES: this.shiftData.BREAK2_TOTAL_MINUTES || 0
+      });
+    }
+
+
     const payload = {
       SHIFT_NAME: this.shiftData.SHIFT_NAME,
-      TIME_START: this.toISOString(this.shiftData.TIME_START),
-      TIME_END: this.toISOString(this.shiftData.TIME_END),
+      TIME_START: this.toTimeString(this.shiftData.TIME_START),
+      TIME_END: this.toTimeString(this.shiftData.TIME_END),
       IS_NEXT_DAY: this.shiftData.IS_NEXT_DAY,
       TOTAL_HOURS: this.shiftData.TOTAL_HOURS,
       BREAK_HOURS: this.shiftData.BREAK_HOURS,
-      ENTRY_VALID_FROM: this.toISOString(this.shiftData.ENTRY_VALID_FROM),
-      ENTRY_VALID_TO: this.toISOString(this.shiftData.ENTRY_VALID_TO),
+      ENTRY_VALID_FROM: this.toTimeString(this.shiftData.ENTRY_VALID_FROM),
+      ENTRY_VALID_TO: this.toTimeString(this.shiftData.ENTRY_VALID_TO),
       MAX_EXIT_TIME: this.shiftData.MAX_EXIT_TIME,
       BREAK_MINUTES: this.shiftData.BREAK_MINUTES,
       IS_FIXED: this.shiftData.IS_FIXED,
@@ -173,6 +212,7 @@ export class ShiftMasterAddComponent {
       IS_DAILY_WAGE: this.shiftData.IS_DAILY_WAGE,
       NO_HALF_DAY: this.shiftData.NO_HALF_DAY,
       COMPANY_ID: this.selected_Company_id, // Replace with actual company ID
+      BREAKS: breaks
     };
 
     console.log('Shift Master Payload:', payload);
@@ -216,6 +256,19 @@ export class ShiftMasterAddComponent {
     });
   }
 
+  toTimeString(value: any): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const date = new Date(value);
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+  }
 
   toISOString(value: any): string | null {
     if (!value) {
@@ -224,6 +277,64 @@ export class ShiftMasterAddComponent {
 
     return new Date(value).toISOString();
   }
+
+
+  toggleBreak1(e: any) {
+    if (!e.value) {
+      this.shiftData.BREAK1_TIME_IN = null;
+      this.shiftData.BREAK1_TIME_OUT = null;
+      this.shiftData.BREAK1_TOTAL_MINUTES = 0;
+    }
+  }
+
+  toggleBreak2(e: any) {
+    if (!e.value) {
+      this.shiftData.BREAK2_TIME_IN = null;
+      this.shiftData.BREAK2_TIME_OUT = null;
+      this.shiftData.BREAK2_TOTAL_MINUTES = 0;
+    }
+  }
+
+  calculateBreakHours(breakNo: number) {
+
+    const start = breakNo === 1
+      ? this.shiftData.BREAK1_TIME_IN
+      : this.shiftData.BREAK2_TIME_IN;
+
+    const end = breakNo === 1
+      ? this.shiftData.BREAK1_TIME_OUT
+      : this.shiftData.BREAK2_TIME_OUT;
+
+    if (!start || !end) {
+      if (breakNo === 1) {
+        this.shiftData.BREAK1_TOTAL_MINUTES = 0;
+      } else {
+        this.shiftData.BREAK2_TOTAL_MINUTES = 0;
+      }
+      return;
+    }
+
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+
+    let difference = endTime.getTime() - startTime.getTime();
+
+    // Handle overnight break
+    if (difference < 0) {
+      difference += 24 * 60 * 60 * 1000;
+    }
+
+    const totalHours = Number(
+      (difference / (1000 * 60 * 60)).toFixed(2)
+    );
+
+    if (breakNo === 1) {
+      this.shiftData.BREAK1_TOTAL_MINUTES = totalHours;
+    } else {
+      this.shiftData.BREAK2_TOTAL_MINUTES = totalHours;
+    }
+  }
+
 
   cancelForm() {
     this.cancelled.emit();

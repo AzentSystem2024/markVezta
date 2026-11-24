@@ -44,7 +44,7 @@
       <dx-date-box
         [(value)]="shiftData.TIME_START"
         type="datetime"
-        displayFormat="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        displayFormat="HH:mm:ss.SSS"
         [useMaskBehavior]="true"
         placeholder="Enter start time"
         labelMode="floating"
@@ -62,7 +62,7 @@
       <dx-date-box
         [(value)]="shiftData.TIME_END"
         type="datetime"
-        displayFormat="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        displayFormat="HH:mm:ss.SSS"
         [useMaskBehavior]="true"
         placeholder="Enter end time"
         labelMode="floating"
@@ -179,6 +179,106 @@
         [(value)]="shiftData.NO_HALF_DAY"
         text="No Half Day.Only Less Hours"
       ></dx-check-box>
+    </dxi-item>
+
+    <!-- Break 1 Checkbox -->
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.IS_BREAK1"
+        text="Break 1"
+        (onValueChanged)="toggleBreak1($event)"
+      ></dx-check-box>
+    </dxi-item>
+
+    <!-- Break 1 Start Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK1_START"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        label="Break 1 Start Time"
+        labelMode="floating"
+        placeholder="Select start time"
+        [disabled]="!shiftData.IS_BREAK1"
+        (onValueChanged)="calculateBreakHours(1)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 1 End Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK1_END"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        label="Break 1 End Time"
+        labelMode="floating"
+        placeholder="Select end time"
+        [disabled]="!shiftData.IS_BREAK1"
+        (onValueChanged)="calculateBreakHours(1)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 1 Total Hours -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.BREAK1_TOTAL_MINUTES"
+        label="Break 1 Total Hours"
+        labelMode="floating"
+        [disabled]="!shiftData.IS_BREAK1"
+        [readOnly]="true"
+        [showSpinButtons]="true"
+        [min]="0"
+      ></dx-number-box>
+    </dxi-item>
+
+    <!-- Break 2 Checkbox -->
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.IS_BREAK2"
+        text="Break 2"
+        (onValueChanged)="toggleBreak2($event)"
+      ></dx-check-box>
+    </dxi-item>
+
+    <!-- Break 2 Start Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK2_START"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        label="Break 2 Start Time"
+        labelMode="floating"
+        placeholder="Select start time"
+        [disabled]="!shiftData.IS_BREAK2"
+        (onValueChanged)="calculateBreakHours(2)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 2 End Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK2_END"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        label="Break 2 End Time"
+        labelMode="floating"
+        placeholder="Select end time"
+        [disabled]="!shiftData.IS_BREAK2"
+        (onValueChanged)="calculateBreakHours(2)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 2 Total Hours -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.BREAK2_TOTAL_MINUTES"
+        label="Break 2 Total Hours"
+        labelMode="floating"
+        [disabled]="!shiftData.IS_BREAK2"
+        [readOnly]="true"
+        [showSpinButtons]="true"
+        [min]="0"
+      ></dx-number-box>
     </dxi-item>
   </dx-form>
 

@@ -1,5 +1,87 @@
 <div class="view-wrapper list-page">
   <div class="grid-container">
+    <!-- Collapsible Filter Panel -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-select-box
+          label="Year"
+          labelMode="floating"
+          [width]="100"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        ></dx-select-box>
+
+        <dx-select-box
+          label="Month"
+          labelMode="floating"
+          [width]="120"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        ></dx-select-box>
+
+        <dx-date-box
+          label="From Date"
+          labelMode="floating"
+          [width]="135"
+          [(value)]="selected_from_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onFromDateChange($event)"
+        ></dx-date-box>
+
+        <dx-date-box
+          label="To Date"
+          labelMode="floating"
+          [width]="135"
+          [(value)]="selected_To_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        ></dx-date-box>
+
+        <dx-select-box
+          label="Employee"
+          labelMode="floating"
+          [width]="200"
+          [(value)]="selected_employee"
+          [dataSource]="employeeDropdownData"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          (onValueChanged)="onEmployeeValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+          [searchEnabled]="true"
+        ></dx-select-box>
+
+        <dx-number-box
+          label="Excess Minutes"
+          labelMode="floating"
+          [width]="150"
+          [(value)]="selected_Excess_Minutes"
+          [showSpinButtons]="true"
+          [min]="0"
+          [step]="1"
+        ></dx-number-box>
+
+        <dx-button
+          text="Apply"
+          stylingMode="contained"
+          type="default"
+          (onClick)="load_GST_data()"
+        ></dx-button>
+      </div>
+    </div>
+
+    <!-- Horizontal Toggle Bar -->
+    <div class="toggle-bar" (click)="toggleParameters()">
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
     <dx-data-grid
       class="grid theme-dependent"
       [dataSource]="GST_datasource"
@@ -48,16 +130,6 @@
           <div class="grid-header gst-report-title">Excess Break Details</div>
         </dxi-item>
 
-        <dxi-item location="after" template="yearboxTemplate"></dxi-item>
-
-        <dxi-item location="after" template="monthboxTemplate"></dxi-item>
-
-        <dxi-item location="after" template="fromdateboxTemplate"></dxi-item>
-
-        <dxi-item location="after" template="todateboxTemplate"></dxi-item>
-
-        <dxi-item location="after" template="employeeTemplate"></dxi-item>
-
         <dxi-item
           location="after"
           widget="dxButton"
@@ -88,76 +160,7 @@
           widget="dxButton"
           [options]="summaryButtonOptions"
         ></dxi-item>
-
-        <dxi-item
-          location="after"
-          widget="dxButton"
-          [options]="applyButtonOptions"
-        ></dxi-item>
       </dxo-toolbar>
-
-      <div *dxTemplate="let data of 'yearboxTemplate'">
-        <dx-select-box
-          label="Year"
-          labelMode="floating"
-          [width]="100"
-          [(value)]="selectedYear"
-          [dataSource]="years"
-          (onValueChanged)="onYearChanged($event)"
-          placeholder="Year"
-        ></dx-select-box>
-      </div>
-
-      <div *dxTemplate="let data of 'monthboxTemplate'">
-        <dx-select-box
-          label="Month"
-          labelMode="floating"
-          [width]="120"
-          [dataSource]="monthDataSource"
-          displayExpr="name"
-          valueExpr="value"
-          [(value)]="selectedmonth"
-          (onValueChanged)="onMonthValueChanged($event)"
-          [dropDownOptions]="{ width: 'auto' }"
-        ></dx-select-box>
-      </div>
-
-      <div *dxTemplate="let data of 'fromdateboxTemplate'">
-        <dx-date-box
-          label="From Date"
-          labelMode="floating"
-          [width]="135"
-          [(value)]="selected_from_date"
-          displayFormat="dd-MM-yyyy"
-          (onValueChanged)="onFromDateChange($event)"
-        ></dx-date-box>
-      </div>
-
-      <div *dxTemplate="let data of 'todateboxTemplate'">
-        <dx-date-box
-          label="To Date"
-          labelMode="floating"
-          [width]="135"
-          [(value)]="selected_To_date"
-          displayFormat="dd-MM-yyyy"
-          (onValueChanged)="onToDateChange($event)"
-        ></dx-date-box>
-      </div>
-
-      <div *dxTemplate="let data of 'employeeTemplate'">
-        <dx-select-box
-          label="Employee"
-          labelMode="floating"
-          [width]="200"
-          [(value)]="selected_employee"
-          [dataSource]="employeeDropdownData"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-          (onValueChanged)="onEmployeeValueChanged($event)"
-          [dropDownOptions]="{ width: 'auto' }"
-          [searchEnabled]="true"
-        ></dx-select-box>
-      </div>
 
       <dxo-sorting mode="none"></dxo-sorting>
       <dxo-filter-row visible="true"></dxo-filter-row>

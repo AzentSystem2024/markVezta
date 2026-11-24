@@ -117,6 +117,7 @@ export class ExcessBreaksComponent {
   selectedmonth: any = '';
   isSummaryVisible = true;
   auto: string = 'auto';
+  selected_Excess_Minutes: any;
 
   constructor(
     private dataService: DataService,
@@ -408,7 +409,7 @@ export class ExcessBreaksComponent {
   load_GST_data() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      EXCESS_MINUTES: 30,
+      EXCESS_MINUTES: this.selected_Excess_Minutes,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
     };

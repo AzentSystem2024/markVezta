@@ -56,6 +56,8 @@
 
         <dxi-item location="after" template="todateboxTemplate"></dxi-item>
 
+        <dxi-item location="after" template="excessminutesTemplate"></dxi-item>
+
         <dxi-item
           location="after"
           widget="dxButton"
@@ -140,6 +142,18 @@
           displayFormat="dd-MM-yyyy"
           (onValueChanged)="onToDateChange($event)"
         ></dx-date-box>
+      </div>
+
+      <div *dxTemplate="let data of 'excessminutesTemplate'">
+        <dx-number-box
+          label="Excess Minutes"
+          labelMode="floating"
+          [width]="145"
+          [(value)]="selected_Excess_Minutes"
+          [showSpinButtons]="true"
+          [min]="0"
+          [step]="1"
+        ></dx-number-box>
       </div>
 
       <dxo-sorting mode="none"></dxo-sorting>
