@@ -131,6 +131,8 @@
         summaryColumnsData.calculateCustomSummary
       "
       (onExporting)="onExporting($event)"
+      (onContentReady)="updateVisibleColumnNames()" 
+       (onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-column-chooser
         [height]="500"
@@ -189,6 +191,27 @@
           widget="dxButton"
           [options]="summaryButtonOptions"
         ></dxi-item>
+          <!-- <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
+        ></dxi-item> -->
+         <dxi-item
+         location="after"
+          widget="dxDropDownButton"
+           [options]="columnFinderButtonOptions"
+           ></dxi-item>
       </dxo-toolbar>
 
       <dxo-sorting mode="none"></dxo-sorting>

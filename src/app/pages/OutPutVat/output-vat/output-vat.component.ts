@@ -37,6 +37,7 @@ import {
   DxAutocompleteModule,
   DxTagBoxModule,
   DxDataGridComponent,
+  DxDropDownButtonModule
 } from 'devextreme-angular';
 
 import {
@@ -289,6 +290,55 @@ export class OutputVatComponent {
     };
     this.cdr.detectChanges();
   }
+    columnFinderButtonOptions: any = {
+        items: [],
+        displayExpr: 'text',
+        keyExpr: 'value',
+        onItemClick: (e: any) => {
+          this.findColumnLocation(e);
+        },
+        hint: 'Column location finder',
+        icon: 'increaseindent',
+        showArrowIcon: true,
+        dropDownOptions: {
+          width: 'auto',
+          height: 300
+        }
+      }; 
+               findColumnLocation(e: any): void {
+                 const columnName = e.itemData?.value;
+               
+                 if (columnName && this.dataGrid?.instance) {
+                   this.dataService.makeColumnVisible(this.dataGrid, columnName);
+                 }
+               }
+               
+               updateVisibleColumnNames(): void {
+                 if (!this.dataGrid?.instance) {
+                   return;
+                 }
+               
+                 const columns = this.dataGrid.instance.getVisibleColumns();
+               
+                 const items = columns
+                   .filter((column: any) => column.dataField && column.caption)
+                   .map((column: any) => ({
+                     text: column.caption,
+                     value: column.dataField
+                   }));
+               
+                 this.columnFinderButtonOptions = {
+                   ...this.columnFinderButtonOptions,
+                   items: items
+                 };
+               
+                 this.cdr.detectChanges();
+               }
+                 onGridOptionChanged(e: any): void {
+                 if (e.fullName?.includes('visible')) {
+                   this.updateVisibleColumnNames();
+                 }
+               }
 
 
   get_customer_list() {
@@ -673,6 +723,7 @@ export class OutputVatComponent {
     ViewCreditNoteModule,
     DxoLoadPanelModule,
     AddInvoiceRetailModule,
+    DxDropDownButtonModule
   ],
   providers: [],
   declarations: [OutputVatComponent],

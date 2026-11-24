@@ -20,6 +20,7 @@ import {
   DxTextBoxModule,
   DxValidationGroupModule,
   DxValidatorModule,
+ 
 } from 'devextreme-angular';
 
 import { DataService } from 'src/app/services';
@@ -321,6 +322,55 @@ export class TrialBalanceFinDimensionComponent {
       grid.option('headerPanel.visible', this.isFilterOpened);
     }
   }
+  columnFinderButtonOptions: any = {
+          items: [],
+          displayExpr: 'text',
+          keyExpr: 'value',
+          onItemClick: (e: any) => {
+            this.findColumnLocation(e);
+          },
+          hint: 'Column location finder',
+          icon: 'increaseindent',
+          showArrowIcon: true,
+          dropDownOptions: {
+            width: 'auto',
+            height: 300
+          }
+        }; 
+                 findColumnLocation(e: any): void {
+                   const columnName = e.itemData?.value;
+                 
+                   if (columnName && this.dataGrid?.instance) {
+                     this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+                   }
+                 }
+                 
+                 updateVisibleColumnNames(): void {
+                   if (!this.dataGrid?.instance) {
+                     return;
+                   }
+                 
+                   const columns = this.dataGrid.instance.getVisibleColumns();
+                 
+                   const items = columns
+                     .filter((column: any) => column.dataField && column.caption)
+                     .map((column: any) => ({
+                       text: column.caption,
+                       value: column.dataField
+                     }));
+                 
+                   this.columnFinderButtonOptions = {
+                     ...this.columnFinderButtonOptions,
+                     items: items
+                   };
+                 
+                   this.cdr.detectChanges();
+                 }
+                   onGridOptionChanged(e: any): void {
+                   if (e.fullName?.includes('visible')) {
+                     this.updateVisibleColumnNames();
+                   }
+                 }
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -366,34 +416,7 @@ export class TrialBalanceFinDimensionComponent {
     this.cdr.detectChanges();
   }
 
-  findColumnLocation = (e: any) => {
-    console.log('CLICK EVENT TRIGGERED');
-  console.log('Full Event:', e);
-    const columnName = e.itemData;
-    console.log('Selected Item:', e.itemData);
-    if (columnName != '' && columnName != null) {
-      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
-    }
-  };
-
-  updateVisibleColumnNames() {
-  if (this.dataGrid?.instance) {
-    const columns = this.dataGrid.instance.getVisibleColumns();
-
-    this.ColumnNames = columns
-      .filter((col: any) => col.caption && col.dataField)
-      .map((col: any) => col.caption);
-  }
-}
-
-onGridOptionChanged(e: any) {
-  if (
-    e.name === 'columns' ||
-    (e.fullName && e.fullName.includes('visible'))
-  ) {
-    this.updateVisibleColumnNames();
-  }
-}
+ 
 
   //================ Year value change ===================
   onYearChanged(e: any): void {

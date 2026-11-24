@@ -30,6 +30,7 @@
       (onCellClick)="onCellClick($event)"
        (onContentReady)="updateVisibleColumnNames()" 
        (onOptionChanged)="onGridOptionChanged($event)"
+       
     >
       <dxo-column-chooser
         [height]="500"
@@ -107,22 +108,11 @@
           widget="dxButton"
           [options]="applyButtonOptions"
         ></dxi-item>
-         <dxi-item
-          class="columnfinderclass"
+        <dxi-item
+         location="after"
           widget="dxDropDownButton"
-          [options]="{
-            dataSource: ColumnNames,
-            onItemClick: findColumnLocation,
-            placeholder: 'Search Column',
-            noDataText: 'Load data and try again',
-            hint: 'Column location finder',
-            icon: 'increaseindent',
-            dropDownOptions: {
-              width: 'auto',
-              height: '60vh',
-            },
-          }"
-        ></dxi-item>
+           [options]="columnFinderButtonOptions"
+           ></dxi-item>
       </dxo-toolbar>
 
       <div *dxTemplate="let data of 'dimensionFilterTemplate'">
