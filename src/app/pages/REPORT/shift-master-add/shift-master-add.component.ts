@@ -75,6 +75,7 @@ export class ShiftMasterAddComponent {
 
   ngOnInit() {
     this.sesstion_Details();
+    this.calculateTotalHours();
   }
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
@@ -122,18 +123,8 @@ export class ShiftMasterAddComponent {
 
     this.shiftData = {
       SHIFT_NAME: '',
-      TIME_START: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        9, 0, 0
-      ),
-      TIME_END: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        18, 0, 0
-      ),
+      TIME_START: new Date(today),
+      TIME_END: new Date(today),
       IS_NEXT_DAY: false,
       TOTAL_HOURS: 0,
       BREAK_HOURS: '',
@@ -157,15 +148,10 @@ export class ShiftMasterAddComponent {
     };
   }
 
-  calculateBreakMinutes(timeIn: any, timeOut: any): number {
-    if (!timeIn || !timeOut) {
-      return 0;
-    }
+  calculateBreakMinutesFromHours() {
+    const breakHours = Number(this.shiftData.BREAK_HOURS) || 0;
 
-    const start = new Date(timeIn);
-    const end = new Date(timeOut);
-
-    return Math.round((end.getTime() - start.getTime()) / 60000);
+    this.shiftData.BREAK_MINUTES = Math.round(breakHours * 60);
   }
 
   saveForm() {

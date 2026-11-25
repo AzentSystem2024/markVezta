@@ -85,6 +85,7 @@
         placeholder="Enter break hours"
         labelMode="floating"
         label="Break Hours"
+        (onValueChanged)="calculateBreakMinutesFromHours()"
       ></dx-number-box>
     </dxi-item>
 
@@ -98,6 +99,7 @@
         placeholder="Enter break minutes"
         labelMode="floating"
         label="Break Minutes"
+        [readOnly]="true"
       ></dx-number-box>
     </dxi-item>
 
