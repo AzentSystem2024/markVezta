@@ -31,16 +31,18 @@ import DataSource from 'devextreme/data/data_source';
   templateUrl: './article-brand.component.html',
   styleUrls: ['./article-brand.component.scss'],
 })
+
 export class ArticleBrandComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
+
   @ViewChild('formValidationGroup')
-  formValidationGroup: DxValidationGroupComponent;
+  formValidationGroup!: DxValidationGroupComponent;
 
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  Datasource: DataSource; // for grid + loader
+  Datasource!: DataSource; // for grid + loader
   articleBrandList: any[] = []; // for forEach / validation
   articleBrandRowCount = 0; // for UI conditions
   isFilterRowVisible: boolean = false;
@@ -98,13 +100,14 @@ export class ArticleBrandComponent {
     `;
     },
   };
+
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => this.toggleFilterRow(),
   };
-  //=================================refresh=============================
+  //======= refresh ==========
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -136,8 +139,8 @@ export class ArticleBrandComponent {
     const menuGroups = menuResponse.MenuGroups || [];
 
     const packingRights = menuGroups
-      .flatMap((group) => group.Menus)
-      .find((menu) => menu.Path === '/article-brand');
+      .flatMap((group: any) => group.Menus)
+      .find((menu: any) => menu.Path === currentUrl);
 
     if (packingRights) {
       this.canAdd = packingRights.CanAdd;
@@ -194,11 +197,13 @@ export class ArticleBrandComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }
-  //===================get data list========================
+  //====== get data list ======
   get_ArticleBrand_List() {
     this.Datasource = new DataSource({
       load: () =>
@@ -304,7 +309,7 @@ export class ArticleBrandComponent {
     }
   }
 
-  //============select data========================
+  //===== select data =======
   Select_ArticleBrand(event: any) {
     const ID = event.data.ID;
 
@@ -312,6 +317,7 @@ export class ArticleBrandComponent {
       this.selectedData = response;
     });
   }
+
   editData() {
     const validationResult = this.formValidationGroup?.instance?.validate();
     const Id = this.editingRowData.ID;
@@ -388,6 +394,7 @@ export class ArticleBrandComponent {
         });
     }
   }
+
   delete_Data(event: any) {
     event.cancel = true;
 
@@ -427,7 +434,7 @@ export class ArticleBrandComponent {
     );
   }
 
-  //========================Export data ==========================
+  //========= Export data ==========
   onExporting(event: any) {
     const fileName = 'article_brand';
     this.dataservice.exportDataGrid(event, fileName);

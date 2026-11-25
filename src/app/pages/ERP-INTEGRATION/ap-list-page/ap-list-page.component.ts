@@ -676,9 +676,7 @@ export class ApListPageComponent implements OnInit {
 
     const matching = this.getMatchingDetails(e.data);
     this.selectedTransID =
-      e.data?.AcTransID ||
       e.data?.TransactionID ||
-      e.data?.ID ||
       matching?.[0]?.AcTransID ||
       matching?.[0]?.TransactionID ||
       matching?.[0]?.ID;
