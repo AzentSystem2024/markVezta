@@ -28,6 +28,8 @@
       [export]="{ enabled: true, formats: ['xlsx'] }"
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
+       (onContentReady)="updateVisibleColumnNames()" 
+       (onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-column-chooser
         [height]="500"
@@ -37,6 +39,7 @@
       ></dxo-column-chooser>
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -101,6 +104,22 @@
           location="after"
           widget="dxButton"
           [options]="applyButtonOptions"
+        ></dxi-item>
+          <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
         ></dxi-item>
       </dxo-toolbar>
 

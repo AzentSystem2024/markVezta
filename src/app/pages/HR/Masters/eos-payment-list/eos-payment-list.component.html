@@ -18,6 +18,7 @@
       (onExporting)="onExporting($event)"
     >
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
 
       <dxo-toolbar>
         <dxi-item location="before">

@@ -34,14 +34,16 @@ export class CurrencyListComponent implements OnInit {
   canDelete = false;
   canApprove = false;
   canPrint = false;
+  isFilterOpened = false;
 
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
     onClick: () => {
-      this.showFilterRow = !this.showFilterRow;
-      this.showHeaderFilter = !this.showHeaderFilter;
+      // this.showFilterRow = !this.showFilterRow;
+      // this.showHeaderFilter = !this.showHeaderFilter;
+      this.toggleFilters();
     },
   };
 
@@ -326,6 +328,17 @@ export class CurrencyListComponent implements OnInit {
 
     return !exists;
   };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
 }
 
 @NgModule({

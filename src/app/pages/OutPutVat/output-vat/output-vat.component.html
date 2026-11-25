@@ -91,6 +91,8 @@
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: false, text: 'Loading...' }"
       [loading]="isLoading"
+       (onContentReady)="updateVisibleColumnNames()" 
+       (onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-scrolling
         mode="virtual"
@@ -103,6 +105,7 @@
 
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-pager
         [visible]="true"
         [allowedPageSizes]="allowedPageSizes"
@@ -157,6 +160,11 @@
           widget="dxButton"
           [options]="summaryButtonOptions"
         ></dxi-item>
+         <dxi-item
+         location="after"
+          widget="dxDropDownButton"
+           [options]="columnFinderButtonOptions"
+           ></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping

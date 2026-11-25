@@ -161,6 +161,7 @@ export class VatReturnComponent {
   isFilterOpened = false;
   isFilterRowVisible: boolean = false;
   private allVatReturnRows: any[] = [];
+  ColumnNames:any;
 
 
   constructor(
@@ -191,9 +192,16 @@ export class VatReturnComponent {
   };
 
 
-  toggleFilters() {
+ toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-    this.isFilterRowVisible = this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+       grid.option('headerPanel.visible', this.isFilterOpened);
+    }
   }
 
   toggleFilterRow = () => {
@@ -262,7 +270,31 @@ export class VatReturnComponent {
         (row: any) => !row.IS_TOTAL_ROW
       );
   }
+ findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
 
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   sesstion_Details() {
     const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));

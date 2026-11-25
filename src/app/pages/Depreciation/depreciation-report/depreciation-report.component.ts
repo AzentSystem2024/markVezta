@@ -117,7 +117,8 @@ export class DepreciationReportComponent implements OnInit {
       viopenColumnsible: true,
     }));
   }
-
+  ColumnNames:any;
+  isFilterOpened=false;
   DepreciationReport: any[] = [];
   isFilterRowVisible = false;
   isViewInvoice = false;
@@ -268,7 +269,7 @@ export class DepreciationReportComponent implements OnInit {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   refreshGrid() {
@@ -306,6 +307,31 @@ export class DepreciationReportComponent implements OnInit {
 
     this.cdr.detectChanges();
   }
+   findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   // Year value change.
   onYearChanged(e: any): void {
@@ -362,6 +388,17 @@ export class DepreciationReportComponent implements OnInit {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible',this.isFilterOpened);
+    }
+  }
 
   onExporting(event: any): void {
     const fileName = 'BalanceSheetReport';

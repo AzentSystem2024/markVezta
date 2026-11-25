@@ -185,6 +185,8 @@ export class PrepaymentPostingReportComponent {
   Department: any;
   select_department_id: number;
   isSummaryVisible = true;
+  isFilterOpened=false;
+  ColumnNames:any;
 
   constructor(
     private dataservice: DataService,
@@ -238,8 +240,19 @@ export class PrepaymentPostingReportComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+       grid.option('headerPanel.visible', this.isFilterOpened);
+    }
+  }
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
@@ -274,6 +287,31 @@ export class PrepaymentPostingReportComponent {
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
   }
+  findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
 
   //================ Year value change ===================

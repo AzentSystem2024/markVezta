@@ -5,6 +5,10 @@ import {
   Input,
   OnInit,
   ChangeDetectorRef,
+   ApplicationRef,
+  EnvironmentInjector,
+  createComponent,
+  ComponentRef
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -24,6 +28,9 @@ import {
   DxTextBoxModule,
   DxValidatorModule,
 } from 'devextreme-angular';
+import {
+  PendingActivityComponent,
+} from 'src/app/pages/pending-activity/pending-activity.component';
 @Component({
   selector: 'app-login-form',
   templateUrl: './login-form.component.html',
@@ -99,6 +106,9 @@ export class LoginFormComponent implements OnInit {
     internetIP: string;
     localIP: string;
   }> | null = null;
+  showPendingActivity = false;
+
+private pendingComponentRef: ComponentRef<PendingActivityComponent> | null = null;
 
   constructor(
     private authService: AuthService,
@@ -106,6 +116,8 @@ export class LoginFormComponent implements OnInit {
     private themeService: ThemeService,
     private dataservice: DataService,
     private cdr: ChangeDetectorRef,
+     private appRef: ApplicationRef,
+  private environmentInjector: EnvironmentInjector
   ) {
     this.themeService.isDark.subscribe((value: boolean) => {
       this.btnStylingMode = value ? 'outlined' : 'contained';
@@ -368,6 +380,7 @@ export class LoginFormComponent implements OnInit {
     this.userDataResponse = res;
 
     this.showNotification('Login successful!', 'success', 2000);
+      this.showPendingActivityPanel();
 
     const redirectPath =
       this.userDataResponse?.GeneralSettings?.VAT_TITLE === 'GST'
@@ -476,6 +489,28 @@ export class LoginFormComponent implements OnInit {
         },
       });
   }
+  showPendingActivityPanel(): void {
+
+  // Prevent duplicate panels
+  if (this.pendingComponentRef) {
+    return;
+  }
+
+  this.pendingComponentRef = createComponent(
+    PendingActivityComponent,
+    {
+      environmentInjector: this.environmentInjector
+    }
+  );
+
+  // Attach component to Angular application
+  this.appRef.attachView(this.pendingComponentRef.hostView);
+
+  // Display component inside document body
+  document.body.appendChild(
+    this.pendingComponentRef.location.nativeElement
+  );
+}
 }
 @NgModule({
   imports: [

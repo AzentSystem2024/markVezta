@@ -115,6 +115,7 @@ export class ProfitLossDepartmentwiseComponent {
   isSummaryVisible = true;
   showParameters = false;
   isFilterOpened = false;
+  ColumnNames:any;
 
   constructor(
     private dataservice: DataService,
@@ -167,9 +168,19 @@ export class ProfitLossDepartmentwiseComponent {
     onClick: () => this.toggleFilters(),
   };
 
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.isFilterRowVisible = this.isFilterOpened;
+  // }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-    this.isFilterRowVisible = this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
   refreshButtonOptions = {
@@ -223,6 +234,31 @@ export class ProfitLossDepartmentwiseComponent {
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
     this.appType = sessionData.Configuration[0]?.APP_TYPE || '';
   }
+   findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   //================ Year value change ===================
   onYearChanged(e: any): void {

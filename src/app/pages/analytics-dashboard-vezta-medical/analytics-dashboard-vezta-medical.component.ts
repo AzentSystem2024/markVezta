@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-
 import { DataService } from 'src/app/services/data.service';
 
 @Component({
@@ -281,13 +280,13 @@ export class AnalyticsDashboardVeztaMedicalComponent implements OnInit {
     };
   };
 
-  customizeLineTooltip = (arg: any) => {
+  customizeLineTooltip:any = (arg: any) => {
     return {
       text: `${arg.seriesName}: ${this.formatAmount(arg.value)}`,
     };
   };
 
-  customizeLineTooltipTotal = (arg: any) => {
+  customizeLineTooltipTotal:any = (arg: any) => {
     return {
       text: `${arg.argumentText}: ${this.formatAmount(arg.value)}`,
     };

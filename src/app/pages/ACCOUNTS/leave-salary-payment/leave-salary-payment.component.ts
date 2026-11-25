@@ -123,6 +123,7 @@ export class LeaveSalaryPaymentComponent implements OnInit {
   selectedCompanyId: any;
   userId: any;
   finId: any;
+  ColumnNames:any;
 
   // --- Permissions ---
   canAdd = true;
@@ -239,12 +240,46 @@ export class LeaveSalaryPaymentComponent implements OnInit {
     this.EmployeeListDropDown();
     this.getLedgerCodeDropdown();
   }
+    findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataService.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
 
-  toggleFilters() {
-    this.isFilterOpened = !this.isFilterOpened;
-    this.showFilterRow = this.isFilterOpened;
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
   }
+}
 
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
+
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.showFilterRow = this.isFilterOpened;
+  // }
+toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
   private getLedgerCodeDropdown() {
     this.dataService.getAccountHeadList().subscribe({
       next: (response: any) => {

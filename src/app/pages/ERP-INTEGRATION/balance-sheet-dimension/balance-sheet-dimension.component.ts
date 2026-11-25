@@ -17,6 +17,7 @@ import {
   DxTextBoxModule,
   DxValidationGroupModule,
   DxValidatorModule,
+  DxDropDownButtonModule
 } from 'devextreme-angular';
 import { DataService } from 'src/app/services';
 
@@ -128,6 +129,7 @@ export class BalanceSheetDimensionComponent {
   selectedRowData: any = null;
   isSummaryVisible = true;
   showDimensionPopup = false;
+  ColumnNames:any;
 
   constructor(
     private dataservice: DataService,
@@ -226,6 +228,55 @@ export class BalanceSheetDimensionComponent {
 
     this.cdr.detectChanges();
   }
+   columnFinderButtonOptions: any = {
+          items: [],
+          displayExpr: 'text',
+          keyExpr: 'value',
+          onItemClick: (e: any) => {
+            this.findColumnLocation(e);
+          },
+          hint: 'Column location finder',
+          icon: 'increaseindent',
+          showArrowIcon: true,
+          dropDownOptions: {
+            width: 'auto',
+            height: 300
+          }
+        }; 
+                 findColumnLocation(e: any): void {
+                   const columnName = e.itemData?.value;
+                 
+                   if (columnName && this.dataGrid?.instance) {
+                     this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+                   }
+                 }
+                 
+                 updateVisibleColumnNames(): void {
+                   if (!this.dataGrid?.instance) {
+                     return;
+                   }
+                 
+                   const columns = this.dataGrid.instance.getVisibleColumns();
+                 
+                   const items = columns
+                     .filter((column: any) => column.dataField && column.caption)
+                     .map((column: any) => ({
+                       text: column.caption,
+                       value: column.dataField
+                     }));
+                 
+                   this.columnFinderButtonOptions = {
+                     ...this.columnFinderButtonOptions,
+                     items: items
+                   };
+                 
+                   this.cdr.detectChanges();
+                 }
+                   onGridOptionChanged(e: any): void {
+                   if (e.fullName?.includes('visible')) {
+                     this.updateVisibleColumnNames();
+                   }
+                 }
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -496,6 +547,7 @@ export class BalanceSheetDimensionComponent {
     DxButtonModule,
     DxTagBoxModule,
     DxPopupModule,
+    DxDropDownButtonModule
   ],
   providers: [],
   exports: [],

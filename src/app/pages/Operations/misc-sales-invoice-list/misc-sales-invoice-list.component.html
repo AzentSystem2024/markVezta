@@ -78,7 +78,7 @@
       <dxi-column dataField="NET_AMOUNT" caption="Net Amount" dataType="number"
         [format]="{ type: 'fixedPoint', precision: 2 }"></dxi-column>
 
-      <dxi-column caption="Status" dataField="STATUS" [width]="80" [cellTemplate]="statusCellRender"
+      <dxi-column caption="Status" dataField="STATUS" [width]="80" [cellTemplate]="statusCellRender" alignment="center"
         [allowHeaderFiltering]="true" [headerFilter]="{
           dataSource: getStatusFilterData,
           encodeHtml: false,

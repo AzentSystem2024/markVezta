@@ -30,6 +30,7 @@ import {
   DxToolbarModule,
   DxValidationGroupModule,
   DxValidatorModule,
+  DxDropDownButtonModule
 } from 'devextreme-angular';
 import {
   DxoFormItemModule,
@@ -190,9 +191,19 @@ export class InputVatComponent {
     onClick: () => this.toggleFilters(),
   };
 
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.isFilterRowVisible = this.isFilterOpened;
+  // }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-    this.isFilterRowVisible = this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
   }
 
   // Toggle filter panel
@@ -218,6 +229,55 @@ export class InputVatComponent {
     }
     this.get_DataSource();
   }
+  columnFinderButtonOptions: any = {
+    items: [],
+    displayExpr: 'text',
+    keyExpr: 'value',
+    onItemClick: (e: any) => {
+      this.findColumnLocation(e);
+    },
+    hint: 'Column location finder',
+    icon: 'increaseindent',
+    showArrowIcon: true,
+    dropDownOptions: {
+      width: 'auto',
+      height: 300
+    }
+  }; 
+           findColumnLocation(e: any): void {
+             const columnName = e.itemData?.value;
+           
+             if (columnName && this.dataGrid?.instance) {
+               this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+             }
+           }
+           
+           updateVisibleColumnNames(): void {
+             if (!this.dataGrid?.instance) {
+               return;
+             }
+           
+             const columns = this.dataGrid.instance.getVisibleColumns();
+           
+             const items = columns
+               .filter((column: any) => column.dataField && column.caption)
+               .map((column: any) => ({
+                 text: column.caption,
+                 value: column.dataField
+               }));
+           
+             this.columnFinderButtonOptions = {
+               ...this.columnFinderButtonOptions,
+               items: items
+             };
+           
+             this.cdr.detectChanges();
+           }
+             onGridOptionChanged(e: any): void {
+             if (e.fullName?.includes('visible')) {
+               this.updateVisibleColumnNames();
+             }
+           }
 
   columnChooserButtonOptions = {
     icon: 'columnchooser',
@@ -552,6 +612,7 @@ export class InputVatComponent {
     EditSupplierPaymentModule,
     ViewDebitModule,
     AddMiscellaneousPaymentModule,
+    DxDropDownButtonModule
   ],
   providers: [],
   declarations: [InputVatComponent],

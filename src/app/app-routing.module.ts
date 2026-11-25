@@ -250,6 +250,13 @@ import { AgeWisePendingReportComponent } from './pages/DESPATCH/Reports/age-wise
 import { AgeWiseReportComponent } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { TopMovingReportComponent } from './pages/DESPATCH/Reports/top-moving-report/top-moving-report.component';
 import { ArticleStockReportComponent } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
+import { EditedAttendanceComponent } from './pages/REPORT/edited-attendance/edited-attendance.component';
+import { LateComerListComponent } from './pages/REPORT/late-comer-list/late-comer-list.component';
+import { AbsentListComponent } from './pages/REPORT/absent-list/absent-list.component';
+import { ExcessBreaksComponent } from './pages/REPORT/excess-breaks/excess-breaks.component';
+import { StaffShiftChangeReportComponent } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
+import { ShiftMasterComponent } from './pages/REPORT/shift-master/shift-master.component';
+import { ExcessBreakDetailsComponent } from './pages/REPORT/excess-break-details/excess-break-details.component';
 
 const routes: Routes = [
   {
@@ -1535,6 +1542,41 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
+        path: 'edited-attendance',
+        component: EditedAttendanceComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'late-comer-report',
+        component: LateComerListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'absent-list',
+        component: AbsentListComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'excess-breaks',
+        component: ExcessBreaksComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'staff-shift-change-report',
+        component: StaffShiftChangeReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'shift-master',
+        component: ShiftMasterComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'excess-break-details',
+        component: ExcessBreakDetailsComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
         path: '**',
         redirectTo: 'login',
         pathMatch: 'full',
@@ -1550,4 +1592,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

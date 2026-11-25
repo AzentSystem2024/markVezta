@@ -1,0 +1,160 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="shift_datasource"
+      noDataText=""
+      width="100%"
+      height="82vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [summary]="
+        isSummaryVisible
+          ? summaryColumnsData
+          : { totalItems: [], groupItems: [] }
+      "
+      (onEditingStart)="onEditShift($event)"
+      (onExporting)="onExporting($event)"
+      (onRowRemoving)="onDeleteShift($event)"
+    >
+      <dxo-editing
+        mode="popup"
+        [allowUpdating]="canEdit"
+        [allowDeleting]="canDelete"
+      ></dxo-editing>
+
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header gst-report-title">Shift Master</div>
+        </dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <!-- Divider -->
+        <dxi-item location="after">
+          <div class="toolbar-divider"></div>
+        </dxi-item>
+
+        <!-- Export (built-in, kept) -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          *ngIf="canAdd"
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="addButtonOptions"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-filter-row visible="true"></dxo-filter-row>
+      <dxo-header-filter visible="true"></dxo-header-filter>
+      <dxo-paging page-size="10"></dxo-paging>
+      <dxo-pager
+        show-page-size-selector="true"
+        show-info="true"
+        show-navigator="true"
+      ></dxo-pager>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <!-- <dxi-column dataField="TransID" caption="Trans Type Id" dataType="date"></dxi-column> -->
+      <dxi-column dataField="SHIFT_NAME" caption="Shift Name"></dxi-column>
+      <dxi-column dataField="TIME_START" caption="Time Start"></dxi-column>
+      <dxi-column dataField="TIME_END" caption="Time End"></dxi-column>
+      <dxi-column dataField="TOTAL_HOURS" caption="Total Hours"></dxi-column>
+      <dxi-column dataField="BREAK_HOURS" caption="Break Hours"></dxi-column>
+    </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isAddPopupVisible"
+      [width]="850"
+      [height]="'auto'"
+      [showTitle]="true"
+      title="Add Shift"
+      [dragEnabled]="true"
+      [hideOnOutsideClick]="false"
+      [showCloseButton]="true"
+    >
+      <div *dxTemplate="let data of 'content'">
+        <app-shift-master-add
+          (save)="onShiftSaved($event)"
+          (cancelled)="closeShiftPopup()"
+        ></app-shift-master-add>
+      </div>
+    </dx-popup>
+
+    <dx-popup
+      [(visible)]="isEditPopupVisible"
+      [width]="850"
+      [height]="'auto'"
+      [showTitle]="true"
+      title="Edit Shift"
+      [dragEnabled]="true"
+      [hideOnOutsideClick]="false"
+      [showCloseButton]="true"
+    >
+      <div *dxTemplate="let data of 'content'">
+        <app-shift-master-edit
+          [shiftData]="selectedShift"
+          (save)="onShiftSaved($event)"
+          (cancelled)="closeShiftPopup()"
+        ></app-shift-master-edit>
+      </div>
+    </dx-popup>
+  </div>
+</div>

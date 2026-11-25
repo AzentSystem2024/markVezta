@@ -225,6 +225,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   popupReady = false;
   isSummaryVisible = true;
 
+
   toggleParameters(): void {
     this.showParameters = !this.showParameters;
   }
@@ -321,6 +322,7 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
   selectedSalaryData: any;
   ledgerlistdata: any[] = []
   appType: any;
+  ColumnNames:any;
 
   constructor(
     private dataService: DataService,
@@ -429,6 +431,31 @@ export class JournalBookComponent implements OnInit, AfterViewInit {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
+  findColumnLocation = (e: any) => {
+    const columnName = e.itemData;
+    if (columnName != '' && columnName != null) {
+      this.dataService.makeColumnVisible(this.dataGrid, columnName);
+    }
+  };
+
+  updateVisibleColumnNames() {
+  if (this.dataGrid?.instance) {
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    this.ColumnNames = columns
+      .filter((col: any) => col.caption && col.dataField)
+      .map((col: any) => col.caption);
+  }
+}
+
+onGridOptionChanged(e: any) {
+  if (
+    e.name === 'columns' ||
+    (e.fullName && e.fullName.includes('visible'))
+  ) {
+    this.updateVisibleColumnNames();
+  }
+}
 
   resetPopups() {
     this.editLedgerPopup = false;

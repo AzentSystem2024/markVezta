@@ -132,6 +132,8 @@
       [summary]="summaryColumnsData"
       (onExporting)="onExporting($event)"
       (onCellClick)="onCellClick($event)"
+      (onContentReady)="updateVisibleColumnNames()"
+      (onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-paging [pageSize]="10"></dxo-paging>
       <dxo-pager
@@ -143,6 +145,7 @@
       ></dxo-pager>
 
       <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
       <dxo-load-panel [showPane]="false"></dxo-load-panel>
       <dxo-scrolling mode="standard"></dxo-scrolling>
       <dxo-header-filter
@@ -199,6 +202,22 @@
           location="after"
           widget="dxButton"
           [options]="summaryButtonOptions"
+        ></dxi-item>
+        <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
         ></dxi-item>
       </dxo-toolbar>
 

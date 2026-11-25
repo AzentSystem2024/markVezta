@@ -28,6 +28,9 @@
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: true, text: 'Loading...' }"
       (onCellClick)="onCellClick($event)"
+       (onContentReady)="updateVisibleColumnNames()" 
+       (onOptionChanged)="onGridOptionChanged($event)"
+       
     >
       <dxo-column-chooser
         [height]="500"
@@ -105,6 +108,11 @@
           widget="dxButton"
           [options]="applyButtonOptions"
         ></dxi-item>
+        <dxi-item
+         location="after"
+          widget="dxDropDownButton"
+           [options]="columnFinderButtonOptions"
+           ></dxi-item>
       </dxo-toolbar>
 
       <div *dxTemplate="let data of 'dimensionFilterTemplate'">

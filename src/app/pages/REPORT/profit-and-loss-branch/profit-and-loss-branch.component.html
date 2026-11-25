@@ -30,6 +30,8 @@
       }"
       (onExporting)="onExporting($event)"
       [loadPanel]="{ enabled: false, text: 'Loading...' }"
+       (onContentReady)="updateVisibleColumnNames()" 
+       (onOptionChanged)="onGridOptionChanged($event)"
     >
       <dxo-column-chooser
         [height]="500"
@@ -157,6 +159,23 @@
           widget="dxButton"
           [options]="refreshButtonOptions"
         ></dxi-item> -->
+
+        <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
+        ></dxi-item>
       </dxo-toolbar>
 
       <dxo-grouping
@@ -171,6 +190,7 @@
         [visible]="isFilterRowVisible"
         [applyFilter]="auto"
       ></dxo-filter-row>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
 
       <dxi-column
         dataField="TYPE_NAME"

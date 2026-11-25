@@ -75,6 +75,14 @@ export class ListSalaryPaymentComponent implements OnInit {
     onClick: () => this.refreshGrid(),
     text: '',
   };
+  searchButtonOptions = {
+  icon: 'search',
+  hint: 'Show / Hide Filters',
+  elementAttr: { class: 'toolbar-icon-btn' },
+  onClick: () => {
+    this.toggleFilters();
+  },
+};
 
   addButtonOptions = {
     // icon: 'add',

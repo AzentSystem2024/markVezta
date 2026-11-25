@@ -1,0 +1,304 @@
+<div class="shift-add-container">
+  <dx-form
+    #shiftForm
+    [formData]="shiftData"
+    [colCount]="2"
+    [showColonAfterLabel]="true"
+    [showValidationSummary]="true"
+    labelLocation="top"
+  >
+    <!-- Shift Name -->
+    <dxi-item>
+      <dx-text-box
+        [(value)]="shiftData.SHIFT_NAME"
+        placeholder="Enter shift name"
+        labelMode="floating"
+        label="Shift Name"
+      ></dx-text-box>
+      <dxi-validation-rule
+        type="required"
+        message="Shift name is required"
+      ></dxi-validation-rule>
+    </dxi-item>
+
+    <!-- Total Hours -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.TOTAL_HOURS"
+        [min]="0"
+        [max]="24"
+        [showSpinButtons]="true"
+        placeholder="Enter total hours"
+        labelMode="floating"
+        label="Total Hours"
+        [readOnly]="true"
+      ></dx-number-box>
+      <dxi-validation-rule
+        type="required"
+        message="Total hours is required"
+      ></dxi-validation-rule>
+    </dxi-item>
+
+    <!-- Time Start -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.TIME_START"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        [useMaskBehavior]="true"
+        placeholder="Enter start time"
+        labelMode="floating"
+        label="Time Start"
+        (onValueChanged)="calculateTotalHours()"
+      ></dx-date-box>
+      <dxi-validation-rule
+        type="required"
+        message="Start time is required"
+      ></dxi-validation-rule>
+    </dxi-item>
+
+    <!-- Time End -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.TIME_END"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        [useMaskBehavior]="true"
+        placeholder="Enter end time"
+        labelMode="floating"
+        label="Time End"
+        (onValueChanged)="calculateTotalHours()"
+      ></dx-date-box>
+      <dxi-validation-rule
+        type="required"
+        message="End time is required"
+      ></dxi-validation-rule>
+    </dxi-item>
+
+    <!-- Break Hours -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.BREAK_HOURS"
+        [min]="0"
+        [max]="24"
+        [showSpinButtons]="true"
+        placeholder="Enter break hours"
+        labelMode="floating"
+        label="Break Hours"
+        (onValueChanged)="calculateBreakMinutesFromHours()"
+      ></dx-number-box>
+    </dxi-item>
+
+    <!-- Break Minutes -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.BREAK_MINUTES"
+        [min]="0"
+        [max]="1440"
+        [showSpinButtons]="true"
+        placeholder="Enter break minutes"
+        labelMode="floating"
+        label="Break Minutes"
+        [readOnly]="true"
+      ></dx-number-box>
+    </dxi-item>
+
+    <!-- Entry Valid From -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.ENTRY_VALID_FROM"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        placeholder="Enter valid from date"
+        labelMode="floating"
+        label="Entry Valid From"
+      ></dx-date-box>
+      <dxi-validation-rule
+        type="required"
+        message="Valid from date is required"
+      ></dxi-validation-rule>
+    </dxi-item>
+
+    <!-- Entry Valid To -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.ENTRY_VALID_TO"
+        type="date"
+        displayFormat="dd-MM-yyyy"
+        placeholder="Enter valid to date"
+        labelMode="floating"
+        label="Entry Valid To"
+      ></dx-date-box>
+      <dxi-validation-rule
+        type="required"
+        message="Valid to date is required"
+      ></dxi-validation-rule>
+    </dxi-item>
+
+    <!-- Maximum Exit Time -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.MAX_EXIT_TIME"
+        [min]="0"
+        [showSpinButtons]="true"
+        placeholder="Enter maximum exit time"
+        labelMode="floating"
+        label="Maximum Exit Time"
+      ></dx-number-box>
+    </dxi-item>
+
+    <!-- Shift Settings -->
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.IS_NEXT_DAY"
+        text="Next Day"
+      ></dx-check-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.IS_FIXED"
+        text="Fixed Shift[can be linked with a staff for timesheet calculations]"
+      ></dx-check-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.SHIFT_CHANGE"
+        text="Show in Shift Change"
+      ></dx-check-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.IS_DAILY_WAGE"
+        text="Daily Wage Shift(will not consider holidays)"
+      ></dx-check-box>
+    </dxi-item>
+
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.NO_HALF_DAY"
+        text="No Half Day.Only Less Hours"
+      ></dx-check-box>
+    </dxi-item>
+
+    <!-- Break 1 Checkbox -->
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.IS_BREAK1"
+        text="Break 1"
+        (onValueChanged)="toggleBreak1($event)"
+      ></dx-check-box>
+    </dxi-item>
+
+    <!-- Break 1 Start Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK1_TIME_IN"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        [useMaskBehavior]="true"
+        label="Break 1 Start Time"
+        labelMode="floating"
+        placeholder="Select start time"
+        [disabled]="!shiftData.IS_BREAK1"
+        (onValueChanged)="calculateBreakHours(1)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 1 End Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK1_TIME_OUT"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        [useMaskBehavior]="true"
+        label="Break 1 End Time"
+        labelMode="floating"
+        placeholder="Select end time"
+        [disabled]="!shiftData.IS_BREAK1"
+        (onValueChanged)="calculateBreakHours(1)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 1 Total Hours -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.BREAK1_TOTAL_MINUTES"
+        label="Break 1 Total Hours"
+        labelMode="floating"
+        [disabled]="!shiftData.IS_BREAK1"
+        [readOnly]="true"
+        [showSpinButtons]="true"
+        [min]="0"
+      ></dx-number-box>
+    </dxi-item>
+
+    <!-- Break 2 Checkbox -->
+    <dxi-item>
+      <dx-check-box
+        [(value)]="shiftData.IS_BREAK2"
+        text="Break 2"
+        (onValueChanged)="toggleBreak2($event)"
+      ></dx-check-box>
+    </dxi-item>
+
+    <!-- Break 2 Start Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK2_TIME_IN"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        label="Break 2 Start Time"
+        labelMode="floating"
+        placeholder="Select start time"
+        [disabled]="!shiftData.IS_BREAK2"
+        (onValueChanged)="calculateBreakHours(2)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 2 End Time -->
+    <dxi-item>
+      <dx-date-box
+        [(value)]="shiftData.BREAK2_TIME_OUT"
+        type="datetime"
+        displayFormat="HH:mm:ss.SSS"
+        label="Break 2 End Time"
+        labelMode="floating"
+        placeholder="Select end time"
+        [disabled]="!shiftData.IS_BREAK2"
+        (onValueChanged)="calculateBreakHours(2)"
+      ></dx-date-box>
+    </dxi-item>
+
+    <!-- Break 2 Total Hours -->
+    <dxi-item>
+      <dx-number-box
+        [(value)]="shiftData.BREAK2_TOTAL_MINUTES"
+        label="Break 2 Total Hours"
+        labelMode="floating"
+        [disabled]="!shiftData.IS_BREAK2"
+        [readOnly]="true"
+        [showSpinButtons]="true"
+        [min]="0"
+      ></dx-number-box>
+    </dxi-item>
+  </dx-form>
+
+  <div class="form-buttons">
+    <dx-button
+      text="Cancel"
+      stylingMode="outlined"
+      type="normal"
+      (onClick)="cancelForm()"
+    ></dx-button>
+
+    <dx-button
+      text="Save"
+      type="default"
+      stylingMode="contained"
+      (onClick)="saveForm()"
+    ></dx-button>
+  </div>
+</div>

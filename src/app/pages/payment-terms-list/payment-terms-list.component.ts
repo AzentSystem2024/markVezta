@@ -34,6 +34,7 @@ export class PaymentTermsListComponent {
   selectedPaymentTerms: any;
   selectedId: any;
   selectedpaymenttermId: any;
+  isFilterOpened = false;
 
   canAdd = false;
   canEdit = false;
@@ -84,7 +85,7 @@ export class PaymentTermsListComponent {
     icon: 'search',
     hint: 'Show / Hide Filters',
     elementAttr: { class: 'toolbar-icon-btn' },
-    onClick: () => this.toggleFilterRow(),
+    onClick: () => this.toggleFilters(),
   };
 
   //=================================refresh=============================
@@ -104,6 +105,17 @@ export class PaymentTermsListComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterPanel.visible', this.isFilterOpened);
+    }
+  }
 
 
 

@@ -112,6 +112,7 @@ export class CPTMasterComponent {
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);
       grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('filterPanel.visible', this.isFilterOpened);
     }
   }
 

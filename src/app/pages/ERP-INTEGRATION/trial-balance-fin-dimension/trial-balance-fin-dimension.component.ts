@@ -8,6 +8,7 @@ import {
   DxDataGridModule,
   DxDateBoxModule,
   DxDropDownBoxModule,
+  DxDropDownButtonModule,
   DxListModule,
   DxLoadIndicatorModule,
   DxLoadPanelModule,
@@ -19,6 +20,7 @@ import {
   DxTextBoxModule,
   DxValidationGroupModule,
   DxValidatorModule,
+ 
 } from 'devextreme-angular';
 
 import { DataService } from 'src/app/services';
@@ -135,6 +137,7 @@ export class TrialBalanceFinDimensionComponent {
   showParameters = false;
   isFilterOpened = false;
   isSummaryVisible = true;
+  ColumnNames : any;
 
 
   summaryColumnsData = {
@@ -287,6 +290,7 @@ export class TrialBalanceFinDimensionComponent {
     this.formatted_To_date = this.formatDate(today);
     this.Diamension_dropdown();
     this.get_DataSource();
+    console.log(this.ColumnNames,'--column names--')
   }
 
 
@@ -303,10 +307,70 @@ export class TrialBalanceFinDimensionComponent {
     onClick: () => this.toggleFilters(),
   };
 
+  // toggleFilters() {
+  //   this.isFilterOpened = !this.isFilterOpened;
+  //   this.isFilterRowVisible = this.isFilterOpened;
+  // }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
-    this.isFilterRowVisible = this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+      grid.option('headerPanel.visible', this.isFilterOpened);
+    }
   }
+  columnFinderButtonOptions: any = {
+          items: [],
+          displayExpr: 'text',
+          keyExpr: 'value',
+          onItemClick: (e: any) => {
+            this.findColumnLocation(e);
+          },
+          hint: 'Column location finder',
+          icon: 'increaseindent',
+          showArrowIcon: true,
+          dropDownOptions: {
+            width: 'auto',
+            height: 300
+          }
+        }; 
+                 findColumnLocation(e: any): void {
+                   const columnName = e.itemData?.value;
+                 
+                   if (columnName && this.dataGrid?.instance) {
+                     this.dataservice.makeColumnVisible(this.dataGrid, columnName);
+                   }
+                 }
+                 
+                 updateVisibleColumnNames(): void {
+                   if (!this.dataGrid?.instance) {
+                     return;
+                   }
+                 
+                   const columns = this.dataGrid.instance.getVisibleColumns();
+                 
+                   const items = columns
+                     .filter((column: any) => column.dataField && column.caption)
+                     .map((column: any) => ({
+                       text: column.caption,
+                       value: column.dataField
+                     }));
+                 
+                   this.columnFinderButtonOptions = {
+                     ...this.columnFinderButtonOptions,
+                     items: items
+                   };
+                 
+                   this.cdr.detectChanges();
+                 }
+                   onGridOptionChanged(e: any): void {
+                   if (e.fullName?.includes('visible')) {
+                     this.updateVisibleColumnNames();
+                   }
+                 }
 
   refreshButtonOptions = {
     icon: 'refresh',
@@ -351,6 +415,8 @@ export class TrialBalanceFinDimensionComponent {
     };
     this.cdr.detectChanges();
   }
+
+ 
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -454,6 +520,10 @@ export class TrialBalanceFinDimensionComponent {
         // this.TrialBalanceReport = res.data;
         this.TrialBalanceReport = [...res.data];
         console.log(this.TrialBalanceReport);
+         // Populate Column Finder names
+      if (this.TrialBalanceReport.length > 0) {
+        this.ColumnNames = Object.keys(this.TrialBalanceReport[0]);
+      }
       });
   }
 
@@ -601,6 +671,7 @@ export class TrialBalanceFinDimensionComponent {
     DxListModule,
     DxDropDownBoxModule,
     DxPopupModule,
+    DxDropDownButtonModule,
   ],
   providers: [],
   exports: [],

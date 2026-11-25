@@ -448,8 +448,19 @@ import { TopMovingReportModule } from './pages/DESPATCH/Reports/top-moving-repor
 import { AgeWisePendingReportModule } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
 import { AgeWiseReportModule } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { ArticleStockReportModule } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
+import { PendingActivityModule } from './pages/pending-activity/pending-activity.component';
 import { ApListPageModule } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-page.component';
 import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-page/inventory-list-page.component';
+import { EditedAttendanceModule } from './pages/REPORT/edited-attendance/edited-attendance.component';
+import { LateComerListModule } from './pages/REPORT/late-comer-list/late-comer-list.component';
+import { AbsentListModule } from './pages/REPORT/absent-list/absent-list.component';
+import { ExcessBreaksModule } from './pages/REPORT/excess-breaks/excess-breaks.component';
+import { StaffShiftChangeReportModule } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
+import { ShiftMasterModule } from './pages/REPORT/shift-master/shift-master.component';
+import { ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-master-add.component';
+import { ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
+import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/excess-break-details.component';
+
 
 @NgModule({
   declarations: [
@@ -474,7 +485,7 @@ import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-
     CreateAccountFormModule,
     ChangePasswordFormModule,
     LoginFormModule,
-  ToastContainerModule,
+    ToastContainerModule,
     UnauthenticatedContentModule,
     DxSelectBoxModule,
     DxTagBoxModule,
@@ -913,9 +924,18 @@ import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-
     TopMovingReportModule,
     AgeWisePendingReportModule,
     AgeWiseReportModule,
-    
     ArticleStockReportModule,
     MultiboxReportModule,
+    PendingActivityModule,
+    EditedAttendanceModule,
+    LateComerListModule,
+    AbsentListModule,
+    ExcessBreaksModule,
+    StaffShiftChangeReportModule,
+    ShiftMasterModule,
+    ShiftMasterAddModule,
+    ShiftMasterEditModule,
+    ExcessBreakDetailsModule,
   ],
 
   providers: [
@@ -924,11 +944,11 @@ import { InventoryListPageModule } from './pages/ERP-INTEGRATION/inventory-list-
     AppInfoService,
     ThemeService,
     DataService,
-  ToastService,
+    ToastService,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: RouteReuseStrategy, useClass: CustomReuseStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

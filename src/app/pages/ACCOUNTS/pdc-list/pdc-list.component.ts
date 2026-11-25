@@ -188,7 +188,7 @@ export class PdcListComponent {
   PDCid: any;
   selected_Company_id: any;
   userId: any;
-  isFilterOpened: boolean;
+  isFilterOpened: boolean = false;
 
   //========================Export data ==========================
   onExporting(event: any) {

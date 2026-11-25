@@ -1245,7 +1245,7 @@ export class DataService {
 
   //  ATTENDANCE SHEET
   getAttendanceSheet(data: any) {
-    return this.http.post(`${this.apiUrl}ESIReport/esireport`, data);
+    return this.http.post(`${this.apiUrl}Report/GetAttendanceReport`, data);
   }
 
   //  ITEM QUANTITY STOCK
@@ -7862,5 +7862,57 @@ The result can be exported to HTML or Markdown.`;
 
   selectNewOrder(id: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}NewOrder/select/` + id, {});
+  }
+
+  TaskBarApi(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}Taskbar/taskbar`, payload);
+  }
+
+  EditedAttendance(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Report/GetTimesheetEdits`, data);
+  }
+  LateComerList(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Report/GetLateComersRpt`, data);
+  }
+  AbsentList(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Report/GetAbsentList`, data);
+  }
+  ExcessBreaks(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Report/GetExcessBreakSummary`, data);
+  }
+  ExcessBreakDetails(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Report/GetExcessBreakDetails`, data);
+  }
+  StaffShiftChangeReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}Report/GetShiftLogReport`, data);
+  }
+
+  ShiftMasterReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ShiftMaster/list`, data);
+  }
+
+  InsertShiftMasterReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ShiftMaster/insert`, data);
+  }
+
+  SelectShiftMasterReport(id: any) {
+    return this.http.post(`${this.apiUrl}ShiftMaster/select/` + id, {});
+  }
+
+  UpdateShiftMasterReport(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}ShiftMaster/update`, data);
+  }
+
+  DeleteShiftMasterReport(id: any) {
+    return this.http.post(`${this.apiUrl}ShiftMaster/delete/` + id, {});
   }
 }

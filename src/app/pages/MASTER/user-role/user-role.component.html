@@ -42,6 +42,7 @@
     <dxo-header-filter [visible]="true">
       <dxo-search [enabled]="true"></dxo-search>
     </dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
     <dxo-export
       [enabled]="true"
       [allowExportSelectedData]="false"
@@ -65,7 +66,7 @@
         </div>
       </dxi-item>
 
-      <dxi-item
+      <!-- <dxi-item
         location="after"
         widget="dxButton"
         [options]="{
@@ -74,7 +75,12 @@
           onClick: toggleFilterRow,
           elementAttr: { class: 'toolbar-icon-btn' },
         }"
-      ></dxi-item>
+      ></dxi-item> -->
+      <dxi-item
+  location="after"
+  widget="dxButton"
+  [options]="searchButtonOptions"
+></dxi-item>
 
       <dxi-item
         location="after"
