@@ -38,8 +38,8 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
+import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
+import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { JournalVoucherListComponent } from '../journal-voucher-list/journal-voucher-list.component';

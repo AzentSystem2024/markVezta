@@ -1,0 +1,94 @@
+@use "../../../../../variables.scss" as *;
+@use "sass:math";
+
+.form-popup-buttons-container {
+  display: flex;
+  justify-content: flex-end; /* Moves buttons to the right */
+  padding: 10px;
+  margin-top: 25px; /* Optional: Adds some spacing */
+}
+
+.popup-footer {
+  display: flex;
+  gap: 10px; /* Space between buttons */
+}
+
+.tab-content.tab-basic {
+  min-height: 380px;
+  background-color: var(--base-bg);
+}
+
+.flag-red {
+  color: red;
+}
+
+.flag-green {
+  color: green;
+}
+
+/* =============================== */
+/* HEADER */
+/* =============================== */
+
+.grid-header {
+  font-weight: 600;
+  font-size: 20px;
+  margin-left: 12px;
+}
+
+/* =============================== */
+/* + NEW BUTTON */
+/* =============================== */
+
+::ng-deep .add-button {
+  background-color: #1e88e5;
+  border-radius: 8px;
+  height: 35px;
+  padding: 0 16px;
+  border: none;
+}
+
+::ng-deep .add-button .dx-button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.add-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+}
+
+.add-btn-content .iconify {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.add-text {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.form-popup-buttons-container {
+  padding: 4px 20px 6px;
+  margin-top: 2;
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.popup-btn {
+  min-width: 90px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 6px;
+}

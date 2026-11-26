@@ -23,7 +23,7 @@ import { DxTextBoxModule } from 'devextreme-angular';
 import {
   SupplierFormComponent,
   SupplierFormModule,
-} from 'src/app/components/library/supplier-form/supplier-form.component';
+} from 'src/app/features/master-data/pages/supplier/supplier-add-form/supplier-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import { Router } from '@angular/router';

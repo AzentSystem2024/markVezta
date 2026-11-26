@@ -39,7 +39,7 @@ import {
 import { FormTextboxModule } from '../../../components/utils/form-textbox/form-textbox.component';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
-import { CustomerFormModule } from 'src/app/components/HR/Masters/Customer/customer-form/customer-form.component';
+import { CustomerFormModule } from 'src/app/features/master-data/pages/customer/customer-add-form/customer-form.component';
 import { AnyCnameRecord } from 'dns';
 
 @Component({

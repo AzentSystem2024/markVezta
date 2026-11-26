@@ -31,7 +31,7 @@ import {
   DxTextAreaModule,
 } from 'devextreme-angular';
 import { FormPopupModule } from 'src/app/components';
-import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
+import { ItemsFormModule } from 'src/app/features/master-data/pages/items/items-add-form/items-form.component';
 import {
   GrnNewFormComponent,
   GrnNewFormModule,

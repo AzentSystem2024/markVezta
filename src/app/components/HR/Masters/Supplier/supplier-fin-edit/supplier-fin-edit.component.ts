@@ -39,7 +39,7 @@ import { FormPopupModule, FormTextboxModule } from 'src/app/components';
 import {
   SupplierFormComponent,
   SupplierFormModule,
-} from 'src/app/components/library/supplier-form/supplier-form.component';
+} from 'src/app/features/master-data/pages/supplier/supplier-add-form/supplier-form.component';
 import { AuthService, DataService } from 'src/app/services';
 import { ExportService } from 'src/app/services/export.service';
 import CountryList from 'country-list-with-dial-code-and-flag';

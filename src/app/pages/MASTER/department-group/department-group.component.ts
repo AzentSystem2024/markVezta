@@ -10,7 +10,7 @@ import {
 import { DxPopupModule } from 'devextreme-angular';
 import { CommonModule } from '@angular/common';
 import { FormPopupModule } from 'src/app/components';
-import { DepartmentFormModule } from '../../../components/library/department-form/department-form.component';
+import { DepartmentFormModule } from '../../../features/master-data/pages/item-department/item-department-add-form/department-form.component';
 import { DxDataGridComponent } from 'devextreme-angular';
 import {
   FormBuilder,
@@ -21,7 +21,7 @@ import {
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
-import { DepartmentComponent } from '../department/department.component';
+import { DepartmentComponent } from '../../../features/master-data/pages/department/department-list/department.component';
 import { ExportService } from 'src/app/services/export.service';
 
 @Component({
@@ -247,7 +247,7 @@ export class DepartmentGroupComponent {
     const isDuplicate = this.Department.some((data: any) => {
       return (
         data.DEPT_NAME?.toLowerCase().trim() ===
-        DEPT_NAME?.toLowerCase().trim() ||
+          DEPT_NAME?.toLowerCase().trim() ||
         data.CODE?.toLowerCase().trim() === CODE?.toLowerCase().trim()
       );
     });
@@ -387,7 +387,7 @@ export class DepartmentGroupComponent {
     const ID = event.data.ID;
     this.dataservice
       .Delete_Department_Group_Api(ID)
-      .subscribe((response: any) => { });
+      .subscribe((response: any) => {});
   }
 
   validateDepartmentGroupCode = (e: any): boolean => {
@@ -396,8 +396,7 @@ export class DepartmentGroupComponent {
     if (!value || !this.Department?.length) return true;
 
     // edit popup row id
-    const currentId =
-      this.editingRowData?.ID || null;
+    const currentId = this.editingRowData?.ID || null;
 
     return !this.Department.some((item: any) => {
       const code = (item.CODE || '').trim().toLowerCase();
@@ -411,23 +410,19 @@ export class DepartmentGroupComponent {
 
     if (!value || !this.Department?.length) return true;
 
-    const currentId =
-      this.editingRowData?.ID || null;
+    const currentId = this.editingRowData?.ID || null;
 
     return !this.Department.some((item: any) => {
-      const name =
-        (item.DEPT_NAME || item.DESCRIPTION || '')
-          .trim()
-          .toLowerCase();
+      const name = (item.DEPT_NAME || item.DESCRIPTION || '')
+        .trim()
+        .toLowerCase();
 
       return name === value && item.ID !== currentId;
     });
   };
 
   getStatusFlagClass(status: any): string {
-    return status?.toLowerCase() === 'active'
-      ? 'green-flag'
-      : 'red-flag';
+    return status?.toLowerCase() === 'active' ? 'green-flag' : 'red-flag';
   }
 }
 @NgModule({
@@ -448,4 +443,4 @@ export class DepartmentGroupComponent {
   exports: [],
   declarations: [DepartmentGroupComponent],
 })
-export class DepartmentGroupModule { }
+export class DepartmentGroupModule {}

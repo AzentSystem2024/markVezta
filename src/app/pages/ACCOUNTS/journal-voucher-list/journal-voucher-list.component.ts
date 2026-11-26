@@ -37,9 +37,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { ArticleListComponent } from '../../MASTER/article-list/article-list.component';
+import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
+import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
+import { ArticleListComponent } from '../../../features/master-data/pages/article/article-list/article-list.component';
 import { DataService } from 'src/app/services';
 import {
   AddJournalVoucharComponent,

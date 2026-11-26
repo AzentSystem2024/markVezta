@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { DxButtonModule, DxCheckBoxModule, DxDataGridModule, DxDateBoxModule, DxFormModule, DxPopupModule, DxSelectBoxModule, DxTextAreaModule, DxTextBoxModule, DxValidationGroupModule, DxValidatorModule } from 'devextreme-angular';
 import { FormTextboxModule } from 'src/app/components';
-import { SupplierFormModule } from 'src/app/components/library/supplier-form/supplier-form.component';
+import { SupplierFormModule } from 'src/app/features/master-data/pages/supplier/supplier-add-form/supplier-form.component';
 
 @Component({
   selector: 'app-landed-cost-edit',

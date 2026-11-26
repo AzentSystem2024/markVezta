@@ -33,7 +33,7 @@ import {
   DxoItemModule,
   DxoLookupModule,
 } from 'devextreme-angular/ui/nested';
-import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
+import { ItemsFormModule } from 'src/app/features/master-data/pages/items/items-add-form/items-form.component';
 @Component({
   selector: 'app-store-items',
   templateUrl: './store-items.component.html',

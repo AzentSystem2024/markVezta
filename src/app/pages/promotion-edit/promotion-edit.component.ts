@@ -40,7 +40,7 @@ import {
 import notify from 'devextreme/ui/notify';
 import { Observable, tap } from 'rxjs';
 import { FormTextboxModule } from 'src/app/components';
-import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
+import { ItemsFormModule } from 'src/app/features/master-data/pages/items/items-add-form/items-form.component';
 import { DataService } from 'src/app/services';
 
 @Component({

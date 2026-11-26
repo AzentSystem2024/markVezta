@@ -7,7 +7,7 @@ import { FormPopupModule } from 'src/app/components';
 import {
   CategoryFormComponent,
   CategoryFormModule,
-} from 'src/app/components/library/category-form/category-form.component';
+} from 'src/app/features/master-data/pages/item-category/item-category-add-form/category-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 

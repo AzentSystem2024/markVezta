@@ -22,7 +22,7 @@ import {
 } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
 import { FormPopupModule } from 'src/app/components';
-import { DepartmentFormModule } from 'src/app/components/library/department-form/department-form.component';
+import { DepartmentFormModule } from 'src/app/features/master-data/pages/item-department/item-department-add-form/department-form.component';
 import { DataService } from 'src/app/services';
 
 @Component({

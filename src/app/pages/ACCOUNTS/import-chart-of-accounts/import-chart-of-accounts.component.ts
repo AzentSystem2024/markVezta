@@ -35,13 +35,13 @@ import { DxPopupModule } from 'devextreme-angular';
 import {
   ImportItemsDialogModule,
   ImportItemsDialogComponent,
-} from 'src/app/components/library/import-items-dialog/import-items-dialog.component';
+} from 'src/app/features/master-data/pages/import-items/import-items-add-form/import-items-dialog.component';
 import { DxiButtonModule } from 'devextreme-angular/ui/nested';
 import {
   ViewImportedItemsComponent,
   ViewImportedItemsModule,
-} from 'src/app/components/library/view-imported-items/view-imported-items.component';
-import { ImportItemTemplateFormComponent } from 'src/app/components/library/import-item-template-form/import-item-template-form.component';
+} from 'src/app/features/master-data/pages/import-items/import-items-view-form/view-imported-items.component';
+import { ImportItemTemplateFormComponent } from 'src/app/features/master-data/pages/import-items-template/import-items-template-add-form/import-item-template-form.component';
 import DataSource from 'devextreme/data/data_source';
 import { DxLoadPanelModule } from 'devextreme-angular';
 import { Router } from '@angular/router';

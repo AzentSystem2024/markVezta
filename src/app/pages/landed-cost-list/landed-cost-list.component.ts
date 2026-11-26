@@ -12,7 +12,7 @@ import {
   LandedCostFormComponent,
   LandedCostFormModule,
 } from 'src/app/components/library/landed-cost-form/landed-cost-form.component';
-import { ItemProperty1FormComponent } from 'src/app/components/library/item-property1-form/item-property1-form.component';
+import { ItemProperty1FormComponent } from 'src/app/features/master-data/pages/item-property1/item-property1-add-form/item-property1-form.component';
 import notify from 'devextreme/ui/notify';
 import { ExportService } from 'src/app/services/export.service';
 import DataSource from 'devextreme/data/data_source';

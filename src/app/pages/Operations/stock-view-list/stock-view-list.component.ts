@@ -7,7 +7,7 @@ import { DxoFormItemModule, DxoItemModule, DxoLookupModule } from 'devextreme-an
 import { DxiDataGridColumn } from 'devextreme-angular/ui/nested/base/data-grid-column-dxi';
 // import { DxiDataGridColumn } from 'devextreme-angular/ui/nested/base/data-grid-column-dxi';
 import { FormTextboxModule } from 'src/app/components';
-import { ItemsFormModule } from 'src/app/components/library/items-form/items-form.component';
+import { ItemsFormModule } from 'src/app/features/master-data/pages/items/items-add-form/items-form.component';
 import { DataService } from 'src/app/services';
 import { debounce } from 'lodash';
 

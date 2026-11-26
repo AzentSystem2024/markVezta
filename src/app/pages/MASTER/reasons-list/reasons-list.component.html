@@ -90,15 +90,7 @@
       </dxo-toolbar>
       <dxi-column dataField="CODE" caption="Code" width="150"> </dxi-column>
       <dxi-column dataField="DESCRIPTION" caption="Description"> </dxi-column>
-      <!-- <dxi-column dataField="ARABIC_DESCRIPTION" caption="Arabic Description">
-        <dxi-validation-rule
-          type="required"
-          message="Arabic description is required"
-        >
-          <dxi-validation-rule type="pattern" message="Description is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column> -->
+
       <dxi-column dataField="REASON_TYPE" caption="Reason Type">
         <dxo-lookup
           [dataSource]="reasontype"
@@ -107,59 +99,10 @@
         >
         </dxo-lookup>
       </dxi-column>
-      <!-- <dxi-column dataField="DISCOUNT_TYPE" caption="Discount Type">
-        <dxo-lookup
-          [dataSource]="discounttype"
-          displayExpr="DESCRIPTION"
-          valueExpr="ID"
-        >
-        </dxo-lookup>
-        <dxi-validation-rule
-          type="required"
-          message="Discount type is required"
-        >
-          <dxi-validation-rule
-            type="pattern"
-            message="Discount type is required"
-          >
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column>
-      <dxi-column dataField="DISCOUNT_PERCENT" caption="Discount Percent">
-        <dxi-validation-rule
-          type="required"
-          message="Discount percent is required"
-        >
-          <dxi-validation-rule type="pattern" message="Description is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column>
-
-      <dxi-column
-        dataField="START_DATE"
-        caption="Start Date"
-        dataType="date"
-        [format]="'dd/MM/yyyy'"
-      >
-        <dxi-validation-rule type="required" message="Start date is required">
-          <dxi-validation-rule type="pattern" message="Start date is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column>
-      <dxi-column
-        dataField="END_DATE"
-        caption="End Date"
-        dataType="date"
-        [format]="'dd/MM/yyyy'"
-      >
-        <dxi-validation-rule type="required" message="End date is required">
-          <dxi-validation-rule type="pattern" message="End date is required">
-          </dxi-validation-rule>
-        </dxi-validation-rule>
-      </dxi-column> -->
     </dx-data-grid>
   </div>
 </div>
+
 <form-popup
   [(visible)]="isAddReasonsPopupOpened"
   [width]="800"
@@ -181,15 +124,3 @@
 >
   <app-reasons-form #editForm [formData]="selected_Data"></app-reasons-form>
 </form-popup>
-
-<!-- <dx-popup
-  [(visible)]="isEditReasonsPopupOpened"
-  width="800px"
-  height="550px"
-  title="Edit Reasons"
->
-  <app-reason-edit
-    (formClosed)="handleClose()"
-    [selectedData]="selected_Data"
-  ></app-reason-edit>
-</dx-popup> -->

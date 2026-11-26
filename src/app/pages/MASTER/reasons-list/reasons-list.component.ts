@@ -23,9 +23,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./reasons-list.component.scss'],
 })
 export class ReasonsListComponent {
-  @ViewChild(ReasonsFormComponent) reasonComponent: ReasonsFormComponent;
+  @ViewChild(ReasonsFormComponent) reasonComponent!: ReasonsFormComponent;
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @ViewChild('addForm') addFormComponent!: ReasonsFormComponent;
   @ViewChild('editForm') editFormComponent!: ReasonsFormComponent;
 

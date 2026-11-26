@@ -1,0 +1,960 @@
+// import { Component } from '@angular/core';
+import {
+  Component,
+  NgModule,
+  Input,
+  SimpleChanges,
+  Output,
+  EventEmitter,
+  ViewChild,
+  OnChanges,
+  OnInit,
+} from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormTextboxModule } from '../../../../../components/utils/form-textbox/form-textbox.component';
+import {
+  DxButtonModule,
+  DxCheckBoxModule,
+  DxDropDownBoxModule,
+  DxListModule,
+  DxRadioGroupModule,
+  DxTabPanelModule,
+  DxValidationGroupModule,
+  DxValidatorComponent,
+  DxValidatorModule,
+} from 'devextreme-angular';
+import { confirm } from 'devextreme/ui/dialog';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+} from 'devextreme-angular';
+import { DxTextBoxComponent, DxTextBoxModule } from 'devextreme-angular/ui/text-box';
+import { AuthService, DataService } from 'src/app/services/index';
+import CountryList from 'country-list-with-dial-code-and-flag';
+import { isValidPhoneNumber } from 'libphonenumber-js';
+import notify from 'devextreme/ui/notify';
+
+@Component({
+  selector: 'app-customer-edit-form',
+  templateUrl: './customer-edit-form.component.html',
+  styleUrls: ['./customer-edit-form.component.scss'],
+})
+export class CustomerEditFormComponent implements OnInit, OnChanges {
+  @Input() selectedCustomerData: any;
+  @Output() ChangedCustomerData: any;
+  @Output() updateCompleted = new EventEmitter<any>();
+  @ViewChild('mobileBoxRef', { static: false }) mobileBoxRef: any;
+  @ViewChild('mobileValidator', { static: false })
+  mobileValidator!: DxValidatorComponent;
+  @ViewChild('phoneValidator', { static: false })
+  phoneValidator!: DxValidatorComponent;
+  @ViewChild('mobileBox', { static: false }) mobileBox!: DxTextBoxComponent;
+  @ViewChild('phoneBox', { static: false }) phoneBox!: DxTextBoxComponent;
+  @ViewChild('deliveryMobileValidator', { static: false })
+  deliveryMobileValidator!: DxValidatorComponent;
+  @ViewChild('deliveryMobileBox', { static: false })
+  deliveryMobileBox!: DxTextBoxComponent;
+
+  CountryDropdownData: any;
+  VATRuleDropdownData: any[] = [];
+  PaymentTermsDropdownData: any;
+  PriceLevelDropdownData: any[] = [];
+  StateDropdownData: any;
+  isCurrencyAccepted: boolean = true;
+  selecte_countyId: any;
+  Warehouse: any[] = [];
+  selectedWarehouseId: any[] = [];
+  WarehouseId: any;
+  DeliveryAddressId: any;
+  DeliveryAddress: any[] = [];
+  selected_fin_id: any;
+  sessionData: any;
+  selected_vat_id: any;
+  selected_Company_id: any = null; // or ''
+  dob: string | number | Date = new Date();
+  Address1Value: any;
+  MobileValue: any;
+  locationValue: any;
+  phoneValue: any;
+  editingIndex: number | null = null;
+
+  formCustomerData = {
+    WAREHOUSE_ID: '',
+    DELIVERY_ADDRESS_ID: '',
+    COMPANY_ID: this.selected_Company_id,
+    CUST_CODE: '',
+    FIRST_NAME: '',
+    LAST_NAME: '',
+    DOB: this.dob,
+    NATIONALITY: '',
+    CONTACT_NAME: '',
+    ADDRESS1: '',
+    ADDRESS2: '',
+    ADDRESS3: '',
+    ZIP: '',
+    STATE_ID: '',
+    CITY: '',
+    COUNTRY_ID: '',
+    PHONE: '',
+    EMAIL: '',
+    MOBILE_NO: '',
+    FAX_NO: '',
+    CREDIT_LIMIT: '',
+    CURRENT_CREDIT: '',
+    PAY_TERM_ID: '',
+    NOTES: '',
+    PRICE_CLASS_ID: '',
+    DISCOUNT_PERCENT: '',
+    CUST_VAT_RULE_ID: '',
+    VAT_REGNO: '',
+    CUST_TYPE: 0,
+    DELIVERY_ADDRESS: [],
+    DEALER_TYPE: 0,
+    DEALER_ID: 0,
+    DISTRICT_ID: 0,
+    SALESMAN_ID: 0,
+    DeliveryAddresses: [],
+  };
+
+  DEFAULT_COUNTRY_CODE: string = '';
+  selectedTabIndex = 0;
+  customerTypeOptions = [
+    { text: 'Unit of Company', value: 1 },
+    { text: 'Outside Customer', value: 2 },
+  ];
+
+  dealerTypeOptions = [
+    { text: 'Dealer', value: 1 },
+    { text: 'Sub-Dealer', value: 2 },
+    { text: 'CompanyBranch', value: 3 },
+  ];
+
+  isDealerVisible: boolean;
+  deliveryAddress1: any;
+  deliveryAddress2: any;
+  deliveryAddress3: any;
+  isSubDealerPopupVisible: boolean;
+  dealerList: any;
+  PhonenumberCode: any;
+  mobilenocode: any;
+  mobileNumber: any;
+  countryCodes: any;
+  mobile_limit: any;
+  MobilecountryCode: any;
+  countryCodeDeliveryaddress: any;
+  Phone_limit: number;
+  mobile_limit_Delivery_Address: number = 0;
+  savedAddresses: any[] = [];
+  districtData: any;
+  Salesman: any;
+  selected_stateId: any;
+  userId: any;
+
+  countryCode: string = '+91';
+  phoneCountryCode: string = '+91';
+  isCountryDropdownOpen = false;
+  isPhoneDropdownOpen = false;
+  isDeliveryCountryDropdownOpen = false;
+
+  constructor(private service: DataService) {
+    this.getStateDropDown();
+    this.showCountry();
+    this.sessionData_tax();
+    this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
+
+    const codes = CountryList.getAll();
+
+    this.countryCodes = codes.map((country: any) => ({
+      ...country,
+      flagUrl: `https://flagcdn.com/w20/${String(country.code).toLowerCase()}.png`,
+      display: country.dial_code,
+    }));
+
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['selectedCustomerData'] &&
+      changes['selectedCustomerData'].currentValue
+    ) {
+      this.formCustomerData = this.selectedCustomerData;
+
+      this.selecte_countyId = this.formCustomerData.COUNTRY_ID;
+      this.ChangedCustomerData = this.formCustomerData;
+      // if (this.formCustomerData.DELIVERY_ADDRESS?.length) {
+      //   this.deliveryAddress1 =
+      //     this.formCustomerData.DELIVERY_ADDRESS[0]?.DELIVERY_ADDRESS || '';
+      //   this.deliveryAddress2 =
+      //     this.formCustomerData.DELIVERY_ADDRESS[1]?.DELIVERY_ADDRESS || '';
+      //   this.deliveryAddress3 =
+      //     this.formCustomerData.DELIVERY_ADDRESS[2]?.DELIVERY_ADDRESS || '';
+      // } else {
+      //   // In case no addresses exist yet
+      //   this.deliveryAddress1 = '';
+      //   this.deliveryAddress2 = '';
+      //   this.deliveryAddress3 = '';
+      // }
+      // Do not automatically bind delivery address fields
+      this.Address1Value = '';
+      this.countryCodeDeliveryaddress = '';
+      this.MobileValue = '';
+      this.locationValue = '';
+      this.phoneValue = '';
+
+      // Keep existing addresses visible as cards
+      this.savedAddresses = [
+        ...(this.formCustomerData.DeliveryAddresses || [])
+      ];
+
+      // Show dealer dropdown automatically if Dealer Type = 2
+      if (this.formCustomerData.CUST_TYPE === 2) {
+        if (this.formCustomerData.DEALER_TYPE === 2) {
+          this.isDealerVisible = true;
+          this.getDealerDropDown(); // fetch dealer list for dropdown
+        } else {
+          this.isDealerVisible = false;
+        }
+      } else {
+        this.isDealerVisible = false;
+      }
+    }
+
+    // Split customer mobile number
+    const mobileData = this.parseIncomingPhone(
+      this.selectedCustomerData.MOBILE_NO || ''
+
+    );
+    console.log(mobileData)
+
+    this.countryCode = mobileData.code;
+    this.mobilenocode = mobileData.code
+    this.formCustomerData.MOBILE_NO = mobileData.number;
+
+    // Split customer telephone number
+    const phoneData = this.parseIncomingPhone(
+      this.selectedCustomerData.PHONE || ''
+
+    );
+    console.log(phoneData)
+
+    this.phoneCountryCode = phoneData.code;
+    this.PhonenumberCode = phoneData.code;
+    this.formCustomerData.PHONE = phoneData.number;
+
+
+    // Dealer dropdown
+    if (this.formCustomerData.CUST_TYPE === 2) {
+      if (this.formCustomerData.DEALER_TYPE === 2) {
+        this.isDealerVisible = true;
+        this.getDealerDropDown();
+      } else {
+        this.isDealerVisible = false;
+      }
+    } else {
+      this.isDealerVisible = false;
+    }
+  }
+
+  validateEmail = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    // Empty → valid (not mandatory)
+    if (!value) return true;
+
+    // Validate only if user entered something
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailRegex.test(value);
+  };
+
+  onCountrycodeChange(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+
+  onCountrycodeChangeDeliveryAddress(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit_Delivery_Address = Number(res.Data[0].MOBILE_DIGITS);
+    });
+    setTimeout(() => {
+      this.mobileBoxRef?.instance?.validate();
+    });
+  }
+
+  addDeliveryAddress(address: string) {
+    if (address && address.trim() !== '') {
+      this.formCustomerData.DELIVERY_ADDRESS.push({
+        DELIVERY_ADDRESS: address,
+      });
+    }
+  }
+
+  onDealerTypeChange(e: any) {
+    if (e.value === 2) {
+      // 2 = Sub Dealer
+      this.isDealerVisible = true; // show dropdown
+      this.getDealerDropDown(); // fetch dealers dynamically
+    } else {
+      this.isDealerVisible = false; // hide dropdown
+      this.formCustomerData.DEALER_ID = null; // reset selection
+    }
+  }
+
+  onDealerSelected(e: any) {
+    const selectedDealer = e.selectedRowsData[0];
+    if (selectedDealer) {
+      this.formCustomerData.DEALER_ID = selectedDealer.ID;
+      this.isSubDealerPopupVisible = false;
+    }
+  }
+
+  getDealerDropDown() {
+    const payload = {
+      NAME: 'DEALER',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((response: any) => {
+      this.dealerList = response;
+    });
+  }
+
+  sessionData_tax() {
+    // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+  }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.userId = sessionData.USER_ID;
+
+
+    this.selected_fin_id = sessionData.FINANCIAL_YEARS[0].FIN_ID;
+
+    this.DEFAULT_COUNTRY_CODE =
+      sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
+  }
+
+  showCountry() {
+    this.service.getCountryDataAPi().subscribe((response) => {
+      this.CountryDropdownData = response;
+    });
+  }
+
+  getPriceLevelDropDown() {
+    const payload = {
+      NAME: 'PRICECLASS',
+      COMPANY_ID: this.selected_Company_id,
+    };
+
+    this.service.getDropdownData(payload).subscribe((data: any) => {
+      this.PriceLevelDropdownData = data;
+    });
+  }
+
+  getVATRuleDropDown() {
+    const payload = {
+      NAME: 'VATRULE',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.getDropdownData(payload).subscribe((data: any) => {
+      this.VATRuleDropdownData = data;
+    });
+  }
+
+  getPaymentTerms() {
+    this.service.getpayment_term_Api().subscribe((response) => {
+      this.PaymentTermsDropdownData = response;
+    });
+  }
+
+  get_Warehouse_Dropdown_List() {
+    this.service.get_Warehouse_Dropdown_Api().subscribe((response: any) => {
+      this.Warehouse = response;
+    });
+  }
+
+  onWarehouseValue(event: any) {
+    this.selectedWarehouseId = event.value;
+    this.WarehouseId = event.value;
+    this.get_Warehouse_Dropdown_List();
+  }
+
+  get_DeliveryAddress_Dropdown_List() {
+    this.service
+      .get_DeliveryAddress_Dropdown_Api()
+      .subscribe((response: any) => {
+        this.DeliveryAddress = response;
+      });
+  }
+
+  onDeliveryAddressValue(event: any) {
+    this.DeliveryAddressId = event.value;
+    this.get_DeliveryAddress_Dropdown_List();
+  }
+
+  getStateDropDown() {
+    const id = this.selecte_countyId;
+    const payload = {
+      NAME: 'STATE_NAME',
+      COUNTRY_ID: this.selecte_countyId,
+    };
+    this.service.getStateData_Api(payload).subscribe((data: any) => {
+      this.StateDropdownData = data;
+    });
+  }
+
+  getDistrictDropDown() {
+    const id = this.selected_stateId;
+    const payload = {
+      NAME: 'DISTRICT_NAME',
+      STATE_ID: this.selected_stateId,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.districtData = data;
+    });
+  }
+
+  getSalesmanDropDown() {
+    const payload = {
+      NAME: 'SALESMAN',
+      COMPANY_ID: this.selected_Company_id,
+    };
+    this.service.Common_Dropdown(payload).subscribe((data: any) => {
+      this.Salesman = data;
+    });
+  }
+
+  onStateSelectionChanged(event: any) {
+    this.selected_stateId = event.value;
+    this.getDistrictDropDown();
+  }
+
+  onCountrySelectionChanged(event: any) {
+    this.selecte_countyId = event.value;
+    this.getStateDropDown();
+
+    if (!this.CountryDropdownData?.length) return;
+
+    const selectedCountry = this.CountryDropdownData.find(
+      (c: any) => c.ID === this.selecte_countyId,
+    );
+
+    if (!selectedCountry) return;
+
+    const selectedName = selectedCountry.DESCRIPTION?.toLowerCase().trim();
+    if (!selectedName || !this.countryCodes?.length) return;
+
+    const matchedCountry = this.countryCodes.find((c: any) => {
+      const cName = (
+        c.name ||
+        c.COUNTRY_NAME ||
+        c.data?.name ||
+        ''
+      ).toLowerCase();
+      return cName.includes(selectedName) || selectedName.includes(cName);
+    });
+
+    if (matchedCountry) {
+      const dialCode =
+        matchedCountry.dial_code ||
+        matchedCountry.data?.dial_code ||
+        matchedCountry.CODE;
+      if (dialCode) {
+        this.countryCode = dialCode;
+        this.DEFAULT_COUNTRY_CODE = dialCode;
+      }
+    }
+  }
+
+
+  ngOnInit(): void {
+    this.sesstion_Details();
+    this.getPaymentTerms();
+
+    this.getVATRuleDropDown();
+    this.getStateDropDown();
+    this.getSalesmanDropDown();
+    this.getPriceLevelDropDown();
+    this.get_Warehouse_Dropdown_List();
+    this.get_DeliveryAddress_Dropdown_List();
+
+  }
+  keyPressNumbers(event: any) {
+    var charCode = event.which ? event.which : event.keyCode;
+    var inputElement = event.target as HTMLInputElement;
+
+    // Only Numbers 0-9
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+      return false;
+    } else if (inputElement.value.length === 0 && charCode === 48) {
+      // Check if first character is '0'
+      event.preventDefault();
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  UpdateData() {
+    console.log(this.selectedCustomerData);
+    return {
+      ...this.selectedCustomerData,
+      MOBILE_NO: this.mobilenocode + '-' + this.formCustomerData.MOBILE_NO,
+      PHONE: this.PhonenumberCode + '-' + this.formCustomerData.PHONE,
+      USER_ID: this.userId || '',
+    };
+  }
+
+  closePopup() { }
+
+  saveDeliveryAddress() {
+    if (!this.locationValue || !this.locationValue.trim()) {
+      notify(
+        {
+          message: 'Location is required',
+          type: 'error',
+          displayTime: 3000,
+          position: {
+            my: 'top center',
+            at: 'top center',
+            of: window,
+          },
+        }
+      );
+      return;
+    }
+    // Validate that at least one field is filled
+    if (
+      this.Address1Value ||
+      this.MobileValue ||
+      this.locationValue ||
+      this.phoneValue
+    ) {
+      const newAddress = {
+        ADDRESS1: this.Address1Value,
+        MOBILE: this.countryCodeDeliveryaddress + '-' + this.MobileValue,
+        LOCATION: this.locationValue,
+        PHONE: this.phoneValue,
+      };
+
+      if (this.editingIndex !== null && this.editingIndex >= 0) {
+        // ✅ Update existing card (do not push)
+        this.savedAddresses[this.editingIndex] = { ...newAddress };
+        this.editingIndex = null; // Exit edit mode
+      } else {
+        // ✅ Add as a new card
+        //  Push into savedAddresses array
+        this.savedAddresses.push(newAddress);
+      }
+
+      //  Optionally link with formCustomerData for payload
+      this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
+
+      //  Clear the input fields
+      this.Address1Value = '';
+      this.MobileValue = '';
+      this.locationValue = '';
+      this.phoneValue = '';
+      this.countryCodeDeliveryaddress = '';
+    }
+  }
+
+  removeAddress(index: number) {
+    const result = confirm(
+      'Are you sure you want to delete this address?',
+      'Confirm Deletion',
+    );
+
+    result.then((dialogResult) => {
+      if (dialogResult) {
+        // ✅ Remove from UI list
+        this.savedAddresses.splice(index, 1);
+
+        // ✅ Sync payload with updated list
+        this.formCustomerData.DeliveryAddresses = [...this.savedAddresses];
+
+        // ✅ Optional: reset edit mode if currently editing
+        if (this.editingIndex === index) {
+          // this.resetPartialForm();
+          this.editingIndex = null;
+        }
+      }
+    });
+  }
+
+  editAddress(i: number) {
+    const addr = this.savedAddresses[i];
+    const [countryCodephone, phonenumber] = addr.MOBILE.split('-');
+
+    const mobileData = this.parseIncomingPhone(addr.MOBILE || '');
+    // Fill form fields
+    this.Address1Value = addr.ADDRESS1;
+    this.MobileValue = phonenumber;
+    this.countryCodeDeliveryaddress = mobileData.code;
+    // this.countryCodeDeliveryaddress = countryCodephone;
+    this.locationValue = addr.LOCATION;
+    this.phoneValue = addr.PHONE;
+
+    // ✅ Remember which card is being edited
+    this.editingIndex = i;
+  }
+
+
+  private parseIncomingPhone(
+    fullPhone: string,
+    defaultCode: string = '+91'
+  ): { code: string; number: string } {
+
+    if (!fullPhone) {
+      return { code: defaultCode, number: '' };
+    }
+
+    const str = String(fullPhone).trim();
+
+    if (!str) {
+      return { code: defaultCode, number: '' };
+    }
+
+    if (str.includes('-')) {
+      const parts = str.split('-');
+
+      return {
+        code: parts[0].trim(),
+        number: parts.slice(1).join('-').replace(/\D/g, '')
+      };
+    }
+
+    return {
+      code: defaultCode,
+      number: str.replace(/\D/g, '')
+    };
+  }
+
+  private extractDialCode(event: any): string {
+    if (!event) return '';
+    let code = '';
+    if (typeof event === 'string') code = event;
+    else if (typeof event.value === 'string') code = event.value;
+    else if (typeof event.value?.dial_code === 'string')
+      code = event.value.dial_code;
+    else if (typeof event.value?.data?.dial_code === 'string')
+      code = event.value.data.dial_code;
+    else if (typeof event.itemData?.dial_code === 'string')
+      code = event.itemData.dial_code;
+    else if (typeof event.itemData?.data?.dial_code === 'string')
+      code = event.itemData.data.dial_code;
+    else if (typeof event.dial_code === 'string') code = event.dial_code;
+    else if (typeof event.data?.dial_code === 'string')
+      code = event.data.dial_code;
+
+    code = (code || '').trim();
+    if (code && !code.startsWith('+')) {
+      code = '+' + code;
+    }
+    return code;
+  }
+
+  onDeliveryCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (
+        this.countryCodeDeliveryaddress &&
+        this.countryCodeDeliveryaddress !== dialCode
+      ) {
+        this.MobileValue = '';
+        if (this.deliveryMobileBox?.instance) {
+          this.deliveryMobileBox.instance.option('isValid', true);
+        }
+      }
+      this.countryCodeDeliveryaddress = dialCode;
+    }
+    this.isDeliveryCountryDropdownOpen = false;
+    this.revalidateDeliveryMobile();
+  }
+
+  revalidateDeliveryMobile() {
+    setTimeout(() => {
+      const val = this.MobileValue || '';
+      if (val) {
+        const isValid = this.DeliveryMobileValidate({ value: val });
+        if (this.deliveryMobileBox?.instance) {
+          this.deliveryMobileBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.deliveryMobileBox.instance.option('validationError', {
+              message: 'Invalid mobile number',
+            });
+          }
+        }
+      } else if (this.deliveryMobileBox?.instance) {
+        this.deliveryMobileBox.instance.option('isValid', true);
+      }
+      this.deliveryMobileValidator?.instance?.validate();
+    }, 0);
+  }
+
+  DeliveryMobileValidate = (e: any): boolean => {
+    return this.validateDeliveryMobile(e);
+  };
+
+  validateDeliveryMobile(e: any): boolean {
+    const dialCode = (this.countryCodeDeliveryaddress || '').trim();
+    const mobileValue = e?.value ? e.value.toString().trim() : '';
+    const mobileNum = mobileValue.replace(/\D/g, '');
+    if (!mobileNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return mobileNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + mobileNum);
+    } catch {
+      return false;
+    }
+  }
+
+  onDeliveryMobileInputChange(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.MobileValue = digits;
+    this.revalidateDeliveryMobile();
+  }
+
+
+  onPhoneCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (this.phoneCountryCode && this.phoneCountryCode !== dialCode) {
+        this.formCustomerData.PHONE = '';
+        if (this.phoneBox?.instance) {
+          this.phoneBox.instance.option('isValid', true);
+        }
+      }
+      this.phoneCountryCode = dialCode;
+      this.PhonenumberCode = dialCode;
+    }
+    this.isPhoneDropdownOpen = false;
+    this.revalidatePhone();
+  }
+
+  onCountrySelected(event: any) {
+    const dialCode = this.extractDialCode(event);
+
+    if (dialCode) {
+      if (this.countryCode && this.countryCode !== dialCode) {
+        this.formCustomerData.MOBILE_NO = '';
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', true);
+        }
+      }
+      this.countryCode = dialCode;
+      this.mobilenocode = dialCode;
+    }
+    this.isCountryDropdownOpen = false;
+    this.revalidateMobile();
+  }
+
+
+  revalidateMobile() {
+    setTimeout(() => {
+      const val = this.formCustomerData.MOBILE_NO || '';
+      if (val) {
+        const isValid = this.MobileValidate({ value: val });
+        if (this.mobileBox?.instance) {
+          this.mobileBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.mobileBox.instance.option('validationError', {
+              message: 'Invalid mobile number',
+            });
+          }
+        }
+      } else if (this.mobileBox?.instance) {
+        this.mobileBox.instance.option('isValid', true);
+      }
+      this.mobileValidator?.instance?.validate();
+    }, 0);
+  }
+
+  revalidatePhone() {
+    setTimeout(() => {
+      const val = this.formCustomerData.PHONE || '';
+      if (val) {
+        const isValid = this.PhoneValidate({ value: val });
+        if (this.phoneBox?.instance) {
+          this.phoneBox.instance.option('isValid', isValid);
+          if (!isValid) {
+            this.phoneBox.instance.option('validationError', {
+              message: 'Invalid phone number',
+            });
+          }
+        }
+      } else if (this.phoneBox?.instance) {
+        this.phoneBox.instance.option('isValid', true);
+      }
+      this.phoneValidator?.instance?.validate();
+    }, 0);
+  }
+
+  MobileValidate = (e: any): boolean => {
+    const dialCode = (this.countryCode || this.mobilenocode || '').trim();
+    const mobileValue = e.value ? e.value.toString().trim() : '';
+    const mobileNum = mobileValue.replace(/\D/g, '');
+    if (!mobileNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return mobileNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + mobileNum);
+    } catch {
+      return false;
+    }
+  };
+
+  PhoneValidate = (e: any): boolean => {
+    const dialCode = (
+      this.phoneCountryCode ||
+      this.PhonenumberCode ||
+      ''
+    ).trim();
+    const phoneValue = e.value ? e.value.toString().trim() : '';
+    const phoneNum = phoneValue.replace(/\D/g, '');
+    if (!phoneNum) return true;
+
+    if (dialCode === '+971' || dialCode === '971') {
+      return phoneNum.length === 9;
+    }
+
+    try {
+      return isValidPhoneNumber(dialCode + phoneNum);
+    } catch {
+      return false;
+    }
+  };
+
+  onMobileInputChange(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.formCustomerData.MOBILE_NO = digits;
+    this.revalidateMobile();
+  }
+
+  validatePhone(event: any) {
+    const target = (event.target ||
+      (event.event && event.event.target)) as HTMLInputElement;
+    if (!target) return;
+    let digits = target.value.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    this.formCustomerData.PHONE = digits;
+    this.revalidatePhone();
+  }
+
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+
+  onCountrycodeChangePhoneNocode(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.Phone_limit = Number(res.Data[0].MOBILE_DIGITS);
+    });
+  }
+
+  validateMobileLengthdeliveryaddress = (e: any): boolean => {
+    const value = (e.value || '').trim();
+    if (!value) return true;
+
+    if (!this.mobile_limit_Delivery_Address) return false;
+
+    return value.length === this.mobile_limit_Delivery_Address;
+  };
+
+  allowOnlyNumbers(e: any) {
+    const value = e.event.target.value;
+    e.event.target.value = value.replace(/\D/g, '');
+  }
+
+  onDropdownClosed() { }
+  onDropdownOpened() { }
+  updateMobileNumber() { }
+
+  onCountrycodeChangeDeliveryAddressmobile(e: any) {
+    const payload = {
+      COUNTRY_CODE: e.value,
+    };
+    this.service.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = res.Data[0].MOBILE_DIGITS;
+    });
+  }
+
+  validateMobileLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.mobile_limit) return false;
+
+    return value.length === this.mobile_limit;
+  };
+
+  validatePhoneLength = (e: any): boolean => {
+    const value = (e.value || '').trim();
+
+    if (!this.Phone_limit) return false;
+
+    return value.length === this.Phone_limit;
+  };
+
+}
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    DxSelectBoxModule,
+    DxTextAreaModule,
+    DxDateBoxModule,
+    DxFormModule,
+    DxTextBoxModule,
+    FormTextboxModule,
+    DxCheckBoxModule,
+    DxValidatorModule,
+    DxValidationGroupModule,
+    DxButtonModule,
+    DxRadioGroupModule,
+    DxTabPanelModule,
+    DxButtonModule,
+    DxListModule,
+    DxDropDownBoxModule,
+  ],
+  declarations: [CustomerEditFormComponent],
+  exports: [CustomerEditFormComponent],
+})
+export class CustomerEditFormModule { }
