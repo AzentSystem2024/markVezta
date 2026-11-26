@@ -44,7 +44,7 @@ import {
 
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
-import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { ViewSalaryAdvanceModule } from 'src/app/components/HR/Masters/view-salary-advance/view-salary-advance.component';
 import notify from 'devextreme/ui/notify';
@@ -407,7 +407,7 @@ export class BankReconciliationAddComponent {
     DxValidationGroupModule,
     DxAutocompleteModule,
     DxTagBoxModule,
-    AddMiscellaneousPaymentModule,
+    AccountsModule,
     AddSalaryPaymentModule,
     ViewSalaryAdvanceModule,
   ],

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -10,7 +11,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  BrowserModule,
   DomSanitizer,
   SafeResourceUrl,
 } from '@angular/platform-browser';
@@ -46,7 +46,7 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddJournalVoucharComponent } from '../add-journal-vouchar/add-journal-vouchar.component';
+import { AddJournalVoucharComponent } from 'src/app/pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
@@ -1032,7 +1032,7 @@ export class EditJournalVoucherComponent {
 
 @NgModule({
   imports: [
-    BrowserModule,
+    CommonModule,
     DxSelectBoxModule,
     DxTextAreaModule,
     DxDateBoxModule,
@@ -1051,10 +1051,8 @@ export class EditJournalVoucherComponent {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
-    DxoItemModule,
     DxTabPanelModule,
     DxTabsModule,
     DxiGroupModule,
@@ -1068,4 +1066,4 @@ export class EditJournalVoucherComponent {
   exports: [EditJournalVoucherComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class EditJournalVoucherModule { }
+export class EditJournalVoucherModule {}

@@ -42,9 +42,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import CustomStore from 'devextreme/data/custom_store';
@@ -812,7 +812,7 @@ export class TransferOutInventoryAddMarkComponent implements OnChanges {
       next: (res: any) => {
         if (res) {
           this.transferOutFormData.DOC_NO = res.DOC_NO;
-          console.log('✅ New Transfer No:', res.DOC_NO);
+          console.log('âœ… New Transfer No:', res.DOC_NO);
         }
       },
       error: (err) => {
@@ -856,7 +856,7 @@ export class TransferOutInventoryAddMarkComponent implements OnChanges {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`; // ✅ preserves local date
+    return `${year}-${month}-${day}`; // âœ… preserves local date
   }
 
   saveTransferOut() {
@@ -1008,7 +1008,7 @@ export class TransferOutInventoryAddMarkComponent implements OnChanges {
           }
         });
       } else if (this.transferOutFormData.IS_APPROVED) {
-        // CONFIRM → APPROVE API
+        // CONFIRM â†’ APPROVE API
         confirm(
           'Are you sure you want to approve this transfer?',
           'Confirm Approval',
@@ -1066,7 +1066,7 @@ export class TransferOutInventoryAddMarkComponent implements OnChanges {
     // ---------- ADD (INSERT) MODE ----------
     if (!this.isEditing) {
       if (this.transferOutFormData.IS_APPROVED) {
-        // CONFIRM → INSERT API
+        // CONFIRM â†’ INSERT API
         confirm(
           'Do you want to approve & save this transfer?',
           'Confirm Save',
@@ -1222,7 +1222,7 @@ export class TransferOutInventoryAddMarkComponent implements OnChanges {
     let y = headerY + 5;
 
     rightDetails.forEach((line) => {
-      //  wrap long text داخل عرض محدد
+      //  wrap long text Ø¯Ø§Ø®Ù„ Ø¹Ø±Ø¶ Ù…Ø­Ø¯Ø¯
       const wrappedText = doc.splitTextToSize(line, maxWidth);
 
       //  draw aligned to right

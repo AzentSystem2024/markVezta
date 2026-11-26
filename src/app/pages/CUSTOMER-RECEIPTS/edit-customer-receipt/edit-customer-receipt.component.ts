@@ -1,3 +1,4 @@
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -40,11 +41,16 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
+<<<<<<< HEAD
 import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
 import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
+=======
+import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
+import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
+>>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf
 import { AddCutomerReceiptComponent } from '../add-cutomer-receipt/add-cutomer-receipt.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
@@ -1089,6 +1095,7 @@ export class EditCustomerReceiptComponent {
 
 @NgModule({
   imports: [
+    AccountsModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
@@ -1120,9 +1127,6 @@ export class EditCustomerReceiptComponent {
     DxoSummaryModule,
     ArticleAddModule,
     ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
   ],
   providers: [],
   declarations: [EditCustomerReceiptComponent],

@@ -1,3 +1,4 @@
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 import {
   ChangeDetectorRef,
   Component,
@@ -43,9 +44,6 @@ import { FormTextboxModule } from 'src/app/components';
 import { ArticleAddModule } from '../../features/master-data/pages/article/article-add-form/article-add.component';
 import { ArticleEditModule } from '../../features/master-data/pages/article/article-edit-form/article-edit.component';
 import { AddInvoiceComponent } from '../INVOICE/add-invoice/add-invoice.component';
-import { AddJournalVoucharModule } from '../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
@@ -515,6 +513,7 @@ export class InvoiceDeliveryFormComponent {
 }
 @NgModule({
   imports: [
+    AccountsModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
@@ -546,9 +545,6 @@ export class InvoiceDeliveryFormComponent {
     DxoSummaryModule,
     ArticleAddModule,
     ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
   ],
   providers: [],
   declarations: [InvoiceDeliveryFormComponent],

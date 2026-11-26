@@ -33,7 +33,6 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
 import { DataService } from 'src/app/services';
-import { EditMiscellaneousPaymentModule } from '../edit-miscellaneous-payment/edit-miscellaneous-payment.component';
 import { VerifyMiscellaneousPaymentModule } from '../verify-miscellaneous-payment/verify-miscellaneous-payment.component';
 import { ApproveMiscellaneousPaymentModule } from '../approve-miscellaneous-payment/approve-miscellaneous-payment.component';
 import { ViewMiscellaneousPaymentModule } from '../view-miscellaneous-payment/view-miscellaneous-payment.component';

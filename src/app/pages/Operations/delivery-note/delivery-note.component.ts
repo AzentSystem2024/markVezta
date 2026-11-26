@@ -37,9 +37,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { TransferInInventoryFormComponent } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
@@ -75,7 +75,7 @@ export class DeliveryNoteComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, // ðŸ”‘ global style
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -243,7 +243,7 @@ export class DeliveryNoteComponent {
   //           return numB - numA;
   //         });
 
-  //       // ✅ same pattern everywhere
+  //       // âœ… same pattern everywhere
   //       this.filteredDeliveryList = this.deliveryNoteList;
   //     },
   //     error: () => {},
@@ -358,7 +358,7 @@ export class DeliveryNoteComponent {
     this.customStartDate = null;
     this.customEndDate = null;
 
-    // ✅ CALL API WITH DATE_FROM & DATE_TO
+    // âœ… CALL API WITH DATE_FROM & DATE_TO
     this.getDeliveryNotes();
   }
 
@@ -450,7 +450,7 @@ export class DeliveryNoteComponent {
     this.selectedDateRange = 'custom';
     this.showCustomDatePopup = false;
 
-    // ✅ CALL API WITH DATE_FROM & DATE_TO
+    // âœ… CALL API WITH DATE_FROM & DATE_TO
     this.getDeliveryNotes();
   }
 
@@ -607,7 +607,7 @@ export class DeliveryNoteComponent {
     this.dataService
       .selectDeliveryNote(deliveryId)
       .subscribe((response: any) => {
-        this.selectedDelivery = response.Data; // ✅ FIX
+        this.selectedDelivery = response.Data; // âœ… FIX
 
         this.isEditDelivery = true;
         this.isReadOnlyDelivery = status === 'APPROVED';

@@ -42,12 +42,12 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../components';
-import { AddCreditNoteModule } from '../pages/CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../pages/CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../pages/DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
+import { AddDebitModule } from '../features/accounts/pages/debit-note/add-debit/add-debit.component';
+import { EditDebitModule } from 'src/app/features/accounts/pages/debit-note/edit-debit/edit-debit.component';
+import { ViewDebitModule } from '../features/accounts/pages/debit-note/view-debit/view-debit.component';
 import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
 import {
@@ -441,7 +441,7 @@ export class BoxproductionJvAddComponent {
 
   isEditDataAvailable() {
     if (!this.isEditing || !this.EditingResponseData) {
-      return; // Not edit mode → nothing to load
+      return; // Not edit mode â†’ nothing to load
     }
 
     const header = this.EditingResponseData.Header;
@@ -719,10 +719,10 @@ export class BoxproductionJvAddComponent {
 
     // -------- EDIT MODE --------
     if (payload.STATUS === 1) {
-      // STATUS = 1 → UPDATE
+      // STATUS = 1 â†’ UPDATE
       callUpdateAPI();
     } else if (payload.STATUS === 5) {
-      // STATUS = 5 → COMMIT
+      // STATUS = 5 â†’ COMMIT
       // const confirmed = confirm(
       //   'Are you sure you want to APPROVE this production?'
       // );

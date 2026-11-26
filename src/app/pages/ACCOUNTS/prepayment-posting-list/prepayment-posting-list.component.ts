@@ -25,8 +25,8 @@ import { DataService } from 'src/app/services';
 import {
   PrepaymentPostingAddComponent,
   PrepaymentPostingAddModule,
-} from '../../PrePayment Posting/prepayment-posting-add/prepayment-posting-add.component';
-import { PrepaymentPostingEditModule } from '../../PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
+} from '../../pre-payment-posting/prepayment-posting-add/prepayment-posting-add.component';
+import { PrepaymentPostingEditModule } from '../../pre-payment-posting/prepayment-posting-edit/prepayment-posting-edit.component';
 import notify from 'devextreme/ui/notify';
 import { Router } from '@angular/router';
 @Component({

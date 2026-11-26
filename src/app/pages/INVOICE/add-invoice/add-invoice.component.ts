@@ -1,3 +1,6 @@
+import { AddJournalVoucharModule } from 'src/app/pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
+import { EditJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
+import { ViewJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import {
   ChangeDetectorRef,
   Component,
@@ -40,12 +43,18 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
+<<<<<<< HEAD
 import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
 import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
 import { AddCreditNoteComponent } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
+=======
+import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
+import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
+import { AddCreditNoteComponent } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+>>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
@@ -393,7 +402,7 @@ export class AddInvoiceComponent {
     this.showGST = !isSameState;
 
     this.mainInvoiceGridList?.forEach((row: any) => {
-      const rowGst = Number(row.GST_PERC || row.GST || 0); // ✅ ITEM GST
+      const rowGst = Number(row.GST_PERC || row.GST || 0); // âœ… ITEM GST
 
       if (isSameState) {
         const half = rowGst / 2;
@@ -442,7 +451,7 @@ export class AddInvoiceComponent {
       // HSN from API
       row.HSN_CODE = row.HSN_CODE || row.HSN || row.HSNCODE;
 
-      const rowGst = Number(row.GST_PERC || 0); // ✅ GST FROM API
+      const rowGst = Number(row.GST_PERC || 0); // âœ… GST FROM API
       const company = this.companyState?.trim().toLowerCase();
       const customer = this.selectedCustomer?.STATE_NAME?.trim().toLowerCase();
 
@@ -731,7 +740,7 @@ export class AddInvoiceComponent {
         }
       });
     } else {
-      // NOT approved → Direct save
+      // NOT approved â†’ Direct save
       callInsertAPI();
     }
   }
@@ -747,7 +756,7 @@ export class AddInvoiceComponent {
       GST_AMOUNT: 0,
       NET_AMOUNT: 0,
       SALE_DETAILS: [],
-      TRANS_DATE: new Date(), // ✅ add this line
+      TRANS_DATE: new Date(), // âœ… add this line
       ADD_TIME: new Date(), // optional
       SALE_DATE: new Date(),
     };
@@ -777,7 +786,7 @@ export class AddInvoiceComponent {
       // Round Off Enabled
       this.netAmount = Math.round(this.grandTotal).toFixed(2);
     } else {
-      // Round Off Disabled → return to original value
+      // Round Off Disabled â†’ return to original value
       this.netAmount = Number(this.grandTotal).toFixed(2);
     }
   }
@@ -785,6 +794,7 @@ export class AddInvoiceComponent {
 
 @NgModule({
   imports: [
+    AddJournalVoucharModule, EditJournalVoucherModule, ViewJournalVoucherModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
@@ -816,9 +826,6 @@ export class AddInvoiceComponent {
     DxoSummaryModule,
     ArticleAddModule,
     ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
   ],
   providers: [],
   declarations: [AddInvoiceComponent],

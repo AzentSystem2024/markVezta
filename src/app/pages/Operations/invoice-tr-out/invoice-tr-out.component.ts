@@ -38,12 +38,12 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
+import { AddDebitModule } from '../../../features/accounts/pages/debit-note/add-debit/add-debit.component';
+import { EditDebitModule } from 'src/app/features/accounts/pages/debit-note/edit-debit/edit-debit.component';
+import { ViewDebitModule } from '../../../features/accounts/pages/debit-note/view-debit/view-debit.component';
 import { AddInvoiceModule } from '../../INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../../INVOICE/edit-invoice/edit-invoice.component';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
@@ -78,7 +78,7 @@ export class InvoiceTrOutComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, // ðŸ”‘ global style
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -224,7 +224,7 @@ export class InvoiceTrOutComponent {
           })
           .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
-        // ✅ SAME AS PRODUCTION JV
+        // âœ… SAME AS PRODUCTION JV
         this.filteredInvoiceList = this.invoiceList;
       },
       error: (err) => {
@@ -432,7 +432,7 @@ export class InvoiceTrOutComponent {
     const fromLabel = this.formatAsDDMMYYYY(new Date(this.customStartDate));
     const toLabel = this.formatAsDDMMYYYY(new Date(this.customEndDate));
 
-    // 🔑 update label
+    // ðŸ”‘ update label
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} - ${toLabel}` }

@@ -1,3 +1,6 @@
+import { AddJournalVoucharModule } from 'src/app/pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
+import { EditJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
+import { ViewJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import {
   ChangeDetectorRef,
   Component,
@@ -41,11 +44,16 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
+<<<<<<< HEAD
 import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
 import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
 import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
 import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
 import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
+=======
+import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
+import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
+>>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf
 import { AddInvoiceComponent } from '../add-invoice/add-invoice.component';
 import { DataService } from 'src/app/services';
 import { Console } from 'console';
@@ -858,6 +866,7 @@ export class EditInvoiceComponent {
 
 @NgModule({
   imports: [
+    AddJournalVoucharModule, EditJournalVoucherModule, ViewJournalVoucherModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
@@ -889,9 +898,6 @@ export class EditInvoiceComponent {
     DxoSummaryModule,
     ArticleAddModule,
     ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
     ViewInvoiceModule,
   ],
   providers: [],
