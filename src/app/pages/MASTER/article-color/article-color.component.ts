@@ -33,11 +33,11 @@ import DataSource from 'devextreme/data/data_source';
 })
 export class ArticleColorComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @ViewChild('formValidationGroup')
-  formValidationGroup: DxValidationGroupComponent;
+  formValidationGroup!: DxValidationGroupComponent;
   @ViewChild('updateValidationGroup')
-  updateValidationGroup: DxValidationGroupComponent;
+  updateValidationGroup!: DxValidationGroupComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
@@ -46,7 +46,7 @@ export class ArticleColorComponent {
   isFilterRowVisible: boolean = false;
   isFilterOpened = false;
   editingRowData: any = {};
-  Datasource: DataSource;
+  Datasource!: DataSource;
   showFilterRow: boolean = true;
   currentFilter: string = 'auto';
   canAdd = false;
@@ -77,6 +77,7 @@ export class ArticleColorComponent {
     this.sesstion_Details();
     this.get_ArticleColor_List();
   }
+
   addButtonOptions = {
     type: 'default',
     stylingMode: 'contained',
@@ -122,27 +123,6 @@ export class ArticleColorComponent {
     this.isFilterRowVisible = !this.isFilterRowVisible;
     this.cdr.detectChanges();
   };
-  //   ngOnInit(){
-  // const currentUrl = this.router.url;
-  //
-  //    const menuResponse = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
-
-  //   const menuGroups = menuResponse.MenuGroups || [];
-  //
-  // const packingRights = menuGroups
-  //   .flatMap(group => group.Menus)
-  //   .find(menu => menu.Path === '/packing');
-
-  // if (packingRights) {
-  //   this.canAdd = packingRights.CanAdd;
-  //   this.canEdit = packingRights.CanEdit;
-  //   this.canDelete = packingRights.CanDelete;
-  //     this.canPrint = packingRights.CanPrint;
-  //   this.canView = packingRights.canView;
-  //    this.canApprove=packingRights.CanApprove;
-  // }
-
-  //   }
 
   addArticleColor() {
     this.AddArticleColorPopup = true;
@@ -150,6 +130,7 @@ export class ArticleColorComponent {
       this.formValidationGroup?.instance?.reset();
     });
   }
+  
   editArticleColor() {
     this.UpdateArticleColorPopup = true;
   }
@@ -182,7 +163,9 @@ export class ArticleColorComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
   }

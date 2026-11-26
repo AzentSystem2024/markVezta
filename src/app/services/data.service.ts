@@ -7785,6 +7785,13 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post<any>(`${this.apiUrl}OrderRpt/Transferout`, payload);
   }
 
+  getDealerWiseReport(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}OrderRpt/DealerWiseReport`,
+      payload,
+    );
+  }
+
   saveNewOrderCartToOrder(payload: any): Observable<any> {
     return this.http.post<any>(
       `${this.apiUrl}NewOrder/SaveCartToOrder`,

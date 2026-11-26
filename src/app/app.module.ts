@@ -470,6 +470,7 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
 import { ZoneComponent } from './pages/MASTER/zone/zone.component';
 import { ZoneAddComponent } from './pages/MASTER/zone-add/zone-add.component';
 import { ZoneEditComponent } from './pages/MASTER/zone-edit/zone-edit.component';
+import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Reports/dealerwise-monthwise-articlewise/dealerwise-monthwise-articlewise.component';
 
 
 @NgModule({
@@ -479,7 +480,7 @@ import { ZoneEditComponent } from './pages/MASTER/zone-edit/zone-edit.component'
     ZoneComponent,
     ZoneAddComponent,
     ZoneEditComponent,
-
+    DealerwiseMonthwiseArticlewiseComponent,
   ],
   imports: [
     ApListPageModule,
@@ -505,6 +506,9 @@ import { ZoneEditComponent } from './pages/MASTER/zone-edit/zone-edit.component'
     DxTagBoxModule,
     DxDateBoxModule,
     DxButtonModule,
+    DxDataGridModule,
+    DxValidatorModule,
+    DxValidationGroupModule,
     DxRadioGroupModule,
     DxChartModule,
     DxPieChartModule,
