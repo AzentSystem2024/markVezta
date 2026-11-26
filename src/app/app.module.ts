@@ -9,6 +9,9 @@ import {
   DxRadioGroupModule,
   DxDateBoxModule,
   DxButtonModule,
+  DxDataGridModule,
+  DxValidatorModule,
+  DxValidationGroupModule,
 } from 'devextreme-angular';
 import { AppComponent } from './app.component';
 import { SideNavOuterToolbarModule, SingleCardModule } from './layouts';
@@ -433,12 +436,14 @@ import { ShiftMasterModule } from './pages/REPORT/shift-master/shift-master.comp
 import { ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-master-add.component';
 import { ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
 import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/excess-break-details.component';
+import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Reports/dealerwise-monthwise-articlewise/dealerwise-monthwise-articlewise.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
+    DealerwiseMonthwiseArticlewiseComponent,
   ],
   imports: [
     ApListPageModule,
@@ -464,6 +469,9 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
     DxTagBoxModule,
     DxDateBoxModule,
     DxButtonModule,
+    DxDataGridModule,
+    DxValidatorModule,
+    DxValidationGroupModule,
     DxRadioGroupModule,
     DxChartModule,
     DxPieChartModule,
