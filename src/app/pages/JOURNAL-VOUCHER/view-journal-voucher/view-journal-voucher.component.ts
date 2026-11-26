@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -10,7 +11,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  BrowserModule,
   DomSanitizer,
   SafeResourceUrl,
 } from '@angular/platform-browser';
@@ -661,7 +661,7 @@ export class ViewJournalVoucherComponent {
 
 @NgModule({
   imports: [
-    BrowserModule,
+    CommonModule,
     DxSelectBoxModule,
     DxTextAreaModule,
     DxDateBoxModule,
@@ -680,10 +680,8 @@ export class ViewJournalVoucherComponent {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
-    DxoItemModule,
     DxTabPanelModule,
     DxTabsModule,
     DxiGroupModule,

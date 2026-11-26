@@ -1,3 +1,4 @@
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 import {
   ChangeDetectorRef,
   Component,
@@ -45,9 +46,6 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { ArticleAddModule } from '../ARTICLE/article-add/article-add.component';
 import { ArticleEditModule } from '../ARTICLE/article-edit/article-edit.component';
-import { AddJournalVoucharModule } from '../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
@@ -1723,6 +1721,7 @@ export class PurchaseReturnDebitFormComponent {
 
 @NgModule({
   imports: [
+    AccountsModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,

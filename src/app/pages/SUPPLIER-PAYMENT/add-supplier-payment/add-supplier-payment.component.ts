@@ -1,3 +1,4 @@
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -43,9 +44,6 @@ import { FormTextboxModule } from 'src/app/components';
 import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
 import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
 import { AddInvoiceComponent } from '../../INVOICE/add-invoice/add-invoice.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
@@ -916,6 +914,7 @@ export class AddSupplierPaymentComponent {
 
 @NgModule({
   imports: [
+    AccountsModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,

@@ -37,9 +37,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AccountsListComponent } from '../../ACCOUNTS/Chart of Account/accounts-list.component';
-import { AddAccountModule } from '../../ACCOUNTS/add-account/add-account.component';
-import { EditAccountModule } from '../../ACCOUNTS/edit-account/edit-account.component';
 import { DataService } from 'src/app/services';
 import {
   ArticleAddComponent,

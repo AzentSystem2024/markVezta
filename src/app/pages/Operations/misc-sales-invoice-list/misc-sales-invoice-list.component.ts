@@ -38,13 +38,12 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { DebitComponent } from '../../ACCOUNTS/debit/debit.component';
-import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
+import { AddDebitModule } from '../../../features/accounts/pages/debit-note/add-debit/add-debit.component';
+import { EditDebitModule } from 'src/app/features/accounts/pages/debit-note/edit-debit/edit-debit.component';
+import { ViewDebitModule } from '../../../features/accounts/pages/debit-note/view-debit/view-debit.component';
 import { DataService } from 'src/app/services';
 import {
   AddInvoiceComponent,

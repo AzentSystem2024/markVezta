@@ -1,3 +1,6 @@
+import { AddJournalVoucharModule } from 'src/app/pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
+import { EditJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
+import { ViewJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -32,9 +35,6 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
 import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { ViewInvoiceComponent } from '../view-invoice/view-invoice.component';
 
 @Component({
@@ -45,6 +45,7 @@ import { ViewInvoiceComponent } from '../view-invoice/view-invoice.component';
 export class ViewInvoiceTrOutComponent {}
 @NgModule({
   imports: [
+    AddJournalVoucharModule, EditJournalVoucherModule, ViewJournalVoucherModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
@@ -76,9 +77,6 @@ export class ViewInvoiceTrOutComponent {}
     DxoSummaryModule,
     ArticleAddModule,
     ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
   ],
   providers: [],
   declarations: [ViewInvoiceTrOutComponent],

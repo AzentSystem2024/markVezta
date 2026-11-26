@@ -38,12 +38,12 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../../../components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../../DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from '../../DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
+import { AddDebitModule } from '../../../features/accounts/pages/debit-note/add-debit/add-debit.component';
+import { EditDebitModule } from 'src/app/features/accounts/pages/debit-note/edit-debit/edit-debit.component';
+import { ViewDebitModule } from '../../../features/accounts/pages/debit-note/view-debit/view-debit.component';
 import { AddInvoiceModule } from '../../INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../../INVOICE/edit-invoice/edit-invoice.component';
 import {
@@ -94,7 +94,7 @@ export class ProductionJvListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, // ðŸ”‘ global style
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -212,8 +212,8 @@ export class ProductionJvListComponent {
 
   //   const payload: any = {
   //     COMPANY_ID: this.selected_Company_id,
-  //     DATE_FROM: fromDate, // 👈 backend filter
-  //     DATE_TO: toDate, // 👈 backend filter
+  //     DATE_FROM: fromDate, // ðŸ‘ˆ backend filter
+  //     DATE_TO: toDate, // ðŸ‘ˆ backend filter
   //   };
 
   //   const api$ =
@@ -245,14 +245,14 @@ export class ProductionJvListComponent {
   //       })
   //       .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
-  //     this.filteredproductionList = this.productionList; // ✅ backend already filtered
+  //     this.filteredproductionList = this.productionList; // âœ… backend already filtered
   //   });
   // }
 
   getProductionList() {
     const grid = this.dataGrid?.instance;
 
-    // 🔵 START LOADING
+    // ðŸ”µ START LOADING
     grid?.beginCustomLoading('Loading...');
 
     const { fromDate, toDate } = this.getDateRange();
@@ -407,7 +407,7 @@ export class ProductionJvListComponent {
         : new Date(this.customEndDate),
     );
 
-    // 🔑 THIS IS THE MISSING PIECE
+    // ðŸ”‘ THIS IS THE MISSING PIECE
     this.dateRanges = this.dateRanges.map((option) =>
       option.value === 'custom'
         ? { ...option, label: `${fromLabel} - ${toLabel}` }
@@ -756,7 +756,7 @@ export class ProductionJvListComponent {
   //   if (e.rowType === 'data' && e.column.command === 'edit') {
   //     const status = e.data.TRANS_STATUS;
 
-  //     // 🚫 Hide Edit & Delete when status = 1
+  //     // ðŸš« Hide Edit & Delete when status = 1
   //     if (status === 1) {
   //       const editButton = e.cellElement.querySelector('.dx-link-edit');
   //       const deleteButton = e.cellElement.querySelector('.dx-link-delete');
@@ -860,7 +860,7 @@ export class ProductionJvListComponent {
           'success',
         );
 
-        // 🔄 Refresh list after delete
+        // ðŸ”„ Refresh list after delete
         this.getProductionList();
       },
       error: (err) => {

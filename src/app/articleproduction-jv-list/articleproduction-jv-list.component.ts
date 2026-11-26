@@ -38,12 +38,12 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../components';
-import { AddCreditNoteModule } from '../pages/CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../pages/CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../pages/DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
+import { AddDebitModule } from '../features/accounts/pages/debit-note/add-debit/add-debit.component';
+import { EditDebitModule } from 'src/app/features/accounts/pages/debit-note/edit-debit/edit-debit.component';
+import { ViewDebitModule } from '../features/accounts/pages/debit-note/view-debit/view-debit.component';
 import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
 import {
@@ -87,7 +87,7 @@ export class ArticleproductionJvListComponent {
   searchButtonOptions = {
     icon: 'search',
     hint: 'Show / Hide Filters',
-    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    elementAttr: { class: 'toolbar-icon-btn' }, // ðŸ”‘ global style
     onClick: () => this.toggleFilters(),
   };
   addButtonOptions = {
@@ -210,7 +210,7 @@ export class ArticleproductionJvListComponent {
       COMPANY_ID: this.selected_Company_id,
     };
 
-    // ✅ Choose API based on production type
+    // âœ… Choose API based on production type
     const api$ =
       this.selectedProductionType === 'ARTICLE'
         ? this.dataService.getArticleProductionJVList(payload)
@@ -239,7 +239,7 @@ export class ArticleproductionJvListComponent {
           _docNoNumber: docNoNumber,
         };
       })
-        // ✅ Latest first
+        // âœ… Latest first
         .sort((a: any, b: any) => b._docNoNumber - a._docNoNumber);
 
       this.applyDateFilter();

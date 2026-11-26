@@ -45,7 +45,7 @@ import {
   DxiGroupModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { AddMiscellaneousPaymentComponent } from '../add-miscellaneous-payment/add-miscellaneous-payment.component';
+import { AddMiscellaneousPaymentComponent } from 'src/app/features/accounts/pages/miscellaneous-payment/add-miscellaneous-payment/add-miscellaneous-payment.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 

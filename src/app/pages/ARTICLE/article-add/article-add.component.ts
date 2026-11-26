@@ -41,7 +41,7 @@ import {
   DxoPageSizeModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddAccountComponent } from '../../ACCOUNTS/add-account/add-account.component';
+import { AddAccountComponent } from '../../../features/accounts/pages/chart-of-accounts/add-account/add-account.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';

@@ -39,9 +39,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { TransferOutInventoryComponent } from '../transfer-out-inventory/transfer-out-inventory.component';
 import { DataService } from 'src/app/services';

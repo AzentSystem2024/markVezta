@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -9,7 +10,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -43,7 +43,7 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddComponent } from '../../ARTICLE/article-add/article-add.component';
+import { ArticleAddComponent } from 'src/app/pages/ARTICLE/article-add/article-add.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import dxSelectBox from 'devextreme/ui/select_box';
@@ -1117,7 +1117,7 @@ export class AddJournalVoucharComponent {
 
 @NgModule({
   imports: [
-    BrowserModule,
+    CommonModule,
     DxSelectBoxModule,
     DxTextAreaModule,
     DxDateBoxModule,
@@ -1136,10 +1136,8 @@ export class AddJournalVoucharComponent {
     DxProgressBarModule,
     DxPopupModule,
     DxDropDownBoxModule,
-    DxButtonModule,
     DxToolbarModule,
     DxiItemModule,
-    DxoItemModule,
     DxTabPanelModule,
     DxTabsModule,
     DxiGroupModule,
@@ -1153,4 +1151,4 @@ export class AddJournalVoucharComponent {
   exports: [AddJournalVoucharComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AddJournalVoucharModule { }
+export class AddJournalVoucharModule {}

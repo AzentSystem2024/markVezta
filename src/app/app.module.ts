@@ -166,9 +166,6 @@ import { StaffEOSModule } from './pages/HR/Masters/staff-eos/staff-eos.component
 import { TimesheetVerifyModule } from './components/HR/Masters/timesheet-verify/timesheet-verify.component';
 import { TimesheetApproveModule } from './components/HR/Masters/timesheet-approve/timesheet-approve.component';
 import { TimesheetViewModule } from './components/HR/Masters/timesheet-view/timesheet-view.component';
-import { MiscellaneousPaymentsModule } from './pages/ACCOUNTS/list-miscellaneous-payments/list-miscellaneous-payments.component';
-import { AddMiscellaneousPaymentModule } from './components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
-import { EditMiscellaneousPaymentModule } from './components/HR/Masters/edit-miscellaneous-payment/edit-miscellaneous-payment.component';
 import { VerifyMiscellaneousPaymentModule } from './components/HR/Masters/verify-miscellaneous-payment/verify-miscellaneous-payment.component';
 import { ApproveMiscellaneousPaymentModule } from './components/HR/Masters/approve-miscellaneous-payment/approve-miscellaneous-payment.component';
 import { ViewMiscellaneousPaymentModule } from './components/HR/Masters/view-miscellaneous-payment/view-miscellaneous-payment.component';
@@ -177,8 +174,7 @@ import { PayrollAddModule } from './components/HR/Masters/payroll-add/payroll-ad
 import { PayrollVerifyModule } from './components/HR/Masters/payroll-verify/payroll-verify.component';
 import { PayrollApproveModule } from './components/HR/Masters/payroll-approve/payroll-approve.component';
 import { PayrollViewModule } from './components/HR/Masters/payroll-view/payroll-view.component';
-import { AddAccountModule } from './pages/ACCOUNTS/add-account/add-account.component';
-import { EditAccountModule } from './pages/ACCOUNTS/edit-account/edit-account.component';
+import { AccountsModule } from './features/accounts/accounts.module';
 import { ArticleListModule } from './pages/MASTER/article-list/article-list.component';
 import { ArticleAddModule } from './pages/ARTICLE/article-add/article-add.component';
 import { ArticleBrandModule } from './pages/MASTER/article-brand/article-brand.component';
@@ -203,17 +199,11 @@ import { UserLevelEditFormModule } from './pages/HR/Masters/user-level-edit-form
 import { UserModule } from './pages/HR/Masters/user/user.component';
 import { UserNewFormModule } from './pages/HR/Masters/user-new-form/user-new-form.component';
 import { UserEditFormModule } from './pages/HR/Masters/user-edit-form/user-edit-form.component';
-import { JournalVoucherModule } from './pages/ACCOUNTS/journal-voucher-list/journal-voucher-list.component';
-import { AddJournalVoucharModule } from './pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from './pages/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from './pages/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { CreditNoteListModule } from './pages/ACCOUNTS/credit-note-list/credit-note-list.component';
 import { LedgerStatementModule } from './pages/REPORT/ledger-statement/ledger-statement.component';
-import { EditCreditNoteModule } from './pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { DebitModule } from './pages/ACCOUNTS/debit/debit.component';
-import { AddDebitModule } from './pages/DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from './pages/DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from './pages/DEBIT/view-debit/view-debit.component';
+import { EditCreditNoteModule } from './features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { AddDebitModule } from './features/accounts/pages/debit-note/add-debit/add-debit.component';
+import { EditDebitModule } from 'src/app/features/accounts/pages/debit-note/edit-debit/edit-debit.component';
+import { ViewDebitModule } from './features/accounts/pages/debit-note/view-debit/view-debit.component';
 import { InvoiceListModule } from './pages/Operations/invoice-list/invoice-list.component';
 import { AddInvoiceModule } from './pages/INVOICE/add-invoice/add-invoice.component';
 import { EditInvoiceModule } from './pages/INVOICE/edit-invoice/edit-invoice.component';
@@ -230,29 +220,17 @@ import { SalaryHeadEditModule } from './components/HR/Masters/Salary Head/salary
 import { CustomerEditFormModule } from './components/HR/Masters/Customer/customer-edit-form/customer-edit-form.component';
 import { CustomerListModule } from './pages/MASTER/customer-list/customer-list.component';
 import { CustomerFormModule } from './components/HR/Masters/Customer/customer-form/customer-form.component';
-import { FixedAsstesListModule } from './pages/ACCOUNTS/fixed-asstes-list/fixed-asstes-list.component';
-import { FixedAsstesAddModule } from './pages/FIXED_ASSETS/fixed-asstes-add/fixed-asstes-add.component';
-import { FixedAsstesEditModule } from './pages/FIXED_ASSETS/fixed-asstes-edit/fixed-asstes-edit.component';
-import { DepreciationListModule } from './pages/ACCOUNTS/depreciation-list/depreciation-list.component';
-import { DepreciationAddModule } from './pages/Depreciation/depreciation-add/depreciation-add.component';
-import { DepreciationEditModule } from './pages/Depreciation/depreciation-edit/depreciation-edit.component';
 import { SupplierPaymentListModule } from './pages/ACCOUNTS/supplier-payment-list/supplier-payment-list.component';
-import { OpeningBalanceModule } from './pages/ACCOUNTS/opening-balance/opening-balance.component';
 import { AddSupplierPaymentModule } from './pages/SUPPLIER-PAYMENT/add-supplier-payment/add-supplier-payment.component';
 import { PurchaseInvoiceListModule } from './pages/Operations/purchase-invoice-list/purchase-invoice-list.component';
 import { AddPurchaseInvoiceModule } from './pages/PURCHASE INVOICE/add-purchase-invoice/add-purchase-invoice.component';
 import { EditPurchaseInvoiceModule } from './pages/PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { EditSupplierPaymentModule } from './pages/SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
-import { ListMiscReceiptModule } from './pages/ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
-import { AddMiscReceiptModule } from './components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
 import { AddSalaryPaymentModule } from './components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { ListSalaryPaymentModule } from './pages/HR/Masters/list-salary-payment/list-salary-payment.component';
 import { LeaveSalaryPaymentModule } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
 import { BoxProductionViewModule } from './components/HR/Masters/box-production-view/box-production-view.component';
 import { PaytimeEntryModule } from './pages/HR/Masters/paytime-entry/paytime-entry.component';
-import { PdcAddFormModule } from './components/HR/Masters/PDC/pdc-add-form/pdc-add-form.component';
-import { PdcEditFormModule } from './components/HR/Masters/PDC/pdc-edit-form/pdc-edit-form.component';
-import { PdcListModule } from './pages/ACCOUNTS/pdc-list/pdc-list.component';
 import { EmployeeSalarySettingsAddModule } from './components/HR/Masters/employee-salary-settings-add/employee-salary-settings-add.component';
 import { EmployeeSalarySettingsEditModule } from './components/HR/Masters/employee-salary-settings-edit/employee-salary-settings-edit.component';
 import { EmployeeSalarySettingsModule } from './pages/HR/Masters/employee-salary-settings/employee-salary-settings.component';
@@ -276,8 +254,8 @@ import { OutputVatModule } from './pages/OutPutVat/output-vat/output-vat.compone
 import { VatReturnModule } from './pages/Vat Return/vat-return/vat-return.component';
 import { PurchaseOrderModule } from './pages/Operations/purchase-order/purchase-order.component';
 import { PrepaymentPostingListModule } from './pages/ACCOUNTS/prepayment-posting-list/prepayment-posting-list.component';
-import { PrepaymentPostingAddModule } from './pages/PrePayment Posting/prepayment-posting-add/prepayment-posting-add.component';
-import { PrepaymentPostingEditModule } from './pages/PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
+import { PrepaymentPostingAddModule } from './pages/pre-payment-posting/prepayment-posting-add/prepayment-posting-add.component';
+import { PrepaymentPostingEditModule } from './pages/pre-payment-posting/prepayment-posting-edit/prepayment-posting-edit.component';
 import { DepartmentEditModule } from './pages/department-edit/department-edit.component';
 import { VatClassEditModule } from './pages/vat-class-edit/vat-class-edit.component';
 import { SubcategoryEditModule } from './pages/subcategory-edit/subcategory-edit.component';
@@ -347,7 +325,6 @@ import { MiscellaneousInvoiceEditModule } from './pages/miscellaneous-invoice-ed
 import { MiscellaneousPurchaseModule } from './pages/Operations/miscellaneous-purchase/miscellaneous-purchase.component';
 import { MiscellaneousPurchaseAddModule } from './pages/miscellaneous-purchase-add/miscellaneous-purchase-add.component';
 import { MiscellaneousPurchaseEditModule } from './pages/miscellaneous-purchase-edit/miscellaneous-purchase-edit.component';
-import { ImportChartOfAccountsModule } from './pages/ACCOUNTS/import-chart-of-accounts/import-chart-of-accounts.component';
 import { SalaryHeadListModule } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
 import { ItemStorePricesLogModule } from './pages/item-store-prices-log/item-store-prices-log.component';
@@ -356,12 +333,8 @@ import { ProductionJvListModule } from './pages/Operations/production-jv-list/pr
 import { SaleReturnModule } from './pages/Operations/sale-return/sale-return.component';
 import { MiscellaneousInvoiceModule } from './pages/Operations/miscellaneous-invoice/miscellaneous-invoice.component';
 import { SalesOrderModule } from './pages/Operations/sales-order/sales-order.component';
-import { FixedAssetRegisterModule } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
-import { DepreciationReportModule } from './pages/Depreciation/depreciation-report/depreciation-report.component';
-import { PDCReportModule } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
 import { SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
 import { SalesOrderFinancePopupFormModule } from './pages/Operations/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
-import { PrepaymentPostingReportModule } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
 import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { StoresListModule } from './pages/MASTER/stores-list/stores-list.component';
 import { SupplierFinListModule } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
@@ -639,9 +612,6 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
     TimesheetVerifyModule,
     TimesheetApproveModule,
     TimesheetViewModule,
-    MiscellaneousPaymentsModule,
-    AddMiscellaneousPaymentModule,
-    EditMiscellaneousPaymentModule,
     VerifyMiscellaneousPaymentModule,
     ApproveMiscellaneousPaymentModule,
     ViewMiscellaneousPaymentModule,
@@ -653,8 +623,7 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
     PayrollVerifyModule,
     PayrollApproveModule,
     PayrollViewModule,
-    AddAccountModule,
-    EditAccountModule,
+    AccountsModule,
     ArticleListModule,
     ArticleAddModule,
 
@@ -682,14 +651,8 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
     UserNewFormModule,
     UserEditFormModule,
 
-    JournalVoucherModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
-    CreditNoteListModule,
     EditCreditNoteModule,
     LedgerStatementModule,
-    DebitModule,
     AddDebitModule,
     EditDebitModule,
     ViewDebitModule,
@@ -708,32 +671,19 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
     SalaryHeadListModule,
     SalaryHeadAddModule,
     SalaryHeadEditModule,
-    FixedAsstesListModule,
-    FixedAsstesEditModule,
-    FixedAsstesAddModule,
-    DepreciationAddModule,
-    DepreciationListModule,
-    DepreciationEditModule,
 
     EmployeeSalarySettingsAddModule,
     SupplierPaymentListModule,
-    OpeningBalanceModule,
     PurchaseInvoiceListModule,
     AddPurchaseInvoiceModule,
     EditPurchaseInvoiceModule,
     AddSupplierPaymentModule,
     EditSupplierPaymentModule,
-    EditMiscellaneousPaymentModule,
-    ListMiscReceiptModule,
-    AddMiscReceiptModule,
     ListSalaryPaymentModule,
     AddSalaryPaymentModule,
     ArticleProductionViewModule,
     BoxProductionViewModule,
     PaytimeEntryModule,
-    PdcAddFormModule,
-    PdcEditFormModule,
-    PdcListModule,
     PrePaymentAddModule,
     PrePaymentListModule,
     PrePaymentEditModule,
@@ -836,12 +786,7 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
     MiscellaneousPurchaseModule,
     MiscellaneousPurchaseAddModule,
     MiscellaneousPurchaseEditModule,
-    ImportChartOfAccountsModule,
     SalesOrderFinancePopupFormModule,
-    FixedAssetRegisterModule,
-    DepreciationReportModule,
-    PDCReportModule,
-    PrepaymentPostingReportModule,
     SalaryWPSModule,
     ProfitAndLossBranchModule,
     SupplierFinListModule,

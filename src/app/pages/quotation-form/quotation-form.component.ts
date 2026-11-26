@@ -42,9 +42,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { TransferInInventoryFormComponent } from '../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
@@ -263,7 +263,7 @@ export class QuotationFormComponent {
     this.getTermsAndConditionsList();
     this.getStoreDropdown();
 
-    // 🔥 IMPORTANT FIX FOR EDIT MODE
+    // ðŸ”¥ IMPORTANT FIX FOR EDIT MODE
     if (this.isEditing && this.EditingResponseData?.STORE_ID) {
       this.storeId = this.EditingResponseData.STORE_ID;
     }
@@ -302,7 +302,7 @@ export class QuotationFormComponent {
     console.log(data, 'DATAINQUOTATION');
     this.combinedTerms = data.TERMS;
 
-    // Map ITEM_NAME → DESCRIPTION for DevExtreme grid binding
+    // Map ITEM_NAME â†’ DESCRIPTION for DevExtreme grid binding
     const mappedDetails = data.Details
       ? data.Details.map((item: any) => ({
           ...item,
@@ -453,7 +453,7 @@ export class QuotationFormComponent {
   };
 
   onRowReorder(e: any) {
-    const dataSource = this.combinedTerms; // ← the actual bound array
+    const dataSource = this.combinedTerms; // â† the actual bound array
     const visibleRows = e.component.getVisibleRows();
     // Get actual indexes in data source
     const fromData = e.itemData;
@@ -1129,7 +1129,7 @@ export class QuotationFormComponent {
           }
         },
         () => {
-          this.isSaving = false; // ERROR → STOP LOADING
+          this.isSaving = false; // ERROR â†’ STOP LOADING
           notify('Something went wrong. Please try again.', 'error', 2000);
         },
       );
@@ -1371,7 +1371,7 @@ export class QuotationFormComponent {
   getTemplateList() {
     this.http.get<any[]>(environment.apiUrl + 'Reports').subscribe({
       next: (data) => {
-        // Category for Quotation — filter by categoryId 4 or name match
+        // Category for Quotation â€” filter by categoryId 4 or name match
         const filtered = data.filter((t: any) => t.categoryId === 4 || t.name?.toLowerCase().includes('quotation'));
         this.templateList = filtered.length > 0 ? filtered : data;
         if (this.templateList.length > 0) this.selectedTemplate = this.templateList[0].name;

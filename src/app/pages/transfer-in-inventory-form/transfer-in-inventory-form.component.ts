@@ -41,9 +41,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { TransferOutInventoryAddComponent } from '../transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
@@ -347,10 +347,10 @@ export class TransferInInventoryFormComponent {
     this.dataService.getDropdownData(payload).subscribe((response: any) => {
       this.transferstores = response || [];
       if (this.IS_HQ_App) {
-        // 🔹 HQ App → show only store with ID = 1
+        // ðŸ”¹ HQ App â†’ show only store with ID = 1
         this.stores = (response || []).filter((item: any) => item.ID === 1);
       } else {
-        // 🔹 Not HQ → show all stores
+        // ðŸ”¹ Not HQ â†’ show all stores
         this.stores = response || [];
       }
 
@@ -716,7 +716,7 @@ export class TransferInInventoryFormComponent {
   onEditorPrepared(e: any) {
     if (e.parentType === 'dataRow' && e.dataField === 'QUANTITY_RECEIVED') {
       setTimeout(() => {
-        e.editorElement.querySelector('input')?.focus(); // 👈 focus actual input
+        e.editorElement.querySelector('input')?.focus(); // ðŸ‘ˆ focus actual input
       });
     }
   }
@@ -975,7 +975,7 @@ export class TransferInInventoryFormComponent {
     // ---------- ADD (INSERT) MODE ----------
     if (!this.isEditing) {
       if (this.transferInFormData.IS_APPROVED) {
-        // CONFIRM → INSERT API
+        // CONFIRM â†’ INSERT API
         confirm(
           'Do you want to approve & save this transfer?',
           'Confirm Approval',
@@ -1210,7 +1210,7 @@ export class TransferInInventoryFormComponent {
     doc.line(15, lineY, pageWidth - 15, lineY);
 
     // ============================================================
-    // 2) COMPANY BLOCK (LEFT BLUE BOX — DYNAMIC HEIGHT)
+    // 2) COMPANY BLOCK (LEFT BLUE BOX â€” DYNAMIC HEIGHT)
     // ============================================================
     const compBoxX = 15;
     const compBoxY = lineY + 3; // reduced spacing
@@ -1306,7 +1306,7 @@ export class TransferInInventoryFormComponent {
     doc.line(15, tableLineY, pageWidth - 15, tableLineY);
 
     // ============================================================
-    // 5) TABLE — EXACT SAME WIDTH AS THE LINE (180mm)
+    // 5) TABLE â€” EXACT SAME WIDTH AS THE LINE (180mm)
     // ============================================================
     const tableStartY = tableLineY + 4;
 
@@ -1407,7 +1407,7 @@ export class TransferInInventoryFormComponent {
     doc.text(`: ${data.PAN_NO || ''}`, leftColX + 40, footerY + 10);
 
     // ============================================================
-    // 8) RIGHT SIDE — AMOUNT IN WORDS
+    // 8) RIGHT SIDE â€” AMOUNT IN WORDS
     // ============================================================
 
     let amountTextY = footerY;
@@ -1424,7 +1424,7 @@ export class TransferInInventoryFormComponent {
     );
 
     // ============================================================
-    // 9) RIGHT SIDE — SIGNATURE BOX
+    // 9) RIGHT SIDE â€” SIGNATURE BOX
     // ============================================================
 
     let boxY = amountTextY + 15;

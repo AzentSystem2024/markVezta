@@ -46,9 +46,9 @@ import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
-import { AddCreditNoteModule } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { ExportService } from 'src/app/services/export.service';
 import { TransferOutInventoryAddMarkModule } from '../../transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
 
@@ -338,7 +338,7 @@ export class TransferOutInventoryMarkComponent {
 
   //   if (!this.selectedDateRange || this.selectedDateRange === 'all') {
   //     this.filteredTrOutList = baseList;
-  //     this.applyStoreFilter(); // ✅ important
+  //     this.applyStoreFilter(); // âœ… important
   //     return;
   //   }
 
@@ -377,7 +377,7 @@ export class TransferOutInventoryMarkComponent {
   //     return date >= startDate && date <= endDate;
   //   });
 
-  //   this.applyStoreFilter(); // ✅ MUST
+  //   this.applyStoreFilter(); // âœ… MUST
   // }
   applyDateFilter() {
     if (!this.transferOutList) return;
@@ -385,7 +385,7 @@ export class TransferOutInventoryMarkComponent {
     let baseList = [...this.transferOutList];
 
     if (!this.selectedDateRange || this.selectedDateRange === 'all') {
-      this.dateFilteredList = baseList; // ✅ STORE THIS
+      this.dateFilteredList = baseList; // âœ… STORE THIS
       this.filteredTrOutList = baseList;
       this.applyStoreFilter();
       return;
@@ -656,7 +656,7 @@ export class TransferOutInventoryMarkComponent {
   }
   applyStoreFilter() {
     if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
-      this.filteredTrOutList = [...this.dateFilteredList]; // ✅ reset correctly
+      this.filteredTrOutList = [...this.dateFilteredList]; // âœ… reset correctly
       return;
     }
 
@@ -671,7 +671,7 @@ export class TransferOutInventoryMarkComponent {
 
   onStoreChanged(e: any) {
     console.log('Selected store IDs:', this.selectedStoreid);
-    this.applyStoreFilter(); // ✅ ONLY store filter
+    this.applyStoreFilter(); // âœ… ONLY store filter
   }
 
   onViewClick(e: any) {

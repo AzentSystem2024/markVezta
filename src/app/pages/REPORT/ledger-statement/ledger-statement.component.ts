@@ -52,17 +52,13 @@ import { DataService } from 'src/app/services';
 import DataSource from 'devextreme/data/data_source';
 
 // Modules
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { ViewDebitModule } from '../../DEBIT/view-debit/view-debit.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { ViewDebitModule } from '../../../features/accounts/pages/debit-note/view-debit/view-debit.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
 import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
 import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
-import { AddMiscReceiptModule } from 'src/app/components/HR/Masters/MISC-RECEIPT/add-misc-receipt/add-misc-receipt.component';
-import { DepreciationEditModule } from '../../Depreciation/depreciation-edit/depreciation-edit.component';
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
-import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
 import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { ViewSalaryAdvanceModule } from 'src/app/components/HR/Masters/view-salary-advance/view-salary-advance.component';
 import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
@@ -1144,18 +1140,14 @@ export class LedgerStatementComponent implements OnInit {
     DxValidationGroupModule,
     DxAutocompleteModule,
     DxTagBoxModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
     ViewDebitModule,
     ViewCreditNoteModule,
     ViewInvoiceModule,
     ViewCustomerReceiptModule,
     EditCustomerReceiptModule,
     EditSupplierPaymentModule,
-    AddMiscReceiptModule,
-    DepreciationEditModule,
+    AccountsModule,
     PrePaymentEditModule,
-    AddMiscellaneousPaymentModule,
     AddSalaryPaymentModule,
     ViewSalaryAdvanceModule,
     EditPurchaseInvoiceModule,

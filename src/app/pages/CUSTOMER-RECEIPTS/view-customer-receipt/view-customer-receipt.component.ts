@@ -1,3 +1,4 @@
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -42,9 +43,6 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
 import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { EditCustomerReceiptComponent } from '../edit-customer-receipt/edit-customer-receipt.component';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
@@ -727,6 +725,7 @@ export class ViewCustomerReceiptComponent {
 
 @NgModule({
   imports: [
+    AccountsModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
@@ -758,9 +757,6 @@ export class ViewCustomerReceiptComponent {
     DxoSummaryModule,
     ArticleAddModule,
     ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
   ],
   providers: [],
   declarations: [ViewCustomerReceiptComponent],

@@ -37,15 +37,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../components';
-import { AddCreditNoteModule } from '../pages/CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../pages/CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../pages/DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
-import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
-import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
-import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 
 @Component({
@@ -189,15 +180,6 @@ export class CustomDatePopupComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
-    AddCreditNoteModule,
-    EditCreditNoteModule,
-    ViewCreditNoteModule,
-    AddDebitModule,
-    EditDebitModule,
-    ViewDebitModule,
-    AddInvoiceModule,
-    EditInvoiceModule,
-    ViewInvoiceModule,
   ],
   providers: [],
   declarations: [CustomDatePopupComponent],

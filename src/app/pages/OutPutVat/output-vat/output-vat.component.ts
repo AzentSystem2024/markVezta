@@ -51,7 +51,7 @@ import {
 import { filter } from 'rxjs';
 import { DataService } from 'src/app/services';
 import { ViewInvoiceModule } from '../../INVOICE/view-invoice/view-invoice.component';
-import { ViewCreditNoteModule } from '../../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { ViewCreditNoteModule } from '../../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { ViewCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 

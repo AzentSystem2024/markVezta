@@ -1,3 +1,6 @@
+import { AddJournalVoucharModule } from 'src/app/pages/JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
+import { EditJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
+import { ViewJournalVoucherModule } from 'src/app/pages/JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import {
   ChangeDetectorRef,
   Component,
@@ -43,9 +46,6 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
 import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
 import { AddInvoiceComponent } from '../add-invoice/add-invoice.component';
 import { confirm } from 'devextreme/ui/dialog';
 import { DataService } from 'src/app/services';
@@ -878,6 +878,7 @@ export class InvoiceTrOutAddComponent {
 }
 @NgModule({
   imports: [
+    AddJournalVoucharModule, EditJournalVoucherModule, ViewJournalVoucherModule,
     BrowserModule,
     DxSelectBoxModule,
     DxTextAreaModule,
@@ -909,9 +910,6 @@ export class InvoiceTrOutAddComponent {
     DxoSummaryModule,
     ArticleAddModule,
     ArticleEditModule,
-    AddJournalVoucharModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
   ],
   providers: [],
   declarations: [InvoiceTrOutAddComponent],

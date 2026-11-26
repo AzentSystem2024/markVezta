@@ -38,10 +38,8 @@ import {
   DxoLookupModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { EditJournalVoucherModule } from '../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-import { ViewDebitModule } from '../DEBIT/view-debit/view-debit.component';
-import { ViewCreditNoteModule } from '../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { ViewDebitModule } from '../../features/accounts/pages/debit-note/view-debit/view-debit.component';
+import { ViewCreditNoteModule } from '../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { ViewInvoiceModule } from '../INVOICE/view-invoice/view-invoice.component';
 import { ViewCustomerReceiptModule } from '../CUSTOMER-RECEIPTS/view-customer-receipt/view-customer-receipt.component';
 import { EditPurchaseInvoiceModule } from '../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
@@ -50,7 +48,7 @@ import { DataService } from 'src/app/services';
 import { filter } from 'rxjs/operators';
 import { PrePaymentEditModule } from '../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
 import { EditSupplierPaymentModule } from '../SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
-import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
+import { AccountsModule } from 'src/app/features/accounts/accounts.module';
 
 @Component({
   selector: 'app-input-vat',
@@ -601,8 +599,6 @@ export class InputVatComponent {
     DxValidationGroupModule,
     DxAutocompleteModule,
     DxTagBoxModule,
-    EditJournalVoucherModule,
-    ViewJournalVoucherModule,
     ViewDebitModule,
     ViewCreditNoteModule,
     ViewInvoiceModule,
@@ -611,7 +607,7 @@ export class InputVatComponent {
     PrePaymentEditModule,
     EditSupplierPaymentModule,
     ViewDebitModule,
-    AddMiscellaneousPaymentModule,
+    AccountsModule,
     DxDropDownButtonModule
   ],
   providers: [],

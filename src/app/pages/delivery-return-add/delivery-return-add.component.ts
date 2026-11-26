@@ -40,9 +40,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-import { AddCreditNoteModule } from '../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../CREDIT-NOTE/view-credit-note/view-credit-note.component';
+import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
+import { EditCreditNoteModule } from '../../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
+import { ViewCreditNoteModule } from '../../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { TransferInInventoryFormComponent } from '../transfer-in-inventory-form/transfer-in-inventory-form.component';
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
@@ -324,8 +324,8 @@ export class DeliveryReturnAddComponent {
       ]
     };
 
-    this.DNDatasource = [];         // ✅ Clear grid data
-    this.customerID = null;         // ✅ Clear customer reference
+    this.DNDatasource = [];         // âœ… Clear grid data
+    this.customerID = null;         // âœ… Clear customer reference
     console.log('Form reset successfully');
   }
 
