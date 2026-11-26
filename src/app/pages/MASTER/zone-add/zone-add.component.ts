@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild, } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild, } from '@angular/core';
 import { DataService, notify } from 'src/app/services';
 
 @Component({
@@ -12,6 +12,7 @@ export class ZoneAddComponent {
 
   @Output() saveZoneData = new EventEmitter<any>();
   @Output() formClosed = new EventEmitter<void>();
+  @Input() zoneArray: any[] = [];
 
   zoneData: any = {
     ZONE: '',
@@ -37,6 +38,18 @@ export class ZoneAddComponent {
     //
   }
 
+  validateMultipleEmails = (e: any): boolean => {
+    const emailValue = e.value || '';
+
+    const emails = emailValue
+      .split(',')
+      .map((email: string) => email.trim());
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emails.every((email: string) => emailRegex.test(email));
+  };
+
   saveZone() {
     const result = this.validationGroup.instance.validate();
 
@@ -47,6 +60,17 @@ export class ZoneAddComponent {
 
   // When clicking Save in confirmation popup
   confirmSaveZone() {
+    const zoneName = this.zoneData.ZONE?.trim().toLowerCase();
+
+    const isDuplicate = this.zoneArray.some(
+      (zone: any) =>
+        zone.ZONE?.trim().toLowerCase() === zoneName
+    );
+
+    if (isDuplicate) {
+      notify('Zone name already exists', 'warning', 2000);
+      return;
+    }
 
     const payload = {
       ...this.zoneData,

@@ -56,9 +56,14 @@
               type="required"
               message="Email is required"
             ></dxi-validation-rule>
-            <dxi-validation-rule
+            <!-- <dxi-validation-rule
               type="email"
               message="Please enter a valid email address"
+            ></dxi-validation-rule> -->
+            <dxi-validation-rule
+              type="custom"
+              [validationCallback]="validateMultipleEmails"
+              message="Please enter valid email addresses separated by commas"
             ></dxi-validation-rule>
           </dx-validator>
         </dx-text-box>

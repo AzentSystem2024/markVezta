@@ -122,6 +122,7 @@
       <app-zone-add
         (saveZoneData)="onClickSaveZone($event)"
         (formClosed)="CloseEditForm()"
+        [zoneArray]="zoneArray"
       ></app-zone-add>
     </div>
   </dx-popup>
@@ -138,6 +139,7 @@
         [selectedZone]="selectedZone"
         (saveZoneData)="onClickUpdateZone($event)"
         (formClosed)="CloseEditForm()"
+        [zoneArray]="zoneArray"
       ></app-zone-edit>
     </div>
   </dx-popup>

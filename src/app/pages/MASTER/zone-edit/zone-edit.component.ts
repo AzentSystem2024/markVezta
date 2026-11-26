@@ -12,6 +12,7 @@ export class ZoneEditComponent implements OnChanges {
 
   @Output() saveZoneData = new EventEmitter<any>();
   @Output() formClosed = new EventEmitter<void>();
+  @Input() zoneArray: any[] = [];
 
   zoneData: any = {
     ZONE: '',
@@ -54,6 +55,17 @@ export class ZoneEditComponent implements OnChanges {
     }
   }
 
+  validateMultipleEmails = (e: any): boolean => {
+    const emailValue = e.value || '';
+
+    const emails = emailValue
+      .split(',')
+      .map((email: string) => email.trim());
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emails.every((email: string) => emailRegex.test(email));
+  };
 
   saveZone() {
     const result = this.validationGroup.instance.validate();
@@ -65,10 +77,19 @@ export class ZoneEditComponent implements OnChanges {
 
   // When clicking Save in confirmation popup
   confirmSaveZone() {
-    const sessionData = JSON.parse(
-      sessionStorage.getItem('savedUserData') || '{}'
+    const zoneName = this.zoneData.ZONE?.trim().toLowerCase();
+
+    // Check duplicate Zone Name, excluding the current record
+    const isDuplicate = this.zoneArray.some(
+      (zone: any) =>
+        zone.ID !== this.zoneData.ID &&
+        zone.ZONE?.trim().toLowerCase() === zoneName
     );
 
+    if (isDuplicate) {
+      notify('Zone name already exists', 'warning', 2000);
+      return;
+    }
     const payload = {
       ...this.zoneData,
       MODIFIED_USER: this.user_id,
