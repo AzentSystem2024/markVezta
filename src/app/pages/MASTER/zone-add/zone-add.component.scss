@@ -1,0 +1,43 @@
+.zone-add-container {
+  padding: 5px 15px 15px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Reduce form item spacing */
+::ng-deep .zone-add-container .dx-layout-manager .dx-field-item {
+  padding-bottom: 8px;
+}
+
+::ng-deep .zone-add-container .dx-texteditor {
+  border-radius: 5px;
+}
+
+//======confirm popup====
+.zone-add-container {
+  padding: 5px 15px 15px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.confirmation-content {
+  padding: 5px 10px;
+}
+
+.confirmation-content p {
+  font-size: 13px;
+  color: #555;
+  margin: 5px 0 15px;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}

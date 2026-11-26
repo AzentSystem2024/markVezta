@@ -1669,6 +1669,14 @@ export class DataService {
   //   return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   // }
 
+  //=================get Zone Dropdown ===================
+  get_Zone_Dropdown_Api() {
+    const reqbody = {
+      NAME: 'ZONE',
+    };
+    return this.http.post(`${this.apiUrl}dropdown`, reqbody);
+  }
+
   Customer_Dropdown(payload: any) {
     const getEndpoint = `${this.apiUrl}dropdown`;
     return this.http.post(getEndpoint, payload);
@@ -5806,14 +5814,6 @@ The result can be exported to HTML or Markdown.`;
     return this.http.post(`${this.apiUrl}dropdown`, reqbody);
   }
 
-  //=================get Zone Dropdown ===================
-  get_Zone_Dropdown_Api() {
-    const reqbody = {
-      NAME: 'ZONE',
-    };
-    return this.http.post(`${this.apiUrl}dropdown`, reqbody);
-  }
-
   //================get Dealer Master List=========================
   get_DealerList_Api() {
     const getEndpoint = this.apiUrl + 'Distributor/list';
@@ -7914,5 +7914,27 @@ The result can be exported to HTML or Markdown.`;
 
   DeleteShiftMasterReport(id: any) {
     return this.http.post(`${this.apiUrl}ShiftMaster/delete/` + id, {});
+  }
+
+  //---------------ZONE------------------------
+  getZoneData() {
+    return this.http.post(`${this.apiUrl}zone/list`, {});
+  }
+
+  InsertZone(items: any) {
+    const data = items
+    return this.http.post(`${this.apiUrl}zone/insert`, data)
+  }
+
+  UpdateZone(items: any) {
+    const data = items;
+    return this.http.post(`${this.apiUrl}zone/update`, data)
+  }
+  SelectZone(id: any) {
+    return this.http.post(`${this.apiUrl}zone/select/` + id, {});
+  }
+
+  removeZone(id: any) {
+    return this.http.post(`${this.apiUrl}zone/delete/` + id, {})
   }
 }

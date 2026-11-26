@@ -152,6 +152,7 @@ export class CustomerListComponent {
     DISCOUNT_PERCENT: '',
     CUST_VAT_RULE_ID: '',
     VAT_REGNO: '',
+    ZONE_ID: ''
   };
 
 
@@ -246,6 +247,7 @@ export class CustomerListComponent {
       DISCOUNT_PERCENT: '',
       CUST_VAT_RULE_ID: '',
       VAT_REGNO: '',
+      ZONE_ID: ''
     };
   }
   OnEditCustomer(e: any) {
@@ -396,6 +398,7 @@ export class CustomerListComponent {
       CUST_VAT_RULE_ID,
       VAT_REGNO,
       CUST_TYPE,
+      ZONE_ID
     } = this.customerComponent.getNewCustomerData();
 
     // this.dataservice.postCustomerData(COMPANY_ID,CUST_CODE, FIRST_NAME,LAST_NAME,DOB,NATIONALITY,CONTACT_NAME,ADDRESS1,ADDRESS2,ADDRESS3,ZIP,STATE_ID,CITY,COUNTRY_ID,PHONE,MOBILE_NO,

@@ -9,6 +9,13 @@ import {
   DxRadioGroupModule,
   DxDateBoxModule,
   DxButtonModule,
+  DxDataGridModule,
+  DxLoadPanelModule,
+  DxFilterBuilderModule,
+  DxPopupModule,
+  DxTextBoxModule,
+  DxValidatorModule,
+  DxValidationGroupModule,
 } from 'devextreme-angular';
 import { AppComponent } from './app.component';
 import { SideNavOuterToolbarModule, SingleCardModule } from './layouts';
@@ -460,12 +467,19 @@ import { ShiftMasterModule } from './pages/REPORT/shift-master/shift-master.comp
 import { ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-master-add.component';
 import { ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
 import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/excess-break-details.component';
+import { ZoneComponent } from './pages/MASTER/zone/zone.component';
+import { ZoneAddComponent } from './pages/MASTER/zone-add/zone-add.component';
+import { ZoneEditComponent } from './pages/MASTER/zone-edit/zone-edit.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
+    ZoneComponent,
+    ZoneAddComponent,
+    ZoneEditComponent,
+
   ],
   imports: [
     ApListPageModule,
@@ -936,6 +950,14 @@ import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/ex
     ShiftMasterAddModule,
     ShiftMasterEditModule,
     ExcessBreakDetailsModule,
+    DxDataGridModule,
+    DxButtonModule,
+    DxLoadPanelModule,
+    DxFilterBuilderModule,
+    DxPopupModule,
+    DxTextBoxModule,
+    DxValidatorModule,
+    DxValidationGroupModule
   ],
 
   providers: [
