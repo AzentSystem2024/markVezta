@@ -10,6 +10,10 @@ import {
   DxDateBoxModule,
   DxButtonModule,
   DxDataGridModule,
+  DxLoadPanelModule,
+  DxFilterBuilderModule,
+  DxPopupModule,
+  DxTextBoxModule,
   DxValidatorModule,
   DxValidationGroupModule,
 } from 'devextreme-angular';
@@ -463,6 +467,9 @@ import { ShiftMasterModule } from './pages/REPORT/shift-master/shift-master.comp
 import { ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-master-add.component';
 import { ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
 import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/excess-break-details.component';
+import { ZoneComponent } from './pages/MASTER/zone/zone.component';
+import { ZoneAddComponent } from './pages/MASTER/zone-add/zone-add.component';
+import { ZoneEditComponent } from './pages/MASTER/zone-edit/zone-edit.component';
 import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Reports/dealerwise-monthwise-articlewise/dealerwise-monthwise-articlewise.component';
 
 
@@ -470,6 +477,9 @@ import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Report
   declarations: [
     AppComponent,
     AnalyticsDashboardVeztaMedicalComponent,
+    ZoneComponent,
+    ZoneAddComponent,
+    ZoneEditComponent,
     DealerwiseMonthwiseArticlewiseComponent,
   ],
   imports: [
@@ -944,6 +954,14 @@ import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Report
     ShiftMasterAddModule,
     ShiftMasterEditModule,
     ExcessBreakDetailsModule,
+    DxDataGridModule,
+    DxButtonModule,
+    DxLoadPanelModule,
+    DxFilterBuilderModule,
+    DxPopupModule,
+    DxTextBoxModule,
+    DxValidatorModule,
+    DxValidationGroupModule
   ],
 
   providers: [

@@ -692,6 +692,25 @@
           </dxi-item>
         </dxi-item>
 
+        <dxi-item itemType="group" [colCount]="1">
+          <dxi-item>
+            <div *dxTemplate>
+              <dx-select-box
+                label="Zone"
+                labelMode="floating"
+                [items]="ZoneDropdownData"
+                displayExpr="DESCRIPTION"
+                valueExpr="ID"
+                [(value)]="newCustomer.ZONE_ID"
+                placeholder="Select Zone"
+                [searchEnabled]="true"
+                [showClearButton]="true"
+              >
+              </dx-select-box>
+            </div>
+          </dxi-item>
+        </dxi-item>
+
         <dxi-item itemType="group" [colCount]="2"> </dxi-item>
       </dxi-item>
 
@@ -767,8 +786,7 @@
             <!-- Mobile (9/12) -->
             <!-- <dxi-item [colSpan]="4"> -->
 
-
-             <dx-text-box
+            <dx-text-box
               #deliveryMobileBox
               label="Mobile"
               labelMode="floating"
@@ -779,7 +797,7 @@
               valueChangeEvent="input"
               (input)="onDeliveryMobileInputChange($event)"
               [maxLength]="17"
-            > 
+            >
               <dx-validator #deliveryMobileValidator>
                 <dxi-validation-rule
                   type="custom"
@@ -827,28 +845,27 @@
           </dx-text-box>
         </dxi-item>   -->
 
-
         <dxi-item>
-  <dx-text-box
-    label="Telephone"
-    labelMode="floating"
-    [(value)]="phoneValue"
-    stylingMode="outlined"
-    width="100%"
-  >
-    <dx-validator>
-      <dxi-validation-rule
-        type="custom"
-        [validationCallback]="validateMobileLengthdeliveryaddress"
-        [message]="
-          'Telephone number must be ' +
-          mobile_limit_Delivery_Address +
-          ' digits long'
-        "
-      ></dxi-validation-rule>
-    </dx-validator>
-  </dx-text-box>
-</dxi-item>       
+          <dx-text-box
+            label="Telephone"
+            labelMode="floating"
+            [(value)]="phoneValue"
+            stylingMode="outlined"
+            width="100%"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="custom"
+                [validationCallback]="validateMobileLengthdeliveryaddress"
+                [message]="
+                  'Telephone number must be ' +
+                  mobile_limit_Delivery_Address +
+                  ' digits long'
+                "
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </dxi-item>
       </dx-form>
       <dxi-item>
         <div class="save-btn">

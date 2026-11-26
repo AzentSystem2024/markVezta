@@ -258,6 +258,7 @@ import { ExcessBreaksComponent } from './pages/REPORT/excess-breaks/excess-break
 import { StaffShiftChangeReportComponent } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
 import { ShiftMasterComponent } from './pages/REPORT/shift-master/shift-master.component';
 import { ExcessBreakDetailsComponent } from './pages/REPORT/excess-break-details/excess-break-details.component';
+import { ZoneComponent } from './pages/MASTER/zone/zone.component';
 
 const routes: Routes = [
   {
@@ -1580,6 +1581,11 @@ const routes: Routes = [
       {
         path: 'excess-break-details',
         component: ExcessBreakDetailsComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'zone',
+        component: ZoneComponent,
         canActivate: [AuthGuardService],
       },
       {
