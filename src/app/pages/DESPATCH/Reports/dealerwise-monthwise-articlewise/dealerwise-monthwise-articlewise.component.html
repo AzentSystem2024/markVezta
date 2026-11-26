@@ -1,0 +1,161 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <!-- ================= COLLAPSIBLE FILTER PANEL ================= -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <dx-validation-group #filterValidationGroup>
+        <div class="filter-row">
+          <dx-select-box
+            class="filter-control-finyear"
+            label="Financial Year *"
+            labelMode="floating"
+            [dataSource]="financialYearList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="selectedFinId"
+            [searchEnabled]="true"
+            placeholder="Select Financial Year"
+          >
+            <dx-validator>
+              <dxi-validation-rule
+                type="required"
+                message="Financial Year is required"
+              ></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+
+          <dx-tag-box
+            class="filter-control-warehouse"
+            label="Warehouse"
+            labelMode="floating"
+            [dataSource]="warehouseList"
+            displayExpr="DESCRIPTION"
+            valueExpr="ID"
+            [(value)]="selectedWarehouses"
+            [showSelectionControls]="true"
+            applyValueMode="useButtons"
+            [searchEnabled]="true"
+            placeholder="Select Warehouse"
+            [showClearButton]="true"
+            [multiline]="false"
+          ></dx-tag-box>
+
+          <div class="filter-btn-group">
+            <dx-button
+              text="Apply"
+              type="default"
+              stylingMode="contained"
+              [disabled]="isLoading"
+              (onClick)="loadReportData(filterValidationGroup)"
+            ></dx-button>
+          </div>
+        </div>
+      </dx-validation-group>
+    </div>
+
+    <!-- ================= HORIZONTAL TOGGLE BAR ================= -->
+    <div
+      class="toggle-bar"
+      (click)="toggleParameters()"
+      hint="Toggle Filter Panel"
+    >
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
+    <!-- ================= DATA GRID ================= -->
+    <dx-data-grid
+      #dataGrid
+      class="grid theme-dependent"
+      [class.hide-summary]="!isSummaryVisible"
+      [dataSource]="reportDataSource"
+      [columns]="gridColumns"
+      width="100%"
+      height="82vh"
+      noDataText="No records found."
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [showRowLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [allowColumnResizing]="true"
+      [columnResizingMode]="'widget'"
+      [scrolling]="{ mode: 'virtual', showScrollbar: 'always' }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [export]="{ enabled: true, formats: ['xlsx'] }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+      [loadPanel]="{ enabled: true, text: 'Loading report...' }"
+    >
+      <dxo-paging [pageSize]="20"></dxo-paging>
+      <dxo-export [enabled]="true" [formats]="['xlsx']"></dxo-export>
+      <dxo-pager
+        [visible]="true"
+        [allowedPageSizes]="allowedPageSizes"
+        [displayMode]="displayMode"
+        [showPageSizeSelector]="true"
+        [showInfo]="true"
+        [showNavigationButtons]="true"
+      ></dxo-pager>
+
+      <!-- Toolbar -->
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div class="grid-header">
+            <span>Dealerwise-monthwise-articlewise</span>
+          </div>
+        </dxi-item>
+
+        <!-- Show/Hide Filter Row -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <!-- Refresh -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <!-- Show/Hide Summary -->
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item>
+
+        <!-- Excel Export -->
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="export-btn"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-sorting mode="multiple"></dxo-sorting>
+      <dxo-filter-row
+        [visible]="isFilterRowVisible"
+        [applyFilter]="auto"
+      ></dxo-filter-row>
+      <dxo-header-filter [visible]="isFilterRowVisible">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <dxo-group-panel [visible]="true"></dxo-group-panel>
+    </dx-data-grid>
+  </div>
+</div>

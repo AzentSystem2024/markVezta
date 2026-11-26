@@ -246,6 +246,7 @@ import { DispatchSalesThroughReportComponent } from './pages/DESPATCH/Reports/di
 import { DispatchStateWiseReportComponent } from './pages/DESPATCH/Reports/dispatch-state-wise-report/dispatch-state-wise-report.component';
 import { DispatchTallyFormatComponent } from './pages/DESPATCH/Reports/dispatch-tally-format/dispatch-tally-format.component';
 import { DispatchYearlyReportComponent } from './pages/DESPATCH/Reports/dispatch-yearly-report/dispatch-yearly-report.component';
+import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Reports/dealerwise-monthwise-articlewise/dealerwise-monthwise-articlewise.component';
 import { AgeWisePendingReportComponent } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
 import { AgeWiseReportComponent } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { TopMovingReportComponent } from './pages/DESPATCH/Reports/top-moving-report/top-moving-report.component';
@@ -1498,6 +1499,11 @@ const routes: Routes = [
       {
         path: 'dispatch-yearly-report',
         component: DispatchYearlyReportComponent,
+        canActivate: [AuthGuardService],
+      },
+      {
+        path: 'dealerwise-rpt',
+        component: DealerwiseMonthwiseArticlewiseComponent,
         canActivate: [AuthGuardService],
       },
       {
