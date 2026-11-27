@@ -57,7 +57,7 @@ import { AddMiscReceiptModule } from 'src/app/components/HR/Masters/MISC-RECEIPT
 import { DepreciationEditModule } from '../../Depreciation/depreciation-edit/depreciation-edit.component';
 import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
-import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
+import { AddSalaryPaymentModule } from 'src/app/features/hr/pages/salary-payment/add-salary-payment/add-salary-payment.component';
 import { ViewSalaryAdvanceModule } from 'src/app/components/HR/Masters/view-salary-advance/view-salary-advance.component';
 import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
@@ -68,15 +68,14 @@ import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
+import { PayrollViewComponent } from 'src/app/features/hr/pages/payroll/payroll-view/payroll-view.component';
 
 @Component({
   selector: 'app-ledger-statement-dimension',
   templateUrl: './ledger-statement-dimension.component.html',
-  styleUrls: ['./ledger-statement-dimension.component.scss']
+  styleUrls: ['./ledger-statement-dimension.component.scss'],
 })
 export class LedgerStatementDimensionComponent {
-
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup!: DxValidationGroupComponent;
 
@@ -173,7 +172,7 @@ export class LedgerStatementDimensionComponent {
     hint: 'Show / Hide Filters',
     onClick: () => {
       this.toggleFiltersPanel();
-    }
+    },
   };
 
   refreshButtonOptions = {
@@ -181,7 +180,7 @@ export class LedgerStatementDimensionComponent {
     hint: 'Refresh',
     onClick: () => {
       this.load_Ledgre_data();
-    }
+    },
   };
 
   constructor(
@@ -249,8 +248,6 @@ export class LedgerStatementDimensionComponent {
     });
 
     this.loadLedgerData();
-
-
   }
 
   loadHeadList() {
@@ -262,7 +259,6 @@ export class LedgerStatementDimensionComponent {
         this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
       });
   }
-
 
   //================ Year value change ===================
   onYearChanged(e: any): void {
@@ -343,7 +339,7 @@ export class LedgerStatementDimensionComponent {
         : '',
       DIMENSION_CODE: this.selectedDiamensions?.length
         ? this.selectedDiamensions.join(',')
-        : ''
+        : '',
     };
 
     console.log(payload, '=========payload=========');
@@ -419,7 +415,6 @@ export class LedgerStatementDimensionComponent {
   }
 
   load_Ledgre_data() {
-
     //  Validate main form
     const validationResult = this.formValidationGroup?.instance?.validate();
     if (!validationResult?.isValid) {
@@ -437,9 +432,9 @@ export class LedgerStatementDimensionComponent {
         : '',
       DIMENSION_CODE: this.selectedDiamensions?.length
         ? this.selectedDiamensions.join(',')
-        : ''
+        : '',
     };
-    console.log(payload)
+    console.log(payload);
     this.createLedgerDataSource(payload);
     this.isFilterVisible = false;
   }
@@ -674,22 +669,24 @@ export class LedgerStatementDimensionComponent {
         this.cdr.detectChanges();
         console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
       });
-    }
-    else if (TRANS_TYPE_ID === 105) {
-      this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
-        this.selectedInvoice = response;
-        this.isMiscViewInvoice = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-      });
-    }
-    else if (TRANS_TYPE_ID === 29) {
-      this.dataService.viewSelectedPayroll(trans_id).subscribe((response: any) => {
-        this.selectedPayroll = response;
-        this.viewPayrollPopupOpened = true;
-        this.cdr.detectChanges();
-        console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
-      });
+    } else if (TRANS_TYPE_ID === 105) {
+      this.dataService
+        .getMiscSalesInvoiceByID(trans_id)
+        .subscribe((response: any) => {
+          this.selectedInvoice = response;
+          this.isMiscViewInvoice = true;
+          this.cdr.detectChanges();
+          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+        });
+    } else if (TRANS_TYPE_ID === 29) {
+      this.dataService
+        .viewSelectedPayroll(trans_id)
+        .subscribe((response: any) => {
+          this.selectedPayroll = response;
+          this.viewPayrollPopupOpened = true;
+          this.cdr.detectChanges();
+          console.log(this.selectedReceipt, 'Selected_Depreciation_data=====');
+        });
     } else {
     }
   }
@@ -706,9 +703,9 @@ export class LedgerStatementDimensionComponent {
       return;
     }
 
-    const selectedNames = this.Store
-      .filter(x => this.selectedStoreid.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
 
     this.storeHint = selectedNames.join(', ');
   }
@@ -716,8 +713,8 @@ export class LedgerStatementDimensionComponent {
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
@@ -834,7 +831,6 @@ export class LedgerStatementDimensionComponent {
       .map((item) => `${item.DESCRIPTION}(${item.SHORT_NAME})`)
       .join(' - ');
   };
-
 
   // POPUP shown → allow child to render
   onPopupShown() {
@@ -1021,7 +1017,6 @@ export class LedgerStatementDimensionComponent {
     DepreciationEditModule,
     PrePaymentEditModule,
     AddMiscellaneousPaymentModule,
-    AddSalaryPaymentModule,
     ViewSalaryAdvanceModule,
     AddMiscReceiptModule,
     EditPurchaseInvoiceModule,
@@ -1031,11 +1026,11 @@ export class LedgerStatementDimensionComponent {
     SaleReturnFormModule,
     ProductionJvViewModule,
     MiscSalesInvoiceFormModule,
-
+    AddSalaryPaymentModule,
   ],
   providers: [],
   declarations: [LedgerStatementDimensionComponent],
   exports: [LedgerStatementDimensionComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LedgerStatementDimensionModule { }
+export class LedgerStatementDimensionModule {}

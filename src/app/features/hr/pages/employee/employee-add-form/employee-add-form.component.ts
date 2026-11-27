@@ -1,0 +1,531 @@
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild } from '@angular/core';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxCheckBoxModule,
+  DxRadioGroupModule,
+  DxFileUploaderModule,
+  DxDataGridModule,
+  DxButtonModule,
+  DxValidatorModule,
+  DxProgressBarModule,
+  DxPopupModule,
+  DxDropDownBoxModule,
+  DxToolbarModule,
+  DxTabPanelModule,
+  DxTabsModule,
+  DxFileUploaderComponent,
+  DxValidationGroupComponent,
+  DxValidationGroupModule,
+  DxNumberBoxModule } from 'devextreme-angular';
+import {
+  DxoItemModule,
+  DxoFormItemModule,
+  DxoLookupModule,
+  DxiItemModule,
+  DxiGroupModule } from 'devextreme-angular/ui/nested';
+import { DataService } from 'src/app/services';
+import notify from 'devextreme/ui/notify';
+import dxValidationGroup from 'devextreme/ui/validation_group';
+
+@Component({
+  selector: 'app-employee-add-form',
+  templateUrl: './employee-add-form.component.html',
+  styleUrls: ['./employee-add-form.component.scss'] })
+export class EmployeeAddFormComponent implements OnInit, OnChanges {
+  @ViewChild('employeeFormGroup', { static: false })
+  employeeFormGroup: DxValidationGroupComponent | undefined;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
+  @ViewChild('fileUploader') fileUploader!: ElementRef;
+  @Input() isOpen: boolean = false;
+  @Output() formClosed = new EventEmitter<boolean>();
+  selectedTabIndex = 0;
+  imageSource: string | null = null;
+  textVisible = true;
+  imageUploaded = false;
+  mobileError: string = '';
+  emailError: string = '';
+  allowedFileExtensions = ['.jpg', '.png', '.jpeg'];
+  employeeFormData: any = {
+    EMP_CODE: '',
+    EMP_NAME: '',
+    DOB: null,
+    ADDRESS1: '',
+    ADDRESS2: '',
+    ADDRESS3: '',
+    CITY: '',
+    STATE_ID: 0,
+    PF_AC_NO: '',
+    ESI_NO: '',
+    ESI_PERCENT: 0,
+    COUNTRY_ID: 0,
+    MOBILE: '',
+    EMAIL: '',
+    IS_MALE: true,
+    DEPT_ID: 0,
+    SUB_DEPT_ID: 0,
+    DESG_ID: 0,
+    DOJ: null,
+    BANK_NAME: '',
+    BANK_CODE: '',
+    BANK_AC_NO: '',
+    PP_NO: '',
+    PP_EXPIRY: null,
+    IQAMA_NO: '',
+    IQAMA_EXPIRY: '',
+    VISA_NO: '',
+    VISA_EXPIRY: null,
+    LICENSE_NO: '',
+    LICENSE_EXPIRY: null,
+    EMP_STATUS: 0,
+    IS_SALESMAN: false,
+    IMAGE_NAME: '',
+    WORK_PERMIT_NO: '',
+    WORK_PERMIT_EXPIRY: null,
+    IBAN_NO: '',
+    DAMAN_NO: '',
+    DAMAN_CATEGORY: '',
+    LEAVE_CREDIT: 0,
+    LESS_SERVICE_DAYS: '',
+    HOLD_SALARY: '',
+    MOL_NUMBER: '',
+    LAST_REJOIN_DATE: null,
+    INCENTIVE_PERCENT: '',
+    STORE_ID: '',
+    Company_Id: 0,
+    DEPT_NAME: '',
+    DESG_NAME: '',
+    STATE_NAME: '',
+    STORE_NAME: '',
+    IS_INACTIVE: false,
+    PAYMENT_TYPE: 1,
+    LEAVE_DAY_BALANCE: 0,
+    DAYS_DEDUCTED: 0,
+    IS_SALARY: true };
+  imageUrl: string | ArrayBuffer | null = null;
+  uploadedFile: any;
+  isSaving: boolean = false;
+  damanCardCategories = ['Basic', 'Enhanced', 'Premier'];
+
+  attachments: any[] = [];
+  selectedFiles: File[] = [];
+  lastRejoinDate: any;
+  leaveDaysBalance: any;
+  daysDeducted: any;
+  readonly allowedPageSizes: any = [10, 15, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  IsAttachmentPopupVisible: boolean = false;
+  showPopup: boolean = false;
+  uploadedFileName: string = '';
+  fileDetails: { file: File | null; remarks: string } = {
+    file: null,
+    remarks: '' };
+  countries: any;
+  country: any;
+  salaryHead: any;
+  salaryDetails: any;
+  paymentType: any;
+  departments: any;
+  designations: any;
+  states: any;
+  eighteenYearsAgo: Date | undefined;
+  employeeList: any;
+  COMPANY_ID: any;
+  selected_Company_id: any;
+  SubDepartmentDataSource: any = null;
+  mobile_limit: any;
+  countryCodes: any = [];
+  countryCode: any;
+  CountryId: any;
+  sessiondata: any;
+  appType: any;
+
+  constructor(public dataservice: DataService) {
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      const SELECTED_COMPANY = JSON.parse(savedUserData);
+      const companyid = SELECTED_COMPANY.SELECTED_COMPANY;
+      this.COMPANY_ID = companyid.COMPANY_ID;
+    }
+
+    dataservice.getCountryWithFlags().subscribe((data) => {
+      this.countries = data;
+      this.countryCodes = data;
+    });
+    const dept_payload = {
+      NAME: 'DEPT',
+      COMPANY_ID: this.COMPANY_ID || 1 };
+    dataservice.getDropdownData(dept_payload).subscribe((data) => {
+      this.departments = data;
+    });
+    const payload = {
+      NAME: 'DESIGNATION' };
+    dataservice.getDropdownData(payload).subscribe((data) => {
+      this.designations = data;
+    });
+    const paymentType_payload = {
+      NAME: 'SALARY PAYMENT TYPE' };
+    dataservice.getDropdownData(paymentType_payload).subscribe((data) => {
+      this.paymentType = data;
+    });
+    const state_payload = {
+      NAME: 'STATE' };
+    dataservice.getDropdownData(state_payload).subscribe((data) => {
+      this.states = data;
+    });
+  }
+
+  ngOnInit() {
+    this.sesstion_Details();
+    this.getEmployeeList();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const today = new Date();
+    this.eighteenYearsAgo = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate(),
+    );
+  }
+
+  onImageUpload(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const base64WithPrefix = reader.result as string;
+
+        this.imageUrl = base64WithPrefix; // for preview
+        this.employeeFormData.IMAGE_NAME = base64WithPrefix;
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  closeForm() {
+    this.formClosed.emit();
+  }
+
+  onDropZoneClick() {
+    this.fileInput.nativeElement.click();
+  }
+
+  onFileInputChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imageSource = e.target.result;
+        this.textVisible = false;
+        this.imageUploaded = true;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  openModal(event: Event) {
+    event.stopPropagation();
+    const modal = document.getElementById('imageModal')!;
+    const modalImage = document.getElementById(
+      'modalImage',
+    ) as HTMLImageElement;
+    modal.style.display = 'block';
+    modalImage.src = this.imageSource!;
+  }
+
+  closeModal() {
+    document.getElementById('imageModal')!.style.display = 'none';
+  }
+
+  clearImage(event: MouseEvent): void {
+    event.stopPropagation();
+    this.imageUrl = null;
+    this.employeeFormData.IMAGE_NAME = '';
+  }
+
+  validateMobile(event: any) {
+    const mobileNumber = event?.target ? event.target.value : event || '';
+
+    if (!mobileNumber) {
+      this.mobileError = '';
+      return;
+    }
+
+    // Ignore spaces for validation
+    const normalizedMobile = mobileNumber.replace(/\s+/g, '');
+
+    if (this.countryCode === '+91') {
+      const mobilePattern = /^[6-9]\d{9}$/;
+      if (!mobilePattern.test(normalizedMobile)) {
+        this.mobileError =
+          'Please enter a valid 10-digit mobile number starting with 6-9';
+      } else {
+        this.mobileError = ''; // Clear error if valid
+      }
+    } else if (this.countryCode === '+971') {
+      const uaePattern = /^5\d{8}$/;
+      if (!uaePattern.test(normalizedMobile)) {
+        this.mobileError =
+          'Please enter a valid 9-digit UAE mobile number starting with 5';
+      } else {
+        this.mobileError = '';
+      }
+    } else if (this.mobile_limit) {
+      const regex = new RegExp(`^\\d{${this.mobile_limit}}$`);
+      if (!regex.test(normalizedMobile)) {
+        this.mobileError = `Please enter a valid ${this.mobile_limit}-digit mobile number`;
+      } else {
+        this.mobileError = ''; // Clear error if valid
+      }
+    } else {
+      const fallbackRegex = /^\d+$/;
+      if (!fallbackRegex.test(normalizedMobile)) {
+        this.mobileError = 'Please enter a valid mobile number';
+      } else {
+        this.mobileError = '';
+      }
+    }
+  }
+
+  validateEmail(event: any) {
+    const email = event.target.value;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2 }$/;
+
+    if (!emailPattern.test(email)) {
+      this.emailError = 'Please enter a valid email address';
+    } else {
+      this.emailError = ''; // Clear error if valid
+    }
+  }
+
+  onFileUploaded(event: any) {
+    const file = event.file;
+    this.attachments.push({ fileName: file.name, remarks: '' });
+  }
+
+  removeAttachment(index: number) {
+    this.attachments.splice(index, 1);
+  }
+
+  triggerFileUpload() {
+    if (this.fileInput) {
+      this.fileInput.nativeElement.click();
+    }
+  }
+
+  openAttachmentPopup() {
+    this.showPopup = true;
+  }
+
+  closePopup() {
+    this.showPopup = false;
+    this.uploadedFileName = '';
+    this.fileDetails = { file: null, remarks: '' };
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadedFileName = file.name; // Show selected file name
+      this.fileDetails.file = file;
+    }
+  }
+
+  sesstion_Details() {
+    const savedUserData = sessionStorage.getItem('savedUserData');
+    if (savedUserData) {
+      this.sessiondata = JSON.parse(savedUserData);
+      this.selected_Company_id = this.sessiondata.SELECTED_COMPANY.COMPANY_ID;
+      this.appType = this.sessiondata.Configuration?.APP_TYPE;
+    }
+  }
+
+  getEmployeeList() {
+    const payload = {
+      CompanyId: this.selected_Company_id };
+    this.dataservice.employeeList(payload).subscribe((response: any) => {
+      this.employeeList = response.reverse();
+    });
+  }
+
+  saveFileDetails(): void {
+    if (this.fileDetails.file && this.fileDetails.remarks) {
+      this.attachments.push({
+        fileName: this.fileDetails.file.name,
+        remarks: this.fileDetails.remarks,
+        file: this.fileDetails.file, // Optional: for download/view later
+      });
+
+      // Reset
+      this.fileDetails = { file: null, remarks: '' };
+      this.uploadedFileName = '';
+      this.showPopup = false;
+    } else {
+      alert('Please upload a file and enter remarks.');
+    }
+  }
+
+  onDepartmentChange(e: any) {
+    const selectedDept = this.departments.find(
+      (dept: any) => dept.ID === e.value,
+    );
+    this.employeeFormData.DEPT_NAME = selectedDept
+      ? selectedDept.DESCRIPTION
+      : '';
+    this.employeeFormData.SUB_DEPT_ID = null;
+    this.SubDepartmentDataSource = [];
+    this.dataservice
+      .get_Sub_Dept_DropdownData(e.value)
+      .subscribe((res: any) => {
+        if (res) {
+          this.SubDepartmentDataSource = res;
+        }
+      });
+  }
+
+  onDesignationChange(e: any) {
+    const selected = this.designations.find((d: any) => d.ID === e.value);
+    this.employeeFormData.DESG_NAME = selected ? selected.DESCRIPTION : '';
+  }
+
+  onStateChange(e: any) {
+    const selected = this.states.find((d: any) => d.ID === e.value);
+    this.employeeFormData.STATE_NAME = selected ? selected.DESCRIPTION : '';
+  }
+
+  onSalaryRowUpdated(e: any): void {
+    const updatedRow = e.data;
+    const headId = updatedRow.HEAD_ID;
+    const amount = updatedRow.amount;
+
+    if (headId !== undefined && amount !== undefined) {
+      const existingIndex = this.employeeFormData.EmployeeSalary.findIndex(
+        (item: any) => item.HEAD_ID === headId,
+      );
+
+      if (existingIndex > -1) {
+        this.employeeFormData.EmployeeSalary[existingIndex].AMOUNT = amount;
+      } else {
+        this.employeeFormData.EmployeeSalary.push({
+          ID: 0,
+          EMP_ID: this.employeeFormData.EMP_ID || 0,
+          HEAD_ID: headId,
+          AMOUNT: amount });
+      }
+    } else {
+      console.warn('Missing HEAD_ID or amount in updated row:', updatedRow);
+    }
+  }
+
+  isValid() {
+    return this.employeeFormGroup?.instance.validate().isValid;
+  }
+
+  saveEmployee() {
+    if (!this.isValid()) return;
+
+    // Check for duplicate employee code
+    const enteredEmpCode = this.employeeFormData.EMP_CODE?.trim().toUpperCase();
+
+    const isDuplicate = this.employeeList.some(
+      (emp: any) =>
+        emp.EMP_CODE?.trim().toUpperCase() === enteredEmpCode &&
+        (!this.employeeFormData.EMP_ID ||
+          emp.EMP_ID !== this.employeeFormData.EMP_ID),
+    );
+
+    if (isDuplicate) {
+      notify(
+        {
+          message: 'Employee Code already exists. Please enter a unique code.',
+          position: { at: 'top center', my: 'top center' } },
+        'error',
+      );
+      return;
+    }
+
+    this.isSaving = true; // start loading
+
+    const payload = {
+      ...this.employeeFormData,
+      Company_Id: this.COMPANY_ID,
+      MOBILE: this.countryCode
+        ? `${this.countryCode}-${this.employeeFormData.MOBILE}`
+        : this.employeeFormData.MOBILE };
+
+    this.dataservice.saveEmployeeData(payload).subscribe({
+      next: (response: any) => {
+        if (response) {
+          notify(
+            {
+              message: 'Employee saved Successfully',
+              position: { at: 'top center', my: 'top center' } },
+            'success',
+          );
+          this.formClosed.emit(true);
+          this.selectedTabIndex = 0;
+        } else {
+          notify(
+            {
+              message: 'Your Data Not Saved',
+              position: { at: 'top right', my: 'top right' } },
+            'error',
+          );
+        }
+      },
+      error: (err) => {
+        notify(
+          {
+            message: 'Something went wrong!',
+            position: { at: 'top right', my: 'top right' } },
+          'error',
+        );
+      },
+      complete: () => {
+        this.isSaving = false; // stop loading
+      } });
+  }
+
+  cancel() {
+    this.formClosed.emit(true);
+  }
+
+  onCountrycodeChange(e: any) {
+    console.log(e, '========event==============');
+    const payload = {
+      COUNTRY_CODE: e.value };
+    this.dataservice.get_mobile_no_length(payload).subscribe((res: any) => {
+      this.mobile_limit = Number(res.Data[0].MOBILE_DIGITS);
+      if (this.employeeFormData.MOBILE) {
+        this.validateMobile(this.employeeFormData.MOBILE);
+      }
+    });
+  }
+  countryDisplay(item: any) {
+    if (!item) return '';
+    return `${item.CODE}`;
+  }
+
+  onCountrySelectionChanged(event: any) {
+    this.CountryId = event.value;
+    const selectedCountry = this.countries.find(
+      (country: any) => country.ID === this.employeeFormData.COUNTRY_ID,
+    );
+  }
+}

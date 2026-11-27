@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectorRef,
-  Component, NgModule,
+  Component,
+  NgModule,
   NgZone,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import {
   DxButtonModule,
@@ -42,20 +43,17 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import notify from 'devextreme/ui/notify';
 
-
 @Component({
   selector: 'app-purchase-report-mark',
   templateUrl: './purchase-report-mark.component.html',
-  styleUrls: ['./purchase-report-mark.component.scss']
+  styleUrls: ['./purchase-report-mark.component.scss'],
 })
 export class PurchaseReportMarkComponent {
-
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid!: DxDataGridComponent;
 
@@ -87,10 +85,8 @@ export class PurchaseReportMarkComponent {
     this.tempColumns = this.chooserColumns.map((column) => ({
       ...column,
       visible:
-        this.dataGrid.instance.columnOption(
-          column.dataField,
-          'visible'
-        ) !== false,
+        this.dataGrid.instance.columnOption(column.dataField, 'visible') !==
+        false,
     }));
 
     this.isColumnChooserVisible = true;
@@ -101,7 +97,7 @@ export class PurchaseReportMarkComponent {
       this.dataGrid.instance.columnOption(
         column.dataField,
         'visible',
-        column.visible
+        column.visible,
       );
     });
 
@@ -120,7 +116,6 @@ export class PurchaseReportMarkComponent {
     }));
   }
 
-
   showParameters = true;
 
   toggleParameters(): void {
@@ -134,18 +129,13 @@ export class PurchaseReportMarkComponent {
 
     const today = new Date();
 
-    this.formatted_from_date = new Date(
-      today.getFullYear(),
-      0,
-      1
-    );
+    this.formatted_from_date = new Date(today.getFullYear(), 0, 1);
 
     this.formatted_To_date = today;
 
     // Reset the report using the default filters.
     this.get_Purchase_list();
   }
-
 
   PurchaseReport: any[] = [];
   isFilterRowVisible: boolean = false;
@@ -249,7 +239,6 @@ export class PurchaseReportMarkComponent {
     // this.applySupplierChange(newSupplierId);
   }
 
-
   refreshButtonOptions = {
     icon: 'refresh',
     hint: 'Refresh',
@@ -299,7 +288,6 @@ export class PurchaseReportMarkComponent {
     };
   }
 
-
   //================ Year value change ===================
   onYearChanged(e: any): void {
     this.selectedYear = e.value;
@@ -337,7 +325,9 @@ export class PurchaseReportMarkComponent {
   }
 
   sesstion_Details() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
 
     this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
 
@@ -353,7 +343,6 @@ export class PurchaseReportMarkComponent {
     this.cdr.detectChanges();
   };
 
-
   getSupplierOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
@@ -365,14 +354,15 @@ export class PurchaseReportMarkComponent {
       });
   }
 
-
   onExporting(event: any) {
     const fileName = 'Purchase Report';
     this.dataservice.exportDataGridReport(event, fileName);
   }
 
   get_sessionstorage_data() {
-    this.savedUserData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    this.savedUserData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '',
+    );
     this.company_list = this.savedUserData.Companies;
   }
 
@@ -407,13 +397,13 @@ export class PurchaseReportMarkComponent {
   }
 
   get_Purchase_list() {
-    this.showParameters = false
+    this.showParameters = false;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       DATE_FROM: this.formatted_from_date,
       DATE_TO: this.formatted_To_date,
       FIN_ID: this.selected_fin_id,
-      SUPP_ID: String(this.selectedSupplier ?? '')
+      SUPP_ID: String(this.selectedSupplier ?? ''),
     };
 
     this.dataservice.Purchase_Report(payload).subscribe((res: any) => {
@@ -421,17 +411,15 @@ export class PurchaseReportMarkComponent {
     });
   }
   onViewClick(e: any) {
-    console.log(e, 'event')
+    console.log(e, 'event');
     const TRANS_TYPE_ID = e.row.data.TRANS_TYPE;
     const trans_id = e.row.data.ID;
-    this.dataservice
-      .Select_PDC(trans_id)
-      .subscribe((response: any) => {
-        this.selectedPDC = response.Data[0];
+    this.dataservice.Select_PDC(trans_id).subscribe((response: any) => {
+      this.selectedPDC = response.Data[0];
 
-        this.editPDCPopupOpened = true;
-        this.cdr.detectChanges();
-      });
+      this.editPDCPopupOpened = true;
+      this.cdr.detectChanges();
+    });
   }
 
   handleClose() {
@@ -441,7 +429,6 @@ export class PurchaseReportMarkComponent {
     totalItems: [],
     groupItems: [],
   };
-
 
   updateSummaryColumnsData(): void {
     if (!this.isSummaryVisible) {
@@ -523,7 +510,6 @@ export class PurchaseReportMarkComponent {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
-    PayrollViewModule,
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
@@ -535,4 +521,4 @@ export class PurchaseReportMarkComponent {
   exports: [],
   declarations: [PurchaseReportMarkComponent],
 })
-export class PurchaseReportMarkModule { }
+export class PurchaseReportMarkModule {}

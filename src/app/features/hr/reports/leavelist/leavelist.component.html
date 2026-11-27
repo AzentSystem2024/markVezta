@@ -1,0 +1,373 @@
+<div class="view-wrapper list-page">
+  <div class="grid-container">
+    <!-- Collapsible Filter Panel -->
+    <div class="filter-panel" [class.collapsed]="!showParameters">
+      <div class="filter-row">
+        <dx-select-box
+          labelMode="floating"
+          labelLocation="left"
+          label="Year"
+          [width]="90"
+          [(value)]="selectedYear"
+          [dataSource]="years"
+          (onValueChanged)="onYearChanged($event)"
+          placeholder="Year"
+        ></dx-select-box>
+
+        <dx-select-box
+          labelMode="floating"
+          labelLocation="left"
+          label="month"
+          [dataSource]="monthDataSource"
+          displayExpr="name"
+          valueExpr="value"
+          [(value)]="selectedmonth"
+          (onValueChanged)="onMonthValueChanged($event)"
+          [dropDownOptions]="{ width: 'auto' }"
+        >
+        </dx-select-box>
+
+        <dx-date-box
+          [width]="120"
+          label="From Date"
+          labelMode="floating"
+          [(value)]="selected_from_date"
+          [displayFormat]="'dd-MM-yyyy'"
+          (onValueChanged)="onFromDateChange($event)"
+        >
+        </dx-date-box>
+
+        <dx-date-box
+          [width]="120"
+          label="To Date"
+          labelMode="floating"
+          [(value)]="selected_To_date"
+          displayFormat="dd-MM-yyyy"
+          (onValueChanged)="onToDateChange($event)"
+        >
+        </dx-date-box>
+
+        <dx-select-box
+          [width]="200"
+          label="Department"
+          labelMode="floating"
+          [items]="Department"
+          displayExpr="DESCRIPTION"
+          valueExpr="ID"
+          [(value)]="select_department_id"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+        >
+        </dx-select-box>
+
+        <dx-select-box
+          [placeholder]="'Employee Code'"
+          label="Employee"
+          [items]="EmployeeDropdown"
+          valueExpr="ID"
+          displayExpr="DESCRIPTION"
+          [(value)]="selectedEmployeeId"
+          [searchEnabled]="true"
+          [showClearButton]="true"
+          [labelMode]="'floating'"
+          [showClearButton]="true"
+        >
+        </dx-select-box>
+
+        <dx-button
+          text="Apply"
+          stylingMode="contained"
+          type="default"
+          (onClick)="Leavelist_Report()"
+        >
+        </dx-button>
+      </div>
+    </div>
+
+    <!-- Horizontal Toggle Bar -->
+    <div class="toggle-bar" (click)="toggleParameters()">
+      <span class="toggle-arrow" [class.rotated]="!showParameters">
+        <i class="dx-icon-chevronup"></i>
+      </span>
+    </div>
+
+    <dx-data-grid
+      class="grid theme-dependent"
+      [dataSource]="LeavelistReport"
+      width="100%"
+      noDataText=""
+      height="78vh"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [columnAutoWidth]="true"
+      [wordWrapEnabled]="false"
+      [grouping]="{ autoExpandAll: false }"
+      [filterRow]="{ visible: false }"
+      [rowAlternationEnabled]="true"
+      [rowAlternationEnabled]="true"
+      rowAlternationInterval="2"
+      [allowColumnReordering]="true"
+      [filterRow]="{ visible: false }"
+      id="dataGrid"
+      [scrolling]="{ mode: 'virtual' }"
+      [headerFilter]="{ visible: false }"
+      [columnFixing]="{
+        enabled: true,
+        texts: { fix: 'Freeze', unfix: 'Unfreeze' },
+      }"
+      [summary]="summaryColumnsData"
+      (onExporting)="onExporting($event)"
+      (onContentReady)="updateVisibleColumnNames()"
+     (onOptionChanged)="onGridOptionChanged($event)"
+    >
+      <dxo-column-chooser
+        [height]="500"
+        hideOnOutsideClick="true"
+        [enabled]="true"
+        mode="select"
+      ></dxo-column-chooser>
+      <dxo-paging [pageSize]="10"></dxo-paging>
+
+      <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+      <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+      <dxo-toolbar>
+        <dxi-item location="before">
+          <div
+            class="grid-header"
+            style="
+              font-weight: 600;
+              font-size: 20px;
+              margin-left: 12px;
+              padding: -3px;
+              margin-right:  3px;
+            "
+          >
+            Leave list Report
+          </div>
+        </dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="searchButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          locateInMenu="auto"
+          widget="dxButton"
+          [options]="refreshButtonOptions"
+        ></dxi-item>
+
+        <dxi-item
+          name="exportButton"
+          location="after"
+          cssClass="toolbar-icon-btn export-btn"
+        ></dxi-item>
+
+        <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="columnChooserButtonOptions"
+        ></dxi-item>
+
+        <!-- Show / Hide Summary -->
+        <!-- <dxi-item
+          location="after"
+          widget="dxButton"
+          [options]="summaryButtonOptions"
+        ></dxi-item> -->
+
+         <dxi-item
+          class="columnfinderclass"
+          widget="dxDropDownButton"
+          [options]="{
+            dataSource: ColumnNames,
+            onItemClick: findColumnLocation,
+            placeholder: 'Search Column',
+            noDataText: 'Load data and try again',
+            hint: 'Column location finder',
+            icon: 'increaseindent',
+            dropDownOptions: {
+              width: 'auto',
+              height: '60vh',
+            },
+          }"
+        ></dxi-item>
+      </dxo-toolbar>
+
+      <dxo-sorting mode="none"></dxo-sorting>
+      <dxo-filter-row visible="true"></dxo-filter-row>
+      <dxo-header-filter visible="true"></dxo-header-filter>
+      <dxo-paging page-size="10"></dxo-paging>
+      <dxo-pager
+        show-page-size-selector="true"
+        show-info="true"
+        show-navigator="true"
+      ></dxo-pager>
+      <dxo-header-filter [visible]="true">
+        <dxo-search [enabled]="true"></dxo-search>
+      </dxo-header-filter>
+      <!-- <dxo-filter-row
+      [visible]="isFilterRowVisible"
+      [applyFilter]="auto"
+    ></dxo-filter-row> -->
+      <dxo-grouping
+        [autoExpandAll]="false"
+        [contextMenuEnabled]="true"
+        [expandMode]="'rowClick'"
+      ></dxo-grouping>
+      <dxi-column
+        dataField="LeaveCode"
+        caption="Leave Code"
+        width="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="ApplicationNo"
+        caption="Application No"
+        width="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="EmployeeCode"
+        caption="Emp Code"
+        width="120"
+      ></dxi-column>
+      <dxi-column
+        dataField="EmployeeName"
+        caption="Emp Name"
+        width="200"
+      ></dxi-column>
+      <dxi-column
+        dataField="DepartmentCode"
+        caption="Dept Code"
+        width="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="LeaveBalance"
+        caption="Leave Balance"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        width="150"
+      ></dxi-column>
+      <dxi-column
+        dataField="LeaveStartDate"
+        caption="Leave Start Date"
+        dataType="date"
+        format="dd-MM-yyyy"
+        width="150"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="LeaveEndDate"
+        dataType="date"
+        caption="Leave End Date"
+        format="dd-MM-yyyy"
+        width="150"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="ApprovedDays"
+        caption="Approved Days"
+        alignment="right"
+        width="150"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="Approved"
+        caption="Approved Status"
+        [format]="{ type: 'fixedPoint', precision: 2, useGrouping: true }"
+        alignment="right"
+        width="150"
+      >
+      </dxi-column>
+
+      <dxi-column
+        dataField="ResumedDate"
+        caption="Resumed Date"
+        dataType="date"
+        format="dd-MM-yyyy"
+        width="150"
+      >
+      </dxi-column>
+
+      <!-- <dxi-column type="buttons" [width]="100">
+        <dxi-button
+          hint="View"
+          icon="eyeopen"
+          text="View"
+          [onClick]="onViewClick.bind(this)"
+          [visible]="isViewVisible"
+        ></dxi-button>
+      </dxi-column> -->
+    </dx-data-grid>
+
+    <dx-popup
+      [(visible)]="isColumnChooserVisible"
+      [width]="420"
+      [height]="'auto'"
+      [maxHeight]="'80vh'"
+      title="Choose Columns"
+      [showTitle]="true"
+      [showCloseButton]="true"
+      [dragEnabled]="false"
+      [hideOnOutsideClick]="false"
+      [shading]="true"
+      shadingColor="rgba(0, 0, 0, 0.4)"
+      [position]="{ my: 'center', at: 'center', of: 'window' }"
+      [wrapperAttr]="{ class: 'custom-column-chooser-popup' }"
+    >
+      <div class="column-chooser-content">
+        <div class="column-chooser-header">
+          <span>Select columns to display</span>
+
+          <dx-button
+            text="Reset"
+            stylingMode="text"
+            (onClick)="resetColumnSelection()"
+          ></dx-button>
+        </div>
+
+        <div class="column-chooser-list">
+          <div class="column-chooser-item" *ngFor="let column of tempColumns">
+            <dx-check-box
+              [text]="column.caption"
+              [(value)]="column.visible"
+            ></dx-check-box>
+          </div>
+        </div>
+
+        <div class="column-chooser-footer">
+          <dx-button
+            text="Cancel"
+            stylingMode="outlined"
+            (onClick)="cancelColumnChooser()"
+          ></dx-button>
+
+          <dx-button
+            text="Apply"
+            type="default"
+            stylingMode="contained"
+            (onClick)="applyColumnChooser()"
+          ></dx-button>
+        </div>
+      </div>
+    </dx-popup>
+  </div>
+</div>
+
+<!-- <dx-popup
+  [(visible)]="viewPayrollPopupOpened"
+  [width]="'75vw'"
+  [height]="'90vh'"
+  title="Payroll"
+  (onHiding)="handleClose()"
+>
+  <app-payroll-view
+    *ngIf="viewPayrollPopupOpened"
+    [payroll]="selectedPayroll"
+    (popupClosed)="handleClose()"
+  ></app-payroll-view>
+</dx-popup> -->

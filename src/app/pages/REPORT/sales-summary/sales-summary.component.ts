@@ -47,7 +47,6 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
@@ -80,7 +79,7 @@ export class SalesSummaryComponent {
     { dataField: 'Invoice No', caption: 'Invoice No' },
     { dataField: 'Customer', caption: 'Customer' },
     { dataField: 'Invoice Type', caption: 'Invoice Type' },
-    { dataField: 'Discount', caption: "Discount" },
+    { dataField: 'Discount', caption: 'Discount' },
     { dataField: 'Exempted', caption: 'Exempted' },
     { dataField: 'Ex. VAT Total', caption: 'Ex. VAT Total' },
     { dataField: 'VAT Amount', caption: 'VAT Amount' },
@@ -227,7 +226,7 @@ export class SalesSummaryComponent {
   Store: any;
   selectedStoreid: any;
   selectedCustomer: any;
-  ColumnNames : any;
+  ColumnNames: any;
 
   items: any;
   selectedItem: any[] = [];
@@ -350,35 +349,35 @@ export class SalesSummaryComponent {
   };
 
   updateVisibleColumnNames() {
-  if (this.dataGrid?.instance) {
-    const columns = this.dataGrid.instance.getVisibleColumns();
+    if (this.dataGrid?.instance) {
+      const columns = this.dataGrid.instance.getVisibleColumns();
 
-    this.ColumnNames = columns
-      .filter((col: any) => col.caption && col.dataField)
-      .map((col: any) => col.caption);
+      this.ColumnNames = columns
+        .filter((col: any) => col.caption && col.dataField)
+        .map((col: any) => col.caption);
+    }
   }
-}
 
-onGridOptionChanged(e: any) {
-  if (
-    e.name === 'columns' ||
-    (e.fullName && e.fullName.includes('visible'))
-  ) {
-    this.updateVisibleColumnNames();
+  onGridOptionChanged(e: any) {
+    if (
+      e.name === 'columns' ||
+      (e.fullName && e.fullName.includes('visible'))
+    ) {
+      this.updateVisibleColumnNames();
+    }
   }
-}
 
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;
 
     this.dataGrid?.instance.option(
       'summary.totalItems',
-      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : [],
     );
 
     this.dataGrid?.instance.option(
       'summary.groupItems',
-      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : [],
     );
 
     this.summaryButtonOptions = {
@@ -387,7 +386,6 @@ onGridOptionChanged(e: any) {
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
   }
-
 
   private reloadJournalBook() {
     if (!this.dataGrid?.instance) return;
@@ -450,7 +448,6 @@ onGridOptionChanged(e: any) {
       grid.option('headerPanel.visible', this.isFilterOpened);
     }
   }
- 
 
   resetPopups() {
     this.isViewJournalVoucher = false;
@@ -626,7 +623,6 @@ onGridOptionChanged(e: any) {
   };
 
   summaryColumnsData = {
-
     totalItems: [
       {
         column: 'Discount',
@@ -893,7 +889,6 @@ onGridOptionChanged(e: any) {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
-    PayrollViewModule,
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
@@ -905,4 +900,4 @@ onGridOptionChanged(e: any) {
   exports: [],
   declarations: [SalesSummaryComponent],
 })
-export class SalesSummaryModule { }
+export class SalesSummaryModule {}

@@ -1,0 +1,295 @@
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  SimpleChanges,
+  ViewChild,
+  OnChanges } from '@angular/core';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxCheckBoxModule,
+  DxRadioGroupModule,
+  DxFileUploaderModule,
+  DxDataGridModule,
+  DxButtonModule,
+  DxValidatorModule,
+  DxProgressBarModule,
+  DxPopupModule,
+  DxDropDownBoxModule,
+  DxToolbarModule,
+  DxValidationGroupModule,
+  DxNumberBoxModule,
+  DxValidationGroupComponent } from 'devextreme-angular';
+import {
+  DxoItemModule,
+  DxoFormItemModule,
+  DxoLookupModule,
+  DxiItemModule,
+  DxiGroupModule } from 'devextreme-angular/ui/nested';
+import { DataService } from 'src/app/services';
+import notify from 'devextreme/ui/notify';
+
+@Component({
+  selector: 'app-salary-head-edit',
+  templateUrl: './salary-head-edit.component.html',
+  styleUrls: ['./salary-head-edit.component.scss'] })
+export class SalaryHeadEditComponent implements OnChanges {
+  @Input() selectedSalaryHeadData: any;
+  @Output() formClosed = new EventEmitter<void>();
+
+  @ViewChild('SalaryHeadValidation', { static: false })
+  SalaryHeadValidation: DxValidationGroupComponent | undefined;
+
+  selectedHeads: any;
+  Ac_head_values: any;
+  grid_value: any = [];
+  selectedNatureId: any;
+  ApplicableWorkingDay: boolean = false;
+  selecteNatureTypeTwo: boolean = false;
+  selecteNatureTypeone: boolean = false;
+  ApplicableWithBasicRange: boolean = false;
+  head_percent: boolean = false;
+  head_From: boolean = false;
+  head_To: boolean = false;
+  isEnabled: boolean = false;
+  is_time_entry: boolean = false;
+  selected_Company_id: any;
+  selectedPriority: any;
+  selectedType: any;
+  selectedRows: any[] | undefined;
+  salaryHeadList: any[] = [];
+  selectedPaytime = 1;
+
+  SalaryHeadData = {
+    ID: 0,
+    HEAD_NAME: '',
+    PAYSLIP_TITLE: '',
+    HEAD_ACTIVE: true,
+    HEAD_TYPE: 1,
+    INSTALLMENT_RECOVERY: true,
+    HEAD_PERCENT_INCLUDE_OT: true,
+    IS_INACTIVE: false,
+    AFFECT_LEAVE: false,
+    AC_HEAD_ID: null,
+    HEAD_ORDER: 0,
+    HEAD_NATURE: 0,
+    FIXED_AMOUNT: 0,
+    HEAD_PERCENT: 0,
+    PERCENT_HEAD_ID: [],
+    RANGE_EXISTS: false,
+    RANGE_FROM: 0,
+    RANGE_TO: 0,
+    IS_TIMESHEET_ENTRY: false };
+
+  priorities = [
+    { id: 1, name: 'gross' },
+    { id: 2, name: 'Deduction' },
+    { id: 3, name: 'Advance' },
+  ];
+
+  salaryHeadTypes = [{ label: 'Fixed Amount', value: 'fixed' }];
+  salaryHeadTypes2 = [{ label: '', value: 'percentage' }];
+  salaryHeadTypes3 = [{ label: 'Others', value: 'others' }];
+
+  RequlerOrpaytime = [
+    { name: 'Regular Salary', value: 1 },
+    { name: 'Paytime Entry', value: 2 },
+  ];
+
+  constructor(private dataservice: DataService) {
+    this.sesstion_Details();
+    this.get_headnameGrid();
+
+    this.dataservice.Dropdown_ac_head(name).subscribe((res: any) => {
+      this.Ac_head_values = res;
+    });
+
+    if (this.selectedType == 'fixed') {
+      this.isEnabled = false;
+    } else if (this.selectedType == 'percentage') {
+      this.isEnabled = false;
+    } else {
+      this.isEnabled = true;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['selectedSalaryHeadData'] &&
+      changes['selectedSalaryHeadData'].currentValue
+    ) {
+      this.SalaryHeadData = this.selectedSalaryHeadData;
+    }
+
+    this.grid_value = this.SalaryHeadData.PERCENT_HEAD_ID;
+
+    this.selectedType =
+      this.SalaryHeadData.HEAD_NATURE === 1
+        ? 'fixed'
+        : this.SalaryHeadData.HEAD_NATURE === 2
+          ? 'percentage'
+          : 'others';
+    const headtype =
+      this.priorities.find((p) => p.id === this.SalaryHeadData.HEAD_TYPE) ||
+      this.priorities[0];
+    this.selectedPriority = headtype.id;
+
+    this.selectedPaytime = this.SalaryHeadData.IS_TIMESHEET_ENTRY ? 2 : 1;
+  }
+
+  sesstion_Details() {
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.selected_Company_id = sessionData.SELECTED_COMPANY.COMPANY_ID;
+  }
+
+  get_headnameGrid() {
+    this.dataservice.Dropdown_advance_types().subscribe((res: any) => {
+      this.selectedHeads = res;
+    });
+  }
+
+  getSalaryHeadList() {
+    const payload = {
+      COMPANY_ID: this.selected_Company_id };
+    this.dataservice.get_salary_head_list(payload).subscribe((res: any) => {
+      this.salaryHeadList = res.Data;
+    });
+  }
+
+  onPriorityChanged(e: any) {
+    this.selectedPriority = e.value;
+    this.isEnabled = this.selectedPriority === 1 || this.selectedPriority === 2;
+
+    // If "Advance" is selected
+    if (this.selectedPriority?.id === 3 || this.selectedPriority === 3) {
+      this.selectedType = 'others'; // auto select "Others"
+      this.SalaryHeadData.FIXED_AMOUNT = 0;
+      this.SalaryHeadData.RANGE_EXISTS = false;
+      this.SalaryHeadData.RANGE_TO = 0;
+      this.SalaryHeadData.RANGE_FROM = 0;
+      this.SalaryHeadData.AFFECT_LEAVE = false;
+      this.selectedRows = [];
+      this.SalaryHeadData.HEAD_PERCENT = 0;
+      this.onTypeChange(); // trigger your type change logic
+    } else if (this.selectedPriority == 1 || this.selectedPriority == 2) {
+      this.SalaryHeadData.INSTALLMENT_RECOVERY = false;
+    }
+  }
+
+  onTypeChange() {
+    const headNatureMap: { [key: string]: number } = {
+      fixed: 1,
+      percentage: 2,
+      others: 3 };
+
+    this.selectedNatureId = headNatureMap[this.selectedType];
+
+    if (this.selectedNatureId === 1) {
+      this.selecteNatureTypeTwo = false;
+      this.head_percent = true;
+      this.head_From = true;
+      this.head_To = true;
+      this.ApplicableWithBasicRange = true;
+      this.ApplicableWorkingDay = false;
+      this.SalaryHeadData.RANGE_EXISTS = false;
+      this.SalaryHeadData.RANGE_TO = 0;
+      this.SalaryHeadData.RANGE_FROM = 0;
+      this.grid_value = [];
+    } else if (this.selectedNatureId === 2) {
+      this.selecteNatureTypeTwo = true;
+      this.head_percent = false;
+      this.head_From = false;
+      this.head_To = false;
+      this.ApplicableWorkingDay = true;
+      this.selecteNatureTypeone = true;
+      this.ApplicableWithBasicRange = false;
+      this.SalaryHeadData.FIXED_AMOUNT = 0;
+      this.SalaryHeadData.AFFECT_LEAVE = false;
+    } else if (this.selectedNatureId === 3) {
+      this.head_percent = true;
+      this.head_From = true;
+      this.head_To = true;
+      this.ApplicableWithBasicRange = true;
+      this.ApplicableWorkingDay = true;
+      this.selecteNatureTypeone = true;
+      this.selecteNatureTypeTwo = true;
+      this.SalaryHeadData.FIXED_AMOUNT = 0;
+      this.SalaryHeadData.RANGE_EXISTS = false;
+      this.SalaryHeadData.RANGE_TO = 0;
+      this.SalaryHeadData.RANGE_FROM = 0;
+      this.SalaryHeadData.AFFECT_LEAVE = false;
+      this.grid_value = [];
+    }
+  }
+
+  onRequlerOrpaytimeChanged(e: any) {
+    this.is_time_entry = e.value === 2;
+  }
+
+  onSelectionChanged(event: any) {
+    this.SalaryHeadData.PERCENT_HEAD_ID = event.selectedRowKeys;
+  }
+
+  onChangeAc_head(e: any) {}
+
+  isValid() {
+    return this.SalaryHeadValidation?.instance.validate().isValid;
+  }
+
+  UpdateSalaryHeadData() {
+    if (!this.isValid()) return;
+    const headNatureMap: { [key: string]: number } = {
+      fixed: 1,
+      percentage: 2,
+      others: 3 };
+    const selectedTypeId = headNatureMap[this.selectedType];
+
+    // Duplicate check
+    if (this.SalaryHeadData.HEAD_NAME) {
+      const isDuplicate = this.salaryHeadList.some(
+        (head: any) =>
+          head.HEAD_NAME.trim().toLowerCase() ===
+          this.SalaryHeadData.HEAD_NAME.trim().toLowerCase() &&
+          head.ID !== this.SalaryHeadData.ID,
+      );
+
+      if (isDuplicate) {
+        notify(
+          {
+            message: 'Salary Head already exists',
+            position: { at: 'top center', my: 'top center' } },
+          'error',
+        );
+        return;
+      }
+
+      const payload = {
+        ...this.SalaryHeadData,
+        HEAD_TYPE: this.selectedPriority,
+        COMPANY_ID: this.selected_Company_id,
+        HEAD_NATURE: selectedTypeId,
+        IS_TIMESHEET_ENTRY: this.is_time_entry };
+
+      this.dataservice.Update_salary_Head_api(payload).subscribe((res: any) => {
+        this.formClosed.emit();
+        notify(
+          {
+            message: 'Salary Head updated successfully',
+            position: { at: 'top center', my: 'top center' } },
+          'success',
+        );
+      });
+    }
+  }
+
+  cancel() {
+    this.formClosed.emit();
+  }
+}

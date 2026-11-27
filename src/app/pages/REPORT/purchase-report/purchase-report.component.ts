@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectorRef,
-  Component, NgModule,
+  Component,
+  NgModule,
   NgZone,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import {
   DxButtonModule,
@@ -42,7 +43,6 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
@@ -51,10 +51,9 @@ import notify from 'devextreme/ui/notify';
 @Component({
   selector: 'app-purchase-report',
   templateUrl: './purchase-report.component.html',
-  styleUrls: ['./purchase-report.component.scss']
+  styleUrls: ['./purchase-report.component.scss'],
 })
 export class PurchaseReportComponent {
-
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   SaleSummaryDataSource: DataSource; // ONLY for dx-data-grid
@@ -84,10 +83,8 @@ export class PurchaseReportComponent {
     this.tempColumns = this.chooserColumns.map((column) => ({
       ...column,
       visible:
-        this.dataGrid.instance.columnOption(
-          column.dataField,
-          'visible'
-        ) !== false,
+        this.dataGrid.instance.columnOption(column.dataField, 'visible') !==
+        false,
     }));
 
     this.isColumnChooserVisible = true;
@@ -98,7 +95,7 @@ export class PurchaseReportComponent {
       this.dataGrid.instance.columnOption(
         column.dataField,
         'visible',
-        column.visible
+        column.visible,
       );
     });
 
@@ -223,7 +220,6 @@ export class PurchaseReportComponent {
     this.isFilterVisible = !this.isFilterVisible;
   }
 
-
   toggleParameters(): void {
     this.showParameters = !this.showParameters;
   }
@@ -289,11 +285,9 @@ export class PurchaseReportComponent {
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
 
-
     this.store_dropdown();
     this.getCustomerOrUnitLst();
   }
-
 
   columnChooserButtonOptions = {
     icon: 'columnchooser',
@@ -314,12 +308,12 @@ export class PurchaseReportComponent {
 
     this.dataGrid?.instance.option(
       'summary.totalItems',
-      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : [],
     );
 
     this.dataGrid?.instance.option(
       'summary.groupItems',
-      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : [],
     );
 
     this.summaryButtonOptions = {
@@ -328,7 +322,6 @@ export class PurchaseReportComponent {
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
   }
-
 
   ngAfterViewInit() {
     setTimeout(() => this.resetPopups());
@@ -514,13 +507,13 @@ export class PurchaseReportComponent {
           this.dataService.PurchaseReport(payload).subscribe({
             next: (res: any) => {
               const list = res.data || [];
-              console.log(list)
-              console.log(list.length)
+              console.log(list);
+              console.log(list.length);
 
               // 🔑 cache for logic
               this.journalBookArray = list;
               this.journalBookCount = list.length;
-              console.log(this.journalBookCount)
+              console.log(this.journalBookCount);
 
               this.ledgerSummaryData = list;
               if (list.length === 0) {
@@ -551,23 +544,24 @@ export class PurchaseReportComponent {
   onViewClick(e: any) {
     const trans_id = e.row.data.TRANS_ID;
 
-    this.dataService.selectPurchaseInvoice(trans_id).subscribe((response: any) => {
+    this.dataService
+      .selectPurchaseInvoice(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
 
-      this.selectedInvoice = response.Data;
+        if (this.selectedInvoice.STATUS == 'Approved') {
+          this.buttonText = 'View Purchase Invoice';
+        } else if (this.selectedInvoice.STATUS == 'Open') {
+          this.buttonText = 'Verify Purchase Invoice';
+        } else if (this.selectedInvoice.STATUS == 'Verified') {
+          this.buttonText = 'Approve Purchase Invoice';
+        } else {
+          this.buttonText = 'Purchase Invoice';
+        }
 
-      if (this.selectedInvoice.STATUS == "Approved") {
-        this.buttonText = 'View Purchase Invoice';
-      } else if (this.selectedInvoice.STATUS == "Open") {
-        this.buttonText = 'Verify Purchase Invoice';
-      } else if (this.selectedInvoice.STATUS == "Verified") {
-        this.buttonText = 'Approve Purchase Invoice';
-      } else {
-        this.buttonText = 'Purchase Invoice';
-      }
-
-      // Open popup AFTER data is received
-      this.isVerifyInvoice = true;
-    });
+        // Open popup AFTER data is received
+        this.isVerifyInvoice = true;
+      });
   }
 
   getNetAmount = (rowData: any) => {
@@ -579,7 +573,6 @@ export class PurchaseReportComponent {
   };
 
   summaryColumnsData = {
-
     totalItems: [
       {
         column: 'DISCOUNT',
@@ -662,7 +655,7 @@ export class PurchaseReportComponent {
     this.editMiscPopup = false;
     this.isMiscViewInvoice = false;
     this.viewPayrollPopupOpened = false;
-    this.isVerifyInvoice = false
+    this.isVerifyInvoice = false;
   }
 
   storeHint: string = '';
@@ -750,7 +743,6 @@ export class PurchaseReportComponent {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
-    PayrollViewModule,
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
@@ -762,4 +754,4 @@ export class PurchaseReportComponent {
   exports: [],
   declarations: [PurchaseReportComponent],
 })
-export class PurchaseReportModule { }
+export class PurchaseReportModule {}

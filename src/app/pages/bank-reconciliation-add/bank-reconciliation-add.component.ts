@@ -45,7 +45,6 @@ import {
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
-import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
 import { ViewSalaryAdvanceModule } from 'src/app/components/HR/Masters/view-salary-advance/view-salary-advance.component';
 import notify from 'devextreme/ui/notify';
 
@@ -139,7 +138,6 @@ export class BankReconciliationAddComponent {
   }
 
   ngOnInit() {
-
     const currentUrl = this.router.url;
 
     const menuResponse = JSON.parse(
@@ -408,7 +406,6 @@ export class BankReconciliationAddComponent {
     DxAutocompleteModule,
     DxTagBoxModule,
     AddMiscellaneousPaymentModule,
-    AddSalaryPaymentModule,
     ViewSalaryAdvanceModule,
   ],
   providers: [],
@@ -416,4 +413,4 @@ export class BankReconciliationAddComponent {
   exports: [BankReconciliationAddComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class BankReconciliationAddModule {}
+export class BankReconciliationAddModule { }

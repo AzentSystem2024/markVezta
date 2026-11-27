@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, NgModule, NgZone, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
 import {
   DxButtonModule,
   DxCheckBoxModule,
@@ -37,7 +43,6 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import notify from 'devextreme/ui/notify';
@@ -46,10 +51,9 @@ import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-
 @Component({
   selector: 'app-item-wise-sales-summary',
   templateUrl: './item-wise-sales-summary.component.html',
-  styleUrls: ['./item-wise-sales-summary.component.scss']
+  styleUrls: ['./item-wise-sales-summary.component.scss'],
 })
 export class ItemWiseSalesSummaryComponent {
-
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
   JournalBookDataSource: DataSource; // ONLY for dx-data-grid
@@ -159,7 +163,7 @@ export class ItemWiseSalesSummaryComponent {
   itemProperty1: any;
   selectedItemProperty1: any;
   selectedItemProperty2: any;
-  ColumnNames : any;
+  ColumnNames: any;
   today: Date = new Date();
 
   Saletype = [
@@ -169,7 +173,7 @@ export class ItemWiseSalesSummaryComponent {
     { ID: 3, DESCRIPTION: 'Return' },
     { ID: 4, DESCRIPTION: 'Void Invoice' },
     { ID: 5, DESCRIPTION: 'Cash In & Cash Out' },
-    { ID: 6, DESCRIPTION: 'Receipts' }
+    { ID: 6, DESCRIPTION: 'Receipts' },
   ];
 
   // Optional default selection
@@ -314,7 +318,7 @@ export class ItemWiseSalesSummaryComponent {
       grid.option('headerFilter.visible', this.isFilterOpened);
     }
   }
-findColumnLocation = (e: any) => {
+  findColumnLocation = (e: any) => {
     const columnName = e.itemData;
     if (columnName != '' && columnName != null) {
       this.dataService.makeColumnVisible(this.dataGrid, columnName);
@@ -322,23 +326,23 @@ findColumnLocation = (e: any) => {
   };
 
   updateVisibleColumnNames() {
-  if (this.dataGrid?.instance) {
-    const columns = this.dataGrid.instance.getVisibleColumns();
+    if (this.dataGrid?.instance) {
+      const columns = this.dataGrid.instance.getVisibleColumns();
 
-    this.ColumnNames = columns
-      .filter((col: any) => col.caption && col.dataField)
-      .map((col: any) => col.caption);
+      this.ColumnNames = columns
+        .filter((col: any) => col.caption && col.dataField)
+        .map((col: any) => col.caption);
+    }
   }
-}
 
-onGridOptionChanged(e: any) {
-  if (
-    e.name === 'columns' ||
-    (e.fullName && e.fullName.includes('visible'))
-  ) {
-    this.updateVisibleColumnNames();
+  onGridOptionChanged(e: any) {
+    if (
+      e.name === 'columns' ||
+      (e.fullName && e.fullName.includes('visible'))
+    ) {
+      this.updateVisibleColumnNames();
+    }
   }
-}
   resetPopups() {
     this.isViewJournalVoucher = false;
     this.isViewDebitNote = false;
@@ -440,7 +444,6 @@ onGridOptionChanged(e: any) {
   }
 
   load_JournalBook_data() {
-
     //remove     STATUS_ID:"",
 
     const payload = {
@@ -451,26 +454,34 @@ onGridOptionChanged(e: any) {
       STORE_ID: this.selectedStoreid?.length
         ? this.selectedStoreid.join(',') // FINAL FIX
         : '',
-      CUST_ID: this.selectedCustomer != null
-        ? String(this.selectedCustomer)
-        : '',
-      SALE_TYPE: this.selectedSaletype != null ? Number(this.selectedSaletype)
-        : 0,
-      BRAND_ID: this.selectedBrand != null
-        ? String(this.selectedBrand)
-        : '',
+      CUST_ID:
+        this.selectedCustomer != null ? String(this.selectedCustomer) : '',
+      SALE_TYPE:
+        this.selectedSaletype != null ? Number(this.selectedSaletype) : 0,
+      BRAND_ID: this.selectedBrand != null ? String(this.selectedBrand) : '',
       ITEM_ID: this.selectedItem != null ? String(this.selectedItem) : '',
-      SALESMAN_ID: this.selectedSalesman != null ? String(this.selectedSalesman) : '',
-      DEPT_ID: this.selectedDepartment != null ? String(this.selectedDepartment) : '',
-      CAT_ID: this.selectedCategory != null ? String(this.selectedCategory) : '',
-      SUBCAT_ID: this.selectedSubcategory != null ? String(this.selectedSubcategory) : '',
+      SALESMAN_ID:
+        this.selectedSalesman != null ? String(this.selectedSalesman) : '',
+      DEPT_ID:
+        this.selectedDepartment != null ? String(this.selectedDepartment) : '',
+      CAT_ID:
+        this.selectedCategory != null ? String(this.selectedCategory) : '',
+      SUBCAT_ID:
+        this.selectedSubcategory != null
+          ? String(this.selectedSubcategory)
+          : '',
       DISCOUNTED_ITEMS_ONLY: 0,
-      CUSTOM1: this.selectedItemProperty1 != null ? String(this.selectedItemProperty1) : '',
-      CUSTOM2: this.selectedItemProperty2 != null ? String(this.selectedItemProperty2) : '',
+      CUSTOM1:
+        this.selectedItemProperty1 != null
+          ? String(this.selectedItemProperty1)
+          : '',
+      CUSTOM2:
+        this.selectedItemProperty2 != null
+          ? String(this.selectedItemProperty2)
+          : '',
       INCLUDE_SUMMARY: 0,
-      GROUP_BY_STORE: 0
+      GROUP_BY_STORE: 0,
     };
-
 
     this.JournalBookDataSource = new DataSource({
       load: () =>
@@ -491,11 +502,11 @@ onGridOptionChanged(e: any) {
                   displayTime: 2000,
                   position: {
                     at: 'top center',
-                    my: 'top center'
-                  }
+                    my: 'top center',
+                  },
                 });
               }
-              this.isFilterVisible = false
+              this.isFilterVisible = false;
               resolve(list); // 🔑 grid gets data
             },
             error: () => {
@@ -510,7 +521,7 @@ onGridOptionChanged(e: any) {
   }
 
   onViewClick(e: any) {
-    console.log(e)
+    console.log(e);
     const trans_id = e.row.data.TRANS_ID;
 
     this.dataService
@@ -518,11 +529,9 @@ onGridOptionChanged(e: any) {
       .subscribe((response: any) => {
         this.selectedInvoice = response.data;
 
-
         this.isViewInvoice = true;
       });
   }
-
 
   summaryColumnsData = {
     totalItems: [
@@ -622,9 +631,9 @@ onGridOptionChanged(e: any) {
       return;
     }
 
-    const selectedNames = this.Store
-      .filter(x => this.selectedStoreid.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
 
     this.storeHint = selectedNames.join(', ');
   }
@@ -632,8 +641,8 @@ onGridOptionChanged(e: any) {
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
@@ -642,8 +651,8 @@ onGridOptionChanged(e: any) {
   department_dropdown() {
     const payload = {
       NAME: 'DEPARTMENT',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Department = res;
     });
@@ -652,8 +661,8 @@ onGridOptionChanged(e: any) {
   Catgeory_dropdown() {
     const payload = {
       NAME: 'ITEMCATEGORY',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Category = res;
     });
@@ -662,8 +671,8 @@ onGridOptionChanged(e: any) {
   SubCatgeory_dropdown() {
     const payload = {
       NAME: 'SUBCATEGORY',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Subcategory = res;
     });
@@ -673,7 +682,7 @@ onGridOptionChanged(e: any) {
     const payload = {
       NAME: 'BRAND',
       // COMPANY_ID : this.selected_Company_id
-    }
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Brand = res;
     });
@@ -683,7 +692,7 @@ onGridOptionChanged(e: any) {
     const payload = {
       NAME: 'SALESMAN',
       // COMPANY_ID : this.selected_Company_id
-    }
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Salesman = res;
     });
@@ -692,8 +701,8 @@ onGridOptionChanged(e: any) {
   ItemProperty1_dropdown() {
     const payload = {
       NAME: 'ITEMPROPERTY1',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.itemProperty1 = res;
     });
@@ -702,18 +711,17 @@ onGridOptionChanged(e: any) {
   ItemProperty2_dropdown() {
     const payload = {
       NAME: 'ITEMPROPERTY2',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.itemProperty2 = res;
     });
   }
 
-
   item_dropdown() {
     const payload = {
-      NAME: 'ITEMS'
-    }
+      NAME: 'ITEMS',
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.items = {
         store: {
@@ -724,7 +732,7 @@ onGridOptionChanged(e: any) {
         paginate: true,
         pageSize: 50,
       };
-    })
+    });
   }
 
   updateItemHint() {
@@ -734,8 +742,8 @@ onGridOptionChanged(e: any) {
     }
 
     const selectedNames = this.items
-      .filter(x => this.selectedItem.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+      .filter((x) => this.selectedItem.includes(x.ID))
+      .map((x) => x.DESCRIPTION);
 
     this.itemHint = selectedNames.join(', ');
   }
@@ -743,13 +751,11 @@ onGridOptionChanged(e: any) {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: 'CUSTOMER'
+      NAME: 'CUSTOMER',
     };
-    this.dataService
-      .Common_Dropdown(payload)
-      .subscribe((response: any) => {
-        this.distributorList = response;
-      });
+    this.dataService.Common_Dropdown(payload).subscribe((response: any) => {
+      this.distributorList = response;
+    });
   }
 
   formatDates(cellData: any): string {
@@ -802,7 +808,6 @@ onGridOptionChanged(e: any) {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
-    PayrollViewModule,
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
@@ -813,4 +818,4 @@ onGridOptionChanged(e: any) {
   exports: [],
   declarations: [ItemWiseSalesSummaryComponent],
 })
-export class ItemWiseSalesSummaryModule { }
+export class ItemWiseSalesSummaryModule {}

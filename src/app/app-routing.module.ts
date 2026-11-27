@@ -36,14 +36,7 @@ import { ItemStorePricesEditComponent } from './pages/item-store-prices-edit/ite
 import { ItemStorePriceVerifyApproveComponent } from './pages/item-store-price-verify-approve/item-store-price-verify-approve.component';
 import { ItemStorePriceViewComponent } from './pages/item-store-price-view/item-store-price-view.component';
 import { DepartmentComponent } from './pages/MASTER/department/department.component';
-import { EOSComponent } from './pages/HR/Masters/eos/eos.component';
-import { LeaveSalaryComponent } from './pages/HR/Masters/leave-type/leave-salary.component';
-import { EmployeeLeaveComponent } from './pages/HR/Masters/employee-leave/employee-leave.component';
-import { EmployeeComponent } from './pages/HR/Masters/employee/employee.component';
-import { TimesheetListComponent } from './pages/HR/Masters/timesheet-list/timesheet-list.component';
-import { StaffEOSComponent } from './pages/HR/Masters/staff-eos/staff-eos.component';
 import { ListMiscellaneousPaymentsComponent } from './pages/ACCOUNTS/list-miscellaneous-payments/list-miscellaneous-payments.component';
-import { PayrollListComponent } from './pages/HR/Masters/payroll-list/payroll-list.component';
 import { AccountsListComponent } from './pages/ACCOUNTS/Chart of Account/accounts-list.component';
 import { ArticleListComponent } from './pages/MASTER/article-list/article-list.component';
 import { ArticleColorComponent } from './pages/MASTER/article-color/article-color.component';
@@ -77,9 +70,6 @@ import { SupplierPaymentListComponent } from './pages/ACCOUNTS/supplier-payment-
 import { OpeningBalanceComponent } from './pages/ACCOUNTS/opening-balance/opening-balance.component';
 
 import { ListMiscReceiptComponent } from './pages/ACCOUNTS/list-misc-receipt/list-misc-receipt.component';
-import { ListSalaryPaymentComponent } from './pages/HR/Masters/list-salary-payment/list-salary-payment.component';
-import { EmployeeSalarySettingsComponent } from './pages/HR/Masters/employee-salary-settings/employee-salary-settings.component';
-import { PaytimeEntryComponent } from './pages/HR/Masters/paytime-entry/paytime-entry.component';
 import { PdcListComponent } from './pages/ACCOUNTS/pdc-list/pdc-list.component';
 import { BoxProductionViewComponent } from './components/HR/Masters/box-production-view/box-production-view.component';
 import { CashBookComponent } from './pages/REPORT/cash-book/cash-book.component';
@@ -98,12 +88,9 @@ import { InputVatComponent } from './pages/input-vat/input-vat.component';
 import { OutputVatComponent } from './pages/OutPutVat/output-vat/output-vat.component';
 import { VatReturnComponent } from './pages/Vat Return/vat-return/vat-return.component';
 import { PrepaymentPostingListComponent } from './pages/ACCOUNTS/prepayment-posting-list/prepayment-posting-list.component';
-import { PaySlipComponent } from './pages/REPORT/pay-slip/pay-slip.component';
 import { EPFRegisterReportComponent } from './pages/REPORT/epf-register-report/epf-register-report.component';
-import { WageRegisterComponent } from './pages/REPORT/wage-register/wage-register.component';
 import { ESIComponent } from './pages/REPORT/esi/esi.component';
 import { TransferInInventoryComponent } from './pages/INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
-import { AttendanceSheetComponent } from './pages/REPORT/attendance-sheet/attendance-sheet.component';
 import { ItemQuantityStockComponent } from './components/HR/Masters/item-quantity-stock/item-quantity-stock.component';
 import { ItemStockValueComponent } from './components/HR/Masters/item-stock-value/item-stock-value.component';
 import { ItemCategoryListComponent } from './pages/MASTER/item-category-list/item-category-list.component';
@@ -127,9 +114,7 @@ import { GstReportCDNRComponent } from './pages/REPORT/gst-report-cdnr/gst-repor
 import { ArticleproductionJvListComponent } from './articleproduction-jv-list/articleproduction-jv-list.component';
 import { StockViewComponent } from './pages/REPORT/stock-view/stock-view.component';
 import { ImportChartOfAccountsComponent } from './pages/ACCOUNTS/import-chart-of-accounts/import-chart-of-accounts.component';
-import { AdvanceComponent } from './pages/HR/Masters/advance/advance.component';
 import { SubDepartmentComponent } from './pages/HR/Masters/sub-department/sub-department.component';
-import { SalaryHeadListComponent } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
 
 import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
@@ -152,8 +137,6 @@ import { MiscellaneousInvoiceComponent } from './pages/Operations/miscellaneous-
 import { MiscellaneousPurchaseComponent } from './pages/Operations/miscellaneous-purchase/miscellaneous-purchase.component';
 import { PDCReportComponent } from './components/HR/Masters/PDC/pdc-report/pdc-report.component';
 import { PrepaymentPostingReportComponent } from './pages/PrePayment Posting/prepayment-posting-report/prepayment-posting-report.component';
-import { SalaryWPSComponent } from './pages/salary-wps/salary-wps.component';
-import { PaySettingsComponent } from './pages/HR/Masters/pay-settings/pay-settings.component';
 import { DepartmentMeComponent } from './pages/MASTER/department-me/department-me.component';
 import { ProfitAndLossBranchComponent } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { CustomerFinListComponent } from './pages/MASTER/customer-fin-list/customer-fin-list.component';
@@ -217,11 +200,6 @@ import { DistrictComponent } from './pages/district/district.component';
 import { DashboardMarkComponent } from './pages/dashboard-mark/dashboard-mark.component';
 import { PurchaseReportComponent } from './pages/REPORT/purchase-report/purchase-report.component';
 import { ItemwisePurchaseReportComponent } from './pages/REPORT/itemwise-purchase-report/itemwise-purchase-report.component';
-import { TimesheetReportComponent } from './pages/HR/timesheet-report/timesheet-report.component';
-import { PayrollReportComponent } from './pages/REPORT/payroll-report/payroll-report.component';
-import { PayrollOtReportComponent } from './pages/REPORT/payroll-ot-report/payroll-ot-report.component';
-import { LeavelistComponent } from './pages/REPORT/leavelist/leavelist.component';
-import { FinalSettlementReportComponent } from './pages/REPORT/final-settlement-report/final-settlement-report.component';
 import { EosPaymentListComponent } from './pages/HR/Masters/eos-payment-list/eos-payment-list.component';
 import { LeaveSalaryPaymentComponent } from './pages/ACCOUNTS/leave-salary-payment/leave-salary-payment.component';
 import { AnalyticsDashboardVeztaMedicalComponent } from './pages/analytics-dashboard-vezta-medical/analytics-dashboard-vezta-medical.component';
@@ -250,13 +228,7 @@ import { AgeWisePendingReportComponent } from './pages/DESPATCH/Reports/age-wise
 import { AgeWiseReportComponent } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { TopMovingReportComponent } from './pages/DESPATCH/Reports/top-moving-report/top-moving-report.component';
 import { ArticleStockReportComponent } from './pages/DESPATCH/Reports/article-stock-report/article-stock-report.component';
-import { EditedAttendanceComponent } from './pages/REPORT/edited-attendance/edited-attendance.component';
-import { LateComerListComponent } from './pages/REPORT/late-comer-list/late-comer-list.component';
-import { AbsentListComponent } from './pages/REPORT/absent-list/absent-list.component';
-import { ExcessBreaksComponent } from './pages/REPORT/excess-breaks/excess-breaks.component';
-import { StaffShiftChangeReportComponent } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
 import { ShiftMasterComponent } from './pages/REPORT/shift-master/shift-master.component';
-import { ExcessBreakDetailsComponent } from './pages/REPORT/excess-break-details/excess-break-details.component';
 
 const routes: Routes = [
   {
@@ -442,11 +414,6 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'payroll',
-        component: PayrollListComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'supplier-payment',
         component: SupplierPaymentListComponent,
         canActivate: [AuthGuardService],
@@ -472,18 +439,8 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'employee-salary-settings',
-        component: EmployeeSalarySettingsComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'trial-balance-report',
         component: TrialBalanceReportComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'salary-advance',
-        component: AdvanceComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -518,21 +475,6 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'salary-payment',
-        component: ListSalaryPaymentComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'employee',
-        component: EmployeeComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'timesheet',
-        component: TimesheetListComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'packing',
         component: PackingComponent,
         canActivate: [AuthGuardService],
@@ -545,11 +487,6 @@ const routes: Routes = [
       {
         path: 'ledger-statement',
         component: LedgerStatementComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'salary-head',
-        component: SalaryHeadListComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -578,11 +515,6 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'Paytime-entry',
-        component: PaytimeEntryComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'pdc',
         component: PdcListComponent,
         canActivate: [AuthGuardService],
@@ -595,11 +527,6 @@ const routes: Routes = [
       {
         path: 'Box-production-view',
         component: BoxProductionViewComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'employee-salary-settings',
-        component: EmployeeSalarySettingsComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -823,11 +750,6 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'pay-slip',
-        component: PaySlipComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'reason',
         component: ReasonsListComponent,
         canActivate: [AuthGuardService],
@@ -847,20 +769,9 @@ const routes: Routes = [
         component: EPFRegisterReportComponent,
         canActivate: [AuthGuardService],
       },
-
-      {
-        path: 'wage-register',
-        component: WageRegisterComponent,
-        canActivate: [AuthGuardService],
-      },
       {
         path: 'esi-register',
         component: ESIComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'attendance-sheet',
-        component: AttendanceSheetComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1044,28 +955,8 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'end-of-service',
-        component: EOSComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'staff-end-of-service',
-        component: StaffEOSComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'eos-payment',
         component: EosPaymentListComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'employee-leave',
-        component: EmployeeLeaveComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'leave-salary',
-        component: LeaveSalaryComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1086,17 +977,6 @@ const routes: Routes = [
       {
         path: 'prepayment-posting-report',
         component: PrepaymentPostingReportComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'pay-settings',
-        component: PaySettingsComponent,
-        canActivate: [AuthGuardService],
-      },
-
-      {
-        path: 'salary-wps',
-        component: SalaryWPSComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -1381,31 +1261,6 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'timesheet-report',
-        component: TimesheetReportComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'payroll-report',
-        component: PayrollReportComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'payroll-ot-report',
-        component: PayrollOtReportComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'leave-list',
-        component: LeavelistComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'finalsettlement-report',
-        component: FinalSettlementReportComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'emp-leave-salary',
         component: LeaveSalaryPaymentComponent,
         canActivate: [AuthGuardService],
@@ -1542,39 +1397,14 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'edited-attendance',
-        component: EditedAttendanceComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'late-comer-report',
-        component: LateComerListComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'absent-list',
-        component: AbsentListComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'excess-breaks',
-        component: ExcessBreaksComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'staff-shift-change-report',
-        component: StaffShiftChangeReportComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'shift-master',
         component: ShiftMasterComponent,
         canActivate: [AuthGuardService],
       },
       {
-        path: 'excess-break-details',
-        component: ExcessBreakDetailsComponent,
-        canActivate: [AuthGuardService],
+        path: '',
+        loadChildren: () =>
+          import('./features/hr/hr.module').then((m) => m.HrModule),
       },
       {
         path: '**',
@@ -1592,4 +1422,4 @@ const routes: Routes = [
   exports: [RouterModule],
   declarations: [],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

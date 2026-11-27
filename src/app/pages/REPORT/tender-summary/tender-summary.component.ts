@@ -47,7 +47,6 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
@@ -57,10 +56,9 @@ import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-
 @Component({
   selector: 'app-tender-summary',
   templateUrl: './tender-summary.component.html',
-  styleUrls: ['./tender-summary.component.scss']
+  styleUrls: ['./tender-summary.component.scss'],
 })
 export class TenderSummaryComponent {
-
   @ViewChild(DxDataGridComponent, { static: true })
   dataGrid: DxDataGridComponent;
 
@@ -76,7 +74,7 @@ export class TenderSummaryComponent {
   }[] = [];
 
   private readonly chooserColumns = [
-    { dataField: 'STORE', caption: "Store" },
+    { dataField: 'STORE', caption: 'Store' },
     { dataField: 'CUSTOMER', caption: 'Customer' },
     { dataField: 'SALE_TYPE_NAME', caption: 'Sale Type' },
     { dataField: 'CASH', caption: 'Cash' },
@@ -240,7 +238,7 @@ export class TenderSummaryComponent {
   selectedItemProperty2: any;
   today: Date = new Date();
   isSummaryVisible = true;
-  ColumnNames : any;
+  ColumnNames: any;
 
   Saletype = [
     { ID: 0, DESCRIPTION: 'All' },
@@ -249,7 +247,7 @@ export class TenderSummaryComponent {
     { ID: 3, DESCRIPTION: 'Return' },
     { ID: 4, DESCRIPTION: 'Void Invoice' },
     { ID: 5, DESCRIPTION: 'Cash In & Cash Out' },
-    { ID: 6, DESCRIPTION: 'Receipts' }
+    { ID: 6, DESCRIPTION: 'Receipts' },
   ];
 
   // Optional default selection
@@ -342,12 +340,12 @@ export class TenderSummaryComponent {
 
     this.dataGrid?.instance.option(
       'summary.totalItems',
-      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : [],
     );
 
     this.dataGrid?.instance.option(
       'summary.groupItems',
-      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : [],
     );
 
     this.summaryButtonOptions = {
@@ -428,23 +426,23 @@ export class TenderSummaryComponent {
   };
 
   updateVisibleColumnNames() {
-  if (this.dataGrid?.instance) {
-    const columns = this.dataGrid.instance.getVisibleColumns();
+    if (this.dataGrid?.instance) {
+      const columns = this.dataGrid.instance.getVisibleColumns();
 
-    this.ColumnNames = columns
-      .filter((col: any) => col.caption && col.dataField)
-      .map((col: any) => col.caption);
+      this.ColumnNames = columns
+        .filter((col: any) => col.caption && col.dataField)
+        .map((col: any) => col.caption);
+    }
   }
-}
 
-onGridOptionChanged(e: any) {
-  if (
-    e.name === 'columns' ||
-    (e.fullName && e.fullName.includes('visible'))
-  ) {
-    this.updateVisibleColumnNames();
+  onGridOptionChanged(e: any) {
+    if (
+      e.name === 'columns' ||
+      (e.fullName && e.fullName.includes('visible'))
+    ) {
+      this.updateVisibleColumnNames();
+    }
   }
-}
 
   resetPopups() {
     this.isViewJournalVoucher = false;
@@ -547,7 +545,7 @@ onGridOptionChanged(e: any) {
   }
 
   load_JournalBook_data() {
-    this.isFilterVisible = false
+    this.isFilterVisible = false;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
@@ -556,13 +554,11 @@ onGridOptionChanged(e: any) {
       STORE_ID: this.selectedStoreid?.length
         ? this.selectedStoreid.join(',') // FINAL FIX
         : '',
-      CUSTOMER_ID: this.selectedCustomer != null
-        ? String(this.selectedCustomer)
-        : '',
-      SALE_TYPE: this.selectedSaletype != null ? Number(this.selectedSaletype)
-        : 0,
+      CUSTOMER_ID:
+        this.selectedCustomer != null ? String(this.selectedCustomer) : '',
+      SALE_TYPE:
+        this.selectedSaletype != null ? Number(this.selectedSaletype) : 0,
     };
-
 
     this.JournalBookDataSource = new DataSource({
       load: () =>
@@ -583,11 +579,11 @@ onGridOptionChanged(e: any) {
                   displayTime: 2000,
                   position: {
                     at: 'top center',
-                    my: 'top center'
-                  }
+                    my: 'top center',
+                  },
                 });
               }
-              this.isFilterVisible = false
+              this.isFilterVisible = false;
               resolve(list); // 🔑 grid gets data
             },
             error: () => {
@@ -602,14 +598,13 @@ onGridOptionChanged(e: any) {
   }
 
   onViewClick(e: any) {
-    console.log(e)
+    console.log(e);
     const trans_id = e.row.data.TRANS_ID;
 
     this.dataService
       .Select_SalesInvoice_Retail(trans_id)
       .subscribe((response: any) => {
         this.selectedInvoice = response.data;
-
 
         this.isViewInvoice = true;
       });
@@ -713,9 +708,9 @@ onGridOptionChanged(e: any) {
       return;
     }
 
-    const selectedNames = this.Store
-      .filter(x => this.selectedStoreid.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
 
     this.storeHint = selectedNames.join(', ');
   }
@@ -723,14 +718,12 @@ onGridOptionChanged(e: any) {
   store_dropdown() {
     const payload = {
       NAME: 'STORE',
-      COMPANY_ID: this.selected_Company_id
-    }
+      COMPANY_ID: this.selected_Company_id,
+    };
     this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
       this.Store = res;
     });
   }
-
-
 
   updateItemHint() {
     if (!this.selectedItem || this.selectedItem.length === 0) {
@@ -739,8 +732,8 @@ onGridOptionChanged(e: any) {
     }
 
     const selectedNames = this.items
-      .filter(x => this.selectedItem.includes(x.ID))
-      .map(x => x.DESCRIPTION);
+      .filter((x) => this.selectedItem.includes(x.ID))
+      .map((x) => x.DESCRIPTION);
 
     this.itemHint = selectedNames.join(', ');
   }
@@ -748,13 +741,11 @@ onGridOptionChanged(e: any) {
   getCustomerOrUnitLst() {
     const payload = {
       COMPANY_ID: this.selected_Company_id,
-      NAME: 'CUSTOMER'
+      NAME: 'CUSTOMER',
     };
-    this.dataService
-      .Common_Dropdown(payload)
-      .subscribe((response: any) => {
-        this.distributorList = response;
-      });
+    this.dataService.Common_Dropdown(payload).subscribe((response: any) => {
+      this.distributorList = response;
+    });
   }
 
   formatDates(cellData: any): string {
@@ -807,7 +798,6 @@ onGridOptionChanged(e: any) {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
-    PayrollViewModule,
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
@@ -818,4 +808,4 @@ onGridOptionChanged(e: any) {
   exports: [],
   declarations: [TenderSummaryComponent],
 })
-export class TenderSummaryModule { }
+export class TenderSummaryModule {}

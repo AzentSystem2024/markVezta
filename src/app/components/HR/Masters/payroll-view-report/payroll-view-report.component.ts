@@ -40,17 +40,14 @@ import {
   DxiGroupModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components/utils/form-textbox/form-textbox.component';
-import { PayrollVerifyComponent } from '../payroll-verify/payroll-verify.component';
 import { DataService } from 'src/app/services';
-
 
 @Component({
   selector: 'app-payroll-view-report',
   templateUrl: './payroll-view-report.component.html',
-  styleUrls: ['./payroll-view-report.component.scss']
+  styleUrls: ['./payroll-view-report.component.scss'],
 })
 export class PayrollViewReportComponent {
-
   @Output() popupClosed = new EventEmitter<void>();
   @Input() payroll: any;
   @ViewChild(DxDataGridComponent, { static: true })

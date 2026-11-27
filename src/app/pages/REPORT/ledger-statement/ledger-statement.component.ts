@@ -36,7 +36,7 @@ import {
   DxTagBoxModule,
   DxValidationGroupComponent,
   DxDataGridComponent,
- DxDropDownButtonModule
+  DxDropDownButtonModule,
 } from 'devextreme-angular';
 
 import {
@@ -63,7 +63,7 @@ import { AddMiscReceiptModule } from 'src/app/components/HR/Masters/MISC-RECEIPT
 import { DepreciationEditModule } from '../../Depreciation/depreciation-edit/depreciation-edit.component';
 import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
-import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
+import { AddSalaryPaymentModule } from 'src/app/features/hr/pages/salary-payment/add-salary-payment/add-salary-payment.component';
 import { ViewSalaryAdvanceModule } from 'src/app/components/HR/Masters/view-salary-advance/view-salary-advance.component';
 import { EditPurchaseInvoiceModule } from '../../PURCHASE INVOICE/edit-purchase-invoice/edit-purchase-invoice.component';
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
@@ -84,7 +84,6 @@ import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sa
 export class LedgerStatementComponent implements OnInit {
   @ViewChild('formValidationGroup', { static: false })
   formValidationGroup!: DxValidationGroupComponent;
-
 
   @ViewChild(DxDataGridComponent, { static: false })
   dataGrid!: DxDataGridComponent;
@@ -265,8 +264,8 @@ export class LedgerStatementComponent implements OnInit {
   appType: any;
   isSummaryVisible = true;
   isFilterRowVisible = false;
-  isFilterOpened=false;
-  ColumnNames:any;
+  isFilterOpened = false;
+  ColumnNames: any;
 
   constructor(
     private dataService: DataService,
@@ -327,7 +326,6 @@ export class LedgerStatementComponent implements OnInit {
 
     this.selected_from_date = sessionStorage.getItem('DATEFROM');
     this.selected_To_date = sessionStorage.getItem('DATETO');
-
 
     this.loadLedgerData();
   }
@@ -402,72 +400,72 @@ export class LedgerStatementComponent implements OnInit {
 
     this.cdr.detectChanges();
   }
- columnFinderButtonOptions: any = {
-  items: [],
-  displayExpr: 'text',
-  keyExpr: 'value',
-  onItemClick: (e: any) => {
-    this.findColumnLocation(e);
-  },
-  hint: 'Column location finder',
-  icon: 'increaseindent',
-  showArrowIcon: true,
-  dropDownOptions: {
-    width: 'auto',
-    height: 300
+  columnFinderButtonOptions: any = {
+    items: [],
+    displayExpr: 'text',
+    keyExpr: 'value',
+    onItemClick: (e: any) => {
+      this.findColumnLocation(e);
+    },
+    hint: 'Column location finder',
+    icon: 'increaseindent',
+    showArrowIcon: true,
+    dropDownOptions: {
+      width: 'auto',
+      height: 300,
+    },
+  };
+  findColumnLocation(e: any): void {
+    const columnName = e.itemData?.value;
+
+    if (columnName && this.dataGrid?.instance) {
+      this.dataService.makeColumnVisible(this.dataGrid, columnName);
+    }
   }
-}; 
-         findColumnLocation(e: any): void {
-           const columnName = e.itemData?.value;
-         
-           if (columnName && this.dataGrid?.instance) {
-             this.dataService.makeColumnVisible(this.dataGrid, columnName);
-           }
-         }
-         
-         updateVisibleColumnNames(): void {
-           if (!this.dataGrid?.instance) {
-             return;
-           }
-         
-           const columns = this.dataGrid.instance.getVisibleColumns();
-         
-           const items = columns
-             .filter((column: any) => column.dataField && column.caption)
-             .map((column: any) => ({
-               text: column.caption,
-               value: column.dataField
-             }));
-         
-           this.columnFinderButtonOptions = {
-             ...this.columnFinderButtonOptions,
-             items: items
-           };
-         
-           this.cdr.detectChanges();
-         }
-           onGridOptionChanged(e: any): void {
-           if (e.fullName?.includes('visible')) {
-             this.updateVisibleColumnNames();
-           }
-         }
+
+  updateVisibleColumnNames(): void {
+    if (!this.dataGrid?.instance) {
+      return;
+    }
+
+    const columns = this.dataGrid.instance.getVisibleColumns();
+
+    const items = columns
+      .filter((column: any) => column.dataField && column.caption)
+      .map((column: any) => ({
+        text: column.caption,
+        value: column.dataField,
+      }));
+
+    this.columnFinderButtonOptions = {
+      ...this.columnFinderButtonOptions,
+      items: items,
+    };
+
+    this.cdr.detectChanges();
+  }
+  onGridOptionChanged(e: any): void {
+    if (e.fullName?.includes('visible')) {
+      this.updateVisibleColumnNames();
+    }
+  }
   //  findColumnLocation = (e: any) => {
   //     const columnName = e.itemData;
   //     if (columnName != '' && columnName != null) {
   //       this.dataService.makeColumnVisible(this.dataGrid, columnName);
   //     }
   //   };
-  
+
   //   updateVisibleColumnNames() {
   //   if (this.dataGrid?.instance) {
   //     const columns = this.dataGrid.instance.getVisibleColumns();
-  
+
   //     this.ColumnNames = columns
   //       .filter((col: any) => col.caption && col.dataField)
   //       .map((col: any) => col.caption);
   //   }
   // }
-  
+
   // onGridOptionChanged(e: any) {
   //   if (
   //     e.name === 'columns' ||
@@ -518,7 +516,7 @@ export class LedgerStatementComponent implements OnInit {
       .HeadId_Dropdown_api(this.selected_Company_id)
       .subscribe((res: any) => {
         this.HEAD_ID_LIST = res?.LEDGER_HEADS || [];
-        console.log("ledger head id fetched", this.HEAD_ID_LIST)
+        console.log('ledger head id fetched', this.HEAD_ID_LIST);
       });
   }
 
@@ -540,10 +538,12 @@ export class LedgerStatementComponent implements OnInit {
       this.storeHint = 'No store selected';
       return;
     }
-    const selectedNames = this.Store
-      ?.filter((x: any) => this.selectedStoreid.includes(x.ID))
-      .map((x: any) => x.DESCRIPTION);
-    this.storeHint = selectedNames ? selectedNames.join(', ') : 'No store selected';
+    const selectedNames = this.Store?.filter((x: any) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x: any) => x.DESCRIPTION);
+    this.storeHint = selectedNames
+      ? selectedNames.join(', ')
+      : 'No store selected';
   }
 
   // -------------------------------------------------------------
@@ -562,7 +562,7 @@ export class LedgerStatementComponent implements OnInit {
                 const storeName = data[0].STORE_NAME;
 
                 const selectedStore = this.Store?.find(
-                  (x: any) => x.DESCRIPTION === storeName
+                  (x: any) => x.DESCRIPTION === storeName,
                 );
 
                 if (selectedStore) {
@@ -592,8 +592,7 @@ export class LedgerStatementComponent implements OnInit {
     const dateFrom =
       sessionStorage.getItem('DATEFROM') || sessiondata?.dateFrom;
 
-    const dateTo =
-      sessionStorage.getItem('DATETO') || sessiondata?.dateTo;
+    const dateTo = sessionStorage.getItem('DATETO') || sessiondata?.dateTo;
 
     const payload = {
       COMPANY_ID: Number(this.selected_Company_id),
@@ -626,7 +625,9 @@ export class LedgerStatementComponent implements OnInit {
       HEAD_ID: this.selected_Head_Id,
       DATE_FROM: this.formatted_from_date ?? this.selected_from_date,
       DATE_TO: this.formatted_To_date ?? this.selected_To_date,
-      STORE_ID: this.selectedStoreid?.length ? this.selectedStoreid.join(',') : '',
+      STORE_ID: this.selectedStoreid?.length
+        ? this.selectedStoreid.join(',')
+        : '',
     };
 
     this.createLedgerDataSource(payload);
@@ -662,8 +663,16 @@ export class LedgerStatementComponent implements OnInit {
       this.selected_from_date = new Date(this.selectedYear!, 0, 1);
       this.selected_To_date = new Date(this.selectedYear!, 11, 31);
     } else {
-      this.selected_from_date = new Date(this.selectedYear!, this.selectedmonth, 1);
-      this.selected_To_date = new Date(this.selectedYear!, this.selectedmonth + 1, 0);
+      this.selected_from_date = new Date(
+        this.selectedYear!,
+        this.selectedmonth,
+        1,
+      );
+      this.selected_To_date = new Date(
+        this.selectedYear!,
+        this.selectedmonth + 1,
+        0,
+      );
     }
   }
 
@@ -755,117 +764,145 @@ export class LedgerStatementComponent implements OnInit {
 
     switch (TRANS_TYPE_ID) {
       case 1: // Opening Balance
-        this.dataService.selectOpeningBalance(trans_id).subscribe((response: any) => {
-          this.selected_Data = response;
-          this.isEditPopUp = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectOpeningBalance(trans_id)
+          .subscribe((response: any) => {
+            this.selected_Data = response;
+            this.isEditPopUp = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 2: // Misc Receipt
-        this.dataService.selectMiscReceipt(trans_id).subscribe((response: any) => {
-          this.selectedmiscellaneousData = response.Data;
-          this.editMiscPopup = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectMiscReceipt(trans_id)
+          .subscribe((response: any) => {
+            this.selectedmiscellaneousData = response.Data;
+            this.editMiscPopup = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 3: // Misc Payment
-        this.dataService.selectMiscPayment(trans_id).subscribe((response: any) => {
-          this.selectedmiscellaneousData = response;
-          this.editMiscPopupOpened = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectMiscPayment(trans_id)
+          .subscribe((response: any) => {
+            this.selectedmiscellaneousData = response;
+            this.editMiscPopupOpened = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 4: // Journal Voucher
-        this.dataService.selectJournalVoucher(trans_id).subscribe((response: any) => {
-          this.selectedJournalVoucher = response.Data;
-          this.isViewJournalVoucher = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectJournalVoucher(trans_id)
+          .subscribe((response: any) => {
+            this.selectedJournalVoucher = response.Data;
+            this.isViewJournalVoucher = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 9: // Depreciation Asset
-        this.dataService.select_Depreciation_Asset(trans_id).subscribe((response: any) => {
-          this.Selected_Depreciation_data = response.Data;
-          this.EditDepreciationPopupVisible = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .select_Depreciation_Asset(trans_id)
+          .subscribe((response: any) => {
+            this.Selected_Depreciation_data = response.Data;
+            this.EditDepreciationPopupVisible = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 14: // Transfer Out
-        this.dataService.selectTransferOutForInventory(trans_id).subscribe((response: any) => {
-          this.selectedTrOut = response;
-          this.isEditTransferOut = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectTransferOutForInventory(trans_id)
+          .subscribe((response: any) => {
+            this.selectedTrOut = response;
+            this.isEditTransferOut = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 15: // Transfer In
-        this.dataService.selectTransferInForInventory(trans_id).subscribe((response: any) => {
-          this.selectedTrIn = response;
-          this.loadingInvoice = false;
-          this.isEditTransferIn = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectTransferInForInventory(trans_id)
+          .subscribe((response: any) => {
+            this.selectedTrIn = response;
+            this.loadingInvoice = false;
+            this.isEditTransferIn = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 19: // Purchase Invoice
-        this.dataService.selectPurchaseInvoice(trans_id).subscribe((response: any) => {
-          this.selectedInvoice = response.Data;
-          this.loadingInvoice = false;
-          this.isEditInvoice = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectPurchaseInvoice(trans_id)
+          .subscribe((response: any) => {
+            this.selectedInvoice = response.Data;
+            this.loadingInvoice = false;
+            this.isEditInvoice = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 20: // Purchase Return
-        this.dataService.selectPurchaseReturn(trans_id).subscribe((response: any) => {
-          this.selectedPurchaseReturn = response;
-          this.isEditPurchaseReturn = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectPurchaseReturn(trans_id)
+          .subscribe((response: any) => {
+            this.selectedPurchaseReturn = response;
+            this.isEditPurchaseReturn = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 21: // Supplier Payment
-        this.dataService.selectSupplierPayment(trans_id).subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
-          this.isEditReceipt = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectSupplierPayment(trans_id)
+          .subscribe((response: any) => {
+            this.selectedReceipt = response.Data;
+            this.isEditReceipt = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 25: // Sales Invoice
         if (this.vat_title === 'GST') {
-          this.dataService.selectInvoice(trans_id).subscribe((response: any) => {
-            this.selectedInvoice = response.Data;
-            this.isViewInvoice = true;
-            this.cdr.detectChanges();
-          });
+          this.dataService
+            .selectInvoice(trans_id)
+            .subscribe((response: any) => {
+              this.selectedInvoice = response.Data;
+              this.isViewInvoice = true;
+              this.cdr.detectChanges();
+            });
         } else {
-          this.dataService.selectInvoiceRetail(trans_id).subscribe((response: any) => {
-            this.selectedInvoice = response.Data;
-            this.isRetailInvoice = true;
-            this.cdr.detectChanges();
-          });
+          this.dataService
+            .selectInvoiceRetail(trans_id)
+            .subscribe((response: any) => {
+              this.selectedInvoice = response.Data;
+              this.isRetailInvoice = true;
+              this.cdr.detectChanges();
+            });
         }
         break;
 
       case 26: // Sale Return
-        this.dataService.selectSaleReturn(trans_id).subscribe((response: any) => {
-          this.selectedSaleReturn = response;
-          this.isEditSaleReturn = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectSaleReturn(trans_id)
+          .subscribe((response: any) => {
+            this.selectedSaleReturn = response;
+            this.isEditSaleReturn = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 27: // Customer Receipt
-        this.dataService.selectCustomerReceipt(trans_id).subscribe((response: any) => {
-          this.selectedReceipt = response.Data;
-          this.isEditCustomerReceipt = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectCustomerReceipt(trans_id)
+          .subscribe((response: any) => {
+            this.selectedReceipt = response.Data;
+            this.isEditCustomerReceipt = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 28: // Advance
@@ -877,67 +914,83 @@ export class LedgerStatementComponent implements OnInit {
         break;
 
       case 29: // Payroll Report
-        this.dataService.viewSelectedPayrollForReport(trans_id).subscribe((response: any) => {
-          this.selectedPayroll = response;
-          this.viewPayrollPopupOpened = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .viewSelectedPayrollForReport(trans_id)
+          .subscribe((response: any) => {
+            this.selectedPayroll = response;
+            this.viewPayrollPopupOpened = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 30: // Salary Payment
-        this.dataService.selectSalaryPayment(trans_id).subscribe((response: any) => {
-          this.selectedSalaryData = response.Data;
-          this.editSalaryPopup = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectSalaryPayment(trans_id)
+          .subscribe((response: any) => {
+            this.selectedSalaryData = response.Data;
+            this.editSalaryPopup = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 36: // Debit Note
-        this.dataService.selectDebitNote(trans_id).subscribe((response: any) => {
-          this.selectedDebitNote = response.Data;
-          this.isViewDebitNote = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectDebitNote(trans_id)
+          .subscribe((response: any) => {
+            this.selectedDebitNote = response.Data;
+            this.isViewDebitNote = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 37: // Credit Note
-        this.dataService.selectCreditNote(trans_id).subscribe((response: any) => {
-          this.selectedCreditNote = response.Data;
-          this.isViewCreditNote = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectCreditNote(trans_id)
+          .subscribe((response: any) => {
+            this.selectedCreditNote = response.Data;
+            this.isViewCreditNote = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 38: // Pre-Payment
-        this.dataService.Select_PrePayment(trans_id).subscribe((response: any) => {
-          this.selectedPrePayment = response.Data;
-          this.editPrePaymentPopupOpened = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .Select_PrePayment(trans_id)
+          .subscribe((response: any) => {
+            this.selectedPrePayment = response.Data;
+            this.editPrePaymentPopupOpened = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 103: // Production
-        this.dataService.selectProduction(trans_id).subscribe((response: any) => {
-          this.selectedProduction = response;
-          this.isViewProduction = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectProduction(trans_id)
+          .subscribe((response: any) => {
+            this.selectedProduction = response;
+            this.isViewProduction = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 104: // Box Production
-        this.dataService.selectBoxProduction(trans_id).subscribe((response: any) => {
-          this.selectedProduction = response;
-          this.isViewProduction = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .selectBoxProduction(trans_id)
+          .subscribe((response: any) => {
+            this.selectedProduction = response;
+            this.isViewProduction = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       case 105: // Misc Sales Invoice
-        this.dataService.getMiscSalesInvoiceByID(trans_id).subscribe((response: any) => {
-          this.selectedInvoice = response;
-          this.isMiscViewInvoice = true;
-          this.cdr.detectChanges();
-        });
+        this.dataService
+          .getMiscSalesInvoiceByID(trans_id)
+          .subscribe((response: any) => {
+            this.selectedInvoice = response;
+            this.isMiscViewInvoice = true;
+            this.cdr.detectChanges();
+          });
         break;
 
       default:
@@ -1072,7 +1125,6 @@ export class LedgerStatementComponent implements OnInit {
     groupItems: [],
   };
 
-
   updateSummaryColumnsData(): void {
     const moneyFormat = {
       type: 'fixedPoint',
@@ -1080,37 +1132,33 @@ export class LedgerStatementComponent implements OnInit {
       useGrouping: true,
     };
 
-    const summaryFields = [
-      'DR_AMOUNT',
-      'CR_AMOUNT',
-    ];
+    const summaryFields = ['DR_AMOUNT', 'CR_AMOUNT'];
 
     this.summaryColumnsData = {
       totalItems: this.isSummaryVisible
         ? summaryFields.map((field) => ({
-          column: field,
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: moneyFormat,
-          showInColumn: field,
-          alignment: 'right',
-        }))
+            column: field,
+            summaryType: 'sum',
+            displayFormat: '{0}',
+            valueFormat: moneyFormat,
+            showInColumn: field,
+            alignment: 'right',
+          }))
         : [],
 
       groupItems: this.isSummaryVisible
         ? summaryFields.map((field) => ({
-          column: field,
-          summaryType: 'sum',
-          displayFormat: '{0}',
-          valueFormat: moneyFormat,
-          alignByColumn: true,
-        }))
+            column: field,
+            summaryType: 'sum',
+            displayFormat: '{0}',
+            valueFormat: moneyFormat,
+            alignByColumn: true,
+          }))
         : [],
     };
 
     this.cdr.detectChanges();
   }
-
 }
 
 @NgModule({
@@ -1156,7 +1204,6 @@ export class LedgerStatementComponent implements OnInit {
     DepreciationEditModule,
     PrePaymentEditModule,
     AddMiscellaneousPaymentModule,
-    AddSalaryPaymentModule,
     ViewSalaryAdvanceModule,
     EditPurchaseInvoiceModule,
     PurchaseReturnDebitFormModule,
@@ -1167,10 +1214,11 @@ export class LedgerStatementComponent implements OnInit {
     MiscSalesInvoiceFormModule,
     AddInvoiceRetailModule,
     PayrollViewReportModule,
-    DxDropDownButtonModule
+    DxDropDownButtonModule,
+    AddSalaryPaymentModule,
   ],
   declarations: [LedgerStatementComponent],
   exports: [LedgerStatementComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LedgerStatementModule { }
+export class LedgerStatementModule {}

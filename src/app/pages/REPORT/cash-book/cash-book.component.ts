@@ -59,7 +59,7 @@ import { DepreciationEditModule } from '../../Depreciation/depreciation-edit/dep
 import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
 import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-payment-edit/pre-payment-edit.component';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
-import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
+import { AddSalaryPaymentModule } from 'src/app/features/hr/pages/salary-payment/add-salary-payment/add-salary-payment.component';
 
 @Component({
   selector: 'app-cash-book',
@@ -813,10 +813,10 @@ updateVisibleColumnNames(): void {
     PrePaymentEditModule,
     EditSupplierPaymentModule,
     AddMiscellaneousPaymentModule,
-    AddSalaryPaymentModule,
     DxLoadPanelModule,
     DxoLoadPanelModule,
-    DxDropDownButtonModule
+    DxDropDownButtonModule,
+    AddSalaryPaymentModule
   ],
   providers: [],
   declarations: [CashBookComponent],

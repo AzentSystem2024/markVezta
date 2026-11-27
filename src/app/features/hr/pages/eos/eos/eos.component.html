@@ -1,0 +1,197 @@
+<div class="view-wrapper list-page">
+  <dx-data-grid
+    #dataGrid
+    noDataText="No data available"
+    [width]="'100%'"
+    [height]="'82vh'"
+    [loadPanel]="{
+      enabled: true,
+      text: 'Loading...',
+      showIndicator: true,
+      showPane: true,
+    }"
+    class="grid theme-dependent"
+    [dataSource]="EOS"
+    [showBorders]="true"
+    [showColumnLines]="true"
+    [showBorders]="true"
+    [columnAutoWidth]="false"
+    [wordWrapEnabled]="false"
+    [rowAlternationEnabled]="true"
+    [allowColumnReordering]="true"
+    [showColumnHeaders]="true"
+    [columnAutoWidth]="true"
+    [allowColumnResizing]="true"
+    [columnResizingMode]="'nextColumn'"
+    [filterRow]="{ visible: false }"
+    [headerFilter]="{ visible: false }"
+    [scrolling]="{ mode: 'virtual' }"
+    rowAlternationInterval="2"
+    [selection]="{ mode: 'single' }"
+    focusStateEnabled="false"
+    (onRowRemoving)="delete_EOS($event)"
+    (onExporting)="onExporting($event)"
+    (onEditingStart)="onEditingStart($event)"
+  >
+    <dxo-filter-row [visible]="isFilterRowVisible"></dxo-filter-row>
+
+    <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
+    <dxo-filter-panel [visible]="isFilterOpened"></dxo-filter-panel>
+
+    <dxo-export [enabled]="true" [formats]="['xlsx']"> </dxo-export>
+
+    <dxo-paging [pageSize]="10"></dxo-paging>
+    <dxo-pager
+      [visible]="true"
+      [allowedPageSizes]="allowedPageSizes"
+      [displayMode]="displayMode"
+      [showPageSizeSelector]="showPageSizeSelector"
+      [showInfo]="true"
+      [showNavigationButtons]="true"
+    ></dxo-pager>
+    <dxo-editing
+      mode="popup"
+      [allowUpdating]="canEdit"
+      [allowDeleting]="canDelete"
+    >
+      <dxo-popup
+        title="Edit EOS"
+        [showTitle]="true"
+        [width]="600"
+        [height]="300"
+      ></dxo-popup>
+    </dxo-editing>
+
+    <dxo-toolbar>
+      <dxi-item location="before">
+        <div
+          class="grid-header"
+          style="
+            font-weight: 600;
+            font-size: 20px;
+            margin-left: 12px;
+            padding: -3px;
+            margin-right: 3px;
+          "
+        >
+          EOS Reason
+        </div>
+      </dxi-item>
+
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="searchButtonOptions"
+      ></dxi-item>
+      <!-- Refresh -->
+      <dxi-item
+        location="after"
+        widget="dxButton"
+        [options]="refreshButtonOptions"
+      ></dxi-item>
+
+      <!-- Divider -->
+      <dxi-item location="after">
+        <div class="toolbar-divider"></div>
+      </dxi-item>
+
+      <!-- Export (built-in, kept) -->
+      <dxi-item
+        name="exportButton"
+        location="after"
+        cssClass="export-btn"
+      ></dxi-item>
+
+      <!-- Add -->
+      <dxi-item
+        *ngIf="canAdd"
+        location="after"
+        widget="dxButton"
+        [options]="addButtonOptions"
+      ></dxi-item>
+    </dxo-toolbar>
+
+    <dxi-column
+      dataField="SlNo"
+      [width]="80"
+      caption="Sl.No"
+      [allowEditing]="false"
+      [allowFiltering]="false"
+      alignment="left"
+      [allowHeaderFiltering]="false"
+    ></dxi-column>
+
+    <dxi-column dataField="CODE" caption="Code"> </dxi-column>
+    <dxi-column dataField="DESCRIPTION" caption="EOS"> </dxi-column>
+
+    <dxi-column
+      dataField="IS_INACTIVE"
+      caption="Status"
+      cellTemplate="statusCellTemplate"
+    ></dxi-column>
+    <div *dxTemplate="let cellData of 'statusCellTemplate'">
+      <i
+        class="fas fa-flag"
+        [ngClass]="getStatusFlagClass(cellData.value)"
+        [attr.title]="cellData.value === false ? 'Active' : 'Inactive'"
+        style="margin-left: 10px; cursor: default"
+      ></i>
+    </div>
+  </dx-data-grid>
+</div>
+
+<form-popup
+  [(visible)]="AddEOSPopup"
+  titleText="New EOS"
+  (save)="Add_EOS()"
+  [showApprove]="false"
+>
+  <dx-form class="plain-styled-form" [formGroup]="formsource">
+    <dxi-item>
+      <dx-text-box label="Code *" formControlName="CODE" labelMode="floating">
+      </dx-text-box>
+    </dxi-item>
+
+    <dxi-item class="mt-3">
+      <dx-text-box
+        label="EOS Reason *"
+        formControlName="DESCRIPTION"
+        labelMode="floating"
+      ></dx-text-box>
+    </dxi-item>
+  </dx-form>
+</form-popup>
+
+<form-popup
+  [(visible)]="UpdateEOSPopup"
+  titleText="Update EOS"
+  (save)="Edit_EOS()"
+  [showApprove]="false"
+>
+  <dx-form class="plain-styled-form">
+    <dxi-item>
+      <dx-text-box
+        label="Code"
+        labelMode="floating"
+        [(value)]="editingRowData.CODE"
+      >
+      </dx-text-box>
+    </dxi-item>
+
+    <dxi-item class="mt-3">
+      <dx-text-box
+        label="EOS Reason *"
+        [(value)]="editingRowData.DESCRIPTION"
+        labelMode="floating"
+      ></dx-text-box>
+    </dxi-item>
+
+    <dxi-item class="mt-3">
+      <dx-check-box
+        text="Inactive"
+        labelMode="floating"
+        [(value)]="editingRowData.IS_INACTIVE"
+      ></dx-check-box>
+    </dxi-item>
+  </dx-form>
+</form-popup>

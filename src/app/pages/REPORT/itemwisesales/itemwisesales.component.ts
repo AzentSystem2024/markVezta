@@ -47,7 +47,6 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
@@ -78,7 +77,7 @@ export class ItemwisesalesComponent {
     { dataField: 'DESCRIPTION', caption: 'Description' },
     { dataField: 'SALE_DATE', caption: 'Date' },
     { dataField: 'SALE_NO', caption: 'Invoice No' },
-    { dataField: 'STORE_NAME', caption: "Store" },
+    { dataField: 'STORE_NAME', caption: 'Store' },
     { dataField: 'SALE_TYPE_NAME', caption: 'Sale Type' },
     { dataField: 'CUST_NAME', caption: 'Customer' },
     { dataField: 'QUANTITY', caption: 'Quantity' },
@@ -251,7 +250,7 @@ export class ItemwisesalesComponent {
   Department: any;
   selectedItemProperty1: any;
   selectedItemProperty2: any;
-  ColumnNames : any;
+  ColumnNames: any;
 
   Saletype = [
     { ID: 0, DESCRIPTION: 'All' },
@@ -369,36 +368,35 @@ export class ItemwisesalesComponent {
   };
 
   updateVisibleColumnNames() {
-  if (this.dataGrid?.instance) {
-    const columns = this.dataGrid.instance.getVisibleColumns();
+    if (this.dataGrid?.instance) {
+      const columns = this.dataGrid.instance.getVisibleColumns();
 
-    this.ColumnNames = columns
-      .filter((col: any) => col.caption && col.dataField)
-      .map((col: any) => col.caption);
+      this.ColumnNames = columns
+        .filter((col: any) => col.caption && col.dataField)
+        .map((col: any) => col.caption);
+    }
   }
-}
 
-onGridOptionChanged(e: any) {
-  if (
-    e.name === 'columns' ||
-    (e.fullName && e.fullName.includes('visible'))
-  ) {
-    this.updateVisibleColumnNames();
+  onGridOptionChanged(e: any) {
+    if (
+      e.name === 'columns' ||
+      (e.fullName && e.fullName.includes('visible'))
+    ) {
+      this.updateVisibleColumnNames();
+    }
   }
-}
-
 
   toggleSummary(): void {
     this.isSummaryVisible = !this.isSummaryVisible;
 
     this.dataGrid?.instance.option(
       'summary.totalItems',
-      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : [],
     );
 
     this.dataGrid?.instance.option(
       'summary.groupItems',
-      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : [],
     );
 
     this.summaryButtonOptions = {
@@ -407,8 +405,6 @@ onGridOptionChanged(e: any) {
       hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
     };
   }
-
-
 
   ngAfterViewInit() {
     setTimeout(() => this.resetPopups());
@@ -575,7 +571,7 @@ onGridOptionChanged(e: any) {
   }
 
   load_JournalBook_data() {
-    this.showParameters = false
+    this.showParameters = false;
     const payload = {
       COMPANY_ID: this.selected_Company_id,
       FIN_ID: this.selected_fin_id,
@@ -929,7 +925,6 @@ onGridOptionChanged(e: any) {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
-    PayrollViewModule,
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
@@ -940,4 +935,4 @@ onGridOptionChanged(e: any) {
   exports: [],
   declarations: [ItemwisesalesComponent],
 })
-export class ItemwisesalesModule { }
+export class ItemwisesalesModule {}

@@ -47,7 +47,6 @@ import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
-import { PayrollViewModule } from 'src/app/components/HR/Masters/payroll-view/payroll-view.component';
 import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sales-invoice-form/misc-sales-invoice-form.component';
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
@@ -57,7 +56,7 @@ import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-
 @Component({
   selector: 'app-itemwise-purchase-report',
   templateUrl: './itemwise-purchase-report.component.html',
-  styleUrls: ['./itemwise-purchase-report.component.scss']
+  styleUrls: ['./itemwise-purchase-report.component.scss'],
 })
 export class ItemwisePurchaseReportComponent {
   @ViewChild(DxDataGridComponent, { static: true })
@@ -80,7 +79,7 @@ export class ItemwisePurchaseReportComponent {
     { dataField: 'PURCH_DATE', caption: 'Date' },
     { dataField: 'PURCH_NO', caption: 'Purch No' },
     { dataField: 'STORE_NAME', caption: 'Store' },
-    { dataField: 'SUPP_NAME', caption: "Supplier" },
+    { dataField: 'SUPP_NAME', caption: 'Supplier' },
     { dataField: 'QUANTITY', caption: 'Quantity' },
     { dataField: 'DEPT_NAME', caption: 'Department' },
     { dataField: 'CAT_NAME', caption: 'Category' },
@@ -326,7 +325,6 @@ export class ItemwisePurchaseReportComponent {
     this.selected_from_date = SystemDate;
     this.selected_To_date = SystemDate;
 
-
     this.store_dropdown();
     this.item_dropdown();
     this.getCustomerOrUnitLst();
@@ -358,12 +356,12 @@ export class ItemwisePurchaseReportComponent {
 
     this.dataGrid?.instance.option(
       'summary.totalItems',
-      this.isSummaryVisible ? this.summaryColumnsData.totalItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.totalItems : [],
     );
 
     this.dataGrid?.instance.option(
       'summary.groupItems',
-      this.isSummaryVisible ? this.summaryColumnsData.groupItems : []
+      this.isSummaryVisible ? this.summaryColumnsData.groupItems : [],
     );
 
     this.summaryButtonOptions = {
@@ -609,23 +607,24 @@ export class ItemwisePurchaseReportComponent {
   onViewClick(e: any) {
     const trans_id = e.row.data.TRANS_ID;
 
-    this.dataService.selectPurchaseInvoice(trans_id).subscribe((response: any) => {
+    this.dataService
+      .selectPurchaseInvoice(trans_id)
+      .subscribe((response: any) => {
+        this.selectedInvoice = response.Data;
 
-      this.selectedInvoice = response.Data;
+        if (this.selectedInvoice.STATUS == 'Approved') {
+          this.buttonText = 'View Purchase Invoice';
+        } else if (this.selectedInvoice.STATUS == 'Open') {
+          this.buttonText = 'Verify Purchase Invoice';
+        } else if (this.selectedInvoice.STATUS == 'Verified') {
+          this.buttonText = 'Approve Purchase Invoice';
+        } else {
+          this.buttonText = 'Purchase Invoice';
+        }
 
-      if (this.selectedInvoice.STATUS == "Approved") {
-        this.buttonText = 'View Purchase Invoice';
-      } else if (this.selectedInvoice.STATUS == "Open") {
-        this.buttonText = 'Verify Purchase Invoice';
-      } else if (this.selectedInvoice.STATUS == "Verified") {
-        this.buttonText = 'Approve Purchase Invoice';
-      } else {
-        this.buttonText = 'Purchase Invoice';
-      }
-
-      // Open popup AFTER data is received
-      this.isVerifyInvoice = true;
-    });
+        // Open popup AFTER data is received
+        this.isVerifyInvoice = true;
+      });
   }
 
   summaryColumnsData = {
@@ -911,7 +910,6 @@ export class ItemwisePurchaseReportComponent {
     EditCustomerReceiptModule,
     SaleReturnFormModule,
     ProductionJvViewModule,
-    PayrollViewModule,
     MiscSalesInvoiceFormModule,
     PayrollViewReportModule,
     DxTagBoxModule,
@@ -923,4 +921,4 @@ export class ItemwisePurchaseReportComponent {
   exports: [],
   declarations: [ItemwisePurchaseReportComponent],
 })
-export class ItemwisePurchaseReportModule { }
+export class ItemwisePurchaseReportModule {}

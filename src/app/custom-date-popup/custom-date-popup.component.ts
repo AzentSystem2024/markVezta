@@ -6,8 +6,8 @@ import {
   NgModule,
   Output,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import {
   DxSelectBoxModule,
   DxTextAreaModule,
@@ -37,15 +37,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../components';
-import { AddCreditNoteModule } from '../pages/CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { EditCreditNoteModule } from '../pages/CREDIT-NOTE/edit-credit-note/edit-credit-note.component';
-import { ViewCreditNoteModule } from '../pages/CREDIT-NOTE/view-credit-note/view-credit-note.component';
-import { AddDebitModule } from '../pages/DEBIT/add-debit/add-debit.component';
-import { EditDebitModule } from '../pages/DEBIT/edit-debit/edit-debit.component';
-import { ViewDebitModule } from '../pages/DEBIT/view-debit/view-debit.component';
-import { AddInvoiceModule } from '../pages/INVOICE/add-invoice/add-invoice.component';
-import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.component';
-import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
 
 @Component({
@@ -102,7 +93,7 @@ export class CustomDatePopupComponent {
     const YearStartDate = today.getFullYear() + '-01-01';
 
     this.selected_from_date = YearStartDate; // e.g. 2026-01-01
-    this.selected_To_date = SystemDate;      // e.g. 2026-07-03
+    this.selected_To_date = SystemDate; // e.g. 2026-07-03
   }
   apply() {
     if (!this.selected_from_date || !this.selected_To_date) return;
@@ -160,7 +151,7 @@ export class CustomDatePopupComponent {
 
 @NgModule({
   imports: [
-    BrowserModule,
+    CommonModule,
     DxSelectBoxModule,
     DxTextAreaModule,
     DxDateBoxModule,
@@ -189,19 +180,10 @@ export class CustomDatePopupComponent {
     FormsModule,
     DxNumberBoxModule,
     DxoSummaryModule,
-    AddCreditNoteModule,
-    EditCreditNoteModule,
-    ViewCreditNoteModule,
-    AddDebitModule,
-    EditDebitModule,
-    ViewDebitModule,
-    AddInvoiceModule,
-    EditInvoiceModule,
-    ViewInvoiceModule,
   ],
   providers: [],
   declarations: [CustomDatePopupComponent],
   exports: [CustomDatePopupComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomDatePopupModule { }
+export class CustomDatePopupModule {}
