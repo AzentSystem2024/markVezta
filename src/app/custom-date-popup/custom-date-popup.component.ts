@@ -93,7 +93,7 @@ export class CustomDatePopupComponent {
     const YearStartDate = today.getFullYear() + '-01-01';
 
     this.selected_from_date = YearStartDate; // e.g. 2026-01-01
-    this.selected_To_date = SystemDate; // e.g. 2026-07-03
+    this.selected_To_date = SystemDate;      // e.g. 2026-07-03
   }
   apply() {
     if (!this.selected_from_date || !this.selected_To_date) return;
@@ -186,4 +186,4 @@ export class CustomDatePopupComponent {
   exports: [CustomDatePopupComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CustomDatePopupModule {}
+export class CustomDatePopupModule { }
