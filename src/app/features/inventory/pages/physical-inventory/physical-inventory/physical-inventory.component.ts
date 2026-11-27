@@ -1,0 +1,794 @@
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxCheckBoxModule,
+  DxRadioGroupModule,
+  DxFileUploaderModule,
+  DxDataGridModule,
+  DxButtonModule,
+  DxValidatorModule,
+  DxProgressBarModule,
+  DxPopupModule,
+  DxDropDownBoxModule,
+  DxToolbarModule,
+  DxTabPanelModule,
+  DxTabsModule,
+  DxNumberBoxModule,
+  DxDataGridComponent,
+  DxTagBoxModule,
+} from 'devextreme-angular';
+import {
+  DxoItemModule,
+  DxoFormItemModule,
+  DxoLookupModule,
+  DxiItemModule,
+  DxiGroupModule,
+  DxoSummaryModule,
+} from 'devextreme-angular/ui/nested';
+import { FormTextboxModule } from 'src/app/components';
+import { DataService } from 'src/app/services';
+import { Router } from '@angular/router';
+import notify from 'devextreme/ui/notify';
+import { PhysicalInventoryFormModule } from '../physical-inventory-form/physical-inventory-form.component';
+import { ThisReceiver } from '@angular/compiler';
+import { ExportService } from 'src/app/services/export.service';
+
+@Component({
+  selector: 'app-physical-inventory',
+  templateUrl: './physical-inventory.component.html',
+  styleUrls: ['./physical-inventory.component.scss'],
+})
+export class PhysicalInventoryComponent {
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canVerify = false
+  canPrint = false;
+  sessionData: any;
+  selected_vat_id: any;
+  isPrePopupVisible = false;
+  category = [];
+  supplier = [];
+  brand = [];
+  department = [];
+  prePopupData: {
+    CAT_ID: any[];
+    SUPP_ID: any[];
+    BRAND_ID: any[];
+    DEPT_ID: any[];
+    ALL_ITEMS: boolean;
+  } = {
+      CAT_ID: [],
+      SUPP_ID: [],
+      BRAND_ID: [],
+      DEPT_ID: [],
+      ALL_ITEMS: false,
+    };
+  stores: any[] = [];
+  dateFilteredList: any[] = [];
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    onClick: () => this.refreshGrid(),
+    text: '',
+  };
+  addButtonOptions = {
+    type: 'default',
+    stylingMode: 'contained',
+    hint: 'Add new entry',
+    onClick: () => {
+      this.zone.run(() => this.openPrePopup());
+    },
+    elementAttr: { class: 'add-button' },
+
+    template: () => {
+      return `
+      <div class="add-btn-content">
+        <span class="iconify"
+              data-icon="formkit:add"
+              data-width="20"
+              data-height="20"></span>
+        <span class="add-text">New</span>
+      </div>
+    `;
+    },
+  };
+
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    stylingMode: 'contained',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleFilters(),
+  };
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+
+    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+
+    if (grid) {
+      grid.option('filterRow.visible', this.isFilterOpened);
+      grid.option('headerFilter.visible', this.isFilterOpened);
+    }
+  }
+
+  dateRanges = [
+    { label: 'Today', value: 'today' },
+    { label: 'All', value: 'all' },
+    { label: 'Last 7 Days', value: 'last7' },
+    { label: 'Last 15 Days', value: 'last15' },
+    { label: 'Last 30 Days', value: 'last30' },
+    { label: 'Custom', value: 'custom' },
+  ];
+  selectedDateRange: string = 'today';
+  customStartDate: any = null;
+  customEndDate: any = null;
+  showCustomDatePopup = false;
+  filteredInventoryList: any;
+  inventoryList: any;
+  isAddInventory: boolean = false;
+  selectedInventory: any = false;
+  isEditSalesOrder: boolean = false;
+  StatusType: any;
+  isReadOnlySalesOrder: boolean = false;
+  selected_Data: any;
+  ;
+  isEditInventory: boolean = false;;
+  isReadOnlyInventory: boolean = false;;
+  store: any;
+  companyID: any;
+  StoreIDData: any;
+  Store: any[] = [];
+  selectedStoreid: any[] = [];
+  IS_HQ_App: boolean = false;
+  buttonText: any
+  constructor(
+    private dataService: DataService,
+    private router: Router,
+    private zone: NgZone,
+    private exportService: ExportService,
+  ) { }
+  ngOnInit() {
+    const currentUrl = this.router.url;
+    console.log('Current URL:', currentUrl);
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    console.log('Parsed ObjectData:', menuResponse);
+    this.sessionData_tax();
+    const menuGroups = menuResponse.MenuGroups || [];
+    console.log('MenuGroups:', menuGroups);
+
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === currentUrl);
+    console.log(packingRights, 'PACKINGRIGHTSSSSSSSSSSSSSSSSSSSSSSS');
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      console.log('packingRights.CanAdd:', packingRights.CanAdd);
+      console.log('this.canAdd after assign:', this.canAdd);
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.CanView;
+      this.canApprove = packingRights.CanApprove;
+      this.canVerify = packingRights.CanVerify
+    }
+    this.getInventoryList();
+    this.getDropdownList()
+  }
+
+  onExporting(event: any) {
+    this.exportService.onExporting(event, 'Physical Inventory');
+  }
+
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '');
+    console.log(this.sessionData, '=================session data==========');
+    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.companyID = this.sessionData.Companies[0].COMPANY_ID;
+    this.IS_HQ_App = this.sessionData.GeneralSettings.IS_HQ_APP;
+
+    this.getStoreDropdown();
+
+
+    // this.IS_HQ_App=fa
+  }
+  getDropdownList() {
+    const payloadsupplier = {
+      COMPANY_ID: this.companyID,
+      NAME: 'SUPPLIER',
+    };
+    this.dataService
+      .getDropdownData(payloadsupplier)
+      .subscribe((response: any) => {
+        this.supplier = response;
+      });
+    const payloaddepartment = {
+      COMPANY_ID: this.companyID,
+      NAME: 'DEPARTMENT',
+    };
+    this.dataService
+      .getDropdownData(payloaddepartment)
+      .subscribe((response: any) => {
+        this.department = response;
+      });
+    const payloadbrand = {
+      NAME: 'BRAND',
+    };
+    this.dataService
+      .getDropdownData(payloadbrand)
+      .subscribe((response: any) => {
+        this.brand = response;
+      });
+
+    const payloaditemcategory = {
+      COMPANY_ID: this.companyID,
+      NAME: 'ITEMCATEGORY',
+    };
+    this.dataService
+      .getDropdownData(payloaditemcategory)
+      .subscribe((response: any) => {
+        this.category = response;
+      });
+  }
+
+  getInventoryList() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+    };
+    this.dataService
+      .getPhysicalInventoryListFinance(payload)
+      .subscribe((response: any) => {
+        this.inventoryList = response.Data.map((item: any) => {
+          let dateValue: Date;
+
+          // Case 1: If backend gives ISO format (2025-08-21T14:06:47.85)
+          if (!isNaN(Date.parse(item.PHYSICAL_DATE))) {
+            dateValue = new Date(item.PHYSICAL_DATE);
+          } else {
+            // Case 2: If backend gives dd-MM-yyyy format
+            dateValue = this.parseDateString(item.PHYSICAL_DATE);
+          }
+
+          return {
+            ...item,
+            PHYSICAL_DATE: dateValue,
+          };
+        });
+
+        this.applyDateFilter();
+      });
+  }
+
+
+  getStatusFilterData = [
+    {
+      text: 'Approved',
+      value: 5,
+    },
+    {
+      text: 'Open',
+      value: 1,
+    },
+  ];
+
+  onDateRangeChanged(e: any) {
+    this.selectedDateRange = e.value;
+
+    if (e.value === 'custom') {
+      this.customStartDate = null;
+      this.customEndDate = null;
+      this.showCustomDatePopup = true;
+    } else {
+      // Reset the custom label
+      const customOpt = this.dateRanges.find((dr) => dr.value === 'custom');
+      if (customOpt) {
+        customOpt.label = 'Custom';
+      }
+      this.applyDateFilter();
+    }
+  }
+
+
+  applyDateFilter() {
+    if (!this.inventoryList) return;
+
+    let baseList = [...this.inventoryList];
+
+    // 🔹 ALL case
+    if (!this.selectedDateRange || this.selectedDateRange === 'all') {
+      this.dateFilteredList = baseList;
+      this.applyStoreFilter(); // ✅ always call
+      return;
+    }
+
+    const today = new Date();
+    let startDate: Date;
+    let endDate: Date;
+
+    switch (this.selectedDateRange) {
+      case 'today':
+        startDate = new Date(today);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last7':
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 6);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last15':
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 14);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last30':
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 29);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+
+      default:
+        this.dateFilteredList = baseList;
+        this.applyStoreFilter();
+        return;
+    }
+
+    // 🔹 Step 1: Date filter
+    this.dateFilteredList = baseList.filter((item: any) => {
+      if (!item.PHYSICAL_DATE) return false;
+      const date = new Date(item.PHYSICAL_DATE);
+      return date >= startDate && date <= endDate;
+    });
+
+    // 🔹 Step 2: Store filter
+    this.applyStoreFilter();
+  }
+  applyStoreFilter() {
+    // ❗ VERY IMPORTANT: start from dateFilteredList
+    let baseList = [...this.dateFilteredList];
+
+    // 🔹 No store selected → show ALL (date filtered)
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.filteredInventoryList = baseList;
+      return;
+    }
+
+    // 🔹 Convert selected IDs → store names
+    const selectedNames = (this.Store || [])
+      .filter((s: any) => this.selectedStoreid.includes(Number(s.ID)))
+      .map((s: any) => s.DESCRIPTION); // ⚠️ ensure matches STORE_NAME
+
+    // 🔹 Apply filter
+    this.filteredInventoryList = baseList.filter((item: any) =>
+      selectedNames.includes(item.STORE_NAME)
+    );
+  }
+
+  applyCustomDateFilter() {
+    if (!(this.customStartDate && this.customEndDate)) return;
+
+    const start = new Date(this.customStartDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(this.customEndDate);
+    end.setHours(23, 59, 59, 999);
+
+    // 🔹 Always start from ORIGINAL list
+    this.dateFilteredList = [...this.inventoryList];
+
+    // 🔹 Apply date filter
+    this.dateFilteredList = this.dateFilteredList.filter((item: any) => {
+      if (!item.PHYSICAL_DATE) return false;
+      const invoiceDate = new Date(item.PHYSICAL_DATE);
+      return invoiceDate >= start && invoiceDate <= end;
+    });
+
+    // 🔹 Apply store filter after date
+    this.applyStoreFilter();
+
+    // 🔹 Update label
+    const fromLabel = this.formatAsDDMMYYYY(start);
+    const toLabel = this.formatAsDDMMYYYY(end);
+
+    this.dateRanges = this.dateRanges.map((option) =>
+      option.value === 'custom'
+        ? { ...option, label: `${fromLabel} to ${toLabel}` }
+        : option
+    );
+
+    this.showCustomDatePopup = false;
+  }
+
+  private parseDateString(dateStr: string): Date {
+    if (!dateStr || typeof dateStr !== 'string') {
+      console.warn('Invalid date string:', dateStr);
+      return new Date('Invalid'); // or new Date(0) if you want a fallback
+    }
+
+    const [day, month, year] = dateStr
+      .split('-')
+      .map((part) => parseInt(part, 10));
+    return new Date(year, month - 1, day);
+  }
+
+  displayExpr = (item: any) => {
+    if (!item) return '';
+
+    if (item.value === 'custom' && this.customStartDate && this.customEndDate) {
+      const from = this.formatAsDDMMYYYY(new Date(this.customStartDate));
+      const to = this.formatAsDDMMYYYY(new Date(this.customEndDate));
+      return `${from} to ${to}`;
+    }
+
+    return item.label;
+  };
+
+  openCustomDatePopup() {
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.showCustomDatePopup = true;
+  }
+
+  private formatAsDDMMYYYY(d: Date): string {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  get customStartDateFormatted(): string {
+    return this.customStartDate
+      ? this.formatAsDDMMYYYY(new Date(this.customStartDate))
+      : '';
+  }
+
+  get customEndDateFormatted(): string {
+    return this.customEndDate
+      ? this.formatAsDDMMYYYY(new Date(this.customEndDate))
+      : '';
+  }
+
+  attachItemClickHandler(e: any) {
+    setTimeout(() => {
+      const popup = e.component._popup;
+      const innerList =
+        popup && popup.$content().find('.dx-list').dxList('instance');
+      if (innerList) {
+        innerList.off('itemClick'); // unsubscribe first (to avoid duplicates)
+        innerList.on('itemClick', (clickEvent: any) => {
+          const clickedValue = clickEvent.itemData.value;
+          if (clickedValue === 'custom') {
+            this.openCustomDatePopup();
+            e.component.close();
+          }
+        });
+      }
+    }, 0);
+  }
+
+  formatDate(date: Date) {
+    if (!date) return '';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  refreshGrid() {
+    if (this.dataGrid?.instance) {
+      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    }
+  }
+
+
+  onEditInventory(event: any) {
+    console.log(event, 'eventttttttttttttt');
+    event.cancel = true;
+    const orderId = event.data.TRANS_ID;
+    const status = event.data.TRANS_STATUS;
+    this.StatusType = 'Editscreen'
+
+    this.dataService
+      .selectPhysicalInventory(orderId)
+      .subscribe((response: any) => {
+        this.selectedInventory = response.Data;
+        if (status === 1) {
+          // Open document -> Edit
+          this.isReadOnlyInventory = false;
+          this.StatusType = 'Editscreen';
+          this.buttonText = 'Update Physical Inventory';
+        } else {
+          // Verified & Approved -> View
+          this.isReadOnlyInventory = true;
+          this.StatusType = 'viewScreen';
+          this.buttonText = 'View Physical Inventory';
+        }
+
+        this.isEditInventory = true;
+
+      });
+  }
+
+  onDeleteInventory(event: any) {
+    const inventoryId = event.data.ID;
+    const status = event.data.TRANS_STATUS;
+    if (event.data.TRANS_STATUS === 5) {
+      event.cancel = true;
+      notify('This cannot be deleted.', 'error', 2000);
+      return;
+    }
+    event.cancel = true;
+    console.log(inventoryId, 'CREDITNOTEIDDDDDDDDDDDDDDDDDD');
+    // Call your delete API
+    this.dataService.deletePhysicalInventory(inventoryId).subscribe(
+      (response: any) => {
+        if (response) {
+          notify(
+            {
+              message: 'Deleted Successfully',
+              position: { at: 'top center', my: 'top center' },
+            },
+            'success',
+          );
+          this.getInventoryList();
+          // this.dataGrid.instance.refresh();
+        } else {
+          notify(
+            {
+              message: 'Your Data Not deleted',
+              position: { at: 'top right', my: 'top right' },
+            },
+            'error',
+          );
+        }
+        // or whatever method you use to refresh `employeeList`
+      },
+      (error) => {
+        console.error('Error deleting employee:', error);
+      },
+    );
+  }
+
+  getTagBoxTooltip(): string {
+    if (!this.prePopupData.DEPT_ID || !this.department) return '';
+    // Map selected IDs to descriptions
+    const selectedNames = this.department
+      .filter((d) => this.prePopupData.DEPT_ID.includes(d.ID))
+      .map((d) => d.DESCRIPTION);
+    return selectedNames.join(', '); // comma-separated tooltip
+  }
+
+  getTagBoxTooltipForBrand() {
+    if (!this.prePopupData.BRAND_ID || !this.brand) return '';
+    // Map selected IDs to descriptions
+    const selectedNames = this.brand
+      .filter((d) => this.prePopupData.BRAND_ID.includes(d.ID))
+      .map((d) => d.DESCRIPTION);
+    return selectedNames.join(', ');
+  }
+
+  getTagBoxTooltipForSupplier() {
+    if (!this.prePopupData.SUPP_ID || !this.brand) return '';
+    // Map selected IDs to descriptions
+    const selectedNames = this.supplier
+      .filter((d) => this.prePopupData.SUPP_ID.includes(d.ID))
+      .map((d) => d.DESCRIPTION);
+    return selectedNames.join(', ');
+  }
+
+  getTagBoxTooltipForCategory() {
+    if (!this.prePopupData.CAT_ID || !this.brand) return '';
+    // Map selected IDs to descriptions
+    const selectedNames = this.category
+      .filter((d) => this.prePopupData.CAT_ID.includes(d.ID))
+      .map((d) => d.DESCRIPTION);
+    return selectedNames.join(', ');
+  }
+
+  openPrePopup() {
+    this.prePopupData = {
+      CAT_ID: [],
+      SUPP_ID: [],
+      BRAND_ID: [],
+      DEPT_ID: [],
+      ALL_ITEMS: false,
+    };
+    this.StoreIDData = null;
+    this.isPrePopupVisible = true;
+  }
+
+  closePrePopup() {
+    this.isPrePopupVisible = false;
+  }
+  applyPrePopup() {
+    if (this.prePopupData.ALL_ITEMS) {
+      if (!this.StoreIDData) {
+        notify('Please select a store.', 'error', 2000);
+        return;
+      }
+    }
+    // const noFiltersSelected =
+    //   !this.prePopupData.CAT_ID.length &&
+    //   !this.prePopupData.SUPP_ID.length &&
+    //   !this.prePopupData.BRAND_ID.length &&
+    //   !this.prePopupData.DEPT_ID.length;
+
+    // if (noFiltersSelected) {
+    //   alert('Please select at least one filter.');
+    //   return;
+    // }
+
+    this.isPrePopupVisible = false;
+    this.isAddInventory = true;
+  }
+  // addPhysicalInventory() {
+  //   this.isAddInventory = true;
+  // }
+
+  handleClose() {
+    this.isAddInventory = false;
+    this.isEditInventory = false;
+    this.getInventoryList();
+  }
+
+  getStoreDropdown() {
+    const payload = {
+      COMPANY_ID: this.companyID,
+      NAME: 'STORE',
+    };
+    this.dataService.getDropdownData(payload).subscribe((response: any) => {
+      if (this.IS_HQ_App) {
+        // 🔹 HQ App → show only store with ID = 1
+        this.stores = response.filter((item: any) => item.ID === 1);
+        this.StoreIDData = 1;
+      } else {
+        // 🔹 Not HQ → show all stores
+        this.stores = response;
+      }
+      this.Store = response
+    });
+  }
+
+
+  onStoreChanged(e: any) {
+
+    console.log('Selected store IDs:', this.selectedStoreid);
+    this.applyStoreFilter(); //  ONLY store filter
+
+  }
+
+  onVerifyClick(e: any) {
+    e.cancel = true;
+
+    const rowData = e.row.data;
+
+    // OPEN -> Verify privilege required
+    if (rowData.TRANS_STATUS === 1 && !this.canVerify) {
+      return;
+    }
+
+    // VERIFIED -> Approve privilege required
+    if (rowData.TRANS_STATUS === 2 && !this.canApprove) {
+      return;
+    }
+
+    // APPROVED -> If user has Edit privilege, badge is disabled
+    if (rowData.TRANS_STATUS === 5 && this.canEdit) {
+      return;
+    }
+
+    const orderId = rowData.TRANS_ID;
+
+    this.dataService.selectPhysicalInventory(orderId)
+      .subscribe((response: any) => {
+
+        this.selectedInventory = response.Data;
+        this.isEditInventory = true;
+
+        switch (rowData.TRANS_STATUS) {
+
+          case 1:
+            // Verify
+            this.StatusType = 'VerifyScreen';
+            this.buttonText = 'Verify Physical Inventory';
+            this.isReadOnlyInventory = false;
+            break;
+
+          case 2:
+            // Approve
+            this.StatusType = 'ApprovalScreen';
+            this.buttonText = 'Approve Physical Inventory';
+            this.isReadOnlyInventory = false;
+            break;
+
+          case 5:
+            // View
+            this.StatusType = 'viewScreen';
+            this.buttonText = 'View Physical Inventory';
+            this.isReadOnlyInventory = true;
+            break;
+        }
+      });
+  }
+
+}
+@NgModule({
+  imports: [
+    BrowserModule,
+    DxSelectBoxModule,
+    DxTextAreaModule,
+    DxDateBoxModule,
+    DxFormModule,
+    DxTextBoxModule,
+    FormTextboxModule,
+    DxCheckBoxModule,
+    DxRadioGroupModule,
+    DxFileUploaderModule,
+    DxDataGridModule,
+    DxButtonModule,
+    DxoItemModule,
+    DxoFormItemModule,
+    DxoLookupModule,
+    DxValidatorModule,
+    DxProgressBarModule,
+    DxPopupModule,
+    DxDropDownBoxModule,
+    DxButtonModule,
+    DxToolbarModule,
+    DxiItemModule,
+    DxoItemModule,
+    DxTabPanelModule,
+    DxTabsModule,
+    DxiGroupModule,
+    FormsModule,
+    DxNumberBoxModule,
+    DxTagBoxModule,
+    DxoSummaryModule,
+    PhysicalInventoryFormModule,
+    DxTagBoxModule
+  ],
+  providers: [],
+  declarations: [PhysicalInventoryComponent],
+  exports: [PhysicalInventoryComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class PhysicalInventoryModule { }

@@ -191,7 +191,7 @@ import { PackingModule } from './features/master-data/pages/packing/packing-list
 import { PackingAddModule } from './features/master-data/pages/packing/packing-add-form/packing-add.component';
 import { ArticleProductionViewModule } from './components/HR/Masters/article-production-view/article-production-view.component';
 import { PackProductionViewModule } from './pages/ARTICLE/pack-production-view/pack-production-view.component';
-import { StockMovementViewModule } from './pages/ARTICLE/stock-movement-view/stock-movement-view.component';
+import { StockMovementViewModule } from './features/inventory/pages/stock-movement-report/stock-movement-view/stock-movement-view.component';
 import { PackingEditModule } from './features/master-data/pages/packing/packing-edit-form/packing-edit.component';
 import { ArticleStockViewModule } from './pages/ARTICLE/article-stock-view/article-stock-view.component';
 import { CartonStockViewModule } from './pages/ARTICLE/carton-stock-view/carton-stock-view.component';
@@ -269,9 +269,8 @@ import { ItemProperty3EditModule } from './features/master-data/pages/item-prope
 import { ItemProperty4EditModule } from './features/master-data/pages/item-property4/item-property4-edit-form/item-property4-edit.component';
 import { ItemProperty5EditModule } from './features/master-data/pages/item-property5/item-property5-edit-form/item-property5-edit.component';
 import { PaySlipModule } from './pages/REPORT/pay-slip/pay-slip.component';
-import { TransferOutInventoryAddModule } from './pages/transfer-out-inventory-add/transfer-out-inventory-add.component';
-import { TransferInInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
-import { TransferInInventoryFormModule } from './pages/transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { TransferOutInventoryAddModule } from './features/inventory/pages/transfer-out/transfer-out-inventory-add/transfer-out-inventory-add.component';
+import { TransferInInventoryModule } from './features/inventory/pages/transfer-in/transfer-in-inventory/transfer-in-inventory.component';
 import { ReasonEditModule } from './features/master-data/pages/reasons/reasons-edit-form/reason-edit.component';
 import { EPFRegisterReportModule } from './pages/REPORT/epf-register-report/epf-register-report.component';
 import { WageRegisterModule } from './pages/REPORT/wage-register/wage-register.component';
@@ -282,12 +281,11 @@ import { ItemStockValueModule } from './components/HR/Masters/item-stock-value/i
 import { DeliveryNoteModule } from './pages/Operations/delivery-note/delivery-note.component';
 import { QuotationModule } from './pages/Operations/quotation/quotation.component';
 import { QuotationFormModule } from './pages/quotation-form/quotation-form.component';
-import { StockMovementReportModule } from './pages/REPORT/stock-movement-report/stock-movement-report.component';
 import { SalesOrderFormModule } from './pages/sales-order-form/sales-order-form.component';
 import { InvoiceDeliveryModule } from './pages/invoice-delivery/invoice-delivery.component';
 import { InvoiceDeliveryFormModule } from './pages/invoice-delivery-form/invoice-delivery-form.component';
-import { PhysicalInventoryModule } from './pages/INVENTORY MANAGEMENT/physical-inventory/physical-inventory.component';
-import { PhysicalInventoryFormModule } from './pages/INVENTORY MANAGEMENT/POPUP PAGES/physical-inventory-form/physical-inventory-form.component';
+import { PhysicalInventoryModule } from './features/inventory/pages/physical-inventory/physical-inventory/physical-inventory.component';
+import { PhysicalInventoryFormModule } from './features/inventory/pages/physical-inventory/physical-inventory-form/physical-inventory-form.component';
 import { DeliveryReturnModule } from './pages/delivery-return/delivery-return.component';
 import { DeliveryReturnAddModule } from './pages/delivery-return-add/delivery-return-add.component';
 import { DeliveryReturnEditModule } from './pages/delivery-return-edit/delivery-return-edit.component';
@@ -308,8 +306,7 @@ import { InvoiceTrOutAddModule } from './pages/INVOICE/invoice-tr-out-add/invoic
 import { EditInvoiceTrOutModule } from './pages/INVOICE/edit-invoice-tr-out/edit-invoice-tr-out.component';
 import { ViewInvoiceTrOutModule } from './pages/INVOICE/view-invoice-tr-out/view-invoice-tr-out.component';
 import { StateEditModule } from './features/master-data/pages/state/state-edit-form/state-edit.component';
-import { SettingsListModule } from './pages/SETTINGS/settings-list/settings-list.component';
-import { LedgerSettingsListModule } from './pages/SETTINGS/ledger-settings-list/ledger-settings-list.component';
+import { SettingsListModule } from './features/inventory/pages/prefix-settings/settings-list/settings-list.component';
 import { GstReportModule } from './pages/REPORT/gst-report/gst-report.component';
 import { GstReportB2CLModule } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
 import { GstReportCDNRModule } from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
@@ -320,7 +317,7 @@ import { BoxproductionJvAddModule } from './boxproduction-jv-add/boxproduction-j
 import { ArticleproductionJvListModule } from './articleproduction-jv-list/articleproduction-jv-list.component';
 import { ArticleproductionJvViewModule } from './articleproduction-jv-view/articleproduction-jv-view.component';
 import { BoxproductionJvViewModule } from './boxproduction-jv-view/boxproduction-jv-view.component';
-import { StockViewModule } from './pages/REPORT/stock-view/stock-view.component';
+import { StockViewModule } from './features/inventory/pages/item-stock-view/stock-view/stock-view.component';
 import { SaleReturnFormModule } from './sale-return-form/sale-return-form.component';
 import { CustomDatePopupModule } from './custom-date-popup/custom-date-popup.component';
 import { MiscellaneousInvoiceAddModule } from './pages/miscellaneous-invoice-add/miscellaneous-invoice-add.component';
@@ -329,7 +326,7 @@ import { MiscellaneousPurchaseModule } from './pages/Operations/miscellaneous-pu
 import { MiscellaneousPurchaseAddModule } from './pages/miscellaneous-purchase-add/miscellaneous-purchase-add.component';
 import { MiscellaneousPurchaseEditModule } from './pages/miscellaneous-purchase-edit/miscellaneous-purchase-edit.component';
 import { SalaryHeadListModule } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
-import { TransferOutInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
+import { TransferOutInventoryModule } from './features/inventory/pages/transfer-out/transfer-out-inventory/transfer-out-inventory.component';
 import { ItemStorePricesLogModule } from './pages/item-store-prices-log/item-store-prices-log.component';
 import { PurchaseReturnDebitModule } from './pages/Operations/purchase-return-debit/purchase-return-debit.component';
 import { ProductionJvListModule } from './pages/Operations/production-jv-list/production-jv-list.component';
@@ -352,7 +349,7 @@ import { MiscPurchInvoiceFormModule } from './pages/Operations/misc-purch-invoic
 import { EditPromotionModule } from './pages/edit-promotion/edit-promotion.component';
 import { MiscellaneousSalesInvoiceModule } from './pages/Operations/miscellaneous-sales-invoice/miscellaneous-sales-invoice.component';
 import { MiscellaneousSalesInvoiceFormModule } from './pages/Operations/miscellaneous-sales-invoice-form/miscellaneous-sales-invoice-form.component';
-import { StorewiseStockViewModule } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
+import { StorewiseStockViewModule } from './features/inventory/pages/store-wise-stock/storewise-stock-view/storewise-stock-view.component';
 import { SalesSummaryModule } from './pages/REPORT/sales-summary/sales-summary.component';
 import { SalesDetailModule } from './pages/REPORT/sales-detail/sales-detail.component';
 import { ConsignmentSummaryModule } from './pages/REPORT/consignment-summary/consignment-summary.component';
@@ -407,8 +404,8 @@ import { NewOrderModule } from './pages/DESPATCH/Order/new-order/new-order.compo
 import { SalesReportModule } from './sales-report/sales-report.component';
 import { PurchaseReportMarkModule } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
 import { OrderViewModule } from './pages/DESPATCH/Order/order-view/order-view.component';
-import { TransferOutInventoryMarkModule } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
-import { TransferOutInventoryAddMarkModule } from './pages/transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
+import { TransferOutInventoryMarkModule } from './features/inventory/pages/transfer-out/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
+import { TransferOutInventoryAddMarkModule } from './features/inventory/pages/transfer-out/transfer-out-inventory-add-mark/transfer-out-inventory-add-mark.component';
 import { OrderReportModule } from './pages/DESPATCH/Reports/order-report/order-report.component';
 import { DispatchReportModule } from './pages/DESPATCH/Reports/dispatch-summary-report/dispatch-report.component';
 import { StockReportModule } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
@@ -437,6 +434,9 @@ import { ShiftMasterAddModule } from './pages/REPORT/shift-master-add/shift-mast
 import { ShiftMasterEditModule } from './pages/REPORT/shift-master-edit/shift-master-edit.component';
 import { ExcessBreakDetailsModule } from './pages/REPORT/excess-break-details/excess-break-details.component';
 import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Reports/dealerwise-monthwise-articlewise/dealerwise-monthwise-articlewise.component';
+import { StockMovementReportModule } from './features/inventory/pages/stock-movement-report/stock-movement-report/stock-movement-report.component';
+import { LedgerSettingsListModule } from './features/inventory/pages/ledger-settings/ledger-settings-list/ledger-settings-list.component';
+import { TransferInInventoryFormModule } from './features/inventory/pages/transfer-in/transfer-in-inventory-form/transfer-in-inventory-form.component';
 
 @NgModule({
   declarations: [

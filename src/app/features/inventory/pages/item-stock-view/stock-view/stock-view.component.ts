@@ -1,0 +1,385 @@
+import {
+  ChangeDetectorRef,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  NgModule,
+  NgZone,
+  ViewChild,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import {
+  DxSelectBoxModule,
+  DxTextAreaModule,
+  DxDateBoxModule,
+  DxFormModule,
+  DxTextBoxModule,
+  DxCheckBoxModule,
+  DxRadioGroupModule,
+  DxFileUploaderModule,
+  DxDataGridModule,
+  DxButtonModule,
+  DxValidatorModule,
+  DxProgressBarModule,
+  DxPopupModule,
+  DxDropDownBoxModule,
+  DxToolbarModule,
+  DxTabPanelModule,
+  DxTabsModule,
+  DxNumberBoxModule,
+  DxTagBoxModule,
+  DxDataGridComponent,
+} from 'devextreme-angular';
+import {
+  DxoItemModule,
+  DxoFormItemModule,
+  DxoLookupModule,
+  DxiItemModule,
+  DxiGroupModule,
+  DxoSummaryModule,
+} from 'devextreme-angular/ui/nested';
+import { DataService } from '../../../../../services';
+import { Router } from '@angular/router';
+import notify from 'devextreme/ui/notify';
+import DataSource from 'devextreme/data/data_source';
+
+@Component({
+  selector: 'app-stock-view',
+  templateUrl: './stock-view.component.html',
+  styleUrls: ['./stock-view.component.scss'],
+})
+export class StockViewComponent {
+  @ViewChild(DxDataGridComponent, { static: true })
+  dataGrid: DxDataGridComponent;
+
+  // Custom Column Chooser
+  isColumnChooserVisible = false;
+
+  tempColumns: {
+    dataField: string;
+    caption: string;
+    visible: boolean;
+  }[] = [];
+
+  private readonly chooserColumns = [
+    { dataField: 'ITEM_CODE', caption: 'Item Code' },
+    { dataField: 'ITEM_TYPE', caption: 'Type' },
+    { dataField: 'ITEM_DESCRIPTION', caption: 'Description' },
+    {
+      dataField: 'STORE_NAME',
+      caption: 'Store/Branch',
+    },
+    { dataField: 'DEPARTMENT', caption: 'Department' },
+    { dataField: 'CATEGORY', caption: 'Category' },
+    { dataField: 'SUB_CATEGORY', caption: 'Sub Category' },
+    { dataField: 'BRAND', caption: 'Brand' },
+    { dataField: 'CURRENT_STOCK', caption: 'Stock' },
+  ];
+
+  openColumnChooser(): void {
+    this.tempColumns = this.chooserColumns.map((column) => ({
+      ...column,
+      caption:
+        column.dataField === 'STORE_NAME' && this.appType === 'VEZTA'
+          ? 'Facility'
+          : column.caption,
+      visible:
+        this.dataGrid.instance.columnOption(
+          column.dataField,
+          'visible'
+        ) !== false,
+    }));
+
+    this.isColumnChooserVisible = true;
+  }
+
+  applyColumnChooser(): void {
+    this.tempColumns.forEach((column) => {
+      this.dataGrid.instance.columnOption(
+        column.dataField,
+        'visible',
+        column.visible
+      );
+    });
+
+    this.isColumnChooserVisible = false;
+  }
+
+  cancelColumnChooser(): void {
+    this.tempColumns = [];
+    this.isColumnChooserVisible = false;
+  }
+
+  resetColumnSelection(): void {
+    this.tempColumns = this.tempColumns.map((column) => ({
+      ...column,
+      visible: true,
+    }));
+  }
+
+  readonly allowedPageSizes: any = [5, 10, 'all'];
+  displayMode: any = 'full';
+  showPageSizeSelector = true;
+  showHeaderFilter: true;
+  showFilterRow = true;
+  isFilterOpened = false;
+  filterRowVisible: boolean = false;
+  isFilterRowVisible: boolean = false;
+  auto: string = 'auto';
+  purchaseReturnList: any;
+  canAdd = false;
+  canEdit = false;
+  canView = false;
+  canDelete = false;
+  canApprove = false;
+  canPrint = false;
+  sessionData: any;
+  selected_vat_id: any;
+  companyID: any;
+  fin_id: any;
+  finID: any;
+  storeHint: string = '';
+  isSummaryVisible = false;
+
+  refreshButtonOptions = {
+    icon: 'refresh',
+    hint: 'Refresh',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => {
+      this.ngZone.run(() => this.refreshGrid());
+    },
+    text: '',
+  };
+
+  searchButtonOptions = {
+    icon: 'search',
+    hint: 'Show / Hide Filters',
+    elementAttr: { class: 'toolbar-icon-btn' }, // 🔑 global style
+    onClick: () => this.toggleFilters(),
+  };
+  stockViewList: any;
+  Store: any;
+  selectedStoreid: any;
+  itemtype: any;
+  selectedItemType: any;
+  appType: any;
+  constructor(
+    private dataService: DataService,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private ngZone: NgZone,
+  ) { }
+
+  ngOnInit() {
+    console.log("ITEMSTOCKVIEW")
+    const currentUrl = this.router.url;
+
+    const menuResponse = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
+    this.appType = menuResponse.Configuration?.APP_TYPE || '';
+    this.fin_id = menuResponse.FINANCIAL_YEARS;
+    if (this.fin_id.length) {
+      this.finID = this.fin_id[0].FIN_ID;
+    }
+
+    this.sessionData_tax();
+    const menuGroups = menuResponse.MenuGroups || [];
+
+    const packingRights = menuGroups
+      .flatMap((group) => group.Menus)
+      .find((menu) => menu.Path === '/debit');
+
+    if (packingRights) {
+      this.canAdd = packingRights.CanAdd;
+      this.canEdit = packingRights.CanEdit;
+      this.canDelete = packingRights.CanDelete;
+      this.canPrint = packingRights.CanPrint;
+      this.canView = packingRights.canView;
+      this.canApprove = packingRights.CanApprove;
+    }
+
+    this.getItemTypeDropdown();
+    this.getStockViewList();
+    this.sessionData_tax();
+    this.store_dropdown();
+  }
+
+  sessionData_tax() {
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || " ");
+    this.selected_vat_id = this.sessionData.VAT_ID;
+    this.companyID = this.sessionData.SELECTED_COMPANY.COMPANY_ID;
+    this.appType = this.sessionData.Configuration[0]?.APP_TYPE || '';
+    console.log(this.companyID)
+  }
+  refreshGrid() {
+    // if (this.dataGrid?.instance) {
+    //   this.dataGrid.instance.refresh(); // Or reload data from API if needed
+    this.getStockViewList();
+    // }
+  }
+
+  toggleFilters() {
+    this.isFilterOpened = !this.isFilterOpened;
+    this.isFilterRowVisible = this.isFilterOpened;
+  }
+
+  columnChooserButtonOptions = {
+    icon: 'columnchooser',
+    hint: 'Choose Columns',
+    stylingMode: 'outlined',
+    onClick: () => this.openColumnChooser(),
+  };
+
+  summaryButtonOptions = {
+    icon: 'chevrondown',
+    hint: 'Hide Summary',
+    stylingMode: 'outlined',
+    elementAttr: { class: 'toolbar-icon-btn' },
+    onClick: () => this.toggleSummary(),
+  };
+
+  toggleSummary(): void {
+    this.isSummaryVisible = !this.isSummaryVisible;
+
+    this.summaryButtonOptions = {
+      ...this.summaryButtonOptions,
+      icon: this.isSummaryVisible ? 'chevrondown' : 'chevronup',
+      hint: this.isSummaryVisible ? 'Hide Summary' : 'Show Summary',
+    };
+    this.cdr.detectChanges();
+  }
+
+  updateStoreHint() {
+    if (!this.selectedStoreid || this.selectedStoreid.length === 0) {
+      this.storeHint = 'No store selected';
+      return;
+    }
+
+    const selectedNames = this.Store.filter((x) =>
+      this.selectedStoreid.includes(x.ID),
+    ).map((x) => x.DESCRIPTION);
+
+    this.storeHint = selectedNames.join(', ');
+    this.getStockViewList();
+  }
+
+  getItemTypeDropdown() {
+    const itemTypePayload = {
+      NAME: 'ITEMTYPE',
+    };
+    this.dataService.getDropdownData(itemTypePayload).subscribe((data: any) => {
+      this.itemtype = data;
+    });
+  }
+
+  onItemTypeChange(event: any) {
+    this.selectedItemType = event.value;
+    this.getStockViewList();
+  }
+
+  store_dropdown() {
+    const payload = {
+      NAME: 'STORE',
+      COMPANY_ID: this.companyID
+    };
+    this.dataService.Common_Dropdown(payload).subscribe((res: any) => {
+      this.Store = res;
+    });
+  }
+
+  getStockViewList() {
+    const payload: any = {
+      FIN_ID: this.finID,
+      STORE_ID: this.selectedStoreid?.length
+        ? this.selectedStoreid.join(',') // FINAL FIX
+        : '',
+      COMPANY_ID: this.companyID,
+      ITEM_TYPE: this.selectedItemType || 0,
+      ITEM_TYPE_ID: this.selectedItemType || 0,
+    };
+    this.stockViewList = new DataSource({
+      load: () =>
+        new Promise((resolve) => {
+          this.dataService.getStockViewList(payload).subscribe({
+            next: (response: any) => {
+              let list = response?.Data || [];
+
+              if (this.selectedItemType) {
+                const selectedObj = this.itemtype?.find((x: any) => x.ID === this.selectedItemType);
+                const selectedDesc = selectedObj ? selectedObj.DESCRIPTION : this.selectedItemType;
+
+                list = list.filter((item: any) => {
+                  return (
+                    item.ITEM_TYPE_ID === this.selectedItemType ||
+                    item.ITEM_TYPE === selectedDesc ||
+                    item.ITEM_TYPE === this.selectedItemType ||
+                    item.TYPE_ID === this.selectedItemType ||
+                    item.TYPE === selectedDesc
+                  );
+                });
+              }
+
+              this.stockViewList = list;
+
+              if (list.length === 0) {
+                notify({
+                  message: 'No data available',
+                  type: 'warning',
+                  displayTime: 2000,
+                  position: {
+                    at: 'top center',
+                    my: 'top center',
+                  },
+                });
+              }
+
+              resolve(list);
+            },
+            error: () => {
+              this.stockViewList = [];
+              resolve([]);
+            },
+          });
+        }),
+    });
+  }
+}
+@NgModule({
+  imports: [
+    BrowserModule,
+    DxSelectBoxModule,
+    DxTextAreaModule,
+    DxDateBoxModule,
+    DxFormModule,
+    DxTextBoxModule,
+    DxCheckBoxModule,
+    DxRadioGroupModule,
+    DxFileUploaderModule,
+    DxDataGridModule,
+    DxButtonModule,
+    DxoItemModule,
+    DxoFormItemModule,
+    DxoLookupModule,
+    DxValidatorModule,
+    DxProgressBarModule,
+    DxPopupModule,
+    DxDropDownBoxModule,
+    DxButtonModule,
+    DxToolbarModule,
+    DxiItemModule,
+    DxoItemModule,
+    DxTabPanelModule,
+    DxTabsModule,
+    DxiGroupModule,
+    FormsModule,
+    DxNumberBoxModule,
+    DxoSummaryModule,
+    DxTagBoxModule,
+  ],
+  providers: [],
+  declarations: [StockViewComponent],
+  exports: [StockViewComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class StockViewModule { }

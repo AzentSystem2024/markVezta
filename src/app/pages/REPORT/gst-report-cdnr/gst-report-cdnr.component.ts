@@ -28,10 +28,10 @@ import { PrePaymentEditModule } from '../../PRE_PAYMENT (1)/PRE_PAYMENT/pre-paym
 import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-payment/edit-supplier-payment.component';
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
 import { PrepaymentPostingEditModule } from '../../pre-payment-posting/prepayment-posting-edit/prepayment-posting-edit.component';
-import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
-import { TransferInInventoryModule } from '../../INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
-import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { TransferOutInventoryAddModule } from '../../../features/inventory/pages/transfer-out/transfer-out-inventory-add/transfer-out-inventory-add.component';
+import { TransferInInventoryModule } from '../../../features/inventory/pages/transfer-in/transfer-in-inventory/transfer-in-inventory.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
+import { TransferInInventoryFormModule } from 'src/app/features/inventory/pages/transfer-in/transfer-in-inventory-form/transfer-in-inventory-form.component';
 
 @Component({
   selector: 'app-gst-report-cdnr',
