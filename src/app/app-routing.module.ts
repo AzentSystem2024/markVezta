@@ -55,7 +55,6 @@ import { CategoryComponent } from './pages/ARTICLE/category/category/category.co
 import { PackingComponent } from './pages/MASTER/packing/packing.component';
 import { ArticleProductionViewComponent } from './components/HR/Masters/article-production-view/article-production-view.component';
 import { PackProductionViewComponent } from './pages/ARTICLE/pack-production-view/pack-production-view.component';
-import { StockMovementViewComponent } from './pages/ARTICLE/stock-movement-view/stock-movement-view.component';
 import { TransferOutViewComponent } from './pages/ARTICLE/transfer-out-view/transfer-out-view.component';
 import { ArticleStockViewComponent } from './pages/ARTICLE/article-stock-view/article-stock-view.component';
 import { TransferInViewComponent } from './pages/ARTICLE/transfer-in-view/transfer-in-view.component';
@@ -102,14 +101,13 @@ import { PaySlipComponent } from './pages/REPORT/pay-slip/pay-slip.component';
 import { EPFRegisterReportComponent } from './pages/REPORT/epf-register-report/epf-register-report.component';
 import { WageRegisterComponent } from './pages/REPORT/wage-register/wage-register.component';
 import { ESIComponent } from './pages/REPORT/esi/esi.component';
-import { TransferInInventoryComponent } from './pages/INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
+import { TransferInInventoryComponent } from './features/inventory/pages/transfer-in/transfer-in-inventory/transfer-in-inventory.component';
 import { AttendanceSheetComponent } from './pages/REPORT/attendance-sheet/attendance-sheet.component';
 import { ItemQuantityStockComponent } from './components/HR/Masters/item-quantity-stock/item-quantity-stock.component';
 import { ItemStockValueComponent } from './components/HR/Masters/item-stock-value/item-stock-value.component';
 import { ItemCategoryListComponent } from './pages/MASTER/item-category-list/item-category-list.component';
-import { StockMovementReportComponent } from './pages/REPORT/stock-movement-report/stock-movement-report.component';
 import { InvoiceDeliveryComponent } from './pages/invoice-delivery/invoice-delivery.component';
-import { PhysicalInventoryComponent } from './pages/INVENTORY MANAGEMENT/physical-inventory/physical-inventory.component';
+import { PhysicalInventoryComponent } from './features/inventory/pages/physical-inventory/physical-inventory/physical-inventory.component';
 import { DeliveryReturnComponent } from './pages/delivery-return/delivery-return.component';
 import { DeliveryAddressComponent } from './components/HR/Masters/delivery-address/delivery-address.component';
 import { ChangePasswordComponent } from './components/library/PROFILEPAGE/change-password/change-password.component';
@@ -119,21 +117,19 @@ import { InvoicePdfViewComponent } from './pages/INVOICE/invoice-pdf-view/invoic
 import { MiscPaymentGstListComponent } from './components/HR/Masters/misc-payment-gst-list/misc-payment-gst-list.component';
 import { PrepaymentGstListComponent } from './pages/PRE_PAYMENT (1)/PRE_PAYMENT/prepayment-gst-list/prepayment-gst-list.component';
 
-import { SettingsListComponent } from './pages/SETTINGS/settings-list/settings-list.component';
+import { SettingsListComponent } from './features/inventory/pages/prefix-settings/settings-list/settings-list.component';
 import { GstReportComponent } from './pages/REPORT/gst-report/gst-report.component';
-import { LedgerSettingsListComponent } from './pages/SETTINGS/ledger-settings-list/ledger-settings-list.component';
 import { GstReportB2CLComponent } from './pages/REPORT/gst-report-b2-cl/gst-report-b2-cl.component';
 import { GstReportCDNRComponent } from './pages/REPORT/gst-report-cdnr/gst-report-cdnr.component';
 import { ArticleproductionJvListComponent } from './articleproduction-jv-list/articleproduction-jv-list.component';
-import { StockViewComponent } from './pages/REPORT/stock-view/stock-view.component';
+import { StockViewComponent } from './features/inventory/pages/item-stock-view/stock-view/stock-view.component';
 import { ImportChartOfAccountsComponent } from './pages/ACCOUNTS/import-chart-of-accounts/import-chart-of-accounts.component';
 import { AdvanceComponent } from './pages/HR/Masters/advance/advance.component';
 import { SubDepartmentComponent } from './pages/HR/Masters/sub-department/sub-department.component';
 import { SalaryHeadListComponent } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
-import { TransferOutInventoryComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
+import { TransferOutInventoryComponent } from './features/inventory/pages/transfer-out/transfer-out-inventory/transfer-out-inventory.component';
 
 import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
-import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock-adjustment-list/stock-adjustment-list.component';
 import { DepreciationReportComponent } from './pages/Depreciation/depreciation-report/depreciation-report.component';
 import { FixedAssetRegisterComponent } from './pages/FIXED_ASSETS/fixed-asset-register/fixed-asset-register.component';
 import { ChartOfAccountsFinanceComponent } from './pages/MASTER/Chart Of Accounts/chart-of-accounts-finance-lookup/chart-of-accounts-finance.component';
@@ -175,7 +171,7 @@ import { PromotionViewComponent } from './pages/promotion-view/promotion-view.co
 import { PromotionApproveComponent } from './pages/promotion-approve/promotion-approve.component';
 import { ItemStorePropertiesLogComponent } from './pages/item-store-properties-log/item-store-properties-log.component';
 import { ItemStorePropertiesEditComponent } from './pages/item-store-properties-edit/item-store-properties-edit.component';
-import { StorewiseStockViewComponent } from './pages/REPORT/storewise-stock-view/storewise-stock-view.component';
+import { StorewiseStockViewComponent } from './features/inventory/pages/store-wise-stock/storewise-stock-view/storewise-stock-view.component';
 import { SalesSummaryComponent } from './pages/REPORT/sales-summary/sales-summary.component';
 import { SalesDetailComponent } from './pages/REPORT/sales-detail/sales-detail.component';
 import { ConsignmentSummaryComponent } from './pages/REPORT/consignment-summary/consignment-summary.component';
@@ -234,7 +230,7 @@ import { NewOrderComponent } from './pages/DESPATCH/Order/new-order/new-order.co
 import { OrderViewComponent } from './pages/DESPATCH/Order/order-view/order-view.component';
 import { SalesReportComponent } from './sales-report/sales-report.component';
 import { PurchaseReportMarkComponent } from './pages/REPORT/purchase-report-mark/purchase-report-mark.component';
-import { TransferOutInventoryMarkComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
+import { TransferOutInventoryMarkComponent } from './features/inventory/pages/transfer-out/transfer-out-inventory-mark/transfer-out-inventory-mark.component';
 import { OrderReportComponent } from './pages/DESPATCH/Reports/order-report/order-report.component';
 import { DispatchReportComponent } from './pages/DESPATCH/Reports/dispatch-summary-report/dispatch-report.component';
 import { StockReportComponent } from './pages/DESPATCH/Reports/stock-report/stock-report.component';
@@ -257,6 +253,10 @@ import { ExcessBreaksComponent } from './pages/REPORT/excess-breaks/excess-break
 import { StaffShiftChangeReportComponent } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
 import { ShiftMasterComponent } from './pages/REPORT/shift-master/shift-master.component';
 import { ExcessBreakDetailsComponent } from './pages/REPORT/excess-break-details/excess-break-details.component';
+import { StockMovementReportComponent } from './features/inventory/pages/stock-movement-report/stock-movement-report/stock-movement-report.component';
+import { StockMovementViewComponent } from './features/inventory/pages/stock-movement-report/stock-movement-view/stock-movement-view.component';
+import { StockAdjustmentListComponent } from './features/inventory/pages/stock-adjustment/stock-adjustment-list/stock-adjustment-list.component';
+import { LedgerSettingsListComponent } from './features/inventory/pages/ledger-settings/ledger-settings-list/ledger-settings-list.component';
 
 const routes: Routes = [
   {
@@ -933,7 +933,7 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'physical-inventory',
+        path: 'Physical-Inventory',
         component: PhysicalInventoryComponent,
         canActivate: [AuthGuardService],
       },

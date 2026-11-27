@@ -42,8 +42,7 @@ import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
 import { PrepaymentPostingEditModule } from '../../PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
-import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
-import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { TransferOutInventoryAddModule } from '../../../features/inventory/pages/transfer-out/transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
 import { ProductionJvViewModule } from 'src/app/production-jv-view/production-jv-view.component';
@@ -52,6 +51,7 @@ import { MiscSalesInvoiceFormModule } from '../../Operations/POPUP PAGES/misc-sa
 import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import { AddSalaryPaymentModule } from 'src/app/components/HR/Masters/SALARY-PAYMENT/add-salary-payment/add-salary-payment.component';
+import { TransferInInventoryFormModule } from 'src/app/features/inventory/pages/transfer-in/transfer-in-inventory-form/transfer-in-inventory-form.component';
 
 @Component({
   selector: 'app-journal-book',

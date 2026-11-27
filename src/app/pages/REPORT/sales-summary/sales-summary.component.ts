@@ -40,9 +40,7 @@ import { EditSupplierPaymentModule } from '../../SUPPLIER-PAYMENT/edit-supplier-
 import { PurchaseReturnDebitFormModule } from '../../purchase-return-debit-form/purchase-return-debit-form.component';
 import { AddMiscellaneousPaymentModule } from 'src/app/components/HR/Masters/add-miscellaneous-payment/add-miscellaneous-payment.component';
 import { PrepaymentPostingEditModule } from '../../PrePayment Posting/prepayment-posting-edit/prepayment-posting-edit.component';
-import { TransferOutInventoryAddModule } from '../../transfer-out-inventory-add/transfer-out-inventory-add.component';
-import { TransferInInventoryModule } from '../../INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
-import { TransferInInventoryFormModule } from '../../transfer-in-inventory-form/transfer-in-inventory-form.component';
+import { TransferOutInventoryAddModule } from '../../../features/inventory/pages/transfer-out/transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { EditCustomerReceiptModule } from '../../CUSTOMER-RECEIPTS/edit-customer-receipt/edit-customer-receipt.component';
 import DataSource from 'devextreme/data/data_source';
 import { SaleReturnFormModule } from 'src/app/sale-return-form/sale-return-form.component';
@@ -53,6 +51,7 @@ import { PayrollViewReportModule } from 'src/app/components/HR/Masters/payroll-v
 import { AddInvoiceRetailModule } from '../../INVOICE/add-invoice-retail/add-invoice-retail.component';
 import notify from 'devextreme/ui/notify';
 import { AddSalesInvoiceRetailModule } from '../../Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
+import { TransferInInventoryFormModule } from 'src/app/features/inventory/pages/transfer-in/transfer-in-inventory-form/transfer-in-inventory-form.component';
 
 @Component({
   selector: 'app-sales-summary',

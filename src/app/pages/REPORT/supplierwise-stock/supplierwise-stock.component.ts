@@ -38,7 +38,6 @@ import {
   DxiGroupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
-import { StockMovementReportComponent } from '../stock-movement-report/stock-movement-report.component';
 import { DataService } from '../../../services';
 import { Router } from '@angular/router';
 import DataSource from 'devextreme/data/data_source';
