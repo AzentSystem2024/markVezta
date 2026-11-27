@@ -64,7 +64,7 @@ import { confirm } from 'devextreme/ui/dialog';
   styleUrls: ['./add-credit-note.component.scss'],
 })
 export class AddCreditNoteComponent {
-  @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;
+  @ViewChild('creditNoteGroup') invoiceFormGroup!: DxValidationGroupComponent;
   @ViewChild('invoiceBoxRef', { static: false })
   invoiceBoxRef!: DxTextBoxComponent;
   @ViewChild('customerRef', { static: false })
@@ -81,13 +81,13 @@ export class AddCreditNoteComponent {
   saveButtonRef!: DxButtonComponent;
   @Input() canApprove: boolean = false;
 
-  @ViewChild('itemsGridRef') itemsGridRef: DxDataGridComponent;
+  @ViewChild('itemsGridRef') itemsGridRef!: DxDataGridComponent;
   @Output() popupClosed = new EventEmitter<void>();
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter!: true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -140,7 +140,7 @@ export class AddCreditNoteComponent {
     { text: 'Unit', value: 'Unit' },
     { text: 'Dealer', value: 'Dealer' },
   ];
-  netAmountDisplay: number;
+  netAmountDisplay!: number;
   selectedCustomerId: any;
   sessionData: any;
   selected_vat_id: any;
@@ -158,15 +158,15 @@ export class AddCreditNoteComponent {
   companyStateID: any;
   HSNCODE: any;
   GST: any;
-  netTotal: number;
-  selectedInvoiceGst: number;
+  netTotal!: number;
+  selectedInvoiceGst!: number;
   selectedInvoiceHsn: any;
   subTypeList: any;
   isSaving = false;
   subType: boolean = false;
   selectedSubTypeId: any;
   vatTitle: any;
-  showSubType: boolean;
+  showSubType!: boolean;
   VatClass: any;
   userId: any;
 
@@ -231,7 +231,7 @@ export class AddCreditNoteComponent {
 
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') || '{}');
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -289,7 +289,7 @@ export class AddCreditNoteComponent {
     }
     const nextSlNo =
       this.creditFormData.NOTE_DETAIL.length > 0
-        ? Math.max(...this.creditFormData.NOTE_DETAIL.map((r) => r.SL_NO)) + 1
+        ? Math.max(...this.creditFormData.NOTE_DETAIL.map((r:any) => r.SL_NO)) + 1
         : 1;
 
     const newRow = {

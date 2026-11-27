@@ -71,7 +71,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   @Input() canApprove: boolean = false;
   creditHeader!: any;
   vatTitle: any;
-  showSubType: boolean;
+  showSubType!: boolean;
   VatClass: any;
   @Input() boolean = false;
   @Input() isVerifyCreditNote: boolean = false;
@@ -92,7 +92,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   @ViewChild('itemsGridRef', { static: false })
   itemsGridRef!: DxDataGridComponent;
 
-  @ViewChild('creditNoteGroup') invoiceFormGroup: DxValidationGroupComponent;
+  @ViewChild('creditNoteGroup') invoiceFormGroup!: DxValidationGroupComponent;
   @ViewChild('invoiceBoxRef', { static: false })
   invoiceBoxRef!: DxTextBoxComponent;
   @ViewChild('customerRef', { static: false })
@@ -111,7 +111,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter!: true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -137,12 +137,12 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   userId: any;
   finId: any;
   selectedCustomerId: any;
-  selectedInvoice: string;
+  selectedInvoice!: string;
   sessionData: any;
   selected_vat_id: any;
   selectedstoreId: any;
   HSNCODE: any;
-  hsnLoaded: boolean;
+  hsnLoaded!: boolean;
   GST: any;
   companyState: any;
   isSameState: boolean = false;
@@ -152,7 +152,7 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   showSGST: boolean = false;
   netAmount: any;
   companyStateID: any;
-  netTotal: number;
+  netTotal!: number;
   customerStateID: any;
   selectedCustomer: any;
   roundedNetAmount: number = 0;
@@ -187,26 +187,19 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
       const selectedCompany = userData?.SELECTED_COMPANY;
       this.companyState = selectedCompany.STATE_NAME;
       this.companyStateID = selectedCompany.STATE_ID;
-      // if (selectedCompany?.COMPANY_ID) {
-      //   this.companyList = [selectedCompany]; // Show only selected company
-      //   this.selectedCompanyId = selectedCompany.COMPANY_ID;
-      //   this.selectedCompany = selectedCompany;
-      // }
 
-      // Also store USER_ID / FIN_ID if needed later
       this.userId = userData.USER_ID;
       this.finId = userData.FINANCIAL_YEARS?.[0]?.FIN_ID;
     }
-    // this.getVatPercentListPromise();
-    // this.getCompanyListDropdown();
-    // this.getLedgerCodeDropdown();
-    // this.getPendingInvoices();
+
     this.sessionData_tax();
     this.sessionDetails();
   }
 
   sessionDetails() {
-    const sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    const sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selectedstoreId = sessionData.Configuration[0].STORE_ID;
   }
 
@@ -223,7 +216,6 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
       /* ---------------- Header bindings ---------------- */
       this.invoiceNo = String(data.INVOICE_NO);
       this.transDate = new Date(data.TRANS_DATE);
-      console.log(this.invoiceNo, 'INVOICENO');
       /* ---------------- Customer dropdown ---------------- */
       this.getCompanyListDropdown(data.DISTRIBUTOR_ID);
 
@@ -238,15 +230,11 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
               (l: any) => l.HEAD_ID === item.HEAD_ID,
             );
 
-            console.log(this.VatClass, 'vatclass------------');
-
             const vatId = item.GST_ID ?? item.GST_PERC;
 
             const selectedVat = this.VatClass.find((v: any) => v.ID === vatId);
 
             const percent = Number(selectedVat?.DESCRIPTION) || 0;
-
-            console.log(percent, 'percent--------------------');
 
             return {
               SL_NO: item.SL_NO,
@@ -391,7 +379,9 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
   }
   sessionData_tax() {
     // [caption]="(selected_vat_id == sessionData.VAT_ID && sessionData.VAT_ID == 2) ? ' VAT Amount' : ' GST Amount'"
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(
+      sessionStorage.getItem('savedUserData') || '{}',
+    );
     this.selected_vat_id = this.sessionData.VAT_ID;
   }
 
@@ -1662,7 +1652,9 @@ export class EditCreditNoteComponent implements OnInit, OnChanges {
 
 @NgModule({
   imports: [
-    AddJournalVoucharModule, EditJournalVoucherModule, ViewJournalVoucherModule,
+    AddJournalVoucharModule,
+    EditJournalVoucherModule,
+    ViewJournalVoucherModule,
     CommonModule,
     DxSelectBoxModule,
     DxTextAreaModule,

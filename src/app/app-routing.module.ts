@@ -17,13 +17,13 @@ import { ReportDesignerComponent } from './pages/report-designer/report-designer
 import { AppResetPasswordComponent } from './pages/reset-password-form/reset-password-form.component';
 import { DepartmentListComponent } from './features/master-data/pages/item-department/item-department-list/department-list.component';
 import { CountryListComponent } from './pages/country-list/country-list.component';
-import { VatClassListComponent } from './pages/MASTER/vat-class-list/vat-class-list.component';
+import { GstClassListComponent } from './features/master-data/pages/gst-class/gst-class-list/gst-class-list.component';
 import { StoresListComponent } from './features/master-data/pages/stores/stores-list/stores-list.component';
 import { SupplierListComponent } from './features/master-data/pages/supplier/supplier-list/supplier-list.component';
 import { StateListComponent } from './features/master-data/pages/state/state-list/state-list.component';
 import { ItemProperty1ListComponent } from './features/master-data/pages/item-property1/item-property1-list/item-property1-list.component';
 import { ItemProperty2ListComponent } from './features/master-data/pages/item-property2/item-property2-list/item-property2-list.component';
-import { ReasonsListComponent } from './pages/MASTER/reasons-list/reasons-list.component';
+import { ReasonsListComponent } from './features/master-data/pages/reasons/reasons-list/reasons-list.component';
 import { ItemsListComponent } from './features/master-data/pages/items/items-list/items-list.component';
 import { SubcategoryListComponent } from './features/master-data/pages/item-sub-category/item-sub-category-list/subcategory-list.component';
 import { UomListComponent } from './features/master-data/pages/uom/uom-list/uom-list.component';
@@ -58,7 +58,7 @@ import { TransferOutViewComponent } from './pages/ARTICLE/transfer-out-view/tran
 import { ArticleStockViewComponent } from './pages/ARTICLE/article-stock-view/article-stock-view.component';
 import { TransferInViewComponent } from './pages/ARTICLE/transfer-in-view/transfer-in-view.component';
 import { CartonStockViewComponent } from './pages/ARTICLE/carton-stock-view/carton-stock-view.component';
-import { UserRoleComponent } from './pages/MASTER/user-role/user-role.component';
+import { UserRoleComponent } from './features/master-data/pages/user-role/user-role-list/user-role.component';
 import { UserComponent } from './features/master-data/pages/user/user-list/user.component';
 import { MonthlyPlanComponent } from './pages/ARTICLE/monthly-plan/monthly-plan.component';
 import { LedgerStatementComponent } from './pages/REPORT/ledger-statement/ledger-statement.component';
@@ -121,7 +121,7 @@ import { SubDepartmentComponent } from './features/master-data/pages/sub-departm
 import { SalaryHeadListComponent } from './pages/HR/Masters/salary-head-list/salary-head-list.component';
 import { TransferOutInventoryComponent } from './pages/INVENTORY MANAGEMENT/transfer-out-inventory/transfer-out-inventory.component';
 
-import { VatClassFinanceComponent } from './pages/MASTER/vat-class-finance/vat-class-finance.component';
+import { VatClassFinanceComponent } from './features/master-data/pages/vat-class-finance/vat-class-finance-list/vat-class-finance.component';
 import { StockAdjustmentListComponent } from './pages/INVENTORY MANAGEMENT/stock-adjustment-list/stock-adjustment-list.component';
 import { GrnComponent } from './pages/Operations/grn/grn/grn.component';
 import { PurchaseOrderComponent } from './pages/Operations/purchase-order/purchase-order.component';
@@ -138,13 +138,13 @@ import { MiscellaneousInvoiceComponent } from './pages/Operations/miscellaneous-
 import { MiscellaneousPurchaseComponent } from './pages/Operations/miscellaneous-purchase/miscellaneous-purchase.component';
 import { SalaryWPSComponent } from './pages/salary-wps/salary-wps.component';
 import { PaySettingsComponent } from './pages/HR/Masters/pay-settings/pay-settings.component';
-import { DepartmentMeComponent } from './pages/MASTER/department-me/department-me.component';
+import { DepartmentMeComponent } from './features/master-data/pages/department-me/department-me-list/department-me.component';
 import { ProfitAndLossBranchComponent } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
-import { CustomerFinListComponent } from './pages/MASTER/customer-fin-list/customer-fin-list.component';
+import { CustomerFinListComponent } from './features/master-data/pages/customer-finance/customer-finance-list/customer-fin-list.component';
 import { MiscSalesInvoiceListComponent } from './pages/Operations/misc-sales-invoice-list/misc-sales-invoice-list.component';
 import { PaymentTermsListComponent } from './pages/payment-terms-list/payment-terms-list.component';
 import { DeliveryTermsListComponent } from './pages/delivery-terms-list/delivery-terms-list.component';
-import { SupplierFinListComponent } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
+import { SupplierFinListComponent } from './features/master-data/pages/supplier-finance/supplier-finance-list/supplier-fin-list.component';
 import { ImportItemsTemplateComponent } from './features/master-data/pages/import-items-template/import-items-template-list/import-items-template.component';
 import { PromotionLogComponent } from './pages/promotion-log/promotion-log.component';
 import { PromotionComponent } from './pages/promotion/promotion.component';
@@ -179,12 +179,12 @@ import { SalesInvoiceRetailComponent } from './pages/Operations/sales-invoice-re
 import { ARImportedListComponent } from './pages/ERP-INTEGRATION/ar-imported-list/ar-imported-list.component';
 import { ApListPageComponent } from './pages/ERP-INTEGRATION/ap-list-page/ap-list-page.component';
 import { InventoryListPageComponent } from './pages/ERP-INTEGRATION/inventory-list-page/inventory-list-page.component';
-import { ClinicianMasterComponent } from './pages/MASTER/clinician-master/clinician-master.component';
-import { CPTMasterComponent } from './pages/MASTER/cpt-master/cpt-master.component';
-import { DepartmentGroupComponent } from './pages/MASTER/department-group/department-group.component';
+import { ClinicianMasterComponent } from './features/master-data/pages/clinician-master/clinician-master-list/clinician-master.component';
+import { CPTMasterComponent } from './features/master-data/pages/cpt-master/cpt-master-list/cpt-master.component';
+import { DepartmentGroupComponent } from './features/master-data/pages/department-group/department-group-list/department-group.component';
 import { TrialBalanceFinDimensionComponent } from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 
-import { DenialListComponent } from './pages/MASTER/denial-list/denial-list.component';
+import { DenialListComponent } from './features/master-data/pages/denial/denial-list/denial-list.component';
 import { ProfitAndLossDimensionComponent } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionComponent } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageComponent } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
@@ -677,7 +677,7 @@ const routes: Routes = [
       },
       {
         path: 'vat-class',
-        component: VatClassListComponent,
+        component: GstClassListComponent,
         canActivate: [AuthGuardService],
       },
       {
@@ -738,7 +738,7 @@ const routes: Routes = [
       },
       {
         path: 'vat-class',
-        component: VatClassListComponent,
+        component: GstClassListComponent,
         canActivate: [AuthGuardService],
       },
       {

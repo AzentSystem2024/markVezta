@@ -19,11 +19,11 @@ import { selected } from '@devexpress/analytics-core/queryBuilder-metadata';
 })
 export class CreditNoteListComponent {
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter!: true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;

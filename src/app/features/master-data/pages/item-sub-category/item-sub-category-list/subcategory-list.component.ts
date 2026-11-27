@@ -14,7 +14,7 @@ import { DepartmentListComponent } from '../../item-department/item-department-l
 import { FormPopupModule } from 'src/app/components/index';
 import { CategoryFormModule } from 'src/app/features/master-data/pages/item-category/item-category-add-form/category-form.component';
 import notify from 'devextreme/ui/notify';
-import { CategoryListComponent } from '../../../../../pages/MASTER/category-list/category-list.component';
+import { CategoryListComponent } from '../../category/category-list/category-list.component';
 import { DxSelectBoxModule } from 'devextreme-angular';
 import { SubcategoryEditModule } from '../item-sub-category-edit-form/subcategory-edit.component';
 import { CommonModule } from '@angular/common';

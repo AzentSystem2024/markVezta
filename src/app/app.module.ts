@@ -45,10 +45,10 @@ import { ItemBrandListModule } from './pages/item-brand-list/item-brand-list.com
 import { ItmBrandFormModule } from './components/library/itm-brand-form/itm-brand-form.component';
 import { CurrencyListModule } from './pages/currency-list/currency-list.component';
 import { CurrencyFormModule } from './components/library/currency-form/currency-form.component';
-import { CategoryListModule } from './pages/MASTER/category-list/category-list.component';
+import { CategoryListModule } from './features/master-data/pages/category/category-list/category-list.component';
 import { CategoryFormModule } from './features/master-data/pages/item-category/item-category-add-form/category-form.component';
-import { VatClassListModule } from './pages/MASTER/vat-class-list/vat-class-list.component';
-import { VatClassFormModule } from './components/library/vat-class-form/vat-class-form.component';
+import { GstClassListModule } from './features/master-data/pages/gst-class/gst-class-list/gst-class-list.component';
+import { GstClassFormModule } from './features/master-data/pages/gst-class/gst-class-add-form/gst-class-form.component';
 import { PaymentTermsListModule } from './pages/payment-terms-list/payment-terms-list.component';
 import { PaymentTermsFormModule } from './components/library/payment-terms-form/payment-terms-form.component';
 import { DeliveryTermsListModule } from './pages/delivery-terms-list/delivery-terms-list.component';
@@ -68,8 +68,8 @@ import { LandedCostListModule } from './pages/landed-cost-list/landed-cost-list.
 import { TendersListModule } from './pages/tenders-list/tenders-list.component';
 import { TendersFormModule } from './components/library/tenders-form/tenders-form.component';
 import { LandedCostFormModule } from './components/library/landed-cost-form/landed-cost-form.component';
-import { ReasonsListModule } from './pages/MASTER/reasons-list/reasons-list.component';
-import { ReasonsFormModule } from './components/library/reasons-form/reasons-form.component';
+import { ReasonsListModule } from './features/master-data/pages/reasons/reasons-list/reasons-list.component';
+import { ReasonsFormModule } from './features/master-data/pages/reasons/reasons-add-form/reasons-form.component';
 import { ItemsListModule } from './features/master-data/pages/items/items-list/items-list.component';
 import { ItemsFormModule } from './features/master-data/pages/items/items-add-form/items-form.component';
 import { SubCategoryListModule } from './features/master-data/pages/item-sub-category/item-sub-category-list/subcategory-list.component';
@@ -196,9 +196,9 @@ import { PackingEditModule } from './features/master-data/pages/packing/packing-
 import { ArticleStockViewModule } from './pages/ARTICLE/article-stock-view/article-stock-view.component';
 import { CartonStockViewModule } from './pages/ARTICLE/carton-stock-view/carton-stock-view.component';
 import { TransferInViewModule } from './pages/ARTICLE/transfer-in-view/transfer-in-view.component';
-import { UserRoleModule } from './pages/MASTER/user-role/user-role.component';
-import { UserLevelNewFormModule } from './pages/HR/Masters/user-level-new-form/user-level-new-form.component';
-import { UserLevelEditFormModule } from './pages/HR/Masters/user-level-edit-form/user-level-edit-form.component';
+import { UserRoleModule } from './features/master-data/pages/user-role/user-role-list/user-role.component';
+import { UserLevelNewFormModule } from './features/master-data/pages/user-role/user-role-add-form/user-level-new-form.component';
+import { UserLevelEditFormModule } from './features/master-data/pages/user-role/user-role-edit-form/user-level-edit-form.component';
 import { UserModule } from './features/master-data/pages/user/user-list/user.component';
 import { UserNewFormModule } from './features/master-data/pages/user/user-add-form/user-new-form.component';
 import { UserEditFormModule } from './features/master-data/pages/user/user-edit-form/user-edit-form.component';
@@ -260,7 +260,7 @@ import { PrepaymentPostingListModule } from './pages/ACCOUNTS/prepayment-posting
 import { PrepaymentPostingAddModule } from './pages/pre-payment-posting/prepayment-posting-add/prepayment-posting-add.component';
 import { PrepaymentPostingEditModule } from './pages/pre-payment-posting/prepayment-posting-edit/prepayment-posting-edit.component';
 import { DepartmentEditModule } from './features/master-data/pages/item-department/item-department-edit-form/department-edit.component';
-import { VatClassEditModule } from './pages/vat-class-edit/vat-class-edit.component';
+import { GstClassEditModule } from './features/master-data/pages/gst-class/gst-class-edit-form/gst-class-edit.component';
 import { SubcategoryEditModule } from './features/master-data/pages/item-sub-category/item-sub-category-edit-form/subcategory-edit.component';
 import { ItemcategoryEditModule } from './features/master-data/pages/item-category/item-category-edit-form/itemcategory-edit.component';
 import { ItemProperty1EditModule } from './features/master-data/pages/item-property1/item-property1-edit-form/item-property1-edit.component';
@@ -272,7 +272,7 @@ import { PaySlipModule } from './pages/REPORT/pay-slip/pay-slip.component';
 import { TransferOutInventoryAddModule } from './pages/transfer-out-inventory-add/transfer-out-inventory-add.component';
 import { TransferInInventoryModule } from './pages/INVENTORY MANAGEMENT/transfer-in-inventory/transfer-in-inventory.component';
 import { TransferInInventoryFormModule } from './pages/transfer-in-inventory-form/transfer-in-inventory-form.component';
-import { ReasonEditModule } from './components/library/reason-edit/reason-edit/reason-edit.component';
+import { ReasonEditModule } from './features/master-data/pages/reasons/reasons-edit-form/reason-edit.component';
 import { EPFRegisterReportModule } from './pages/REPORT/epf-register-report/epf-register-report.component';
 import { WageRegisterModule } from './pages/REPORT/wage-register/wage-register.component';
 import { ESIModule } from './pages/REPORT/esi/esi.component';
@@ -340,9 +340,9 @@ import { SalaryWPSModule } from './pages/salary-wps/salary-wps.component';
 import { SalesOrderFinancePopupFormModule } from './pages/Operations/sales-order-finance-popup-form/sales-order-finance-popup-form.component';
 import { ProfitAndLossBranchModule } from './pages/REPORT/profit-and-loss-branch/profit-and-loss-branch.component';
 import { StoresListModule } from './features/master-data/pages/stores/stores-list/stores-list.component';
-import { SupplierFinListModule } from './components/HR/Masters/Supplier/supplier-fin-list/supplier-fin-list.component';
-import { SupplierFinFormModule } from './components/HR/Masters/Supplier/supplier-fin-form/supplier-fin-form.component';
-import { SupplierFinEditModule } from './components/HR/Masters/Supplier/supplier-fin-edit/supplier-fin-edit.component';
+import { SupplierFinListModule } from './features/master-data/pages/supplier-finance/supplier-finance-list/supplier-fin-list.component';
+import { SupplierFinFormModule } from './features/master-data/pages/supplier-finance/supplier-finance-add-form/supplier-fin-form.component';
+import { SupplierFinEditModule } from './features/master-data/pages/supplier-finance/supplier-finance-edit-form/supplier-fin-edit.component';
 import { PayrollViewReportModule } from './components/HR/Masters/payroll-view-report/payroll-view-report.component';
 import { InvoiceRetailModule } from './pages/Operations/invoice-retail/invoice-retail.component';
 import { AddInvoiceRetailModule } from './pages/INVOICE/add-invoice-retail/add-invoice-retail.component';
@@ -366,17 +366,17 @@ import { TenderSummaryModule } from './pages/REPORT/tender-summary/tender-summar
 import { ZReportModule } from './pages/REPORT/zreport/zreport.component';
 import { SalesInvoiceRetailModule } from './pages/Operations/sales-invoice-retail/sales-invoice-retail.component';
 import { AddSalesInvoiceRetailModule } from './pages/Operations/add-sales-invoice-retail/add-sales-invoice-retail.component';
-import { ClinicianMasterModule } from './pages/MASTER/clinician-master/clinician-master.component';
-import { ClinicianEditFormModule } from './pages/MASTER/POPUP PAGES/clinician-edit-form/clinician-edit-form.component';
-import { ClinicianNewFormModule } from './pages/MASTER/POPUP PAGES/clinician-new-form/clinician-new-form.component';
-import { CptMasterNewFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-new-form/cpt-master-new-form.component';
-import { CptMasterEditFormModule } from './pages/MASTER/POPUP PAGES/cpt-master-edit-form/cpt-master-edit-form.component';
-import { CPTMasterModule } from './pages/MASTER/cpt-master/cpt-master.component';
-import { DepartmentGroupModule } from './pages/MASTER/department-group/department-group.component';
+import { ClinicianMasterModule } from './features/master-data/pages/clinician-master/clinician-master-list/clinician-master.component';
+import { ClinicianEditFormModule } from './features/master-data/pages/clinician-master/clinician-master-edit-form/clinician-edit-form.component';
+import { ClinicianNewFormModule } from './features/master-data/pages/clinician-master/clinician-master-add-form/clinician-new-form.component';
+import { CptMasterNewFormModule } from './features/master-data/pages/cpt-master/cpt-master-add-form/cpt-master-new-form.component';
+import { CptMasterEditFormModule } from './features/master-data/pages/cpt-master/cpt-master-edit-form/cpt-master-edit-form.component';
+import { CPTMasterModule } from './features/master-data/pages/cpt-master/cpt-master-list/cpt-master.component';
+import { DepartmentGroupModule } from './features/master-data/pages/department-group/department-group-list/department-group.component';
 import { TrialBalanceFinDimensionModule } from './pages/ERP-INTEGRATION/trial-balance-fin-dimension/trial-balance-fin-dimension.component';
 import { ERPJVModule } from './pages/ERP-INTEGRATION/POPUP-PAGES/erp-jv/erp-jv.component';
-import { DenialListModule } from './pages/MASTER/denial-list/denial-list.component';
-import { DenialNewFormModule } from './pages/MASTER/POPUP PAGES/denial-new-form/denial-new-form.component';
+import { DenialListModule } from './features/master-data/pages/denial/denial-list/denial-list.component';
+import { DenialNewFormModule } from './features/master-data/pages/denial/denial-add-form/denial-new-form.component';
 import { ProfitAndLossDimensionModule } from './pages/ERP-INTEGRATION/profit-and-loss-dimension/profit-and-loss-dimension.component';
 import { BalanceSheetDimensionModule } from './pages/ERP-INTEGRATION/balance-sheet-dimension/balance-sheet-dimension.component';
 import { ARReportPageModule } from './pages/ERP-INTEGRATION/ar-report-page/ar-report-page.component';
@@ -491,8 +491,8 @@ import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Report
     CategoryListModule,
     CategoryFormModule,
     SubCategoryFormModule,
-    VatClassListModule,
-    VatClassFormModule,
+    GstClassListModule,
+    GstClassFormModule,
     PaymentTermsListModule,
     PaymentTermsFormModule,
     DeliveryTermsListModule,
@@ -721,8 +721,8 @@ import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Report
     SubCategoryListModule,
     DepartmentEditModule,
     DepartmentListModule,
-    VatClassListModule,
-    VatClassEditModule,
+    GstClassListModule,
+    GstClassEditModule,
     CategoryListModule,
     SubcategoryEditModule,
     ItemcategoryEditModule,

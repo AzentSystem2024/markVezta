@@ -245,6 +245,7 @@ export class ArticleListComponent {
       this.dataGrid.instance.refresh(); 
     }
   }
+  
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
