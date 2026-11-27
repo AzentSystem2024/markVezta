@@ -6,21 +6,6 @@ import {
 import {
   DxDataGridComponent,
 } from 'devextreme-angular';
-<<<<<<< HEAD:src/app/pages/ACCOUNTS/journal-voucher-list/journal-voucher-list.component.ts
-import {
-  DxoItemModule,
-  DxoFormItemModule,
-  DxoLookupModule,
-  DxiItemModule,
-  DxiGroupModule,
-  DxoSummaryModule,
-} from 'devextreme-angular/ui/nested';
-import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
-import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
-import { ArticleListComponent } from '../../../features/master-data/pages/article/article-list/article-list.component';
-=======
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf:src/app/features/accounts/pages/journal-voucher-list/journal-voucher-list.component.ts
 import { DataService } from 'src/app/services';
 import {
   AddJournalVoucharComponent,

@@ -39,7 +39,6 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from '../components';
-import { AddCreditNoteModule } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
 import { EditCreditNoteModule } from '../features/accounts/pages/credit-note/edit-credit-note/edit-credit-note.component';
 import { ViewCreditNoteModule } from '../features/accounts/pages/credit-note/view-credit-note/view-credit-note.component';
 import { AddDebitModule } from '../features/accounts/pages/debit-note/add-debit/add-debit.component';
@@ -50,6 +49,7 @@ import { EditInvoiceModule } from '../pages/INVOICE/edit-invoice/edit-invoice.co
 import { InvoiceTrOutAddModule } from '../pages/INVOICE/invoice-tr-out-add/invoice-tr-out-add.component';
 import { ViewInvoiceModule } from '../pages/INVOICE/view-invoice/view-invoice.component';
 import { DataService } from '../services';
+import { AddCreditNoteModule } from '../features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
 
 @Component({
   selector: 'app-production-jv-view',
@@ -62,7 +62,7 @@ export class ProductionJvViewComponent {
   @Input() isReadOnlyMode: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
   @ViewChild(DxDataGridComponent, { static: true })
-  dataGrid: DxDataGridComponent;
+  dataGrid!: DxDataGridComponent;
   @ViewChild('popupGridRef', { static: false })
   popupGridRef!: DxDataGridComponent;
   @ViewChild('itemsGridRef', { static: false })
@@ -70,7 +70,7 @@ export class ProductionJvViewComponent {
   readonly allowedPageSizes: any = [5, 10, 'all'];
   displayMode: any = 'full';
   showPageSizeSelector = true;
-  showHeaderFilter: true;
+  showHeaderFilter!: true;
   showFilterRow = true;
   isFilterOpened = false;
   filterRowVisible: boolean = false;
@@ -105,7 +105,7 @@ export class ProductionJvViewComponent {
   }
 
   sessionData_tax() {
-    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData'));
+    this.sessionData = JSON.parse(sessionStorage.getItem('savedUserData') ||'{}');
     this.selected_vat_id = this.sessionData.VAT_ID;
 
     this.selectedCompany = this.sessionData.SELECTED_COMPANY.COMPANY_ID;

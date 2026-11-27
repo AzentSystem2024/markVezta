@@ -40,15 +40,9 @@ import {
   DxoSummaryModule,
   DxoPageSizeModule,
 } from 'devextreme-angular/ui/nested';
-<<<<<<< HEAD:src/app/features/master-data/pages/article/article-add-form/article-add.component.ts
 import { FormTextboxModule } from 'src/app/components/index';
-import { AddAccountComponent } from '../../../../../pages/ACCOUNTS/add-account/add-account.component';
+import { AddAccountComponent } from 'src/app/features/accounts/pages/chart-of-accounts/add-account/add-account.component';
 import { DataService } from 'src/app/services/index';
-=======
-import { FormTextboxModule } from 'src/app/components';
-import { AddAccountComponent } from '../../../features/accounts/pages/chart-of-accounts/add-account/add-account.component';
-import { DataService } from 'src/app/services';
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf:src/app/pages/ARTICLE/article-add/article-add.component.ts
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
 

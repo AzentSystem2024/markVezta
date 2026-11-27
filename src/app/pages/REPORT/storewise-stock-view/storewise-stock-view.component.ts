@@ -466,7 +466,7 @@ export class StorewiseStockViewComponent {
 
           // ✅ STORES SELECTED → SHOW ONLY SELECTED
           this.selectedStoreid.forEach((storeId) => {
-            const storeObj = this.Store.find(s => s.ID === storeId);
+            const storeObj = this.Store.find((s: any) => s.ID === storeId);
 
             if (storeObj) {
               const key = storeObj.DESCRIPTION?.trim();

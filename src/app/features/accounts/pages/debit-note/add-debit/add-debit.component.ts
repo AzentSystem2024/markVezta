@@ -46,18 +46,9 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
-<<<<<<< HEAD:src/app/pages/DEBIT/add-debit/add-debit.component.ts
-import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
-import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
-import { AddCreditNoteComponent } from '../../CREDIT-NOTE/add-credit-note/add-credit-note.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-=======
-import { ArticleAddModule } from 'src/app/pages/ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from 'src/app/pages/ARTICLE/article-edit/article-edit.component';
+import { ArticleAddModule } from 'src/app/features/master-data/pages/article/article-add-form/article-add.component';
+import { ArticleEditModule } from 'src/app/features/master-data/pages/article/article-edit-form/article-edit.component';
 import { AddCreditNoteComponent } from 'src/app/features/accounts/pages/credit-note/add-credit-note/add-credit-note.component';
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf:src/app/features/accounts/pages/debit-note/add-debit/add-debit.component.ts
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
 

@@ -52,18 +52,9 @@ import {
 import notify from 'devextreme/ui/notify';
 import { FormTextboxModule } from 'src/app/components';
 import { DataService } from 'src/app/services';
-<<<<<<< HEAD:src/app/pages/DEBIT/view-debit/view-debit.component.ts
-import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
-import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
+import { ArticleAddModule } from 'src/app/features/master-data/pages/article/article-add-form/article-add.component';
+import { ArticleEditModule } from 'src/app/features/master-data/pages/article/article-edit-form/article-edit.component';
 import { EditDebitComponent } from '../edit-debit/edit-debit.component';
-=======
-import { ArticleAddModule } from '../../../../../pages/ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../../../../../pages/ARTICLE/article-edit/article-edit.component';
-import { EditDebitComponent } from 'src/app/features/accounts/pages/debit-note/edit-debit/edit-debit.component';
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf:src/app/features/accounts/pages/debit-note/view-debit/view-debit.component.ts
 import { confirm } from 'devextreme/ui/dialog';
 import jsPDF from 'jspdf';
 

@@ -43,11 +43,7 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-<<<<<<< HEAD
-import { ArticleAddComponent } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
-=======
-import { ArticleAddComponent } from 'src/app/pages/ARTICLE/article-add/article-add.component';
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf
+import { ArticleAddComponent } from 'src/app/features/master-data/pages/article/article-add-form/article-add.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import dxSelectBox from 'devextreme/ui/select_box';

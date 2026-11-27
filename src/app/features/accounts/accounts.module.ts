@@ -38,8 +38,8 @@ import {
 } from 'devextreme-angular/ui/nested';
 import { FormPopupModule, FormTextboxModule } from 'src/app/components';
 import { TooltipCellModule } from 'src/app/components/utils/tooltip-cell/tooltip-cell.component';
-import { ImportItemsDialogModule } from 'src/app/components/library/import-items-dialog/import-items-dialog.component';
-import { ViewImportedItemsModule } from 'src/app/components/library/view-imported-items/view-imported-items.component';
+import { ImportItemsDialogModule } from 'src/app/features/master-data/pages/import-items/import-items-add-form/import-items-dialog.component';
+import { ViewImportedItemsModule } from 'src/app/features/master-data/pages/import-items/import-items-view-form/view-imported-items.component';
 import { CustomDatePopupModule } from 'src/app/custom-date-popup/custom-date-popup.component';
 
 import { AccountsRoutingModule } from './accounts-routing.module';

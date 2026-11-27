@@ -11,24 +11,6 @@ import {
   DxDataGridComponent,
   DxTextBoxComponent,
 } from 'devextreme-angular';
-<<<<<<< HEAD:src/app/pages/ACCOUNTS/opening-balance/opening-balance.component.ts
-import {
-  DxoItemModule,
-  DxoFormItemModule,
-  DxoLookupModule,
-  DxiItemModule,
-  DxiGroupModule,
-  DxoSummaryModule,
-} from 'devextreme-angular/ui/nested';
-import { FormTextboxModule } from 'src/app/components';
-import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
-import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { JournalVoucherListComponent } from '../journal-voucher-list/journal-voucher-list.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-=======
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf:src/app/features/accounts/pages/opening-balance/opening-balance.component.ts
 import { DataService } from 'src/app/services';
 import { Router } from '@angular/router';
 import notify from 'devextreme/ui/notify';

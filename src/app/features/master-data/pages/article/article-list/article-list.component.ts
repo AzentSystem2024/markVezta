@@ -36,16 +36,8 @@ import {
   DxiGroupModule,
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
-<<<<<<< HEAD:src/app/features/master-data/pages/article/article-list/article-list.component.ts
 import { FormTextboxModule } from 'src/app/components/index';
-import { AccountsListComponent } from '../../../../../pages/ACCOUNTS/Chart of Account/accounts-list.component';
-import { AddAccountModule } from '../../../../../pages/ACCOUNTS/add-account/add-account.component';
-import { EditAccountModule } from '../../../../../pages/ACCOUNTS/edit-account/edit-account.component';
 import { DataService } from 'src/app/services/index';
-=======
-import { FormTextboxModule } from 'src/app/components';
-import { DataService } from 'src/app/services';
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf:src/app/pages/MASTER/article-list/article-list.component.ts
 import {
   ArticleAddComponent,
   ArticleAddModule,
@@ -250,13 +242,13 @@ export class ArticleListComponent {
 
   refreshGrid() {
     if (this.dataGrid?.instance) {
-      this.dataGrid.instance.refresh(); // Or reload data from API if needed
+      this.dataGrid.instance.refresh(); 
     }
   }
   toggleFilters() {
     this.isFilterOpened = !this.isFilterOpened;
 
-    const grid = this.dataGrid?.instance; // Assuming you have @ViewChild('dataGrid') dataGrid: DxDataGridComponent;
+    const grid = this.dataGrid?.instance; 
 
     if (grid) {
       grid.option('filterRow.visible', this.isFilterOpened);

@@ -54,16 +54,8 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-<<<<<<< HEAD:src/app/pages/CREDIT-NOTE/view-credit-note/view-credit-note.component.ts
-import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
-import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-=======
-import { ArticleAddModule } from '../../../../../pages/ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../../../../../pages/ARTICLE/article-edit/article-edit.component';
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf:src/app/features/accounts/pages/credit-note/view-credit-note/view-credit-note.component.ts
+import { ArticleAddModule } from 'src/app/features/master-data/pages/article/article-add-form/article-add.component';
+import { ArticleEditModule } from 'src/app/features/master-data/pages/article/article-edit-form/article-edit.component';
 import { EditCreditNoteComponent } from '../edit-credit-note/edit-credit-note.component';
 import { DataService } from 'src/app/services';
 import jsPDF from 'jspdf';

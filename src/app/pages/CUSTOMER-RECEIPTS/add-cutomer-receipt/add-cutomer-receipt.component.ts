@@ -41,18 +41,9 @@ import {
   DxoSummaryModule,
 } from 'devextreme-angular/ui/nested';
 import { FormTextboxModule } from 'src/app/components';
-<<<<<<< HEAD
-import { ArticleAddModule } from '../../../features/master-data/pages/article/article-add-form/article-add.component';
-import { ArticleEditModule } from '../../../features/master-data/pages/article/article-edit-form/article-edit.component';
-import { AddDebitComponent } from '../../DEBIT/add-debit/add-debit.component';
-import { AddJournalVoucharModule } from '../../JOURNAL-VOUCHER/add-journal-vouchar/add-journal-vouchar.component';
-import { EditJournalVoucherModule } from '../../JOURNAL-VOUCHER/edit-journal-voucher/edit-journal-voucher.component';
-import { ViewJournalVoucherModule } from '../../JOURNAL-VOUCHER/view-journal-voucher/view-journal-voucher.component';
-=======
-import { ArticleAddModule } from '../../ARTICLE/article-add/article-add.component';
-import { ArticleEditModule } from '../../ARTICLE/article-edit/article-edit.component';
-import { AddDebitComponent } from '../../../features/accounts/pages/debit-note/add-debit/add-debit.component';
->>>>>>> a6995a6eb4acaef137acf14d6f302d4e470dfcdf
+import { ArticleAddModule } from 'src/app/features/master-data/pages/article/article-add-form/article-add.component';
+import { ArticleEditModule } from 'src/app/features/master-data/pages/article/article-edit-form/article-edit.component';
+import { AddDebitComponent } from 'src/app/features/accounts/pages/debit-note/add-debit/add-debit.component';
 import { DataService } from 'src/app/services';
 import notify from 'devextreme/ui/notify';
 import { confirm } from 'devextreme/ui/dialog';
