@@ -63,7 +63,6 @@ export class CustomerFormComponent {
   PaymentTermsDropdownData: any;
   PriceLevelDropdownData: any[] = [];
   StateDropdownData: any[] = [];
-  ZoneDropdownData: any[] = [];
 
   isCurrencyAccepted: boolean = true;
   selecte_countyId: any;
@@ -94,7 +93,6 @@ export class CustomerFormComponent {
     STATE_ID: '',
     CITY: '',
     COUNTRY_ID: '',
-    ZONE_ID: '',
     PHONE: '',
     EMAIL: '',
     MOBILE_NO: '',
@@ -187,7 +185,6 @@ export class CustomerFormComponent {
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
     this.sesstion_Details();
-    this.getZoneDropdown();
 
   }
 
@@ -301,21 +298,6 @@ export class CustomerFormComponent {
     this.DEFAULT_COUNTRY_CODE =
       sessionData.GeneralSettings.DEFAULT_COUNTRY_CODE;
 
-  }
-
-  getZoneDropdown() {
-    const payload = {
-      NAME: 'ZONE',
-    }
-    this.service.Common_Dropdown(payload).subscribe({
-      next: (response: any) => {
-        this.ZoneDropdownData = response || [];
-      },
-      error: (err: any) => {
-        console.error('Zone Dropdown Error:', err);
-        this.ZoneDropdownData = [];
-      }
-    });
   }
 
   onDealerTypeChange(e: any) {

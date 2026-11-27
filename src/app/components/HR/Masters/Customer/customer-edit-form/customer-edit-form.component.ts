@@ -115,7 +115,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     DEALER_ID: 0,
     DISTRICT_ID: 0,
     SALESMAN_ID: 0,
-    ZONE_ID: '',
     DeliveryAddresses: [],
   };
 
@@ -158,7 +157,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
   isCountryDropdownOpen = false;
   isPhoneDropdownOpen = false;
   isDeliveryCountryDropdownOpen = false;
-  ZoneDropdownData: any[] = [];
 
   constructor(private service: DataService) {
     this.getStateDropDown();
@@ -270,22 +268,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
 
     return emailRegex.test(value);
   };
-
-  getZoneDropdown() {
-    const payload = {
-      NAME: 'ZONE',
-    }
-    this.service.Common_Dropdown(payload).subscribe({
-      next: (response: any) => {
-        this.ZoneDropdownData = response || [];
-      },
-      error: (err: any) => {
-        console.error('Zone Dropdown Error:', err);
-        this.ZoneDropdownData = [];
-      }
-    });
-  }
-
 
   onCountrycodeChange(e: any) {
     const payload = {
@@ -506,7 +488,6 @@ export class CustomerEditFormComponent implements OnInit, OnChanges {
     this.getPriceLevelDropDown();
     this.get_Warehouse_Dropdown_List();
     this.get_DeliveryAddress_Dropdown_List();
-    this.getZoneDropdown();
 
   }
   keyPressNumbers(event: any) {

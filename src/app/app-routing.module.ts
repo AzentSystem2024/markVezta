@@ -242,7 +242,6 @@ import { DispatchSalesThroughReportComponent } from './pages/DESPATCH/Reports/di
 import { DispatchStateWiseReportComponent } from './pages/DESPATCH/Reports/dispatch-state-wise-report/dispatch-state-wise-report.component';
 import { DispatchTallyFormatComponent } from './pages/DESPATCH/Reports/dispatch-tally-format/dispatch-tally-format.component';
 import { DispatchYearlyReportComponent } from './pages/DESPATCH/Reports/dispatch-yearly-report/dispatch-yearly-report.component';
-import { DealerwiseMonthwiseArticlewiseComponent } from './pages/DESPATCH/Reports/dealerwise-monthwise-articlewise/dealerwise-monthwise-articlewise.component';
 import { AgeWisePendingReportComponent } from './pages/DESPATCH/Reports/age-wise-pending-report/age-wise-pending-report.component';
 import { AgeWiseReportComponent } from './pages/DESPATCH/Reports/age-wise-report/age-wise-report.component';
 import { TopMovingReportComponent } from './pages/DESPATCH/Reports/top-moving-report/top-moving-report.component';
@@ -254,7 +253,10 @@ import { ExcessBreaksComponent } from './pages/REPORT/excess-breaks/excess-break
 import { StaffShiftChangeReportComponent } from './pages/REPORT/staff-shift-change-report/staff-shift-change-report.component';
 import { ShiftMasterComponent } from './pages/REPORT/shift-master/shift-master.component';
 import { ExcessBreakDetailsComponent } from './pages/REPORT/excess-break-details/excess-break-details.component';
-import { ZoneComponent } from './pages/MASTER/zone/zone.component';
+import { StockMovementReportComponent } from './features/inventory/pages/stock-movement-report/stock-movement-report/stock-movement-report.component';
+import { StockMovementViewComponent } from './features/inventory/pages/stock-movement-report/stock-movement-view/stock-movement-view.component';
+import { StockAdjustmentListComponent } from './features/inventory/pages/stock-adjustment/stock-adjustment-list/stock-adjustment-list.component';
+import { LedgerSettingsListComponent } from './features/inventory/pages/ledger-settings/ledger-settings-list/ledger-settings-list.component';
 
 const routes: Routes = [
   {
@@ -1499,11 +1501,6 @@ const routes: Routes = [
         canActivate: [AuthGuardService],
       },
       {
-        path: 'dealerwise-rpt',
-        component: DealerwiseMonthwiseArticlewiseComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
         path: 'dispatch-state-report',
         component: DispatchStateWiseReportComponent,
         canActivate: [AuthGuardService],
@@ -1577,11 +1574,6 @@ const routes: Routes = [
       {
         path: 'excess-break-details',
         component: ExcessBreakDetailsComponent,
-        canActivate: [AuthGuardService],
-      },
-      {
-        path: 'zone',
-        component: ZoneComponent,
         canActivate: [AuthGuardService],
       },
       {
